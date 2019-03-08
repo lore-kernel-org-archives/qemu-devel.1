@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39014)
+Received: from eggs.gnu.org ([209.51.188.92]:40722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h2LVA-0000VH-Rb
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:49:53 -0500
+	(envelope-from <lersek@redhat.com>) id 1h2Lfj-00038Z-S4
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:00:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1h2LV9-0006W0-49
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:49:52 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:37804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1h2LV8-0006VI-Kx
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:49:50 -0500
-Date: Fri, 8 Mar 2019 11:49:42 -0800
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Message-ID: <20190308194941.GC20066@heatpipe>
-References: <20190307072025.8041-1-elena.ufimtseva@oracle.com>
-	<20190307104550.GE2843@stefanha-x1.localdomain>
-	<CAJ+F1CK_Lr+UKkzicLvfwcBRa4kTTrOQTm0wN8cEHek+Tkj=dw@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1h2LfV-0007vY-S8
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 15:00:39 -0500
+References: <20190308013222.12524-1-philmd@redhat.com>
+	<20190308013222.12524-14-philmd@redhat.com>
+	<0e007e09-cf54-312b-9563-59f3994209bf@redhat.com>
+	<40319ac6-4545-4e7b-0339-8229727355e3@redhat.com>
+	<a3c759a5-73df-f481-ba21-48ece92f1185@redhat.com>
+	<9f1cdb48-3262-de5e-a500-1dfb3d6372e5@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f4d5a154-0c9d-0e1c-144c-c6855dadafd6@redhat.com>
+Date: Fri, 8 Mar 2019 21:00:03 +0100
 MIME-Version: 1.0
+In-Reply-To: <9f1cdb48-3262-de5e-a500-1dfb3d6372e5@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CK_Lr+UKkzicLvfwcBRa4kTTrOQTm0wN8cEHek+Tkj=dw@mail.gmail.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 00/37] Initial support of
- multi-process qemu
+Subject: Re: [Qemu-devel] [PATCH v2 13/18] hw/nvram/fw_cfg: Add QMP 'info
+ fw_cfg' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, john.g.johnson@oracle.com, Stefano Stabellini <sstabellini@kernel.org>, jag.raman@oracle.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, QEMU <qemu-devel@nongnu.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, liran.alon@oracle.com, Stefan Hajnoczi <stefanha@redhat.com>, kanth.ghatraju@oracle.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-On Thu, Mar 07, 2019 at 02:27:57PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+On 03/08/19 19:07, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/8/19 6:31 PM, Eric Blake wrote:
+>> On 3/8/19 5:08 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>
+>>>>> {
+>>>>>     "return": [
+>>>>>         {
+>>>>>             "architecture_specific": false,
+>>>>>             "key": 0,
+>>>>>             "writeable": false,
+>>>>>             "size": 4,
+>>>>>             "keyname": "signature"
+>>>>
+>>>> You could return a base64-encoded representation of the field (we do
+>>>> that in other interfaces where raw binary can't be passed reliably o=
+ver
+>>>> JSON).  For 4 bytes, that makes sense,
+>>>>
+>>>>
+>>>>>         {
+>>>>>             "architecture_specific": true,
+>>>>>             "key": 3,
+>>>>>             "writeable": false,
+>>>>>             "size": 324,
+>>>>>             "keyname": "e820_tables"
+>>>>
+>>>> for 324 bytes, it gets a bit long. Still, may be worth it for the ad=
+ded
+>>>> debug visibility.
+>>>
+>>> Until you see values in the next patch...:
+>>>
+>>> $ (echo info fw_cfg; echo q) | qemu-system-x86_64 -S -monitor stdio
+>>> Selector  Well-Known Key  Pathname ArchSpec Perm   Size Order Hex Dat=
+a
+>>> [...]
+>>>  0x0019   file_dir                           RO    2052       0000000=
+b..
+>>>  0x0022   file: etc/acpi/tables              RO  131072  130  4641435=
+3..
+>>
+>> Yeah, that's a no-go.
+>>>
+>>> What about using a 512B limit on this QMP answer?
+>>
+>> Seems reasonable. Either omit the field when its size exceeds the limi=
+t,
+>> or use the field to give a truncated version (where the size field sti=
+ll
+>> shows the full length, either way).
 >=20
-> On Thu, Mar 7, 2019 at 11:46 AM Stefan Hajnoczi <stefanha@gmail.com> wr=
-ote:
-> >
-> > On Wed, Mar 06, 2019 at 11:20:25PM -0800, elena.ufimtseva@oracle.com =
-wrote:
-> > > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > >
-> > > Initial support of multi-process qemu
-> >
-> > Hi Elena,
-> > Please use the following setting when sending future patch series:
-> >
-> >   $ git config sendemail.thread shallow
-> >
-> > This way all patches are part of a single email thread (starting with
-> > your PATCH 00 cover letter).  Reviewers find this more convenient so
-> > that individual emails don't get separated and lost.
-
-Thanks Stefan, will do.
-> >
+> OK.
 >=20
-> Please also check that there is no regression after each commit. In
-> particular, the build shouldn't fail, so we can easily study, apply
-> and bisect patches one by one.
+>>>>> +# @path: If the key is a 'file', the named file path.
+>>>>> +# @order: If the key is a 'file', the named file order.
+>>>>> +#
+>>>>> +# Since 4.0
+>>>>> +##
+>>>>> +{ 'struct': 'FirmwareConfigurationItem',
+>>>>> +  'data': { 'key': 'uint16',
+>>>>> +            '*keyname': 'str',
+>>>>> +            'architecture_specific': 'bool',
+>>>>> +            'writeable': 'bool',
+>>>>> +            '*data': 'str',
+>>>>> +            'size': 'int',
+>>>>> +            '*path': 'str',
+>>>>> +            '*order': 'int' } }
+>>>>
+>>>> Is it worth making 'keyname' an enum type, and turning this into a f=
+lat
+>>>> union where 'path' and 'order' appear on the branch associated with
+>>>> 'file', and where all other well-known keynames have smaller branche=
+s?
+>>>
+>>> I have no idea about that, I will have a look at QMP flat unions.
+>>
+>> Markus can help if you get stuck on what it might look like. But by no=
+w,
+>> there are several examples in .qapi files to copy from (look for
+>> 'discriminator').
 >=20
-
-
-Yep, we try to make sure each commit builds and will automate for future
-series as well, maybe with some simple tests.
-
-Elena
-
-> thanks
+> OK.
 >=20
+>>>
+>>>>> +
+>>>>> +
+>>>>> +##
+>>>>> +# @query-fw_cfg-items:
+>>>>
+>>>> That looks weird to mix - and _. Any reason we can't just go with
+>>>> query-firmware-config?
+>>>
+>>> Way better! I'll use query-firmware-config-items.
+>>
+>> Do we need the -items suffix? Also, is there a chance that we might ev=
+er
+>> want to extend the command to return more information that is global t=
+o
+>> firmware-config rather than per-item?
 >=20
-> --=20
-> Marc-Andr=C3=A9 Lureau
+> Laszlo suggested it could be useful to ask for a specific item (with th=
+e
+> full data encoded?).
+
+It's possible I referred to that a long time ago, but most recently, I
+think it has been raised by Dave.
+
+Thanks
+Laszlo
+
+>=20
+>>>>> +{ 'command': 'query-fw_cfg-items', 'returns': ['FirmwareConfigurat=
+ionItem']}
+>>
+>> As written, this results in:
+>>
+>> { "return": [ { ... }, { ... } ] }
+>>
+>> but if you add a layer of nesting, you could have easier extensions:
+>>
+>> { "return": { "global": {}, "items": [ { ... }, { ... } ] } }
+>>
+>=20
+> Oh I guess I got it, I'll try it.
+>=20
+> Thanks!
+>=20
+> Phil.
+>=20
