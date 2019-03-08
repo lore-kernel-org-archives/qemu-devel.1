@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49718)
+Received: from eggs.gnu.org ([209.51.188.92]:53783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h23PH-00073E-MY
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:30:36 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1h23VQ-0008So-AG
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:36:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h23PG-0006pO-EO
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:30:35 -0500
-Resent-Message-Id: <E1h23PG-0006pO-EO@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h23PD-0006a5-S6
-	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:30:32 -0500
-Message-ID: <155200499889.8146.11158165149957912559@6acff2cf482b>
-In-Reply-To: <20190221150353.93DE87465DE@zero.eik.bme.hu>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1h23VN-0007Vq-8h
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:36:56 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:57307)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h23VM-0007S1-8i
+	for qemu-devel@nongnu.org; Thu, 07 Mar 2019 19:36:52 -0500
+Date: Fri, 8 Mar 2019 01:36:49 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1903071507470.53555@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1903080125270.3082@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.9999.1903041535050.72040@zero.eik.bme.hu>
+	<20190305053842.m2u5ahgztybbzpaj@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1903052357200.40521@zero.eik.bme.hu>
+	<20190306060744.dxq75ak2knmzv4kv@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1903061440270.30260@zero.eik.bme.hu>
+	<20190307064332.mvxhuaopgpdtp3za@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1903071507470.53555@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Mar 2019 16:30:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3] hw/display: Add basic ATI VGA emulation
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] Question about hardware cursor in VGA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: balaton@eik.bme.hu
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, kraxel@redhat.com, philmd@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIyMTE1MDM1My45M0RF
-ODc0NjVERUB6ZXJvLmVpay5ibWUuaHUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
-cmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9pbnRjL2FzcGVlZF92aWMubwogIENDICAgICAgeDg2
-XzY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1pbnB1dC1wY2kubwpJbiBmaWxlIGluY2x1ZGVk
-IGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Rpc3BsYXkvYXRpLmM6MTk6Ci90bXAvcWVtdS10
-ZXN0L3NyYy9ody9kaXNwbGF5L2F0aV9yZWdzLmg6MjE1OiBlcnJvcjogIkRFRkFVTFRfUElUQ0gi
-IHJlZGVmaW5lZCBbLVdlcnJvcl0KICNkZWZpbmUgREVGQVVMVF9QSVRDSCAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIDB4MTZlNAogCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdXNyL3g4Nl82NC13
-NjQtbWluZ3czMi9zeXMtcm9vdC9taW5ndy9pbmNsdWRlL3dpbmRvd3MuaDo3MSwKLS0tCiAjZGVm
-aW5lIERFRkFVTFRfUElUQ0ggMAogCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVz
-dC9zcmMvaHcvZGlzcGxheS9hdGlfMmQuYzoxMToKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Rpc3Bs
-YXkvYXRpX3JlZ3MuaDoyMTU6IGVycm9yOiAiREVGQVVMVF9QSVRDSCIgcmVkZWZpbmVkIFstV2Vy
-cm9yXQogI2RlZmluZSBERUZBVUxUX1BJVENIICAgICAgICAgICAgICAgICAgICAgICAgICAgMHgx
-NmU0CiAKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3IveDg2XzY0LXc2NC1taW5ndzMyL3N5cy1y
-b290L21pbmd3L2luY2x1ZGUvd2luZG93cy5oOjcxLAotLS0KIAogIENDICAgICAgYWFyY2g2NC1z
-b2Z0bW11L2h3L2ludGMvYXJtX2dpY3YzX2NwdWlmLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90
-bXAvcWVtdS10ZXN0L3NyYy9ody9kaXNwbGF5L2F0aV8yZC5jOjExOgovdG1wL3FlbXUtdGVzdC9z
-cmMvaHcvZGlzcGxheS9hdGlfcmVncy5oOjIxNTogZXJyb3I6ICJERUZBVUxUX1BJVENIIiByZWRl
-ZmluZWQgWy1XZXJyb3JdCiAjZGVmaW5lIERFRkFVTFRfUElUQ0ggICAgICAgICAgICAgICAgICAg
-ICAgICAgICAweDE2ZTQKIApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci94ODZfNjQtdzY0LW1p
-bmd3MzIvc3lzLXJvb3QvbWluZ3cvaW5jbHVkZS93aW5kb3dzLmg6NzEsCi0tLQpjYzE6IGFsbCB3
-YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10
-ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L2Rpc3BsYXkvYXRpLm9dIEVycm9yIDEKSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9ody9kaXNwbGF5L2F0aS5jOjE5OgovdG1w
-L3FlbXUtdGVzdC9zcmMvaHcvZGlzcGxheS9hdGlfcmVncy5oOjIxNTogZXJyb3I6ICJERUZBVUxU
-X1BJVENIIiByZWRlZmluZWQgWy1XZXJyb3JdCiAjZGVmaW5lIERFRkFVTFRfUElUQ0ggICAgICAg
-ICAgICAgICAgICAgICAgICAgICAweDE2ZTQKIApJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci94
-ODZfNjQtdzY0LW1pbmd3MzIvc3lzLXJvb3QvbWluZ3cvaW5jbHVkZS93aW5kb3dzLmg6NzEsCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
-MDIyMTE1MDM1My45M0RFODc0NjVERUB6ZXJvLmVpay5ibWUuaHUvdGVzdGluZy5kb2NrZXItbWlu
-Z3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, 7 Mar 2019, BALATON Zoltan wrote:
+> I still have the unfinished version using the callbacks which might work with 
+> force_shadow like for cirrus but I'd need to finish and clean that up. Now 
+> that we have both implemented probably will allow switching between them but 
+> may not be able to do it before the freeze so don't wait for that. (The 
+> define_cursor way is enough for testing at the moment and rewriting it to use 
+> different callback could be considered bugfix or added in next devel cycle as 
+> well.)
+
+I've sent a v6 now (of just the ati-vga patch, the other patch in the 
+series is unchanged) with this. Defaults to define_cursor but cursor 
+rendering via callbacks can be enabled with guest_hwcursor=true property. 
+The cursor seems to be less jumpy with it but probably slower. I'm still 
+not sure why it jumps with define_cursor but I think that may be a problem 
+outside of this device.
+
+I've also attempted to implement DDC for EDID but that's not ready yet and 
+it will be a separate series because I'll likely need some changes to i2c 
+as well to be able to use bitbang_i2c in this device model. (Probably we 
+should merge contents of hw/bitbang_i2c.h in include/hw/i2c.h where the 
+structure definition had to be moved already or move this header to 
+include to be able to use it outside of hw/i2c. Currently I just #include 
+"../i2c/bitbang_i2c.h" from hw/display/ati.c but I think that's not 
+acceptable.)
+
+Regards,
+BALATON Zoltan
