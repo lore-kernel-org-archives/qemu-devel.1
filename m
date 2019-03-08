@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60225)
+Received: from eggs.gnu.org ([209.51.188.92]:34722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h2KxV-0007mX-Qr
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:15:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1h2LAa-0001dS-8t
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:28:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h2KxV-0003x2-0j
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:15:05 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h2KxU-0003wT-Na
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:15:04 -0500
-Received: by mail-pf1-x444.google.com with SMTP id h1so14822009pfo.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 11:15:04 -0800 (PST)
-References: <20190308185932.4954-1-richard.henderson@linaro.org>
-	<CAFEAcA_ri8+bspkOhfmWu2fyPxomECZ2WPButBG6qOscBOWLZA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fa71b1a6-9211-7e6b-be0b-8f8d69872214@linaro.org>
-Date: Fri, 8 Mar 2019 11:15:00 -0800
+	(envelope-from <dgilbert@redhat.com>) id 1h2LAZ-0000U1-HT
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:28:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h2LAZ-0000TK-Ay
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 14:28:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7B8DA2D7F5
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 19:28:34 +0000 (UTC)
+Date: Fri, 8 Mar 2019 19:28:30 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190308192829.GL2834@work-vm>
+References: <20190227110812.2185-1-quintela@redhat.com>
+	<20190227110812.2185-4-quintela@redhat.com>
+	<20190306152812.GF2727@work-vm> <87o96m3m2o.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_ri8+bspkOhfmWu2fyPxomECZ2WPButBG6qOscBOWLZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/hppa: Check for page crossings in
- use_goto_tb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o96m3m2o.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] multifd: Create new
+ next_packet_size field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Sven Schnelle <svens@stackframe.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 3/8/19 11:04 AM, Peter Maydell wrote:
-> On Fri, 8 Mar 2019 at 19:00, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> We got away with eliding this check when target/hppa was user-only,
->> but missed adding this check when adding system support.
->>
->> Fixes an early crash in the HP-UX 11 installer.
->>
->> Reported-by: Sven Schnelle <svens@stackframe.org>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/hppa/translate.c | 10 ++++------
->>  1 file changed, 4 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/hppa/translate.c b/target/hppa/translate.c
->> index dc5636fe94..6c815e05c2 100644
->> --- a/target/hppa/translate.c
->> +++ b/target/hppa/translate.c
->> @@ -816,12 +816,10 @@ static bool gen_illegal(DisasContext *ctx)
->>
->>  static bool use_goto_tb(DisasContext *ctx, target_ureg dest)
->>  {
->> -    /* Suppress goto_tb in the case of single-steping and IO.  */
->> -    if ((tb_cflags(ctx->base.tb) & CF_LAST_IO)
->> -        || ctx->base.singlestep_enabled) {
->> -        return false;
->> -    }
->> -    return true;
->> +    /* Suppress goto_tb for page crossing, IO, or single-steping.  */
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> We need to send this field when we add compression support.  As we are
+> >> still on x- stage, we can do this kind of changes.
+> >> 
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >
+> > OK, so that kind of makes sense - in that what you want to do is read
+> > the whole compressed chunk in one go.
+> >
+> > Consider it might be a good idea to add some spare entries here;
+> > say a uint64_t dummy[4] so that if you need any more fields in the
+> > future it'll be easy to add them without breaking compatibility.
 > 
-> "stepping"
-
-Oops.
-
->> +    return !(((ctx->base.pc_first ^ dest) & TARGET_PAGE_MASK)
->> +             || (tb_cflags(ctx->base.tb) & CF_LAST_IO)
->> +             || ctx->base.singlestep_enabled);
->>  }
+> We have a version field, so ... we can handle it relatively gratiously,
+> but I see your point.
 > 
-> I note that (a) this isn't the way every other port phrases
-> the "same page" check -- they generally use something like
->  (ctx->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK)
+> How many?
 
-This should be the same result.
+<rolls dice>
 
-ctx->base.pc_first was initialized from tb->pc.  I find the xor expression more
-compact and usually fits on a line, where repeating TARGET_PAGE_MASK doesn't.
+4
 
-> and (b) the other ports generally keep that check inside an
-> ifndef CONFIG_USER_ONLY.
+Now don't use them all at once!
 
-I've wondered about that.  It certainly works for normal executables, but I
-wonder if there are jit-like cases that fail when eliding that check.
-
-Here, I think I was just a bit lazy.
-
-Thoughts?
-
-
-r~
+Dave
+ 
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
