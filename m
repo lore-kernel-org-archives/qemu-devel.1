@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45996)
+Received: from eggs.gnu.org ([209.51.188.92]:46574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2Olf-0006W5-LX
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:19:08 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2Oq4-0007gA-42
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2Ole-0007wf-Li
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:19:07 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:43900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2Ole-0007uA-ET
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:19:06 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id d17so23031261wre.10
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 15:19:06 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20190307144126.31847-1-richard.henderson@linaro.org>
-	<20190307144126.31847-2-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3f26ba53-d1a7-cbf2-e490-3118d63d9dc8@amsat.org>
-Date: Sat, 9 Mar 2019 00:19:01 +0100
+	(envelope-from <no-reply@patchew.org>) id 1h2Oq3-00050A-8I
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:23:40 -0500
+Resent-Message-Id: <E1h2Oq3-00050A-8I@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h2Oq3-0004zG-1i
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:23:39 -0500
+Message-ID: <155208739302.8146.10563426498181468432@6acff2cf482b>
+In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307144126.31847-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/9] tcg: Implement tcg_gen_extract2_{i32,
- i64}
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Mar 2019 15:23:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,125 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: david@redhat.com
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, david@redhat.com
 
-On 3/7/19 3:41 PM, Richard Henderson wrote:
-> From: David Hildenbrand <david@redhat.com>
-> 
-> Will be helpful for s390x. Input 128 bit and output 64 bit only,
-> which is sufficient for now.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Message-Id: <20190225154204.26751-1-david@redhat.com>
-> [rth: Add matching tcg_gen_extract2_i32.]
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg-op.h |  6 ++++++
->  tcg/tcg-op.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
-> 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index d3e51b15af..1f1824c30a 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -308,6 +308,8 @@ void tcg_gen_extract_i32(TCGv_i32 ret, TCGv_i32 arg,
->                           unsigned int ofs, unsigned int len);
->  void tcg_gen_sextract_i32(TCGv_i32 ret, TCGv_i32 arg,
->                            unsigned int ofs, unsigned int len);
-> +void tcg_gen_extract2_i32(TCGv_i32 ret, TCGv_i32 al, TCGv_i32 ah,
-> +                          unsigned int ofs);
->  void tcg_gen_brcond_i32(TCGCond cond, TCGv_i32 arg1, TCGv_i32 arg2, TCGLabel *);
->  void tcg_gen_brcondi_i32(TCGCond cond, TCGv_i32 arg1, int32_t arg2, TCGLabel *);
->  void tcg_gen_setcond_i32(TCGCond cond, TCGv_i32 ret,
-> @@ -501,6 +503,8 @@ void tcg_gen_extract_i64(TCGv_i64 ret, TCGv_i64 arg,
->                           unsigned int ofs, unsigned int len);
->  void tcg_gen_sextract_i64(TCGv_i64 ret, TCGv_i64 arg,
->                            unsigned int ofs, unsigned int len);
-> +void tcg_gen_extract2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah,
-> +                          unsigned int ofs);
->  void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 arg1, TCGv_i64 arg2, TCGLabel *);
->  void tcg_gen_brcondi_i64(TCGCond cond, TCGv_i64 arg1, int64_t arg2, TCGLabel *);
->  void tcg_gen_setcond_i64(TCGCond cond, TCGv_i64 ret,
-> @@ -1068,6 +1072,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_deposit_z_tl tcg_gen_deposit_z_i64
->  #define tcg_gen_extract_tl tcg_gen_extract_i64
->  #define tcg_gen_sextract_tl tcg_gen_sextract_i64
-> +#define tcg_gen_extract2_tl tcg_gen_extract2_i64
->  #define tcg_const_tl tcg_const_i64
->  #define tcg_const_local_tl tcg_const_local_i64
->  #define tcg_gen_movcond_tl tcg_gen_movcond_i64
-> @@ -1178,6 +1183,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_deposit_z_tl tcg_gen_deposit_z_i32
->  #define tcg_gen_extract_tl tcg_gen_extract_i32
->  #define tcg_gen_sextract_tl tcg_gen_sextract_i32
-> +#define tcg_gen_extract2_tl tcg_gen_extract2_i32
->  #define tcg_const_tl tcg_const_i32
->  #define tcg_const_local_tl tcg_const_local_i32
->  #define tcg_gen_movcond_tl tcg_gen_movcond_i32
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index 1bd7ef24af..7c56c92c8e 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -809,6 +809,28 @@ void tcg_gen_sextract_i32(TCGv_i32 ret, TCGv_i32 arg,
->      tcg_gen_sari_i32(ret, ret, 32 - len);
->  }
->  
-> +/*
-> + * Extract 32-bits from a 64-bit input, ah:al, starting from ofs.
-> + * Unlike tcg_gen_extract_i32 above, len is fixed at 32.
-> + */
-> +void tcg_gen_extract2_i32(TCGv_i32 ret, TCGv_i32 al, TCGv_i32 ah,
-> +                          unsigned int ofs)
-> +{
-> +    tcg_debug_assert(ofs <= 32);
-> +    if (ofs == 0) {
-> +        tcg_gen_mov_i32(ret, al);
-> +    } else if (ofs == 32) {
-> +        tcg_gen_mov_i32(ret, ah);
-> +    } else if (al == ah) {
-> +        tcg_gen_rotri_i32(ret, al, ofs);
-> +    } else {
-> +        TCGv_i32 t0 = tcg_temp_new_i32();
-> +        tcg_gen_shri_i32(t0, al, ofs);
-> +        tcg_gen_deposit_i32(ret, t0, ah, 32 - ofs, ofs);
-> +        tcg_temp_free_i32(t0);
-> +    }
-> +}
-> +
->  void tcg_gen_movcond_i32(TCGCond cond, TCGv_i32 ret, TCGv_i32 c1,
->                           TCGv_i32 c2, TCGv_i32 v1, TCGv_i32 v2)
->  {
-> @@ -2297,6 +2319,28 @@ void tcg_gen_sextract_i64(TCGv_i64 ret, TCGv_i64 arg,
->      tcg_gen_sari_i64(ret, ret, 64 - len);
->  }
->  
-> +/*
-> + * Extract 64 bits from a 128-bit input, ah:al, starting from ofs.
-> + * Unlike tcg_gen_extract_i64 above, len is fixed at 64.
-> + */
-> +void tcg_gen_extract2_i64(TCGv_i64 ret, TCGv_i64 al, TCGv_i64 ah,
-> +                          unsigned int ofs)
-> +{
-> +    tcg_debug_assert(ofs <= 64);
-> +    if (ofs == 0) {
-> +        tcg_gen_mov_i64(ret, al);
-> +    } else if (ofs == 64) {
-> +        tcg_gen_mov_i64(ret, ah);
-> +    } else if (al == ah) {
-> +        tcg_gen_rotri_i64(ret, al, ofs);
-> +    } else {
-> +        TCGv_i64 t0 = tcg_temp_new_i64();
-> +        tcg_gen_shri_i64(t0, al, ofs);
-> +        tcg_gen_deposit_i64(ret, t0, ah, 64 - ofs, ofs);
-> +        tcg_temp_free_i64(t0);
-> +    }
-> +}
-> +
->  void tcg_gen_movcond_i64(TCGCond cond, TCGv_i64 ret, TCGv_i64 c1,
->                           TCGv_i64 c2, TCGv_i64 v1, TCGv_i64 v2)
->  {
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE0NDEyNi4zMTg0
+Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMwNzE0
+NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzldIHRjZzogQWRkIHRjZ19nZW5fZXh0cmFjdDJfe2kzMixpNjR9Cgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkw
+MzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3
+LzIwMTkwMzA3MTQ0MTI2LjMxODQ3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjMyOTJkN2I0M2MgdGFyZ2V0L2FybTogU2ltcGxp
+ZnkgQkZYSUwgZXhwYW5zaW9uCmZmNmFjMmU1NmYgdGFyZ2V0L2FybTogVXNlIGV4dHJhY3QyIGZv
+ciBFWFRSCmNmMzI0MDQ3MTIgdGNnL2FhcmNoNjQ6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
+e2kzMiwgaTY0fQo3YmIyYmY1YjJmIHRjZy9hcm06IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJf
+aTMyCjc3Y2Q4OWM1NjUgdGNnL2kzODY6IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwg
+aTY0fQpjNzQ1MzVmNjAxIHRjZzogVXNlIGV4dHJhY3QyIGluIHRjZ19nZW5fZGVwb3NpdF97aTMy
+LCBpNjR9CmJmM2U0ZWIxYjUgdGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9zaGlmdGlfaTY0
+Cjc4ODBhNWJlNjUgdGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9CjZmNDI4NzQy
+ZmUgdGNnOiBJbXBsZW1lbnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9Cgo9PT0gT1VUUFVU
+IEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IDZmNDI4NzQyZmU0MSAodGNnOiBJbXBsZW1l
+bnQgdGNnX2dlbl9leHRyYWN0Ml97aTMyLCBpNjR9KQoyLzkgQ2hlY2tpbmcgY29tbWl0IDc4ODBh
+NWJlNjUyMCAodGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9KQpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzEwOTogRklMRTogdGNnL29w
+dGltaXplLmM6MTIwNToKKyAgICAgICAgQ0FTRV9PUF8zMl82NChleHRyYWN0Mik6CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+OTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoz
+LzkgQ2hlY2tpbmcgY29tbWl0IGJmM2U0ZWIxYjViMCAodGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNn
+X2dlbl9zaGlmdGlfaTY0KQo0LzkgQ2hlY2tpbmcgY29tbWl0IGM3NDUzNWY2MDFkYyAodGNnOiBV
+c2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9kZXBvc2l0X3tpMzIsIGk2NH0pCjUvOSBDaGVja2luZyBj
+b21taXQgNzdjZDg5YzU2NWI1ICh0Y2cvaTM4NjogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97
+aTMyLCBpNjR9KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
+RSkKIzQ4OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI1OTE6CisgICAgT1BfMzJf
+NjQoZXh0cmFjdDIpOgogICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgNTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS85IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo2LzkgQ2hlY2tpbmcgY29tbWl0IDdiYjJiZjViMmZhNCAodGNnL2FybTogU3Vw
+cG9ydCBJTkRFWF9vcF9leHRyYWN0Ml9pMzIpCjcvOSBDaGVja2luZyBjb21taXQgY2YzMjQwNDcx
+MjhkICh0Y2cvYWFyY2g2NDogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml97aTMyLCBpNjR9KQo4
+LzkgQ2hlY2tpbmcgY29tbWl0IGZmNmFjMmU1NmYyMyAodGFyZ2V0L2FybTogVXNlIGV4dHJhY3Qy
+IGZvciBFWFRSKQo5LzkgQ2hlY2tpbmcgY29tbWl0IDMyOTJkN2I0M2M4YiAodGFyZ2V0L2FybTog
+U2ltcGxpZnkgQkZYSUwgZXhwYW5zaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMwNzE0NDEyNi4zMTg0Ny0xLXJpY2hhcmQuaGVuZGVy
+c29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
