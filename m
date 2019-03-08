@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47142)
+Received: from eggs.gnu.org ([209.51.188.92]:47765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2EM1-00008S-0L
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:11:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2EPF-00020u-Kk
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2ELy-0000Yh-NI
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:11:55 -0500
-Date: Fri, 8 Mar 2019 22:09:51 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190308110951.GB15851@umbus.fritz.box>
-References: <20190307130323.9353-1-armbru@redhat.com>
-	<20190307130323.9353-8-armbru@redhat.com>
-	<20190308001032.GF7722@umbus.fritz.box>
-	<874l8dj0bv.fsf@dusky.pond.sub.org>
+	(envelope-from <armbru@redhat.com>) id 1h2EPA-0001SD-Rp
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:15:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h2EPA-0001F5-JI
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 07:15:12 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AA8081E18
+	for <qemu-devel@nongnu.org>; Fri,  8 Mar 2019 12:15:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190222153254.22739-1-stefanha@redhat.com>
+	<20190308103532.GF12318@stefanha-x1.localdomain>
+Date: Fri, 08 Mar 2019 13:15:01 +0100
+In-Reply-To: <20190308103532.GF12318@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Fri, 8 Mar 2019 10:35:32 +0000")
+Message-ID: <87imwtef5m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
-Content-Disposition: inline
-In-Reply-To: <874l8dj0bv.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 07/14] ppc405_boards: Don't size flash
- memory to match backing image
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qmp: add query-qemu-capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Krempa <pkrempa@redhat.com>
 
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
---kXdP64Ggrk/fb43R
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Fri, Feb 22, 2019 at 03:32:54PM +0000, Stefan Hajnoczi wrote:
+>> QMP clients can usually detect the presence of features via schema
+>> introspection.  There are rare features that do not involve schema
+>> changes and are therefore impossible to detect with schema
+>> introspection.
+>> 
+>> This patch adds the query-qemu-capabilities command.  It returns a list
+>> of capabilities that this QEMU supports.
+>> 
+>> The decision to make this a command rather than something statically
+>> defined in the schema is intentional.  It allows QEMU to decide which
+>> capabilities are available at runtime, if necessary.
+>> 
+>> This new interface is necessary so that QMP clients can discover that
+>> migrating disk image files is safe with cache.direct=off on Linux.
+>> There is no other way to detect whether or not QEMU supports this.
+>> 
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Peter Krempa <pkrempa@redhat.com>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  qapi/misc.json | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>  qmp.c          | 18 ++++++++++++++++++
+>>  2 files changed, 60 insertions(+)
+>
+> Markus: query-qemu-features is no longer needed by the page cache
+> invalidation feature since a related QMP schema change is being made now
+> and clients can detect the feature via that change.
+>
+> I'm inclined to leave this patch series for now.  Later someone can pick
+> it up again if there is a feature that cannot be detected via a schema
+> change.
 
-On Fri, Mar 08, 2019 at 08:24:04AM +0100, Markus Armbruster wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
->=20
-> > On Thu, Mar 07, 2019 at 02:03:16PM +0100, Markus Armbruster wrote:
-> >> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
-> >> Image size is rounded up to the next multiple of 64KiB.  Useless,
-> >> because pflash_cfi02_realize() fails with "failed to read the initial
-> >> flash content" unless the rounding is a no-op.
-> >>=20
-> >> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
-> >> other stuff.  No idea how that would play out, but useful outcomes
-> >> seem unlikely.
-> >>=20
-> >> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
-> >> regardless of image size, to match the physical hardware.
-> >>=20
-> >> Machine "taihu" maps its boot flash memory similarly.  The code even
-> >> has a comment /* XXX: should check that size is 2MB */, followed by
-> >> disabled code to adjust the size to 2MiB regardless of image size.
-> >>=20
-> >> Its code to map its application flash memory looks the same, except
-> >> there the XXX comment asks for 32MiB, and the code to adjust the size
-> >> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
-> >> to read the initial flash content" for images smaller than 32MiB.
-> >>=20
-> >> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
-> >> to match the physical hardware.  Delete dead code from application
-> >> flash mapping, and simplify some.
-> >>=20
-> >> Cc: David Gibson <david@gibson.dropbear.id.au>
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> >> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >
-> > I'm assuming because this is in a series I'm not otherwise CCed on
-> > that this is going in through someone else's tree.  Let me know if you
-> > want me take it through mine.
->=20
-> I intend to take the complete series through my tree unless a maintainer
-> objects.
-
-No objection here.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---kXdP64Ggrk/fb43R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyCTX8ACgkQbDjKyiDZ
-s5JuXw//c0xDtWRxWDrkEY9xUatFB05fZvP5UzT5BpNEHOTPdcdeENL/AaXmD5Re
-s5fhJM+iGR5aEKPB6lI9Vbyzqb05UpkYGN8umpgt1H/CuD3vp6bENeOsUnjZJOBR
-B2FbqLpMBBqU1bJniaq0rxNuFwa9vlrJPsxJvwY3XJNbPBV0fLRu5hvsB7P08KHA
-aCO+3aTou7nWb+ZYzd/MT1tujuWoOcE4auSw5M1yWmuYCUz1oFg5+tcPFqumwS3A
-4FWqw1NhZ/J8dJ7c080saVPfZqcQZ8JVZylrKD08is1IzJCJGPoFM/HNHzjmlr/y
-7efeFIfaKy5bZhJGeKKwJT3lQ2Nw8CmJiWX9v9VbozYcALmKkjN/QI7dYBjmeHMh
-zWeulxgDYb/0eG1ryB/xbOKM3XYfdfXehiC6s+7YR8T9tli5l0EG3jC6KenKIPA5
-T2i6j6eFE7K7KK2SXnickC7ksrAS7Wp056mI8JVR+0C5DwQ6UAO+CR0oxCICX+9Z
-OUeewWY4O23oXh6EgdS1yzkRTLWJTDhvE6c+Zhir5mGFfQAmFbob2ZZ7XtU68mHH
-f1Wy22Nyb2kvt5DMtoNAOY6tCRKvy4n8LhtpjhBlLblnXaWBqCPuzLLtVCwRTv/m
-4ZSOD9XxP82g0gKkoE7gQP1mIHqdJSECS4vpwxC5V8tGWa3MxOo=
-=O1Yf
------END PGP SIGNATURE-----
-
---kXdP64Ggrk/fb43R--
+Mekse sense.  I figure we'll likely want the command at some point.  And
+that's when we should add it.  Hold on to your git branch until then.
