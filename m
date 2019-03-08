@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41544)
+Received: from eggs.gnu.org ([209.51.188.92]:42219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2JUh-0002dt-5O
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:41:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1h2JVw-0003gX-Q7
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:42:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1h2JUg-000378-GM
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:41:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1h2JUg-00036V-7v
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:41:14 -0500
-Date: Fri, 8 Mar 2019 17:41:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190308174108.GG2834@work-vm>
-References: <20190303145021.2962-1-chen.zhang@intel.com>
-	<20190303145021.2962-7-chen.zhang@intel.com>
+	(envelope-from <ehabkost@redhat.com>) id 1h2JVw-0004Co-2Y
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 12:42:32 -0500
+Date: Fri, 8 Mar 2019 14:42:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190308174214.GD8899@habkost.net>
+References: <20190308152511.10882-1-eric.auger@redhat.com>
+	<20190308152511.10882-3-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190303145021.2962-7-chen.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH V3 6/7] Migration/colo.c: Add the necessary
- checks for colo_do_failover
+In-Reply-To: <20190308152511.10882-3-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] machine: Move nvdimms state into
+ struct MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <chen.zhang@intel.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com, philmd@redhat.com
 
-* Zhang Chen (chen.zhang@intel.com) wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
-> 
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-
-OK, we should make that properly return an error.
-(Actually we should make the failover command be one of the new OOB
-commands; so that it can work even if the main loop is blocked- that
-would make COLO robust properly against network failures)
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/colo.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/colo.c b/migration/colo.c
-> index dbe2b88807..d1ae2e6d11 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -197,10 +197,16 @@ void colo_do_failover(MigrationState *s)
->          vm_stop_force_state(RUN_STATE_COLO);
->      }
+On Fri, Mar 08, 2019 at 04:25:11PM +0100, Eric Auger wrote:
+[...]
+> @@ -791,6 +833,28 @@ static void machine_initfn(Object *obj)
+>      ms->mem_merge = true;
+>      ms->enable_graphics = true;
 >  
-> -    if (get_colo_mode() == COLO_MODE_PRIMARY) {
-> +    switch (get_colo_mode()) {
-> +    case COLO_MODE_PRIMARY:
->          primary_vm_do_failover();
-> -    } else {
-> +        break;
-> +    case COLO_MODE_SECONDARY:
->          secondary_vm_do_failover();
-> +        break;
-> +    default:
-> +        error_report("colo_do_failover failed because the colo mode"
-> +                     " could not be obtained");
->      }
->  }
->  
-> -- 
-> 2.17.GIT
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +    if (mc->nvdimm_supported) {
+> +        ObjectClass *oc = OBJECT_CLASS(mc);
+> +
+> +        ms->nvdimms_state = g_new0(NVDIMMState, 1);
+
+Initializing ms->nvdimms_state inside machine_initfn()
+only if mc->nvdimm_support makes sense.
+
+But:
+
+> +        object_class_property_add_bool(oc, "nvdimm",
+> +                                       machine_get_nvdimm, machine_set_nvdimm,
+> +                                       &error_abort);
+> +        object_class_property_set_description(oc, "nvdimm",
+> +                                             "Set on/off to enable/disable "
+> +                                             "NVDIMM instantiation", NULL);
+> +
+> +        object_class_property_add_str(oc, "nvdimm-persistence",
+> +                                      machine_get_nvdimm_persistence,
+> +                                      machine_set_nvdimm_persistence,
+> +                                      &error_abort);
+> +        object_class_property_set_description(oc, "nvdimm-persistence",
+> +                                             "Set NVDIMM persistence"
+> +                                             "Valid values are cpu, mem-ctrl",
+> +                                              NULL);
+
+Calling object_class_property_add_*() inside instance_init
+defeats the purpose of class properties.  I suggest either using
+object_property_add_*(), or registering these class properties in
+machine_class_base_init().
+
+
+> [...]
+
+-- 
+Eduardo
