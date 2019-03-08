@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36500)
+Received: from eggs.gnu.org ([209.51.188.92]:36352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FLG-0004zx-8y
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FL5-0004nX-BC
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2FLE-0007Pk-EN
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2FL3-0006R4-Fu
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 08:15:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  8 Mar 2019 14:14:40 +0100
-Message-Id: <20190308131445.17502-8-armbru@redhat.com>
+Date: Fri,  8 Mar 2019 14:14:37 +0100
+Message-Id: <20190308131445.17502-5-armbru@redhat.com>
 In-Reply-To: <20190308131445.17502-1-armbru@redhat.com>
 References: <20190308131445.17502-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/12] vl: Create block backends before
- setting machine properties
+Subject: [Qemu-devel] [PATCH v3 04/12] sysbus: Fix latent bug with onboard
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +26,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
 
-qemu-system-FOO's main() acts on command line arguments in its own
-idiosyncratic order.  There's not much method to its madness.
-Whenever we find a case where one kind of command line argument needs
-to refer to something created for another kind later, we rejigger the
-order.
+The first call of sysbus_get_default() creates the main system bus and
+stores it in QOM as "/machine/unattached/sysbus".  This must not
+happen before main() creates "/machine", or else container_get() would
+"helpfully" create it as "container" object, and the real creation of
+"/machine" would later abort with "attempt to add duplicate property
+'machine' to object (type 'container')".  Has been that way ever since
+we wired up busses in QOM (commit f968fc6892d, v1.2.0).
 
-Block devices get created long after machine properties get processed.
-Therefore, block device machine properties can be created, but not
-set.  No such properties exist.  But the next commit will create some.
-Time to rejigger again: create block devices earlier.
+I believe the bug is latent.  I got it to bite by trying to
+qdev_create() a sysbus device from a machine's .instance_init()
+method.
+
+The fix is obvious: store the main system bus in QOM right after
+creating "/machine".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- vl.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/core/sysbus.c | 3 ---
+ vl.c             | 4 ++++
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 9f9edbcab9..307cf90a51 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -357,9 +357,6 @@ static void main_system_bus_create(void)
+     qbus_create_inplace(main_system_bus, system_bus_info.instance_size,
+                         TYPE_SYSTEM_BUS, NULL, "main-system-bus");
+     OBJECT(main_system_bus)->free =3D g_free;
+-    object_property_add_child(container_get(qdev_get_machine(),
+-                                            "/unattached"),
+-                              "sysbus", OBJECT(main_system_bus), NULL);
+ }
+=20
+ BusState *sysbus_get_default(void)
 diff --git a/vl.c b/vl.c
-index 573de5ec4a..58e05b296f 100644
+index b6368662e0..c38739e34c 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -4276,6 +4276,13 @@ int main(int argc, char **argv, char **envp)
-         exit(0);
+@@ -3991,6 +3991,10 @@ int main(int argc, char **argv, char **envp)
      }
+     object_property_add_child(object_get_root(), "machine",
+                               OBJECT(current_machine), &error_abort);
++    object_property_add_child(container_get(OBJECT(current_machine),
++                                            "/unattached"),
++                              "sysbus", OBJECT(sysbus_get_default()),
++                              NULL);
 =20
-+    /*
-+     * Note: we need to create block backends before
-+     * machine_set_property(), so machine properties can refer to
-+     * them.
-+     */
-+    configure_blockdev(&bdo_queue, machine_class, snapshot);
-+
-     machine_opts =3D qemu_get_machine_opts();
-     qemu_opt_foreach(machine_opts, machine_set_property, current_machine=
-,
-                      &error_fatal);
-@@ -4402,8 +4409,6 @@ int main(int argc, char **argv, char **envp)
-     ram_mig_init();
-     dirty_bitmap_mig_init();
-=20
--    configure_blockdev(&bdo_queue, machine_class, snapshot);
--
-     qemu_opts_foreach(qemu_find_opts("mon"),
-                       mon_init_func, NULL, &error_fatal);
-=20
+     if (machine_class->minimum_page_bits) {
+         if (!set_preferred_target_page_bits(machine_class->minimum_page_=
+bits)) {
 --=20
 2.17.2
