@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43215)
+Received: from eggs.gnu.org ([209.51.188.92]:43039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2C5B-0002KP-U0
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2C58-0002Et-93
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2C5A-0006Hy-Bq
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1h2C56-00069w-9r
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 04:46:22 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  8 Mar 2019 10:46:03 +0100
-Message-Id: <20190308094610.21210-9-armbru@redhat.com>
+Date: Fri,  8 Mar 2019 10:46:00 +0100
+Message-Id: <20190308094610.21210-6-armbru@redhat.com>
 In-Reply-To: <20190308094610.21210-1-armbru@redhat.com>
 References: <20190308094610.21210-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 08/15] ppc405_boards: Don't size flash
- memory to match backing image
+Subject: [Qemu-devel] [PATCH v4 05/15] hw: Use PFLASH_CFI0{1,
+ 2} and TYPE_PFLASH_CFI0{1, 2}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +24,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu, David Gibson <david@gibson.dropbear.id.au>
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, philmd@redhat.com, balaton@eik.bme.hu
 
-Machine "ref405ep" maps its flash memory at address 2^32 - image size.
-Image size is rounded up to the next multiple of 64KiB.  Useless,
-because pflash_cfi02_realize() fails with "failed to read the initial
-flash content" unless the rounding is a no-op.
+We have two open-coded copies of macro PFLASH_CFI01().  Move the macro
+to the header, so we can ditch the copies.  Move PFLASH_CFI02() to the
+header for symmetry.
 
-If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
-other stuff.  No idea how that would play out, but useful outcomes
-seem unlikely.
+We define macros TYPE_PFLASH_CFI01 and TYPE_PFLASH_CFI02 for type name
+strings, then mostly use the strings.  If the macros are worth
+defining, they are worth using.  Replace the strings by the macros.
 
-Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
-regardless of image size, to match the physical hardware.
-
-Machine "taihu" maps its boot flash memory similarly.  The code even
-has a comment /* XXX: should check that size is 2MB */, followed by
-disabled code to adjust the size to 2MiB regardless of image size.
-
-Its code to map its application flash memory looks the same, except
-there the XXX comment asks for 32MiB, and the code to adjust the size
-isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
-to read the initial flash content" for images smaller than 32MiB.
-
-Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
-to match the physical hardware.  Delete dead code from application
-flash mapping, and simplify some.
-
-Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- hw/ppc/ppc405_boards.c | 36 ++++++++++++------------------------
- 1 file changed, 12 insertions(+), 24 deletions(-)
+ hw/arm/vexpress.c        | 4 ++--
+ hw/arm/virt.c            | 3 ++-
+ hw/block/pflash_cfi01.c  | 3 ---
+ hw/block/pflash_cfi02.c  | 3 ---
+ hw/xtensa/xtfpga.c       | 4 ++--
+ include/hw/block/flash.h | 4 ++++
+ 6 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index bb73d6d848..fe8e3cad12 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -156,7 +156,7 @@ static void ref405ep_init(MachineState *machine)
-     target_ulong kernel_base, initrd_base;
-     long kernel_size, initrd_size;
-     int linux_boot;
--    int fl_idx, fl_sectors, len;
-+    int len;
-     DriveInfo *dinfo;
-     MemoryRegion *sysmem =3D get_system_memory();
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index ed46d2e730..f07134c424 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot=
+_info *info, void *fdt)
+ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
+me,
+                                              DriveInfo *di)
+ {
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
 =20
-@@ -177,20 +177,16 @@ static void ref405ep_init(MachineState *machine)
-                            &error_fatal);
-     memory_region_add_subregion(sysmem, 0xFFF00000, sram);
-     /* allocate and load BIOS */
--    fl_idx =3D 0;
- #ifdef USE_FLASH_BIOS
--    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-+    dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
--
--        bios_size =3D blk_getlength(blk);
--        fl_sectors =3D (bios_size + 65535) >> 16;
-+        bios_size =3D 8 * MiB;
-         pflash_cfi02_register((uint32_t)(-bios_size),
-                               NULL, "ef405ep.bios", bios_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
--        fl_idx++;
-     } else
+     if (di) {
+         qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
+@@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr b=
+ase, const char *name,
+     qdev_init_nofail(dev);
+=20
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
++    return PFLASH_CFI01(dev);
+ }
+=20
+ static void vexpress_common_init(MachineState *machine)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index c7fb5348ae..773637876f 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -35,6 +35,7 @@
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+ #include "hw/arm/virt.h"
++#include "hw/block/flash.h"
+ #include "hw/vfio/vfio-calxeda-xgmac.h"
+ #include "hw/vfio/vfio-amd-xgbe.h"
+ #include "hw/display/ramfb.h"
+@@ -879,7 +880,7 @@ static void create_one_flash(const char *name, hwaddr=
+ flashbase,
+      * parameters as the flash devices on the Versatile Express board.
+      */
+     DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     const uint64_t sectorlength =3D 256 * 1024;
+=20
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index f75f0a6998..1c99aa6e4a 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -59,9 +59,6 @@ do {                                                   =
+     \
+ #define DPRINTF(fmt, ...) do { } while (0)
  #endif
-     {
-@@ -425,7 +421,7 @@ static void taihu_405ep_init(MachineState *machine)
-     target_ulong kernel_base, initrd_base;
-     long kernel_size, initrd_size;
-     int linux_boot;
--    int fl_idx, fl_sectors;
-+    int fl_idx;
-     DriveInfo *dinfo;
 =20
-     /* RAM is soldered to the board so the size cannot be changed */
-@@ -450,15 +446,11 @@ static void taihu_405ep_init(MachineState *machine)
- #if defined(USE_FLASH_BIOS)
-     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+-#define PFLASH_CFI01(obj) \
+-    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
 -
--        bios_size =3D blk_getlength(blk);
--        /* XXX: should check that size is 2MB */
--        //        bios_size =3D 2 * 1024 * 1024;
--        fl_sectors =3D (bios_size + 65535) >> 16;
--        pflash_cfi02_register((uint32_t)(-bios_size),
-+        bios_size =3D 2 * MiB;
-+        pflash_cfi02_register(0xFFE00000,
-                               NULL, "taihu_405ep.bios", bios_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
-         fl_idx++;
-@@ -491,14 +483,10 @@ static void taihu_405ep_init(MachineState *machine)
-     /* Register Linux flash */
-     dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
-     if (dinfo) {
--        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+ #define PFLASH_BE          0
+ #define PFLASH_SECURE      1
+=20
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 933de99d6a..915c6171a0 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -57,9 +57,6 @@ do {                                                   =
+    \
+=20
+ #define PFLASH_LAZY_ROMD_THRESHOLD 42
+=20
+-#define PFLASH_CFI02(obj) \
+-    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
 -
--        bios_size =3D blk_getlength(blk);
--        /* XXX: should check that size is 32MB */
-         bios_size =3D 32 * MiB;
--        fl_sectors =3D (bios_size + 65535) >> 16;
-         pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
-s_size,
--                              blk, 65536, fl_sectors, 1,
-+                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-+                              64 * KiB, bios_size / (64 * KiB), 1,
-                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
-0x2AA,
-                               1);
-         fl_idx++;
+ struct PFlashCFI02 {
+     /*< private >*/
+     SysBusDevice parent_obj;
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 3d59a7a356..e05ef75a75 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
+ddress_space,
+                                       DriveInfo *dinfo, int be)
+ {
+     SysBusDevice *s;
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+=20
+     qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+                         &error_abort);
+@@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
+ddress_space,
+     s =3D SYS_BUS_DEVICE(dev);
+     memory_region_add_subregion(address_space, board->flash->base,
+                                 sysbus_mmio_get_region(s, 0));
+-    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
++    return PFLASH_CFI01(dev);
+ }
+=20
+ static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
+diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+index 333005d9ff..aeea3ca99d 100644
+--- a/include/hw/block/flash.h
++++ b/include/hw/block/flash.h
+@@ -8,6 +8,8 @@
+ /* pflash_cfi01.c */
+=20
+ #define TYPE_PFLASH_CFI01 "cfi.pflash01"
++#define PFLASH_CFI01(obj) \
++    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
+=20
+ typedef struct PFlashCFI01 PFlashCFI01;
+=20
+@@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+ /* pflash_cfi02.c */
+=20
+ #define TYPE_PFLASH_CFI02 "cfi.pflash02"
++#define PFLASH_CFI02(obj) \
++    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
+=20
+ typedef struct PFlashCFI02 PFlashCFI02;
+=20
 --=20
 2.17.2
