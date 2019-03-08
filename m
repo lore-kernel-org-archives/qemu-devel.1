@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54293)
+Received: from eggs.gnu.org ([209.51.188.92]:54628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2IMD-00010i-Tg
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:28:26 -0500
+	(envelope-from <philmd@redhat.com>) id 1h2IN0-0001ku-Qi
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:29:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2IMB-0007E3-Uj
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:28:25 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:35984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2IM9-0007BH-Tx
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:28:22 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id v62so17859828otb.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 08:28:21 -0800 (PST)
+	(envelope-from <philmd@redhat.com>) id 1h2IMz-0008BV-W8
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:29:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2IMz-0008A4-PI
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 11:29:13 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri,  8 Mar 2019 17:29:03 +0100
+Message-Id: <20190308162906.10491-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20190308015830.10980-1-richard.henderson@linaro.org>
-In-Reply-To: <20190308015830.10980-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Mar 2019 16:28:09 +0000
-Message-ID: <CAFEAcA8Dx2M95Q94E3fY0PdF=-=wJEQOPDbzxXHJdW-+30D=sg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] target/hppa updates
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] travis-ci: Test installing Sphinx
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Fam Zheng <fam@euphon.net>
 
-On Fri, 8 Mar 2019 at 01:58, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2a6:
->
->   Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-03-07 16:16:02 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-hppa-20190307
->
-> for you to fetch changes up to b35aec8597e86911d5553c94769f914a52a8b389:
->
->   target/hppa: Optimize blr r0,rn (2019-03-07 17:43:12 -0800)
->
-> ----------------------------------------------------------------
-> Fix use after free on temporary.
-> Optmize branch to next insn via br r0.
->
+Hi,
 
-Applied, thanks.
+This series improve the Travis CI to test installing the Sphinx
+generated documentation in in-tree and out-of-tree builds.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+It is based on Peter's "Fix various issues with Sphinx build
+machinery" series:
+https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02625.html
 
--- PMM
+Regards,
+
+Phil.
+
+Based-on: <20190308135744.6480-1-peter.maydell@linaro.org>
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  .travis.yml: Reduce the out-of-tree target list
+  .travis.yml: Test the documentation installation process
+  .travis.yml: Test installing Sphinx documentation in out-of-tree build
+
+ .travis.yml | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
+
+--=20
+2.20.1
