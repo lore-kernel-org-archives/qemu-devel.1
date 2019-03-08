@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38904)
+Received: from eggs.gnu.org ([209.51.188.92]:40383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h2DoD-0006Kv-0V
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:37:01 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1h2DvV-00084q-0E
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h2Do7-0004H4-Rk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:36:58 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:45382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h2Do7-0003O1-Ge
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:36:55 -0500
-Date: Fri, 8 Mar 2019 12:36:44 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Message-ID: <alpine.BSF.2.21.9999.1903081225050.71488@zero.eik.bme.hu>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1h2DvT-0005Ba-2S
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 06:44:31 -0500
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 8 Mar 2019 11:42:07 +0000
+Message-ID: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Qemu-devel] [RFC PATCH] ati-vga: Implement DDC and EDID info from
- monitor
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 00/11] ARM virt: ACPI memory hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +21,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
+Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
 
-I was thinking about something like this for adding DDC/EDID support that 
-several clients seem to expect to get modes other than default 640x480 but 
-it's not working yet correctly. Problems:
+This series is an attempt to provide device memory hotplug support 
+on ARM virt platform. This is based on Eric's recent works here[1]
+and carries some of the pc-dimm related patches dropped from his
+series.
 
-1. Compilation fails during linking if I don't have CONFIG_BITBANG_I2C and 
-CONFIG_DDC in top level default-configs/*.mak even if I add these to 
-pci.mak that's included by these and is where CONFIG_ATI_VGA is defined. 
-So probably only compiles for ppc-softmmu at the moment.
+The kernel support for arm64 memory hot add was added recently by
+Robin and hence the guest kernel should be => 5.0-rc1.
 
-2. Something is read from EDID but probably not correct as guests don't 
-like it. Need to debug and check if bits are wired up correctly
+NVDIM support is not included currently as we still have an unresolved
+issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
+can be included, but not done for now, for keeping it simple.
 
-3. Want to use bitbang_i2c from outside hw/i2c but that's currently 
-private to that dir. We had to move the struct definition to the public 
-header before to avoid a warning (in commit 2b4c1125ac), maybe we need to 
-move all of bitbanh_i2c.h to include/hw/i2c.h now or make this header 
-public reverting the previous patch. Which one you prefer?
+This makes use of GED device to sent hotplug ACPI events to the
+Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
+Sebastien to add the hardware-reduced support to Nemu using GED
+device[3]. (Please shout if I got the author/signed-off wrong for
+those patches or missed any names).
 
-I may not have time to finish this before the freeze so if anyone can fix 
-it feel free to take it and continue (drop me a note if you're taking it 
-so we avoid duplicate work).
+This series can be applied on top of Eric's branch here[4].
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/ati.c     | 24 ++++++++++++++++++++++--
- hw/display/ati_int.h |  4 ++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+This is sanity tested on a HiSilicon ARM64 platform and appreciate
+any further testing.
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 8322f52aff..6ea845d550 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -24,6 +24,8 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "ui/console.h"
-+#include "hw/i2c/i2c-ddc.h"
-+#include "../i2c/bitbang_i2c.h"
- #include "trace.h"
+Thanks,
+Shameer
 
- #define ATI_DEBUG_HW_CURSOR 0
-@@ -267,7 +269,9 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
-     case DAC_CNTL:
-         val = s->regs.dac_cntl;
-         break;
--/*    case GPIO_MONID: FIXME hook up DDC I2C here */
-+    case GPIO_MONID:
-+        val = s->regs.gpio_monid;
-+        break;
-     case PALETTE_INDEX:
-         /* FIXME unaligned access */
-         val = vga_ioport_read(&s->vga, VGA_PEL_IR) << 16;
-@@ -501,7 +505,17 @@ static void ati_mm_write(void *opaque, hwaddr addr,
-         s->regs.dac_cntl = data & 0xffffe3ff;
-         s->vga.dac_8bit = !!(data & DAC_8BIT_EN);
-         break;
--/*    case GPIO_MONID: FIXME hook up DDC I2C here */
-+    case GPIO_MONID:
-+        s->regs.gpio_monid = data & 0x000f000f;
-+        if (data & BIT(2) << 16) {
-+            s->regs.gpio_monid |= bitbang_i2c_set(s->bbi2c, BITBANG_I2C_SCL,
-+                                                  (data & BIT(2)) != 0) << 10;
-+        }
-+        if (data & BIT(1) << 16) {
-+            s->regs.gpio_monid |= bitbang_i2c_set(s->bbi2c, BITBANG_I2C_SDA,
-+                                                  (data & BIT(1)) != 0) << 9;
-+        }
-+        break;
-     case PALETTE_INDEX ... PALETTE_INDEX + 3:
-         if (size == 4) {
-             vga_ioport_write(&s->vga, VGA_PEL_IR, (data >> 16) & 0xff);
-@@ -792,6 +806,12 @@ static void ati_vga_realize(PCIDevice *dev, Error **errp)
-         vga->cursor_draw_line = ati_cursor_draw_line;
-     }
+[1] https://patchwork.kernel.org/cover/10837565/
+[2] https://patchwork.kernel.org/cover/10783589/
+[3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
+[4] https://github.com/eauger/qemu/tree/v3.1.0-extended-memmap-v12
 
-+    /* ddc, edid */
-+    s->ddc = i2c_init_bus(DEVICE(s), "ati-vga.ddc");
-+    s->bbi2c = bitbang_i2c_init(s->ddc);
-+    I2CDDCState *i2cddc = I2CDDC(qdev_create(BUS(s->ddc), TYPE_I2CDDC));
-+    i2c_set_slave_address(I2C_SLAVE(i2cddc), 0x50);
-+
-     /* mmio register space */
-     memory_region_init_io(&s->mm, OBJECT(s), &ati_mm_ops, s,
-                           "ati.mmregs", 0x4000);
-diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
-index a6f3e20e63..1636f4d710 100644
---- a/hw/display/ati_int.h
-+++ b/hw/display/ati_int.h
-@@ -11,6 +11,7 @@
 
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
-+#include "hw/i2c/i2c.h"
- #include "vga_int.h"
+RFC --> v2
 
- /*#define DEBUG_ATI*/
-@@ -36,6 +37,7 @@ typedef struct ATIVGARegs {
-     uint32_t crtc_gen_cntl;
-     uint32_t crtc_ext_cntl;
-     uint32_t dac_cntl;
-+    uint32_t gpio_monid;
-     uint32_t crtc_h_total_disp;
-     uint32_t crtc_h_sync_strt_wid;
-     uint32_t crtc_v_total_disp;
-@@ -84,6 +86,8 @@ typedef struct ATIVGAState {
-     uint16_t cursor_size;
-     uint32_t cursor_offset;
-     QEMUCursor *cursor;
-+    I2CBus *ddc;
-+    bitbang_i2c_interface *bbi2c;
-     MemoryRegion io;
-     MemoryRegion mm;
-     ATIVGARegs regs;
+-Use GED device instead of GPIO for ACPI hotplug events.
+-Removed NVDIMM support for now.
+-Includes dropped patches from Eric's v9 series.
+
+
+Eric Auger (1):
+  hw/arm/virt: Add memory hotplug framework
+
+Samuel Ortiz (3):
+  hw/acpi: Do not create memory hotplug method when handler is not
+    defined
+  hw/arm/virt: Add virtual ACPI device
+  hw/acpi: Add ACPI Generic Event Device Support
+
+Sebastien Boeuf (1):
+  hw/acpi: Move constant definitions to header files
+
+Shameer Kolothum (6):
+  hw/acpi: Make ACPI IO address space configurable
+  hw/arm/virt: Add ACPI support for device memory cold-plug
+  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+  hw/arm/boot: Expose the PC-DIMM nodes in the DT
+  hw/arm/virt: Add GED device configuration and build aml
+  hw/arm/virt: Add GED irq routing and Enable memory hotplug
+
+ default-configs/arm-softmmu.mak  |   4 +
+ hw/acpi/Makefile.objs            |   1 +
+ hw/acpi/ged.c                    | 198 +++++++++++++++++++++++++++++++++++++++
+ hw/acpi/memory_hotplug.c         |  58 ++++--------
+ hw/arm/Makefile.objs             |   2 +-
+ hw/arm/boot.c                    |  42 +++++++++
+ hw/arm/virt-acpi-build.c         |  31 ++++++
+ hw/arm/virt-acpi.c               | 161 +++++++++++++++++++++++++++++++
+ hw/arm/virt.c                    |  93 +++++++++++++++++-
+ hw/i386/acpi-build.c             |   3 +-
+ include/hw/acpi/ged.h            |  61 ++++++++++++
+ include/hw/acpi/memory_hotplug.h |  31 +++++-
+ include/hw/arm/virt.h            |   8 ++
+ 13 files changed, 649 insertions(+), 44 deletions(-)
+ create mode 100644 hw/acpi/ged.c
+ create mode 100644 hw/arm/virt-acpi.c
+ create mode 100644 include/hw/acpi/ged.h
+
 -- 
-2.13.7
+2.7.4
