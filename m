@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33734)
+Received: from eggs.gnu.org ([209.51.188.92]:39372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2hbD-0006jC-4S
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1h2iJ0-0000rI-Eh
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2hbC-00043Y-9V
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37768)
+	(envelope-from <bounces@canonical.com>) id 1h2iIq-0000UR-Mn
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42682)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2hbC-00041X-2f
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:34 -0500
+	id 1h2iIq-0000S7-5f
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2hb9-0004BX-IV
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 19:25:31 +0000
+	id 1h2iIo-0007Yn-Vq
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 20:10:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6605F2E80CC
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 19:25:31 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EF3BA2E80C3
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 20:10:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Mar 2019 19:16:31 -0000
-From: Deepika Choudhary <1817345@bugs.launchpad.net>
-Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
+Date: Sat, 09 Mar 2019 20:02:54 -0000
+From: John M <1819289@bugs.launchpad.net>
+Reply-To: Bug 1819289 <1819289@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155215899175.15523.12873708625311540124.malone@chaenomeles.canonical.com>
+Message-Id: <155216177409.9624.16357609956497374456.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
- $source_path contains white spaces
+Subject: [Qemu-devel] [Bug 1819289] [NEW] Windows 95 and Windows 98 will not
+ install or run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,81 +38,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-If calling from any Unix shell, and the parameter has spaces, then we
-need to quote it.we can also use single quotes, these are more powerful.
-They stop the shell from interpreting anything ($, !, \, *, ", etc,
-except ').
+Public bug reported:
 
+The last version of QEMU I have been able to run Windows 95 or Windows
+98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
+either not install or will not run 95 or 98 at all. I have tried every
+combination of options like isapc or no isapc, cpu pentium  or cpu as
+486. Tried different memory configurations, but they just don't work
+anymore.
 
-can't we use this approach here??
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817345
+https://bugs.launchpad.net/bugs/1819289
 
 Title:
-  configure script breaks when $source_path contains white spaces
+  Windows 95 and Windows 98 will not install or run
 
 Status in QEMU:
   New
 
 Bug description:
-  Hi,
-
-  I noticed that the configure script breaks when the qemu source
-  directory is in a path containing white spaces, in particular the list
-  of targets is not correctly generated when calling "./configure
-  --help".
-
-  Steps to reproduce the problem:
-
-  $ mkdir "dir with spaces"
-  $ cd dir\ with\ spaces/
-  $ git clone https://git.qemu.org/git/qemu.git
-  $ cd qemu/
-  $ ./configure --help | grep -A3 target-list
-
-  =
-
-  Actual result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: dir with *-softmmu dir with =
-
-                             *-linux-user
-
-  =
-
-  Expected result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: aarch64-softmmu alpha-softm=
-mu =
-
-                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
-tmmu =
-
-                             lm32-softmmu m68k-softmmu microblaze-softmmu =
-
-
-  =
-
-  This happens because the $mak_wilds variable uses spaces to separate diff=
-erent paths, maybe newlines may be used, which are less likely to be in dir=
-ectory names.
-
-  BTW "shellcheck" may help finding some other problems.
-
-  Qemu version:
-
-  $ git describe =
-
-  v3.1.0-1960-ga05838cb2a
-
-  Thanks,
-     Antonio
+  The last version of QEMU I have been able to run Windows 95 or Windows
+  98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
+  either not install or will not run 95 or 98 at all. I have tried every
+  combination of options like isapc or no isapc, cpu pentium  or cpu as
+  486. Tried different memory configurations, but they just don't work
+  anymore.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1819289/+subscriptions
