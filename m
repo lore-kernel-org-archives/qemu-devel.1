@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58011)
+Received: from eggs.gnu.org ([209.51.188.92]:58024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2QAg-0000dG-NQ
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:04 -0500
+	(envelope-from <lersek@redhat.com>) id 1h2QAj-0000gc-HG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1h2QAf-00020N-Bd
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42288)
+	(envelope-from <lersek@redhat.com>) id 1h2QAh-00023o-JN
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1h2QAf-0001zi-22
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:01 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1h2QAh-00023D-9G
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:49:03 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 547EA30832CB
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 00:49:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 94FC45AFE9
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 00:49:02 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Sat,  9 Mar 2019 01:48:23 +0100
-Message-Id: <20190309004826.9027-8-lersek@redhat.com>
+Date: Sat,  9 Mar 2019 01:48:24 +0100
+Message-Id: <20190309004826.9027-9-lersek@redhat.com>
 In-Reply-To: <20190309004826.9027-1-lersek@redhat.com>
 References: <20190309004826.9027-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/10] roms: build edk2 firmware binaries and
+Subject: [Qemu-devel] [PATCH 08/10] pc-bios: add edk2 firmware binaries and
  variable store templates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,272 +34,305 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
-Add the "efi" target to "Makefile".
-
-Introduce "Makefile.edk2" for building and cleaning the firmware images
-and varstore templates.
-
-Collect the common bits from the recipes in the helper script
-"edk2-build.sh".
+Add the files built by the last patch: binaries, and the cumulative
+license text that covers them.
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 ---
- roms/Makefile      |   5 +
- roms/Makefile.edk2 | 138 ++++++++++++++++++++
- roms/edk2-build.sh |  55 ++++++++
- 3 files changed, 198 insertions(+)
+ pc-bios/edk2-licenses.txt          | 209 ++++++++++++++++++++
+ pc-bios/edk2-aarch64-code.fd       | Bin 0 -> 67108864 bytes
+ pc-bios/edk2-arm-code.fd           | Bin 0 -> 67108864 bytes
+ pc-bios/edk2-arm-vars.fd           | Bin 0 -> 67108864 bytes
+ pc-bios/edk2-i386-code.fd          | Bin 0 -> 3653632 bytes
+ pc-bios/edk2-i386-secure-code.fd   | Bin 0 -> 3653632 bytes
+ pc-bios/edk2-i386-vars.fd          | Bin 0 -> 540672 bytes
+ pc-bios/edk2-x86_64-code.fd        | Bin 0 -> 3653632 bytes
+ pc-bios/edk2-x86_64-secure-code.fd | Bin 0 -> 3653632 bytes
+ 9 files changed, 209 insertions(+)
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 2e83ececa25a..054b432834ba 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -61,6 +61,7 @@ default:
- 	@echo "  skiboot        -- update skiboot.lid"
- 	@echo "  u-boot.e500    -- update u-boot.e500"
- 	@echo "  u-boot.sam460  -- update u-boot.sam460"
-+	@echo "  efi            -- update UEFI (edk2) platform firmware"
-=20
- bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256=
-k
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
-@@ -143,6 +144,9 @@ skiboot:
- 	$(MAKE) -C skiboot CROSS=3D$(powerpc64_cross_prefix)
- 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
-=20
-+efi: edk2-basetools
-+	$(MAKE) -f Makefile.edk2
-+
- clean:
- 	rm -rf seabios/.config seabios/out seabios/builds
- 	$(MAKE) -C sgabios clean
-@@ -153,3 +157,4 @@ clean:
- 	rm -rf u-boot/build.e500
- 	$(MAKE) -C u-boot-sam460ex distclean
- 	$(MAKE) -C skiboot clean
-+	$(MAKE) -f Makefile.edk2 clean
-diff --git a/roms/Makefile.edk2 b/roms/Makefile.edk2
+diff --git a/pc-bios/edk2-licenses.txt b/pc-bios/edk2-licenses.txt
 new file mode 100644
-index 000000000000..ad6fff044cd6
+index 000000000000..8bdb1abc993e
 --- /dev/null
-+++ b/roms/Makefile.edk2
-@@ -0,0 +1,138 @@
-+# Makefile for building firmware binaries and variable store templates f=
-or a
-+# number of virtual platforms in edk2.
-+#
-+# Copyright (C) 2019, Red Hat, Inc.
-+#
-+# This program and the accompanying materials are licensed and made avai=
-lable
-+# under the terms and conditions of the BSD License that accompanies thi=
++++ b/pc-bios/edk2-licenses.txt
+@@ -0,0 +1,209 @@
++=3D=3D> edk2/License.txt <=3D=3D
++Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.
++Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.
++Copyright (c) 2011 - 2015, ARM Limited. All rights reserved.
++Copyright (c) 2014 - 2015, Linaro Limited. All rights reserved.
++Copyright (c) 2013 - 2015, Red Hat, Inc.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions
++are met:
++
++* Redistributions of source code must retain the above copyright
++  notice, this list of conditions and the following disclaimer.
++* Redistributions in binary form must reproduce the above copyright
++  notice, this list of conditions and the following disclaimer in
++  the documentation and/or other materials provided with the
++  distribution.
++
++THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
++CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
++ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++POSSIBILITY OF SUCH DAMAGE.
++
++=3D=3D> edk2/OvmfPkg/License.txt <=3D=3D
++Copyright (c) 2012, Intel Corporation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions
++are met:
++
++* Redistributions of source code must retain the above copyright
++  notice, this list of conditions and the following disclaimer.
++* Redistributions in binary form must reproduce the above copyright
++  notice, this list of conditions and the following disclaimer in
++  the documentation and/or other materials provided with the
++  distribution.
++
++THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
++CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
++ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++POSSIBILITY OF SUCH DAMAGE.
++
++
++Some files are subject to the following license, the MIT license. Those =
+files
++are located in:
++- OvmfPkg/Include/IndustryStandard/Xen/
++- OvmfPkg/XenBusDxe/
++- OvmfPkg/XenPvBlkDxe/
++
++Permission is hereby granted, free of charge, to any person obtaining a =
+copy
++of this software and associated documentation files (the "Software"), to=
+ deal
++in the Software without restriction, including without limitation the ri=
+ghts
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sel=
+l
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included =
+in
++all copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS =
+OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL =
+THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING =
+FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS I=
+N
++THE SOFTWARE.
++
++=3D=3D> edk2/CryptoPkg/Library/OpensslLib/openssl/LICENSE <=3D=3D
++
++  LICENSE ISSUES
++  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++  The OpenSSL toolkit stays under a double license, i.e. both the condit=
+ions of
++  the OpenSSL License and the original SSLeay license apply to the toolk=
+it.
++  See below for the actual license texts.
++
++  OpenSSL License
++  ---------------
++
++/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ * Copyright (c) 1998-2018 The OpenSSL Project.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.=20
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the OpenSSL Project
++ *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
++ *
++ * 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used=
+ to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    openssl-core@openssl.org.
++ *
++ * 5. Products derived from this software may not be called "OpenSSL"
++ *    nor may "OpenSSL" appear in their names without prior written
++ *    permission of the OpenSSL Project.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the OpenSSL Project
++ *    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ *
++ * This product includes cryptographic software written by Eric Young
++ * (eay@cryptsoft.com).  This product includes software written by Tim
++ * Hudson (tjh@cryptsoft.com).
++ *
++ */
++
++ Original SSLeay License
++ -----------------------
++
++/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
++ * All rights reserved.
++ *
++ * This package is an SSL implementation written
++ * by Eric Young (eay@cryptsoft.com).
++ * The implementation was written so as to conform with Netscapes SSL.
++ *=20
++ * This library is free for commercial and non-commercial use as long as
++ * the following conditions are aheared to.  The following conditions
++ * apply to all code found in this distribution, be it the RC4, RSA,
++ * lhash, DES, etc., code; not just the SSL code.  The SSL documentation
++ * included with this distribution is covered by the same copyright term=
 s
-+# distribution. The full text of the license may be found at
-+# <http://opensource.org/licenses/bsd-license.php>.
-+#
-+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
-WITHOUT
-+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++ * except that the holder is Tim Hudson (tjh@cryptsoft.com).
++ *=20
++ * Copyright remains Eric Young's, and as such any Copyright notices in
++ * the code are not to be removed.
++ * If this package is used in a product, Eric Young should be given attr=
+ibution
++ * as the author of the parts of the library used.
++ * This can be in the form of a textual message at program startup or
++ * in documentation (online or textual) provided with the package.
++ *=20
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in th=
+e
++ *    documentation and/or other materials provided with the distributio=
+n.
++ * 3. All advertising materials mentioning features or use of this softw=
+are
++ *    must display the following acknowledgement:
++ *    "This product includes cryptographic software written by
++ *     Eric Young (eay@cryptsoft.com)"
++ *    The word 'cryptographic' can be left out if the rouines from the l=
+ibrary
++ *    being used are not cryptographic related :-).
++ * 4. If you include any Windows specific code (or a derivative thereof)=
+ from=20
++ *    the apps directory (application code) you must include an acknowle=
+dgement:
++ *    "This product includes software written by Tim Hudson (tjh@cryptso=
+ft.com)"
++ *=20
++ * THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIAB=
+LE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
++ * SUCH DAMAGE.
++ *=20
++ * The licence and distribution terms for any publically available versi=
+on or
++ * derivative of this code cannot be changed.  i.e. this code cannot sim=
+ply be
++ * copied and put under another distribution licence
++ * [including the GNU Public Licence.]
++ */
 +
-+toolchain =3D $(shell source ./edk2-funcs.sh && qemu_edk2_get_toolchain =
-$(1))
-+
-+licenses :=3D \
-+	edk2/License.txt \
-+	edk2/OvmfPkg/License.txt \
-+	edk2/CryptoPkg/Library/OpensslLib/openssl/LICENSE
-+
-+# The "edk2-arm-vars.fd" varstore template is suitable for aarch64 as we=
-ll.
-+# Similarly, the "edk2-i386-vars.fd" varstore template is suitable for x=
-86_64
-+# as well, independently of "secure" too.
-+all: \
-+	../pc-bios/edk2-aarch64-code.fd \
-+	../pc-bios/edk2-arm-code.fd \
-+	../pc-bios/edk2-i386-code.fd \
-+	../pc-bios/edk2-i386-secure-code.fd \
-+	../pc-bios/edk2-x86_64-code.fd \
-+	../pc-bios/edk2-x86_64-secure-code.fd \
-+	\
-+	../pc-bios/edk2-arm-vars.fd \
-+	../pc-bios/edk2-i386-vars.fd \
-+	\
-+	../pc-bios/edk2-licenses.txt
-+
-+submodules:
-+	cd edk2 && git submodule update --init --force
-+
-+# See notes on the ".NOTPARALLEL" target and the "+" indicator in
-+# "tests/uefi-test-tools/Makefile".
-+.NOTPARALLEL:
-+
-+../pc-bios/edk2-aarch64-code.fd: submodules
-+	+./edk2-build.sh \
-+		aarch64 \
-+		--arch=3DAARCH64 \
-+		--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE
-+	cp edk2/Build/ArmVirtQemu-AARCH64/DEBUG_$(call toolchain,aarch64)/FV/QE=
-MU_EFI.fd \
-+		$@
-+	truncate --size=3D64M $@
-+
-+../pc-bios/edk2-arm-code.fd: submodules
-+	+./edk2-build.sh \
-+		arm \
-+		--arch=3DARM \
-+		--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE
-+	cp edk2/Build/ArmVirtQemu-ARM/DEBUG_$(call toolchain,arm)/FV/QEMU_EFI.f=
-d \
-+		$@
-+	truncate --size=3D64M $@
-+
-+../pc-bios/edk2-i386-code.fd: submodules
-+	+./edk2-build.sh \
-+		i386 \
-+		--arch=3DIA32 \
-+		--platform=3DOvmfPkg/OvmfPkgIa32.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE \
-+		-D TLS_ENABLE \
-+		-D TPM2_ENABLE \
-+		-D TPM2_CONFIG_ENABLE
-+	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_CODE.fd $@
-+
-+../pc-bios/edk2-i386-secure-code.fd: submodules
-+	+./edk2-build.sh \
-+		i386 \
-+		--arch=3DIA32 \
-+		--platform=3DOvmfPkg/OvmfPkgIa32.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE \
-+		-D TLS_ENABLE \
-+		-D TPM2_ENABLE \
-+		-D TPM2_CONFIG_ENABLE \
-+		-D SECURE_BOOT_ENABLE \
-+		-D SMM_REQUIRE
-+	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_CODE.fd $@
-+
-+../pc-bios/edk2-x86_64-code.fd: submodules
-+	+./edk2-build.sh \
-+		x86_64 \
-+		--arch=3DX64 \
-+		--platform=3DOvmfPkg/OvmfPkgX64.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE \
-+		-D TLS_ENABLE \
-+		-D TPM2_ENABLE \
-+		-D TPM2_CONFIG_ENABLE
-+	cp edk2/Build/OvmfX64/DEBUG_$(call toolchain,x86_64)/FV/OVMF_CODE.fd $@
-+
-+../pc-bios/edk2-x86_64-secure-code.fd: submodules
-+	+./edk2-build.sh \
-+		x86_64 \
-+		--arch=3DIA32 \
-+		--arch=3DX64 \
-+		--platform=3DOvmfPkg/OvmfPkgIa32X64.dsc \
-+		-D NETWORK_IP6_ENABLE \
-+		-D HTTP_BOOT_ENABLE \
-+		-D TLS_ENABLE \
-+		-D TPM2_ENABLE \
-+		-D TPM2_CONFIG_ENABLE \
-+		-D SECURE_BOOT_ENABLE \
-+		-D SMM_REQUIRE
-+	cp edk2/Build/Ovmf3264/DEBUG_$(call toolchain,x86_64)/FV/OVMF_CODE.fd $=
-@
-+
-+../pc-bios/edk2-arm-vars.fd: ../pc-bios/edk2-arm-code.fd
-+	cp edk2/Build/ArmVirtQemu-ARM/DEBUG_$(call toolchain,arm)/FV/QEMU_VARS.=
-fd \
-+		$@
-+	truncate --size=3D64M $@
-+
-+../pc-bios/edk2-i386-vars.fd: ../pc-bios/edk2-i386-code.fd
-+	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_VARS.fd $@
-+
-+# The license file accumulates several individual licenses from under ed=
-k2,
-+# prefixing each individual license with a header (generated by "tail") =
-that
-+# states its pathname.
-+../pc-bios/edk2-licenses.txt: submodules
-+	tail -n $(shell cat $(licenses) | wc -l) $(licenses) > $@
-+	dos2unix $@
-+
-+clean:
-+	rm -rf edk2/Build
-+	cd edk2/Conf && \
-+		rm -rf .cache BuildEnv.sh build_rule.txt target.txt \
-+			tools_def.txt
-diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
-new file mode 100755
-index 000000000000..936d2c874a22
---- /dev/null
-+++ b/roms/edk2-build.sh
-@@ -0,0 +1,55 @@
-+#!/bin/bash
-+
-+# Wrapper shell script for building a  virtual platform firmware in edk2=
-.
-+#
-+# Copyright (C) 2019, Red Hat, Inc.
-+#
-+# This program and the accompanying materials are licensed and made avai=
-lable
-+# under the terms and conditions of the BSD License that accompanies thi=
-s
-+# distribution. The full text of the license may be found at
-+# <http://opensource.org/licenses/bsd-license.php>.
-+#
-+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
-WITHOUT
-+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-+
-+set -e -u -C
-+
-+# Save the command line arguments. We need to reset $# to 0 before sourc=
-ing
-+# "edksetup.sh", as it will inherit $@.
-+emulation_target=3D$1
-+shift
-+num_args=3D0
-+args=3D()
-+for arg in "$@"; do
-+  args[num_args++]=3D"$arg"
-+done
-+shift $num_args
-+
-+cd edk2
-+
-+# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
-+export PYTHON_COMMAND=3Dpython2
-+
-+# Source "edksetup.sh" carefully.
-+set +e +u +C
-+source ./edksetup.sh
-+ret=3D$?
-+set -e -u -C
-+if [ $ret -ne 0 ]; then
-+  exit $ret
-+fi
-+
-+# Fetch some option arguments, and set the cross-compilation environment=
- (if
-+# any), for the edk2 "build" utility.
-+source ../edk2-funcs.sh
-+edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
-+qemu_edk2_set_cross_env "$emulation_target"
-+
-+# Build the platform firmware.
-+build \
-+  --cmd-len=3D65536 \
-+  -n "$edk2_thread_count" \
-+  --buildtarget=3DDEBUG \
-+  --tagname=3D"$edk2_toolchain" \
-+  "${args[@]}"
+diff --git a/pc-bios/edk2-aarch64-code.fd b/pc-bios/edk2-aarch64-code.fd
+new file mode 100644
+index 000000000000..c6ef5113e8cd
+Binary files /dev/null and b/pc-bios/edk2-aarch64-code.fd differ
+diff --git a/pc-bios/edk2-arm-code.fd b/pc-bios/edk2-arm-code.fd
+new file mode 100644
+index 000000000000..2ebd846818d1
+Binary files /dev/null and b/pc-bios/edk2-arm-code.fd differ
+diff --git a/pc-bios/edk2-arm-vars.fd b/pc-bios/edk2-arm-vars.fd
+new file mode 100644
+index 000000000000..a71658f98825
+Binary files /dev/null and b/pc-bios/edk2-arm-vars.fd differ
+diff --git a/pc-bios/edk2-i386-code.fd b/pc-bios/edk2-i386-code.fd
+new file mode 100644
+index 000000000000..df3d24182209
+Binary files /dev/null and b/pc-bios/edk2-i386-code.fd differ
+diff --git a/pc-bios/edk2-i386-secure-code.fd b/pc-bios/edk2-i386-secure-=
+code.fd
+new file mode 100644
+index 000000000000..9f203cdd0d88
+Binary files /dev/null and b/pc-bios/edk2-i386-secure-code.fd differ
+diff --git a/pc-bios/edk2-i386-vars.fd b/pc-bios/edk2-i386-vars.fd
+new file mode 100644
+index 000000000000..efb4f46c09af
+Binary files /dev/null and b/pc-bios/edk2-i386-vars.fd differ
+diff --git a/pc-bios/edk2-x86_64-code.fd b/pc-bios/edk2-x86_64-code.fd
+new file mode 100644
+index 000000000000..bf2dd8c4373d
+Binary files /dev/null and b/pc-bios/edk2-x86_64-code.fd differ
+diff --git a/pc-bios/edk2-x86_64-secure-code.fd b/pc-bios/edk2-x86_64-sec=
+ure-code.fd
+new file mode 100644
+index 000000000000..d1a28834ce60
+Binary files /dev/null and b/pc-bios/edk2-x86_64-secure-code.fd differ
 --=20
 2.19.1.3.g30247aa5d201
