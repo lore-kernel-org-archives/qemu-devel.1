@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47918)
+Received: from eggs.gnu.org ([209.51.188.92]:48349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2cgz-0006Gf-TM
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2cjH-0007Qo-K4
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2cgx-0005Kw-Lf
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:13 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43478)
+	(envelope-from <peter.maydell@linaro.org>) id 1h2cjF-0007MW-9V
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:13:34 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46852)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2cgx-0005K8-EO
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:11 -0500
-Received: by mail-ot1-x341.google.com with SMTP id n71so275822ota.10
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 06:11:11 -0800 (PST)
+	id 1h2cjC-0007KJ-Dp
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:13:32 -0500
+Received: by mail-oi1-x243.google.com with SMTP id j10so331377oij.13
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 06:13:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20190308211557.22589-1-alex.bennee@linaro.org>
-In-Reply-To: <20190308211557.22589-1-alex.bennee@linaro.org>
+References: <20190307095441.31921-1-kraxel@redhat.com>
+	<20190307095441.31921-4-kraxel@redhat.com>
+	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
+	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
+	<jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
+In-Reply-To: <jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 9 Mar 2019 14:10:58 +0000
-Message-ID: <CAFEAcA-bOvwPJOtL5pYXR5jE9k8ysc-haqm_f4HvTjA2=iEYWg@mail.gmail.com>
+Date: Sat, 9 Mar 2019 14:13:18 +0000
+Message-ID: <CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] docs/booting.rst: start documenting
- the boot process
+Subject: Re: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Bandan Das <bsd@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 8 Mar 2019 at 21:16, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
+On Fri, 8 Mar 2019 at 22:14, Bandan Das <bsd@redhat.com> wrote:
 >
-> While working on some test cases I realised there was quite a lot of
-> assumed knowledge about how things boot up. I thought it would be
-> worth gathering this together in a user facing document where we could
-> pour in the details and background to the boot process. As it's quite
-> wordy I thought it should be a separate document to the manual (which
-> can obviously reference this). So far I've managed almost a thousand
-> words and haven't actually related anything to QEMU's options yet.
 >
-> So going forward:
+> Spotted by Coverity: CID 1399414
 >
->   - is this a useful document to have in docs?
->   - are there any other areas to mention?
->     - out auto-magic -bios selection seems like something worth covering
->   - should we have some worked examples of command lines?
->     - I was thinking for example of read-only and pflash examples
->   - we should also describe why direct kernel boots exits
->     - and also the fact they are not that direct (some code executes
->       before a kernel - even if it's less than a full firmware)
+> mtp delete allows the a return status of delete succeeded,
+> partial_delete or readonly - when none of the objects could be
+> deleted.
 >
-> Submitted for comment....
+> Some initiators recurse over the objects themselves. In that case,
+> only READ_ONLY can be returned.
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
 > ---
->  docs/booting.rst | 127 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 127 insertions(+)
->  create mode 100644 docs/booting.rst
+>  hw/usb/dev-mtp.c | 25 +++++++++----------------
+>  1 file changed, 9 insertions(+), 16 deletions(-)
+>
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 06e376bcd2..e3401aad75 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1137,9 +1137,9 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
+>
+>  /* Return correct return code for a delete event */
+>  enum {
+> -    ALL_DELETE,
+> -    PARTIAL_DELETE,
+> +    ALL_DELETE = 1,
+>      READ_ONLY,
+> +    PARTIAL_DELETE,
 
-We're trying to move towards having no documents in
-the root docs/ directory, but instead having them all
-in one of the various subdirectories that will each
-be one of our five manuals:
-https://wiki.qemu.org/Features/Documentation
+This is an enum, ie a set of incrementing values, but you're
+using them as bit positions you're ORing together. If they're
+really bit flags you should define them properly that way,
+so it's clear what you're doing.
+
+At the moment PARTIAL_DELETE is "ALL_DELETE | READ_ONLY", which
+doesn't seem like it makes much sense.
 
 thanks
 -- PMM
