@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47549)
+Received: from eggs.gnu.org ([209.51.188.92]:47918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2cfR-0005CI-Tw
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:09:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1h2cgz-0006Gf-TM
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2cfR-0003jh-7Y
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:09:37 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190308013222.12524-1-philmd@redhat.com>
-	<20190308013222.12524-2-philmd@redhat.com>
-Date: Sat, 09 Mar 2019 15:09:27 +0100
-In-Reply-To: <20190308013222.12524-2-philmd@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 8 Mar 2019 02:32:05
-	+0100")
-Message-ID: <87d0n05eco.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h2cgx-0005Kw-Lf
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:13 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h2cgx-0005K8-EO
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 09:11:11 -0500
+Received: by mail-ot1-x341.google.com with SMTP id n71so275822ota.10
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 06:11:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20190308211557.22589-1-alex.bennee@linaro.org>
+In-Reply-To: <20190308211557.22589-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 9 Mar 2019 14:10:58 +0000
+Message-ID: <CAFEAcA-bOvwPJOtL5pYXR5jE9k8ysc-haqm_f4HvTjA2=iEYWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/18] hw/arm/virt: Remove null-check in
- virt_build_smbios()
+Subject: Re: [Qemu-devel] [RFC PATCH] docs/booting.rst: start documenting
+ the boot process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> Since commit 578f3c7b0835 ("arm: add fw_cfg to "virt" board",
-> 2014-12-22), the machvirt_init() unconditionally creates the
-> fw_cfg object.  Later, commit c30e15658b1b ("smbios: implement
-> smbios support for mach-virt", 2015-09-07) added a superfluous
-> null-check on it.
-> Remove this superfluous check.
+On Fri, 8 Mar 2019 at 21:16, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
 >
-> Fixes: c30e15658b1b
+> While working on some test cases I realised there was quite a lot of
+> assumed knowledge about how things boot up. I thought it would be
+> worth gathering this together in a user facing document where we could
+> pour in the details and background to the boot process. As it's quite
+> wordy I thought it should be a separate document to the manual (which
+> can obviously reference this). So far I've managed almost a thousand
+> words and haven't actually related anything to QEMU's options yet.
+>
+> So going forward:
+>
+>   - is this a useful document to have in docs?
+>   - are there any other areas to mention?
+>     - out auto-magic -bios selection seems like something worth covering
+>   - should we have some worked examples of command lines?
+>     - I was thinking for example of read-only and pflash examples
+>   - we should also describe why direct kernel boots exits
+>     - and also the fact they are not that direct (some code executes
+>       before a kernel - even if it's less than a full firmware)
+>
+> Submitted for comment....
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  docs/booting.rst | 127 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 127 insertions(+)
+>  create mode 100644 docs/booting.rst
 
-I'd use 'Fixes:' only for bug fixes.  This is a cleanup
+We're trying to move towards having no documents in
+the root docs/ directory, but instead having them all
+in one of the various subdirectories that will each
+be one of our five manuals:
+https://wiki.qemu.org/Features/Documentation
 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+thanks
+-- PMM
