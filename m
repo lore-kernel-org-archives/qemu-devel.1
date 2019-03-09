@@ -1,25 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37559)
+Received: from eggs.gnu.org ([209.51.188.92]:39139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2Ya0-0005HG-Jp
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:45 -0500
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h2Yoj-0000Fi-W9
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:02:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2YZz-0002Ho-9L
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:44 -0500
-Resent-Message-Id: <E1h2YZz-0002Ho-9L@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h2YZz-0002Gj-31
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:43 -0500
-Message-ID: <155212484477.8146.14914331552892856832@6acff2cf482b>
-In-Reply-To: <20190306031221.GA53@03612eec87fc>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h2Yoj-0001R7-0E
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:02:57 -0500
+Received: from smtp.lg.ehu.es ([158.227.0.66]:7872 helo=smtp.ehu.eus)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h2Yoi-0001Lz-M4
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:02:56 -0500
+Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
+	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 1E5F931728
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:02:48 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3E2F110052
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:02:47 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D860B110045
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:02:47 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.73])
+	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:02:47 +0100 (CET)
+Received: from mail-it1-f175.google.com (mail-it1-f175.google.com
+	[209.85.166.175]) by smtp1 (Postfix) with ESMTPSA id 9B57E31753
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:02:47 +0100 (CET)
+Received: by mail-it1-f175.google.com with SMTP id 188so128677itb.0
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 02:02:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 9 Mar 2019 01:47:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/10] qemu-binfmt-conf.sh
+References: <20190306031221.GA53@03612eec87fc>
+	<20190306044620.GC75@03612eec87fc>
+	<3ccb5a7c-9b64-d380-0c3b-e755c612c31f@vivier.eu>
+In-Reply-To: <3ccb5a7c-9b64-d380-0c3b-e755c612c31f@vivier.eu>
+Reply-To: unai.martinezcorral@ehu.eus
+From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
+Date: Sat, 9 Mar 2019 11:02:37 +0100
+Message-ID: <CAGZZdDHmv+S-mLZUAjRGVSbFAJP7bmOWgyOwRb=8u0rZHmYA0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 3/10] qemu-binfmt-conf.sh: add
+ QEMU_CREDENTIAL and QEMU_PERSISTENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +47,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: unai.martinezcorral@ehu.eus
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNjAzMTIyMS5HQTUz
-QDAzNjEyZWVjODdmYy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29k
-aW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9u
-OgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA2MDMxMjIxLkdBNTNAMDM2MTJlZWM4
-N2ZjClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8xMF0gcWVtdS1iaW5mbXQtY29u
-Zi5zaAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hl
-dy8yMDE5MDMwNjAzMTIyMS5HQTUzQDAzNjEyZWVjODdmYyAtPiBwYXRjaGV3LzIwMTkwMzA2MDMx
-MjIxLkdBNTNAMDM2MTJlZWM4N2ZjClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmJh
-Mjg0YWZiNSBxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUwo0NDU3YmQx
-M2ZkIHFlbXUtYmluZm10LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpCjE1MTYxNjEyNWYgcWVtdS1i
-aW5mbXQtY29uZi5zaDogcmVmYWN0b3IgdXNhZ2UoKQpmYmRlY2Q1ZTNkIHFlbXUtYmluZm10LWNv
-bmYuc2g6IGFkZCBvcHRpb24gLS1yZXNldCA8QVJDSFM+CjY4YTAwMTZhOTggcWVtdS1iaW5mbXQt
-Y29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BVPiB0byBwb3NpdGlvbmFsIDxDUFVTPgo0NDNmNjJjN2I0
-IHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5kL29yIFFFTVVfU1VGRklY
-CjQwYTU1YjdhZjQgcWVtdS1iaW5mbXQtY29uZi5zaDogcmVtb3ZlICdxZW11JyBwcmVmaXggZnJv
-bSBjbGkgb3B0aW9ucwoyMWFhOTY2MTA0IHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NS
-RURFTlRJQUwgYW5kIFFFTVVfUEVSU0lTVEVOVAo3ODExZGNjMTljIHFlbXUtYmluZm10LWNvbmYu
-c2g6IG1ha2Ugb3B0cyAtcCBhbmQgLWMgYm9vbGVhbgoyZTg4MGQxYjY4IHFlbXUtYmluZm10LWNv
-bmYuc2g6IGVuZm9yY2Ugc2FmZSBzdHlsZSBjb25zaXN0ZW5jeQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8xMCBDaGVja2luZyBjb21taXQgMmU4ODBkMWI2OGRjIChxZW11LWJpbmZtdC1jb25mLnNo
-OiBlbmZvcmNlIHNhZmUgc3R5bGUgY29uc2lzdGVuY3kpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM1MzogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjI5OToKKyAg
-ICAgICAgaWYgWyAieCRtYWdpYyIgPSAieCIgXSB8fCBbICJ4JG1hc2siID0gIngiIF0gfHwgWyAi
-eCRmYW1pbHkiID0gIngiIF0gOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ3
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8x
-MCBDaGVja2luZyBjb21taXQgNzgxMWRjYzE5YzJlIChxZW11LWJpbmZtdC1jb25mLnNoOiBtYWtl
-IG9wdHMgLXAgYW5kIC1jIGJvb2xlYW4pCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-NTE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMjc6CitvcHRpb25zPSQoZ2V0
-b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBkZWJpYW4sc3lzdGVtZDoscWVtdS1wYXRoOixxZW11LXN1
-ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzEwIENoZWNraW5nIGNvbW1pdCAyMWFhOTY2MTA0
-OTIgKHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFFTVVfUEVS
-U0lTVEVOVCkKNC8xMCBDaGVja2luZyBjb21taXQgNDBhNTViN2FmNGVjIChxZW11LWJpbmZtdC1j
-b25mLnNoOiByZW1vdmUgJ3FlbXUnIHByZWZpeCBmcm9tIGNsaSBvcHRpb25zKQpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ2OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
-c2g6MzMxOgorb3B0aW9ucz0kKGdldG9wdCAtbyBkczpROlM6ZTpoY3AgLWwgZGViaWFuLHN5c3Rl
-bWQ6LHBhdGg6LHN1ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAt
-LSAiJEAiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCA0LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzEwIENoZWNraW5nIGNvbW1p
-dCA0NDNmNjJjN2I0N2UgKHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5k
-L29yIFFFTVVfU1VGRklYKQo2LzEwIENoZWNraW5nIGNvbW1pdCA2OGEwMDE2YTk4YzYgKHFlbXUt
-YmluZm10LWNvbmYuc2g6IGdlbmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCA8Q1BVUz4pCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MDogRklMRTogc2NyaXB0cy9xZW11LWJp
-bmZtdC1jb25mLnNoOjIwNToKKyAgICAgICBTdXBwb3J0ZWQgZm9ybWF0cyBmb3IgQ1BVUyBhcmU6
-IHNpbmdsZSBhcmNoIG9yIGNvbW1hL3NwYWNlIHNlcGFyYXRlZCBsaXN0LgoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
-c2g6MjA2OgorICAgICAgIFNlZSBRRU1VIHRhcmdldCBsaXN0IGJlbG93LiBJZiBDUFVTIGlzICdB
-TEwnIG9yIGVtcHR5LCBjb25maWd1cmUgYWxsIGtub3duCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzE0NjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjM2NzoKK29w
-dGlvbnM9JChnZXRvcHQgLW8gOmRzUTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1
-ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
-YWw6IDEgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xMCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNy8xMCBDaGVja2luZyBjb21taXQgZmJkZWNkNWUz
-ZGMxIChxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgb3B0aW9uIC0tcmVzZXQgPEFSQ0hTPikKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmlu
-Zm10LWNvbmYuc2g6Mzc1OgorICAgIGZpbmQgL3Byb2Mvc3lzL2ZzL2JpbmZtdF9taXNjLyAtdHlw
-ZSBmIC1uYW1lICRuYW1lcyAtZXhlYyBzaCAtYyAncHJpbnRmICVzIC0xID4ge30nIFw7CgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg1OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
-LWNvbmYuc2g6MzkwOgorb3B0aW9ucz0kKGdldG9wdCAtbyByOmRzUTpTOmU6aGNwIC1sIHJlc2V0
-OixkZWJpYW4sc3lzdGVtZCxwYXRoOixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFs
-LHBlcnNpc3RlbnQgLS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNzQgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC8xMCBD
-aGVja2luZyBjb21taXQgMTUxNjE2MTI1ZjViIChxZW11LWJpbmZtdC1jb25mLnNoOiByZWZhY3Rv
-ciB1c2FnZSgpKQo5LzEwIENoZWNraW5nIGNvbW1pdCA0NDU3YmQxM2ZkYTcgKHFlbXUtYmluZm10
-LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpKQoxMC8xMCBDaGVja2luZyBjb21taXQgZmJhMjg0YWZi
-NTQ2IChxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUykKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
-bmYuc2g6MjA1OgorICAgIFN1cHBvcnRlZCBmb3JtYXRzIGZvciBUQVJHRVRTIGFyZTogc2luZ2xl
-IGFyY2ggb3IgY29tbWEvc3BhY2Ugc2VwYXJhdGVkIGxpc3QuCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojNDU6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDY6
-CisgICAgU2VlIFFFTVUgdGFyZ2V0IGxpc3QgYmVsb3cuIElmIFRBUkdFVFMgaXMgJ0FMTCcgb3Ig
-ZW1wdHksIGNvbmZpZ3VyZSBhbGwga25vd24KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywg
-NjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAz
-MDYwMzEyMjEuR0E1M0AwMzYxMmVlYzg3ZmMvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+2019/3/9 10:42, Laurent Vivier:
+> On 06/03/2019 05:46, Unai Martinez-Corral wrote:
+> > Allow to set options '--persistent' and/or '--credential' through
+> > environment variables. If not defined, defaults are used ('no').
+> > Anyway, command-line arguments have priority over environment variables.
+>
+> Could you explain why we could need to use the env variable instead of
+> the command line parameter?
+>
+> I don't see any use case for that.
+
+The main use case is to provide defaults when this script is included
+in a docker container. There are three actors involved:
+
+- Developers of QEMU providing some defaults in the script.
+- Developer of a docker image including the script from upstream but
+changing some defaults by setting envvars inside the container.
+- User of the container that might want to override the settings
+either by setting the envvars or through the command line.
+
+If the entrypoint to the docker image is any script that executes
+qemu-binfmt-conf.sh at some point, the user cannot provide options
+through the command line. Envvars allow to do so, without requiring
+the user to customize the docker image.
+
+Regards,
+
+Unai
