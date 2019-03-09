@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47328)
+Received: from eggs.gnu.org ([209.51.188.92]:47347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003t8-1f
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003tK-EF
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000W8-22
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000WM-4Q
 	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54746)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2Wie-0000Rv-2X
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:33 -0500
-Received: by mail-wm1-x342.google.com with SMTP id f3so14573470wmj.4
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:30 -0800 (PST)
+	id 1h2Wif-0000Nx-7j
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:34 -0500
+Received: by mail-wr1-x444.google.com with SMTP id o17so23668688wrw.3
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:26 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:48:03 +0100
-Message-Id: <1552117698-12355-11-git-send-email-pbonzini@redhat.com>
+Date: Sat,  9 Mar 2019 08:47:59 +0100
+Message-Id: <1552117698-12355-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/25] lsi: implement basic SBCL functionality
+Subject: [Qemu-devel] [PULL 06/25] configure: Enable werror for git worktrees
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +28,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sven Schnelle <svens@stackframe.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-From: Sven Schnelle <svens@stackframe.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-HP-UX checks this register after sending data to the target. If there's no valid
-information present, it assumes the client disconnected because the kernel sent
-to much data. Implement at least some of the SBCL functionality that is possible
-without having a real SCSI bus.
+The configure script checks multiple times whether it works in a git
+repository and it does this by "test -e "${source_path}/.git" in 4 cases
+but in one case where it tries to enable werror "-d" is used there which
+fails on git worktrees as .git is a file then and not a directory.
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Message-Id: <20190215194021.20543-1-svens@stackframe.org>
+This changes the test to "-e" as other occurrences.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-Id: <20190228043503.68494-1-aik@ozlabs.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/lsi53c895a.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 89def14..8ba07f8 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -160,6 +160,11 @@ static const char *names[] = {
- #define LSI_CCNTL1_DDAC      0x08
- #define LSI_CCNTL1_ZMOD      0x80
- 
-+#define LSI_SBCL_ATN         0x08
-+#define LSI_SBCL_BSY         0x20
-+#define LSI_SBCL_ACK         0x40
-+#define LSI_SBCL_REQ         0x80
-+
- /* Enable Response to Reselection */
- #define LSI_SCID_RRE      0x60
- 
-@@ -258,6 +263,7 @@ typedef struct {
-     uint8_t sdid;
-     uint8_t ssid;
-     uint8_t sfbr;
-+    uint8_t sbcl;
-     uint8_t stest1;
-     uint8_t stest2;
-     uint8_t stest3;
-@@ -356,6 +362,7 @@ static void lsi_soft_reset(LSIState *s)
-     s->socl = 0;
-     s->sdid = 0;
-     s->ssid = 0;
-+    s->sbcl = 0;
-     s->stest1 = 0;
-     s->stest2 = 0;
-     s->stest3 = 0;
-@@ -530,6 +537,8 @@ static void lsi_script_dma_interrupt(LSIState *s, int stat)
- 
- static inline void lsi_set_phase(LSIState *s, int phase)
- {
-+    s->sbcl &= ~PHASE_MASK;
-+    s->sbcl |= phase | LSI_SBCL_REQ;
-     s->sstat1 = (s->sstat1 & ~PHASE_MASK) | phase;
- }
- 
-@@ -567,6 +576,7 @@ static void lsi_disconnect(LSIState *s)
- {
-     s->scntl1 &= ~LSI_SCNTL1_CON;
-     s->sstat1 &= ~PHASE_MASK;
-+    s->sbcl = 0;
- }
- 
- static void lsi_bad_selection(LSIState *s, uint32_t id)
-@@ -1265,7 +1275,9 @@ again:
-                 s->scntl1 |= LSI_SCNTL1_CON;
-                 if (insn & (1 << 3)) {
-                     s->socl |= LSI_SOCL_ATN;
-+                    s->sbcl |= LSI_SBCL_ATN;
-                 }
-+                s->sbcl |= LSI_SBCL_BSY;
-                 lsi_set_phase(s, PHASE_MO);
-                 break;
-             case 1: /* Disconnect */
-@@ -1297,8 +1309,14 @@ again:
-                         insn & (1 << 10) ? " CC" : "");
-                 if (insn & (1 << 3)) {
-                     s->socl |= LSI_SOCL_ATN;
-+                    s->sbcl |= LSI_SBCL_ATN;
-                     lsi_set_phase(s, PHASE_MO);
-                 }
-+
-+                if (insn & (1 << 6)) {
-+                    s->sbcl |= LSI_SBCL_ACK;
-+                }
-+
-                 if (insn & (1 << 9)) {
-                     qemu_log_mask(LOG_UNIMP,
-                         "lsi_scsi: Target mode not implemented\n");
-@@ -1314,7 +1332,13 @@ again:
-                         insn & (1 << 10) ? " CC" : "");
-                 if (insn & (1 << 3)) {
-                     s->socl &= ~LSI_SOCL_ATN;
-+                    s->sbcl &= ~LSI_SBCL_ATN;
-                 }
-+
-+                if (insn & (1 << 6)) {
-+                    s->sbcl &= ~LSI_SBCL_ACK;
-+                }
-+
-                 if (insn & (1 << 10))
-                     s->carry = 0;
-                 break;
-@@ -1591,9 +1615,7 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
-         ret = s->ssid;
-         break;
-     case 0xb: /* SBCL */
--        /* ??? This is not correct. However it's (hopefully) only
--           used for diagnostics, so should be ok.  */
--        ret = 0;
-+        ret = s->sbcl;
-         break;
-     case 0xc: /* DSTAT */
-         ret = s->dstat | LSI_DSTAT_DFE;
-@@ -2143,7 +2165,7 @@ static int lsi_post_load(void *opaque, int version_id)
- 
- static const VMStateDescription vmstate_lsi_scsi = {
-     .name = "lsiscsi",
--    .version_id = 0,
-+    .version_id = 1,
-     .minimum_version_id = 0,
-     .pre_save = lsi_pre_save,
-     .post_load = lsi_post_load,
-@@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
-         VMSTATE_UINT8(stime0, LSIState),
-         VMSTATE_UINT8(respid0, LSIState),
-         VMSTATE_UINT8(respid1, LSIState),
-+        VMSTATE_UINT8_V(sbcl, LSIState, 1),
-         VMSTATE_UINT32(mmrs, LSIState),
-         VMSTATE_UINT32(mmws, LSIState),
-         VMSTATE_UINT32(sfs, LSIState),
+diff --git a/configure b/configure
+index 79453a6..c9a260c 100755
+--- a/configure
++++ b/configure
+@@ -1836,7 +1836,7 @@ fi
+ # Consult white-list to determine whether to enable werror
+ # by default.  Only enable by default for git builds
+ if test -z "$werror" ; then
+-    if test -d "$source_path/.git" && \
++    if test -e "$source_path/.git" && \
+         { test "$linux" = "yes" || test "$mingw32" = "yes"; }; then
+         werror="yes"
+     else
 -- 
 1.8.3.1
