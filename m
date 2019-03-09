@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50414)
+Received: from eggs.gnu.org ([209.51.188.92]:52425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1h2PHR-0005vD-Gr
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:51:58 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pal-0000qi-Ov
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:11:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1h2PHQ-0006gO-HY
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:51:57 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:33702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
-	id 1h2PHQ-0006ez-9U
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 18:51:56 -0500
-References: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
-	<1550029560-30530-2-git-send-email-sandra@codesourcery.com>
-	<CAFEAcA8p9rSYEJQ7jPFvM9Q+UXi6r7Vr8voWQ_fhzzFX1=uVzw@mail.gmail.com>
-From: Sandra Loosemore <sandra@codesourcery.com>
-Message-ID: <97684d40-2a1a-1c3c-cb29-cf137fa00875@codesourcery.com>
-Date: Fri, 8 Mar 2019 16:51:46 -0700
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pak-0007et-Rr
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:11:55 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38751)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pak-0007dd-Ia
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:11:54 -0500
+Received: by mail-wr1-x441.google.com with SMTP id g12so23099790wrm.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 16:11:54 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-7-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7bb7933e-276d-3236-b4cc-ce18ce5ac9d4@amsat.org>
+Date: Sat, 9 Mar 2019 01:11:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8p9rSYEJQ7jPFvM9Q+UXi6r7Vr8voWQ_fhzzFX1=uVzw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20190307144126.31847-7-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] Add generic Nios II board.
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] tcg/arm: Support INDEX_op_extract2_i32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>, Andrew Jenner <andrew@codesourcery.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: david@redhat.com
 
-On 3/7/19 7:57 AM, Peter Maydell wrote:
->> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
->> index 5f0ab2f..c697047 100644
->> --- a/hw/nios2/boot.c
->> +++ b/hw/nios2/boot.c
->> @@ -140,6 +140,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
->>           uint64_t entry, low, high;
->>           uint32_t base32;
->>           int big_endian = 0;
->> +        int kernel_space = 0;
->>
->>   #ifdef TARGET_WORDS_BIGENDIAN
->>           big_endian = 1;
->> @@ -155,10 +156,12 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
->>                                      translate_kernel_address, NULL,
->>                                      &entry, NULL, NULL,
->>                                      big_endian, EM_ALTERA_NIOS2, 0, 0);
->> +            kernel_space = 1;
->>           }
->>
->>           /* Always boot into physical ram. */
->> -        boot_info.bootstrap_pc = ddr_base + 0xc0000000 + (entry & 0x07ffffff);
->> +        boot_info.bootstrap_pc = ddr_base + (kernel_space ? 0xc0000000 : 0)
->> +                                 + (entry & 0x07ffffff);
+On 3/7/19 3:41 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/arm/tcg-target.h     |  2 +-
+>  tcg/arm/tcg-target.inc.c | 25 +++++++++++++++++++++++++
+>  2 files changed, 26 insertions(+), 1 deletion(-)
 > 
-> It's not clear to me what's going on here, or why an
-> entry address of 0xc000_0000 is special, but I don't
-> know anything about NiosII -- maybe it's clear if you do?
+> diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
+> index 4ee6c98958..17e771374d 100644
+> --- a/tcg/arm/tcg-target.h
+> +++ b/tcg/arm/tcg-target.h
+> @@ -116,7 +116,7 @@ extern bool use_idiv_instructions;
+>  #define TCG_TARGET_HAS_deposit_i32      use_armv7_instructions
+>  #define TCG_TARGET_HAS_extract_i32      use_armv7_instructions
+>  #define TCG_TARGET_HAS_sextract_i32     use_armv7_instructions
+> -#define TCG_TARGET_HAS_extract2_i32     0
+> +#define TCG_TARGET_HAS_extract2_i32     1
+>  #define TCG_TARGET_HAS_movcond_i32      1
+>  #define TCG_TARGET_HAS_mulu2_i32        1
+>  #define TCG_TARGET_HAS_muls2_i32        1
+> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+> index 2245a8aeb9..6873b0cf95 100644
+> --- a/tcg/arm/tcg-target.inc.c
+> +++ b/tcg/arm/tcg-target.inc.c
+> @@ -2064,6 +2064,27 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+>      case INDEX_op_sextract_i32:
+>          tcg_out_sextract(s, COND_AL, args[0], args[1], args[2], args[3]);
+>          break;
+> +    case INDEX_op_extract2_i32:
+> +        /* ??? These optimization vs zero should be generic.  */
+> +        /* ??? But we can't substitute 2 for 1 in the opcode stream yet.  */
+> +        if (const_args[1]) {
+> +            if (const_args[2]) {
+> +                tcg_out_movi(s, TCG_TYPE_REG, args[0], 0);
+> +            } else {
+> +                tcg_out_dat_reg(s, COND_AL, ARITH_MOV, args[0], 0,
+> +                                args[2], SHIFT_IMM_LSL(32 - args[3]));
+> +            }
+> +        } else if (const_args[2]) {
+> +            tcg_out_dat_reg(s, COND_AL, ARITH_MOV, args[0], 0,
+> +                            args[1], SHIFT_IMM_LSR(args[3]));
+> +        } else {
+> +            /* We can do extract2 in 2 insns, vs the 3 required otherwise.  */
+> +            tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP, 0,
+> +                            args[2], SHIFT_IMM_LSL(32 - args[3]));
+> +            tcg_out_dat_reg(s, COND_AL, ARITH_ORR, args[0], TCG_REG_TMP,
+> +                            args[1], SHIFT_IMM_LSR(args[3]));
+> +        }
 
-The processor reference guide documents that the kernel is placed at 
-virtual memory address 0xc0000000.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-https://www.intel.com/content/www/us/en/programmable/documentation/iga1409256728501.html#iga1409332620358
-
-The problem the patch to boot.c is trying to solve is that we found 
-things like unwind info were screwed up when using -kernel to load 
-executables with an entry address other than 0xc0000000.
-
-> Why isn't the bootstrap_pc just always the entry address ?
-> Some comments on what is being done here and the use cases
-> being addressed might assist. I wasn't able to work out what
-> the remarks in the commit message meant, I'm afraid.
+> +        break;
+>  
+>      case INDEX_op_div_i32:
+>          tcg_out_sdiv(s, COND_AL, args[0], args[1], args[2]);
+> @@ -2108,6 +2129,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+>          = { .args_ct_str = { "s", "s", "s", "s" } };
+>      static const TCGTargetOpDef br
+>          = { .args_ct_str = { "r", "rIN" } };
+> +    static const TCGTargetOpDef ext2
+> +        = { .args_ct_str = { "r", "rZ", "rZ" } };
+>      static const TCGTargetOpDef dep
+>          = { .args_ct_str = { "r", "0", "rZ" } };
+>      static const TCGTargetOpDef movc
+> @@ -2174,6 +2197,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+>          return &br;
+>      case INDEX_op_deposit_i32:
+>          return &dep;
+> +    case INDEX_op_extract2_i32:
+> +        return &ext2;
+>      case INDEX_op_movcond_i32:
+>          return &movc;
+>      case INDEX_op_add2_i32:
 > 
-> Looking at the code, I don't think that the second call to
-> load_elf() will return a different entry address to the first
-> one (ie translate_kernel_address() is not applied to &entry).
-> That means that kernel_space is only true if entry == 0xc0000000,
-> and
->    (kernel_space ? 0xc0000000 : 0) + (entry & 0x07ffffff);
-> is almost the same thing as just 'entry'.
-
-It seems like these remarks are directed more at the existing code than 
-the patch....  :-S  TBH, I don't know why it was done that way originally.
-
-> 
->> +static void nios2_generic_nommu_init(MachineState *machine)
->> +{
->> +    Nios2CPU *cpu;
->> +    DeviceState *dev;
->> +    MemoryRegion *address_space_mem = get_system_memory();
->> +    MemoryRegion *phys_tcm = g_new(MemoryRegion, 1);
->> +    MemoryRegion *phys_tcm_alias = g_new(MemoryRegion, 1);
->> +    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
->> +    MemoryRegion *phys_ram_alias = g_new(MemoryRegion, 1);
->> +    ram_addr_t tcm_base = 0x0;
->> +    ram_addr_t tcm_size = 0x1000;    /* 1 kiB, but QEMU limit is 4 kiB */
->> +    ram_addr_t ram_base = 0x10000000;
->> +    ram_addr_t ram_size = 0x08000000;
->> +    qemu_irq *cpu_irq, irq[32];
->> +    int i;
-> 
-> The description says this is "generic", but it appears to
-> be almost identical to the existing 10M50 board model,
-> including having exactly the same devices at the same
-> apparently arbitrary addresses.
-> 
-> Could we instead add a machine parameter to the existing
-> board so you could say "-machine 10m50-ghrd,mmu=no"
-> (and drop the other changes -- it's not clear what they're
-> needed for) ?
-> 
-> If it really ought to be a separate board model, perhaps
-> it should be in the same source file and share the common
-> code.
-
-I didn't write this code, but the intent was actually to allow 
-executables linked for the 3c120 devboards we'd been using for hardware 
-testing to run in this emulation; not to emulate a mmu-less 10m50 board. 
-  The BSP that we contributed to libgloss locates the reset vector, etc 
-appropriately for this emulation.
-
-I can't comment on whether the peripherals copied from the 10m50 
-emulation are actually necessary or useful for anything; we certainly 
-don't intend to support manipulating them from the program being loaded, 
-but maybe other parts of QEMU expect certain devices to be present (I've 
-seen that on other targets like ARM).  Andrew, do you have any state on 
-this left?
-
--Sandra
