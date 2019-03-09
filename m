@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47414)
+Received: from eggs.gnu.org ([209.51.188.92]:40000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1h2ZyU-00085i-Lc
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:07 -0500
+	(envelope-from <mprivozn@redhat.com>) id 1h2bqs-0001th-JP
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 08:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1h2ZyT-0001AM-P2
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:06 -0500
-Received: from mga14.intel.com ([192.55.52.115]:8467)
+	(envelope-from <mprivozn@redhat.com>) id 1h2bqr-00042j-HB
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 08:17:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1h2ZyT-00011a-D1
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:05 -0500
-Message-ID: <5C83A1DF.2020803@intel.com>
-Date: Sat, 09 Mar 2019 19:22:07 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1h2bqr-0003yj-7b
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 08:17:21 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 275F385360
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 13:10:31 +0000 (UTC)
+References: <20190309004826.9027-1-lersek@redhat.com>
+From: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+Message-ID: <c1c9b441-3d2d-7178-aa2b-1439bc97d6a6@redhat.com>
+Date: Sat, 9 Mar 2019 14:10:17 +0100
 MIME-Version: 1.0
-References: <20190306114227.9125-1-dgilbert@redhat.com>
-	<20190306114227.9125-20-dgilbert@redhat.com>
-	<CAFEAcA-mJdymqYBp-xrUbrXQ_fZ+mTZ90DG0nQs3v40HVxETzA@mail.gmail.com>
-	<20190308183053.GI2834@work-vm>
-In-Reply-To: <20190308183053.GI2834@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20190309004826.9027-1-lersek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: sk-SK
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 19/22] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Subject: Re: [Qemu-devel] [PATCH 00/10] bundle edk2 platform firmware with
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +34,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, yury-kotov@yandex-team.ru, Zhang Chen <chen.zhang@intel.com>, Markus Armbruster <armbru@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
-On 03/09/2019 02:30 AM, Dr. David Alan Gilbert wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> On Wed, 6 Mar 2019 at 11:55, Dr. David Alan Gilbert (git)
->> <dgilbert@redhat.com> wrote:
->>> From: Wei Wang <wei.w.wang@intel.com>
->
-> Wei: Can you look at this....
+On 3/9/19 1:48 AM, Laszlo Ersek wrote:
+> Repo:   https://github.com/lersek/qemu.git
+> Branch: edk2_build
+> 
+> This series advances the roms/edk2 submodule to the "edk2-stable201903"
+> release, and builds and captures platform firmware binaries from that
+> release. At this point they are meant to be used by both end-users and
+> by Igor's ACPI unit tests in qtest ("make check").
+> 
+> Previous discussion:
+> 
+>   [Qemu-devel] bundling edk2 platform firmware images with QEMU
+>   http://mid.mail-archive.com/80f0bae3-e79a-bb68-04c4-1c9c684d95b8@redhat.com
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02601.html
+> 
+> Note that the series was formatted with "--no-binary" (affecting patch
+> #8), therefore it cannot be applied with "git-am". See the remote
+> repo/branch reference near the top instead.
+> 
+> Thanks,
+> Laszlo
+> 
+> Laszlo Ersek (10):
+>   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+>   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+>   tests/uefi-test-tools/build.sh: work around TianoCore#1607
+>   roms/edk2: advance to tag edk2-stable201903
+>   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+>   roms/Makefile: replace the $(EFIROM) target with "edk2-basetools"
+>   roms: build edk2 firmware binaries and variable store templates
+>   pc-bios: add edk2 firmware binaries and variable store templates
+>   pc-bios: document the edk2 firmware images; add firmware descriptors
+>   Makefile: install the edk2 firmware images and their descriptors
+> 
+>  Makefile                                       |  17 +-
+>  pc-bios/README                                 |  11 +
+>  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
+>  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
+>  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
+>  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
+>  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
+>  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
+>  pc-bios/edk2-aarch64-code.fd                   | Bin 0 -> 67108864 bytes
+>  pc-bios/edk2-arm-code.fd                       | Bin 0 -> 67108864 bytes
+>  pc-bios/edk2-arm-vars.fd                       | Bin 0 -> 67108864 bytes
+>  pc-bios/edk2-i386-code.fd                      | Bin 0 -> 3653632 bytes
+>  pc-bios/edk2-i386-secure-code.fd               | Bin 0 -> 3653632 bytes
+>  pc-bios/edk2-i386-vars.fd                      | Bin 0 -> 540672 bytes
+>  pc-bios/edk2-licenses.txt                      | 209 ++++++++++++++++
+>  pc-bios/edk2-x86_64-code.fd                    | Bin 0 -> 3653632 bytes
+>  pc-bios/edk2-x86_64-secure-code.fd             | Bin 0 -> 3653632 bytes
+>  roms/Makefile                                  |   9 +-
+>  roms/Makefile.edk2                             | 138 +++++++++++
+>  roms/edk2                                      |   2 +-
+>  roms/edk2-build.sh                             |  55 +++++
+>  roms/edk2-funcs.sh                             | 253 ++++++++++++++++++++
+>  tests/uefi-test-tools/build.sh                 | 100 +-------
+>  23 files changed, 897 insertions(+), 95 deletions(-)
+>  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
+>  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
+>  create mode 100644 pc-bios/edk2-aarch64-code.fd
+>  create mode 100644 pc-bios/edk2-arm-code.fd
+>  create mode 100644 pc-bios/edk2-arm-vars.fd
+>  create mode 100644 pc-bios/edk2-i386-code.fd
+>  create mode 100644 pc-bios/edk2-i386-secure-code.fd
+>  create mode 100644 pc-bios/edk2-i386-vars.fd
+>  create mode 100644 pc-bios/edk2-licenses.txt
+>  create mode 100644 pc-bios/edk2-x86_64-code.fd
+>  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd
+>  create mode 100644 roms/Makefile.edk2
+>  create mode 100755 roms/edk2-build.sh
+>  create mode 100644 roms/edk2-funcs.sh
+> 
 
-Sure, I'll send a followup patch to fix this.
+Unsure whether my ACK is worth anything on this list, but you have it.
 
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
 
->
->>> The new feature enables the virtio-balloon device to receive hints of
->>> guest free pages from the free page vq.
->>>
->>> A notifier is registered to the migration precopy notifier chain. The
->>> notifier calls free_page_start after the migration thread syncs the dirty
->>> bitmap, so that the free page optimization starts to clear bits of free
->>> pages from the bitmap. It calls the free_page_stop before the migration
->>> thread syncs the bitmap, which is the end of the current round of ram
->>> save. The free_page_stop is also called to stop the optimization in the
->>> case when there is an error occurred in the process of ram saving.
->>>
->>> Note: balloon will report pages which were free at the time of this call.
->>> As the reporting happens asynchronously, dirty bit logging must be
->>> enabled before this free_page_start call is made. Guest reporting must be
->>> disabled before the migration dirty bitmap is synchronized.
->>>
->>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>> CC: Michael S. Tsirkin <mst@redhat.com>
->>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> CC: Juan Quintela <quintela@redhat.com>
->>> CC: Peter Xu <peterx@redhat.com>
->>> Message-Id: <1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
->>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>    dgilbert: Dropped kernel header update, fixed up CMD_ID_* name change
->>> ---
->> Hi -- Coverity points out a use-after-free here (CID 1399412):
->>
->>> +static bool get_free_page_hints(VirtIOBalloon *dev)
->>> +{
->>> +    VirtQueueElement *elem;
->>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->>> +    VirtQueue *vq = dev->free_page_vq;
->>> +
->>> +    while (dev->block_iothread) {
->>> +        qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
->>> +    }
->>> +
->>> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
->>> +    if (!elem) {
->>> +        return false;
->>> +    }
->>> +
->>> +    if (elem->out_num) {
->>> +        uint32_t id;
->>> +        size_t size = iov_to_buf(elem->out_sg, elem->out_num, 0,
->>> +                                 &id, sizeof(id));
->>> +        virtqueue_push(vq, elem, size);
->>> +        g_free(elem);
->> Here we free elem...
->>
->>> +
->>> +        virtio_tswap32s(vdev, &id);
->>> +        if (unlikely(size != sizeof(id))) {
->>> +            virtio_error(vdev, "received an incorrect cmd id");
->>> +            return false;
->>> +        }
->>> +        if (id == dev->free_page_report_cmd_id) {
->>> +            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
->>> +        } else {
->>> +            /*
->>> +             * Stop the optimization only when it has started. This
->>> +             * avoids a stale stop sign for the previous command.
->>> +             */
->>> +            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
->>> +                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
->>> +            }
->>> +        }
->>> +    }
->>> +
->>> +    if (elem->in_num) {
->> ...but we can fall through here and try to dereference elem...
->>
->>> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
->>> +            qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
->>> +                                      elem->in_sg[0].iov_len);
->>> +        }
->>> +        virtqueue_push(vq, elem, 1);
->>> +        g_free(elem);
->> ...and then free it again.
-> OK, so the question here is:
->    Is it allowed to have both in and out in the same queue element; if
-> it's not then we need to error the device.
->    If it is allowed then we need to fix up the out_num case.
->
+Now that libvirt patches for consuming those JSON descriptions are
+almost merged, distros can start picking this up.
 
-I think it is allowed. From virtqueue_pop, an elem could consist of 
-several inbufs and outbufs.
-
-Probably we could just delay the free till the end of this 
-function..will post the fix patch for review soon.
-
-Best,
-Wei
+Michal
