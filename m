@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47237)
+Received: from eggs.gnu.org ([209.51.188.92]:47275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wic-0003qj-6k
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:30 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0003t5-22
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wia-0000Qe-AN
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:30 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55316)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wie-0000UU-4W
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:33 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:36876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2WiY-0000M2-Ci
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:27 -0500
-Received: by mail-wm1-x335.google.com with SMTP id q187so14583757wme.5
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:24 -0800 (PST)
+	id 1h2Wic-0000Pd-6G
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:31 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id x10so14099387wmg.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:28 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:47:57 +0100
-Message-Id: <1552117698-12355-5-git-send-email-pbonzini@redhat.com>
+Date: Sat,  9 Mar 2019 08:48:01 +0100
+Message-Id: <1552117698-12355-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/25] block/iscsi: Restrict Linux-specific code
+Subject: [Qemu-devel] [PULL 08/25] i386: extended the cpuid_level when Intel
+ PT is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +29,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Luwei Kang <luwei.kang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Luwei Kang <luwei.kang@intel.com>
 
-Some Linux specific code is missing guards, leading to
-build failure on OSX:
+Intel Processor Trace required CPUID[0x14] but the cpuid_level
+have no change when create a kvm guest with
+e.g. "-cpu qemu64,+intel-pt".
 
-  $ sudo brew install libiscsi
-  $ ./configure && make
-  [...]
-    CC      block/iscsi.o
-  qemu/block/iscsi.c:338:24: error: 'iscsi_aiocb_info' defined but not used [-Werror=unused-const-variable=]
-   static const AIOCBInfo iscsi_aiocb_info = {
-                          ^~~~~~~~~~~~~~~~
-  qemu/block/iscsi.c:168:1: error: 'iscsi_schedule_bh' defined but not used [-Werror=unused-function]
-   iscsi_schedule_bh(IscsiAIOCB *acb)
-   ^~~~~~~~~~~~~~~~~
-  cc1: all warnings being treated as errors
-
-Add guards to restrict this code for Linux.
-
-Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
-Message-Id: <20190220000553.28438-1-philmd@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+Message-Id: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- block/iscsi.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/i386/pc.c      | 1 +
+ target/i386/cpu.c | 9 +++++++++
+ target/i386/cpu.h | 3 +++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index a0c0084..f31c612 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -145,6 +145,8 @@ static const unsigned iscsi_retry_times[] = {8, 32, 128, 512, 2048, 8192, 32768}
-  * unallocated. */
- #define ISCSI_CHECKALLOC_THRES 64
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9c8f833..c6d047b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -136,6 +136,7 @@ GlobalProperty pc_compat_3_1[] = {
+     { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+     { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+     { "Cascadelake-Server" "-" TYPE_X86_CPU, "stepping", "5" },
++    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
+ };
+ const size_t pc_compat_3_1_len = G_N_ELEMENTS(pc_compat_3_1);
  
-+#ifdef __linux__
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d3aa6a8..d90c01a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5031,6 +5031,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
 +
- static void
- iscsi_bh_cb(void *p)
- {
-@@ -172,6 +174,8 @@ iscsi_schedule_bh(IscsiAIOCB *acb)
-     qemu_bh_schedule(acb->bh);
- }
- 
-+#endif
++        /* Intel Processor Trace requires CPUID[0x14] */
++        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
++             kvm_enabled() && cpu->intel_pt_auto_level) {
++            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
++        }
 +
- static void iscsi_co_generic_bh_cb(void *opaque)
- {
-     struct IscsiTask *iTask = opaque;
-@@ -290,6 +294,8 @@ static void iscsi_co_init_iscsitask(IscsiLun *iscsilun, struct IscsiTask *iTask)
-     };
- }
- 
-+#ifdef __linux__
-+
- /* Called (via iscsi_service) with QemuMutex held. */
- static void
- iscsi_abort_task_cb(struct iscsi_context *iscsi, int status, void *command_data,
-@@ -338,6 +344,7 @@ static const AIOCBInfo iscsi_aiocb_info = {
-     .cancel_async       = iscsi_aio_cancel,
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+@@ -5824,6 +5831,8 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
+     DEFINE_PROP_BOOL("x-hv-synic-kvm-only", X86CPU, hyperv_synic_kvm_only,
+                      false),
++    DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_level,
++                     true),
+     DEFINE_PROP_END_OF_LIST()
  };
  
-+#endif
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 95112b9..83fb522 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1454,6 +1454,9 @@ struct X86CPU {
+     /* Enable auto level-increase for all CPUID leaves */
+     bool full_cpuid_auto_level;
  
- static void iscsi_process_read(void *arg);
- static void iscsi_process_write(void *arg);
++    /* Enable auto level-increase for Intel Processor Trace leave */
++    bool intel_pt_auto_level;
++
+     /* if true fill the top bits of the MTRR_PHYSMASKn variable range */
+     bool fill_mtrr_mask;
+ 
 -- 
 1.8.3.1
