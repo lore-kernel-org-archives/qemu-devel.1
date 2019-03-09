@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45914)
+Received: from eggs.gnu.org ([209.51.188.92]:50965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2j5O-0005U9-0f
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2jhp-0002hz-1k
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2j5N-0005Ak-3s
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2j5M-00057L-Rx
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2j5L-0002KE-Je
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 21:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 758232E80CD
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 21:00:47 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1h2jho-00016J-2W
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:40:33 -0500
+Resent-Message-Id: <E1h2jho-00016J-2W@eggs.gnu.org>
+Message-ID: <155216760406.8146.5929094742377229921@6acff2cf482b>
+In-Reply-To: <1551968334-18982-1-git-send-email-thuth@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Mar 2019 20:54:46 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155216488641.28864.1317149550461443380.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
- $source_path contains white spaces
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 9 Mar 2019 13:40:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4 00/29] Kconfig dependencies for ARM
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +24,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: thuth@redhat.com
+Cc: fam@euphon.net, yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, jsnow@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com, mst@redhat.com
 
-Deepika: the tricky part is the makefiles, not the configure script...
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817345
-
-Title:
-  configure script breaks when $source_path contains white spaces
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-
-  I noticed that the configure script breaks when the qemu source
-  directory is in a path containing white spaces, in particular the list
-  of targets is not correctly generated when calling "./configure
-  --help".
-
-  Steps to reproduce the problem:
-
-  $ mkdir "dir with spaces"
-  $ cd dir\ with\ spaces/
-  $ git clone https://git.qemu.org/git/qemu.git
-  $ cd qemu/
-  $ ./configure --help | grep -A3 target-list
-
-  =
-
-  Actual result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: dir with *-softmmu dir with =
-
-                             *-linux-user
-
-  =
-
-  Expected result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: aarch64-softmmu alpha-softm=
-mu =
-
-                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
-tmmu =
-
-                             lm32-softmmu m68k-softmmu microblaze-softmmu =
-
-
-  =
-
-  This happens because the $mak_wilds variable uses spaces to separate diff=
-erent paths, maybe newlines may be used, which are less likely to be in dir=
-ectory names.
-
-  BTW "shellcheck" may help finding some other problems.
-
-  Qemu version:
-
-  $ git describe =
-
-  v3.1.0-1960-ga05838cb2a
-
-  Thanks,
-     Antonio
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUxOTY4MzM0LTE4OTgyLTEt
+Z2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
+c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
+IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
+bmd3QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgogIENDICAgICAgaHcvdXNiL2Rldi13YWNvbS5vCiAgQ0MgICAgICBody91c2IvZGV2LXN0
+b3JhZ2UubwpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3RwbS90
+cG1fZW11bGF0b3IuYzozNzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3RwbS90cG1faW9jdGwuaDox
+MToxMDogZmF0YWwgZXJyb3I6IHN5cy91aW8uaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQog
+I2luY2x1ZGUgPHN5cy91aW8uaD4KICAgICAgICAgIF5+fn5+fn5+fn5+CmNvbXBpbGF0aW9uIHRl
+cm1pbmF0ZWQuCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8xNTUxOTY4MzM0LTE4OTgyLTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNv
+bS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
