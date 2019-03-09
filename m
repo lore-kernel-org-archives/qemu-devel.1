@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37295)
+Received: from eggs.gnu.org ([209.51.188.92]:37564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2R3P-0000ZV-Qm
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:36 -0500
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h2R56-0001GM-K3
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:47:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2R3O-0001oi-KC
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2R3O-0001nF-Dk
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2R3M-00072g-D6
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 01:45:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A0572E80CC
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 01:45:32 +0000 (UTC)
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1h2R55-0003RH-PG
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:47:20 -0500
+Date: Sat, 9 Mar 2019 09:46:48 +0800
+From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Message-ID: <20190309014648.GA28010@byw>
+Reply-To: baiyaowei@cmss.chinamobile.com
+References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	<20190306215633.GM6818@localhost.localdomain>
+	<20190307084405.GB26350@byw>
+	<20190307112505.GB5786@linux.fritz.box> <20190308072230.GA9529@byw>
+	<20190308100826.GB5339@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Mar 2019 01:35:41 -0000
-From: umarcor <1817239@bugs.launchpad.net>
-Reply-To: Bug 1817239 <1817239@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155080581544.22842.8774442486795126526.malonedeb@wampee.canonical.com>
-Message-Id: <155209534203.9449.13630241082296365109.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817239] Re: add '--targets' option to
- qemu-binfmt-conf.sh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190308100826.GB5339@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
+ utility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,96 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>, Fam Zheng <fam@euphon.net>, stefanha <stefanha@redhat.com>, Yaowei Bai <baiyaowei@cmss.chinamobile.com>
 
-I submitted a first version some days ago, which homogeneized the
-implementation, as suggested by Laurent Vivier. It received some
-feedback from Eric Blake. A patchset (v3) is ready for review:
-https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/#
+> 
+> I'm not sure what check you mean. Case 2 would need to find an existing
+> export with the given name, of course, and would return an error if no
+> such export exists yet.
+> 
+> But for care 1, isn't the image explicitly opened when the target is
+> configured? And if it can't be opened, -1 is returned to libtcmu?
 
-The feature requested in this issue is included in the patchset:
+Yes it is. I misunderstood your meaning, forget about this.
 
-[Qemu-devel] [PATCH v3 6/10] qemu-binfmt-conf.sh: generalize <CPU> to posit=
-ional <CPUS> =
+> 
+> > Actually we thought about qemu-tcmu working like case2, but felt is's quite less
+> > flexible. With case2, e.g. when we want to export another new image file with
+> > one qemu-tcmu already running, we have to run another qemu-tcmu with
+> > the configuration of the new image file in commandline, or through QMP of the
+> > running qemu-tcmu, and then configure it with targetcli. So anyway,
+> > there's one more step for case2 to export a new image file. While for case1 
+> > you just need to run qemu-tcmu once and all other operations will be done
+> > within targetcli, which is more friendly to users i think.
+> 
+> Some users may call it more convenient (even though it's really the
+> same, just moved to a different command, in the simple case that case 2
+> supports). But it's actually not very flexible.
+> 
+> If we implement case 1, you can define your configuration exactly as
+> with QEMU, including multiple -blockdev and -object options, and select
+> the exact block node that you want to export.
+> 
+> In case 2, you only have a single string, which comes with many
+> downsides:
+> 
+> * You cannot get the semantics of block nodes defined individually with
+>   separate -blockdev options, but only a single tree that is managed as
+>   a single unit.
+> 
+> * Additional objects such as iothreads or secrets cannot be included in
+>   the config string, so you must split the configuration and pass some
+>   parts directly to qemu-tcmu and other parts to targetcli. This is
+>   inconsistent.
+> 
+> * You need a way to represent a possible options of a node in a string.
+>   QEMU -drive already caused trouble by giving commas a special meaning.
+>   This patch adds @ as a special character, without an option to escape
+>   it. If you have a filename that contains @, there is no way to use it.
+> 
+> * For the not yet implemented QMP part: You can export only images that
+>   are newly opened. You cannot export images that are already opened and
+>   in use. But exporting images that are in use by the VM is the main use
+>   of even having a QMP interface.
+> 
+> If I think a bit longer, I'm sure I can come up with more points. Case 2
+> just doesn't feel right, it is like drives were configured in QEMU 0.10,
+> not in 4.0, and we moved away from it for many reasons, most of which
+> probably apply here, too.
 
-https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/20190306045019.GF=
-75@03612eec87fc/
+Thanks for explaining the background. It comes to my mind that actually we
+talked about these two cases with Fam a bit long time ago and decided to
+support both these two cases. The reason why we implement case2 first is
+currently we care more about exporting new opened images and it's a bit
+more convenient, exporting from a VM or QMP can be added in the later
+release. Do you think it's reasonable/acceptable that we support both
+cases and use case2 for normal new opened images and case1 for the
+circumstances you mention above?
 
-Note that, instead of adding a parameter named `--target`, positional
-arguments are used, which where not being processed at all.
-
-** Changed in: qemu
-       Status: New =3D> In Progress
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817239
-
-Title:
-  add '--targets' option to qemu-binfmt-conf.sh
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  I'd like to ask for the addition of option '--targets' to scripts
-  /qemu-binfmt-conf.sh, in order to allow registering the interpreters
-  for the given list of architectures only, instead of using all of the
-  ones defined in qemu_target_list. The following is a possible patch
-  that implements it:
-
-   qemu-binfmt-conf.sh | 9 ++++++++-
-   1 file changed, 8 insertions(+), 1 deletion(-)
-
-  diff --git a/qemu-binfmt-conf.sh b/qemu-binfmt-conf.sh
-  index b5a1674..be4a19b 100644
-  --- a/qemu-binfmt-conf.sh
-  +++ b/qemu-binfmt-conf.sh
-  @@ -170,6 +170,7 @@ usage() {
-   Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                              [--help][--credential yes|no][--exportdir PAT=
-H]
-                              [--persistent yes|no][--qemu-suffix SUFFIX]
-  +                           [--targets TARGETS]
-
-          Configure binfmt_misc to use qemu interpreter
-
-  @@ -189,6 +190,8 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debia=
-n][--systemd CPU]
-          --persistent:  if yes, the interpreter is loaded when binfmt is
-                         configured and remains in memory. All future uses
-                         are cloned from the open file.
-  +       --targets:     comma-separated list of targets. If provided, only
-  +                      the targets in the list are registered.
-
-       To import templates with update-binfmts, use :
-
-  @@ -324,7 +327,7 @@ CREDENTIAL=3Dno
-   PERSISTENT=3Dno
-   QEMU_SUFFIX=3D""
-
-  -options=3D$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-=
-suffix:,exportdir:,help,credential:,persistent: -- "$@")
-  +options=3D$(getopt -o ds:Q:S:e:hc:p:t: -l debian,systemd:,qemu-path:,qem=
-u-suffix:,exportdir:,help,credential:,persistent:,targets: -- "$@")
-   eval set -- "$options"
-
-   while true ; do
-  @@ -380,6 +383,10 @@ while true ; do
-           shift
-           PERSISTENT=3D"$1"
-           ;;
-  +    -t|--targets)
-  +        shift
-  +        qemu_target_list=3D"$(echo "$1" | tr ',' ' ')"
-  +        ;;
-       *)
-           break
-           ;;
-  --
-  2.20.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817239/+subscriptions
+> 
