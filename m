@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47334)
+Received: from eggs.gnu.org ([209.51.188.92]:47444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003t9-4b
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:36 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wim-0003wQ-OV
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000Wh-C1
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:54879)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wim-0000dF-0f
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:40 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:34143)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2Wig-0000Tc-3n
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:34 -0500
-Received: by mail-wm1-x329.google.com with SMTP id f3so14573501wmj.4
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:31 -0800 (PST)
+	id 1h2Wil-0000cJ-PA
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:39 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id f14so23644687wrg.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:39 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:48:04 +0100
-Message-Id: <1552117698-12355-12-git-send-email-pbonzini@redhat.com>
+Date: Sat,  9 Mar 2019 08:48:13 +0100
+Message-Id: <1552117698-12355-21-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/25] lsi: check if SIGP bit is already set in
- Wait reselect
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 20/25] lsi: use ldn_le_p()/stn_le_p()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +35,70 @@ Cc: Sven Schnelle <svens@stackframe.org>
 
 From: Sven Schnelle <svens@stackframe.org>
 
-If SIGP is set, the 'Wait for Reselection' command should jump
-immediately to the address stored in the second DWORD of the
-instruction. This fixes spurious hangs in the HP-UX 11.11
-installer when the SIGP bit gets set by the kernel before the
-'Wait for Reselection' command is executed by SCRIPTS.
+Instead of using the open-coded versions, use the helper already
+present as this makes the code easier to read and less error-prone.
 
 Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Tested-by: Helge Deller <deller@gmx.de>
-Message-Id: <20190217113717.7077-1-svens@stackframe.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190305195519.24303-2-svens@stackframe.org>
 ---
- hw/scsi/lsi53c895a.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/scsi/lsi53c895a.c | 24 ++++--------------------
+ 1 file changed, 4 insertions(+), 20 deletions(-)
 
 diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 8ba07f8..bcff859 100644
+index bcff859..402b785 100644
 --- a/hw/scsi/lsi53c895a.c
 +++ b/hw/scsi/lsi53c895a.c
-@@ -1297,8 +1297,10 @@ again:
-                 }
-                 break;
-             case 2: /* Wait Reselect */
--                if (!lsi_irq_on_rsl(s)) {
--                    lsi_wait_reselect(s);
-+                if (s->istat0 & LSI_ISTAT0_SIGP) {
-+                    s->dsp = s->dnad;
-+                } else if (!lsi_irq_on_rsl(s)) {
-+                        lsi_wait_reselect(s);
-                 }
-                 break;
-             case 3: /* Set */
+@@ -289,8 +289,7 @@ typedef struct {
+     uint8_t sbr;
+     uint32_t adder;
+ 
+-    /* Script ram is stored as 32-bit words in host byteorder.  */
+-    uint32_t script_ram[2048];
++    uint8_t script_ram[2048 * sizeof(uint32_t)];
+ } LSIState;
+ 
+ #define TYPE_LSI53C810  "lsi53c810"
+@@ -2079,29 +2078,14 @@ static void lsi_ram_write(void *opaque, hwaddr addr,
+                           uint64_t val, unsigned size)
+ {
+     LSIState *s = opaque;
+-    uint32_t newval;
+-    uint32_t mask;
+-    int shift;
+-
+-    newval = s->script_ram[addr >> 2];
+-    shift = (addr & 3) * 8;
+-    mask = ((uint64_t)1 << (size * 8)) - 1;
+-    newval &= ~(mask << shift);
+-    newval |= val << shift;
+-    s->script_ram[addr >> 2] = newval;
++    stn_le_p(s->script_ram + addr, size, val);
+ }
+ 
+ static uint64_t lsi_ram_read(void *opaque, hwaddr addr,
+                              unsigned size)
+ {
+     LSIState *s = opaque;
+-    uint32_t val;
+-    uint32_t mask;
+-
+-    val = s->script_ram[addr >> 2];
+-    mask = ((uint64_t)1 << (size * 8)) - 1;
+-    val >>= (addr & 3) * 8;
+-    return val & mask;
++    return ldn_le_p(s->script_ram + addr, size);
+ }
+ 
+ static const MemoryRegionOps lsi_ram_ops = {
+@@ -2244,7 +2228,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
+         VMSTATE_BUFFER_UNSAFE(scratch, LSIState, 0, 18 * sizeof(uint32_t)),
+         VMSTATE_UINT8(sbr, LSIState),
+ 
+-        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 2048 * sizeof(uint32_t)),
++        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 8192),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 1.8.3.1
