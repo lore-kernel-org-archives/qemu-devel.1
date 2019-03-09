@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47457)
+Received: from eggs.gnu.org ([209.51.188.92]:47553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Win-0003xM-TA
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:42 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2WjH-0004PK-Jt
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:49:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wim-0000e3-TG
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:41 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:47016)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2WjG-0001Hc-SZ
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:49:11 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40561)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2Wim-0000dJ-Je
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:40 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id i16so23627107wrs.13
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:40 -0800 (PST)
+	id 1h2WjG-0001Ga-LG
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:49:10 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so4447275wrw.7
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:49:10 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20190219211936.6466-1-viktor.prutyanov@phystech.edu>
+	<d0855c42-bd84-4f90-9af3-0080e0de1740@redhat.com>
+	<CAFEAcA-vMz=2XNkZ7n1WUBj6sMXk4Ffe_-3=tO1-2rowD0O0KQ@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:48:14 +0100
-Message-Id: <1552117698-12355-22-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <1d4754e8-fd06-f3b8-93f7-743e8606ad9c@redhat.com>
+Date: Sat, 9 Mar 2019 08:49:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/25] lsi: use enum type for s->waiting
+In-Reply-To: <CAFEAcA-vMz=2XNkZ7n1WUBj6sMXk4Ffe_-3=tO1-2rowD0O0KQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] contrib/elf2dmp: add kernel start address
+ checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +34,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Sven Schnelle <svens@stackframe.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Roman Kagan <rkagan@virtuozzo.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Sven Schnelle <svens@stackframe.org>
+On 08/03/19 18:55, Peter Maydell wrote:
+> On Wed, 20 Feb 2019 at 11:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 19/02/19 22:19, Viktor Prutyanov wrote:
+>>> Before this patch, if elf2dmp failed to find NT kernel PE magic in
+>>> allowed virtual address range, then it assumes NULL as NT kernel
+>>> address and cause segfault.
+>>>
+>>> This patch fix the problem described above by checking NT kernel address
+>>> before futher processing.
+>>>
+>>> Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+>>> ---
+>>>  contrib/elf2dmp/main.c | 6 ++++++
+>>>  1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/contrib/elf2dmp/main.c b/contrib/elf2dmp/main.c
+>>> index 1a45eaf565..1bfeb89ba7 100644
+>>> --- a/contrib/elf2dmp/main.c
+>>> +++ b/contrib/elf2dmp/main.c
+>>> @@ -524,6 +524,12 @@ int main(int argc, char *argv[])
+>>>          }
+>>>      }
+>>>
+>>> +    if (!nt_start_addr) {
+>>> +        eprintf("Failed to find NT kernel image\n");
+>>> +        err = 1;
+>>> +        goto out_ps;
+>>> +    }
+>>> +
+>>>      printf("KernBase = 0x%016"PRIx64", signature is \'%.2s\'\n", KernBase,
+>>>              (char *)nt_start_addr);
+>>>
+>>>
+>>
+>> Queued, thanks.
+> 
+> Hi Paolo -- I noticed this fix wasn't in master yet -- is it in
+> a tree you're planning on sending a pullreq for soon?
 
-This makes the code easier to read - no functional change.
+Yep, I just wanted to flush kconfig and qgraph before everybody starts
+sending pull requests for soft freeze.
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190305195519.24303-3-svens@stackframe.org>
----
- hw/scsi/lsi53c895a.c | 42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
-
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 402b785..c17bb4f 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -194,6 +194,13 @@ typedef struct lsi_request {
-     QTAILQ_ENTRY(lsi_request) next;
- } lsi_request;
- 
-+enum {
-+    LSI_NOWAIT, /* SCRIPTS are running or stopped */
-+    LSI_WAIT_RESELECT, /* Wait Reselect instruction has been issued */
-+    LSI_DMA_SCRIPTS, /* processing DMA from lsi_execute_script */
-+    LSI_DMA_IN_PROGRESS, /* DMA operation is in progress */
-+};
-+
- typedef struct {
-     /*< private >*/
-     PCIDevice parent_obj;
-@@ -212,10 +219,6 @@ typedef struct {
-     int msg_action;
-     int msg_len;
-     uint8_t msg[LSI_MAX_MSGIN_LEN];
--    /* 0 if SCRIPTS are running or stopped.
--     * 1 if a Wait Reselect instruction has been issued.
--     * 2 if processing DMA from lsi_execute_script.
--     * 3 if a DMA operation is in progress.  */
-     int waiting;
-     SCSIBus bus;
-     int current_lun;
-@@ -322,7 +325,7 @@ static void lsi_soft_reset(LSIState *s)
- 
-     s->msg_action = 0;
-     s->msg_len = 0;
--    s->waiting = 0;
-+    s->waiting = LSI_NOWAIT;
-     s->dsa = 0;
-     s->dnad = 0;
-     s->dbc = 0;
-@@ -564,10 +567,10 @@ static void lsi_bad_phase(LSIState *s, int out, int new_phase)
- static void lsi_resume_script(LSIState *s)
- {
-     if (s->waiting != 2) {
--        s->waiting = 0;
-+        s->waiting = LSI_NOWAIT;
-         lsi_execute_script(s);
-     } else {
--        s->waiting = 0;
-+        s->waiting = LSI_NOWAIT;
-     }
- }
- 
-@@ -744,7 +747,7 @@ static int lsi_queue_req(LSIState *s, SCSIRequest *req, uint32_t len)
-        Since no interrupt stacking is implemented in the emulation, it
-        is also required that there are no pending interrupts waiting
-        for service from the device driver. */
--    if (s->waiting == 1 ||
-+    if (s->waiting == LSI_WAIT_RESELECT ||
-         (lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON) &&
-          !(s->istat0 & (LSI_ISTAT0_SIP | LSI_ISTAT0_DIP)))) {
-         /* Reselect device.  */
-@@ -789,7 +792,7 @@ static void lsi_transfer_data(SCSIRequest *req, uint32_t len)
-     int out;
- 
-     assert(req->hba_private);
--    if (s->waiting == 1 || req->hba_private != s->current ||
-+    if (s->waiting == LSI_WAIT_RESELECT || req->hba_private != s->current ||
-         (lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON))) {
-         if (lsi_queue_req(s, req, len)) {
-             return;
-@@ -803,7 +806,7 @@ static void lsi_transfer_data(SCSIRequest *req, uint32_t len)
-     s->current->dma_len = len;
-     s->command_complete = 1;
-     if (s->waiting) {
--        if (s->waiting == 1 || s->dbc == 0) {
-+        if (s->waiting == LSI_WAIT_RESELECT || s->dbc == 0) {
-             lsi_resume_script(s);
-         } else {
-             lsi_do_dma(s, out);
-@@ -1093,7 +1096,7 @@ static void lsi_wait_reselect(LSIState *s)
-         lsi_reselect(s, p);
-     }
-     if (s->current == NULL) {
--        s->waiting = 1;
-+        s->waiting = LSI_WAIT_RESELECT;
-     }
- }
- 
-@@ -1202,16 +1205,16 @@ again:
-         s->dnad64 = addr_high;
-         switch (s->sstat1 & 0x7) {
-         case PHASE_DO:
--            s->waiting = 2;
-+            s->waiting = LSI_DMA_SCRIPTS;
-             lsi_do_dma(s, 1);
-             if (s->waiting)
--                s->waiting = 3;
-+                s->waiting = LSI_DMA_IN_PROGRESS;
-             break;
-         case PHASE_DI:
--            s->waiting = 2;
-+            s->waiting = LSI_DMA_SCRIPTS;
-             lsi_do_dma(s, 0);
-             if (s->waiting)
--                s->waiting = 3;
-+                s->waiting = LSI_DMA_IN_PROGRESS;
-             break;
-         case PHASE_CMD:
-             lsi_do_command(s);
-@@ -1278,6 +1281,7 @@ again:
-                 }
-                 s->sbcl |= LSI_SBCL_BSY;
-                 lsi_set_phase(s, PHASE_MO);
-+                s->waiting = LSI_NOWAIT;
-                 break;
-             case 1: /* Disconnect */
-                 trace_lsi_execute_script_io_disconnect();
-@@ -1544,7 +1548,7 @@ again:
-             }
-         }
-     }
--    if (insn_processed > 10000 && !s->waiting) {
-+    if (insn_processed > 10000 && s->waiting == LSI_NOWAIT) {
-         /* Some windows drivers make the device spin waiting for a memory
-            location to change.  If we have been executed a lot of code then
-            assume this is the case and force an unexpected device disconnect.
-@@ -1556,7 +1560,7 @@ again:
-         }
-         lsi_script_scsi_interrupt(s, LSI_SIST0_UDC, 0);
-         lsi_disconnect(s);
--    } else if (s->istat1 & LSI_ISTAT1_SRUN && !s->waiting) {
-+    } else if (s->istat1 & LSI_ISTAT1_SRUN && s->waiting == LSI_NOWAIT) {
-         if (s->dcntl & LSI_DCNTL_SSM) {
-             lsi_script_dma_interrupt(s, LSI_DSTAT_SSI);
-         } else {
-@@ -1887,9 +1891,9 @@ static void lsi_reg_writeb(LSIState *s, int offset, uint8_t val)
-             s->istat0 &= ~LSI_ISTAT0_INTF;
-             lsi_update_irq(s);
-         }
--        if (s->waiting == 1 && val & LSI_ISTAT0_SIGP) {
-+        if (s->waiting == LSI_WAIT_RESELECT && val & LSI_ISTAT0_SIGP) {
-             trace_lsi_awoken();
--            s->waiting = 0;
-+            s->waiting = LSI_NOWAIT;
-             s->dsp = s->dnad;
-             lsi_execute_script(s);
-         }
--- 
-1.8.3.1
+Paolo
