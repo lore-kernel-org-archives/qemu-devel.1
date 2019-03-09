@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45167)
+Received: from eggs.gnu.org ([209.51.188.92]:45914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2j09-0003fp-Qm
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:55:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1h2j5O-0005U9-0f
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2j09-0007Ft-14
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:55:25 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:36770)
+	(envelope-from <bounces@canonical.com>) id 1h2j5N-0005Ak-3s
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46292)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2j08-0007Do-Lt
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:55:24 -0500
-Received: by mail-oi1-x234.google.com with SMTP id t206so811918oib.3
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 12:55:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h2j5M-00057L-Rx
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 16:00:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h2j5L-0002KE-Je
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 21:00:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 758232E80CD
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 21:00:47 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190308165344.10685-1-stefanha@redhat.com>
-In-Reply-To: <20190308165344.10685-1-stefanha@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 09 Mar 2019 20:54:46 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 9 Mar 2019 20:55:11 +0000
-Message-ID: <CAFEAcA9muwNYJ9UdYqvP8Bcu-ZZ9QU7NsneRgObkjjY9mmsz5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] Block patches
+Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155216488641.28864.1317149550461443380.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
+ $source_path contains white spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, 8 Mar 2019 at 16:53, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit 6cb4f6db4f4367faa33da85b15f75bbbd2bed2a6:
->
->   Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-03-07 16:16:02 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 6ca206204fa773c8626d59caf2a5676d6cc35f52:
->
->   iothread: document about why we need explicit aio_poll() (2019-03-08 10:20:57 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
+Deepika: the tricky part is the makefiles, not the configure script...
 
-Applied, thanks.
+-- =
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817345
 
--- PMM
+Title:
+  configure script breaks when $source_path contains white spaces
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I noticed that the configure script breaks when the qemu source
+  directory is in a path containing white spaces, in particular the list
+  of targets is not correctly generated when calling "./configure
+  --help".
+
+  Steps to reproduce the problem:
+
+  $ mkdir "dir with spaces"
+  $ cd dir\ with\ spaces/
+  $ git clone https://git.qemu.org/git/qemu.git
+  $ cd qemu/
+  $ ./configure --help | grep -A3 target-list
+
+  =
+
+  Actual result:
+
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: dir with *-softmmu dir with =
+
+                             *-linux-user
+
+  =
+
+  Expected result:
+
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: aarch64-softmmu alpha-softm=
+mu =
+
+                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
+tmmu =
+
+                             lm32-softmmu m68k-softmmu microblaze-softmmu =
+
+
+  =
+
+  This happens because the $mak_wilds variable uses spaces to separate diff=
+erent paths, maybe newlines may be used, which are less likely to be in dir=
+ectory names.
+
+  BTW "shellcheck" may help finding some other problems.
+
+  Qemu version:
+
+  $ git describe =
+
+  v3.1.0-1960-ga05838cb2a
+
+  Thanks,
+     Antonio
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
