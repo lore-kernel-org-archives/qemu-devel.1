@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35920)
+Received: from eggs.gnu.org ([209.51.188.92]:36391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2YPy-0001LI-V5
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:37:24 -0500
+	(envelope-from <ndevos@redhat.com>) id 1h2YSd-0002GT-IY
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2YPx-0004iy-Q8
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:37:22 -0500
-Resent-Message-Id: <E1h2YPx-0004iy-Q8@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h2YPx-0004ih-Jx
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:37:21 -0500
-Message-ID: <155212421186.8146.8170056284799479324@6acff2cf482b>
-In-Reply-To: <20190306031221.GA53@03612eec87fc>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <ndevos@redhat.com>) id 1h2YSc-0005zb-Pp
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:40:07 -0500
+Date: Sat, 9 Mar 2019 10:40:00 +0100
+From: Niels de Vos <ndevos@redhat.com>
+Message-ID: <20190309094000.GB3535@ndevos-x270>
+References: <20190305154634.4609-1-ndevos@redhat.com>
+	<20190308131151.GA31583@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 9 Mar 2019 01:36:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/10] qemu-binfmt-conf.sh
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190308131151.GA31583@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] block: Gluster 6
+ compatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: unai.martinezcorral@ehu.eus
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, integration@gluster.org, qemu-devel@nongnu.org, Stefano Garzarella <sgarzare@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNjAzMTIyMS5HQTUz
-QDAzNjEyZWVjODdmYy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29k
-aW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9u
-OgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA2MDMxMjIxLkdBNTNAMDM2MTJlZWM4
-N2ZjClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8xMF0gcWVtdS1iaW5mbXQtY29u
-Zi5zaAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hl
-dy8yMDE5MDMwNjAzMTIyMS5HQTUzQDAzNjEyZWVjODdmYyAtPiBwYXRjaGV3LzIwMTkwMzA2MDMx
-MjIxLkdBNTNAMDM2MTJlZWM4N2ZjClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTgw
-NTI3MjdlZCBxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUwphNWZlMjY5
-Y2NhIHFlbXUtYmluZm10LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpCmU2NWMwZGI5ODcgcWVtdS1i
-aW5mbXQtY29uZi5zaDogcmVmYWN0b3IgdXNhZ2UoKQo2NmIwOTU1MTU1IHFlbXUtYmluZm10LWNv
-bmYuc2g6IGFkZCBvcHRpb24gLS1yZXNldCA8QVJDSFM+CjIyMDBmMzAxNWQgcWVtdS1iaW5mbXQt
-Y29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BVPiB0byBwb3NpdGlvbmFsIDxDUFVTPgo2ODZjOTc0OWNm
-IHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5kL29yIFFFTVVfU1VGRklY
-CjBjOWZiOGQ5YWEgcWVtdS1iaW5mbXQtY29uZi5zaDogcmVtb3ZlICdxZW11JyBwcmVmaXggZnJv
-bSBjbGkgb3B0aW9ucwpkZjdjM2VmOGMzIHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NS
-RURFTlRJQUwgYW5kIFFFTVVfUEVSU0lTVEVOVAplMmY4OGMyYmJmIHFlbXUtYmluZm10LWNvbmYu
-c2g6IG1ha2Ugb3B0cyAtcCBhbmQgLWMgYm9vbGVhbgowOGI2YThhOGExIHFlbXUtYmluZm10LWNv
-bmYuc2g6IGVuZm9yY2Ugc2FmZSBzdHlsZSBjb25zaXN0ZW5jeQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8xMCBDaGVja2luZyBjb21taXQgMDhiNmE4YThhMTQ1IChxZW11LWJpbmZtdC1jb25mLnNo
-OiBlbmZvcmNlIHNhZmUgc3R5bGUgY29uc2lzdGVuY3kpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM1MzogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjI5OToKKyAg
-ICAgICAgaWYgWyAieCRtYWdpYyIgPSAieCIgXSB8fCBbICJ4JG1hc2siID0gIngiIF0gfHwgWyAi
-eCRmYW1pbHkiID0gIngiIF0gOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ3
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8x
-MCBDaGVja2luZyBjb21taXQgZTJmODhjMmJiZjY2IChxZW11LWJpbmZtdC1jb25mLnNoOiBtYWtl
-IG9wdHMgLXAgYW5kIC1jIGJvb2xlYW4pCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-NTE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMjc6CitvcHRpb25zPSQoZ2V0
-b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBkZWJpYW4sc3lzdGVtZDoscWVtdS1wYXRoOixxZW11LXN1
-ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzEwIENoZWNraW5nIGNvbW1pdCBkZjdjM2VmOGMz
-N2QgKHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFFTVVfUEVS
-U0lTVEVOVCkKNC8xMCBDaGVja2luZyBjb21taXQgMGM5ZmI4ZDlhYTlmIChxZW11LWJpbmZtdC1j
-b25mLnNoOiByZW1vdmUgJ3FlbXUnIHByZWZpeCBmcm9tIGNsaSBvcHRpb25zKQpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
-c2g6MzMxOgorb3B0aW9ucz0kKGdldG9wdCAtbyBkczpROlM6ZTpoY3AgLWwgZGViaWFuLHN5c3Rl
-bWQ6LHBhdGg6LHN1ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAt
-LSAiJEAiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCA0LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzEwIENoZWNraW5nIGNvbW1p
-dCA2ODZjOTc0OWNmZjkgKHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5k
-L29yIFFFTVVfU1VGRklYKQo2LzEwIENoZWNraW5nIGNvbW1pdCAyMjAwZjMwMTVkZDAgKHFlbXUt
-YmluZm10LWNvbmYuc2g6IGdlbmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCA8Q1BVUz4pCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MDogRklMRTogc2NyaXB0cy9xZW11LWJp
-bmZtdC1jb25mLnNoOjIwNToKKyAgICAgICBTdXBwb3J0ZWQgZm9ybWF0cyBmb3IgQ1BVUyBhcmU6
-IHNpbmdsZSBhcmNoIG9yIGNvbW1hL3NwYWNlIHNlcGFyYXRlZCBsaXN0LgoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
-c2g6MjA2OgorICAgICAgIFNlZSBRRU1VIHRhcmdldCBsaXN0IGJlbG93LiBJZiBDUFVTIGlzICdB
-TEwnIG9yIGVtcHR5LCBjb25maWd1cmUgYWxsIGtub3duCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzE0NjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjM2NzoKK29w
-dGlvbnM9JChnZXRvcHQgLW8gOmRzUTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1
-ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
-YWw6IDEgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xMCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNy8xMCBDaGVja2luZyBjb21taXQgNjZiMDk1NTE1
-NTgwIChxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgb3B0aW9uIC0tcmVzZXQgPEFSQ0hTPikKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmlu
-Zm10LWNvbmYuc2g6Mzc1OgorICAgIGZpbmQgL3Byb2Mvc3lzL2ZzL2JpbmZtdF9taXNjLyAtdHlw
-ZSBmIC1uYW1lICRuYW1lcyAtZXhlYyBzaCAtYyAncHJpbnRmICVzIC0xID4ge30nIFw7CgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg1OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
-LWNvbmYuc2g6MzkwOgorb3B0aW9ucz0kKGdldG9wdCAtbyByOmRzUTpTOmU6aGNwIC1sIHJlc2V0
-OixkZWJpYW4sc3lzdGVtZCxwYXRoOixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFs
-LHBlcnNpc3RlbnQgLS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNzQgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC8xMCBD
-aGVja2luZyBjb21taXQgZTY1YzBkYjk4NzFlIChxZW11LWJpbmZtdC1jb25mLnNoOiByZWZhY3Rv
-ciB1c2FnZSgpKQo5LzEwIENoZWNraW5nIGNvbW1pdCBhNWZlMjY5Y2NhNTggKHFlbXUtYmluZm10
-LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpKQoxMC8xMCBDaGVja2luZyBjb21taXQgZTgwNTI3Mjdl
-ZGY0IChxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUykKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
-bmYuc2g6MjA1OgorICAgIFN1cHBvcnRlZCBmb3JtYXRzIGZvciBUQVJHRVRTIGFyZTogc2luZ2xl
-IGFyY2ggb3IgY29tbWEvc3BhY2Ugc2VwYXJhdGVkIGxpc3QuCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojNDU6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDY6
-CisgICAgU2VlIFFFTVUgdGFyZ2V0IGxpc3QgYmVsb3cuIElmIFRBUkdFVFMgaXMgJ0FMTCcgb3Ig
-ZW1wdHksIGNvbmZpZ3VyZSBhbGwga25vd24KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywg
-NjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAz
-MDYwMzEyMjEuR0E1M0AwMzYxMmVlYzg3ZmMvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On Fri, Mar 08, 2019 at 02:11:51PM +0100, Kevin Wolf wrote:
+> Am 05.03.2019 um 16:46 hat Niels de Vos geschrieben:
+> > Gluster 6 is currently available as release candidate. There have bee=
+n a
+> > few changes to libgfapi.so that need to be adapted by consuming proje=
+cts
+> > like QEMU. Fedora Rawhide already contains glusterfs-6.0-RC0, and thi=
+s
+> > prevents rebuilds of QEMU there (https://bugzilla.redhat.com/1684298)=
+.
+> >=20
+> > The following two changes should be sufficient to consume Gluster 6 o=
+nce
+> > it is released. These have been tested on CentOS-7 with Gluster 5 and
+> > Gluster 6 (minimal manual qemu-img tests only).
+> >=20
+> > This v2 post contains changes suggested by Daniel P. Berrang=E9 and K=
+evin
+> > Wolf. Thanks!
+>=20
+> Thanks, applied to the block branch.
+
+Thanks! Stefano Garzarella gave a suggestion for further cleanup. I was
+planning to address that (no #ifdef for function arguments) next week
+when I'm back from a trip, Is that something you would also like to see,
+or do you prefer the change to stay minimal/small as it is now? I'm
+happy to send a followup if you agree that it is cleaner.
+
+Niels
