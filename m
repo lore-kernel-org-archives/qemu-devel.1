@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33569)
+Received: from eggs.gnu.org ([209.51.188.92]:34028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h2yki-0002z1-BM
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:44:33 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1h2ynY-0004SX-OU
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h2ykh-0002Fi-IQ
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:44:32 -0400
-From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
-Date: Sun, 10 Mar 2019 13:44:14 +0000
-Message-ID: <c9f69861058412a1f71418a9c892daf0821a9e33.camel@aisec.fraunhofer.de>
-References: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
-	<CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
-In-Reply-To: <CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DD7B6325D19A284898681D2BD4DF516C@xch.fraunhofer.de>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
- compatible string to /soc/ node
+	(envelope-from <balaton@eik.bme.hu>) id 1h2ynY-0004e1-1U
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:47:28 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:29058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h2ynX-0004bA-Qb
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:47:27 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Sat, 9 Mar 2019 17:48:40 +0100
+Message-Id: <20190309165740.0755B7480BD@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] isa: Add APM and ACPI dependencies for VT82C686
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
-Cc: "palmer@sifive.com" <palmer@sifive.com>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>, "mjc@sifive.com" <mjc@sifive.com>, "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>, "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-SGkgQmluLA0KDQpPbiBTdW4sIDIwMTktMDMtMTAgYXQgMDk6MDcgKzA4MDAsIEJpbiBNZW5nIHdy
-b3RlOg0KPiBIaSBMdWthcywNCj4gDQo+IE9uIE1vbiwgRmViIDExLCAyMDE5IGF0IDY6MTMgQU0g
-THVrYXMgQXVlcg0KPiA8bHVrYXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPiB3cm90ZToNCj4g
-PiBSZS1hZGQgdGhlIHByZXZpb3VzIGNvbXBhdGlibGUgc3RyaW5nICJyaXNjdi12aXJ0aW8tc29j
-IiB0byB0aGUgc29jDQo+ID4gZGV2aWNlIHRyZWUgbm9kZSB0byBhbGxvdyBVLUJvb3QgYW5kIExp
-bnV4IHRvIGJpbmQgbWFjaGluZS1zcGVjaWZpYw0KPiA+IGRyaXZlcnMgdG8gaXQuIFRoZSBjdXJy
-ZW50IGNvbXBhdGlibGUgc3RyaW5nICJzaW1wbGUtYnVzIiBpcw0KPiA+IHJldGFpbmVkLg0KPiA+
-IA0KPiA+IFRoaXMgaXMgcmVxdWlyZWQgYnkgVS1Cb290IHRvIGJpbmQgZGV2aWNlcyBlYXJseSwg
-YXMgcGFydCBvZiB0aGUNCj4gPiBwcmUtcmVsb2NhdGlvbiBkcml2ZXIgbW9kZWwuDQo+ID4gDQo+
-IA0KPiBJIHNlZSBubyBwcm9ibGVtIHdpdGggVS1Cb290IHdvcmtpbmcgd2l0aCBjdXJyZW50IGNv
-bXBhdGlibGUgc3RyaW5nDQo+ICJzaW1wbGUtYnVzIi4gSW4gZmFjdCBJIGhhZCBwbGFubmVkIHRv
-IHJlbW92ZSB0aGUgY29tcGF0aWJsZSBzdHJpbmcNCj4gInJpc2N2LXZpcnRpby1zb2MiIGluIFUt
-Qm9vdCBidXQgZGlkIG5vdCBnZXQgdGltZSB0byB3b3JrIG9uIGl0Lg0KPiANCg0KSXQgaXMgb25s
-eSByZXF1aXJlZCBpZiBVLUJvb3QgaXMgcnVubmluZyBpbiBtYWNoaW5lLW1vZGUuIEZvcg0KcmVs
-b2NhdGlvbiBpdCBuZWVkcyB0byB1c2UgdGhlIENMSU5UIGRyaXZlciB0byBzZW5kIGFwcHJvcHJp
-YXRlIElQSXMgdG8NCnRoZSBvdGhlciBoYXJ0cy4gVG8gYmUgYWJsZSB0byBwcm9iZSB0aGUgZHJp
-dmVyLCB0aGUgZGV2aWNlIGFuZCBpdHMNCnBhcmVudCBkZXZpY2UgdHJlZSBub2RlIChzb2MpIG11
-c3QgdGhlcmVmb3JlIGJlIGF2YWlsYWJsZSBpbiB0aGUgcHJlLQ0KcmVsb2NhdGlvbiBkZXZpY2Ug
-bW9kZWwuDQpUaGlzIHBhdGNoIHdhcyB0aGUgZWFzaWVzdCB3YXkgSSBjb3VsZCB0aGluayBvZiBm
-b3IgYWNoaWV2aW5nIHRoaXMuIEl0DQpjb3VsZCBiZSB0aGF0IHRoZXJlIGlzIGEgYmV0dGVyIHdh
-eSBvZiBzb2x2aW5nIHRoaXMuDQoNClRoYW5rcywNCkx1a2FzDQoNCj4gPiBGaXhlczogNTNmNTQ1
-MDhkYWU2KCJody9yaXNjdi92aXJ0aW86IFNldCB0aGUgc29jIGRldmljZSB0cmVlIG5vZGUNCj4g
-PiBhcyBhDQo+ID4gc2ltcGxlLWJ1cyIpDQo+ID4gU2lnbmVkLW9mZi1ieTogTHVrYXMgQXVlciA8
-bHVrYXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPg0KPiA+IC0tLQ0KPiA+IA0KPiA+ICBody9y
-aXNjdi92aXJ0LmMgfCAzICsrLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAxIGRlbGV0aW9uKC0pDQo+ID4gDQo+IA0KPiBSZWdhcmRzLA0KPiBCaW4NCg==
+Compiling vt82c686.c fails without APM and ACPI_PM funtions. Add
+dependency on these in Kconfig to fix this.
+
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/isa/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+index 57e09a0cb8..e092da3fc3 100644
+--- a/hw/isa/Kconfig
++++ b/hw/isa/Kconfig
+@@ -36,6 +36,8 @@ config VT82C686
+     select ACPI_SMBUS
+     select SERIAL_ISA
+     select FDC
++    select APM
++    select ACPI_X86
+ 
+ config SMC37C669
+     bool
+-- 
+2.13.7
