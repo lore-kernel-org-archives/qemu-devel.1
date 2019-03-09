@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47047)
+Received: from eggs.gnu.org ([209.51.188.92]:47464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2fst-0007Pz-0g
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:35:44 -0500
+	(envelope-from <cota@braap.org>) id 1h2fvA-0008NA-G4
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2fss-00064s-9L
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:35:42 -0500
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:39023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2fss-00063z-1r
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:35:42 -0500
-Received: by mail-oi1-x22f.google.com with SMTP id b4so590291oif.6
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 09:35:41 -0800 (PST)
+	(envelope-from <cota@braap.org>) id 1h2fv8-0008AB-8l
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:38:04 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:52115)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1h2fv7-000882-J3
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 12:38:02 -0500
+Date: Sat, 9 Mar 2019 12:37:56 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190309173756.GA1038@flamenco>
+References: <5C8354E3.03C6BB.09225@m12-12.163.com>
 MIME-Version: 1.0
-References: <20190308125823.32535-1-kwolf@redhat.com>
-In-Reply-To: <20190308125823.32535-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 9 Mar 2019 17:35:29 +0000
-Message-ID: <CAFEAcA_bJdG+SD9hDiYG_W0kSv_bK8Q0H+=wyecmxZV6EUyjpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/33] Block layer patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5C8354E3.03C6BB.09225@m12-12.163.com>
+Subject: Re: [Qemu-devel] 'make check' error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Li Qiang <liq3ea@163.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 8 Mar 2019 at 12:58, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit c4e0780ed1ffd056f205348d387a61b4136a45df:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-03-07 18:40:43 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to e88153ea9a40009a8ae7648282c0eac1b7f5494f:
->
->   qcow2 spec: Describe string header extensions (2019-03-08 12:26:46 +0100)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qcow2: Support for external data files
-> - qcow2: Default to 4KB for the qcow2 cache entry size
-> - Apply block driver whitelist for -drive format=help
-> - Several qemu-iotests improvements
->
+On Sat, Mar 09, 2019 at 13:53:32 +0800, Li Qiang wrote:
+> Hi all, 
+> 
+> Today I ‘git clone’ && configure && make && make check 
+> 
+> And get following error, 
+> 
+> fp-test.c:50:10: fatal error: fail.h: No such file or directory
+>  #include "fail.h"
+>           ^~~~~~~~
+> 
+> I look at the commit:
+> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=3ac1f81329f4dfdc10a51e180f9cf28dbcb02a3c;hp=b44b5abeae4a3b54ccbd7137f59c0a8923cecec9
+> 
+> Seems it’s old commit, I think I got ‘make check’ work after this commit.
+> So I don’t know anywhere wrong.
+> 
+> Any hints?
 
-Applied, thanks.
+fail.h is part of berkeley-testfloat-3 -- I suspect the
+berkeley-testfloat-3 git submodule wasn't checked out.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Make sure both berkeley-softfloat-3 and berkeley-testfloat-3 are
+checked out at $src/tests/fp. If not, you can get them with
+"git submodule init && git submodule update".
 
--- PMM
+Hope that helps,
+
+		Emilio
