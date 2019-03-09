@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41421)
+Received: from eggs.gnu.org ([209.51.188.92]:47414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h2Z9e-0006Q0-PG
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:24:35 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1h2ZyU-00085i-Lc
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h2Z9e-0004c8-5O
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:24:34 -0500
-Received: from smtp.lg.ehu.es ([158.227.0.66]:27554 helo=smtp.ehu.eus)
+	(envelope-from <wei.w.wang@intel.com>) id 1h2ZyT-0001AM-P2
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:06 -0500
+Received: from mga14.intel.com ([192.55.52.115]:8467)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h2Z9d-0004S1-Qm
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 05:24:34 -0500
-Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
-	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 39C1F31C52
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:24:31 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1087D110054
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:24:31 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0587B110050
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:24:31 +0100 (CET)
-Received: from smtp.ehu.eus (unknown [10.0.100.73])
-	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:24:30 +0100 (CET)
-Received: from mail-it1-f171.google.com (mail-it1-f171.google.com
-	[209.85.166.171]) by smtp1 (Postfix) with ESMTPSA id B74CF31C52
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 11:24:30 +0100 (CET)
-Received: by mail-it1-f171.google.com with SMTP id l139so151728ita.5
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 02:24:30 -0800 (PST)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1h2ZyT-00011a-D1
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 06:17:05 -0500
+Message-ID: <5C83A1DF.2020803@intel.com>
+Date: Sat, 09 Mar 2019 19:22:07 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-References: <20190306031221.GA53@03612eec87fc>
-	<20190306044947.GE75@03612eec87fc>
-	<fa52b25f-5f1c-7ec2-e2f1-bbfc73943847@vivier.eu>
-In-Reply-To: <fa52b25f-5f1c-7ec2-e2f1-bbfc73943847@vivier.eu>
-Reply-To: unai.martinezcorral@ehu.eus
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Sat, 9 Mar 2019 11:24:20 +0100
-Message-ID: <CAGZZdDGXTs0QM2KcvceBcUarE3Rn6txYtZ2e+wQLSVtmi8hakQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 5/10] qemu-binfmt-conf.sh: honour
- QEMU_PATH and/or QEMU_SUFFIX
+References: <20190306114227.9125-1-dgilbert@redhat.com>
+	<20190306114227.9125-20-dgilbert@redhat.com>
+	<CAFEAcA-mJdymqYBp-xrUbrXQ_fZ+mTZ90DG0nQs3v40HVxETzA@mail.gmail.com>
+	<20190308183053.GI2834@work-vm>
+In-Reply-To: <20190308183053.GI2834@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 19/22] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,30 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, yury-kotov@yandex-team.ru, Zhang Chen <chen.zhang@intel.com>, Markus Armbruster <armbru@redhat.com>
 
-2019/3/9 10:46, Laurent Vivier:
-> On 06/03/2019 05:49, Unai Martinez-Corral wrote:
-> > -QEMU_PATH=/usr/local/bin
-> > -
-> > +QEMU_PATH="${QEMU_PATH:-/usr/local/bin}"
-> > +QEMU_SUFFIX="${QEMU_SUFFIX:-}"
-> >  QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
-> >  QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-> >
-> > -QEMU_SUFFIX=""
+On 03/09/2019 02:30 AM, Dr. David Alan Gilbert wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> On Wed, 6 Mar 2019 at 11:55, Dr. David Alan Gilbert (git)
+>> <dgilbert@redhat.com> wrote:
+>>> From: Wei Wang <wei.w.wang@intel.com>
 >
-> Same question as for PATCH 3/10: why?
+> Wei: Can you look at this....
 
-Same context. Moreover, in this case envvars already existed and were
-hardcoded. I don't think it does any harm to let a external caller set
-the defaults.
+Sure, I'll send a followup patch to fix this.
 
-> And I think the usage text should be formatted differently to be cleared and looks
-> like more the one of qemu-XXX:
 
-Agree. I will update when the remaining patches are reviewed, since 6
-out of 10 are affected by this change.
+>
+>>> The new feature enables the virtio-balloon device to receive hints of
+>>> guest free pages from the free page vq.
+>>>
+>>> A notifier is registered to the migration precopy notifier chain. The
+>>> notifier calls free_page_start after the migration thread syncs the dirty
+>>> bitmap, so that the free page optimization starts to clear bits of free
+>>> pages from the bitmap. It calls the free_page_stop before the migration
+>>> thread syncs the bitmap, which is the end of the current round of ram
+>>> save. The free_page_stop is also called to stop the optimization in the
+>>> case when there is an error occurred in the process of ram saving.
+>>>
+>>> Note: balloon will report pages which were free at the time of this call.
+>>> As the reporting happens asynchronously, dirty bit logging must be
+>>> enabled before this free_page_start call is made. Guest reporting must be
+>>> disabled before the migration dirty bitmap is synchronized.
+>>>
+>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> CC: Juan Quintela <quintela@redhat.com>
+>>> CC: Peter Xu <peterx@redhat.com>
+>>> Message-Id: <1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+>>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>    dgilbert: Dropped kernel header update, fixed up CMD_ID_* name change
+>>> ---
+>> Hi -- Coverity points out a use-after-free here (CID 1399412):
+>>
+>>> +static bool get_free_page_hints(VirtIOBalloon *dev)
+>>> +{
+>>> +    VirtQueueElement *elem;
+>>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>> +    VirtQueue *vq = dev->free_page_vq;
+>>> +
+>>> +    while (dev->block_iothread) {
+>>> +        qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
+>>> +    }
+>>> +
+>>> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+>>> +    if (!elem) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    if (elem->out_num) {
+>>> +        uint32_t id;
+>>> +        size_t size = iov_to_buf(elem->out_sg, elem->out_num, 0,
+>>> +                                 &id, sizeof(id));
+>>> +        virtqueue_push(vq, elem, size);
+>>> +        g_free(elem);
+>> Here we free elem...
+>>
+>>> +
+>>> +        virtio_tswap32s(vdev, &id);
+>>> +        if (unlikely(size != sizeof(id))) {
+>>> +            virtio_error(vdev, "received an incorrect cmd id");
+>>> +            return false;
+>>> +        }
+>>> +        if (id == dev->free_page_report_cmd_id) {
+>>> +            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>>> +        } else {
+>>> +            /*
+>>> +             * Stop the optimization only when it has started. This
+>>> +             * avoids a stale stop sign for the previous command.
+>>> +             */
+>>> +            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+>>> +                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+>>> +            }
+>>> +        }
+>>> +    }
+>>> +
+>>> +    if (elem->in_num) {
+>> ...but we can fall through here and try to dereference elem...
+>>
+>>> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+>>> +            qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
+>>> +                                      elem->in_sg[0].iov_len);
+>>> +        }
+>>> +        virtqueue_push(vq, elem, 1);
+>>> +        g_free(elem);
+>> ...and then free it again.
+> OK, so the question here is:
+>    Is it allowed to have both in and out in the same queue element; if
+> it's not then we need to error the device.
+>    If it is allowed then we need to fix up the out_num case.
+>
 
-Unai
+I think it is allowed. From virtqueue_pop, an elem could consist of 
+several inbufs and outbufs.
+
+Probably we could just delay the free till the end of this 
+function..will post the fix patch for review soon.
+
+Best,
+Wei
