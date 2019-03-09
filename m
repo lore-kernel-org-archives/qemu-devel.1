@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47477)
+Received: from eggs.gnu.org ([209.51.188.92]:47339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wio-0003yj-Rf
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:46 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003tB-5y
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Win-0000ew-OD
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:42 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43381)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000Wo-DT
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38723)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2Win-0000dz-Gr
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:41 -0500
-Received: by mail-wr1-x434.google.com with SMTP id d17so23651518wre.10
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:41 -0800 (PST)
+	id 1h2Wig-0000R1-3Y
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:34 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g12so23639139wrm.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:29 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:48:15 +0100
-Message-Id: <1552117698-12355-23-git-send-email-pbonzini@redhat.com>
+Date: Sat,  9 Mar 2019 08:48:02 +0100
+Message-Id: <1552117698-12355-10-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/25] lsi: use enum type for s->msg_action
+Subject: [Qemu-devel] [PULL 09/25] virtio-scsi: Fix build with gcc 9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +31,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sven Schnelle <svens@stackframe.org>
+Cc: Greg Kurz <groug@kaod.org>
 
-From: Sven Schnelle <svens@stackframe.org>
+From: Greg Kurz <groug@kaod.org>
 
-This makes the code easier to read - no functional change.
+Build fails with gcc 9:
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190305195519.24303-4-svens@stackframe.org>
+  CC      ppc64-softmmu/hw/scsi/virtio-scsi.o
+hw/scsi/virtio-scsi.c: In function â€˜virtio_scsi_do_tmfâ€™:
+hw/scsi/virtio-scsi.c:265:39: error: taking address of packed member of â€˜struct virtio_scsi_ctrl_tmf_reqâ€™ may result in an unaligned pointer value [-Werror=address-of-packed-member]
+  265 |     virtio_tswap32s(VIRTIO_DEVICE(s), &req->req.tmf.subtype);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+All the fields in struct virtio_scsi_ctrl_tmf_req are naturally aligned,
+so we could in theory drop QEMU_PACKED. Unfortunately, the header file
+is imported from linux which already has the packed attribute. Trying to
+fix that in the update-linux-headers.sh script is likely to produce
+ugliness. Turn the call to virtio_tswap32s() into an assignment instead.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <155137678223.44753.5438092367451176318.stgit@bahia.lan>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/lsi53c895a.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+ hw/scsi/virtio-scsi.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index c17bb4f..d67584e 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -201,6 +201,13 @@ enum {
-     LSI_DMA_IN_PROGRESS, /* DMA operation is in progress */
- };
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index ce99d28..839f120 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -262,7 +262,13 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+     /* Here VIRTIO_SCSI_S_OK means "FUNCTION COMPLETE".  */
+     req->resp.tmf.response = VIRTIO_SCSI_S_OK;
  
-+enum {
-+    LSI_MSG_ACTION_COMMAND = 0,
-+    LSI_MSG_ACTION_DISCONNECT = 1,
-+    LSI_MSG_ACTION_DOUT = 2,
-+    LSI_MSG_ACTION_DIN = 3,
-+};
+-    virtio_tswap32s(VIRTIO_DEVICE(s), &req->req.tmf.subtype);
++    /*
++     * req->req.tmf has the QEMU_PACKED attribute. Don't use virtio_tswap32s()
++     * to avoid compiler errors.
++     */
++    req->req.tmf.subtype =
++        virtio_tswap32(VIRTIO_DEVICE(s), req->req.tmf.subtype);
 +
- typedef struct {
-     /*< private >*/
-     PCIDevice parent_obj;
-@@ -214,8 +221,6 @@ typedef struct {
- 
-     int carry; /* ??? Should this be an a visible register somewhere?  */
-     int status;
--    /* Action to take at the end of a MSG IN phase.
--       0 = COMMAND, 1 = disconnect, 2 = DATA OUT, 3 = DATA IN.  */
-     int msg_action;
-     int msg_len;
-     uint8_t msg[LSI_MAX_MSGIN_LEN];
-@@ -323,7 +328,7 @@ static void lsi_soft_reset(LSIState *s)
-     trace_lsi_reset();
-     s->carry = 0;
- 
--    s->msg_action = 0;
-+    s->msg_action = LSI_MSG_ACTION_COMMAND;
-     s->msg_len = 0;
-     s->waiting = LSI_NOWAIT;
-     s->dsa = 0;
-@@ -686,7 +691,7 @@ static void lsi_reselect(LSIState *s, lsi_request *p)
-     trace_lsi_reselect(id);
-     s->scntl1 |= LSI_SCNTL1_CON;
-     lsi_set_phase(s, PHASE_MI);
--    s->msg_action = p->out ? 2 : 3;
-+    s->msg_action = p->out ? LSI_MSG_ACTION_DOUT : LSI_MSG_ACTION_DIN;
-     s->current->dma_len = p->pending;
-     lsi_add_msg_byte(s, 0x80);
-     if (s->current->tag & LSI_TAG_VALID) {
-@@ -857,7 +862,7 @@ static void lsi_do_command(LSIState *s)
-             lsi_add_msg_byte(s, 4); /* DISCONNECT */
-             /* wait data */
-             lsi_set_phase(s, PHASE_MI);
--            s->msg_action = 1;
-+            s->msg_action = LSI_MSG_ACTION_DISCONNECT;
-             lsi_queue_command(s);
-         } else {
-             /* wait command complete */
-@@ -878,7 +883,7 @@ static void lsi_do_status(LSIState *s)
-     s->sfbr = status;
-     pci_dma_write(PCI_DEVICE(s), s->dnad, &status, 1);
-     lsi_set_phase(s, PHASE_MI);
--    s->msg_action = 1;
-+    s->msg_action = LSI_MSG_ACTION_DISCONNECT;
-     lsi_add_msg_byte(s, 0); /* COMMAND COMPLETE */
- }
- 
-@@ -901,16 +906,16 @@ static void lsi_do_msgin(LSIState *s)
-         /* ??? Check if ATN (not yet implemented) is asserted and maybe
-            switch to PHASE_MO.  */
-         switch (s->msg_action) {
--        case 0:
-+        case LSI_MSG_ACTION_COMMAND:
-             lsi_set_phase(s, PHASE_CMD);
-             break;
--        case 1:
-+        case LSI_MSG_ACTION_DISCONNECT:
-             lsi_disconnect(s);
-             break;
--        case 2:
-+        case LSI_MSG_ACTION_DOUT:
-             lsi_set_phase(s, PHASE_DO);
-             break;
--        case 3:
-+        case LSI_MSG_ACTION_DIN:
-             lsi_set_phase(s, PHASE_DI);
-             break;
-         default:
-@@ -1062,7 +1067,7 @@ bad:
-     qemu_log_mask(LOG_UNIMP, "Unimplemented message 0x%02x\n", msg);
-     lsi_set_phase(s, PHASE_MI);
-     lsi_add_msg_byte(s, 7); /* MESSAGE REJECT */
--    s->msg_action = 0;
-+    s->msg_action = LSI_MSG_ACTION_COMMAND;
- }
- 
- #define LSI_BUF_SIZE 4096
+     switch (req->req.tmf.subtype) {
+     case VIRTIO_SCSI_T_TMF_ABORT_TASK:
+     case VIRTIO_SCSI_T_TMF_QUERY_TASK:
 -- 
 1.8.3.1
