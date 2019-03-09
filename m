@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55809)
+Received: from eggs.gnu.org ([209.51.188.92]:55807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2TdQ-0001QX-Tq
+	(envelope-from <bounces@canonical.com>) id 1h2TdQ-0001Po-NW
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 23:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2TdP-00017p-Sr
+	(envelope-from <bounces@canonical.com>) id 1h2TdP-000187-Vd
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 23:30:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48672)
+Received: from indium.canonical.com ([91.189.90.7]:48712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2TdP-00016R-MH
+	id 1h2TdP-00016y-OF
 	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 23:30:55 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2TdO-000102-2s
+	id 1h2TdO-00011O-Tv
 	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 04:30:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED2CA2E80D2
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 04:30:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CC4D82E80C8
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 04:30:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Mar 2019 04:17:33 -0000
-From: Launchpad Bug Tracker <1535497@bugs.launchpad.net>
-Reply-To: Bug 1535497 <1535497@bugs.launchpad.net>
+Date: Sat, 09 Mar 2019 04:17:35 -0000
+From: Launchpad Bug Tracker <1534382@bugs.launchpad.net>
+Reply-To: Bug 1534382 <1534382@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160119020241.26347.75552.malonedeb@soybean.canonical.com>
-Message-Id: <155210505393.19923.10172508958880254198.malone@loganberry.canonical.com>
+References: <20160115001145.28422.26218.malonedeb@gac.canonical.com>
+Message-Id: <155210505542.19923.916418400080548636.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1535497] Re: Guest can not boot up when assigned
- more than 20 vcpus with option "-no-acpi"
+Subject: [Qemu-devel] [Bug 1534382] Re: loadvm makes Windows 7 x86 guest
+ crash with some CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,39 +48,36 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1535497
+https://bugs.launchpad.net/bugs/1534382
 
 Title:
-  Guest can not boot up when assigned more than 20 vcpus with option
-  "-no-acpi"
+  loadvm makes Windows 7 x86 guest crash with some CPUs
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Environment:
-   -------------------------------
-   KVM commit/branch: da3f7ca3/next
-   Qemu commit/branch: 7b8a354d/master
-   Host OS: RHEL7.2 ia32e
-   Host Kernel: 4.4-rc2
-   Guest OS: RHEL7.2 ia32e
+  Running qemu with kvm enabled and -cpu set to some of the more "modern" C=
+PUs,
+  and having Windows 7 x86 as the guest.
 
-  Description:
-   --------------------------------
-  When assign more than 20 vpcus with option "-no-acpi", guest can not boot=
- up.
+  After guest OS loads, start some app (I started "cmd"), then do "savevm".
+  After that, do some more activity (I closed cmd window and opened IE),
+  then do "loadvm" of the previously saved snapshot.
 
-  Reproduce:
-   ----------------
-   1.qemu-system-x86_64 --enable-kvm -m 1024 -smp 20 -no-acpi -device virti=
-o-net-pci,netdev=3Dnic0,mac=3D00:16:3e:17:9b:4c -netdev tap,id=3Dnic0,scrip=
-t=3D/etc/kvm/qemu-ifup -drive file=3D/root/7u2.qcow2,if=3Dnone,id=3Dvirtio-=
-disk0 -device virtio-blk-pci,drive=3Dvirtio-disk0
+  loadvm shows briefly the state that the system was in at the snapshot tim=
+e,
+  then guest OS crashes (blue screen).
 
-  =
+  Originally I saw this problem on qemu 1.4.0,
+  then I also tried qemu 2.5.0 and found the same problem.
 
-  Bisect show the bad commit is 9ee2e2625 of seabios.
+  The CPUs that I tried were mostly those that support NX bit (core2duo, =
+
+  qemu64, kvm64, Nehalem, etc.)
+
+  If I use the default CPU, or some other like qemu32/kvm32,
+  the problem does not occur.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1535497/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1534382/+subscriptions
