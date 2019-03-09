@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55935)
+Received: from eggs.gnu.org ([209.51.188.92]:56056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2Py4-0005Dl-RX
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:36:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pys-0005kP-3G
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h2Py3-0006Ek-Er
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:36:00 -0500
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<20190305234337.18353-5-jsnow@redhat.com>
-	<6c9c5b9b-8093-e993-1027-db692d20e2e1@virtuozzo.com>
-	<737eb62f-47f4-1824-909d-8578584b8794@redhat.com>
-	<bc1be082-1838-72ab-e0ae-4146ddbfbdb8@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3f97a41b-4baf-7d49-4faa-81649b6f669f@redhat.com>
-Date: Fri, 8 Mar 2019 19:35:53 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pyr-0007Hl-Cx
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:36:50 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2Pyr-0007Gu-3O
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:36:49 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l12so6682171wrp.6
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 16:36:49 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-5-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3809811c-348b-1073-2627-e3e4adec9244@amsat.org>
+Date: Sat, 9 Mar 2019 01:36:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <bc1be082-1838-72ab-e0ae-4146ddbfbdb8@virtuozzo.com>
+In-Reply-To: <20190307144126.31847-5-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Allow resizes with
- persistent bitmaps
+Subject: Re: [Qemu-devel] [PATCH 4/9] tcg: Use extract2 in
+ tcg_gen_deposit_{i32, i64}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,222 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: david@redhat.com
 
-
-
-On 3/6/19 10:52 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 06.03.2019 18:41, John Snow wrote:
->>
->>
->> On 3/6/19 10:33 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 06.03.2019 2:43, John Snow wrote:
->>>> Since we now load all bitmaps into memory anyway, we can just truncate them
->>>> in-memory and then flush them back to disk. Just in case, we will still check
->>>> and enforce that this shortcut is valid -- i.e. that any bitmap described
->>>> on-disk is indeed in-memory and can be modified.
->>>>
->>>> If there are any inconsistent bitmaps, we refuse to allow the truncate as
->>>> we do not actually load these bitmaps into memory, and it isn't safe or
->>>> reasonable to attempt to truncate corrupted data.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>    block/qcow2.h        |  1 +
->>>>    block/qcow2-bitmap.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->>>>    block/qcow2.c        | 27 ++++++++++++++++++++-------
->>>>    3 files changed, 63 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/block/qcow2.h b/block/qcow2.h
->>>> index 4c1fdfcbec..b9227a72cc 100644
->>>> --- a/block/qcow2.h
->>>> +++ b/block/qcow2.h
->>>> @@ -689,6 +689,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
->>>>    int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
->>>>                                     Error **errp);
->>>>    int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
->>>> +int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
->>>>    void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->>>>    void qcow2_flush_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->>>>    int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
->>>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->>>> index 9373055d3b..24f280bccc 100644
->>>> --- a/block/qcow2-bitmap.c
->>>> +++ b/block/qcow2-bitmap.c
->>>> @@ -1167,6 +1167,48 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
->>>>        return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
->>>>    }
->>>>    
->>>> +/* Checks to see if it's safe to resize bitmaps */
->>>> +int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp)
->>>> +{
->>>> +    BDRVQcow2State *s = bs->opaque;
->>>> +    Qcow2BitmapList *bm_list;
->>>> +    Qcow2Bitmap *bm;
->>>> +    int ret = 0;
->>>> +
->>>> +    if (s->nb_bitmaps == 0) {
->>>> +        return 0;
->>>> +    }
->>>> +
->>>> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
->>>> +                               s->bitmap_directory_size, false, errp);
->>>> +    if (bm_list == NULL) {
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
->>>> +        BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
->>>> +        if (bitmap == NULL) {
->>>> +            /* We rely on all bitmaps being in-memory to be able to resize them,
->>>> +             * Otherwise, we'd need to resize them on disk explicitly */
->>>> +            error_setg(errp, "Cannot resize qcow2 with persistent bitmaps that "
->>>> +                       "were not loaded into memory");
->>>> +            ret = -ENOTSUP;
->>>> +            goto out;
->>>> +        }
->>>> +
->>>> +        /* The checks against readonly and busy are redundant, but certainly
->>>> +         * do no harm. checks against inconsistent are crucial: */
->>>> +        if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_DEFAULT, errp)) {
->>>> +            ret = -ENOTSUP;
->>>> +            goto out;
->>>> +        }
->>>> +    }
->>>> +
->>>> +out:
->>>> +    bitmap_list_free(bm_list);
->>>> +    return ret;
->>>> +}
->>>> +
->>>>    /* store_bitmap_data()
->>>>     * Store bitmap to image, filling bitmap table accordingly.
->>>>     */
->>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>> index 7fb2730f09..6fd9252494 100644
->>>> --- a/block/qcow2.c
->>>> +++ b/block/qcow2.c
->>>> @@ -3472,7 +3472,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>>>    {
->>>>        BDRVQcow2State *s = bs->opaque;
->>>>        uint64_t old_length;
->>>> -    int64_t new_l1_size;
->>>> +    int64_t new_l1_size, offset_be;
->>>>        int ret;
->>>>        QDict *options;
->>>>    
->>>> @@ -3498,10 +3498,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>>>            goto fail;
->>>>        }
->>>>    
->>>> -    /* cannot proceed if image has bitmaps */
->>>> -    if (s->nb_bitmaps) {
->>>> -        /* TODO: resize bitmaps in the image */
->>>> -        error_setg(errp, "Can't resize an image which has bitmaps");
->>>> +    /* Only certain persistent bitmaps can be resized: */
->>>> +    if (qcow2_truncate_bitmaps_check(bs, errp)) {
->>>>            ret = -ENOTSUP;
->>>>            goto fail;
->>>>        }
->>>> @@ -3702,9 +3700,9 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>>>        bs->total_sectors = offset / BDRV_SECTOR_SIZE;
->>>>    
->>>>        /* write updated header.size */
->>>> -    offset = cpu_to_be64(offset);
->>>> +    offset_be = cpu_to_be64(offset);
->>>>        ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
->>>> -                           &offset, sizeof(uint64_t));
->>>> +                           &offset_be, sizeof(uint64_t));
->>>>        if (ret < 0) {
->>>>            error_setg_errno(errp, -ret, "Failed to update the image size");
->>>>            goto fail;
->>>> @@ -3719,6 +3717,21 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->>>>        if (ret < 0) {
->>>>            goto fail;
->>>>        }
->>>> +
->>>> +    /* Flush bitmaps */
->>>> +    if (s->nb_bitmaps) {
->>>> +        Error *local_err = NULL;
->>>> +
->>>> +        /* Usually, bitmaps get resized after this call.
->>>> +         * Force it earlier so we can make the metadata consistent. */
->>>> +        bdrv_dirty_bitmap_truncate(bs, offset);
->>>> +        qcow2_flush_persistent_dirty_bitmaps(bs, &local_err);
->>>> +        if (local_err) {
->>>> +            ret = -EINVAL;
->>>> +            goto fail;
->>>> +        }
->>>> +    }
->>>
->>> Why to flush after resize? Bitmaps will be IN_USE in the image anyway...
->>>
->>> Could we implement resize without flush first,  it would be one patch + test? And then consider
->>> flushing in separate?
->>>
->>
->> If you don't flush it to disk, all calls to retrieve the bm_list begin
->> failing because of inconsistent metadata.
->>
->> Future calls to add bitmaps, remove bitmaps, etc will start failing. It
->> seemed safest and easiest to just flush the whole suite to disk. I am
->> trying to avoid premature optimizations at this stage, as I believe
->> resizes will be very infrequent events.
+On 3/7/19 3:41 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/tcg-op.c | 28 ++++++++++++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
 > 
-> Hmmm, understand.
+> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+> index 34e0dbc6e0..caee80235e 100644
+> --- a/tcg/tcg-op.c
+> +++ b/tcg/tcg-op.c
+> @@ -614,6 +614,18 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
+>      mask = (1u << len) - 1;
+
+FWIW you can move 'mask' ...
+
+>      t1 = tcg_temp_new_i32();
+>  
+> +    if (TCG_TARGET_HAS_extract2_i32) {
+> +        if (ofs + len == 32) {
+> +            tcg_gen_shli_i32(t1, arg1, len);
+> +            tcg_gen_extract2_i32(ret, t1, arg2, len);
+> +            goto done;
+> +        }
+> +        if (ofs == 0) {
+> +            tcg_gen_extract2_i32(ret, arg1, arg2, len);
+> +            tcg_gen_rotli_i32(ret, ret, len);
+> +            goto done;
+> +        }
+> +    }
+
+... here, saving few instr if TCG_TARGET_HAS_extract2_i32 ;)
+
+>      if (ofs + len < 32) {
+>          tcg_gen_andi_i32(t1, arg2, mask);
+>          tcg_gen_shli_i32(t1, t1, ofs);
+> @@ -622,7 +634,7 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
+>      }
+>      tcg_gen_andi_i32(ret, arg1, ~(mask << ofs));
+>      tcg_gen_or_i32(ret, ret, t1);
+> -
+> + done:
+>      tcg_temp_free_i32(t1);
+>  }
+>  
+> @@ -2027,6 +2039,18 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
+>      mask = (1ull << len) - 1;
+>      t1 = tcg_temp_new_i64();
+>  
+> +    if (TCG_TARGET_HAS_extract2_i64) {
+> +        if (ofs + len == 64) {
+> +            tcg_gen_shli_i64(t1, arg1, len);
+> +            tcg_gen_extract2_i64(ret, t1, arg2, len);
+> +            goto done;
+> +        }
+> +        if (ofs == 0) {
+> +            tcg_gen_extract2_i64(ret, arg1, arg2, len);
+> +            tcg_gen_rotli_i64(ret, ret, len);
+> +            goto done;
+> +        }
+> +    }
+
+Ditto.
+
+>      if (ofs + len < 64) {
+>          tcg_gen_andi_i64(t1, arg2, mask);
+>          tcg_gen_shli_i64(t1, t1, ofs);
+> @@ -2035,7 +2059,7 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
+>      }
+>      tcg_gen_andi_i64(ret, arg1, ~(mask << ofs));
+>      tcg_gen_or_i64(ret, ret, t1);
+> -
+> + done:
+>      tcg_temp_free_i64(t1);
+>  }
+>  
 > 
-> But I think, if we are going to allow resizes, it definitely means that IN_USE flag covers not
-> only bitmap data, but size field too. And we must write it to specification. And it is right
-> even if you flush here, as resize may fail after your flush, and actual disk size will remain
-> unchanged when bitmaps are flushed with new size.
-> 
-> And if size is covered by IN_USE, we should ignore it for IN_USE bitmaps (for IN_USE by us too).
-> And it means, that we need check it only on qcow2_open. And not on other cases.
-> 
-
-Hm, so your proposal here is:
-
-- Check metadata constraints (like size) only when not marked IN_USE,
-(i.e. on first open)
-
-- It's fine to skip the size constraint for inconsistent bitmaps which
-are not loaded, because we do not load their data anyway.
-
-- subsequent bm_list loads do not need to check these constraints
-because the bitmaps are already in memory and we will not be using the
-size-related metadata.
-
-I think you are correct, but it feels a little "clever" or "tricky" and
-it warrants good documentation. I'll audit the codepaths to make sure
-this is a safe approach.
-
-(Though, even given that, I *still* want to flush bitmaps to disk on
-resize, just to avoid having out of date metadata on the disk -- even if
-we're not clearing the IN_USE bit on flush, it still seems "less wrong"
-to have correct headers.)
-
-
-To the point about resize failures:
-
-I think we do have a problem, because no matter what order we choose, we
-have a race condition:
-
-- flush bitmaps before resize: If we crash after the flush but before
-the resize, the image may be unopenable
-- resize before flush (this patch): If we crash before the flush, the
-image may be unopenable
-
-So I'll have to address that: we might not be able to avoid losing the
-bitmaps during resize (because of a rare failure event) but we need to
-make sure the image remains openable.
-
-We may want to amend bitmap loading so that it never FAILS because of
-bad constraints, but merely marks the image as corrupt/inconsistent.
-Some size issues may be recoverable but others may be "fatal" in the
-sense of needing to lose the bitmap.
-
-I'll respin, but I believe this patch series is absolutely crucial for
-4.0... We've got until Tuesday!
-
---js
