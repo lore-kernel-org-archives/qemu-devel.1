@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59764)
+Received: from eggs.gnu.org ([209.51.188.92]:60480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2QI7-00075P-6K
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:56:44 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2QLY-00013b-Lc
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h2QI6-000258-86
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 19:56:43 -0500
-Resent-Message-Id: <E1h2QI6-000258-86@eggs.gnu.org>
-Message-ID: <155209298740.8146.7385134403227050710@6acff2cf482b>
-In-Reply-To: <20190307172401.29451-1-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2QLX-0004b6-HD
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:00:16 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1h2QLX-0004aD-61
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:00:15 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t18so23193298wrx.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 17:00:15 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-4-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d38e7159-8395-5d35-92a0-549f509f4863@amsat.org>
+Date: Sat, 9 Mar 2019 02:00:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Mar 2019 16:56:29 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] pc: Support firmware
- configuration with -blockdev
+In-Reply-To: <20190307144126.31847-4-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] tcg: Use extract2 in tcg_gen_shifti_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +35,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: david@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNzE3MjQwMS4yOTQ1
-MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0Mg
-ICAgICBody9jaGFyL25yZjUxX3VhcnQubwogIENDICAgICAgaHcvY2hhci9wYXJhbGxlbC5vCi90
-bXAvcWVtdS10ZXN0L3NyYy9ody9ibG9jay9wZmxhc2hfY2ZpMDIuYzogSW4gZnVuY3Rpb24gJ3Bm
-bGFzaF9jZmkwMl91bnJlYWxpemUnOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svcGZsYXNo
-X2NmaTAyLmM6Njk4OjU6IGVycm9yOiB1bmtub3duIHR5cGUgbmFtZSAncGZsYXNoX3QnOyBkaWQg
-eW91IG1lYW4gJ2Zwb3NfdCc/CiAgICAgcGZsYXNoX3QgKnBmbCA9IENGSV9QRkxBU0gwMihkZXYp
-OwogICAgIF5+fn5+fn5+CiAgICAgZnBvc190Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9ibG9jay9w
-Zmxhc2hfY2ZpMDIuYzo2OTg6MjE6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5j
-dGlvbiAnQ0ZJX1BGTEFTSDAyJzsgZGlkIHlvdSBtZWFuICdIV19GTEFTSF9IJz8gWy1XZXJyb3I9
-aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgcGZsYXNoX3QgKnBmbCA9IENGSV9Q
-RkxBU0gwMihkZXYpOwogICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KICAgICAgICAg
-ICAgICAgICAgICAgSFdfRkxBU0hfSAovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svcGZsYXNo
-X2NmaTAyLmM6Njk4OjIxOiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnQ0ZJ
-X1BGTEFTSDAyJyBbLVdlcnJvcj1uZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL2h3
-L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjY5ODoyMTogZXJyb3I6IGluaXRpYWxpemF0aW9uIG9mICdp
-bnQgKicgZnJvbSAnaW50JyBtYWtlcyBwb2ludGVyIGZyb20gaW50ZWdlciB3aXRob3V0IGEgY2Fz
-dCBbLVdlcnJvcj1pbnQtY29udmVyc2lvbl0KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL3Bm
-bGFzaF9jZmkwMi5jOjY5OToxOTogZXJyb3I6IHJlcXVlc3QgZm9yIG1lbWJlciAndGltZXInIGlu
-IHNvbWV0aGluZyBub3QgYSBzdHJ1Y3R1cmUgb3IgdW5pb24KICAgICB0aW1lcl9kZWwoJnBmbC0+
-dGltZXIpOwogICAgICAgICAgICAgICAgICAgXn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJl
-YXRlZCBhcyBlcnJvcnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMTkwMzA3MTcyNDAxLjI5NDUxLTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVz
-dGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Richard,
+
+On 3/7/19 3:41 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/tcg-op.c | 47 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 24 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+> index deacc63e3b..34e0dbc6e0 100644
+> --- a/tcg/tcg-op.c
+> +++ b/tcg/tcg-op.c
+> @@ -1355,31 +1355,32 @@ static inline void tcg_gen_shifti_i64(TCGv_i64 ret, TCGv_i64 arg1,
+>              tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_LOW(arg1), c);
+>              tcg_gen_movi_i32(TCGV_LOW(ret), 0);
+>          }
+> -    } else {
+> -        TCGv_i32 t0, t1;
+> -
+> -        t0 = tcg_temp_new_i32();
+> -        t1 = tcg_temp_new_i32();
+> -        if (right) {
+> -            tcg_gen_shli_i32(t0, TCGV_HIGH(arg1), 32 - c);
+> -            if (arith) {
+> -                tcg_gen_sari_i32(t1, TCGV_HIGH(arg1), c);
+> -            } else {
+> -                tcg_gen_shri_i32(t1, TCGV_HIGH(arg1), c);
+> -            }
+> -            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+> -            tcg_gen_or_i32(TCGV_LOW(ret), TCGV_LOW(ret), t0);
+> -            tcg_gen_mov_i32(TCGV_HIGH(ret), t1);
+> +    } else if (right) {
+> +        if (TCG_TARGET_HAS_extract2_i32) {
+> +            tcg_gen_extract2_i32(TCGV_LOW(ret), TCGV_LOW(arg1),
+> +                                 TCGV_HIGH(arg1), c);
+>          } else {
+> -            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+> -            /* Note: ret can be the same as arg1, so we use t1 */
+> -            tcg_gen_shli_i32(t1, TCGV_LOW(arg1), c);
+> -            tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> -            tcg_gen_or_i32(TCGV_HIGH(ret), TCGV_HIGH(ret), t0);
+> -            tcg_gen_mov_i32(TCGV_LOW(ret), t1);
+> +            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+> +            tcg_gen_deposit_i32(TCGV_LOW(ret), TCGV_LOW(ret),
+> +                                TCGV_HIGH(arg1), 32 - c, c);
+>          }
+> -        tcg_temp_free_i32(t0);
+> -        tcg_temp_free_i32(t1);
+> +        if (arith) {
+> +            tcg_gen_sari_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> +        } else {
+> +            tcg_gen_shri_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> +        }
+> +    } else {
+> +        if (TCG_TARGET_HAS_extract2_i32) {
+> +            tcg_gen_extract2_i32(TCGV_HIGH(ret), TCGV_LOW(arg1),
+> +                                 TCGV_HIGH(arg1), 32 - c);
+> +        } else {
+> +            TCGv_i32 t0 = tcg_temp_new_i32();
+> +            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+> +            tcg_gen_deposit_i32(TCGV_HIGH(ret), t0,
+> +                                TCGV_HIGH(arg1), c, 32 - c);
+> +            tcg_temp_free_i32(t0);
+> +        }
+> +        tcg_gen_shli_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+>      }
+>  }
+
+I find this patch quite hard to review because you somehow do more than
+simply use extract2, you also reordered part of this function.
+
+I find it easier to review as split in 2 commits:
+
+1/ reorder; the code movement is way easier to follow:
+
+-- >8 --
+@@ -1355,31 +1355,22 @@ static inline void tcg_gen_shifti_i64(TCGv_i64
+ret, TCGv_i64 arg1,
+             tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_LOW(arg1), c);
+             tcg_gen_movi_i32(TCGV_LOW(ret), 0);
+         }
+-    } else {
+-        TCGv_i32 t0, t1;
+-
+-        t0 = tcg_temp_new_i32();
+-        t1 = tcg_temp_new_i32();
+-        if (right) {
+-            tcg_gen_shli_i32(t0, TCGV_HIGH(arg1), 32 - c);
+-            if (arith) {
+-                tcg_gen_sari_i32(t1, TCGV_HIGH(arg1), c);
+-            } else {
+-                tcg_gen_shri_i32(t1, TCGV_HIGH(arg1), c);
+-            }
+-            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+-            tcg_gen_or_i32(TCGV_LOW(ret), TCGV_LOW(ret), t0);
+-            tcg_gen_mov_i32(TCGV_HIGH(ret), t1);
++    } else if (right) {
++        tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
++        tcg_gen_deposit_i32(TCGV_LOW(ret), TCGV_LOW(ret),
++                            TCGV_HIGH(arg1), 32 - c, c);
++        if (arith) {
++            tcg_gen_sari_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+         } else {
+-            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+-            /* Note: ret can be the same as arg1, so we use t1 */
+-            tcg_gen_shli_i32(t1, TCGV_LOW(arg1), c);
+-            tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+-            tcg_gen_or_i32(TCGV_HIGH(ret), TCGV_HIGH(ret), t0);
+-            tcg_gen_mov_i32(TCGV_LOW(ret), t1);
++            tcg_gen_shri_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+         }
++    } else {
++        TCGv_i32 t0 = tcg_temp_new_i32();
++        tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
++        tcg_gen_deposit_i32(TCGV_HIGH(ret), t0,
++                            TCGV_HIGH(arg1), c, 32 - c);
+         tcg_temp_free_i32(t0);
+-        tcg_temp_free_i32(t1);
++        tcg_gen_shli_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+     }
+ }
+---
+
+2/ use extract2:
+
+-- >8 --
+@@ -1356,20 +1356,30 @@ static inline void tcg_gen_shifti_i64(TCGv_i64
+ret, TCGv_i64 arg1,
+             tcg_gen_movi_i32(TCGV_LOW(ret), 0);
+         }
+     } else if (right) {
+-        tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+-        tcg_gen_deposit_i32(TCGV_LOW(ret), TCGV_LOW(ret),
+-                            TCGV_HIGH(arg1), 32 - c, c);
++        if (TCG_TARGET_HAS_extract2_i32) {
++            tcg_gen_extract2_i32(TCGV_LOW(ret),
++                                 TCGV_LOW(arg1), TCGV_HIGH(arg1), c);
++        } else {
++            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
++            tcg_gen_deposit_i32(TCGV_LOW(ret), TCGV_LOW(ret),
++                                TCGV_HIGH(arg1), 32 - c, c);
++        }
+         if (arith) {
+             tcg_gen_sari_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+         } else {
+             tcg_gen_shri_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+         }
+     } else {
+-        TCGv_i32 t0 = tcg_temp_new_i32();
+-        tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+-        tcg_gen_deposit_i32(TCGV_HIGH(ret), t0,
+-                            TCGV_HIGH(arg1), c, 32 - c);
+-        tcg_temp_free_i32(t0);
++        if (TCG_TARGET_HAS_extract2_i32) {
++            tcg_gen_extract2_i32(TCGV_HIGH(ret),
++                                 TCGV_LOW(arg1), TCGV_HIGH(arg1), 32 - c);
++        } else {
++            TCGv_i32 t0 = tcg_temp_new_i32();
++            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
++            tcg_gen_deposit_i32(TCGV_HIGH(ret), t0,
++                                TCGV_HIGH(arg1), c, 32 - c);
++            tcg_temp_free_i32(t0);
++        }
+         tcg_gen_shli_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+     }
+ }
+---
+
+Note that I indented the extract2 slighly differently,
+TCGV_LOW(arg1) and TCGV_HIGH(arg1) are now together on the same line.
+My brain find it more digestible :)
+
+Regards,
+
+Phil.
