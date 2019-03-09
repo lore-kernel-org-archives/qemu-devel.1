@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39372)
+Received: from eggs.gnu.org ([209.51.188.92]:41781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2iJ0-0000rI-Eh
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:51 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1h2ic3-0005mS-1C
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2iIq-0000UR-Mn
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42682)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1h2ic1-0000dn-U4
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:30:31 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33377)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2iIq-0000S7-5f
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:10:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2iIo-0007Yn-Vq
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 20:10:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EF3BA2E80C3
-	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 20:10:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1h2ic1-0000Sh-LI
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 15:30:29 -0500
+Received: by mail-ot1-x341.google.com with SMTP id q24so789128otk.0
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 12:30:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Mar 2019 20:02:54 -0000
-From: John M <1819289@bugs.launchpad.net>
-Reply-To: Bug 1819289 <1819289@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155216177409.9624.16357609956497374456.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1819289] [NEW] Windows 95 and Windows 98 will not
- install or run
+In-Reply-To: <20190307144126.31847-4-richard.henderson@linaro.org>
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-4-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 9 Mar 2019 21:30:24 +0100
+Message-ID: <CAL1e-=iVz3aKwz6-DxjWgLxhx32_PdA45Kk6Uh7f1ezatv6SdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/9] tcg: Use extract2 in tcg_gen_shifti_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "david@redhat.com" <david@redhat.com>
 
-Public bug reported:
+On Thursday, March 7, 2019, Richard Henderson <richard.henderson@linaro.org>
+wrote:
 
-The last version of QEMU I have been able to run Windows 95 or Windows
-98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
-either not install or will not run 95 or 98 at all. I have tried every
-combination of options like isapc or no isapc, cpu pentium  or cpu as
-486. Tried different memory configurations, but they just don't work
-anymore.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/tcg-op.c | 47 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 24 insertions(+), 23 deletions(-)
+>
+>
+Extract2 is not a good name for this new function, IMHO.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1819289
-
-Title:
-  Windows 95 and Windows 98 will not install or run
-
-Status in QEMU:
-  New
-
-Bug description:
-  The last version of QEMU I have been able to run Windows 95 or Windows
-  98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
-  either not install or will not run 95 or 98 at all. I have tried every
-  combination of options like isapc or no isapc, cpu pentium  or cpu as
-  486. Tried different memory configurations, but they just don't work
-  anymore.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1819289/+subscriptions
+> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+> index deacc63e3b..34e0dbc6e0 100644
+> --- a/tcg/tcg-op.c
+> +++ b/tcg/tcg-op.c
+> @@ -1355,31 +1355,32 @@ static inline void tcg_gen_shifti_i64(TCGv_i64
+> ret, TCGv_i64 arg1,
+>              tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_LOW(arg1), c);
+>              tcg_gen_movi_i32(TCGV_LOW(ret), 0);
+>          }
+> -    } else {
+> -        TCGv_i32 t0, t1;
+> -
+> -        t0 = tcg_temp_new_i32();
+> -        t1 = tcg_temp_new_i32();
+> -        if (right) {
+> -            tcg_gen_shli_i32(t0, TCGV_HIGH(arg1), 32 - c);
+> -            if (arith) {
+> -                tcg_gen_sari_i32(t1, TCGV_HIGH(arg1), c);
+> -            } else {
+> -                tcg_gen_shri_i32(t1, TCGV_HIGH(arg1), c);
+> -            }
+> -            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+> -            tcg_gen_or_i32(TCGV_LOW(ret), TCGV_LOW(ret), t0);
+> -            tcg_gen_mov_i32(TCGV_HIGH(ret), t1);
+> +    } else if (right) {
+> +        if (TCG_TARGET_HAS_extract2_i32) {
+> +            tcg_gen_extract2_i32(TCGV_LOW(ret), TCGV_LOW(arg1),
+> +                                 TCGV_HIGH(arg1), c);
+>          } else {
+> -            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+> -            /* Note: ret can be the same as arg1, so we use t1 */
+> -            tcg_gen_shli_i32(t1, TCGV_LOW(arg1), c);
+> -            tcg_gen_shli_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> -            tcg_gen_or_i32(TCGV_HIGH(ret), TCGV_HIGH(ret), t0);
+> -            tcg_gen_mov_i32(TCGV_LOW(ret), t1);
+> +            tcg_gen_shri_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+> +            tcg_gen_deposit_i32(TCGV_LOW(ret), TCGV_LOW(ret),
+> +                                TCGV_HIGH(arg1), 32 - c, c);
+>          }
+> -        tcg_temp_free_i32(t0);
+> -        tcg_temp_free_i32(t1);
+> +        if (arith) {
+> +            tcg_gen_sari_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> +        } else {
+> +            tcg_gen_shri_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), c);
+> +        }
+> +    } else {
+> +        if (TCG_TARGET_HAS_extract2_i32) {
+> +            tcg_gen_extract2_i32(TCGV_HIGH(ret), TCGV_LOW(arg1),
+> +                                 TCGV_HIGH(arg1), 32 - c);
+> +        } else {
+> +            TCGv_i32 t0 = tcg_temp_new_i32();
+> +            tcg_gen_shri_i32(t0, TCGV_LOW(arg1), 32 - c);
+> +            tcg_gen_deposit_i32(TCGV_HIGH(ret), t0,
+> +                                TCGV_HIGH(arg1), c, 32 - c);
+> +            tcg_temp_free_i32(t0);
+> +        }
+> +        tcg_gen_shli_i32(TCGV_LOW(ret), TCGV_LOW(arg1), c);
+>      }
+>  }
+>
+> --
+> 2.17.2
+>
+>
+>
