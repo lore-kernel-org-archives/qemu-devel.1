@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36033)
+Received: from eggs.gnu.org ([209.51.188.92]:37295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2Qqs-0006mS-67
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:32:39 -0500
+	(envelope-from <bounces@canonical.com>) id 1h2R3P-0000ZV-Qm
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2Qqr-0007yP-DF
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:32:38 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52385)
+	(envelope-from <bounces@canonical.com>) id 1h2R3O-0001oi-KC
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2Qqr-0007xg-54
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:32:37 -0500
-Received: by mail-wm1-f66.google.com with SMTP id f65so14091885wma.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 17:32:37 -0800 (PST)
-References: <20190309004826.9027-1-lersek@redhat.com>
-	<20190309004826.9027-7-lersek@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2d33be0b-aa53-2038-01b0-0afed368aea8@redhat.com>
-Date: Sat, 9 Mar 2019 02:32:34 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h2R3O-0001nF-Dk
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:45:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h2R3M-00072g-D6
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 01:45:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A0572E80CC
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 01:45:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190309004826.9027-7-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/10] roms/Makefile: replace the $(EFIROM)
- target with "edk2-basetools"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 09 Mar 2019 01:35:41 -0000
+From: umarcor <1817239@bugs.launchpad.net>
+Reply-To: Bug 1817239 <1817239@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155080581544.22842.8774442486795126526.malonedeb@wampee.canonical.com>
+Message-Id: <155209534203.9449.13630241082296365109.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817239] Re: add '--targets' option to
+ qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Laszlo,
+I submitted a first version some days ago, which homogeneized the
+implementation, as suggested by Laurent Vivier. It received some
+feedback from Eric Blake. A patchset (v3) is ready for review:
+https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/#
 
-On 3/9/19 1:48 AM, Laszlo Ersek wrote:
-> We don't (can't) have a recipe for building just $(EFIROM); therefore,
-> while we call the target $(EFIROM), we actually build all of the edk2
-> BaseTools. Rename the target to edk2-basetools, and update the iPXE
-> prerequisite accordingly. This will let other targets depend on
-> "edk2-basetools", where an $(EFIROM) pre-requisite would be misleading.
-> 
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  roms/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/roms/Makefile b/roms/Makefile
-> index 78d5dd18c301..2e83ececa25a 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -102,7 +102,7 @@ pxe-rom-%: build-pxe-roms
->  
->  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
->  
-> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
-> +efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
->  	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
->  		-b ipxe/src/bin/$(VID)$(DID).rom \
->  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
->  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
->  
-> -$(EFIROM):
-> +edk2-basetools:
+The feature requested in this issue is included in the patchset:
 
-Should we add:
+[Qemu-devel] [PATCH v3 6/10] qemu-binfmt-conf.sh: generalize <CPU> to posit=
+ional <CPUS> =
 
-        $(MAKE) -f Makefile.edk2 submodules
+https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/20190306045019.GF=
+75@03612eec87fc/
 
-from your next patch?
+Note that, instead of adding a parameter named `--target`, positional
+arguments are used, which where not being processed at all.
 
-There might be a circular dependency else, if the user doesn't init the
-submodules manually.
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-The next patch add a make dependency 'efi' -> 'edk2-basetools', but
-'edk2-basetools' build the BaseTools within edk2/.
+-- =
 
->  	$(MAKE) -C edk2/BaseTools
->  
->  slof:
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817239
+
+Title:
+  add '--targets' option to qemu-binfmt-conf.sh
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I'd like to ask for the addition of option '--targets' to scripts
+  /qemu-binfmt-conf.sh, in order to allow registering the interpreters
+  for the given list of architectures only, instead of using all of the
+  ones defined in qemu_target_list. The following is a possible patch
+  that implements it:
+
+   qemu-binfmt-conf.sh | 9 ++++++++-
+   1 file changed, 8 insertions(+), 1 deletion(-)
+
+  diff --git a/qemu-binfmt-conf.sh b/qemu-binfmt-conf.sh
+  index b5a1674..be4a19b 100644
+  --- a/qemu-binfmt-conf.sh
+  +++ b/qemu-binfmt-conf.sh
+  @@ -170,6 +170,7 @@ usage() {
+   Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                              [--help][--credential yes|no][--exportdir PAT=
+H]
+                              [--persistent yes|no][--qemu-suffix SUFFIX]
+  +                           [--targets TARGETS]
+
+          Configure binfmt_misc to use qemu interpreter
+
+  @@ -189,6 +190,8 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debia=
+n][--systemd CPU]
+          --persistent:  if yes, the interpreter is loaded when binfmt is
+                         configured and remains in memory. All future uses
+                         are cloned from the open file.
+  +       --targets:     comma-separated list of targets. If provided, only
+  +                      the targets in the list are registered.
+
+       To import templates with update-binfmts, use :
+
+  @@ -324,7 +327,7 @@ CREDENTIAL=3Dno
+   PERSISTENT=3Dno
+   QEMU_SUFFIX=3D""
+
+  -options=3D$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-=
+suffix:,exportdir:,help,credential:,persistent: -- "$@")
+  +options=3D$(getopt -o ds:Q:S:e:hc:p:t: -l debian,systemd:,qemu-path:,qem=
+u-suffix:,exportdir:,help,credential:,persistent:,targets: -- "$@")
+   eval set -- "$options"
+
+   while true ; do
+  @@ -380,6 +383,10 @@ while true ; do
+           shift
+           PERSISTENT=3D"$1"
+           ;;
+  +    -t|--targets)
+  +        shift
+  +        qemu_target_list=3D"$(echo "$1" | tr ',' ' ')"
+  +        ;;
+       *)
+           break
+           ;;
+  --
+  2.20.1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817239/+subscriptions
