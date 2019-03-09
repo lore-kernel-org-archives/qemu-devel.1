@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53133)
+Received: from eggs.gnu.org ([209.51.188.92]:33734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2gZU-00015N-7v
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 13:19:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1h2hbD-0006jC-4S
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2gZS-0004Ed-87
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 13:19:42 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Sat,  9 Mar 2019 19:19:20 +0100
-Message-Id: <20190309181920.30553-3-philmd@redhat.com>
-In-Reply-To: <20190309181920.30553-1-philmd@redhat.com>
-References: <20190309181920.30553-1-philmd@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1h2hbC-00043Y-9V
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37768)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h2hbC-00041X-2f
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 14:25:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h2hb9-0004BX-IV
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 19:25:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6605F2E80CC
+	for <qemu-devel@nongnu.org>; Sat,  9 Mar 2019 19:25:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] hw/nvram/fw_cfg: Use the ldst API
+Date: Sat, 09 Mar 2019 19:16:31 -0000
+From: Deepika Choudhary <1817345@bugs.launchpad.net>
+Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155215899175.15523.12873708625311540124.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
+ $source_path contains white spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-The load/store API eases code review.
+If calling from any Unix shell, and the parameter has spaces, then we
+need to quote it.we can also use single quotes, these are more powerful.
+They stop the shell from interpreting anything ($, !, \, *, ", etc,
+except ').
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/nvram/fw_cfg.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 7fdf04adc9..3d8859e333 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -85,7 +85,7 @@ static char *read_splashfile(char *filename, gsize *fil=
-e_sizep,
-     }
-=20
-     /* check magic ID */
--    filehead =3D ((content[0] & 0xff) + (content[1] << 8)) & 0xffff;
-+    filehead =3D lduw_le_p(content);
-     if (filehead =3D=3D 0xd8ff) {
-         file_type =3D JPG_FILE;
-     } else if (filehead =3D=3D 0x4d42) {
-@@ -96,7 +96,7 @@ static char *read_splashfile(char *filename, gsize *fil=
-e_sizep,
-=20
-     /* check BMP bpp */
-     if (file_type =3D=3D BMP_FILE) {
--        bmp_bpp =3D (content[28] + (content[29] << 8)) & 0xffff;
-+        bmp_bpp =3D lduw_le_p(&content[28]);
-         if (bmp_bpp !=3D 24) {
-             goto error;
-         }
---=20
-2.20.1
+can't we use this approach here??
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1817345
+
+Title:
+  configure script breaks when $source_path contains white spaces
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I noticed that the configure script breaks when the qemu source
+  directory is in a path containing white spaces, in particular the list
+  of targets is not correctly generated when calling "./configure
+  --help".
+
+  Steps to reproduce the problem:
+
+  $ mkdir "dir with spaces"
+  $ cd dir\ with\ spaces/
+  $ git clone https://git.qemu.org/git/qemu.git
+  $ cd qemu/
+  $ ./configure --help | grep -A3 target-list
+
+  =
+
+  Actual result:
+
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: dir with *-softmmu dir with =
+
+                             *-linux-user
+
+  =
+
+  Expected result:
+
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: aarch64-softmmu alpha-softm=
+mu =
+
+                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
+tmmu =
+
+                             lm32-softmmu m68k-softmmu microblaze-softmmu =
+
+
+  =
+
+  This happens because the $mak_wilds variable uses spaces to separate diff=
+erent paths, maybe newlines may be used, which are less likely to be in dir=
+ectory names.
+
+  BTW "shellcheck" may help finding some other problems.
+
+  Qemu version:
+
+  $ git describe =
+
+  v3.1.0-1960-ga05838cb2a
+
+  Thanks,
+     Antonio
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
