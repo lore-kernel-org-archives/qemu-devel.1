@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37500)
+Received: from eggs.gnu.org ([209.51.188.92]:37559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h2YZe-00057P-Kk
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:23 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h2Ya0-0005HG-Jp
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h2YZd-00025J-Ph
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:22 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:49363)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h2YZb-00023l-QZ
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:21 -0500
-References: <20190306031221.GA53@03612eec87fc>
-	<20190306044947.GE75@03612eec87fc>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fa52b25f-5f1c-7ec2-e2f1-bbfc73943847@vivier.eu>
-Date: Sat, 9 Mar 2019 10:46:59 +0100
+	(envelope-from <no-reply@patchew.org>) id 1h2YZz-0002Ho-9L
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:44 -0500
+Resent-Message-Id: <E1h2YZz-0002Ho-9L@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h2YZz-0002Gj-31
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 04:47:43 -0500
+Message-ID: <155212484477.8146.14914331552892856832@6acff2cf482b>
+In-Reply-To: <20190306031221.GA53@03612eec87fc>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190306044947.GE75@03612eec87fc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/10] qemu-binfmt-conf.sh: honour
- QEMU_PATH and/or QEMU_SUFFIX
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 9 Mar 2019 01:47:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/10] qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, eblake@redhat.com
+To: unai.martinezcorral@ehu.eus
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-On 06/03/2019 05:49, Unai Martinez-Corral wrote:
-> Allow to set 'path' or 'suffix' through environment variables,
-> consistently with 'persistent' and 'credential'.
-> 
-> Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-> ---
->  scripts/qemu-binfmt-conf.sh | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index 68aa4c3f78..c113ff131e 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -176,6 +176,7 @@ Usage: qemu-binfmt-conf.sh [--path PATH][--debian][--systemd CPU]
->         --help:        display this usage
->         --path:        set path to qemu interpreter ($QEMU_PATH)
->         --suffix:      add a suffix to the default interpreter name
-> +                      ($QEMU_SUFFIX)
->         --debian:      don't write into /proc,
->                        instead generate update-binfmts templates
->         --systemd:     don't write into /proc,
-> @@ -321,13 +322,11 @@ BINFMT_SET=qemu_register_interpreter
->  SYSTEMDDIR="/etc/binfmt.d"
->  DEBIANDIR="/usr/share/binfmts"
-> 
-> -QEMU_PATH=/usr/local/bin
-> -
-> +QEMU_PATH="${QEMU_PATH:-/usr/local/bin}"
-> +QEMU_SUFFIX="${QEMU_SUFFIX:-}"
->  QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
->  QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-> 
-> -QEMU_SUFFIX=""
-> -
->  options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
->  eval set -- "$options"
-> 
-> --
-> 2.20.1
-> 
-
-Same question as for PATCH 3/10: why?
-
-And I think the usage text should be formatted differently to be cleared and looks 
-like more the one of qemu-XXX:
-
-  usage: qemu-m68k [options] program [arguments...]
-  Linux CPU emulator (compiled for m68k emulation)
-
-  Options and associated environment variables:
-
-  Argument             Env-variable      Description
-  -h                                     print this help
-  -help                                  
-  -g port              QEMU_GDB          wait gdb connection to 'port'
-  -L path              QEMU_LD_PREFIX    set the elf interpreter prefix to 'path'
-  -s size              QEMU_STACK_SIZE   set the stack size to 'size' bytes
-  ...
-
-Thanks,
-Laurent
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNjAzMTIyMS5HQTUz
+QDAzNjEyZWVjODdmYy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29k
+aW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9u
+OgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMzA2MDMxMjIxLkdBNTNAMDM2MTJlZWM4
+N2ZjClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8xMF0gcWVtdS1iaW5mbXQtY29u
+Zi5zaAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
+IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hl
+dy8yMDE5MDMwNjAzMTIyMS5HQTUzQDAzNjEyZWVjODdmYyAtPiBwYXRjaGV3LzIwMTkwMzA2MDMx
+MjIxLkdBNTNAMDM2MTJlZWM4N2ZjClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmJh
+Mjg0YWZiNSBxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUwo0NDU3YmQx
+M2ZkIHFlbXUtYmluZm10LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpCjE1MTYxNjEyNWYgcWVtdS1i
+aW5mbXQtY29uZi5zaDogcmVmYWN0b3IgdXNhZ2UoKQpmYmRlY2Q1ZTNkIHFlbXUtYmluZm10LWNv
+bmYuc2g6IGFkZCBvcHRpb24gLS1yZXNldCA8QVJDSFM+CjY4YTAwMTZhOTggcWVtdS1iaW5mbXQt
+Y29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BVPiB0byBwb3NpdGlvbmFsIDxDUFVTPgo0NDNmNjJjN2I0
+IHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5kL29yIFFFTVVfU1VGRklY
+CjQwYTU1YjdhZjQgcWVtdS1iaW5mbXQtY29uZi5zaDogcmVtb3ZlICdxZW11JyBwcmVmaXggZnJv
+bSBjbGkgb3B0aW9ucwoyMWFhOTY2MTA0IHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NS
+RURFTlRJQUwgYW5kIFFFTVVfUEVSU0lTVEVOVAo3ODExZGNjMTljIHFlbXUtYmluZm10LWNvbmYu
+c2g6IG1ha2Ugb3B0cyAtcCBhbmQgLWMgYm9vbGVhbgoyZTg4MGQxYjY4IHFlbXUtYmluZm10LWNv
+bmYuc2g6IGVuZm9yY2Ugc2FmZSBzdHlsZSBjb25zaXN0ZW5jeQoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KMS8xMCBDaGVja2luZyBjb21taXQgMmU4ODBkMWI2OGRjIChxZW11LWJpbmZtdC1jb25mLnNo
+OiBlbmZvcmNlIHNhZmUgc3R5bGUgY29uc2lzdGVuY3kpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
+aGFyYWN0ZXJzCiM1MzogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjI5OToKKyAg
+ICAgICAgaWYgWyAieCRtYWdpYyIgPSAieCIgXSB8fCBbICJ4JG1hc2siID0gIngiIF0gfHwgWyAi
+eCRmYW1pbHkiID0gIngiIF0gOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ3
+IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8x
+MCBDaGVja2luZyBjb21taXQgNzgxMWRjYzE5YzJlIChxZW11LWJpbmZtdC1jb25mLnNoOiBtYWtl
+IG9wdHMgLXAgYW5kIC1jIGJvb2xlYW4pCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+NTE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMjc6CitvcHRpb25zPSQoZ2V0
+b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBkZWJpYW4sc3lzdGVtZDoscWVtdS1wYXRoOixxZW11LXN1
+ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEwIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzEwIENoZWNraW5nIGNvbW1pdCAyMWFhOTY2MTA0
+OTIgKHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFFTVVfUEVS
+U0lTVEVOVCkKNC8xMCBDaGVja2luZyBjb21taXQgNDBhNTViN2FmNGVjIChxZW11LWJpbmZtdC1j
+b25mLnNoOiByZW1vdmUgJ3FlbXUnIHByZWZpeCBmcm9tIGNsaSBvcHRpb25zKQpFUlJPUjogbGlu
+ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ2OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
+c2g6MzMxOgorb3B0aW9ucz0kKGdldG9wdCAtbyBkczpROlM6ZTpoY3AgLWwgZGViaWFuLHN5c3Rl
+bWQ6LHBhdGg6LHN1ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAt
+LSAiJEAiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCA0LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzEwIENoZWNraW5nIGNvbW1p
+dCA0NDNmNjJjN2I0N2UgKHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5k
+L29yIFFFTVVfU1VGRklYKQo2LzEwIENoZWNraW5nIGNvbW1pdCA2OGEwMDE2YTk4YzYgKHFlbXUt
+YmluZm10LWNvbmYuc2g6IGdlbmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCA8Q1BVUz4pCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MDogRklMRTogc2NyaXB0cy9xZW11LWJp
+bmZtdC1jb25mLnNoOjIwNToKKyAgICAgICBTdXBwb3J0ZWQgZm9ybWF0cyBmb3IgQ1BVUyBhcmU6
+IHNpbmdsZSBhcmNoIG9yIGNvbW1hL3NwYWNlIHNlcGFyYXRlZCBsaXN0LgoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYu
+c2g6MjA2OgorICAgICAgIFNlZSBRRU1VIHRhcmdldCBsaXN0IGJlbG93LiBJZiBDUFVTIGlzICdB
+TEwnIG9yIGVtcHR5LCBjb25maWd1cmUgYWxsIGtub3duCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
+YXJhY3RlcnMKIzE0NjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjM2NzoKK29w
+dGlvbnM9JChnZXRvcHQgLW8gOmRzUTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1
+ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90
+YWw6IDEgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xMCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNy8xMCBDaGVja2luZyBjb21taXQgZmJkZWNkNWUz
+ZGMxIChxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgb3B0aW9uIC0tcmVzZXQgPEFSQ0hTPikKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmlu
+Zm10LWNvbmYuc2g6Mzc1OgorICAgIGZpbmQgL3Byb2Mvc3lzL2ZzL2JpbmZtdF9taXNjLyAtdHlw
+ZSBmIC1uYW1lICRuYW1lcyAtZXhlYyBzaCAtYyAncHJpbnRmICVzIC0xID4ge30nIFw7CgpFUlJP
+UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg1OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
+LWNvbmYuc2g6MzkwOgorb3B0aW9ucz0kKGdldG9wdCAtbyByOmRzUTpTOmU6aGNwIC1sIHJlc2V0
+OixkZWJpYW4sc3lzdGVtZCxwYXRoOixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFs
+LHBlcnNpc3RlbnQgLS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNzQgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC8xMCBD
+aGVja2luZyBjb21taXQgMTUxNjE2MTI1ZjViIChxZW11LWJpbmZtdC1jb25mLnNoOiByZWZhY3Rv
+ciB1c2FnZSgpKQo5LzEwIENoZWNraW5nIGNvbW1pdCA0NDU3YmQxM2ZkYTcgKHFlbXUtYmluZm10
+LWNvbmYuc2g6IHVwZGF0ZSB1c2FnZSgpKQoxMC8xMCBDaGVja2luZyBjb21taXQgZmJhMjg0YWZi
+NTQ2IChxZW11LWJpbmZtdC1jb25mLnNoOiBzdXBwb3J0IFFFTVVfVEFSR0VUUykKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
+bmYuc2g6MjA1OgorICAgIFN1cHBvcnRlZCBmb3JtYXRzIGZvciBUQVJHRVRTIGFyZTogc2luZ2xl
+IGFyY2ggb3IgY29tbWEvc3BhY2Ugc2VwYXJhdGVkIGxpc3QuCgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNDU6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDY6
+CisgICAgU2VlIFFFTVUgdGFyZ2V0IGxpc3QgYmVsb3cuIElmIFRBUkdFVFMgaXMgJ0FMTCcgb3Ig
+ZW1wdHksIGNvbmZpZ3VyZSBhbGwga25vd24KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywg
+NjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAz
+MDYwMzEyMjEuR0E1M0AwMzYxMmVlYzg3ZmMvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
