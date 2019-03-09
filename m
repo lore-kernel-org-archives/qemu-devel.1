@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38271)
+Received: from eggs.gnu.org ([209.51.188.92]:42440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2RBO-0002fU-4G
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:53:50 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1h2Rme-0000iJ-9j
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 21:32:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h2RBL-0000jt-Ae
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:53:48 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2RBH-0000XG-Fr
-	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 20:53:44 -0500
-Received: by mail-wr1-f68.google.com with SMTP id f14so23228279wrg.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 17:53:36 -0800 (PST)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190309004826.9027-1-lersek@redhat.com>
-	<20190309004826.9027-7-lersek@redhat.com>
-	<2d33be0b-aa53-2038-01b0-0afed368aea8@redhat.com>
-Message-ID: <d7a6faeb-069e-d715-ad3b-fb31511d16a1@redhat.com>
-Date: Sat, 9 Mar 2019 02:53:33 +0100
+	(envelope-from <guoheyi@huawei.com>) id 1h2Rmd-0004vs-IK
+	for qemu-devel@nongnu.org; Fri, 08 Mar 2019 21:32:20 -0500
+From: Heyi Guo <guoheyi@huawei.com>
+Date: Sat, 9 Mar 2019 10:30:47 +0800
+Message-ID: <1552098649-28341-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <2d33be0b-aa53-2038-01b0-0afed368aea8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 06/10] roms/Makefile: replace the $(EFIROM)
- target with "edk2-basetools"
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 0/2] arm/acpi: simplify aml code and enable
+ SHPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +20,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wanghaibin.wang@huawei.com, Heyi Guo <guoheyi@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 3/9/19 2:32 AM, Philippe Mathieu-Daudé wrote:
-> Hi Laszlo,
-> 
-> On 3/9/19 1:48 AM, Laszlo Ersek wrote:
->> We don't (can't) have a recipe for building just $(EFIROM); therefore,
->> while we call the target $(EFIROM), we actually build all of the edk2
->> BaseTools. Rename the target to edk2-basetools, and update the iPXE
->> prerequisite accordingly. This will let other targets depend on
->> "edk2-basetools", where an $(EFIROM) pre-requisite would be misleading.
->>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>  roms/Makefile | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/roms/Makefile b/roms/Makefile
->> index 78d5dd18c301..2e83ececa25a 100644
->> --- a/roms/Makefile
->> +++ b/roms/Makefile
->> @@ -102,7 +102,7 @@ pxe-rom-%: build-pxe-roms
->>  
->>  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
->>  
->> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
->> +efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
->>  	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
->>  		-b ipxe/src/bin/$(VID)$(DID).rom \
->>  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
->> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
->>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
->>  
->> -$(EFIROM):
->> +edk2-basetools:
-> 
-> Should we add:
-> 
->         $(MAKE) -f Makefile.edk2 submodules
-> 
-> from your next patch?
-> 
-> There might be a circular dependency else, if the user doesn't init the
-> submodules manually.
-> 
-> The next patch add a make dependency 'efi' -> 'edk2-basetools', but
-> 'edk2-basetools' build the BaseTools within edk2/.
-> 
+After the introduction of generic PCIe root port and PCIe-PCI bridge, we will
+also have SHPC controller on ARM, and we don't support ACPI hot plug, so just
+enable SHPC native hot plug.
 
-OK I mixed, the Makefile.edk2's submodules rules is for the edk2
-repository submodules, while by 'the user submodules' I mean the QEMU
-submodules...
+Igor also spotted the store operation outside of bit and/or is not necessary, so
+simply the code at first.
 
-So the user has to initialize the roms/edk2 submodule previous to run
-both efi/edk2-basetools rules of this Makefile.
+v5:
+- Refine commit message of patch 1/2
 
->>  	$(MAKE) -C edk2/BaseTools
->>  
->>  slof:
->>
+v4:
+- Improve the code indention.
+
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+
+
+
+Heyi Guo (2):
+  hw/arm/acpi: simplify AML bit and/or statement
+  hw/arm/acpi: enable SHPC native hot plug
+
+ hw/arm/virt-acpi-build.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+-- 
+1.8.3.1
