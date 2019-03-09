@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47337)
+Received: from eggs.gnu.org ([209.51.188.92]:47343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003tA-5M
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wih-0003tC-9c
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000X7-GI
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h2Wig-0000Wv-Eu
 	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:35 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:40838)
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h2Wig-0000Vb-58
+	id 1h2Wig-0000UC-5l
 	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 02:48:34 -0500
-Received: by mail-wm1-x329.google.com with SMTP id g20so14081989wmh.5
-	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:34 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-	by smtp.gmail.com with ESMTPSA id 11sm5252294wmg.27.2019.03.08.23.48.32
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 08 Mar 2019 23:48:32 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id g20so14081951wmh.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Mar 2019 23:48:32 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  9 Mar 2019 08:48:07 +0100
-Message-Id: <1552117698-12355-15-git-send-email-pbonzini@redhat.com>
+Date: Sat,  9 Mar 2019 08:48:05 +0100
+Message-Id: <1552117698-12355-13-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
 References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 14/25] build: remove unnecessary assignments
- from Makefile.target
+Subject: [Qemu-devel] [PULL 12/25] update copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +28,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: David Kiarie <davidkiarie4@gmail.com>
 
-It is only necessary to clear block-obj-y because Makefile.objs
-uses "+=" instead of "="; fix that and remove the assignment.
-The other variables need not be cleared at all.
+From: David Kiarie <davidkiarie4@gmail.com>
 
+Signed-off-by: David Kiarie <davidkiarie4@gmail.com>
+Message-Id: <20190304151827.1813-2-davidkiarie4@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs   | 2 +-
- Makefile.target | 3 ---
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ hw/i386/amd_iommu.c | 2 +-
+ hw/i386/amd_iommu.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index acc53aa..31a84b7 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -13,7 +13,7 @@ authz-obj-y = authz/
- #######################################################################
- # block-obj-y is code used by both qemu system emulation and qemu-img
- 
--block-obj-y += nbd/
-+block-obj-y = nbd/
- block-obj-y += block.o blockjob.o job.o
- block-obj-y += block/ scsi/
- block-obj-y += qemu-io-cmds.o
-diff --git a/Makefile.target b/Makefile.target
-index a458506..441ace6 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -175,9 +175,6 @@ endif # CONFIG_SOFTMMU
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
- 
--block-obj-y :=
--common-obj-y :=
--chardev-obj-y :=
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call unnest-vars,.., \
-                authz-obj-y \
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index 8ad707a..6eabdf9 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -2,7 +2,7 @@
+  * QEMU emulation of AMD IOMMU (AMD-Vi)
+  *
+  * Copyright (C) 2011 Eduard - Gabriel Munteanu
+- * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
++ * Copyright (C) 2015, 2016 David Kiarie Kahurani
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+index c52886f..0ff9095 100644
+--- a/hw/i386/amd_iommu.h
++++ b/hw/i386/amd_iommu.h
+@@ -2,7 +2,7 @@
+  * QEMU emulation of an AMD IOMMU (AMD-Vi)
+  *
+  * Copyright (C) 2011 Eduard - Gabriel Munteanu
+- * Copyright (C) 2015 David Kiarie, <davidkiarie4@gmail.com>
++ * Copyright (C) 2015, 2016 David Kiarie Kahurani
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
 -- 
 1.8.3.1
