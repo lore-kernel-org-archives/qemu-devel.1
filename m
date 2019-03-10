@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42734)
+Received: from eggs.gnu.org ([209.51.188.92]:42754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2to4-0000sJ-Ag
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2to5-0000tW-5o
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2to2-0001Hv-TP
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2to3-0001Iy-TL
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:18 +1100
-Message-Id: <20190310082703.1245-16-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:25 +1100
+Message-Id: <20190310082703.1245-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/60] target/ppc: Refactor kvm_handle_debug
+Subject: [Qemu-devel] [PULL 22/60] ppc: externalize ppc_get_vcpu_by_pir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,135 +23,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Fabiano Rosas <farosas@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Fabiano Rosas <farosas@linux.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-There are four scenarios being handled in this function:
+We will use it to get the CPU interrupt presenter in XIVE when the
+TIMA is accessed from the indirect page.
 
-- single stepping
-- hardware breakpoints
-- software breakpoints
-- fallback (no debug supported)
-
-A future patch will add code to handle specific single step and
-software breakpoints cases so let's split each scenario into its own
-function now to avoid hurting readability.
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-Id: <20190228225759.21328-5-farosas@linux.ibm.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190306085032.15744-3-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/kvm.c | 86 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 50 insertions(+), 36 deletions(-)
+ hw/ppc/pnv.c         | 16 ----------------
+ hw/ppc/ppc.c         | 16 ++++++++++++++++
+ include/hw/ppc/ppc.h |  1 +
+ 3 files changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 996b08a1d3..4e3f1e4b78 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1624,52 +1624,66 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
-     return handle;
- }
-=20
-+static int kvm_handle_singlestep(void)
-+{
-+    return 1;
-+}
-+
-+static int kvm_handle_sw_breakpoint(void)
-+{
-+    return 1;
-+}
-+
- static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
- {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-     struct kvm_debug_exit_arch *arch_info =3D &run->debug.arch;
--    int handle =3D 0;
-=20
-     if (cs->singlestep_enabled) {
--        handle =3D 1;
--    } else if (arch_info->status) {
--        handle =3D kvm_handle_hw_breakpoint(cs, arch_info);
--    } else if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
--        handle =3D 1;
--    } else {
--        /* QEMU is not able to handle debug exception, so inject
--         * program exception to guest;
--         * Yes program exception NOT debug exception !!
--         * When QEMU is using debug resources then debug exception must
--         * be always set. To achieve this we set MSR_DE and also set
--         * MSRP_DEP so guest cannot change MSR_DE.
--         * When emulating debug resource for guest we want guest
--         * to control MSR_DE (enable/disable debug interrupt on need).
--         * Supporting both configurations are NOT possible.
--         * So the result is that we cannot share debug resources
--         * between QEMU and Guest on BOOKE architecture.
--         * In the current design QEMU gets the priority over guest,
--         * this means that if QEMU is using debug resources then guest
--         * cannot use them;
--         * For software breakpoint QEMU uses a privileged instruction;
--         * So there cannot be any reason that we are here for guest
--         * set debug exception, only possibility is guest executed a
--         * privileged / illegal instruction and that's why we are
--         * injecting a program interrupt.
--         */
-+        return kvm_handle_singlestep();
-+    }
-=20
--        cpu_synchronize_state(cs);
--        /* env->nip is PC, so increment this by 4 to use
--         * ppc_cpu_do_interrupt(), which set srr0 =3D env->nip - 4.
--         */
--        env->nip +=3D 4;
--        cs->exception_index =3D POWERPC_EXCP_PROGRAM;
--        env->error_code =3D POWERPC_EXCP_INVAL;
--        ppc_cpu_do_interrupt(cs);
-+    if (arch_info->status) {
-+        return kvm_handle_hw_breakpoint(cs, arch_info);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 3d5dfef220..9aa81c7f09 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1082,22 +1082,6 @@ static void pnv_ics_resend(XICSFabric *xi)
      }
-=20
--    return handle;
-+    if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
-+        return kvm_handle_sw_breakpoint();
-+    }
-+
-+    /*
-+     * QEMU is not able to handle debug exception, so inject
-+     * program exception to guest;
-+     * Yes program exception NOT debug exception !!
-+     * When QEMU is using debug resources then debug exception must
-+     * be always set. To achieve this we set MSR_DE and also set
-+     * MSRP_DEP so guest cannot change MSR_DE.
-+     * When emulating debug resource for guest we want guest
-+     * to control MSR_DE (enable/disable debug interrupt on need).
-+     * Supporting both configurations are NOT possible.
-+     * So the result is that we cannot share debug resources
-+     * between QEMU and Guest on BOOKE architecture.
-+     * In the current design QEMU gets the priority over guest,
-+     * this means that if QEMU is using debug resources then guest
-+     * cannot use them;
-+     * For software breakpoint QEMU uses a privileged instruction;
-+     * So there cannot be any reason that we are here for guest
-+     * set debug exception, only possibility is guest executed a
-+     * privileged / illegal instruction and that's why we are
-+     * injecting a program interrupt.
-+     */
-+    cpu_synchronize_state(cs);
-+    /*
-+     * env->nip is PC, so increment this by 4 to use
-+     * ppc_cpu_do_interrupt(), which set srr0 =3D env->nip - 4.
-+     */
-+    env->nip +=3D 4;
-+    cs->exception_index =3D POWERPC_EXCP_PROGRAM;
-+    env->error_code =3D POWERPC_EXCP_INVAL;
-+    ppc_cpu_do_interrupt(cs);
-+
-+    return 0;
  }
 =20
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+-static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
+-{
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-        CPUPPCState *env =3D &cpu->env;
+-
+-        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
+-            return cpu;
+-        }
+-    }
+-
+-    return NULL;
+-}
+-
+ static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
+ {
+     PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 9145aeddcb..b2ff99ec66 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -1487,3 +1487,19 @@ void PPC_debug_write (void *opaque, uint32_t addr,=
+ uint32_t val)
+         break;
+     }
+ }
++
++PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        CPUPPCState *env =3D &cpu->env;
++
++        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
++            return cpu;
++        }
++    }
++
++    return NULL;
++}
+diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+index 746170f635..4bdcb8bacd 100644
+--- a/include/hw/ppc/ppc.h
++++ b/include/hw/ppc/ppc.h
+@@ -4,6 +4,7 @@
+ #include "target/ppc/cpu-qom.h"
+=20
+ void ppc_set_irq(PowerPCCPU *cpu, int n_IRQ, int level);
++PowerPCCPU *ppc_get_vcpu_by_pir(int pir);
+=20
+ /* PowerPC hardware exceptions management helpers */
+ typedef void (*clk_setup_cb)(void *opaque, uint32_t freq);
 --=20
 2.20.1
