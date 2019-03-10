@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43269)
+Received: from eggs.gnu.org ([209.51.188.92]:43526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tor-0001gz-Ah
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpD-00025O-LF
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2toq-0001oL-9K
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpC-00022r-Td
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:51 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:42 +1100
-Message-Id: <20190310082703.1245-40-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:50 +1100
+Message-Id: <20190310082703.1245-48-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 39/60] target/ppc: switch fpr/vsrl registers so
- all VSX registers are in host endian order
+Subject: [Qemu-devel] [PULL 47/60] ppc/pnv: add a 'dt_isa_nodename' to the
+ chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,124 +24,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-When VSX support was initially added, the fpr registers were added at
-offset 0 of the VSR register and the vsrl registers were added at offset
-1. This is in contrast to the VMX registers (the last 32 VSX registers) w=
-hich
-are stored in host-endian order.
+The ISA bus has a different DT nodename on POWER9. Compute the name
+when the PnvChip is realized, that is before it is used by the machine
+to populate the device tree with the ISA devices.
 
-Switch the fpr/vsrl registers so that the lower 32 VSX registers are now =
-also
-stored in host endian order to match the VMX registers. This ensures that=
- TCG
-vector operations involving mixed VMX and VSX registers will function
-correctly.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190307180520.13868-7-mark.cave-ayland@ilande.co.uk>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190307223548.20516-6-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h      | 4 ++--
- target/ppc/internal.h | 8 ++++----
- target/ppc/machine.c  | 8 ++++----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ hw/ppc/pnv.c         | 18 +++++-------------
+ include/hw/ppc/pnv.h |  2 ++
+ 2 files changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 3050982707..8905edbfd0 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -2585,7 +2585,7 @@ static inline bool lsw_reg_in_range(int start, int =
-nregs, int rx)
-=20
- static inline int fpr_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[i].u64[0]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(0));
- }
-=20
- static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
-@@ -2595,7 +2595,7 @@ static inline uint64_t *cpu_fpr_ptr(CPUPPCState *en=
-v, int i)
-=20
- static inline int vsrl_offset(int i)
- {
--    return offsetof(CPUPPCState, vsr[i].u64[1]);
-+    return offsetof(CPUPPCState, vsr[i].VsrD(1));
- }
-=20
- static inline int vsr_full_offset(int i)
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 3ebbdf4da4..fb6f64ed1e 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -206,14 +206,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, =
-1, 6, 6);
-=20
- static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
--    vsr->VsrD(0) =3D env->vsr[n].u64[0];
--    vsr->VsrD(1) =3D env->vsr[n].u64[1];
-+    vsr->VsrD(0) =3D env->vsr[n].VsrD(0);
-+    vsr->VsrD(1) =3D env->vsr[n].VsrD(1);
- }
-=20
- static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
--    env->vsr[n].u64[0] =3D vsr->VsrD(0);
--    env->vsr[n].u64[1] =3D vsr->VsrD(1);
-+    env->vsr[n].VsrD(0) =3D vsr->VsrD(0);
-+    env->vsr[n].VsrD(1) =3D vsr->VsrD(1);
- }
-=20
- void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 756b6d2971..a92d0ad3a3 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -150,7 +150,7 @@ static int get_fpr(QEMUFile *f, void *pv, size_t size=
-,
- {
-     ppc_vsr_t *v =3D pv;
-=20
--    v->u64[0] =3D qemu_get_be64(f);
-+    v->VsrD(0) =3D qemu_get_be64(f);
-=20
-     return 0;
- }
-@@ -160,7 +160,7 @@ static int put_fpr(QEMUFile *f, void *pv, size_t size=
-,
- {
-     ppc_vsr_t *v =3D pv;
-=20
--    qemu_put_be64(f, v->u64[0]);
-+    qemu_put_be64(f, v->VsrD(0));
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 922e3ec48b..6625562d27 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -417,24 +417,12 @@ static int pnv_dt_isa_device(DeviceState *dev, void=
+ *opaque)
      return 0;
  }
 =20
-@@ -181,7 +181,7 @@ static int get_vsr(QEMUFile *f, void *pv, size_t size=
-,
+-static int pnv_chip_isa_offset(PnvChip *chip, void *fdt)
+-{
+-    char *name;
+-    int offset;
+-
+-    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
+-                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
+C_BASE);
+-    offset =3D fdt_path_offset(fdt, name);
+-    g_free(name);
+-    return offset;
+-}
+-
+ /* The default LPC bus of a multichip system is on chip 0. It's
+  * recognized by the firmware (skiboot) using a "primary" property.
+  */
+ static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
  {
-     ppc_vsr_t *v =3D pv;
+-    int isa_offset =3D pnv_chip_isa_offset(pnv->chips[0], fdt);
++    int isa_offset =3D fdt_path_offset(fdt, pnv->chips[0]->dt_isa_nodena=
+me);
+     ForeachPopulateArgs args =3D {
+         .fdt =3D fdt,
+         .offset =3D isa_offset,
+@@ -866,6 +854,10 @@ static void pnv_chip_power8_realize(DeviceState *dev=
+, Error **errp)
+                              &error_fatal);
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip8->lpc.xscom_=
+regs);
 =20
--    v->u64[1] =3D qemu_get_be64(f);
-+    v->VsrD(1) =3D qemu_get_be64(f);
++    chip->dt_isa_nodename =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x=
+",
++                                            (uint64_t) PNV_XSCOM_BASE(ch=
+ip),
++                                            PNV_XSCOM_LPC_BASE);
++
+     /* Interrupt Management Area. This is the memory region holding
+      * all the Interrupt Control Presenter (ICP) registers */
+     pnv_chip_icp_realize(chip8, &local_err);
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 8d80cb34ee..c81f157f41 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -58,6 +58,8 @@ typedef struct PnvChip {
+     MemoryRegion xscom_mmio;
+     MemoryRegion xscom;
+     AddressSpace xscom_as;
++
++    gchar        *dt_isa_nodename;
+ } PnvChip;
 =20
-     return 0;
- }
-@@ -191,7 +191,7 @@ static int put_vsr(QEMUFile *f, void *pv, size_t size=
-,
- {
-     ppc_vsr_t *v =3D pv;
-=20
--    qemu_put_be64(f, v->u64[1]);
-+    qemu_put_be64(f, v->VsrD(1));
-     return 0;
- }
-=20
+ #define TYPE_PNV8_CHIP "pnv8-chip"
 --=20
 2.20.1
