@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60109)
+Received: from eggs.gnu.org ([209.51.188.92]:37035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h32CZ-0003ue-Un
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:25:32 -0400
+	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h32q0-0005Va-Sp
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 14:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h32CY-0002jA-UJ
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:25:31 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:59721)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h32CY-0002ci-Gf
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:25:30 -0400
-References: <20190306031221.GA53@03612eec87fc>
-	<20190306045508.GJ75@03612eec87fc>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <5b17cc79-33a2-8747-d3bc-581a69074ca8@vivier.eu>
-Date: Sun, 10 Mar 2019 18:25:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190306045508.GJ75@03612eec87fc>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h32nv-0007Yr-SO
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 14:04:08 -0400
+From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
+Date: Sun, 10 Mar 2019 18:03:54 +0000
+Message-ID: <e131b4b0eb9109547ce0ed0993665206d6bf983a.camel@aisec.fraunhofer.de>
+References: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
+	<CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
+	<c9f69861058412a1f71418a9c892daf0821a9e33.camel@aisec.fraunhofer.de>
+	<CAEUhbmXjCqRRtNDqq5E5y60sDz+4=WqMuxFhaLndot7TSJuUiQ@mail.gmail.com>
+In-Reply-To: <CAEUhbmXjCqRRtNDqq5E5y60sDz+4=WqMuxFhaLndot7TSJuUiQ@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/10] qemu-binfmt-conf.sh: support
- QEMU_TARGETS
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8CA85682BF11414581107E976302382F@xch.fraunhofer.de>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
+ compatible string to /soc/ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, eblake@redhat.com
+To: "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
+Cc: "palmer@sifive.com" <palmer@sifive.com>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>, "mjc@sifive.com" <mjc@sifive.com>, "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>, "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
 
-On 06/03/2019 05:55, Unai Martinez-Corral wrote:
-> Rename CPUS to TARGETS, and support QEMU_TARGETS environment variable.
-> This does not break backward compatibility, because it is just a placeholder.
-> 
-> Consistently with 'path', 'suffix', 'persistent' and 'credential',
-> provide an environment variable to set the list of target architectures.
-> The supported formats are the same as for positional arguments, which have
-> priority. If both the variable and the list of positional arguments are empty,
-> defaults to 'ALL'.
-> 
-> Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-> ---
->  scripts/qemu-binfmt-conf.sh | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
-> 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index 8ca2647ed0..0676f86512 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -6,7 +6,7 @@ mips mipsel mipsn32 mipsn32el mips64 mips64el \
->  sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
->  microblaze microblazeel or1k x86_64"
-> 
-> -# check if given target CPUS is/are in the supported target list
-> +# check if given TARGETS is/are in the supported target list
->  qemu_check_target_list() {
->      all="$qemu_target_list"
->      if [ "x$1" = "xALL" ] ; then
-> @@ -199,12 +199,12 @@ usage() {
->      cat <<EOF
->  Usage: qemu-binfmt-conf.sh [--help][--path PATH][--suffix SUFFIX]
->                             [--persistent][--credential][--exportdir PATH]
-> -                           [--reset ARCHS][--systemd][--debian][CPUS]
-> +                           [--reset ARCHS][--systemd][--debian][TARGETS]
-> 
-> -    Configure binfmt_misc to use qemu interpreter for the given CPUS.
-> -    Supported formats for CPUS are: single arch or comma/space separated list.
-> -    See QEMU target list below. If CPUS is 'ALL' or empty, configure all known
-> -    cpus. If CPUS is 'NONE', no interpreter is configured.
-> +    Configure binfmt_misc to use qemu interpreter for the given TARGETS.
-> +    Supported formats for TARGETS are: single arch or comma/space separated list.
-> +    See QEMU target list below. If TARGETS is 'ALL' or empty, configure all known
-> +    TARGETS. If TARGETS is 'NONE', no interpreter is configured.
-> 
->      --help:        display this usage.
->      --path:        set path to qemu interpreter.
-> @@ -244,6 +244,7 @@ Usage: qemu-binfmt-conf.sh [--help][--path PATH][--suffix SUFFIX]
->        QEMU_SUFFIX=
->        QEMU_PERSISTENT=no
->        QEMU_CREDENTIAL=no
-> +      QEMU_TARGETS=
-
-         QEMU_TARGETS=$QEMU_TARGETS
-
-> 
->  EOF
->  }
-> @@ -324,17 +325,17 @@ EOF
->  }
-> 
->  qemu_set_binfmts() {
-> -    if [ "x$1" = "xNONE" ] ; then
-> -      return
-> -    fi
-> -
->      # probe cpu type
->      host_family=$(qemu_get_family)
-> 
->      # reduce the list of target interpreters to those given in the CLI
-> -    targets="$@"
->      if [ $# -eq 0 ] ; then
-> -      targets="ALL"
-> +      targets="${QEMU_TARGETS:-ALL}"
-> +    else
-> +      if [ "x$1" = "xNONE" ] ; then
-
-In fact, I think it would be cleaner to have a "--dry-run" option
-instead (something setting BINFMT_SET to ':' I think)
-
-Thanks,
-Laurent
+SGkgQmluLA0KDQpPbiBTdW4sIDIwMTktMDMtMTAgYXQgMjI6NTcgKzA4MDAsIEJpbiBNZW5nIHdy
+b3RlOg0KPiBIaSBMdWthcywNCj4gDQo+IE9uIFN1biwgTWFyIDEwLCAyMDE5IGF0IDk6NDQgUE0g
+QXVlciwgTHVrYXMNCj4gPGx1a2FzLmF1ZXJAYWlzZWMuZnJhdW5ob2Zlci5kZT4gd3JvdGU6DQo+
+ID4gSGkgQmluLA0KPiA+IA0KPiA+IE9uIFN1biwgMjAxOS0wMy0xMCBhdCAwOTowNyArMDgwMCwg
+QmluIE1lbmcgd3JvdGU6DQo+ID4gPiBIaSBMdWthcywNCj4gPiA+IA0KPiA+ID4gT24gTW9uLCBG
+ZWIgMTEsIDIwMTkgYXQgNjoxMyBBTSBMdWthcyBBdWVyDQo+ID4gPiA8bHVrYXMuYXVlckBhaXNl
+Yy5mcmF1bmhvZmVyLmRlPiB3cm90ZToNCj4gPiA+ID4gUmUtYWRkIHRoZSBwcmV2aW91cyBjb21w
+YXRpYmxlIHN0cmluZyAicmlzY3YtdmlydGlvLXNvYyIgdG8gdGhlDQo+ID4gPiA+IHNvYw0KPiA+
+ID4gPiBkZXZpY2UgdHJlZSBub2RlIHRvIGFsbG93IFUtQm9vdCBhbmQgTGludXggdG8gYmluZCBt
+YWNoaW5lLQ0KPiA+ID4gPiBzcGVjaWZpYw0KPiA+ID4gPiBkcml2ZXJzIHRvIGl0LiBUaGUgY3Vy
+cmVudCBjb21wYXRpYmxlIHN0cmluZyAic2ltcGxlLWJ1cyIgaXMNCj4gPiA+ID4gcmV0YWluZWQu
+DQo+ID4gPiA+IA0KPiA+ID4gPiBUaGlzIGlzIHJlcXVpcmVkIGJ5IFUtQm9vdCB0byBiaW5kIGRl
+dmljZXMgZWFybHksIGFzIHBhcnQgb2YNCj4gPiA+ID4gdGhlDQo+ID4gPiA+IHByZS1yZWxvY2F0
+aW9uIGRyaXZlciBtb2RlbC4NCj4gPiA+ID4gDQo+ID4gPiANCj4gPiA+IEkgc2VlIG5vIHByb2Js
+ZW0gd2l0aCBVLUJvb3Qgd29ya2luZyB3aXRoIGN1cnJlbnQgY29tcGF0aWJsZQ0KPiA+ID4gc3Ry
+aW5nDQo+ID4gPiAic2ltcGxlLWJ1cyIuIEluIGZhY3QgSSBoYWQgcGxhbm5lZCB0byByZW1vdmUg
+dGhlIGNvbXBhdGlibGUNCj4gPiA+IHN0cmluZw0KPiA+ID4gInJpc2N2LXZpcnRpby1zb2MiIGlu
+IFUtQm9vdCBidXQgZGlkIG5vdCBnZXQgdGltZSB0byB3b3JrIG9uIGl0Lg0KPiA+ID4gDQo+ID4g
+DQo+ID4gSXQgaXMgb25seSByZXF1aXJlZCBpZiBVLUJvb3QgaXMgcnVubmluZyBpbiBtYWNoaW5l
+LW1vZGUuIEZvcg0KPiA+IHJlbG9jYXRpb24gaXQgbmVlZHMgdG8gdXNlIHRoZSBDTElOVCBkcml2
+ZXIgdG8gc2VuZCBhcHByb3ByaWF0ZQ0KPiA+IElQSXMgdG8NCj4gPiB0aGUgb3RoZXIgaGFydHMu
+IFRvIGJlIGFibGUgdG8gcHJvYmUgdGhlIGRyaXZlciwgdGhlIGRldmljZSBhbmQgaXRzDQo+ID4g
+cGFyZW50IGRldmljZSB0cmVlIG5vZGUgKHNvYykgbXVzdCB0aGVyZWZvcmUgYmUgYXZhaWxhYmxl
+IGluIHRoZQ0KPiA+IHByZS0NCj4gPiByZWxvY2F0aW9uIGRldmljZSBtb2RlbC4NCj4gPiBUaGlz
+IHBhdGNoIHdhcyB0aGUgZWFzaWVzdCB3YXkgSSBjb3VsZCB0aGluayBvZiBmb3IgYWNoaWV2aW5n
+IHRoaXMuDQo+ID4gSXQNCj4gPiBjb3VsZCBiZSB0aGF0IHRoZXJlIGlzIGEgYmV0dGVyIHdheSBv
+ZiBzb2x2aW5nIHRoaXMuDQo+ID4gDQo+IA0KPiBJIHRlc3RlZCB5b3VyIFNNUCBVLUJvb3Qgc2Vy
+aWVzIGluIGJvdGggTS1tb2RlIGFuZCBTLW1vZGUsIHVzaW5nIGEgNA0KPiBjb3JlICd2aXJ0JyB0
+YXJnZXQuIFdvcmtzIGZpbmUuIEkgYW0gdXNpbmcgUUVNVSAzLjEuMCBzbyBpdCBpcw0KPiAic2lt
+cGxlLWJ1cyIuDQo+IA0KDQpUaGF0IGlzIGFjdHVhbGx5IG15IGZhdWx0LCBpdCBzaG91bGQgbm90
+IHdvcmsuDQpXaGF0IGlzIGhhcHBlbmluZyBpcyB0aGF0IFUtQm9vdCBmYWlscyB0byByZWxvY2F0
+ZSB0aGUgc2Vjb25kYXJ5IGhhcnRzLA0KYmVjYXVzZSB0aGUgQ0xJTlQgZHJpdmVyIGNhbm5vdCBn
+ZXQgdGhlIG1lbW9yeSBhZGRyZXNzIG9mIHRoZSBDTElOVA0KZGV2aWNlLiBUaGlzIGVycm9yIGlz
+IGN1cnJlbnRseSBzaWxlbnRseSBpZ25vcmVkLg0KVGhlIHNlY29uZGFyeSBoYXJ0cyBhcmUgc3Rp
+bGwgd2FpdGluZyB0byByZWNlaXZlIElQSXMsIHNvIGJvb3RpbmcgTGludXgNCndvcmtzIGZpbmUs
+IGJlY2F1c2UgVS1Cb290IGNhbiBub3cgc2VuZCBJUElzLiBUaGlzIHdpbGwgaG93ZXZlciBicmVh
+aw0KaWYgVS1Cb290IG92ZXJ3cml0ZXMgdGhlIGNvZGUgdGhlIHNlY29uZGFyeSBoYXJ0cyBhcmUg
+cnVubmluZywgd2hpY2gNCmNvdWxkIGhhcHBlbiB3aGVuIGxvYWRpbmcgYW4gaW1hZ2UuDQoNCkkg
+d2lsbCB1cGRhdGUgbXkgU01QIFUtQm9vdCBzZXJpZXMgdG8gcHJpbnQgYSB3YXJuaW5nIGlmIHNl
+bmRpbmcgYW4gSVBJDQpmYWlscy4NCg0KVGhhbmtzLA0KTHVrYXMNCg==
