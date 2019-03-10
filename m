@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37658)
+Received: from eggs.gnu.org ([209.51.188.92]:38308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2zK9-0003wN-I4
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1h2zOS-0004vF-32
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2zK8-0005ax-RX
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h2zK8-0005aA-Js
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-	<CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
-	<20190307113309.GN32268@redhat.com>
-Date: Sun, 10 Mar 2019 15:21:02 +0100
-In-Reply-To: <20190307113309.GN32268@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Thu, 7 Mar 2019 11:33:09 +0000")
-Message-ID: <87ef7ex12p.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1h2zOR-0000Gc-B9
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:25:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1h2zOP-0000FU-IH
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:25:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1h2zOO-0000Qw-9k
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 14:25:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 46DCE2E8054
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 14:25:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Date: Sun, 10 Mar 2019 14:17:52 -0000
+From: Tim Schuster <1819343@bugs.launchpad.net>
+Reply-To: Bug 1819343 <1819343@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155222747303.16387.17760363757245891386.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1819343] [NEW] Qcow2 image stuck as locked after
+ host crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Public bug reported:
 
-[...]
-> As long term contributors we've built enough enough knowledge to
-> QEMU to consider our build system attractive or even "simple",
+After a host crash, the qcow2 image of the VM, stored on a remote NFS
+share, has become inaccessible. Libvirt/QEMU reports that 'failed to get
+"write" lock\nIs another process using the image
+[/path/nfs/image.qcow2]?'. No process is accessing the image from either
+host or the network share side. There is no obvious way in qemu-img to
+force unlocking the file or repair the image (attempting a qemu-img
+check with -r all results in qemu-img complaining about the lock and
+being unable to do force-share=3Don on anything but readonly images).
 
-The words that come to my mind aren't "attractive" or "simple", but
-"impressively clever", "brittle", and "uh, can I hack on something else
-today?"
+I'm currently attempting to fix this by converting the image via 'qemu-
+img convert -U -f qcow2 -O qcow2 image.qcow2 image_2.gcow2', though this
+will likely take some time.
 
-I've obviously failed to develop enough of a Stockholm Syndrome in 8+
-years.
+Using QEMU 3.1.0
 
-> which skews our view of the benefits of alternatives to people
-> without this tribal knowledge.
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1819343
+
+Title:
+  Qcow2 image stuck as locked after host crash
+
+Status in QEMU:
+  New
+
+Bug description:
+  After a host crash, the qcow2 image of the VM, stored on a remote NFS
+  share, has become inaccessible. Libvirt/QEMU reports that 'failed to
+  get "write" lock\nIs another process using the image
+  [/path/nfs/image.qcow2]?'. No process is accessing the image from
+  either host or the network share side. There is no obvious way in
+  qemu-img to force unlocking the file or repair the image (attempting a
+  qemu-img check with -r all results in qemu-img complaining about the
+  lock and being unable to do force-share=3Don on anything but readonly
+  images).
+
+  I'm currently attempting to fix this by converting the image via
+  'qemu-img convert -U -f qcow2 -O qcow2 image.qcow2 image_2.gcow2',
+  though this will likely take some time.
+
+  Using QEMU 3.1.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1819343/+subscriptions
