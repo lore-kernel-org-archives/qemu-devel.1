@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45733)
+Received: from eggs.gnu.org ([209.51.188.92]:57400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2wr2-0002FP-0a
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 07:42:56 -0400
+	(envelope-from <liq3ea@163.com>) id 1h2yFY-000462-Tu
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h2wr1-000620-B8
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 07:42:55 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h2wr1-00060q-4E
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 07:42:55 -0400
-Received: by mail-ot1-x343.google.com with SMTP id b3so1609050otp.4
-	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 04:42:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1552117698-12355-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 10 Mar 2019 11:42:42 +0000
-Message-ID: <CAFEAcA_NBUw78zJz-VmYMCfN2eTQ=N4Zjw34_Fjvbye1FvPKjw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] Misc patches for QEMU 4.0 soft freeze
+	(envelope-from <liq3ea@163.com>) id 1h2yFW-0005nK-TC
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:20 -0400
+Received: from m12-15.163.com ([220.181.12.15]:36875)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1h2yFV-0005lw-U8
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:18 -0400
+From: Li Qiang <liq3ea@163.com>
+Date: Sun, 10 Mar 2019 06:12:05 -0700
+Message-Id: <20190310131205.75856-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] tests: test-announce-self: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +21,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: vyasevic@redhat.com, dgilbert@redhat.com, mst@redhat.com, jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
 
-On Sat, 9 Mar 2019 at 07:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 62cfabb52210139843e26c95434356f73a0631=
-b9:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20190307' into=
- staging (2019-03-08 15:17:01 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to d7fa7c30d45c375fb7d9ad6f58462a64c3317037:
->
->   exec: streamline flatview_add_to_dispatch (2019-03-09 08:46:56 +0100)
->
-> ----------------------------------------------------------------
-> * allow building QEMU without TCG or KVM support (Anthony)
-> * update AMD IOMMU copyright (David)
-> * compilation fixes for GCC and BSDs (Alexey, David, Paolo, Philippe)
-> * coalesced I/O bugfix (Jagannathan)
-> * Processor Tracing cpuid fix (Luwei)
-> * Kconfig fix (Paolo)
-> * Cleanups (Paolo)
-> * PVH vs. multiboot fix (Stefano)
-> * LSI bugfixes (Sven)
-> * elf2dmp Coverity fix (Victor)
-> * scsi-disk fix (Zhengui)
+Spotted by ASAN when 'make check'.
 
-    Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <philmd@redhat.com>
-    Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <philmd@redhat.com>
-    Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <philmd@redhat.com>
-ERROR: pull request includes tag with UTF-8 error in person name
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ tests/test-announce-self.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-(Maybe we should add "patch includes LATIN CAPITAL LETTER A WITH TILDE"
-in checkpatch.pl as a warning, since it's much more likely to
-be "something got doubly-utf-8-encoded" than intentional.)
-
-thanks
--- PMM
+diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
+index 1644d34a3f..3f370d8bf5 100644
+--- a/tests/test-announce-self.c
++++ b/tests/test-announce-self.c
+@@ -21,17 +21,6 @@
+ #define ETH_P_RARP 0x8035
+ #endif
+ 
+-static QTestState *test_init(int socket)
+-{
+-    char *args;
+-
+-    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
+-                           "virtio-net-pci,netdev=hs0", socket);
+-
+-    return qtest_start(args);
+-}
+-
+-
+ static void test_announce(int socket)
+ {
+     char buffer[60];
+@@ -58,19 +47,22 @@ static void test_announce(int socket)
+ 
+ static void setup(gconstpointer data)
+ {
+-    QTestState *qs;
+     void (*func) (int socket) = data;
+     int sv[2], ret;
++    char *args;
+ 
+     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
+     g_assert_cmpint(ret, !=, -1);
+ 
+-    qs = test_init(sv[1]);
++    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
++                           "virtio-net-pci,netdev=hs0", sv[1]);
++    qtest_start(args);
+     func(sv[0]);
+ 
+     /* End test */
+     close(sv[0]);
+-    qtest_quit(qs);
++    qtest_end();
++    g_free(args);
+ }
+ 
+ int main(int argc, char **argv)
+-- 
+2.17.1
