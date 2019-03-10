@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57400)
+Received: from eggs.gnu.org ([209.51.188.92]:33569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h2yFY-000462-Tu
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:21 -0400
+	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h2yki-0002z1-BM
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:44:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h2yFW-0005nK-TC
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:20 -0400
-Received: from m12-15.163.com ([220.181.12.15]:36875)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h2yFV-0005lw-U8
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:12:18 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Sun, 10 Mar 2019 06:12:05 -0700
-Message-Id: <20190310131205.75856-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] tests: test-announce-self: fix memory leak
+	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h2ykh-0002Fi-IQ
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 09:44:32 -0400
+From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
+Date: Sun, 10 Mar 2019 13:44:14 +0000
+Message-ID: <c9f69861058412a1f71418a9c892daf0821a9e33.camel@aisec.fraunhofer.de>
+References: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
+	<CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
+In-Reply-To: <CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DD7B6325D19A284898681D2BD4DF516C@xch.fraunhofer.de>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
+ compatible string to /soc/ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,63 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vyasevic@redhat.com, dgilbert@redhat.com, mst@redhat.com, jasowang@redhat.com
-Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
+To: "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
+Cc: "palmer@sifive.com" <palmer@sifive.com>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>, "mjc@sifive.com" <mjc@sifive.com>, "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>, "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
 
-Spotted by ASAN when 'make check'.
-
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- tests/test-announce-self.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
-
-diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-index 1644d34a3f..3f370d8bf5 100644
---- a/tests/test-announce-self.c
-+++ b/tests/test-announce-self.c
-@@ -21,17 +21,6 @@
- #define ETH_P_RARP 0x8035
- #endif
- 
--static QTestState *test_init(int socket)
--{
--    char *args;
--
--    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
--                           "virtio-net-pci,netdev=hs0", socket);
--
--    return qtest_start(args);
--}
--
--
- static void test_announce(int socket)
- {
-     char buffer[60];
-@@ -58,19 +47,22 @@ static void test_announce(int socket)
- 
- static void setup(gconstpointer data)
- {
--    QTestState *qs;
-     void (*func) (int socket) = data;
-     int sv[2], ret;
-+    char *args;
- 
-     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-     g_assert_cmpint(ret, !=, -1);
- 
--    qs = test_init(sv[1]);
-+    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
-+                           "virtio-net-pci,netdev=hs0", sv[1]);
-+    qtest_start(args);
-     func(sv[0]);
- 
-     /* End test */
-     close(sv[0]);
--    qtest_quit(qs);
-+    qtest_end();
-+    g_free(args);
- }
- 
- int main(int argc, char **argv)
--- 
-2.17.1
+SGkgQmluLA0KDQpPbiBTdW4sIDIwMTktMDMtMTAgYXQgMDk6MDcgKzA4MDAsIEJpbiBNZW5nIHdy
+b3RlOg0KPiBIaSBMdWthcywNCj4gDQo+IE9uIE1vbiwgRmViIDExLCAyMDE5IGF0IDY6MTMgQU0g
+THVrYXMgQXVlcg0KPiA8bHVrYXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPiB3cm90ZToNCj4g
+PiBSZS1hZGQgdGhlIHByZXZpb3VzIGNvbXBhdGlibGUgc3RyaW5nICJyaXNjdi12aXJ0aW8tc29j
+IiB0byB0aGUgc29jDQo+ID4gZGV2aWNlIHRyZWUgbm9kZSB0byBhbGxvdyBVLUJvb3QgYW5kIExp
+bnV4IHRvIGJpbmQgbWFjaGluZS1zcGVjaWZpYw0KPiA+IGRyaXZlcnMgdG8gaXQuIFRoZSBjdXJy
+ZW50IGNvbXBhdGlibGUgc3RyaW5nICJzaW1wbGUtYnVzIiBpcw0KPiA+IHJldGFpbmVkLg0KPiA+
+IA0KPiA+IFRoaXMgaXMgcmVxdWlyZWQgYnkgVS1Cb290IHRvIGJpbmQgZGV2aWNlcyBlYXJseSwg
+YXMgcGFydCBvZiB0aGUNCj4gPiBwcmUtcmVsb2NhdGlvbiBkcml2ZXIgbW9kZWwuDQo+ID4gDQo+
+IA0KPiBJIHNlZSBubyBwcm9ibGVtIHdpdGggVS1Cb290IHdvcmtpbmcgd2l0aCBjdXJyZW50IGNv
+bXBhdGlibGUgc3RyaW5nDQo+ICJzaW1wbGUtYnVzIi4gSW4gZmFjdCBJIGhhZCBwbGFubmVkIHRv
+IHJlbW92ZSB0aGUgY29tcGF0aWJsZSBzdHJpbmcNCj4gInJpc2N2LXZpcnRpby1zb2MiIGluIFUt
+Qm9vdCBidXQgZGlkIG5vdCBnZXQgdGltZSB0byB3b3JrIG9uIGl0Lg0KPiANCg0KSXQgaXMgb25s
+eSByZXF1aXJlZCBpZiBVLUJvb3QgaXMgcnVubmluZyBpbiBtYWNoaW5lLW1vZGUuIEZvcg0KcmVs
+b2NhdGlvbiBpdCBuZWVkcyB0byB1c2UgdGhlIENMSU5UIGRyaXZlciB0byBzZW5kIGFwcHJvcHJp
+YXRlIElQSXMgdG8NCnRoZSBvdGhlciBoYXJ0cy4gVG8gYmUgYWJsZSB0byBwcm9iZSB0aGUgZHJp
+dmVyLCB0aGUgZGV2aWNlIGFuZCBpdHMNCnBhcmVudCBkZXZpY2UgdHJlZSBub2RlIChzb2MpIG11
+c3QgdGhlcmVmb3JlIGJlIGF2YWlsYWJsZSBpbiB0aGUgcHJlLQ0KcmVsb2NhdGlvbiBkZXZpY2Ug
+bW9kZWwuDQpUaGlzIHBhdGNoIHdhcyB0aGUgZWFzaWVzdCB3YXkgSSBjb3VsZCB0aGluayBvZiBm
+b3IgYWNoaWV2aW5nIHRoaXMuIEl0DQpjb3VsZCBiZSB0aGF0IHRoZXJlIGlzIGEgYmV0dGVyIHdh
+eSBvZiBzb2x2aW5nIHRoaXMuDQoNClRoYW5rcywNCkx1a2FzDQoNCj4gPiBGaXhlczogNTNmNTQ1
+MDhkYWU2KCJody9yaXNjdi92aXJ0aW86IFNldCB0aGUgc29jIGRldmljZSB0cmVlIG5vZGUNCj4g
+PiBhcyBhDQo+ID4gc2ltcGxlLWJ1cyIpDQo+ID4gU2lnbmVkLW9mZi1ieTogTHVrYXMgQXVlciA8
+bHVrYXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPg0KPiA+IC0tLQ0KPiA+IA0KPiA+ICBody9y
+aXNjdi92aXJ0LmMgfCAzICsrLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
+LCAxIGRlbGV0aW9uKC0pDQo+ID4gDQo+IA0KPiBSZWdhcmRzLA0KPiBCaW4NCg==
