@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58910)
+Received: from eggs.gnu.org ([209.51.188.92]:59189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h327V-0008O2-Ci
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:20:18 -0400
+	(envelope-from <laurent@vivier.eu>) id 1h3286-0000b1-EY
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3234-00057X-76
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:15:43 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:51785)
+	(envelope-from <laurent@vivier.eu>) id 1h3284-0007oj-Fw
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:20:54 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:37161)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3233-00056x-Th
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:15:42 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3282-0007mw-IP
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 13:20:50 -0400
 References: <20190306031221.GA53@03612eec87fc>
-	<20190306045252.GG75@03612eec87fc>
+	<20190306045432.GI75@03612eec87fc>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <aa7609b9-be37-6a50-7471-20e814051dac@vivier.eu>
-Date: Sun, 10 Mar 2019 18:15:16 +0100
+Message-ID: <67a67488-78b7-9c00-cec8-8e9995dd74cf@vivier.eu>
+Date: Sun, 10 Mar 2019 18:20:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190306045252.GG75@03612eec87fc>
+In-Reply-To: <20190306045432.GI75@03612eec87fc>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 7/10] qemu-binfmt-conf.sh: add option
- --reset <ARCHS>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 9/10] qemu-binfmt-conf.sh: update usage()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +29,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, eblake@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: riku.voipio@iki.fi, eblake@redhat.com
 
-On 06/03/2019 05:52, Unai Martinez-Corral wrote:
-> This is a partial implementation.
+On 06/03/2019 05:54, Unai Martinez-Corral wrote:
+> Reduce indentation to better use available space.
 > 
-> Allows to remove a single or a list of already registered binfmt
-> interpreters. If <ARCHS> is a list, it must be comma-separated.
-
-I think ARCHS and CPUS are the same thing, so use the same word.
-
-> Valid values are those in qemu_target_list. If <ARCHS> is 'ALL', all
-> the existing 'qemu-*' interpreters are removed.
-> 
-> This is partial because 'debian' and 'systemd' configurations are not
-> removed. If option 'reset' is provided before any of those, reset is
-> executed first and the configuration proceeds. However, if 'reset' is
-> provided after any of them, the script will exit with error 'option
-> reset not implemented for this mode yet'.
-> 
-> Removal is done by printing '-1' as explained at:
-> https://www.kernel.org/doc/Documentation/admin-guide/binfmt-misc.rst
+> Add list of supported environment variables and their default values.
 > 
 > Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 > ---
->  scripts/qemu-binfmt-conf.sh | 36 +++++++++++++++++++++++++++++++++---
->  1 file changed, 33 insertions(+), 3 deletions(-)
+>  scripts/qemu-binfmt-conf.sh | 61 ++++++++++++++++++++-----------------
+>  1 file changed, 33 insertions(+), 28 deletions(-)
 > 
 > diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index 2751363089..824e3c4c34 100755
+> index 4a45636b53..8ca2647ed0 100755
 > --- a/scripts/qemu-binfmt-conf.sh
 > +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -197,8 +197,8 @@ qemu_get_family() {
+> @@ -201,34 +201,31 @@ Usage: qemu-binfmt-conf.sh [--help][--path PATH][--suffix SUFFIX]
+>                             [--persistent][--credential][--exportdir PATH]
+>                             [--reset ARCHS][--systemd][--debian][CPUS]
 > 
->  usage() {
->      cat <<EOF
-> -Usage: qemu-binfmt-conf.sh [--path PATH][--debian][--systemd]
-> -                           [--help][--credential][--exportdir PATH]
-> +Usage: qemu-binfmt-conf.sh [--help][--path PATH][--debian][--systemd]
-> +                           [--reset ARCHS][--credential][--exportdir PATH]
->                             [--persistent][--suffix SUFFIX][CPUS]
+> -       Configure binfmt_misc to use qemu interpreter for the given CPUS.
+> -       Supported formats for CPUS are: single arch or comma/space separated list.
+> -       See QEMU target list below. If CPUS is 'ALL' or empty, configure all known
+> -       cpus. If CPUS is 'NONE', no interpreter is configured.
+> +    Configure binfmt_misc to use qemu interpreter for the given CPUS.
+> +    Supported formats for CPUS are: single arch or comma/space separated list.
+> +    See QEMU target list below. If CPUS is 'ALL' or empty, configure all known
+> +    cpus. If CPUS is 'NONE', no interpreter is configured.
+> 
+> -       --help:        display this usage
+> -       --path:        set path to qemu interpreter ($QEMU_PATH)
+> -       --suffix:      add a suffix to the default interpreter name
+> -                      ($QEMU_SUFFIX)
+> -       --persistent:  if present, the interpreter is loaded when binfmt is
+> -                      configured and remains in memory. All future uses
+> -                      are cloned from the open file.
+> -                      ($QEMU_PERSISTENT=yes)
+> -       --credential:  if present, credential and security tokens are
+> -                      calculated according to the binary to interpret
+> -                      ($QEMU_CREDENTIAL=yes)
+> -       --exportdir:   define where to write configuration files
+> -                      (default: $SYSTEMDDIR or $DEBIANDIR)
+> -       --reset:       remove registered interpreter for target ARCHS (comma
+> -                      separated list). If ARCHS is 'ALL', remove all registered
+> -                      'qemu-*' interpreters.
+> -       --systemd:     don't write into /proc,
+> -                      instead generate file for systemd-binfmt.service;
+> -                      environment variable HOST_ARCH allows to override 'uname'
+> -                      to generate configuration files for a different
+> -                      architecture than the current one.
+> -       --debian:      don't write into /proc,
+> -                      instead generate update-binfmts templates
+> +    --help:        display this usage.
+> +    --path:        set path to qemu interpreter.
+> +    --suffix:      add a suffix to the default interpreter name.
+> +    --persistent:  if present, the interpreter is loaded when binfmt is
+> +                   configured and remains in memory. All future uses
+> +                   are cloned from the open file.
+> +    --credential:  if present, credential and security tokens are
+> +                   calculated according to the binary to interpret.
+> +    --exportdir:   define where to write configuration files.
+> +                   (default: $SYSTEMDDIR or $DEBIANDIR)
+> +    --reset:       remove registered interpreter for target ARCHS (comma
+> +                   separated list). If ARCHS is 'ALL', remove all registered
+> +                   'qemu-*' interpreters.
+> +    --systemd:     don't write into /proc,
+> +                   instead generate file(s) for systemd-binfmt.service;
+> +                   environment variable HOST_ARCH allows to override 'uname'
+> +                   to generate configuration files for a different
+> +                   architecture than the current one.
+> +    --debian:      don't write into /proc,
+> +                   instead generate update-binfmts templates.
+> 
+>      To import templates with update-binfmts, use :
+> 
+> @@ -240,6 +237,14 @@ Usage: qemu-binfmt-conf.sh [--help][--path PATH][--suffix SUFFIX]
+> 
+>      QEMU target list: $qemu_target_list
+> 
+> +    Options 'path, 'suffix', 'persistent' and 'credential' are also supported
+> +    through environment variables. Defaults are:
+> +
+> +      QEMU_PATH=/usr/local/bin
 
-I don't like the idea of being able to set and reset different
-interpretes with same command line call.
+You can write
 
-Make "--reset" exclusive without parameter to be able to use the common
-cpu list at the end of the command line (this way, I think you would be
-able to share more common code between setting an resetting).
+        QEMU_PATH=$QEMU_PATH
 
-You could have a look to Alex Bennée's patch:
+to have the actual value.
 
-  https://patchwork.ozlabs.org/patch/938796/
+> +      QEMU_SUFFIX=
+> +      QEMU_PERSISTENT=no
+> +      QEMU_CREDENTIAL=no
 
-I think this is the good way to do this and it should merge easily with
-your series.
+and
+         QEMU_SUFFIX=$QEMU_SUFFIX
+         QEMU_PERSISTENT=$QEMU_PERSISTENT
+         QEMU_CREDENTIAL=$QEMU_CREDENTIAL=
+
+> +
+>  EOF
+>  }
+> 
+> @@ -384,8 +389,8 @@ DEBIANDIR="/usr/share/binfmts"
+> 
+>  QEMU_PATH="${QEMU_PATH:-/usr/local/bin}"
+>  QEMU_SUFFIX="${QEMU_SUFFIX:-}"
+> -QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
+>  QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
+> +QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
+> 
+>  options=$(getopt -o r:dsQ:S:e:hcp -l reset:,debian,systemd,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
+>  eval set -- "$options"
+
+
+I think you can merge this patch with the previous one.
 
 Thanks,
 Laurent
