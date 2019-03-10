@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43940)
+Received: from eggs.gnu.org ([209.51.188.92]:44041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h305w-00051f-OP
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:10:33 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3078-0005Yr-Ov
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h305v-0004dA-HU
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:10:32 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34512)
+	(envelope-from <philmd@redhat.com>) id 1h3077-0005C3-24
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:11:46 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h305v-0004cQ-9z
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:10:31 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f14so2366125wrg.1
-	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 08:10:30 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3076-0005BF-Rm
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 11:11:44 -0400
+Received: by mail-wm1-f68.google.com with SMTP id j125so1949049wmj.1
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 08:11:43 -0700 (PDT)
 References: <20190309004826.9027-1-lersek@redhat.com>
-	<20190309004826.9027-8-lersek@redhat.com>
-	<137d7a76-5d69-6b8c-a048-c296849fec9e@redhat.com>
-Message-ID: <f218fbf9-12c6-96a0-09e7-c496388728a5@redhat.com>
-Date: Sun, 10 Mar 2019 16:10:27 +0100
+	<20190309004826.9027-3-lersek@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f095ab66-f880-fcfe-006e-cb46eb2b7b02@redhat.com>
+Date: Sun, 10 Mar 2019 16:11:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <137d7a76-5d69-6b8c-a048-c296849fec9e@redhat.com>
+In-Reply-To: <20190309004826.9027-3-lersek@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/10] roms: build edk2 firmware binaries
- and variable store templates
+Subject: Re: [Qemu-devel] [PATCH 02/10] roms/edk2-funcs.sh: require gcc-4.8+
+ for building i386 and x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,162 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, kraxel@redhat.com, mst@redhat.com, Eric Blake <eblake@redhat.com>
-Cc: berrange@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
 
-Hi Laszlo,
+On 3/9/19 1:48 AM, Laszlo Ersek wrote:
+> Adapt the qemu_edk2_get_toolchain() function in "roms/edk2-funcs.sh" in
+> advance to edk2 commit 8d7cdfae8cb8 ("OvmfPkg: require GCC48 or later",
+> 2019-01-08), which is part of the "edk2-stable201903" tag.
+> 
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 
-On 3/9/19 5:48 PM, Philippe Mathieu-Daudé wrote:
-> On 3/9/19 1:48 AM, Laszlo Ersek wrote:
->> Add the "efi" target to "Makefile".
->>
->> Introduce "Makefile.edk2" for building and cleaning the firmware images
->> and varstore templates.
->>
->> Collect the common bits from the recipes in the helper script
->> "edk2-build.sh".
->>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>  roms/Makefile      |   5 +
->>  roms/Makefile.edk2 | 138 ++++++++++++++++++++
->>  roms/edk2-build.sh |  55 ++++++++
->>  3 files changed, 198 insertions(+)
->>
->> diff --git a/roms/Makefile b/roms/Makefile
->> index 2e83ececa25a..054b432834ba 100644
->> --- a/roms/Makefile
->> +++ b/roms/Makefile
->> @@ -61,6 +61,7 @@ default:
->>  	@echo "  skiboot        -- update skiboot.lid"
->>  	@echo "  u-boot.e500    -- update u-boot.e500"
->>  	@echo "  u-boot.sam460  -- update u-boot.sam460"
->> +	@echo "  efi            -- update UEFI (edk2) platform firmware"
->>  
->>  bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
->>  	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
->> @@ -143,6 +144,9 @@ skiboot:
->>  	$(MAKE) -C skiboot CROSS=$(powerpc64_cross_prefix)
->>  	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
->>  
->> +efi: edk2-basetools
->> +	$(MAKE) -f Makefile.edk2
->> +
->>  clean:
->>  	rm -rf seabios/.config seabios/out seabios/builds
->>  	$(MAKE) -C sgabios clean
->> @@ -153,3 +157,4 @@ clean:
->>  	rm -rf u-boot/build.e500
->>  	$(MAKE) -C u-boot-sam460ex distclean
->>  	$(MAKE) -C skiboot clean
->> +	$(MAKE) -f Makefile.edk2 clean
->> diff --git a/roms/Makefile.edk2 b/roms/Makefile.edk2
->> new file mode 100644
->> index 000000000000..ad6fff044cd6
->> --- /dev/null
->> +++ b/roms/Makefile.edk2
->> @@ -0,0 +1,138 @@
->> +# Makefile for building firmware binaries and variable store templates for a
->> +# number of virtual platforms in edk2.
->> +#
->> +# Copyright (C) 2019, Red Hat, Inc.
->> +#
->> +# This program and the accompanying materials are licensed and made available
->> +# under the terms and conditions of the BSD License that accompanies this
->> +# distribution. The full text of the license may be found at
->> +# <http://opensource.org/licenses/bsd-license.php>.
->> +#
->> +# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
->> +# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
->> +
->> +toolchain = $(shell source ./edk2-funcs.sh && qemu_edk2_get_toolchain $(1))
-
-Well I finally figured out why building on Ubuntu fails. It default
-shell is dash, and 'source' is a bash builtin command. The portable
-equivalent is '.' (dot).
-
-The fix is:
-
--- >8 --
--toolchain = $(shell source ./edk2-funcs.sh && qemu_edk2_get_toolchain $(1))
-+toolchain = $(shell . ./edk2-funcs.sh && qemu_edk2_get_toolchain $(1))
----
-
-With this hunk:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
->> +
->> +licenses := \
->> +	edk2/License.txt \
->> +	edk2/OvmfPkg/License.txt \
->> +	edk2/CryptoPkg/Library/OpensslLib/openssl/LICENSE
->> +
->> +# The "edk2-arm-vars.fd" varstore template is suitable for aarch64 as well.
->> +# Similarly, the "edk2-i386-vars.fd" varstore template is suitable for x86_64
->> +# as well, independently of "secure" too.
->> +all: \
->> +	../pc-bios/edk2-aarch64-code.fd \
->> +	../pc-bios/edk2-arm-code.fd \
->> +	../pc-bios/edk2-i386-code.fd \
->> +	../pc-bios/edk2-i386-secure-code.fd \
->> +	../pc-bios/edk2-x86_64-code.fd \
->> +	../pc-bios/edk2-x86_64-secure-code.fd \
->> +	\
->> +	../pc-bios/edk2-arm-vars.fd \
->> +	../pc-bios/edk2-i386-vars.fd \
->> +	\
->> +	../pc-bios/edk2-licenses.txt
->> +
->> +submodules:
->> +	cd edk2 && git submodule update --init --force
->> +
->> +# See notes on the ".NOTPARALLEL" target and the "+" indicator in
->> +# "tests/uefi-test-tools/Makefile".
->> +.NOTPARALLEL:
->> +
->> +../pc-bios/edk2-aarch64-code.fd: submodules
->> +	+./edk2-build.sh \
->> +		aarch64 \
->> +		--arch=AARCH64 \
->> +		--platform=ArmVirtPkg/ArmVirtQemu.dsc \
->> +		-D NETWORK_IP6_ENABLE \
->> +		-D HTTP_BOOT_ENABLE
->> +	cp edk2/Build/ArmVirtQemu-AARCH64/DEBUG_$(call toolchain,aarch64)/FV/QEMU_EFI.fd \
->> +		$@
->> +	truncate --size=64M $@
-> [...]
+> ---
+>  roms/edk2-funcs.sh | 14 +-------------
+>  1 file changed, 1 insertion(+), 13 deletions(-)
 > 
-> Trying on Ubuntu I get:
+> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+> index 908c7665c6ed..22a5dc8f6ab6 100644
+> --- a/roms/edk2-funcs.sh
+> +++ b/roms/edk2-funcs.sh
+> @@ -149,23 +149,11 @@ qemu_edk2_get_toolchain()
+>        # Run "git-blame" on "OvmfPkg/build.sh" in edk2 for more information on
+>        # the mapping below.
+>        case "$gcc_version" in
+> -        ([1-3].*|4.[0-3].*)
+> +        ([1-3].*|4.[0-7].*)
+>            printf '%s: unsupported gcc version "%s"\n' \
+>              "$program_name" "$gcc_version" >&2
+>            return 1
+>            ;;
+> -        (4.4.*)
+> -          printf 'GCC44\n'
+> -          ;;
+> -        (4.5.*)
+> -          printf 'GCC45\n'
+> -          ;;
+> -        (4.6.*)
+> -          printf 'GCC46\n'
+> -          ;;
+> -        (4.7.*)
+> -          printf 'GCC47\n'
+> -          ;;
+>          (4.8.*)
+>            printf 'GCC48\n'
+>            ;;
 > 
-> $ make -C roms efi
-> [...]
-> Fd File Name:QEMU_EFI
-> (/home/phil/source/qemu/roms/edk2/Build/ArmVirtQemu-AARCH64/DEBUG_GCC5/FV/QEMU_EFI.fd)
-> Fd File Name:QEMU_VARS
-> (/home/phil/source/qemu/roms/edk2/Build/ArmVirtQemu-AARCH64/DEBUG_GCC5/FV/QEMU_VARS.fd)
-> GUID cross reference file can be found at
-> /home/phil/source/qemu/roms/edk2/Build/ArmVirtQemu-AARCH64/DEBUG_GCC5/FV/Guid.xref
-> - Done -
-> Build end time: 16:33:29, Mar.09 2019
-> Build total time: 00:03:35
-> cp edk2/Build/ArmVirtQemu-AARCH64/DEBUG_/FV/QEMU_EFI.fd \
-> 	../pc-bios/edk2-aarch64-code.fd
-> cp: cannot stat 'edk2/Build/ArmVirtQemu-AARCH64/DEBUG_/FV/QEMU_EFI.fd':
-> No such file or directory
-> Makefile.edk2:45: recipe for target '../pc-bios/edk2-aarch64-code.fd' failed
-> make[1]: *** [../pc-bios/edk2-aarch64-code.fd] Error 1
-> make[1]: Leaving directory '/home/phil/source/qemu/roms'
-> Makefile:148: recipe for target 'efi' failed
-> make: *** [efi] Error 2
-> make: Leaving directory '/home/phil/source/qemu/roms'
-> 
-> The edk2-build.sh script source edksetup.sh, then you call the
-> 'toolchain' command out of the edk2-build.sh script, but here
-> the edksetup.sh setup is no more effective.
-
-I was wrong, it is sourced. See self-reply at top of this post.
-
-Regards,
-
-Phil.
