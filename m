@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42994)
+Received: from eggs.gnu.org ([209.51.188.92]:42993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2toU-0001LE-1d
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2toU-0001LD-1C
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2toT-0001Yh-2u
+	(envelope-from <dgibson@ozlabs.org>) id 1h2toT-0001YY-19
 	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:05 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:34 +1100
-Message-Id: <20190310082703.1245-32-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:26 +1100
+Message-Id: <20190310082703.1245-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 31/60] ppc/pnv: psi: add a PSIHB_REG macro
+Subject: [Qemu-devel] [PULL 23/60] ppc/xive: export the TIMA memory accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,90 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This is a simple helper to translate XSCOM addresses to MMIO addresses
+The PowerNV machine can perform indirect loads and stores on the TIMA
+on behalf of another CPU. Give the controller the possibility to call
+the TIMA memory accessors with a XiveTCTX of its choice.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190306085032.15744-13-clg@kaod.org>
+Message-Id: <20190306085032.15744-4-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_psi.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/intc/xive.c        | 23 ++++++++++++++++++-----
+ include/hw/ppc/xive.h |  3 +++
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index c872be0b9c..a2f8d0dece 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -114,6 +114,8 @@
- #define PSIHB_BAR_MASK                  0x0003fffffff00000ull
- #define PSIHB_FSPBAR_MASK               0x0003ffff00000000ull
-=20
-+#define PSIHB_REG(addr) (((addr) >> 3) + PSIHB_XSCOM_BAR)
-+
- static void pnv_psi_set_bar(PnvPsi *psi, uint64_t bar)
- {
-     MemoryRegion *sysmem =3D get_system_memory();
-@@ -392,13 +394,13 @@ static void pnv_psi_reg_write(PnvPsi *psi, uint32_t=
- offset, uint64_t val,
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index b21759c938..3d7de864e9 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -317,10 +317,9 @@ static const XiveTmOp *xive_tm_find_op(hwaddr offset=
+, unsigned size, bool write)
+ /*
+  * TIMA MMIO handlers
   */
- static uint64_t pnv_psi_mmio_read(void *opaque, hwaddr addr, unsigned si=
-ze)
+-static void xive_tm_write(void *opaque, hwaddr offset,
+-                          uint64_t value, unsigned size)
++void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset, uint64_t value,
++                        unsigned size)
  {
--    return pnv_psi_reg_read(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, true)=
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+     const XiveTmOp *xto;
+=20
+     /*
+@@ -356,9 +355,8 @@ static void xive_tm_write(void *opaque, hwaddr offset=
+,
+     xive_tm_raw_write(tctx, offset, value, size);
+ }
+=20
+-static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
++uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr offset, unsigned size)
+ {
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+     const XiveTmOp *xto;
+=20
+     /*
+@@ -392,6 +390,21 @@ static uint64_t xive_tm_read(void *opaque, hwaddr of=
+fset, unsigned size)
+     return xive_tm_raw_read(tctx, offset, size);
+ }
+=20
++static void xive_tm_write(void *opaque, hwaddr offset,
++                          uint64_t value, unsigned size)
++{
++    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
++
++    xive_tctx_tm_write(tctx, offset, value, size);
++}
++
++static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
++{
++    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
++
++    return xive_tctx_tm_read(tctx, offset, size);
++}
++
+ const MemoryRegionOps xive_tm_ops =3D {
+     .read =3D xive_tm_read,
+     .write =3D xive_tm_write,
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 13a487527b..7dd80e0f46 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -410,6 +410,9 @@ void xive_end_queue_pic_print_info(XiveEND *end, uint=
+32_t width, Monitor *mon);
+ #define XIVE_TM_USER_PAGE       0x3
+=20
+ extern const MemoryRegionOps xive_tm_ops;
++void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset, uint64_t value,
++                        unsigned size);
++uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr offset, unsigned size)=
 ;
-+    return pnv_psi_reg_read(opaque, PSIHB_REG(addr), true);
- }
 =20
- static void pnv_psi_mmio_write(void *opaque, hwaddr addr,
-                               uint64_t val, unsigned size)
- {
--    pnv_psi_reg_write(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, val, true);
-+    pnv_psi_reg_write(opaque, PSIHB_REG(addr), val, true);
- }
-=20
- static const MemoryRegionOps psi_mmio_ops =3D {
+ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+ Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
 --=20
 2.20.1
