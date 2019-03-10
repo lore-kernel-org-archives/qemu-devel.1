@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42583)
+Received: from eggs.gnu.org ([209.51.188.92]:42584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tnw-0000m0-EH
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tnw-0000m1-EI
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tnr-000191-CI
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tns-0001AR-PN
 	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:30 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:15 +1100
-Message-Id: <20190310082703.1245-13-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:14 +1100
+Message-Id: <20190310082703.1245-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/60] target/ppc/spapr: Enable mitigations by
- default for pseries-4.0 machine type
+Subject: [Qemu-devel] [PULL 11/60] target/ppc/tcg: make spapr_caps apply
+ cap-[cfpc/sbbc/ibs] non-fatal for tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,117 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-There are currently 3 mitigations the availability of which is controlled
-by the spapr-caps mechanism, cap-cfpc, cap-sbbc, and cap-ibs. Enable thes=
-e
-mitigations by default for the pseries-4.0 machine type.
+The spapr_caps cap-cfpc, cap-sbbc and cap-ibs are used to control the
+availability of certain mitigations to the guest. These haven't been
+implemented under TCG, it is unlikely they ever will be, and it is unclea=
+r
+as to whether they even need to be.
 
-By now machine firmware should have been upgraded to allow these
-settings.
+As such, make failure to apply these capabilities under TCG non-fatal.
+Instead we print a warning message to the user but still allow the guest
+to continue.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Message-Id: <20190301044609.9626-3-sjitindarsingh@gmail.com>
+Message-Id: <20190301044609.9626-2-sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_caps.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 37fd7a1411..946bbcf9ee 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4307,9 +4307,9 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_ON;
--    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
--    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
--    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_WORKAROUND;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_WORKAROUND;
-+    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_WORKAROUND;
-     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
-/
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON=
-;
-@@ -4389,6 +4389,9 @@ static void spapr_machine_3_1_class_options(Machine=
-Class *mc)
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
-     smc->dr_phb_enabled =3D false;
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_OF=
-F;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f03f2f64e7..b68d767d63 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -239,17 +239,22 @@ sPAPRCapPossible cap_cfpc_possible =3D {
+ static void cap_safe_cache_apply(sPAPRMachineState *spapr, uint8_t val,
+                                  Error **errp)
+ {
++    Error *local_err =3D NULL;
+     uint8_t kvm_val =3D  kvmppc_get_cap_safe_cache();
+=20
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe cache capability level not supported by tcg, try a diffe=
+rent value for cap-cfpc");
++        /* TCG only supports broken, allow other values and print a warn=
+ing */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-cfpc=3D%s=
+",
++                   cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe cache capability level not supported by kvm, try cap-cfp=
+c=3D%s",
+                    cap_cfpc_possible.vals[kvm_val]);
+     }
++
++    if (local_err !=3D NULL)
++        warn_report_err(local_err);
  }
 =20
+ sPAPRCapPossible cap_sbbc_possible =3D {
+@@ -262,17 +267,22 @@ sPAPRCapPossible cap_sbbc_possible =3D {
+ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_=
+t val,
+                                         Error **errp)
+ {
++    Error *local_err =3D NULL;
+     uint8_t kvm_val =3D  kvmppc_get_cap_safe_bounds_check();
+=20
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe bounds check capability level not supported by tcg, try =
+a different value for cap-sbbc");
++        /* TCG only supports broken, allow other values and print a warn=
+ing */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-sbbc=3D%s=
+",
++                   cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe bounds check capability level not supported by kvm, try =
+cap-sbbc=3D%s",
+                    cap_sbbc_possible.vals[kvm_val]);
+     }
++
++    if (local_err !=3D NULL)
++        warn_report_err(local_err);
+ }
+=20
+ sPAPRCapPossible cap_ibs_possible =3D {
+@@ -288,17 +298,22 @@ sPAPRCapPossible cap_ibs_possible =3D {
+ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
++    Error *local_err =3D NULL;
+     uint8_t kvm_val =3D kvmppc_get_cap_safe_indirect_branch();
+=20
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested safe indirect branch capability level not supported by tcg, t=
+ry a different value for cap-ibs");
++        /* TCG only supports broken, allow other values and print a warn=
+ing */
++        error_setg(&local_err,
++                   "TCG doesn't support requested feature, cap-ibs=3D%s"=
+,
++                   cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+ "Requested safe indirect branch capability level not supported by kvm, t=
+ry cap-ibs=3D%s",
+                    cap_ibs_possible.vals[kvm_val]);
+     }
++
++    if (local_err !=3D NULL)
++        warn_report_err(local_err);
+ }
+=20
+ #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
 --=20
 2.20.1
