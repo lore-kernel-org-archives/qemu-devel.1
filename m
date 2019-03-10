@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35042)
+Received: from eggs.gnu.org ([209.51.188.92]:38163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2vVb-0006Mx-A3
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 06:16:47 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1h2vxO-0004Xo-6l
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 06:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2vVa-0006T3-D7
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 06:16:43 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190301183328.20b63e23@redhat.com>
-	<20190301174806.GN21251@redhat.com>
-	<87va0zcdse.fsf@dusky.pond.sub.org>
-	<20190304132507.39273826@redhat.com>
-	<20190304123908.GK4239@redhat.com>
-	<20190304151641.3deefc3b@redhat.com>
-	<20190304142432.GM4239@redhat.com>
-	<a6081774-c9d5-0496-3e65-ffb885408261@redhat.com>
-	<20190304163516.GQ4239@redhat.com>
-	<20190306200348.11e9eece@Igors-MacBook-Pro.local>
-	<20190307095901.GF32268@redhat.com>
-Date: Sun, 10 Mar 2019 11:16:33 +0100
-In-Reply-To: <20190307095901.GF32268@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Thu, 7 Mar 2019 09:59:01 +0000")
-Message-ID: <871s3fxce6.fsf@dusky.pond.sub.org>
+	(envelope-from <danielhb413@gmail.com>) id 1h2vmE-0000JX-Qy
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 06:33:55 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:37385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1h2vmE-0000JC-HG
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 06:33:54 -0400
+Received: by mail-qt1-x844.google.com with SMTP id z17so2026469qtn.4
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 03:33:54 -0700 (PDT)
+Received: from [192.168.15.40] ([191.193.152.252])
+	by smtp.gmail.com with ESMTPSA id u13sm1796369qtb.2.2019.03.10.03.33.52
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 10 Mar 2019 03:33:52 -0700 (PDT)
+References: <20190308173622.21386-1-pbonzini@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <bc54c197-b87c-c4a9-8c93-d32dafaa6e27@gmail.com>
+Date: Sun, 10 Mar 2019 07:33:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 1/2] numa: deprecate 'mem'
- parameter of '-numa node' option
+In-Reply-To: <20190308173622.21386-1-pbonzini@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vfio-pci: enable by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,105 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, ehabkost@redhat.com, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Just faced this problem when trying to test vfio-pci using upstream:
 
-> On Wed, Mar 06, 2019 at 08:03:48PM +0100, Igor Mammedov wrote:
->> On Mon, 4 Mar 2019 16:35:16 +0000
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->>=20
->> > On Mon, Mar 04, 2019 at 05:20:13PM +0100, Michal Privoznik wrote:
->> > > We couldn't have done that. How we would migrate from older qemu?
->> > >=20
->> > > Anyway, now that I look into this (esp. git log) I came accross:
->> > >=20
->> > > commit f309db1f4d51009bad0d32e12efc75530b66836b
->> > > Author:     Michal Privoznik <mprivozn@redhat.com>
->> > > AuthorDate: Thu Dec 18 12:36:48 2014 +0100
->> > > Commit:     Michal Privoznik <mprivozn@redhat.com>
->> > > CommitDate: Fri Dec 19 07:44:44 2014 +0100
->> > >=20
->> > >     qemu: Create memory-backend-{ram,file} iff needed
->> > >=20
->> > > Or this 7832fac84741d65e851dbdbfaf474785cbfdcf3c. We did try to gene=
-rated
->> > > newer cmd line but then for various reasong (e.g. avoiding triggerin=
-g a qemu
->> > > bug) we turned it off and make libvirt default to older (now depreca=
-ted) cmd
->> > > line.
->> > >=20
->> > > Frankly, I don't know how to proceed. Unless qemu is fixed to allow
->> > > migration from deprecated to new cmd line (unlikely, if not impossib=
-le,
->> > > right?) then I guess the only approach we can have is that:
->> > >=20
->> > > 1) whenever so called cold booting a new machine (fresh, brand new s=
-tart of
->> > > a new domain) libvirt would default to modern cmd line,
->> > >=20
->> > > 2) on migration, libvirt would record in the migration stream (or st=
-atus XML
->> > > or wherever) that modern cmd line was generated and thus it'll make =
-the
->> > > destination generate modern cmd line too.
->> > >=20
->> > > This solution still suffers a couple of problems:
->> > > a) migration to older libvirt will fail as older libvirt won't recog=
-nize the
->> > > flag set in 2) and therefore would default to deprecated cmd line
->> > > b) migrating from one host to another won't modernize the cmd line
->> > >=20
->> > > But I guess we have to draw a line somewhere (if we are not willing =
-to write
->> > > those migration patches).
->> >=20
->> > Yeah supporting backwards migration is a non-optional requirement from=
- at
->> > least one of the mgmt apps using libvirt, so breaking the new to old c=
-ase
->> > is something we always aim to avoid.
->> Aiming for support of=20
->> "new QEMU + new machine type" =3D> "old QEMU + non-existing machine type"
->> seems a bit difficult.
+qemu-system-ppc64: -device vfio-pci,host=0035:03:00.0,id=hostdev8: 
+'vfio-pci' is not a valid device model name
+
+
+This patch fixed it.
+
+Tested-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+
+On 3/8/19 2:36 PM, Paolo Bonzini wrote:
+> CONFIG_VFIO_PCI was not "default y" - and once you do that, it is also important
+> to disable it if PCI is not there.
 >
-> That's not the scenario that's the problem. The problem is
+> Reported-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   hw/vfio/Kconfig | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 >
->    new QEMU + new machine type + new libvirt   -> new QEMU + new machine =
-type + old libvirt
->
-> Previously released versions of libvirt will happily use any new machine
-> type that QEMU introduces. So we can't make new libvirt use a different
-> options, only for new machine types, as old libvirt supports those machine
-> types too.
-
-Avoiding tight coupling between QEMU und libvirt versions makes sense,
-because having to upgrade stuff in lock-step is such a pain.
-
-Does not imply we must support arbitrary combinations of QEMU and
-libvirt versions.
-
-Unless upstream libvirt's test matrix covers all versions of libvirt
-against all released versions of QEMU, "previously released versions of
-libvirt will continue to work with new QEMU" is largely an empty promise
-anyway.  The real promise is more like "we won't break it intentionally;
-good luck".
-
-Mind, I'm not criticizing that real promise.  I'm criticizing cutting
-yourself off from large areas of the solution space so you can continue
-to pretend to yourself you actually deliver on the empty promise.
-
-Now, if you limited what you promise to something more realistic,
-ideally to something you actually test, we could talk about deprecation
-schedules constructively.
-
-For instance, if you promised
-
-    QEMU as of time T + its latest machine type + libvirt as of time T
- -> QEMU as of time T + its latest machine type + libvirt as of time T - d
-
-will work for a certain value of d, then once all released versions of
-libvirt since T - d support a new way of doing things, flipping to that
-new way becomes a whole lot easier.
+> diff --git a/hw/vfio/Kconfig b/hw/vfio/Kconfig
+> index ebda9fdf22..34da2a3cfd 100644
+> --- a/hw/vfio/Kconfig
+> +++ b/hw/vfio/Kconfig
+> @@ -4,8 +4,9 @@ config VFIO
+>   
+>   config VFIO_PCI
+>       bool
+> +    default y
+>       select VFIO
+> -    depends on LINUX
+> +    depends on LINUX && PCI
+>   
+>   config VFIO_CCW
+>       bool
