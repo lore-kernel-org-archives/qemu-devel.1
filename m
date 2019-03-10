@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37035)
+Received: from eggs.gnu.org ([209.51.188.92]:44528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h32q0-0005Va-Sp
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 14:06:17 -0400
+	(envelope-from <mst@redhat.com>) id 1h35cX-0000ED-JO
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 17:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1h32nv-0007Yr-SO
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 14:04:08 -0400
-From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
-Date: Sun, 10 Mar 2019 18:03:54 +0000
-Message-ID: <e131b4b0eb9109547ce0ed0993665206d6bf983a.camel@aisec.fraunhofer.de>
-References: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
-	<CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
-	<c9f69861058412a1f71418a9c892daf0821a9e33.camel@aisec.fraunhofer.de>
-	<CAEUhbmXjCqRRtNDqq5E5y60sDz+4=WqMuxFhaLndot7TSJuUiQ@mail.gmail.com>
-In-Reply-To: <CAEUhbmXjCqRRtNDqq5E5y60sDz+4=WqMuxFhaLndot7TSJuUiQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8CA85682BF11414581107E976302382F@xch.fraunhofer.de>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1h35ML-0004Ju-Kg
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 16:47:50 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:33119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h35ML-0004JK-Dm
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 16:47:49 -0400
+Received: by mail-qt1-f195.google.com with SMTP id z39so2938133qtz.0
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 13:47:49 -0700 (PDT)
+Date: Sun, 10 Mar 2019 16:47:45 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190310164736-mutt-send-email-mst@kernel.org>
+References: <1552098649-28341-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
- compatible string to /soc/ node
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1552098649-28341-1-git-send-email-guoheyi@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] arm/acpi: simplify aml code and
+ enable SHPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "bmeng.cn@gmail.com" <bmeng.cn@gmail.com>
-Cc: "palmer@sifive.com" <palmer@sifive.com>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>, "mjc@sifive.com" <mjc@sifive.com>, "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>, "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
 
-SGkgQmluLA0KDQpPbiBTdW4sIDIwMTktMDMtMTAgYXQgMjI6NTcgKzA4MDAsIEJpbiBNZW5nIHdy
-b3RlOg0KPiBIaSBMdWthcywNCj4gDQo+IE9uIFN1biwgTWFyIDEwLCAyMDE5IGF0IDk6NDQgUE0g
-QXVlciwgTHVrYXMNCj4gPGx1a2FzLmF1ZXJAYWlzZWMuZnJhdW5ob2Zlci5kZT4gd3JvdGU6DQo+
-ID4gSGkgQmluLA0KPiA+IA0KPiA+IE9uIFN1biwgMjAxOS0wMy0xMCBhdCAwOTowNyArMDgwMCwg
-QmluIE1lbmcgd3JvdGU6DQo+ID4gPiBIaSBMdWthcywNCj4gPiA+IA0KPiA+ID4gT24gTW9uLCBG
-ZWIgMTEsIDIwMTkgYXQgNjoxMyBBTSBMdWthcyBBdWVyDQo+ID4gPiA8bHVrYXMuYXVlckBhaXNl
-Yy5mcmF1bmhvZmVyLmRlPiB3cm90ZToNCj4gPiA+ID4gUmUtYWRkIHRoZSBwcmV2aW91cyBjb21w
-YXRpYmxlIHN0cmluZyAicmlzY3YtdmlydGlvLXNvYyIgdG8gdGhlDQo+ID4gPiA+IHNvYw0KPiA+
-ID4gPiBkZXZpY2UgdHJlZSBub2RlIHRvIGFsbG93IFUtQm9vdCBhbmQgTGludXggdG8gYmluZCBt
-YWNoaW5lLQ0KPiA+ID4gPiBzcGVjaWZpYw0KPiA+ID4gPiBkcml2ZXJzIHRvIGl0LiBUaGUgY3Vy
-cmVudCBjb21wYXRpYmxlIHN0cmluZyAic2ltcGxlLWJ1cyIgaXMNCj4gPiA+ID4gcmV0YWluZWQu
-DQo+ID4gPiA+IA0KPiA+ID4gPiBUaGlzIGlzIHJlcXVpcmVkIGJ5IFUtQm9vdCB0byBiaW5kIGRl
-dmljZXMgZWFybHksIGFzIHBhcnQgb2YNCj4gPiA+ID4gdGhlDQo+ID4gPiA+IHByZS1yZWxvY2F0
-aW9uIGRyaXZlciBtb2RlbC4NCj4gPiA+ID4gDQo+ID4gPiANCj4gPiA+IEkgc2VlIG5vIHByb2Js
-ZW0gd2l0aCBVLUJvb3Qgd29ya2luZyB3aXRoIGN1cnJlbnQgY29tcGF0aWJsZQ0KPiA+ID4gc3Ry
-aW5nDQo+ID4gPiAic2ltcGxlLWJ1cyIuIEluIGZhY3QgSSBoYWQgcGxhbm5lZCB0byByZW1vdmUg
-dGhlIGNvbXBhdGlibGUNCj4gPiA+IHN0cmluZw0KPiA+ID4gInJpc2N2LXZpcnRpby1zb2MiIGlu
-IFUtQm9vdCBidXQgZGlkIG5vdCBnZXQgdGltZSB0byB3b3JrIG9uIGl0Lg0KPiA+ID4gDQo+ID4g
-DQo+ID4gSXQgaXMgb25seSByZXF1aXJlZCBpZiBVLUJvb3QgaXMgcnVubmluZyBpbiBtYWNoaW5l
-LW1vZGUuIEZvcg0KPiA+IHJlbG9jYXRpb24gaXQgbmVlZHMgdG8gdXNlIHRoZSBDTElOVCBkcml2
-ZXIgdG8gc2VuZCBhcHByb3ByaWF0ZQ0KPiA+IElQSXMgdG8NCj4gPiB0aGUgb3RoZXIgaGFydHMu
-IFRvIGJlIGFibGUgdG8gcHJvYmUgdGhlIGRyaXZlciwgdGhlIGRldmljZSBhbmQgaXRzDQo+ID4g
-cGFyZW50IGRldmljZSB0cmVlIG5vZGUgKHNvYykgbXVzdCB0aGVyZWZvcmUgYmUgYXZhaWxhYmxl
-IGluIHRoZQ0KPiA+IHByZS0NCj4gPiByZWxvY2F0aW9uIGRldmljZSBtb2RlbC4NCj4gPiBUaGlz
-IHBhdGNoIHdhcyB0aGUgZWFzaWVzdCB3YXkgSSBjb3VsZCB0aGluayBvZiBmb3IgYWNoaWV2aW5n
-IHRoaXMuDQo+ID4gSXQNCj4gPiBjb3VsZCBiZSB0aGF0IHRoZXJlIGlzIGEgYmV0dGVyIHdheSBv
-ZiBzb2x2aW5nIHRoaXMuDQo+ID4gDQo+IA0KPiBJIHRlc3RlZCB5b3VyIFNNUCBVLUJvb3Qgc2Vy
-aWVzIGluIGJvdGggTS1tb2RlIGFuZCBTLW1vZGUsIHVzaW5nIGEgNA0KPiBjb3JlICd2aXJ0JyB0
-YXJnZXQuIFdvcmtzIGZpbmUuIEkgYW0gdXNpbmcgUUVNVSAzLjEuMCBzbyBpdCBpcw0KPiAic2lt
-cGxlLWJ1cyIuDQo+IA0KDQpUaGF0IGlzIGFjdHVhbGx5IG15IGZhdWx0LCBpdCBzaG91bGQgbm90
-IHdvcmsuDQpXaGF0IGlzIGhhcHBlbmluZyBpcyB0aGF0IFUtQm9vdCBmYWlscyB0byByZWxvY2F0
-ZSB0aGUgc2Vjb25kYXJ5IGhhcnRzLA0KYmVjYXVzZSB0aGUgQ0xJTlQgZHJpdmVyIGNhbm5vdCBn
-ZXQgdGhlIG1lbW9yeSBhZGRyZXNzIG9mIHRoZSBDTElOVA0KZGV2aWNlLiBUaGlzIGVycm9yIGlz
-IGN1cnJlbnRseSBzaWxlbnRseSBpZ25vcmVkLg0KVGhlIHNlY29uZGFyeSBoYXJ0cyBhcmUgc3Rp
-bGwgd2FpdGluZyB0byByZWNlaXZlIElQSXMsIHNvIGJvb3RpbmcgTGludXgNCndvcmtzIGZpbmUs
-IGJlY2F1c2UgVS1Cb290IGNhbiBub3cgc2VuZCBJUElzLiBUaGlzIHdpbGwgaG93ZXZlciBicmVh
-aw0KaWYgVS1Cb290IG92ZXJ3cml0ZXMgdGhlIGNvZGUgdGhlIHNlY29uZGFyeSBoYXJ0cyBhcmUg
-cnVubmluZywgd2hpY2gNCmNvdWxkIGhhcHBlbiB3aGVuIGxvYWRpbmcgYW4gaW1hZ2UuDQoNCkkg
-d2lsbCB1cGRhdGUgbXkgU01QIFUtQm9vdCBzZXJpZXMgdG8gcHJpbnQgYSB3YXJuaW5nIGlmIHNl
-bmRpbmcgYW4gSVBJDQpmYWlscy4NCg0KVGhhbmtzLA0KTHVrYXMNCg==
+On Sat, Mar 09, 2019 at 10:30:47AM +0800, Heyi Guo wrote:
+> After the introduction of generic PCIe root port and PCIe-PCI bridge, we will
+> also have SHPC controller on ARM, and we don't support ACPI hot plug, so just
+> enable SHPC native hot plug.
+> 
+> Igor also spotted the store operation outside of bit and/or is not necessary, so
+> simply the code at first.
+> 
+> v5:
+> - Refine commit message of patch 1/2
+> 
+> v4:
+> - Improve the code indention.
+> 
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> 
+> 
+> Heyi Guo (2):
+>   hw/arm/acpi: simplify AML bit and/or statement
+>   hw/arm/acpi: enable SHPC native hot plug
+> 
+>  hw/arm/virt-acpi-build.c | 21 +++++++++++++--------
+>  1 file changed, 13 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 1.8.3.1
