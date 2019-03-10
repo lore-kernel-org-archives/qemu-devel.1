@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51017)
+Received: from eggs.gnu.org ([209.51.188.92]:52528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3181-0002lq-Pl
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:16:46 -0400
+	(envelope-from <laurent@vivier.eu>) id 1h31Dm-00063l-N4
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h30tC-0001fg-TJ
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:01:28 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:37101)
+	(envelope-from <laurent@vivier.eu>) id 1h31Dm-0000vP-0h
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:22:42 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:34993)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h30tC-0001bM-Hq
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:01:26 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h31Dl-0000uc-Ld
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:22:41 -0400
 References: <20190227191556.GA20198@ls3530.dellerweb.de>
 	<e6a8123c-20f9-8cc4-594f-8db02c3607cc@vivier.eu>
 	<20190310111216.GA5578@ls3530.dellerweb.de>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <00dc16e9-f86e-2289-27cf-adfa5470e879@vivier.eu>
-Date: Sun, 10 Mar 2019 17:01:21 +0100
+Message-ID: <59f461e1-8bc2-76e7-aad8-4bbad4082911@vivier.eu>
+Date: Sun, 10 Mar 2019 17:22:37 +0100
 MIME-Version: 1.0
 In-Reply-To: <20190310111216.GA5578@ls3530.dellerweb.de>
 Content-Type: text/plain; charset=utf-8
@@ -90,4 +90,7 @@ On 10/03/2019 12:12, Helge Deller wrote:
 >              if (len < 0)
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
