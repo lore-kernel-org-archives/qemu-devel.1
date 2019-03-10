@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43876)
+Received: from eggs.gnu.org ([209.51.188.92]:43882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tpc-0002VK-FY
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpc-0002Vf-Mm
 	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tpb-0002Kd-ET
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpb-0002KS-Dy
 	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:29:16 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:49 +1100
-Message-Id: <20190310082703.1245-47-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:56 +1100
+Message-Id: <20190310082703.1245-54-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 46/60] ppc/pnv: add a LPC Controller class model
+Subject: [Qemu-devel] [PULL 53/60] ppc/pnv: POWER9 XSCOM quad support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +27,265 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-It will ease the introduction of the LPC Controller model for POWER9.
+The POWER9 processor does not support per-core frequency control. The
+cores are arranged in groups of four, along with their respective L2
+and L3 caches, into a structure known as a Quad. The frequency must be
+managed at the Quad level.
+
+Provide a basic Quad model to fake the settings done by the firmware
+on the Non-Cacheable Unit (NCU). Each core pair (EX) needs a special
+BAR setting for the TIMA area of XIVE because it resides on the same
+address on all chips.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190307223548.20516-5-clg@kaod.org>
+Message-Id: <20190307223548.20516-12-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c             |  2 +-
- hw/ppc/pnv_lpc.c         | 85 ++++++++++++++++++++++++++++------------
- include/hw/ppc/pnv_lpc.h | 15 +++++++
- 3 files changed, 77 insertions(+), 25 deletions(-)
+ hw/ppc/pnv.c               | 38 ++++++++++++++++-
+ hw/ppc/pnv_core.c          | 87 ++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/pnv.h       |  4 ++
+ include/hw/ppc/pnv_core.h  | 10 +++++
+ include/hw/ppc/pnv_xscom.h | 12 ++++--
+ 5 files changed, 146 insertions(+), 5 deletions(-)
 
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 1cc454cbbc..922e3ec48b 100644
+index 1559a73323..e68d419203 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -794,7 +794,7 @@ static void pnv_chip_power8_instance_init(Object *obj=
-)
-                                    OBJECT(qdev_get_machine()), &error_ab=
-ort);
-=20
-     object_initialize_child(obj, "lpc",  &chip8->lpc, sizeof(chip8->lpc)=
-,
--                            TYPE_PNV_LPC, &error_abort, NULL);
-+                            TYPE_PNV8_LPC, &error_abort, NULL);
-     object_property_add_const_link(OBJECT(&chip8->lpc), "psi",
-                                    OBJECT(&chip8->psi), &error_abort);
-=20
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index 547be609ca..3c509a30a0 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -245,6 +245,7 @@ static const MemoryRegionOps pnv_lpc_xscom_ops =3D {
- static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
- {
-     bool lpc_to_opb_irq =3D false;
-+    PnvLpcClass *plc =3D PNV_LPC_GET_CLASS(lpc);
-=20
-     /* Update LPC controller to OPB line */
-     if (lpc->lpc_hc_irqser_ctrl & LPC_HC_IRQSER_EN) {
-@@ -267,7 +268,7 @@ static void pnv_lpc_eval_irqs(PnvLpcController *lpc)
-     lpc->opb_irq_stat |=3D lpc->opb_irq_input & lpc->opb_irq_mask;
-=20
-     /* Reflect the interrupt */
--    pnv_psi_irq_set(lpc->psi, PSIHB_IRQ_LPC_I2C, lpc->opb_irq_stat !=3D =
-0);
-+    pnv_psi_irq_set(lpc->psi, plc->psi_irq, lpc->opb_irq_stat !=3D 0);
+@@ -963,6 +963,36 @@ static void pnv_chip_power9_instance_init(Object *ob=
+j)
+                                    OBJECT(&chip9->psi), &error_abort);
  }
 =20
- static uint64_t lpc_hc_read(void *opaque, hwaddr addr, unsigned size)
-@@ -419,11 +420,65 @@ static const MemoryRegionOps opb_master_ops =3D {
-     },
- };
-=20
-+static void pnv_lpc_power8_realize(DeviceState *dev, Error **errp)
++static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
 +{
-+    PnvLpcController *lpc =3D PNV_LPC(dev);
-+    PnvLpcClass *plc =3D PNV_LPC_GET_CLASS(dev);
-+    Error *local_err =3D NULL;
++    PnvChip *chip =3D PNV_CHIP(chip9);
++    const char *typename =3D pnv_chip_core_typename(chip);
++    size_t typesize =3D object_type_get_instance_size(typename);
++    int i;
 +
-+    plc->parent_realize(dev, &local_err);
++    chip9->nr_quads =3D DIV_ROUND_UP(chip->nr_cores, 4);
++    chip9->quads =3D g_new0(PnvQuad, chip9->nr_quads);
++
++    for (i =3D 0; i < chip9->nr_quads; i++) {
++        char eq_name[32];
++        PnvQuad *eq =3D &chip9->quads[i];
++        PnvCore *pnv_core =3D PNV_CORE(chip->cores + (i * 4) * typesize)=
+;
++        int core_id =3D CPU_CORE(pnv_core)->core_id;
++
++        object_initialize(eq, sizeof(*eq), TYPE_PNV_QUAD);
++        snprintf(eq_name, sizeof(eq_name), "eq[%d]", core_id);
++
++        object_property_add_child(OBJECT(chip), eq_name, OBJECT(eq),
++                                  &error_fatal);
++        object_property_set_int(OBJECT(eq), core_id, "id", &error_fatal)=
+;
++        object_property_set_bool(OBJECT(eq), true, "realized", &error_fa=
+tal);
++        object_unref(OBJECT(eq));
++
++        pnv_xscom_add_subregion(chip, PNV9_XSCOM_EQ_BASE(eq->id),
++                                &eq->xscom_regs);
++    }
++}
++
+ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+ {
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(dev);
+@@ -977,6 +1007,12 @@ static void pnv_chip_power9_realize(DeviceState *de=
+v, Error **errp)
+         return;
+     }
+=20
++    pnv_chip_quad_realize(chip9, &local_err);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
 +        return;
 +    }
 +
-+    /* P8 uses a XSCOM region for LPC registers */
-+    pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(lpc),
-+                          &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
-+                          PNV_XSCOM_LPC_SIZE);
-+}
-+
-+static void pnv_lpc_power8_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
-+    PnvLpcClass *plc =3D PNV_LPC_CLASS(klass);
-+
-+    dc->desc =3D "PowerNV LPC Controller POWER8";
-+
-+    xdc->dt_xscom =3D pnv_lpc_dt_xscom;
-+
-+    plc->psi_irq =3D PSIHB_IRQ_LPC_I2C;
-+
-+    device_class_set_parent_realize(dc, pnv_lpc_power8_realize,
-+                                    &plc->parent_realize);
-+}
-+
-+static const TypeInfo pnv_lpc_power8_info =3D {
-+    .name          =3D TYPE_PNV8_LPC,
-+    .parent        =3D TYPE_PNV_LPC,
-+    .instance_size =3D sizeof(PnvLpcController),
-+    .class_init    =3D pnv_lpc_power8_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_PNV_XSCOM_INTERFACE },
-+        { }
-+    }
-+};
-+
- static void pnv_lpc_realize(DeviceState *dev, Error **errp)
- {
-     PnvLpcController *lpc =3D PNV_LPC(dev);
-     Object *obj;
--    Error *error =3D NULL;
-+    Error *local_err =3D NULL;
-+
-+    obj =3D object_property_get_link(OBJECT(dev), "psi", &local_err);
-+    if (!obj) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'psi' not found: ");
-+        return;
-+    }
-+    /* The LPC controller needs PSI to generate interrupts  */
-+    lpc->psi =3D PNV_PSI(obj);
+     /* XIVE interrupt controller (POWER9) */
+     object_property_set_int(OBJECT(&chip9->xive), PNV9_XIVE_IC_BASE(chip=
+),
+                             "ic-bar", &error_fatal);
+@@ -1135,7 +1171,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+         if (!pnv_chip_is_power9(chip)) {
+             xscom_core_base =3D PNV_XSCOM_EX_BASE(core_hwid);
+         } else {
+-            xscom_core_base =3D PNV_XSCOM_P9_EC_BASE(core_hwid);
++            xscom_core_base =3D PNV9_XSCOM_EC_BASE(core_hwid);
+         }
 =20
-     /* Reg inits */
-     lpc->lpc_hc_fw_rd_acc_size =3D LPC_HC_FW_RD_4B;
-@@ -463,46 +518,28 @@ static void pnv_lpc_realize(DeviceState *dev, Error=
- **errp)
-                           "lpc-hc", LPC_HC_REGS_OPB_SIZE);
-     memory_region_add_subregion(&lpc->opb_mr, LPC_HC_REGS_OPB_ADDR,
-                                 &lpc->lpc_hc_regs);
--
--    /* XScom region for LPC registers */
--    pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(dev),
--                          &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
--                          PNV_XSCOM_LPC_SIZE);
--
--    /* get PSI object from chip */
--    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
--    if (!obj) {
--        error_setg(errp, "%s: required link 'psi' not found: %s",
--                   __func__, error_get_pretty(error));
--        return;
--    }
--    lpc->psi =3D PNV_PSI(obj);
- }
-=20
- static void pnv_lpc_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
--    PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
--
--    xdc->dt_xscom =3D pnv_lpc_dt_xscom;
-=20
-     dc->realize =3D pnv_lpc_realize;
-+    dc->desc =3D "PowerNV LPC Controller";
- }
-=20
- static const TypeInfo pnv_lpc_info =3D {
-     .name          =3D TYPE_PNV_LPC,
-     .parent        =3D TYPE_DEVICE,
--    .instance_size =3D sizeof(PnvLpcController),
-     .class_init    =3D pnv_lpc_class_init,
--    .interfaces =3D (InterfaceInfo[]) {
--        { TYPE_PNV_XSCOM_INTERFACE },
--        { }
--    }
-+    .class_size    =3D sizeof(PnvLpcClass),
-+    .abstract      =3D true,
+         pnv_xscom_add_subregion(chip, xscom_core_base,
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 171474e080..5feeed6bc4 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -327,3 +327,90 @@ static const TypeInfo pnv_core_infos[] =3D {
  };
 =20
- static void pnv_lpc_register_types(void)
- {
-     type_register_static(&pnv_lpc_info);
-+    type_register_static(&pnv_lpc_power8_info);
+ DEFINE_TYPES(pnv_core_infos)
++
++/*
++ * POWER9 Quads
++ */
++
++#define P9X_EX_NCU_SPEC_BAR                     0x11010
++
++static uint64_t pnv_quad_xscom_read(void *opaque, hwaddr addr,
++                                    unsigned int width)
++{
++    uint32_t offset =3D addr >> 3;
++    uint64_t val =3D -1;
++
++    switch (offset) {
++    case P9X_EX_NCU_SPEC_BAR:
++    case P9X_EX_NCU_SPEC_BAR + 0x400: /* Second EX */
++        val =3D 0;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: writing @0x%08x\n", __func__,
++                      offset);
++    }
++
++    return val;
++}
++
++static void pnv_quad_xscom_write(void *opaque, hwaddr addr, uint64_t val=
+,
++                                 unsigned int width)
++{
++    uint32_t offset =3D addr >> 3;
++
++    switch (offset) {
++    case P9X_EX_NCU_SPEC_BAR:
++    case P9X_EX_NCU_SPEC_BAR + 0x400: /* Second EX */
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: writing @0x%08x\n", __func__,
++                  offset);
++    }
++}
++
++static const MemoryRegionOps pnv_quad_xscom_ops =3D {
++    .read =3D pnv_quad_xscom_read,
++    .write =3D pnv_quad_xscom_write,
++    .valid.min_access_size =3D 8,
++    .valid.max_access_size =3D 8,
++    .impl.min_access_size =3D 8,
++    .impl.max_access_size =3D 8,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++};
++
++static void pnv_quad_realize(DeviceState *dev, Error **errp)
++{
++    PnvQuad *eq =3D PNV_QUAD(dev);
++    char name[32];
++
++    snprintf(name, sizeof(name), "xscom-quad.%d", eq->id);
++    pnv_xscom_region_init(&eq->xscom_regs, OBJECT(dev), &pnv_quad_xscom_=
+ops,
++                          eq, name, PNV9_XSCOM_EQ_SIZE);
++}
++
++static Property pnv_quad_properties[] =3D {
++    DEFINE_PROP_UINT32("id", PnvQuad, id, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void pnv_quad_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(oc);
++
++    dc->realize =3D pnv_quad_realize;
++    dc->props =3D pnv_quad_properties;
++}
++
++static const TypeInfo pnv_quad_info =3D {
++    .name          =3D TYPE_PNV_QUAD,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(PnvQuad),
++    .class_init    =3D pnv_quad_class_init,
++};
++
++static void pnv_core_register_types(void)
++{
++    type_register_static(&pnv_quad_info);
++}
++
++type_init(pnv_core_register_types)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 39888f9d52..e5b00d373e 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -26,6 +26,7 @@
+ #include "hw/ppc/pnv_psi.h"
+ #include "hw/ppc/pnv_occ.h"
+ #include "hw/ppc/pnv_xive.h"
++#include "hw/ppc/pnv_core.h"
+=20
+ #define TYPE_PNV_CHIP "pnv-chip"
+ #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
+@@ -89,6 +90,9 @@ typedef struct Pnv9Chip {
+     Pnv9Psi      psi;
+     PnvLpcController lpc;
+     PnvOCC       occ;
++
++    uint32_t     nr_quads;
++    PnvQuad      *quads;
+ } Pnv9Chip;
+=20
+ typedef struct PnvChipClass {
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index cbe9ad36f3..50cdb2b358 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -58,4 +58,14 @@ static inline PnvCPUState *pnv_cpu_state(PowerPCCPU *c=
+pu)
+     return (PnvCPUState *)cpu->machine_data;
  }
 =20
- type_init(pnv_lpc_register_types)
-diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
-index d657489b07..f3f24419b1 100644
---- a/include/hw/ppc/pnv_lpc.h
-+++ b/include/hw/ppc/pnv_lpc.h
-@@ -24,6 +24,8 @@
- #define TYPE_PNV_LPC "pnv-lpc"
- #define PNV_LPC(obj) \
-      OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
-+#define TYPE_PNV8_LPC TYPE_PNV_LPC "-POWER8"
-+#define PNV8_LPC(obj) OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV8_LP=
-C)
++#define TYPE_PNV_QUAD "powernv-cpu-quad"
++#define PNV_QUAD(obj) \
++    OBJECT_CHECK(PnvQuad, (obj), TYPE_PNV_QUAD)
++
++typedef struct PnvQuad {
++    DeviceState parent_obj;
++
++    uint32_t id;
++    MemoryRegion xscom_regs;
++} PnvQuad;
+ #endif /* _PPC_PNV_CORE_H */
+diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+index 3292459fbb..68dfae0dfe 100644
+--- a/include/hw/ppc/pnv_xscom.h
++++ b/include/hw/ppc/pnv_xscom.h
+@@ -60,10 +60,6 @@ typedef struct PnvXScomInterfaceClass {
+     (PNV_XSCOM_EX_CORE_BASE | ((uint64_t)(core) << 24))
+ #define PNV_XSCOM_EX_SIZE         0x100000
 =20
- typedef struct PnvLpcController {
-     DeviceState parent;
-@@ -70,6 +72,19 @@ typedef struct PnvLpcController {
-     PnvPsi *psi;
- } PnvLpcController;
+-#define PNV_XSCOM_P9_EC_BASE(core) \
+-    ((uint64_t)(((core) & 0x1F) + 0x20) << 24)
+-#define PNV_XSCOM_P9_EC_SIZE      0x100000
+-
+ #define PNV_XSCOM_LPC_BASE        0xb0020
+ #define PNV_XSCOM_LPC_SIZE        0x4
 =20
-+#define PNV_LPC_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(PnvLpcClass, (klass), TYPE_PNV_LPC)
-+#define PNV_LPC_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(PnvLpcClass, (obj), TYPE_PNV_LPC)
-+
-+typedef struct PnvLpcClass {
-+    DeviceClass parent_class;
-+
-+    int psi_irq;
-+
-+    DeviceRealize parent_realize;
-+} PnvLpcClass;
-+
- ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
-*errp);
+@@ -73,6 +69,14 @@ typedef struct PnvXScomInterfaceClass {
+ #define PNV_XSCOM_OCC_BASE        0x0066000
+ #define PNV_XSCOM_OCC_SIZE        0x6000
 =20
- #endif /* _PPC_PNV_LPC_H */
++#define PNV9_XSCOM_EC_BASE(core) \
++    ((uint64_t)(((core) & 0x1F) + 0x20) << 24)
++#define PNV9_XSCOM_EC_SIZE        0x100000
++
++#define PNV9_XSCOM_EQ_BASE(core) \
++    ((uint64_t)(((core) & 0x1C) + 0x40) << 22)
++#define PNV9_XSCOM_EQ_SIZE        0x100000
++
+ #define PNV9_XSCOM_OCC_BASE       PNV_XSCOM_OCC_BASE
+ #define PNV9_XSCOM_OCC_SIZE       0x8000
+=20
 --=20
 2.20.1
