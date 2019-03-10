@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45933)
+Received: from eggs.gnu.org ([209.51.188.92]:58443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2qEE-0002vH-Uq
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 23:38:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1h2sB2-0002Yd-Nw
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 01:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2qEE-0000kq-3N
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 23:38:26 -0500
-Date: Sun, 10 Mar 2019 14:37:10 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190310033710.GC15851@umbus.fritz.box>
-References: <20190309214255.9952-1-f4bug@amsat.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1h2sB1-0003yt-Rx
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 01:43:16 -0500
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:38014)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h2sB1-0003yb-KK
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 01:43:15 -0500
+Received: by mail-pf1-x431.google.com with SMTP id n125so1294460pfn.5
+	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 22:43:15 -0800 (PST)
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-4-richard.henderson@linaro.org>
+	<CAL1e-=iVz3aKwz6-DxjWgLxhx32_PdA45Kk6Uh7f1ezatv6SdQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <09ea64b5-ed4e-0047-7578-1db9c9ec469b@linaro.org>
+Date: Sat, 9 Mar 2019 22:43:10 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8X7/QrJGcKSMr1RN"
-Content-Disposition: inline
-In-Reply-To: <20190309214255.9952-1-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/ppc: Optimize VSX instructions
- using deposit_i64()
+In-Reply-To: <CAL1e-=iVz3aKwz6-DxjWgLxhx32_PdA45Kk6Uh7f1ezatv6SdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] tcg: Use extract2 in tcg_gen_shifti_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "david@redhat.com" <david@redhat.com>
+
+On 3/9/19 12:30 PM, Aleksandar Markovic wrote:
+> 
+> 
+> On Thursday, March 7, 2019, Richard Henderson <richard.henderson@linaro.org
+> <mailto:richard.henderson@linaro.org>> wrote:
+> 
+>     Signed-off-by: Richard Henderson <richard.henderson@linaro.org
+>     <mailto:richard.henderson@linaro.org>>
+>     ---
+>      tcg/tcg-op.c | 47 ++++++++++++++++++++++++-----------------------
+>      1 file changed, 24 insertions(+), 23 deletions(-)
+> 
+> 
+> Extract2 is not a good name for this new function, IMHO.
+
+If you're going to bike shed the name, you should suggest something else.
+
+But I think it's a pretty good name, since it extracts one register output out
+of two register inputs.
 
 
---8X7/QrJGcKSMr1RN
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Mar 09, 2019 at 10:42:53PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi David, Richard.
->=20
-> I found these two patches while cleaning dangling branches on my
-> previous laptop... Original commits date is 2017-07-21 05:24:05...
-> I simply rebased them.
->=20
-> It doesn't have to be merged for soft freeze, but since I'm doing
-> housekeeping I rather send it to keep archived by the ML.
-
-Applied, thanks.
-
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Philippe Mathieu-Daud=E9 (2):
->   target/ppc: Optimize xviexpdp() using deposit_i64()
->   target/ppc: Optimize x[sv]xsigdp using deposit_i64()
->=20
->  target/ppc/translate/vsx-impl.inc.c | 26 +++++++-------------------
->  1 file changed, 7 insertions(+), 19 deletions(-)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---8X7/QrJGcKSMr1RN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyEhmUACgkQbDjKyiDZ
-s5LqcRAAvl5kif5HetIHMk0z+h2ssUSxynVRcCr2lEKeoNJDcPZMDFb1Vc520DkR
-gC5K44z+cKpnTH2FTXqMoTNrH4HjB74+zS0jeJS135WhgjIx2xvcoCDDj6doHkph
-qkid5I0qGnBcX/B0see7vHOEBO0VL5DtL1VNbICm4wKLFdF3dHZdOLj0YVXtT3zM
-4viFSoxmEWejgOBySsFyJneahlhvFp0ccIilZeNwJyMSoffXXrzTWJn9M9Y7YIDO
-m9SqmKglyxwkPBkHMM7GNod8A8LayEekT50B5AfahLUI0NYDEWVU94meB9QbqEBR
-MQzBl4mobwFIdlieU1P7sbok6Z19P0u9iXnm+5VamLsG+OV86P09ju1rWJiMEBbd
-2B0wLAY0V4QK/yIRukaYHfOp2XzqkktwMwv79uST7RujCjzMxZxBbEzCAM6wqzBc
-KgRqqZJZOZ8+WdAzXKRF4S/wFXCehMzc903v0ap9fUBD4n3O38ILFRciBiKIMsge
-EFg5kGWiG5Yr2ulHnmaSTWRZ5q2v8YS//BqWvOj/SSU6fdUVsR3BdUqPECeO41Z3
-w11QISi1EWlNyIe0lbs2r7Ceg4Ds6cS8RnRSCg+ggMxIabf/Ns8YEfDvyUQuJnCw
-WmgV+TArvQnG3yxBKWuul17dnQkBPkkBCBI0O7i5WVFSjnVkPAE=
-=PP8J
------END PGP SIGNATURE-----
-
---8X7/QrJGcKSMr1RN--
+r~
