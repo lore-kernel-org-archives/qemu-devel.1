@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39287)
+Received: from eggs.gnu.org ([209.51.188.92]:39317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2zWi-0007L1-GJ
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:09 -0400
+	(envelope-from <philmd@redhat.com>) id 1h2zWx-0007U5-Ef
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h2zWh-0004P2-Ay
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h2zWa-0004L9-AM
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:02 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
-	<CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
-Date: Sun, 10 Mar 2019 15:33:53 +0100
-In-Reply-To: <CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 7 Mar 2019 10:13:13 +0000")
-Message-ID: <877ed6x0ha.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1h2zWv-0004Td-Gs
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:23 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2zWn-0004QJ-NS
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:34:17 -0400
+Received: by mail-wr1-f68.google.com with SMTP id w2so2279358wrt.11
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 07:34:11 -0700 (PDT)
+References: <20190310113408.59912-1-liq3ea@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <43275bae-952c-c044-0525-5e6592dbe58d@redhat.com>
+Date: Sun, 10 Mar 2019 15:34:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] converting build system to Meson?
+In-Reply-To: <20190310113408.59912-1-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tests: test-bdrv-graph-mod: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Li Qiang <liq3ea@163.com>, vsementsov@virtuozzo.com, kwolf@redhat.com
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 3/10/19 12:34 PM, Li Qiang wrote:
+> Fixes: 2dbfadf
 
-> On Thu, 7 Mar 2019 at 06:39, Thomas Huth <thuth@redhat.com> wrote:
->> On 06/03/2019 19.12, Paolo Bonzini wrote:
->> > lately I have been thinking of converting the QEMU build system to
->> > Meson.  Meson is a relatively new build system that can replace
->> > Autotools or hand-written Makefiles such as QEMU; as a die-hard
->> > Autotools fan, I must say that Meson is by far better than anything else
->> > that has ever tried to replace Autotools, and actually has the potential
->> > to do so.
->> >
->> > Advantages of Meson that directly matter for QEMU include:[...]
->>
->> I'm not objecting a new build system per se, but could you elaborate on
->>  problems of the current QEMU build system that will be fixed by this
->> change? Since apart from some minor glitches (with the *.mak file
->> dependencies for example), the current build system seems to work quite
->> well for me ... so at least I currently don't feel enough pain yet to do
->> such a big step, just because there is another new cool build system
->> around...
->
-> Yes, that tends to be my view. Our current build system:
->  * has no dependencies that are problematic for older hosts
->    (contrast Meson, which needs Python 3.5, even if we take
->    the drastic step of shipping an entire build tool along
->    with QEMU; OSX python is 2.7 still)
+  ^ Please keep tags together (with Signed-off-by, ...)
 
-By the time Meson is ready for us, and we're ready for Meson, chances
-are even OS-X has moved on from Python 2.
+> Spotted by ASAN when 'make check'.
 
-https://pythonclock.org/
+I'm not native English speaker but I'd say:
 
->  * is not particularly hard to deal with for the common cases
->    ("add new source file" is straightforward)
+Spotted by ASAN [with] 'make check'.
 
-Yes.  Quite an achievement.
+or
 
->  * covers all our requirements as far as I'm aware
->    (whereas you've listed a couple of places where Meson
->    would need changes/extensions to support things we do already)
->  * is generally flexible enough to be hackable to deal with odd
->    cases (it has escape mechanisms to generic-programmability,
->    even if they're ugly and awkward)
+Spotted by ASAN [while running] 'make check'.
 
-Yes, it's hackable, but it takes quite a hacker to hack it.  While it's
-reasonably easy to do simple things in it with basic voodoo skills, the
-learning curve goes up like the Zimbabwean inflation rate after that.  I
-got plenty of experience in Make, and consider myself pretty fluent, yet
-I find myself running to Paolo for help.
+Here goes:
 
-> So I think we'd need a more compelling reason to move right now.
-> (This might change in the future, eg if Meson catches on to the
-> extent that everybody is using it and competitors like CMake are
-> more obviously eclipsed by it, in the way that git took over
-> from svn and relegated mercurial and bzr to obscurity.)
->
-> thanks
-> -- PMM
+"Fixes: 2dbfadf"
+
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  tests/test-bdrv-graph-mod.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/tests/test-bdrv-graph-mod.c b/tests/test-bdrv-graph-mod.c
+> index 458dfa6661..8bf0fe735d 100644
+> --- a/tests/test-bdrv-graph-mod.c
+> +++ b/tests/test-bdrv-graph-mod.c
+> @@ -117,6 +117,7 @@ static void test_update_perm_tree(void)
+>  
+>      bdrv_unref(bs);
+>      blk_unref(root);
+> +    error_free(local_err);
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>  }
+>  
+>  /*
+> 
