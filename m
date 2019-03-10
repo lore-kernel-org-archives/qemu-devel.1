@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47008)
+Received: from eggs.gnu.org ([209.51.188.92]:48903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2mQI-0003Nu-V5
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:34:43 -0500
+	(envelope-from <philmd@redhat.com>) id 1h2mdL-0001ED-1c
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:48:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2mQI-0001GK-4U
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:34:38 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1h2mQH-0001FD-UI
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:34:38 -0500
-Received: by mail-wr1-x442.google.com with SMTP id f14so1284413wrg.1
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 16:34:37 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 10 Mar 2019 01:34:27 +0100
-Message-Id: <20190310003428.11723-6-f4bug@amsat.org>
-In-Reply-To: <20190310003428.11723-1-f4bug@amsat.org>
-References: <20190310003428.11723-1-f4bug@amsat.org>
+	(envelope-from <philmd@redhat.com>) id 1h2mdJ-0006UW-J7
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:48:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h2mdJ-0006SF-Bu
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 19:48:05 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6844F3084246
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 00:48:02 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Sun, 10 Mar 2019 01:47:45 +0100
+Message-Id: <20190310004749.27029-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 5/6] target/m68k: Optimize rotate_x() using
- extract_i32()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/4] fw_cfg: Add
+ edk2_add_host_crypto_policy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Optimize rotate_x() using tcg_gen_extract_i32(). We can now free the
-'sz' tcg_temp earlier. Since it is allocated with tcg_const_i32(),
-free it with tcg_temp_free_i32().
+Hi,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/m68k/translate.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+This series consists of:
+- add fw_cfg_add_file_from_host()
+- add edk2_add_host_crypto_policy() and the Edk2Crypto object
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f43ac07b7f..b51b8a2a12 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -3686,6 +3686,7 @@ static TCGv rotate_x(TCGv reg, TCGv shift, int left, int size)
-         tcg_gen_sub_i32(shl, shl, shift); /* shl = size + 1 - shift */
-         tcg_gen_sub_i32(shx, sz, shift); /* shx = size - shift */
-     }
-+    tcg_temp_free_i32(sz);
- 
-     /* reg = (reg << shl) | (reg >> shr) | (x << shx); */
- 
-@@ -3701,9 +3702,7 @@ static TCGv rotate_x(TCGv reg, TCGv shift, int left, int size)
-     /* X = (reg >> size) & 1 */
- 
-     X = tcg_temp_new();
--    tcg_gen_shr_i32(X, reg, sz);
--    tcg_gen_andi_i32(X, X, 1);
--    tcg_temp_free(sz);
-+    tcg_gen_extract_i32(X, reg, size, 1);
- 
-     return X;
- }
--- 
-2.19.1
+The Edk2Crypto object is used to hold configuration values specific
+to EDK2.
+
+The edk2_add_host_crypto_policy() function loads crypto policies
+from the host, and register them as fw_cfg named file items.
+
+So far only the 'https' policy is supported.
+
+A usercase example is the 'HTTPS Boof' feature of OVMF [*].
+
+Usage example:
+
+$ qemu-system-x86_64 \
+    --object edk2_crypto,id=3Dhttps,\
+        ciphers=3D/etc/crypto-policies/back-ends/openssl.config,\
+        cacerts=3D/etc/pki/ca-trust/extracted/edk2/cacerts.bin
+
+(On Fedora these files are provided by the ca-certificates and
+crypto-policies packages).
+
+[*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
+
+Since v2:
+- Split of
+Since v1:
+- Addressed Michael and Laszlo comments.
+
+Please review,
+
+Phil.
+
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02522.html
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01598.html
+
+Philippe Mathieu-Daud=C3=A9 (4):
+  hw/nvram/fw_cfg: Add fw_cfg_add_file_from_host()
+  hw/firmware: Add Edk2Crypto and edk2_add_host_crypto_policy()
+  hw/i386: Use edk2_add_host_crypto_policy()
+  hw/arm/virt: Use edk2_add_host_crypto_policy()
+
+ MAINTAINERS                             |   8 ++
+ hw/Makefile.objs                        |   1 +
+ hw/arm/virt.c                           |   7 +
+ hw/firmware/Makefile.objs               |   1 +
+ hw/firmware/uefi_edk2_crypto_policies.c | 177 ++++++++++++++++++++++++
+ hw/i386/pc.c                            |   7 +
+ hw/nvram/fw_cfg.c                       |  21 +++
+ include/hw/firmware/uefi_edk2.h         |  28 ++++
+ include/hw/nvram/fw_cfg.h               |  23 +++
+ 9 files changed, 273 insertions(+)
+ create mode 100644 hw/firmware/Makefile.objs
+ create mode 100644 hw/firmware/uefi_edk2_crypto_policies.c
+ create mode 100644 include/hw/firmware/uefi_edk2.h
+
+--=20
+2.20.1
