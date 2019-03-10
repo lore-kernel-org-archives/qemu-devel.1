@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41998)
+Received: from eggs.gnu.org ([209.51.188.92]:45933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h2paC-0005h0-Le
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 22:57:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1h2qEE-0002vH-Uq
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 23:38:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h2paB-0001YT-09
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 22:57:04 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h2paA-0001V7-FW
-	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 22:57:02 -0500
-Received: by mail-qt1-f194.google.com with SMTP id f11so1599627qti.7
-	for <qemu-devel@nongnu.org>; Sat, 09 Mar 2019 19:56:58 -0800 (PST)
-Date: Sat, 9 Mar 2019 22:56:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190309225457-mutt-send-email-mst@kernel.org>
-References: <20190309004826.9027-1-lersek@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h2qEE-0000kq-3N
+	for qemu-devel@nongnu.org; Sat, 09 Mar 2019 23:38:26 -0500
+Date: Sun, 10 Mar 2019 14:37:10 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190310033710.GC15851@umbus.fritz.box>
+References: <20190309214255.9952-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="8X7/QrJGcKSMr1RN"
 Content-Disposition: inline
-In-Reply-To: <20190309004826.9027-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/10] bundle edk2 platform firmware with
- QEMU
+In-Reply-To: <20190309214255.9952-1-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 0/2] target/ppc: Optimize VSX instructions
+ using deposit_i64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
-
-On Sat, Mar 09, 2019 at 01:48:16AM +0100, Laszlo Ersek wrote:
-> Repo:   https://github.com/lersek/qemu.git
-> Branch: edk2_build
-> 
-> This series advances the roms/edk2 submodule to the "edk2-stable201903"
-> release, and builds and captures platform firmware binaries from that
-> release. At this point they are meant to be used by both end-users and
-> by Igor's ACPI unit tests in qtest ("make check").
-> 
-> Previous discussion:
-> 
->   [Qemu-devel] bundling edk2 platform firmware images with QEMU
->   http://mid.mail-archive.com/80f0bae3-e79a-bb68-04c4-1c9c684d95b8@redhat.com
->   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02601.html
-> 
-> Note that the series was formatted with "--no-binary" (affecting patch
-> #8), therefore it cannot be applied with "git-am". See the remote
-> repo/branch reference near the top instead.
-> 
-> Thanks,
-> Laszlo
-
-High time IMO.
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Laszlo I suggest you add an entry to MAINTAINERS
-and start doing pull requests.
-
-Peter, what do you say? OK with you?
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
-> Laszlo Ersek (10):
->   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
->   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
->   tests/uefi-test-tools/build.sh: work around TianoCore#1607
->   roms/edk2: advance to tag edk2-stable201903
->   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
->   roms/Makefile: replace the $(EFIROM) target with "edk2-basetools"
->   roms: build edk2 firmware binaries and variable store templates
->   pc-bios: add edk2 firmware binaries and variable store templates
->   pc-bios: document the edk2 firmware images; add firmware descriptors
->   Makefile: install the edk2 firmware images and their descriptors
-> 
->  Makefile                                       |  17 +-
->  pc-bios/README                                 |  11 +
->  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
->  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
->  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
->  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
->  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
->  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
->  pc-bios/edk2-aarch64-code.fd                   | Bin 0 -> 67108864 bytes
->  pc-bios/edk2-arm-code.fd                       | Bin 0 -> 67108864 bytes
->  pc-bios/edk2-arm-vars.fd                       | Bin 0 -> 67108864 bytes
->  pc-bios/edk2-i386-code.fd                      | Bin 0 -> 3653632 bytes
->  pc-bios/edk2-i386-secure-code.fd               | Bin 0 -> 3653632 bytes
->  pc-bios/edk2-i386-vars.fd                      | Bin 0 -> 540672 bytes
->  pc-bios/edk2-licenses.txt                      | 209 ++++++++++++++++
->  pc-bios/edk2-x86_64-code.fd                    | Bin 0 -> 3653632 bytes
->  pc-bios/edk2-x86_64-secure-code.fd             | Bin 0 -> 3653632 bytes
->  roms/Makefile                                  |   9 +-
->  roms/Makefile.edk2                             | 138 +++++++++++
->  roms/edk2                                      |   2 +-
->  roms/edk2-build.sh                             |  55 +++++
->  roms/edk2-funcs.sh                             | 253 ++++++++++++++++++++
->  tests/uefi-test-tools/build.sh                 | 100 +-------
->  23 files changed, 897 insertions(+), 95 deletions(-)
->  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
->  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
->  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
->  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
->  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
->  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
->  create mode 100644 pc-bios/edk2-aarch64-code.fd
->  create mode 100644 pc-bios/edk2-arm-code.fd
->  create mode 100644 pc-bios/edk2-arm-vars.fd
->  create mode 100644 pc-bios/edk2-i386-code.fd
->  create mode 100644 pc-bios/edk2-i386-secure-code.fd
->  create mode 100644 pc-bios/edk2-i386-vars.fd
->  create mode 100644 pc-bios/edk2-licenses.txt
->  create mode 100644 pc-bios/edk2-x86_64-code.fd
->  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd
->  create mode 100644 roms/Makefile.edk2
->  create mode 100755 roms/edk2-build.sh
->  create mode 100644 roms/edk2-funcs.sh
-> 
-> -- 
-> 2.19.1.3.g30247aa5d201
+--8X7/QrJGcKSMr1RN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Mar 09, 2019 at 10:42:53PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi David, Richard.
+>=20
+> I found these two patches while cleaning dangling branches on my
+> previous laptop... Original commits date is 2017-07-21 05:24:05...
+> I simply rebased them.
+>=20
+> It doesn't have to be merged for soft freeze, but since I'm doing
+> housekeeping I rather send it to keep archived by the ML.
+
+Applied, thanks.
+
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=E9 (2):
+>   target/ppc: Optimize xviexpdp() using deposit_i64()
+>   target/ppc: Optimize x[sv]xsigdp using deposit_i64()
+>=20
+>  target/ppc/translate/vsx-impl.inc.c | 26 +++++++-------------------
+>  1 file changed, 7 insertions(+), 19 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--8X7/QrJGcKSMr1RN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyEhmUACgkQbDjKyiDZ
+s5LqcRAAvl5kif5HetIHMk0z+h2ssUSxynVRcCr2lEKeoNJDcPZMDFb1Vc520DkR
+gC5K44z+cKpnTH2FTXqMoTNrH4HjB74+zS0jeJS135WhgjIx2xvcoCDDj6doHkph
+qkid5I0qGnBcX/B0see7vHOEBO0VL5DtL1VNbICm4wKLFdF3dHZdOLj0YVXtT3zM
+4viFSoxmEWejgOBySsFyJneahlhvFp0ccIilZeNwJyMSoffXXrzTWJn9M9Y7YIDO
+m9SqmKglyxwkPBkHMM7GNod8A8LayEekT50B5AfahLUI0NYDEWVU94meB9QbqEBR
+MQzBl4mobwFIdlieU1P7sbok6Z19P0u9iXnm+5VamLsG+OV86P09ju1rWJiMEBbd
+2B0wLAY0V4QK/yIRukaYHfOp2XzqkktwMwv79uST7RujCjzMxZxBbEzCAM6wqzBc
+KgRqqZJZOZ8+WdAzXKRF4S/wFXCehMzc903v0ap9fUBD4n3O38ILFRciBiKIMsge
+EFg5kGWiG5Yr2ulHnmaSTWRZ5q2v8YS//BqWvOj/SSU6fdUVsR3BdUqPECeO41Z3
+w11QISi1EWlNyIe0lbs2r7Ceg4Ds6cS8RnRSCg+ggMxIabf/Ns8YEfDvyUQuJnCw
+WmgV+TArvQnG3yxBKWuul17dnQkBPkkBCBI0O7i5WVFSjnVkPAE=
+=PP8J
+-----END PGP SIGNATURE-----
+
+--8X7/QrJGcKSMr1RN--
