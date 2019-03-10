@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43604)
+Received: from eggs.gnu.org ([209.51.188.92]:43614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tpF-00027T-PF
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpG-00027p-4M
 	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2tpE-00024x-UB
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2tpF-00025Q-Af
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:28:54 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:48 +1100
-Message-Id: <20190310082703.1245-46-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:57 +1100
+Message-Id: <20190310082703.1245-55-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 45/60] ppc/pnv: lpc: fix OPB address ranges
+Subject: [Qemu-devel] [PULL 54/60] ppc/pnv: activate XSCOM tests for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +27,34 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The PowerNV LPC Controller exposes different sets of registers for
-each of the functional units it encompasses, among which the OPB
-(On-Chip Peripheral Bus) Master and Arbitrer and the LPC HOST
-Controller.
-
-The mapping addresses of each register range are correct but the sizes
-are too large. Fix the sizes and define the OPB Arbitrer range to fill
-the gap between the OPB Master registers and the LPC HOST Controller
-registers.
+We now have enough support to let the XSCOM test run on POWER9.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190307223548.20516-4-clg@kaod.org>
+Message-Id: <20190307223548.20516-13-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_lpc.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ tests/pnv-xscom-test.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index 9b18ce55e3..547be609ca 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -89,10 +89,11 @@ enum {
- #define LPC_FW_OPB_SIZE         0x10000000
+diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
+index 974f8da5b2..63d464048d 100644
+--- a/tests/pnv-xscom-test.c
++++ b/tests/pnv-xscom-test.c
+@@ -39,7 +39,6 @@ static const PnvChip pnv_chips[] =3D {
+         .cfam_id    =3D 0x120d304980000000ull,
+         .first_core =3D 0x1,
+     },
+-#if 0 /* POWER9 support is not ready yet */
+     {
+         .chip_type  =3D PNV_CHIP_POWER9,
+         .cpu_model  =3D "POWER9",
+@@ -47,7 +46,6 @@ static const PnvChip pnv_chips[] =3D {
+         .cfam_id    =3D 0x220d104900008000ull,
+         .first_core =3D 0x0,
+     },
+-#endif
+ };
 =20
- #define LPC_OPB_REGS_OPB_ADDR   0xc0010000
--#define LPC_OPB_REGS_OPB_SIZE   0x00002000
-+#define LPC_OPB_REGS_OPB_SIZE   0x00000060
-+#define LPC_OPB_REGS_OPBA_ADDR  0xc0011000
-+#define LPC_OPB_REGS_OPBA_SIZE  0x00000008
- #define LPC_HC_REGS_OPB_ADDR    0xc0012000
--#define LPC_HC_REGS_OPB_SIZE    0x00001000
--
-+#define LPC_HC_REGS_OPB_SIZE    0x00000100
-=20
- static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
- {
+ static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
 --=20
 2.20.1
