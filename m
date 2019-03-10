@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47471)
+Received: from eggs.gnu.org ([209.51.188.92]:47516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h2u6A-0000XD-A4
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:23 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1h2u6F-0000bu-Cw
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h2u69-0007Mk-FK
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:22 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:42094)
+	(envelope-from <yuval.shaia@oracle.com>) id 1h2u6E-0007Q2-LU
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1h2u69-0007Lv-5Q
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:21 -0400
+	id 1h2u6E-0007PY-C7
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:46:26 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Sun, 10 Mar 2019 10:46:00 +0200
-Message-Id: <20190310084610.23077-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 00/10] Misc fixes to pvrdma device
+Date: Sun, 10 Mar 2019 10:46:03 +0200
+Message-Id: <20190310084610.23077-4-yuval.shaia@oracle.com>
+In-Reply-To: <20190310084610.23077-1-yuval.shaia@oracle.com>
+References: <20190310084610.23077-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 03/10] hw/rdma: Protect against concurrent
+ execution of poll_cq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-Hi,
-Please review the following patch-set which consist of cosmetics fixes to
-device's user interface (traces, error_report and monitor) and some bug
-fixes.
+The function rdma_poll_cq is called from two contexts - completion
+handler thread which sense new completion on backend channel and
+explicitly as result of guest issuing poll_cq command.
 
-Thanks Markus, Eric, Marcel and David for your review
+Add lock to protect against concurrent executions.
 
-Review is needed for patch #4 - "hw/pvrdma: Collect debugging statistics"
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
+ hw/rdma/rdma_backend.c | 2 ++
+ hw/rdma/rdma_rm.c      | 4 ++++
+ hw/rdma/rdma_rm_defs.h | 1 +
+ 3 files changed, 7 insertions(+)
 
-v0 -> v1:
-    * Explain why device attributes are exposed only in HMP interface.
-    * Squash the 3 patches related to HMP interface into one.
-    * Make monitor dump function simple.
-    * Make HMP interface available only if pvrdma is included (detected by
-      build robot).
-    * Remove patch 03/10 ("Warn when too many consecutive poll CQ triggered
-      on an empty CQ) and add the two counters to patch 0/7 (monitor).
-    * Add Marcel's R-Bs.
-    * Add mutex protection to cqe_ctx list.
-    * Add two new patches.
-
-v1 -> v2:
-    * Rename locked-lists to protected-lists in patch 2 and patch 6.
-    * Add Marcel's R-Bs.
-
-v2 -> v3:
-    * Address some 32 bit host compilation issues.
-
-v3 -> v4:
-    * Per suggestion from Markus rebase HMP report on
-      object_child_foreach_recursive().
-    * Strip off David's r-b from HMP patch (#4) because of the above.
-
-v4 -> v5:
-    * Accept comments from Marcus and David
-        * Rename RDMA device interface
-        * Split patch #4 into 2 patches
-        * Add some more counters
-    * Add Marcus and David ack-by to hmp patch
-
-Yuval Shaia (10):
-  hw/rdma: Switch to generic error reporting way
-  hw/rdma: Introduce protected qlist
-  hw/rdma: Protect against concurrent execution of poll_cq
-  hw/pvrdma: Collect debugging statistics
-  {hmp, hw/pvrdma}: Expose device internals via monitor interface
-  hw/rdma: Free all MAD receive buffers when device is closed
-  hw/rdma: Free all receive buffers when QP is destroyed
-  hw/pvrdma: Delete unneeded function argument
-  hw/pvrdma: Delete pvrdma_exit function
-  hw/pvrdma: Unregister from shutdown notifier when device goes down
-
- hmp-commands-info.hx          |  14 +
- hmp.c                         |  27 ++
- hmp.h                         |   1 +
- hw/rdma/Makefile.objs         |   2 +-
- hw/rdma/rdma.c                |  30 +++
- hw/rdma/rdma_backend.c        | 483 +++++++++++++++++-----------------
- hw/rdma/rdma_backend.h        |   3 +-
- hw/rdma/rdma_backend_defs.h   |  10 +-
- hw/rdma/rdma_rm.c             | 193 ++++++++------
- hw/rdma/rdma_rm.h             |   7 +-
- hw/rdma/rdma_rm_defs.h        |  28 +-
- hw/rdma/rdma_utils.c          |  83 +++++-
- hw/rdma/rdma_utils.h          |  61 ++---
- hw/rdma/trace-events          |  32 ++-
- hw/rdma/vmw/pvrdma.h          |  12 +-
- hw/rdma/vmw/pvrdma_cmd.c      | 115 +++-----
- hw/rdma/vmw/pvrdma_dev_ring.c |  26 +-
- hw/rdma/vmw/pvrdma_main.c     | 168 ++++++------
- hw/rdma/vmw/pvrdma_qp_ops.c   |  52 +---
- hw/rdma/vmw/trace-events      |  16 +-
- include/hw/rdma/rdma.h        |  40 +++
- 21 files changed, 796 insertions(+), 607 deletions(-)
- create mode 100644 hw/rdma/rdma.c
- create mode 100644 include/hw/rdma/rdma.h
-
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index 0ed14751be..9679b842d1 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -70,6 +70,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+     BackendCtx *bctx;
+     struct ibv_wc wc[2];
+ 
++    qemu_mutex_lock(&rdma_dev_res->lock);
+     do {
+         ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+ 
+@@ -89,6 +90,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+             g_free(bctx);
+         }
+     } while (ne > 0);
++    qemu_mutex_unlock(&rdma_dev_res->lock);
+ 
+     if (ne < 0) {
+         rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 5dab4a2189..14580ca379 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -618,12 +618,16 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+ 
+     init_ports(dev_res);
+ 
++    qemu_mutex_init(&dev_res->lock);
++
+     return 0;
+ }
+ 
+ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+                   const char *ifname)
+ {
++    qemu_mutex_destroy(&dev_res->lock);
++
+     fini_ports(dev_res, backend_dev, ifname);
+ 
+     res_tbl_free(&dev_res->uc_tbl);
+diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+index 0ba61d1838..f0ee1f3072 100644
+--- a/hw/rdma/rdma_rm_defs.h
++++ b/hw/rdma/rdma_rm_defs.h
+@@ -105,6 +105,7 @@ typedef struct RdmaDeviceResources {
+     RdmaRmResTbl cq_tbl;
+     RdmaRmResTbl cqe_ctx_tbl;
+     GHashTable *qp_hash; /* Keeps mapping between real and emulated */
++    QemuMutex lock;
+ } RdmaDeviceResources;
+ 
+ #endif
 -- 
 2.17.2
