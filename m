@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35700)
+Received: from eggs.gnu.org ([209.51.188.92]:37658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2z0W-0000x9-EE
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:00:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1h2zK9-0003wN-I4
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1h2z0U-0003NC-OI
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:00:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39348)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1h2z0U-0003Ka-Hx
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:00:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1h2z0S-0007WF-0c
-	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 14:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 01B582E80C7
-	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 14:00:48 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1h2zK8-0005ax-RX
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h2zK8-0005aA-Js
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 10:21:08 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
+	<CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
+	<20190307113309.GN32268@redhat.com>
+Date: Sun, 10 Mar 2019 15:21:02 +0100
+In-Reply-To: <20190307113309.GN32268@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Thu, 7 Mar 2019 11:33:09 +0000")
+Message-ID: <87ef7ex12p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 10 Mar 2019 13:50:45 -0000
-From: YunQiang Su <wzssyqa@gmail.com>
-Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155222584537.27918.371851496126472096.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
- binfmt_misc config with flags include "P"
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-@Peter Luyou and me are working on try to pass the info about whether P
-flag is enabled or not by enviroment var or auxval. While we have not
-found the right method to do it from binfmt_misc.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-In fact, currently qemu trys to process the O flag, and it cannot work at a=
-ll.
-When you install qemu-user-static package from Debian/Ubuntu, the O flag is=
- enabled,
-while =
+[...]
+> As long term contributors we've built enough enough knowledge to
+> QEMU to consider our build system attractive or even "simple",
 
-   execfd =3D qemu_getauxval(AT_EXECFD);
-always return 0.
+The words that come to my mind aren't "attractive" or "simple", but
+"impressively clever", "brittle", and "uh, can I hack on something else
+today?"
 
--- =
+I've obviously failed to develop enough of a Stockholm Syndrome in 8+
+years.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818483
-
-Title:
-  qemu user mode does not support binfmt_misc config with flags include
-  "P"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi Sir:
-  During our test in chroot environment with qemu-user-static, we got some =
-test cases failed because of program output warning with unexpected full pa=
-th name.
-  For example in test module "Devscripts"
-  the test item for broken tarball expected the warning info:
-  <tar: This does not look like a tar archive
-  tar: ******* >
-  but the output was:
-  </bin/tar: This does not look like a tar archive
-  /bin/tar: ******>
-  the cause is the config file of binfmt_misc was set not to send argv0, fo=
-r example:
-  type command "tar" after chroot:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
-  [sudo] password for lpeng: =
-
-  root@lpeng-VirtualBox:/# tar
-  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
-abel' options
-  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
-  root@lpeng-VirtualBox:/# =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-
-  by adding output log in main()@qemu/Linux-user/main.c
-  we found the original input command was changed, and qemu do not know tha=
-t, we got the input args:
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----NULL---
-
-  Next step we modified the flags=3DP in the corresponding config under fol=
-der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
-  But chroot could not start bash because in current qemu dose not consider=
- about this unexpected one more"argv[0]"
-
-  =
-
-  After modified qemu code temporary to handle the new argv list we got the=
- input args, and from argv[2] is the original input command
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----tar---
-
-  We need the original input from command line, so is it possible that let =
-binfmt_misc to pass one more additional args or env to qemu as a token of t=
-he binfmt_misc flag, then qemu can judge how to parse the input args by it?
-  looking forward your suggestions.
-
-  Thanks
-  luyou
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
+> which skews our view of the benefits of alternatives to people
+> without this tribal knowledge.
