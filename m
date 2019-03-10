@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42739)
+Received: from eggs.gnu.org ([209.51.188.92]:42792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2to4-0000sO-E4
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2to6-0000ut-8P
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h2to2-0001I2-Uw
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h2to4-0001K3-Kp
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 04:27:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 10 Mar 2019 19:26:32 +1100
-Message-Id: <20190310082703.1245-30-david@gibson.dropbear.id.au>
+Date: Sun, 10 Mar 2019 19:26:24 +1100
+Message-Id: <20190310082703.1245-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 29/60] ppc/xive: activate HV support
+Subject: [Qemu-devel] [PULL 21/60] ppc/xive: hardwire the Physical CAM line
+ of the thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,153 +28,86 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The NSR register of the HV ring has a different, although similar, bit
-layout. TM_QW3_NSR_HE_PHYS bit should now be raised when the
-Hypervisor interrupt line is signaled. Other bits TM_QW3_NSR_HE_POOL
-and TM_QW3_NSR_HE_LSI are not modeled. LSI are for special interrupts
-reserved for HW bringup and the POOL bit is used when signaling a
-group of VPs. This is not currently implemented in Linux but it is in
-pHyp.
+By default on P9, the HW CAM line (23bits) is hardwired to :
 
-The most important special commands on the HV TIMA page are added to
-let the core manage interrupts : acking and changing the CPU priority.
+      0x000||0b1||4Bit chip number||7Bit Thread number.
+
+When the block group mode is enabled at the controller level (PowerNV),
+the CAM line is changed for CAM compares to :
+
+      4Bit chip number||0x001||7Bit Thread number
+
+This will require changes in xive_presenter_tctx_match() possibly.
+This is a lowlevel functionality of the HW controller and it is not
+strictly needed. Leave it for later.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190306085032.15744-10-clg@kaod.org>
+Message-Id: <20190306085032.15744-2-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 54 insertions(+), 3 deletions(-)
+ hw/intc/xive.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 7d7992c0ce..a0b87001da 100644
+index daa7badc84..b21759c938 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -54,6 +54,8 @@ static uint8_t exception_mask(uint8_t ring)
-     switch (ring) {
-     case TM_QW1_OS:
-         return TM_QW1_NSR_EO;
-+    case TM_QW3_HV_PHYS:
-+        return TM_QW3_NSR_HE;
-     default:
-         g_assert_not_reached();
-     }
-@@ -88,7 +90,16 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t r=
-ing)
-     uint8_t *regs =3D &tctx->regs[ring];
-=20
-     if (regs[TM_PIPR] < regs[TM_CPPR]) {
--        regs[TM_NSR] |=3D exception_mask(ring);
-+        switch (ring) {
-+        case TM_QW1_OS:
-+            regs[TM_NSR] |=3D TM_QW1_NSR_EO;
-+            break;
-+        case TM_QW3_HV_PHYS:
-+            regs[TM_NSR] |=3D (TM_QW3_NSR_HE_PHYS << 6);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-         qemu_irq_raise(tctx->output);
-     }
+@@ -1112,6 +1112,30 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, C=
+PUState *cs)
+     return xrc->get_tctx(xrtr, cs);
  }
-@@ -109,6 +120,38 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
-_t ring, uint8_t cppr)
-  * XIVE Thread Interrupt Management Area (TIMA)
-  */
 =20
-+static void xive_tm_set_hv_cppr(XiveTCTX *tctx, hwaddr offset,
-+                                uint64_t value, unsigned size)
++/*
++ * By default on P9, the HW CAM line (23bits) is hardwired to :
++ *
++ *   0x000||0b1||4Bit chip number||7Bit Thread number.
++ *
++ * When the block grouping is enabled, the CAM line is changed to :
++ *
++ *   4Bit chip number||0x001||7Bit Thread number.
++ */
++static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
 +{
-+    xive_tctx_set_cppr(tctx, TM_QW3_HV_PHYS, value & 0xff);
++    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
 +}
 +
-+static uint64_t xive_tm_ack_hv_reg(XiveTCTX *tctx, hwaddr offset, unsign=
-ed size)
++static bool xive_presenter_tctx_match_hw(XiveTCTX *tctx,
++                                         uint8_t nvt_blk, uint32_t nvt_i=
+dx)
 +{
-+    return xive_tctx_accept(tctx, TM_QW3_HV_PHYS);
-+}
++    CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
++    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
 +
-+static uint64_t xive_tm_pull_pool_ctx(XiveTCTX *tctx, hwaddr offset,
-+                                      unsigned size)
-+{
-+    uint64_t ret;
-+
-+    ret =3D tctx->regs[TM_QW2_HV_POOL + TM_WORD2] & TM_QW2W2_POOL_CAM;
-+    tctx->regs[TM_QW2_HV_POOL + TM_WORD2] &=3D ~TM_QW2W2_POOL_CAM;
-+    return ret;
-+}
-+
-+static void xive_tm_vt_push(XiveTCTX *tctx, hwaddr offset,
-+                            uint64_t value, unsigned size)
-+{
-+    tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] =3D value & 0xff;
-+}
-+
-+static uint64_t xive_tm_vt_poll(XiveTCTX *tctx, hwaddr offset, unsigned =
-size)
-+{
-+    return tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] & 0xff;
++    return hw_cam_line((pir >> 8) & 0xf, pir & 0x7f) =3D=3D
++        hw_cam_line(nvt_blk, nvt_idx);
 +}
 +
  /*
-  * Define an access map for each page of the TIMA that we will use in
-  * the memory region ops to filter values when doing loads and stores
-@@ -288,10 +331,16 @@ static const XiveTmOp xive_tm_operations[] =3D {
-      * effects
-      */
-     { XIVE_TM_OS_PAGE, TM_QW1_OS + TM_CPPR,   1, xive_tm_set_os_cppr, NU=
-LL },
-+    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_CPPR, 1, xive_tm_set_hv_cppr,=
- NULL },
-+    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, xive_tm_vt_push, NU=
-LL },
-+    { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, NULL, xive_tm_vt_po=
-ll },
+  * The thread context register words are in big-endian format.
+  */
+@@ -1120,6 +1144,7 @@ static int xive_presenter_tctx_match(XiveTCTX *tctx=
+, uint8_t format,
+                                      bool cam_ignore, uint32_t logic_ser=
+v)
+ {
+     uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
++    uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
+     uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
+     uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
+     uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
+@@ -1142,7 +1167,11 @@ static int xive_presenter_tctx_match(XiveTCTX *tct=
+x, uint8_t format,
 =20
-     /* MMIOs above 2K : special operations with side effects */
-     { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os_re=
-g },
-     { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pending,=
- NULL },
-+    { XIVE_TM_HV_PAGE, TM_SPC_ACK_HV_REG,     2, NULL, xive_tm_ack_hv_re=
-g },
-+    { XIVE_TM_HV_PAGE, TM_SPC_PULL_POOL_CTX,  4, NULL, xive_tm_pull_pool=
-_ctx },
-+    { XIVE_TM_HV_PAGE, TM_SPC_PULL_POOL_CTX,  8, NULL, xive_tm_pull_pool=
-_ctx },
- };
+         /* F=3D0 & i=3D0: Specific NVT notification */
 =20
- static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, boo=
-l write)
-@@ -323,7 +372,7 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset=
-, uint64_t value,
-     const XiveTmOp *xto;
+-        /* TODO (PowerNV) : PHYS ring */
++        /* PHYS ring */
++        if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
++            xive_presenter_tctx_match_hw(tctx, nvt_blk, nvt_idx)) {
++            return TM_QW3_HV_PHYS;
++        }
 =20
-     /*
--     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
-+     * TODO: check V bit in Q[0-3]W2
-      */
-=20
-     /*
-@@ -360,7 +409,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size)
-     const XiveTmOp *xto;
-=20
-     /*
--     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
-+     * TODO: check V bit in Q[0-3]W2
-      */
-=20
-     /*
-@@ -472,6 +521,8 @@ static void xive_tctx_reset(void *dev)
-      */
-     tctx->regs[TM_QW1_OS + TM_PIPR] =3D
-         ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
-+    tctx->regs[TM_QW3_HV_PHYS + TM_PIPR] =3D
-+        ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
- }
-=20
- static void xive_tctx_realize(DeviceState *dev, Error **errp)
+         /* HV POOL ring */
+         if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
 --=20
 2.20.1
