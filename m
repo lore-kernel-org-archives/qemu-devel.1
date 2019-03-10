@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54011)
+Received: from eggs.gnu.org ([209.51.188.92]:55869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h31OT-0008VY-08
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:33:45 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h31fI-0003DV-1M
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h31OS-0007FW-C6
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:33:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h31OS-0007FA-5i
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:33:44 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<87r2bigarf.fsf@zen.linaroharston>
-	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
-	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
-	<20190307190554.w75ltd6wvnvhzsdh@dhcp-17-118.bos.redhat.com>
-Date: Sun, 10 Mar 2019 17:33:39 +0100
-In-Reply-To: <20190307190554.w75ltd6wvnvhzsdh@dhcp-17-118.bos.redhat.com>
-	(Cleber Rosa's message of "Thu, 7 Mar 2019 14:05:54 -0500")
-Message-ID: <87pnqyvgd8.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1h31fG-0008L5-US
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 12:51:07 -0400
+Resent-Message-Id: <E1h31fG-0008L5-US@eggs.gnu.org>
+Message-ID: <155223663493.31099.11768542801492225686@6acff2cf482b>
+In-Reply-To: <20190305234337.18353-1-jsnow@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 10 Mar 2019 09:50:36 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] block/qcow2-bitmap: Enable resize with
+ persistent bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: jsnow@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Cleber Rosa <crosa@redhat.com> writes:
-
-> On Thu, Mar 07, 2019 at 01:09:52PM +0000, Peter Maydell wrote:
->> On Thu, 7 Mar 2019 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > In any case, this wouldn't change; as you suggest below, configure could
->> > remain as a front-end (well, in-srcdir builds are not supported by
->> > Meson, so "../configure && ninja" perhaps).
->> 
->> As an aside, it might be a nice idea to drop the in-srcdir
->> build altogether for QEMU anyway -- it's not really a very
->> good idea and it means our build system has to cope with two
->> different ways of working to no particularly useful end.
->>
->
-> THIS.  Please.
-
-Seconded.
-
-If nothing beyond abandoning in-tree builds should come out of this
-thread, it will have been totally worth it for me.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMwNTIzNDMzNy4xODM1
+My0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
+U0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAg
+ICAgIGNyeXB0by90bHNzZXNzaW9uLm8KICBDQyAgICAgIGNyeXB0by9zZWNyZXQubwovdG1wL3Fl
+bXUtdGVzdC9zcmMvYmxvY2svcWNvdzItYml0bWFwLmM6IEluIGZ1bmN0aW9uICdxY293Ml90cnVu
+Y2F0ZV9iaXRtYXBzX2NoZWNrJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLWJpdG1h
+cC5jOjExOTg6MTM6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnYmRy
+dl9kaXJ0eV9iaXRtYXBfY2hlY2snOyBkaWQgeW91IG1lYW4gJ2JkcnZfZGlydHlfYml0bWFwX2xv
+Y2snPyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICAgICAgaWYg
+KGJkcnZfZGlydHlfYml0bWFwX2NoZWNrKGJpdG1hcCwgQkRSVl9CSVRNQVBfREVGQVVMVCwgZXJy
+cCkpIHsKICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICBi
+ZHJ2X2RpcnR5X2JpdG1hcF9sb2NrCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi1iaXRt
+YXAuYzoxMTk4OjEzOiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnYmRydl9k
+aXJ0eV9iaXRtYXBfY2hlY2snIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVz
+dC9zcmMvYmxvY2svcWNvdzItYml0bWFwLmM6MTE5ODo0NTogZXJyb3I6ICdCRFJWX0JJVE1BUF9E
+RUZBVUxUJyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3Ug
+bWVhbiAnRE1fT1VUX0RFRkFVTFQnPwogICAgICAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfY2hl
+Y2soYml0bWFwLCBCRFJWX0JJVE1BUF9ERUZBVUxULCBlcnJwKSkgewogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERNX09VVF9ERUZBVUxUCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMw
+NTIzNDMzNy4xODM1My0xLWpzbm93QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVk
+b3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
