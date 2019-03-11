@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48295)
+Received: from eggs.gnu.org ([209.51.188.92]:48476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3FMH-0001wt-Sz
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:28:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3FMi-00024b-Dw
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3FKo-0006s7-P4
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:26:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41828)
+	(envelope-from <armbru@redhat.com>) id 1h3F9m-0000LB-3f
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:15:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3FKo-0006qe-Fa
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:26:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3F9l-0000KX-Pe
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 03:15:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D1DF308FBA9
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:26:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 604BE30821FA
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:15:28 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20190310004749.27029-1-philmd@redhat.com>
-	<20190310004749.27029-3-philmd@redhat.com>
-Date: Mon, 11 Mar 2019 08:26:44 +0100
-In-Reply-To: <20190310004749.27029-3-philmd@redhat.com> ("Philippe
+	<20190310004749.27029-2-philmd@redhat.com>
+Date: Mon, 11 Mar 2019 08:15:15 +0100
+In-Reply-To: <20190310004749.27029-2-philmd@redhat.com> ("Philippe
 	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Sun,
-	10 Mar 2019 01:47:47 +0100")
-Message-ID: <8736ntswgb.fsf@dusky.pond.sub.org>
+	10 Mar 2019 01:47:46 +0100")
+Message-ID: <87d0mxswzg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] hw/firmware: Add Edk2Crypto and
- edk2_add_host_crypto_policy()
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] hw/nvram/fw_cfg: Add
+ fw_cfg_add_file_from_host()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,320 +41,127 @@ Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michae
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> The Edk2Crypto object is used to hold configuration values specific
-> to EDK2.
->
-> The edk2_add_host_crypto_policy() function loads crypto policies
-> from the host, and register them as fw_cfg named file items.
-> So far only the 'https' policy is supported.
->
-> A usercase example is the 'HTTPS Boof' feature of OVMF [*].
->
-> Usage example:
->
->   $ qemu-system-x86_64 \
->       --object edk2_crypto,id=3Dhttps,\
->               ciphers=3D/etc/crypto-policies/back-ends/openssl.config,\
->               cacerts=3D/etc/pki/ca-trust/extracted/edk2/cacerts.bin
->
-> (On Fedora these files are provided by the ca-certificates and
-> crypto-policies packages).
->
-> [*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
+> Add a function to read the full content of file on the host, and add
+> a new 'file' name item to the fw_cfg device.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
-> v3:
-> - '-object' -> '--object' in commit description (Eric)
-> - reworded the 'TODO: g_free' comment
+> v2: s/ptr/data, corrected documentation (Laszlo)
+> v3: inverted the if() logic
 > ---
->  MAINTAINERS                             |   8 ++
->  hw/Makefile.objs                        |   1 +
->  hw/firmware/Makefile.objs               |   1 +
->  hw/firmware/uefi_edk2_crypto_policies.c | 177 ++++++++++++++++++++++++
->  include/hw/firmware/uefi_edk2.h         |  28 ++++
->  5 files changed, 215 insertions(+)
->  create mode 100644 hw/firmware/Makefile.objs
->  create mode 100644 hw/firmware/uefi_edk2_crypto_policies.c
->  create mode 100644 include/hw/firmware/uefi_edk2.h
+>  hw/nvram/fw_cfg.c         | 21 +++++++++++++++++++++
+>  include/hw/nvram/fw_cfg.h | 23 +++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index cf09a4c127..70122b3d0d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2206,6 +2206,14 @@ F: include/hw/i2c/smbus_master.h
->  F: include/hw/i2c/smbus_slave.h
->  F: include/hw/i2c/smbus_eeprom.h
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 7fdf04adc9..2a345bfd5c 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -826,6 +826,27 @@ void fw_cfg_add_file(FWCfgState *s,  const char *fil=
+ename,
+>      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, t=
+rue);
+>  }
 >=20=20
-> +EDK2 Firmware
-> +M: Laszlo Ersek <lersek@redhat.com>
-> +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> +S: Maintained
-> +F: docs/interop/firmware.json
-> +F: hw/firmware/uefi_edk2_crypto_policies.c
-> +F: include/hw/firmware/uefi_edk2.h
-> +
->  Usermode Emulation
->  ------------------
->  Overall
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 82aa7fab8e..2b075aa1e0 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -8,6 +8,7 @@ devices-dirs-$(CONFIG_SOFTMMU) +=3D char/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D cpu/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D display/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D dma/
-> +devices-dirs-$(CONFIG_SOFTMMU) +=3D firmware/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D gpio/
->  devices-dirs-$(CONFIG_HYPERV) +=3D hyperv/
->  devices-dirs-$(CONFIG_I2C) +=3D i2c/
-> diff --git a/hw/firmware/Makefile.objs b/hw/firmware/Makefile.objs
-> new file mode 100644
-> index 0000000000..ea1f6d44df
-> --- /dev/null
-> +++ b/hw/firmware/Makefile.objs
-> @@ -0,0 +1 @@
-> +common-obj-y +=3D uefi_edk2_crypto_policies.o
-> diff --git a/hw/firmware/uefi_edk2_crypto_policies.c b/hw/firmware/uefi_e=
-dk2_crypto_policies.c
-> new file mode 100644
-> index 0000000000..5f88819a50
-> --- /dev/null
-> +++ b/hw/firmware/uefi_edk2_crypto_policies.c
-> @@ -0,0 +1,177 @@
-> +/*
-> + * UEFI EDK2 Support
-> + *
-> + * Copyright (c) 2019 Red Hat Inc.
-> + *
-> + * Author:
-> + *  Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qom/object_interfaces.h"
-> +#include "hw/firmware/uefi_edk2.h"
-> +
-> +
-> +#define TYPE_EDK2_CRYPTO "edk2_crypto"
-> +
-> +#define EDK2_CRYPTO_CLASS(klass) \
-> +     OBJECT_CLASS_CHECK(Edk2CryptoClass, (klass), \
-> +                        TYPE_EDK2_CRYPTO)
-> +#define EDK2_CRYPTO_GET_CLASS(obj) \
-> +     OBJECT_GET_CLASS(Edk2CryptoClass, (obj), \
-> +                      TYPE_EDK2_CRYPTO)
-> +#define EDK2_CRYPTO(obj) \
-> +     INTERFACE_CHECK(Edk2Crypto, (obj), \
-> +                     TYPE_EDK2_CRYPTO)
-
-Uh, should this be OBJECT_CLASS_CHECK()?  TYPE_EDK2_CRYPTO is a
-TYPE_OBJECT, not a TYPE_INTERFACE...
-
-> +
-> +typedef struct Edk2Crypto {
-> +    Object parent_obj;
-> +
-> +    /*
-> +     * Path to the acceptable ciphersuites and the preferred order from
-> +     * the host-side crypto policy.
-> +     */
-> +    char *ciphers_path;
-> +
-> +    /* Path to the trusted CA certificates configured on the host side. =
-*/
-> +    char *cacerts_path;
-> +} Edk2Crypto;
-
-Bike-shedding: I prefer to call file names file names, and reserve
-"path" for search paths.  But it's your shed, not mine.
-
-> +
-> +typedef struct Edk2CryptoClass {
-> +    ObjectClass parent_class;
-> +} Edk2CryptoClass;
-> +
-> +
-> +static void edk2_crypto_prop_set_ciphers(Object *obj, const char *value,
-> +                                         Error **errp G_GNUC_UNUSED)
+> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
+> +                                const char *host_path, size_t *len)
 > +{
-> +    Edk2Crypto *s =3D EDK2_CRYPTO(obj);
+> +    GError *gerr =3D NULL;
+> +    gchar *data =3D NULL;
+> +    gsize contents_len =3D 0;
 > +
-> +    g_free(s->ciphers_path);
-> +    s->ciphers_path =3D g_strdup(value);
-> +}
-> +
-> +static char *edk2_crypto_prop_get_ciphers(Object *obj,
-> +                                          Error **errp G_GNUC_UNUSED)
-> +{
-> +    Edk2Crypto *s =3D EDK2_CRYPTO(obj);
-> +
-> +    return g_strdup(s->ciphers_path);
-> +}
-> +
-> +static void edk2_crypto_prop_set_cacerts(Object *obj, const char *value,
-> +                                         Error **errp G_GNUC_UNUSED)
-> +{
-> +    Edk2Crypto *s =3D EDK2_CRYPTO(obj);
-> +
-> +    g_free(s->cacerts_path);
-> +    s->cacerts_path =3D g_strdup(value);
-> +}
-> +
-> +static char *edk2_crypto_prop_get_cacerts(Object *obj,
-> +                                          Error **errp G_GNUC_UNUSED)
-> +{
-> +    Edk2Crypto *s =3D EDK2_CRYPTO(obj);
-> +
-> +    return g_strdup(s->cacerts_path);
-> +}
-> +
-> +static void edk2_crypto_finalize(Object *obj)
-> +{
-> +    Edk2Crypto *s =3D EDK2_CRYPTO(obj);
-> +
-> +    g_free(s->ciphers_path);
-> +    g_free(s->cacerts_path);
-> +}
-> +
-> +static void edk2_crypto_class_init(ObjectClass *oc, void *data)
-> +{
-> +    object_class_property_add_str(oc, "ciphers",
-> +                                  edk2_crypto_prop_get_ciphers,
-> +                                  edk2_crypto_prop_set_ciphers,
-> +                                  NULL);
-> +    object_class_property_add_str(oc, "cacerts",
-> +                                  edk2_crypto_prop_get_cacerts,
-> +                                  edk2_crypto_prop_set_cacerts,
-> +                                  NULL);
-> +}
-> +
-> +static const TypeInfo edk2_crypto_info =3D {
-> +    .parent =3D TYPE_OBJECT,
-> +    .name =3D TYPE_EDK2_CRYPTO,
-> +    .instance_size =3D sizeof(Edk2Crypto),
-> +    .instance_finalize =3D edk2_crypto_finalize,
-> +    .class_size =3D sizeof(Edk2CryptoClass),
-> +    .class_init =3D edk2_crypto_class_init,
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_USER_CREATABLE },
-> +        { }
-> +    }
-> +};
-> +
-> +static void edk2_crypto_register_types(void)
-> +{
-> +    type_register_static(&edk2_crypto_info);
-> +}
-> +
-> +type_init(edk2_crypto_register_types);
-> +
-> +static Edk2Crypto *edk2_crypto_by_id(const char *edk_crypto_id, Error **=
-errp)
-> +{
-> +    Object *obj;
-> +    Object *container;
-> +
-> +    container =3D object_get_objects_root();
-> +    obj =3D object_resolve_path_component(container,
-> +                                        edk_crypto_id);
-> +    if (!obj) {
-> +        error_setg(errp, "Cannot find EDK2 crypto object ID %s",
-> +                   edk_crypto_id);
+> +    if (!g_file_get_contents(host_path, &data, &contents_len, &gerr)) {
+> +        error_report("%s", gerr->message);
+> +        g_error_free(gerr);
 > +        return NULL;
 > +    }
+> +    fw_cfg_add_file(s, filename, data, contents_len);
 > +
-> +    if (!object_dynamic_cast(obj, TYPE_EDK2_CRYPTO)) {
-> +        error_setg(errp, "Object '%s' is not a EDK2 crypto subclass",
-> +                   edk_crypto_id);
-> +        return NULL;
+> +    if (len) {
+> +        *len =3D contents_len;
 > +    }
 > +
-> +    return EDK2_CRYPTO(obj);
+> +    return data;
 > +}
 > +
-> +void edk2_add_host_crypto_policy(FWCfgState *fw_cfg)
-> +{
-> +    Edk2Crypto *s;
-> +
-> +    s =3D edk2_crypto_by_id("https", NULL);
-> +    if (!s) {
-> +        return;
-> +    }
-> +
-> +    if (s->ciphers_path) {
-> +        /*
-> +         * Note:
-> +         * Unlike with fw_cfg_add_file() where the allocated data has
-> +         * to be valid for the lifetime of the FwCfg object, there is
-> +         * no such contract interface with fw_cfg_add_file_from_host().
-
-In my review of PATCH 1, I argue there should be.
-
-> +         * It would be easier that the FwCfg object keeps reference of
-> +         * its allocated memory and releases it when destroy, but it
-> +         * currently doesn't. Meanwhile we simply add this TODO comment.
-> +         */
-> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/ciphers",
-> +                                  s->ciphers_path, NULL);
-> +    }
-> +
-> +    if (s->cacerts_path) {
-> +        /*
-> +         * TODO: g_free the returned pointer
-> +         * (see previous comment for ciphers_path in this function).
-> +         */
-
-Is it even possible to reolve this TODO?  Is there any point in time
-where we can free the returned pointer without leaving a dangling
-pointer in @fw_cfg?
-
-> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/cacerts",
-> +                                  s->cacerts_path, NULL);
-> +    }
-> +}
-> diff --git a/include/hw/firmware/uefi_edk2.h b/include/hw/firmware/uefi_e=
-dk2.h
-> new file mode 100644
-> index 0000000000..e0b2fb160a
-> --- /dev/null
-> +++ b/include/hw/firmware/uefi_edk2.h
-> @@ -0,0 +1,28 @@
-> +/*
-> + * UEFI EDK2 Support
-> + *
-> + * Copyright (c) 2019 Red Hat Inc.
-> + *
-> + * Author:
-> + *  Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef HW_FIRMWARE_UEFI_EDK2_H
-> +#define HW_FIRMWARE_UEFI_EDK2_H
-> +
-> +#include "hw/nvram/fw_cfg.h"
-> +
+>  void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>                          void *data, size_t len)
+>  {
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index f5a6895a74..7c4dbe2a2a 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -166,6 +166,29 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uin=
+t64_t value);
+>  void fw_cfg_add_file(FWCfgState *s, const char *filename, void *data,
+>                       size_t len);
+>=20=20
 > +/**
-> + * edk2_add_host_crypto_policy:
+> + * fw_cfg_add_file_from_host:
 > + * @s: fw_cfg device being modified
+> + * @filename: name of new fw_cfg file item
+> + * @host_path: path of the host file to read the data from
+> + * @len: pointer to hold the length of the host file (optional)
 > + *
-> + * Add a new named file containing the host crypto policy.
+> + * Read the content of a host file as a raw "blob" then add a new NAMED
+> + * fw_cfg item of the file size. If @len is provided, it will contain the
+> + * total length read from the host file. The data read from the host
+> + * filesystem is owned by the new fw_cfg entry, and is stored into the d=
+ata
+> + * structure of the fw_cfg device.
+> + * The next available (unused) selector key starting at FW_CFG_FILE_FIRST
+> + * will be used; also, a new entry will be added to the file directory
+> + * structure residing at key value FW_CFG_FILE_DIR, containing the item =
+name,
+> + * data size, and assigned selector key value.
 > + *
-> + * Currently only the 'https' policy is supported.
+> + * Returns: pointer to the newly allocated file content, or NULL if an e=
+rror
+> + * occured. The returned pointer must be freed with g_free().
+
+In theory.  In practice, your callers (in PATCH 2) ignore the value.
+
+The file contents needs to live as long as FWCfgState (something the
+function comments in this file neglect to spell out; doc fix patch would
+be nice, not necessarily in this series).  An FWCfgState generally
+belongs to a machine (see PATCH 3+4).
+
+It looks like we destroy neither the machine (in a quick test,
+machine_finalize() never gets called), nor its fw_cfg device (if I add
+an instance_finalize() method to TYPE_FW_CFG_IO, it doesn't get called),
+so both machine and its FWCfgState live forever.  There's no point in
+time where the caller can obey the function comment's demand to free
+without leaving dangling pointers in FWCfgState.
+
+Pushing the responsibility to free the file contents on the caller is
+not a nice interface anyway.  I feel fw_cfg should take over ownership.
+In the current state of things, that's trivial: document it does, done.
+
+If we ever get around to cleaning up machines and onboard devices
+properly, then fw_cfg.c will have to grow a suitable instance_finalize()
+method, even without your patch.  We lack such resource cleanup all over
+the place, but feel free to a TODO comment here anyway.
+
+Are there more functions in fw_cfg.h with the same interface issue?
+Besides FWCfgState constructors, the only one returning a pointer is
+fw_cfg_modify_file().  Function comment:
+
+ * Replace a NAMED fw_cfg item. If an existing item is found, its callback
+ * information will be cleared, and a pointer to its data will be returned
+ * to the caller, so that it may be freed if necessary. If an existing item
+ * is not found, this call defaults to fw_cfg_add_file(), and NULL is
+ * returned to the caller.
+
+Okay, not the same issue, but there's still an issue: this function's
+caller needs to know how the old file contents was added!  Remember,
+fw_cfg_add_file() lets you add both malloc'ed and other memory.  Needs
+an interface fix or at least a comment pointing out the issue.  Separate
+patch, not necessarily in this series.
+
 > + */
-> +void edk2_add_host_crypto_policy(FWCfgState *s);
-
-Out of curiosity, what happens if you call this more than once?
-
+> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
+> +                                const char *host_path, size_t *len);
 > +
-> +#endif /* HW_FIRMWARE_UEFI_EDK2_H */
+>  /**
+>   * fw_cfg_add_file_callback:
+>   * @s: fw_cfg device being modified
