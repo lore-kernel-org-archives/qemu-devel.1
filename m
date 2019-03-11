@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39159)
+Received: from eggs.gnu.org ([209.51.188.92]:42583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3IMh-0008Eu-UC
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:04 -0400
+	(envelope-from <groug@kaod.org>) id 1h3Idg-00063m-82
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3IMg-0000nT-O0
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:34345)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3IMg-0000mE-Ar
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:02 -0400
-References: <20190311101428.GA11@765644dd90e5>
-	<20190311102659.GB16@765644dd90e5>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e088c9f2-6042-c770-fec1-d9d686d905c3@vivier.eu>
-Date: Mon, 11 Mar 2019 11:40:42 +0100
+	(envelope-from <groug@kaod.org>) id 1h3IY0-0000fK-Gc
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:52:45 -0400
+Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:57271)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1h3IY0-0000au-9v
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:52:44 -0400
+Received: from player714.ha.ovh.net (unknown [10.109.143.72])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A94C21D7715
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:52:36 +0100 (CET)
+Date: Mon, 11 Mar 2019 11:52:28 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190311115228.30efc27b@bahia.lan>
+In-Reply-To: <20190310082703.1245-5-david@gibson.dropbear.id.au>
+References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
+	<20190310082703.1245-5-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20190311102659.GB16@765644dd90e5>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/10] qemu-binfmt-conf.sh: add
- QEMU_CREDENTIAL and QEMU_PERSISTENT
+Subject: Re: [Qemu-devel] [PULL 04/60] Revert "spapr: support memory unplug
+ for qtest"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, eblake@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 11/03/2019 11:26, Unai Martinez-Corral wrote:
-> Allow to set options '--persistent' and/or '--credential' through
-> environment variables. If not defined, defaults are used ('no').
-> Anyway, command-line arguments have priority over environment variables.
+On Sun, 10 Mar 2019 19:26:07 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> From: Greg Kurz <groug@kaod.org>
 > 
-> Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+> Commit b8165118f52c broke CPU hotplug tests for old machine types:
+> 
+> $ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-test -m=slow
+> /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=6: OK
+> /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=6: **
+> ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_to_source: assertion failed: (source->enabled)
+> Broken pipe
+> /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
+> Aborted (core dumped)
+> 
+> The approach of faking the availability of OV5_HP_EVT causes the
+> code to assume the hotplug event source is enabled, which is wrong
+> for older machines.
+> 
+> This reverts commit b8165118f52ce5ee88565d3cec83d30374efdc96.
+> 
+> A subsequent patch will address the problem of CAS under qtest from
+> a different angle.
+> 
+
+Since the patches got re-ordered, this sentence is wrong. In case
+you re-send this pull request, maybe you can update the changelog
+accordingly ?
+
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Message-Id: <155146875097.147873.1732264036668112686.stgit@bahia.lan>
+> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  scripts/qemu-binfmt-conf.sh | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
+>  hw/ppc/spapr_ovec.c | 6 ------
+>  1 file changed, 6 deletions(-)
 > 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index ca15ff8092..e7a714e22c 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -186,9 +186,11 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
->                        (default: $SYSTEMDDIR or $DEBIANDIR)
->         --credential:  if present, credential and security tokens are
->                        calculated according to the binary to interpret
-> +                      ($QEMU_CREDENTIAL=yes)
->         --persistent:  if present, the interpreter is loaded when binfmt is
->                        configured and remains in memory. All future uses
->                        are cloned from the open file.
-> +                      ($QEMU_PERSISTENT=yes)
-> 
->      To import templates with update-binfmts, use :
-> 
-> @@ -255,10 +257,10 @@ qemu_check_systemd() {
-> 
->  qemu_generate_register() {
->      flags=""
-> -    if [ "x$CREDENTIAL" = "xyes" ] ; then
-> +    if [ "x$QEMU_CREDENTIAL" = "xyes" ] ; then
->          flags="OC"
->      fi
-> -    if [ "x$PERSISTENT" = "xyes" ] ; then
-> +    if [ "x$QEMU_PERSISTENT" = "xyes" ] ; then
->          flags="${flags}F"
->      fi
-> 
-> @@ -281,7 +283,7 @@ package qemu-$cpu
->  interpreter $qemu
->  magic $magic
->  mask $mask
-> -credential $CREDENTIAL
-> +credential $QEMU_CREDENTIAL
->  EOF
+> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> index 12510b236a..318bf33de4 100644
+> --- a/hw/ppc/spapr_ovec.c
+> +++ b/hw/ppc/spapr_ovec.c
+> @@ -16,7 +16,6 @@
+>  #include "qemu/bitmap.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+> -#include "sysemu/qtest.h"
+>  #include "trace.h"
+>  #include <libfdt.h>
+>  
+> @@ -132,11 +131,6 @@ bool spapr_ovec_test(sPAPROptionVector *ov, long bitnr)
+>      g_assert(ov);
+>      g_assert(bitnr < OV_MAXBITS);
+>  
+> -    /* support memory unplug for qtest */
+> -    if (qtest_enabled() && bitnr == OV5_HP_EVT) {
+> -        return true;
+> -    }
+> -
+>      return test_bit(bitnr, ov->bitmap) ? true : false;
 >  }
-> 
-> @@ -320,8 +322,10 @@ SYSTEMDDIR="/etc/binfmt.d"
->  DEBIANDIR="/usr/share/binfmts"
-> 
->  QEMU_PATH=/usr/local/bin
-> -CREDENTIAL=no
-> -PERSISTENT=no
-> +
-> +QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
-> +QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-> +
->  QEMU_SUFFIX=""
-> 
->  options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
-> @@ -373,10 +377,10 @@ while true ; do
->          exit 1
->          ;;
->      -c|--credential)
-> -        CREDENTIAL="yes"
-> +        QEMU_CREDENTIAL="yes"
->          ;;
->      -p|--persistent)
-> -        PERSISTENT="yes"
-> +        QEMU_PERSISTENT="yes"
->          ;;
->      *)
->          break
-> --
-> 2.21.0
-> 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>  
