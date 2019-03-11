@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46738)
+Received: from eggs.gnu.org ([209.51.188.92]:49155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RT9-0006P4-68
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:24:20 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1h3Ris-0008Cn-2V
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RT8-0003n6-Bs
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:24:19 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:34367 helo=smtp.ehu.eus)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h3RT8-0003ld-0K
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:24:18 -0400
-Date: Mon, 11 Mar 2019 20:24:18 +0000
-From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-Message-ID: <20190311202418.GI9@59ca1d9b7985>
-References: <20190311201532.GA6@59ca1d9b7985>
+	(envelope-from <pkrempa@redhat.com>) id 1h3RhS-0008E6-2y
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:39:07 -0400
+Date: Mon, 11 Mar 2019 21:38:54 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190311203854.GC21327@angien.pipo.sk>
+References: <20190311165017.32247-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
 Content-Disposition: inline
-In-Reply-To: <20190311201532.GA6@59ca1d9b7985>
-Subject: [Qemu-devel] [PATCH v5 9/9] qemu-binfmt-conf.sh: add --test
+In-Reply-To: <20190311165017.32247-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] file-posix: Make auto-read-only
+ dynamic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
 
-Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
----
- scripts/qemu-binfmt-conf.sh | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 382bdaabfe..b750f60ef5 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -197,8 +197,7 @@ Options and associated environment variables:
+--L6iaP+gRLNZHKoI4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Argument             Env-variable     Description
- TARGETS              QEMU_TARGETS     A single arch name or a list of them (see all names below);
--                                      if empty, configure/clear all known targets;
--                                      if 'NONE', no interpreter is configured.
-+                                      if empty, configure/clear all known targets.
- -h|--help                             display this usage
- -Q|--path PATH       QEMU_PATH        set path to qemu interpreter(s)
- -F|--suffix SUFFIX   QEMU_SUFFIX      add a suffix to the default interpreter name
-@@ -208,6 +207,8 @@ TARGETS              QEMU_TARGETS     A single arch name or a list of them (see
-                                       to the binary to interpret
- -r|--clear           QEMU_CLEAR       (yes) remove registered interpreters for target TARGETS;
-                                       then exit.
-+-t|--test            QEMU_TEST        (yes) test the setup with the provided arguments, but do not
-+                                      configure any of the interpreters.
- -e|--exportdir PATH  DEBIANDIR        define where to write configuration files
-                      SYSTEMDDIR
- -s|--systemd                          don't write into /proc, generate file(s) for
-@@ -221,6 +222,7 @@ QEMU_SUFFIX=$QEMU_SUFFIX
- QEMU_PERSISTENT=$QEMU_PERSISTENT
- QEMU_CREDENTIAL=$QEMU_CREDENTIAL
- QEMU_CLEAR=$QEMU_CLEAR
-+QEMU_TEST=$QEMU_TEST
+On Mon, Mar 11, 2019 at 17:50:07 +0100, Kevin Wolf wrote:
+> We introduced the auto-read-only option to fix the problem that block
+> jobs that reopen a backing file read-write don't work any more when all
+> nodes are created individually with -blockdev. The reason is that
+> bs->file of these backing files doesn't inherit the read-only option
+> from the format layer node any more if it's created separately.
+>=20
+> The way auto-read-only was designed to fix this is that it just always
+> opens the file node read-write if it can, so reopening the format layer
+> node is enough to make the backing file writable when necessary.
+>=20
+> This works in principle, but not when libvirt uses sVirt: Then QEMU
+> doesn't even have the permissions to open the image file read-write
+> until libvirt performs an operation where write access is needed.
+>=20
+> This series changes auto-read-only so that it works dynamically and
+> automatically reopens the file read-only or read-write depending on the
+> permissions that users attached to the node requested.
+>=20
+> See also: https://bugzilla.redhat.com/show_bug.cgi?id=3D1685989
+>=20
+> v2:
+> - Added test for and fixed snapshot=3Don,read-only=3Don regression [Berto]
+> - Added test for and fixed commit regression [Peter]
 
- To import templates with update-binfmts, use :
+I've quickly tested it with non-active commit and it works in this
+scenario as expected.
 
-@@ -319,9 +321,6 @@ qemu_set_binfmts() {
+I'll give it a bit more thorough test in the morning.
 
-     # reduce the list of target interpreters to those given in the CLI
-     [ $# -eq 0 ] && targets="${QEMU_TARGETS:-}" || targets="$@"
--    if [ "x$targets" = "xNONE" ] ; then
--      return
--    fi
-     qemu_check_target_list $targets
+--L6iaP+gRLNZHKoI4
+Content-Type: application/pgp-signature; name="signature.asc"
 
-     # register the interpreter for each target except for the native one
-@@ -379,12 +378,16 @@ QEMU_SUFFIX="${QEMU_SUFFIX:-}"
- QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
- QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
- QEMU_CLEAR="${QEMU_CLEAR:-no}"
-+QEMU_TEST="${QEMU_TEST:-no}"
+-----BEGIN PGP SIGNATURE-----
 
--options=$(getopt -o rdsQ:S:e:hcp -l clear,debian,systemd,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
-+options=$(getopt -o trdsQ:S:e:hcp -l test,clear,debian,systemd,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
- eval set -- "$options"
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlyGx1sACgkQHGwCByjY
+1GpMew//Q6kHHF2C/78Raeh+lXzVRhT8Rkg5DWrPUBezdQ9Rz1rvsCXHYqd+HJt4
+5PMEF8gLFqQxOqO8zA4wXdiX9QlLHPuiQuuJa3hT/yCt6pv2AMY3Edfflb68kYkk
+ETUPJz6/nTO+Ya4ZaBj5+3YB36BWM3Ow6GqGZ5Q2JHgxIHAGuSzCl7ATd4/L+WUO
+FCbCqMHbmrB6cbMDEYS5gD5JrLR2he1oRwX4mpz5NjnvLTEV7jq1CYeGQweSB01B
+wTMWreFK8a/hIZsAjr5C1uEKcZK0su+5VU50cbXs6p/s7oQ8LCaTvnGKaHsq7JnG
+3mCCmX6WGN0qBmbi1WuqS2lx4T2U+8aScWk8ehsugopU1gZWqBkOgbcGt7BEehRd
+r2RhG/7SiTdv5zv1tAgFTBqXrn0UmLrgLmJdn0Lt0bI6kAqC4PMzFH9n109uK5b9
+A+8KgR4sBnNiXgbKA/MODSOZEUOqiV7kisSToRnz9W4pdJ0E0c2VtPrVRJ5TDyB8
+Om4ZmGRbckh4uXRKK46TGUl2zhn4hx5Q+R+ii4dJQ5mWOD7lgXBcLaONI3hO+X48
+cBuiekpJNvRFY/mdT8+xomI7QW7GOMjug+URNJNRzyJsboZbamkeLJW7F5prlppL
+IxPX3EIXXTAcLJZj1m/XkO1JLPlu9JIZDf/EO4Mn9BPk7ZgwdCY=
+=zBDm
+-----END PGP SIGNATURE-----
 
- while true ; do
-     case "$1" in
-+    -t|--test)
-+        QEMU_TEST="yes"
-+    ;;
-     -r|--clear)
-         QEMU_CLEAR="yes"
-         ;;
-@@ -438,4 +441,8 @@ if [ "x$QEMU_CLEAR" = "xyes" ] ; then
-     exit
- fi
-
-+if [ "x$QEMU_TEST" = "xyes" ] ; then
-+    BINFMT_SET=:
-+fi
-+
- qemu_set_binfmts "$@"
---
-2.21.0
+--L6iaP+gRLNZHKoI4--
