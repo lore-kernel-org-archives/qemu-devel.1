@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45636)
+Received: from eggs.gnu.org ([209.51.188.92]:45928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3PCX-0007Ey-3y
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:02 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h3PCf-0007ax-7B
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3P7W-0001AG-Lm
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:53:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3P7U-000182-Ni
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:53:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190311085024.13780-1-kraxel@redhat.com>
-	<20190311085024.13780-5-kraxel@redhat.com>
-Date: Mon, 11 Mar 2019 18:53:39 +0100
-In-Reply-To: <20190311085024.13780-5-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Mon, 11 Mar 2019 09:50:23 +0100")
-Message-ID: <87ef7d8fh8.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1h3P4D-0007B1-5V
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:50:26 -0400
+Resent-Message-Id: <E1h3P4D-0007B1-5V@eggs.gnu.org>
+Message-ID: <155232659361.9137.1469461722321921119@6acff2cf482b>
+In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 4/5] hw/display: Add basic ATI VGA emulation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Mar 2019 10:49:55 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: jjherne@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
-
-> From: BALATON Zoltan <balaton@eik.bme.hu>
->
-> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
-> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
-> guests running on these and the PMON2000 firmware of the fulong2e
-> expect this to be available. Fortunately these are very similar chips
-> so they can be mostly emulated in the same device model. This patch
-> adds basic emulation of these ATI VGA chips.
->
-> While this is incomplete and currently only enough to run the MIPS
-> firmware and get framebuffer output with Linux, it allows the fulong2e
-> board to work more like the real hardware and having it in QEMU in
-> this state provides a way to experiment with it and allows others to
-> contribute to improve it. It is compiled for all archs but only the
-> fulong2e (which currently has no display output at all) is set to use
-> it by default (in a separate patch).
->
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
-> Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
-> Message-id: 0b1b7c22873a6e37627261b04fb687412b25ff4f.1552152100.git.balaton@eik.bme.hu
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-[...]
-> diff --git a/hw/display/trace-events b/hw/display/trace-events
-> index 37d3264bb2e6..80993cc4d913 100644
-> --- a/hw/display/trace-events
-> +++ b/hw/display/trace-events
-> @@ -138,3 +138,7 @@ vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
->  sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
->  sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
->  sii9022_switch_mode(const char *mode) "mode: %s"
-> +
-> +# hw/display/ati*.c
-> +ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s -> 0x%"PRIx64
-> +ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s <- 0x%"PRIx64
-
-Blows up for me:
-
-Traceback (most recent call last):
-  File "/work/armbru/qemu/scripts/tracetool.py", line 152, in <module>
-    main(sys.argv)
-  File "/work/armbru/qemu/scripts/tracetool.py", line 147, in main
-    binary=binary, probe_prefix=probe_prefix)
-  File "/work/armbru/qemu/scripts/tracetool/__init__.py", line 472, in generate
-    tracetool.format.generate(events, format, backend, group)
-  File "/work/armbru/qemu/scripts/tracetool/format/__init__.py", line 85, in generate
-    func(events, backend, group)
-  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 121, in generate
-    fmt_str = "%d@%d " + e.name + " " + c_fmt_to_stap(e.fmt) + "\\n"
-  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 64, in c_fmt_to_stap
-    bits.append(c_macro_to_format(macro))
-  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 36, in c_macro_to_format
-    raise Exception("Unhandled macro '%s'" % macro)
-Exception: Unhandled macro 'HWADDR_PRIx'
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
+Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
+NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
+dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
+aW51eC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMTEw
+ODMyMzQuMjA4NDEtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbSAtPiBwYXRjaGV3LzIw
+MTkwMzExMDgzMjM0LjIwODQxLTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyOGQwYWQ1OTAyIHMzOTAtYmlvczogU3VwcG9ydCBi
+b290aW5nIGZyb20gcmVhbCBkYXNkIGRldmljZQo5ODYzYWE3ZjFhIHMzOTAtYmlvczogQWRkIGNo
+YW5uZWwgY29tbWFuZCBjb2Rlcy9zdHJ1Y3RzIG5lZWRlZCBmb3IgZGFzZC1pcGwKYTFlZDc3ZDQ1
+YyBzMzkwLWJpb3M6IFVzZSBjb250cm9sIHVuaXQgdHlwZSB0byBkZXRlcm1pbmUgYm9vdCBtZXRo
+b2QKODYwY2U5ZjA4NyBzMzkwLWJpb3M6IFJlZmFjdG9yIHZpcnRpbyB0byBydW4gY2hhbm5lbCBw
+cm9ncmFtcyB2aWEgY2lvCjBiOTA4NjI0OTcgczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcK
+NGE1ODE1ZmQyZCBzMzkwLWJpb3M6IFN1cHBvcnQgZm9yIHJ1bm5pbmcgZm9ybWF0LTAvMSBjaGFu
+bmVsIHByb2dyYW1zCjZmNTQxZmM2ZmYgczM5MC1iaW9zOiBwdHIydTMyIGFuZCB1MzJ0b3B0cgo1
+YTczYzM4MDljIHMzOTAtYmlvczogTWFwIGxvdyBjb3JlIG1lbW9yeQpiNmZkZDQyMGNhIHMzOTAt
+YmlvczogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8KZWYyNTYzODUzMyBz
+MzkwLWJpb3M6IENsZWFuIHVwIGNpby5oCjgzYWQxYTlhYWEgczM5MC1iaW9zOiBGYWN0b3IgZmlu
+ZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aApjYzVhNjFkNWNlIHMzOTAt
+YmlvczogRXh0ZW5kIGZpbmRfZGV2KCkgZm9yIG5vbi12aXJ0aW8gZGV2aWNlcwplNTAwZmM1MWJm
+IHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8KYWE5NTc0
+M2RmNyBzMzkwLWJpb3M6IGRlY291cGxlIGNpbyBzZXR1cCBmcm9tIHZpcnRpbwplNTc0MjFlNThj
+IHMzOTAgdmZpby1jY3c6IEFkZCBib290aW5kZXggcHJvcGVydHkgYW5kIElQTEIgZGF0YQoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KMS8xNSBDaGVja2luZyBjb21taXQgZTU3NDIxZTU4Y2EwIChzMzkw
+IHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEpCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzIyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDE5OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzE1IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjIvMTUgQ2hlY2tpbmcgY29tbWl0IGFhOTU3NDNkZjdkMyAoczM5MC1iaW9zOiBk
+ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8pCjMvMTUgQ2hlY2tpbmcgY29tbWl0IGU1MDBm
+YzUxYmZmOCAoczM5MC1iaW9zOiBkZWNvdXBsZSBjb21tb24gYm9vdCBsb2dpYyBmcm9tIHZpcnRp
+bykKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzMxOiBGSUxF
+OiBwYy1iaW9zL3MzOTAtY2N3L21haW4uYzoxOToKK0lwbFBhcmFtZXRlckJsb2NrIGlwbGIgX19h
+dHRyaWJ1dGVfXygoX19hbGlnbmVkX18oUEFHRV9TSVpFKSkpOwoKdG90YWw6IDEgZXJyb3JzLCAw
+IHdhcm5pbmdzLCA2NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzE1IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo0LzE1IENoZWNraW5nIGNvbW1pdCBjYzVhNjFkNWNlODMgKHMzOTAtYmlvczog
+RXh0ZW5kIGZpbmRfZGV2KCkgZm9yIG5vbi12aXJ0aW8gZGV2aWNlcykKNS8xNSBDaGVja2luZyBj
+b21taXQgODNhZDFhOWFhYTY2IChzMzkwLWJpb3M6IEZhY3RvciBmaW5kaW5nIGJvb3QgZGV2aWNl
+IG91dCBvZiB2aXJ0aW8gY29kZSBwYXRoKQo2LzE1IENoZWNraW5nIGNvbW1pdCBlZjI1NjM4NTMz
+YWEgKHMzOTAtYmlvczogQ2xlYW4gdXAgY2lvLmgpCjcvMTUgQ2hlY2tpbmcgY29tbWl0IGI2ZmRk
+NDIwY2FjMSAoczM5MC1iaW9zOiBEZWNvdXBsZSBjaGFubmVsIGkvbyBsb2dpYyBmcm9tIHZpcnRp
+bykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
+TkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgo4LzE1IENoZWNraW5nIGNvbW1pdCA1YTczYzM4MDljMGEgKHMz
+OTAtYmlvczogTWFwIGxvdyBjb3JlIG1lbW9yeSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzY6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDQgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggOC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzE1IENoZWNr
+aW5nIGNvbW1pdCA2ZjU0MWZjNmZmM2MgKHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgMzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8xNSBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoxMC8xNSBDaGVja2luZyBjb21taXQgNGE1ODE1ZmQyZGMzIChzMzkw
+LWJpb3M6IFN1cHBvcnQgZm9yIHJ1bm5pbmcgZm9ybWF0LTAvMSBjaGFubmVsIHByb2dyYW1zKQpF
+UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTM3OiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L2Np
+by5jOjE0NToKKyAqIGFjdGl2ZSAoZ2VuZXJhdGluZyBpL28gaW50ZXJydXB0cykuICQKCnRvdGFs
+OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE1IGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMS8xNSBDaGVja2luZyBjb21taXQgMGI5MDg2MjQ5
+N2JhIChzMzkwLWJpb3M6IGNpbyBlcnJvciBoYW5kbGluZykKMTIvMTUgQ2hlY2tpbmcgY29tbWl0
+IDg2MGNlOWYwODcxZCAoczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwg
+cHJvZ3JhbXMgdmlhIGNpbykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwMzog
+RklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzoyOTg6CisgICAgICAgICAgICBydW5fY2N3
+KHZkZXYsIENDV19DTURfUkVBRF9WUV9DT05GLCAmY29uZmlnLCBzaXplb2YoY29uZmlnKSwgZmFs
+c2UpID09IDAsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE2OiBGSUxFOiBw
+Yy1iaW9zL3MzOTAtY2N3L3ZpcnRpby5jOjMwODoKKyAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1df
+Q01EX1dSSVRFX1NUQVRVUywgJnN0YXR1cywgc2l6ZW9mKHN0YXR1cyksIGZhbHNlKSA9PSAwLAoK
+dG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIv
+MTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTMvMTUgQ2hlY2tpbmcgY29tbWl0IGExZWQ3
+N2Q0NWM2MyAoczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJv
+b3QgbWV0aG9kKQoxNC8xNSBDaGVja2luZyBjb21taXQgOTg2M2FhN2YxYTMyIChzMzkwLWJpb3M6
+IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsKQox
+NS8xNSBDaGVja2luZyBjb21taXQgMjhkMGFkNTkwMjA3IChzMzkwLWJpb3M6IFN1cHBvcnQgYm9v
+dGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
+dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3IGZp
+bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ4IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDE1LzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
+aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTIzMTc2OTMtMjE5Nzkt
+MS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
