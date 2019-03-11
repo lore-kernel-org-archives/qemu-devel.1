@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47546)
+Received: from eggs.gnu.org ([209.51.188.92]:47734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3NHK-0007Sh-If
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:55:51 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3NHy-000811-DT
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3NHJ-0008QR-1p
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:55:50 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 11 Mar 2019 15:55:33 +0000
-Message-ID: C87848E9-4108-4586-B433-BF026017D406
-References: <0184EA26B2509940AA629AE1405DD7F202153AC7@dggema523-mbx.china.huawei.com>,
-	<CAFEAcA9yr3trFz7ZFsS-P-g=gxe=MX6Eet_dTdcOCSdhW7_J4w@mail.gmail.com>
-In-Reply-To: <CAFEAcA9yr3trFz7ZFsS-P-g=gxe=MX6Eet_dTdcOCSdhW7_J4w@mail.gmail.com>
-Content-Language: zh-CN
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3NHx-0000Gv-C4
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:56:30 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:51109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1h3NHx-0000GR-4l
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:56:29 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id x7so5095888wmj.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:56:28 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id b4sm4552555wrr.64.2019.03.11.08.56.25
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 11 Mar 2019 08:56:25 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 16:56:24 +0100
+Message-Id: <1552319784-31755-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [RESEND PATCH] target/arm: change arch timer
- registers access permission
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] qemugdb: fix licensing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +33,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-dW5kZXJzdGFuZCBub3fvvIx0aGFua3MgZm9yIHRoZSBleHBsYWluYXRpb24sIEkgd2lsbCB1cGRh
-dGUgaXQuDQrlj5Hku7bkurrvvJpQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmc+DQrmlLbku7bkurrvvJpnZW5nZG9uZ2ppdSA8Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4NCuaK
-hOKAg+mAge+8mnFlbXUtYXJtIDxxZW11LWFybUBub25nbnUub3JnPjtRRU1VIERldmVsb3BlcnMg
-PHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCuaXtumXtO+8mjIwMTktMDMtMTEgMjM6Mzk6MzINCuS4
-u+KAg+mimO+8mlJlOiBbUkVTRU5EIFBBVENIXSB0YXJnZXQvYXJtOiBjaGFuZ2UgYXJjaCB0aW1l
-ciByZWdpc3RlcnMgYWNjZXNzIHBlcm1pc3Npb24NCg0KT24gTW9uLCAxMSBNYXIgMjAxOSBhdCAx
-NToyNCwgZ2VuZ2RvbmdqaXUgPGdlbmdkb25naml1QGh1YXdlaS5jb20+IHdyb3RlOg0KPiBTbyBJ
-ZiBRRU1VIGRlZmluZWQgdGhlIHRpbWVyIHJlZ2lzdGVycyByZWFkIG9ubHkgaW4gUEwwLCBldmVu
-IHRob3VnaCBpdCBoYXMgYmVlbiBjb25maWd1cmVkIHRvIGhhdmUgd3JpdGUgcGVybWlzc2lvbiBp
-biBQTDAgYnkgaGlnaCBQTHgsIHdlIHN0aWxsIGNhbm5vdCBoYXZlDQo+IFdyaXRlIHBlcm1pc3Np
-b24sIGJlY2F1c2UgUUVNVSB3aWxsIGZpcnN0bHkgY2hlY2sgdGhlIGRlZmluZWQgcGVybWlzc2lv
-biBhbmQgdGhlbiBjaGVjayB0aGUgY29uZmlndXJlZCBwZXJtaXNzaW9uIGJ5IGhpZ2ggUEx4Lg0K
-DQpJJ20gYWZyYWlkIEkgZG9uJ3QgdW5kZXJzdGFuZCB3aGF0IHlvdSdyZSB0cnlpbmcgdG8gc2F5
-IGhlcmUuDQoNClllcywgaXQgd2FzIGEgYnVnIHRoYXQgd2UgbWFya2VkIHRoZXNlIHJlZ2lzdGVy
-cyBhcyByZWFkLW9ubHkgZm9yIFBMMCwNCmFuZCB3ZSBzaG91bGQgZml4IGl0Lg0KDQpXaGF0IEkg
-YW0gdHJ5aW5nIHRvIHNheSBpcyB0aGF0DQogLmFjY2VzcyA9IFBMMV9SVyB8IFBMMF9SVw0KDQpp
-cyBleGFjdGx5IGVxdWl2YWxlbnQgdG8NCiAuYWNjZXNzID0gUEwwX1JXDQoNCmFuZCB3ZSBzaG91
-bGQgdXNlIHRoZSBzaW1wbGVyIHZlcnNpb24gb2YgdGhlIGV4cHJlc3Npb24uDQoNCihJZiB5b3Ug
-bG9vayBhdCB0aGUgZGVmaW5pdGlvbnMgb2YgYWxsIHRoZSBQTCpfIGNvbnN0YW50cywNCnlvdSBj
-YW4gc2VlIHRoYXQgUEwwX1cgaW1wbGllcyBQTDFfVzoNCiNkZWZpbmUgUEwwX1cgKDB4MDEgfCBQ
-TDFfVykNCmFuZCBzaW1pbGFybHkgZm9yIFBMMF9SLiBTbyBhbGwgdGhlIGJpdHMgaW4gdGhlIGJp
-dGZpZWxkIHRoYXQgd291bGQgYmUNCnNldCBieSBQTDFfUlcgYXJlIGFsc28gc2V0IGJ5IFBMMF9S
-Vy4pDQoNCnRoYW5rcw0KLS0gUE1NDQo=
+qemu-gdb.py was committed after 2012-01-13, so the notice about
+GPL v2-only contributions does not apply.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/qemu-gdb.py          | 7 ++-----
+ scripts/qemugdb/coroutine.py | 7 ++-----
+ scripts/qemugdb/mtree.py     | 7 ++-----
+ scripts/qemugdb/tcg.py       | 7 ++-----
+ 4 files changed, 8 insertions(+), 20 deletions(-)
+
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index 690827e..f2a305c 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -7,11 +7,8 @@
+ # Authors:
+ #  Avi Kivity <avi@redhat.com>
+ #
+-# This work is licensed under the terms of the GNU GPL, version 2.  See
+-# the COPYING file in the top-level directory.
+-#
+-# Contributions after 2012-01-13 are licensed under the terms of the
+-# GNU GPL, version 2 or (at your option) any later version.
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
+ 
+ # Usage:
+ # At the (gdb) prompt, type "source scripts/qemu-gdb.py".
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index 81f811a..41e079d 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -7,11 +7,8 @@
+ # Authors:
+ #  Avi Kivity <avi@redhat.com>
+ #
+-# This work is licensed under the terms of the GNU GPL, version 2.  See
+-# the COPYING file in the top-level directory.
+-#
+-# Contributions after 2012-01-13 are licensed under the terms of the
+-# GNU GPL, version 2 or (at your option) any later version.
++# This work is licensed under the terms of the GNU GPL, version 2
++# or later.  See the COPYING file in the top-level directory.
+ 
+ import gdb
+ 
+diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
+index e6791b7..3030a60 100644
+--- a/scripts/qemugdb/mtree.py
++++ b/scripts/qemugdb/mtree.py
+@@ -7,11 +7,8 @@
+ # Authors:
+ #  Avi Kivity <avi@redhat.com>
+ #
+-# This work is licensed under the terms of the GNU GPL, version 2.  See
+-# the COPYING file in the top-level directory.
+-#
+-# Contributions after 2012-01-13 are licensed under the terms of the
+-# GNU GPL, version 2 or (at your option) any later version.
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
+ 
+ # 'qemu mtree' -- display the memory hierarchy
+ 
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
+index 8c7f1d7..18880fc 100644
+--- a/scripts/qemugdb/tcg.py
++++ b/scripts/qemugdb/tcg.py
+@@ -8,11 +8,8 @@
+ # Authors:
+ #  Alex Bennée <alex.bennee@linaro.org>
+ #
+-# This work is licensed under the terms of the GNU GPL, version 2.  See
+-# the COPYING file in the top-level directory.
+-#
+-# Contributions after 2012-01-13 are licensed under the terms of the
+-# GNU GPL, version 2 or (at your option) any later version.
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
+ 
+ # 'qemu tcg-lock-status' -- display the TCG lock status across threads
+ 
+-- 
+1.8.3.1
