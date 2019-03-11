@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51308)
+Received: from eggs.gnu.org ([209.51.188.92]:55356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1h3LSi-00008X-Lx
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:59:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1h3Lni-0000Sx-Sn
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1h3LSh-0000WU-RN
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:59:28 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:45239)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1h3LSh-0000W0-Kl
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:59:27 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20190311135926euoutp020c61c692d9e4f6d53c79afd4d910e3df~K7DyYG0eb2092420924euoutp02f
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 13:59:26 +0000 (GMT)
-From: Ilya Maximets <i.maximets@samsung.com>
-Date: Mon, 11 Mar 2019 16:58:50 +0300
-Message-Id: <20190311135850.6537-5-i.maximets@samsung.com>
-In-Reply-To: <20190311135850.6537-1-i.maximets@samsung.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1h3Ll6-0005r5-Nu
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:18:30 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1h3Ll6-0005qY-FB
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:18:28 -0400
+Received: by mail-wr1-x442.google.com with SMTP id t6so5284495wrw.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:18:28 -0700 (PDT)
+References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
+	<BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Mon, 11 Mar 2019 14:18:25 +0000
+Message-ID: <87ftrt5wb2.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-References: <20190311135850.6537-1-i.maximets@samsung.com>
-	<CGME20190311135925eucas1p21442eda0f28a7e6ae1f9a238ca0a4f0d@eucas1p2.samsung.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 4/4] memfd: improve error messages
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-This gives more information about the failure.
-Additionally 'ENOSYS' returned for a non-Linux platforms instead of
-'errno', which is not initilaized in this case.
 
-Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- util/memfd.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Aleksandar Markovic <amarkovic@wavecomp.com> writes:
 
-diff --git a/util/memfd.c b/util/memfd.c
-index 393d23da96..00334e5b21 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -71,14 +71,18 @@ int qemu_memfd_create(const char *name, size_t size, =
-bool hugetlb,
-     }
-     mfd =3D memfd_create(name, flags);
-     if (mfd < 0) {
-+        error_setg_errno(errp, errno,
-+                         "failed to create memfd with flags 0x%x", flags=
-);
-         goto err;
-     }
-=20
-     if (ftruncate(mfd, size) =3D=3D -1) {
-+        error_setg_errno(errp, errno, "failed to resize memfd to %zu", s=
-ize);
-         goto err;
-     }
-=20
-     if (seals && fcntl(mfd, F_ADD_SEALS, seals) =3D=3D -1) {
-+        error_setg_errno(errp, errno, "failed to add seals 0x%x", seals)=
-;
-         goto err;
-     }
-=20
-@@ -88,8 +92,9 @@ err:
-     if (mfd >=3D 0) {
-         close(mfd);
-     }
-+#else
-+    error_setg_errno(errp, ENOSYS, "failed to create memfd");
- #endif
--    error_setg_errno(errp, errno, "failed to create memfd");
-     return -1;
- }
-=20
---=20
-2.17.1
+>> From: Peter Maydell <peter.maydell@linaro.org>
+>> Subject: Re: [PATCH] target/mips: Fix minor bug in FPU
+>>
+>> On Mon, 11 Mar 2019 at 11:52, Aleksandar Markovic
+>> <amarkovic@wavecomp.com> wrote:
+>> >
+>> > > From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> > > Subject: [PATCH] target/mips: Fix minor bug in FPU
+>> > >
+>> > > Wrong type of NaN was generated by maddf and msubf insturctions
+>> > > when the arguments were inf, zero, nan or zero, inf, nan
+>> > > respectively.
+>> >
+>> > I did the applicable tests on both pre-NaN2008 and NaN2008 MIPS hardwa=
+re,
+>> > and compared results with QEMu emulations. The underlying reason for t=
+his
+>> > patch is correct, but, as Alex also pointed out, it needs some improve=
+ments.
+>> > However, the softfreeze being so close, I am going to amend the patch =
+while
+>> > creating the pull request. No respin needed. All in all:
+>>
+>> Since this is a bug fix, there is no requirement that it goes in
+>> before softfreeze, FWIW -- pretty much any bug fix is OK for
+>> rc1, and a focused bugfix like this one that doesn't affect
+>> other guest architectures would be ok in rc2 as well.
+>>
+>
+> Thanks, Peter, for the clarification!
+>
+> In this case, I think, the most natural would be to wait for the
+> submitter to submit the v2.
+>
+> The reference to the documentation that Alex rightfully asked for
+> is this:
+>
+> "MIPS Architecture for Programmers Volume IV-j: The MIPS32
+> SIMD Architecture Module", Revision 1.12, February 3, 2016
+>
+> The key sentence is on page 53:
+>
+>    "If the destination format is floating-point, all NaN propagating
+>    operations with one NaN operand produce a NaN with the
+>    payload of the input NaN."
+
+Hmm doesn't that fail for:
+
+  Inf * Zero + !NaN?
+
+Should the check be:
+
+    if (infzero) {
+        float_raise(float_flag_invalid, status);
+        if (is_nan(c_cls)) {
+            return 2;
+        }
+        return 3;
+    }
+
+?
+
+If either a or b is a NaN we fall through to the NaN selection rules
+bellow preferring SNaN over QNaN.
+
+>
+> There are other details in surrounding paragraphs. The document
+> is for SIMD (MSA) ASE, but both the SIMD and FPU NaN2008
+> floating point instruction should follow the same rules. I could't
+> find a separate document on FPU instructions.
+>
+> The problem with the current implementation of 0*inf+nan is that
+> it returns the default NaN (all zeroes in the payload segment),
+> whereas the documentation says the payload should be from
+> the input NaN. The behavior specified in the documentation is
+> confirmed also with tests on hardware.
+>
+> Sincerely,
+> Aleksandar
+
+
+--
+Alex Benn=C3=A9e
