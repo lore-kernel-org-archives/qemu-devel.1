@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52505)
+Received: from eggs.gnu.org ([209.51.188.92]:52707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3JTW-0008R5-L4
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:11 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1h3JTf-0000Fn-4H
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3JOz-00024N-Pq
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:47:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3JOx-0001wV-Pv
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:47:29 -0400
-References: <20190311005618.19007-1-philmd@redhat.com>
-	<20190311005618.19007-3-philmd@redhat.com>
-	<50e483c6-9580-dcdb-65aa-a8d66040c5a7@redhat.com>
-	<24ecc3f9-4c22-d162-50a1-ad913fe56807@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aaac47e0-62a3-7c57-bf42-0874e4daee9e@redhat.com>
-Date: Mon, 11 Mar 2019 12:47:19 +0100
-MIME-Version: 1.0
-In-Reply-To: <24ecc3f9-4c22-d162-50a1-ad913fe56807@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1h3JTd-0006R5-Rp
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:19 -0400
+Received: from mail-eopbgr770118.outbound.protection.outlook.com
+	([40.107.77.118]:19086
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h3JTd-0006Pv-FU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:17 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 11 Mar 2019 11:52:06 +0000
+Message-ID: <BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
 Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/mips: Express dependencies of
- the Jazz machine with Kconfig
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 
-On 11/03/2019 12.37, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 3/11/19 12:17 PM, Thomas Huth wrote:
->> On 11/03/2019 01.56, Philippe Mathieu-Daud=C3=A9 wrote:
->>> The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
->>> framebuffer display is managed by a G364, the network card is a Sonic
->>> DP83932. A QLogic ESP216 provides a SCSI bus.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>> v3: Keep CONFIG_JAZZ in default-configs/mips64el-softmmu.mak (Thomas)
->>> ---
->>>  default-configs/mips-softmmu-common.mak |  1 -
->>>  default-configs/mips64-softmmu.mak      |  5 -----
->>>  default-configs/mips64el-softmmu.mak    |  5 -----
->>>  hw/mips/Kconfig                         | 17 +++++++++++++++++
->>>  4 files changed, 17 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/default-configs/mips-softmmu-common.mak b/default-config=
-s/mips-softmmu-common.mak
->>> index 8c5fdf5ee1..caebafd416 100644
->>> --- a/default-configs/mips-softmmu-common.mak
->>> +++ b/default-configs/mips-softmmu-common.mak
->>> @@ -3,7 +3,6 @@
->>>  CONFIG_ISA_BUS=3Dy
->>>  CONFIG_PCI=3Dy
->>>  CONFIG_PCI_DEVICES=3Dy
->>> -CONFIG_ESP=3Dy
->>>  CONFIG_VGA_ISA=3Dy
->>>  CONFIG_VGA_ISA_MM=3Dy
->>>  CONFIG_VGA_CIRRUS=3Dy
->>> diff --git a/default-configs/mips64-softmmu.mak b/default-configs/mip=
-s64-softmmu.mak
->>> index bad7496672..a169738635 100644
->>> --- a/default-configs/mips64-softmmu.mak
->>> +++ b/default-configs/mips64-softmmu.mak
->>> @@ -1,9 +1,4 @@
->>>  # Default configuration for mips64-softmmu
->>> =20
->>>  include mips-softmmu-common.mak
->>> -CONFIG_RC4030=3Dy
->>> -CONFIG_DP8393X=3Dy
->>> -CONFIG_DS1225Y=3Dy
->>>  CONFIG_JAZZ=3Dy
->>> -CONFIG_G364FB=3Dy
->>> -CONFIG_JAZZ_LED=3Dy
->>> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/m=
-ips64el-softmmu.mak
->>> index 8b255efc54..a7b88318b2 100644
->>> --- a/default-configs/mips64el-softmmu.mak
->>> +++ b/default-configs/mips64el-softmmu.mak
->>> @@ -2,13 +2,8 @@
->>> =20
->>>  include mips-softmmu-common.mak
->>>  CONFIG_IDE_VIA=3Dy
->>> -CONFIG_RC4030=3Dy
->>> -CONFIG_DP8393X=3Dy
->>> -CONFIG_DS1225Y=3Dy
->>>  CONFIG_FULONG=3Dy
->>>  CONFIG_JAZZ=3Dy
->>> -CONFIG_G364FB=3Dy
->>> -CONFIG_JAZZ_LED=3Dy
->>>  CONFIG_VT82C686=3Dy
->>>  CONFIG_AHCI=3Dy
->>>  CONFIG_MIPS_BOSTON=3Dy
->>> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
->>> index 3433e97e1a..ab006477c7 100644
->>> --- a/hw/mips/Kconfig
->>> +++ b/hw/mips/Kconfig
->>> @@ -12,6 +12,23 @@ config MIPSSIM
->>> =20
->>>  config JAZZ
->>>      bool
->>> +    select ISA_BUS
->>> +    select RC4030
->>> +    select I8259
->>> +    select I8254
->>> +    select I8257
->>> +    select PCSPK
->>> +    select VGA_ISA_MM
->>> +    select G364FB
->>> +    select DP8393X
->>
->> Looking at the code, it seems like you can also run the machine with
->> "-net none", so I'd rather use "imply DP8393X" here instead.
->=20
-> Well here I'm not sure.
-> For the both machine variants (PICA-61 and Magnum 4000), the chipset is
-> soldered on the board, and is MMIO mapped (via a ChipSelect, no via a
-> bus you can plug/unplug).
-Ok, then please ignore my comment and keep the "select" here!
+> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> Subject: [PATCH] target/mips: Fix minor bug in FPU
+>
+> Wrong type of NaN was generated by maddf and msubf insturctions
+> when the arguments were inf, zero, nan or zero, inf, nan
+> respectively.
 
- Thomas
+I did the applicable tests on both pre-NaN2008 and NaN2008 MIPS hardware,
+and compared results with QEMu emulations. The underlying reason for this
+patch is correct, but, as Alex also pointed out, it needs some improvements=
+.
+However, the softfreeze being so close, I am going to amend the patch while
+creating the pull request. No respin needed. All in all:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
