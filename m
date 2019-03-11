@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60193)
+Received: from eggs.gnu.org ([209.51.188.92]:60282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3GNW-00028G-6z
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:51 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h3GNh-0002EF-FW
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3GNV-0008G2-I2
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h3GNV-0008Et-8p
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:45 -0400
-Date: Mon, 11 Mar 2019 09:33:40 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190311083340.toucg3xfdoqaybgn@sirius.home.kraxel.org>
-References: <20190307151141.6483-1-kraxel@redhat.com>
-	<CAFEAcA-t7kkq8pMK-Nh2mopZiEsTuO+kGzGNTz3Aj2kjngPmtg@mail.gmail.com>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1h3GBC-0006UE-HK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:21:03 -0400
+Received: from mail-eopbgr80132.outbound.protection.outlook.com
+	([40.107.8.132]:22762
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1h3GBB-0006PE-La
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:21:02 -0400
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Mon, 11 Mar 2019 08:20:57 +0000
+Message-ID: <7abd40bc-963b-cf61-14e8-4c4187813c5c@virtuozzo.com>
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+In-Reply-To: <8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <69249BE5E516C34D9DEB63AB3C942356@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-t7kkq8pMK-Nh2mopZiEsTuO+kGzGNTz3Aj2kjngPmtg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/7] Ui 20190307 patches
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> > curses: better wide char support.
-> > vnc: acl update, stall fix.
-
-> Hi; this fails to build on FreeBSD; linking the qemu-system-*
-> binaries fails with:
-> 
-> /usr/bin/ld: undefined reference to symbol `libiconv_open' (try adding -liconv)
-> //usr/local/lib/libiconv.so.2: could not read symbols: Bad value
-> c++: error: linker command failed with exit code 1 (use -v to see invocation)
-
-> (This is with the FreeBSD test setup from tests/vm/freebsd).
-
-Hmm, not obvious why configure finds iconv but the build doesn't.
-Samuel, can you check please?
-
-Dropped the two iconv patches, sent a v2 pull.
-
-cheers,
-  Gerd
+cGluZyBwaW5nIHBpbmchDQoNCk9uIDA0LjAzLjIwMTkgMTg6MTAsIERlbmlzIFBsb3RuaWtvdiB3
+cm90ZToNCj4gcGluZyENCj4gDQo+IE9uIDI2LjAyLjIwMTkgMTY6MTUsIERlbmlzIFBsb3RuaWtv
+diB3cm90ZToNCj4+IHpzdGQgZGF0ZSBjb21wcmVzc2lvbiBhbGdvcml0aG0gc2hvd3MgYmV0dGVy
+IHBlcmZvcm1hbmNlIG9uIGRhdGEgY29tcHJlc3Npb24uDQo+PiBJdCBtaWdodCBiZSB1c2VmdWwg
+dG8gZW1wbG95IHRoZSBhbGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNh
+Z2UuDQo+PiBBIHVzZXIgd2lsbCBiZSBhYmxlIHRvIGNob29zZSBiZXR3ZWVuIHRob3NlIGFsZ29y
+aXRobXMsIHRoZXJlZm9yIGNvbXByZXNzLXR5cGUNCj4+IG1pZ3JhdGlvbiBwYXJhbWV0ZXIgaXMg
+YWRkZWQuDQo+Pg0KPj4gSGVyZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBh
+cmlzb24genN0ZCB2cyBnemlwOg0KPj4NCj4+IGhvc3Q6IGk3LTQ3OTAgOHhDUFUgQCAzLjYwR0h6
+LCAxNkcgUkFNDQo+PiBtaWdyYXRpb24gdG8gdGhlIHNhbWUgaG9zdA0KPj4gVk06IDJ4VkNQVSwg
+OEcgUkFNIHRvdGFsDQo+PiA1RyBSQU0gdXNlZCwgbWVtb3J5IHBvcHVsYXRlZCB3aXRoIHBvc3Rn
+cmVxc2wgZGF0YQ0KPj4gcHJvZHVjZWQgYnkgcGdiZW5jaCBwZXJmb3JtYW5jZSBiZW5jaG1hcmsN
+Cj4+DQo+Pg0KPj4gVGhyZWFkczogMSBjb21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+Pg0KPj4g
+enN0ZCBwcm92aWRlcyBzbGlnaHRseSBsZXNzIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0
+IHRoZSBzYW1lDQo+PiBDUFUgdXNhZ2UgYnV0IGNvcGVzIHdpdGggUkFNICBjb21wcmVzc2lvbiBy
+b2dobHkgMiB0aW1lcyBmYXN0ZXINCj4+DQo+PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAg
+ICB6bGliICAgICAgIHwgICAgICB6c3RkDQo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+IGNvbXByZXNzaW9uIGxldmVsICAgICAg
+ICAgIDEgICAgICAgNSAgICAgfCAgIDEgICAgICAgNQ0KPj4gY29tcHJlc3Npb24gcmF0aW8gICAg
+ICAgICAgNi45MiAgICA3LjA1ICB8ICAgNi42OSAgICA2Ljg5DQo+PiBjcHUgaWRsZSwgJSAgICAg
+ICAgICAgICAgICA4MiAgICAgIDgzICAgIHwgICA4NiAgICAgIDgwDQo+PiB0aW1lLCBzZWMgICAg
+ICAgICAgICAgICAgICA0OSAgICAgIDcxICAgIHwgICAyNiAgICAgIDMxDQo+PiB0aW1lIGRpZmYg
+dG8gemxpYiwgc2VjICAgICAgICAgICAgICAgICAgICAgIC0yNSAgICAgLTQxDQo+Pg0KPj4NCj4+
+IFRocmVhZHM6IDggY29tcHJlc3Mg4oCTIDIgZGVjb21wcmVzcw0KPj4NCj4+IHpzdGQgcHJvdmlk
+ZXMgdGhlIHNhbWUgbWlncmF0aW9uIHRpbWUgd2l0aCBsZXNzIGNwdSBjb25zdW1wdGlvbg0KPj4N
+Cj4+IGNvbXByZXNzaW9uIHR5cGUgICAgICAgICBub25lICB8ICAgICAgICBnemlwKHpsaWIpICAg
+IHwgICAgICAgICAgenN0ZA0KPj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiBjb21wcmVzc2lv
+biBsZXZlbCAgICAgICAgLSAgICAgfCAgMSAgICAgIDUgICAgICAgOSAgICB8ICAgMSAgICAgICA1
+ICAgICAgIDE1DQo+PiBjb21wcmVzc2lvbiByYXRpbyAgICAgICAgLSAgICAgfCAgNi45NCAgIDYu
+OTkgICAgNy4xNCB8ICAgNi42NCAgICA2Ljg5ICAgIDYuOTMNCj4+IHRpbWUsIHNlYyAgICAgICAg
+ICAgICAgICAxNTQgICB8ICAyMiAgICAgMjMgICAgICAyNyAgIHwgICAyMyAgICAgIDIzICAgICAg
+MjUNCj4+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICA5OSAgICB8ICA0NSAgICAgMzAgICAgICAx
+MiAgIHwgICA3MCAgICAgIDUyICAgICAgMjMNCj4+IGNwdSBpZGxlIGRpZmYgdG8gemxpYiAgICAg
+ICAgICB8ICAgICAgICAgICAgICAgICAgICAgIHwgIC0yNSUgICAgLTIyJSAgICAtMTElDQo+Pg0K
+Pj4NCj4+IERlbmlzIFBsb3RuaWtvdiAoMyk6DQo+PiAgICAgbWlncmF0aW9uOiByZXdvcmsgY29t
+cHJlc3Npb24gY29kZSBmb3IgYWRkaW5nIG1vcmUgZGF0YSBjb21wcmVzc29ycw0KPj4gICAgIGht
+cDogYWRkIGNvbXByZXNzLXR5cGUgcGFyYW1ldGVyIHRvIG1pZ3JhdGlvbiBwYXJhbWV0ZXJzDQo+
+PiAgICAgbWlncmF0aW9uOiBhZGQgenN0ZCBjb21wcmVzc2lvbg0KPj4NCj4+ICAgIGNvbmZpZ3Vy
+ZSAgICAgICAgICAgICB8ICAyNiArKysrDQo+PiAgICBobXAuYyAgICAgICAgICAgICAgICAgfCAg
+IDggKysNCj4+ICAgIG1pZ3JhdGlvbi9taWdyYXRpb24uYyB8ICA0NSArKysrKystDQo+PiAgICBt
+aWdyYXRpb24vbWlncmF0aW9uLmggfCAgIDEgKw0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5j
+IHwgIDM5ICsrLS0tLQ0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5oIHwgIDE4ICsrLQ0KPj4g
+ICAgbWlncmF0aW9uL3JhbS5jICAgICAgIHwgMjkxICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKystLS0tLS0tLQ0KPj4gICAgcWFwaS9taWdyYXRpb24uanNvbiAgIHwgIDI2ICsrKy0N
+Cj4+ICAgIDggZmlsZXMgY2hhbmdlZCwgMzY5IGluc2VydGlvbnMoKyksIDg1IGRlbGV0aW9ucygt
+KQ0KPj4NCj4gDQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
