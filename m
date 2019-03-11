@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35848)
+Received: from eggs.gnu.org ([209.51.188.92]:35719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3T6T-0000B7-Fy
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:09:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3T6P-000064-6e
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3T6R-0004f7-7D
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3T6P-0004dO-D3
+	(envelope-from <armbru@redhat.com>) id 1h3T6M-0004bJ-Oh
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:08:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from mx1.redhat.com ([209.132.183.28]:52970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3T6M-0004aG-Cx
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:08:54 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8BD668762D
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D30B37E60
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-92.ams2.redhat.com
+	[10.36.116.92])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E69FD19724
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:49 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 11 Mar 2019 23:08:32 +0100
-Message-Id: <20190311220843.4026-17-armbru@redhat.com>
+Date: Mon, 11 Mar 2019 23:08:21 +0100
+Message-Id: <20190311220843.4026-6-armbru@redhat.com>
 In-Reply-To: <20190311220843.4026-1-armbru@redhat.com>
 References: <20190311220843.4026-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/27] qdev: Fix latent bug with compat_props
- and onboard devices
+Subject: [Qemu-devel] [PULL 05/27] hw: Use PFLASH_CFI0{1,
+ 2} and TYPE_PFLASH_CFI0{1, 2}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,170 +38,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Compatibility properties started life as a qdev property thing: we
-supported them only for qdev properties, and implemented them with the
-machinery backing command line option -global.
+We have two open-coded copies of macro PFLASH_CFI01().  Move the macro
+to the header, so we can ditch the copies.  Move PFLASH_CFI02() to the
+header for symmetry.
 
-Recent commit fa0cb34d221 put them to use (tacitly) with memory
-backend objects (subtypes of TYPE_MEMORY_BACKEND).  To make that
-possible, we first moved the work of applying them from the -global
-machinery into TYPE_DEVICE's .instance_post_init() method
-device_post_init(), in commits ea9ce8934c5 and b66bbee39f6, then made
-it available to TYPE_MEMORY_BACKEND's .instance_post_init() method
-host_memory_backend_post_init() as object_apply_compat_props(), in
-commit 1c3994f6d2a.
+We define macros TYPE_PFLASH_CFI01 and TYPE_PFLASH_CFI02 for type name
+strings, then mostly use the strings.  If the macros are worth
+defining, they are worth using.  Replace the strings by the macros.
 
-Note the code smell: we now have function name starting with object_
-in hw/core/qdev.c.  It has to be there rather than in qom/, because it
-calls qdev_get_machine() to find the current accelerator's and
-machine's compat_props.
-
-Turns out calling qdev_get_machine() there is problematic.  If we
-qdev_create() from a machine's .instance_init() method, we call
-device_post_init() and thus qdev_get_machine() before main() can
-create "/machine" in QOM.  qdev_get_machine() tries to get it with
-container_get(), which "helpfully" creates it as "container" object,
-and returns that.  object_apply_compat_props() tries to paper over the
-problem by doing nothing when the value of qdev_get_machine() isn't a
-TYPE_MACHINE.  But the damage is done already: when main() later
-attempts to create the real "/machine", it fails with "attempt to add
-duplicate property 'machine' to object (type 'container')", and
-aborts.
-
-Since no machine .instance_init() calls qdev_create() so far, the bug
-is latent.  But since I want to do that, I get to fix the bug first.
-
-Observe that object_apply_compat_props() doesn't actually need the
-MachineState, only its the compat_props member of its MachineClass and
-AccelClass.  This permits a simple fix: register MachineClass and
-AccelClass compat_props with the object_apply_compat_props() machinery
-right after these classes get selected.
-
-This is actually similar to how things worked before commits
-ea9ce8934c5 and b66bbee39f6, except we now register much earlier.  The
-old code registered them only after the machine's .instance_init()
-ran, which would've broken compatibility properties for any devices
-created there.
-
-Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190308131445.17502-2-armbru@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Message-Id: <20190308094610.21210-6-armbru@redhat.com>
 ---
- accel/accel.c          |  1 +
- hw/core/qdev.c         | 48 ++++++++++++++++++++++++++++++++----------
- include/hw/qdev-core.h |  2 ++
- vl.c                   |  1 +
- 4 files changed, 41 insertions(+), 11 deletions(-)
+ hw/arm/vexpress.c        | 4 ++--
+ hw/arm/virt.c            | 3 ++-
+ hw/block/pflash_cfi01.c  | 3 ---
+ hw/block/pflash_cfi02.c  | 3 ---
+ hw/xtensa/xtfpga.c       | 4 ++--
+ include/hw/block/flash.h | 4 ++++
+ 6 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index 0d5b370dfd..8deb475b5d 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -66,6 +66,7 @@ static int accel_init_machine(AccelClass *acc, MachineS=
-tate *ms)
-         *(acc->allowed) =3D false;
-         object_unref(OBJECT(accel));
-     }
-+    object_set_accelerator_compat_props(acc->compat_props);
-     return ret;
- }
-=20
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 512ce7ca7a..4f3200d54b 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -978,25 +978,51 @@ static void device_initfn(Object *obj)
-     QLIST_INIT(&dev->gpios);
- }
-=20
-+/*
-+ * Global property defaults
-+ * Slot 0: accelerator's global property defaults
-+ * Slot 1: machine's global property defaults
-+ * Each is a GPtrArray of of GlobalProperty.
-+ * Applied in order, later entries override earlier ones.
-+ */
-+static GPtrArray *object_compat_props[2];
-+
-+/*
-+ * Set machine's global property defaults to @compat_props.
-+ * May be called at most once.
-+ */
-+void object_set_machine_compat_props(GPtrArray *compat_props)
-+{
-+    assert(!object_compat_props[1]);
-+    object_compat_props[1] =3D compat_props;
-+}
-+
-+/*
-+ * Set accelerator's global property defaults to @compat_props.
-+ * May be called at most once.
-+ */
-+void object_set_accelerator_compat_props(GPtrArray *compat_props)
-+{
-+    assert(!object_compat_props[0]);
-+    object_compat_props[0] =3D compat_props;
-+}
-+
- void object_apply_compat_props(Object *obj)
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index ed46d2e730..f07134c424 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot=
+_info *info, void *fdt)
+ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
+me,
+                                              DriveInfo *di)
  {
--    if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
--        MachineState *m =3D MACHINE(qdev_get_machine());
--        MachineClass *mc =3D MACHINE_GET_CLASS(m);
-+    int i;
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
 =20
--        if (m->accelerator) {
--            AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
+     if (di) {
+         qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
+@@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr b=
+ase, const char *name,
+     qdev_init_nofail(dev);
+=20
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
++    return PFLASH_CFI01(dev);
+ }
+=20
+ static void vexpress_common_init(MachineState *machine)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 7f66ddad89..1e8485ff7c 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -35,6 +35,7 @@
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+ #include "hw/arm/virt.h"
++#include "hw/block/flash.h"
+ #include "hw/vfio/vfio-calxeda-xgmac.h"
+ #include "hw/vfio/vfio-amd-xgbe.h"
+ #include "hw/display/ramfb.h"
+@@ -878,7 +879,7 @@ static void create_one_flash(const char *name, hwaddr=
+ flashbase,
+      * parameters as the flash devices on the Versatile Express board.
+      */
+     DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     const uint64_t sectorlength =3D 256 * 1024;
+=20
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index f75f0a6998..1c99aa6e4a 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -59,9 +59,6 @@ do {                                                   =
+     \
+ #define DPRINTF(fmt, ...) do { } while (0)
+ #endif
+=20
+-#define PFLASH_CFI01(obj) \
+-    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
 -
--            if (ac->compat_props) {
--                object_apply_global_props(obj, ac->compat_props, &error_=
-abort);
--            }
--        }
--        object_apply_global_props(obj, mc->compat_props, &error_abort);
-+    for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
-+        object_apply_global_props(obj, object_compat_props[i],
-+                                  &error_abort);
-     }
- }
+ #define PFLASH_BE          0
+ #define PFLASH_SECURE      1
 =20
- static void device_post_init(Object *obj)
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 933de99d6a..915c6171a0 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -57,9 +57,6 @@ do {                                                   =
+    \
+=20
+ #define PFLASH_LAZY_ROMD_THRESHOLD 42
+=20
+-#define PFLASH_CFI02(obj) \
+-    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
+-
+ struct PFlashCFI02 {
+     /*< private >*/
+     SysBusDevice parent_obj;
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 3d59a7a356..e05ef75a75 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
+ddress_space,
+                                       DriveInfo *dinfo, int be)
  {
-+    /*
-+     * Note: ordered so that the user's global properties take
-+     * precedence.
-+     */
-     object_apply_compat_props(obj);
-     qdev_prop_set_globals(DEVICE(obj));
+     SysBusDevice *s;
+-    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
++    DeviceState *dev =3D qdev_create(NULL, TYPE_PFLASH_CFI01);
+=20
+     qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+                         &error_abort);
+@@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
+ddress_space,
+     s =3D SYS_BUS_DEVICE(dev);
+     memory_region_add_subregion(address_space, board->flash->base,
+                                 sysbus_mmio_get_region(s, 0));
+-    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
++    return PFLASH_CFI01(dev);
  }
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 17f09aac72..aa8a3ea782 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -431,6 +431,8 @@ const char *qdev_fw_name(DeviceState *dev);
 =20
- Object *qdev_get_machine(void);
+ static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
+diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+index 333005d9ff..aeea3ca99d 100644
+--- a/include/hw/block/flash.h
++++ b/include/hw/block/flash.h
+@@ -8,6 +8,8 @@
+ /* pflash_cfi01.c */
 =20
-+void object_set_machine_compat_props(GPtrArray *compat_props);
-+void object_set_accelerator_compat_props(GPtrArray *compat_props);
- void object_apply_compat_props(Object *obj);
+ #define TYPE_PFLASH_CFI01 "cfi.pflash01"
++#define PFLASH_CFI01(obj) \
++    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_PFLASH_CFI01)
 =20
- /* FIXME: make this a link<> */
-diff --git a/vl.c b/vl.c
-index f46f8d769a..5278beaae0 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3953,6 +3953,7 @@ int main(int argc, char **argv, char **envp)
-     configure_rtc(qemu_find_opts_singleton("rtc"));
+ typedef struct PFlashCFI01 PFlashCFI01;
 =20
-     machine_class =3D select_machine();
-+    object_set_machine_compat_props(machine_class->compat_props);
+@@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+ /* pflash_cfi02.c */
 =20
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
+ #define TYPE_PFLASH_CFI02 "cfi.pflash02"
++#define PFLASH_CFI02(obj) \
++    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_PFLASH_CFI02)
+=20
+ typedef struct PFlashCFI02 PFlashCFI02;
 =20
 --=20
 2.17.2
