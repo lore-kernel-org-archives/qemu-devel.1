@@ -1,26 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I9Y-0005rG-CC
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:29 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I9a-0005rG-PK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I80-0007CC-Ep
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:53 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3I80-00079n-7u
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:52 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w2so4404293wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 03:25:52 -0700 (PDT)
-References: <20190310160227.103090-1-liq3ea@163.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8d2f633f-97c8-9577-742c-a78a0603f2d5@redhat.com>
-Date: Mon, 11 Mar 2019 11:09:41 +0100
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I7y-00078q-DI
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:51 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:40481 helo=smtp.ehu.eus)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h3I7y-00076M-1U
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:50 -0400
+Date: Mon, 11 Mar 2019 10:25:43 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Message-ID: <20190311102543.GA16@765644dd90e5>
+References: <20190311101428.GA11@765644dd90e5>
 MIME-Version: 1.0
-In-Reply-To: <20190310160227.103090-1-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests: test-qgraph: fix a memory leak
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190311101428.GA11@765644dd90e5>
+Subject: [Qemu-devel] [PATCH v4 2/10] qemu-binfmt-conf.sh: make opts -p and
+ -c boolean
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
-On 3/10/19 5:02 PM, Li Qiang wrote:
-> Spotted by ASAN when 'make check'.
-> 
+This patch breaks backward compatibility.
 
-Fixes: fc281c80202
+Both '--persistent' and '--credential' default to 'no'. Hence, '-p no'
+or '-c no' are reduntant. Overall, accepting an argument might be
+misleading because options are, indeed, boolean. This patch makes both
+options boolean in getopt, so if any of them is provided the corresponding
+variable is set to true.
 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
+ scripts/qemu-binfmt-conf.sh | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 0009385be2..ca15ff8092 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -168,8 +168,8 @@ qemu_get_family() {
+ usage() {
+     cat <<EOF
+ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no][--qemu-suffix SUFFIX]
++                           [--help][--credential][--exportdir PATH]
++                           [--persistent][--qemu-suffix SUFFIX]
 
-> ---
->  tests/test-qgraph.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
-> index f6a6565e31..5c7e457075 100644
-> --- a/tests/test-qgraph.c
-> +++ b/tests/test-qgraph.c
-> @@ -122,7 +122,7 @@ static void check_driver(const char *driver)
->  static void check_test(const char *test, const char *interface)
->  {
->      QOSGraphEdge *edge;
-> -    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
-> +    char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
->  
->      qos_add_test(test, interface, testfunct, NULL);
->      g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
-> @@ -138,6 +138,7 @@ static void check_test(const char *test, const char *interface)
->      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
->      qos_graph_node_set_availability(full_name, FALSE);
->      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
-> +    g_free(full_name);
->  }
->  
->  static void count_each_test(QOSGraphNode *path, int len)
-> 
+        Configure binfmt_misc to use qemu interpreter
+
+@@ -184,9 +184,9 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                       file for all known cpus
+        --exportdir:   define where to write configuration files
+                       (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if yes, credential and security tokens are
++       --credential:  if present, credential and security tokens are
+                       calculated according to the binary to interpret
+-       --persistent:  if yes, the interpreter is loaded when binfmt is
++       --persistent:  if present, the interpreter is loaded when binfmt is
+                       configured and remains in memory. All future uses
+                       are cloned from the open file.
+
+@@ -324,7 +324,7 @@ CREDENTIAL=no
+ PERSISTENT=no
+ QEMU_SUFFIX=""
+
+-options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
++options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
+ eval set -- "$options"
+
+ while true ; do
+@@ -373,12 +373,10 @@ while true ; do
+         exit 1
+         ;;
+     -c|--credential)
+-        shift
+-        CREDENTIAL="$1"
++        CREDENTIAL="yes"
+         ;;
+     -p|--persistent)
+-        shift
+-        PERSISTENT="$1"
++        PERSISTENT="yes"
+         ;;
+     *)
+         break
+--
+2.21.0
