@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42631)
+Received: from eggs.gnu.org ([209.51.188.92]:42543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3En6-0002Wp-7f
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:52:04 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3EnA-0002TC-NL
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3EZa-0006Zo-Gs
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:38:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h3EZa-0006YG-8d
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:38:06 -0400
-Date: Mon, 11 Mar 2019 07:38:00 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190311063800.b5uujceufcnkllst@sirius.home.kraxel.org>
-References: <cover.1551902740.git.balaton@eik.bme.hu>
-	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
-	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
-	<20190308073206.qd3efvlxgeos45np@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1903081718580.52464@zero.eik.bme.hu>
+	(envelope-from <thuth@redhat.com>) id 1h3EXh-0004IW-SL
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:36:10 -0400
+References: <1551968334-18982-1-git-send-email-thuth@redhat.com>
+	<1551968334-18982-20-git-send-email-thuth@redhat.com>
+	<7e477c03-59d0-f6a4-a557-a8f5740d259a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8cf27b8a-2868-12e7-9b21-483884067029@redhat.com>
+Date: Mon, 11 Mar 2019 07:35:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1903081718580.52464@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
- graphics chip
+In-Reply-To: <7e477c03-59d0-f6a4-a557-a8f5740d259a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 19/29] hw/arm: Express dependencies of
+ the MPS2 boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-  Hi,
+On 10/03/2019 22.33, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 3/7/19 3:18 PM, Thomas Huth wrote:
+>> Add Kconfig dependencies for the mps2-an* machines.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak | 20 +-------------------
+>>  hw/arm/Kconfig                  | 18 ++++++++++++++++++
+>>  2 files changed, 19 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
+tmmu.mak
+>> index b6f3d60..b8509fd 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -27,6 +27,7 @@ CONFIG_Z2=3Dy
+>>  CONFIG_COLLIE=3Dy
+>>  CONFIG_ASPEED_SOC=3Dy
+>>  CONFIG_NETDUINO2=3Dy
+>> +CONFIG_MPS2=3Dy
+>> =20
+>>  CONFIG_VGA=3Dy
+>>  CONFIG_SSI_M25P80=3Dy
+>> @@ -35,28 +36,9 @@ CONFIG_IMX_FEC=3Dy
+>>  CONFIG_FRAMEBUFFER=3Dy
+>> =20
+>>  CONFIG_DIGIC=3Dy
+>> -CONFIG_MPS2=3Dy
+>>  CONFIG_RASPI=3Dy
+>>  CONFIG_NRF51_SOC=3Dy
+>> =20
+>> -CONFIG_CMSDK_APB_TIMER=3Dy
+>> -CONFIG_CMSDK_APB_DUALTIMER=3Dy
+>> -CONFIG_CMSDK_APB_UART=3Dy
+>> -CONFIG_CMSDK_APB_WATCHDOG=3Dy
+>> -
+>> -CONFIG_MPS2_FPGAIO=3Dy
+>> -CONFIG_MPS2_SCC=3Dy
+>> -
+>> -CONFIG_TZ_MPC=3Dy
+>> -CONFIG_TZ_MSC=3Dy
+>> -CONFIG_TZ_PPC=3Dy
+>> -CONFIG_ARMSSE=3Dy
+>> -CONFIG_IOTKIT_SECCTL=3Dy
+>> -CONFIG_IOTKIT_SYSCTL=3Dy
+>> -CONFIG_IOTKIT_SYSINFO=3Dy
+>> -CONFIG_ARMSSE_CPUID=3Dy
+>> -CONFIG_ARMSSE_MHU=3Dy
+>> -
+>>  CONFIG_FSL_IMX6=3Dy
+>>  CONFIG_FSL_IMX25=3Dy
+>>  CONFIG_FSL_IMX7=3Dy
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> index 743c78b..32c8663 100644
+>> --- a/hw/arm/Kconfig
+>> +++ b/hw/arm/Kconfig
+>> @@ -308,6 +308,13 @@ config ASPEED_SOC
+>> =20
+>>  config MPS2
+>>      bool
+>> +    select ARMSSE
+>> +    select LAN9118
+>> +    select MPS2_FPGAIO
+>> +    select MPS2_SCC
+>> +    select PL022    # Serial port
+>> +    select PL080    # DMA controller
+>> +    select TZ_MPC
+>=20
+> Can we move TZ_MPC to ARMSSE?
 
-> > "git send-email" should send the patches with correct headers, it even
-> > asks for the charset it should use in case it finds non-ascii
-> > characters.  So BALATON, could you check your mail client config, or
-> > switch over to "git send-email" for submitting patches?
-> 
-> I'm sending what git format-patch is generating and that does not add
-> content type header by default. Is there a config option to enable that? I
-> can't use git send-email because I'm sending from different machine than I
-> use git on.
+Oh, right, armsse_init() uses TYPE_TZ_MPC, too, so it should be moved.
 
-git send-email also accepts files generated by git format-patch,
-so you can:
-
-  (1) "git format-patch master..$branch", on machine A
-  (2) copy over 000*.patch from machine A to machine B
-  (3) "git send-email 000*.patch", on machine B
-
-But take care that you don't have old 000*.patch files lying around on
-machine B ...
-
-HTH,
-  Gerd
+ Thomas
