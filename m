@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35377)
+Received: from eggs.gnu.org ([209.51.188.92]:35487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3OTc-0003tO-GO
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:12:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h3OTe-00041O-Ik
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3OQE-0004jv-Id
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:09:11 -0400
-References: <20190308131445.17502-1-armbru@redhat.com>
-	<20190308131445.17502-12-armbru@redhat.com>
-	<fde51cea-909c-6c63-7553-2b48d7d4ac45@redhat.com>
-	<87mum1l8o9.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7cdf93fd-504d-9371-a927-096a43394ecf@redhat.com>
-Date: Mon, 11 Mar 2019 18:08:41 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h3OPb-0004OU-Bg
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:08:32 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40587)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1h3OPb-0004Lo-3P
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:08:27 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g20so5053746wmh.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 10:08:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87mum1l8o9.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/12] pc: Support firmware
- configuration with -blockdev
+References: <20190311083234.20841-1-richardw.yang@linux.intel.com>
+In-Reply-To: <20190311083234.20841-1-richardw.yang@linux.intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 11 Mar 2019 18:08:10 +0100
+Message-ID: <CAJ+F1CJrUawSKzcCg4yOh8A+Fn0gQXqDtq1Tw14g7jEBBLOZHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qom: use object_new_with_type in
+ object_new_with_propv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, lersek@redhat.com
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-On 11/03/19 16:42, Markus Armbruster wrote:
->> Does it work if you add the device yourself as a child of /machine,
->> instead of relying on /machine/unattached?
-> 
-> I figure you're suggesting something like this incremental patch:
+Hi
 
-Yes.
+On Mon, Mar 11, 2019 at 9:34 AM Wei Yang <richardw.yang@linux.intel.com> wr=
+ote:
+>
+> Function object_new_with_propv already get the Type of the object, so we
+> could leverage object_new_with_type here.
+>
+> [make check test pass]
+>
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  qom/object.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/qom/object.c b/qom/object.c
+> index 05a8567041..76d2f1eb2f 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -640,7 +640,7 @@ Object *object_new_with_propv(const char *typename,
+>          error_setg(errp, "object type '%s' is abstract", typename);
+>          return NULL;
+>      }
+> -    obj =3D object_new(typename);
+> +    obj =3D object_new_with_type(klass->type);
+>
+>      if (object_set_propv(obj, &local_err, vargs) < 0) {
+>          goto error;
+> --
+> 2.19.1
+>
+>
 
-> Passes "make check" and "info qtree" looks good both with and without
-> -machine pflash0,...
-> 
-> I'm not exactly happy with "pfl0" and "pfl1".  Got a favorite color for
-> my bikeshed?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-"pflash[0]" and "pflash[1]"?
-
-Paolo
+--=20
+Marc-Andr=C3=A9 Lureau
