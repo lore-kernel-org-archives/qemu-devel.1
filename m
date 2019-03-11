@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51121)
+Received: from eggs.gnu.org ([209.51.188.92]:51917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3NWW-0003pG-18
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:11:33 -0400
+	(envelope-from <bsd@redhat.com>) id 1h3NZj-0005qv-3T
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3NWU-0000OF-JI
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:11:32 -0400
-Resent-Message-Id: <E1h3NWU-0000OF-JI@eggs.gnu.org>
-Message-ID: <155232066741.9137.7676552706724599076@6acff2cf482b>
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bsd@redhat.com>) id 1h3NZc-0003PY-CY
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:14:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1h3NZZ-0003It-3Q
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:14:42 -0400
+From: Bandan Das <bsd@redhat.com>
+References: <20190307095441.31921-1-kraxel@redhat.com>
+	<20190307095441.31921-4-kraxel@redhat.com>
+	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
+	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
+	<jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
+	<CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
+Date: Mon, 11 Mar 2019 12:14:33 -0400
+In-Reply-To: <CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
+	(Peter Maydell's message of "Sat, 9 Mar 2019 14:13:18 +0000")
+Message-ID: <jpg8sxle6c6.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 09:11:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
-NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWE5NmYwODQ4MiBz
-MzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UKYWI3ZDU5ZTIx
-OCBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9y
-IGRhc2QtaXBsCjJhZDY5MjA1NjMgczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8g
-ZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCmMxZGQ5MWRjYWIgczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0
-aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo3ODNhNWQ5OTJlIHMzOTAtYmlvczog
-Y2lvIGVycm9yIGhhbmRsaW5nCmVkNWEwMWE0ZDEgczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5u
-aW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwpjZTA0YjU4MGZmIHMzOTAtYmlvczogcHRy
-MnUzMiBhbmQgdTMydG9wdHIKZDBiZjllMTNlNCBzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1v
-cnkKYmVmMzFlNTQ1YiBzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20g
-dmlydGlvCjlkNTE3YjdkODQgczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaAoxOWZiYTBmZDU2IHMz
-OTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ugb3V0IG9mIHZpcnRpbyBjb2RlIHBh
-dGgKNmMwZGFmOTBlNyBzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlv
-IGRldmljZXMKYTUwMGRiOWY1OCBzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxvZ2lj
-IGZyb20gdmlydGlvCjFhOGIxZjAxYWIgczM5MC1iaW9zOiBkZWNvdXBsZSBjaW8gc2V0dXAgZnJv
-bSB2aXJ0aW8KMjJhZWYxYzAyNyBzMzkwIHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5
-IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0
-IDIyYWVmMWMwMjc0NyAoczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQg
-SVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8x
-NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE1IENoZWNraW5nIGNvbW1pdCAxYThiMWYw
-MWFiZjggKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmlydGlvKQozLzE1IENo
-ZWNraW5nIGNvbW1pdCBhNTAwZGI5ZjU4YmMgKHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJv
-b3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGlu
-IC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9tYWluLmM6MTk6CitJcGxQYXJh
-bWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxpZ25lZF9fKFBBR0VfU0laRSkpKTsK
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8x
-NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgNmMwZGFm
-OTBlN2EyIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmlj
-ZXMpCjUvMTUgQ2hlY2tpbmcgY29tbWl0IDE5ZmJhMGZkNTY4YSAoczM5MC1iaW9zOiBGYWN0b3Ig
-ZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aCkKNi8xNSBDaGVja2lu
-ZyBjb21taXQgOWQ1MTdiN2Q4NDdlIChzMzkwLWJpb3M6IENsZWFuIHVwIGNpby5oKQo3LzE1IENo
-ZWNraW5nIGNvbW1pdCBiZWYzMWU1NDViODIgKHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5lbCBp
-L28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDcvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNSBDaGVja2luZyBjb21t
-aXQgZDBiZjllMTNlNGYyIChzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KOS8xNSBDaGVja2luZyBjb21taXQgY2UwNGI1ODBmZjE2IChzMzkwLWJpb3M6IHB0
-cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDkvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTUgQ2hlY2tpbmcgY29tbWl0
-IGVkNWEwMWE0ZDFiYiAoczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEg
-Y2hhbm5lbCBwcm9ncmFtcykKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTog
-cGMtYmlvcy9zMzkwLWNjdy9jaW8uYzoxNDU6CisgKiBhY3RpdmUgKGdlbmVyYXRpbmcgaS9vIGlu
-dGVycnVwdHMpLiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NSBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxMC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTUgQ2hlY2tp
-bmcgY29tbWl0IDc4M2E1ZDk5MmUzMiAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEy
-LzE1IENoZWNraW5nIGNvbW1pdCBjMWRkOTFkY2FiZjUgKHMzOTAtYmlvczogUmVmYWN0b3Igdmly
-dGlvIHRvIHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4Ogor
-ICAgICAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywg
-c2l6ZW9mKGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAg
-IHJ1bl9jY3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0
-dXMpLCBmYWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDEyLzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE1IENo
-ZWNraW5nIGNvbW1pdCAyYWQ2OTIwNTYzN2IgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0
-eXBlIHRvIGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IGFiN2Q1
-OWUyMTg4MCAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVl
-ZGVkIGZvciBkYXNkLWlwbCkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IGVhOTZmMDg0ODJmYiAoczM5
-MC1iaW9zOiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMyNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQ0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29t
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Fri, 8 Mar 2019 at 22:14, Bandan Das <bsd@redhat.com> wrote:
+>>
+>>
+>> Spotted by Coverity: CID 1399414
+>>
+>> mtp delete allows the a return status of delete succeeded,
+>> partial_delete or readonly - when none of the objects could be
+>> deleted.
+>>
+>> Some initiators recurse over the objects themselves. In that case,
+>> only READ_ONLY can be returned.
+>>
+>> Signed-off-by: Bandan Das <bsd@redhat.com>
+>> ---
+>>  hw/usb/dev-mtp.c | 25 +++++++++----------------
+>>  1 file changed, 9 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+>> index 06e376bcd2..e3401aad75 100644
+>> --- a/hw/usb/dev-mtp.c
+>> +++ b/hw/usb/dev-mtp.c
+>> @@ -1137,9 +1137,9 @@ static MTPData *usb_mtp_get_object_prop_value(MTPState *s, MTPControl *c,
+>>
+>>  /* Return correct return code for a delete event */
+>>  enum {
+>> -    ALL_DELETE,
+>> -    PARTIAL_DELETE,
+>> +    ALL_DELETE = 1,
+>>      READ_ONLY,
+>> +    PARTIAL_DELETE,
+>
+> This is an enum, ie a set of incrementing values, but you're
+> using them as bit positions you're ORing together. If they're
+> really bit flags you should define them properly that way,
+> so it's clear what you're doing.
+>
+Sure, no problem
+
+> At the moment PARTIAL_DELETE is "ALL_DELETE | READ_ONLY", which
+> doesn't seem like it makes much sense.
+>
+
+Sorry, can you please clarify what doesn't make sense ?
+
+> thanks
+> -- PMM
