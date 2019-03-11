@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59771)
+Received: from eggs.gnu.org ([209.51.188.92]:59884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3GNS-0001pB-LC
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:44 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1h3GNU-0001v7-11
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1h3GGV-00026b-6Z
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h3GGT-00023j-8R
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:26:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7482130821FA
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:26:27 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 11 Mar 2019 09:26:18 +0100
-Message-Id: <20190311082619.17966-5-kraxel@redhat.com>
-In-Reply-To: <20190311082619.17966-1-kraxel@redhat.com>
-References: <20190311082619.17966-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] vnc: allow specifying a custom
- authorization object name
+	(envelope-from <gengdongjiu@huawei.com>) id 1h3GFN-0001Cz-Mo
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:25:24 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Mon, 11 Mar 2019 16:25:08 +0800
+Message-ID: <1552292708-19223-1-git-send-email-gengdongjiu@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target/arm: change arch timer registers access
+ permission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,223 +20,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, gengdongjiu@huawei.com
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+Some generic arch timer registers are Config-RW in the EL0,
+which means the EL0 exception level can have write permission
+if it is appropriately configured.
 
-The VNC server has historically had support for ACLs to check both the
-SASL username and the TLS x509 distinguished name. The VNC server was
-responsible for creating the initial ACL, and the client app was then
-responsible for populating it with rules using the HMP 'acl_add' command.
+When VM access registers, it firstly checks whether they have RW
+permission, then check whether it is appropriately configured.
+If they are defined to Ready only in EL0, even though they have been
+appropriately configured, they still do not have write permission.
+So need to add the write permission according to ARMV8 spec when
+define it.
 
-This is not satisfactory for a variety of reasons. There is no way to
-populate the ACLs from the command line, users are forced to use the
-HMP. With multiple network services all supporting TLS and ACLs now, it
-is desirable to be able to define a single ACL that is referenced by all
-services.
-
-To address these limitations, two new options are added to the VNC
-server CLI. The 'tls-authz' option takes the ID of a QAuthZ object to
-use for checking TLS x509 distinguished names, and the 'sasl-authz'
-option takes the ID of another object to use for checking SASL usernames.
-
-In this example, we setup two authorization rules. The first allows any
-client with a certificate issued by the 'RedHat' organization in the
-'London' locality. The second ACL allows clients with either the
-'joe@REDHAT.COM' or  'fred@REDHAT.COM' kerberos usernames. Both checks
-must pass for the user to be allowed.
-
-    $QEMU -object tls-creds-x509,id=tls0,dir=/home/berrange/qemutls,\
-                  endpoint=server,verify-peer=yes \
-          -object authz-simple,id=authz0,policy=deny,\
-                  rules.0.match=O=RedHat,,L=London,rules.0.policy=allow \
-          -object authz-simple,id=authz1,policy=deny,\
-                  rules.0.match=fred@REDHAT.COM,rules.0.policy=allow \
-                  rules.0.match=joe@REDHAT.COM,rules.0.policy=allow \
-          -vnc 0.0.0.0:1,tls-creds=tls0,tls-authz=authz0,
-	       sasl,sasl-authz=authz1 \
-          ...other QEMU args...
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20190227145755.26556-2-berrange@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- ui/vnc.c             | 58 +++++++++++++++++++++++++++++++++++++-------
- qemu-deprecated.texi |  5 ++++
- qemu-options.hx      | 35 ++++++++++++++++++--------
- 3 files changed, 79 insertions(+), 19 deletions(-)
+When kernel or Hypervisor configures the timer registers to RW in EL0
+user space, it will still have below panic when EL0 user space access
+the timer registers.
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 2f2ab62fcf71..2d9e8f43b09b 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3363,6 +3363,12 @@ static QemuOptsList qemu_vnc_opts = {
-         },{
-             .name = "acl",
-             .type = QEMU_OPT_BOOL,
-+        },{
-+            .name = "tls-authz",
-+            .type = QEMU_OPT_STRING,
-+        },{
-+            .name = "sasl-authz",
-+            .type = QEMU_OPT_STRING,
-         },{
-             .name = "lossy",
-             .type = QEMU_OPT_BOOL,
-@@ -3802,6 +3808,8 @@ void vnc_display_open(const char *id, Error **errp)
-     const char *credid;
-     bool sasl = false;
-     int acl = 0;
-+    const char *tlsauthz;
-+    const char *saslauthz;
-     int lock_key_sync = 1;
-     int key_delay_ms;
- 
-@@ -3873,7 +3881,33 @@ void vnc_display_open(const char *id, Error **errp)
-             goto fail;
-         }
-     }
-+    if (qemu_opt_get(opts, "acl")) {
-+        error_report("The 'acl' option to -vnc is deprecated. "
-+                     "Please use the 'tls-authz' and 'sasl-authz' "
-+                     "options instead");
-+    }
-     acl = qemu_opt_get_bool(opts, "acl", false);
-+    tlsauthz = qemu_opt_get(opts, "tls-authz");
-+    if (acl && tlsauthz) {
-+        error_setg(errp, "'acl' option is mutually exclusive with the "
-+                   "'tls-authz' option");
-+        goto fail;
-+    }
-+    if (tlsauthz && !vd->tlscreds) {
-+        error_setg(errp, "'tls-authz' provided but TLS is not enabled");
-+        goto fail;
-+    }
-+
-+    saslauthz = qemu_opt_get(opts, "sasl-authz");
-+    if (acl && saslauthz) {
-+        error_setg(errp, "'acl' option is mutually exclusive with the "
-+                   "'sasl-authz' option");
-+        goto fail;
-+    }
-+    if (saslauthz && !sasl) {
-+        error_setg(errp, "'sasl-authz' provided but SASL auth is not enabled");
-+        goto fail;
-+    }
- 
-     share = qemu_opt_get(opts, "share");
-     if (share) {
-@@ -3903,7 +3937,9 @@ void vnc_display_open(const char *id, Error **errp)
-         vd->non_adaptive = true;
-     }
- 
--    if (acl) {
-+    if (tlsauthz) {
-+        vd->tlsauthzid = g_strdup(tlsauthz);
-+    } else if (acl) {
-         if (strcmp(vd->id, "default") == 0) {
-             vd->tlsauthzid = g_strdup("vnc.x509dname");
-         } else {
-@@ -3914,15 +3950,19 @@ void vnc_display_open(const char *id, Error **errp)
-                                               &error_abort));
-     }
- #ifdef CONFIG_VNC_SASL
--    if (acl && sasl) {
--        if (strcmp(vd->id, "default") == 0) {
--            vd->sasl.authzid = g_strdup("vnc.username");
--        } else {
--            vd->sasl.authzid = g_strdup_printf("vnc.%s.username", vd->id);
-+    if (sasl) {
-+        if (saslauthz) {
-+            vd->sasl.authzid = g_strdup(saslauthz);
-+        } else if (acl) {
-+            if (strcmp(vd->id, "default") == 0) {
-+                vd->sasl.authzid = g_strdup("vnc.username");
-+            } else {
-+                vd->sasl.authzid = g_strdup_printf("vnc.%s.username", vd->id);
-+            }
-+            vd->sasl.authz = QAUTHZ(qauthz_list_new(vd->sasl.authzid,
-+                                                    QAUTHZ_LIST_POLICY_DENY,
-+                                                    &error_abort));
-         }
--        vd->sasl.authz = QAUTHZ(qauthz_list_new(vd->sasl.authzid,
--                                                QAUTHZ_LIST_POLICY_DENY,
--                                                &error_abort));
-     }
- #endif
- 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 45c57952da56..1258da479535 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -60,6 +60,11 @@ Support for invalid topologies will be removed, the user must ensure
- topologies described with -smp include all possible cpus, i.e.
-   @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
- 
-+@subsection -vnc acl (since 4.0.0)
-+
-+The @code{acl} option to the @code{-vnc} argument has been replaced
-+by the @code{tls-authz} and @code{sasl-authz} options.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1cf9aac1fe35..c74f99b2653a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1624,6 +1624,14 @@ will cause the VNC server socket to enable the VeNCrypt auth
- mechanism.  The credentials should have been previously created
- using the @option{-object tls-creds} argument.
- 
-+@item tls-authz=@var{ID}
-+
-+Provides the ID of the QAuthZ authorization object against which
-+the client's x509 distinguished name will validated. This object is
-+only resolved at time of use, so can be deleted and recreated on the
-+fly while the VNC server is active. If missing, it will default
-+to denying access.
-+
- @item sasl
- 
- Require that the client use SASL to authenticate with the VNC server.
-@@ -1639,18 +1647,25 @@ ensures a data encryption preventing compromise of authentication
- credentials. See the @ref{vnc_security} section for details on using
- SASL authentication.
- 
-+@item sasl-authz=@var{ID}
-+
-+Provides the ID of the QAuthZ authorization object against which
-+the client's SASL username will validated. This object is
-+only resolved at time of use, so can be deleted and recreated on the
-+fly while the VNC server is active. If missing, it will default
-+to denying access.
-+
- @item acl
- 
--Turn on access control lists for checking of the x509 client certificate
--and SASL party. For x509 certs, the ACL check is made against the
--certificate's distinguished name. This is something that looks like
--@code{C=GB,O=ACME,L=Boston,CN=bob}. For SASL party, the ACL check is
--made against the username, which depending on the SASL plugin, may
--include a realm component, eg @code{bob} or @code{bob@@EXAMPLE.COM}.
--When the @option{acl} flag is set, the initial access list will be
--empty, with a @code{deny} policy. Thus no one will be allowed to
--use the VNC server until the ACLs have been loaded. This can be
--achieved using the @code{acl} monitor command.
-+Legacy method for enabling authorization of clients against the
-+x509 distinguished name and SASL username. It results in the creation
-+of two @code{authz-list} objects with IDs of @code{vnc.username} and
-+@code{vnc.x509dname}. The rules for these objects must be configured
-+with the HMP ACL commands.
-+
-+This option is deprecated and should no longer be used. The new
-+@option{sasl-authz} and @option{tls-authz} options are a
-+replacement.
- 
- @item lossy
- 
+[INFO ]@(el0_sync:60): UNIMPLEMENTED, esr=2000000
+[INFO ]@(unimpl_exception:88): KERNEL UNIMPLEMENTED EXCEPTION
+[INFO ]@(unimpl_exception:98): FAR=0000000000000000, ESR=02000000 (EC=0x0, IL=0x1, ISS=0x0)
+[INFO ]@(dump_registers:64): KERNEL REGISTERS
+[INFO ]@(dump_registers:68): X0=00000000f52b7d50 X1=00000000040d5040
+[INFO ]@(dump_registers:68): X2=0000004000033e10 X3=0000000000000000
+[INFO ]@(dump_registers:68): X4=000000007fffffff X5=0000000000000020
+[INFO ]@(dump_registers:68): X6=0000000000000020 X7=000000000c00b030
+---
+ target/arm/helper.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 2607d39..3db94c6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2665,7 +2665,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     /* per-timer control */
+     { .name = "CNTP_CTL", .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
+       .secure = ARM_CP_SECSTATE_NS,
+-      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access,
+       .fieldoffset = offsetoflow32(CPUARMState,
+                                    cp15.c14_timer[GTIMER_PHYS].ctl),
+@@ -2674,7 +2674,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     { .name = "CNTP_CTL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
+       .secure = ARM_CP_SECSTATE_S,
+-      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access,
+       .fieldoffset = offsetoflow32(CPUARMState,
+                                    cp15.c14_timer[GTIMER_SEC].ctl),
+@@ -2682,14 +2682,14 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     },
+     { .name = "CNTP_CTL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 1,
+-      .type = ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].ctl),
+       .resetvalue = 0,
+       .writefn = gt_phys_ctl_write, .raw_writefn = raw_write,
+     },
+     { .name = "CNTV_CTL", .cp = 15, .crn = 14, .crm = 3, .opc1 = 0, .opc2 = 1,
+-      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_vtimer_access,
+       .fieldoffset = offsetoflow32(CPUARMState,
+                                    cp15.c14_timer[GTIMER_VIRT].ctl),
+@@ -2697,7 +2697,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     },
+     { .name = "CNTV_CTL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 1,
+-      .type = ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_vtimer_access,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].ctl),
+       .resetvalue = 0,
+@@ -2706,31 +2706,31 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     /* TimerValue views: a 32 bit downcounting view of the underlying state */
+     { .name = "CNTP_TVAL", .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
+       .secure = ARM_CP_SECSTATE_NS,
+-      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access,
+       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
+     },
+     { .name = "CNTP_TVAL_S",
+       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
+       .secure = ARM_CP_SECSTATE_S,
+-      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access,
+       .readfn = gt_sec_tval_read, .writefn = gt_sec_tval_write,
+     },
+     { .name = "CNTP_TVAL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 0,
+-      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_ptimer_access, .resetfn = gt_phys_timer_reset,
+       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
+     },
+     { .name = "CNTV_TVAL", .cp = 15, .crn = 14, .crm = 3, .opc1 = 0, .opc2 = 0,
+-      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_vtimer_access,
+       .readfn = gt_virt_tval_read, .writefn = gt_virt_tval_write,
+     },
+     { .name = "CNTV_TVAL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 0,
+-      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
+       .accessfn = gt_vtimer_access, .resetfn = gt_virt_timer_reset,
+       .readfn = gt_virt_tval_read, .writefn = gt_virt_tval_write,
+     },
+@@ -2758,7 +2758,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     /* Comparison value, indicating when the timer goes off */
+     { .name = "CNTP_CVAL", .cp = 15, .crm = 14, .opc1 = 2,
+       .secure = ARM_CP_SECSTATE_NS,
+-      .access = PL1_RW | PL0_R,
++      .access = PL1_RW | PL0_RW,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].cval),
+       .accessfn = gt_ptimer_access,
+@@ -2766,7 +2766,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     },
+     { .name = "CNTP_CVAL_S", .cp = 15, .crm = 14, .opc1 = 2,
+       .secure = ARM_CP_SECSTATE_S,
+-      .access = PL1_RW | PL0_R,
++      .access = PL1_RW | PL0_RW,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_SEC].cval),
+       .accessfn = gt_ptimer_access,
+@@ -2774,14 +2774,14 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     },
+     { .name = "CNTP_CVAL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 2,
+-      .access = PL1_RW | PL0_R,
++      .access = PL1_RW | PL0_RW,
+       .type = ARM_CP_IO,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].cval),
+       .resetvalue = 0, .accessfn = gt_ptimer_access,
+       .writefn = gt_phys_cval_write, .raw_writefn = raw_write,
+     },
+     { .name = "CNTV_CVAL", .cp = 15, .crm = 14, .opc1 = 3,
+-      .access = PL1_RW | PL0_R,
++      .access = PL1_RW | PL0_RW,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].cval),
+       .accessfn = gt_vtimer_access,
+@@ -2789,7 +2789,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     },
+     { .name = "CNTV_CVAL_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 2,
+-      .access = PL1_RW | PL0_R,
++      .access = PL1_RW | PL0_RW,
+       .type = ARM_CP_IO,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].cval),
+       .resetvalue = 0, .accessfn = gt_vtimer_access,
 -- 
-2.18.1
+2.7.4
