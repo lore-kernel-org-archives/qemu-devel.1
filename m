@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35518)
+Received: from eggs.gnu.org ([209.51.188.92]:35712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h3I9r-0005rF-Oe
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:49 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I9v-0006Bs-4I
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h3I6Q-0006Cn-LZ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:24:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39120)
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I9u-0008UG-4r
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:51 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:44920 helo=smtp.ehu.eus)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h3I6Q-0006CY-C5
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:24:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DCDC308219F
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 10:24:13 +0000 (UTC)
-Date: Mon, 11 Mar 2019 10:23:59 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190311102359.GL12393@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190309004826.9027-1-lersek@redhat.com>
-	<c1c9b441-3d2d-7178-aa2b-1439bc97d6a6@redhat.com>
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h3I9t-0008Kt-Nu
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:50 -0400
+Date: Mon, 11 Mar 2019 10:27:33 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Message-ID: <20190311102733.GC16@765644dd90e5>
+References: <20190311101428.GA11@765644dd90e5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c1c9b441-3d2d-7178-aa2b-1439bc97d6a6@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/10] bundle edk2 platform firmware with
- QEMU
+In-Reply-To: <20190311101428.GA11@765644dd90e5>
+Subject: [Qemu-devel] [PATCH v4 4/10] qemu-binfmt-conf.sh: use the same
+ presentation format as for qemu-*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,119 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal =?utf-8?B?UHLDrXZvem7DrWs=?= <mprivozn@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
-On Sat, Mar 09, 2019 at 02:10:17PM +0100, Michal Pr=C3=ADvozn=C3=ADk wrot=
-e:
-> On 3/9/19 1:48 AM, Laszlo Ersek wrote:
-> > Repo:   https://github.com/lersek/qemu.git
-> > Branch: edk2_build
-> >=20
-> > This series advances the roms/edk2 submodule to the "edk2-stable20190=
-3"
-> > release, and builds and captures platform firmware binaries from that
-> > release. At this point they are meant to be used by both end-users an=
-d
-> > by Igor's ACPI unit tests in qtest ("make check").
-> >=20
-> > Previous discussion:
-> >=20
-> >   [Qemu-devel] bundling edk2 platform firmware images with QEMU
-> >   http://mid.mail-archive.com/80f0bae3-e79a-bb68-04c4-1c9c684d95b8@re=
-dhat.com
-> >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02601.html
-> >=20
-> > Note that the series was formatted with "--no-binary" (affecting patc=
-h
-> > #8), therefore it cannot be applied with "git-am". See the remote
-> > repo/branch reference near the top instead.
-> >=20
-> > Thanks,
-> > Laszlo
-> >=20
-> > Laszlo Ersek (10):
-> >   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
-> >   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
-> >   tests/uefi-test-tools/build.sh: work around TianoCore#1607
-> >   roms/edk2: advance to tag edk2-stable201903
-> >   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
-> >   roms/Makefile: replace the $(EFIROM) target with "edk2-basetools"
-> >   roms: build edk2 firmware binaries and variable store templates
-> >   pc-bios: add edk2 firmware binaries and variable store templates
-> >   pc-bios: document the edk2 firmware images; add firmware descriptor=
-s
-> >   Makefile: install the edk2 firmware images and their descriptors
-> >=20
-> >  Makefile                                       |  17 +-
-> >  pc-bios/README                                 |  11 +
-> >  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
-> >  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
-> >  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
-> >  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
-> >  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
-> >  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
-> >  pc-bios/edk2-aarch64-code.fd                   | Bin 0 -> 67108864 b=
-ytes
-> >  pc-bios/edk2-arm-code.fd                       | Bin 0 -> 67108864 b=
-ytes
-> >  pc-bios/edk2-arm-vars.fd                       | Bin 0 -> 67108864 b=
-ytes
-> >  pc-bios/edk2-i386-code.fd                      | Bin 0 -> 3653632 by=
-tes
-> >  pc-bios/edk2-i386-secure-code.fd               | Bin 0 -> 3653632 by=
-tes
-> >  pc-bios/edk2-i386-vars.fd                      | Bin 0 -> 540672 byt=
-es
-> >  pc-bios/edk2-licenses.txt                      | 209 +++++++++++++++=
+
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+---
+ scripts/qemu-binfmt-conf.sh | 58 +++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 31 deletions(-)
+
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index e7a714e22c..489d7d2326 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -167,47 +167,43 @@ qemu_get_family() {
+
+ usage() {
+     cat <<EOF
+-Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential][--exportdir PATH]
+-                           [--persistent][--qemu-suffix SUFFIX]
++Usage: qemu-binfmt-conf.sh [options]
+
+-       Configure binfmt_misc to use qemu interpreter
++Configure binfmt_misc to use qemu interpreter
+
+-       --help:        display this usage
+-       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+-       --qemu-suffix: add a suffix to the default interpreter name
+-       --debian:      don't write into /proc,
+-                      instead generate update-binfmts templates
+-       --systemd:     don't write into /proc,
+-                      instead generate file for systemd-binfmt.service
+-                      for the given CPU. If CPU is "ALL", generate a
+-                      file for all known cpus
+-       --exportdir:   define where to write configuration files
+-                      (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if present, credential and security tokens are
+-                      calculated according to the binary to interpret
+-                      ($QEMU_CREDENTIAL=yes)
+-       --persistent:  if present, the interpreter is loaded when binfmt is
+-                      configured and remains in memory. All future uses
+-                      are cloned from the open file.
+-                      ($QEMU_PERSISTENT=yes)
++Options and associated environment variables:
+
+-    To import templates with update-binfmts, use :
++Argument             Env-variable     Description
++-h|--help                             display this usage
++-Q|--qemu-path PATH: QEMU_PATH        set path to qemu interpreter
++-F|--qemu-suffix SUFFIX:              add a suffix to the default interpreter name
++-d|--debian:                          don't write into /proc, generate update-binfmts templates
++-s|--systemd CPU:                     don't write into /proc, generate file for
++                                      systemd-binfmt.service for the given CPU; if CPU is "ALL",
++                                      generate a file for all known cpus.
++-e|--exportdir PATH: DEBIANDIR        define where to write configuration files
++                     SYSTEMDDIR
++-c|--credential:     QEMU_CREDENTIAL  (yes) credential and security tokens are calculated according
++                                      to the binary to interpret
++-p|--persistent:     QEMU_PERSISTENT  (yes) load the interpreter and keep it in memory; all future
++                                      uses are cloned from the open file.
+
+-        sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
++To import templates with update-binfmts, use :
+
+-    To remove interpreter, use :
++    sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
+
+-        sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
++To remove interpreter, use :
+
+-    With systemd, binfmt files are loaded by systemd-binfmt.service
++    sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+
+-    The environment variable HOST_ARCH allows to override 'uname' to generate
+-    configuration files for a different architecture than the current one.
++With systemd, binfmt files are loaded by systemd-binfmt.service
+
+-    where CPU is one of:
++The environment variable HOST_ARCH allows to override 'uname' to generate configuration files for a
++different architecture than the current one.
+
+-        $qemu_target_list
++where CPU is one of:
 +
-> >  pc-bios/edk2-x86_64-code.fd                    | Bin 0 -> 3653632 by=
-tes
-> >  pc-bios/edk2-x86_64-secure-code.fd             | Bin 0 -> 3653632 by=
-tes
-> >  roms/Makefile                                  |   9 +-
-> >  roms/Makefile.edk2                             | 138 +++++++++++
-> >  roms/edk2                                      |   2 +-
-> >  roms/edk2-build.sh                             |  55 +++++
-> >  roms/edk2-funcs.sh                             | 253 +++++++++++++++=
-+++++
-> >  tests/uefi-test-tools/build.sh                 | 100 +-------
-> >  23 files changed, 897 insertions(+), 95 deletions(-)
-> >  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
-> >  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
-> >  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
-> >  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
-> >  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
-> >  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
-> >  create mode 100644 pc-bios/edk2-aarch64-code.fd
-> >  create mode 100644 pc-bios/edk2-arm-code.fd
-> >  create mode 100644 pc-bios/edk2-arm-vars.fd
-> >  create mode 100644 pc-bios/edk2-i386-code.fd
-> >  create mode 100644 pc-bios/edk2-i386-secure-code.fd
-> >  create mode 100644 pc-bios/edk2-i386-vars.fd
-> >  create mode 100644 pc-bios/edk2-licenses.txt
-> >  create mode 100644 pc-bios/edk2-x86_64-code.fd
-> >  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd
-> >  create mode 100644 roms/Makefile.edk2
-> >  create mode 100755 roms/edk2-build.sh
-> >  create mode 100644 roms/edk2-funcs.sh
-> >=20
->=20
-> Unsure whether my ACK is worth anything on this list, but you have it.
->
-> Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
++    $qemu_target_list
 
-Anyone on the QEMU mailing list is welcome, and indeed encouraged to
-review patches & add R-b acks if they feel comfortable with the code
-they are looking at. As with most projects, QEMU suffers from a
-not having enough reviewers to look at the volume of patches sent....
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+ EOF
+ }
+--
+2.21.0
