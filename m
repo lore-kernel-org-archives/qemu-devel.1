@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56051)
+Received: from eggs.gnu.org ([209.51.188.92]:59206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3SH0-0005FS-Iu
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:15:51 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1h3SbT-0001Nh-Ds
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3SGz-0007uV-9W
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:15:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190311165017.32247-1-kwolf@redhat.com>
-	<20190311165017.32247-11-kwolf@redhat.com>
-	<2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
-	<20190311195925.GA21327@angien.pipo.sk>
-	<74cc34ed-a60b-75fd-3cf1-122ba485917e@redhat.com>
-	<20190311202534.GB21327@angien.pipo.sk>
-Date: Mon, 11 Mar 2019 22:15:32 +0100
-In-Reply-To: <20190311202534.GB21327@angien.pipo.sk> (Peter Krempa's message
-	of "Mon, 11 Mar 2019 21:25:34 +0100")
-Message-ID: <87tvg96rkb.fsf@dusky.pond.sub.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1h3SbR-0005tM-Mf
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:36:59 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:42184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h3SbR-0005sm-AR
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:36:57 -0400
+Date: Mon, 11 Mar 2019 22:36:51 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <87y35l6rlz.fsf@dusky.pond.sub.org>
+Message-ID: <alpine.BSF.2.21.9999.1903112234001.6117@zero.eik.bme.hu>
+References: <20190311085024.13780-1-kraxel@redhat.com>
+	<20190311085024.13780-5-kraxel@redhat.com>
+	<87ef7d8fh8.fsf@dusky.pond.sub.org>
+	<alpine.BSF.2.21.9999.1903112044360.69539@zero.eik.bme.hu>
+	<476d5325-7097-7a27-392b-65a0119b24ea@ilande.co.uk>
+	<87y35l6rlz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] file-posix: Make auto-read-only
- dynamic
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PULL 4/5] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, berto@igalia.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-Peter Krempa <pkrempa@redhat.com> writes:
-
-> On Mon, Mar 11, 2019 at 15:10:36 -0500, Eric Blake wrote:
->> On 3/11/19 2:59 PM, Peter Krempa wrote:
->> 
->> >> auto-read-only was introduced in 3.1, at which point we intentionally
->> >> had sufficiently loose wording to permit (but not require) dynamic state
->> >> checking; so you are not breaking the interface.  On the other hand, is
->> >> libvirt going to have problems introspecting whether it can use
->> >> auto-read-only and get the dynamic behavior it needs?  Or is there
->> >> enough else in the way of libvirt's switch to -blockdev that it won't
->> >> attempt anything that needs auto-read-only without other 4.0 interfaces
->> >> anyway, at which point detecting the presence of the field (but not
->> >> whether the field has a guarantee of dynamic behavior) on 3.1 doesn't
->> >> matter?
->> > 
->> > I think we can use Stefan's capability detection mechanism he introduced
->> > for the migration with cache enabled for local files to add a flag for
->> > this as well.
->> 
->> Except I thought we decided that the most recent version of his QMP
->> changes was now fully-introspectible, thanks to using conditional
->> compilation.
->> 
->> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02510.html
+On Mon, 11 Mar 2019, Markus Armbruster wrote:
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+>> On 11/03/2019 19:51, BALATON Zoltan wrote:
+>>> On Mon, 11 Mar 2019, Markus Armbruster wrote:
+>>>> Gerd Hoffmann <kraxel@redhat.com> writes:
+>>>>> From: BALATON Zoltan <balaton@eik.bme.hu>
+>>>>>
+>>>>> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
+>>>>> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
+>>>>> guests running on these and the PMON2000 firmware of the fulong2e
+>>>>> expect this to be available. Fortunately these are very similar chips
+>>>>> so they can be mostly emulated in the same device model. This patch
+>>>>> adds basic emulation of these ATI VGA chips.
+>>>>>
+>>>>> While this is incomplete and currently only enough to run the MIPS
+>>>>> firmware and get framebuffer output with Linux, it allows the fulong2e
+>>>>> board to work more like the real hardware and having it in QEMU in
+>>>>> this state provides a way to experiment with it and allows others to
+>>>>> contribute to improve it. It is compiled for all archs but only the
+>>>>> fulong2e (which currently has no display output at all) is set to use
+>>>>> it by default (in a separate patch).
+>>>>>
+>>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>>> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>>>>> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+>>>>> Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
+>>>>> Message-id:
+>>>>> 0b1b7c22873a6e37627261b04fb687412b25ff4f.1552152100.git.balaton@eik.bme.hu
+>>>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>>> [...]
+>>>>> diff --git a/hw/display/trace-events b/hw/display/trace-events
+>>>>> index 37d3264bb2e6..80993cc4d913 100644
+>>>>> --- a/hw/display/trace-events
+>>>>> +++ b/hw/display/trace-events
+>>>>> @@ -138,3 +138,7 @@ vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset
+>>>>> 0x%x, val 0x%x"
+>>>>> ?sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+>>>>> ?sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+>>>>> ?sii9022_switch_mode(const char *mode) "mode: %s"
+>>>>> +
+>>>>> +# hw/display/ati*.c
+>>>>> +ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u
+>>>>> 0x%"HWADDR_PRIx " %s -> 0x%"PRIx64
+>>>>> +ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint64_t val)
+>>>>> "%u 0x%"HWADDR_PRIx " %s <- 0x%"PRIx64
+>>>>
+>>>> Blows up for me:
+>>>>
+>>>> Traceback (most recent call last):
+>>>> ?File "/work/armbru/qemu/scripts/tracetool.py", line 152, in <module>
+>>>> ?? main(sys.argv)
+>>>> ?File "/work/armbru/qemu/scripts/tracetool.py", line 147, in main
+>>>> ?? binary=binary, probe_prefix=probe_prefix)
+>>>> ?File "/work/armbru/qemu/scripts/tracetool/__init__.py", line 472, in generate
+>>>> ?? tracetool.format.generate(events, format, backend, group)
+>>>> ?File "/work/armbru/qemu/scripts/tracetool/format/__init__.py", line 85, in generate
+>>>> ?? func(events, backend, group)
+>>>> ?File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 121, in generate
+>>>> ?? fmt_str = "%d@%d " + e.name + " " + c_fmt_to_stap(e.fmt) + "\\n"
+>>>> ?File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 64, in
+>>>> c_fmt_to_stap
+>>>> ?? bits.append(c_macro_to_format(macro))
+>>>> ?File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 36, in
+>>>> c_macro_to_format
+>>>> ?? raise Exception("Unhandled macro '%s'" % macro)
+>>>> Exception: Unhandled macro 'HWADDR_PRIx'
+>>>
+>>> No idea. Nobody else reported a problem with this yet and the above error makes no
+>>> sense to me. Cc'd some tracetool related people who hopefully can hint what might be
+>>> wrong. Do you get error during build? What trace backend do you use?
 >
-> Oh, bummer, I missed that it was no longer needed. I still think it's
-> worth adding that for future use once it will be necessary to detect
-> that certain things were patched and require libvirt to change behaviour
-> if that's the case.
+> I enable all trace backends for my integration testing.  The error is
+> thrown for the dtrace backend.
+>
+>> You can't use HWADDR_PRIx in trace-events because other non-qemu-based trace backends
+>> have no awareness of it (as I also found out). For HWADDR_PRIx you need to use PRIx64
 
-We'll add it when we have a compelling use for it.
+OK, does it compile for you if you change that to PRIx64? Should I submit 
+a patch with that fix or do you want to make a patch?
 
->> Well, that may prove to be a short-lived hiatus, if libvirt would
->> happily attempt to use qemu 3.1 and fail without some other
->> introspectible hook to know whether auto-read-only has required semantics.
+Regards,
+BALATON Zoltan
