@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60898)
+Received: from eggs.gnu.org ([209.51.188.92]:60913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODe-0007B7-Nd
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODf-0007EW-Gg
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODd-0003O0-Jw
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:06 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:55571)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODe-0003Sn-GM
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:07 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h3ODc-0003JH-WC
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:05 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id 4so289917wmf.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:04 -0700 (PDT)
+	id 1h3ODe-0003NE-1W
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:06 -0400
+Received: by mail-wr1-x431.google.com with SMTP id t18so5945020wrx.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:05 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 11 Mar 2019 17:55:27 +0100
-Message-Id: <1552323335-46779-24-git-send-email-pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 17:55:28 +0100
+Message-Id: <1552323335-46779-25-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 23/31] lsi: use enum type for s->waiting
+Subject: [Qemu-devel] [PULL v2 24/31] lsi: use enum type for s->msg_action
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,156 +39,103 @@ This makes the code easier to read - no functional change.
 
 Signed-off-by: Sven Schnelle <svens@stackframe.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190305195519.24303-3-svens@stackframe.org>
+Message-Id: <20190305195519.24303-4-svens@stackframe.org>
 ---
- hw/scsi/lsi53c895a.c | 42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ hw/scsi/lsi53c895a.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 402b785..c17bb4f 100644
+index c17bb4f..d67584e 100644
 --- a/hw/scsi/lsi53c895a.c
 +++ b/hw/scsi/lsi53c895a.c
-@@ -194,6 +194,13 @@ typedef struct lsi_request {
-     QTAILQ_ENTRY(lsi_request) next;
- } lsi_request;
+@@ -201,6 +201,13 @@ enum {
+     LSI_DMA_IN_PROGRESS, /* DMA operation is in progress */
+ };
  
 +enum {
-+    LSI_NOWAIT, /* SCRIPTS are running or stopped */
-+    LSI_WAIT_RESELECT, /* Wait Reselect instruction has been issued */
-+    LSI_DMA_SCRIPTS, /* processing DMA from lsi_execute_script */
-+    LSI_DMA_IN_PROGRESS, /* DMA operation is in progress */
++    LSI_MSG_ACTION_COMMAND = 0,
++    LSI_MSG_ACTION_DISCONNECT = 1,
++    LSI_MSG_ACTION_DOUT = 2,
++    LSI_MSG_ACTION_DIN = 3,
 +};
 +
  typedef struct {
      /*< private >*/
      PCIDevice parent_obj;
-@@ -212,10 +219,6 @@ typedef struct {
+@@ -214,8 +221,6 @@ typedef struct {
+ 
+     int carry; /* ??? Should this be an a visible register somewhere?  */
+     int status;
+-    /* Action to take at the end of a MSG IN phase.
+-       0 = COMMAND, 1 = disconnect, 2 = DATA OUT, 3 = DATA IN.  */
      int msg_action;
      int msg_len;
      uint8_t msg[LSI_MAX_MSGIN_LEN];
--    /* 0 if SCRIPTS are running or stopped.
--     * 1 if a Wait Reselect instruction has been issued.
--     * 2 if processing DMA from lsi_execute_script.
--     * 3 if a DMA operation is in progress.  */
-     int waiting;
-     SCSIBus bus;
-     int current_lun;
-@@ -322,7 +325,7 @@ static void lsi_soft_reset(LSIState *s)
+@@ -323,7 +328,7 @@ static void lsi_soft_reset(LSIState *s)
+     trace_lsi_reset();
+     s->carry = 0;
  
-     s->msg_action = 0;
+-    s->msg_action = 0;
++    s->msg_action = LSI_MSG_ACTION_COMMAND;
      s->msg_len = 0;
--    s->waiting = 0;
-+    s->waiting = LSI_NOWAIT;
+     s->waiting = LSI_NOWAIT;
      s->dsa = 0;
-     s->dnad = 0;
-     s->dbc = 0;
-@@ -564,10 +567,10 @@ static void lsi_bad_phase(LSIState *s, int out, int new_phase)
- static void lsi_resume_script(LSIState *s)
- {
-     if (s->waiting != 2) {
--        s->waiting = 0;
-+        s->waiting = LSI_NOWAIT;
-         lsi_execute_script(s);
-     } else {
--        s->waiting = 0;
-+        s->waiting = LSI_NOWAIT;
-     }
+@@ -686,7 +691,7 @@ static void lsi_reselect(LSIState *s, lsi_request *p)
+     trace_lsi_reselect(id);
+     s->scntl1 |= LSI_SCNTL1_CON;
+     lsi_set_phase(s, PHASE_MI);
+-    s->msg_action = p->out ? 2 : 3;
++    s->msg_action = p->out ? LSI_MSG_ACTION_DOUT : LSI_MSG_ACTION_DIN;
+     s->current->dma_len = p->pending;
+     lsi_add_msg_byte(s, 0x80);
+     if (s->current->tag & LSI_TAG_VALID) {
+@@ -857,7 +862,7 @@ static void lsi_do_command(LSIState *s)
+             lsi_add_msg_byte(s, 4); /* DISCONNECT */
+             /* wait data */
+             lsi_set_phase(s, PHASE_MI);
+-            s->msg_action = 1;
++            s->msg_action = LSI_MSG_ACTION_DISCONNECT;
+             lsi_queue_command(s);
+         } else {
+             /* wait command complete */
+@@ -878,7 +883,7 @@ static void lsi_do_status(LSIState *s)
+     s->sfbr = status;
+     pci_dma_write(PCI_DEVICE(s), s->dnad, &status, 1);
+     lsi_set_phase(s, PHASE_MI);
+-    s->msg_action = 1;
++    s->msg_action = LSI_MSG_ACTION_DISCONNECT;
+     lsi_add_msg_byte(s, 0); /* COMMAND COMPLETE */
  }
  
-@@ -744,7 +747,7 @@ static int lsi_queue_req(LSIState *s, SCSIRequest *req, uint32_t len)
-        Since no interrupt stacking is implemented in the emulation, it
-        is also required that there are no pending interrupts waiting
-        for service from the device driver. */
--    if (s->waiting == 1 ||
-+    if (s->waiting == LSI_WAIT_RESELECT ||
-         (lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON) &&
-          !(s->istat0 & (LSI_ISTAT0_SIP | LSI_ISTAT0_DIP)))) {
-         /* Reselect device.  */
-@@ -789,7 +792,7 @@ static void lsi_transfer_data(SCSIRequest *req, uint32_t len)
-     int out;
- 
-     assert(req->hba_private);
--    if (s->waiting == 1 || req->hba_private != s->current ||
-+    if (s->waiting == LSI_WAIT_RESELECT || req->hba_private != s->current ||
-         (lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON))) {
-         if (lsi_queue_req(s, req, len)) {
-             return;
-@@ -803,7 +806,7 @@ static void lsi_transfer_data(SCSIRequest *req, uint32_t len)
-     s->current->dma_len = len;
-     s->command_complete = 1;
-     if (s->waiting) {
--        if (s->waiting == 1 || s->dbc == 0) {
-+        if (s->waiting == LSI_WAIT_RESELECT || s->dbc == 0) {
-             lsi_resume_script(s);
-         } else {
-             lsi_do_dma(s, out);
-@@ -1093,7 +1096,7 @@ static void lsi_wait_reselect(LSIState *s)
-         lsi_reselect(s, p);
-     }
-     if (s->current == NULL) {
--        s->waiting = 1;
-+        s->waiting = LSI_WAIT_RESELECT;
-     }
+@@ -901,16 +906,16 @@ static void lsi_do_msgin(LSIState *s)
+         /* ??? Check if ATN (not yet implemented) is asserted and maybe
+            switch to PHASE_MO.  */
+         switch (s->msg_action) {
+-        case 0:
++        case LSI_MSG_ACTION_COMMAND:
+             lsi_set_phase(s, PHASE_CMD);
+             break;
+-        case 1:
++        case LSI_MSG_ACTION_DISCONNECT:
+             lsi_disconnect(s);
+             break;
+-        case 2:
++        case LSI_MSG_ACTION_DOUT:
+             lsi_set_phase(s, PHASE_DO);
+             break;
+-        case 3:
++        case LSI_MSG_ACTION_DIN:
+             lsi_set_phase(s, PHASE_DI);
+             break;
+         default:
+@@ -1062,7 +1067,7 @@ bad:
+     qemu_log_mask(LOG_UNIMP, "Unimplemented message 0x%02x\n", msg);
+     lsi_set_phase(s, PHASE_MI);
+     lsi_add_msg_byte(s, 7); /* MESSAGE REJECT */
+-    s->msg_action = 0;
++    s->msg_action = LSI_MSG_ACTION_COMMAND;
  }
  
-@@ -1202,16 +1205,16 @@ again:
-         s->dnad64 = addr_high;
-         switch (s->sstat1 & 0x7) {
-         case PHASE_DO:
--            s->waiting = 2;
-+            s->waiting = LSI_DMA_SCRIPTS;
-             lsi_do_dma(s, 1);
-             if (s->waiting)
--                s->waiting = 3;
-+                s->waiting = LSI_DMA_IN_PROGRESS;
-             break;
-         case PHASE_DI:
--            s->waiting = 2;
-+            s->waiting = LSI_DMA_SCRIPTS;
-             lsi_do_dma(s, 0);
-             if (s->waiting)
--                s->waiting = 3;
-+                s->waiting = LSI_DMA_IN_PROGRESS;
-             break;
-         case PHASE_CMD:
-             lsi_do_command(s);
-@@ -1278,6 +1281,7 @@ again:
-                 }
-                 s->sbcl |= LSI_SBCL_BSY;
-                 lsi_set_phase(s, PHASE_MO);
-+                s->waiting = LSI_NOWAIT;
-                 break;
-             case 1: /* Disconnect */
-                 trace_lsi_execute_script_io_disconnect();
-@@ -1544,7 +1548,7 @@ again:
-             }
-         }
-     }
--    if (insn_processed > 10000 && !s->waiting) {
-+    if (insn_processed > 10000 && s->waiting == LSI_NOWAIT) {
-         /* Some windows drivers make the device spin waiting for a memory
-            location to change.  If we have been executed a lot of code then
-            assume this is the case and force an unexpected device disconnect.
-@@ -1556,7 +1560,7 @@ again:
-         }
-         lsi_script_scsi_interrupt(s, LSI_SIST0_UDC, 0);
-         lsi_disconnect(s);
--    } else if (s->istat1 & LSI_ISTAT1_SRUN && !s->waiting) {
-+    } else if (s->istat1 & LSI_ISTAT1_SRUN && s->waiting == LSI_NOWAIT) {
-         if (s->dcntl & LSI_DCNTL_SSM) {
-             lsi_script_dma_interrupt(s, LSI_DSTAT_SSI);
-         } else {
-@@ -1887,9 +1891,9 @@ static void lsi_reg_writeb(LSIState *s, int offset, uint8_t val)
-             s->istat0 &= ~LSI_ISTAT0_INTF;
-             lsi_update_irq(s);
-         }
--        if (s->waiting == 1 && val & LSI_ISTAT0_SIGP) {
-+        if (s->waiting == LSI_WAIT_RESELECT && val & LSI_ISTAT0_SIGP) {
-             trace_lsi_awoken();
--            s->waiting = 0;
-+            s->waiting = LSI_NOWAIT;
-             s->dsp = s->dnad;
-             lsi_execute_script(s);
-         }
+ #define LSI_BUF_SIZE 4096
 -- 
 1.8.3.1
