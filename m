@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40988)
+Received: from eggs.gnu.org ([209.51.188.92]:41316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h3Kob-0003Ti-Ja
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:18:07 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3Kol-0003hA-8N
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:18:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1h3Kd6-0003gE-Az
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:06:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39556)
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3KcH-0002x4-7B
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:05:20 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:55231 helo=smtp.ehu.eus)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h3KTo-0005lL-RS
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:56:33 -0400
-Date: Mon, 11 Mar 2019 12:56:14 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190311125614.GV12393@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
-	<20181127135030.1671-1-i.maximets@samsung.com>
-	<1fa60eac-9718-ee9d-e21c-3331c3bd60ff@samsung.com>
-	<CAJ+F1CKBJZ504S5sPvgXfcJvLkG1XpzJ499H54hT4cLffdm+Og@mail.gmail.com>
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h3KcE-0002sr-DK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:05:15 -0400
+Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
+	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id B700334C6F
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:05:10 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8494D110058
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:05:10 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 78E41110052
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:05:10 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.73])
+	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:05:10 +0100 (CET)
+Received: from mail-it1-f178.google.com (mail-it1-f178.google.com
+	[209.85.166.178]) by smtp1 (Postfix) with ESMTPSA id 264AA3F9E4
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:05:10 +0100 (CET)
+Received: by mail-it1-f178.google.com with SMTP id f186so12645822ita.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 06:05:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKBJZ504S5sPvgXfcJvLkG1XpzJ499H54hT4cLffdm+Og@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
+References: <20190311101428.GA11@765644dd90e5>
+	<20190311103207.GI16@765644dd90e5>
+	<84a11265-59ea-4c06-12df-6f2c54927e7f@vivier.eu>
+In-Reply-To: <84a11265-59ea-4c06-12df-6f2c54927e7f@vivier.eu>
+Reply-To: unai.martinezcorral@ehu.eus
+From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
+Date: Mon, 11 Mar 2019 14:04:57 +0100
+Message-ID: <CAGZZdDG2h7p1+Qbe9n56sFrog1uN_-5zE+7Xop04PDkDB3VpEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 10/10] qemu-binfmt-conf.sh: add
+ --test|--dry-run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +47,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Ilya Maximets <i.maximets@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>
 
-On Mon, Mar 11, 2019 at 01:50:37PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Mar 11, 2019 at 1:35 PM Ilya Maximets <i.maximets@samsung.com> =
-wrote:
-> >
-> > Hi.
-> >
-> > I'm trying to figure out the state of this patch set.
-> > Is there any chance for it to be accepted?
-> >
-> > The first patch needs minor rebase. I could send a new version.
->=20
-> Please do,
->=20
-> I prefer the solution proposed in v2: do not register hostmem-memfd if
-> sealing isn't supported (keep sealing=3Dtrue the default - it's one of
-> the main purpose of memfd imho).
->=20
-> Daniel, Eduardo: are you ok with this series for 4.0?
+2019/3/11 11:45, Laurent Vivier:
+> >  while true ; do
+> >      case "$1" in
+> > +    -t|--test|--dry-run)
+>
+> We don't need multiple parameter for the same effect. You must choose
+> between --test and --dry-run.
 
-I prefer the more flexible approach, but I won't object to tieing memfd
-to sealing support.
+Ok. I'll take 'test', because the short for '--dry-run' would be '-d'
+and it is already used for 'debian'.
+
+> > +if [ "x$QEMU_TEST" = "xyes" ] ; then
+> > +    skip(){
+> > +    :;}
+> > +    BINFMT_SET=skip
+>
+> Why do you need a function?
+> Can't you set directly BINFMT_SET to ':'?
+
+Indeed...
 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Unai
