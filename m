@@ -1,35 +1,36 @@
 Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwC-0005vi-HE
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:01 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwD-0005vi-Hz
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mlb-0007Jf-Jd
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46414
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MlV-0007I7-Dy
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:22:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45816
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h3Mlb-0007JT-E8
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:03 -0400
+	id 1h3MlV-0007Hx-7X
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:22:57 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x2BFMuFX005862
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:23:03 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5r5hq57v-1
+	x2BFMuTW005889
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:22:56 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5r5hq52k-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:22:57 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:22:54 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 11 Mar 2019 15:21:50 -0000
+	Mon, 11 Mar 2019 15:21:43 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 11 Mar 2019 11:21:26 -0400
+Date: Mon, 11 Mar 2019 11:21:22 -0400
 In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
 References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1552317693-21979-9-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 08/15] s390-bios: Map low core memory
+Message-Id: <1552317693-21979-5-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 04/15] s390-bios: Extend find_dev() for
+ non-virtio devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,133 +41,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a new header for basic architecture specific definitions and add a
-mapping of low core memory. This mapping will be used by the real dasd boot
-process.
+We need a method for finding the subchannel of a dasd device. Let's
+modify find_dev to handle this since it mostly does what we need. Up to
+this point find_dev has been specific to only virtio devices.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/main.c      |  2 +
- pc-bios/s390-ccw/s390-arch.h | 90 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
+ pc-bios/s390-ccw/main.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 2d912cb..d3a161c 100644
+index 67df421..7e3f65e 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
-  */
+@@ -49,6 +49,12 @@ unsigned int get_loadparm_index(void)
+     return atoui(loadparm_str);
+ }
  
- #include "libc.h"
-+#include "s390-arch.h"
- #include "s390-ccw.h"
- #include "cio.h"
- #include "virtio.h"
-@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+LowCore const *lowcore; /* Yes, this *is* a pointer to address 0 */
- 
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-new file mode 100644
-index 0000000..5e92c7a
---- /dev/null
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -0,0 +1,90 @@
 +/*
-+ * S390 Basic Architecture
-+ *
-+ * Copyright (c) 2019 Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
++ * Find the subchannel connected to the given device (dev_no) and fill in the
++ * subchannel information block (schib) with the connected subchannel's info.
++ * NOTE: The global variable blk_schid is updated to contain the subchannel
++ * information.
 + */
+ static bool find_dev(Schib *schib, int dev_no)
+ {
+     int i, r;
+@@ -62,15 +68,15 @@ static bool find_dev(Schib *schib, int dev_no)
+         if (!schib->pmcw.dnv) {
+             continue;
+         }
+-        if (!virtio_is_supported(blk_schid)) {
+-            continue;
+-        }
 +
-+#ifndef S390_ARCH_H
-+#define S390_ARCH_H
+         /* Skip net devices since no IPLB is created and therefore no
+-         * no network bootloader has been loaded
++         * network bootloader has been loaded
+          */
+-        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
++        if (virtio_is_supported(blk_schid) &&
++            virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
+             continue;
+         }
 +
-+typedef struct PSW {
-+    uint64_t mask;
-+    uint64_t addr;
-+} __attribute__ ((aligned(8))) PSW;
-+_Static_assert(sizeof(struct PSW) == 16, "PSW size incorrect");
-+
-+/* Older PSW format used by LPSW instruction */
-+typedef struct PSWLegacy {
-+    uint32_t mask;
-+    uint32_t addr;
-+} __attribute__ ((aligned(8))) PSWLegacy;
-+_Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
-+
-+/* s390 psw bit masks */
-+#define PSW_MASK_IOINT      0x0200000000000000ULL
-+#define PSW_MASK_WAIT       0x0002000000000000ULL
-+#define PSW_MASK_EAMODE     0x0000000100000000ULL
-+#define PSW_MASK_BAMODE     0x0000000080000000ULL
-+#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-+
-+/* Low core mapping */
-+typedef struct LowCore {
-+    /* prefix area: defined by architecture */
-+    PSWLegacy       ipl_psw;                  /* 0x000 */
-+    uint32_t        ccw1[2];                  /* 0x008 */
-+    uint32_t        ccw2[2];                  /* 0x010 */
-+    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-+    uint32_t        ext_params;               /* 0x080 */
-+    uint16_t        cpu_addr;                 /* 0x084 */
-+    uint16_t        ext_int_code;             /* 0x086 */
-+    uint16_t        svc_ilen;                 /* 0x088 */
-+    uint16_t        svc_code;                 /* 0x08a */
-+    uint16_t        pgm_ilen;                 /* 0x08c */
-+    uint16_t        pgm_code;                 /* 0x08e */
-+    uint32_t        data_exc_code;            /* 0x090 */
-+    uint16_t        mon_class_num;            /* 0x094 */
-+    uint16_t        per_perc_atmid;           /* 0x096 */
-+    uint64_t        per_address;              /* 0x098 */
-+    uint8_t         exc_access_id;            /* 0x0a0 */
-+    uint8_t         per_access_id;            /* 0x0a1 */
-+    uint8_t         op_access_id;             /* 0x0a2 */
-+    uint8_t         ar_access_id;             /* 0x0a3 */
-+    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-+    uint64_t        trans_exc_code;           /* 0x0a8 */
-+    uint64_t        monitor_code;             /* 0x0b0 */
-+    uint16_t        subchannel_id;            /* 0x0b8 */
-+    uint16_t        subchannel_nr;            /* 0x0ba */
-+    uint32_t        io_int_parm;              /* 0x0bc */
-+    uint32_t        io_int_word;              /* 0x0c0 */
-+    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-+    uint32_t        stfl_fac_list;            /* 0x0c8 */
-+    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-+    uint64_t        mcic;                     /* 0x0e8 */
-+    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-+    uint32_t        external_damage_code;     /* 0x0f4 */
-+    uint64_t        failing_storage_address;  /* 0x0f8 */
-+    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-+    uint64_t        per_breaking_event_addr;  /* 0x110 */
-+    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-+    PSW             restart_old_psw;          /* 0x120 */
-+    PSW             external_old_psw;         /* 0x130 */
-+    PSW             svc_old_psw;              /* 0x140 */
-+    PSW             program_old_psw;          /* 0x150 */
-+    PSW             mcck_old_psw;             /* 0x160 */
-+    PSW             io_old_psw;               /* 0x170 */
-+    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-+    PSW             restart_new_psw;          /* 0x1a0 */
-+    PSW             external_new_psw;         /* 0x1b0 */
-+    PSW             svc_new_psw;              /* 0x1c0 */
-+    PSW             program_new_psw;          /* 0x1d0 */
-+    PSW             mcck_new_psw;             /* 0x1e0 */
-+    PSW             io_new_psw;               /* 0x1f0 */
-+} __attribute__((packed, aligned(8192))) LowCore;
-+
-+extern LowCore const *lowcore;
-+
-+#endif
+         if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
+             return true;
+         }
 -- 
 2.7.4
