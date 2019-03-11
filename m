@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35538)
+Received: from eggs.gnu.org ([209.51.188.92]:38715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1h3MOs-0006iB-2f
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:59:35 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1h3MYx-0006xo-HS
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1h3MOq-0003dc-TL
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:59:34 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33707)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1h3MOq-0003dA-JA
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:59:32 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h11so4246631pgl.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:59:32 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20190310003428.11723-1-f4bug@amsat.org>
-	<20190310003428.11723-6-f4bug@amsat.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d49bf2d2-8c5b-0d00-188e-1ba92571aa28@twiddle.net>
-Date: Mon, 11 Mar 2019 07:59:28 -0700
+	(envelope-from <eric.auger@redhat.com>) id 1h3MYw-0000QN-U1
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:09:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1h3MYw-0000PQ-Mg
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:09:58 -0400
+References: <20190214190603.25030-1-peter.maydell@linaro.org>
+	<20190214190603.25030-12-peter.maydell@linaro.org>
+	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+	<CAFEAcA9=oUk_W+pqYLkd=oBC7eENU1yYKbGzoOzgxXoOmg7_+A@mail.gmail.com>
+	<85304416-5bd3-c957-b2c3-dd8e7c1aa071@redhat.com>
+	<CAFEAcA8vdJyNa7KEAv5sOJDQUu_9x0pyXvixw4nT0Yq1KVosmA@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <1a59692d-527c-9750-4bfa-6b5adbbab81a@redhat.com>
+Date: Mon, 11 Mar 2019 16:09:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190310003428.11723-6-f4bug@amsat.org>
+In-Reply-To: <CAFEAcA8vdJyNa7KEAv5sOJDQUu_9x0pyXvixw4nT0Yq1KVosmA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] target/m68k: Optimize rotate_x() using
- extract_i32()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
+ guests to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 3/9/19 4:34 PM, Philippe Mathieu-Daudé wrote:
-> Optimize rotate_x() using tcg_gen_extract_i32(). We can now free the
-> 'sz' tcg_temp earlier. Since it is allocated with tcg_const_i32(),
-> free it with tcg_temp_free_i32().
+Hi Peter,
+
+On 3/11/19 3:55 PM, Peter Maydell wrote:
+> On Mon, 11 Mar 2019 at 14:54, Auger Eric <eric.auger@redhat.com> wrote:
+>> yes I hit the bug with your reduced command line:
+>>
+>> aarch64-softmmu/qemu-system-aarch64 -M virt,gic-version=host -cpu host
+>> -smp 2 -m 4G -display none --enable-kvm  -serial stdio -bios
+>> ~/VM/UEFI/QEMU_EFI_cbuild_debug_feb21_2019.fd
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/m68k/translate.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+> OK, that's good to know. What hardware are you using, and what host
+> kernel version ?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I am using Cavium ThunderX 2 and 5.0 host
 
+Thanks
 
-r~
+Eric
+> 
+> thanks
+> -- PMM
+> 
