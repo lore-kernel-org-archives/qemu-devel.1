@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35518)
+Received: from eggs.gnu.org ([209.51.188.92]:35525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I9X-0005rF-Cn
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:28 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3I9Y-0005rG-CC
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I82-0007DK-SO
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:55 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37669)
+	(envelope-from <philmd@redhat.com>) id 1h3I80-0007CC-Ep
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:53 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3I82-0007Cu-LQ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:54 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x10so3663042wmg.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 03:25:54 -0700 (PDT)
-References: <20190311074752.GA17747@ls3530.dellerweb.de>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3I80-00079n-7u
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:25:52 -0400
+Received: by mail-wr1-f68.google.com with SMTP id w2so4404293wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 03:25:52 -0700 (PDT)
+References: <20190310160227.103090-1-liq3ea@163.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9b974705-d8b3-3068-9925-23e678491d98@redhat.com>
-Date: Mon, 11 Mar 2019 11:11:26 +0100
+Message-ID: <8d2f633f-97c8-9577-742c-a78a0603f2d5@redhat.com>
+Date: Mon, 11 Mar 2019 11:09:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190311074752.GA17747@ls3530.dellerweb.de>
+In-Reply-To: <20190310160227.103090-1-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] pcnet: Avoid warning when switching back
- to 16bit mode
+Subject: Re: [Qemu-devel] [PATCH] tests: test-qgraph: fix a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 
-On 3/11/19 8:47 AM, Helge Deller wrote:
-> When Linux is shutting down, the pcnet32 driver switches the pcnet card
-> back to 16bit mode to "avoid problems with dumb DOS packet driver after
-> a warm reboot".
-> This triggers the following warning in the qemu pcnet32 emulation:
-> Bad SWSTYLE=0x04
-
-This was bugging us for years, thanks!
-
+On 3/10/19 5:02 PM, Li Qiang wrote:
+> Spotted by ASAN when 'make check'.
 > 
-> Avoid this qemu warning by allowing the switch-back to 16bit mode.
-> 
-> Signed-off-by: Helge Deller <deller@gmx.de>
+
+Fixes: fc281c80202
+
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+> ---
+>  tests/test-qgraph.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-> index d9ba04bdfc..14eb2fa1b0 100644
-> --- a/hw/net/pcnet.c
-> +++ b/hw/net/pcnet.c
-> @@ -1496,8 +1496,9 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_t rap, uint32_t val)
->          case 1:
->              val |= 0x0100;
->              break;
-> -        case 2:
-> +        case 2: /* 32bit mode */
->          case 3:
-> +        case 4: /* 16bit mode */
->              val |= 0x0300;
->              break;
->          default:
+> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+> index f6a6565e31..5c7e457075 100644
+> --- a/tests/test-qgraph.c
+> +++ b/tests/test-qgraph.c
+> @@ -122,7 +122,7 @@ static void check_driver(const char *driver)
+>  static void check_test(const char *test, const char *interface)
+>  {
+>      QOSGraphEdge *edge;
+> -    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+> +    char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+>  
+>      qos_add_test(test, interface, testfunct, NULL);
+>      g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
+> @@ -138,6 +138,7 @@ static void check_test(const char *test, const char *interface)
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
+>      qos_graph_node_set_availability(full_name, FALSE);
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
+> +    g_free(full_name);
+>  }
+>  
+>  static void count_each_test(QOSGraphNode *path, int len)
 > 
