@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35869)
+Received: from eggs.gnu.org ([209.51.188.92]:35788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3T6V-0000Dv-Io
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:09:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3T6R-00008A-LU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3T6T-0004gv-G1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:09:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60130)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3T6R-0004ep-LJ
+	(envelope-from <armbru@redhat.com>) id 1h3T6P-0004dv-63
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:08:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from mx1.redhat.com ([209.132.183.28]:45406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3T6O-0004d2-QZ
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 18:08:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 823A0356DB
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ECE2B3084029
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:55 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-92.ams2.redhat.com
+	[10.36.116.92])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 938685DA27
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 22:08:54 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 11 Mar 2019 23:08:40 +0100
-Message-Id: <20190311220843.4026-25-armbru@redhat.com>
+Date: Mon, 11 Mar 2019 23:08:33 +0100
+Message-Id: <20190311220843.4026-18-armbru@redhat.com>
 In-Reply-To: <20190311220843.4026-1-armbru@redhat.com>
 References: <20190311220843.4026-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/27] pc_sysfw: Remove unused PcSysFwDevice
+Subject: [Qemu-devel] [PULL 17/27] qom: Move compat_props machinery from
+ qdev to QOM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +38,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+See the previous commit for rationale.
 
-This structure is not used since commit 6dd2a5c98a.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190308131445.17502-10-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190308131445.17502-3-armbru@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/pc_sysfw.c | 5 -----
- 1 file changed, 5 deletions(-)
+ hw/core/qdev.c         | 39 ---------------------------------------
+ include/hw/qdev-core.h |  4 ----
+ include/qom/object.h   |  3 +++
+ qom/object.c           | 39 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 43 deletions(-)
 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 34727c5b1f..46b87afe23 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -40,11 +40,6 @@
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 4f3200d54b..f9b6efe509 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -978,45 +978,6 @@ static void device_initfn(Object *obj)
+     QLIST_INIT(&dev->gpios);
+ }
 =20
- #define BIOS_FILENAME "bios.bin"
-=20
--typedef struct PcSysFwDevice {
--    SysBusDevice busdev;
--    uint8_t isapc_ram_fw;
--} PcSysFwDevice;
+-/*
+- * Global property defaults
+- * Slot 0: accelerator's global property defaults
+- * Slot 1: machine's global property defaults
+- * Each is a GPtrArray of of GlobalProperty.
+- * Applied in order, later entries override earlier ones.
+- */
+-static GPtrArray *object_compat_props[2];
 -
- static void pc_isa_bios_init(MemoryRegion *rom_memory,
-                              MemoryRegion *flash_mem,
-                              int ram_size)
+-/*
+- * Set machine's global property defaults to @compat_props.
+- * May be called at most once.
+- */
+-void object_set_machine_compat_props(GPtrArray *compat_props)
+-{
+-    assert(!object_compat_props[1]);
+-    object_compat_props[1] =3D compat_props;
+-}
+-
+-/*
+- * Set accelerator's global property defaults to @compat_props.
+- * May be called at most once.
+- */
+-void object_set_accelerator_compat_props(GPtrArray *compat_props)
+-{
+-    assert(!object_compat_props[0]);
+-    object_compat_props[0] =3D compat_props;
+-}
+-
+-void object_apply_compat_props(Object *obj)
+-{
+-    int i;
+-
+-    for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
+-        object_apply_global_props(obj, object_compat_props[i],
+-                                  &error_abort);
+-    }
+-}
+-
+ static void device_post_init(Object *obj)
+ {
+     /*
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index aa8a3ea782..33ed3b8dde 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -431,10 +431,6 @@ const char *qdev_fw_name(DeviceState *dev);
+=20
+ Object *qdev_get_machine(void);
+=20
+-void object_set_machine_compat_props(GPtrArray *compat_props);
+-void object_set_accelerator_compat_props(GPtrArray *compat_props);
+-void object_apply_compat_props(Object *obj);
+-
+ /* FIXME: make this a link<> */
+ void qdev_set_parent_bus(DeviceState *dev, BusState *bus);
+=20
+diff --git a/include/qom/object.h b/include/qom/object.h
+index e0262962b5..288cdddf44 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -677,6 +677,9 @@ Object *object_new_with_propv(const char *typename,
+=20
+ void object_apply_global_props(Object *obj, const GPtrArray *props,
+                                Error **errp);
++void object_set_machine_compat_props(GPtrArray *compat_props);
++void object_set_accelerator_compat_props(GPtrArray *compat_props);
++void object_apply_compat_props(Object *obj);
+=20
+ /**
+  * object_set_props:
+diff --git a/qom/object.c b/qom/object.c
+index 05a8567041..e3206d6799 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -408,6 +408,45 @@ void object_apply_global_props(Object *obj, const GP=
+trArray *props, Error **errp
+     }
+ }
+=20
++/*
++ * Global property defaults
++ * Slot 0: accelerator's global property defaults
++ * Slot 1: machine's global property defaults
++ * Each is a GPtrArray of of GlobalProperty.
++ * Applied in order, later entries override earlier ones.
++ */
++static GPtrArray *object_compat_props[2];
++
++/*
++ * Set machine's global property defaults to @compat_props.
++ * May be called at most once.
++ */
++void object_set_machine_compat_props(GPtrArray *compat_props)
++{
++    assert(!object_compat_props[1]);
++    object_compat_props[1] =3D compat_props;
++}
++
++/*
++ * Set accelerator's global property defaults to @compat_props.
++ * May be called at most once.
++ */
++void object_set_accelerator_compat_props(GPtrArray *compat_props)
++{
++    assert(!object_compat_props[0]);
++    object_compat_props[0] =3D compat_props;
++}
++
++void object_apply_compat_props(Object *obj)
++{
++    int i;
++
++    for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
++        object_apply_global_props(obj, object_compat_props[i],
++                                  &error_abort);
++    }
++}
++
+ static void object_initialize_with_type(void *data, size_t size, TypeImp=
+l *type)
+ {
+     Object *obj =3D data;
 --=20
 2.17.2
