@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34407)
+Received: from eggs.gnu.org ([209.51.188.92]:34252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h3Qay-0004Gr-Up
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:28:21 -0400
+	(envelope-from <svens@stackframe.org>) id 1h3Qb0-00042z-5s
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1h3QPI-0007Wq-9m
+	(envelope-from <svens@stackframe.org>) id 1h3QPI-0007Wv-AN
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:16:17 -0400
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:60429)
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:42532)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1h3QPH-0007VJ-Po
+	id 1h3QPH-0007V7-U7
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:16:16 -0400
 From: Sven Schnelle <svens@stackframe.org>
-Date: Mon, 11 Mar 2019 20:16:01 +0100
-Message-Id: <20190311191602.25796-11-svens@stackframe.org>
+Date: Mon, 11 Mar 2019 20:15:58 +0100
+Message-Id: <20190311191602.25796-8-svens@stackframe.org>
 In-Reply-To: <20190311191602.25796-1-svens@stackframe.org>
 References: <20190311191602.25796-1-svens@stackframe.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 10/11] target/hppa: exit TB if either Data or
- Instruction TLB changes
+Subject: [Qemu-devel] [PATCH 07/11] target/hppa: fix b,gate instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 
-The current code assumes that we don't need to exit the TB
-if a Data Cache Flush or Insert has happend. However, as we
-have a shared Data/Instruction TLB, a Data cache flush also
-flushes Instruction TLB entries, and a Data cache TLB insert
-might also evict a Instruction TLB entry.
-
-So exit the TB in all cases if Instruction translation is enabled.
+b,gate does GR[t] ← cat(GR[t]{0..29},IAOQ_Front{30..31});
+instead of saving the link address to register t.
 
 Signed-off-by: Sven Schnelle <svens@stackframe.org>
 ---
- target/hppa/translate.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ target/hppa/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index a393a12252..fcacff963e 100644
+index 441f0ea9d6..a393a12252 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2474,9 +2474,8 @@ static bool trans_ixtlbx(DisasContext *ctx, arg_ixtlbx *a)
-         gen_helper_itlbp(cpu_env, addr, reg);
+@@ -3464,6 +3464,7 @@ static bool trans_b_gate(DisasContext *ctx, arg_b_gate *a)
      }
  
--    /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
--       the case, since the OS TLB fill handler runs with mmu disabled.  */
--    if (!a->data && (ctx->tb_flags & PSW_C)) {
-+    /* Exit TB for TLB change if mmu is enabled.  */
-+    if (ctx->tb_flags & PSW_C) {
-         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
+ #ifndef CONFIG_USER_ONLY
++    TCGv_reg tmp;
+     if (ctx->tb_flags & PSW_C) {
+         CPUHPPAState *env = ctx->cs->env_ptr;
+         int type = hppa_artype_for_page(env, ctx->base.pc_next);
+@@ -3480,12 +3481,13 @@ static bool trans_b_gate(DisasContext *ctx, arg_b_gate *a)
+         if (type >= 4 && type - 4 < ctx->privilege) {
+             dest = deposit32(dest, 0, 2, type - 4);
+         }
++        tmp = dest_gpr(ctx, a->l);
++        tcg_gen_deposit_reg(tmp, tmp, cpu_iaoq_f, 0, 2);
+     } else {
+         dest &= -4;  /* priv = 0 */
      }
-     return nullify_end(ctx);
-@@ -2503,7 +2502,7 @@ static bool trans_pxtlbx(DisasContext *ctx, arg_pxtlbx *a)
-     }
+ #endif
+-
+-    return do_dbranch(ctx, dest, a->l, a->n);
++    return do_dbranch(ctx, dest, 0, a->n);
+ }
  
-     /* Exit TB for TLB change if mmu is enabled.  */
--    if (!a->data && (ctx->tb_flags & PSW_C)) {
-+    if (ctx->tb_flags & PSW_C) {
-         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
-     }
-     return nullify_end(ctx);
+ static bool trans_blr(DisasContext *ctx, arg_blr *a)
 -- 
 2.20.1
