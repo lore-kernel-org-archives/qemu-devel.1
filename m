@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51948)
+Received: from eggs.gnu.org ([209.51.188.92]:55402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h39G0-0007bK-OT
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:33 -0400
+	(envelope-from <ngompa13@gmail.com>) id 1h39bq-0005d4-3y
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h39G0-0007Yb-1f
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h39Fz-0007Y7-Ro
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:31 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 11 Mar 2019 01:56:18 +0100
-Message-Id: <20190311005618.19007-8-philmd@redhat.com>
-In-Reply-To: <20190311005618.19007-1-philmd@redhat.com>
-References: <20190311005618.19007-1-philmd@redhat.com>
+	(envelope-from <ngompa13@gmail.com>) id 1h39SY-00068t-8A
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:10:31 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:39694)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ngompa13@gmail.com>) id 1h39SX-00068V-Tr
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:10:30 -0400
+Received: by mail-qt1-x841.google.com with SMTP id i14so3346847qtp.6
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 18:10:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<87r2bigarf.fsf@zen.linaroharston>
+	<a6d25edf-1386-655e-6fd8-3b121838b00b@redhat.com>
+	<CAFEAcA_ybrfeVdGrr=fWRg8xR1Yj33xySjX14-JmPvBySqKF8w@mail.gmail.com>
+	<62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+In-Reply-To: <62408d6c-5a61-ffb2-f810-6ef36703b277@redhat.com>
+From: Neal Gompa <ngompa13@gmail.com>
+Date: Sun, 10 Mar 2019 21:09:51 -0400
+Message-ID: <CAEg-Je-0EA7qafLAXOdSTDAHUEi-Gf9wgriSsDkSrSw-YuPz=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 7/7] hw/mips: Express dependencies of the
- Fulong 2E machine with Kconfig
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-The Fulong 2E machine uses a Loongson 2E as CPU, a Bonito64 system
-controller as North Bridge and a VT82C686 chipset as South Bridge.
-The network card chipset is a RTL8139D.
+On Thu, Mar 7, 2019 at 1:44 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 07/03/19 14:09, Peter Maydell wrote:
+> > On Thu, 7 Mar 2019 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >> In any case, this wouldn't change; as you suggest below, configure cou=
+ld
+> >> remain as a front-end (well, in-srcdir builds are not supported by
+> >> Meson, so "../configure && ninja" perhaps).
+> >
+> > As an aside, it might be a nice idea to drop the in-srcdir
+> > build altogether for QEMU anyway -- it's not really a very
+> > good idea and it means our build system has to cope with two
+> > different ways of working to no particularly useful end.
+>
+> I was actually going to propose that, but I was afraid of throwing two
+> bombs in the same day. :)
+>
+> > Of the various hosts I do builds on:
+> >  * OSX is 2.7 only
+> >  * the ppc64 box in the gcc compile farm is 2.7 and 3.4
+> >    ("Centos 7.5.1804")
+> >  * the aarch64 box in the gcc compile farm is 2.7 and 3.4
+> >    ("Ubuntu 14.04.5 LTS", aka trusty)
+>
+> OS X will need to get Python 3 from Homebrew sooner or later anyway.
+>
+> Trusty does have a python3.5 package, perhaps you could ask the
+> maintainers to install it.
+>
+> CentOS 7 doesn't have "native" Python 3 (even the 3.4 version you have
+> there is probably coming from Fedora) but it has software collections,
+> where you have to do "scl enable rh-python35 './configure && make'".
+> You can check if scl and the rh-python35 software collections are
+> already installed.
+>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v3: Loongson 2E =3D CPU, Fulong 2E =3D machine (Aleksandar)
----
- default-configs/mips64el-softmmu.mak |  3 ---
- hw/isa/Kconfig                       | 13 +++++++++----
- hw/mips/Kconfig                      |  5 +++++
- 3 files changed, 14 insertions(+), 7 deletions(-)
+Most normal users of CentOS use it with EPEL. In this case, EPEL 7 is
+transitioning to Python 3.6 (both are available in EPEL 7 today, and
+Meson is built there against 3.6).
 
-diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips6=
-4el-softmmu.mak
-index 88b66a91d7..d0814e76af 100644
---- a/default-configs/mips64el-softmmu.mak
-+++ b/default-configs/mips64el-softmmu.mak
-@@ -1,9 +1,6 @@
- # Default configuration for mips64el-softmmu
-=20
- include mips-softmmu-common.mak
--CONFIG_IDE_VIA=3Dy
- CONFIG_FULONG=3Dy
--CONFIG_PCI_BONITO=3Dy
- CONFIG_JAZZ=3Dy
--CONFIG_VT82C686=3Dy
- CONFIG_MIPS_BOSTON=3Dy
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index 57e09a0cb8..30055aed82 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -32,10 +32,15 @@ config PIIX4
-=20
- config VT82C686
-     bool
--    select ISA_BUS
--    select ACPI_SMBUS
--    select SERIAL_ISA
--    select FDC
-+    select PCI
-+    select I8259
-+    select I8254
-+    select I8257
-+    select PARALLEL
-+    select IDE_ISA
-+    select IDE_VIA
-+    select USB_UHCI
-+    #select PCKBD
-=20
- config SMC37C669
-     bool
-diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index bd6e3be2cd..b06d70bf01 100644
---- a/hw/mips/Kconfig
-+++ b/hw/mips/Kconfig
-@@ -43,6 +43,11 @@ config JAZZ
-=20
- config FULONG
-     bool
-+    select PCI_BONITO
-+    select VT82C686
-+    select SMBUS_EEPROM
-+    select RTL8139_PCI
-+    select MC146818RTC
-=20
- config MIPS_CPS
-     bool
+macOS already has Python 3 in Homebrew, as well as Meson itself.
+Eventually Apple will change the native Python runtime to 3.x as well.
+
+Ubuntu 14.04 LTS is EOL next month, and Ubuntu 16.04 LTS ships Python
+3.5 and offers a recent Meson in backports.
+
+
 --=20
-2.20.1
+=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
+=BC=81/ Always, there's only one truth!
