@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51980)
+Received: from eggs.gnu.org ([209.51.188.92]:52450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1h3Na4-00067W-2k
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:15:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h3Nba-0007Gw-Ss
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1h3Na1-0003pX-LI
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:15:11 -0400
-Date: Mon, 11 Mar 2019 10:14:57 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190311101457.23237b84@x1.home>
-In-Reply-To: <20190308014420.29178-1-aik@ozlabs.ru>
-References: <20190308014420.29178-1-aik@ozlabs.ru>
+	(envelope-from <no-reply@patchew.org>) id 1h3NbZ-0006Qi-Ee
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:16:46 -0400
+Resent-Message-Id: <E1h3NbZ-0006Qi-Ee@eggs.gnu.org>
+Message-ID: <155232098359.9137.2456647579998545754@6acff2cf482b>
+In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v5] spapr: Support NVIDIA V100 GPU
- with NVLink2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Mar 2019 09:16:24 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,353 +23,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?UTF-8?B?R3Vp?= =?UTF-8?B?bWFyw6Nlcw==?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: jjherne@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On Fri,  8 Mar 2019 12:44:20 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-
-> NVIDIA V100 GPUs have on-board RAM which is mapped into the host memory
-> space and accessible as normal RAM via an NVLink bus. The VFIO-PCI driver
-> implements special regions for such GPUs and emulates an NVLink bridge.
-> NVLink2-enabled POWER9 CPUs also provide address translation services
-> which includes an ATS shootdown (ATSD) register exported via the NVLink
-> bridge device.
-> 
-> This adds a quirk to VFIO to map the GPU memory and create an MR;
-> the new MR is stored in a PCI device as a QOM link. The sPAPR PCI uses
-> this to get the MR and map it to the system address space.
-> Another quirk does the same for ATSD.
-> 
-> This adds additional steps to sPAPR PHB setup:
-> 
-> 1. Search for specific GPUs and NPUs, collect findings in
-> sPAPRPHBState::nvgpus, manage system address space mappings;
-> 
-> 2. Add device-specific properties such as "ibm,npu", "ibm,gpu",
-> "memory-block", "link-speed" to advertise the NVLink2 function to
-> the guest;
-> 
-> 3. Add "mmio-atsd" to vPHB to advertise the ATSD capability;
-> 
-> 4. Add new memory blocks (with extra "linux,memory-usable" to prevent
-> the guest OS from accessing the new memory until it is onlined) and
-> npuphb# nodes representing an NPU unit for every vPHB as the GPU driver
-> uses it for link discovery.
-> 
-> This allocates space for GPU RAM and ATSD like we do for MMIOs by
-> adding 2 new parameters to the phb_placement() hook. Older machine types
-> set these to zero.
-> 
-> This puts new memory nodes in a separate NUMA node to replicate the host
-> system setup as the GPU driver relies on this.
-> 
-> This adds requirement similar to EEH - one IOMMU group per vPHB.
-> The reason for this is that ATSD registers belong to a physical NPU
-> so they cannot invalidate translations on GPUs attached to another NPU.
-> It is guaranteed by the host platform as it does not mix NVLink bridges
-> or GPUs from different NPU in the same IOMMU group. If more than one
-> IOMMU group is detected on a vPHB, this disables ATSD support for that
-> vPHB and prints a warning.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> This is based on David's ppc-for-4.0 +
-> applied but not pushed "iommu replay": https://patchwork.ozlabs.org/patch/1052644/
-> acked "vfio_info_cap public": https://patchwork.ozlabs.org/patch/1052645/
-> 
-> 
-> Changes:
-> v5:
-> * converted MRs to VFIOQuirk - this fixed leaks
-> 
-> v4:
-> * fixed ATSD placement
-> * fixed spapr_phb_unrealize() to do nvgpu cleanup
-> * replaced warn_report() with Error*
-> 
-> v3:
-> * moved GPU RAM above PCI MMIO limit
-> * renamed QOM property to nvlink2-tgt
-> * moved nvlink2 code to its own file
-> 
-> ---
-> 
-> The example command line for redbud system:
-> 
-> pbuild/qemu-aiku1804le-ppc64/ppc64-softmmu/qemu-system-ppc64 \
-> -nodefaults \
-> -chardev stdio,id=STDIO0,signal=off,mux=on \
-> -device spapr-vty,id=svty0,reg=0x71000110,chardev=STDIO0 \
-> -mon id=MON0,chardev=STDIO0,mode=readline -nographic -vga none \
-> -enable-kvm -m 384G \
-> -chardev socket,id=SOCKET0,server,nowait,host=localhost,port=40000 \
-> -mon chardev=SOCKET0,mode=control \
-> -smp 80,sockets=1,threads=4 \
-> -netdev "tap,id=TAP0,helper=/home/aik/qemu-bridge-helper --br=br0" \
-> -device "virtio-net-pci,id=vnet0,mac=52:54:00:12:34:56,netdev=TAP0" \
-> img/vdisk0.img \
-> -device "vfio-pci,id=vfio0004_04_00_0,host=0004:04:00.0" \
-> -device "vfio-pci,id=vfio0006_00_00_0,host=0006:00:00.0" \
-> -device "vfio-pci,id=vfio0006_00_00_1,host=0006:00:00.1" \
-> -device "vfio-pci,id=vfio0006_00_00_2,host=0006:00:00.2" \
-> -device "vfio-pci,id=vfio0004_05_00_0,host=0004:05:00.0" \
-> -device "vfio-pci,id=vfio0006_00_01_0,host=0006:00:01.0" \
-> -device "vfio-pci,id=vfio0006_00_01_1,host=0006:00:01.1" \
-> -device "vfio-pci,id=vfio0006_00_01_2,host=0006:00:01.2" \
-> -device spapr-pci-host-bridge,id=phb1,index=1 \
-> -device "vfio-pci,id=vfio0035_03_00_0,host=0035:03:00.0" \
-> -device "vfio-pci,id=vfio0007_00_00_0,host=0007:00:00.0" \
-> -device "vfio-pci,id=vfio0007_00_00_1,host=0007:00:00.1" \
-> -device "vfio-pci,id=vfio0007_00_00_2,host=0007:00:00.2" \
-> -device "vfio-pci,id=vfio0035_04_00_0,host=0035:04:00.0" \
-> -device "vfio-pci,id=vfio0007_00_01_0,host=0007:00:01.0" \
-> -device "vfio-pci,id=vfio0007_00_01_1,host=0007:00:01.1" \
-> -device "vfio-pci,id=vfio0007_00_01_2,host=0007:00:01.2" -snapshot \
-> -machine pseries \
-> -L /home/aik/t/qemu-ppc64-bios/ -d guest_errors
-> 
-> Note that QEMU attaches PCI devices to the last added vPHB so first
-> 8 devices - 4:04:00.0 till 6:00:01.2 - go to the default vPHB, and
-> 35:03:00.0..7:00:01.2 to the vPHB with id=phb1.
-> ---
->  hw/ppc/Makefile.objs        |   2 +-
->  hw/vfio/pci.h               |   2 +
->  include/hw/pci-host/spapr.h |  45 ++++
->  include/hw/ppc/spapr.h      |   3 +-
->  hw/ppc/spapr.c              |  29 ++-
->  hw/ppc/spapr_pci.c          |  19 ++
->  hw/ppc/spapr_pci_nvlink2.c  | 441 ++++++++++++++++++++++++++++++++++++
->  hw/vfio/pci-quirks.c        | 132 +++++++++++
->  hw/vfio/pci.c               |  14 ++
->  hw/vfio/trace-events        |   4 +
->  10 files changed, 686 insertions(+), 5 deletions(-)
->  create mode 100644 hw/ppc/spapr_pci_nvlink2.c
-> 
-
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index b1ae4c07549a..706c30443617 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -194,6 +194,8 @@ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp);
->  int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
->                                 struct vfio_region_info *info,
->                                 Error **errp);
-> +int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp);
-> +int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp);
->  
->  void vfio_display_reset(VFIOPCIDevice *vdev);
->  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index ab0e3a0a6f72..912fb36807ee 100644
-
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 40a12001f580..99d4180a5479 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -2180,3 +2180,135 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp)
->  
->      return 0;
->  }
-> +
-> +static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
-> +                                     const char *name,
-> +                                     void *opaque, Error **errp)
-> +{
-> +    uint64_t tgt = (uint64_t) opaque;
-> +    visit_type_uint64(v, name, &tgt, errp);
-> +}
-> +
-> +static void vfio_pci_nvlink2_get_link_speed(Object *obj, Visitor *v,
-> +                                                 const char *name,
-> +                                                 void *opaque, Error **errp)
-> +{
-> +    uint32_t link_speed = (uint32_t)(uint64_t) opaque;
-> +    visit_type_uint32(v, name, &link_speed, errp);
-> +}
-> +
-> +int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp)
-> +{
-> +    int ret;
-> +    void *p;
-> +    struct vfio_region_info *nv2reg = NULL;
-> +    struct vfio_info_cap_header *hdr;
-> +    struct vfio_region_info_cap_nvlink2_ssatgt *cap;
-> +    VFIOQuirk *quirk;
-> +
-> +    ret = vfio_get_dev_region_info(&vdev->vbasedev,
-> +                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
-> +                                   PCI_VENDOR_ID_NVIDIA,
-> +                                   VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM,
-> +                                   &nv2reg);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    hdr = vfio_get_region_info_cap(nv2reg, VFIO_REGION_INFO_CAP_NVLINK2_SSATGT);
-> +    if (!hdr) {
-> +        ret = -ENODEV;
-> +        goto free_exit;
-> +    }
-> +    cap = (void *) hdr;
-> +
-> +    p = mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-> +             MAP_SHARED, vdev->vbasedev.fd, nv2reg->offset);
-> +
-> +    if (!p) {
-
-NULL is not the proper test here, mmap(2) needs to test against
-MAP_FAILED for error:
-
-RETURN VALUE
-       On success, mmap() returns a pointer to the mapped area.  On error, the
-       value  MAP_FAILED  (that is, (void *) -1) is returned, and errno is set
-       to indicate the cause of the error.
-
-
-So this should test:
-
-    if (p == MAP_FAILED) {
-
-It's arguable whether we should be setting this up as a proper region
-with vfio_region_setup() and vfio_region_mmap(), and torn down with
-vfio_region_exit() and vfio_region_finalize(), but I guess the quirk is
-sufficient for now.  This would improve the discontinuity David noted
-in using a quirk on an arbitrary, unrelated BAR for managing the
-lifecycle, but we'd need somewhere to call the tear down functions
-rather than piggy backing on the VFIOQuirks on BARs infrastructure.
-
-> +        ret = -errno;
-> +        goto free_exit;
-> +    }
-> +
-> +    quirk = vfio_quirk_alloc(1);
-> +    memory_region_init_ram_ptr(&quirk->mem[0], OBJECT(vdev), "nvlink2-mr",
-> +                               nv2reg->size, p);
-> +    QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
-> +
-> +    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
-> +                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
-> +                        (void *) cap->tgt, NULL);
-> +    trace_vfio_pci_nvidia_gpu_setup_quirk(vdev->vbasedev.name, cap->tgt,
-> +                                          nv2reg->size);
-> +free_exit:
-> +    g_free(nv2reg);
-> +
-> +    return ret;
-> +}
-> +
-> +int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp)
-> +{
-> +    int ret;
-> +    void *p;
-> +    struct vfio_region_info *atsdreg = NULL;
-> +    struct vfio_info_cap_header *hdr;
-> +    struct vfio_region_info_cap_nvlink2_ssatgt *captgt;
-> +    struct vfio_region_info_cap_nvlink2_lnkspd *capspeed;
-> +    VFIOQuirk *quirk;
-> +
-> +    ret = vfio_get_dev_region_info(&vdev->vbasedev,
-> +                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
-> +                                   PCI_VENDOR_ID_IBM,
-> +                                   VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD,
-> +                                   &atsdreg);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    hdr = vfio_get_region_info_cap(atsdreg,
-> +                                   VFIO_REGION_INFO_CAP_NVLINK2_SSATGT);
-> +    if (!hdr) {
-> +        ret = -ENODEV;
-> +        goto free_exit;
-> +    }
-> +    captgt = (void *) hdr;
-> +
-> +    hdr = vfio_get_region_info_cap(atsdreg,
-> +                                   VFIO_REGION_INFO_CAP_NVLINK2_LNKSPD);
-> +    if (!hdr) {
-> +        ret = -ENODEV;
-> +        goto free_exit;
-> +    }
-> +    capspeed = (void *) hdr;
-> +
-> +    /* Some NVLink bridges may not have assigned ATSD */
-> +    if (atsdreg->size) {
-> +        p = mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-> +                 MAP_SHARED, vdev->vbasedev.fd, atsdreg->offset);
-> +        if (!p) {
-
-Same here.
-
-With mmap return value testing fixed, for the vfio portions:
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-> +            ret = -errno;
-> +            goto free_exit;
-> +        }
-> +
-> +        quirk = vfio_quirk_alloc(1);
-> +        memory_region_init_ram_device_ptr(&quirk->mem[0], OBJECT(vdev),
-> +                                          "nvlink2-atsd-mr", atsdreg->size, p);
-> +        QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
-> +    }
-> +
-> +    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
-> +                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
-> +                        (void *) captgt->tgt, NULL);
-> +    trace_vfio_pci_nvlink2_setup_quirk_ssatgt(vdev->vbasedev.name, captgt->tgt,
-> +                                              atsdreg->size);
-> +
-> +    object_property_add(OBJECT(vdev), "nvlink2-link-speed", "uint32",
-> +                        vfio_pci_nvlink2_get_link_speed, NULL, NULL,
-> +                        (void *) (uint64_t) capspeed->link_speed, NULL);
-> +    trace_vfio_pci_nvlink2_setup_quirk_lnkspd(vdev->vbasedev.name,
-> +                                              capspeed->link_speed);
-> +free_exit:
-> +    g_free(atsdreg);
-> +
-> +    return ret;
-> +}
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index dd12f363915d..07aa141aabe6 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3069,6 +3069,20 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          goto out_teardown;
->      }
->  
-> +    if (vdev->vendor_id == PCI_VENDOR_ID_NVIDIA) {
-> +        ret = vfio_pci_nvidia_v100_ram_init(vdev, errp);
-> +        if (ret && ret != -ENODEV) {
-> +            error_report("Failed to setup NVIDIA V100 GPU RAM");
-> +        }
-> +    }
-> +
-> +    if (vdev->vendor_id == PCI_VENDOR_ID_IBM) {
-> +        ret = vfio_pci_nvlink2_init(vdev, errp);
-> +        if (ret && ret != -ENODEV) {
-> +            error_report("Failed to setup NVlink2 bridge");
-> +        }
-> +    }
-> +
->      vfio_register_err_notifier(vdev);
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index cf1e8868182b..88841e9a61da 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -87,6 +87,10 @@ vfio_pci_igd_opregion_enabled(const char *name) "%s"
->  vfio_pci_igd_host_bridge_enabled(const char *name) "%s"
->  vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
->  
-> +vfio_pci_nvidia_gpu_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
-> +vfio_pci_nvlink2_setup_quirk_ssatgt(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
-> +vfio_pci_nvlink2_setup_quirk_lnkspd(const char *name, uint32_t link_speed) "%s link_speed=0x%x"
-> +
->  # hw/vfio/common.c
->  vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
->  vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
+Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
+NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
+dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
+aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmM4ZjM1ZjY4YiBz
+MzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UKY2M4ZjliOTU4
+MiBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9y
+IGRhc2QtaXBsCmIyOWRiZGMyMWUgczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8g
+ZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCjMwMjYzNWYyYjAgczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0
+aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwpkOTc3ODBkNzMyIHMzOTAtYmlvczog
+Y2lvIGVycm9yIGhhbmRsaW5nCjRkOTY5NDZjMjEgczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5u
+aW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwpmNDZlN2E4NzRiIHMzOTAtYmlvczogcHRy
+MnUzMiBhbmQgdTMydG9wdHIKZmEzOGY3ZTgyOSBzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1v
+cnkKZDhiNTY4Y2FmNyBzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20g
+dmlydGlvCmEyNTc1OGMzN2IgczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaAplYmE5YzJmMzUyIHMz
+OTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ugb3V0IG9mIHZpcnRpbyBjb2RlIHBh
+dGgKMGI3YzVkOTAyMCBzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlv
+IGRldmljZXMKNmRhMDc2MTVhMyBzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxvZ2lj
+IGZyb20gdmlydGlvCmMwOWY4ZTI4Y2EgczM5MC1iaW9zOiBkZWNvdXBsZSBjaW8gc2V0dXAgZnJv
+bSB2aXJ0aW8KODI4OTU2MGIyNSBzMzkwIHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5
+IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0
+IDgyODk1NjBiMjUwYSAoczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQg
+SVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8x
+NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE1IENoZWNraW5nIGNvbW1pdCBjMDlmOGUy
+OGNhNmEgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmlydGlvKQozLzE1IENo
+ZWNraW5nIGNvbW1pdCA2ZGEwNzYxNWEzMmUgKHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJv
+b3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGlu
+IC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9tYWluLmM6MTk6CitJcGxQYXJh
+bWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxpZ25lZF9fKFBBR0VfU0laRSkpKTsK
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8x
+NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgMGI3YzVk
+OTAyMDdiIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmlj
+ZXMpCjUvMTUgQ2hlY2tpbmcgY29tbWl0IGViYTljMmYzNTI0MSAoczM5MC1iaW9zOiBGYWN0b3Ig
+ZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aCkKNi8xNSBDaGVja2lu
+ZyBjb21taXQgYTI1NzU4YzM3YjQ5IChzMzkwLWJpb3M6IENsZWFuIHVwIGNpby5oKQo3LzE1IENo
+ZWNraW5nIGNvbW1pdCBkOGI1NjhjYWY3MjggKHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5lbCBp
+L28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDcvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNSBDaGVja2luZyBjb21t
+aXQgZmEzOGY3ZTgyOTQ3IChzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkpCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
+YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KOS8xNSBDaGVja2luZyBjb21taXQgZjQ2ZTdhODc0YjZjIChzMzkwLWJpb3M6IHB0
+cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDkvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTUgQ2hlY2tpbmcgY29tbWl0
+IDRkOTY5NDZjMjFkNCAoczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEg
+Y2hhbm5lbCBwcm9ncmFtcykKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTog
+cGMtYmlvcy9zMzkwLWNjdy9jaW8uYzoxNDU6CisgKiBhY3RpdmUgKGdlbmVyYXRpbmcgaS9vIGlu
+dGVycnVwdHMpLiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NSBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAxMC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTUgQ2hlY2tp
+bmcgY29tbWl0IGQ5Nzc4MGQ3MzIxMyAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEy
+LzE1IENoZWNraW5nIGNvbW1pdCAzMDI2MzVmMmIwYjEgKHMzOTAtYmlvczogUmVmYWN0b3Igdmly
+dGlvIHRvIHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4Ogor
+ICAgICAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywg
+c2l6ZW9mKGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAg
+IHJ1bl9jY3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0
+dXMpLCBmYWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDEyLzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE1IENo
+ZWNraW5nIGNvbW1pdCBiMjlkYmRjMjFlNjcgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0
+eXBlIHRvIGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IGNjOGY5
+Yjk1ODIxNyAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVl
+ZGVkIGZvciBkYXNkLWlwbCkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IGZjOGYzNWY2OGIwYSAoczM5
+MC1iaW9zOiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMyNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQ0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29t
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
