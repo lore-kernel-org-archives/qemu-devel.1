@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34621)
+Received: from eggs.gnu.org ([209.51.188.92]:34726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3MMi-0004j8-Jr
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:57:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3MMo-0004sd-DW
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3MFP-000774-73
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:49:48 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 11 Mar 2019 14:49:38 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F202153912@dggema523-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1h3MEh-0006gs-BO
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:49:04 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3MEh-0006gM-1s
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:49:03 -0400
+Received: by mail-oi1-x244.google.com with SMTP id x187so3839817oia.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:49:02 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RESEND PATCH] target/arm: change arch timer
- registers access permission
+References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
+	<BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<87ftrt5wb2.fsf@zen.linaroharston>
+	<BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 14:48:50 +0000
+Message-ID: <CAFEAcA-osjnv83OL+uma-YekZvhCFGP8JpgZUzUniZHrQG2WFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-SGkgUGV0ZXIsDQogICBUaGFua3MgZm9yIHRoZSByZXZpZXcuDQoNCj4gPg0KPiA+IEZyb206IERv
-bmdqaXUgR2VuZyA8Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4NCj4gPg0KPiA+IFNvbWUgZ2VuZXJp
-YyBhcmNoIHRpbWVyIHJlZ2lzdGVycyBhcmUgQ29uZmlnLVJXIGluIHRoZSBFTDAsIHdoaWNoDQo+
-ID4gbWVhbnMgdGhlIEVMMCBleGNlcHRpb24gbGV2ZWwgY2FuIGhhdmUgd3JpdGUgcGVybWlzc2lv
-biBpZiBpdCBpcw0KPiA+IGFwcHJvcHJpYXRlbHkgY29uZmlndXJlZC4NCj4gPg0KPiA+IFdoZW4g
-Vk0gYWNjZXNzIHJlZ2lzdGVycywgaXQgZmlyc3RseSBjaGVja3Mgd2hldGhlciB0aGV5IGhhdmUg
-UlcNCj4gPiBwZXJtaXNzaW9uLCB0aGVuIGNoZWNrIHdoZXRoZXIgaXQgaXMgYXBwcm9wcmlhdGVs
-eSBjb25maWd1cmVkLg0KPiA+IElmIHRoZXkgYXJlIGRlZmluZWQgdG8gUmVhZHkgb25seSBpbiBF
-TDAsIGV2ZW4gdGhvdWdoIHRoZXkgaGF2ZSBiZWVuDQo+IA0KPiAicmVhZCBvbmx5IiA/DQpZZXMs
-IHJlYWQgb25seS4NCg0KPiANCj4gPiBhcHByb3ByaWF0ZWx5IGNvbmZpZ3VyZWQsIHRoZXkgc3Rp
-bGwgZG8gbm90IGhhdmUgd3JpdGUgcGVybWlzc2lvbi4NCj4gPiBTbyBuZWVkIHRvIGFkZCB0aGUg
-d3JpdGUgcGVybWlzc2lvbiBhY2NvcmRpbmcgdG8gQVJNVjggc3BlYyB3aGVuDQo+ID4gZGVmaW5l
-IGl0Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBo
-dWF3ZWkuY29tPg0KPiANCj4gWWVzLCB0aGlzIHNlZW1zIHRvIGJlIGEgYnVnIHdoaWNoIGhhcyBi
-ZWVuIHByZXNlbnQgc2luY2UgSSBhZGRlZCB0aGUgZ2VuZXJpYyB0aW1lciBzdXBwb3J0IGluIGNv
-bW1pdCA1NWQyODRhZjhlMzFiIGluIDIwMTMuDQo+IA0KPiBJJ20gbm90IHN1cmUgd2h5IHRoZSBi
-dWcgaXMgdGhlcmUgLS0gbXkgYmVzdCBndWVzcyBpcyB0aGF0IEkgaW5jb3JyZWN0bHkgY29waWVk
-IHRoZSBwZXJtaXNzaW9uIGZsYWdzIGZyb20gdGhlIENOVEZSUSByZWdpc3RlciAod2hpY2ggcmVh
-bGx5IGlzDQo+IFJPIGZyb20gUEwwIGJ1dCBSVyBmcm9tIFBMMSBhbmQgYWJvdmUpIHRvIHRoZXNl
-IG90aGVyIHJlZ2lzdGVycyB3aGljaCBzaG91bGQgYmUgZnVsbHkgUlcgZnJvbSBQTDAuDQoNClRo
-ZSBjdXJyZW50IGxvZ2ljIGlzIHNob3cgYmVsb3dbMV0sIGhhbmRsZV9zeXMoKSB3aWxsIGNoZWNr
-IHdoZXRoZXIgdGhlIHN5c3RlbSByZWdpc3RlciBoYXZlIHdyaXRlIHBlcm1pc3Npb24gaW4gUEww
-LCBpZiBoYXZlLCB0aGVuIGNoZWNrIHdoZXRoZXINCkl0IGhhdmUgYmVlbiBjb25maWd1cmVkIGlu
-IHRoZSBoaWdoIFBMeCBieSByaS0+YWNjZXNzZm4oKQ0KDQoNClsxXToNCmhhbmRsZV9zeXMoKQ0K
-ICAgIC0tLS0tLT4gY3BfYWNjZXNzX29rKHMtPmN1cnJlbnRfZWwsIHJpLCBpc3JlYWQpDQogICAg
-LS0tLS0tPiBnZW5faGVscGVyX2FjY2Vzc19jaGVja19jcF9yZWcoKQ0KICAgICAgICAgICAtLS0t
-LT5yaS0+YWNjZXNzZm4oKQ0KDQpbMl06DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0Kc3RhdGljIHZvaWQgaGFuZGxlX3N5cyhE
-aXNhc0NvbnRleHQgKnMsIHVpbnQzMl90IGluc24sIGJvb2wgaXNyZWFkLA0KICAgICAgICAgICAg
-ICAgICAgICAgICB1bnNpZ25lZCBpbnQgb3AwLCB1bnNpZ25lZCBpbnQgb3AxLCB1bnNpZ25lZCBp
-bnQgb3AyLA0KICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBpbnQgY3JuLCB1bnNpZ25l
-ZCBpbnQgY3JtLCB1bnNpZ25lZCBpbnQgcnQpDQp7DQogICANCiAgICAtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0NCiAgICAgICAvKiBDaGVjayBhY2Nlc3MgcGVybWlzc2lvbnMgKi8NCiAgICBpZiAoIWNwX2Fj
-Y2Vzc19vayhzLT5jdXJyZW50X2VsLCByaSwgaXNyZWFkKSkgew0KICAgICAgICB1bmFsbG9jYXRl
-ZF9lbmNvZGluZyhzKTsNCiAgICAgICAgcmV0dXJuOw0KICAgIH0NCg0KICAgIGlmIChyaS0+YWNj
-ZXNzZm4pIHsNCiAgICAgICAgLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uDQogICAgICAg
-IGdlbl9oZWxwZXJfYWNjZXNzX2NoZWNrX2NwX3JlZyhjcHVfZW52LCB0bXBwdHIsIHRjZ19zeW4s
-IHRjZ19pc3JlYWQpOw0KICAgICAgICAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4NCgl9
-DQogICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KfQ0KDQoN
-Cg0KPiANCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9oZWxwZXIuYyBiL3RhcmdldC9hcm0v
-aGVscGVyLmMgaW5kZXgNCj4gPiAyNjA3ZDM5Li4zZGI5NGM2IDEwMDY0NA0KPiA+IC0tLSBhL3Rh
-cmdldC9hcm0vaGVscGVyLmMNCj4gPiArKysgYi90YXJnZXQvYXJtL2hlbHBlci5jDQo+ID4gQEAg
-LTI2NjUsNyArMjY2NSw3IEBAIHN0YXRpYyBjb25zdCBBUk1DUFJlZ0luZm8gZ2VuZXJpY190aW1l
-cl9jcF9yZWdpbmZvW10gPSB7DQo+ID4gICAgICAvKiBwZXItdGltZXIgY29udHJvbCAqLw0KPiA+
-ICAgICAgeyAubmFtZSA9ICJDTlRQX0NUTCIsIC5jcCA9IDE1LCAuY3JuID0gMTQsIC5jcm0gPSAy
-LCAub3BjMSA9IDAsIC5vcGMyID0gMSwNCj4gPiAgICAgICAgLnNlY3VyZSA9IEFSTV9DUF9TRUNT
-VEFURV9OUywNCj4gPiAtICAgICAgLnR5cGUgPSBBUk1fQ1BfSU8gfCBBUk1fQ1BfQUxJQVMsIC5h
-Y2Nlc3MgPSBQTDFfUlcgfCBQTDBfUiwNCj4gPiArICAgICAgLnR5cGUgPSBBUk1fQ1BfSU8gfCBB
-Uk1fQ1BfQUxJQVMsIC5hY2Nlc3MgPSBQTDFfUlcgfCBQTDBfUlcsDQo+IA0KPiBUaGUgUEx4X3tS
-LFcsUld9IGNvbnN0YW50cyBhbGwgaW1wbHkgYWNjZXNzIGlzIGFsc28gcG9zc2libGUgZnJvbSB0
-aGUgaGlnaGVyIFBMcywgc28gdGhpcyBjYW4ganVzdCBiZSB3cml0dGVuICIuYWNjZXNzID0gUEww
-X1JXIi4NCg0KT2ssIEkgd2lsbCB1c2VzIHlvdXIgc3VnZ2VzdGVkIG1ldGhvZCBhbmQgdG8gc2Vl
-IHdoZXRoZXIgaXQgY2FuIGJlIHdvcmthYmxlLg0KDQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
+On Mon, 11 Mar 2019 at 14:35, Aleksandar Markovic
+<amarkovic@wavecomp.com> wrote:
+> I'll doublecheck, but I think "infzero" here is a misnomer.
+>
+> The variable/argument "infzero" actually denotes the cases:
+>
+>    - "Inf * Zero +/- NaN"
+>    - "Inf * Zero +/- NaN"
+>    - "Zero * Inf +/- NaN"
+>    - "Zero * Inf +/- NaN"
+>
+> "Inf * Zero +/- !NaN (let's say, normal fp)" is handled
+> somewhere else.
+>
+> Therefore, "infzero" should be rather called "infzeronan".
+> This is from what I remember, but I will reanalyse the
+> relevant softfloat code one more time.
+
+Yes; we don't ask the target-dependent code to pick a NaN
+in the case of 0 * inf + not-a-NaN because the IEEE spec
+entirely defines the behaviour there (you get the default
+NaN and Invalid is set), so that case is handled in the
+generic softfloat code. (The flag is called 'infzero'
+probably because in the calling code it indicates all
+the inf * zero cases, not just the info * zero + nan ones).
+
+It's specifically the (0,inf,qnan) and (inf,0,qnan) cases
+where the spec allows the implementation to decide whether
+they raise Invalid or not (and what qnan to return if they
+do), so this is why we pass that flag through to the
+pick-a-NaN routine.
+
+It looks like this part of the MIPS-specific code was
+incorrectly copied from the Arm implementation (which does
+return the default NaN here).
+
+
+As well as what the right NaN value should be, the other
+question for this function for the (0, inf, qnan) case is
+"should we raise Invalid?" -- what does the MIPS spec
+require here?
+
+thanks
+-- PMM
