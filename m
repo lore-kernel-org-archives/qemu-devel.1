@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45928)
+Received: from eggs.gnu.org ([209.51.188.92]:45636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3PCf-0007ax-7B
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1h3PCj-0007Ey-PY
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3P4D-0007B1-5V
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:50:26 -0400
-Resent-Message-Id: <E1h3P4D-0007B1-5V@eggs.gnu.org>
-Message-ID: <155232659361.9137.1469461722321921119@6acff2cf482b>
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1h3P2Q-0005hY-K9
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:48:35 -0400
+References: <20190305234337.18353-1-jsnow@redhat.com>
+	<3a8ed35f-e50b-c411-2004-38917d2164c6@redhat.com>
+	<d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4c132978-2965-fa82-601a-69bff47590cf@redhat.com>
+Date: Mon, 11 Mar 2019 12:48:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 10:49:55 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
+In-Reply-To: <d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4U1KAjJyWdcP8hFeaPkQYVCbrsBB5wnk5"
+Subject: Re: [Qemu-devel] [PATCH 0/5] block/qcow2-bitmap: Enable resize with
+ persistent bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
-NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMTEw
-ODMyMzQuMjA4NDEtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbSAtPiBwYXRjaGV3LzIw
-MTkwMzExMDgzMjM0LjIwODQxLTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyOGQwYWQ1OTAyIHMzOTAtYmlvczogU3VwcG9ydCBi
-b290aW5nIGZyb20gcmVhbCBkYXNkIGRldmljZQo5ODYzYWE3ZjFhIHMzOTAtYmlvczogQWRkIGNo
-YW5uZWwgY29tbWFuZCBjb2Rlcy9zdHJ1Y3RzIG5lZWRlZCBmb3IgZGFzZC1pcGwKYTFlZDc3ZDQ1
-YyBzMzkwLWJpb3M6IFVzZSBjb250cm9sIHVuaXQgdHlwZSB0byBkZXRlcm1pbmUgYm9vdCBtZXRo
-b2QKODYwY2U5ZjA4NyBzMzkwLWJpb3M6IFJlZmFjdG9yIHZpcnRpbyB0byBydW4gY2hhbm5lbCBw
-cm9ncmFtcyB2aWEgY2lvCjBiOTA4NjI0OTcgczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcK
-NGE1ODE1ZmQyZCBzMzkwLWJpb3M6IFN1cHBvcnQgZm9yIHJ1bm5pbmcgZm9ybWF0LTAvMSBjaGFu
-bmVsIHByb2dyYW1zCjZmNTQxZmM2ZmYgczM5MC1iaW9zOiBwdHIydTMyIGFuZCB1MzJ0b3B0cgo1
-YTczYzM4MDljIHMzOTAtYmlvczogTWFwIGxvdyBjb3JlIG1lbW9yeQpiNmZkZDQyMGNhIHMzOTAt
-YmlvczogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMgZnJvbSB2aXJ0aW8KZWYyNTYzODUzMyBz
-MzkwLWJpb3M6IENsZWFuIHVwIGNpby5oCjgzYWQxYTlhYWEgczM5MC1iaW9zOiBGYWN0b3IgZmlu
-ZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aApjYzVhNjFkNWNlIHMzOTAt
-YmlvczogRXh0ZW5kIGZpbmRfZGV2KCkgZm9yIG5vbi12aXJ0aW8gZGV2aWNlcwplNTAwZmM1MWJm
-IHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMgZnJvbSB2aXJ0aW8KYWE5NTc0
-M2RmNyBzMzkwLWJpb3M6IGRlY291cGxlIGNpbyBzZXR1cCBmcm9tIHZpcnRpbwplNTc0MjFlNThj
-IHMzOTAgdmZpby1jY3c6IEFkZCBib290aW5kZXggcHJvcGVydHkgYW5kIElQTEIgZGF0YQoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KMS8xNSBDaGVja2luZyBjb21taXQgZTU3NDIxZTU4Y2EwIChzMzkw
-IHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExCIGRhdGEpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzIyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE5OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzE1IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjIvMTUgQ2hlY2tpbmcgY29tbWl0IGFhOTU3NDNkZjdkMyAoczM5MC1iaW9zOiBk
-ZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8pCjMvMTUgQ2hlY2tpbmcgY29tbWl0IGU1MDBm
-YzUxYmZmOCAoczM5MC1iaW9zOiBkZWNvdXBsZSBjb21tb24gYm9vdCBsb2dpYyBmcm9tIHZpcnRp
-bykKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzMxOiBGSUxF
-OiBwYy1iaW9zL3MzOTAtY2N3L21haW4uYzoxOToKK0lwbFBhcmFtZXRlckJsb2NrIGlwbGIgX19h
-dHRyaWJ1dGVfXygoX19hbGlnbmVkX18oUEFHRV9TSVpFKSkpOwoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCA2NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzE1IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo0LzE1IENoZWNraW5nIGNvbW1pdCBjYzVhNjFkNWNlODMgKHMzOTAtYmlvczog
-RXh0ZW5kIGZpbmRfZGV2KCkgZm9yIG5vbi12aXJ0aW8gZGV2aWNlcykKNS8xNSBDaGVja2luZyBj
-b21taXQgODNhZDFhOWFhYTY2IChzMzkwLWJpb3M6IEZhY3RvciBmaW5kaW5nIGJvb3QgZGV2aWNl
-IG91dCBvZiB2aXJ0aW8gY29kZSBwYXRoKQo2LzE1IENoZWNraW5nIGNvbW1pdCBlZjI1NjM4NTMz
-YWEgKHMzOTAtYmlvczogQ2xlYW4gdXAgY2lvLmgpCjcvMTUgQ2hlY2tpbmcgY29tbWl0IGI2ZmRk
-NDIwY2FjMSAoczM5MC1iaW9zOiBEZWNvdXBsZSBjaGFubmVsIGkvbyBsb2dpYyBmcm9tIHZpcnRp
-bykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo4LzE1IENoZWNraW5nIGNvbW1pdCA1YTczYzM4MDljMGEgKHMz
-OTAtYmlvczogTWFwIGxvdyBjb3JlIG1lbW9yeSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzY6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDQgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggOC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzE1IENoZWNr
-aW5nIGNvbW1pdCA2ZjU0MWZjNmZmM2MgKHMzOTAtYmlvczogcHRyMnUzMiBhbmQgdTMydG9wdHIp
-CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
-UlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgMzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8xNSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxMC8xNSBDaGVja2luZyBjb21taXQgNGE1ODE1ZmQyZGMzIChzMzkw
-LWJpb3M6IFN1cHBvcnQgZm9yIHJ1bm5pbmcgZm9ybWF0LTAvMSBjaGFubmVsIHByb2dyYW1zKQpF
-UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTM3OiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L2Np
-by5jOjE0NToKKyAqIGFjdGl2ZSAoZ2VuZXJhdGluZyBpL28gaW50ZXJydXB0cykuICQKCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE1IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMS8xNSBDaGVja2luZyBjb21taXQgMGI5MDg2MjQ5
-N2JhIChzMzkwLWJpb3M6IGNpbyBlcnJvciBoYW5kbGluZykKMTIvMTUgQ2hlY2tpbmcgY29tbWl0
-IDg2MGNlOWYwODcxZCAoczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVuIGNoYW5uZWwg
-cHJvZ3JhbXMgdmlhIGNpbykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwMzog
-RklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzoyOTg6CisgICAgICAgICAgICBydW5fY2N3
-KHZkZXYsIENDV19DTURfUkVBRF9WUV9DT05GLCAmY29uZmlnLCBzaXplb2YoY29uZmlnKSwgZmFs
-c2UpID09IDAsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE2OiBGSUxFOiBw
-Yy1iaW9zL3MzOTAtY2N3L3ZpcnRpby5jOjMwODoKKyAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1df
-Q01EX1dSSVRFX1NUQVRVUywgJnN0YXR1cywgc2l6ZW9mKHN0YXR1cyksIGZhbHNlKSA9PSAwLAoK
-dG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIv
-MTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTMvMTUgQ2hlY2tpbmcgY29tbWl0IGExZWQ3
-N2Q0NWM2MyAoczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5lIGJv
-b3QgbWV0aG9kKQoxNC8xNSBDaGVja2luZyBjb21taXQgOTg2M2FhN2YxYTMyIChzMzkwLWJpb3M6
-IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBsKQox
-NS8xNSBDaGVja2luZyBjb21taXQgMjhkMGFkNTkwMjA3IChzMzkwLWJpb3M6IFN1cHBvcnQgYm9v
-dGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI2OiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ4IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE1LzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTIzMTc2OTMtMjE5Nzkt
-MS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20vdGVzdGluZy5jaGVja3BhdGNo
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4U1KAjJyWdcP8hFeaPkQYVCbrsBB5wnk5
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <4c132978-2965-fa82-601a-69bff47590cf@redhat.com>
+Subject: Re: [PATCH 0/5] block/qcow2-bitmap: Enable resize with persistent
+ bitmaps
+References: <20190305234337.18353-1-jsnow@redhat.com>
+ <3a8ed35f-e50b-c411-2004-38917d2164c6@redhat.com>
+ <d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
+In-Reply-To: <d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 3/11/19 12:36 PM, Vladimir Sementsov-Ogievskiy wrote:
+
+>> FWIW - I have not yet reviewed this series closely, but I think it wou=
+ld
+>> be wise to get this initial cut in before softfreeze (we can make
+>> further tweaks to fix bugs in assumptions during rc1 and rc2, but it's=
+ a
+>> lot harder to add the series at all if it misses softfreeze).
+>>
+>=20
+> I still not convinced that we need bitmap flushing. I think (and Den su=
+pports
+> me) that it's a bad idea. It makes things more difficult without a reas=
+on,
+> except improving debugging with --force-share which should never be use=
+d in
+> production.
+
+And I'm still not convinced that adding bitmap flushing will add a
+benchmarkable delay to operation. Although debugging may not be needed
+in a production environment, having it after a failure can be a lifesaver=
+=2E
+
+Looking at this from another point of view: if this series goes in now
+(with its use of limited bitmap flushing on resize in order to make
+coding bitmap resize easier, rather than global bitmap flushing after
+every bitmap add/delete), then the only time that flushing to disk
+happens is during resize (which is currently flat-out forbidden), so it
+will not penalize existing use cases. And we still have rc1/rc2 to fix
+any bugs if we can come up with some other way to get resize to work
+without flushing (or even revert things if it proves to be too
+invasive). But as a feature addition, if this series does not go in now,
+then bitmap resize is stuck waiting for 4.2, regardless of what we can
+figure out during rc1/rc2.
+
+>=20
+> Bitmaps are stored in qcow2_inactivate() which is true place for flushi=
+ng caches.
+>=20
+
+There doesn't have to be just one place for flushing caches.  In terms
+of IOPs, how much overhead does a flush cost in relation to everything
+else?  And how infrequent are bitmap resize, add, and delete events?
+Optimizing to the bare minimum of flushes just because it adds minimal
+overhead may be premature optimization if that overhead is in the noise
+anyway.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--4U1KAjJyWdcP8hFeaPkQYVCbrsBB5wnk5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyGn2gACgkQp6FrSiUn
+Q2rCCAf/UaVKZI8orwXGJeWP0fZgAfiwR8K8KKuoZNZkA2Qqlz+pmYIj+PBljriK
+1K6bzDTuRd4SYngDJUmP6mmYfOYNSU67DW5zjVqrSKgm1rTt9QmNgW8X3MmNpzDc
+g+ivF+ebUka0VXDyUH7U8okqzeNMVawpKkGPvP3Zqw93kTk1HsPj1flTvYBoWKjj
+S6itlL4ZFllWY4LHfrSnWDNDZyy8w5MsczmYglGMdFPBJ7d5pvtyNrx16tEVDbUS
+EhGUSuOeLTjNEKK3tHSsxiMGY8PZOGRoLL7FcWSCSCpm9g0pDPFfyq42gF+QPri3
+S8LTLDHdogjPco3ikxTlEMmntIhHzA==
+=N2AK
+-----END PGP SIGNATURE-----
+
+--4U1KAjJyWdcP8hFeaPkQYVCbrsBB5wnk5--
