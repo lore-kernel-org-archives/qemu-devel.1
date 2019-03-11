@@ -1,18 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I9T-0005rF-SY
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:24 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I9U-0005rF-KU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3I9T-0008FF-7M
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:23 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 11 Mar 2019 11:27:12 +0100
-Message-Id: <20190311102712.8572-1-philmd@redhat.com>
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3I97-00085c-3G
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:01 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:59273 helo=smtp.ehu.eus)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h3I96-00084v-OM
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:01 -0400
+Date: Mon, 11 Mar 2019 10:26:59 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Message-ID: <20190311102659.GB16@765644dd90e5>
+References: <20190311101428.GA11@765644dd90e5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hw/net/pcnet: Use qemu_log_mask(GUEST_ERROR)
- instead of fprintf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190311101428.GA11@765644dd90e5>
+Subject: [Qemu-devel] [PATCH v4 3/10] qemu-binfmt-conf.sh: add
+ QEMU_CREDENTIAL and QEMU_PERSISTENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,46 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
-Avoid to clutter stdout until explicitly requested
-(with -d guest_errors):
+Allow to set options '--persistent' and/or '--credential' through
+environment variables. If not defined, defaults are used ('no').
+Anyway, command-line arguments have priority over environment variables.
 
-  $ qemu-system-mips -M malta -m 512 -kernel vmlinux-3.2.0-4-4kc-malta
-  Bad SWSTYLE=3D0x04
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 ---
-Helge patch "pcnet: Avoid warning when switching back to 16bit mode"
-remembered me I had this one somewhere.
----
- hw/net/pcnet.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/qemu-binfmt-conf.sh | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-index d9ba04bdfc..16683091c9 100644
---- a/hw/net/pcnet.c
-+++ b/hw/net/pcnet.c
-@@ -36,6 +36,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "hw/qdev.h"
- #include "net/net.h"
- #include "net/eth.h"
-@@ -1501,7 +1502,8 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_=
-t rap, uint32_t val)
-             val |=3D 0x0300;
-             break;
-         default:
--            printf("Bad SWSTYLE=3D0x%02x\n", val & 0xff);
-+            qemu_log_mask(LOG_GUEST_ERROR, "pcnet: Bad SWSTYLE=3D0x%02x\=
-n",
-+                          val & 0xff);
-             val =3D 0x0200;
-             break;
-         }
---=20
-2.20.1
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index ca15ff8092..e7a714e22c 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -186,9 +186,11 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                       (default: $SYSTEMDDIR or $DEBIANDIR)
+        --credential:  if present, credential and security tokens are
+                       calculated according to the binary to interpret
++                      ($QEMU_CREDENTIAL=yes)
+        --persistent:  if present, the interpreter is loaded when binfmt is
+                       configured and remains in memory. All future uses
+                       are cloned from the open file.
++                      ($QEMU_PERSISTENT=yes)
+
+     To import templates with update-binfmts, use :
+
+@@ -255,10 +257,10 @@ qemu_check_systemd() {
+
+ qemu_generate_register() {
+     flags=""
+-    if [ "x$CREDENTIAL" = "xyes" ] ; then
++    if [ "x$QEMU_CREDENTIAL" = "xyes" ] ; then
+         flags="OC"
+     fi
+-    if [ "x$PERSISTENT" = "xyes" ] ; then
++    if [ "x$QEMU_PERSISTENT" = "xyes" ] ; then
+         flags="${flags}F"
+     fi
+
+@@ -281,7 +283,7 @@ package qemu-$cpu
+ interpreter $qemu
+ magic $magic
+ mask $mask
+-credential $CREDENTIAL
++credential $QEMU_CREDENTIAL
+ EOF
+ }
+
+@@ -320,8 +322,10 @@ SYSTEMDDIR="/etc/binfmt.d"
+ DEBIANDIR="/usr/share/binfmts"
+
+ QEMU_PATH=/usr/local/bin
+-CREDENTIAL=no
+-PERSISTENT=no
++
++QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
++QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
++
+ QEMU_SUFFIX=""
+
+ options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
+@@ -373,10 +377,10 @@ while true ; do
+         exit 1
+         ;;
+     -c|--credential)
+-        CREDENTIAL="yes"
++        QEMU_CREDENTIAL="yes"
+         ;;
+     -p|--persistent)
+-        PERSISTENT="yes"
++        QEMU_PERSISTENT="yes"
+         ;;
+     *)
+         break
+--
+2.21.0
