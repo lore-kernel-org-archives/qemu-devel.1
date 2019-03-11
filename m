@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38715)
+Received: from eggs.gnu.org ([209.51.188.92]:39110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3MYx-0006xo-HS
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:10:00 -0400
+	(envelope-from <keith.busch@intel.com>) id 1h3MaT-0008NY-IK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3MYw-0000QN-U1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:09:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47086)
+	(envelope-from <keith.busch@intel.com>) id 1h3MaS-0001nV-LE
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:33 -0400
+Received: from mga03.intel.com ([134.134.136.65]:59318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1h3MYw-0000PQ-Mg
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:09:58 -0400
-References: <20190214190603.25030-1-peter.maydell@linaro.org>
-	<20190214190603.25030-12-peter.maydell@linaro.org>
-	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
-	<CAFEAcA9=oUk_W+pqYLkd=oBC7eENU1yYKbGzoOzgxXoOmg7_+A@mail.gmail.com>
-	<85304416-5bd3-c957-b2c3-dd8e7c1aa071@redhat.com>
-	<CAFEAcA8vdJyNa7KEAv5sOJDQUu_9x0pyXvixw4nT0Yq1KVosmA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1a59692d-527c-9750-4bfa-6b5adbbab81a@redhat.com>
-Date: Mon, 11 Mar 2019 16:09:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8vdJyNa7KEAv5sOJDQUu_9x0pyXvixw4nT0Yq1KVosmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
- guests to be changed by QEMU code
+	(Exim 4.71) (envelope-from <keith.busch@intel.com>)
+	id 1h3MaR-0001er-MV
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:32 -0400
+From: Keith Busch <keith.busch@intel.com>
+Date: Mon, 11 Mar 2019 09:11:53 -0600
+Message-Id: <20190311151153.10516-1-keith.busch@intel.com>
+Subject: [Qemu-devel] [PATCH] nvme: fix write zeroes offset and count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>
 
-Hi Peter,
+The implementation used blocks units rather than the expected bytes.
 
-On 3/11/19 3:55 PM, Peter Maydell wrote:
-> On Mon, 11 Mar 2019 at 14:54, Auger Eric <eric.auger@redhat.com> wrote:
->> yes I hit the bug with your reduced command line:
->>
->> aarch64-softmmu/qemu-system-aarch64 -M virt,gic-version=host -cpu host
->> -smp 2 -m 4G -display none --enable-kvm  -serial stdio -bios
->> ~/VM/UEFI/QEMU_EFI_cbuild_debug_feb21_2019.fd
-> 
-> OK, that's good to know. What hardware are you using, and what host
-> kernel version ?
+Fixes: c03e7ef12a9 ("nvme: Implement Write Zeroes")
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ hw/block/nvme.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I am using Cavium ThunderX 2 and 5.0 host
-
-Thanks
-
-Eric
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 7c8c63e8f5..e8fe8f1ddd 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -324,8 +324,8 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
+     uint64_t slba = le64_to_cpu(rw->slba);
+     uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
+-    uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
+-    uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
++    uint64_t offset = slba << data_shift;
++    uint32_t count = nlb << data_shift;
+ 
+     if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+         trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+@@ -335,7 +335,7 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     req->has_sg = false;
+     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+                      BLOCK_ACCT_WRITE);
+-    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, aio_slba, aio_nlb,
++    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
+                                         BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
+     return NVME_NO_COMPLETE;
+ }
+-- 
+2.14.4
