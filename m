@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36347)
+Received: from eggs.gnu.org ([209.51.188.92]:36366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBR-0007Xn-RF
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBS-0007Xv-A7
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBP-0000uR-HG
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:25 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:59596)
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBP-0000ug-Mt
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:26 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1h3IBP-0000tD-3C
+	id 1h3IBP-0000ti-BO
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:23 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Mon, 11 Mar 2019 03:29:06 -0700
-Message-Id: <1552300155-25216-3-git-send-email-yuval.shaia@oracle.com>
+Date: Mon, 11 Mar 2019 03:29:11 -0700
+Message-Id: <1552300155-25216-8-git-send-email-yuval.shaia@oracle.com>
 In-Reply-To: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
 References: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 02/11] hw/rdma: Introduce protected qlist
+Subject: [Qemu-devel] [PATCH v6 07/11] hw/rdma: Free all receive buffers
+ when QP is destroyed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,187 +27,260 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-To make code more readable move handling of protected list to a
-rdma_utils
+When QP is destroyed the backend QP is destroyed as well. This ensures
+we clean all received buffer we posted to it.
+However, a contexts of these buffers are still remain in the device.
+Fix it by maintaining a list of buffer's context and free them when QP
+is destroyed.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c      | 20 +++++---------------
- hw/rdma/rdma_backend_defs.h |  8 ++------
- hw/rdma/rdma_utils.c        | 39 +++++++++++++++++++++++++++++++++++++++
- hw/rdma/rdma_utils.h        |  9 +++++++++
- 4 files changed, 55 insertions(+), 21 deletions(-)
+ hw/rdma/rdma_backend.c      | 26 ++++++++++++++++++++------
+ hw/rdma/rdma_backend.h      |  2 +-
+ hw/rdma/rdma_backend_defs.h |  2 +-
+ hw/rdma/rdma_rm.c           |  2 +-
+ hw/rdma/rdma_utils.c        | 29 +++++++++++++++++++++++++++++
+ hw/rdma/rdma_utils.h        | 11 +++++++++++
+ 6 files changed, 63 insertions(+), 9 deletions(-)
 
 diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index d138591..37edf42 100644
+index d0bbe57..e124d8d 100644
 --- a/hw/rdma/rdma_backend.c
 +++ b/hw/rdma/rdma_backend.c
-@@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
-     bctx->up_ctx = ctx;
-     bctx->sge = *sge;
+@@ -39,6 +39,7 @@
+ typedef struct BackendCtx {
+     void *up_ctx;
+     struct ibv_sge sge; /* Used to save MAD recv buffer */
++    RdmaBackendQP *backend_qp; /* To maintain recv buffers */
+ } BackendCtx;
  
--    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
--    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
--    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
-+    rdma_protected_qlist_append_int64(&backend_dev->recv_mads_list, bctx_id);
- 
-     return 0;
+ struct backend_umad {
+@@ -73,6 +74,7 @@ static void free_cqe_ctx(gpointer data, gpointer user_data)
+     bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
+     if (bctx) {
+         rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
++        atomic_dec(&rdma_dev_res->stats.missing_cqe);
+     }
+     g_free(bctx);
  }
-@@ -913,23 +911,19 @@ static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid *sgid,
- static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
-                                      RdmaCmMuxMsg *msg)
+@@ -85,13 +87,15 @@ static void clean_recv_mads(RdmaBackendDev *backend_dev)
+         cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->
+                                                     recv_mads_list);
+         if (cqe_ctx_id != -ENOENT) {
++            atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
+             free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
+                          backend_dev->rdma_dev_res);
+         }
+     } while (cqe_ctx_id != -ENOENT);
+ }
+ 
+-static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
++static int rdma_poll_cq(RdmaBackendDev *backend_dev,
++                        RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
  {
--    QObject *o_ctx_id;
-     unsigned long cqe_ctx_id;
+     int i, ne, total_ne = 0;
      BackendCtx *bctx;
-     char *mad;
+@@ -113,6 +117,8 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
  
-     trace_mad_message("recv", msg->umad.mad, msg->umad_len);
+             comp_handler(bctx->up_ctx, &wc[i]);
  
--    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
--    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
--    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
--    if (!o_ctx_id) {
-+    cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->recv_mads_list);
-+    if (cqe_ctx_id == -ENOENT) {
-         rdma_warn_report("No more free MADs buffers, waiting for a while");
-         sleep(THR_POLL_TO);
-         return;
++            rdma_protected_gslist_remove_int32(&bctx->backend_qp->cqe_ctx_list,
++                                               wc[i].wr_id);
+             rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+             g_free(bctx);
+         }
+@@ -175,14 +181,12 @@ static void *comp_handler_thread(void *arg)
+             }
+ 
+             backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
+-            rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
++            rdma_poll_cq(backend_dev, backend_dev->rdma_dev_res, ev_cq);
+ 
+             ibv_ack_cq_events(ev_cq, 1);
+         }
      }
  
--    cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
-     bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
-     if (unlikely(!bctx)) {
-         rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
-@@ -994,8 +988,7 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+-    /* TODO: Post cqe for all remaining buffs that were posted */
+-
+     backend_dev->comp_thread.is_running = false;
+ 
+     qemu_thread_exit(0);
+@@ -311,7 +315,7 @@ void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
+     int polled;
+ 
+     rdma_dev_res->stats.poll_cq_from_guest++;
+-    polled = rdma_poll_cq(rdma_dev_res, cq->ibcq);
++    polled = rdma_poll_cq(cq->backend_dev, rdma_dev_res, cq->ibcq);
+     if (!polled) {
+         rdma_dev_res->stats.poll_cq_from_guest_empty++;
+     }
+@@ -501,6 +505,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+ 
+     bctx = g_malloc0(sizeof(*bctx));
+     bctx->up_ctx = ctx;
++    bctx->backend_qp = qp;
+ 
+     rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+     if (unlikely(rc)) {
+@@ -508,6 +513,8 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+         goto err_free_bctx;
+     }
+ 
++    rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
++
+     rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.tx_len);
+     if (rc) {
+@@ -616,6 +623,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+ 
+     bctx = g_malloc0(sizeof(*bctx));
+     bctx->up_ctx = ctx;
++    bctx->backend_qp = qp;
+ 
+     rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
+     if (unlikely(rc)) {
+@@ -623,6 +631,8 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+         goto err_free_bctx;
+     }
+ 
++    rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
++
+     rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
+                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+     if (rc) {
+@@ -762,6 +772,8 @@ int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
          return -EIO;
      }
  
--    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
--    backend_dev->recv_mads_list.list = qlist_new();
-+    rdma_protected_qlist_init(&backend_dev->recv_mads_list);
++    rdma_protected_gslist_init(&qp->cqe_ctx_list);
++
+     qp->ibpd = pd->ibpd;
  
-     enable_rdmacm_mux_async(backend_dev);
- 
-@@ -1010,10 +1003,7 @@ static void mad_fini(RdmaBackendDev *backend_dev)
- {
-     disable_rdmacm_mux_async(backend_dev);
-     qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
--    if (backend_dev->recv_mads_list.list) {
--        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
--        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
--    }
-+    rdma_protected_qlist_destroy(&backend_dev->recv_mads_list);
+     /* TODO: Query QP to get max_inline_data and save it to be used in send */
+@@ -919,11 +931,13 @@ int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
+     return ibv_query_qp(qp->ibqp, attr, attr_mask, init_attr);
  }
  
- int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+-void rdma_backend_destroy_qp(RdmaBackendQP *qp)
++void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
+ {
+     if (qp->ibqp) {
+         ibv_destroy_qp(qp->ibqp);
+     }
++    g_slist_foreach(qp->cqe_ctx_list.list, free_cqe_ctx, dev_res);
++    rdma_protected_gslist_destroy(&qp->cqe_ctx_list);
+ }
+ 
+ #define CHK_ATTR(req, dev, member, fmt) ({ \
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index 8e53a72..c54eaf2 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -102,7 +102,7 @@ int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
+                               uint32_t sq_psn, uint32_t qkey, bool use_qkey);
+ int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
+                           int attr_mask, struct ibv_qp_init_attr *init_attr);
+-void rdma_backend_destroy_qp(RdmaBackendQP *qp);
++void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res);
+ 
+ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+                             RdmaBackendQP *qp, uint8_t qp_type,
 diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-index 15ae8b9..a8c15b0 100644
+index a8c15b0..817153d 100644
 --- a/hw/rdma/rdma_backend_defs.h
 +++ b/hw/rdma/rdma_backend_defs.h
-@@ -20,6 +20,7 @@
- #include "chardev/char-fe.h"
- #include <infiniband/verbs.h>
- #include "contrib/rdmacm-mux/rdmacm-mux.h"
-+#include "rdma_utils.h"
+@@ -26,7 +26,6 @@ typedef struct RdmaDeviceResources RdmaDeviceResources;
  
- typedef struct RdmaDeviceResources RdmaDeviceResources;
- 
-@@ -30,11 +31,6 @@ typedef struct RdmaBackendThread {
+ typedef struct RdmaBackendThread {
+     QemuThread thread;
+-    QemuMutex mutex;
+     bool run; /* Set by thread manager to let thread know it should exit */
      bool is_running; /* Set by the thread to report its status */
  } RdmaBackendThread;
+@@ -66,6 +65,7 @@ typedef struct RdmaBackendQP {
+     struct ibv_pd *ibpd;
+     struct ibv_qp *ibqp;
+     uint8_t sgid_idx;
++    RdmaProtectedGSList cqe_ctx_list;
+ } RdmaBackendQP;
  
--typedef struct RecvMadList {
--    QemuMutex lock;
--    QList *list;
--} RecvMadList;
--
- typedef struct RdmaCmMux {
-     CharBackend *chr_be;
-     int can_receive;
-@@ -48,7 +44,7 @@ typedef struct RdmaBackendDev {
-     struct ibv_context *context;
-     struct ibv_comp_channel *channel;
-     uint8_t port_num;
--    RecvMadList recv_mads_list;
-+    RdmaProtectedQList recv_mads_list;
-     RdmaCmMux rdmacm_mux;
- } RdmaBackendDev;
+ #endif
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index b50e192..bac3b2f 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -537,7 +537,7 @@ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
+         return;
+     }
  
+-    rdma_backend_destroy_qp(&qp->backend_qp);
++    rdma_backend_destroy_qp(&qp->backend_qp, dev_res);
+ 
+     rdma_res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
+ }
 diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-index b9f07fc..0a8abe5 100644
+index 0a8abe5..73f2791 100644
 --- a/hw/rdma/rdma_utils.c
 +++ b/hw/rdma/rdma_utils.c
-@@ -14,6 +14,8 @@
-  */
+@@ -90,3 +90,32 @@ int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
  
- #include "qemu/osdep.h"
-+#include "qapi/qmp/qlist.h"
-+#include "qapi/qmp/qnum.h"
- #include "trace.h"
- #include "rdma_utils.h"
- 
-@@ -51,3 +53,40 @@ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
-         pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
-     }
+     return qnum_get_uint(qobject_to(QNum, obj));
  }
 +
-+void rdma_protected_qlist_init(RdmaProtectedQList *list)
++void rdma_protected_gslist_init(RdmaProtectedGSList *list)
 +{
 +    qemu_mutex_init(&list->lock);
-+    list->list = qlist_new();
 +}
 +
-+void rdma_protected_qlist_destroy(RdmaProtectedQList *list)
++void rdma_protected_gslist_destroy(RdmaProtectedGSList *list)
 +{
 +    if (list->list) {
-+        qlist_destroy_obj(QOBJECT(list->list));
-+        qemu_mutex_destroy(&list->lock);
++        g_slist_free(list->list);
 +        list->list = NULL;
 +    }
 +}
 +
-+void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value)
++void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,
++                                        int32_t value)
 +{
 +    qemu_mutex_lock(&list->lock);
-+    qlist_append_int(list->list, value);
++    list->list = g_slist_prepend(list->list, GINT_TO_POINTER(value));
 +    qemu_mutex_unlock(&list->lock);
 +}
 +
-+int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
++void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,
++                                        int32_t value)
 +{
-+    QObject *obj;
-+
 +    qemu_mutex_lock(&list->lock);
-+    obj = qlist_pop(list->list);
++    list->list = g_slist_remove(list->list, GINT_TO_POINTER(value));
 +    qemu_mutex_unlock(&list->lock);
-+
-+    if (!obj) {
-+        return -ENOENT;
-+    }
-+
-+    return qnum_get_uint(qobject_to(QNum, obj));
 +}
 diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index acd1488..a8bf1d4 100644
+index a8bf1d4..2d42249 100644
 --- a/hw/rdma/rdma_utils.h
 +++ b/hw/rdma/rdma_utils.h
-@@ -29,8 +29,17 @@
- #define rdma_info_report(fmt, ...) \
-     info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
+@@ -34,12 +34,23 @@ typedef struct RdmaProtectedQList {
+     QList *list;
+ } RdmaProtectedQList;
  
-+typedef struct RdmaProtectedQList {
++typedef struct RdmaProtectedGSList {
 +    QemuMutex lock;
-+    QList *list;
-+} RdmaProtectedQList;
++    GSList *list;
++} RdmaProtectedGSList;
 +
  void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
  void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
-+void rdma_protected_qlist_init(RdmaProtectedQList *list);
-+void rdma_protected_qlist_destroy(RdmaProtectedQList *list);
-+void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value);
-+int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list);
+ void rdma_protected_qlist_init(RdmaProtectedQList *list);
+ void rdma_protected_qlist_destroy(RdmaProtectedQList *list);
+ void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value);
+ int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list);
++void rdma_protected_gslist_init(RdmaProtectedGSList *list);
++void rdma_protected_gslist_destroy(RdmaProtectedGSList *list);
++void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,
++                                        int32_t value);
++void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,
++                                        int32_t value);
  
  static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
  {
