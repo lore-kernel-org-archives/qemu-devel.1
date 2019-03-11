@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49647)
+Received: from eggs.gnu.org ([209.51.188.92]:52350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h3PQ1-0001V7-FV
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:12:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3PdG-0001Qj-98
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:26:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1h3PQ0-0002fe-Hl
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:12:57 -0400
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<3a8ed35f-e50b-c411-2004-38917d2164c6@redhat.com>
-	<d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e472a0f9-3664-30bc-88aa-1fb1d4f5fbaa@redhat.com>
-Date: Mon, 11 Mar 2019 14:05:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3PdF-00022w-AE
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:26:38 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:36367)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3PdF-00021x-1U
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:26:37 -0400
+Received: by mail-oi1-x233.google.com with SMTP id t206so4481903oib.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:26:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] block/qcow2-bitmap: Enable resize with
- persistent bitmaps
+References: <1552314290-28709-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1552314290-28709-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 18:26:24 +0000
+Message-ID: <CAFEAcA-3PZkOu-WcL2OVy-4LS+bwOvhORREU1NfgFryydiKoHQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] MIPS queue for March 11th, 2019
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
+On Mon, 11 Mar 2019 at 14:24, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit e2a18635a400b0e68679614132e9ef6316105590:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-03-08' into staging (2019-03-09 20:55:44 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-mar-11-2019
+>
+> for you to fetch changes up to 53e116fed6dde572003aebf3bc32e25663eeb446:
+>
+>   target/mips: Add tests for a variety of MSA integer subtract instructions (2019-03-11 12:45:36 +0100)
+>
+> ----------------------------------------------------------------
+>
+> MIPS queue for March 11th, 2019
+>
+>   - MIPS TCG tests updates and cleanups
+>
+>   Note:
+>
+>   - six checkpatch.pl warnings on "MAINTAINERS" can be ignored
+>
 
+Applied, thanks.
 
-On 3/11/19 1:36 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.03.2019 19:18, Eric Blake wrote:
->> On 3/5/19 5:43 PM, John Snow wrote:
->>> This series aims to enable block resizes when persistent bitmaps are
->>> in use. The basic approach here is to recognize that we now load all
->>> persistent bitmaps in memory, and so we can rely on in-memory resizes
->>> and then flush the changed metadata back to disk.
->>>
->>> One part that is potentially now quite strange is that bitmap resizes
->>> may happen twice: once during the qcow2 resize event only if persistent
->>> bitmaps are found, and then again as part of the generic resize callback
->>> event whether or not we have any persistent bitmaps.
->>>
->>> The second round is required if we are not using qcow2 or we have only
->>> transient bitmaps. The first round is required as we wish to flush the
->>> bitmaps back to disk atomically with the qcow2 resize to avoid violating
->>> our invariants for the bitmap metadata which is checked in many places.
->>>
->>> This is harmless; hbitmap_truncate will recognize the second round as
->>> a no-op.
->>
->> FWIW - I have not yet reviewed this series closely, but I think it would
->> be wise to get this initial cut in before softfreeze (we can make
->> further tweaks to fix bugs in assumptions during rc1 and rc2, but it's a
->> lot harder to add the series at all if it misses softfreeze).
->>
-> 
-> I still not convinced that we need bitmap flushing. I think (and Den supports
-> me) that it's a bad idea. It makes things more difficult without a reason,
-> except improving debugging with --force-share which should never be used in
-> production.
-> 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-I know you don't want it in the general case, but I think resizing
-represents a genuine case for exactly when we want it.
-
-Set aside your concerns about general case flushing for now -- this is a
-distraction -- and let us consider ONLY resize events.
-
-If QEMU crashes after a resize event, we will be unable to even open
-qcow2 images if we don't resize the metadata information and write it
-back out to disk.
-
-It is far simpler -- logically and technically -- to just write this
-data out to disk during a resize event. It won't happen often, shouldn't
-incur much of an IO penalty, and (I think) is algorithmically
-straightforward.
-
-If it's really that much of a problem, we can revise it during the RC
-period to eliminate the flush.
-
-> Bitmaps are stored in qcow2_inactivate() which is true place for flushing caches.
-> 
+-- PMM
