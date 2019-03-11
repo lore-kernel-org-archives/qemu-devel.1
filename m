@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47766)
+Received: from eggs.gnu.org ([209.51.188.92]:47802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3J4D-000623-HJ
+	(envelope-from <thuth@redhat.com>) id 1h3J4D-000629-Ja
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1h3J1K-0007iT-S4
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:23:05 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:57929)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3J1I-0007gG-Oa
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:23:02 -0400
-References: <20190311101428.GA11@765644dd90e5>
-	<20190311102733.GC16@765644dd90e5>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ddb227ec-84ea-caa8-43e6-b5aade0bba2a@vivier.eu>
-Date: Mon, 11 Mar 2019 12:22:38 +0100
+	(envelope-from <thuth@redhat.com>) id 1h3J4C-0001WT-Nj
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3J4A-0001U9-Ow
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:25:59 -0400
+References: <20190311005618.19007-1-philmd@redhat.com>
+	<20190311005618.19007-8-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7c16b3f7-32b7-14c8-5c5f-3826df7c02f3@redhat.com>
+Date: Mon, 11 Mar 2019 12:25:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190311102733.GC16@765644dd90e5>
+In-Reply-To: <20190311005618.19007-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/10] qemu-binfmt-conf.sh: use the same
- presentation format as for qemu-*
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] hw/mips: Express dependencies of
+ the Fulong 2E machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, eblake@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On 11/03/2019 11:27, Unai Martinez-Corral wrote:
-> 
-> Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+On 11/03/2019 01.56, Philippe Mathieu-Daud=C3=A9 wrote:
+> The Fulong 2E machine uses a Loongson 2E as CPU, a Bonito64 system
+> controller as North Bridge and a VT82C686 chipset as South Bridge.
+> The network card chipset is a RTL8139D.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  scripts/qemu-binfmt-conf.sh | 58 +++++++++++++++++--------------------
->  1 file changed, 27 insertions(+), 31 deletions(-)
-> 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index e7a714e22c..489d7d2326 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -167,47 +167,43 @@ qemu_get_family() {
-> 
->  usage() {
->      cat <<EOF
-> -Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-> -                           [--help][--credential][--exportdir PATH]
-> -                           [--persistent][--qemu-suffix SUFFIX]
-> +Usage: qemu-binfmt-conf.sh [options]
-> 
-> -       Configure binfmt_misc to use qemu interpreter
-> +Configure binfmt_misc to use qemu interpreter
-> 
-> -       --help:        display this usage
-> -       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
-> -       --qemu-suffix: add a suffix to the default interpreter name
-> -       --debian:      don't write into /proc,
-> -                      instead generate update-binfmts templates
-> -       --systemd:     don't write into /proc,
-> -                      instead generate file for systemd-binfmt.service
-> -                      for the given CPU. If CPU is "ALL", generate a
-> -                      file for all known cpus
-> -       --exportdir:   define where to write configuration files
-> -                      (default: $SYSTEMDDIR or $DEBIANDIR)
-> -       --credential:  if present, credential and security tokens are
-> -                      calculated according to the binary to interpret
-> -                      ($QEMU_CREDENTIAL=yes)
-> -       --persistent:  if present, the interpreter is loaded when binfmt is
-> -                      configured and remains in memory. All future uses
-> -                      are cloned from the open file.
-> -                      ($QEMU_PERSISTENT=yes)
-> +Options and associated environment variables:
-> 
-> -    To import templates with update-binfmts, use :
-> +Argument             Env-variable     Description
-> +-h|--help                             display this usage
-> +-Q|--qemu-path PATH: QEMU_PATH        set path to qemu interpreter
+> v3: Loongson 2E =3D CPU, Fulong 2E =3D machine (Aleksandar)
+> ---
+>  default-configs/mips64el-softmmu.mak |  3 ---
+>  hw/isa/Kconfig                       | 13 +++++++++----
+>  hw/mips/Kconfig                      |  5 +++++
+>  3 files changed, 14 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mip=
+s64el-softmmu.mak
+> index 88b66a91d7..d0814e76af 100644
+> --- a/default-configs/mips64el-softmmu.mak
+> +++ b/default-configs/mips64el-softmmu.mak
+> @@ -1,9 +1,6 @@
+>  # Default configuration for mips64el-softmmu
+> =20
+>  include mips-softmmu-common.mak
+> -CONFIG_IDE_VIA=3Dy
+>  CONFIG_FULONG=3Dy
+> -CONFIG_PCI_BONITO=3Dy
 
-Please, remove all the ':' above and below.
-You should merge PATCH 9/10 with this one.
+I think I'd rather squash the previous patch into this one here (and
+adjust the patch description here with some information about BONITO),
+so that you don't have to remove the switch again that you've just added
+one patch earlier.
 
-Thanks,
-Laurent
+>  CONFIG_JAZZ=3Dy
+> -CONFIG_VT82C686=3Dy
+>  CONFIG_MIPS_BOSTON=3Dy
+> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+> index 57e09a0cb8..30055aed82 100644
+> --- a/hw/isa/Kconfig
+> +++ b/hw/isa/Kconfig
+> @@ -32,10 +32,15 @@ config PIIX4
+> =20
+>  config VT82C686
+>      bool
+> -    select ISA_BUS
+> -    select ACPI_SMBUS
+> -    select SERIAL_ISA
+> -    select FDC
+> +    select PCI
+> +    select I8259
+> +    select I8254
+> +    select I8257
+> +    select PARALLEL
+> +    select IDE_ISA
+> +    select IDE_VIA
+> +    select USB_UHCI
+> +    #select PCKBD
+
+Why is this commented out? Please mention the reason either in the
+commit message or in an additional comment here.
+
+>  config SMC37C669
+>      bool
+> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+> index bd6e3be2cd..b06d70bf01 100644
+> --- a/hw/mips/Kconfig
+> +++ b/hw/mips/Kconfig
+> @@ -43,6 +43,11 @@ config JAZZ
+> =20
+>  config FULONG
+>      bool
+> +    select PCI_BONITO
+> +    select VT82C686
+> +    select SMBUS_EEPROM
+> +    select RTL8139_PCI
+
+I'd suggest to use "imply RTL8139_PCI" here instead, since "-net none"
+should be possible for this machine, too.
+
+ Thomas
