@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60282)
+Received: from eggs.gnu.org ([209.51.188.92]:35909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1h3GNh-0002EF-FW
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:58 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3Gc0-0003vU-1i
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1h3GBC-0006UE-HK
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:21:03 -0400
-Received: from mail-eopbgr80132.outbound.protection.outlook.com
-	([40.107.8.132]:22762
-	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1h3GBB-0006PE-La
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:21:02 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Mon, 11 Mar 2019 08:20:57 +0000
-Message-ID: <7abd40bc-963b-cf61-14e8-4c4187813c5c@virtuozzo.com>
-References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
-	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
-In-Reply-To: <8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <69249BE5E516C34D9DEB63AB3C942356@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1h3Gbz-00014U-Ad
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:48:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3Gbz-00013n-12
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:48:43 -0400
+References: <20190310160227.103090-1-liq3ea@163.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <01bd73f5-ac1b-cc7f-a3df-4c3a05de7800@redhat.com>
+Date: Mon, 11 Mar 2019 09:48:37 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/3] migration: add sztd compression
+In-Reply-To: <20190310160227.103090-1-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: test-qgraph: fix a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
-Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 
-cGluZyBwaW5nIHBpbmchDQoNCk9uIDA0LjAzLjIwMTkgMTg6MTAsIERlbmlzIFBsb3RuaWtvdiB3
-cm90ZToNCj4gcGluZyENCj4gDQo+IE9uIDI2LjAyLjIwMTkgMTY6MTUsIERlbmlzIFBsb3RuaWtv
-diB3cm90ZToNCj4+IHpzdGQgZGF0ZSBjb21wcmVzc2lvbiBhbGdvcml0aG0gc2hvd3MgYmV0dGVy
-IHBlcmZvcm1hbmNlIG9uIGRhdGEgY29tcHJlc3Npb24uDQo+PiBJdCBtaWdodCBiZSB1c2VmdWwg
-dG8gZW1wbG95IHRoZSBhbGdvcml0aG0gaW4gVk0gbWlncmF0aW9uIHRvIHJlZHVjZSBDUFUgdXNh
-Z2UuDQo+PiBBIHVzZXIgd2lsbCBiZSBhYmxlIHRvIGNob29zZSBiZXR3ZWVuIHRob3NlIGFsZ29y
-aXRobXMsIHRoZXJlZm9yIGNvbXByZXNzLXR5cGUNCj4+IG1pZ3JhdGlvbiBwYXJhbWV0ZXIgaXMg
-YWRkZWQuDQo+Pg0KPj4gSGVyZSBhcmUgc29tZSByZXN1bHRzIG9mIHBlcmZvcm1hbmNlIGNvbXBh
-cmlzb24genN0ZCB2cyBnemlwOg0KPj4NCj4+IGhvc3Q6IGk3LTQ3OTAgOHhDUFUgQCAzLjYwR0h6
-LCAxNkcgUkFNDQo+PiBtaWdyYXRpb24gdG8gdGhlIHNhbWUgaG9zdA0KPj4gVk06IDJ4VkNQVSwg
-OEcgUkFNIHRvdGFsDQo+PiA1RyBSQU0gdXNlZCwgbWVtb3J5IHBvcHVsYXRlZCB3aXRoIHBvc3Rn
-cmVxc2wgZGF0YQ0KPj4gcHJvZHVjZWQgYnkgcGdiZW5jaCBwZXJmb3JtYW5jZSBiZW5jaG1hcmsN
-Cj4+DQo+Pg0KPj4gVGhyZWFkczogMSBjb21wcmVzcyDigJMgMSBkZWNvbXByZXNzDQo+Pg0KPj4g
-enN0ZCBwcm92aWRlcyBzbGlnaHRseSBsZXNzIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0
-IHRoZSBzYW1lDQo+PiBDUFUgdXNhZ2UgYnV0IGNvcGVzIHdpdGggUkFNICBjb21wcmVzc2lvbiBy
-b2dobHkgMiB0aW1lcyBmYXN0ZXINCj4+DQo+PiBjb21wcmVzc2lvbiB0eXBlICAgICAgICAgICAg
-ICB6bGliICAgICAgIHwgICAgICB6c3RkDQo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+IGNvbXByZXNzaW9uIGxldmVsICAgICAg
-ICAgIDEgICAgICAgNSAgICAgfCAgIDEgICAgICAgNQ0KPj4gY29tcHJlc3Npb24gcmF0aW8gICAg
-ICAgICAgNi45MiAgICA3LjA1ICB8ICAgNi42OSAgICA2Ljg5DQo+PiBjcHUgaWRsZSwgJSAgICAg
-ICAgICAgICAgICA4MiAgICAgIDgzICAgIHwgICA4NiAgICAgIDgwDQo+PiB0aW1lLCBzZWMgICAg
-ICAgICAgICAgICAgICA0OSAgICAgIDcxICAgIHwgICAyNiAgICAgIDMxDQo+PiB0aW1lIGRpZmYg
-dG8gemxpYiwgc2VjICAgICAgICAgICAgICAgICAgICAgIC0yNSAgICAgLTQxDQo+Pg0KPj4NCj4+
-IFRocmVhZHM6IDggY29tcHJlc3Mg4oCTIDIgZGVjb21wcmVzcw0KPj4NCj4+IHpzdGQgcHJvdmlk
-ZXMgdGhlIHNhbWUgbWlncmF0aW9uIHRpbWUgd2l0aCBsZXNzIGNwdSBjb25zdW1wdGlvbg0KPj4N
-Cj4+IGNvbXByZXNzaW9uIHR5cGUgICAgICAgICBub25lICB8ICAgICAgICBnemlwKHpsaWIpICAg
-IHwgICAgICAgICAgenN0ZA0KPj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiBjb21wcmVzc2lv
-biBsZXZlbCAgICAgICAgLSAgICAgfCAgMSAgICAgIDUgICAgICAgOSAgICB8ICAgMSAgICAgICA1
-ICAgICAgIDE1DQo+PiBjb21wcmVzc2lvbiByYXRpbyAgICAgICAgLSAgICAgfCAgNi45NCAgIDYu
-OTkgICAgNy4xNCB8ICAgNi42NCAgICA2Ljg5ICAgIDYuOTMNCj4+IHRpbWUsIHNlYyAgICAgICAg
-ICAgICAgICAxNTQgICB8ICAyMiAgICAgMjMgICAgICAyNyAgIHwgICAyMyAgICAgIDIzICAgICAg
-MjUNCj4+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICA5OSAgICB8ICA0NSAgICAgMzAgICAgICAx
-MiAgIHwgICA3MCAgICAgIDUyICAgICAgMjMNCj4+IGNwdSBpZGxlIGRpZmYgdG8gemxpYiAgICAg
-ICAgICB8ICAgICAgICAgICAgICAgICAgICAgIHwgIC0yNSUgICAgLTIyJSAgICAtMTElDQo+Pg0K
-Pj4NCj4+IERlbmlzIFBsb3RuaWtvdiAoMyk6DQo+PiAgICAgbWlncmF0aW9uOiByZXdvcmsgY29t
-cHJlc3Npb24gY29kZSBmb3IgYWRkaW5nIG1vcmUgZGF0YSBjb21wcmVzc29ycw0KPj4gICAgIGht
-cDogYWRkIGNvbXByZXNzLXR5cGUgcGFyYW1ldGVyIHRvIG1pZ3JhdGlvbiBwYXJhbWV0ZXJzDQo+
-PiAgICAgbWlncmF0aW9uOiBhZGQgenN0ZCBjb21wcmVzc2lvbg0KPj4NCj4+ICAgIGNvbmZpZ3Vy
-ZSAgICAgICAgICAgICB8ICAyNiArKysrDQo+PiAgICBobXAuYyAgICAgICAgICAgICAgICAgfCAg
-IDggKysNCj4+ICAgIG1pZ3JhdGlvbi9taWdyYXRpb24uYyB8ICA0NSArKysrKystDQo+PiAgICBt
-aWdyYXRpb24vbWlncmF0aW9uLmggfCAgIDEgKw0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5j
-IHwgIDM5ICsrLS0tLQ0KPj4gICAgbWlncmF0aW9uL3FlbXUtZmlsZS5oIHwgIDE4ICsrLQ0KPj4g
-ICAgbWlncmF0aW9uL3JhbS5jICAgICAgIHwgMjkxICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKystLS0tLS0tLQ0KPj4gICAgcWFwaS9taWdyYXRpb24uanNvbiAgIHwgIDI2ICsrKy0N
-Cj4+ICAgIDggZmlsZXMgY2hhbmdlZCwgMzY5IGluc2VydGlvbnMoKyksIDg1IGRlbGV0aW9ucygt
-KQ0KPj4NCj4gDQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
+On 10/03/2019 17.02, Li Qiang wrote:
+> Spotted by ASAN when 'make check'.
+> 
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  tests/test-qgraph.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+> index f6a6565e31..5c7e457075 100644
+> --- a/tests/test-qgraph.c
+> +++ b/tests/test-qgraph.c
+> @@ -122,7 +122,7 @@ static void check_driver(const char *driver)
+>  static void check_test(const char *test, const char *interface)
+>  {
+>      QOSGraphEdge *edge;
+> -    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+> +    char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+>  
+>      qos_add_test(test, interface, testfunct, NULL);
+>      g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
+> @@ -138,6 +138,7 @@ static void check_test(const char *test, const char *interface)
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
+>      qos_graph_node_set_availability(full_name, FALSE);
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
+> +    g_free(full_name);
+>  }
+>  
+>  static void count_each_test(QOSGraphNode *path, int len)
+> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
