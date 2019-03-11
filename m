@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42543)
+Received: from eggs.gnu.org ([209.51.188.92]:42631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3Emz-0002TC-Ts
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:51:58 -0400
+	(envelope-from <kraxel@redhat.com>) id 1h3En6-0002Wp-7f
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3EdU-0000Hf-2S
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:42:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57826)
+	(envelope-from <kraxel@redhat.com>) id 1h3EZa-0006Zo-Gs
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:38:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3EdT-0000FV-Np
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:42:08 -0400
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-	<87r2bevglf.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f21d90a7-e406-2ee2-3706-e5effe3b2c7c@redhat.com>
-Date: Mon, 11 Mar 2019 07:42:01 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h3EZa-0006YG-8d
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 02:38:06 -0400
+Date: Mon, 11 Mar 2019 07:38:00 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190311063800.b5uujceufcnkllst@sirius.home.kraxel.org>
+References: <cover.1551902740.git.balaton@eik.bme.hu>
+	<12a45041a9a5ae863bf04edf3875aa9d25c481a3.1551902740.git.balaton@eik.bme.hu>
+	<c245140a-8cf7-63c6-f7e0-078ae1f1c0fd@redhat.com>
+	<20190308073206.qd3efvlxgeos45np@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1903081718580.52464@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <87r2bevglf.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] converting build system to Meson?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.9999.1903081718580.52464@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v5-resend 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On 10/03/2019 17.28, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> Hi all,
->>
->> lately I have been thinking of converting the QEMU build system to
->> Meson.  Meson is a relatively new build system that can replace
->> Autotools or hand-written Makefiles such as QEMU; as a die-hard
->> Autotools fan, I must say that Meson is by far better than anything else
->> that has ever tried to replace Autotools, and actually has the potential
->> to do so.
->>
->> Advantages of Meson that directly matter for QEMU include:
-> [...]
->> - ease of distributing a full copy of Meson to support distros that ship
->> an older version (no dependencies apart from Python 3.5).  At 40000
->> lines of Python, Meson is relatively small.
-> 
-> Meson is licensed under the Apache 2 license.  QEMU as a whole is
-> licensed under GPLv2 (and no later versions).  From
-> <https://www.gnu.org/licenses/license-list.html#apache2>:
-> 
->     This is a free software license, compatible with version 3 of the
->     GNU GPL.
-> 
->     Please note that this license is not compatible with GPL version 2,
->     because it has some requirements that are not in that GPL version.
->     These include certain patent termination and indemnification
->     provisions.  The patent termination provision is a good thing, which
->     is why we recommend the Apache 2.0 license for substantial programs
->     over other lax permissive licenses.
-> 
-> Can we distribute Meson along with QEMU anyway?
+  Hi,
 
-Sure, as long as we make it clear that it is a separate executable (with
-its own license), and do not link the meson code into the QEMU binary.
+> > "git send-email" should send the patches with correct headers, it even
+> > asks for the charset it should use in case it finds non-ascii
+> > characters.  So BALATON, could you check your mail client config, or
+> > switch over to "git send-email" for submitting patches?
+> 
+> I'm sending what git format-patch is generating and that does not add
+> content type header by default. Is there a config option to enable that? I
+> can't use git send-email because I'm sending from different machine than I
+> use git on.
 
- Thomas
+git send-email also accepts files generated by git format-patch,
+so you can:
+
+  (1) "git format-patch master..$branch", on machine A
+  (2) copy over 000*.patch from machine A to machine B
+  (3) "git send-email 000*.patch", on machine B
+
+But take care that you don't have old 000*.patch files lying around on
+machine B ...
+
+HTH,
+  Gerd
