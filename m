@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55356)
+Received: from eggs.gnu.org ([209.51.188.92]:55328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h3Lns-0000Sx-Ic
+	(envelope-from <berrange@redhat.com>) id 1h3Lns-0000Sm-Kf
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h3Li2-000316-L8
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:15:19 -0400
-Received: from m12-15.163.com ([220.181.12.15]:40873)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1h3Li0-0002pC-VQ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:15:17 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Mon, 11 Mar 2019 07:14:57 -0700
-Message-Id: <20190311141457.109436-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH v2] tests: test-announce-self: fix memory leak
+	(envelope-from <berrange@redhat.com>) id 1h3Lha-0002ak-Ho
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:14:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h3LhZ-0002UK-Pi
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:14:50 -0400
+Date: Mon, 11 Mar 2019 14:14:37 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190311141437.GA12393@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
+	<20181127135030.1671-1-i.maximets@samsung.com>
+	<1fa60eac-9718-ee9d-e21c-3331c3bd60ff@samsung.com>
+	<CAJ+F1CKBJZ504S5sPvgXfcJvLkG1XpzJ499H54hT4cLffdm+Og@mail.gmail.com>
+	<20190311125614.GV12393@redhat.com>
+	<20190311141229.GK8899@habkost.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190311141229.GK8899@habkost.net>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,72 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vyasevic@redhat.com, dgilbert@redhat.com, mst@redhat.com, jasowang@redhat.com, thuth@redhat.com
-Cc: qemu-devel@nongnu.org, philmd@redhat.com, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Ilya Maximets <i.maximets@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Spotted by ASAN while running 'make check'.
+On Mon, Mar 11, 2019 at 11:12:29AM -0300, Eduardo Habkost wrote:
+> On Mon, Mar 11, 2019 at 12:56:14PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Mon, Mar 11, 2019 at 01:50:37PM +0100, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Hi
+> > >=20
+> > > On Mon, Mar 11, 2019 at 1:35 PM Ilya Maximets <i.maximets@samsung.c=
+om> wrote:
+> > > >
+> > > > Hi.
+> > > >
+> > > > I'm trying to figure out the state of this patch set.
+> > > > Is there any chance for it to be accepted?
+> > > >
+> > > > The first patch needs minor rebase. I could send a new version.
+> > >=20
+> > > Please do,
+> > >=20
+> > > I prefer the solution proposed in v2: do not register hostmem-memfd=
+ if
+> > > sealing isn't supported (keep sealing=3Dtrue the default - it's one=
+ of
+> > > the main purpose of memfd imho).
+> > >=20
+> > > Daniel, Eduardo: are you ok with this series for 4.0?
+> >=20
+> > I prefer the more flexible approach, but I won't object to tieing mem=
+fd
+> > to sealing support.
+>=20
+> Daniel, Marc-Andr=C3=A9: do you know if the libvirt QEMU capability
+> cache is invalidated when the host kernel version changes?
 
-Fixes: 4b9b7000(tests: Add a test for qemu
-self announcements)
+Yes kernl version is one of the many invalidation criteria:
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
-Changes since v1: Use Thomas's patch
- tests/test-announce-self.c | 21 ++++++---------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
+https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/qemu/qemu_capab=
+ilities.c;h=3Dc9700193fd0c404c16dd6f334b80255a4d1ba605;hb=3DHEAD#l4072
 
-diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-index 1644d34a3f..662c3aaf06 100644
---- a/tests/test-announce-self.c
-+++ b/tests/test-announce-self.c
-@@ -21,18 +21,8 @@
- #define ETH_P_RARP 0x8035
- #endif
- 
--static QTestState *test_init(int socket)
--{
--    char *args;
--
--    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
--                           "virtio-net-pci,netdev=hs0", socket);
--
--    return qtest_start(args);
--}
--
- 
--static void test_announce(int socket)
-+static void test_announce(QTestState *qs, int socket)
- {
-     char buffer[60];
-     int len;
-@@ -40,7 +30,7 @@ static void test_announce(int socket)
-     int ret;
-     uint16_t *proto = (uint16_t *)&buffer[12];
- 
--    rsp = qmp("{ 'execute' : 'announce-self', "
-+    rsp = qtest_qmp(qs, "{ 'execute' : 'announce-self', "
-                   " 'arguments': {"
-                       " 'initial': 50, 'max': 550,"
-                       " 'rounds': 10, 'step': 50 } }");
-@@ -59,14 +49,15 @@ static void test_announce(int socket)
- static void setup(gconstpointer data)
- {
-     QTestState *qs;
--    void (*func) (int socket) = data;
-+    void (*func) (QTestState *qs, int socket) = data;
-     int sv[2], ret;
- 
-     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-     g_assert_cmpint(ret, !=, -1);
- 
--    qs = test_init(sv[1]);
--    func(sv[0]);
-+    qs = qtest_initf("-netdev socket,fd=%d,id=hs0 -device "
-+                           "virtio-net-pci,netdev=hs0", sv[1]);
-+    func(qs, sv[0]);
- 
-     /* End test */
-     close(sv[0]);
--- 
-2.17.1
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
