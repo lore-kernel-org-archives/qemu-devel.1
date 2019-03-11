@@ -1,29 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:52505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3JTE-0008R5-VC
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:51:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3JTG-0008R5-Ms
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:51:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3JSD-0004ox-Qn
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:50:50 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3JSD-0004nW-K0
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:50:49 -0400
-Received: by mail-wr1-f65.google.com with SMTP id o9so4721132wrv.9
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 04:50:49 -0700 (PDT)
-References: <20190311005618.19007-1-philmd@redhat.com>
-	<20190311005618.19007-8-philmd@redhat.com>
-	<7c16b3f7-32b7-14c8-5c5f-3826df7c02f3@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cd6ea9c1-fd8a-4af7-69ca-e78e4f26a2e3@redhat.com>
-Date: Mon, 11 Mar 2019 12:50:47 +0100
+	(envelope-from <thuth@redhat.com>) id 1h3JRO-0004Ju-2Y
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:49:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3JRN-0004JE-Q1
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:49:58 -0400
+References: <20180103214925.16677-1-f4bug@amsat.org>
+	<20180103214925.16677-2-f4bug@amsat.org>
+	<ed8793ce-cc5f-a506-2bdc-a39e9fc79cc7@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <07100472-e75f-88c7-6740-21a56e225f80@redhat.com>
+Date: Mon, 11 Mar 2019 12:49:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <7c16b3f7-32b7-14c8-5c5f-3826df7c02f3@redhat.com>
+In-Reply-To: <ed8793ce-cc5f-a506-2bdc-a39e9fc79cc7@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] hw/mips: Express dependencies of
- the Fulong 2E machine with Kconfig
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] sdbus: add a QMP command to access
+ a SDBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Edgar Iglesias <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 3/11/19 12:25 PM, Thomas Huth wrote:
-> On 11/03/2019 01.56, Philippe Mathieu-Daudé wrote:
->> The Fulong 2E machine uses a Loongson 2E as CPU, a Bonito64 system
->> controller as North Bridge and a VT82C686 chipset as South Bridge.
->> The network card chipset is a RTL8139D.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> v3: Loongson 2E = CPU, Fulong 2E = machine (Aleksandar)
->> ---
->>  default-configs/mips64el-softmmu.mak |  3 ---
->>  hw/isa/Kconfig                       | 13 +++++++++----
->>  hw/mips/Kconfig                      |  5 +++++
->>  3 files changed, 14 insertions(+), 7 deletions(-)
->>
->> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
->> index 88b66a91d7..d0814e76af 100644
->> --- a/default-configs/mips64el-softmmu.mak
->> +++ b/default-configs/mips64el-softmmu.mak
->> @@ -1,9 +1,6 @@
->>  # Default configuration for mips64el-softmmu
->>  
->>  include mips-softmmu-common.mak
->> -CONFIG_IDE_VIA=y
->>  CONFIG_FULONG=y
->> -CONFIG_PCI_BONITO=y
-> 
-> I think I'd rather squash the previous patch into this one here (and
-> adjust the patch description here with some information about BONITO),
-> so that you don't have to remove the switch again that you've just added
-> one patch earlier.
+On 08/03/2019 17.11, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Markus,
+>=20
+> [Asking again from the correct series thread]
+>=20
+> On 1/3/18 10:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Use Base64 to serialize the binary blobs in JSON.
+>> So far at most 512 bytes will be transfered, which result
+>> in a 684 bytes payload.
+>> Since this command is intented for qtesting, it is acceptable.
+>=20
+> Any comment regarding QMP for this patch?
 
-I find it clearer this way... And easier for the PCI maintainers to review.
+Is this useful for anybody else than qtest? If not, I think this should
+rather go into the qtest protocol instead, since QMP is our "public"
+protocol.
 
-> 
->>  CONFIG_JAZZ=y
->> -CONFIG_VT82C686=y
->>  CONFIG_MIPS_BOSTON=y
->> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
->> index 57e09a0cb8..30055aed82 100644
->> --- a/hw/isa/Kconfig
->> +++ b/hw/isa/Kconfig
->> @@ -32,10 +32,15 @@ config PIIX4
->>  
->>  config VT82C686
->>      bool
->> -    select ISA_BUS
->> -    select ACPI_SMBUS
->> -    select SERIAL_ISA
->> -    select FDC
->> +    select PCI
->> +    select I8259
->> +    select I8254
->> +    select I8257
->> +    select PARALLEL
->> +    select IDE_ISA
->> +    select IDE_VIA
->> +    select USB_UHCI
->> +    #select PCKBD
-> 
-> Why is this commented out? Please mention the reason either in the
-> commit message or in an additional comment here.
+>> diff --git a/hw/sd/sdbus-qmp.c b/hw/sd/sdbus-qmp.c
+>> new file mode 100644
+>> index 0000000000..8c4b6f2aee
+>> --- /dev/null
+>> +++ b/hw/sd/sdbus-qmp.c
+>> @@ -0,0 +1,65 @@
+>> +/*
+>> + * SD card bus QMP debugging interface (for QTesting).
+>> + *
+>> + * Copyright (c) 2017 ?
 
-Oops I missed this while rebasing.
-I commented this because I was not sure how to express the "USB Legacy
-Support", I couldn't find reference to this feature in the USB specs.
-It looks something the southbridge manufacturers use to emulate an i8042
-controller for USB keyboard/mouse.
-Gerd any idea?
+Weird line. Add you name here ?
 
-Thomas, what about adding in hw/usb/Kconfig:
-
-  config USB_LEGACY_PS2_SUPPORT
-      # Emulated i8042
-      select I8042
-
->>  config SMC37C669
->>      bool
->> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
->> index bd6e3be2cd..b06d70bf01 100644
->> --- a/hw/mips/Kconfig
->> +++ b/hw/mips/Kconfig
->> @@ -43,6 +43,11 @@ config JAZZ
->>  
->>  config FULONG
->>      bool
->> +    select PCI_BONITO
->> +    select VT82C686
->> +    select SMBUS_EEPROM
->> +    select RTL8139_PCI
-> 
-> I'd suggest to use "imply RTL8139_PCI" here instead, since "-net none"
-> should be possible for this machine, too.
-
-This chipset is soldered onboard, so I'd rather keep it that way...
-
-The -net option is confusing IMHO.
-
-Thought?
+ Thomas
