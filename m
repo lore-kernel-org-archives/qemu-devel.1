@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55397)
+Received: from eggs.gnu.org ([209.51.188.92]:55584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3Nnz-0005hV-2m
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:29:40 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1h3Noo-0006HH-TR
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3Nnx-0008Pe-Mz
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:29:35 -0400
-Resent-Message-Id: <E1h3Nnx-0008Pe-Mz@eggs.gnu.org>
-Message-ID: <155232175403.9137.14444067559340534127@6acff2cf482b>
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1h3Nok-0000Ys-A6
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:30:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3Noi-0000UW-CQ
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:30:20 -0400
+References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
+	<9fb589af-a78e-6eeb-ca1c-a5049c5ac5ab@redhat.com>
+	<CAFEAcA_RQU+HYczN4Z=vEL8U31---GTi_HOxg8y50pzX8p+p7Q@mail.gmail.com>
+	<877ed6x0ha.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <885fd5a3-918e-67cc-9603-19736bfcdd3a@redhat.com>
+Date: Mon, 11 Mar 2019 17:30:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 09:29:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
+In-Reply-To: <877ed6x0ha.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] converting build system to Meson?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,114 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
-NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICA3OWQ4YjFkYzViLi4yZTM1Yzc3MzhlICBtYXN0
-ZXIgICAgIC0+IG1hc3RlcgogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1NTIz
-MTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5jb20gLT4gcGF0
-Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0u
-Y29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWU1OTMwYzEyYiBzMzkwLWJpb3M6
-IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UKNWZmNmZjMTdhNSBzMzkwLWJp
-b3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9yIGRhc2QtaXBs
-CmNiMDQxYTRiMzIgczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gZGV0ZXJtaW5l
-IGJvb3QgbWV0aG9kCmI4NDE2MDE3YzQgczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0aW8gdG8gcnVu
-IGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwpkZjJlYzM3ZTQzIHMzOTAtYmlvczogY2lvIGVycm9y
-IGhhbmRsaW5nCjYzYjE4ZWI5N2IgczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1h
-dC0wLzEgY2hhbm5lbCBwcm9ncmFtcwplNjkwMDU2NmVkIHMzOTAtYmlvczogcHRyMnUzMiBhbmQg
-dTMydG9wdHIKOWRlODRmY2I0NSBzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkKNTExNmJk
-YjllNSBzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlvCjA2
-Zjc4MTBiYmMgczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaApiNDg4OTY1YTBiIHMzOTAtYmlvczog
-RmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ugb3V0IG9mIHZpcnRpbyBjb2RlIHBhdGgKNTA5NDY3
-YWYyOSBzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMK
-NWEyZmIzNWYzNCBzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxvZ2ljIGZyb20gdmly
-dGlvCjNhMzc1NDllNTMgczM5MC1iaW9zOiBkZWNvdXBsZSBjaW8gc2V0dXAgZnJvbSB2aXJ0aW8K
-OTU5YTJiNjk4ZSBzMzkwIHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5IGFuZCBJUExC
-IGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0IDk1OWEyYjY5
-OGU3MCAoczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQgSVBMQiBkYXRh
-KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiMyMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoyLzE1IENoZWNraW5nIGNvbW1pdCAzYTM3NTQ5ZTUzY2IgKHMz
-OTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmlydGlvKQozLzE1IENoZWNraW5nIGNv
-bW1pdCA1YTJmYjM1ZjM0Y2QgKHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJvb3QgbG9naWMg
-ZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVz
-CiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9tYWluLmM6MTk6CitJcGxQYXJhbWV0ZXJCbG9j
-ayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxpZ25lZF9fKFBBR0VfU0laRSkpKTsKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgNTA5NDY3YWYyOTYzIChz
-MzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmljZXMpCjUvMTUg
-Q2hlY2tpbmcgY29tbWl0IGI0ODg5NjVhMGIyMSAoczM5MC1iaW9zOiBGYWN0b3IgZmluZGluZyBi
-b290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aCkKNi8xNSBDaGVja2luZyBjb21taXQg
-MDZmNzgxMGJiYzI2IChzMzkwLWJpb3M6IENsZWFuIHVwIGNpby5oKQo3LzE1IENoZWNraW5nIGNv
-bW1pdCA1MTE2YmRiOWU1YWIgKHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5lbCBpL28gbG9naWMg
-ZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcv
-MTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNSBDaGVja2luZyBjb21taXQgOWRlODRm
-Y2I0NWFmIChzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-MTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-OS8xNSBDaGVja2luZyBjb21taXQgZTY5MDA1NjZlZGRhIChzMzkwLWJpb3M6IHB0cjJ1MzIgYW5k
-IHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTUg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTUgQ2hlY2tpbmcgY29tbWl0IDYzYjE4ZWI5
-N2IzZCAoczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBw
-cm9ncmFtcykKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTogcGMtYmlvcy9z
-MzkwLWNjdy9jaW8uYzoxNDU6CisgKiBhY3RpdmUgKGdlbmVyYXRpbmcgaS9vIGludGVycnVwdHMp
-LiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAxMC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTUgQ2hlY2tpbmcgY29tbWl0
-IGRmMmVjMzdlNDNlOCAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEyLzE1IENoZWNr
-aW5nIGNvbW1pdCBiODQxNjAxN2M0YjMgKHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRvIHJ1
-biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4OgorICAgICAgICAg
-ICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywgc2l6ZW9mKGNv
-bmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEx
-NjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAgIHJ1bl9jY3co
-dmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLCBmYWxz
-ZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDEyLzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE1IENoZWNraW5nIGNv
-bW1pdCBjYjA0MWE0YjMyNDkgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRvIGRl
-dGVybWluZSBib290IG1ldGhvZCkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IDVmZjZmYzE3YTVlYSAo
-czM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZvciBk
-YXNkLWlwbCkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IGVlNTkzMGMxMmI5NiAoczM5MC1iaW9zOiBT
-dXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBhZGRlZCwgbW92
-ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMy
-NjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0
-OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTUyMzE3
-NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tL3Rlc3Rpbmcu
-Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 10/03/19 15:33, Markus Armbruster wrote:
+>>  * is not particularly hard to deal with for the common cases
+>>    ("add new source file" is straightforward)
+>>  * covers all our requirements as far as I'm aware
+>>    (whereas you've listed a couple of places where Meson
+>>    would need changes/extensions to support things we do already)
+>>  * is generally flexible enough to be hackable to deal with odd
+>>    cases (it has escape mechanisms to generic-programmability,
+>>    even if they're ugly and awkward)
+>=20
+> Yes, it's hackable, but it takes quite a hacker to hack it.  While it's
+> reasonably easy to do simple things in it with basic voodoo skills, the
+> learning curve goes up like the Zimbabwean inflation rate after that.  =
+I
+> got plenty of experience in Make, and consider myself pretty fluent, ye=
+t
+> I find myself running to Paolo for help.
+
+The build system should make it trivial to do trivial things; easy to do
+things that are a matter of cut-and-paste from something that already
+exist; possible to do everything else.
+
+We are good at the first and barely acceptable at the second.  The third
+depends on your definition of possible and on the effort you want to put =
+in.
+
+My hope with a switch to Meson would be to keep the first just as
+trivial as it is now (commas and quotes do add visual weight but do not
+make things any less trivial; they are a nuisance but not a blocker);
+make the second easier; make the third hopefully much easier and at
+least more predictable.
+
+There is a possibility that sooner or later we'll find out something
+else that requires more Meson patches.  Our build system is already
+quite mature, so that's at least not too likely, but it's obviously
+impossible to rule it out definitively.
+
+Paolo
