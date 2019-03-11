@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55903)
+Received: from eggs.gnu.org ([209.51.188.92]:56111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h3HW8-0003dK-JS
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:46:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1h3HXA-0004AE-Si
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h3HW7-0004lC-VH
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:46:44 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:45424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1h3HW7-0004k7-N1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:46:43 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id o7so4254305wrp.12
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 02:46:43 -0700 (PDT)
-Date: Mon, 11 Mar 2019 09:46:39 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190311094639.GA5991@stefanha-x1.localdomain>
-References: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
-	<20190306100646.GI22159@stefanha-x1.localdomain>
-	<40280F65B1B0B44E8089ED31C01616EBA394CD10@dggeml529-mbx.china.huawei.com>
+	(envelope-from <cohuck@redhat.com>) id 1h3HX9-0005PB-S1
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:47:48 -0400
+Date: Mon, 11 Mar 2019 10:47:40 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190311104740.6b271c6a.cohuck@redhat.com>
+In-Reply-To: <2f3cd598-5d95-c1b5-24f8-4de2c454be59@linux.ibm.com>
+References: <20190301093902.27799-1-cohuck@redhat.com>
+	<20190301093902.27799-3-cohuck@redhat.com>
+	<2f3cd598-5d95-c1b5-24f8-4de2c454be59@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vkogqOf2sHV7VnPd"
-Content-Disposition: inline
-In-Reply-To: <40280F65B1B0B44E8089ED31C01616EBA394CD10@dggeml529-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
- vhost-user reconnect
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] vfio-ccw: rework ssch state handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, wangyunjian <wangyunjian@huawei.com>
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
+On Fri, 8 Mar 2019 17:18:22 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
---vkogqOf2sHV7VnPd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On 03/01/2019 04:38 AM, Cornelia Huck wrote:
+> > The flow for processing ssch requests can be improved by splitting
+> > the BUSY state:
+> > 
+> > - CP_PROCESSING: We reject any user space requests while we are in
+> >    the process of translating a channel program and submitting it to
+> >    the hardware. Use -EAGAIN to signal user space that it should
+> >    retry the request.
+> > - CP_PENDING: We have successfully submitted a request with ssch and
+> >    are now expecting an interrupt. As we can't handle more than one
+> >    channel program being processed, reject any further requests with
+> >    -EBUSY. A final interrupt will move us out of this state; this also
+> >    fixes a latent bug where a non-final interrupt might have freed up
+> >    a channel program that still was in progress.
+> >    By making this a separate state, we make it possible to issue a
+> >    halt or a clear while we're still waiting for the final interrupt
+> >    for the ssch (in a follow-on patch).
+> > 
+> > It also makes a lot of sense not to preemptively filter out writes to
+> > the io_region if we're in an incorrect state: the state machine will
+> > handle this correctly.
+> > 
+> > Reviewed-by: Eric Farman <farman@linux.ibm.com>
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_drv.c     |  8 ++++++--
+> >   drivers/s390/cio/vfio_ccw_fsm.c     | 19 ++++++++++++++-----
+> >   drivers/s390/cio/vfio_ccw_ops.c     |  2 --
+> >   drivers/s390/cio/vfio_ccw_private.h |  3 ++-
+> >   4 files changed, 22 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> > index a10cec0e86eb..0b3b9de45c60 100644
+> > --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > @@ -72,20 +72,24 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+> >   {
+> >   	struct vfio_ccw_private *private;
+> >   	struct irb *irb;
+> > +	bool is_final;
+> >   
+> >   	private = container_of(work, struct vfio_ccw_private, io_work);
+> >   	irb = &private->irb;
+> >   
+> > +	is_final = !(scsw_actl(&irb->scsw) &
+> > +		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+> >   	if (scsw_is_solicited(&irb->scsw)) {
+> >   		cp_update_scsw(&private->cp, &irb->scsw);
+> > -		cp_free(&private->cp);
+> > +		if (is_final)
+> > +			cp_free(&private->cp);
+> >   	}
+> >   	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
+> >   
+> >   	if (private->io_trigger)
+> >   		eventfd_signal(private->io_trigger, 1);
+> >   
+> > -	if (private->mdev)
+> > +	if (private->mdev && is_final)
+> >   		private->state = VFIO_CCW_STATE_IDLE;
+> >   }
+> >     
+> 
+> Coincidentally, I did something AWESOME last night that the chunks 
+> listed above actually fix.  I have a large channel program, and when it 
+> runs my host crashes which isn't nice.  
 
-On Fri, Mar 08, 2019 at 02:31:12AM +0000, Lilijun (Jerry, Cloud Networking) wrote:
-> This problem is related with backend vhost-user socket abnormal cases, we shouldn't ask customers to configure it manually for backend's issues or depends on guest OS's network configuration.
+Ouch.
 
-In Step 1 you said:
+(...)
 
-> > >      1) In the VM, I add one route entry manually on the vNIC eth0 using the
-> > linux tool route.
+> Recalling the above changes, I applied JUST the above pieces (not the 
+> remainder of this patch), and the above channel program works fine.
 
-You configured the route manually inside the guest.  Seems like a guest
-problem to me.
-
-If this was a physical machine that lost connectivity due to a link
-event, what would happen?
-
-Stefan
-
---vkogqOf2sHV7VnPd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJchi5/AAoJEJykq7OBq3PILrIIAMC5rNU9zohL8QLbao8LxRow
-O7ltceN9XWoqcoYu+CH4ckdN37uXNkCDPSyaG7Mn6q0vucVUo2vpwu1SJM7lueeY
-qVHD0+9f4edUCTN5PED2/GfHJhOQOXs8gTH4GmNRy7UwLkWo160JFmIchQ+i4LnC
-Y5ewT2syIqahEL1kN9Y9jJSduMGD5scvTeFriugTUYumSE6qgMqmc3kr8+0BeOyu
-G/ooEz5Tb2i5kCvcX3pLMU46DSWKIVxrdXPnjHu5U1SAWzsO1fUsiSGU0aZpDVTz
-4/gedRLRdLCHTsJUKLFD+JeR9cSR5JH07o6I/gfXuUZI2vw0zBiDmT70OXFvAx8=
-=XroA
------END PGP SIGNATURE-----
-
---vkogqOf2sHV7VnPd--
+Thanks for pointing that out... I'll extract a patch with only the
+changes above and post it with cc:stable. A channel program submitted
+by the guest being able to crash the host is... not good.
