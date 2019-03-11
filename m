@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36428)
+Received: from eggs.gnu.org ([209.51.188.92]:36442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBV-0007c5-Hs
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:30 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBW-0007d6-Rq
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBU-0000xV-4L
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:29 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:47772)
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBV-0000yg-SP
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:30 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1h3IBT-0000wy-ON
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:28 -0400
+	id 1h3IBV-0000y9-HU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:29 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Mon, 11 Mar 2019 03:29:10 -0700
-Message-Id: <1552300155-25216-7-git-send-email-yuval.shaia@oracle.com>
+Date: Mon, 11 Mar 2019 03:29:15 -0700
+Message-Id: <1552300155-25216-12-git-send-email-yuval.shaia@oracle.com>
 In-Reply-To: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
 References: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 06/11] hw/rdma: Free all MAD receive buffers
- when device is closed
+Subject: [Qemu-devel] [PATCH v6 11/11] hw/pvrdma: Provide correct value to
+ object_get_typename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +27,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-When device is going down free all saved MAD buffers.
+Use base object of PCIDevice in call to object_get_typename().
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c    | 34 +++++++++++++++++++++++++++++++++-
- hw/rdma/vmw/pvrdma_main.c |  2 ++
- 2 files changed, 35 insertions(+), 1 deletion(-)
+ hw/rdma/vmw/pvrdma_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index e8af974..d0bbe57 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -64,6 +64,33 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
-     comp_handler(ctx, &wc);
- }
- 
-+static void free_cqe_ctx(gpointer data, gpointer user_data)
-+{
-+    BackendCtx *bctx;
-+    RdmaDeviceResources *rdma_dev_res = user_data;
-+    unsigned long cqe_ctx_id = GPOINTER_TO_INT(data);
-+
-+    bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-+    if (bctx) {
-+        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
-+    }
-+    g_free(bctx);
-+}
-+
-+static void clean_recv_mads(RdmaBackendDev *backend_dev)
-+{
-+    unsigned long cqe_ctx_id;
-+
-+    do {
-+        cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->
-+                                                    recv_mads_list);
-+        if (cqe_ctx_id != -ENOENT) {
-+            free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
-+                         backend_dev->rdma_dev_res);
-+        }
-+    } while (cqe_ctx_id != -ENOENT);
-+}
-+
- static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
- {
-     int i, ne, total_ne = 0;
-@@ -1037,6 +1064,11 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
-     return 0;
- }
- 
-+static void mad_stop(RdmaBackendDev *backend_dev)
-+{
-+    clean_recv_mads(backend_dev);
-+}
-+
- static void mad_fini(RdmaBackendDev *backend_dev)
- {
-     disable_rdmacm_mux_async(backend_dev);
-@@ -1224,12 +1256,12 @@ void rdma_backend_start(RdmaBackendDev *backend_dev)
- 
- void rdma_backend_stop(RdmaBackendDev *backend_dev)
- {
-+    mad_stop(backend_dev);
-     stop_backend_thread(&backend_dev->comp_thread);
- }
- 
- void rdma_backend_fini(RdmaBackendDev *backend_dev)
- {
--    rdma_backend_stop(backend_dev);
-     mad_fini(backend_dev);
-     g_hash_table_destroy(ah_hash);
-     ibv_destroy_comp_channel(backend_dev->channel);
 diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 729a2df..04845f4 100644
+index 49bfbd6..0b46561 100644
 --- a/hw/rdma/vmw/pvrdma_main.c
 +++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -313,6 +313,8 @@ static void pvrdma_fini(PCIDevice *pdev)
+@@ -593,7 +593,7 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
  
-     pvrdma_qp_ops_fini();
- 
-+    rdma_backend_stop(&dev->backend_dev);
-+
-     rdma_rm_fini(&dev->rdma_dev_res, &dev->backend_dev,
-                  dev->backend_eth_device_name);
- 
+     func0 = pci_get_function_0(pdev);
+     /* Break if not vmxnet3 device in slot 0 */
+-    if (strcmp(object_get_typename(&func0->qdev.parent_obj), TYPE_VMXNET3)) {
++    if (strcmp(object_get_typename(OBJECT(func0)), TYPE_VMXNET3)) {
+         error_setg(errp, "Device on %x.0 must be %s", PCI_SLOT(pdev->devfn),
+                    TYPE_VMXNET3);
+         return;
 -- 
 1.8.3.1
