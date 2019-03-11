@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39125)
+Received: from eggs.gnu.org ([209.51.188.92]:39159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h3IMc-00089d-Of
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:40:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1h3IMh-0008Eu-UC
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h3IMb-0000ja-Qx
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:40:58 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1h3IMb-0000ib-FR
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:40:57 -0400
-Received: by mail-wr1-x442.google.com with SMTP id d17so4461724wre.10
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 03:40:56 -0700 (PDT)
-References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
-	<CAFEAcA--XHtUhOzSdNBDOVXbEceHkWSFiBcgNMTr5B-zz2fajA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA--XHtUhOzSdNBDOVXbEceHkWSFiBcgNMTr5B-zz2fajA@mail.gmail.com>
-Date: Mon, 11 Mar 2019 10:40:54 +0000
-Message-ID: <87zhq1ofrd.fsf@zen.linaroharston>
+	(envelope-from <laurent@vivier.eu>) id 1h3IMg-0000nT-O0
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:03 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:34345)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3IMg-0000mE-Ar
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:41:02 -0400
+References: <20190311101428.GA11@765644dd90e5>
+	<20190311102659.GB16@765644dd90e5>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e088c9f2-6042-c770-fec1-d9d686d905c3@vivier.eu>
+Date: Mon, 11 Mar 2019 11:40:42 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190311102659.GB16@765644dd90e5>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/60] ppc-for-4.0 queue 20190310
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/10] qemu-binfmt-conf.sh: add
+ QEMU_CREDENTIAL and QEMU_PERSISTENT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, eblake@redhat.com
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Sun, 10 Mar 2019 at 08:27, David Gibson <david@gibson.dropbear.id.au> =
-wrote:
->>
->> The following changes since commit f5b4c31030f45293bb4517445722768434829=
-d91:
->>
->>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request=
-' into staging (2019-03-09 17:35:48 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190310
->>
->> for you to fetch changes up to 08d020471fcd41cb020fc9987ed1945eefcc8805:
->>
->>   spapr: Use CamelCase properly (2019-03-10 14:35:44 +1100)
->>
->> ----------------------------------------------------------------
->> ppc patch queue for 2019-03-10
->>
->> Here's a final pull request before the 4.0 soft freeze.  Changes
->> include:
->>   * A Great Renaming to use camel case properly in spapr code
->>   * Optimization of some vector instructions
->>   * Support for POWER9 cpus in the powernv machine
->>   * Fixes a regression from the last pull request in handling VSX
->>     instructions with mixed operands from the FPR and VMX parts of the
->>     register array
->>   * Optimization hack to avoid scanning all the (empty) entries on a
->>     new IOMMU window
->>   * Add FSL I2C controller model for E500
->>   * Support for KVM acceleration of the H_PAGE_INIT hypercall on spapr
->>   * Update u-boot image for E500
->>   * Enable Specre/Meltdown mitigations by default on the new machine type
->>   * Enable large decrementer support for POWER9
->>
->> Plus a number of assorted bugfixes and cleanups.
->>
->
-> Hi. This pullreq generates a pile of new 'warning' messages
-> during 'make check':
->
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64
-> QTEST_QEMU_IMG=3Dqemu-img tests/
-> boot-serial-test -m=3Dquick -k --tap < /dev/null |
-> ./scripts/tap-driver.pl --test-name=3D"boot-serial-test"
-> PASS 1 boot-serial-test /ppc64/boot-serial/ppce500
-> PASS 2 boot-serial-test /ppc64/boot-serial/40p
-> PASS 3 boot-serial-test /ppc64/boot-serial/mac99
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-cfpc=3Dworkaround
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-sbbc=3Dworkaround
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-ibs=3Dworkaround
-> PASS 4 boot-serial-test /ppc64/boot-serial/pseries
-> PASS 5 boot-serial-test /ppc64/boot-serial/powernv
-> PASS 6 boot-serial-test /ppc64/boot-serial/sam460ex
->
-> and similarly during the boot-pxe-test.
->
-> Could you silence these, please?
-
-FWIW this PR contains fixes that will finally get the gitlab CI green so
-I look forward to v2 getting merged ;-)
-
---
-Alex Benn=C3=A9e
+On 11/03/2019 11:26, Unai Martinez-Corral wrote:
+> Allow to set options '--persistent' and/or '--credential' through
+> environment variables. If not defined, defaults are used ('no').
+> Anyway, command-line arguments have priority over environment variables.
+> 
+> Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+> ---
+>  scripts/qemu-binfmt-conf.sh | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+> index ca15ff8092..e7a714e22c 100755
+> --- a/scripts/qemu-binfmt-conf.sh
+> +++ b/scripts/qemu-binfmt-conf.sh
+> @@ -186,9 +186,11 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+>                        (default: $SYSTEMDDIR or $DEBIANDIR)
+>         --credential:  if present, credential and security tokens are
+>                        calculated according to the binary to interpret
+> +                      ($QEMU_CREDENTIAL=yes)
+>         --persistent:  if present, the interpreter is loaded when binfmt is
+>                        configured and remains in memory. All future uses
+>                        are cloned from the open file.
+> +                      ($QEMU_PERSISTENT=yes)
+> 
+>      To import templates with update-binfmts, use :
+> 
+> @@ -255,10 +257,10 @@ qemu_check_systemd() {
+> 
+>  qemu_generate_register() {
+>      flags=""
+> -    if [ "x$CREDENTIAL" = "xyes" ] ; then
+> +    if [ "x$QEMU_CREDENTIAL" = "xyes" ] ; then
+>          flags="OC"
+>      fi
+> -    if [ "x$PERSISTENT" = "xyes" ] ; then
+> +    if [ "x$QEMU_PERSISTENT" = "xyes" ] ; then
+>          flags="${flags}F"
+>      fi
+> 
+> @@ -281,7 +283,7 @@ package qemu-$cpu
+>  interpreter $qemu
+>  magic $magic
+>  mask $mask
+> -credential $CREDENTIAL
+> +credential $QEMU_CREDENTIAL
+>  EOF
+>  }
+> 
+> @@ -320,8 +322,10 @@ SYSTEMDDIR="/etc/binfmt.d"
+>  DEBIANDIR="/usr/share/binfmts"
+> 
+>  QEMU_PATH=/usr/local/bin
+> -CREDENTIAL=no
+> -PERSISTENT=no
+> +
+> +QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
+> +QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
+> +
+>  QEMU_SUFFIX=""
+> 
+>  options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
+> @@ -373,10 +377,10 @@ while true ; do
+>          exit 1
+>          ;;
+>      -c|--credential)
+> -        CREDENTIAL="yes"
+> +        QEMU_CREDENTIAL="yes"
+>          ;;
+>      -p|--persistent)
+> -        PERSISTENT="yes"
+> +        QEMU_PERSISTENT="yes"
+>          ;;
+>      *)
+>          break
+> --
+> 2.21.0
+> 
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
