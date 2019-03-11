@@ -1,19 +1,19 @@
 Received: from eggs.gnu.org ([209.51.188.92]:59233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h3O9I-00037v-4c
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:51:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1h3O9K-00037v-J3
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h3O8R-0007nO-Rb
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:50:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1h3O8P-0007lt-Pi
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:50:42 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 11 Mar 2019 17:50:17 +0100
-Message-Id: <20190311165017.32247-11-kwolf@redhat.com>
+Date: Mon, 11 Mar 2019 17:50:16 +0100
+Message-Id: <20190311165017.32247-10-kwolf@redhat.com>
 In-Reply-To: <20190311165017.32247-1-kwolf@redhat.com>
 References: <20190311165017.32247-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/10] file-posix: Make auto-read-only
- dynamic
+Subject: [Qemu-devel] [PATCH v2 09/10] file-posix: Prepare permission code
+ for fd switching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,181 +25,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
 
-Until now, with auto-read-only=3Don we tried to open the file read-write
-first and if that failed, read-only was tried. This is actually not good
-enough for libvirt, which gives QEMU SELinux permissions for read-write
-only as soon as it actually intends to write to the image. So we need to
-be able to switch between read-only and read-write at runtime.
+In order to be able to dynamically reopen the file read-only or
+read-write, depending on the users that are attached, we need to be able
+to switch to a different file descriptor during the permission change.
 
-This patch makes auto-read-only dynamic, i.e. the file is opened
-read-only as long as no user of the node has requested write
-permissions, but it is automatically reopened read-write as soon as the
-first writer is attached. Conversely, if the last writer goes away, the
-file is reopened read-only again.
+This interacts with reopen, which also creates a new file descriptor and
+performs permission changes internally. In this case, the permission
+change code must reuse the reopen file descriptor instead of creating a
+third one.
 
-bs->read_only is no longer set for auto-read-only=3Don files even if the
-file descriptor is opened read-only because it will be transparently
-upgraded as soon as a writer is attached. This changes the output of
-qemu-iotests 232.
+In turn, reopen can drop its code to copy file locks to the new file
+descriptor because that is now done when applying the new permissions.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c         | 36 +++++++++++++++++-------------------
- tests/qemu-iotests/232.out | 12 ++++++------
- 2 files changed, 23 insertions(+), 25 deletions(-)
+ block/file-posix.c | 96 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 85 insertions(+), 11 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index e41e0779c6..d41059d139 100644
+index 932cc8e58c..e41e0779c6 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -376,13 +376,21 @@ static void raw_probe_alignment(BlockDriverState *b=
-s, int fd, Error **errp)
-     }
- }
+@@ -144,6 +144,7 @@ typedef struct BDRVRawState {
+     uint64_t locked_perm;
+     uint64_t locked_shared_perm;
 =20
--static void raw_parse_flags(int bdrv_flags, int *open_flags)
-+static void raw_parse_flags(int bdrv_flags, int *open_flags, bool has_wr=
-iters)
- {
-+    bool read_write =3D false;
-     assert(open_flags !=3D NULL);
++    int perm_change_fd;
+     BDRVReopenState *reopen_state;
 =20
-     *open_flags |=3D O_BINARY;
-     *open_flags &=3D ~O_ACCMODE;
--    if (bdrv_flags & BDRV_O_RDWR) {
-+
-+    if (bdrv_flags & BDRV_O_AUTO_RDONLY) {
-+        read_write =3D has_writers;
-+    } else if (bdrv_flags & BDRV_O_RDWR) {
-+        read_write =3D true;
-+    }
-+
-+    if (read_write) {
-         *open_flags |=3D O_RDWR;
-     } else {
-         *open_flags |=3D O_RDONLY;
-@@ -518,24 +526,12 @@ static int raw_open_common(BlockDriverState *bs, QD=
-ict *options,
-                                                false);
-=20
-     s->open_flags =3D open_flags;
--    raw_parse_flags(bdrv_flags, &s->open_flags);
-+    raw_parse_flags(bdrv_flags, &s->open_flags, false);
-=20
-     s->fd =3D -1;
-     fd =3D qemu_open(filename, s->open_flags, 0644);
-     ret =3D fd < 0 ? -errno : 0;
-=20
--    if (ret =3D=3D -EACCES || ret =3D=3D -EROFS) {
--        /* Try to degrade to read-only, but if it doesn't work, still us=
-e the
--         * normal error message. */
--        if (bdrv_apply_auto_read_only(bs, NULL, NULL) =3D=3D 0) {
--            bdrv_flags &=3D ~BDRV_O_RDWR;
--            raw_parse_flags(bdrv_flags, &s->open_flags);
--            assert(!(s->open_flags & O_CREAT));
--            fd =3D qemu_open(filename, s->open_flags);
--            ret =3D fd < 0 ? -errno : 0;
--        }
--    }
--
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Could not open '%s'", filename);
-         if (ret =3D=3D -EROFS) {
-@@ -846,12 +842,14 @@ static int raw_handle_perm_lock(BlockDriverState *b=
-s,
+ #ifdef CONFIG_XFS
+@@ -845,7 +846,8 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
  }
 =20
  static int raw_reconfigure_getfd(BlockDriverState *bs, int flags,
--                                 int *open_flags, bool force_dup,
-+                                 int *open_flags, uint64_t perm, bool fo=
-rce_dup,
-                                  Error **errp)
+-                                 int *open_flags, Error **errp)
++                                 int *open_flags, bool force_dup,
++                                 Error **errp)
  {
      BDRVRawState *s =3D bs->opaque;
      int fd =3D -1;
-     int ret;
-+    bool has_writers =3D perm &
-+        (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED | BLK_PERM_RESIZE);
-     int fcntl_flags =3D O_APPEND | O_NONBLOCK;
- #ifdef O_NOATIME
-     fcntl_flags |=3D O_NOATIME;
-@@ -862,7 +860,7 @@ static int raw_reconfigure_getfd(BlockDriverState *bs=
-, int flags,
-         *open_flags |=3D O_NONBLOCK;
-     }
+@@ -871,6 +873,11 @@ static int raw_reconfigure_getfd(BlockDriverState *b=
+s, int flags,
+     assert((s->open_flags & O_ASYNC) =3D=3D 0);
+ #endif
 =20
--    raw_parse_flags(flags, open_flags);
-+    raw_parse_flags(flags, open_flags, has_writers);
-=20
- #ifdef O_ASYNC
-     /* Not all operating systems have O_ASYNC, and those that don't
-@@ -942,7 +940,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
++    if (!force_dup && *open_flags =3D=3D s->open_flags) {
++        /* We're lucky, the existing fd is fine */
++        return s->fd;
++    }
++
+     if ((*open_flags & ~fcntl_flags) =3D=3D (s->open_flags & ~fcntl_flag=
+s)) {
+         /* dup the original fd */
+         fd =3D qemu_dup(s->fd);
+@@ -935,7 +942,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
      qemu_opts_to_qdict(opts, state->options);
 =20
      rs->fd =3D raw_reconfigure_getfd(state->bs, state->flags, &rs->open_=
 flags,
--                                   true, &local_err);
-+                                   state->perm, true, &local_err);
+-                                   &local_err);
++                                   true, &local_err);
      if (local_err) {
          error_propagate(errp, local_err);
          ret =3D -1;
-@@ -2720,7 +2718,7 @@ static int raw_check_perm(BlockDriverState *bs, uin=
-t64_t perm, uint64_t shared,
-         s->perm_change_fd =3D rs->fd;
-     } else {
-         /* We may need a new fd if auto-read-only switches the mode */
--        ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags,
-+        ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags, p=
-erm,
-                                     false, errp);
-         if (ret < 0) {
-             return ret;
-diff --git a/tests/qemu-iotests/232.out b/tests/qemu-iotests/232.out
-index 5036ef13d4..5bcc44bb62 100644
---- a/tests/qemu-iotests/232.out
-+++ b/tests/qemu-iotests/232.out
-@@ -22,12 +22,12 @@ NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
- NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+@@ -951,14 +958,6 @@ static int raw_reopen_prepare(BDRVReopenState *state=
+,
+             ret =3D -EINVAL;
+             goto out_fd;
+         }
+-
+-        /* Copy locks to the new fd */
+-        ret =3D raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
+-                                   s->locked_shared_perm, false, errp);
+-        if (ret < 0) {
+-            ret =3D -EINVAL;
+-            goto out_fd;
+-        }
+     }
 =20
- QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,read-=
-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Perm=
-ission denied
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
+     s->reopen_state =3D state;
+@@ -2696,12 +2695,78 @@ static QemuOptsList raw_create_opts =3D {
+ static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t =
+shared,
+                           Error **errp)
+ {
+-    return raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, errp);
++    BDRVRawState *s =3D bs->opaque;
++    BDRVRawReopenState *rs =3D NULL;
++    int open_flags;
++    int ret;
++
++    if (s->perm_change_fd) {
++        /*
++         * In the context of reopen, this function may be called several=
+ times
++         * (directly and recursively while change permissions of the par=
+ent).
++         * This is even true for children that don't inherit from the or=
+iginal
++         * reopen node, so s->reopen_state is not set.
++         *
++         * Ignore all but the first call.
++         */
++        return 0;
++    }
++
++    if (s->reopen_state) {
++        /* We already have a new file descriptor to set permissions for =
+*/
++        assert(s->reopen_state->perm =3D=3D perm);
++        assert(s->reopen_state->shared_perm =3D=3D shared);
++        rs =3D s->reopen_state->opaque;
++        s->perm_change_fd =3D rs->fd;
++    } else {
++        /* We may need a new fd if auto-read-only switches the mode */
++        ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags,
++                                    false, errp);
++        if (ret < 0) {
++            return ret;
++        } else if (ret !=3D s->fd) {
++            s->perm_change_fd =3D ret;
++        }
++    }
++
++    /* Prepare permissions on old fd to avoid conflicts between old and =
+new,
++     * but keep everything locked that new will need. */
++    ret =3D raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, errp)=
+;
++    if (ret < 0) {
++        goto fail;
++    }
++
++    /* Copy locks to the new fd */
++    if (s->perm_change_fd) {
++        ret =3D raw_apply_lock_bytes(NULL, s->perm_change_fd, perm, ~sha=
+red,
++                                   false, errp);
++        if (ret < 0) {
++            raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
++            goto fail;
++        }
++    }
++    return 0;
++
++fail:
++    if (s->perm_change_fd && !s->reopen_state) {
++        qemu_close(s->perm_change_fd);
++    }
++    s->perm_change_fd =3D 0;
++    return ret;
+ }
 =20
- QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,auto-=
-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
--NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
-+NODE_NAME: TEST_DIR/t.IMGFMT (file)
+ static void raw_set_perm(BlockDriverState *bs, uint64_t perm, uint64_t s=
+hared)
+ {
+     BDRVRawState *s =3D bs->opaque;
++
++    /* For reopen, we have already switched to the new fd (.bdrv_set_per=
+m is
++     * called after .bdrv_reopen_commit) */
++    if (s->perm_change_fd && s->fd !=3D s->perm_change_fd) {
++        qemu_close(s->fd);
++        s->fd =3D s->perm_change_fd;
++    }
++    s->perm_change_fd =3D 0;
++
+     raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
+     s->perm =3D perm;
+     s->shared_perm =3D shared;
+@@ -2709,6 +2774,15 @@ static void raw_set_perm(BlockDriverState *bs, uin=
+t64_t perm, uint64_t shared)
 =20
- =3D=3D=3D -blockdev with read-write image: read-only/auto-read-only comb=
-inations =3D=3D=3D
+ static void raw_abort_perm_update(BlockDriverState *bs)
+ {
++    BDRVRawState *s =3D bs->opaque;
++
++    /* For reopen, .bdrv_reopen_abort is called afterwards and will clos=
+e
++     * the file descriptor. */
++    if (s->perm_change_fd && !s->reopen_state) {
++        qemu_close(s->perm_change_fd);
++    }
++    s->perm_change_fd =3D 0;
++
+     raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
+ }
 =20
-@@ -50,11 +50,11 @@ node0: TEST_DIR/t.IMGFMT (file, read-only)
- node0: TEST_DIR/t.IMGFMT (file, read-only)
-=20
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,read-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/=
-t.IMGFMT': Permission denied
--node0: TEST_DIR/t.IMGFMT (file, read-only)
-+node0: TEST_DIR/t.IMGFMT (file)
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission=
- denied
-=20
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permi=
-ssion denied
--node0: TEST_DIR/t.IMGFMT (file, read-only)
-+node0: TEST_DIR/t.IMGFMT (file)
- QEMU_PROG: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-nam=
-e=3Dnode0: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
-=20
- =3D=3D=3D Try commit to backing file with auto-read-only =3D=3D=3D
 --=20
 2.20.1
