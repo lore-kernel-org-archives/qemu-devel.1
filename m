@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60848)
+Received: from eggs.gnu.org ([209.51.188.92]:60868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODc-00077z-1b
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODc-00078i-KC
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODa-0003G1-Ng
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:03 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:41570)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODb-0003I7-Q7
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:04 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h3ODa-0003Cs-FH
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:02 -0400
-Received: by mail-wr1-x432.google.com with SMTP id p1so1443270wrs.8
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:02 -0700 (PDT)
+	id 1h3ODb-0003GD-G5
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:03 -0400
+Received: by mail-wm1-x331.google.com with SMTP id f3so5367451wmj.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:03 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 11 Mar 2019 17:55:25 +0100
-Message-Id: <1552323335-46779-22-git-send-email-pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 17:55:26 +0100
+Message-Id: <1552323335-46779-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL v2 21/31] scsi-disk: Fix crash if request is
- invaild or disk is no medium
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 22/31] lsi: use ldn_le_p()/stn_le_p()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +31,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Zhengui Li <lizhengui@huawei.com>
+Cc: Sven Schnelle <svens@stackframe.org>
 
-From: Zhengui Li <lizhengui@huawei.com>
+From: Sven Schnelle <svens@stackframe.org>
 
-Qemu will crash with the assertion error that "assert(r->req.aiocb !=
-NULL)" in scsi_read_complete if request is invaild or disk is no medium.
-The error is below:
-qemu-kvm: hw/scsi/scsi_disk.c:299: scsi_read_complete: Assertion
-`r->req.aiocb != NULL' failed.
+Instead of using the open-coded versions, use the helper already
+present as this makes the code easier to read and less error-prone.
 
-This patch add a funtion scsi_read_complete_noio to fix it.
-
-Signed-off-by: Zhengui Li <lizhengui@huawei.com>
-Message-Id: <1551949966-20092-1-git-send-email-lizhengui@huawei.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190305195519.24303-2-svens@stackframe.org>
 ---
- hw/scsi/scsi-disk.c | 37 ++++++++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 13 deletions(-)
+ hw/scsi/lsi53c895a.c | 24 ++++--------------------
+ 1 file changed, 4 insertions(+), 20 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index d4e83ae..e7e865a 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -296,22 +296,15 @@ static void scsi_dma_complete(void *opaque, int ret)
-     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
- }
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index bcff859..402b785 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -289,8 +289,7 @@ typedef struct {
+     uint8_t sbr;
+     uint32_t adder;
  
--static void scsi_read_complete(void * opaque, int ret)
-+static void scsi_read_complete_noio(SCSIDiskReq *r, int ret)
+-    /* Script ram is stored as 32-bit words in host byteorder.  */
+-    uint32_t script_ram[2048];
++    uint8_t script_ram[2048 * sizeof(uint32_t)];
+ } LSIState;
+ 
+ #define TYPE_LSI53C810  "lsi53c810"
+@@ -2079,29 +2078,14 @@ static void lsi_ram_write(void *opaque, hwaddr addr,
+                           uint64_t val, unsigned size)
  {
--    SCSIDiskReq *r = (SCSIDiskReq *)opaque;
--    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
--    int n;
-+    uint32_t n;
- 
--    assert(r->req.aiocb != NULL);
--    r->req.aiocb = NULL;
--    aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
--    if (scsi_disk_req_check_error(r, ret, true)) {
-+    assert(r->req.aiocb == NULL);
-+    if (scsi_disk_req_check_error(r, ret, false)) {
-         goto done;
-     }
- 
--    block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
--    trace_scsi_disk_read_complete(r->req.tag, r->qiov.size);
+     LSIState *s = opaque;
+-    uint32_t newval;
+-    uint32_t mask;
+-    int shift;
 -
-     n = r->qiov.size / 512;
-     r->sector += n;
-     r->sector_count -= n;
-@@ -319,6 +312,24 @@ static void scsi_read_complete(void * opaque, int ret)
- 
- done:
-     scsi_req_unref(&r->req);
-+}
-+
-+static void scsi_read_complete(void *opaque, int ret)
-+{
-+    SCSIDiskReq *r = (SCSIDiskReq *)opaque;
-+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-+
-+    assert(r->req.aiocb != NULL);
-+    r->req.aiocb = NULL;
-+
-+    aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
-+    if (ret < 0) {
-+        block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
-+    } else {
-+        block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
-+        trace_scsi_disk_read_complete(r->req.tag, r->qiov.size);
-+    }
-+    scsi_read_complete_noio(r, ret);
-     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
+-    newval = s->script_ram[addr >> 2];
+-    shift = (addr & 3) * 8;
+-    mask = ((uint64_t)1 << (size * 8)) - 1;
+-    newval &= ~(mask << shift);
+-    newval |= val << shift;
+-    s->script_ram[addr >> 2] = newval;
++    stn_le_p(s->script_ram + addr, size, val);
  }
  
-@@ -395,12 +406,12 @@ static void scsi_read_data(SCSIRequest *req)
-     scsi_req_ref(&r->req);
-     if (r->req.cmd.mode == SCSI_XFER_TO_DEV) {
-         trace_scsi_disk_read_data_invalid();
--        scsi_read_complete(r, -EINVAL);
-+        scsi_read_complete_noio(r, -EINVAL);
-         return;
-     }
+ static uint64_t lsi_ram_read(void *opaque, hwaddr addr,
+                              unsigned size)
+ {
+     LSIState *s = opaque;
+-    uint32_t val;
+-    uint32_t mask;
+-
+-    val = s->script_ram[addr >> 2];
+-    mask = ((uint64_t)1 << (size * 8)) - 1;
+-    val >>= (addr & 3) * 8;
+-    return val & mask;
++    return ldn_le_p(s->script_ram + addr, size);
+ }
  
-     if (!blk_is_available(req->dev->conf.blk)) {
--        scsi_read_complete(r, -ENOMEDIUM);
-+        scsi_read_complete_noio(r, -ENOMEDIUM);
-         return;
-     }
+ static const MemoryRegionOps lsi_ram_ops = {
+@@ -2244,7 +2228,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
+         VMSTATE_BUFFER_UNSAFE(scratch, LSIState, 0, 18 * sizeof(uint32_t)),
+         VMSTATE_UINT8(sbr, LSIState),
  
+-        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 2048 * sizeof(uint32_t)),
++        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 8192),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 1.8.3.1
