@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48177)
+Received: from eggs.gnu.org ([209.51.188.92]:50967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h38r4-0007la-43
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:31:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1h39CU-0004vA-Go
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h38r3-0003eu-BF
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:31:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h38r3-0003eS-2J
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:31:45 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 11 Mar 2019 01:30:52 +0100
-Message-Id: <20190311003052.13778-6-philmd@redhat.com>
-In-Reply-To: <20190311003052.13778-1-philmd@redhat.com>
-References: <20190311003052.13778-1-philmd@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1h3929-0000d3-1o
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:43:13 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35617)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3928-0000cf-RL
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:43:13 -0400
+Received: by mail-wm1-f66.google.com with SMTP id y15so2633517wma.0
+	for <qemu-devel@nongnu.org>; Sun, 10 Mar 2019 17:43:12 -0700 (PDT)
+References: <cover.1552152100.git.balaton@eik.bme.hu>
+	<da6370b22e0352ee803d25d68a62ff32eebf06e2.1552152100.git.balaton@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d5191334-6fdf-c160-203f-a6bee5f0384a@redhat.com>
+Date: Mon, 11 Mar 2019 01:43:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/5] .travis.yml: Build and install EDK2 roms
+In-Reply-To: <da6370b22e0352ee803d25d68a62ff32eebf06e2.1552152100.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?q?Michal=20Pr=C3=ADvozn=C3=ADk?= <mprivozn@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add a job to build and install the EDK2 platform firmware binaries.
+On 3/9/19 6:21 PM, BALATON Zoltan wrote:
+> Add (partial) emulation of the on-board GPU of the machine. This
+> allows the PMON2000 firmware to run and should also work with Linux
+> console but probably not with X yet.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
 
-This job is only triggered if the last commit matches the EDK2
-name (case insensitive), or when tag are created (such releases
-or release candidates).
+Mojibaked again :(
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- .travis.yml | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+I guess this is the last respin and this series will be applied,
+so to the maintainer: Can you fix using:
 
-diff --git a/.travis.yml b/.travis.yml
-index e942175dd3..628cc52c99 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -258,3 +258,24 @@ matrix:
-     - env:
-         - CONFIG=3D"--disable-system"
-         - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-+
-+
-+    # EDK2 roms builds
-+    - if: tag IS present OR commit_message =3D~ /(edk2|EDK2)/
-+      env:
-+        - CONFIG=3D"--disable-system --disable-user --prefix=3D$PWD/dist=
-"
-+        - EDK2_BUILD_OPTIONS=3D"--quiet --silent"
-+      script:
-+        - git submodule update --init roms/edk2
-+        - make -j3
-+        - make -C roms efi -j2
-+        - make install
-+      addons:
-+        apt:
-+          packages:
-+            - dos2unix
-+            - gcc-aarch64-linux-gnu
-+            - gcc-arm-linux-gnueabihf
-+            - iasl
-+            - nasm
-+            - uuid-dev
---=20
-2.20.1
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Zoltan if you have to respin, please simply use:
+
+Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
+
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+> v7:
+> - set vgamem_mb explicitely to match board instead of relying on default
+> 
+>  hw/mips/mips_fulong2e.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index fbbc543eed..2bdb766ed1 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machine)
+>      I2CBus *smbus;
+>      MIPSCPU *cpu;
+>      CPUMIPSState *env;
+> +    DeviceState *dev;
+>  
+>      /* init CPUs */
+>      cpu = MIPS_CPU(cpu_create(machine->cpu_type));
+> @@ -347,6 +348,12 @@ static void mips_fulong2e_init(MachineState *machine)
+>      vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
+>                                 &smbus, &isa_bus);
+>  
+> +    /* GPU */
+> +    dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
+> +    qdev_prop_set_uint32(dev, "vgamem_mb", 16);
+> +    qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
+> +    qdev_init_nofail(dev);
+> +
+>      /* Populate SPD eeprom data */
+>      spd_data = spd_data_generate(DDR, ram_size, &err);
+>      if (err) {
+> 
