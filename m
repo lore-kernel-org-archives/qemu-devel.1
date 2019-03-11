@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45253)
+Received: from eggs.gnu.org ([209.51.188.92]:45289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3L2i-0004x9-N1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:32:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1h3L30-0005BZ-Ri
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:32:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3L2h-0002K7-Ji
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:32:36 -0400
-References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
-	<20190308114218.26692-7-shameerali.kolothum.thodi@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3c656ef1-a58e-6461-254e-140976b01d4e@redhat.com>
-Date: Mon, 11 Mar 2019 14:32:25 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1h3L2y-0002R0-Sv
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:32:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3L2y-0002Pm-JR
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:32:52 -0400
+References: <20190308211557.22589-1-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <11181bec-9285-c79a-eb38-e12ac8df9aac@redhat.com>
+Date: Mon, 11 Mar 2019 14:32:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190308114218.26692-7-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20190308211557.22589-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/11] hw/arm/virt: Add ACPI support for
- device memory cold-plug
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] docs/booting.rst: start documenting
+ the boot process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,196 +28,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
-Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, rth@twiddle.net, f4bug@amsat.org, shannon.zhaosl@gmail.com, hpoussin@reactos.org, david@gibson.dropbear.id.au, mark.cave-ayland@ilande.co.uk, borntraeger@de.ibm.com, thuth@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, ehabkost@redhat.com, armbru@redhat.com, agraf@suse.de
 
-Hi Shameer,
+On 08/03/19 22:15, Alex Benn=C3=A9e wrote:
+> While working on some test cases I realised there was quite a lot of
+> assumed knowledge about how things boot up. I thought it would be
+> worth gathering this together in a user facing document where we could
+> pour in the details and background to the boot process. As it's quite
+> wordy I thought it should be a separate document to the manual (which
+> can obviously reference this). So far I've managed almost a thousand
+> words and haven't actually related anything to QEMU's options yet.
 
-On 3/8/19 12:42 PM, Shameer Kolothum wrote:
-> This adds support to build the aml code so that Guest can see the
-s/Guest/the guest
-> cold-plugged device memory.
+This might be more blog material, but it's certainly good stuff!
 
-Isn't the colplug part only related to acpi_dsdt_add_memory_hotplug()? I
-understand the patch also adds some hotplug infra?
+Paolo
 
-Can't you just keerp the dsdt additions here, move the virt-acpi changes
-in the original patch and move the virt-acpi instantiation in a
-subsequent patch?
-
-Thanks
-
-Eric
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> So going forward:
+>=20
+>   - is this a useful document to have in docs?
+>   - are there any other areas to mention?
+>     - out auto-magic -bios selection seems like something worth coverin=
+g
+>   - should we have some worked examples of command lines?
+>     - I was thinking for example of read-only and pflash examples
+>   - we should also describe why direct kernel boots exits
+>     - and also the fact they are not that direct (some code executes
+>       before a kernel - even if it's less than a full firmware)
+>=20
+> Submitted for comment....
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  default-configs/arm-softmmu.mak |  1 +
->  hw/arm/virt-acpi-build.c        |  9 +++++++++
->  hw/arm/virt-acpi.c              | 23 +++++++++++++++++++++++
->  hw/arm/virt.c                   | 11 +++++++++++
->  include/hw/arm/virt.h           |  2 ++
->  5 files changed, 46 insertions(+)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index fbc4564..b3bac25 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -167,3 +167,4 @@ CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
->  CONFIG_MEM_DEVICE=y
->  CONFIG_DIMM=y
-> +CONFIG_ACPI_MEMORY_HOTPLUG=y
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index d7e2e48..87d66da 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -40,6 +40,7 @@
->  #include "hw/loader.h"
->  #include "hw/hw.h"
->  #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/memory_hotplug.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
-> @@ -49,6 +50,13 @@
->  #define ARM_SPI_BASE 32
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> +static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState *ms)
-> +{
-> +    uint32_t nr_mem = ms->ram_slots;
+>  docs/booting.rst | 127 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 127 insertions(+)
+>  create mode 100644 docs/booting.rst
+>=20
+> diff --git a/docs/booting.rst b/docs/booting.rst
+> new file mode 100644
+> index 0000000000..a8a644ff9a
+> --- /dev/null
+> +++ b/docs/booting.rst
+> @@ -0,0 +1,127 @@
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +Anatomy of a Boot, a QEMU perspective
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 > +
-> +    build_memory_hotplug_aml(scope, nr_mem, "\\_SB", NULL, AML_SYSTEM_MEMORY);
-> +}
+> +This document attempts to give an overview of how machines boot-up and
+> +how this matters to QEMU. We will discuss firmware and BIOSes and the
+> +things they do before the OS kernel is loaded and your usable system
+> +is finally ready.
 > +
->  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
->  {
->      uint16_t i;
-> @@ -740,6 +748,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->       * the RTC ACPI device at all when using UEFI.
->       */
->      scope = aml_scope("\\_SB");
-> +    acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
->      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
->      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
->                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> diff --git a/hw/arm/virt-acpi.c b/hw/arm/virt-acpi.c
-> index df8a02b..18ebe94 100644
-> --- a/hw/arm/virt-acpi.c
-> +++ b/hw/arm/virt-acpi.c
-> @@ -26,9 +26,11 @@
->  #include "hw/arm/virt.h"
->  
->  #include "hw/acpi/acpi.h"
-> +#include "hw/acpi/memory_hotplug.h"
->  
->  typedef struct VirtAcpiState {
->      SysBusDevice parent_obj;
-> +    MemHotplugState memhp_state;
->  } VirtAcpiState;
->  
->  #define TYPE_VIRT_ACPI "virt-acpi"
-> @@ -44,6 +46,16 @@ static const VMStateDescription vmstate_acpi = {
->  static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
->                                  DeviceState *dev, Error **errp)
->  {
-> +    VirtAcpiState *s = VIRT_ACPI(hotplug_dev);
+> +Firmware
+> +=3D=3D=3D=3D=3D=3D=3D=3D
 > +
-> +    if (s->memhp_state.is_enabled &&
-> +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
-> +                                dev, errp);
-> +    } else {
-> +        error_setg(errp, "virt: device plug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
->  }
->  
->  static void virt_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> @@ -62,6 +74,15 @@ static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
->  
->  static void virt_device_realize(DeviceState *dev, Error **errp)
->  {
-> +    VirtMachineState *vms = VIRT_MACHINE(qdev_get_machine());
-> +    const MemMapEntry *memmap = vms->memmap;
-> +    VirtAcpiState *s = VIRT_ACPI(dev);
+> +When a CPU is powered up it knows nothing about it's environment. It's
+> +internal state, including the program counter (PC), will be reset to a
+> +defined set of values and it will attempt to fetch it's first
+> +instruction and execute it. It is the job of the firmware to bring a
+> +CPU up from it's first few instructions to running in a relatively
+> +sane execution environment. Firmware tends to be specific to the
+> +hardware in question and is stored on non-volatile memory (memory that
+> +survives a power off) usually a ROM or flash device on the computers
+> +main board.
 > +
-> +    if (s->memhp_state.is_enabled) {
-> +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
-> +                                 &s->memhp_state,
-> +                                 memmap[VIRT_PCDIMM_ACPI].base);
-> +    }
->  }
->  
->  DeviceState *virt_acpi_init(void)
-> @@ -70,6 +91,8 @@ DeviceState *virt_acpi_init(void)
->  }
->  
->  static Property virt_acpi_properties[] = {
-> +    DEFINE_PROP_BOOL("memory-hotplug-support", VirtAcpiState,
-> +                     memhp_state.is_enabled, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 40a1273..9427f4f 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -133,6 +133,7 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, 0x00010000 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -1648,6 +1649,8 @@ static void machvirt_init(MachineState *machine)
->  
->      create_platform_bus(vms, pic);
->  
-> +    vms->acpi = virt_acpi_init();
+> +Some examples of what firmware does include:
 > +
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
->      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> @@ -1832,11 +1835,19 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
-> +    HotplugHandlerClass *hhc;
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->      Error *local_err = NULL;
->  
->      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
+> +Early Hardware Setup
+> +--------------------
 > +
-> +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi);
-> +    hhc->plug(HOTPLUG_HANDLER(vms->acpi), dev, &error_abort);
->  
-> +out:
->      error_propagate(errp, local_err);
->  }
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 6076167..e46a051 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -77,6 +77,7 @@ enum {
->      VIRT_GPIO,
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
-> +    VIRT_PCDIMM_ACPI,
->      VIRT_LOWMEMMAP_LAST,
->  };
->  
-> @@ -132,6 +133,7 @@ typedef struct {
->      uint32_t iommu_phandle;
->      int psci_conduit;
->      hwaddr highest_gpa;
-> +    DeviceState *acpi;
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> 
+> +Modern hardware often requires configuring before it is usable. For
+> +example most modern systems won't have working RAM until the memory
+> +controller has been programmed with the correct timings for whatever
+> +memory is installed on the system. Processors may boot with a very
+> +restricted view of the memory map until RAM and other key peripherals
+> +have been configured to appear in it's address space. Some hardware
+> +may not even appear until some sort of blob has been loaded into it so
+> +it can start responding to the CPU.
+> +
+> +Fortunately for QEMU we don't have to worry too much about this very
+> +low level configuration. The device model we present to the CPU at
+> +start-up will generally respond to IO access from processor straight
+> +away.
+> +
+> +BIOS or Firmware Services
+> +-------------------------
+> +
+> +In the early days of the PC era the BIOS or Basic Input/Output System
+> +provided an abstraction interface to the operating system which
+> +allowed them to do basic IO operations without having to directly
+> +drive the hardware. Since then the scope of these firmware services
+> +have grown as systems become more and more complex.
+> +
+> +Modern firmware often follows the Unified Extensible Firmware
+> +Interface (UEFI) which provides services like secure boot, persistent
+> +variables and external time-keeping.
+> +
+> +There can often be multiple levels of firmware service functions. For
+> +example systems which support secure execution enclaves generally have
+> +a firmware component that executes in this secure mode which the
+> +operating system can call in a defined secure manner to undertake
+> +security sensitive tasks on it's behalf.
+> +
+> +Hardware Enumeration
+> +--------------------
+> +
+> +It's easy to assume that modern hardware is built to be discover-able
+> +and all the operating system needs to do is enumerate the various
+> +buses on the system to find out what hardware exists. While buses like
+> +PCI and USB do support discovery there is usually much more on a
+> +modern system than just these two things.
+> +
+> +In the embedded world it used to be acceptable to have a custom
+> +compiled kernel which knew where everything is meant to be. However
+> +this was a brittle approach and not very flexible - most obviously if
+> +you try and use a kernel compiled for one piece of hardware on another
+> +piece of hardware that might nominally have the same processor.
+> +
+> +The more modern approach is to have a "generic" kernel that has a
+> +number of different drivers compiled in which are then enabled based
+> +on a hardware description provided by the firmware. This allows
+> +flexibility on both sides. The software distribution is less concerned
+> +about managing lots of different kernels for different pieces of
+> +hardware. The hardware manufacturer is also able to make small changes
+> +to the board over time to fix bugs or change minor components.
+> +
+> +The two main methods for this are the Advanced Configuration and Power
+> +Interface (ACPI) and Device Trees. ACPI originated from the PC world
+> +although is becoming increasingly common for "enterprise" hardware
+> +like servers. Device Trees of various forms have existed for a while
+> +with perhaps the most common being Flattened Device Trees (FDT).
+> +
+> +Boot Code
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +The line between firmware and boot code is a very blurry one. However
+> +from a functionality point of view we have moved from ensuring the
+> +hardware is usable as a computing device to finding and loading a
+> +kernel which is then going to take over control of the system. Modern
+> +firmware often has the ability to boot a kernel directly and in some
+> +systems you might chain through several boot loaders before the final
+> +kernel takes control.
+> +
+> +The boot loader needs to do 3 things:
+> +
+> +  - find a kernel and load it into RAM
+> +  - ensure the CPU is in the correct mode for the kernel to boot
+> +  - pass any information the kernel may need to boot and can't find it=
+self
+> +
+> +Once it has done these things it can jump to the kernel and let it get
+> +on with things.
+> +
+> +Kernel
+> +=3D=3D=3D=3D=3D=3D
+> +
+> +The Kernel now takes over and will be in charge of the system from now
+> +on. It will enumerate all the devices on the system (again) and load
+> +drivers that can control them. It will then locate some sort of
+> +file-system and eventually start running programs that actually do
+> +work.
+> +
+> +------------------------
+> +How this relates to QEMU
+> +------------------------
+> +
+> +TODO:
+> +
+> +  - -bios and -drive flash
+> +  - dynamic and fixed hardware definitions
+> +  - direct kernel boots
+>=20
