@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45710)
+Received: from eggs.gnu.org ([209.51.188.92]:45636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3PCN-0007JR-AJ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:58:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3PCX-0007Ey-3y
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3P8u-00023x-J8
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:55:17 -0400
-References: <20190311165538.6623-1-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <532e5c6d-b93e-7fb3-f987-22e9b0362acb@redhat.com>
-Date: Mon, 11 Mar 2019 18:55:11 +0100
+	(envelope-from <armbru@redhat.com>) id 1h3P7W-0001AG-Lm
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:53:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3P7U-000182-Ni
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:53:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311085024.13780-1-kraxel@redhat.com>
+	<20190311085024.13780-5-kraxel@redhat.com>
+Date: Mon, 11 Mar 2019 18:53:39 +0100
+In-Reply-To: <20190311085024.13780-5-kraxel@redhat.com> (Gerd Hoffmann's
+	message of "Mon, 11 Mar 2019 09:50:23 +0100")
+Message-ID: <87ef7d8fh8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190311165538.6623-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: re-license timers.py to
- GPLv2 or later
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 4/5] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 11/03/19 17:55, Alex Benn=C3=A9e wrote:
-> I'm the sole author (aside from a one line by Greg fixing encoding)
-> and I was asked nicely on IRC to bring it into line with the rest of
-> the files.
->=20
-> Cc: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  scripts/qemugdb/timers.py | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-> index 51ea04b5e2..f0e132d27a 100644
-> --- a/scripts/qemugdb/timers.py
-> +++ b/scripts/qemugdb/timers.py
-> @@ -6,8 +6,10 @@
->  #
->  # Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->  #
-> -# This work is licensed under the terms of the GNU GPL, version 2.  Se=
-e
-> -# the COPYING file in the top-level directory.
-> +# This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
-> +# See the COPYING file in the top-level directory.
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> =20
->  # 'qemu timers' -- display the current timerlists
-> =20
->=20
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-+qemu-trivial
+> From: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
+> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
+> guests running on these and the PMON2000 firmware of the fulong2e
+> expect this to be available. Fortunately these are very similar chips
+> so they can be mostly emulated in the same device model. This patch
+> adds basic emulation of these ATI VGA chips.
+>
+> While this is incomplete and currently only enough to run the MIPS
+> firmware and get framebuffer output with Linux, it allows the fulong2e
+> board to work more like the real hardware and having it in QEMU in
+> this state provides a way to experiment with it and allows others to
+> contribute to improve it. It is compiled for all archs but only the
+> fulong2e (which currently has no display output at all) is set to use
+> it by default (in a separate patch).
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+> Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> Message-id: 0b1b7c22873a6e37627261b04fb687412b25ff4f.1552152100.git.balaton@eik.bme.hu
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+[...]
+> diff --git a/hw/display/trace-events b/hw/display/trace-events
+> index 37d3264bb2e6..80993cc4d913 100644
+> --- a/hw/display/trace-events
+> +++ b/hw/display/trace-events
+> @@ -138,3 +138,7 @@ vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
+>  sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+>  sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
+>  sii9022_switch_mode(const char *mode) "mode: %s"
+> +
+> +# hw/display/ati*.c
+> +ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s -> 0x%"PRIx64
+> +ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s <- 0x%"PRIx64
+
+Blows up for me:
+
+Traceback (most recent call last):
+  File "/work/armbru/qemu/scripts/tracetool.py", line 152, in <module>
+    main(sys.argv)
+  File "/work/armbru/qemu/scripts/tracetool.py", line 147, in main
+    binary=binary, probe_prefix=probe_prefix)
+  File "/work/armbru/qemu/scripts/tracetool/__init__.py", line 472, in generate
+    tracetool.format.generate(events, format, backend, group)
+  File "/work/armbru/qemu/scripts/tracetool/format/__init__.py", line 85, in generate
+    func(events, backend, group)
+  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 121, in generate
+    fmt_str = "%d@%d " + e.name + " " + c_fmt_to_stap(e.fmt) + "\\n"
+  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 64, in c_fmt_to_stap
+    bits.append(c_macro_to_format(macro))
+  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 36, in c_macro_to_format
+    raise Exception("Unhandled macro '%s'" % macro)
+Exception: Unhandled macro 'HWADDR_PRIx'
