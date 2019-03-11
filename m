@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40680)
+Received: from eggs.gnu.org ([209.51.188.92]:41322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3Ot6-000833-5o
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:39:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1h3Ou0-0000oO-0x
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1h3Olu-00044Q-2t
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:31:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3Olt-000441-Ok
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:31:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190131202637.4062-1-jusual@mail.ru>
-	<87lg2zj2f2.fsf@dusky.pond.sub.org>
-	<d10b10d5-0600-515b-66d7-e6f448f42ced@mail.ru>
-	<8736otqy2o.fsf@dusky.pond.sub.org>
-	<3a755bba-a539-d1f5-933b-54d2def67596@mail.ru>
-Date: Mon, 11 Mar 2019 18:31:22 +0100
-In-Reply-To: <3a755bba-a539-d1f5-933b-54d2def67596@mail.ru> (Julia Suvorova
-	via Qemu-devel's message of "Thu, 21 Feb 2019 20:27:56 +0300")
-Message-ID: <87tvg9uxlh.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1h3Ogm-0000xC-VS
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:26:13 -0400
+References: <20190311165017.32247-1-kwolf@redhat.com>
+	<20190311165017.32247-11-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
+Date: Mon, 11 Mar 2019 12:26:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
- commands
+In-Reply-To: <20190311165017.32247-11-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ymk4KGeT8zrODFUhCBPxjTTmD5w8jByQU"
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] file-posix: Make auto-read-only
+ dynamic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
-Cc: Julia Suvorova <jusual@mail.ru>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?Q?G=C3=B6rtz?= <contrib@steffen-goertz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
 
-I apologize for the long delay.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ymk4KGeT8zrODFUhCBPxjTTmD5w8jByQU
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, berto@igalia.com,
+ qemu-devel@nongnu.org
+Message-ID: <2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
+Subject: Re: [PATCH v2 10/10] file-posix: Make auto-read-only dynamic
+References: <20190311165017.32247-1-kwolf@redhat.com>
+ <20190311165017.32247-11-kwolf@redhat.com>
+In-Reply-To: <20190311165017.32247-11-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> writes:
+On 3/11/19 11:50 AM, Kevin Wolf wrote:
+> Until now, with auto-read-only=3Don we tried to open the file read-writ=
+e
+> first and if that failed, read-only was tried. This is actually not goo=
+d
+> enough for libvirt, which gives QEMU SELinux permissions for read-write=
 
-> On 12.02.2019 10:13, Markus Armbruster wrote:
->> Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> writes:
->>
->>> On 01.02.2019 12:14, Markus Armbruster wrote:
->>>> Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> writes:
->>>>
->>>>> The whitelist option allows to run a reduced monitor with a subset of
->>>>> QMP commands. This allows the monitor to run in secure mode, which is
->>>>
->>>> For a value of "secure".  I'm not saying this can't be useful, just
->>>> tempering expecations.  I guess you intend to use this to restrict the
->>>> monitor to sufficiently harmless commands, such as commands that merely
->>>> return information without changing anything.  However, even such
->>>> commands can be abused for denial of service.  Whether that's an issue
->>>> depends on your use case.
->>>>
->>>>> convenient for sending commands via the WebSocket monitor using the
->>>>> web UI. This is planned to be done on micro:bit board.
->>>>>
->>>>> The list of allowed commands should be written to a file, one per line.
->>>>> The command line will look like this:
->>>>>       -mon chardev_name,mode=control,whitelist=path_to_file
->>>>>
->>>>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->>>>
->>>> Please describe your intended use case in more detail, and provide at
->>>> least a rough security analysis that includes the denial of service
->>>> aspect.
->>>
->>> It is planned to use the web interface for micro:bit board, e.g. send a
->>> button press as a QMP command and send a LED display changing as a QMP
->>> event, and send them via WebSocket protocol from QEMU to a web page.
->>> The monitor will also send commands from some other sensors, for
->>> example, an accelerometer/magnetometer. Therefore, it is convenient to
->>> limit the monitor so that it can send only these commands of
->>> buttons/sensors.
->>
->> Covers "describe your intended use case" nicely, thanks.  Still missing:
->> "a rough security analysis that includes the denial of service aspect".
->> Here are two questions to help you get started.  Is "the web interface"
->> trusted?  If not, what if it floods QEMU with button presses?
->
-> In the case of a trusted connection, we don't even need a whitelist.
-> The oob execution must be disabled in order to prohibit the direct
-> execution of speculative series of commands. The regular command
-> suspends the monitor and causes it to stop reading the commands until
-> the execution is completed, which prevents the client from capturing too
-> many resources.
+> only as soon as it actually intends to write to the image. So we need t=
+o
+> be able to switch between read-only and read-write at runtime.
+>=20
+> This patch makes auto-read-only dynamic, i.e. the file is opened
+> read-only as long as no user of the node has requested write
+> permissions, but it is automatically reopened read-write as soon as the=
 
-It could still peg one core, at least in theory.
+> first writer is attached. Conversely, if the last writer goes away, the=
 
->                 And since the suspension of the monitor doesn't stop the
-> sending of events, the display will work fine.
+> file is reopened read-only again.
+>=20
+> bs->read_only is no longer set for auto-read-only=3Don files even if th=
+e
+> file descriptor is opened read-only because it will be transparently
+> upgraded as soon as a writer is attached. This changes the output of
+> qemu-iotests 232.
 
-This is not an objection; I asked for a rough security analysis not to
-challenge its premises, but to make sure you have one.  Now put it on
-record by working it into your commit message.
+auto-read-only was introduced in 3.1, at which point we intentionally
+had sufficiently loose wording to permit (but not require) dynamic state
+checking; so you are not breaking the interface.  On the other hand, is
+libvirt going to have problems introspecting whether it can use
+auto-read-only and get the dynamic behavior it needs?  Or is there
+enough else in the way of libvirt's switch to -blockdev that it won't
+attempt anything that needs auto-read-only without other 4.0 interfaces
+anyway, at which point detecting the presence of the field (but not
+whether the field has a guarantee of dynamic behavior) on 3.1 doesn't
+matter?
 
-I still have to review the actual patch.  You may want to wait for that
-before you respin.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--ymk4KGeT8zrODFUhCBPxjTTmD5w8jByQU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyGmjEACgkQp6FrSiUn
+Q2owvAgAn4XPIO64o3nHU8dSEq0IXQfktbWgrJhUj4O7HSF12N4q8bylYCS9fAvY
+nINwbShuNBi6PtVOBqirVOtWhup4969TdxHLrETLIYjToZANh9Tht1+5YNMgZh9E
+kIA8r5c04qxkLWauTy+3rpFFEO3zP8OHJNizBbzij/9FjkJui7sr5YSufY8daYwn
+jUTOXPZ2VT3jovu4o0VsSyCZptxjevtJW0960zL+HZc6dgMGbz8ZdLYLAMozkpji
+mZaPknuVVEfMXxwWnapUktAulmfdToiHsTbsNZHu6OvJiv11NgEB14j5iGabRRRx
+2s3rZ8QdbZgCEIV4zXzAolBxCXebpw==
+=cvWH
+-----END PGP SIGNATURE-----
+
+--ymk4KGeT8zrODFUhCBPxjTTmD5w8jByQU--
