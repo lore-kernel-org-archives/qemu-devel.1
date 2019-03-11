@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48181)
+Received: from eggs.gnu.org ([209.51.188.92]:50126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3NJc-00012a-6N
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:58:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3NST-0000Nl-OV
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3NJT-0000oJ-P9
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:58:09 -0400
-Resent-Message-Id: <E1h3NJT-0000oJ-P9@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h3NJQ-0000my-2N
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:58:00 -0400
-Message-ID: <155231984953.9137.10100952349460426656@6acff2cf482b>
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1h3NSS-0005wN-T5
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:07:21 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3NSS-0005uo-MZ
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:07:20 -0400
+Received: by mail-oi1-x244.google.com with SMTP id b4so4076194oif.6
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:07:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 08:57:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
+References: <20190214190603.25030-1-peter.maydell@linaro.org>
+	<20190214190603.25030-12-peter.maydell@linaro.org>
+	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+	<CAFEAcA9=oUk_W+pqYLkd=oBC7eENU1yYKbGzoOzgxXoOmg7_+A@mail.gmail.com>
+	<85304416-5bd3-c957-b2c3-dd8e7c1aa071@redhat.com>
+	<CAFEAcA8vdJyNa7KEAv5sOJDQUu_9x0pyXvixw4nT0Yq1KVosmA@mail.gmail.com>
+	<1a59692d-527c-9750-4bfa-6b5adbbab81a@redhat.com>
+In-Reply-To: <1a59692d-527c-9750-4bfa-6b5adbbab81a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 16:07:07 +0000
+Message-ID: <CAFEAcA8Bx6GqtF-CYHy472ZsBkKNkOk_1cpe1GzkrWrrp-0u3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
+ guests to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
-NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
-dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
-aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmQ5NGU1MDIzNCBz
-MzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UKYWFkNWJmMTMw
-YyBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9y
-IGRhc2QtaXBsCmUyNThiNjYwNTcgczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8g
-ZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCmNjODkzNTI5N2MgczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0
-aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo3YmRhZmZiZjNmIHMzOTAtYmlvczog
-Y2lvIGVycm9yIGhhbmRsaW5nCjVmM2JkNzE5OGQgczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5u
-aW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwplYjJhY2MyZThhIHMzOTAtYmlvczogcHRy
-MnUzMiBhbmQgdTMydG9wdHIKMGU5ODFkNzRhYyBzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1v
-cnkKZjA1OTk2NTIwMSBzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20g
-dmlydGlvCjdmYzdlODYwZDEgczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaAo0ZTRlZDc0MTBlIHMz
-OTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ugb3V0IG9mIHZpcnRpbyBjb2RlIHBh
-dGgKN2QwY2IzYTdkOCBzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlv
-IGRldmljZXMKYzcxNmFiODk2NCBzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxvZ2lj
-IGZyb20gdmlydGlvCmRlNDBkODIyNmUgczM5MC1iaW9zOiBkZWNvdXBsZSBjaW8gc2V0dXAgZnJv
-bSB2aXJ0aW8KODMyMzgxNDk1YiBzMzkwIHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5
-IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0
-IDgzMjM4MTQ5NWJhMCAoczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQg
-SVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8x
-NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE1IENoZWNraW5nIGNvbW1pdCBkZTQwZDgy
-MjZlZWQgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmlydGlvKQozLzE1IENo
-ZWNraW5nIGNvbW1pdCBjNzE2YWI4OTY0MjQgKHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJv
-b3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGlu
-IC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9tYWluLmM6MTk6CitJcGxQYXJh
-bWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxpZ25lZF9fKFBBR0VfU0laRSkpKTsK
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8x
-NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgN2QwY2Iz
-YTdkODM3IChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmlj
-ZXMpCjUvMTUgQ2hlY2tpbmcgY29tbWl0IDRlNGVkNzQxMGVkMiAoczM5MC1iaW9zOiBGYWN0b3Ig
-ZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aCkKNi8xNSBDaGVja2lu
-ZyBjb21taXQgN2ZjN2U4NjBkMWE4IChzMzkwLWJpb3M6IENsZWFuIHVwIGNpby5oKQo3LzE1IENo
-ZWNraW5nIGNvbW1pdCBmMDU5OTY1MjAxMzUgKHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5lbCBp
-L28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDcvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNSBDaGVja2luZyBjb21t
-aXQgMGU5ODFkNzRhYzFkIChzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KOS8xNSBDaGVja2luZyBjb21taXQgZWIyYWNjMmU4YWJmIChzMzkwLWJpb3M6IHB0
-cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDkvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTUgQ2hlY2tpbmcgY29tbWl0
-IDVmM2JkNzE5OGQyMiAoczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEg
-Y2hhbm5lbCBwcm9ncmFtcykKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTog
-cGMtYmlvcy9zMzkwLWNjdy9jaW8uYzoxNDU6CisgKiBhY3RpdmUgKGdlbmVyYXRpbmcgaS9vIGlu
-dGVycnVwdHMpLiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NSBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxMC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTUgQ2hlY2tp
-bmcgY29tbWl0IDdiZGFmZmJmM2YzOSAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEy
-LzE1IENoZWNraW5nIGNvbW1pdCBjYzg5MzUyOTdjYjEgKHMzOTAtYmlvczogUmVmYWN0b3Igdmly
-dGlvIHRvIHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4Ogor
-ICAgICAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywg
-c2l6ZW9mKGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAg
-IHJ1bl9jY3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0
-dXMpLCBmYWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDEyLzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE1IENo
-ZWNraW5nIGNvbW1pdCBlMjU4YjY2MDU3MGIgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0
-eXBlIHRvIGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IGFhZDVi
-ZjEzMGMwMCAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVl
-ZGVkIGZvciBkYXNkLWlwbCkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IGJkOTRlNTAyMzRjNSAoczM5
-MC1iaW9zOiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMyNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQ0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29t
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, 11 Mar 2019 at 15:09, Auger Eric <eric.auger@redhat.com> wrote:
+>
+> Hi Peter,
+>
+> On 3/11/19 3:55 PM, Peter Maydell wrote:
+> > On Mon, 11 Mar 2019 at 14:54, Auger Eric <eric.auger@redhat.com> wrote:
+> >> yes I hit the bug with your reduced command line:
+> >>
+> >> aarch64-softmmu/qemu-system-aarch64 -M virt,gic-version=host -cpu host
+> >> -smp 2 -m 4G -display none --enable-kvm  -serial stdio -bios
+> >> ~/VM/UEFI/QEMU_EFI_cbuild_debug_feb21_2019.fd
+> >
+> > OK, that's good to know. What hardware are you using, and what host
+> > kernel version ?
+>
+> I am using Cavium ThunderX 2 and 5.0 host
+
+Thanks -- I got access to a thunderx 2 and have repro'd the failure
+there.
+
+-- PMM
