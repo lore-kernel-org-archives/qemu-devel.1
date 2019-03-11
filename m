@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39110)
+Received: from eggs.gnu.org ([209.51.188.92]:40401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1h3MaT-0008NY-IK
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:34 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1h3Mh8-0003Tz-EU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1h3MaS-0001nV-LE
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:33 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <keith.busch@intel.com>)
-	id 1h3MaR-0001er-MV
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:11:32 -0400
-From: Keith Busch <keith.busch@intel.com>
-Date: Mon, 11 Mar 2019 09:11:53 -0600
-Message-Id: <20190311151153.10516-1-keith.busch@intel.com>
-Subject: [Qemu-devel] [PATCH] nvme: fix write zeroes offset and count
+	(envelope-from <alex.bennee@linaro.org>) id 1h3Mh3-0005Mf-J3
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:26 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1h3Mh1-0005Lx-Mm
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:20 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f3so4978157wmj.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:18:18 -0700 (PDT)
+References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
+	<BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<87ftrt5wb2.fsf@zen.linaroharston>
+	<BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Mon, 11 Mar 2019 15:18:16 +0000
+Message-ID: <87ef7d5tjb.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +34,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-The implementation used blocks units rather than the expected bytes.
 
-Fixes: c03e7ef12a9 ("nvme: Implement Write Zeroes")
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- hw/block/nvme.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Aleksandar Markovic <amarkovic@wavecomp.com> writes:
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 7c8c63e8f5..e8fe8f1ddd 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -324,8 +324,8 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
-     uint64_t slba = le64_to_cpu(rw->slba);
-     uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
--    uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
--    uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
-+    uint64_t offset = slba << data_shift;
-+    uint32_t count = nlb << data_shift;
- 
-     if (unlikely(slba + nlb > ns->id_ns.nsze)) {
-         trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-@@ -335,7 +335,7 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     req->has_sg = false;
-     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-                      BLOCK_ACCT_WRITE);
--    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, aio_slba, aio_nlb,
-+    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
-                                         BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
-     return NVME_NO_COMPLETE;
- }
--- 
-2.14.4
+>> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> > Aleksandar Markovic <amarkovic@wavecomp.com> writes:
+>>
+>> >> From: Peter Maydell <peter.maydell@linaro.org>
+>> >> Subject: Re: [PATCH] target/mips: Fix minor bug in FPU
+>> >>
+>> >> On Mon, 11 Mar 2019 at 11:52, Aleksandar Markovic
+>> >> <amarkovic@wavecomp.com> wrote:
+>> >> >
+>> >> > > From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> >> > > Subject: [PATCH] target/mips: Fix minor bug in FPU
+>> >> > >
+>> >> > > Wrong type of NaN was generated by maddf and msubf insturctions
+>> >> > > when the arguments were inf, zero, nan or zero, inf, nan
+>> >> > > respectively.
+>> >> >
+>> >> > I did the applicable tests on both pre-NaN2008 and NaN2008 MIPS har=
+dware,
+>> >> > and compared results with QEMu emulations. The underlying reason fo=
+r this
+>> >> > patch is correct, but, as Alex also pointed out, it needs some impr=
+ovements.
+>> >> > However, the softfreeze being so close, I am going to amend the pat=
+ch while
+>> >> > creating the pull request. No respin needed. All in all:
+>> >>
+>> >> Since this is a bug fix, there is no requirement that it goes in
+>> >> before softfreeze, FWIW -- pretty much any bug fix is OK for
+>> >> rc1, and a focused bugfix like this one that doesn't affect
+>> >> other guest architectures would be ok in rc2 as well.
+>> >>
+>> >
+>> > Thanks, Peter, for the clarification!
+>> >
+>> > In this case, I think, the most natural would be to wait for the
+>> > submitter to submit the v2.
+>> >
+>> > The reference to the documentation that Alex rightfully asked for
+>> > is this:
+>> >
+>> > "MIPS Architecture for Programmers Volume IV-j: The MIPS32
+>> > SIMD Architecture Module", Revision 1.12, February 3, 2016
+>> >
+>> > The key sentence is on page 53:
+>> >
+>> >    "If the destination format is floating-point, all NaN propagating
+>> >    operations with one NaN operand produce a NaN with the
+>> >    payload of the input NaN."
+>>
+>> Hmm doesn't that fail for:
+>>
+>>   Inf * Zero + !NaN?
+>>
+>> Should the check be:
+>>
+>>     if (infzero) {
+>>         float_raise(float_flag_invalid, status);
+>>         if (is_nan(c_cls)) {
+>>             return 2;
+>>         }
+>>         return 3;
+>>     }
+>>
+>> ?
+>>
+>> If either a or b is a NaN we fall through to the NaN selection rules
+>> bellow preferring SNaN over QNaN.
+>>
+>
+> Alex,
+>
+> I'll doublecheck, but I think "infzero" here is a misnomer.
+>
+> The variable/argument "infzero" actually denotes the cases:
+>
+>    - "Inf * Zero +/- NaN"
+>    - "Inf * Zero +/- NaN"
+>    - "Zero * Inf +/- NaN"
+>    - "Zero * Inf +/- NaN"
+>
+> "Inf * Zero +/- !NaN (let's say, normal fp)" is handled
+> somewhere else.
+
+Ahh my mistake, infzero only cares about a and b:
+
+    bool inf_zero =3D ((1 << a.cls) | (1 << b.cls)) =3D=3D
+                    ((1 << float_class_inf) | (1 << float_class_zero));
+
+but is wrapped in:
+
+    if (is_nan(a.cls) || is_nan(b.cls) || is_nan(c.cls)) {
+        return pick_nan_muladd(a, b, c, inf_zero, s);
+    }
+
+Which when infzero is true implies c has to be the NaN...
+
+>
+> Therefore, "infzero" should be rather called "infzeronan".
+> This is from what I remember, but I will reanalyse the
+> relevant softfloat code one more time.
+
+No need. I overthought it ;-)
+
+>
+> Regards,
+> Aleksandar
+>
+>> >
+>> > There are other details in surrounding paragraphs. The document
+>> > is for SIMD (MSA) ASE, but both the SIMD and FPU NaN2008
+>> > floating point instruction should follow the same rules. I could't
+>> > find a separate document on FPU instructions.
+>> >
+>> > The problem with the current implementation of 0*inf+nan is that
+>> > it returns the default NaN (all zeroes in the payload segment),
+>> > whereas the documentation says the payload should be from
+>> > the input NaN. The behavior specified in the documentation is
+>> > confirmed also with tests on hardware.
+>> >
+>> > Sincerely,
+>> > Aleksandar
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+
+
+--
+Alex Benn=C3=A9e
