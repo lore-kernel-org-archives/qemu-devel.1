@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47739)
+Received: from eggs.gnu.org ([209.51.188.92]:47855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h3J4Q-00061P-2H
+	(envelope-from <philmd@redhat.com>) id 1h3J4Q-000632-23
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1h3Irv-0008DF-Im
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:13:20 -0400
-Received: from mail-eopbgr710101.outbound.protection.outlook.com
-	([40.107.71.101]:20064
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1h3Irv-0008CG-AG
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:13:19 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 11 Mar 2019 11:13:16 +0000
-Message-ID: <BN6PR2201MB12519856F9E722191F0844ECC6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190311005618.19007-1-philmd@redhat.com>,
-	<20190311005618.19007-3-philmd@redhat.com>
-In-Reply-To: <20190311005618.19007-3-philmd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philmd@redhat.com>) id 1h3It5-0000eX-N5
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:14:32 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52868)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3It5-0000dp-GT
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:14:31 -0400
+Received: by mail-wm1-f66.google.com with SMTP id f65so3989979wma.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 04:14:31 -0700 (PDT)
+References: <20190310235351.1863-1-philmd@redhat.com>
+	<20190310235351.1863-3-philmd@redhat.com>
+	<cfb987fd-8190-c100-80b9-657c060eb20f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <57ccad1d-3e6a-6356-fbbd-c048e27988e0@redhat.com>
+Date: Mon, 11 Mar 2019 12:14:28 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/mips: Express dependencies of
- the Jazz machine with Kconfig
+In-Reply-To: <cfb987fd-8190-c100-80b9-657c060eb20f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/8] hw/input: Add 8042 PS/2 Keyboard
+ Controller to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>
+To: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Subject: [PATCH v3 2/7] hw/mips: Express dependencies of the Jazz machine=
- with Kconfig
->=20
-> The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
-> framebuffer display is managed by a G364, the network card is a Sonic
-> DP83932. A QLogic ESP216 provides a SCSI bus.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
+On 3/11/19 7:47 AM, Thomas Huth wrote:
+> On 11/03/2019 00.53, Philippe Mathieu-Daudé wrote:
+>> The Intel 8042 chipset also includes some functions unrelated to
+>> the keyboard, such the A20-Gate.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  hw/input/Kconfig | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+>> index e2e66f0858..83e4546a28 100644
+>> --- a/hw/input/Kconfig
+>> +++ b/hw/input/Kconfig
+>> @@ -10,6 +10,10 @@ config PCKBD
+>>      default y
+>>      depends on ISA_BUS
+>>  
+>> +config I8042
+>> +    bool
+>> +    select PCKBD
+> 
+> I fail to see why you need this config switch. There is a "select I8042"
+> in a later patch, but that's it - you never use this switch to decide
+> anything (like including a file in the Makefiles or toggle other
+> switches), so this seems to be just a defunc switch to me. Or do I miss
+> something?
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
+The PIIX3 emulates a 8042 when the USB Legacy Support is enabled.
+
+Oh now I see, I first understood the hw/input/pckbd.c file was
+modeling the 8042 and other things, but no, it is simply it.
+
+So please disregard this patch, I'll respin renaming PCKBD -> I8042.
+
+Thanks!
+
+Phil.
