@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48174)
+Received: from eggs.gnu.org ([209.51.188.92]:48336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3PJ6-0004nz-4W
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:05:50 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1h3PJh-0005IS-EQ
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3PJ4-0004qO-Qb
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:05:48 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Mar 2019 18:05:40 +0000
-Message-ID: <99428d87-e02f-6f2a-1432-3f5bf84d0589@virtuozzo.com>
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<3a8ed35f-e50b-c411-2004-38917d2164c6@redhat.com>
-	<d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
-	<4c132978-2965-fa82-601a-69bff47590cf@redhat.com>
-In-Reply-To: <4c132978-2965-fa82-601a-69bff47590cf@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <635D506BF33AA54AAE4792969A04B571@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1h3PJg-0005iq-Ag
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39593)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3PJf-0005hL-Ti
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:24 -0400
+References: <20190311180216.18811-1-jandryuk@gmail.com>
+	<20190311180216.18811-2-jandryuk@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d7fb0cfd-9573-028c-5631-be9df4102fcc@redhat.com>
+Date: Mon, 11 Mar 2019 19:06:17 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/5] block/qcow2-bitmap: Enable resize with
- persistent bitmaps
+In-Reply-To: <20190311180216.18811-2-jandryuk@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] xen: Introduce -xen-stubdom option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Jason Andryuk <jandryuk@gmail.com>, qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, marmarek@invisiblethingslab.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul.durrant@citrix.com>
 
-MTEuMDMuMjAxOSAyMDo0OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMy8xMS8xOSAxMjozNiBQ
-TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4gDQo+Pj4gRldJVyAtIEkg
-aGF2ZSBub3QgeWV0IHJldmlld2VkIHRoaXMgc2VyaWVzIGNsb3NlbHksIGJ1dCBJIHRoaW5rIGl0
-IHdvdWxkDQo+Pj4gYmUgd2lzZSB0byBnZXQgdGhpcyBpbml0aWFsIGN1dCBpbiBiZWZvcmUgc29m
-dGZyZWV6ZSAod2UgY2FuIG1ha2UNCj4+PiBmdXJ0aGVyIHR3ZWFrcyB0byBmaXggYnVncyBpbiBh
-c3N1bXB0aW9ucyBkdXJpbmcgcmMxIGFuZCByYzIsIGJ1dCBpdCdzIGENCj4+PiBsb3QgaGFyZGVy
-IHRvIGFkZCB0aGUgc2VyaWVzIGF0IGFsbCBpZiBpdCBtaXNzZXMgc29mdGZyZWV6ZSkuDQo+Pj4N
-Cj4+DQo+PiBJIHN0aWxsIG5vdCBjb252aW5jZWQgdGhhdCB3ZSBuZWVkIGJpdG1hcCBmbHVzaGlu
-Zy4gSSB0aGluayAoYW5kIERlbiBzdXBwb3J0cw0KPj4gbWUpIHRoYXQgaXQncyBhIGJhZCBpZGVh
-LiBJdCBtYWtlcyB0aGluZ3MgbW9yZSBkaWZmaWN1bHQgd2l0aG91dCBhIHJlYXNvbiwNCj4+IGV4
-Y2VwdCBpbXByb3ZpbmcgZGVidWdnaW5nIHdpdGggLS1mb3JjZS1zaGFyZSB3aGljaCBzaG91bGQg
-bmV2ZXIgYmUgdXNlZCBpbg0KPj4gcHJvZHVjdGlvbi4NCj4gDQo+IEFuZCBJJ20gc3RpbGwgbm90
-IGNvbnZpbmNlZCB0aGF0IGFkZGluZyBiaXRtYXAgZmx1c2hpbmcgd2lsbCBhZGQgYQ0KPiBiZW5j
-aG1hcmthYmxlIGRlbGF5IHRvIG9wZXJhdGlvbi4gQWx0aG91Z2ggZGVidWdnaW5nIG1heSBub3Qg
-YmUgbmVlZGVkDQo+IGluIGEgcHJvZHVjdGlvbiBlbnZpcm9ubWVudCwgaGF2aW5nIGl0IGFmdGVy
-IGEgZmFpbHVyZSBjYW4gYmUgYSBsaWZlc2F2ZXIuDQoNCldoYXQgaXMgdGhlIHJlYWwgZGVidWdn
-aW5nIGNhc2UsIHdoZW4gd2UgbmVlZCB0aGlzIGluZm9ybWF0aW9uPyBLZWVwaW5nIGluIG1pbmQs
-DQp0aGF0IGl0IG1heSBzdGlsbCBiZSBpbmNvcnJlY3QgZHVlIHRvIGRpZmZlcmVudCBlcnJvciBw
-YXRocz8gKHJlc2l6ZSBmYWlsZWQgb24NCnNvbWUgcG9pbnQgYmVmb3JlIGZsdXNoLCBvciByZXNp
-emUgc3VjY2Vzc2VkIGJ1dCBmbHVzaCBmYWlsZWQpDQoNCj4gDQo+IExvb2tpbmcgYXQgdGhpcyBm
-cm9tIGFub3RoZXIgcG9pbnQgb2YgdmlldzogaWYgdGhpcyBzZXJpZXMgZ29lcyBpbiBub3cNCj4g
-KHdpdGggaXRzIHVzZSBvZiBsaW1pdGVkIGJpdG1hcCBmbHVzaGluZyBvbiByZXNpemUgaW4gb3Jk
-ZXIgdG8gbWFrZQ0KPiBjb2RpbmcgYml0bWFwIHJlc2l6ZSBlYXNpZXIsIHJhdGhlciB0aGFuIGds
-b2JhbCBiaXRtYXAgZmx1c2hpbmcgYWZ0ZXINCj4gZXZlcnkgYml0bWFwIGFkZC9kZWxldGUpLCB0
-aGVuIHRoZSBvbmx5IHRpbWUgdGhhdCBmbHVzaGluZyB0byBkaXNrDQo+IGhhcHBlbnMgaXMgZHVy
-aW5nIHJlc2l6ZSAod2hpY2ggaXMgY3VycmVudGx5IGZsYXQtb3V0IGZvcmJpZGRlbiksIHNvIGl0
-DQo+IHdpbGwgbm90IHBlbmFsaXplIGV4aXN0aW5nIHVzZSBjYXNlcy4gQW5kIHdlIHN0aWxsIGhh
-dmUgcmMxL3JjMiB0byBmaXgNCj4gYW55IGJ1Z3MgaWYgd2UgY2FuIGNvbWUgdXAgd2l0aCBzb21l
-IG90aGVyIHdheSB0byBnZXQgcmVzaXplIHRvIHdvcmsNCj4gd2l0aG91dCBmbHVzaGluZyAob3Ig
-ZXZlbiByZXZlcnQgdGhpbmdzIGlmIGl0IHByb3ZlcyB0byBiZSB0b28NCj4gaW52YXNpdmUpLiBC
-dXQgYXMgYSBmZWF0dXJlIGFkZGl0aW9uLCBpZiB0aGlzIHNlcmllcyBkb2VzIG5vdCBnbyBpbiBu
-b3csDQo+IHRoZW4gYml0bWFwIHJlc2l6ZSBpcyBzdHVjayB3YWl0aW5nIGZvciA0LjIsIHJlZ2Fy
-ZGxlc3Mgb2Ygd2hhdCB3ZSBjYW4NCj4gZmlndXJlIG91dCBkdXJpbmcgcmMxL3JjMi4NCj4gDQo+
-Pg0KPj4gQml0bWFwcyBhcmUgc3RvcmVkIGluIHFjb3cyX2luYWN0aXZhdGUoKSB3aGljaCBpcyB0
-cnVlIHBsYWNlIGZvciBmbHVzaGluZyBjYWNoZXMuDQo+Pg0KPiANCj4gVGhlcmUgZG9lc24ndCBo
-YXZlIHRvIGJlIGp1c3Qgb25lIHBsYWNlIGZvciBmbHVzaGluZyBjYWNoZXMuICBJbiB0ZXJtcw0K
-PiBvZiBJT1BzLCBob3cgbXVjaCBvdmVyaGVhZCBkb2VzIGEgZmx1c2ggY29zdCBpbiByZWxhdGlv
-biB0byBldmVyeXRoaW5nDQo+IGVsc2U/DQoNCkFzc3VtZSB3ZSBoYXZlIDE2dGIgZGlzay4gQml0
-bWFwIHdpdGggZGVmYXVsdCBncmFudWxhcml0eSB3aWxsIHRha2UgMzBtYi4NCkFzc3VtZSB0aGF0
-IHdlIGhhdmUgc2V2ZXJhbCBzdWNoIGJpdG1hcHMgKGZvciBleGFtcGxlLCBzZXZlcmFsIGRpc2Fi
-bGVkIGFuZA0Kb25lIGFjdGl2ZSwgcmVtZW1iZXIgZGlmZmVyZW50aWFsIGJhY2t1cHMgYW5kIHJl
-bGF0ZWQgc3RhZmYpLiBTbywgaXQgd2lsbA0KYmUgc2V2ZXJhbCBodW5kcmVkcyBvZiBtZWdhYnl0
-ZXMuDQoNCiAgIEFuZCBob3cgaW5mcmVxdWVudCBhcmUgYml0bWFwIHJlc2l6ZSwgYWRkLCBhbmQg
-ZGVsZXRlIGV2ZW50cz8NCj4gT3B0aW1pemluZyB0byB0aGUgYmFyZSBtaW5pbXVtIG9mIGZsdXNo
-ZXMganVzdCBiZWNhdXNlIGl0IGFkZHMgbWluaW1hbA0KPiBvdmVyaGVhZCBtYXkgYmUgcHJlbWF0
-dXJlIG9wdGltaXphdGlvbiBpZiB0aGF0IG92ZXJoZWFkIGlzIGluIHRoZSBub2lzZQ0KPiBhbnl3
-YXkuDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 11/03/19 19:02, Jason Andryuk wrote:
+> With Xen, QEMU can run isolated in a dedicated service VM - a stubdom.
+> There are a few differences when running in a stubdom compared to dom0.
+> Add the -xen-stubdom option to select this mode at runtime.  The default
+> is off.
+
+This should be "-accel xen,stubdom=on".  You should find examples for
+tcg that explain how to add a suboption to -accel.
+
+Paolo
+
+> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+> ---
+>  include/hw/xen/xen.h | 6 ++++++
+>  qemu-options.hx      | 7 +++++++
+>  vl.c                 | 8 ++++++++
+>  3 files changed, 21 insertions(+)
+> 
+> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+> index ba039c146d..fed3611623 100644
+> --- a/include/hw/xen/xen.h
+> +++ b/include/hw/xen/xen.h
+> @@ -21,6 +21,7 @@ enum xen_mode {
+>  extern uint32_t xen_domid;
+>  extern enum xen_mode xen_mode;
+>  extern bool xen_domid_restrict;
+> +extern bool xen_stubdom;
+>  
+>  extern bool xen_allowed;
+>  
+> @@ -29,6 +30,11 @@ static inline bool xen_enabled(void)
+>      return xen_allowed;
+>  }
+>  
+> +static inline bool xen_stubdom_enabled(void)
+> +{
+> +    return xen_stubdom;
+> +}
+> +
+>  int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
+>  void xen_piix3_set_irq(void *opaque, int irq_num, int level);
+>  void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1cf9aac1fe..ba56c3dd9a 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3386,6 +3386,10 @@ DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
+>      "                        to specified domain id. (Does not affect\n"
+>      "                        xenpv machine type).\n",
+>      QEMU_ARCH_ALL)
+> +DEF("xen-stubdom", 0, QEMU_OPTION_xen_stubdom,
+> +    "-xen-stubdom    specify QEMU is running in a stubdom, so certain\n"
+> +    "                behavior changes. (Does not affect xenpv machine type).\n",
+> +    QEMU_ARCH_ALL)
+>  STEXI
+>  @item -xen-domid @var{id}
+>  @findex -xen-domid
+> @@ -3396,6 +3400,9 @@ Attach to existing xen domain.
+>  libxl will use this when starting QEMU (XEN only).
+>  @findex -xen-domid-restrict
+>  Restrict set of available xen operations to specified domain id (XEN only).
+> +@findex -xen-stubdom
+> +@item -xen-stubdom
+> +Run qemu in stubdom-mode (XEN only).
+>  ETEXI
+>  
+>  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+> diff --git a/vl.c b/vl.c
+> index 4a350de5cd..0d04319d9b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -206,6 +206,7 @@ bool xen_allowed;
+>  uint32_t xen_domid;
+>  enum xen_mode xen_mode = XEN_EMULATE;
+>  bool xen_domid_restrict;
+> +bool xen_stubdom;
+>  
+>  static int has_defaults = 1;
+>  static int default_serial = 1;
+> @@ -3796,6 +3797,13 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  xen_domid_restrict = true;
+>                  break;
+> +            case QEMU_OPTION_xen_stubdom:
+> +                if (!(xen_available())) {
+> +                    error_report("Option not supported for this target");
+> +                    exit(1);
+> +                }
+> +                xen_stubdom = true;
+> +                break;
+>              case QEMU_OPTION_trace:
+>                  g_free(trace_file);
+>                  trace_file = trace_opt_parse(optarg);
+> 
