@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58431)
+Received: from eggs.gnu.org ([209.51.188.92]:36325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h39vP-0004Qb-Rw
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:40:20 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1h3Aeh-0003LG-34
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 22:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1h39mE-0008Ma-4Q
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:30:50 -0400
-Received: from mga18.intel.com ([134.134.136.126]:20586)
+	(envelope-from <balaton@eik.bme.hu>) id 1h3Aeg-00071R-4W
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 22:27:07 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:33288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1h39mD-0008K0-RK
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 21:30:50 -0400
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Mon, 11 Mar 2019 09:30:16 +0800
-Message-Id: <20190311013016.14411-1-richardw.yang@linux.intel.com>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h3Aef-0006yp-Ph
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 22:27:06 -0400
+Date: Mon, 11 Mar 2019 03:26:57 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <d5191334-6fdf-c160-203f-a6bee5f0384a@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1903110323200.87103@zero.eik.bme.hu>
+References: <cover.1552152100.git.balaton@eik.bme.hu>
+	<da6370b22e0352ee803d25d68a62ff32eebf06e2.1552152100.git.balaton@eik.bme.hu>
+	<d5191334-6fdf-c160-203f-a6bee5f0384a@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] exec.c: refactor function
- flatview_add_to_dispatch()
+Content-ID: <alpine.BSF.2.21.9999.1903110324520.87103@zero.eik.bme.hu>
+Content-Type: text/plain; CHARSET=ISO-8859-15; FORMAT=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 2/2] mips_fulong2e: Add on-board
+ graphics chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,108 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-flatview_add_to_dispatch() registers page based on the condition of
-*section*, which may looks like this:
+On Mon, 11 Mar 2019, Philippe Mathieu-Daud=E9 wrote:
+> On 3/9/19 6:21 PM, BALATON Zoltan wrote:
+>> Add (partial) emulation of the on-board GPU of the machine. This
+>> allows the PMON2000 firmware to run and should also work with Linux
+>> console but probably not with X yet.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> Mojibaked again :(
+>
+> I guess this is the last respin and this series will be applied,
+> so to the maintainer: Can you fix using:
 
-    |s|PPPPPPP|s|
+Don't worry, Gerd said before it came out OK as he also uses UTF8 so=20
+maybe it only shows up wrong in your email client.
 
-where s stands for subpage and P for page.
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>
+> Zoltan if you have to respin, please simply use:
 
-The procedure of this function could be described as:
+I've tried adding some headers to specify encoding which I'll use next bu=
+t=20
+I did not bother for this resend as it worked before.
 
-    - register first subpage
-    - register page
-    - register last subpage
-
-This means the procedure could be simplified into these three steps
-instead of a loop iteration.
-
-This patch refactors the function into three corresponding steps and
-adds some comment to clarify it.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
----
-v2:
-  * removes the loop iteration as suggested by Paolo
----
- exec.c | 50 +++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 17 deletions(-)
-
-diff --git a/exec.c b/exec.c
-index 0959b00c06..160b8587d4 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1598,34 +1598,50 @@ static void register_multipage(FlatView *fv,
-     phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
- }
- 
-+/*
-+ * The range in *section* may look like this:
-+ *
-+ *      |s|PPPPPPP|s|
-+ *
-+ * where s stands for subpage and P for page.
-+ *
-+ * The procedure in following function could be described as:
-+ *
-+ * - register first subpage
-+ * - register page
-+ * - register last subpage
-+ */
- void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section)
- {
--    MemoryRegionSection now = *section, remain = *section;
-+    MemoryRegionSection now, remain = *section;
-     Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
- 
--    if (now.offset_within_address_space & ~TARGET_PAGE_MASK) {
--        uint64_t left = TARGET_PAGE_ALIGN(now.offset_within_address_space)
--                       - now.offset_within_address_space;
-+    /* register first subpage */
-+    if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
-+        uint64_t left = TARGET_PAGE_ALIGN(remain.offset_within_address_space)
-+                        - remain.offset_within_address_space;
- 
-+        now = remain;
-         now.size = int128_min(int128_make64(left), now.size);
-+        remain.size = int128_sub(remain.size, now.size);
-+        remain.offset_within_address_space += int128_get64(now.size);
-+        remain.offset_within_region += int128_get64(now.size);
-         register_subpage(fv, &now);
--    } else {
--        now.size = int128_zero();
-     }
--    while (int128_ne(remain.size, now.size)) {
-+
-+    /* register page */
-+    if (int128_ge(remain.size, page_size)) {
-+        now = remain;
-+        now.size = int128_and(now.size, int128_neg(page_size));
-         remain.size = int128_sub(remain.size, now.size);
-         remain.offset_within_address_space += int128_get64(now.size);
-         remain.offset_within_region += int128_get64(now.size);
--        now = remain;
--        if (int128_lt(remain.size, page_size)) {
--            register_subpage(fv, &now);
--        } else if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
--            now.size = page_size;
--            register_subpage(fv, &now);
--        } else {
--            now.size = int128_and(now.size, int128_neg(page_size));
--            register_multipage(fv, &now);
--        }
-+        register_multipage(fv, &now);
-+    }
-+
-+    /* register last subpage */
-+    if (int128_gt(remain.size, 0)) {
-+        register_subpage(fv, &remain);
-     }
- }
- 
--- 
-2.19.1
+Regards,
+BALATON Zoltan
