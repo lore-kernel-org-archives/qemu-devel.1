@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36229)
+Received: from eggs.gnu.org ([209.51.188.92]:36320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3IBH-0007Lt-4f
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:15 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBQ-0007Xk-Qs
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3IBG-0000ph-HG
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:15 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 11 Mar 2019 11:29:05 +0100
-Message-Id: <1552300145-12526-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] configure: Remove old *-config-devices.mak.d
- files when running configure
+	(envelope-from <yuval.shaia@oracle.com>) id 1h3IBP-0000uZ-JB
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:24 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1h3IBP-0000tc-9B
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:23 -0400
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Mon, 11 Mar 2019 03:29:13 -0700
+Message-Id: <1552300155-25216-10-git-send-email-yuval.shaia@oracle.com>
+In-Reply-To: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
+References: <1552300155-25216-1-git-send-email-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH v6 09/11] hw/pvrdma: Delete pvrdma_exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,38 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-When running "make" in a build directory from the pre-Kconfig merge time,
-the build process currently fails with:
+This hook is not called and was implemented by mistake.
 
- make: *** No rule to make target `.../default-configs/pci.mak',
-  needed by `aarch64-softmmu/config-devices.mak'.  Stop.
-
-To make sure that this problem at least goes away when the user runs
-"configure" (or "sh config.status") again, we have to make sure that
-we re-generate the .mak.d files. Thus remove the old stale files
-while running the configure script.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- configure | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/rdma/vmw/pvrdma_main.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/configure b/configure
-index b354e74..32c847f 100755
---- a/configure
-+++ b/configure
-@@ -1792,6 +1792,9 @@ EOF
- exit 0
- fi
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 04845f4..a4afced 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -654,11 +654,6 @@ out:
+     }
+ }
  
-+# Remove old dependency files to make sure that they get properly regenerated
-+rm -f *-config-devices.mak.d
-+
- if ! has $python; then
-   error_exit "Python not found. Use --python=/path/to/python"
- fi
+-static void pvrdma_exit(PCIDevice *pdev)
+-{
+-    pvrdma_fini(pdev);
+-}
+-
+ static void pvrdma_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -666,7 +661,6 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
+     RdmaProviderClass *ir = INTERFACE_RDMA_PROVIDER_CLASS(klass);
+ 
+     k->realize = pvrdma_realize;
+-    k->exit = pvrdma_exit;
+     k->vendor_id = PCI_VENDOR_ID_VMWARE;
+     k->device_id = PCI_DEVICE_ID_VMWARE_PVRDMA;
+     k->revision = 0x00;
 -- 
 1.8.3.1
