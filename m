@@ -1,21 +1,20 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h3Uwu-0003eX-IM
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 20:07:17 -0400
+	(envelope-from <crosa@redhat.com>) id 1h3Uwx-0003eX-5s
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 20:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1h3Uqt-0004QM-W4
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 20:01:06 -0400
-Date: Mon, 11 Mar 2019 20:00:48 -0400
+	(envelope-from <crosa@redhat.com>) id 1h3UoT-0003Gg-PU
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:58:34 -0400
+Date: Mon, 11 Mar 2019 19:58:22 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190312000048.klac35tbrousl32w@localhost.localdomain>
+Message-ID: <20190311235822.zavteezbiewr4eoq@localhost.localdomain>
 References: <20190221005753.27955-1-crosa@redhat.com>
 	<20190221005753.27955-10-crosa@redhat.com>
-	<540075f0-5217-db8e-e4b0-36849bb7738d@redhat.com>
+	<20190301114144.23351a68.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <540075f0-5217-db8e-e4b0-36849bb7738d@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190301114144.23351a68.cohuck@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3 09/20] Boot Linux Console Test: update
  the x86_64 kernel
 List-Id: <qemu-devel.nongnu.org>
@@ -26,54 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Cornelia Huck <cohuck@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On Sat, Mar 02, 2019 at 10:42:13PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/21/19 1:57 AM, Cleber Rosa wrote:
+On Fri, Mar 01, 2019 at 11:41:44AM +0100, Cornelia Huck wrote:
+> On Wed, 20 Feb 2019 19:57:42 -0500
+> Cleber Rosa <crosa@redhat.com> wrote:
+> 
 > > To the stock Fedora 29 kernel, from the Fedora 28.  New tests will be
->=20
-> [Update] to ... ?
->
-
-Right... I used this line as a continuation of the commit title,
-but probably shouldn't have done that.
-
 > > added using the 29 kernel, so for consistency, let's also update it
 > > here.
-> >=20
+> > 
 > > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > > Reviewed-by: Caio Carrara <ccarrara@redhat.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->
-
-Thanks!
-- Cleber.
-
 > > ---
 > >  tests/acceptance/boot_linux_console.py | 4 ++--
 > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptanc=
-e/boot_linux_console.py
+> > 
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
 > > index 89df7f6e4f..35b31162d4 100644
 > > --- a/tests/acceptance/boot_linux_console.py
 > > +++ b/tests/acceptance/boot_linux_console.py
 > > @@ -28,9 +28,9 @@ class BootLinuxConsole(Test):
-> >          :avocado: tags=3Darch:x86_64
-> >          :avocado: tags=3Dmachine:pc
+> >          :avocado: tags=arch:x86_64
+> >          :avocado: tags=machine:pc
 > >          """
-> > -        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/=
-28/'
-> > +        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/=
-29/'
+> > -        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
+> > +        kernel_url = ('https://mirrors.kernel.org/fedora/releases/29/'
 > >                        'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> > -        kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
-> > +        kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
-> >          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dke=
-rnel_hash)
-> > =20
+> > -        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
+> > +        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
+> >          kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+> >  
 > >          self.vm.set_machine('pc')
-> >=20
+> 
+> This looks reasonable; but an obvious follow-up question is how we
+> handle updates to new distro levels in general.
+> 
+> I don't think we'll need to run acceptance tests on old qemus, though.
+
+No, I don't think we have to bother with that.  Backport(er)s would be
+expected to handle this (if they ever come to existence).
+
+You do have a point about consistenly updating those images, though.
+I won't pretend to have an answer for that just yet... but it's
+possible that these "kernel_urls" can be turned into parameters
+that will eventually be expand based on the user's selected distro
+and version (similar to the Avocado vmimage library[1]).
+
+- Cleber.
+
+[1] https://avocado-framework.readthedocs.io/en/69.0/api/utils/avocado.utils.html#avocado.utils.vmimage.get
