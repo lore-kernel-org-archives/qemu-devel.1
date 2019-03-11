@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54433)
+Received: from eggs.gnu.org ([209.51.188.92]:54877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h3Njs-0003Dn-PR
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:25:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3Nli-0004VK-1V
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1h3Njq-0005J0-Uv
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:25:20 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:43098)
+	(envelope-from <peter.maydell@linaro.org>) id 1h3Nlh-0006iZ-52
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:27:14 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:40298)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1h3Njp-0005H2-Iv
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:25:17 -0400
-Received: by mail-oi1-x232.google.com with SMTP id i8so4126586oib.10
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:25:17 -0700 (PDT)
+	id 1h3Nlg-0006hr-TY
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:27:13 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id v20so4491247otk.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:27:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190307095441.31921-1-kraxel@redhat.com>
-	<20190307095441.31921-4-kraxel@redhat.com>
-	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
-	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
-	<jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
-	<CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
-	<jpg8sxle6c6.fsf@linux.bootlegged.copy>
-In-Reply-To: <jpg8sxle6c6.fsf@linux.bootlegged.copy>
+References: <20190311085024.13780-1-kraxel@redhat.com>
+In-Reply-To: <20190311085024.13780-1-kraxel@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Mar 2019 16:25:05 +0000
-Message-ID: <CAFEAcA9sx64kcz=wOqeBwGg0YJc-xO-K5yNkoSC8uuCqNF_FYA@mail.gmail.com>
+Date: Mon, 11 Mar 2019 16:27:00 +0000
+Message-ID: <CAFEAcA_JssV5iLJyJLjin7=fk-3BkpKRgxPr43zhu1dchxqZXw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
+Subject: Re: [Qemu-devel] [PULL 0/5] Vga 20190311 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon, 11 Mar 2019 at 16:14, Bandan Das <bsd@redhat.com> wrote:
+On Mon, 11 Mar 2019 at 08:52, Gerd Hoffmann <kraxel@redhat.com> wrote:
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > At the moment PARTIAL_DELETE is "ALL_DELETE | READ_ONLY", which
-> > doesn't seem like it makes much sense.
-> >
+> The following changes since commit e2a18635a400b0e68679614132e9ef6316105590:
 >
-> Sorry, can you please clarify what doesn't make sense ?
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-03-08' into staging (2019-03-09 20:55:44 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20190311-v2-pull-request
+>
+> for you to fetch changes up to ff243cff11526c0703cefdd60467dfaa5c5803a0:
+>
+>   mips_fulong2e: Add on-board graphics chip (2019-03-11 08:04:55 +0100)
+>
+> ----------------------------------------------------------------
+> vga: virtio reset fix, add ati emulation.
+>
+> ----------------------------------------------------------------
+>
+> BALATON Zoltan (2):
+>   hw/display: Add basic ATI VGA emulation
+>   mips_fulong2e: Add on-board graphics chip
+>
+> Gerd Hoffmann (3):
+>   virtio: add class_size to VirtioPCIDeviceTypeInfo
+>   virtio-vga: fix reset.
+>   virtio-gpu: make virtio_gpu_reset static
+>
 
-Generally, if you have multiple bits X, Y in a return
-value, they should be independent. Sometimes we define
-a convenience value Z that's X | Y, but then Z should
-have a name that indicates that it's really doing both
-X and Y (for instance often a READWRITE constant will
-be READ | WRITE). In this case, I don't see why
-PARTIAL_DELETE would be a sensible name to indicate
-"both ALL_DELETE and also READ_ONLY" -- if we only
-partially did a delete why do we set the ALL_DELETE bit ?
+Applied, thanks.
 
-It might be useful to take a step back -- what are
-the different possible outcomes from this function that
-we need to distinguish, and when should we be returning
-which outcome?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-thanks
 -- PMM
