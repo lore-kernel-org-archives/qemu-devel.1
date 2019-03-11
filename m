@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36242)
+Received: from eggs.gnu.org ([209.51.188.92]:38440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3KPe-0006Ta-5h
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:52:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1h3KXY-0000hE-HM
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:00:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3KPc-00028e-L7
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:52:14 -0400
-Resent-Message-Id: <E1h3KPc-00028e-L7@eggs.gnu.org>
-Message-ID: <155230871537.8567.1757969456103312430@6acff2cf482b>
-In-Reply-To: <20190311123507.24867-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berrange@redhat.com>) id 1h3KXW-0007yV-5m
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:00:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h3KXV-0007y0-Rs
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:00:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11C03C05E77B
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 13:00:21 +0000 (UTC)
+Date: Mon, 11 Mar 2019 13:00:00 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190311130000.GW12393@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190309004826.9027-1-lersek@redhat.com>
+	<bf1a5775-17d9-c5bd-4e08-451585d3015e@redhat.com>
+	<20190311102801.GM12393@redhat.com>
+	<20190311085449-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 05:51:56 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] coroutine: add x86 specific coroutine
- backend
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190311085449-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/10] bundle edk2 platform firmware with
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,161 +38,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMxMTEyMzUwNy4yNDg2
-Ny0xLXBib256aW5pQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDMxMTEyMzUwNy4yNDg2
-Ny0xLXBib256aW5pQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJd
-IGNvcm91dGluZTogYWRkIHg4NiBzcGVjaWZpYyBjb3JvdXRpbmUgYmFja2VuZAoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
-bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
-Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9q
-ZWN0L3FlbXUKICAgZTJhMTg2MzVhNC4uMzM2Y2ZlZjQ5NSAgbWFzdGVyICAgICAtPiBtYXN0ZXIK
-ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDMxMTEyMzUwNy4yNDg2Ny0x
-LXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDMxMTEyMzUwNy4yNDg2Ny0xLXBi
-b256aW5pQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplMjQxNDg3
-Nzc0IGNvcm91dGluZTogYWRkIHg4NiBzcGVjaWZpYyBjb3JvdXRpbmUgYmFja2VuZAo1YjNiNzc5
-NTQ4IHFlbXVnZGI6IGFsbG93IGFkZGluZyBzdXBwb3J0IGZvciBvdGhlciBjb3JvdXRpbmUgYmFj
-a2VuZHMKODM4NDFjYjczMiBxZW11Z2RiOiBmaXggbGljZW5zaW5nCgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDgzODQxY2I3MzI4OCAocWVtdWdkYjogZml4IGxpY2Vu
-c2luZykKMi8zIENoZWNraW5nIGNvbW1pdCA1YjNiNzc5NTQ4MzcgKHFlbXVnZGI6IGFsbG93IGFk
-ZGluZyBzdXBwb3J0IGZvciBvdGhlciBjb3JvdXRpbmUgYmFja2VuZHMpCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDc6IEZJTEU6IHNjcmlwdHMvcWVtdWdkYi9jb3JvdXRpbmUu
-cHk6NjU6CisgICAgICAgIHJldHVybiBjb3JvdXRpbmVfYmFja2VuZCgpLmdldF9jb3JvdXRpbmVf
-cmVncyhhZGRyKVsncnNwJ10uY2FzdChWT0lEX1BUUikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxNTU6IEZJTEU6IHNjcmlwdHMvcWVtdWdkYi9jb3JvdXRpbmUucHk6NzI6Cisg
-ICAgICAgIHJldHVybiBjb3JvdXRpbmVfYmFja2VuZCgpLmdldF9jb3JvdXRpbmVfcmVncyhhZGRy
-KVsncmlwJ10uY2FzdChWT0lEX1BUUikKCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
-IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE1NzogCm5ldyBmaWxl
-IG1vZGUgMTAwNjQ0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIwNjogRklMRTog
-c2NyaXB0cy9xZW11Z2RiL2Nvcm91dGluZV91Y29udGV4dC5weTo0NToKKyAgICByZXR1cm4gZ2Ri
-LnBhcnNlX2FuZF9ldmFsKCcoKCh1aW50NjRfdCklcyA+PiAweDExKSB8ICgodWludDY0X3QpJXMg
-PDwgKDY0IC0gMHgxMSkpKSBeICh1aW50NjRfdCklcycgJSAodmFsLCB2YWwsIHBvaW50ZXJfZ3Vh
-cmQpKQoKdG90YWw6IDEgZXJyb3JzLCAzIHdhcm5pbmdzLCAyMDUgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMi8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzMgQ2hlY2tpbmcgY29tbWl0IGUy
-NDE0ODc3NzQxNCAoY29yb3V0aW5lOiBhZGQgeDg2IHNwZWNpZmljIGNvcm91dGluZSBiYWNrZW5k
-KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBh
-cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTIxOiBGSUxF
-OiB1dGlsL2Nvcm91dGluZS14ODYuYzozNDoKKyNpZiBkZWZpbmVkKF9fU0FOSVRJWkVfQUREUkVT
-U19fKSB8fCBfX2hhc19mZWF0dXJlKGFkZHJlc3Nfc2FuaXRpemVyKQoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzE2OTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6ODI6Cisj
-ZGVmaW5lIENPX1NXSVRDSChmcm9tLCB0bywgYWN0aW9uLCBqdW1wKSAoeyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzE3MDogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6ODM6CisgICAgaW50IHJl
-dCA9IGFjdGlvbjsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzE3MTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6ODQ6CisgICAgdm9pZCAqZnJvbV8gPSBm
-cm9tOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MjogRklM
-RTogdXRpbC9jb3JvdXRpbmUteDg2LmM6ODU6CisgICAgdm9pZCAqdG9fID0gdG87ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MzogRklMRTogdXRpbC9j
-b3JvdXRpbmUteDg2LmM6ODY6CisgICAgYXNtIHZvbGF0aWxlKCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3NDogRklMRTogdXRpbC9jb3JvdXRpbmUt
-eDg2LmM6ODc6CisgICAgICAgICIuY2ZpX3JlbWVtYmVyX3N0YXRlXG4iICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3NTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6ODg6
-CisgICAgICAgICJwdXNocSAlJXJicFxuIiAgICAgICAgICAgICAgICAgICAgIC8qIHNhdmUgc2Ny
-YXRjaCByZWdpc3RlciBvbiBzb3VyY2Ugc3RhY2sgKi8gXAoKV0FSTklORzogQmxvY2sgY29tbWVu
-dHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3NTogRklMRTogdXRpbC9j
-b3JvdXRpbmUteDg2LmM6ODg6CisgICAgICAgICJwdXNocSAlJXJicFxuIiAgICAgICAgICAgICAg
-ICAgICAgIC8qIHNhdmUgc2NyYXRjaCByZWdpc3RlciBvbiBzb3VyY2Ugc3RhY2sgKi8gXAoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3NjogRklMRTogdXRpbC9jb3JvdXRpbmUt
-eDg2LmM6ODk6CisgICAgICAgICIuY2ZpX2FkanVzdF9jZmFfb2Zmc2V0IDhcbiIgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3NzogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTA6
-CisgICAgICAgICIuY2ZpX3JlbF9vZmZzZXQgJSVyYnAsIDBcbiIgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzE3ODogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTE6CisgICAgICAg
-ICJjYWxsIDFmXG4iICAgICAgICAgICAgICAgICAgICAgICAgIC8qIHN3aXRjaCBjb250aW51ZXMg
-YXQgbGFiZWwgMSAqLyAgICAgICAgICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEg
-bGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE3ODogRklMRTogdXRpbC9jb3JvdXRpbmUt
-eDg2LmM6OTE6CisgICAgICAgICJjYWxsIDFmXG4iICAgICAgICAgICAgICAgICAgICAgICAgIC8q
-IHN3aXRjaCBjb250aW51ZXMgYXQgbGFiZWwgMSAqLyAgICAgICAgICAgXAoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3OTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTI6
-CisgICAgICAgICIuY2ZpX2FkanVzdF9jZmFfb2Zmc2V0IDhcbiIgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzE4MDogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTM6CisgICAgICAg
-ICJqbXAgMmZcbiIgICAgICAgICAgICAgICAgICAgICAgICAgIC8qIHN3aXRjaCBiYWNrIGNvbnRp
-bnVlcyBhdCBsYWJlbCAyICovICAgICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEg
-bGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE4MDogRklMRTogdXRpbC9jb3JvdXRpbmUt
-eDg2LmM6OTM6CisgICAgICAgICJqbXAgMmZcbiIgICAgICAgICAgICAgICAgICAgICAgICAgIC8q
-IHN3aXRjaCBiYWNrIGNvbnRpbnVlcyBhdCBsYWJlbCAyICovICAgICAgXAoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4MTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTQ6
-CisgICAgICAgICIxOiBtb3ZxICglJXJzcCksICUlcmJwXG4iICAgICAgICAgIC8qIHNhdmUgc291
-cmNlIElQIGZvciBkZWJ1Z2dpbmcgKi8gICAgICAgICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVu
-dHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE4MTogRklMRTogdXRpbC9j
-b3JvdXRpbmUteDg2LmM6OTQ6CisgICAgICAgICIxOiBtb3ZxICglJXJzcCksICUlcmJwXG4iICAg
-ICAgICAgIC8qIHNhdmUgc291cmNlIElQIGZvciBkZWJ1Z2dpbmcgKi8gICAgICAgICAgXAoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4MjogRklMRTogdXRpbC9jb3JvdXRpbmUt
-eDg2LmM6OTU6CisgICAgICAgICJtb3ZxICUlcnNwLCAlY1tzcF0oJVtGUk9NXSlcbiIgICAgIC8q
-IHNhdmUgc291cmNlIFNQICovICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogQmxv
-Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE4MjogRklM
-RTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTU6CisgICAgICAgICJtb3ZxICUlcnNwLCAlY1tzcF0o
-JVtGUk9NXSlcbiIgICAgIC8qIHNhdmUgc291cmNlIFNQICovICAgICAgICAgICAgICAgICAgICAg
-ICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4MzogRklMRTogdXRpbC9j
-b3JvdXRpbmUteDg2LmM6OTY6CisgICAgICAgICJtb3ZxICVjW3NwXSglW1RPXSksICUlcnNwXG4i
-ICAgICAgIC8qIGxvYWQgZGVzdGluYXRpb24gU1AgKi8gICAgICAgICAgICAgICAgICAgXAoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
-IzE4MzogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTY6CisgICAgICAgICJtb3ZxICVjW3Nw
-XSglW1RPXSksICUlcnNwXG4iICAgICAgIC8qIGxvYWQgZGVzdGluYXRpb24gU1AgKi8gICAgICAg
-ICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NDogRklM
-RTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTc6CisgICAgICAgIGp1bXAgIlxuIiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIC8qIGNvcm91dGluZSBzd2l0Y2ggKi8gICAgICAgICAgICAgICAgICAg
-ICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFy
-YXRlIGxpbmUKIzE4NDogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTc6CisgICAgICAgIGp1
-bXAgIlxuIiAgICAgICAgICAgICAgICAgICAgICAgICAgIC8qIGNvcm91dGluZSBzd2l0Y2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzE4NTogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTg6CisgICAgICAgICIyOiIgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NjogRklM
-RTogdXRpbC9jb3JvdXRpbmUteDg2LmM6OTk6CisgICAgICAgICIuY2ZpX2FkanVzdF9jZmFfb2Zm
-c2V0IC04XG4iICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NzogRklMRTogdXRpbC9j
-b3JvdXRpbmUteDg2LmM6MTAwOgorICAgICAgICAicG9wcSAlJXJicFxuIiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODg6IEZJTEU6IHV0aWwvY29yb3V0aW5l
-LXg4Ni5jOjEwMToKKyAgICAgICAgIi5jZmlfYWRqdXN0X2NmYV9vZmZzZXQgLThcbiIgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTg5OiBGSUxFOiB1dGlsL2Nvcm91dGluZS14ODYuYzox
-MDI6CisgICAgICAgICIuY2ZpX3Jlc3RvcmVfc3RhdGVcbiIgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzE5MDogRklMRTogdXRpbC9jb3JvdXRpbmUteDg2LmM6MTAzOgorICAg
-ICAgICA6ICIrYSIgKHJldCksIFtGUk9NXSAiK2IiIChmcm9tXyksIFtUT10gIitEIiAodG9fKSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxOTE6IEZJTEU6IHV0aWwvY29yb3V0aW5lLXg4Ni5jOjEwNDoKKyAgICAgICAgOiBb
-c3BdICJpIiAob2Zmc2V0b2YoQ29yb3V0aW5lWDg2LCBzcCkpICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MTkyOiBGSUxFOiB1dGlsL2Nvcm91dGluZS14ODYuYzoxMDU6CisgICAgICAgIDogInJjeCIsICJy
-ZHgiLCAicnNpIiwgInI4IiwgInI5IiwgInIxMCIsICJyMTEiLCAicjEyIiwgInIxMyIsICJyMTQi
-LCAicjE1IiwgICAgXAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5MzogRklM
-RTogdXRpbC9jb3JvdXRpbmUteDg2LmM6MTA2OgorICAgICAgICAgICJtZW1vcnkiKTsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjU6IEZJTEU6IHV0aWwv
-Y29yb3V0aW5lLXg4Ni5jOjEzODoKKyAgICAvKiBJbW1lZGlhdGVseSBlbnRlciB0aGUgY29yb3V0
-aW5lIG9uY2UgdG8gcGFzcyBpdCBpdHMgYWRkcmVzcyBhcyB0aGUgYXJndW1lbnQgKi8KCldBUk5J
-Tkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyMzY6
-IEZJTEU6IHV0aWwvY29yb3V0aW5lLXg4Ni5jOjE0OToKKyNpZiBkZWZpbmVkKENPTkZJR19QUkFH
-TUFfRElBR05PU1RJQ19BVkFJTEFCTEUpICYmICFkZWZpbmVkKF9fY2xhbmdfXykKCldBUk5JTkc6
-IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyNDU6IEZJ
-TEU6IHV0aWwvY29yb3V0aW5lLXg4Ni5jOjE1ODoKKyNpZiBkZWZpbmVkKENPTkZJR19QUkFHTUFf
-RElBR05PU1RJQ19BVkFJTEFCTEUpICYmICFkZWZpbmVkKF9fY2xhbmdfXykKCnRvdGFsOiAwIGVy
-cm9ycywgMzcgd2FybmluZ3MsIDI2NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMjAxOTAzMTExMjM1MDcuMjQ4NjctMS1wYm9uemluaUByZWRoYXQuY29tL3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, Mar 11, 2019 at 08:57:04AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Mar 11, 2019 at 10:28:01AM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Sat, Mar 09, 2019 at 02:20:06AM +0100, Philippe Mathieu-Daud=C3=A9=
+ wrote:
+> > > On 3/9/19 1:48 AM, Laszlo Ersek wrote:
+> > > > Repo:   https://github.com/lersek/qemu.git
+> > > > Branch: edk2_build
+> > > >=20
+> > > > This series advances the roms/edk2 submodule to the "edk2-stable2=
+01903"
+> > > > release, and builds and captures platform firmware binaries from =
+that
+> > > > release. At this point they are meant to be used by both end-user=
+s and
+> > > > by Igor's ACPI unit tests in qtest ("make check").
+> > > >=20
+> > > > Previous discussion:
+> > > >=20
+> > > >   [Qemu-devel] bundling edk2 platform firmware images with QEMU
+> > > >   http://mid.mail-archive.com/80f0bae3-e79a-bb68-04c4-1c9c684d95b=
+8@redhat.com
+> > > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02601.=
+html
+> > > >=20
+> > > > Note that the series was formatted with "--no-binary" (affecting =
+patch
+> > > > #8), therefore it cannot be applied with "git-am". See the remote
+> > > > repo/branch reference near the top instead.
+> > > >=20
+> > > > Thanks,
+> > > > Laszlo
+> > > >=20
+> > > > Laszlo Ersek (10):
+> > > >   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh=
+"
+> > > >   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_=
+64
+> > > >   tests/uefi-test-tools/build.sh: work around TianoCore#1607
+> > > >   roms/edk2: advance to tag edk2-stable201903
+> > > >   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() functi=
+on
+> > > >   roms/Makefile: replace the $(EFIROM) target with "edk2-basetool=
+s"
+> > > >   roms: build edk2 firmware binaries and variable store templates
+> > > >   pc-bios: add edk2 firmware binaries and variable store template=
+s
+> > > >   pc-bios: document the edk2 firmware images; add firmware descri=
+ptors
+> > > >   Makefile: install the edk2 firmware images and their descriptor=
+s
+> > > >=20
+> > > >  Makefile                                       |  17 +-
+> > > >  pc-bios/README                                 |  11 +
+> > > >  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
+> > > >  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
+> > > >  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
+> > > >  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
+> > > >  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
+> > > >  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
+> > > >  pc-bios/edk2-aarch64-code.fd                   | Bin 0 -> 671088=
+64 bytes
+> > > >  pc-bios/edk2-arm-code.fd                       | Bin 0 -> 671088=
+64 bytes
+> > > >  pc-bios/edk2-arm-vars.fd                       | Bin 0 -> 671088=
+64 bytes
+> > >=20
+> > > GitHub moans here:
+> > >=20
+> > > remote: warning: GH001: Large files detected. You may want to try G=
+it
+> > > Large File Storage - https://git-lfs.github.com.
+> > > remote: warning: See http://git.io/iEPt8g for more information.
+> > > remote: warning: File pc-bios/edk2-arm-vars.fd is 64.00 MB; this is
+> > > larger than GitHub's recommended maximum file size of 50.00 MB
+> > > remote: warning: File pc-bios/edk2-arm-code.fd is 64.00 MB; this is
+> > > larger than GitHub's recommended maximum file size of 50.00 MB
+> > > remote: warning: File pc-bios/edk2-aarch64-code.fd is 64.00 MB; thi=
+s is
+> > > larger than GitHub's recommended maximum file size of 50.00 MB
+> >=20
+> > I wonder if this is a such that github isn't handling sparse files
+> > well, or if they just blindly do this check before they look at the
+> > actual required storage for the files.
+> >=20
+> > Regards,
+> > Daniel
+>=20
+>=20
+> Right. But really: can we keep these around compressed?
+
+I think it is viable for us to xz compress the images that we store in
+git & just let make "build"  the uncompressed images when needed.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
