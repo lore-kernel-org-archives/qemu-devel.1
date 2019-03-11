@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53424)
+Received: from eggs.gnu.org ([209.51.188.92]:54373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3NgD-0001X5-BL
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:21:34 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h3Njj-0003AI-SY
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3NgC-0002Pv-Dm
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:21:33 -0400
-References: <1552300145-12526-1-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6d46de0f-a443-2c90-334b-edd34325ac16@redhat.com>
-Date: Mon, 11 Mar 2019 11:21:27 -0500
+	(envelope-from <no-reply@patchew.org>) id 1h3Nji-0005Ce-Gg
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:25:11 -0400
+Resent-Message-Id: <E1h3Nji-0005Ce-Gg@eggs.gnu.org>
+Message-ID: <155232149070.9137.2522775114243727293@6acff2cf482b>
+In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1552300145-12526-1-git-send-email-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3NYOdmDI1QFfX0zYfAGB1voUcH6HJV7K1"
-Subject: Re: [Qemu-devel] [PATCH] configure: Remove old
- *-config-devices.mak.d files when running configure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Mar 2019 09:24:52 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +23,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: jjherne@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3NYOdmDI1QFfX0zYfAGB1voUcH6HJV7K1
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-Message-ID: <6d46de0f-a443-2c90-334b-edd34325ac16@redhat.com>
-Subject: Re: [PATCH] configure: Remove old *-config-devices.mak.d files when
- running configure
-References: <1552300145-12526-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1552300145-12526-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 3/11/19 5:29 AM, Thomas Huth wrote:
-> When running "make" in a build directory from the pre-Kconfig merge tim=
-e,
-> the build process currently fails with:
->=20
->  make: *** No rule to make target `.../default-configs/pci.mak',
->   needed by `aarch64-softmmu/config-devices.mak'.  Stop.
->=20
-> To make sure that this problem at least goes away when the user runs
-> "configure" (or "sh config.status") again, we have to make sure that
-> we re-generate the .mak.d files. Thus remove the old stale files
-> while running the configure script.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 3 +++
->  1 file changed, 3 insertions(+)
-
-What are the conditions for make deciding it needs to rerun
-config.status? Are end users still going to get 'make' failing with the
-cryptic message (where we just advise on-list and on-wiki to
-'./config.status' to fix it), or is there a way to build in a dependency
-so that the makefile itself knows that if config.status has to be rerun,
-that takes priority over any other rule that depends on .mak files?
-
->=20
-> diff --git a/configure b/configure
-> index b354e74..32c847f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1792,6 +1792,9 @@ EOF
->  exit 0
->  fi
-> =20
-> +# Remove old dependency files to make sure that they get properly rege=
-nerated
-> +rm -f *-config-devices.mak.d
-> +
->  if ! has $python; then
->    error_exit "Python not found. Use --python=3D/path/to/python"
->  fi
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---3NYOdmDI1QFfX0zYfAGB1voUcH6HJV7K1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyGiwcACgkQp6FrSiUn
-Q2r86Af/VRJDF3RUpBcpcETmr4Xbb9lGe8m+lHqXP4I7R05e4Fvckxwrc523PDoX
-JtEBRZzJn9aUtdjdj9teN7xevsMHoMK/g8+ZZ8YBYZEiWuIJXEqvWdQkjQwDBCb4
-nWu/6BHqCz9TVs2mhVZ3am5/q8aLw76Lkr/N2+9Ya+C4+liRrpQEUvmb+bsL0orQ
-Y2HM1/8Yw377uF6JXIYGMB+tiyZ46u6XTIi93S1Cis+BZAcKLDJtEycZe7WeyLDo
-HzQzKV724WbKQ7QgJbcG/xt3jbysJbCUCIb54fl+oZ8lkiZd2AGewgi0fl0hUZDt
-IHDOOiO9mVfDSB1aTMYIP6dehirNJQ==
-=25cx
------END PGP SIGNATURE-----
-
---3NYOdmDI1QFfX0zYfAGB1voUcH6HJV7K1--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzE3NjkzLTIxOTc5LTEt
+Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU1MjMx
+NzY5My0yMTk3OS0xLWdpdC1zZW5kLWVtYWlsLWpqaGVybmVAbGludXguaWJtLmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzE1XSBzMzkwOiB2ZmlvLWNjdyBkYXNkIGlwbCBz
+dXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTIzMTc2OTMtMjE5NzktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
+b20gLT4gcGF0Y2hldy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
+aW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzRlMzlhNDA5NyBz
+MzkwLWJpb3M6IFN1cHBvcnQgYm9vdGluZyBmcm9tIHJlYWwgZGFzZCBkZXZpY2UKNmQ0NTJhNDQ4
+ZCBzMzkwLWJpb3M6IEFkZCBjaGFubmVsIGNvbW1hbmQgY29kZXMvc3RydWN0cyBuZWVkZWQgZm9y
+IGRhc2QtaXBsCmNiNDkyY2FhNmMgczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8g
+ZGV0ZXJtaW5lIGJvb3QgbWV0aG9kCjA2MjA3NzZiODcgczM5MC1iaW9zOiBSZWZhY3RvciB2aXJ0
+aW8gdG8gcnVuIGNoYW5uZWwgcHJvZ3JhbXMgdmlhIGNpbwo0NTU4YTRkNGM4IHMzOTAtYmlvczog
+Y2lvIGVycm9yIGhhbmRsaW5nCmU3MTU2Mjk2NjIgczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5u
+aW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcwpiYTUyM2U0YzcxIHMzOTAtYmlvczogcHRy
+MnUzMiBhbmQgdTMydG9wdHIKMGM3NDhlNWRhZSBzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1v
+cnkKOTJlYTBmZTJkMCBzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20g
+dmlydGlvCmU2NzYyNTIxMTUgczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaAphOTRmODdhMzYxIHMz
+OTAtYmlvczogRmFjdG9yIGZpbmRpbmcgYm9vdCBkZXZpY2Ugb3V0IG9mIHZpcnRpbyBjb2RlIHBh
+dGgKMjk1ZmQ0MmFmMCBzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlv
+IGRldmljZXMKN2E1ZTY0ZjUxZSBzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxvZ2lj
+IGZyb20gdmlydGlvCjJmZDEyMDU1NTUgczM5MC1iaW9zOiBkZWNvdXBsZSBjaW8gc2V0dXAgZnJv
+bSB2aXJ0aW8KNDkyNWJjOTZmMSBzMzkwIHZmaW8tY2N3OiBBZGQgYm9vdGluZGV4IHByb3BlcnR5
+IGFuZCBJUExCIGRhdGEKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0
+IDQ5MjViYzk2ZjE3MSAoczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQg
+SVBMQiBkYXRhKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8x
+NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzE1IENoZWNraW5nIGNvbW1pdCAyZmQxMjA1
+NTU1MTcgKHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmlydGlvKQozLzE1IENo
+ZWNraW5nIGNvbW1pdCA3YTVlNjRmNTFlZTkgKHMzOTAtYmlvczogZGVjb3VwbGUgY29tbW9uIGJv
+b3QgbG9naWMgZnJvbSB2aXJ0aW8pCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGlu
+IC5jIGZpbGVzCiMzMTogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9tYWluLmM6MTk6CitJcGxQYXJh
+bWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKF9fYWxpZ25lZF9fKFBBR0VfU0laRSkpKTsK
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8x
+NSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgMjk1ZmQ0
+MmFmMGJkIChzMzkwLWJpb3M6IEV4dGVuZCBmaW5kX2RldigpIGZvciBub24tdmlydGlvIGRldmlj
+ZXMpCjUvMTUgQ2hlY2tpbmcgY29tbWl0IGE5NGY4N2EzNjFjYyAoczM5MC1iaW9zOiBGYWN0b3Ig
+ZmluZGluZyBib290IGRldmljZSBvdXQgb2YgdmlydGlvIGNvZGUgcGF0aCkKNi8xNSBDaGVja2lu
+ZyBjb21taXQgZTY3NjI1MjExNWQ2IChzMzkwLWJpb3M6IENsZWFuIHVwIGNpby5oKQo3LzE1IENo
+ZWNraW5nIGNvbW1pdCA5MmVhMGZlMmQwYjYgKHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5lbCBp
+L28gbG9naWMgZnJvbSB2aXJ0aW8pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIzIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDcvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNSBDaGVja2luZyBjb21t
+aXQgMGM3NDhlNWRhZTYzIChzMzkwLWJpb3M6IE1hcCBsb3cgY29yZSBtZW1vcnkpCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
+YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KOS8xNSBDaGVja2luZyBjb21taXQgYmE1MjNlNGM3MWY3IChzMzkwLWJpb3M6IHB0
+cjJ1MzIgYW5kIHUzMnRvcHRyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDkvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTUgQ2hlY2tpbmcgY29tbWl0
+IGU3MTU2Mjk2NjI2YSAoczM5MC1iaW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEg
+Y2hhbm5lbCBwcm9ncmFtcykKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEzNzogRklMRTog
+cGMtYmlvcy9zMzkwLWNjdy9jaW8uYzoxNDU6CisgKiBhY3RpdmUgKGdlbmVyYXRpbmcgaS9vIGlu
+dGVycnVwdHMpLiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NSBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAxMC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTEvMTUgQ2hlY2tp
+bmcgY29tbWl0IDQ1NThhNGQ0Yzg1NSAoczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcpCjEy
+LzE1IENoZWNraW5nIGNvbW1pdCAwNjIwNzc2Yjg3YzQgKHMzOTAtYmlvczogUmVmYWN0b3Igdmly
+dGlvIHRvIHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8pCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvdmlydGlvLmM6Mjk4Ogor
+ICAgICAgICAgICAgcnVuX2Njdyh2ZGV2LCBDQ1dfQ01EX1JFQURfVlFfQ09ORiwgJmNvbmZpZywg
+c2l6ZW9mKGNvbmZpZyksIGZhbHNlKSA9PSAwLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzExNjogRklMRTogcGMtYmlvcy9zMzkwLWNjdy92aXJ0aW8uYzozMDg6CisgICAgICAg
+IHJ1bl9jY3codmRldiwgQ0NXX0NNRF9XUklURV9TVEFUVVMsICZzdGF0dXMsIHNpemVvZihzdGF0
+dXMpLCBmYWxzZSkgPT0gMCwKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTA3IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDEyLzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEzLzE1IENo
+ZWNraW5nIGNvbW1pdCBjYjQ5MmNhYTZjNDkgKHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0
+eXBlIHRvIGRldGVybWluZSBib290IG1ldGhvZCkKMTQvMTUgQ2hlY2tpbmcgY29tbWl0IDZkNDUy
+YTQ0OGQ1OCAoczM5MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVl
+ZGVkIGZvciBkYXNkLWlwbCkKMTUvMTUgQ2hlY2tpbmcgY29tbWl0IDc0ZTM5YTQwOTcyYyAoczM5
+MC1iaW9zOiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlKQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMyNjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQ0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8xNTUyMzE3NjkzLTIxOTc5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29t
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
