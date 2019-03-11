@@ -1,46 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3Qac-00042z-Kg
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:27:59 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1h3Qaf-00042z-14
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3QWt-0005uU-Ff
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:24:08 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:18991 helo=smtp.ehu.eus)
+	(envelope-from <alex.williamson@redhat.com>) id 1h3QVx-0005Oc-Kn
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:23:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h3QWt-0005s7-4d
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:24:07 -0400
-Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
-	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 75C023CCB8
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:24:04 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 44DC511004A
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:24:04 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 39514110045
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:24:04 +0100 (CET)
-Received: from smtp.ehu.eus (unknown [10.0.100.73])
-	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:24:04 +0100 (CET)
-Received: from mail-it1-f182.google.com (mail-it1-f182.google.com
-	[209.85.166.182]) by smtp1 (Postfix) with ESMTPSA id DA5813CCB8
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:24:03 +0100 (CET)
-Received: by mail-it1-f182.google.com with SMTP id k193so499013ita.3
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:24:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1h3QVx-0005Nj-9D
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:23:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7095F6696F
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 19:23:08 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Mon, 11 Mar 2019 13:23:05 -0600
+Message-ID: <155233218516.8141.11063684664443124069.stgit@gimli.home>
+In-Reply-To: <155233206671.8141.2579745444621332750.stgit@gimli.home>
+References: <155233206671.8141.2579745444621332750.stgit@gimli.home>
 MIME-Version: 1.0
-References: <20190311101428.GA11@765644dd90e5>
-	<20190311103029.GF16@765644dd90e5>
-	<1ab60a5e-bb20-5b13-6ddf-ebb8e28b3a08@vivier.eu>
-	<CAGZZdDFXPkS__qyHCYbEdNz+0jY_MorSux3HAJnpi7pxTUN07g@mail.gmail.com>
-	<ef1bf7aa-cbca-37a0-5885-b3838c9c81cd@vivier.eu>
-In-Reply-To: <ef1bf7aa-cbca-37a0-5885-b3838c9c81cd@vivier.eu>
-Reply-To: unai.martinezcorral@ehu.eus
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Mon, 11 Mar 2019 20:23:55 +0100
-Message-ID: <CAGZZdDE6ZWr0g-8PHWwvg=9vyEo+GR_T1VONEo9GQEbZWn3m+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 7/10] qemu-binfmt-conf.sh: generalize
- CPU to positional TARGETS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 2/3] vfio/display: add xres + yres properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,56 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: =?UTF-8?Q?Unai_Mart=C3=ADnez_Corral?= <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-2019/3/11 a las 14:36, Laurent Vivier:
-> On 11/03/2019 14:29, Unai Martinez Corral wrote:
-> > 2019/3/11 12:14, Laurent Vivier:
-> >> On 11/03/2019 11:30, Unai Martinez-Corral wrote:
-> >
-> >>> +-s|--systemd:                         don't write into /proc, generate file(s) for
-> >>> +                                      systemd-binfmt.service; environment variable HOST_ARCH
-> >>
-> >> why HOST_ARCH appears here?
-> >
-> > The existing comment seems to be specific to systemd:
-> > https://github.com/qemu/qemu/blob/master/scripts/qemu-binfmt-conf.sh#L201-L204
-> > 'systemd' is the single mode in which it makes sense to generate a
-> > bunch of configuration files for a different architecture than the
-> > current one, isn't it?
->
-> No, it's not specific to systemd. If we register an interpreter for the
-> current architecture we can make it unusable.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-I think we are not understanding each other in this point:
+This allows configure the display resolution which the vgpu should use.
+The information will be passed to the guest using EDID, so the mdev
+driver must support the vfio edid region for this to work.
 
-The comment about HOST_ARCH in the current master branch is as follows:
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/display.c |   12 ++++++++++--
+ hw/vfio/pci.c     |   12 ++++++++++++
+ hw/vfio/pci.h     |    2 ++
+ 3 files changed, 24 insertions(+), 2 deletions(-)
 
-> With systemd, binfmt files are loaded by systemd-binfmt.service
->
-> The environment variable HOST_ARCH allows to override 'uname' to generate
-configuration files for a different architecture than the current one.
-
-That's why I assumed that the envvar is meant to be used with systemd
-only. Certainly, withou systemd no configuration files are generated
-at all; interpreters are directly registered/configured.
-
-However, the implementation takes HOST_ARCH into account with no
-regard to 'systemd' or 'debian'. It is used unconditionally. This has
-been like this since the base of the current script was pushed in
-2016/1/29.
-
-So, what is your proposal?
-
-- Move the comment below, as it was before.
-- Add a patch to only take HOST_ARCH into account for systemd (and debian?)
-- Remove HOST_ARCH and the comment from the script (and take it back
-if you patch to the kernel is accepted some day).
-
-I will wait to sort this out before pushing v5. I think that all the
-remaining issues are addressed already:
-https://github.com/umarcor/qemu/blob/series-qemu-binfmt-conf/scripts/qemu-binfmt-conf.sh
-
-Regards,
-Unai
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+index 276fba090d8b..212ad1674ec1 100644
+--- a/hw/vfio/display.c
++++ b/hw/vfio/display.c
+@@ -45,8 +45,8 @@ static void vfio_display_edid_update(VFIOPCIDevice *vdev, bool enabled,
+     qemu_edid_info edid = {
+         .maxx  = dpy->edid_regs->max_xres,
+         .maxy  = dpy->edid_regs->max_yres,
+-        .prefx = prefx,
+-        .prefy = prefy,
++        .prefx = prefx ?: vdev->display_xres,
++        .prefy = prefy ?: vdev->display_yres,
+     };
+ 
+     dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_DOWN;
+@@ -142,6 +142,14 @@ static void vfio_display_edid_init(VFIOPCIDevice *vdev)
+ 
+     dpy->edid_blob = g_malloc0(dpy->edid_regs->edid_max_size);
+ 
++    /* if xres + yres properties are unset use the maximum resolution */
++    if (!vdev->display_xres) {
++        vdev->display_xres = dpy->edid_regs->max_xres;
++    }
++    if (!vdev->display_yres) {
++        vdev->display_yres = dpy->edid_regs->max_yres;
++    }
++
+     vfio_display_edid_update(vdev, true, 0, 0);
+     return;
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index dd12f363915d..504019c4582b 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3068,6 +3068,16 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         error_setg(errp, "ramfb=on requires display=on");
+         goto out_teardown;
+     }
++    if (vdev->display_xres || vdev->display_yres) {
++        if (vdev->dpy == NULL) {
++            error_setg(errp, "xres and yres properties require display=on");
++            goto out_teardown;
++        }
++        if (vdev->dpy->edid_regs == NULL) {
++            error_setg(errp, "xres and yres properties need edid support");
++            goto out_teardown;
++        }
++    }
+ 
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+@@ -3182,6 +3192,8 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
+     DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
+                             display, ON_OFF_AUTO_OFF),
++    DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
++    DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
+     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+                        intx.mmap_timeout, 1100),
+     DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index b1ae4c07549a..c11c3f167070 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -149,6 +149,8 @@ typedef struct VFIOPCIDevice {
+ #define VFIO_FEATURE_ENABLE_IGD_OPREGION \
+                                 (1 << VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT)
+     OnOffAuto display;
++    uint32_t display_xres;
++    uint32_t display_yres;
+     int32_t bootindex;
+     uint32_t igd_gms;
+     OffAutoPCIBAR msix_relo;
