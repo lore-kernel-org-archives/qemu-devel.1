@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42203)
+Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h3MwA-0005vg-8k
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:59 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mw7-0005vi-Np
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h3Mm9-0007SI-5P
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:40 -0400
-Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:56491)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h3Mm6-0007RU-HI
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:36 -0400
-Received: from player763.ha.ovh.net (unknown [10.109.159.222])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B6F261DDF4C
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 16:23:31 +0100 (CET)
-References: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e942cdab-fe1b-fdf4-3b9f-da16a4afa953@kaod.org>
-Date: Mon, 11 Mar 2019 16:23:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Clearing slirp/ license
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mmm-0007fl-1j
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:24:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1h3Mml-0007fK-NB
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:24:15 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x2BFOEbb061746
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:24:14 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5rg16ay8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:43 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 11 Mar 2019 15:21:42 -0000
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Mon, 11 Mar 2019 11:21:21 -0400
+In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+Message-Id: <1552317693-21979-4-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 03/15] s390-bios: decouple common boot logic
+ from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +38,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 2/13/19 12:03 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> As we are trying to move slirp/ in a standalone project, which
-> eventually could be installed as a shared library, we need to clear
-> the license.
->=20
-> slirp is supposed to be 3-Clause BSD license (according to
-> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D2f5f89963186d42a7ded2=
-53bc6cf5b32abb45cec)
-> but it seems to be effectively a 2-Clause BSD (the third clause is not
-> in COPYRIGHT)
->=20
-> However, there are two units that are GPL-2:
->=20
-> - dhcpv6.c, dhcpv6.h:
->   The code was contributed by Thomas Huth <thuth@redhat.com>
->=20
-> $ git shortlog -nes slirp/dhcpv6.{c,h}
->      6  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->      1  Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->      1  Thomas Huth <thuth@redhat.com>
->      1  Yuval Shaia <yuval.shaia@oracle.com>
->=20
-> - ncsi.c, ncsi-pkt.h:
->   The code was contributed by C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> $ git shortlog -nes slirp/ncsi.c slirp/ncsi-pkt.h
->      5  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->      4  C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Could you reply that you have no objection in relicensing those files
-> are 3-Clause BSD?
+Create a boot_setup function to handle getting boot information from
+the machine/hypervisor. This decouples common boot logic from the
+virtio code path and allows us to make use of it for the real dasd boot
+scenario.
 
-Fine for me. You can change the license of slirp/ncsi.c and=20
-slirp/ncsi-pkt.hto a 3-Clause BSD.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-Thanks,
-
-C.=20
-
-> After "[Qemu-devel] [PATCH 0/7] slirp: make it a standalone project",
-> the vmstate subset that I adapted would also need to be relicensed.
-> There are more contributors here, I am not sure how it should be
-> handled. Any idea?
->=20
-> thanks
->=20
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e82fe2c..67df421 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -14,16 +14,17 @@
+ 
+ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+ static SubChannelId blk_schid = { .one = 1 };
+-IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ QemuIplParameters qipl;
++IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
++static bool have_iplb;
+ 
+ #define LOADPARM_PROMPT "PROMPT  "
+ #define LOADPARM_EMPTY  "        "
+ #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+ 
+ /*
+- * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
++ * Principles of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+  * after list-directed-IPL and ccw-IPL.
+  */
+@@ -111,23 +112,33 @@ static void css_setup(void)
+     enable_mss_facility();
+ }
+ 
++/*
++ * Collect various pieces of information from the hypervisor/hardware that
++ * we'll use to determine exactly how we'll boot.
++ */
++static void boot_setup(void)
++{
++    char lpmsg[] = "LOADPARM=[________]\n";
++
++    sclp_get_loadparm_ascii(loadparm_str);
++    memcpy(lpmsg + 10, loadparm_str, 8);
++    sclp_print(lpmsg);
++
++    have_iplb = store_iplb(&iplb);
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+     int ssid;
+     bool found = false;
+     uint16_t dev_no;
+-    char ldp[] = "LOADPARM=[________]\n";
+     VDev *vdev = virtio_get_device();
+     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+ 
+-    sclp_get_loadparm_ascii(loadparm_str);
+-    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+-    sclp_print(ldp);
+-
+     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+ 
+-    if (store_iplb(&iplb)) {
++    if (have_iplb) {
+         switch (iplb.pbt) {
+         case S390_IPL_TYPE_CCW:
+             dev_no = iplb.ccw.devno;
+@@ -174,6 +185,7 @@ int main(void)
+ {
+     sclp_setup();
+     css_setup();
++    boot_setup();
+     virtio_setup();
+ 
+     zipl_load(); /* no return */
+-- 
+2.7.4
