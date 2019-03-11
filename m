@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:45576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RPQ-0003Iq-4E
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:20:28 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RPR-0003Iq-K2
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3ROH-0001hp-8c
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:19:18 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:43847 helo=smtp.ehu.eus)
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RNn-0000bf-J5
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:18:48 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:26109 helo=smtp.ehu.eus)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h3ROG-0001ek-TG
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:19:17 -0400
-Date: Mon, 11 Mar 2019 20:19:18 +0000
+	id 1h3RNn-0000Y1-8e
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:18:47 -0400
+Date: Mon, 11 Mar 2019 20:18:48 +0000
 From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-Message-ID: <20190311201918.GC9@59ca1d9b7985>
+Message-ID: <20190311201848.GB9@59ca1d9b7985>
 References: <20190311201532.GA6@59ca1d9b7985>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190311201532.GA6@59ca1d9b7985>
-Subject: [Qemu-devel] [PATCH v5 3/9] qemu-binfmt-conf.sh: add
- QEMU_CREDENTIAL and QEMU_PERSISTENT
+Subject: [Qemu-devel] [PATCH v5 2/9] qemu-binfmt-conf.sh: make opts -p and
+ -c boolean
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +31,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
-Allow to set options '--persistent' and/or '--credential' through
-environment variables. If not defined, defaults are used ('no').
-Anyway, command-line arguments have priority over environment variables.
+This patch breaks backward compatibility.
+
+Both '--persistent' and '--credential' default to 'no'. Hence, '-p no'
+or '-c no' are reduntant. Overall, accepting an argument might be
+misleading because options are, indeed, boolean. This patch makes both
+options boolean in getopt, so if any of them is provided the corresponding
+variable is set to true.
 
 Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ scripts/qemu-binfmt-conf.sh | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index ca15ff8092..ad9ae731a0 100755
+index 0009385be2..ca15ff8092 100755
 --- a/scripts/qemu-binfmt-conf.sh
 +++ b/scripts/qemu-binfmt-conf.sh
-@@ -186,9 +186,11 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+@@ -168,8 +168,8 @@ qemu_get_family() {
+ usage() {
+     cat <<EOF
+ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no][--qemu-suffix SUFFIX]
++                           [--help][--credential][--exportdir PATH]
++                           [--persistent][--qemu-suffix SUFFIX]
+
+        Configure binfmt_misc to use qemu interpreter
+
+@@ -184,9 +184,9 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                       file for all known cpus
+        --exportdir:   define where to write configuration files
                        (default: $SYSTEMDDIR or $DEBIANDIR)
-        --credential:  if present, credential and security tokens are
+-       --credential:  if yes, credential and security tokens are
++       --credential:  if present, credential and security tokens are
                        calculated according to the binary to interpret
-+                      ($QEMU_CREDENTIAL=yes)
-        --persistent:  if present, the interpreter is loaded when binfmt is
+-       --persistent:  if yes, the interpreter is loaded when binfmt is
++       --persistent:  if present, the interpreter is loaded when binfmt is
                        configured and remains in memory. All future uses
                        are cloned from the open file.
-+                      ($QEMU_PERSISTENT=yes)
 
-     To import templates with update-binfmts, use :
-
-@@ -255,10 +257,10 @@ qemu_check_systemd() {
-
- qemu_generate_register() {
-     flags=""
--    if [ "x$CREDENTIAL" = "xyes" ] ; then
-+    if [ "x$QEMU_CREDENTIAL" = "xyes" ] ; then
-         flags="OC"
-     fi
--    if [ "x$PERSISTENT" = "xyes" ] ; then
-+    if [ "x$QEMU_PERSISTENT" = "xyes" ] ; then
-         flags="${flags}F"
-     fi
-
-@@ -281,7 +283,7 @@ package qemu-$cpu
- interpreter $qemu
- magic $magic
- mask $mask
--credential $CREDENTIAL
-+credential $QEMU_CREDENTIAL
- EOF
- }
-
-@@ -320,8 +322,10 @@ SYSTEMDDIR="/etc/binfmt.d"
- DEBIANDIR="/usr/share/binfmts"
-
- QEMU_PATH=/usr/local/bin
--CREDENTIAL=no
--PERSISTENT=no
-+
-+QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-+QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
-+
+@@ -324,7 +324,7 @@ CREDENTIAL=no
+ PERSISTENT=no
  QEMU_SUFFIX=""
 
- options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
-@@ -373,10 +377,10 @@ while true ; do
+-options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
++options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
+ eval set -- "$options"
+
+ while true ; do
+@@ -373,12 +373,10 @@ while true ; do
          exit 1
          ;;
      -c|--credential)
--        CREDENTIAL="yes"
-+        QEMU_CREDENTIAL="yes"
+-        shift
+-        CREDENTIAL="$1"
++        CREDENTIAL="yes"
          ;;
      -p|--persistent)
--        PERSISTENT="yes"
-+        QEMU_PERSISTENT="yes"
+-        shift
+-        PERSISTENT="$1"
++        PERSISTENT="yes"
          ;;
      *)
          break
