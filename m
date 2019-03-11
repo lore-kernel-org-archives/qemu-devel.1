@@ -1,27 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59413)
+Received: from eggs.gnu.org ([209.51.188.92]:59802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h3M1Q-000438-3I
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:35:20 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1h3M2q-0004xO-H6
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1h3M1M-0006Er-Ds
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:35:20 -0400
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:54754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1h3M1L-0006DG-0f
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:35:16 -0400
-Received: by mail-wm1-f44.google.com with SMTP id f3so4799889wmj.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 07:35:14 -0700 (PDT)
-References: <871s3dg3si.fsf@redhat.com>
-	<3fd4f68a-9ce4-7e54-a763-ccdcf844890e@redhat.com>
-	<87zhq1ed33.fsf@redhat.com>
-	<21d96d05-b600-b115-3649-8d488aeec82b@redhat.com>
-From: Sergio Lopez <slp@redhat.com>
-In-reply-to: <21d96d05-b600-b115-3649-8d488aeec82b@redhat.com>
-Date: Mon, 11 Mar 2019 15:35:11 +0100
-Message-ID: <87y35leaxs.fsf@redhat.com>
+	(envelope-from <akrowiak@linux.ibm.com>) id 1h3M2p-0007JL-Lz
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:36:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1h3M2p-0007II-AT
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 10:36:47 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x2BEY9Eb129413
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 10:36:45 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5s4jsm6f-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 10:36:45 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Mon, 11 Mar 2019 14:36:44 -0000
+References: <1550519397-25359-1-git-send-email-akrowiak@linux.ibm.com>
+	<1550519397-25359-3-git-send-email-akrowiak@linux.ibm.com>
+	<20190220165128.630ad793.cohuck@redhat.com>
+	<ee4e057a-8c40-1c40-3fbe-acbe4cc64aab@linux.ibm.com>
+	<20190221173249.64a04e10.cohuck@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Mon, 11 Mar 2019 10:36:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Flatview rendering scalability issue
+In-Reply-To: <20190221173249.64a04e10.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <be30451e-e6d9-eae6-f595-59d793238cba@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] s390x/vfio-ap: document hot
+ plug/unplug of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +46,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, fiuczy@linux.ibm.com
 
-
-Paolo Bonzini writes:
-
-> On 11/03/19 14:48, Sergio Lopez wrote:
->>> The initialization is O(n^2) because the guest initializes one device at
->>> a time, so you rebuild the FlatView first with 0 devices, then 1, then
->>> 2, etc.  This is very hard to fix, if at all possible.
+On 2/21/19 11:32 AM, Cornelia Huck wrote:
+> On Thu, 21 Feb 2019 11:26:53 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> 
+>> On 2/20/19 10:51 AM, Cornelia Huck wrote:
+>>> On Mon, 18 Feb 2019 14:49:57 -0500
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>    
+>>>> Let's update the vfio-ap.txt document to include the hot plug/unplug
+>>>> support introduced in this patch set.
 >>>
->>> However, each FlatView creation should be O(n) where n is the number of
->>> devices currently configured.  Please check with "info mtree -f" that
->>> you only have a fixed number of FlatViews.  Old versions had one per device.
->> I'm seeing 9 FVs with 1 PCI, and 119 with 100 PCIs.
->
-> With
->
-> $ eval qemu-system-x86_64 -M q35 \
->     -device\ e1000,id=n{1,2,3,4,5,6,7,8}{1,2,3}
->
-> I only see 4 flat views ("system", "io", "memory", "(none)").
->
-> Probably you are using intel-iommu?  Peter, it should be possible to
-> reorganize the VT-d memory regions like this:
+>>> s/ introduced in this patch set//
+>>>
+>>> Nobody will know about this patch set when they look at the commit in
+>>> the future :)
+>>
+>> Good point, I'll remove it.
+> 
+> I can do that while applying if no other feedback comes in.
 
-You're right, the number of FVs goes down drastically after removing
-intel-iommu, and the slowness during Guest PCI initialization disappears
-with it.
+Okay, sounds good to me.
 
-Thanks,
-Sergio.
+> 
+>>
+>>>    
+>>>>
+>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>> ---
+>>>>    docs/vfio-ap.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>>>>    1 file changed, 56 insertions(+), 5 deletions(-)
+>>>
+>>> Looks good to me, but would not mind a R-b before queuing.
+>>>    
+>>
+> 
