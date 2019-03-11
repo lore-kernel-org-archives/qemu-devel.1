@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49155)
+Received: from eggs.gnu.org ([209.51.188.92]:49699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1h3Ris-0008Cn-2V
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:40:34 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1h3Rje-0000Lt-41
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1h3RhS-0008E6-2y
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:39:07 -0400
-Date: Mon, 11 Mar 2019 21:38:54 +0100
+	(envelope-from <pkrempa@redhat.com>) id 1h3RUW-0005qC-MO
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:25:45 -0400
+Date: Mon, 11 Mar 2019 21:25:34 +0100
 From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20190311203854.GC21327@angien.pipo.sk>
+Message-ID: <20190311202534.GB21327@angien.pipo.sk>
 References: <20190311165017.32247-1-kwolf@redhat.com>
+	<20190311165017.32247-11-kwolf@redhat.com>
+	<2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
+	<20190311195925.GA21327@angien.pipo.sk>
+	<74cc34ed-a60b-75fd-3cf1-122ba485917e@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
+	protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
 Content-Disposition: inline
-In-Reply-To: <20190311165017.32247-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] file-posix: Make auto-read-only
+In-Reply-To: <74cc34ed-a60b-75fd-3cf1-122ba485917e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] file-posix: Make auto-read-only
  dynamic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,63 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com, qemu-devel@nongnu.org, "stefanha@redhat.com" <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
---L6iaP+gRLNZHKoI4
+--z6Eq5LdranGa6ru8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 11, 2019 at 17:50:07 +0100, Kevin Wolf wrote:
-> We introduced the auto-read-only option to fix the problem that block
-> jobs that reopen a backing file read-write don't work any more when all
-> nodes are created individually with -blockdev. The reason is that
-> bs->file of these backing files doesn't inherit the read-only option
-> from the format layer node any more if it's created separately.
+On Mon, Mar 11, 2019 at 15:10:36 -0500, Eric Blake wrote:
+> On 3/11/19 2:59 PM, Peter Krempa wrote:
 >=20
-> The way auto-read-only was designed to fix this is that it just always
-> opens the file node read-write if it can, so reopening the format layer
-> node is enough to make the backing file writable when necessary.
+> >> auto-read-only was introduced in 3.1, at which point we intentionally
+> >> had sufficiently loose wording to permit (but not require) dynamic sta=
+te
+> >> checking; so you are not breaking the interface.  On the other hand, is
+> >> libvirt going to have problems introspecting whether it can use
+> >> auto-read-only and get the dynamic behavior it needs?  Or is there
+> >> enough else in the way of libvirt's switch to -blockdev that it won't
+> >> attempt anything that needs auto-read-only without other 4.0 interfaces
+> >> anyway, at which point detecting the presence of the field (but not
+> >> whether the field has a guarantee of dynamic behavior) on 3.1 doesn't
+> >> matter?
+> >=20
+> > I think we can use Stefan's capability detection mechanism he introduced
+> > for the migration with cache enabled for local files to add a flag for
+> > this as well.
 >=20
-> This works in principle, but not when libvirt uses sVirt: Then QEMU
-> doesn't even have the permissions to open the image file read-write
-> until libvirt performs an operation where write access is needed.
+> Except I thought we decided that the most recent version of his QMP
+> changes was now fully-introspectible, thanks to using conditional
+> compilation.
 >=20
-> This series changes auto-read-only so that it works dynamically and
-> automatically reopens the file read-only or read-write depending on the
-> permissions that users attached to the node requested.
->=20
-> See also: https://bugzilla.redhat.com/show_bug.cgi?id=3D1685989
->=20
-> v2:
-> - Added test for and fixed snapshot=3Don,read-only=3Don regression [Berto]
-> - Added test for and fixed commit regression [Peter]
+> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02510.html
 
-I've quickly tested it with non-active commit and it works in this
-scenario as expected.
+Oh, bummer, I missed that it was no longer needed. I still think it's
+worth adding that for future use once it will be necessary to detect
+that certain things were patched and require libvirt to change behaviour
+if that's the case.
 
-I'll give it a bit more thorough test in the morning.
+> Well, that may prove to be a short-lived hiatus, if libvirt would
+> happily attempt to use qemu 3.1 and fail without some other
+> introspectible hook to know whether auto-read-only has required semantics.
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>=20
 
---L6iaP+gRLNZHKoI4
+
+
+
+--z6Eq5LdranGa6ru8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlyGx1sACgkQHGwCByjY
-1GpMew//Q6kHHF2C/78Raeh+lXzVRhT8Rkg5DWrPUBezdQ9Rz1rvsCXHYqd+HJt4
-5PMEF8gLFqQxOqO8zA4wXdiX9QlLHPuiQuuJa3hT/yCt6pv2AMY3Edfflb68kYkk
-ETUPJz6/nTO+Ya4ZaBj5+3YB36BWM3Ow6GqGZ5Q2JHgxIHAGuSzCl7ATd4/L+WUO
-FCbCqMHbmrB6cbMDEYS5gD5JrLR2he1oRwX4mpz5NjnvLTEV7jq1CYeGQweSB01B
-wTMWreFK8a/hIZsAjr5C1uEKcZK0su+5VU50cbXs6p/s7oQ8LCaTvnGKaHsq7JnG
-3mCCmX6WGN0qBmbi1WuqS2lx4T2U+8aScWk8ehsugopU1gZWqBkOgbcGt7BEehRd
-r2RhG/7SiTdv5zv1tAgFTBqXrn0UmLrgLmJdn0Lt0bI6kAqC4PMzFH9n109uK5b9
-A+8KgR4sBnNiXgbKA/MODSOZEUOqiV7kisSToRnz9W4pdJ0E0c2VtPrVRJ5TDyB8
-Om4ZmGRbckh4uXRKK46TGUl2zhn4hx5Q+R+ii4dJQ5mWOD7lgXBcLaONI3hO+X48
-cBuiekpJNvRFY/mdT8+xomI7QW7GOMjug+URNJNRzyJsboZbamkeLJW7F5prlppL
-IxPX3EIXXTAcLJZj1m/XkO1JLPlu9JIZDf/EO4Mn9BPk7ZgwdCY=
-=zBDm
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlyGxDwACgkQHGwCByjY
+1Gq31w/+MSEsSvfloUXWwOUtJCYrw0bGOerLFFoM/08T5L9G4wUUJOKPcqHePsWW
+56OkeZDMYwTCq586Ybj0MoIgLbbVX6smKl+Wh9O44/IBVrK8dB2teX2qMKA90PoB
+hy96D67o0qV83k7H5c/U25TNlniCSOlcj2k7pGkPbhu1dgiLjsieeFqEF2Z7I1kc
+QQsg8VbF+HGf8/anvKMwDdRZQ+FOVNOltGlFzSTFrMnBSo15n04H/+L8Z8syPCdC
+cRyewDlWC5HyLl/yvMlN+ELSBBEMKM1Kyi4gzCBb65ewxpDTL62GxIg8Vw2xB9pJ
+54b2kkAa+k7VJ+IKJUDQaU5/0d7nPF1SYQvBviLq6GIV1QAqycRXxoAlMSV8STSr
+HpNqWSAL3qjsH3+URgo7kW3r0YT7fl3t9w9ckyEtvgybX98YVrB/lTIFNsaFrNpR
+t/Deavr4wm1iUjzPDopDVbqw5MRiOSL2NDHRz4/TbThV88MYoIzKbz/spA8hucNb
+kqO539xxh/oy2+6O5R7AopQrAcW6e9KLTvXCb6+NJOWKK0nKu+RaLO4UaYnsY0ki
+qS57Qt7eLVJkXCpNnQhxB4cjeIEwaKPU0tsgVQprLAkNLC4liPltRkmRe0aezAL1
+GQd6oywELATb4JkLjBDFGqQClUZlbuljfh3zl6rjTHd5RXbCSoU=
+=vp+5
 -----END PGP SIGNATURE-----
 
---L6iaP+gRLNZHKoI4--
+--z6Eq5LdranGa6ru8--
