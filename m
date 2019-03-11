@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36082)
+Received: from eggs.gnu.org ([209.51.188.92]:36229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3IAl-0006pq-4R
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:28:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3IBH-0007Lt-4f
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3IAk-0000cI-Aj
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:28:43 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:33712 helo=smtp.ehu.eus)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h3IAj-0000bj-Sk
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:28:42 -0400
-Date: Mon, 11 Mar 2019 10:28:41 +0000
-From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-Message-ID: <20190311102841.GD16@765644dd90e5>
-References: <20190311101428.GA11@765644dd90e5>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190311101428.GA11@765644dd90e5>
-Subject: [Qemu-devel] [PATCH v4 5/10] qemu-binfmt-conf.sh: remove 'qemu'
- prefix from cli options
+	(envelope-from <thuth@redhat.com>) id 1h3IBG-0000ph-HG
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:29:15 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 11 Mar 2019 11:29:05 +0100
+Message-Id: <1552300145-12526-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] configure: Remove old *-config-devices.mak.d
+ files when running configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-This breaks backward compatibility.
+When running "make" in a build directory from the pre-Kconfig merge time,
+the build process currently fails with:
 
-Options 'qemu-path' and 'qemu-suffix' have the 'qemu-' prefix, which is
-not present in other option names ('debian', 'systemd', 'persistent',
-'credential'...). In order to keep consistency, the prefix is removed.
+ make: *** No rule to make target `.../default-configs/pci.mak',
+  needed by `aarch64-softmmu/config-devices.mak'.  Stop.
 
-Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+To make sure that this problem at least goes away when the user runs
+"configure" (or "sh config.status") again, we have to make sure that
+we re-generate the .mak.d files. Thus remove the old stale files
+while running the configure script.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- scripts/qemu-binfmt-conf.sh | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ configure | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 489d7d2326..0918f7fba6 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -167,6 +167,7 @@ qemu_get_family() {
-
- usage() {
-     cat <<EOF
+diff --git a/configure b/configure
+index b354e74..32c847f 100755
+--- a/configure
++++ b/configure
+@@ -1792,6 +1792,9 @@ EOF
+ exit 0
+ fi
+ 
++# Remove old dependency files to make sure that they get properly regenerated
++rm -f *-config-devices.mak.d
 +
- Usage: qemu-binfmt-conf.sh [options]
-
- Configure binfmt_misc to use qemu interpreter
-@@ -175,8 +176,8 @@ Options and associated environment variables:
-
- Argument             Env-variable     Description
- -h|--help                             display this usage
---Q|--qemu-path PATH: QEMU_PATH        set path to qemu interpreter
---F|--qemu-suffix SUFFIX:              add a suffix to the default interpreter name
-+-Q|--path PATH:      QEMU_PATH        set path to qemu interpreter(s)
-+-F|--suffix SUFFIX:                   add a suffix to the default interpreter name
- -d|--debian:                          don't write into /proc, generate update-binfmts templates
- -s|--systemd CPU:                     don't write into /proc, generate file for
-                                       systemd-binfmt.service for the given CPU; if CPU is "ALL",
-@@ -324,7 +325,7 @@ QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-
- QEMU_SUFFIX=""
-
--options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
-+options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
- eval set -- "$options"
-
- while true ; do
-@@ -356,11 +357,11 @@ while true ; do
-             fi
-         fi
-         ;;
--    -Q|--qemu-path)
-+    -Q|--path)
-         shift
-         QEMU_PATH="$1"
-         ;;
--    -F|--qemu-suffix)
-+    -F|--suffix)
-         shift
-         QEMU_SUFFIX="$1"
-         ;;
---
-2.21.0
+ if ! has $python; then
+   error_exit "Python not found. Use --python=/path/to/python"
+ fi
+-- 
+1.8.3.1
