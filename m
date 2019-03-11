@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40947)
+Received: from eggs.gnu.org ([209.51.188.92]:40988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h3Kob-0003TQ-DR
+	(envelope-from <berrange@redhat.com>) id 1h3Kob-0003Ti-Ja
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1h3KdF-0003nl-Vg
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:06:20 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:32907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1h3KUU-0006Pm-7b
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:57:14 -0400
-Received: by mail-qt1-f194.google.com with SMTP id z39so4840594qtz.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 05:57:12 -0700 (PDT)
-Date: Mon, 11 Mar 2019 08:57:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190311085449-mutt-send-email-mst@kernel.org>
-References: <20190309004826.9027-1-lersek@redhat.com>
-	<bf1a5775-17d9-c5bd-4e08-451585d3015e@redhat.com>
-	<20190311102801.GM12393@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1h3Kd6-0003gE-Az
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:06:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1h3KTo-0005lL-RS
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:56:33 -0400
+Date: Mon, 11 Mar 2019 12:56:14 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190311125614.GV12393@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
+	<20181127135030.1671-1-i.maximets@samsung.com>
+	<1fa60eac-9718-ee9d-e21c-3331c3bd60ff@samsung.com>
+	<CAJ+F1CKBJZ504S5sPvgXfcJvLkG1XpzJ499H54hT4cLffdm+Og@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190311102801.GM12393@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/10] bundle edk2 platform firmware with
- QEMU
+In-Reply-To: <CAJ+F1CKBJZ504S5sPvgXfcJvLkG1XpzJ499H54hT4cLffdm+Og@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Ilya Maximets <i.maximets@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On Mon, Mar 11, 2019 at 10:28:01AM +0000, Daniel P. Berrangé wrote:
-> On Sat, Mar 09, 2019 at 02:20:06AM +0100, Philippe Mathieu-Daudé wrote:
-> > On 3/9/19 1:48 AM, Laszlo Ersek wrote:
-> > > Repo:   https://github.com/lersek/qemu.git
-> > > Branch: edk2_build
-> > > 
-> > > This series advances the roms/edk2 submodule to the "edk2-stable201903"
-> > > release, and builds and captures platform firmware binaries from that
-> > > release. At this point they are meant to be used by both end-users and
-> > > by Igor's ACPI unit tests in qtest ("make check").
-> > > 
-> > > Previous discussion:
-> > > 
-> > >   [Qemu-devel] bundling edk2 platform firmware images with QEMU
-> > >   http://mid.mail-archive.com/80f0bae3-e79a-bb68-04c4-1c9c684d95b8@redhat.com
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02601.html
-> > > 
-> > > Note that the series was formatted with "--no-binary" (affecting patch
-> > > #8), therefore it cannot be applied with "git-am". See the remote
-> > > repo/branch reference near the top instead.
-> > > 
-> > > Thanks,
-> > > Laszlo
-> > > 
-> > > Laszlo Ersek (10):
-> > >   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
-> > >   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
-> > >   tests/uefi-test-tools/build.sh: work around TianoCore#1607
-> > >   roms/edk2: advance to tag edk2-stable201903
-> > >   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
-> > >   roms/Makefile: replace the $(EFIROM) target with "edk2-basetools"
-> > >   roms: build edk2 firmware binaries and variable store templates
-> > >   pc-bios: add edk2 firmware binaries and variable store templates
-> > >   pc-bios: document the edk2 firmware images; add firmware descriptors
-> > >   Makefile: install the edk2 firmware images and their descriptors
-> > > 
-> > >  Makefile                                       |  17 +-
-> > >  pc-bios/README                                 |  11 +
-> > >  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
-> > >  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
-> > >  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
-> > >  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
-> > >  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
-> > >  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
-> > >  pc-bios/edk2-aarch64-code.fd                   | Bin 0 -> 67108864 bytes
-> > >  pc-bios/edk2-arm-code.fd                       | Bin 0 -> 67108864 bytes
-> > >  pc-bios/edk2-arm-vars.fd                       | Bin 0 -> 67108864 bytes
-> > 
-> > GitHub moans here:
-> > 
-> > remote: warning: GH001: Large files detected. You may want to try Git
-> > Large File Storage - https://git-lfs.github.com.
-> > remote: warning: See http://git.io/iEPt8g for more information.
-> > remote: warning: File pc-bios/edk2-arm-vars.fd is 64.00 MB; this is
-> > larger than GitHub's recommended maximum file size of 50.00 MB
-> > remote: warning: File pc-bios/edk2-arm-code.fd is 64.00 MB; this is
-> > larger than GitHub's recommended maximum file size of 50.00 MB
-> > remote: warning: File pc-bios/edk2-aarch64-code.fd is 64.00 MB; this is
-> > larger than GitHub's recommended maximum file size of 50.00 MB
-> 
-> I wonder if this is a such that github isn't handling sparse files
-> well, or if they just blindly do this check before they look at the
-> actual required storage for the files.
-> 
-> Regards,
-> Daniel
+On Mon, Mar 11, 2019 at 01:50:37PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Mon, Mar 11, 2019 at 1:35 PM Ilya Maximets <i.maximets@samsung.com> =
+wrote:
+> >
+> > Hi.
+> >
+> > I'm trying to figure out the state of this patch set.
+> > Is there any chance for it to be accepted?
+> >
+> > The first patch needs minor rebase. I could send a new version.
+>=20
+> Please do,
+>=20
+> I prefer the solution proposed in v2: do not register hostmem-memfd if
+> sealing isn't supported (keep sealing=3Dtrue the default - it's one of
+> the main purpose of memfd imho).
+>=20
+> Daniel, Eduardo: are you ok with this series for 4.0?
 
+I prefer the more flexible approach, but I won't object to tieing memfd
+to sealing support.
 
-Right. But really: can we keep these around compressed?
-People's disk space isn't completely free either
-(even though it's getting cheaper).
-
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
