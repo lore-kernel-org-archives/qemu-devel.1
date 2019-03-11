@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56228)
+Received: from eggs.gnu.org ([209.51.188.92]:58773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3Q1h-0004rD-1e
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:51:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3QHC-0002gu-W2
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:07:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3Q1g-0005N5-4I
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:51:52 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Mar 2019 21:51:44 +0300
-Message-Id: <20190311185147.52309-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190311185147.52309-1-vsementsov@virtuozzo.com>
-References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] docs/interop/qcow2: Improve bitmap flag
- in_use specification
+	(envelope-from <peter.maydell@linaro.org>) id 1h3QF7-0005qP-Ej
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:05:46 -0400
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:41585)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3QF6-0005pu-O2
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:05:44 -0400
+Received: by mail-oi1-x22a.google.com with SMTP id e7so4578468oia.8
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:05:44 -0700 (PDT)
+MIME-Version: 1.0
+References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 19:05:32 +0000
+Message-ID: <CAFEAcA-c0qW1bzc4Sa5+SL2v3y_x_qRU0JMEEDqaO2BWFPNU4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/31] Misc patches for 2019-03-09
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,54 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-We already use (we didn't notice it) IN_USE flag for marking bitmap
-metadata outdated, such as AUTO flag, which mirrors enabled/disabled
-bitmaps. No we are going to support bitmap resize, so it's good to
-write IN_USE meaning with more details.
+On Mon, 11 Mar 2019 at 17:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 79d8b1dc5b44d806d9700f2e8a8028075a8ff2b2:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190311-v2-pull-request' into staging (2019-03-11 12:52:44 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 328eb60dc1a19448b36eb63901ca0b8f87ed6f57:
+>
+>   qemugdb: fix licensing (2019-03-11 16:55:52 +0100)
+>
+> ----------------------------------------------------------------
+> * allow building QEMU without TCG or KVM support (Anthony)
+> * update AMD IOMMU copyright (David)
+> * compilation fixes for GCC and BSDs (Alexey, David, Paolo, Philippe)
+> * coalesced I/O bugfix (Jagannathan)
+> * Processor Tracing cpuid fix (Luwei)
+> * Kconfig fixes (Paolo, David)
+> * Cleanups (Paolo, Wei)
+> * PVH vs. multiboot fix (Stefano)
+> * LSI bugfixes (Sven)
+> * elf2dmp Coverity fix (Victor)
+> * scsi-disk fix (Zhengui)
+> * authorization support for chardev TLS (Daniel)
+>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- docs/interop/qcow2.txt | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index fb5cb47245..575a5f25e2 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -589,7 +589,19 @@ Structure of a bitmap directory entry:
-                     Bit
-                       0: in_use
-                          The bitmap was not saved correctly and may be
--                         inconsistent.
-+                         inconsistent. This inconsitency may touch both bitmap
-+                         data and metadata, and this mean that bitmap state
-+                         (its data and metadata) was changed but not stored
-+                         back to the image. This flag doesn't relate to format
-+                         corruption, all fields are still correct from qcow2
-+                         point of view, they just may be outdated.
-+
-+                         Note: Currently, Qemu may change (additionally to
-+                         bitmap data) @auto flag and size of the bitmap during
-+                         image resize. This mean, that not only bitmap data
-+                         may be outdated if @in_use flag set, but also value of
-+                         @auto flag and bitmap size (which is indirectly
-+                         referenced by @bitmap_table_size).
- 
-                       1: auto
-                          The bitmap must reflect all changes of the virtual
-@@ -717,8 +729,8 @@ corresponding range of the virtual disk (see above) was written to while the
- bitmap was 'enabled'. An unset bit means that this range was not written to.
- 
- The software doesn't have to sync the bitmap in the image file with its
--representation in RAM after each write. Flag 'in_use' should be set while the
--bitmap is not synced.
-+representation in RAM after each write or metadata change. Flag 'in_use'
-+should be set while the bitmap is not synced.
- 
- In the image file the 'enabled' state is reflected by the 'auto' flag. If this
- flag is set, the software must consider the bitmap as 'enabled' and start
--- 
-2.18.0
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
