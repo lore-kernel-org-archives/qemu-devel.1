@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52389)
+Received: from eggs.gnu.org ([209.51.188.92]:52589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3PdP-0001Uo-FP
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:26:48 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3Pe3-0001vl-Pf
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3PdO-0002II-An
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:26:47 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Mar 2019 18:26:39 +0000
-Message-ID: <6dcf369f-d97f-6a04-6a8d-60a6a2a23faf@virtuozzo.com>
-References: <20190305234337.18353-1-jsnow@redhat.com>
-	<3a8ed35f-e50b-c411-2004-38917d2164c6@redhat.com>
-	<d6458782-9335-e3f4-f8cb-51e46b790aad@virtuozzo.com>
-	<e472a0f9-3664-30bc-88aa-1fb1d4f5fbaa@redhat.com>
-In-Reply-To: <e472a0f9-3664-30bc-88aa-1fb1d4f5fbaa@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <367150968C265F44AC37C64078754FE3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1h3Pe2-0002tt-0s
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:27:27 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3Pe1-0002tE-Kl
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:27:25 -0400
+Received: by mail-wr1-f68.google.com with SMTP id o9so6265300wrv.9
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:27:25 -0700 (PDT)
+References: <20190310004749.27029-1-philmd@redhat.com>
+	<20190310004749.27029-3-philmd@redhat.com>
+	<8736ntswgb.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d7da2fd5-2d8f-acdc-e02f-30daadea705e@redhat.com>
+Date: Mon, 11 Mar 2019 19:27:11 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/5] block/qcow2-bitmap: Enable resize with
- persistent bitmaps
+In-Reply-To: <8736ntswgb.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] hw/firmware: Add Edk2Crypto and
+ edk2_add_host_crypto_policy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +32,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-MTEuMDMuMjAxOSAyMTowNSwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDMvMTEvMTkg
-MTozNiBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDExLjAzLjIw
-MTkgMTk6MTgsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4gT24gMy81LzE5IDU6NDMgUE0sIEpvaG4g
-U25vdyB3cm90ZToNCj4+Pj4gVGhpcyBzZXJpZXMgYWltcyB0byBlbmFibGUgYmxvY2sgcmVzaXpl
-cyB3aGVuIHBlcnNpc3RlbnQgYml0bWFwcyBhcmUNCj4+Pj4gaW4gdXNlLiBUaGUgYmFzaWMgYXBw
-cm9hY2ggaGVyZSBpcyB0byByZWNvZ25pemUgdGhhdCB3ZSBub3cgbG9hZCBhbGwNCj4+Pj4gcGVy
-c2lzdGVudCBiaXRtYXBzIGluIG1lbW9yeSwgYW5kIHNvIHdlIGNhbiByZWx5IG9uIGluLW1lbW9y
-eSByZXNpemVzDQo+Pj4+IGFuZCB0aGVuIGZsdXNoIHRoZSBjaGFuZ2VkIG1ldGFkYXRhIGJhY2sg
-dG8gZGlzay4NCj4+Pj4NCj4+Pj4gT25lIHBhcnQgdGhhdCBpcyBwb3RlbnRpYWxseSBub3cgcXVp
-dGUgc3RyYW5nZSBpcyB0aGF0IGJpdG1hcCByZXNpemVzDQo+Pj4+IG1heSBoYXBwZW4gdHdpY2U6
-IG9uY2UgZHVyaW5nIHRoZSBxY293MiByZXNpemUgZXZlbnQgb25seSBpZiBwZXJzaXN0ZW50DQo+
-Pj4+IGJpdG1hcHMgYXJlIGZvdW5kLCBhbmQgdGhlbiBhZ2FpbiBhcyBwYXJ0IG9mIHRoZSBnZW5l
-cmljIHJlc2l6ZSBjYWxsYmFjaw0KPj4+PiBldmVudCB3aGV0aGVyIG9yIG5vdCB3ZSBoYXZlIGFu
-eSBwZXJzaXN0ZW50IGJpdG1hcHMuDQo+Pj4+DQo+Pj4+IFRoZSBzZWNvbmQgcm91bmQgaXMgcmVx
-dWlyZWQgaWYgd2UgYXJlIG5vdCB1c2luZyBxY293MiBvciB3ZSBoYXZlIG9ubHkNCj4+Pj4gdHJh
-bnNpZW50IGJpdG1hcHMuIFRoZSBmaXJzdCByb3VuZCBpcyByZXF1aXJlZCBhcyB3ZSB3aXNoIHRv
-IGZsdXNoIHRoZQ0KPj4+PiBiaXRtYXBzIGJhY2sgdG8gZGlzayBhdG9taWNhbGx5IHdpdGggdGhl
-IHFjb3cyIHJlc2l6ZSB0byBhdm9pZCB2aW9sYXRpbmcNCj4+Pj4gb3VyIGludmFyaWFudHMgZm9y
-IHRoZSBiaXRtYXAgbWV0YWRhdGEgd2hpY2ggaXMgY2hlY2tlZCBpbiBtYW55IHBsYWNlcy4NCj4+
-Pj4NCj4+Pj4gVGhpcyBpcyBoYXJtbGVzczsgaGJpdG1hcF90cnVuY2F0ZSB3aWxsIHJlY29nbml6
-ZSB0aGUgc2Vjb25kIHJvdW5kIGFzDQo+Pj4+IGEgbm8tb3AuDQo+Pj4NCj4+PiBGV0lXIC0gSSBo
-YXZlIG5vdCB5ZXQgcmV2aWV3ZWQgdGhpcyBzZXJpZXMgY2xvc2VseSwgYnV0IEkgdGhpbmsgaXQg
-d291bGQNCj4+PiBiZSB3aXNlIHRvIGdldCB0aGlzIGluaXRpYWwgY3V0IGluIGJlZm9yZSBzb2Z0
-ZnJlZXplICh3ZSBjYW4gbWFrZQ0KPj4+IGZ1cnRoZXIgdHdlYWtzIHRvIGZpeCBidWdzIGluIGFz
-c3VtcHRpb25zIGR1cmluZyByYzEgYW5kIHJjMiwgYnV0IGl0J3MgYQ0KPj4+IGxvdCBoYXJkZXIg
-dG8gYWRkIHRoZSBzZXJpZXMgYXQgYWxsIGlmIGl0IG1pc3NlcyBzb2Z0ZnJlZXplKS4NCj4+Pg0K
-Pj4NCj4+IEkgc3RpbGwgbm90IGNvbnZpbmNlZCB0aGF0IHdlIG5lZWQgYml0bWFwIGZsdXNoaW5n
-LiBJIHRoaW5rIChhbmQgRGVuIHN1cHBvcnRzDQo+PiBtZSkgdGhhdCBpdCdzIGEgYmFkIGlkZWEu
-IEl0IG1ha2VzIHRoaW5ncyBtb3JlIGRpZmZpY3VsdCB3aXRob3V0IGEgcmVhc29uLA0KPj4gZXhj
-ZXB0IGltcHJvdmluZyBkZWJ1Z2dpbmcgd2l0aCAtLWZvcmNlLXNoYXJlIHdoaWNoIHNob3VsZCBu
-ZXZlciBiZSB1c2VkIGluDQo+PiBwcm9kdWN0aW9uLg0KPj4NCj4gDQo+IEkga25vdyB5b3UgZG9u
-J3Qgd2FudCBpdCBpbiB0aGUgZ2VuZXJhbCBjYXNlLCBidXQgSSB0aGluayByZXNpemluZw0KPiBy
-ZXByZXNlbnRzIGEgZ2VudWluZSBjYXNlIGZvciBleGFjdGx5IHdoZW4gd2Ugd2FudCBpdC4NCj4g
-DQo+IFNldCBhc2lkZSB5b3VyIGNvbmNlcm5zIGFib3V0IGdlbmVyYWwgY2FzZSBmbHVzaGluZyBm
-b3Igbm93IC0tIHRoaXMgaXMgYQ0KPiBkaXN0cmFjdGlvbiAtLSBhbmQgbGV0IHVzIGNvbnNpZGVy
-IE9OTFkgcmVzaXplIGV2ZW50cy4NCj4gDQo+IElmIFFFTVUgY3Jhc2hlcyBhZnRlciBhIHJlc2l6
-ZSBldmVudCwgd2Ugd2lsbCBiZSB1bmFibGUgdG8gZXZlbiBvcGVuDQo+IHFjb3cyIGltYWdlcyBp
-ZiB3ZSBkb24ndCByZXNpemUgdGhlIG1ldGFkYXRhIGluZm9ybWF0aW9uIGFuZCB3cml0ZSBpdA0K
-PiBiYWNrIG91dCB0byBkaXNrLg0KPiANCj4gSXQgaXMgZmFyIHNpbXBsZXIgLS0gbG9naWNhbGx5
-IGFuZCB0ZWNobmljYWxseSAtLSB0byBqdXN0IHdyaXRlIHRoaXMNCj4gZGF0YSBvdXQgdG8gZGlz
-ayBkdXJpbmcgYSByZXNpemUgZXZlbnQuIEl0IHdvbid0IGhhcHBlbiBvZnRlbiwgc2hvdWxkbid0
-DQo+IGluY3VyIG11Y2ggb2YgYW4gSU8gcGVuYWx0eSwgYW5kIChJIHRoaW5rKSBpcyBhbGdvcml0
-aG1pY2FsbHkNCj4gc3RyYWlnaHRmb3J3YXJkLg0KPiANCj4gSWYgaXQncyByZWFsbHkgdGhhdCBt
-dWNoIG9mIGEgcHJvYmxlbSwgd2UgY2FuIHJldmlzZSBpdCBkdXJpbmcgdGhlIFJDDQo+IHBlcmlv
-ZCB0byBlbGltaW5hdGUgdGhlIGZsdXNoLg0KPiANCj4+IEJpdG1hcHMgYXJlIHN0b3JlZCBpbiBx
-Y293Ml9pbmFjdGl2YXRlKCkgd2hpY2ggaXMgdHJ1ZSBwbGFjZSBmb3IgZmx1c2hpbmcgY2FjaGVz
-Lg0KPj4NCg0KDQpIbW0sIHlvdSBhcmUgc28gc3VyZSwgdGhhdCBJIGNhbid0IGNvbnRpbnVlIGFy
-Z3VpbmcpDQpXaGF0IGFib3V0IHBhdGNoIDMsIGRpZCB5b3UgdGVzdCBpdD8NCkl0J3MganVzdCBz
-dHJhbmdlIGZvciBtZSB0aGF0IHdlIGFyZSBnb2luZyB0byBwdXNoIHVucmV2aWV3ZWQgc2VyaWVz
-IGp1c3QgdG8gaGF2ZQ0KdGhlIGZlYXR1cmUgaW4gNC4wLi4gV2h5IGlzIGl0IHNvIGltcG9ydGFu
-dD8NCkFsc28sIHdlIGhhdmUgbm8gY29tbWVudHMgZnJvbSBNYXggYW5kIEtldmluIHdobyBhcmUg
-bWFpbnRhaW5lcnMgb2YgdGhlIG9ubHkgZmlsZSwNCmNoYW5nZWQgaW4gdGhlIHNlcmllcy4gQW5k
-IHdoeSB0aGlzIGRvbid0IGdvIHRocm91Z2ggdGhlaXIgdHJlZXM/DQpUaGlzIGFsbCBqdXN0IGJy
-ZWFrcyBhbGwgcGF0dGVybnMgSSdtIHVzZWQgdG8uLg0KDQpBbmQgSSBob3BlLCBJJ2xsIHNlbmQg
-YSBjb3VudGVyLXByb3Bhc2FsIHdpdGhvdXQgZmx1c2hpbmcgaW4gYSBmZXcgbWludXRlcy4uLg0K
-DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 3/11/19 8:26 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> The Edk2Crypto object is used to hold configuration values specific
+>> to EDK2.
+>>
+>> The edk2_add_host_crypto_policy() function loads crypto policies
+>> from the host, and register them as fw_cfg named file items.
+>> So far only the 'https' policy is supported.
+>>
+>> A usercase example is the 'HTTPS Boof' feature of OVMF [*].
+>>
+>> Usage example:
+>>
+>>   $ qemu-system-x86_64 \
+>>       --object edk2_crypto,id=https,\
+>>               ciphers=/etc/crypto-policies/back-ends/openssl.config,\
+>>               cacerts=/etc/pki/ca-trust/extracted/edk2/cacerts.bin
+>>
+>> (On Fedora these files are provided by the ca-certificates and
+>> crypto-policies packages).
+>>
+>> [*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> v3:
+>> - '-object' -> '--object' in commit description (Eric)
+>> - reworded the 'TODO: g_free' comment
+>> ---
+>>  MAINTAINERS                             |   8 ++
+>>  hw/Makefile.objs                        |   1 +
+>>  hw/firmware/Makefile.objs               |   1 +
+>>  hw/firmware/uefi_edk2_crypto_policies.c | 177 ++++++++++++++++++++++++
+>>  include/hw/firmware/uefi_edk2.h         |  28 ++++
+>>  5 files changed, 215 insertions(+)
+>>  create mode 100644 hw/firmware/Makefile.objs
+>>  create mode 100644 hw/firmware/uefi_edk2_crypto_policies.c
+>>  create mode 100644 include/hw/firmware/uefi_edk2.h
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index cf09a4c127..70122b3d0d 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -2206,6 +2206,14 @@ F: include/hw/i2c/smbus_master.h
+>>  F: include/hw/i2c/smbus_slave.h
+>>  F: include/hw/i2c/smbus_eeprom.h
+>>  
+>> +EDK2 Firmware
+>> +M: Laszlo Ersek <lersek@redhat.com>
+>> +M: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> +S: Maintained
+>> +F: docs/interop/firmware.json
+>> +F: hw/firmware/uefi_edk2_crypto_policies.c
+>> +F: include/hw/firmware/uefi_edk2.h
+>> +
+>>  Usermode Emulation
+>>  ------------------
+>>  Overall
+>> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+>> index 82aa7fab8e..2b075aa1e0 100644
+>> --- a/hw/Makefile.objs
+>> +++ b/hw/Makefile.objs
+>> @@ -8,6 +8,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += char/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += cpu/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += display/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += dma/
+>> +devices-dirs-$(CONFIG_SOFTMMU) += firmware/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += gpio/
+>>  devices-dirs-$(CONFIG_HYPERV) += hyperv/
+>>  devices-dirs-$(CONFIG_I2C) += i2c/
+>> diff --git a/hw/firmware/Makefile.objs b/hw/firmware/Makefile.objs
+>> new file mode 100644
+>> index 0000000000..ea1f6d44df
+>> --- /dev/null
+>> +++ b/hw/firmware/Makefile.objs
+>> @@ -0,0 +1 @@
+>> +common-obj-y += uefi_edk2_crypto_policies.o
+>> diff --git a/hw/firmware/uefi_edk2_crypto_policies.c b/hw/firmware/uefi_edk2_crypto_policies.c
+>> new file mode 100644
+>> index 0000000000..5f88819a50
+>> --- /dev/null
+>> +++ b/hw/firmware/uefi_edk2_crypto_policies.c
+>> @@ -0,0 +1,177 @@
+>> +/*
+>> + * UEFI EDK2 Support
+>> + *
+>> + * Copyright (c) 2019 Red Hat Inc.
+>> + *
+>> + * Author:
+>> + *  Philippe Mathieu-Daudé <philmd@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qom/object_interfaces.h"
+>> +#include "hw/firmware/uefi_edk2.h"
+>> +
+>> +
+>> +#define TYPE_EDK2_CRYPTO "edk2_crypto"
+>> +
+>> +#define EDK2_CRYPTO_CLASS(klass) \
+>> +     OBJECT_CLASS_CHECK(Edk2CryptoClass, (klass), \
+>> +                        TYPE_EDK2_CRYPTO)
+>> +#define EDK2_CRYPTO_GET_CLASS(obj) \
+>> +     OBJECT_GET_CLASS(Edk2CryptoClass, (obj), \
+>> +                      TYPE_EDK2_CRYPTO)
+>> +#define EDK2_CRYPTO(obj) \
+>> +     INTERFACE_CHECK(Edk2Crypto, (obj), \
+>> +                     TYPE_EDK2_CRYPTO)
+> 
+> Uh, should this be OBJECT_CLASS_CHECK()?  TYPE_EDK2_CRYPTO is a
+> TYPE_OBJECT, not a TYPE_INTERFACE...
+
+Good catch!
+
+>> +
+>> +typedef struct Edk2Crypto {
+>> +    Object parent_obj;
+>> +
+>> +    /*
+>> +     * Path to the acceptable ciphersuites and the preferred order from
+>> +     * the host-side crypto policy.
+>> +     */
+>> +    char *ciphers_path;
+>> +
+>> +    /* Path to the trusted CA certificates configured on the host side. */
+>> +    char *cacerts_path;
+>> +} Edk2Crypto;
+> 
+> Bike-shedding: I prefer to call file names file names, and reserve
+> "path" for search paths.  But it's your shed, not mine.
+
+OK.
+
+>> +
+>> +typedef struct Edk2CryptoClass {
+>> +    ObjectClass parent_class;
+>> +} Edk2CryptoClass;
+>> +
+>> +
+>> +static void edk2_crypto_prop_set_ciphers(Object *obj, const char *value,
+>> +                                         Error **errp G_GNUC_UNUSED)
+>> +{
+>> +    Edk2Crypto *s = EDK2_CRYPTO(obj);
+>> +
+>> +    g_free(s->ciphers_path);
+>> +    s->ciphers_path = g_strdup(value);
+>> +}
+>> +
+>> +static char *edk2_crypto_prop_get_ciphers(Object *obj,
+>> +                                          Error **errp G_GNUC_UNUSED)
+>> +{
+>> +    Edk2Crypto *s = EDK2_CRYPTO(obj);
+>> +
+>> +    return g_strdup(s->ciphers_path);
+>> +}
+>> +
+>> +static void edk2_crypto_prop_set_cacerts(Object *obj, const char *value,
+>> +                                         Error **errp G_GNUC_UNUSED)
+>> +{
+>> +    Edk2Crypto *s = EDK2_CRYPTO(obj);
+>> +
+>> +    g_free(s->cacerts_path);
+>> +    s->cacerts_path = g_strdup(value);
+>> +}
+>> +
+>> +static char *edk2_crypto_prop_get_cacerts(Object *obj,
+>> +                                          Error **errp G_GNUC_UNUSED)
+>> +{
+>> +    Edk2Crypto *s = EDK2_CRYPTO(obj);
+>> +
+>> +    return g_strdup(s->cacerts_path);
+>> +}
+>> +
+>> +static void edk2_crypto_finalize(Object *obj)
+>> +{
+>> +    Edk2Crypto *s = EDK2_CRYPTO(obj);
+>> +
+>> +    g_free(s->ciphers_path);
+>> +    g_free(s->cacerts_path);
+>> +}
+>> +
+>> +static void edk2_crypto_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    object_class_property_add_str(oc, "ciphers",
+>> +                                  edk2_crypto_prop_get_ciphers,
+>> +                                  edk2_crypto_prop_set_ciphers,
+>> +                                  NULL);
+>> +    object_class_property_add_str(oc, "cacerts",
+>> +                                  edk2_crypto_prop_get_cacerts,
+>> +                                  edk2_crypto_prop_set_cacerts,
+>> +                                  NULL);
+>> +}
+>> +
+>> +static const TypeInfo edk2_crypto_info = {
+>> +    .parent = TYPE_OBJECT,
+>> +    .name = TYPE_EDK2_CRYPTO,
+>> +    .instance_size = sizeof(Edk2Crypto),
+>> +    .instance_finalize = edk2_crypto_finalize,
+>> +    .class_size = sizeof(Edk2CryptoClass),
+>> +    .class_init = edk2_crypto_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_USER_CREATABLE },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +static void edk2_crypto_register_types(void)
+>> +{
+>> +    type_register_static(&edk2_crypto_info);
+>> +}
+>> +
+>> +type_init(edk2_crypto_register_types);
+>> +
+>> +static Edk2Crypto *edk2_crypto_by_id(const char *edk_crypto_id, Error **errp)
+>> +{
+>> +    Object *obj;
+>> +    Object *container;
+>> +
+>> +    container = object_get_objects_root();
+>> +    obj = object_resolve_path_component(container,
+>> +                                        edk_crypto_id);
+>> +    if (!obj) {
+>> +        error_setg(errp, "Cannot find EDK2 crypto object ID %s",
+>> +                   edk_crypto_id);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    if (!object_dynamic_cast(obj, TYPE_EDK2_CRYPTO)) {
+>> +        error_setg(errp, "Object '%s' is not a EDK2 crypto subclass",
+>> +                   edk_crypto_id);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    return EDK2_CRYPTO(obj);
+>> +}
+>> +
+>> +void edk2_add_host_crypto_policy(FWCfgState *fw_cfg)
+>> +{
+>> +    Edk2Crypto *s;
+>> +
+>> +    s = edk2_crypto_by_id("https", NULL);
+>> +    if (!s) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (s->ciphers_path) {
+>> +        /*
+>> +         * Note:
+>> +         * Unlike with fw_cfg_add_file() where the allocated data has
+>> +         * to be valid for the lifetime of the FwCfg object, there is
+>> +         * no such contract interface with fw_cfg_add_file_from_host().
+> 
+> In my review of PATCH 1, I argue there should be.
+> 
+>> +         * It would be easier that the FwCfg object keeps reference of
+>> +         * its allocated memory and releases it when destroy, but it
+>> +         * currently doesn't. Meanwhile we simply add this TODO comment.
+>> +         */
+>> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/ciphers",
+>> +                                  s->ciphers_path, NULL);
+>> +    }
+>> +
+>> +    if (s->cacerts_path) {
+>> +        /*
+>> +         * TODO: g_free the returned pointer
+>> +         * (see previous comment for ciphers_path in this function).
+>> +         */
+> 
+> Is it even possible to reolve this TODO?  Is there any point in time
+> where we can free the returned pointer without leaving a dangling
+> pointer in @fw_cfg?
+
+I understood Laszlo suggested the fw_cfg devices do the garbage collection.
+
+>> +        fw_cfg_add_file_from_host(fw_cfg, "etc/edk2/https/cacerts",
+>> +                                  s->cacerts_path, NULL);
+>> +    }
+>> +}
+>> diff --git a/include/hw/firmware/uefi_edk2.h b/include/hw/firmware/uefi_edk2.h
+>> new file mode 100644
+>> index 0000000000..e0b2fb160a
+>> --- /dev/null
+>> +++ b/include/hw/firmware/uefi_edk2.h
+>> @@ -0,0 +1,28 @@
+>> +/*
+>> + * UEFI EDK2 Support
+>> + *
+>> + * Copyright (c) 2019 Red Hat Inc.
+>> + *
+>> + * Author:
+>> + *  Philippe Mathieu-Daudé <philmd@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#ifndef HW_FIRMWARE_UEFI_EDK2_H
+>> +#define HW_FIRMWARE_UEFI_EDK2_H
+>> +
+>> +#include "hw/nvram/fw_cfg.h"
+>> +
+>> +/**
+>> + * edk2_add_host_crypto_policy:
+>> + * @s: fw_cfg device being modified
+>> + *
+>> + * Add a new named file containing the host crypto policy.
+>> + *
+>> + * Currently only the 'https' policy is supported.
+>> + */
+>> +void edk2_add_host_crypto_policy(FWCfgState *s);
+> 
+> Out of curiosity, what happens if you call this more than once?
+
+Such curiosity is useful, thanks :)
+
+>> +
+>> +#endif /* HW_FIRMWARE_UEFI_EDK2_H */
