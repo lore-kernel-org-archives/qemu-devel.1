@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60927)
+Received: from eggs.gnu.org ([209.51.188.92]:60834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODg-0007FW-IA
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:09 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODb-00077Y-Lh
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODf-0003Vy-69
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:08 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34247)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODa-0003FW-Gl
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:03 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:53905)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h3ODe-0003Rf-TP
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:07 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id f14so5953724wrg.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:06 -0700 (PDT)
+	id 1h3ODa-00037k-7b
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:56:02 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id e74so5327944wmg.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:56:01 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 11 Mar 2019 17:55:29 +0100
-Message-Id: <1552323335-46779-26-git-send-email-pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 17:55:24 +0100
+Message-Id: <1552323335-46779-21-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 25/31] lsi: use SCSI phase names instead of
- numbers in trace
+Subject: [Qemu-devel] [PULL v2 20/31] configure: Disable W^X on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +31,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sven Schnelle <svens@stackframe.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Sven Schnelle <svens@stackframe.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-This makes trace logs much easier to read, especially for
-people who are not fluent in SCSI.
+Since OpenBSD 6.0 [1], W^X is enforced by default [2].
+TCG requires WX access. Disable W^X if it is available.
+This fixes:
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190305195519.24303-5-svens@stackframe.org>
+  # lm32-softmmu/qemu-system-lm32
+  Could not allocate dynamic translator buffer
+
+  # sysctl kern.wxabort=1
+  kern.wxabort: 0 -> 1
+  # lm32-softmmu/qemu-system-lm32
+  mmap: Not supported
+  Abort trap (core dumped)
+  # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
+  (gdb) bt
+  #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input}:5
+  #1  0x000017e3c15e5d7a in *_libc_mmap (addr=Variable "addr" is not available.) at /usr/src/lib/libc/sys/mmap.c:47
+  #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/accel/tcg/translate-all.c:1064
+  #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1112
+  #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1149
+  #5  0x000017e17d9897e9 in tcg_init (ms=0x17e45e456800) at /usr/src/qemu/accel/tcg/tcg-all.c:66
+  #6  0x000017e17d9891b8 in accel_init_machine (acc=0x17e3c3f50800, ms=0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
+  #7  0x000017e17d989312 in configure_accelerator (ms=0x17e45e456800, progname=0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/qemu/accel/accel.c:111
+  #8  0x000017e17d9d8616 in main (argc=1, argv=0x7f7fffff06b8, envp=0x7f7fffff06c8) at vl.c:4325
+
+[1] https://www.openbsd.org/faq/upgrade60.html
+[2] https://undeadly.org/cgi?action=article&sid=20160527203200
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190307142822.8531-3-philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/lsi53c895a.c | 31 +++++++++++++++++++++++--------
- hw/scsi/trace-events |  6 +++---
- 2 files changed, 26 insertions(+), 11 deletions(-)
+ configure | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index d67584e..66f217f 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -306,6 +306,22 @@ typedef struct {
- #define LSI53C895A(obj) \
-     OBJECT_CHECK(LSIState, (obj), TYPE_LSI53C895A)
+diff --git a/configure b/configure
+index fa83e21..cab830a 100755
+--- a/configure
++++ b/configure
+@@ -5903,6 +5903,17 @@ if test "$mingw32" = "yes" ; then
+     done
+ fi
  
-+static const char *scsi_phases[] = {
-+    "DOUT",
-+    "DIN",
-+    "CMD",
-+    "STATUS",
-+    "RSVOUT",
-+    "RSVIN",
-+    "MSGOUT",
-+    "MSGIN"
-+};
++# Disable OpenBSD W^X if available
++if test "$tcg" = "yes" && test "$targetos" = "OpenBSD"; then
++    cat > $TMPC <<EOF
++    int main(void) { return 0; }
++EOF
++    wx_ldflags="-Wl,-z,wxneeded"
++    if compile_prog "" "$wx_ldflags"; then
++        QEMU_LDFLAGS="$QEMU_LDFLAGS $wx_ldflags"
++    fi
++fi
 +
-+static const char *scsi_phase_name(int phase)
-+{
-+    return scsi_phases[phase & PHASE_MASK];
-+}
-+
- static inline int lsi_irq_on_rsl(LSIState *s)
- {
-     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
-@@ -1201,8 +1217,9 @@ again:
-             s->ia = s->dsp - 12;
-         }
-         if ((s->sstat1 & PHASE_MASK) != ((insn >> 24) & 7)) {
--            trace_lsi_execute_script_blockmove_badphase(s->sstat1 & PHASE_MASK,
--                                                        (insn >> 24) & 7);
-+            trace_lsi_execute_script_blockmove_badphase(
-+                    scsi_phase_name(s->sstat1),
-+                    scsi_phase_name(insn >> 24));
-             lsi_script_scsi_interrupt(s, LSI_SIST0_MA, 0);
-             break;
-         }
-@@ -1234,8 +1251,8 @@ again:
-             lsi_do_msgin(s);
-             break;
-         default:
--            qemu_log_mask(LOG_UNIMP, "lsi_scsi: Unimplemented phase %d\n",
--                          s->sstat1 & PHASE_MASK);
-+            qemu_log_mask(LOG_UNIMP, "lsi_scsi: Unimplemented phase %s\n",
-+                          scsi_phase_name(s->sstat1));
-         }
-         s->dfifo = s->dbc & 0xff;
-         s->ctest5 = (s->ctest5 & 0xfc) | ((s->dbc >> 8) & 3);
-@@ -1463,10 +1480,8 @@ again:
-                 cond = s->carry != 0;
-             }
-             if (cond == jmp && (insn & (1 << 17))) {
--                trace_lsi_execute_script_tc_compp(
--                        (s->sstat1 & PHASE_MASK),
--                        jmp ? '=' : '!',
--                        ((insn >> 24) & 7));
-+                trace_lsi_execute_script_tc_compp(scsi_phase_name(s->sstat1),
-+                        jmp ? '=' : '!', scsi_phase_name(insn >> 24));
-                 cond = (s->sstat1 & PHASE_MASK) == ((insn >> 24) & 7);
-             }
-             if (cond == jmp && (insn & (1 << 18))) {
-diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
-index 29aaa75..09f3fc3 100644
---- a/hw/scsi/trace-events
-+++ b/hw/scsi/trace-events
-@@ -268,7 +268,7 @@ lsi_memcpy(uint32_t dest, uint32_t src, int count) "memcpy dest 0x%"PRIx32" src
- lsi_wait_reselect(void) "Wait Reselect"
- lsi_execute_script(uint32_t dsp, uint32_t insn, uint32_t addr) "SCRIPTS dsp=0x%"PRIx32" opcode 0x%"PRIx32" arg 0x%"PRIx32
- lsi_execute_script_blockmove_delayed(void) "Delayed select timeout"
--lsi_execute_script_blockmove_badphase(uint8_t phase, uint8_t expected) "Wrong phase got %d expected %d"
-+lsi_execute_script_blockmove_badphase(const char *phase, const char *expected) "Wrong phase got %s expected %s"
- lsi_execute_script_io_alreadyreselected(void) "Already reselected, jumping to alternative address"
- lsi_execute_script_io_selected(uint8_t id, const char *atn) "Selected target %d%s"
- lsi_execute_script_io_disconnect(void) "Wait Disconnect"
-@@ -278,8 +278,8 @@ lsi_execute_script_io_opcode(const char *opcode, int reg, const char *opname, ui
- lsi_execute_script_tc_nop(void) "NOP"
- lsi_execute_script_tc_delayedselect_timeout(void) "Delayed select timeout"
- lsi_execute_script_tc_compc(int result) "Compare carry %d"
--lsi_execute_script_tc_compp(uint8_t phase, int op, uint8_t insn_phase) "Compare phase %d %c= %d"
--lsi_execute_script_tc_compd(uint32_t sfbr, uint8_t mask, int op, int result) "Compare data 0x%"PRIx32" & 0x%x %c= 0x%x"
-+lsi_execute_script_tc_compp(const char *phase, char op, const char *insn_phase) "Compare phase %s %c= %s"
-+lsi_execute_script_tc_compd(uint32_t sfbr, uint8_t mask, char op, int result) "Compare data 0x%"PRIx32" & 0x%x %c= 0x%x"
- lsi_execute_script_tc_jump(uint32_t addr) "Jump to 0x%"PRIx32
- lsi_execute_script_tc_call(uint32_t addr) "Call 0x%"PRIx32
- lsi_execute_script_tc_return(uint32_t addr) "Return to 0x%"PRIx32
+ qemu_confdir=$sysconfdir$confsuffix
+ qemu_moddir=$libdir$confsuffix
+ qemu_datadir=$datadir$confsuffix
 -- 
 1.8.3.1
