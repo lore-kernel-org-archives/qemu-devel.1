@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60151)
+Received: from eggs.gnu.org ([209.51.188.92]:60311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3K9H-00028w-CF
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:35:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1h3K9S-0002Ls-4c
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3Jqj-0003zn-JQ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:16:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h3Jqj-0003zT-73
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:16:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB03D88306
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:07:23 +0000 (UTC)
-References: <20190309004826.9027-1-lersek@redhat.com>
-	<20190309004826.9027-2-lersek@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
-Date: Mon, 11 Mar 2019 07:07:14 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1h3K9Q-0006Et-JI
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:35:30 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 13:35:06 +0100
+Message-Id: <20190311123507.24867-3-pbonzini@redhat.com>
+In-Reply-To: <20190311123507.24867-1-pbonzini@redhat.com>
+References: <20190311123507.24867-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190309004826.9027-2-lersek@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c56eNZkEdc4KHLGjjwQfpJGo1vuGmgrBL"
-Subject: Re: [Qemu-devel] [PATCH 01/10] roms: lift "edk2-funcs.sh" from
- "tests/uefi-test-tools/build.sh"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/3] qemugdb: allow adding support for other
+ coroutine backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +22,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c56eNZkEdc4KHLGjjwQfpJGo1vuGmgrBL
-From: Eric Blake <eblake@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com,
- imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/10] roms: lift "edk2-funcs.sh" from
- "tests/uefi-test-tools/build.sh"
-References: <20190309004826.9027-1-lersek@redhat.com>
- <20190309004826.9027-2-lersek@redhat.com>
-In-Reply-To: <20190309004826.9027-2-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Split the jmpbuf access to a separate module and dispatch based
+on which CoroutineXYZ type is defined.
 
-On 3/8/19 6:48 PM, Laszlo Ersek wrote:
-> Extract the dense logic for architecture and toolchain massaging from
-> "tests/uefi-test-tools/build.sh", to a set of small functions. We'll re=
-use
-> these functions for building full platform firmware images.
->=20
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  roms/edk2-funcs.sh             | 240 ++++++++++++++++++++
->  tests/uefi-test-tools/build.sh |  97 +-------
->  2 files changed, 246 insertions(+), 91 deletions(-)
->=20
-> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-> new file mode 100644
-> index 000000000000..908c7665c6ed
-> --- /dev/null
-> +++ b/roms/edk2-funcs.sh
-> @@ -0,0 +1,240 @@
-> +# Shell script that defines functions for determining some environment=
-al
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/qemugdb/coroutine.py          | 106 ++++++++------------------
+ scripts/qemugdb/coroutine_ucontext.py |  69 +++++++++++++++++
+ 2 files changed, 100 insertions(+), 75 deletions(-)
+ create mode 100644 scripts/qemugdb/coroutine_ucontext.py
 
-No #! line, so this runs with /bin/sh, which might not be bash.  However,=
-=2E..
-
-> +# characteristics for the edk2 "build" utility.
-> +#
-> +# This script is meant to be sourced.
-> +#
-> +# Copyright (C) 2019, Red Hat, Inc.
-
-I don't usually put a comma after the year.
-
-
-> +# Parameters:
-> +#   $1: QEMU system emulation target
-> +qemu_edk2_verify_arch()
-> +{
-> +  local emulation_target=3D"$1"
-> +  local program_name=3D$(basename -- "$0")
-
-=2E..local is a bashism, not present in all /bin/sh implementations.  The=
-n
-again...
-
-> +++ b/tests/uefi-test-tools/build.sh
-> @@ -38,97 +38,12 @@ if [ $ret -ne 0 ]; then
-
-build.sh is already marked as a bash script, and...
-
-> +# Fetch some option arguments, and set the cross-compilation environme=
-nt (if
-> +# any), for the edk2 "build" utility.
-> +source "$edk2_dir/../edk2-funcs.sh"
-
-you are only ever sourcing the file, rather than directly executing it
-as a standalone script. I'd update the comments to mention that the file
-is meant to be sourced.  (By the way, 'source' is also a bashism, the
-portable spelling is '.').
-
-So nothing jumped out at me as a potential shell script trap, although I
-did not closely review the logic.
-
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index 41e079d0e2..db2753d949 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -1,6 +1,6 @@
+ #!/usr/bin/python
+=20
+-# GDB debugging support
++# GDB debugging support, coroutine dispatch
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+ #
+@@ -10,82 +10,25 @@
+ # This work is licensed under the terms of the GNU GPL, version 2
+ # or later.  See the COPYING file in the top-level directory.
+=20
++from . import coroutine_ucontext
+ import gdb
+=20
+ VOID_PTR =3D gdb.lookup_type('void').pointer()
++UINTPTR_T =3D gdb.lookup_type('uintptr_t')
+=20
+-def get_fs_base():
+-    '''Fetch %fs base value using arch_prctl(ARCH_GET_FS).  This is
+-       pthread_self().'''
+-    # %rsp - 120 is scratch space according to the SystemV ABI
+-    old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+-    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
+-    fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+-    gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
+)
+-    return fs_base
+-
+-def pthread_self():
+-    '''Fetch pthread_self() from the glibc start_thread function.'''
+-    f =3D gdb.newest_frame()
+-    while f.name() !=3D 'start_thread':
+-        f =3D f.older()
+-        if f is None:
+-            return get_fs_base()
+-
+-    try:
+-        return f.read_var("arg")
+-    except ValueError:
+-        return get_fs_base()
+-
+-def get_glibc_pointer_guard():
+-    '''Fetch glibc pointer guard value'''
+-    fs_base =3D pthread_self()
+-    return gdb.parse_and_eval('*(uint64_t*)((uint64_t)%s + 0x30)' % fs_b=
+ase)
+-
+-def glibc_ptr_demangle(val, pointer_guard):
+-    '''Undo effect of glibc's PTR_MANGLE()'''
+-    return gdb.parse_and_eval('(((uint64_t)%s >> 0x11) | ((uint64_t)%s <=
+< (64 - 0x11))) ^ (uint64_t)%s' % (val, val, pointer_guard))
+-
+-def get_jmpbuf_regs(jmpbuf):
+-    JB_RBX  =3D 0
+-    JB_RBP  =3D 1
+-    JB_R12  =3D 2
+-    JB_R13  =3D 3
+-    JB_R14  =3D 4
+-    JB_R15  =3D 5
+-    JB_RSP  =3D 6
+-    JB_PC   =3D 7
+-
+-    pointer_guard =3D get_glibc_pointer_guard()
+-    return {'rbx': jmpbuf[JB_RBX],
+-        'rbp': glibc_ptr_demangle(jmpbuf[JB_RBP], pointer_guard),
+-        'rsp': glibc_ptr_demangle(jmpbuf[JB_RSP], pointer_guard),
+-        'r12': jmpbuf[JB_R12],
+-        'r13': jmpbuf[JB_R13],
+-        'r14': jmpbuf[JB_R14],
+-        'r15': jmpbuf[JB_R15],
+-        'rip': glibc_ptr_demangle(jmpbuf[JB_PC], pointer_guard) }
+-
+-def bt_jmpbuf(jmpbuf):
+-    '''Backtrace a jmpbuf'''
+-    regs =3D get_jmpbuf_regs(jmpbuf)
+-    old =3D dict()
+-
+-    for i in regs:
+-        old[i] =3D gdb.parse_and_eval('(uint64_t)$%s' % i)
+-
+-    for i in regs:
+-        gdb.execute('set $%s =3D %s' % (i, regs[i]))
+-
+-    gdb.execute('bt')
+-
+-    for i in regs:
+-        gdb.execute('set $%s =3D %s' % (i, old[i]))
+-
+-def coroutine_to_jmpbuf(co):
+-    coroutine_pointer =3D co.cast(gdb.lookup_type('CoroutineUContext').p=
+ointer())
+-    return coroutine_pointer['env']['__jmpbuf']
++backends =3D {
++    'CoroutineUContext': coroutine_ucontext
++}
+=20
++def coroutine_backend():
++    for k, v in backends.items():
++        try:
++            gdb.lookup_type(k)
++        except:
++            continue
++        return v
++
++    raise Exception('could not find coroutine backend')
+=20
+ class CoroutineCommand(gdb.Command):
+     '''Display coroutine backtrace'''
+@@ -99,18 +42,31 @@ class CoroutineCommand(gdb.Command):
+             gdb.write('usage: qemu coroutine <coroutine-pointer>\n')
+             return
+=20
+-        bt_jmpbuf(coroutine_to_jmpbuf(gdb.parse_and_eval(argv[0])))
++        addr =3D gdb.parse_and_eval(argv[0])
++        regs =3D coroutine_backend().get_coroutine_regs(addr)
++        old =3D dict()
++
++        for i in regs:
++            old[i] =3D gdb.parse_and_eval('(uint64_t)$%s' % i)
++
++        for i in regs:
++            gdb.execute('set $%s =3D %s' % (i, regs[i].cast(UINTPTR_T)))
++
++        gdb.execute('bt')
++
++        for i in regs:
++            gdb.execute('set $%s =3D %s' % (i, old[i].cast(UINTPTR_T)))
+=20
+ class CoroutineSPFunction(gdb.Function):
+     def __init__(self):
+         gdb.Function.__init__(self, 'qemu_coroutine_sp')
+=20
+     def invoke(self, addr):
+-        return get_jmpbuf_regs(coroutine_to_jmpbuf(addr))['rsp'].cast(VO=
+ID_PTR)
++        return coroutine_backend().get_coroutine_regs(addr)['rsp'].cast(=
+VOID_PTR)
+=20
+ class CoroutinePCFunction(gdb.Function):
+     def __init__(self):
+         gdb.Function.__init__(self, 'qemu_coroutine_pc')
+=20
+     def invoke(self, addr):
+-        return get_jmpbuf_regs(coroutine_to_jmpbuf(addr))['rip'].cast(VO=
+ID_PTR)
++        return coroutine_backend().get_coroutine_regs(addr)['rip'].cast(=
+VOID_PTR)
+diff --git a/scripts/qemugdb/coroutine_ucontext.py b/scripts/qemugdb/coro=
+utine_ucontext.py
+new file mode 100644
+index 0000000000..a2f8c1dbbf
+--- /dev/null
++++ b/scripts/qemugdb/coroutine_ucontext.py
+@@ -0,0 +1,69 @@
++#!/usr/bin/python
++
++# GDB debugging support
++#
++# Copyright 2012 Red Hat, Inc. and/or its affiliates
++#
++# Authors:
++#  Avi Kivity <avi@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++import gdb
++
++def get_fs_base():
++    '''Fetch %fs base value using arch_prctl(ARCH_GET_FS).  This is
++       pthread_self().'''
++    # %rsp - 120 is scratch space according to the SystemV ABI
++    old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
++    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
++    fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
++    gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
+)
++    return fs_base
++
++def pthread_self():
++    '''Fetch pthread_self() from the glibc start_thread function.'''
++    f =3D gdb.newest_frame()
++    while f.name() !=3D 'start_thread':
++        f =3D f.older()
++        if f is None:
++            return get_fs_base()
++
++    try:
++        return f.read_var("arg")
++    except ValueError:
++        return get_fs_base()
++
++def get_glibc_pointer_guard():
++    '''Fetch glibc pointer guard value'''
++    fs_base =3D pthread_self()
++    return gdb.parse_and_eval('*(uint64_t*)((uint64_t)%s + 0x30)' % fs_b=
+ase)
++
++def glibc_ptr_demangle(val, pointer_guard):
++    '''Undo effect of glibc's PTR_MANGLE()'''
++    return gdb.parse_and_eval('(((uint64_t)%s >> 0x11) | ((uint64_t)%s <=
+< (64 - 0x11))) ^ (uint64_t)%s' % (val, val, pointer_guard))
++
++def get_jmpbuf_regs(jmpbuf):
++    JB_RBX  =3D 0
++    JB_RBP  =3D 1
++    JB_R12  =3D 2
++    JB_R13  =3D 3
++    JB_R14  =3D 4
++    JB_R15  =3D 5
++    JB_RSP  =3D 6
++    JB_PC   =3D 7
++
++    pointer_guard =3D get_glibc_pointer_guard()
++    return {'rbx': jmpbuf[JB_RBX],
++        'rbp': glibc_ptr_demangle(jmpbuf[JB_RBP], pointer_guard),
++        'rsp': glibc_ptr_demangle(jmpbuf[JB_RSP], pointer_guard),
++        'r12': jmpbuf[JB_R12],
++        'r13': jmpbuf[JB_R13],
++        'r14': jmpbuf[JB_R14],
++        'r15': jmpbuf[JB_R15],
++        'rip': glibc_ptr_demangle(jmpbuf[JB_PC], pointer_guard) }
++
++def get_coroutine_regs(addr):
++    co =3D addr.cast(gdb.lookup_type('CoroutineUContext').pointer())
++    return get_jmpbuf_regs(co['env']['__jmpbuf'])
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---c56eNZkEdc4KHLGjjwQfpJGo1vuGmgrBL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyGT3IACgkQp6FrSiUn
-Q2r0qQf/ecMZLcJUmLnnTcSwZP3ifCIzWPYRiARp1Wzgzr1inX1kKBlVF2euS5Tt
-6zRobnNuTWi4RiEFrnpzpLVA4FDdanmPBiRz3j25BIyZdGEN3+w065JV8vb4d0Zt
-rp0p4jPipsXjvAik0NQJjDHF0bkz23esiEuwcDXl7wYCWEmSr6/eMY3r8Kfnfwxr
-G585pi/4A+m3vABQ2+4ZR7jdevFsqTPgAgNR4By9PnAuCP2H89joGfRnTf9mGqhO
-dGmAjvL19ni835Czzznpc/n11e8fQvNwJ4QzXoPHL4ixdREtMu0nhLsx4fw6T/H2
-lL9YpjKPUROJwTKxisG5ZhKMXa+Gpw==
-=X8N4
------END PGP SIGNATURE-----
-
---c56eNZkEdc4KHLGjjwQfpJGo1vuGmgrBL--
+2.20.1
