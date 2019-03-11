@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58345)
+Received: from eggs.gnu.org ([209.51.188.92]:35518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h3HeJ-00006Q-TN
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:55:12 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3I9T-0005rF-SY
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1h3HeJ-0004ZR-1S
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:55:11 -0400
-Date: Mon, 11 Mar 2019 09:55:05 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190311095505.GB5991@stefanha-x1.localdomain>
-References: <1545387387-9613-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20190306215633.GM6818@localhost.localdomain>
-	<20190307102206.GC2843@stefanha-x1.localdomain>
-	<20190307103455.GA5786@linux.fritz.box>
+	(envelope-from <philmd@redhat.com>) id 1h3I9T-0008FF-7M
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 06:27:23 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 11 Mar 2019 11:27:12 +0100
+Message-Id: <20190311102712.8572-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
-Content-Disposition: inline
-In-Reply-To: <20190307103455.GA5786@linux.fritz.box>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tcmu: Introduce qemu-tcmu
- utility
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] hw/net/pcnet: Use qemu_log_mask(GUEST_ERROR)
+ instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +21,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Yaowei Bai <baiyaowei@cmss.chinamobile.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Amar Tumballi <atumball@redhat.com>, Mike Christie <mchristi@redhat.com>, Prasanna Kalever <pkalever@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiubo Li <xiubli@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: Helge Deller <deller@gmx.de>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
+Avoid to clutter stdout until explicitly requested
+(with -d guest_errors):
 
---lEGEL1/lMxI0MVQ2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  $ qemu-system-mips -M malta -m 512 -kernel vmlinux-3.2.0-4-4kc-malta
+  Bad SWSTYLE=3D0x04
 
-On Thu, Mar 07, 2019 at 11:34:55AM +0100, Kevin Wolf wrote:
-> Am 07.03.2019 um 11:22 hat Stefan Hajnoczi geschrieben:
-> > On Wed, Mar 06, 2019 at 10:56:33PM +0100, Kevin Wolf wrote:
-> > > Am 21.12.2018 um 11:16 hat Yaowei Bai geschrieben:
-> > > * The first priority should be adding an in-process iscsi target that
-> > >   can be managed with QMP, similar to the built-in NBD server.
-> >=20
-> > Using the in-kernel SCSI target with TCMU, or do you mean implementing
-> > the iSCSI network protocol inside QEMU?
->=20
-> Using TCMU in this case, of course. This point was about external tool
-> vs. exporting from a running QEMU instance, not about how to implement
-> the actual functionality.
->=20
-> Building an external command line tool around QMP functionality is easy,
-> but the reverse way isn't necessarily. This is why I think QMP-based
-> should come first.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+Helge patch "pcnet: Avoid warning when switching back to 16bit mode"
+remembered me I had this one somewhere.
+---
+ hw/net/pcnet.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Makes sense, thanks.
-
-Stefan
-
---lEGEL1/lMxI0MVQ2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJchjB5AAoJEJykq7OBq3PIsEAH/1GrQHG/36Li4OIEPDMbsZs/
-11qVNUcRuX81sqvtrVb7OOjV970ImUCaAR2yIEi7b+nQzAFeWoauyoAlYa5mnOjr
-PYcrdVGMvLoH+H+hk3ghBGLoX6MlUfq2dV7xBHnY+05XBno4mYDE3unQTWTcmbPu
-ZfXBDMXr82N8V0uejN0ZMP20SkRMbFPbYPNNzks2EwlnCmFCb1AOCBodwGl7ESTh
-55WTfze71G0npOqxKWx5exR7rcO/d0M+hQ9eWzJb5GHOd8hTsdSYhQ4LQPtGAkpp
-Sntq0ZZX+lRoMHVALp1QOaT9PDmllfhpQzR2w/8Z7s3x6vkJPI1EpvR96kCI1AA=
-=6v3R
------END PGP SIGNATURE-----
-
---lEGEL1/lMxI0MVQ2--
+diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+index d9ba04bdfc..16683091c9 100644
+--- a/hw/net/pcnet.c
++++ b/hw/net/pcnet.c
+@@ -36,6 +36,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "hw/qdev.h"
+ #include "net/net.h"
+ #include "net/eth.h"
+@@ -1501,7 +1502,8 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_=
+t rap, uint32_t val)
+             val |=3D 0x0300;
+             break;
+         default:
+-            printf("Bad SWSTYLE=3D0x%02x\n", val & 0xff);
++            qemu_log_mask(LOG_GUEST_ERROR, "pcnet: Bad SWSTYLE=3D0x%02x\=
+n",
++                          val & 0xff);
+             val =3D 0x0200;
+             break;
+         }
+--=20
+2.20.1
