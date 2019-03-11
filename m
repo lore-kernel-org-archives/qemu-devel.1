@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43417)
+Received: from eggs.gnu.org ([209.51.188.92]:43455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h3GrV-0003kh-IJ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:04:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1h3Gra-0003pk-D8
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h3GrU-0005zb-Lq
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:04:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1h3GrZ-000661-B6
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:04:50 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 11 Mar 2019 10:03:05 +0100
-Message-Id: <20190311090322.21603-17-cohuck@redhat.com>
+Date: Mon, 11 Mar 2019 10:03:06 +0100
+Message-Id: <20190311090322.21603-18-cohuck@redhat.com>
 In-Reply-To: <20190311090322.21603-1-cohuck@redhat.com>
 References: <20190311090322.21603-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 16/33] s390x/tcg: Implement VECTOR LOAD VR
- ELEMENT FROM GR
+Subject: [Qemu-devel] [PULL 17/33] s390x/tcg: Implement VECTOR LOAD VR FROM
+ GRS DISJOINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,43 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-Very similar to VECTOR LOAD GR FROM VR ELEMENT, just the opposite
-direction. Also provide a fast path in case we don't care about the
-register content.
+Fairly easy, just load from to gprs into a single vector.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190307121539.12842-16-david@redhat.com>
+Message-Id: <20190307121539.12842-17-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 41 +++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ target/s390x/insn-data.def      | 2 ++
+ target/s390x/translate_vx.inc.c | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index ad8df5283cfd..68140612045e 100644
+index 68140612045e..bdd66758fa62 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1004,6 +1004,8 @@
-     F(0xe736, VLM,     VRS_a, V,   la2, 0, 0, 0, vlm, 0, IF_VEC)
- /* VECTOR LOAD TO BLOCK BOUNDARY */
+@@ -1006,6 +1006,8 @@
      F(0xe707, VLBB,    VRX,   V,   la2, 0, 0, 0, vlbb, 0, IF_VEC)
-+/* VECTOR LOAD VR ELEMENT FROM GR */
-+    F(0xe722, VLVG,    VRS_b, V,   la2, r3, 0, 0, vlvg, 0, IF_VEC)
+ /* VECTOR LOAD VR ELEMENT FROM GR */
+     F(0xe722, VLVG,    VRS_b, V,   la2, r3, 0, 0, vlvg, 0, IF_VEC)
++/* VECTOR LOAD VR FROM GRS DISJOINT */
++    F(0xe762, VLVGP,   VRR_f, V,   r2, r3, 0, 0, vlvgp, 0, IF_VEC)
  
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
-index f1eb45890201..287bd9627d34 100644
+index 287bd9627d34..abd33a9e3d96 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -471,3 +471,44 @@ static DisasJumpType op_vlbb(DisasContext *s, DisasOps *o)
-     tcg_temp_free_ptr(a0);
+@@ -512,3 +512,10 @@ static DisasJumpType op_vlvg(DisasContext *s, DisasOps *o)
+ 
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vlvg(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlvgp(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es = get_field(s->fields, m4);
-+    TCGv_ptr ptr;
-+
-+    if (es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    /* fast path if we don't need the register content */
-+    if (!get_field(s->fields, b2)) {
-+        uint8_t enr = get_field(s->fields, d2) & (NUM_VEC_ELEMENTS(es) - 1);
-+
-+        write_vec_element_i64(o->in2, get_field(s->fields, v1), enr, es);
-+        return DISAS_NEXT;
-+    }
-+
-+    ptr = tcg_temp_new_ptr();
-+    get_vec_element_ptr_i64(ptr, get_field(s->fields, v1), o->addr1, es);
-+    switch (es) {
-+    case ES_8:
-+        tcg_gen_st8_i64(o->in2, ptr, 0);
-+        break;
-+    case ES_16:
-+        tcg_gen_st16_i64(o->in2, ptr, 0);
-+        break;
-+    case ES_32:
-+        tcg_gen_st32_i64(o->in2, ptr, 0);
-+        break;
-+    case ES_64:
-+        tcg_gen_st_i64(o->in2, ptr, 0);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    tcg_temp_free_ptr(ptr);
-+
++    write_vec_element_i64(o->in1, get_field(s->fields, v1), 0, ES_64);
++    write_vec_element_i64(o->in2, get_field(s->fields, v1), 1, ES_64);
 +    return DISAS_NEXT;
 +}
 -- 
