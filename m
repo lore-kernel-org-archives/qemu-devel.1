@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59233)
+Received: from eggs.gnu.org ([209.51.188.92]:59362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h3O9S-00037v-3K
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:51:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1h3O9U-0003FI-RK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:51:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1h3O8K-0007gx-2V
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:50:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1h3O8I-0007fR-4L
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:50:35 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 11 Mar 2019 17:50:13 +0100
-Message-Id: <20190311165017.32247-7-kwolf@redhat.com>
+Date: Mon, 11 Mar 2019 17:50:12 +0100
+Message-Id: <20190311165017.32247-6-kwolf@redhat.com>
 In-Reply-To: <20190311165017.32247-1-kwolf@redhat.com>
 References: <20190311165017.32247-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/10] file-posix: Factor out
- raw_reconfigure_getfd()
+Subject: [Qemu-devel] [PATCH v2 05/10] file-posix: Fix bdrv_open_flags() for
+ snapshot=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +25,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
 
+Using a different read-only setting for bs->open_flags than for the
+flags to the driver's open function is just inconsistent and a bad idea.
+After this patch, the temporary snapshot keeps being opened read-only if
+read-only=3Don,snapshot=3Don is passed.
+
+If we wanted to change this behaviour to make only the orginal image
+file read-only, but the temporary overlay read-write (as the comment in
+the removed code suggests), that change would have to be made in
+bdrv_temp_snapshot_options() (where the comment suggests otherwise).
+
+Addressing this inconsistency before introducing dynamic auto-read-only
+is important because otherwise we would immediately try to reopen the
+temporary overlay even though the file is already unlinked.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 107 ++++++++++++++++++++++++++-------------------
- 1 file changed, 62 insertions(+), 45 deletions(-)
+ block.c                       | 7 -------
+ tests/qemu-iotests/051        | 7 +++++++
+ tests/qemu-iotests/051.out    | 9 +++++++++
+ tests/qemu-iotests/051.pc.out | 9 +++++++++
+ 4 files changed, 25 insertions(+), 7 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ba6ab62a38..ae57ba1fc6 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -842,6 +842,62 @@ static int raw_handle_perm_lock(BlockDriverState *bs=
-,
-     return ret;
+diff --git a/block.c b/block.c
+index 9b9d25e843..33804cdcaa 100644
+--- a/block.c
++++ b/block.c
+@@ -1163,13 +1163,6 @@ static int bdrv_open_flags(BlockDriverState *bs, i=
+nt flags)
+      */
+     open_flags &=3D ~(BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING | BDRV_O_PROTO=
+COL);
+=20
+-    /*
+-     * Snapshots should be writable.
+-     */
+-    if (flags & BDRV_O_TEMPORARY) {
+-        open_flags |=3D BDRV_O_RDWR;
+-    }
+-
+     return open_flags;
  }
 =20
-+static int raw_reconfigure_getfd(BlockDriverState *bs, int flags,
-+                                 int *open_flags, Error **errp)
-+{
-+    BDRVRawState *s =3D bs->opaque;
-+    int fd =3D -1;
-+    int ret;
-+    int fcntl_flags =3D O_APPEND | O_NONBLOCK;
-+#ifdef O_NOATIME
-+    fcntl_flags |=3D O_NOATIME;
-+#endif
-+
-+    *open_flags =3D 0;
-+    if (s->type =3D=3D FTYPE_CD) {
-+        *open_flags |=3D O_NONBLOCK;
-+    }
-+
-+    raw_parse_flags(flags, open_flags);
-+
-+#ifdef O_ASYNC
-+    /* Not all operating systems have O_ASYNC, and those that don't
-+     * will not let us track the state into rs->open_flags (typically
-+     * you achieve the same effect with an ioctl, for example I_SETSIG
-+     * on Solaris). But we do not use O_ASYNC, so that's fine.
-+     */
-+    assert((s->open_flags & O_ASYNC) =3D=3D 0);
-+#endif
-+
-+    if ((*open_flags & ~fcntl_flags) =3D=3D (s->open_flags & ~fcntl_flag=
-s)) {
-+        /* dup the original fd */
-+        fd =3D qemu_dup(s->fd);
-+        if (fd >=3D 0) {
-+            ret =3D fcntl_setfl(fd, *open_flags);
-+            if (ret) {
-+                qemu_close(fd);
-+                fd =3D -1;
-+            }
-+        }
-+    }
-+
-+    /* If we cannot use fcntl, or fcntl failed, fall back to qemu_open()=
- */
-+    if (fd =3D=3D -1) {
-+        const char *normalized_filename =3D bs->filename;
-+        ret =3D raw_normalize_devicepath(&normalized_filename, errp);
-+        if (ret >=3D 0) {
-+            assert(!(*open_flags & O_CREAT));
-+            fd =3D qemu_open(normalized_filename, *open_flags);
-+            if (fd =3D=3D -1) {
-+                error_setg_errno(errp, errno, "Could not reopen file");
-+                return -1;
-+            }
-+        }
-+    }
-+
-+    return fd;
-+}
-+
- static int raw_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-@@ -858,7 +914,6 @@ static int raw_reopen_prepare(BDRVReopenState *state,
+diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+index 3b50c7f188..151b850a8b 100755
+--- a/tests/qemu-iotests/051
++++ b/tests/qemu-iotests/051
+@@ -356,6 +356,13 @@ $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filte=
+r_qemu_io
+ # Using snapshot=3Don with a non-existent TMPDIR
+ TMPDIR=3D/nonexistent run_qemu -drive driver=3Dnull-co,snapshot=3Don
 =20
-     state->opaque =3D g_new0(BDRVRawReopenState, 1);
-     rs =3D state->opaque;
--    rs->fd =3D -1;
++# Using snapshot=3Don together with read-only=3Don
++echo "info block" |
++    run_qemu -drive file=3D"$TEST_IMG",snapshot=3Don,read-only=3Don,if=3D=
+none,id=3D$device_id |
++    _filter_qemu_io |
++    sed -e 's#"/[^"]*/vl\.[A-Za-z]\{6\}"#SNAPSHOT_PATH#g'
++
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
+index b900935fbc..9f1cf22608 100644
+--- a/tests/qemu-iotests/051.out
++++ b/tests/qemu-iotests/051.out
+@@ -458,4 +458,13 @@ read 4096/4096 bytes at offset 0
+ Testing: -drive driver=3Dnull-co,snapshot=3Don
+ QEMU_PROG: -drive driver=3Dnull-co,snapshot=3Don: Could not get temporar=
+y filename: No such file or directory
 =20
-     /* Handle options changes */
-     opts =3D qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-@@ -877,50 +932,12 @@ static int raw_reopen_prepare(BDRVReopenState *stat=
-e,
-      * bdrv_reopen_prepare() will detect changes and complain. */
-     qemu_opts_to_qdict(opts, state->options);
++Testing: -drive file=3DTEST_DIR/t.qcow2,snapshot=3Don,read-only=3Don,if=3D=
+none,id=3Ddrive0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"drive=
+r": "file", "filename": "TEST_DIR/t.qcow2"}}, "driver": "qcow2", "file": =
+{"driver": "file", "filename": SNAPSHOT_PATH}} (qcow2, read-only)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback, ignore flushes
++    Backing file:     TEST_DIR/t.qcow2 (chain depth: 1)
++(qemu) quit
++
+ *** done
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.ou=
+t
+index 8c5c735dfd..c4743cc31c 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -530,4 +530,13 @@ read 4096/4096 bytes at offset 0
+ Testing: -drive driver=3Dnull-co,snapshot=3Don
+ QEMU_PROG: -drive driver=3Dnull-co,snapshot=3Don: Could not get temporar=
+y filename: No such file or directory
 =20
--    if (s->type =3D=3D FTYPE_CD) {
--        rs->open_flags |=3D O_NONBLOCK;
--    }
--
--    raw_parse_flags(state->flags, &rs->open_flags);
--
--    int fcntl_flags =3D O_APPEND | O_NONBLOCK;
--#ifdef O_NOATIME
--    fcntl_flags |=3D O_NOATIME;
--#endif
--
--#ifdef O_ASYNC
--    /* Not all operating systems have O_ASYNC, and those that don't
--     * will not let us track the state into rs->open_flags (typically
--     * you achieve the same effect with an ioctl, for example I_SETSIG
--     * on Solaris). But we do not use O_ASYNC, so that's fine.
--     */
--    assert((s->open_flags & O_ASYNC) =3D=3D 0);
--#endif
--
--    if ((rs->open_flags & ~fcntl_flags) =3D=3D (s->open_flags & ~fcntl_f=
-lags)) {
--        /* dup the original fd */
--        rs->fd =3D qemu_dup(s->fd);
--        if (rs->fd >=3D 0) {
--            ret =3D fcntl_setfl(rs->fd, rs->open_flags);
--            if (ret) {
--                qemu_close(rs->fd);
--                rs->fd =3D -1;
--            }
--        }
--    }
--
--    /* If we cannot use fcntl, or fcntl failed, fall back to qemu_open()=
- */
--    if (rs->fd =3D=3D -1) {
--        const char *normalized_filename =3D state->bs->filename;
--        ret =3D raw_normalize_devicepath(&normalized_filename, errp);
--        if (ret >=3D 0) {
--            assert(!(rs->open_flags & O_CREAT));
--            rs->fd =3D qemu_open(normalized_filename, rs->open_flags);
--            if (rs->fd =3D=3D -1) {
--                error_setg_errno(errp, errno, "Could not reopen file");
--                ret =3D -1;
--            }
--        }
-+    rs->fd =3D raw_reconfigure_getfd(state->bs, state->flags, &rs->open_=
-flags,
-+                                   &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret =3D -1;
-+        goto out;
-     }
-=20
-     /* Fail already reopen_prepare() if we can't get a working O_DIRECT
++Testing: -drive file=3DTEST_DIR/t.qcow2,snapshot=3Don,read-only=3Don,if=3D=
+none,id=3Ddrive0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++drive0 (NODE_NAME): json:{"backing": {"driver": "qcow2", "file": {"drive=
+r": "file", "filename": "TEST_DIR/t.qcow2"}}, "driver": "qcow2", "file": =
+{"driver": "file", "filename": SNAPSHOT_PATH}} (qcow2, read-only)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback, ignore flushes
++    Backing file:     TEST_DIR/t.qcow2 (chain depth: 1)
++(qemu) quit
++
+ *** done
 --=20
 2.20.1
