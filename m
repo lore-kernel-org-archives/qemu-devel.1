@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42602)
+Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwY-0006jc-Gz
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:23 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mwb-0005vi-Cp
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MkQ-0006y6-Bp
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42982
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MkI-0006me-O8
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54526)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h3MkQ-0006xa-5o
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:50 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x2BFLnUI084261
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:49 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2r5sv21a8p-1
+	id 1h3MkI-0006iB-Bw
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:42 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x2BFGbkx073441
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:40 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5rh6p5c6-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:49 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:40 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 11 Mar 2019 15:21:46 -0000
+	Mon, 11 Mar 2019 15:21:38 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 11 Mar 2019 11:21:23 -0400
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1552317693-21979-6-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 05/15] s390-bios: Factor finding boot device
- out of virtio code path
+Date: Mon, 11 Mar 2019 11:21:18 -0400
+Message-Id: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,175 +37,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Make a new routine find_boot_device to locate the boot device for all
-cases, not just virtio.
+This is to support booting from vfio-ccw dasd devices. We basically implement
+the real hardware ipl procedure. This allows for booting Linux guests on
+vfio-ccw devices.
 
-The error message for the case where no boot device has been specified
-and a suitable boot device cannot be auto detected was specific to
-virtio devices. We update this message to remove virtio specific wording.
+vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
+channel programs dynamically modify themselves. Details on the ipl process and
+how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++++++----------------------
- tests/boot-serial-test.c |  2 +-
- 2 files changed, 47 insertions(+), 40 deletions(-)
+*********************
+NOTE: Newer DASD units which initially present as control unit type 3990 may in
+fact really be 2107. Some operating systems may enable 2107 features for these
+devices thereby making sense id return a control unit type of 2107. I've added
+support for control unit type 2107 so we can ipl from these devices.
+*********************
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 7e3f65e..5b2b941 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -55,17 +55,18 @@ unsigned int get_loadparm_index(void)
-  * NOTE: The global variable blk_schid is updated to contain the subchannel
-  * information.
-  */
--static bool find_dev(Schib *schib, int dev_no)
-+static bool find_subch(int dev_no)
- {
-+    Schib schib;
-     int i, r;
- 
-     for (i = 0; i < 0x10000; i++) {
-         blk_schid.sch_no = i;
--        r = stsch_err(blk_schid, schib);
-+        r = stsch_err(blk_schid, &schib);
-         if ((r == 3) || (r == -EIO)) {
-             break;
-         }
--        if (!schib->pmcw.dnv) {
-+        if (!schib.pmcw.dnv) {
-             continue;
-         }
- 
-@@ -77,7 +78,7 @@ static bool find_dev(Schib *schib, int dev_no)
-             continue;
-         }
- 
--        if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
-+        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
-             return true;
-         }
-     }
-@@ -133,56 +134,61 @@ static void boot_setup(void)
-     have_iplb = store_iplb(&iplb);
- }
- 
--static void virtio_setup(void)
-+static void find_boot_device(void)
- {
--    Schib schib;
--    int ssid;
--    bool found = false;
--    uint16_t dev_no;
-     VDev *vdev = virtio_get_device();
--    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
--
--    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+    int ssid;
-+    bool found;
- 
--    if (have_iplb) {
--        switch (iplb.pbt) {
--        case S390_IPL_TYPE_CCW:
--            dev_no = iplb.ccw.devno;
--            debug_print_int("device no. ", dev_no);
--            blk_schid.ssid = iplb.ccw.ssid & 0x3;
--            debug_print_int("ssid ", blk_schid.ssid);
--            found = find_dev(&schib, dev_no);
--            break;
--        case S390_IPL_TYPE_QEMU_SCSI:
--            vdev->scsi_device_selected = true;
--            vdev->selected_scsi_device.channel = iplb.scsi.channel;
--            vdev->selected_scsi_device.target = iplb.scsi.target;
--            vdev->selected_scsi_device.lun = iplb.scsi.lun;
--            blk_schid.ssid = iplb.scsi.ssid & 0x3;
--            found = find_dev(&schib, iplb.scsi.devno);
--            break;
--        default:
--            panic("List-directed IPL not supported yet!\n");
--        }
--        menu_setup();
--    } else {
-+    if (!have_iplb) {
-         for (ssid = 0; ssid < 0x3; ssid++) {
-             blk_schid.ssid = ssid;
--            found = find_dev(&schib, -1);
-+            found = find_subch(-1);
-             if (found) {
--                break;
-+                return;
-             }
-         }
-+        panic("Could not find a suitable boot device (none specified)\n");
-+    }
-+
-+    switch (iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        debug_print_int("device no. ", iplb.ccw.devno);
-+        blk_schid.ssid = iplb.ccw.ssid & 0x3;
-+        debug_print_int("ssid ", blk_schid.ssid);
-+        found = find_subch(iplb.ccw.devno);
-+        break;
-+    case S390_IPL_TYPE_QEMU_SCSI:
-+        vdev->scsi_device_selected = true;
-+        vdev->selected_scsi_device.channel = iplb.scsi.channel;
-+        vdev->selected_scsi_device.target = iplb.scsi.target;
-+        vdev->selected_scsi_device.lun = iplb.scsi.lun;
-+        blk_schid.ssid = iplb.scsi.ssid & 0x3;
-+        found = find_subch(iplb.scsi.devno);
-+        break;
-+    default:
-+        panic("List-directed IPL not supported yet!\n");
-     }
- 
--    IPL_assert(found, "No virtio device found");
-+    IPL_assert(found, "Boot device not found\n");
-+}
-+
-+static void virtio_setup(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
-+
-+    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+
-+    if (have_iplb) {
-+        menu_setup();
-+    }
- 
-     if (virtio_get_device_type() == VIRTIO_ID_NET) {
-         sclp_print("Network boot device detected\n");
-         vdev->netboot_start_addr = qipl.netboot_start_addr;
-     } else {
-         virtio_blk_setup_device(blk_schid);
--
-         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
-     }
- }
-@@ -192,8 +198,9 @@ int main(void)
-     sclp_setup();
-     css_setup();
-     boot_setup();
--    virtio_setup();
-+    find_boot_device();
- 
-+    virtio_setup();
-     zipl_load(); /* no return */
- 
-     panic("Failed to load OS from hard disk\n");
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 58a48f3..9daf2cb 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -112,7 +112,7 @@ static testdef_t tests[] = {
-     { "sparc", "SS-4", "", "MB86904" },
-     { "sparc", "SS-600MP", "", "TMS390Z55" },
-     { "sparc64", "sun4u", "", "UltraSPARC" },
--    { "s390x", "s390-ccw-virtio", "", "virtio device" },
-+    { "s390x", "s390-ccw-virtio", "", "device" },
-     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
-     { "microblaze", "petalogix-s3adsp1800", "", "TT",
-       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
--- 
+Changelog
+==========
+v4
+01/16: s390 vfio-ccw: Add bootindex property and IPLB data
+- Adding CCW_DEVTYPE_VIRTIO_NET type.
+- s390_get_ccw_device can now accept a NULL devtype argument
+- Other minor refactors
+
+06/16: s390-bios: Clean up cio.h
+- Remove whitespace changes to cmd_orb struct
+
+07/16: s390-bios: Decouple channel i/o logic from virtio
+- Fix copyright line
+
+08/16: s390-bios: Map low core memory
+- Remove Lowcore entries >= 0x200
+- Repositioned const keywords
+
+09/16: s390-bios: ptr2u32 and u32toptr
+- Add assert to ensure pointer being converted to u32 is below 32 bits in length
+- Add missing copyright comment
+
+10/16: s390-bios: Support for running format-0/1 channel programs
+- basic_sense now calls __do_cio instead of do_cio. Further protection from
+  infinite recursion.
+- __do_cio now asks for retry for subchannel busy case.
+- Minor fixups to comments and message wording
+- start.S: Formating and register naming cleanups
+- Added CU_TYPE_DASD_2107
+
+11/16: s390-bios: cio error handling
+- Only print sense data when it is provided
+
+15/16:
+- Added support for CU_TYPE_DASD_2107
+
+16/16:
+- Merged with various earlier patches
+
+Jason J. Herne (15):
+  s390 vfio-ccw: Add bootindex property and IPLB data
+  s390-bios: decouple cio setup from virtio
+  s390-bios: decouple common boot logic from virtio
+  s390-bios: Extend find_dev() for non-virtio devices
+  s390-bios: Factor finding boot device out of virtio code path
+  s390-bios: Clean up cio.h
+  s390-bios: Decouple channel i/o logic from virtio
+  s390-bios: Map low core memory
+  s390-bios: ptr2u32 and u32toptr
+  s390-bios: Support for running format-0/1 channel programs
+  s390-bios: cio error handling
+  s390-bios: Refactor virtio to run channel programs via cio
+  s390-bios: Use control unit type to determine boot method
+  s390-bios: Add channel command codes/structs needed for dasd-ipl
+  s390-bios: Support booting from real dasd device
+
+ MAINTAINERS                  |   2 +
+ docs/devel/s390-dasd-ipl.txt | 133 ++++++++++++++
+ hw/s390x/ipl.c               |  61 +++++--
+ hw/s390x/s390-ccw.c          |   9 +
+ hw/vfio/ccw.c                |   2 +-
+ include/hw/s390x/s390-ccw.h  |   1 +
+ include/hw/s390x/vfio-ccw.h  |  28 +++
+ pc-bios/s390-ccw/Makefile    |   2 +-
+ pc-bios/s390-ccw/cio.c       | 423 +++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/cio.h       | 270 +++++++++++++++++++++------
+ pc-bios/s390-ccw/dasd-ipl.c  | 250 +++++++++++++++++++++++++
+ pc-bios/s390-ccw/dasd-ipl.h  |  16 ++
+ pc-bios/s390-ccw/helper.h    |  31 ++++
+ pc-bios/s390-ccw/libc.h      |  11 ++
+ pc-bios/s390-ccw/main.c      | 161 ++++++++++------
+ pc-bios/s390-ccw/netboot.mak |   2 +-
+ pc-bios/s390-ccw/netmain.c   |   2 +
+ pc-bios/s390-ccw/s390-arch.h | 103 +++++++++++
+ pc-bios/s390-ccw/s390-ccw.h  |  10 +-
+ pc-bios/s390-ccw/start.S     |  29 +++
+ pc-bios/s390-ccw/virtio.c    |  73 ++------
+ tests/boot-serial-test.c     |   2 +-
+ 22 files changed, 1425 insertions(+), 196 deletions(-)
+ create mode 100644 docs/devel/s390-dasd-ipl.txt
+ create mode 100644 include/hw/s390x/vfio-ccw.h
+ create mode 100644 pc-bios/s390-ccw/cio.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+ create mode 100644 pc-bios/s390-ccw/helper.h
+ create mode 100644 pc-bios/s390-ccw/s390-arch.h
+
+--
 2.7.4
