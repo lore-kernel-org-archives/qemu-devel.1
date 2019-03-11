@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42203)
+Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1h3Mvp-0005vg-Fm
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:38 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1h3Mw1-0005vi-2i
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1h3Mqh-0001EV-LY
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:28:21 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1h3MnH-0007qR-0p
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:24:48 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Mon, 11 Mar 2019 15:24:33 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F202153AC7@dggema523-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
-	<CAEUhbmUtSAeznt1DCwJ7tS=YFeqwnYBemS6278=QQ60qs_MthA@mail.gmail.com>
-	<c9f69861058412a1f71418a9c892daf0821a9e33.camel@aisec.fraunhofer.de>
-	<CAEUhbmXjCqRRtNDqq5E5y60sDz+4=WqMuxFhaLndot7TSJuUiQ@mail.gmail.com>
-	<e131b4b0eb9109547ce0ed0993665206d6bf983a.camel@aisec.fraunhofer.de>
-In-Reply-To: <e131b4b0eb9109547ce0ed0993665206d6bf983a.camel@aisec.fraunhofer.de>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 11 Mar 2019 23:28:01 +0800
-Message-ID: <CAEUhbmX=PT-46nqtMqSaGn5xu2tRJ50Sm6kK7b97Xc_Y+6stPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
- compatible string to /soc/ node
+Subject: Re: [Qemu-devel] [RESEND PATCH] target/arm: change arch timer
+ registers access permission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +22,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
-Cc: "palmer@sifive.com" <palmer@sifive.com>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>, "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>, "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Lukas,
-
-On Mon, Mar 11, 2019 at 2:03 AM Auer, Lukas
-<lukas.auer@aisec.fraunhofer.de> wrote:
->
-> Hi Bin,
->
-> On Sun, 2019-03-10 at 22:57 +0800, Bin Meng wrote:
-> > Hi Lukas,
-> >
-> > On Sun, Mar 10, 2019 at 9:44 PM Auer, Lukas
-> > <lukas.auer@aisec.fraunhofer.de> wrote:
-> > > Hi Bin,
-> > >
-> > > On Sun, 2019-03-10 at 09:07 +0800, Bin Meng wrote:
-> > > > Hi Lukas,
-> > > >
-> > > > On Mon, Feb 11, 2019 at 6:13 AM Lukas Auer
-> > > > <lukas.auer@aisec.fraunhofer.de> wrote:
-> > > > > Re-add the previous compatible string "riscv-virtio-soc" to the
-> > > > > soc
-> > > > > device tree node to allow U-Boot and Linux to bind machine-
-> > > > > specific
-> > > > > drivers to it. The current compatible string "simple-bus" is
-> > > > > retained.
-> > > > >
-> > > > > This is required by U-Boot to bind devices early, as part of
-> > > > > the
-> > > > > pre-relocation driver model.
-> > > > >
-> > > >
-> > > > I see no problem with U-Boot working with current compatible
-> > > > string
-> > > > "simple-bus". In fact I had planned to remove the compatible
-> > > > string
-> > > > "riscv-virtio-soc" in U-Boot but did not get time to work on it.
-> > > >
-> > >
-> > > It is only required if U-Boot is running in machine-mode. For
-> > > relocation it needs to use the CLINT driver to send appropriate
-> > > IPIs to
-> > > the other harts. To be able to probe the driver, the device and its
-> > > parent device tree node (soc) must therefore be available in the
-> > > pre-
-> > > relocation device model.
-> > > This patch was the easiest way I could think of for achieving this.
-> > > It
-> > > could be that there is a better way of solving this.
-> > >
-> >
-> > I tested your SMP U-Boot series in both M-mode and S-mode, using a 4
-> > core 'virt' target. Works fine. I am using QEMU 3.1.0 so it is
-> > "simple-bus".
-> >
->
-> That is actually my fault, it should not work.
-> What is happening is that U-Boot fails to relocate the secondary harts,
-> because the CLINT driver cannot get the memory address of the CLINT
-> device. This error is currently silently ignored.
-
-I still don't understand. Why does the CLINT driver fail to get the
-memory address? U-Boot has been supporting "simpile-bus" for a long
-time. It was because QEMU 3.0.0 generated the /soc node with
-"riscv-virtio-soc" compatible string, U-Boot was taught to treat such
-compatible string as a "simple-bus" too (that was the U-Boot commit
-27dc2c130e29)
-
-> The secondary harts are still waiting to receive IPIs, so booting Linux
-> works fine, because U-Boot can now send IPIs. This will however break
-> if U-Boot overwrites the code the secondary harts are running, which
-> could happen when loading an image.
->
-> I will update my SMP U-Boot series to print a warning if sending an IPI
-> fails.
->
-
-Regards,
-Bin
+PiBIaSBQZXRlciwNCj4gICAgVGhhbmtzIGZvciB0aGUgcmV2aWV3Lg0KPiANCj4gPiA+DQo+ID4g
+PiBGcm9tOiBEb25naml1IEdlbmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+DQo+ID4gPg0KPiA+
+ID4gU29tZSBnZW5lcmljIGFyY2ggdGltZXIgcmVnaXN0ZXJzIGFyZSBDb25maWctUlcgaW4gdGhl
+IEVMMCwgd2hpY2gNCj4gPiA+IG1lYW5zIHRoZSBFTDAgZXhjZXB0aW9uIGxldmVsIGNhbiBoYXZl
+IHdyaXRlIHBlcm1pc3Npb24gaWYgaXQgaXMNCj4gPiA+IGFwcHJvcHJpYXRlbHkgY29uZmlndXJl
+ZC4NCj4gPiA+DQo+ID4gPiBXaGVuIFZNIGFjY2VzcyByZWdpc3RlcnMsIGl0IGZpcnN0bHkgY2hl
+Y2tzIHdoZXRoZXIgdGhleSBoYXZlIFJXDQo+ID4gPiBwZXJtaXNzaW9uLCB0aGVuIGNoZWNrIHdo
+ZXRoZXIgaXQgaXMgYXBwcm9wcmlhdGVseSBjb25maWd1cmVkLg0KPiA+ID4gSWYgdGhleSBhcmUg
+ZGVmaW5lZCB0byBSZWFkeSBvbmx5IGluIEVMMCwgZXZlbiB0aG91Z2ggdGhleSBoYXZlIGJlZW4N
+Cj4gPg0KPiA+ICJyZWFkIG9ubHkiID8NCj4gWWVzLCByZWFkIG9ubHkuDQo+IA0KPiA+DQo+ID4g
+PiBhcHByb3ByaWF0ZWx5IGNvbmZpZ3VyZWQsIHRoZXkgc3RpbGwgZG8gbm90IGhhdmUgd3JpdGUg
+cGVybWlzc2lvbi4NCj4gPiA+IFNvIG5lZWQgdG8gYWRkIHRoZSB3cml0ZSBwZXJtaXNzaW9uIGFj
+Y29yZGluZyB0byBBUk1WOCBzcGVjIHdoZW4NCj4gPiA+IGRlZmluZSBpdC4NCj4gPiA+DQo+ID4g
+PiBTaWduZWQtb2ZmLWJ5OiBEb25naml1IEdlbmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+DQo+
+ID4NCj4gPiBZZXMsIHRoaXMgc2VlbXMgdG8gYmUgYSBidWcgd2hpY2ggaGFzIGJlZW4gcHJlc2Vu
+dCBzaW5jZSBJIGFkZGVkIHRoZSBnZW5lcmljIHRpbWVyIHN1cHBvcnQgaW4gY29tbWl0IDU1ZDI4
+NGFmOGUzMWIgaW4gMjAxMy4NCj4gPg0KPiA+IEknbSBub3Qgc3VyZSB3aHkgdGhlIGJ1ZyBpcyB0
+aGVyZSAtLSBteSBiZXN0IGd1ZXNzIGlzIHRoYXQgSQ0KPiA+IGluY29ycmVjdGx5IGNvcGllZCB0
+aGUgcGVybWlzc2lvbiBmbGFncyBmcm9tIHRoZSBDTlRGUlEgcmVnaXN0ZXIgKHdoaWNoIHJlYWxs
+eSBpcyBSTyBmcm9tIFBMMCBidXQgUlcgZnJvbSBQTDEgYW5kIGFib3ZlKSB0byB0aGVzZSBvdGhl
+cg0KPiByZWdpc3RlcnMgd2hpY2ggc2hvdWxkIGJlIGZ1bGx5IFJXIGZyb20gUEwwLg0KPiANCj4g
+VGhlIGN1cnJlbnQgbG9naWMgaXMgc2hvdyBiZWxvd1sxXSwgaGFuZGxlX3N5cygpIHdpbGwgY2hl
+Y2sgd2hldGhlciB0aGUgc3lzdGVtIHJlZ2lzdGVyIGhhdmUgd3JpdGUgcGVybWlzc2lvbiBpbiBQ
+TDAsIGlmIGhhdmUsIHRoZW4gY2hlY2sNCj4gd2hldGhlciBJdCBoYXZlIGJlZW4gY29uZmlndXJl
+ZCBpbiB0aGUgaGlnaCBQTHggYnkgcmktPmFjY2Vzc2ZuKCkuDQoNClNvIElmIFFFTVUgZGVmaW5l
+ZCB0aGUgdGltZXIgcmVnaXN0ZXJzIHJlYWQgb25seSBpbiBQTDAsIGV2ZW4gdGhvdWdoIGl0IGhh
+cyBiZWVuIGNvbmZpZ3VyZWQgdG8gaGF2ZSB3cml0ZSBwZXJtaXNzaW9uIGluIFBMMCBieSBoaWdo
+IFBMeCwgd2Ugc3RpbGwgY2Fubm90IGhhdmUNCldyaXRlIHBlcm1pc3Npb24sIGJlY2F1c2UgUUVN
+VSB3aWxsIGZpcnN0bHkgY2hlY2sgdGhlIGRlZmluZWQgcGVybWlzc2lvbiBhbmQgdGhlbiBjaGVj
+ayB0aGUgY29uZmlndXJlZCBwZXJtaXNzaW9uIGJ5IGhpZ2ggUEx4Lg0KDQo+IA0KPiANCj4gWzFd
+Og0KPiBoYW5kbGVfc3lzKCkNCj4gICAgIC0tLS0tLT4gY3BfYWNjZXNzX29rKHMtPmN1cnJlbnRf
+ZWwsIHJpLCBpc3JlYWQpDQo+ICAgICAtLS0tLS0+IGdlbl9oZWxwZXJfYWNjZXNzX2NoZWNrX2Nw
+X3JlZygpDQo+ICAgICAgICAgICAgLS0tLS0+cmktPmFjY2Vzc2ZuKCkNCj4gDQo+IFsyXToNCj4g
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0NCj4gc3RhdGljIHZvaWQgaGFuZGxlX3N5cyhEaXNhc0NvbnRleHQgKnMsIHVpbnQzMl90
+IGluc24sIGJvb2wgaXNyZWFkLA0KPiAgICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGlu
+dCBvcDAsIHVuc2lnbmVkIGludCBvcDEsIHVuc2lnbmVkIGludCBvcDIsDQo+ICAgICAgICAgICAg
+ICAgICAgICAgICAgdW5zaWduZWQgaW50IGNybiwgdW5zaWduZWQgaW50IGNybSwgdW5zaWduZWQg
+aW50IHJ0KSB7DQo+IA0KPiAgICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgICAgICAvKiBDaGVj
+ayBhY2Nlc3MgcGVybWlzc2lvbnMgKi8NCj4gICAgIGlmICghY3BfYWNjZXNzX29rKHMtPmN1cnJl
+bnRfZWwsIHJpLCBpc3JlYWQpKSB7DQo+ICAgICAgICAgdW5hbGxvY2F0ZWRfZW5jb2Rpbmcocyk7
+DQo+ICAgICAgICAgcmV0dXJuOw0KPiAgICAgfQ0KPiANCj4gICAgIGlmIChyaS0+YWNjZXNzZm4p
+IHsNCj4gICAgICAgICAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4NCj4gICAgICAgICBn
+ZW5faGVscGVyX2FjY2Vzc19jaGVja19jcF9yZWcoY3B1X2VudiwgdG1wcHRyLCB0Y2dfc3luLCB0
+Y2dfaXNyZWFkKTsNCj4gICAgICAgICAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4NCj4g
+CX0NCj4gICAgIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4g
+fQ0KPiANCj4gDQo+IA0KPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9oZWxwZXIu
+YyBiL3RhcmdldC9hcm0vaGVscGVyLmMgaW5kZXgNCj4gPiA+IDI2MDdkMzkuLjNkYjk0YzYgMTAw
+NjQ0DQo+ID4gPiAtLS0gYS90YXJnZXQvYXJtL2hlbHBlci5jDQo+ID4gPiArKysgYi90YXJnZXQv
+YXJtL2hlbHBlci5jDQo+ID4gPiBAQCAtMjY2NSw3ICsyNjY1LDcgQEAgc3RhdGljIGNvbnN0IEFS
+TUNQUmVnSW5mbyBnZW5lcmljX3RpbWVyX2NwX3JlZ2luZm9bXSA9IHsNCj4gPiA+ICAgICAgLyog
+cGVyLXRpbWVyIGNvbnRyb2wgKi8NCj4gPiA+ICAgICAgeyAubmFtZSA9ICJDTlRQX0NUTCIsIC5j
+cCA9IDE1LCAuY3JuID0gMTQsIC5jcm0gPSAyLCAub3BjMSA9IDAsIC5vcGMyID0gMSwNCj4gPiA+
+ICAgICAgICAuc2VjdXJlID0gQVJNX0NQX1NFQ1NUQVRFX05TLA0KPiA+ID4gLSAgICAgIC50eXBl
+ID0gQVJNX0NQX0lPIHwgQVJNX0NQX0FMSUFTLCAuYWNjZXNzID0gUEwxX1JXIHwgUEwwX1IsDQo+
+ID4gPiArICAgICAgLnR5cGUgPSBBUk1fQ1BfSU8gfCBBUk1fQ1BfQUxJQVMsIC5hY2Nlc3MgPSBQ
+TDFfUlcgfCBQTDBfUlcsDQo+ID4NCj4gPiBUaGUgUEx4X3tSLFcsUld9IGNvbnN0YW50cyBhbGwg
+aW1wbHkgYWNjZXNzIGlzIGFsc28gcG9zc2libGUgZnJvbSB0aGUgaGlnaGVyIFBMcywgc28gdGhp
+cyBjYW4ganVzdCBiZSB3cml0dGVuICIuYWNjZXNzID0gUEwwX1JXIi4NCj4gDQo+IE9rLCBJIHdp
+bGwgdXNlcyB5b3VyIHN1Z2dlc3RlZCBtZXRob2QgYW5kIHRvIHNlZSB3aGV0aGVyIGl0IGNhbiBi
+ZSB3b3JrYWJsZS4NCj4gDQo+ID4NCj4gPiB0aGFua3MNCj4gPiAtLSBQTU0NCg==
