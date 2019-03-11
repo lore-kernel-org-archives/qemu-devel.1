@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42416)
+Received: from eggs.gnu.org ([209.51.188.92]:45576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1h3R5C-0007Yr-U8
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:59:35 -0400
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3RPI-0003Iq-RF
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:20:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1h3R5B-0007EL-37
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 15:59:33 -0400
-Date: Mon, 11 Mar 2019 20:59:25 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20190311195925.GA21327@angien.pipo.sk>
-References: <20190311165017.32247-1-kwolf@redhat.com>
-	<20190311165017.32247-11-kwolf@redhat.com>
-	<2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
+	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3ROy-0003EE-NR
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:20:01 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:16725 helo=smtp.ehu.eus)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+	id 1h3ROy-00039X-BO
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:20:00 -0400
+Date: Mon, 11 Mar 2019 20:20:01 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Message-ID: <20190311202001.GD9@59ca1d9b7985>
+References: <20190311201532.GA6@59ca1d9b7985>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2f72f4e8-879a-62a5-d131-8c6562bd4043@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] file-posix: Make auto-read-only
- dynamic
+In-Reply-To: <20190311201532.GA6@59ca1d9b7985>
+Subject: [Qemu-devel] [PATCH v5 4/9] qemu-binfmt-conf.sh: use the same
+ presentation format as for qemu-*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, eblake@redhat.com
 
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+---
+ scripts/qemu-binfmt-conf.sh | 63 +++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index ad9ae731a0..35f61d9a6c 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -167,47 +167,48 @@ qemu_get_family() {
 
-On Mon, Mar 11, 2019 at 12:26:08 -0500, Eric Blake wrote:
-> On 3/11/19 11:50 AM, Kevin Wolf wrote:
-> > Until now, with auto-read-only=3Don we tried to open the file read-write
-> > first and if that failed, read-only was tried. This is actually not good
-> > enough for libvirt, which gives QEMU SELinux permissions for read-write
-> > only as soon as it actually intends to write to the image. So we need to
-> > be able to switch between read-only and read-write at runtime.
-> >=20
-> > This patch makes auto-read-only dynamic, i.e. the file is opened
-> > read-only as long as no user of the node has requested write
-> > permissions, but it is automatically reopened read-write as soon as the
-> > first writer is attached. Conversely, if the last writer goes away, the
-> > file is reopened read-only again.
-> >=20
-> > bs->read_only is no longer set for auto-read-only=3Don files even if the
-> > file descriptor is opened read-only because it will be transparently
-> > upgraded as soon as a writer is attached. This changes the output of
-> > qemu-iotests 232.
->=20
-> auto-read-only was introduced in 3.1, at which point we intentionally
-> had sufficiently loose wording to permit (but not require) dynamic state
-> checking; so you are not breaking the interface.  On the other hand, is
-> libvirt going to have problems introspecting whether it can use
-> auto-read-only and get the dynamic behavior it needs?  Or is there
-> enough else in the way of libvirt's switch to -blockdev that it won't
-> attempt anything that needs auto-read-only without other 4.0 interfaces
-> anyway, at which point detecting the presence of the field (but not
-> whether the field has a guarantee of dynamic behavior) on 3.1 doesn't
-> matter?
+ usage() {
+     cat <<EOF
+-Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential][--exportdir PATH]
+-                           [--persistent][--qemu-suffix SUFFIX]
++Usage: qemu-binfmt-conf.sh [options]
 
-I think we can use Stefan's capability detection mechanism he introduced
-for the migration with cache enabled for local files to add a flag for
-this as well.
+-       Configure binfmt_misc to use qemu interpreter
++Configure binfmt_misc to use qemu interpreter
 
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
+-       --help:        display this usage
+-       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+-       --qemu-suffix: add a suffix to the default interpreter name
+-       --debian:      don't write into /proc,
+-                      instead generate update-binfmts templates
+-       --systemd:     don't write into /proc,
+-                      instead generate file for systemd-binfmt.service
+-                      for the given CPU. If CPU is "ALL", generate a
+-                      file for all known cpus
+-       --exportdir:   define where to write configuration files
+-                      (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if present, credential and security tokens are
+-                      calculated according to the binary to interpret
+-                      ($QEMU_CREDENTIAL=yes)
+-       --persistent:  if present, the interpreter is loaded when binfmt is
+-                      configured and remains in memory. All future uses
+-                      are cloned from the open file.
+-                      ($QEMU_PERSISTENT=yes)
++Options and associated environment variables:
 
------BEGIN PGP SIGNATURE-----
+-    To import templates with update-binfmts, use :
++Argument             Env-variable     Description
++-h|--help                             display this usage
++-Q|--qemu-path PATH  QEMU_PATH        set path to qemu interpreter
++-F|--qemu-suffix SUFFIX               add a suffix to the default interpreter name
++-p|--persistent      QEMU_PERSISTENT  (yes) load the interpreter and keep it in memory; all future
++                                      uses are cloned from the open file.
++-c|--credential      QEMU_CREDENTIAL  (yes) credential and security tokens are calculated according
++                                      to the binary to interpret
++-e|--exportdir PATH  DEBIANDIR        define where to write configuration files
++                     SYSTEMDDIR
++-s|--systemd CPU                      don't write into /proc, generate file for
++                                      systemd-binfmt.service for the given CPU; if CPU is "ALL",
++                                      generate a file for all known cpus.
++-d|--debian                           don't write into /proc, generate update-binfmts templates
 
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlyGvhoACgkQHGwCByjY
-1GooUw//QvNCmmf8Q2thJvcxD/6tWsMcOHg2f/iNtK4qAW0DqXr4lfW5HuwQPHYG
-YpNC61Ly+3mjxcFQ0OhHXxGUygOpzyvKg4uu5c3OCqi/pVCUwoMILjqkm+lLzSu0
-I03LhGSyiZ0SpeHPuu74/NHjWiGsObtrnCyzHrLnvi0zowWLfJ6fuBwwcYIMJ40I
-pDU/BvNm6UygxSOcwJh4bE29OJkcZs05vjIpGB0IjZ9QZOHfIT3X611QoCMQwBOr
-CdtwMjmUTkAGs829pPO1MnXFDDSMYvrhWL6nigxw5MtXfcBbTFu8+wl2ebHXSR3V
-Kvj/sqPizyCEwNYRbUUZzYvilVxvUjGX7IScptV9ZjBR4jlXwviaiP4eM8SVCXFd
-UcMLzISGdcBzqdrgTa7F4nO2kJ8f9MPGg3V7mDz2XfOQPxfUki3oelsML4g86Kr2
-Y+wmULiTzw9AuD1y+Ad2gCZy+Fw9W997fwo8Ys131OvaTd6NwVv+gXwVC9n020QB
-OghzrwqQw/5BO3JXdYowm+8TX0H8IzMRosQxTgQlGCGy4iRH/KxSsOYPX3f1JkG6
-kPjH7vp/Sq/IZ4GOvBfhLXO4r/jws542lCZzhviREyuegN/tJcJsr07sy622u9HQ
-yu+ULbovmFJM09y4zXfVOMrr6CtlEc9tu98ENfGpUE4lw8VQK+s=
-=ytGU
------END PGP SIGNATURE-----
+-        sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
++Defaults:
++QEMU_PATH=$QEMU_PATH
++QEMU_PERSISTENT=$QEMU_PERSISTENT
++QEMU_CREDENTIAL=$QEMU_CREDENTIAL
 
---9amGYk9869ThD9tj--
+-    To remove interpreter, use :
++To import templates with update-binfmts, use :
+
+-        sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
++    sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
+
+-    With systemd, binfmt files are loaded by systemd-binfmt.service
++To remove interpreter, use :
+
+-    The environment variable HOST_ARCH allows to override 'uname' to generate
+-    configuration files for a different architecture than the current one.
++    sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+
+-    where CPU is one of:
++With systemd, binfmt files are loaded by systemd-binfmt.service
+
+-        $qemu_target_list
++The environment variable HOST_ARCH allows to override 'uname' to generate configuration files for a
++different architecture than the current one.
++
++where CPU is one of:
++
++    $qemu_target_list
+
+ EOF
+ }
+--
+2.21.0
