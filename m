@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51730)
+Received: from eggs.gnu.org ([209.51.188.92]:51767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h39FO-00075s-W5
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:56:55 -0400
+	(envelope-from <philmd@redhat.com>) id 1h39FU-0007AZ-S9
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h39FK-000783-UO
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:56:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60422)
+	(envelope-from <philmd@redhat.com>) id 1h39FU-0007Ci-3F
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h39FH-000750-4v
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:56:49 -0400
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h39FT-0007Bh-S5
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 20:57:00 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 11 Mar 2019 01:56:13 +0100
-Message-Id: <20190311005618.19007-3-philmd@redhat.com>
+Date: Mon, 11 Mar 2019 01:56:14 +0100
+Message-Id: <20190311005618.19007-4-philmd@redhat.com>
 In-Reply-To: <20190311005618.19007-1-philmd@redhat.com>
 References: <20190311005618.19007-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/7] hw/mips: Express dependencies of the
- Jazz machine with Kconfig
+Subject: [Qemu-devel] [PATCH v3 3/7] hw/mips: Express dependencies of the
+ r4k platform with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +30,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
-framebuffer display is managed by a G364, the network card is a Sonic
-DP83932. A QLogic ESP216 provides a SCSI bus.
+This platform use standard PC devices connected to an ISA bus.
+Networking is provided by a ne2000 chipset.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v3: Keep CONFIG_JAZZ in default-configs/mips64el-softmmu.mak (Thomas)
+v3: remove CONFIG_NE2000_ISA (Thomas)
+    add PFLASH_CFI01
 ---
  default-configs/mips-softmmu-common.mak |  1 -
- default-configs/mips64-softmmu.mak      |  5 -----
- default-configs/mips64el-softmmu.mak    |  5 -----
- hw/mips/Kconfig                         | 17 +++++++++++++++++
- 4 files changed, 17 insertions(+), 11 deletions(-)
+ hw/mips/Kconfig                         | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mi=
 ps-softmmu-common.mak
-index 8c5fdf5ee1..caebafd416 100644
+index caebafd416..2ca57bfee1 100644
 --- a/default-configs/mips-softmmu-common.mak
 +++ b/default-configs/mips-softmmu-common.mak
-@@ -3,7 +3,6 @@
- CONFIG_ISA_BUS=3Dy
- CONFIG_PCI=3Dy
- CONFIG_PCI_DEVICES=3Dy
--CONFIG_ESP=3Dy
- CONFIG_VGA_ISA=3Dy
- CONFIG_VGA_ISA_MM=3Dy
- CONFIG_VGA_CIRRUS=3Dy
-diff --git a/default-configs/mips64-softmmu.mak b/default-configs/mips64-=
-softmmu.mak
-index bad7496672..a169738635 100644
---- a/default-configs/mips64-softmmu.mak
-+++ b/default-configs/mips64-softmmu.mak
-@@ -1,9 +1,4 @@
- # Default configuration for mips64-softmmu
-=20
- include mips-softmmu-common.mak
--CONFIG_RC4030=3Dy
--CONFIG_DP8393X=3Dy
--CONFIG_DS1225Y=3Dy
- CONFIG_JAZZ=3Dy
--CONFIG_G364FB=3Dy
--CONFIG_JAZZ_LED=3Dy
-diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips6=
-4el-softmmu.mak
-index 8b255efc54..a7b88318b2 100644
---- a/default-configs/mips64el-softmmu.mak
-+++ b/default-configs/mips64el-softmmu.mak
-@@ -2,13 +2,8 @@
-=20
- include mips-softmmu-common.mak
- CONFIG_IDE_VIA=3Dy
--CONFIG_RC4030=3Dy
--CONFIG_DP8393X=3Dy
--CONFIG_DS1225Y=3Dy
- CONFIG_FULONG=3Dy
- CONFIG_JAZZ=3Dy
--CONFIG_G364FB=3Dy
--CONFIG_JAZZ_LED=3Dy
- CONFIG_VT82C686=3Dy
- CONFIG_AHCI=3Dy
- CONFIG_MIPS_BOSTON=3Dy
+@@ -24,7 +24,6 @@ CONFIG_I8257=3Dy
+ CONFIG_PIIX4=3Dy
+ CONFIG_IDE_ISA=3Dy
+ CONFIG_IDE_PIIX=3Dy
+-CONFIG_NE2000_ISA=3Dy
+ CONFIG_PFLASH_CFI01=3Dy
+ CONFIG_I8259=3Dy
+ CONFIG_MC146818RTC=3Dy
 diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index 3433e97e1a..ab006477c7 100644
+index ab006477c7..5678c9cf15 100644
 --- a/hw/mips/Kconfig
 +++ b/hw/mips/Kconfig
-@@ -12,6 +12,23 @@ config MIPSSIM
-=20
- config JAZZ
+@@ -1,5 +1,16 @@
+ config R4K
      bool
 +    select ISA_BUS
-+    select RC4030
++    select SERIAL_ISA
 +    select I8259
 +    select I8254
-+    select I8257
-+    select PCSPK
-+    select VGA_ISA_MM
-+    select G364FB
-+    select DP8393X
-+    select ESP
-+    select FDC
 +    select MC146818RTC
++    select VGA_ISA
++    select NE2000_ISA
++    select IDE_ISA
++    # I8042
 +    select PCKBD
-+    select SERIAL
-+    select PARALLEL
-+    select DS1225Y
-+    select JAZZ_LED
++    select PFLASH_CFI01
 =20
- config FULONG
+ config MALTA
      bool
 --=20
 2.20.1
