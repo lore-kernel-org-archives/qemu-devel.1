@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44960)
+Received: from eggs.gnu.org ([209.51.188.92]:50981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h3Gvg-00078K-9o
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:09:05 -0400
+	(envelope-from <slp@redhat.com>) id 1h3HCk-0005oR-JC
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:26:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1h3Gve-0000mW-UP
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:09:04 -0400
-Received: from mga01.intel.com ([192.55.52.88]:45219)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1h3Gve-0000hH-IQ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:09:02 -0400
-From: "Zhang, Chen" <chen.zhang@intel.com>
-Date: Mon, 11 Mar 2019 09:08:50 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D7806073764@shsmsx102.ccr.corp.intel.com>
-References: <20190303145021.2962-1-chen.zhang@intel.com>
-	<20190303145021.2962-5-chen.zhang@intel.com>
-	<87ef7g2d16.fsf@dusky.pond.sub.org>
-In-Reply-To: <87ef7g2d16.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <slp@redhat.com>) id 1h3HCj-0007VR-HD
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:26:42 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:42837)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1h3HCj-0007Ts-8g
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:26:41 -0400
+Received: by mail-wr1-f48.google.com with SMTP id o9so4191630wrv.9
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 02:26:40 -0700 (PDT)
+From: Sergio Lopez <slp@redhat.com>
+Date: Mon, 11 Mar 2019 10:26:37 +0100
+Message-ID: <871s3dg3si.fsf@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH V3 4/7] Migration/colo.c: Add new
- COLOExitReason to handle all failover state
+Content-Type: text/plain
+Subject: [Qemu-devel] Flatview rendering scalability issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,183 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
+Hi,
 
------Original Message-----
-From: Markus Armbruster [mailto:armbru@redhat.com]=20
-Sent: Sunday, March 10, 2019 1:06 AM
-To: Zhang, Chen <chen.zhang@intel.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>; Zhang Chen <zhangckid@gmail.com>=
-; Dr. David Alan Gilbert <dgilbert@redhat.com>; Juan Quintela <quintela@red=
-hat.com>; zhanghailiang <zhang.zhanghailiang@huawei.com>; Eric Blake <eblak=
-e@redhat.com>; qemu-dev <qemu-devel@nongnu.org>; Zhang, Chen <chen.zhang@in=
-tel.com>
-Subject: Re: [Qemu-devel] [PATCH V3 4/7] Migration/colo.c: Add new COLOExit=
-Reason to handle all failover state
+Thanks to Q35/PCIe, we can now assign a large number of PCI devices to a
+single VM, but it seems that Flatview rendering scales poorly (worse
+than linear) when it has to deal with a large number of Memory Regions.
 
-Zhang Chen <chen.zhang@intel.com > writes:
+I've measured to cost of the pci_default_write_config() call at
+virtio_write_config() for 1 PCI device vs. 100 PCI devices:
 
-> From: Zhang Chen <chen.zhang@intel.com>
->
-> In this patch we add the processing state for COLOExitReason, because=20
-> we have to identify COLO in the failover processing state or failover=20
-> error state. In the way, we can handle all the failover state.
-> We have improved the description of the COLOExitReason by the way.
->
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->  migration/colo.c    | 24 +++++++++++++-----------
->  qapi/migration.json | 15 +++++++++------
->  2 files changed, 22 insertions(+), 17 deletions(-)
->
-> diff --git a/migration/colo.c b/migration/colo.c index=20
-> 89325952c7..dbe2b88807 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -267,7 +267,11 @@ COLOStatus *qmp_query_colo_status(Error **errp)
-       switch (failover_get_state()) {
+ - 1 PCI device
 
-failover_get_state() returns FailoverStatus, i.e. one of FAILOVER_STATUS_NO=
-NE, _REQUIRE, _ACTIVE, _COMPLETED, _RELAUNCH.
+write_config: 1879 us
+write_config: 1037 us
+write_config: 1 us
+write_config: 3 us
+write_config: 1783 us
+write_config: 2652 us
+write_config: 1 us
+write_config: 2 us
+write_config: 1551 us
 
-Yes, have any concern here?
+ - 100 PCI devices
 
-       case FAILOVER_STATUS_NONE:
-           s->reason =3D COLO_EXIT_REASON_NONE;
-           break;
-       case FAILOVER_STATUS_REQUIRE:
->          s->reason =3D COLO_EXIT_REASON_REQUEST;
->          break;
->      default:
-> -        s->reason =3D COLO_EXIT_REASON_ERROR;
-> +        if (migration_in_colo_state()) {
-> +            s->reason =3D COLO_EXIT_REASON_PROCESSING;
-> +        } else {
-> +            s->reason =3D COLO_EXIT_REASON_ERROR;
-> +        }
->      }
-> =20
->      return s;
+write_config: 503963 us
+write_config: 1 us
+write_config: 493344 us
+write_config: 0 us
+write_config: 472946 us
+write_config: 1 us
+write_config: 495175 us
+write_config: 1 us
+write_config: 519312 us
+write_config: 1 us
 
-In which FailoverStatus can migration_in_colo_state() return true?
+I guess this is a consequence of having to reset/rebuild the Flatview
+when altering the PCI BAR regions.
 
-It is no close connection about the FailoverStatus,  except the "FAILOVER_S=
-TATUS_REQUIRE",=20
-other status still have the possibility be triggered here , if migration_in=
-_colo_state() return true means
-we still in COLO failover process, otherwise means we have exit COLO with s=
-ome failover error.
+Is this a known issue we're already working on?
 
-> @@ -579,16 +583,13 @@ out:
-       /*
-        * There are only two reasons we can get here, some error happened
->       * or the user triggered failover.
->       */
->      switch (failover_get_state()) {
-> -    case FAILOVER_STATUS_NONE:
-> -        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> -                                  COLO_EXIT_REASON_ERROR);
-> -        break;
->      case FAILOVER_STATUS_COMPLETED:
->          qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
->                                    COLO_EXIT_REASON_REQUEST);
->          break;
->      default:
-> -        abort();
-> +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> +                                  COLO_EXIT_REASON_ERROR);
->      }
-> =20
->      /* Hope this not to be too long to wait here */
-
-Change of behavior for FAILOVER_STATUS_REQUIRE, _ACTIVE, _COMPLETED,
-_RELAUNCH: send a COLO_EXIT event instead of calling abort().  Why?
-
-Because if COLO occur failover error, we want to make the VM back to normal=
- running status rather than just crash VM.
-
-
-> @@ -850,17 +851,18 @@ out:
->          error_report_err(local_err);
->      }
-> =20
-> +    /*
-> +     * There are only two reasons we can get here, some error happened
-> +     * or the user triggered failover.
-> +     */
->      switch (failover_get_state()) {
-> -    case FAILOVER_STATUS_NONE:
-> -        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> -                                  COLO_EXIT_REASON_ERROR);
-> -        break;
->      case FAILOVER_STATUS_COMPLETED:
->          qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
->                                    COLO_EXIT_REASON_REQUEST);
->          break;
->      default:
-> -        abort();
-> +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> +                                  COLO_EXIT_REASON_ERROR);
->      }
-> =20
->      if (fb) {
-
-Same question.
-
-> diff --git a/qapi/migration.json b/qapi/migration.json index=20
-> 7a795ecc16..089ed67807 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -983,19 +983,22 @@
->  ##
->  # @COLOExitReason:
->  #
-> -# The reason for a COLO exit
-> +# Describe the reason for COLO exit.
-
-The old text was better.
-
-OK, I will remove it.
-
->  #
-> -# @none: no failover has ever happened. This can't occur in the -#=20
-> COLO_EXIT event, only in the result of query-colo-status.
-> +# @none: failover has never happened. This state does not occur # in=20
-> +the COLO_EXIT event, and is only visible in the result of #=20
-> +query-colo-status.
-
-This might be a small improvment.
-
->  #
-> -# @request: COLO exit is due to an external request
-> +# @request: COLO exit caused by an external request.
->  #
-> -# @error: COLO exit is due to an internal error
-> +# @error: COLO exit caused by an internal error.
-
-I like the old text better.
-
-Sorry, I'm not a native speaker.
-I will remove it in next version.
-
-> +#
-> +# @processing: COLO is currently handling a failover (since 4.0).
->  #
->  # Since: 3.1
->  ##
->  { 'enum': 'COLOExitReason',
-> -  'data': [ 'none', 'request', 'error' ] }
-> +  'data': [ 'none', 'request', 'error' , 'processing' ] }
-> =20
->  ##
->  # @x-colo-lost-heartbeat:
-
-The patch conflates addition of a new member with doc improvements.
-Tolerable since both are small.
-
-Yes, Just tiny fix...
-
-Thanks
-Zhang Chen
+Thanks,
+Sergio (slp).
