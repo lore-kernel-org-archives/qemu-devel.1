@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60580)
+Received: from eggs.gnu.org ([209.51.188.92]:60618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODJ-0006mi-7W
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:45 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODM-0006qS-Lt
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODI-0002pu-Gg
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:45 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:40368)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODJ-0002rC-OO
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:46 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:35246)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h3ODI-0002pD-7R
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:44 -0400
-Received: by mail-wr1-x436.google.com with SMTP id t6so5931326wrw.7
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:55:44 -0700 (PDT)
+	id 1h3ODJ-0002qE-G6
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:45 -0400
+Received: by mail-wm1-x332.google.com with SMTP id y15so5067570wma.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:55:45 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 11 Mar 2019 17:55:08 +0100
-Message-Id: <1552323335-46779-5-git-send-email-pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 17:55:09 +0100
+Message-Id: <1552323335-46779-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 04/31] tests: test-qgraph: fix a memory leak
+Subject: [Qemu-devel] [PULL v2 05/31] hw/i386/pc: run the multiboot loader
+ before the PVH loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +29,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Li Qiang <liq3ea@163.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Li Qiang <liq3ea@163.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Spotted by ASAN when 'make check'.
+Some multiboot images could be in the ELF format. In the current
+implementation QEMU fails because we try to load these images
+as a PVH image.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-Id: <20190310160227.103090-1-liq3ea@163.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Fixes: fc281c80202
+In order to fix this issue, we should try multiboot first (we
+already check the multiboot magic header before to load it).
+If it is not a multiboot image, we can try the PVH loader.
+
+Fixes: ab969087da6 ("pvh: Boot uncompressed kernel using direct boot ABI", 2019-01-15)
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20190214180216.246707-1-sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/test-qgraph.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/i386/pc.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
-index f6a6565..5c7e457 100644
---- a/tests/test-qgraph.c
-+++ b/tests/test-qgraph.c
-@@ -122,7 +122,7 @@ static void check_driver(const char *driver)
- static void check_test(const char *test, const char *interface)
- {
-     QOSGraphEdge *edge;
--    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
-+    char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4212818..9c8f833 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1210,6 +1210,17 @@ static void load_linux(PCMachineState *pcms,
+         protocol = lduw_p(header+0x206);
+     } else {
+         /*
++         * This could be a multiboot kernel. If it is, let's stop treating it
++         * like a Linux kernel.
++         * Note: some multiboot images could be in the ELF format (the same of
++         * PVH), so we try multiboot first since we check the multiboot magic
++         * header before to load it.
++         */
++        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
++                           kernel_cmdline, kernel_size, header)) {
++            return;
++        }
++        /*
+          * Check if the file is an uncompressed kernel file (ELF) and load it,
+          * saving the PVH entry point used by the x86/HVM direct boot ABI.
+          * If load_elfboot() is successful, populate the fw_cfg info.
+@@ -1262,12 +1273,6 @@ static void load_linux(PCMachineState *pcms,
  
-     qos_add_test(test, interface, testfunct, NULL);
-     g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
-@@ -138,6 +138,7 @@ static void check_test(const char *test, const char *interface)
-     g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
-     qos_graph_node_set_availability(full_name, FALSE);
-     g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
-+    g_free(full_name);
- }
+             return;
+         }
+-        /* This looks like a multiboot kernel. If it is, let's stop
+-           treating it like a Linux kernel. */
+-        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+-                           kernel_cmdline, kernel_size, header)) {
+-            return;
+-        }
+         protocol = 0;
+     }
  
- static void count_each_test(QOSGraphNode *path, int len)
 -- 
 1.8.3.1
