@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60554)
+Received: from eggs.gnu.org ([209.51.188.92]:60568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODH-0006l3-WD
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:44 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODI-0006lm-H0
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODH-0002ot-9b
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:43 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:40365)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1h3ODH-0002p9-K1
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:44 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:38539)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1h3ODH-0002oQ-1k
+	id 1h3ODH-0002od-Bw
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 12:55:43 -0400
-Received: by mail-wr1-x433.google.com with SMTP id t6so5931268wrw.7
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:55:42 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id a188so5017216wmf.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 09:55:43 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	e12sm6484836wrs.91.2019.03.11.09.55.39 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 11 Mar 2019 09:55:39 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 11 Mar 2019 17:55:07 +0100
-Message-Id: <1552323335-46779-4-git-send-email-pbonzini@redhat.com>
+Date: Mon, 11 Mar 2019 17:55:06 +0100
+Message-Id: <1552323335-46779-3-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
 References: <1552323335-46779-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL v2 03/31] riscv/Kconfig: enable PCI_DEVICES
+Subject: [Qemu-devel] [PULL v2 02/31] vfio-pci: enable by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +32,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Abdurachmanov <david.abdurachmanov@gmail.com>
 
-From: David Abdurachmanov <david.abdurachmanov@gmail.com>
+CONFIG_VFIO_PCI was not "default y" - and once you do that, it is also
+important to disable it if PCI is not there.
 
-Re-enable PCI_DEVICES for RISC-V.
-The patch is based on other <arch>/Kconfig.
-
-Signed-off-by: David Abdurachmanov <david.abdurachmanov@gmail.com>
-Fixes: 82a230d5a303 ("riscv-softmmu.mak: replace CONFIG_* with Kconfig "select" directives")
-Message-Id: <20190311091256.18385-1-david.abdurachmanov@gmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reported-by: Alex Williamson <alex.williamson@redhat.com>
+Tested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/riscv/Kconfig | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/vfio/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index e0ee304..8c7fc1f 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -26,6 +26,9 @@ config SPIKE
+diff --git a/hw/vfio/Kconfig b/hw/vfio/Kconfig
+index ebda9fd..34da2a3 100644
+--- a/hw/vfio/Kconfig
++++ b/hw/vfio/Kconfig
+@@ -4,8 +4,9 @@ config VFIO
  
- config RISCV_VIRT
+ config VFIO_PCI
      bool
-+    imply PCI_DEVICES
-+    imply TEST_DEVICES
-+    select PCI
-     select HART
-     select SERIAL
-     select VIRTIO_MMIO
++    default y
+     select VFIO
+-    depends on LINUX
++    depends on LINUX && PCI
+ 
+ config VFIO_CCW
+     bool
 -- 
 1.8.3.1
