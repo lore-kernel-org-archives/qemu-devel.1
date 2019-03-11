@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59781)
+Received: from eggs.gnu.org ([209.51.188.92]:59884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3GNU-0001pJ-80
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1h3GNT-0001v7-4k
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1h3GEt-0000t3-UE
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:24:53 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 11 Mar 2019 16:24:39 +0800
-Message-ID: <1552292679-19173-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <kraxel@redhat.com>) id 1h3GGT-00024s-A1
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:26:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1h3GGR-00022L-EC
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 04:26:28 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 89AD93DE1C
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:26:25 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 11 Mar 2019 09:26:14 +0100
+Message-Id: <20190311082619.17966-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/arm: change arch timer registers access
- permission
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/5] Ui 20190311 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,165 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Some generic arch timer registers are Config-RW in the EL0,
-which means the EL0 exception level can have write permission
-if it is appropriately configured.
+The following changes since commit e2a18635a400b0e68679614132e9ef63161055=
+90:
 
-When VM access registers, it firstly checks whether they have RW
-permission, then check whether it is appropriately configured.
-If they are defined to Ready only in EL0, even though they have been
-appropriately configured, they still do not have write permission.
-So need to add the write permission according to ARMV8 spec when
-define it.
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-03-08' i=
+nto staging (2019-03-09 20:55:44 +0000)
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-When kernel or Hypervisor configures the timer registers to RW in EL0
-user space, it will still have below panic when EL0 user space access
-the timer registers.
+are available in the Git repository at:
 
-[INFO ]@(el0_sync:60): UNIMPLEMENTED, esr=2000000
-[INFO ]@(unimpl_exception:88): KERNEL UNIMPLEMENTED EXCEPTION
-[INFO ]@(unimpl_exception:98): FAR=0000000000000000, ESR=02000000 (EC=0x0, IL=0x1, ISS=0x0)
-[INFO ]@(dump_registers:64): KERNEL REGISTERS
-[INFO ]@(dump_registers:68): X0=00000000f52b7d50 X1=00000000040d5040
-[INFO ]@(dump_registers:68): X2=0000004000033e10 X3=0000000000000000
-[INFO ]@(dump_registers:68): X4=000000007fffffff X5=0000000000000020
-[INFO ]@(dump_registers:68): X6=0000000000000020 X7=000000000c00b030
----
- target/arm/helper.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+  git://git.kraxel.org/qemu tags/ui-20190311-v2-pull-request
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2607d39..3db94c6 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -2665,7 +2665,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     /* per-timer control */
-     { .name = "CNTP_CTL", .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
-       .secure = ARM_CP_SECSTATE_NS,
--      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access,
-       .fieldoffset = offsetoflow32(CPUARMState,
-                                    cp15.c14_timer[GTIMER_PHYS].ctl),
-@@ -2674,7 +2674,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     { .name = "CNTP_CTL_S",
-       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 1,
-       .secure = ARM_CP_SECSTATE_S,
--      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access,
-       .fieldoffset = offsetoflow32(CPUARMState,
-                                    cp15.c14_timer[GTIMER_SEC].ctl),
-@@ -2682,14 +2682,14 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     },
-     { .name = "CNTP_CTL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 1,
--      .type = ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].ctl),
-       .resetvalue = 0,
-       .writefn = gt_phys_ctl_write, .raw_writefn = raw_write,
-     },
-     { .name = "CNTV_CTL", .cp = 15, .crn = 14, .crm = 3, .opc1 = 0, .opc2 = 1,
--      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_IO | ARM_CP_ALIAS, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_vtimer_access,
-       .fieldoffset = offsetoflow32(CPUARMState,
-                                    cp15.c14_timer[GTIMER_VIRT].ctl),
-@@ -2697,7 +2697,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     },
-     { .name = "CNTV_CTL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 1,
--      .type = ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_vtimer_access,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].ctl),
-       .resetvalue = 0,
-@@ -2706,31 +2706,31 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     /* TimerValue views: a 32 bit downcounting view of the underlying state */
-     { .name = "CNTP_TVAL", .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
-       .secure = ARM_CP_SECSTATE_NS,
--      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access,
-       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
-     },
-     { .name = "CNTP_TVAL_S",
-       .cp = 15, .crn = 14, .crm = 2, .opc1 = 0, .opc2 = 0,
-       .secure = ARM_CP_SECSTATE_S,
--      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access,
-       .readfn = gt_sec_tval_read, .writefn = gt_sec_tval_write,
-     },
-     { .name = "CNTP_TVAL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 0,
--      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_ptimer_access, .resetfn = gt_phys_timer_reset,
-       .readfn = gt_phys_tval_read, .writefn = gt_phys_tval_write,
-     },
-     { .name = "CNTV_TVAL", .cp = 15, .crn = 14, .crm = 3, .opc1 = 0, .opc2 = 0,
--      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_vtimer_access,
-       .readfn = gt_virt_tval_read, .writefn = gt_virt_tval_write,
-     },
-     { .name = "CNTV_TVAL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 0,
--      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_R,
-+      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL1_RW | PL0_RW,
-       .accessfn = gt_vtimer_access, .resetfn = gt_virt_timer_reset,
-       .readfn = gt_virt_tval_read, .writefn = gt_virt_tval_write,
-     },
-@@ -2758,7 +2758,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     /* Comparison value, indicating when the timer goes off */
-     { .name = "CNTP_CVAL", .cp = 15, .crm = 14, .opc1 = 2,
-       .secure = ARM_CP_SECSTATE_NS,
--      .access = PL1_RW | PL0_R,
-+      .access = PL1_RW | PL0_RW,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].cval),
-       .accessfn = gt_ptimer_access,
-@@ -2766,7 +2766,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     },
-     { .name = "CNTP_CVAL_S", .cp = 15, .crm = 14, .opc1 = 2,
-       .secure = ARM_CP_SECSTATE_S,
--      .access = PL1_RW | PL0_R,
-+      .access = PL1_RW | PL0_RW,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_SEC].cval),
-       .accessfn = gt_ptimer_access,
-@@ -2774,14 +2774,14 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     },
-     { .name = "CNTP_CVAL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 2, .opc2 = 2,
--      .access = PL1_RW | PL0_R,
-+      .access = PL1_RW | PL0_RW,
-       .type = ARM_CP_IO,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_PHYS].cval),
-       .resetvalue = 0, .accessfn = gt_ptimer_access,
-       .writefn = gt_phys_cval_write, .raw_writefn = raw_write,
-     },
-     { .name = "CNTV_CVAL", .cp = 15, .crm = 14, .opc1 = 3,
--      .access = PL1_RW | PL0_R,
-+      .access = PL1_RW | PL0_RW,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_ALIAS,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].cval),
-       .accessfn = gt_vtimer_access,
-@@ -2789,7 +2789,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-     },
-     { .name = "CNTV_CVAL_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 3, .opc2 = 2,
--      .access = PL1_RW | PL0_R,
-+      .access = PL1_RW | PL0_RW,
-       .type = ARM_CP_IO,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_VIRT].cval),
-       .resetvalue = 0, .accessfn = gt_vtimer_access,
--- 
-2.7.4
+for you to fetch changes up to 0143840771548e8ffece831398d745880ddfa080:
+
+  monitor: deprecate acl_show, acl_reset, acl_policy, acl_add, acl_remove=
+ (2019-03-11 08:39:02 +0100)
+
+----------------------------------------------------------------
+curses: wide char input support.
+vnc: acl update, stall fix.
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (2):
+  vnc: allow specifying a custom authorization object name
+  monitor: deprecate acl_show, acl_reset, acl_policy, acl_add,
+    acl_remove
+
+Gerd Hoffmann (1):
+  vnc: fix update stalls
+
+Samuel Thibault (2):
+  Reduce curses escdelay from 1s to 25ms
+  curses: support wide input
+
+ ui/curses_keys.h     | 113 +++++++++++++++++++++++++------------------
+ monitor.c            |  23 +++++++++
+ ui/curses.c          |  79 ++++++++++++++++++++++++------
+ ui/vnc.c             |  64 ++++++++++++++++++++----
+ qemu-deprecated.texi |  11 +++++
+ qemu-options.hx      |  35 ++++++++++----
+ 6 files changed, 243 insertions(+), 82 deletions(-)
+
+--=20
+2.18.1
