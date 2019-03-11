@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47802)
+Received: from eggs.gnu.org ([209.51.188.92]:47739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3J4D-000629-Ja
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:02 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3J4K-00061P-3E
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3J4C-0001WT-Nj
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:26:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3J4A-0001U9-Ow
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:25:59 -0400
+	(envelope-from <philmd@redhat.com>) id 1h3Ixd-0004up-TS
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:19:14 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3Ixd-0004u6-MV
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:19:13 -0400
+Received: by mail-wr1-f66.google.com with SMTP id o9so4607985wrv.9
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 04:19:13 -0700 (PDT)
 References: <20190311005618.19007-1-philmd@redhat.com>
-	<20190311005618.19007-8-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7c16b3f7-32b7-14c8-5c5f-3826df7c02f3@redhat.com>
-Date: Mon, 11 Mar 2019 12:25:49 +0100
+	<20190311005618.19007-4-philmd@redhat.com>
+	<bbd425da-0cb9-40d6-5d24-7ef7e0dec097@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <17989bbc-08a3-1ec1-b1c7-5aefc032a29b@redhat.com>
+Date: Mon, 11 Mar 2019 12:19:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190311005618.19007-8-philmd@redhat.com>
+In-Reply-To: <bbd425da-0cb9-40d6-5d24-7ef7e0dec097@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] hw/mips: Express dependencies of
- the Fulong 2E machine with Kconfig
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] hw/mips: Express dependencies of
+ the r4k platform with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On 11/03/2019 01.56, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Fulong 2E machine uses a Loongson 2E as CPU, a Bonito64 system
-> controller as North Bridge and a VT82C686 chipset as South Bridge.
-> The network card chipset is a RTL8139D.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v3: Loongson 2E =3D CPU, Fulong 2E =3D machine (Aleksandar)
-> ---
->  default-configs/mips64el-softmmu.mak |  3 ---
->  hw/isa/Kconfig                       | 13 +++++++++----
->  hw/mips/Kconfig                      |  5 +++++
->  3 files changed, 14 insertions(+), 7 deletions(-)
->=20
-> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mip=
-s64el-softmmu.mak
-> index 88b66a91d7..d0814e76af 100644
-> --- a/default-configs/mips64el-softmmu.mak
-> +++ b/default-configs/mips64el-softmmu.mak
-> @@ -1,9 +1,6 @@
->  # Default configuration for mips64el-softmmu
-> =20
->  include mips-softmmu-common.mak
-> -CONFIG_IDE_VIA=3Dy
->  CONFIG_FULONG=3Dy
-> -CONFIG_PCI_BONITO=3Dy
+On 3/11/19 7:58 AM, Thomas Huth wrote:
+> On 11/03/2019 01.56, Philippe Mathieu-Daudé wrote:
+>> This platform use standard PC devices connected to an ISA bus.
+>> Networking is provided by a ne2000 chipset.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> v3: remove CONFIG_NE2000_ISA (Thomas)
+>>     add PFLASH_CFI01
+>> ---
+>>  default-configs/mips-softmmu-common.mak |  1 -
+>>  hw/mips/Kconfig                         | 11 +++++++++++
+>>  2 files changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+>> index caebafd416..2ca57bfee1 100644
+>> --- a/default-configs/mips-softmmu-common.mak
+>> +++ b/default-configs/mips-softmmu-common.mak
+>> @@ -24,7 +24,6 @@ CONFIG_I8257=y
+>>  CONFIG_PIIX4=y
+>>  CONFIG_IDE_ISA=y
+>>  CONFIG_IDE_PIIX=y
+>> -CONFIG_NE2000_ISA=y
+>>  CONFIG_PFLASH_CFI01=y
+>>  CONFIG_I8259=y
+>>  CONFIG_MC146818RTC=y
+>> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+>> index ab006477c7..5678c9cf15 100644
+>> --- a/hw/mips/Kconfig
+>> +++ b/hw/mips/Kconfig
+>> @@ -1,5 +1,16 @@
+>>  config R4K
+>>      bool
+>> +    select ISA_BUS
+>> +    select SERIAL_ISA
+>> +    select I8259
+>> +    select I8254
+>> +    select MC146818RTC
+>> +    select VGA_ISA
+>> +    select NE2000_ISA
+> 
+> Since Paolo now also introduced the "imply" keyword, I think you should
+> use "imply" instead of "select" for both, VGA_ISA and NE2000_ISA, since
+> the r4k machine can work without both when you specify -vga none and
+> -net none.
 
-I think I'd rather squash the previous patch into this one here (and
-adjust the patch description here with some information about BONITO),
-so that you don't have to remove the switch again that you've just added
-one patch earlier.
+OK I'll use "imply", thanks.
 
->  CONFIG_JAZZ=3Dy
-> -CONFIG_VT82C686=3Dy
->  CONFIG_MIPS_BOSTON=3Dy
-> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-> index 57e09a0cb8..30055aed82 100644
-> --- a/hw/isa/Kconfig
-> +++ b/hw/isa/Kconfig
-> @@ -32,10 +32,15 @@ config PIIX4
-> =20
->  config VT82C686
->      bool
-> -    select ISA_BUS
-> -    select ACPI_SMBUS
-> -    select SERIAL_ISA
-> -    select FDC
-> +    select PCI
-> +    select I8259
-> +    select I8254
-> +    select I8257
-> +    select PARALLEL
-> +    select IDE_ISA
-> +    select IDE_VIA
-> +    select USB_UHCI
-> +    #select PCKBD
-
-Why is this commented out? Please mention the reason either in the
-commit message or in an additional comment here.
-
->  config SMC37C669
->      bool
-> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-> index bd6e3be2cd..b06d70bf01 100644
-> --- a/hw/mips/Kconfig
-> +++ b/hw/mips/Kconfig
-> @@ -43,6 +43,11 @@ config JAZZ
-> =20
->  config FULONG
->      bool
-> +    select PCI_BONITO
-> +    select VT82C686
-> +    select SMBUS_EEPROM
-> +    select RTL8139_PCI
-
-I'd suggest to use "imply RTL8139_PCI" here instead, since "-net none"
-should be possible for this machine, too.
-
- Thomas
+> 
+>  Thomas
+> 
