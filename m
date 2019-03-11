@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48336)
+Received: from eggs.gnu.org ([209.51.188.92]:49301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3PJh-0005IS-EQ
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:26 -0400
+	(envelope-from <bsd@redhat.com>) id 1h3POO-0000Rg-DO
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3PJg-0005iq-Ag
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39593)
+	(envelope-from <bsd@redhat.com>) id 1h3PON-0001to-Ga
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:11:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3PJf-0005hL-Ti
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:06:24 -0400
-References: <20190311180216.18811-1-jandryuk@gmail.com>
-	<20190311180216.18811-2-jandryuk@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7fb0cfd-9573-028c-5631-be9df4102fcc@redhat.com>
-Date: Mon, 11 Mar 2019 19:06:17 +0100
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1h3PON-0001sd-7T
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:11:15 -0400
+From: Bandan Das <bsd@redhat.com>
+References: <20190307095441.31921-1-kraxel@redhat.com>
+	<20190307095441.31921-4-kraxel@redhat.com>
+	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
+	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
+	<jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
+	<CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
+	<jpg8sxle6c6.fsf@linux.bootlegged.copy>
+	<CAFEAcA9sx64kcz=wOqeBwGg0YJc-xO-K5yNkoSC8uuCqNF_FYA@mail.gmail.com>
+	<jpgef7d746o.fsf@linux.bootlegged.copy>
+	<CAFEAcA_U=1w2krP9zrC3oXjhJZ1Y5k+2GP_s3oY0p8WvB_9hig@mail.gmail.com>
+	<jpgzhq1cnuc.fsf@linux.bootlegged.copy>
+	<CAFEAcA_xQ=Y0HVkb+qDTmuf8p02UiAp5UKbbjPthy-vTv+SyXA@mail.gmail.com>
+Date: Mon, 11 Mar 2019 14:11:09 -0400
+In-Reply-To: <CAFEAcA_xQ=Y0HVkb+qDTmuf8p02UiAp5UKbbjPthy-vTv+SyXA@mail.gmail.com>
+	(Peter Maydell's message of "Mon, 11 Mar 2019 17:55:09 +0000")
+Message-ID: <jpga7i1uvr6.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <20190311180216.18811-2-jandryuk@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] xen: Introduce -xen-stubdom option
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +37,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Andryuk <jandryuk@gmail.com>, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, marmarek@invisiblethingslab.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul.durrant@citrix.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/03/19 19:02, Jason Andryuk wrote:
-> With Xen, QEMU can run isolated in a dedicated service VM - a stubdom.
-> There are a few differences when running in a stubdom compared to dom0.
-> Add the -xen-stubdom option to select this mode at runtime.  The default
-> is off.
+Peter Maydell <peter.maydell@linaro.org> writes:
+...
+>> >
+>> >> > It might be useful to take a step back -- what are
+>> >> > the different possible outcomes from this function that
+>> >> > we need to distinguish, and when should we be returning
+>> >> > which outcome?
+>> >
+>> They are what the variable names signify.
+>
+> That doesn't get me any further forward, I'm afraid.
+>
+> Looking at the code, we seem to have:
+>  * for any particular node, either we can delete it
+>    or we can't
+>  * we also iterate through each child node recursively
+>
+> So we have to combine together the "deleted this"
+> and "failed to delete this" information for the whole tree.
+> In which conditions should we end up with which RES_*
+> result code? It seems plausible that we want RES_OK
+> only if every deletion attempt in the tree succeeded.
+> But what about the others? Is it supposed to be
+> RES_PARTIAL_DELETE if some deletions succeeded and
+> some failed, and RES_STORE_READ_ONLY if every single
+> deletion failed ?
+>
+Ok, this is easier. Now, I know what you are referring to
+instead of guessing what and how I should be explainng.
 
-This should be "-accel xen,stubdom=on".  You should find examples for
-tcg that explain how to add a suboption to -accel.
+What you said is essentially correct. When deleting a
+single object that's a file, the return value would either
+be OK or STORE_READ_ONLY.
 
-Paolo
+When deleting an object which is a folder, Qemu goes through
+its contents. If it succeeds in deleting all the content objects,
+the result is success. If one or some objects couldn't be deleted for
+whatever reason, the result is RES_PARTIAL_DELETE and if none
+of the objects could be deleted, Qemu returns a READ_ONLY.
 
-> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
-> ---
->  include/hw/xen/xen.h | 6 ++++++
->  qemu-options.hx      | 7 +++++++
->  vl.c                 | 8 ++++++++
->  3 files changed, 21 insertions(+)
-> 
-> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-> index ba039c146d..fed3611623 100644
-> --- a/include/hw/xen/xen.h
-> +++ b/include/hw/xen/xen.h
-> @@ -21,6 +21,7 @@ enum xen_mode {
->  extern uint32_t xen_domid;
->  extern enum xen_mode xen_mode;
->  extern bool xen_domid_restrict;
-> +extern bool xen_stubdom;
->  
->  extern bool xen_allowed;
->  
-> @@ -29,6 +30,11 @@ static inline bool xen_enabled(void)
->      return xen_allowed;
->  }
->  
-> +static inline bool xen_stubdom_enabled(void)
-> +{
-> +    return xen_stubdom;
-> +}
-> +
->  int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
->  void xen_piix3_set_irq(void *opaque, int irq_num, int level);
->  void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 1cf9aac1fe..ba56c3dd9a 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3386,6 +3386,10 @@ DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
->      "                        to specified domain id. (Does not affect\n"
->      "                        xenpv machine type).\n",
->      QEMU_ARCH_ALL)
-> +DEF("xen-stubdom", 0, QEMU_OPTION_xen_stubdom,
-> +    "-xen-stubdom    specify QEMU is running in a stubdom, so certain\n"
-> +    "                behavior changes. (Does not affect xenpv machine type).\n",
-> +    QEMU_ARCH_ALL)
->  STEXI
->  @item -xen-domid @var{id}
->  @findex -xen-domid
-> @@ -3396,6 +3400,9 @@ Attach to existing xen domain.
->  libxl will use this when starting QEMU (XEN only).
->  @findex -xen-domid-restrict
->  Restrict set of available xen operations to specified domain id (XEN only).
-> +@findex -xen-stubdom
-> +@item -xen-stubdom
-> +Run qemu in stubdom-mode (XEN only).
->  ETEXI
->  
->  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
-> diff --git a/vl.c b/vl.c
-> index 4a350de5cd..0d04319d9b 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -206,6 +206,7 @@ bool xen_allowed;
->  uint32_t xen_domid;
->  enum xen_mode xen_mode = XEN_EMULATE;
->  bool xen_domid_restrict;
-> +bool xen_stubdom;
->  
->  static int has_defaults = 1;
->  static int default_serial = 1;
-> @@ -3796,6 +3797,13 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  xen_domid_restrict = true;
->                  break;
-> +            case QEMU_OPTION_xen_stubdom:
-> +                if (!(xen_available())) {
-> +                    error_report("Option not supported for this target");
-> +                    exit(1);
-> +                }
-> +                xen_stubdom = true;
-> +                break;
->              case QEMU_OPTION_trace:
->                  g_free(trace_file);
->                  trace_file = trace_opt_parse(optarg);
-> 
+In usb_mtp_object_delete(), based on the return value of this
+function, we set s->result appropriately.
+
+> thanks
+> -- PMM
