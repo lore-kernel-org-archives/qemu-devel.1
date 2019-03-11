@@ -1,35 +1,35 @@
 Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mw7-0005vi-Np
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:56 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwC-0005vi-HE
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mmm-0007fl-1j
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:24:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38656)
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mlb-0007Jf-Jd
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46414
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h3Mml-0007fK-NB
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:24:15 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1h3Mlb-0007JT-E8
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:23:03 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x2BFOEbb061746
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:24:14 -0400
+	x2BFMuFX005862
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:23:03 -0400
 Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5rg16ay8-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5r5hq57v-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:43 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:22:57 -0400
 Received: from localhost
 	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 11 Mar 2019 15:21:42 -0000
+	Mon, 11 Mar 2019 15:21:50 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 11 Mar 2019 11:21:21 -0400
+Date: Mon, 11 Mar 2019 11:21:26 -0400
 In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
 References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1552317693-21979-4-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 03/15] s390-bios: decouple common boot logic
- from virtio
+Message-Id: <1552317693-21979-9-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 08/15] s390-bios: Map low core memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,92 +40,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a boot_setup function to handle getting boot information from
-the machine/hypervisor. This decouples common boot logic from the
-virtio code path and allows us to make use of it for the real dasd boot
-scenario.
+Create a new header for basic architecture specific definitions and add a
+mapping of low core memory. This mapping will be used by the real dasd boot
+process.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Collin Walling <walling@linux.ibm.com
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/main.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+ pc-bios/s390-ccw/main.c      |  2 +
+ pc-bios/s390-ccw/s390-arch.h | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 pc-bios/s390-ccw/s390-arch.h
 
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e82fe2c..67df421 100644
+index 2d912cb..d3a161c 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -14,16 +14,17 @@
+@@ -9,6 +9,7 @@
+  */
  
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
--IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ #include "libc.h"
++#include "s390-arch.h"
+ #include "s390-ccw.h"
+ #include "cio.h"
+ #include "virtio.h"
+@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
  QemuIplParameters qipl;
-+IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
-+static bool have_iplb;
+ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static bool have_iplb;
++LowCore const *lowcore; /* Yes, this *is* a pointer to address 0 */
  
  #define LOADPARM_PROMPT "PROMPT  "
  #define LOADPARM_EMPTY  "        "
- #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
- 
- /*
-- * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-+ * Principles of Operations (SA22-7832-09) chapter 17 requires that
-  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
-  * after list-directed-IPL and ccw-IPL.
-  */
-@@ -111,23 +112,33 @@ static void css_setup(void)
-     enable_mss_facility();
- }
- 
+diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
+new file mode 100644
+index 0000000..5e92c7a
+--- /dev/null
++++ b/pc-bios/s390-ccw/s390-arch.h
+@@ -0,0 +1,90 @@
 +/*
-+ * Collect various pieces of information from the hypervisor/hardware that
-+ * we'll use to determine exactly how we'll boot.
++ * S390 Basic Architecture
++ *
++ * Copyright (c) 2019 Jason J. Herne <jjherne@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
 + */
-+static void boot_setup(void)
-+{
-+    char lpmsg[] = "LOADPARM=[________]\n";
 +
-+    sclp_get_loadparm_ascii(loadparm_str);
-+    memcpy(lpmsg + 10, loadparm_str, 8);
-+    sclp_print(lpmsg);
++#ifndef S390_ARCH_H
++#define S390_ARCH_H
 +
-+    have_iplb = store_iplb(&iplb);
-+}
++typedef struct PSW {
++    uint64_t mask;
++    uint64_t addr;
++} __attribute__ ((aligned(8))) PSW;
++_Static_assert(sizeof(struct PSW) == 16, "PSW size incorrect");
 +
- static void virtio_setup(void)
- {
-     Schib schib;
-     int ssid;
-     bool found = false;
-     uint16_t dev_no;
--    char ldp[] = "LOADPARM=[________]\n";
-     VDev *vdev = virtio_get_device();
-     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
- 
--    sclp_get_loadparm_ascii(loadparm_str);
--    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
--    sclp_print(ldp);
--
-     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
- 
--    if (store_iplb(&iplb)) {
-+    if (have_iplb) {
-         switch (iplb.pbt) {
-         case S390_IPL_TYPE_CCW:
-             dev_no = iplb.ccw.devno;
-@@ -174,6 +185,7 @@ int main(void)
- {
-     sclp_setup();
-     css_setup();
-+    boot_setup();
-     virtio_setup();
- 
-     zipl_load(); /* no return */
++/* Older PSW format used by LPSW instruction */
++typedef struct PSWLegacy {
++    uint32_t mask;
++    uint32_t addr;
++} __attribute__ ((aligned(8))) PSWLegacy;
++_Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
++
++/* s390 psw bit masks */
++#define PSW_MASK_IOINT      0x0200000000000000ULL
++#define PSW_MASK_WAIT       0x0002000000000000ULL
++#define PSW_MASK_EAMODE     0x0000000100000000ULL
++#define PSW_MASK_BAMODE     0x0000000080000000ULL
++#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
++
++/* Low core mapping */
++typedef struct LowCore {
++    /* prefix area: defined by architecture */
++    PSWLegacy       ipl_psw;                  /* 0x000 */
++    uint32_t        ccw1[2];                  /* 0x008 */
++    uint32_t        ccw2[2];                  /* 0x010 */
++    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
++    uint32_t        ext_params;               /* 0x080 */
++    uint16_t        cpu_addr;                 /* 0x084 */
++    uint16_t        ext_int_code;             /* 0x086 */
++    uint16_t        svc_ilen;                 /* 0x088 */
++    uint16_t        svc_code;                 /* 0x08a */
++    uint16_t        pgm_ilen;                 /* 0x08c */
++    uint16_t        pgm_code;                 /* 0x08e */
++    uint32_t        data_exc_code;            /* 0x090 */
++    uint16_t        mon_class_num;            /* 0x094 */
++    uint16_t        per_perc_atmid;           /* 0x096 */
++    uint64_t        per_address;              /* 0x098 */
++    uint8_t         exc_access_id;            /* 0x0a0 */
++    uint8_t         per_access_id;            /* 0x0a1 */
++    uint8_t         op_access_id;             /* 0x0a2 */
++    uint8_t         ar_access_id;             /* 0x0a3 */
++    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
++    uint64_t        trans_exc_code;           /* 0x0a8 */
++    uint64_t        monitor_code;             /* 0x0b0 */
++    uint16_t        subchannel_id;            /* 0x0b8 */
++    uint16_t        subchannel_nr;            /* 0x0ba */
++    uint32_t        io_int_parm;              /* 0x0bc */
++    uint32_t        io_int_word;              /* 0x0c0 */
++    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
++    uint32_t        stfl_fac_list;            /* 0x0c8 */
++    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
++    uint64_t        mcic;                     /* 0x0e8 */
++    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
++    uint32_t        external_damage_code;     /* 0x0f4 */
++    uint64_t        failing_storage_address;  /* 0x0f8 */
++    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
++    uint64_t        per_breaking_event_addr;  /* 0x110 */
++    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
++    PSW             restart_old_psw;          /* 0x120 */
++    PSW             external_old_psw;         /* 0x130 */
++    PSW             svc_old_psw;              /* 0x140 */
++    PSW             program_old_psw;          /* 0x150 */
++    PSW             mcck_old_psw;             /* 0x160 */
++    PSW             io_old_psw;               /* 0x170 */
++    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
++    PSW             restart_new_psw;          /* 0x1a0 */
++    PSW             external_new_psw;         /* 0x1b0 */
++    PSW             svc_new_psw;              /* 0x1c0 */
++    PSW             program_new_psw;          /* 0x1d0 */
++    PSW             mcck_new_psw;             /* 0x1e0 */
++    PSW             io_new_psw;               /* 0x1f0 */
++} __attribute__((packed, aligned(8192))) LowCore;
++
++extern LowCore const *lowcore;
++
++#endif
 -- 
 2.7.4
