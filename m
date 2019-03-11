@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55119)
+Received: from eggs.gnu.org ([209.51.188.92]:55774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3SCb-0003Ko-1r
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:11:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3SFz-0004Ym-Uq
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3SCZ-0003wI-VN
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:11:17 -0400
-References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
-	<20190308114218.26692-11-shameerali.kolothum.thodi@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <f3386b54-ec43-c133-9545-c58ad917a71b@redhat.com>
-Date: Mon, 11 Mar 2019 22:11:03 +0100
+	(envelope-from <armbru@redhat.com>) id 1h3SFy-00076j-Cw
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:14:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1h3SFy-00075V-2e
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 17:14:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311085024.13780-1-kraxel@redhat.com>
+	<20190311085024.13780-5-kraxel@redhat.com>
+	<87ef7d8fh8.fsf@dusky.pond.sub.org>
+	<alpine.BSF.2.21.9999.1903112044360.69539@zero.eik.bme.hu>
+	<476d5325-7097-7a27-392b-65a0119b24ea@ilande.co.uk>
+Date: Mon, 11 Mar 2019 22:14:32 +0100
+In-Reply-To: <476d5325-7097-7a27-392b-65a0119b24ea@ilande.co.uk> (Mark
+	Cave-Ayland's message of "Mon, 11 Mar 2019 19:55:45 +0000")
+Message-ID: <87y35l6rlz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190308114218.26692-11-shameerali.kolothum.thodi@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/11] hw/arm/virt: Add GED device
- configuration and build aml
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 4/5] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,188 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
-Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-Hi Shameer,
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-On 3/8/19 12:42 PM, Shameer Kolothum wrote:
-> This initializes the GED device with base memory and irq.
-> It also configures ged memory hotplug event and builds the
-> corresponding aml code.
-> 
-> But ged irq routing to Guest is not enabled and thus hotplug
-> is not yet supported.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  default-configs/arm-softmmu.mak |  1 +
->  hw/arm/virt-acpi-build.c        | 13 +++++++++++++
->  hw/arm/virt-acpi.c              |  4 ++++
->  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
->  include/hw/arm/virt.h           |  4 ++++
->  5 files changed, 44 insertions(+)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index b3bac25..7c442fd 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -168,3 +168,4 @@ CONFIG_MUSICPAL=y
->  CONFIG_MEM_DEVICE=y
->  CONFIG_DIMM=y
->  CONFIG_ACPI_MEMORY_HOTPLUG=y
-> +CONFIG_ACPI_HW_REDUCED=y
-requires a KConfig entry now
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 6cb7263..86f25ad 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -50,6 +50,18 @@
->  #define ARM_SPI_BASE 32
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> +static void acpi_dsdt_add_ged(Aml *scope, VirtMachineState *vms)
-> +{
-> +    int irq =  vms->irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE;
-> +
-> +    if (!vms->ged_events || !vms->ged_events_size) {
-> +        return;
-> +    }
-> +
-> +    build_ged_aml(scope, "\\_SB."GED_DEVICE, irq, vms->ged_events,
-> +                  vms->ged_events_size, AML_SYSTEM_MEMORY);
-> +}
-> +
->  static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState *ms)
->  {
->      uint32_t nr_mem = ms->ram_slots;
-> @@ -758,6 +770,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->       */
->      scope = aml_scope("\\_SB");
->      acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
-> +    acpi_dsdt_add_ged(scope, vms);
->      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
->      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
->                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> diff --git a/hw/arm/virt-acpi.c b/hw/arm/virt-acpi.c
-> index 18ebe94..3b55c63 100644
-> --- a/hw/arm/virt-acpi.c
-> +++ b/hw/arm/virt-acpi.c
-> @@ -31,6 +31,7 @@
->  typedef struct VirtAcpiState {
->      SysBusDevice parent_obj;
->      MemHotplugState memhp_state;
-> +    GEDState ged_state;
->  } VirtAcpiState;
->  
->  #define TYPE_VIRT_ACPI "virt-acpi"
-> @@ -76,12 +77,15 @@ static void virt_device_realize(DeviceState *dev, Error **errp)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(qdev_get_machine());
->      const MemMapEntry *memmap = vms->memmap;
-> +    const int *irqmap = vms->irqmap;
->      VirtAcpiState *s = VIRT_ACPI(dev);
->  
->      if (s->memhp_state.is_enabled) {
->          acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
->                                   &s->memhp_state,
->                                   memmap[VIRT_PCDIMM_ACPI].base);
-> +        acpi_ged_init(get_system_memory(), OBJECT(dev), &s->ged_state,
-> +                      memmap[VIRT_ACPI_GED].base, irqmap[VIRT_ACPI_GED]);
->      }
->  }
->  
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9427f4f..352dbb1 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -134,6 +134,7 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
->      [VIRT_PCDIMM_ACPI] =        { 0x09070000, 0x00010000 },
-> +    [VIRT_ACPI_GED] =           { 0x09080000, 0x00010000 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -169,6 +170,7 @@ static const int a15irqmap[] = {
->      [VIRT_PCIE] = 3, /* ... to 6 */
->      [VIRT_GPIO] = 7,
->      [VIRT_SECURE_UART] = 8,
-> +    [VIRT_ACPI_GED] = 9,
->      [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
->      [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
->      [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
-> @@ -184,6 +186,25 @@ static const char *valid_cpus[] = {
->      ARM_CPU_TYPE_NAME("max"),
->  };
->  
-> +static void virt_acpi_ged_conf(VirtMachineState *vms)
-> +{
-> +    uint8_t events_size;
-> +
-> +    /* GED events */
-> +    GedEvent events[] = {
-> +        {
-> +            .selector = ACPI_GED_IRQ_SEL_MEM,
-> +            .event    = GED_MEMORY_HOTPLUG,
-> +        },
-> +    };
-> +
-> +    events_size = ARRAY_SIZE(events);
-> +
-> +    vms->ged_events = g_malloc0(events_size * sizeof(GedEvent));
-> +    memcpy(vms->ged_events, events, events_size * sizeof(GedEvent));
-> +    vms->ged_events_size = events_size;
-> +}
-can't you do the virt_acpi_ged_conf's job directly in virt_acpi_init
-avoid this memcpy by using a pointer to a static const GedEvent
-ged_events[]?
-> +
->  static bool cpu_type_valid(const char *cpu)
->  {
->      int i;
-> @@ -1650,6 +1671,7 @@ static void machvirt_init(MachineState *machine)
->      create_platform_bus(vms, pic);
->  
->      vms->acpi = virt_acpi_init();
-> +    virt_acpi_ged_conf(vms);
+> On 11/03/2019 19:51, BALATON Zoltan wrote:
+>
+>> On Mon, 11 Mar 2019, Markus Armbruster wrote:
+>>> Gerd Hoffmann <kraxel@redhat.com> writes:
+>>>> From: BALATON Zoltan <balaton@eik.bme.hu>
+>>>>
+>>>> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
+>>>> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
+>>>> guests running on these and the PMON2000 firmware of the fulong2e
+>>>> expect this to be available. Fortunately these are very similar chips
+>>>> so they can be mostly emulated in the same device model. This patch
+>>>> adds basic emulation of these ATI VGA chips.
+>>>>
+>>>> While this is incomplete and currently only enough to run the MIPS
+>>>> firmware and get framebuffer output with Linux, it allows the fulong2e
+>>>> board to work more like the real hardware and having it in QEMU in
+>>>> this state provides a way to experiment with it and allows others to
+>>>> contribute to improve it. It is compiled for all archs but only the
+>>>> fulong2e (which currently has no display output at all) is set to use
+>>>> it by default (in a separate patch).
+>>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>>>> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+>>>> Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
+>>>> Message-id:
+>>>> 0b1b7c22873a6e37627261b04fb687412b25ff4f.1552152100.git.balaton@eik.bm=
+e.hu
+>>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> [...]
+>>>> diff --git a/hw/display/trace-events b/hw/display/trace-events
+>>>> index 37d3264bb2e6..80993cc4d913 100644
+>>>> --- a/hw/display/trace-events
+>>>> +++ b/hw/display/trace-events
+>>>> @@ -138,3 +138,7 @@ vga_cirrus_write_blt(uint32_t offset, uint32_t val=
+) "offset
+>>>> 0x%x, val 0x%x"
+>>>> =C2=A0sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x=
+%02x"
+>>>> =C2=A0sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0=
+x%02x"
+>>>> =C2=A0sii9022_switch_mode(const char *mode) "mode: %s"
+>>>> +
+>>>> +# hw/display/ati*.c
+>>>> +ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint6=
+4_t val) "%u
+>>>> 0x%"HWADDR_PRIx " %s -> 0x%"PRIx64
+>>>> +ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint=
+64_t val)
+>>>> "%u 0x%"HWADDR_PRIx " %s <- 0x%"PRIx64
+>>>
+>>> Blows up for me:
+>>>
+>>> Traceback (most recent call last):
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool.py", line 152, in <modu=
+le>
+>>> =C2=A0=C2=A0 main(sys.argv)
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool.py", line 147, in main
+>>> =C2=A0=C2=A0 binary=3Dbinary, probe_prefix=3Dprobe_prefix)
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool/__init__.py", line 472,=
+ in generate
+>>> =C2=A0=C2=A0 tracetool.format.generate(events, format, backend, group)
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool/format/__init__.py", li=
+ne 85, in generate
+>>> =C2=A0=C2=A0 func(events, backend, group)
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", li=
+ne 121, in generate
+>>> =C2=A0=C2=A0 fmt_str =3D "%d@%d " + e.name + " " + c_fmt_to_stap(e.fmt)=
+ + "\\n"
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", li=
+ne 64, in
+>>> c_fmt_to_stap
+>>> =C2=A0=C2=A0 bits.append(c_macro_to_format(macro))
+>>> =C2=A0File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", li=
+ne 36, in
+>>> c_macro_to_format
+>>> =C2=A0=C2=A0 raise Exception("Unhandled macro '%s'" % macro)
+>>> Exception: Unhandled macro 'HWADDR_PRIx'
+>>=20
+>> No idea. Nobody else reported a problem with this yet and the above erro=
+r makes no
+>> sense to me. Cc'd some tracetool related people who hopefully can hint w=
+hat might be
+>> wrong. Do you get error during build? What trace backend do you use?
 
->  
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index e46a051..49fda81 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -37,6 +37,7 @@
->  #include "hw/arm/arm.h"
->  #include "sysemu/kvm.h"
->  #include "hw/intc/arm_gicv3_common.h"
-> +#include "hw/acpi/ged.h"
->  
->  #define NUM_GICV2M_SPIS       64
->  #define NUM_VIRTIO_TRANSPORTS 32
-> @@ -78,6 +79,7 @@ enum {
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
->      VIRT_PCDIMM_ACPI,
-> +    VIRT_ACPI_GED,
->      VIRT_LOWMEMMAP_LAST,
->  };
->  
-> @@ -134,6 +136,8 @@ typedef struct {
->      int psci_conduit;
->      hwaddr highest_gpa;
->      DeviceState *acpi;
-> +    GedEvent *ged_events;
-> +    uint32_t ged_events_size;
-I guess we can avoid that one by using a const GedEvent *ged_events and
-using ARRAY_SIZE?
+I enable all trace backends for my integration testing.  The error is
+thrown for the dtrace backend.
 
-Thanks
+> You can't use HWADDR_PRIx in trace-events because other non-qemu-based tr=
+ace backends
+> have no awareness of it (as I also found out). For HWADDR_PRIx you need t=
+o use PRIx64
+> instead. I have a vague recollection of someone posting a patch for check=
+patch to
+> detect this - does it pass a local checkpatch run?
 
-Eric
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> 
+Only unrelated warnings:
+
+$ scripts/checkpatch.pl 0001-hw-display-Add-basic-ATI-VGA-emulation.patch=20
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#69:=20
+new file mode 100644
+
+WARNING: line over 80 characters
+#176: FILE: hw/display/ati.c:103:
++                    vbe_ioport_write_index(&s->vga, 0, VBE_DISPI_INDEX_Y_O=
+FFSET);
+
+total: 0 errors, 2 warnings, 1876 lines checked
