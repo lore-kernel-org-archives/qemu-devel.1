@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59676)
+Received: from eggs.gnu.org ([209.51.188.92]:59737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h3K8c-0001ar-J3
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:39 -0400
+	(envelope-from <i.maximets@samsung.com>) id 1h3K8g-0001cH-Uc
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1h3K5z-0004Do-Uj
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:31:56 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:53616)
+	(envelope-from <i.maximets@samsung.com>) id 1h3K8f-0005cA-N6
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:42 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:40601)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1h3K5z-0004Bz-Id
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:31:55 -0400
-Date: Mon, 11 Mar 2019 13:31:50 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190311090435.7g5womfl6habq2ql@sirius.home.kraxel.org>
-Message-ID: <alpine.BSF.2.21.9999.1903111322170.47169@zero.eik.bme.hu>
-References: <20190309232719.43A8074862C@zero.eik.bme.hu>
-	<20190311090435.7g5womfl6habq2ql@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1h3K8e-0005X0-JA
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:41 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+	20190311123433euoutp02975c868e0fafa998caf4c814537453ec~K55rR0stA0679206792euoutp02U
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:34:33 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-ID: <1fa60eac-9718-ee9d-e21c-3331c3bd60ff@samsung.com>
+Date: Mon, 11 Mar 2019 15:34:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] ati-vga: Implement DDC and EDID info from
- monitor
+In-Reply-To: <20181127135030.1671-1-i.maximets@samsung.com>
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
+	<20181127135030.1671-1-i.maximets@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-On Mon, 11 Mar 2019, Gerd Hoffmann wrote:
-> On Sun, Mar 10, 2019 at 12:22:17AM +0100, BALATON Zoltan wrote:
->> This adds DDC support to ati-vga and connects i2c-ddc to provide EDID
->> info that is read by guests to find available screen modes. Not sure
->> if this is 100% correct yet but at least MorphOS is happy with it and
->> starts in a high resolution mode instead of 640x480 (although its
->> splash screen is still not correct).
->
->> Linux needs support from VESA
->> vgabios, it seems to be missing INT10 0x4F15 function (see
->> https://gitlab.freedesktop.org/xorg/xserver/blob/master/hw/xfree86/vbe/vbe.c)
->> without which no DDC is available that also prevents loading the
->> accelerated X driver.
->
-> radeonfb doesn't pick up the edid either.
-> There seem to be four i2c busses though:
->
-> void radeon_create_i2c_busses(struct radeonfb_info *rinfo)
-> {
-> 	rinfo->i2c[0].rinfo	= rinfo;
-> 	rinfo->i2c[0].ddc_reg	= GPIO_MONID;
-> #ifndef CONFIG_PPC
-> 	rinfo->i2c[0].adapter.class = I2C_CLASS_HWMON;
-> #endif
-> 	radeon_setup_i2c_bus(&rinfo->i2c[0], "monid");
->
-> 	rinfo->i2c[1].rinfo	= rinfo;
-> 	rinfo->i2c[1].ddc_reg	= GPIO_DVI_DDC;
-> 	radeon_setup_i2c_bus(&rinfo->i2c[1], "dvi");
->
-> 	rinfo->i2c[2].rinfo	= rinfo;
-> 	rinfo->i2c[2].ddc_reg	= GPIO_VGA_DDC;
-> 	radeon_setup_i2c_bus(&rinfo->i2c[2], "vga");
->
-> 	rinfo->i2c[3].rinfo	= rinfo;
-> 	rinfo->i2c[3].ddc_reg	= GPIO_CRT2_DDC;
-> 	radeon_setup_i2c_bus(&rinfo->i2c[3], "crt2");
-> }
->
-> aty128fb has no i2c support.
+Hi.
 
-On rage128p I think there's only GPIO_MONID where there are 4 pins that 
-can have 2 i2c busses. I think they are DDC for CRT and flat-panel ports 
-but not sure about that. So what it's missing is i2c for hw monitoring 
-which the GPIO_MONID may be used for on radeon according to the above.
+I'm trying to figure out the state of this patch set.
+Is there any chance for it to be accepted?
 
-The r128 xorg driver complains about missing support in VESA VBE as quoted 
-above and unloads itself. I think it may work if that support is 
-implemented in vgabios which I hope you can look at as I have no 
-experience with vgabios.
+The first patch needs minor rebase. I could send a new version.
 
-For radeon the DDC may need to be added on the GPIO_VGA_PORT as well based 
-on the above code excerpt but I haven't checked that.
+BTW, even without the first patch that raised some discussion
+the last three patches are kind of straightforward and useful.
 
->> Besides, this depends on bitbang_i2c.h which is now in hw/i2c so if
->> including it from there is not desirable that may need to be moved
->> somewhere.
->
-> include/hw/i2c/ looks like a sensible location to me.
+Best regards, Ilya Maximets.
 
-The i2c_bitbang.h could be merged with include/i2c/i2c.h where a line 
-from it was already moved before or it could be moved to include/hw/i2c 
-and revert previous change and adjust its users again. I'm inclined to 
-just merge it with i2c.h but not sure who is to decide about this. The 
-bitbang i2c does not seem to have a maintainer.
-
-Regards,
-BALATON Zoltan
+On 27.11.2018 16:50, Ilya Maximets wrote:
+> Version 2:
+>     * First patch changed to just drop the memfd backend
+>       if seals are not supported.
+> 
+> Ilya Maximets (4):
+>   hostmem-memfd: disable for systems wihtout sealing support
+>   memfd: always check for MFD_CLOEXEC
+>   memfd: set up correct errno if not supported
+>   memfd: improve error messages
+> 
+>  backends/hostmem-memfd.c | 18 ++++++++----------
+>  tests/vhost-user-test.c  |  6 +++---
+>  util/memfd.c             | 10 ++++++++--
+>  3 files changed, 19 insertions(+), 15 deletions(-)
+> 
