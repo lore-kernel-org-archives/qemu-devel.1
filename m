@@ -1,27 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:52505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3JTG-0008R5-Ms
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:51:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3JTW-0008R5-L4
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3JRO-0004Ju-2Y
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:49:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56568)
+	(envelope-from <thuth@redhat.com>) id 1h3JOz-00024N-Pq
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:47:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3JRN-0004JE-Q1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:49:58 -0400
-References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-2-f4bug@amsat.org>
-	<ed8793ce-cc5f-a506-2bdc-a39e9fc79cc7@amsat.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1h3JOx-0001wV-Pv
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:47:29 -0400
+References: <20190311005618.19007-1-philmd@redhat.com>
+	<20190311005618.19007-3-philmd@redhat.com>
+	<50e483c6-9580-dcdb-65aa-a8d66040c5a7@redhat.com>
+	<24ecc3f9-4c22-d162-50a1-ad913fe56807@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <07100472-e75f-88c7-6740-21a56e225f80@redhat.com>
-Date: Mon, 11 Mar 2019 12:49:50 +0100
+Message-ID: <aaac47e0-62a3-7c57-bf42-0874e4daee9e@redhat.com>
+Date: Mon, 11 Mar 2019 12:47:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <ed8793ce-cc5f-a506-2bdc-a39e9fc79cc7@amsat.org>
+In-Reply-To: <24ecc3f9-4c22-d162-50a1-ad913fe56807@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] sdbus: add a QMP command to access
- a SDBus
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/mips: Express dependencies of
+ the Jazz machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Edgar Iglesias <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 08/03/2019 17.11, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Markus,
+On 11/03/2019 12.37, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
 >=20
-> [Asking again from the correct series thread]
+> On 3/11/19 12:17 PM, Thomas Huth wrote:
+>> On 11/03/2019 01.56, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
+>>> framebuffer display is managed by a G364, the network card is a Sonic
+>>> DP83932. A QLogic ESP216 provides a SCSI bus.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> v3: Keep CONFIG_JAZZ in default-configs/mips64el-softmmu.mak (Thomas)
+>>> ---
+>>>  default-configs/mips-softmmu-common.mak |  1 -
+>>>  default-configs/mips64-softmmu.mak      |  5 -----
+>>>  default-configs/mips64el-softmmu.mak    |  5 -----
+>>>  hw/mips/Kconfig                         | 17 +++++++++++++++++
+>>>  4 files changed, 17 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/default-configs/mips-softmmu-common.mak b/default-config=
+s/mips-softmmu-common.mak
+>>> index 8c5fdf5ee1..caebafd416 100644
+>>> --- a/default-configs/mips-softmmu-common.mak
+>>> +++ b/default-configs/mips-softmmu-common.mak
+>>> @@ -3,7 +3,6 @@
+>>>  CONFIG_ISA_BUS=3Dy
+>>>  CONFIG_PCI=3Dy
+>>>  CONFIG_PCI_DEVICES=3Dy
+>>> -CONFIG_ESP=3Dy
+>>>  CONFIG_VGA_ISA=3Dy
+>>>  CONFIG_VGA_ISA_MM=3Dy
+>>>  CONFIG_VGA_CIRRUS=3Dy
+>>> diff --git a/default-configs/mips64-softmmu.mak b/default-configs/mip=
+s64-softmmu.mak
+>>> index bad7496672..a169738635 100644
+>>> --- a/default-configs/mips64-softmmu.mak
+>>> +++ b/default-configs/mips64-softmmu.mak
+>>> @@ -1,9 +1,4 @@
+>>>  # Default configuration for mips64-softmmu
+>>> =20
+>>>  include mips-softmmu-common.mak
+>>> -CONFIG_RC4030=3Dy
+>>> -CONFIG_DP8393X=3Dy
+>>> -CONFIG_DS1225Y=3Dy
+>>>  CONFIG_JAZZ=3Dy
+>>> -CONFIG_G364FB=3Dy
+>>> -CONFIG_JAZZ_LED=3Dy
+>>> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/m=
+ips64el-softmmu.mak
+>>> index 8b255efc54..a7b88318b2 100644
+>>> --- a/default-configs/mips64el-softmmu.mak
+>>> +++ b/default-configs/mips64el-softmmu.mak
+>>> @@ -2,13 +2,8 @@
+>>> =20
+>>>  include mips-softmmu-common.mak
+>>>  CONFIG_IDE_VIA=3Dy
+>>> -CONFIG_RC4030=3Dy
+>>> -CONFIG_DP8393X=3Dy
+>>> -CONFIG_DS1225Y=3Dy
+>>>  CONFIG_FULONG=3Dy
+>>>  CONFIG_JAZZ=3Dy
+>>> -CONFIG_G364FB=3Dy
+>>> -CONFIG_JAZZ_LED=3Dy
+>>>  CONFIG_VT82C686=3Dy
+>>>  CONFIG_AHCI=3Dy
+>>>  CONFIG_MIPS_BOSTON=3Dy
+>>> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+>>> index 3433e97e1a..ab006477c7 100644
+>>> --- a/hw/mips/Kconfig
+>>> +++ b/hw/mips/Kconfig
+>>> @@ -12,6 +12,23 @@ config MIPSSIM
+>>> =20
+>>>  config JAZZ
+>>>      bool
+>>> +    select ISA_BUS
+>>> +    select RC4030
+>>> +    select I8259
+>>> +    select I8254
+>>> +    select I8257
+>>> +    select PCSPK
+>>> +    select VGA_ISA_MM
+>>> +    select G364FB
+>>> +    select DP8393X
+>>
+>> Looking at the code, it seems like you can also run the machine with
+>> "-net none", so I'd rather use "imply DP8393X" here instead.
 >=20
-> On 1/3/18 10:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Use Base64 to serialize the binary blobs in JSON.
->> So far at most 512 bytes will be transfered, which result
->> in a 684 bytes payload.
->> Since this command is intented for qtesting, it is acceptable.
->=20
-> Any comment regarding QMP for this patch?
-
-Is this useful for anybody else than qtest? If not, I think this should
-rather go into the qtest protocol instead, since QMP is our "public"
-protocol.
-
->> diff --git a/hw/sd/sdbus-qmp.c b/hw/sd/sdbus-qmp.c
->> new file mode 100644
->> index 0000000000..8c4b6f2aee
->> --- /dev/null
->> +++ b/hw/sd/sdbus-qmp.c
->> @@ -0,0 +1,65 @@
->> +/*
->> + * SD card bus QMP debugging interface (for QTesting).
->> + *
->> + * Copyright (c) 2017 ?
-
-Weird line. Add you name here ?
+> Well here I'm not sure.
+> For the both machine variants (PICA-61 and Magnum 4000), the chipset is
+> soldered on the board, and is MMIO mapped (via a ChipSelect, no via a
+> bus you can plug/unplug).
+Ok, then please ignore my comment and keep the "select" here!
 
  Thomas
