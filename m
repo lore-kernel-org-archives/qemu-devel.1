@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44882)
+Received: from eggs.gnu.org ([209.51.188.92]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3L11-0003gh-6G
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:30:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1h3L1N-0003vW-8T
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1h3L0w-0001fk-2P
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:30:51 -0400
-References: <20190308114218.26692-1-shameerali.kolothum.thodi@huawei.com>
-	<20190308114218.26692-5-shameerali.kolothum.thodi@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7cea0bf3-2eba-d649-fb33-a84648f856e0@redhat.com>
-Date: Mon, 11 Mar 2019 14:24:11 +0100
+	(envelope-from <laurent@vivier.eu>) id 1h3L1G-0001qC-Qy
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:31:13 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:40793)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1h3L19-0001fp-4H
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:31:06 -0400
+References: <20190311101428.GA11@765644dd90e5>
+	<20190311103106.GG16@765644dd90e5>
+	<9b0b6b52-347e-7a48-22be-798f101989ac@vivier.eu>
+	<CAGZZdDHBKs46ep-+hnjBDRJpk5vf+kk+fyaBmXzj4_KrawwwsQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4c16264a-5548-6247-e200-a4006f0aa241@vivier.eu>
+Date: Mon, 11 Mar 2019 14:30:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190308114218.26692-5-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <CAGZZdDHBKs46ep-+hnjBDRJpk5vf+kk+fyaBmXzj4_KrawwwsQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/11] hw/arm/virt: Add virtual ACPI
- device
+Subject: Re: [Qemu-devel] [PATCH v4 8/10] qemu-binfmt-conf.sh: add option
+ --clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,178 +31,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com
-Cc: linuxarm@huawei.com, xuwei5@hisilicon.com
+To: unai.martinezcorral@ehu.eus
+Cc: qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Hi Shameer,
-
-On 3/8/19 12:42 PM, Shameer Kolothum wrote:
-> From: Samuel Ortiz <sameo@linux.intel.com>
+On 11/03/2019 14:19, Unai Martinez Corral wrote:
+> 2019/3/11 12:04, Laurent Vivier:
+>>> +    find /proc/sys/fs/binfmt_misc/ -type f -name $names -exec sh -c 'printf %s -1 > {}' \;
+>>
+>> The qemu-* will be expanded here if you have a qemu-XXX in the current
+>> directory. You must use "$names".
 > 
-> This is to provide an acpi device interface for Arm/virt.
-> This will be used by Arm/Virt to add hotplug support via
-> ACPI GED device.
+> You are correct. Indeed, I had not spotted it because I introduced a
+> bug when renaming 'reset' to 'clear'. Precisely, '-c' was being used
+> twice: for 'credential' and for 'clear'. Both issues will be fixed in
+> the next version.
+> 
+>> But:
+>>
+>> To remove all, you can do:
+>> sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/status'
+>>
+>> so something like
+>>
+>> if [ $# -eq 0 ] ; then
+>>   sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/status
+>> fi
+>> qemu_check_target_list $1
+>> for t in $checked_target_list ; do
+>>    sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/qemu-$t'
+>> done
+> 
+> Wouldn't writing to 'status' remove all the interpreters, and not only
+> those that correspond to qemu?
 
-I think this would deserves to mention this is a skeleton or,
-wouldn't it make sense to merge the virt-acpi part of "hw/arm/virt: Add
-ACPI support for device memory cold-plug" inside this patch; and keep
-its instantiation in machvirt in a separate patch?
+Yes, you are right.
 
 > 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  hw/arm/Makefile.objs  |   2 +-
->  hw/arm/virt-acpi.c    | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/arm/virt.h |   1 +
->  3 files changed, 113 insertions(+), 1 deletion(-)
->  create mode 100644 hw/arm/virt-acpi.c
+>> But I think you should also taking care of the suffix.
 > 
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index fa57c7c..e0db3cd 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -1,6 +1,6 @@
->  obj-y += boot.o sysbus-fdt.o
->  obj-$(CONFIG_ARM_VIRT) += virt.o
-> -obj-$(CONFIG_ACPI) += virt-acpi-build.o
-> +obj-$(CONFIG_ACPI) += virt-acpi-build.o virt-acpi.o
->  obj-$(CONFIG_DIGIC) += digic_boards.o
->  obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
->  obj-$(CONFIG_HIGHBANK) += highbank.o
-> diff --git a/hw/arm/virt-acpi.c b/hw/arm/virt-acpi.c
-> new file mode 100644
-> index 0000000..df8a02b
-> --- /dev/null
-> +++ b/hw/arm/virt-acpi.c
-> @@ -0,0 +1,111 @@
-> +/*
-> + *
-> + * Copyright (c) 2018 Intel Corporation
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/range.h"
-> +#include "qapi/error.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#include "hw/hw.h"
-> +#include "hw/hotplug.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/arm/virt.h"
-> +
-> +#include "hw/acpi/acpi.h"
-> +
-> +typedef struct VirtAcpiState {
-> +    SysBusDevice parent_obj;
-> +} VirtAcpiState;
-> +
-> +#define TYPE_VIRT_ACPI "virt-acpi"
-> +#define VIRT_ACPI(obj) \
-> +    OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
-> +
-> +static const VMStateDescription vmstate_acpi = {
-> +    .name = "virt_acpi",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +};
-> +
-> +static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
-> +                                DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
-> +static void virt_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                          DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
-> +static void virt_device_unplug_cb(HotplugHandler *hotplug_dev,
-> +                                  DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
-> +static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-> +{
-> +}
-> +
-> +static void virt_device_realize(DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
-> +DeviceState *virt_acpi_init(void)
-> +{
-> +    return sysbus_create_simple(TYPE_VIRT_ACPI, -1, NULL);
-> +}
-> +
-> +static Property virt_acpi_properties[] = {
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void virt_acpi_class_init(ObjectClass *class, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(class);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(class);
-> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-> +
-> +    dc->desc = "ACPI";
-> +    dc->vmsd = &vmstate_acpi;
-do we really need the vmsd field as of now?
-> +    dc->props = virt_acpi_properties;> +    dc->realize = virt_device_realize;
-> +
-> +    hc->plug = virt_device_plug_cb;
-> +    hc->unplug_request = virt_device_unplug_request_cb;
-> +    hc->unplug = virt_device_unplug_cb;
-unplug_request and unplug still aren't implemented at the end of the
-series. Maybe we can ignore them at the moment?
-> +
-> +    adevc->send_event = virt_send_ged;
-> +}
-> +
-> +static const TypeInfo virt_acpi_info = {
-> +    .name          = TYPE_VIRT_ACPI,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(VirtAcpiState),
-> +    .class_init    = virt_acpi_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_HOTPLUG_HANDLER },
-> +        { TYPE_ACPI_DEVICE_IF },
-> +        { }
-> +    }
-> +};
-> +
-> +static void virt_acpi_register_types(void)
-> +{
-> +    type_register_static(&virt_acpi_info);
-> +}
-> +
-> +type_init(virt_acpi_register_types)
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 507517c..6076167 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -145,6 +145,7 @@ typedef struct {
->      OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
->  
->  void virt_acpi_setup(VirtMachineState *vms);
-> +DeviceState *virt_acpi_init(void);
->  
->  /* Return the number of used redistributor regions  */
->  static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+> I think that the suffix is not related to the entry in
+> '/proc/sys/fs/binfmt_misc/'. See, e.g.:
 > 
+> package qemu-$cpu
+> interpreter $qemu
+> 
+> So, independently of which is the executable (interpreter), the
+> package name does not include the suffix.
 
-Thanks
+Yes, you are right.
 
-Eric
+>>> +if [ "x$QEMU_CLEAR" = "xyes" ] ; then
+>>> +  case "$BINFMT_SET" in
+>>> +    *debian)  BINFMT_CLEAR=qemu_clear_notimplemented ;;
+>>> +    *systemd) BINFMT_CLEAR=qemu_clear_notimplemented ;;
+>>> +    *)        BINFMT_CLEAR=qemu_clear_interpreter
+>>> +  esac
+>>
+>> Put this in the previous case for decoding options, please.
+> 
+> It won't work. This if/case block requires all the options to be
+> already parsed and processed. If I put it in the case for '-r|--clear'
+> above, it will only work only when '-r' is given after '--debian' or
+> '--systemd'. Otherwise, BINFMT_SET will always be
+> qemu_register_interpreter when '-crear' is evaluated. I think that we
+> should not rely on the users providing the options in a specific
+> order.
+
+I meant something like this:
+
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index b5a16742a149..5c2651a6df57 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -327,17 +327,23 @@ QEMU_SUFFIX=""
+ options=$(getopt -o ds:Q:S:e:hc:p: -l
+debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent:
+-- "$@")
+ eval set -- "$options"
+
++BINFMT_CLEAR=qemu_clear_interpreter
+ while true ; do
+     case "$1" in
++    -c|--clear)
++        QEMU_CLEAR="yes"
++        ;;
+     -d|--debian)
+         CHECK=qemu_check_debian
+         BINFMT_SET=qemu_generate_debian
+         EXPORTDIR=${EXPORTDIR:-$DEBIANDIR}
++        BINFMT_CLEAR=qemu_clear_notimplemented
+         ;;
+     -s|--systemd)
+         CHECK=qemu_check_systemd
+         BINFMT_SET=qemu_generate_systemd
+         EXPORTDIR=${EXPORTDIR:-$SYSTEMDDIR}
++        BINFMT_CLEAR=qemu_clear_notimplemented
+         shift
+         # check given cpu is in the supported CPU list
+         if [ "$1" != "ALL" ] ; then
+@@ -387,5 +393,9 @@ while true ; do
+     shift
+ done
+
++if [ "x$QEMU_CLEAR" = "xyes" ] ; then
++  $BINFMT_CLEAR "$@"
++  exit
++fi
+ $CHECK
+ qemu_set_binfmts
