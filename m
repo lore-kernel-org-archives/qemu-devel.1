@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42203)
+Received: from eggs.gnu.org ([209.51.188.92]:43931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3Mwg-0005vg-4r
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3N1W-0002qd-ND
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MkI-0006jF-3P
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42646
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h3MkH-0006iS-Tl
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:42 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x2BFGc3w062123
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:41 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2r5sv21a4r-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:41 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 11 Mar 2019 15:21:40 -0000
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 11 Mar 2019 11:21:20 -0400
-In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1552317693-21979-3-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 02/15] s390-bios: decouple cio setup from
- virtio
+	(envelope-from <peter.maydell@linaro.org>) id 1h3N1R-0005aN-24
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:39:30 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3N1P-0005Zl-4H
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:39:23 -0400
+Received: by mail-oi1-x244.google.com with SMTP id w66so3996399oia.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:39:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <0184EA26B2509940AA629AE1405DD7F202153AC7@dggema523-mbx.china.huawei.com>
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F202153AC7@dggema523-mbx.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 15:39:09 +0000
+Message-ID: <CAFEAcA9yr3trFz7ZFsS-P-g=gxe=MX6Eet_dTdcOCSdhW7_J4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RESEND PATCH] target/arm: change arch timer
+ registers access permission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Move channel i/o setup code out to a separate function. This decouples cio
-setup from the virtio code path and allows us to make use of it for booting
-dasd devices.
+On Mon, 11 Mar 2019 at 15:24, gengdongjiu <gengdongjiu@huawei.com> wrote:
+> So If QEMU defined the timer registers read only in PL0, even though it has been configured to have write permission in PL0 by high PLx, we still cannot have
+> Write permission, because QEMU will firstly check the defined permission and then check the configured permission by high PLx.
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+I'm afraid I don't understand what you're trying to say here.
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 544851d..e82fe2c 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -99,6 +99,18 @@ static void menu_setup(void)
-     }
- }
- 
-+/*
-+ * Initialize the channel I/O subsystem so we can talk to our ipl/boot device.
-+ */
-+static void css_setup(void)
-+{
-+    /*
-+     * Unconditionally enable mss support. In every sane configuration this
-+     * will succeed; and even if it doesn't, stsch_err() can handle it.
-+     */
-+    enable_mss_facility();
-+}
-+
- static void virtio_setup(void)
- {
-     Schib schib;
-@@ -109,13 +121,6 @@ static void virtio_setup(void)
-     VDev *vdev = virtio_get_device();
-     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
- 
--    /*
--     * We unconditionally enable mss support. In every sane configuration,
--     * this will succeed; and even if it doesn't, stsch_err() can deal
--     * with the consequences.
--     */
--    enable_mss_facility();
--
-     sclp_get_loadparm_ascii(loadparm_str);
-     memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
-     sclp_print(ldp);
-@@ -168,6 +173,7 @@ static void virtio_setup(void)
- int main(void)
- {
-     sclp_setup();
-+    css_setup();
-     virtio_setup();
- 
-     zipl_load(); /* no return */
--- 
-2.7.4
+Yes, it was a bug that we marked these registers as read-only for PL0,
+and we should fix it.
+
+What I am trying to say is that
+ .access = PL1_RW | PL0_RW
+
+is exactly equivalent to
+ .access = PL0_RW
+
+and we should use the simpler version of the expression.
+
+(If you look at the definitions of all the PL*_ constants,
+you can see that PL0_W implies PL1_W:
+#define PL0_W (0x01 | PL1_W)
+and similarly for PL0_R. So all the bits in the bitfield that would be
+set by PL1_RW are also set by PL0_RW.)
+
+thanks
+-- PMM
