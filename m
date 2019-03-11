@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50608)
+Received: from eggs.gnu.org ([209.51.188.92]:50798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h3Rmg-0002TV-T1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:44:31 -0400
+	(envelope-from <clg@kaod.org>) id 1h3Rnv-0003qI-2r
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1h3Rmg-0002ZH-3E
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:44:30 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:38823)
+	(envelope-from <clg@kaod.org>) id 1h3Rnt-000339-70
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:45:47 -0400
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:42916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h3Rmf-0002Yb-Nt
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:44:30 -0400
-Received: from player692.ha.ovh.net (unknown [10.109.160.153])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D542B18510B
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 21:44:27 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1h3Rnp-00031p-VF
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 16:45:43 -0400
+Received: from player696.ha.ovh.net (unknown [10.109.143.223])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id CCF07464CA
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 21:45:39 +0100 (CET)
 References: <20190222131322.26079-1-clg@kaod.org>
-	<20190222131322.26079-4-clg@kaod.org>
-	<20190225234927.GB6872@umbus.fritz.box>
+	<20190222131322.26079-8-clg@kaod.org>
+	<20190226010246.GG6872@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3c56afd5-460c-acfb-f67a-4115b27d73cf@kaod.org>
-Date: Mon, 11 Mar 2019 21:44:22 +0100
+Message-ID: <4ff22528-a871-8141-e871-2de5fbcce5c6@kaod.org>
+Date: Mon, 11 Mar 2019 21:45:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190225234927.GB6872@umbus.fritz.box>
+In-Reply-To: <20190226010246.GG6872@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/13] spapr/xive: activate KVM support
+Subject: Re: [Qemu-devel] [PATCH v2 07/13] spapr/xive: fix migration of the
+ XiveTCTX under TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +36,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 2/26/19 12:49 AM, David Gibson wrote:
-> On Fri, Feb 22, 2019 at 02:13:12PM +0100, C=E9dric Le Goater wrote:
->> All is in place for KVM now. State synchronization and migration will
->> come next.
->=20
-> As with the kernel side capability, this should be moved later in the
-> series to avoid breaking bisections.
-
-I am not sure to understand. At this stage of the patchset, the XIVE
-exploitation mode is operational. We can not synchronise the state=20
-or migrate but it runs.
-
-Should we move XIVE activation after the migration patch ?=20
-
-C.=20
-
-=20
+On 2/26/19 2:02 AM, David Gibson wrote:
+> On Fri, Feb 22, 2019 at 02:13:16PM +0100, C=E9dric Le Goater wrote:
+>> When the thread interrupt management state is retrieved from the KVM
+>> VCPU, word2 is saved under the QEMU XIVE thread context to print out
+>> the OS CAM line under the QEMU monitor.
+>>
+>> This breaks the migration of a TCG guest (and with KVM when
+>> kernel_irqchip=3Doff) because the matching algorithm of the presenter
+>> relies on the OS CAM value. Fix with an extra reset of the thread
+>> contexts to restore the expected value.
 >>
 >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> As noted elsewhere, I'm not sure this is the right approach to fixing
+> this.  In any case this can be folded into the previous patch.
+
+I have proposed an alternative in a response to :
+
+ [PATCH v2 04/13] spapr/xive: add state synchronization with KVM=20
+
+C.
+
+
+>=20
 >> ---
->>  hw/ppc/spapr_irq.c | 9 ---------
->>  1 file changed, 9 deletions(-)
+>>  hw/ppc/spapr_irq.c | 26 +++++++++++++++++++++++++-
+>>  1 file changed, 25 insertions(+), 1 deletion(-)
 >>
 >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 6e1c36dc62ca..1ad57582a403 100644
+>> index 12ecca6264f3..3176098b9f7c 100644
 >> --- a/hw/ppc/spapr_irq.c
 >> +++ b/hw/ppc/spapr_irq.c
->> @@ -263,19 +263,10 @@ sPAPRIrq spapr_irq_xics =3D {
->>  static void spapr_irq_init_xive(sPAPRMachineState *spapr, int nr_irqs=
-,
->>                                  Error **errp)
->>  {
->> -    MachineState *machine =3D MACHINE(spapr);
->>      uint32_t nr_servers =3D spapr_max_server_number(spapr);
->>      DeviceState *dev;
->>      int i;
+>> @@ -356,7 +356,31 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRM=
+achineState *spapr,
 >> =20
->> -    /* KVM XIVE device not yet available */
->> -    if (kvm_enabled()) {
->> -        if (machine_kernel_irqchip_required(machine)) {
->> -            error_setg(errp, "kernel_irqchip requested. no KVM XIVE s=
-upport");
->> -            return;
->> -        }
->> -    }
->> -
->>      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
->>      qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
->>      /*
+>>  static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int ver=
+sion_id)
+>>  {
+>> -    return spapr_xive_post_load(spapr->xive, version_id);
+>> +    CPUState *cs;
+>> +    int ret;
+>> +
+>> +    ret =3D spapr_xive_post_load(spapr->xive, version_id);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    /*
+>> +     * When the states are collected from the KVM XIVE device, word2
+>> +     * of the XiveTCTX is set to print out the OS CAM line under the
+>> +     * QEMU monitor.
+>> +     *
+>> +     * This breaks the migration on a TCG guest (or on KVM with
+>> +     * kernel_irqchip=3Doff) because the matching algorithm of the
+>> +     * presenter relies on the OS CAM value. Fix with an extra reset
+>> +     * of the thread contexts to restore the expected value.
+>> +     */
+>> +    CPU_FOREACH(cs) {
+>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>> +
+>> +        /* (TCG) Set the OS CAM line of the thread interrupt context.=
+ */
+>> +        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+>> +    }
+>> +    return 0;
+>>  }
+>> =20
+>>  static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **er=
+rp)
 >=20
