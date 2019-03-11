@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48959)
+Received: from eggs.gnu.org ([209.51.188.92]:50891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3LNz-0003bP-A3
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:54:37 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1h3LRf-0007cs-4v
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3LCp-0001gV-IK
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:43:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3LCp-0001g6-7F
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:43:03 -0400
-References: <20190311054252.6094-1-richardw.yang@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <32619343-ad9b-4610-13f2-7c7bc4dec70e@redhat.com>
-Date: Mon, 11 Mar 2019 14:42:58 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190311054252.6094-1-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1h3LRe-0008LZ-3I
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:58:23 -0400
+Received: from mail-eopbgr770107.outbound.protection.outlook.com
+	([40.107.77.107]:52288
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1h3LRc-0008KB-74
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:58:22 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 11 Mar 2019 13:58:17 +0000
+Message-ID: <BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] exec.c: refactor function
- flatview_add_to_dispatch()
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 
-On 11/03/19 06:42, Wei Yang wrote:
-> flatview_add_to_dispatch() registers page based on the condition of
-> *section*, which may looks like this:
-> 
->     |s|PPPPPPP|s|
-> 
-> where s stands for subpage and P for page.
-> 
-> The procedure of this function could be described as:
-> 
->     - register first subpage
->     - register page
->     - register last subpage
-> 
-> This means the procedure could be simplified into these three steps
-> instead of a loop iteration.
-> 
-> This patch refactors the function into three corresponding steps and
-> adds some comment to clarify it.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> 
-> ---
-> v3:
->   * pass int128_make64() instead of 0 to int128_gt()
-> v2:
->   * removes the loop iteration as suggested by Paolo
-> ---
->  exec.c | 50 +++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 33 insertions(+), 17 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 0959b00c06..79cd561b3b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1598,34 +1598,50 @@ static void register_multipage(FlatView *fv,
->      phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
->  }
->  
-> +/*
-> + * The range in *section* may look like this:
-> + *
-> + *      |s|PPPPPPP|s|
-> + *
-> + * where s stands for subpage and P for page.
-> + *
-> + * The procedure in following function could be described as:
-> + *
-> + * - register first subpage
-> + * - register page
-> + * - register last subpage
+> From: Peter Maydell <peter.maydell@linaro.org>
+> Subject: Re: [PATCH] target/mips: Fix minor bug in FPU
+>=20
+> On Mon, 11 Mar 2019 at 11:52, Aleksandar Markovic
+> <amarkovic@wavecomp.com> wrote:
+> >
+> > > From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> > > Subject: [PATCH] target/mips: Fix minor bug in FPU
+> > >
+> > > Wrong type of NaN was generated by maddf and msubf insturctions
+> > > when the arguments were inf, zero, nan or zero, inf, nan
+> > > respectively.
+> >
+> > I did the applicable tests on both pre-NaN2008 and NaN2008 MIPS hardwar=
+e,
+> > and compared results with QEMu emulations. The underlying reason for th=
+is
+> > patch is correct, but, as Alex also pointed out, it needs some improvem=
+ents.
+> > However, the softfreeze being so close, I am going to amend the patch w=
+hile
+> > creating the pull request. No respin needed. All in all:
+>=20
+> Since this is a bug fix, there is no requirement that it goes in
+> before softfreeze, FWIW -- pretty much any bug fix is OK for
+> rc1, and a focused bugfix like this one that doesn't affect
+> other guest architectures would be ok in rc2 as well.
+>=20
 
-The last paragraph is a duplicate of the comments in the function, so it
-can be deleted.  I did that and queued the patch.
+Thanks, Peter, for the clarification!
 
-Paolo
+In this case, I think, the most natural would be to wait for the
+submitter to submit the v2.
 
-> + */
->  void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section)
->  {
-> -    MemoryRegionSection now = *section, remain = *section;
-> +    MemoryRegionSection now, remain = *section;
->      Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
->  
-> -    if (now.offset_within_address_space & ~TARGET_PAGE_MASK) {
-> -        uint64_t left = TARGET_PAGE_ALIGN(now.offset_within_address_space)
-> -                       - now.offset_within_address_space;
-> +    /* register first subpage */
-> +    if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
-> +        uint64_t left = TARGET_PAGE_ALIGN(remain.offset_within_address_space)
-> +                        - remain.offset_within_address_space;
->  
-> +        now = remain;
->          now.size = int128_min(int128_make64(left), now.size);
-> +        remain.size = int128_sub(remain.size, now.size);
-> +        remain.offset_within_address_space += int128_get64(now.size);
-> +        remain.offset_within_region += int128_get64(now.size);
->          register_subpage(fv, &now);
-> -    } else {
-> -        now.size = int128_zero();
->      }
-> -    while (int128_ne(remain.size, now.size)) {
-> +
-> +    /* register page */
-> +    if (int128_ge(remain.size, page_size)) {
-> +        now = remain;
-> +        now.size = int128_and(now.size, int128_neg(page_size));
->          remain.size = int128_sub(remain.size, now.size);
->          remain.offset_within_address_space += int128_get64(now.size);
->          remain.offset_within_region += int128_get64(now.size);
-> -        now = remain;
-> -        if (int128_lt(remain.size, page_size)) {
-> -            register_subpage(fv, &now);
-> -        } else if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
-> -            now.size = page_size;
-> -            register_subpage(fv, &now);
-> -        } else {
-> -            now.size = int128_and(now.size, int128_neg(page_size));
-> -            register_multipage(fv, &now);
-> -        }
-> +        register_multipage(fv, &now);
-> +    }
-> +
-> +    /* register last subpage */
-> +    if (int128_gt(remain.size, int128_make64(0))) {
-> +        register_subpage(fv, &remain);
->      }
->  }
->  
-> 
+The reference to the documentation that Alex rightfully asked for
+is this:
+
+"MIPS Architecture for Programmers Volume IV-j: The MIPS32
+SIMD Architecture Module", Revision 1.12, February 3, 2016
+
+The key sentence is on page 53:
+
+   "If the destination format is floating-point, all NaN propagating
+   operations with one NaN operand produce a NaN with the
+   payload of the input NaN."
+
+There are other details in surrounding paragraphs. The document
+is for SIMD (MSA) ASE, but both the SIMD and FPU NaN2008
+floating point instruction should follow the same rules. I could't
+find a separate document on FPU instructions.
+
+The problem with the current implementation of 0*inf+nan is that
+it returns the default NaN (all zeroes in the payload segment),
+whereas the documentation says the payload should be from
+the input NaN. The behavior specified in the documentation is
+confirmed also with tests on hardware.
+
+Sincerely,
+Aleksandar=
