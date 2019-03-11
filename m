@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46703)
+Received: from eggs.gnu.org ([209.51.188.92]:52759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1h3Tw9-0002eA-9v
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:02:26 -0400
+	(envelope-from <crosa@redhat.com>) id 1h3Udl-0006TW-VH
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1h3Tw8-0006vQ-9l
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:02:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38607)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1h3Tw8-0006uz-0n
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:02:24 -0400
-From: Bandan Das <bsd@redhat.com>
-References: <20190307095441.31921-1-kraxel@redhat.com>
-	<20190307095441.31921-4-kraxel@redhat.com>
-	<CAFEAcA_HzSj7sQ+aKEwHmJXkJcG8yLmn5ZsZKM5xxYUrBxO2rQ@mail.gmail.com>
-	<jpg36nxf8ta.fsf@linux.bootlegged.copy>
-	<jpg8sxpypx2.fsf_-_@linux.bootlegged.copy>
-	<CAFEAcA_3=cQDHibDe++d+6UpkHhKMP8=s4iJYbqUVeJdDQv+fQ@mail.gmail.com>
-	<jpg8sxle6c6.fsf@linux.bootlegged.copy>
-	<CAFEAcA9sx64kcz=wOqeBwGg0YJc-xO-K5yNkoSC8uuCqNF_FYA@mail.gmail.com>
-	<jpgef7d746o.fsf@linux.bootlegged.copy>
-	<CAFEAcA_U=1w2krP9zrC3oXjhJZ1Y5k+2GP_s3oY0p8WvB_9hig@mail.gmail.com>
-	<jpgzhq1cnuc.fsf@linux.bootlegged.copy>
-	<CAFEAcA_xQ=Y0HVkb+qDTmuf8p02UiAp5UKbbjPthy-vTv+SyXA@mail.gmail.com>
-	<jpga7i1uvr6.fsf@linux.bootlegged.copy>
-	<CAFEAcA_wDgYooMLotS-SmASWjRxVhTzn6eeiDgH-zVfu3=v+xA@mail.gmail.com>
-Date: Mon, 11 Mar 2019 19:02:19 -0400
-In-Reply-To: <CAFEAcA_wDgYooMLotS-SmASWjRxVhTzn6eeiDgH-zVfu3=v+xA@mail.gmail.com>
-	(Peter Maydell's message of "Mon, 11 Mar 2019 18:56:51 +0000")
-Message-ID: <jpg5zsp581w.fsf@linux.bootlegged.copy>
+	(envelope-from <crosa@redhat.com>) id 1h3Uc8-0006ME-Gr
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 19:45:50 -0400
+Date: Mon, 11 Mar 2019 19:45:35 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190311234535.oaejcgcewgcof7ql@localhost.localdomain>
+References: <20190221005753.27955-1-crosa@redhat.com>
+	<20190221005753.27955-7-crosa@redhat.com>
+	<20190301113227.04f1f128.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] usb-mtp: fix return status of delete
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190301113227.04f1f128.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 06/20] Acceptance tests: use "arch:" tag
+ to filter target specific tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,76 +25,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-...
->> Ok, this is easier. Now, I know what you are referring to
->> instead of guessing what and how I should be explainng.
->>
->> What you said is essentially correct. When deleting a
->> single object that's a file, the return value would either
->> be OK or STORE_READ_ONLY.
->>
->> When deleting an object which is a folder, Qemu goes through
->> its contents. If it succeeds in deleting all the content objects,
->> the result is success. If one or some objects couldn't be deleted for
->> whatever reason, the result is RES_PARTIAL_DELETE and if none
->> of the objects could be deleted, Qemu returns a READ_ONLY.
->>
->> In usb_mtp_object_delete(), based on the return value of this
->> function, we set s->result appropriately.
+On Fri, Mar 01, 2019 at 11:32:27AM +0100, Cornelia Huck wrote:
+> On Wed, 20 Feb 2019 19:57:39 -0500
+> Cleber Rosa <crosa@redhat.com> wrote:
+> 
+> > Currently, the only test that contains some target architecture
+> > information is "boot_linux_console.py" which test contains a "x86_64"
+> 
+> But there are two others changed by you here, aren't there?
 >
-> OK. So we can do this with a return value where the
-> two relevant bits indicate:
->  * bit 0: We had at least one successful deletion
->  * bit 1: We had at least one failed deletion
->
-> and then the correct RES value is:
->  * only bit 0 set: READ_ONLY
->  * only bit 1 set: OK
->  * both bits set: PARTIAL_DELETE
->  * neither bit set: can't happen
->
-> This is what your patch does, I think, but you've named
-> the "at least one deletion succeeded" bit "ALL_DELETE"
-> (even though it can be set in a return value where not
-> all of the deletions succeeded) and the "at least one
-> deletion failed" bit "READ_ONLY" (even though it can
-> be set in a return value where some deletions succeeded),
-> which is what I found confusing.
->
-> I think the code would be easier to understand if we:
->  * picked clearer names for the bits, like
->    DELETE_SUCCESS and DELETE_FAILURE
->  * had a comment explaining what the return value
->    of the function means, something like:
->
-> /*
->  * Delete the object @o and all its children. In the
->  * return value, the DELETE_SUCCESS bit is set if at
->  * least one of the deletions succeeded, and the
->  * DELETE_FAILURE bit is set if at least one of the
->  * deletions failed. If the tree of objects was only
->  * partially deleted then both bits will be set.
->  */
->
-> But really the second of these is the more important:
-> slightly confusing naming is OK if there is a good
-> comment explaining what is going on (and my suggested
-> bit flag names don't really stand on their own without
-> any explanation either). So if you strongly prefer your names
-> for the bits that's ok, but please do add a comment,
-> either at the top of the function or documenting
-> the meaning of the enum values.
->
-Peter, thank you for the thorough review, I really appreciate it.
-I definitely want to make this code less confusing to the next
-potential reviewer. I will address all your suggestions in the
-next version of the patch.
 
-Bandan
+Yes, the "only test" is now outdated.  Fixing it.
 
-> thanks
-> -- PMM
+> > tag.  But that tag is not respected in the default execution, that is,
+> > "make check-acceptance" doesn't do anything with it.
+> > 
+> > That said, even the target architecture handling currently present in
+> > the "avocado_qemu.Test" class, class is pretty limited.  For instance,
+> 
+> s/class, class/class/
+
+You are so good at proof reading! Kudos!
+
+> 
+> > by default, it chooses a target based on the host architecture.
+> > 
+> > Because the original implementation of the tags feature in Avocado did
+> > not include any time of namespace or "key:val" mechanism, no tag has
+> > relation to another tag.  The new implementation of the tags feature
+> > from version 67.0 onwards, allows "key:val" tags, and because of that,
+> > a test can be classified with a tag in a given key.  For instance, the
+> > new proposed version of the "boot_linux_console.py" test, which
+> > downloads and attempts to run a x86_64 kernel, is now tagged as:
+> > 
+> >   :avocado: tags=arch:x86_64
+> > 
+> > This means that it can be filtered (out) when no x86_64 target is
+> > available.  At the same time, tests that don't have a "arch:" tag,
+> > will not be filtered out.
+> > 
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >  tests/Makefile.include                 | 3 +++
+> >  tests/acceptance/boot_linux_console.py | 2 +-
+> >  tests/acceptance/linux_initrd.py       | 2 +-
+> >  tests/acceptance/virtio_version.py     | 2 +-
+> >  tests/requirements.txt                 | 2 +-
+> >  5 files changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 93ea42553e..633992603d 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -1090,6 +1090,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+> >  # Any number of command separated loggers are accepted.  For more
+> >  # information please refer to "avocado --help".
+> >  AVOCADO_SHOW=app
+> > +AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
+> >  
+> >  ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
+> >  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+> > @@ -1115,6 +1116,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+> >  	$(call quiet-command, \
+> >              $(TESTS_VENV_DIR)/bin/python -m avocado \
+> >              --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
+> > +            --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
+> > +            $(AVOCADO_TAGS) \
+> >              --failfast=on $(SRC_PATH)/tests/acceptance, \
+> >              "AVOCADO", "tests/acceptance")
+> >  
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> > index 98324f7591..46b20bdfe2 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
+> >      and the kernel command line is properly passed from QEMU to the kernel
+> >  
+> >      :avocado: enable
+> > -    :avocado: tags=x86_64
+> > +    :avocado: tags=arch:x86_64
+> >      """
+> >  
+> >      timeout = 60
+> > diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
+> > index 737355c2ef..c75e29be70 100644
+> > --- a/tests/acceptance/linux_initrd.py
+> > +++ b/tests/acceptance/linux_initrd.py
+> > @@ -19,7 +19,7 @@ class LinuxInitrd(Test):
+> >      Checks QEMU evaluates correctly the initrd file passed as -initrd option.
+> >  
+> >      :avocado: enable
+> > -    :avocado: tags=x86_64
+> > +    :avocado: tags=arch:x86_64
+> >      """
+> >  
+> >      timeout = 60
+> > diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
+> > index ce990250d8..3b280e7fc3 100644
+> > --- a/tests/acceptance/virtio_version.py
+> > +++ b/tests/acceptance/virtio_version.py
+> > @@ -62,7 +62,7 @@ class VirtioVersionCheck(Test):
+> >      `disable-legacy`.
+> >  
+> >      :avocado: enable
+> > -    :avocado: tags=x86_64
+> > +    :avocado: tags=arch:x86_64
+> >      """
+> >  
+> >      # just in case there are failures, show larger diff:
+> > diff --git a/tests/requirements.txt b/tests/requirements.txt
+> > index 64c6e27a94..002ded6a22 100644
+> > --- a/tests/requirements.txt
+> > +++ b/tests/requirements.txt
+> > @@ -1,4 +1,4 @@
+> >  # Add Python module requirements, one per line, to be installed
+> >  # in the tests/venv Python virtual environment. For more info,
+> >  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> > -avocado-framework==65.0
+> > +avocado-framework==68.0
+> 
+> I think you should explain why you bump the required version to 68.0
+> instead of the 67.0 you mention above.
+
+Actually, this bit will be removed in the rebase, because other commit
+(9531d26c106) already merged did that for other reason.  So, it looks
+like the explanation of the needed feature being present in 67.0 (and
+later) is adequate.
+
+Thanks,
+- Cleber.
