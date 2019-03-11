@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42515)
+Received: from eggs.gnu.org ([209.51.188.92]:49229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h3BQ9-000448-OS
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 23:16:10 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h3CAS-0004Sa-HB
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 00:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h3BLx-0004Xi-VW
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 23:11:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h3BLx-0004WG-OK
-	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 23:11:49 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF3723083394
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 03:11:48 +0000 (UTC)
-Date: Mon, 11 Mar 2019 11:11:44 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190311031144.GE16479@xz-x1>
-References: <20190308101210.28038-1-dgilbert@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1h3C1k-0001V6-OH
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 23:55:01 -0400
+Resent-Message-Id: <E1h3C1k-0001V6-OH@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1h3C1k-0001S1-F6
+	for qemu-devel@nongnu.org; Sun, 10 Mar 2019 23:55:00 -0400
+Message-ID: <155227646252.31099.9785093789314771052@6acff2cf482b>
+In-Reply-To: <20190310235351.1863-1-philmd@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190308101210.28038-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/postcopy: Update the bandwidth
- during postcopy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 10 Mar 2019 20:54:24 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/8] Kconfig: Clean up the PIIX southbridge
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: philmd@redhat.com
+Cc: fam@euphon.net, mst@redhat.com, thuth@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, hpoussin@reactos.org, arikalo@wavecomp.com, aurelien@aurel32.net, ehabkost@redhat.com, amarkovic@wavecomp.com
 
-On Fri, Mar 08, 2019 at 10:12:10AM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> The recently added max-postcopy-bandwidth parameter is only read
-> at the transition from precopy->postcopy where as the older
-> max-bandwidth parameter updates the migration bandwidth when changed
-> even if the migration is already running.
-> 
-> Fix this discrepency so that:
->   a) You can change the bandwidth during postcopy by setting
->      max-postcopy-bandwidth
-> 
->   b) Changing max-bandwidth during postcopy has no effect
->      (it currently changes the postcopy bandwidth which isn't
->      expected).
-> 
-> Fixes: 7e555c6c
-> bz: https://bugzilla.redhat.com/show_bug.cgi?id=1686321
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Now in qapi/migration.json it's not mentioning precopy in the
-max-bandwidth entry which seems to work even for postcopy but it'll
-not:
-
-# @max-bandwidth: to set maximum speed for migration. maximum speed in
-#                 bytes per second. (Since 2.8)
-
-Should we consider to touch that up too to match everything?
-
--- 
-Peter Xu
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDMxMDIzNTM1MS4xODYz
+LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
+U0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDMx
+MDIzNTM1MS4xODYzLTEtcGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVk
+b3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
