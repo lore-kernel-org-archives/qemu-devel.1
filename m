@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40401)
+Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h3Mh8-0003Tz-EU
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1h3Mvi-0005vi-Be
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1h3Mh3-0005Mf-J3
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:26 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1h3Mh1-0005Lx-Mm
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:18:20 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f3so4978157wmj.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 08:18:18 -0700 (PDT)
-References: <1551978650-23207-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<BN6PR2201MB1251FE1DD4630A150FFA1747C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<CAFEAcA-5D7nHBgb2hY+BT6CtTbt_qBQUL1KdLsoQLWsfyvRt6Q@mail.gmail.com>
-	<BN6PR2201MB125142E0D49100AA21CBFB36C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<87ftrt5wb2.fsf@zen.linaroharston>
-	<BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <BN6PR2201MB12515708748670C8F930B088C6480@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Date: Mon, 11 Mar 2019 15:18:16 +0000
-Message-ID: <87ef7d5tjb.fsf@zen.linaroharston>
+	(envelope-from <pbonzini@redhat.com>) id 1h3Mvh-000325-M8
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1h3Mvh-00031U-Bp
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:33:29 -0400
+References: <20190310160227.103090-1-liq3ea@163.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a7e2b946-b903-0dee-a362-58c394551a2f@redhat.com>
+Date: Mon, 11 Mar 2019 16:33:25 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190310160227.103090-1-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix minor bug in FPU
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: test-qgraph: fix a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,139 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Li Qiang <liq3ea@163.com>, e.emanuelegiuseppe@gmail.com
+Cc: qemu-devel@nongnu.org, liq3ea@gmail.com
 
+On 10/03/19 17:02, Li Qiang wrote:
+> Spotted by ASAN when 'make check'.
+> 
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  tests/test-qgraph.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+> index f6a6565e31..5c7e457075 100644
+> --- a/tests/test-qgraph.c
+> +++ b/tests/test-qgraph.c
+> @@ -122,7 +122,7 @@ static void check_driver(const char *driver)
+>  static void check_test(const char *test, const char *interface)
+>  {
+>      QOSGraphEdge *edge;
+> -    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+> +    char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
+>  
+>      qos_add_test(test, interface, testfunct, NULL);
+>      g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
+> @@ -138,6 +138,7 @@ static void check_test(const char *test, const char *interface)
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
+>      qos_graph_node_set_availability(full_name, FALSE);
+>      g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
+> +    g_free(full_name);
+>  }
+>  
+>  static void count_each_test(QOSGraphNode *path, int len)
+> 
 
-Aleksandar Markovic <amarkovic@wavecomp.com> writes:
+Queued, thanks.
 
->> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> > Aleksandar Markovic <amarkovic@wavecomp.com> writes:
->>
->> >> From: Peter Maydell <peter.maydell@linaro.org>
->> >> Subject: Re: [PATCH] target/mips: Fix minor bug in FPU
->> >>
->> >> On Mon, 11 Mar 2019 at 11:52, Aleksandar Markovic
->> >> <amarkovic@wavecomp.com> wrote:
->> >> >
->> >> > > From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
->> >> > > Subject: [PATCH] target/mips: Fix minor bug in FPU
->> >> > >
->> >> > > Wrong type of NaN was generated by maddf and msubf insturctions
->> >> > > when the arguments were inf, zero, nan or zero, inf, nan
->> >> > > respectively.
->> >> >
->> >> > I did the applicable tests on both pre-NaN2008 and NaN2008 MIPS har=
-dware,
->> >> > and compared results with QEMu emulations. The underlying reason fo=
-r this
->> >> > patch is correct, but, as Alex also pointed out, it needs some impr=
-ovements.
->> >> > However, the softfreeze being so close, I am going to amend the pat=
-ch while
->> >> > creating the pull request. No respin needed. All in all:
->> >>
->> >> Since this is a bug fix, there is no requirement that it goes in
->> >> before softfreeze, FWIW -- pretty much any bug fix is OK for
->> >> rc1, and a focused bugfix like this one that doesn't affect
->> >> other guest architectures would be ok in rc2 as well.
->> >>
->> >
->> > Thanks, Peter, for the clarification!
->> >
->> > In this case, I think, the most natural would be to wait for the
->> > submitter to submit the v2.
->> >
->> > The reference to the documentation that Alex rightfully asked for
->> > is this:
->> >
->> > "MIPS Architecture for Programmers Volume IV-j: The MIPS32
->> > SIMD Architecture Module", Revision 1.12, February 3, 2016
->> >
->> > The key sentence is on page 53:
->> >
->> >    "If the destination format is floating-point, all NaN propagating
->> >    operations with one NaN operand produce a NaN with the
->> >    payload of the input NaN."
->>
->> Hmm doesn't that fail for:
->>
->>   Inf * Zero + !NaN?
->>
->> Should the check be:
->>
->>     if (infzero) {
->>         float_raise(float_flag_invalid, status);
->>         if (is_nan(c_cls)) {
->>             return 2;
->>         }
->>         return 3;
->>     }
->>
->> ?
->>
->> If either a or b is a NaN we fall through to the NaN selection rules
->> bellow preferring SNaN over QNaN.
->>
->
-> Alex,
->
-> I'll doublecheck, but I think "infzero" here is a misnomer.
->
-> The variable/argument "infzero" actually denotes the cases:
->
->    - "Inf * Zero +/- NaN"
->    - "Inf * Zero +/- NaN"
->    - "Zero * Inf +/- NaN"
->    - "Zero * Inf +/- NaN"
->
-> "Inf * Zero +/- !NaN (let's say, normal fp)" is handled
-> somewhere else.
-
-Ahh my mistake, infzero only cares about a and b:
-
-    bool inf_zero =3D ((1 << a.cls) | (1 << b.cls)) =3D=3D
-                    ((1 << float_class_inf) | (1 << float_class_zero));
-
-but is wrapped in:
-
-    if (is_nan(a.cls) || is_nan(b.cls) || is_nan(c.cls)) {
-        return pick_nan_muladd(a, b, c, inf_zero, s);
-    }
-
-Which when infzero is true implies c has to be the NaN...
-
->
-> Therefore, "infzero" should be rather called "infzeronan".
-> This is from what I remember, but I will reanalyse the
-> relevant softfloat code one more time.
-
-No need. I overthought it ;-)
-
->
-> Regards,
-> Aleksandar
->
->> >
->> > There are other details in surrounding paragraphs. The document
->> > is for SIMD (MSA) ASE, but both the SIMD and FPU NaN2008
->> > floating point instruction should follow the same rules. I could't
->> > find a separate document on FPU instructions.
->> >
->> > The problem with the current implementation of 0*inf+nan is that
->> > it returns the default NaN (all zeroes in the payload segment),
->> > whereas the documentation says the payload should be from
->> > the input NaN. The behavior specified in the documentation is
->> > confirmed also with tests on hardware.
->> >
->> > Sincerely,
->> > Aleksandar
->>
->>
->> --
->> Alex Benn=C3=A9e
-
-
---
-Alex Benn=C3=A9e
+Paolo
