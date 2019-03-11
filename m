@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59737)
+Received: from eggs.gnu.org ([209.51.188.92]:59658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1h3K8g-0001cH-Uc
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1h3K91-0001aj-2a
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1h3K8f-0005cA-N6
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:42 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:40601)
+	(envelope-from <eblake@redhat.com>) id 1h3Jv4-0006If-76
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:20:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1h3K8e-0005X0-JA
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:34:41 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20190311123433euoutp02975c868e0fafa998caf4c814537453ec~K55rR0stA0679206792euoutp02U
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:34:33 +0000 (GMT)
-From: Ilya Maximets <i.maximets@samsung.com>
-Message-ID: <1fa60eac-9718-ee9d-e21c-3331c3bd60ff@samsung.com>
-Date: Mon, 11 Mar 2019 15:34:30 +0300
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1h3Jv3-0006IK-RN
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:20:38 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 71513C049E23
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 12:11:37 +0000 (UTC)
+References: <20190309004826.9027-1-lersek@redhat.com>
+	<20190309004826.9027-2-lersek@redhat.com>
+	<ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <81647c9a-7da7-0b7a-bc9e-46467df6a56d@redhat.com>
+Date: Mon, 11 Mar 2019 07:11:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181127135030.1671-1-i.maximets@samsung.com>
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
-	<20181127135030.1671-1-i.maximets@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
+In-Reply-To: <ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KzEPGR4zL9DaXJDmDIcDdUfG3DnFJ2gFV"
+Subject: Re: [Qemu-devel] [PATCH 01/10] roms: lift "edk2-funcs.sh" from
+ "tests/uefi-test-tools/build.sh"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com, imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
-Hi.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KzEPGR4zL9DaXJDmDIcDdUfG3DnFJ2gFV
+From: Eric Blake <eblake@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, berrange@redhat.com,
+ imammedo@redhat.com, kraxel@redhat.com, mst@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <81647c9a-7da7-0b7a-bc9e-46467df6a56d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/10] roms: lift "edk2-funcs.sh" from
+ "tests/uefi-test-tools/build.sh"
+References: <20190309004826.9027-1-lersek@redhat.com>
+ <20190309004826.9027-2-lersek@redhat.com>
+ <ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
+In-Reply-To: <ed04ad23-72c9-ce20-dc90-52b540044c13@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm trying to figure out the state of this patch set.
-Is there any chance for it to be accepted?
+On 3/11/19 7:07 AM, Eric Blake wrote:
+> On 3/8/19 6:48 PM, Laszlo Ersek wrote:
+>> Extract the dense logic for architecture and toolchain massaging from
+>> "tests/uefi-test-tools/build.sh", to a set of small functions. We'll r=
+euse
+>> these functions for building full platform firmware images.
+>>
 
-The first patch needs minor rebase. I could send a new version.
 
-BTW, even without the first patch that raised some discussion
-the last three patches are kind of straightforward and useful.
+>> +++ b/tests/uefi-test-tools/build.sh
+>> @@ -38,97 +38,12 @@ if [ $ret -ne 0 ]; then
+>=20
+> build.sh is already marked as a bash script, and...
+>=20
+>> +# Fetch some option arguments, and set the cross-compilation environm=
+ent (if
+>> +# any), for the edk2 "build" utility.
+>> +source "$edk2_dir/../edk2-funcs.sh"
+>=20
+> you are only ever sourcing the file, rather than directly executing it
+> as a standalone script.
 
-Best regards, Ilya Maximets.
+Except that later, you have a patch that sources the file from non-bash.
+See my followup on 7/10. :(
 
-On 27.11.2018 16:50, Ilya Maximets wrote:
-> Version 2:
->     * First patch changed to just drop the memfd backend
->       if seals are not supported.
-> 
-> Ilya Maximets (4):
->   hostmem-memfd: disable for systems wihtout sealing support
->   memfd: always check for MFD_CLOEXEC
->   memfd: set up correct errno if not supported
->   memfd: improve error messages
-> 
->  backends/hostmem-memfd.c | 18 ++++++++----------
->  tests/vhost-user-test.c  |  6 +++---
->  util/memfd.c             | 10 ++++++++--
->  3 files changed, 19 insertions(+), 15 deletions(-)
-> 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--KzEPGR4zL9DaXJDmDIcDdUfG3DnFJ2gFV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyGUHAACgkQp6FrSiUn
+Q2qRrAf/dtErQ/hoEWpBzFPVdzRrjL5IfqU7aqxvSvVgFuwupfPYOtBhVzpixuRr
+183Lin74GltAi8/lcrnAxYafT4lhvqiY7OKK6f/RaGQZlWb8shX7Q6ZMebNUzlSa
+y4FJLyFgltvV3NlcyclICepnJKh4I/J6VpXusZJZu7tKrD89v6iG43ULZ/nUuMZ5
+WbNEAv1h/00G5BRTPxl5I+RK4ZuqYy3E8HvNkJKKWNVO2Ch5UZH4Xb6NZDfcGVjt
++CYulJqcOO0e+TG7v7iLJT1sOL5C0gGta3cxwab5w+cTpCSbDVzTtWp6gSoBLuXw
+MydnIoC2tXNqxyyKQlNCPwTTFwLGUA==
+=ZHtg
+-----END PGP SIGNATURE-----
+
+--KzEPGR4zL9DaXJDmDIcDdUfG3DnFJ2gFV--
