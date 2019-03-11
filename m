@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42126)
+Received: from eggs.gnu.org ([209.51.188.92]:43877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3KqO-0005E1-Sk
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:19:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1h3KxA-0001VA-BW
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <unai.martinezcorral@ehu.eus>) id 1h3KqN-0004CZ-De
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:19:52 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:22697 helo=smtp.ehu.eus)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
-	id 1h3KqM-00049m-Vr
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:19:51 -0400
-Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
-	by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 37EF43F9EF
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:19:48 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 127EA110056
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:19:48 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 04FF0110052
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:19:48 +0100 (CET)
-Received: from smtp.ehu.eus (unknown [10.0.100.73])
-	by imsva1.lgp.ehu.es (Postfix) with ESMTPS
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:19:47 +0100 (CET)
-Received: from mail-it1-f175.google.com (mail-it1-f175.google.com
-	[209.85.166.175]) by smtp1 (Postfix) with ESMTPSA id A1D2F3FA07
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 14:19:47 +0100 (CET)
-Received: by mail-it1-f175.google.com with SMTP id l15so7187395iti.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 06:19:47 -0700 (PDT)
+	(envelope-from <peter.maydell@linaro.org>) id 1h3Kx9-0007vW-JR
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:26:52 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:33613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1h3Kx9-0007v7-Cp
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 09:26:51 -0400
+Received: by mail-oi1-x236.google.com with SMTP id z14so3607940oid.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 06:26:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190311101428.GA11@765644dd90e5>
-	<20190311103106.GG16@765644dd90e5>
-	<9b0b6b52-347e-7a48-22be-798f101989ac@vivier.eu>
-In-Reply-To: <9b0b6b52-347e-7a48-22be-798f101989ac@vivier.eu>
-Reply-To: unai.martinezcorral@ehu.eus
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Mon, 11 Mar 2019 14:19:34 +0100
-Message-ID: <CAGZZdDHBKs46ep-+hnjBDRJpk5vf+kk+fyaBmXzj4_KrawwwsQ@mail.gmail.com>
+References: <20190214190603.25030-1-peter.maydell@linaro.org>
+	<20190214190603.25030-12-peter.maydell@linaro.org>
+	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+In-Reply-To: <72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Mar 2019 13:26:37 +0000
+Message-ID: <CAFEAcA9=oUk_W+pqYLkd=oBC7eENU1yYKbGzoOzgxXoOmg7_+A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 8/10] qemu-binfmt-conf.sh: add option
- --clear
+Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
+ guests to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,65 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org, riku.voipio@iki.fi, Eric Blake <eblake@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-2019/3/11 12:04, Laurent Vivier:
-> > +    find /proc/sys/fs/binfmt_misc/ -type f -name $names -exec sh -c 'printf %s -1 > {}' \;
+On Thu, 21 Feb 2019 at 14:20, Auger Eric <eric.auger@redhat.com> wrote:
+> This commit introduces a regression when running with EDK2 FW:
 >
-> The qemu-* will be expanded here if you have a qemu-XXX in the current
-> directory. You must use "$names".
-
-You are correct. Indeed, I had not spotted it because I introduced a
-bug when renaming 'reset' to 'clear'. Precisely, '-c' was being used
-twice: for 'credential' and for 'clear'. Both issues will be fixed in
-the next version.
-
-> But:
+> I get the following traces:
 >
-> To remove all, you can do:
-> sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/status'
->
-> so something like
->
-> if [ $# -eq 0 ] ; then
->   sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/status
-> fi
-> qemu_check_target_list $1
-> for t in $checked_target_list ; do
->    sh -c 'printf %s -1 > /proc/sys/fs/binfmt_misc/qemu-$t'
-> done
+> error: kvm run failed Function not implemented
 
-Wouldn't writing to 'status' remove all the interpreters, and not only
-those that correspond to qemu?
+Unfortunately I can't repro this, on a Mustang host with
+4.8.0-42-generic host kernel, with this command line:
 
-> But I think you should also taking care of the suffix.
+ ./build/kvm/aarch64-softmmu/qemu-system-aarch64  -M
+virt,gic-version=host -cpu host -smp 2 -m 4G -display none
+--enable-kvm  -serial stdio -bios
+~/QEMU_EFI_cbuild_debug_feb21_2019.fd
 
-I think that the suffix is not related to the entry in
-'/proc/sys/fs/binfmt_misc/'. See, e.g.:
+Does that simplified command line still repro the problem
+for you on your hardware, or does the bug require all
+the extra stuff with blk and net devices and a real
+guest filesystem to trigger? (You'll need to revert the
+revert commit 942f99c825fc94c8b1a4, obivously.)
 
-package qemu-$cpu
-interpreter $qemu
+More generally, can you strip the repro command line
+down as much as possible to something that still shows
+the bug? I'd rather not have to sort out getting TAP networking
+on this box if it isn't actually a necessary component of
+reproducing the bug :-)
 
-So, independently of which is the executable (interpreter), the
-package name does not include the suffix.
-
-> > +if [ "x$QEMU_CLEAR" = "xyes" ] ; then
-> > +  case "$BINFMT_SET" in
-> > +    *debian)  BINFMT_CLEAR=qemu_clear_notimplemented ;;
-> > +    *systemd) BINFMT_CLEAR=qemu_clear_notimplemented ;;
-> > +    *)        BINFMT_CLEAR=qemu_clear_interpreter
-> > +  esac
->
-> Put this in the previous case for decoding options, please.
-
-It won't work. This if/case block requires all the options to be
-already parsed and processed. If I put it in the case for '-r|--clear'
-above, it will only work only when '-r' is given after '--debian' or
-'--systemd'. Otherwise, BINFMT_SET will always be
-qemu_register_interpreter when '-crear' is evaluated. I think that we
-should not rely on the users providing the options in a specific
-order.
-
-Regards,
-Unai
+thanks
+-- PMM
