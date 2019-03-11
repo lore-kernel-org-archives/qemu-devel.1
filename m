@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52930)
+Received: from eggs.gnu.org ([209.51.188.92]:56491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3JU4-0000Vj-0h
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:52:45 -0400
+	(envelope-from <imammedo@redhat.com>) id 1h3JlV-0006XH-Ss
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1h3JFR-0002Kk-9G
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:37:38 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54965)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1h3JFR-0002JC-1l
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 07:37:37 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f3so4103787wmj.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 04:37:36 -0700 (PDT)
-References: <20190311005618.19007-1-philmd@redhat.com>
-	<20190311005618.19007-3-philmd@redhat.com>
-	<50e483c6-9580-dcdb-65aa-a8d66040c5a7@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <24ecc3f9-4c22-d162-50a1-ad913fe56807@redhat.com>
-Date: Mon, 11 Mar 2019 12:37:32 +0100
+	(envelope-from <imammedo@redhat.com>) id 1h3JlU-0000MJ-O3
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 08:10:45 -0400
+Date: Mon, 11 Mar 2019 13:10:23 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190311131023.18849710@redhat.com>
+In-Reply-To: <20190308182053.5487-2-eric.auger@redhat.com>
+References: <20190308182053.5487-1-eric.auger@redhat.com>
+	<20190308182053.5487-2-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <50e483c6-9580-dcdb-65aa-a8d66040c5a7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/mips: Express dependencies of
- the Jazz machine with Kconfig
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] nvdimm: Rename AcpiNVDIMMState into
+ NVDIMMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +24,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: James Hogan <jhogan@kernel.org>, Yang Zhong <yang.zhong@intel.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, richard.henderson@linaro.org, sbhat@linux.ibm.com, philmd@redhat.com
 
-Hi Thomas,
+On Fri,  8 Mar 2019 19:20:52 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On 3/11/19 12:17 PM, Thomas Huth wrote:
-> On 11/03/2019 01.56, Philippe Mathieu-Daudé wrote:
->> The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
->> framebuffer display is managed by a G364, the network card is a Sonic
->> DP83932. A QLogic ESP216 provides a SCSI bus.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> v3: Keep CONFIG_JAZZ in default-configs/mips64el-softmmu.mak (Thomas)
->> ---
->>  default-configs/mips-softmmu-common.mak |  1 -
->>  default-configs/mips64-softmmu.mak      |  5 -----
->>  default-configs/mips64el-softmmu.mak    |  5 -----
->>  hw/mips/Kconfig                         | 17 +++++++++++++++++
->>  4 files changed, 17 insertions(+), 11 deletions(-)
->>
->> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
->> index 8c5fdf5ee1..caebafd416 100644
->> --- a/default-configs/mips-softmmu-common.mak
->> +++ b/default-configs/mips-softmmu-common.mak
->> @@ -3,7 +3,6 @@
->>  CONFIG_ISA_BUS=y
->>  CONFIG_PCI=y
->>  CONFIG_PCI_DEVICES=y
->> -CONFIG_ESP=y
->>  CONFIG_VGA_ISA=y
->>  CONFIG_VGA_ISA_MM=y
->>  CONFIG_VGA_CIRRUS=y
->> diff --git a/default-configs/mips64-softmmu.mak b/default-configs/mips64-softmmu.mak
->> index bad7496672..a169738635 100644
->> --- a/default-configs/mips64-softmmu.mak
->> +++ b/default-configs/mips64-softmmu.mak
->> @@ -1,9 +1,4 @@
->>  # Default configuration for mips64-softmmu
->>  
->>  include mips-softmmu-common.mak
->> -CONFIG_RC4030=y
->> -CONFIG_DP8393X=y
->> -CONFIG_DS1225Y=y
->>  CONFIG_JAZZ=y
->> -CONFIG_G364FB=y
->> -CONFIG_JAZZ_LED=y
->> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
->> index 8b255efc54..a7b88318b2 100644
->> --- a/default-configs/mips64el-softmmu.mak
->> +++ b/default-configs/mips64el-softmmu.mak
->> @@ -2,13 +2,8 @@
->>  
->>  include mips-softmmu-common.mak
->>  CONFIG_IDE_VIA=y
->> -CONFIG_RC4030=y
->> -CONFIG_DP8393X=y
->> -CONFIG_DS1225Y=y
->>  CONFIG_FULONG=y
->>  CONFIG_JAZZ=y
->> -CONFIG_G364FB=y
->> -CONFIG_JAZZ_LED=y
->>  CONFIG_VT82C686=y
->>  CONFIG_AHCI=y
->>  CONFIG_MIPS_BOSTON=y
->> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
->> index 3433e97e1a..ab006477c7 100644
->> --- a/hw/mips/Kconfig
->> +++ b/hw/mips/Kconfig
->> @@ -12,6 +12,23 @@ config MIPSSIM
->>  
->>  config JAZZ
->>      bool
->> +    select ISA_BUS
->> +    select RC4030
->> +    select I8259
->> +    select I8254
->> +    select I8257
->> +    select PCSPK
->> +    select VGA_ISA_MM
->> +    select G364FB
->> +    select DP8393X
-> 
-> Looking at the code, it seems like you can also run the machine with
-> "-net none", so I'd rather use "imply DP8393X" here instead.
+> As we intend to migrate the acpi_nvdimm_state into
+> the base machine with a new dimms_state name, let's
+> also rename the datatype.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Well here I'm not sure.
-For the both machine variants (PICA-61 and Magnum 4000), the chipset is
-soldered on the board, and is MMIO mapped (via a ChipSelect, no via a
-bus you can plug/unplug). So it looks the code inherited habits from
-boards having network card via busses.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Not sure the code can be fixed in time for soft freeze.
-I might improve the commit message explaining this chipset is soldered
-on the board.
-
-Regards,
-
-Phil.
+> ---
+>  hw/acpi/nvdimm.c        | 18 +++++++++---------
+>  hw/i386/pc.c            |  2 +-
+>  include/hw/i386/pc.h    |  2 +-
+>  include/hw/mem/nvdimm.h | 10 +++++-----
+>  4 files changed, 16 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index e53b2cb681..f73cfb9d90 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -382,7 +382,7 @@ nvdimm_build_structure_caps(GArray *structures, uint3=
+2_t capabilities)
+>      nfit_caps->capabilities =3D cpu_to_le32(capabilities);
+>  }
+> =20
+> -static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state)
+> +static GArray *nvdimm_build_device_structure(NVDIMMState *state)
+>  {
+>      GSList *device_list =3D nvdimm_get_device_list();
+>      GArray *structures =3D g_array_new(false, true /* clear */, 1);
+> @@ -416,7 +416,7 @@ static void nvdimm_init_fit_buffer(NvdimmFitBuffer *f=
+it_buf)
+>      fit_buf->fit =3D g_array_new(false, true /* clear */, 1);
+>  }
+> =20
+> -static void nvdimm_build_fit_buffer(AcpiNVDIMMState *state)
+> +static void nvdimm_build_fit_buffer(NVDIMMState *state)
+>  {
+>      NvdimmFitBuffer *fit_buf =3D &state->fit_buf;
+> =20
+> @@ -425,12 +425,12 @@ static void nvdimm_build_fit_buffer(AcpiNVDIMMState=
+ *state)
+>      fit_buf->dirty =3D true;
+>  }
+> =20
+> -void nvdimm_plug(AcpiNVDIMMState *state)
+> +void nvdimm_plug(NVDIMMState *state)
+>  {
+>      nvdimm_build_fit_buffer(state);
+>  }
+> =20
+> -static void nvdimm_build_nfit(AcpiNVDIMMState *state, GArray *table_offs=
+ets,
+> +static void nvdimm_build_nfit(NVDIMMState *state, GArray *table_offsets,
+>                                GArray *table_data, BIOSLinker *linker)
+>  {
+>      NvdimmFitBuffer *fit_buf =3D &state->fit_buf;
+> @@ -570,7 +570,7 @@ nvdimm_dsm_no_payload(uint32_t func_ret_status, hwadd=
+r dsm_mem_addr)
+>  #define NVDIMM_QEMU_RSVD_HANDLE_ROOT         0x10000
+> =20
+>  /* Read FIT data, defined in docs/specs/acpi_nvdimm.txt. */
+> -static void nvdimm_dsm_func_read_fit(AcpiNVDIMMState *state, NvdimmDsmIn=
+ *in,
+> +static void nvdimm_dsm_func_read_fit(NVDIMMState *state, NvdimmDsmIn *in,
+>                                       hwaddr dsm_mem_addr)
+>  {
+>      NvdimmFitBuffer *fit_buf =3D &state->fit_buf;
+> @@ -619,7 +619,7 @@ exit:
+>  }
+> =20
+>  static void
+> -nvdimm_dsm_handle_reserved_root_method(AcpiNVDIMMState *state,
+> +nvdimm_dsm_handle_reserved_root_method(NVDIMMState *state,
+>                                         NvdimmDsmIn *in, hwaddr dsm_mem_a=
+ddr)
+>  {
+>      switch (in->function) {
+> @@ -863,7 +863,7 @@ nvdimm_dsm_read(void *opaque, hwaddr addr, unsigned s=
+ize)
+>  static void
+>  nvdimm_dsm_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>  {
+> -    AcpiNVDIMMState *state =3D opaque;
+> +    NVDIMMState *state =3D opaque;
+>      NvdimmDsmIn *in;
+>      hwaddr dsm_mem_addr =3D val;
+> =20
+> @@ -925,7 +925,7 @@ void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev,=
+ DeviceState *dev)
+>      }
+>  }
+> =20
+> -void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+> +void nvdimm_init_acpi_state(NVDIMMState *state, MemoryRegion *io,
+>                              FWCfgState *fw_cfg, Object *owner)
+>  {
+>      memory_region_init_io(&state->io_mr, owner, &nvdimm_dsm_ops, state,
+> @@ -1319,7 +1319,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets=
+, GArray *table_data,
+>  }
+> =20
+>  void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+> -                       BIOSLinker *linker, AcpiNVDIMMState *state,
+> +                       BIOSLinker *linker, NVDIMMState *state,
+>                         uint32_t ram_slots)
+>  {
+>      GSList *device_list;
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 42128183e9..0338dbe9da 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2571,7 +2571,7 @@ static void pc_machine_set_nvdimm_persistence(Objec=
+t *obj, const char *value,
+>                                                 Error **errp)
+>  {
+>      PCMachineState *pcms =3D PC_MACHINE(obj);
+> -    AcpiNVDIMMState *nvdimm_state =3D &pcms->acpi_nvdimm_state;
+> +    NVDIMMState *nvdimm_state =3D &pcms->acpi_nvdimm_state;
+> =20
+>      if (strcmp(value, "cpu") =3D=3D 0)
+>          nvdimm_state->persistence =3D 3;
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 54222a202d..94fb620d65 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -45,7 +45,7 @@ struct PCMachineState {
+>      OnOffAuto vmport;
+>      OnOffAuto smm;
+> =20
+> -    AcpiNVDIMMState acpi_nvdimm_state;
+> +    NVDIMMState acpi_nvdimm_state;
+> =20
+>      bool acpi_build_enabled;
+>      bool smbus_enabled;
+> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+> index c5c9b3c7f8..523a9b3d4a 100644
+> --- a/include/hw/mem/nvdimm.h
+> +++ b/include/hw/mem/nvdimm.h
+> @@ -123,7 +123,7 @@ struct NvdimmFitBuffer {
+>  };
+>  typedef struct NvdimmFitBuffer NvdimmFitBuffer;
+> =20
+> -struct AcpiNVDIMMState {
+> +struct NVDIMMState {
+>      /* detect if NVDIMM support is enabled. */
+>      bool is_enabled;
+> =20
+> @@ -141,13 +141,13 @@ struct AcpiNVDIMMState {
+>      int32_t persistence;
+>      char    *persistence_string;
+>  };
+> -typedef struct AcpiNVDIMMState AcpiNVDIMMState;
+> +typedef struct NVDIMMState NVDIMMState;
+> =20
+> -void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+> +void nvdimm_init_acpi_state(NVDIMMState *state, MemoryRegion *io,
+>                              FWCfgState *fw_cfg, Object *owner);
+>  void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+> -                       BIOSLinker *linker, AcpiNVDIMMState *state,
+> +                       BIOSLinker *linker, NVDIMMState *state,
+>                         uint32_t ram_slots);
+> -void nvdimm_plug(AcpiNVDIMMState *state);
+> +void nvdimm_plug(NVDIMMState *state);
+>  void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev);
+>  #endif
