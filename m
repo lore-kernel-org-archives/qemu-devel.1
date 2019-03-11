@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45616)
+Received: from eggs.gnu.org ([209.51.188.92]:46068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3PCp-0007Es-RT
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:20 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h3PCr-0007kF-Gh
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:59:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1h3OzR-0003og-Tu
+	(envelope-from <marcandre.lureau@gmail.com>) id 1h3OzR-0003om-Ue
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:45:31 -0400
-References: <20190308131445.17502-1-armbru@redhat.com>
-	<87ftrtux81.fsf@dusky.pond.sub.org> <875zspux2c.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dfa8c033-e2d8-28ea-7404-a0c1edfc5b84@redhat.com>
-Date: Mon, 11 Mar 2019 18:45:03 +0100
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:52994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1h3OzP-0003m2-Bg
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 13:45:28 -0400
+Received: by mail-wm1-x329.google.com with SMTP id f65so11787wma.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 10:45:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <875zspux2c.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/12] pc: Support firmware
- configuration with -blockdev
+References: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 11 Mar 2019 18:45:12 +0100
+Message-ID: <CAJ+F1CLQTOH_mY__hgqtGXu7w0pDyCYTuTuZN-u-txKjrF-RAQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Clearing slirp/ license
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com
+To: QEMU <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On 11/03/19 18:42, Markus Armbruster wrote:
-> Incremental diff since v3:
+Hi
 
-Ack, thanks.
+On Wed, Feb 13, 2019 at 12:03 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi,
+>
+> As we are trying to move slirp/ in a standalone project, which
+> eventually could be installed as a shared library, we need to clear
+> the license.
+>
+> slirp is supposed to be 3-Clause BSD license (according to
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D2f5f89963186d42a7ded253=
+bc6cf5b32abb45cec)
+> but it seems to be effectively a 2-Clause BSD (the third clause is not
+> in COPYRIGHT)
+>
+> However, there are two units that are GPL-2:
+>
 
-Paolo
+Thanks Thomas & Cedric.
 
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index ccf2221acb..c628540774 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -82,13 +82,19 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
->      memory_region_set_readonly(isa_bios, true);
->  }
->  
-> -static PFlashCFI01 *pc_pflash_create(const char *name)
-> +static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
-> +                                     const char *name,
-> +                                     const char *alias_prop_name)
->  {
->      DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
->  
->      qdev_prop_set_uint64(dev, "sector-length", FLASH_SECTOR_SIZE);
->      qdev_prop_set_uint8(dev, "width", 1);
->      qdev_prop_set_string(dev, "name", name);
-> +    object_property_add_child(OBJECT(pcms), name, OBJECT(dev),
-> +                              &error_abort);
-> +    object_property_add_alias(OBJECT(pcms), alias_prop_name,
-> +                              OBJECT(dev), "drive", &error_abort);
->      return PFLASH_CFI01(dev);
->  }
->  
-> @@ -97,14 +103,10 @@ void pc_system_flash_create(PCMachineState *pcms)
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->  
->      if (pcmc->pci_enabled) {
-> -        pcms->flash[0] = pc_pflash_create("system.flash0");
-> -        pcms->flash[1] = pc_pflash_create("system.flash1");
-> -        object_property_add_alias(OBJECT(pcms), "pflash0",
-> -                                  OBJECT(pcms->flash[0]), "drive",
-> -                                  &error_abort);
-> -        object_property_add_alias(OBJECT(pcms), "pflash1",
-> -                                  OBJECT(pcms->flash[1]), "drive",
-> -                                  &error_abort);
-> +        pcms->flash[0] = pc_pflash_create(pcms, "system.flash0",
-> +                                          "pflash0");
-> +        pcms->flash[1] = pc_pflash_create(pcms, "system.flash1",
-> +                                          "pflash1");
->      }
->  }
->  
-> @@ -122,19 +124,7 @@ static void pc_system_flash_cleanup_unused(PCMachineState *pcms)
->              prop_name = g_strdup_printf("pflash%d", i);
->              object_property_del(OBJECT(pcms), prop_name, &error_abort);
->              g_free(prop_name);
-> -            /*
-> -             * Delete @dev_obj.  Straight object_unref() is wrong,
-> -             * since it leaves dangling references in the parent bus
-> -             * behind.  object_unparent() doesn't work, either: since
-> -             * @dev_obj hasn't been realized, dev_obj->parent is null,
-> -             * and object_unparent() does nothing.  DeviceClass method
-> -             * device_unparent() works, but we have to take a
-> -             * temporary reference, or else device_unparent() commits
-> -             * a use-after-free error.
-> -             */
-> -            object_ref(dev_obj);
-> -            object_get_class(dev_obj)->unparent(dev_obj);
-> -            object_unref(dev_obj);
-> +            object_unparent(dev_obj);
->              pcms->flash[i] = NULL;
->          }
->      }
-> 
+Since this mail was sent, slirp/src/vmstate.c was added, based on qemu
+implementation, which is attributed to Juan Quintela/
+
+Juan, Could you reply that you have no objection in relicensing the
+vmstate files as 3-Clause BSD?
+
+thanks!
+
+--=20
+Marc-Andr=C3=A9 Lureau
