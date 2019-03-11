@@ -1,35 +1,35 @@
 Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwR-0005vi-D8
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:16 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MwU-0005vi-G2
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1h3MkY-00072N-Q1
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48292)
+	(envelope-from <jjherne@linux.ibm.com>) id 1h3MkT-0006zA-Dm
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43822
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1h3MkW-00071O-SN
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:58 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x2BFLqLx048026
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:55 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2r5rft6ay6-1
+	id 1h3MkT-0006yq-2m
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 11:21:53 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x2BFLopa084307
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:52 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2r5sv21ach-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:54 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:21:51 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 11 Mar 2019 15:21:53 -0000
+	Mon, 11 Mar 2019 15:21:51 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 11 Mar 2019 11:21:30 -0400
+Date: Mon, 11 Mar 2019 11:21:27 -0400
 In-Reply-To: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
 References: <1552317693-21979-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1552317693-21979-13-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 12/15] s390-bios: Refactor virtio to run
- channel programs via cio
+Message-Id: <1552317693-21979-10-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 09/15] s390-bios: ptr2u32 and u32toptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,130 +40,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Now that we have a Channel I/O library let's modify virtio boot code to
-make use of it for running channel programs.
+Introduce inline functions to convert between pointers and unsigned 32-bit
+ints. These are used to hide the ugliness required to  avoid compiler
+warnings.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/virtio.c | 49 +++++++++++++++++++----------------------------
- 1 file changed, 20 insertions(+), 29 deletions(-)
+ pc-bios/s390-ccw/helper.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 pc-bios/s390-ccw/helper.h
 
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index aa9da72..4cd09eb 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -14,6 +14,7 @@
- #include "virtio.h"
- #include "virtio-scsi.h"
- #include "bswap.h"
-+#include "helper.h"
- 
- #define VRING_WAIT_REPLY_TIMEOUT 30
- 
-@@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
-     }
- }
- 
--static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
-+static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
- {
-     Ccw1 ccw = {};
--    CmdOrb orb = {};
--    int r;
--
--    enable_subchannel(vdev->schid);
--
--    /* start subchannel command */
--    orb.fmt = 1;
--    orb.cpa = (u32)(long)&ccw;
--    orb.lpm = 0x80;
- 
-     ccw.cmd_code = cmd;
-     ccw.cda = (long)ptr;
-     ccw.count = len;
- 
--    r = ssch(vdev->schid, &orb);
--    /*
--     * XXX Wait until device is done processing the CCW. For now we can
--     *     assume that a simple tsch will have finished the CCW processing,
--     *     but the architecture allows for asynchronous operation
--     */
--    if (!r) {
--        r = drain_irqs(vdev->schid);
-+    if (sli) {
-+        ccw.flags |= CCW_FLAG_SLI;
-     }
--    return r;
+diff --git a/pc-bios/s390-ccw/helper.h b/pc-bios/s390-ccw/helper.h
+new file mode 100644
+index 0000000..78d5bc7
+--- /dev/null
++++ b/pc-bios/s390-ccw/helper.h
+@@ -0,0 +1,31 @@
++/*
++ * Helper Functions
++ *
++ * Copyright (c) 2019 IBM Corp.
++ *
++ * Author(s): Jason J. Herne <jjherne@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
 +
-+    enable_subchannel(vdev->schid);
-+    return do_cio(vdev->schid, vdev->senseid.cu_type, ptr2u32(&ccw), CCW_FMT1);
- }
- 
- static void vring_init(VRing *vr, VqInfo *info)
-@@ -257,7 +245,7 @@ void virtio_setup_ccw(VDev *vdev)
-     vdev->config.blk.blk_size = 0; /* mark "illegal" - setup started... */
-     vdev->guessed_disk_nature = VIRTIO_GDN_NONE;
- 
--    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
-+    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0, false);
- 
-     switch (vdev->senseid.cu_model) {
-     case VIRTIO_ID_NET:
-@@ -278,18 +266,19 @@ void virtio_setup_ccw(VDev *vdev)
-     default:
-         panic("Unsupported virtio device\n");
-     }
--    IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size) == 0,
--               "Could not get block device configuration");
-+    IPL_assert(
-+        run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size, false) == 0,
-+       "Could not get block device configuration");
- 
-     /* Feature negotiation */
-     for (i = 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
-         feats.features = 0;
-         feats.index = i;
--        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
-+        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats), false);
-         IPL_assert(rc == 0, "Could not get features bits");
-         vdev->guest_features[i] &= bswap32(feats.features);
-         feats.features = bswap32(vdev->guest_features[i]);
--        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
-+        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats), false);
-         IPL_assert(rc == 0, "Could not set features bits");
-     }
- 
-@@ -306,16 +295,17 @@ void virtio_setup_ccw(VDev *vdev)
-         };
- 
-         IPL_assert(
--            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config)) == 0,
-+            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config), false) == 0,
-             "Could not get block device VQ configuration");
-         info.num = config.num;
-         vring_init(&vdev->vrings[i], &info);
-         vdev->vrings[i].schid = vdev->schid;
--        IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) == 0,
--                   "Cannot set VQ info");
-+        IPL_assert(
-+            run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info), false) == 0,
-+            "Cannot set VQ info");
-     }
-     IPL_assert(
--        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) == 0,
-+        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status), false) == 0,
-         "Could not write status to host");
- }
- 
-@@ -324,7 +314,8 @@ bool virtio_is_supported(SubChannelId schid)
-     vdev.schid = schid;
-     memset(&vdev.senseid, 0, sizeof(vdev.senseid));
-     /* run sense id command */
--    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid))) {
-+    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid),
-+                true)) {
-         return false;
-     }
-     if (vdev.senseid.cu_type == 0x3832) {
++#ifndef S390_CCW_HELPER_H
++#define S390_CCW_HELPER_H
++
++#include "s390-ccw.h"
++
++/* Avoids compiler warnings when casting a pointer to a u32 */
++static inline uint32_t ptr2u32(void *ptr)
++{
++    IPL_assert((uint64_t)ptr <= 0xffffffff, "ptr2u32: ptr too large");
++    return (uint32_t)(uint64_t)ptr;
++}
++
++/* Avoids compiler warnings when casting a u32 to a pointer */
++static inline void *u32toptr(uint32_t n)
++{
++    return (void *)(uint64_t)n;
++}
++
++#endif
 -- 
 2.7.4
