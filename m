@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47199)
+Received: from eggs.gnu.org ([209.51.188.92]:47604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1h3PEr-0001Sg-89
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:01:27 -0400
+	(envelope-from <jandryuk@gmail.com>) id 1h3PGT-0002fh-Kz
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1h3PEp-0007ng-Lg
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:01:25 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:53094)
+	(envelope-from <jandryuk@gmail.com>) id 1h3PGS-00021N-T0
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:03:05 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44750)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1h3PEp-0007mA-87
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:01:23 -0400
-Received: by mail-wm1-x329.google.com with SMTP id f65so61683wma.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:01:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1h3PGS-000200-OW
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 14:03:04 -0400
+Received: by mail-qk1-x742.google.com with SMTP id u22so3268795qkj.11
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 11:03:04 -0700 (PDT)
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Mon, 11 Mar 2019 14:02:10 -0400
+Message-Id: <20190311180216.18811-1-jandryuk@gmail.com>
 MIME-Version: 1.0
-References: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
-	<e942cdab-fe1b-fdf4-3b9f-da16a4afa953@kaod.org>
-In-Reply-To: <e942cdab-fe1b-fdf4-3b9f-da16a4afa953@kaod.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 11 Mar 2019 19:01:10 +0100
-Message-ID: <CAJ+F1C+hFfsa5gcSdttTP5J+uyDvNdYJWrm9OJM26+Zc1ZQkew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Clearing slirp/ license
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/6] Xen stubdom support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, gwshan@linux.vnet.ibm.com
-Cc: QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, marmarek@invisiblethingslab.com, Jason Andryuk <jandryuk@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi C=C3=A9dric, Gavin,
+Xen supports running QEMU in a dedicated service vm - a stub domain or
+stubdom.  QEMU is then isolated outside of the privileged Domain-0.
 
-On Mon, Mar 11, 2019 at 4:23 PM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> On 2/13/19 12:03 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > As we are trying to move slirp/ in a standalone project, which
-> > eventually could be installed as a shared library, we need to clear
-> > the license.
-> >
-> > slirp is supposed to be 3-Clause BSD license (according to
-> > https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D2f5f89963186d42a7ded2=
-53bc6cf5b32abb45cec)
-> > but it seems to be effectively a 2-Clause BSD (the third clause is not
-> > in COPYRIGHT)
-> >
-> > However, there are two units that are GPL-2:
-> >
-> > - dhcpv6.c, dhcpv6.h:
-> >   The code was contributed by Thomas Huth <thuth@redhat.com>
-> >
-> > $ git shortlog -nes slirp/dhcpv6.{c,h}
-> >      6  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >      1  Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >      1  Thomas Huth <thuth@redhat.com>
-> >      1  Yuval Shaia <yuval.shaia@oracle.com>
-> >
-> > - ncsi.c, ncsi-pkt.h:
-> >   The code was contributed by C=C3=A9dric Le Goater <clg@kaod.org>
-> >
-> > $ git shortlog -nes slirp/ncsi.c slirp/ncsi-pkt.h
-> >      5  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >      4  C=C3=A9dric Le Goater <clg@kaod.org>
-> >
-> > Could you reply that you have no objection in relicensing those files
-> > are 3-Clause BSD?
->
-> Fine for me. You can change the license of slirp/ncsi.c and
-> slirp/ncsi-pkt.hto a 3-Clause BSD.
+When running in a stubdom, there are a few changes needed for QEMU.  On
+older Xen versions, the default ioreq server needs to have the stubdom's
+domid specified.  The stubdom doesn't run PV backends, so that
+initialization code can be skipped.  Stubdom's don't support MSI-X, so
+that PCI capability must be hidden from passed through devices.
 
-I noticed that ncsi-pkt.h has "Copyright Gavin Shan, IBM Corporation 2016"
+Stubdom mode is enabled by the new -xen-stubdom flag.
 
-I suppose Gavin should also give his agreement to relicense the file.
+Jason Andryuk (5):
+  xen: Introduce -xen-stubdom option
+  xen: Move xenstore initialization to common location
+  xen: Skip backend initialization for stubdom
+  xen: Set HVM_PARAM_DM_DOMAIN for stubdom on older Xen
+  xen-pt: Hide MSI-X from xen stubdoms
 
+Simon Gaiser (1):
+  xen-pt: Round pci regions sizes to XEN_PAGE_SIZE
 
-Gavin, could you reply that you have no objection in relicensing
-ncsi-pkt.h as 3-Clause BSD?
+ hw/i386/xen/xen-hvm.c       | 22 ++++++++++++++++------
+ hw/xen/xen-legacy-backend.c |  8 --------
+ hw/xen/xen_pt.c             | 10 +++++++---
+ hw/xen/xen_pt_config_init.c |  3 +++
+ include/hw/xen/xen.h        |  6 ++++++
+ include/hw/xen/xen_common.h |  5 +++++
+ qemu-options.hx             |  7 +++++++
+ vl.c                        |  8 ++++++++
+ 8 files changed, 52 insertions(+), 17 deletions(-)
 
-
-Thanks
-
->
-> Thanks,
->
-> C.
->
-> > After "[Qemu-devel] [PATCH 0/7] slirp: make it a standalone project",
-> > the vmstate subset that I adapted would also need to be relicensed.
-> > There are more contributors here, I am not sure how it should be
-> > handled. Any idea?
-> >
-> > thanks
-> >
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+2.20.1
