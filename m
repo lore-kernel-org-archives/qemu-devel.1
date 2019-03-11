@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42860)
+Received: from eggs.gnu.org ([209.51.188.92]:42888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h3GqH-0002mq-DH
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:03:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1h3GqM-0002oL-PK
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1h3GqG-00054T-E6
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:03:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1h3GqL-00057Z-Dt
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 05:03:34 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 11 Mar 2019 10:02:49 +0100
-Message-Id: <20190311090322.21603-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 00/33] final s390x patches for 4.0 soft freeze
+Date: Mon, 11 Mar 2019 10:02:50 +0100
+Message-Id: <20190311090322.21603-2-cohuck@redhat.com>
+In-Reply-To: <20190311090322.21603-1-cohuck@redhat.com>
+References: <20190311090322.21603-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 01/33] target/s390x: Remove non-architected
+ entries from struct LowCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,79 +21,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit e2a18635a400b0e68679614132e9ef6316105590:
+From: Thomas Huth <thuth@redhat.com>
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-03-08' into staging (2019-03-09 20:55:44 +0000)
+There are some fields in our struct LowCore which apparently have
+been copied from a very old version of the Linux kernel. These
+fields are not architected in the "Principles of Operation", and
+only used on these memory locations in Linux kernels older than
+2.6.29. Newer Linux kernels moved the entries to different locations
+or are not using them at all anymore. Thus we should never access
+these fields from the QEMU side, so they should be removed.
 
-are available in the Git repository at:
+While we're at it, also add a QEMU_BUILD_BUG_ON() statement to
+assert that struct LowCore has the right size.
 
-  https://github.com/cohuck/qemu tags/s390x-20190311
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1551775581-27989-1-git-send-email-thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/internal.h | 41 ++---------------------------------------
+ 1 file changed, 2 insertions(+), 39 deletions(-)
 
-for you to fetch changes up to 2c7590c8ea90a7fbe1efcac90cdfdb8017c1b365:
-
-  s390x/tcg: Implement VECTOR UNPACK * (2019-03-11 09:31:01 +0100)
-
-----------------------------------------------------------------
-s390x update:
-- clean up LowCore definition
-- first part of vector instruction support for tcg
-
-----------------------------------------------------------------
-
-David Hildenbrand (32):
-  s390x/tcg: Define vector instruction formats
-  s390x/tcg: Check vector register instructions at central point
-  s390x/tcg: Utilities for vector instruction helpers
-  s390x/tcg: Implement VECTOR GATHER ELEMENT
-  s390x/tcg: Implement VECTOR GENERATE BYTE MASK
-  s390x/tcg: Implement VECTOR GENERATE MASK
-  s390x/tcg: Implement VECTOR LOAD
-  s390x/tcg: Implement VECTOR LOAD AND REPLICATE
-  s390x/tcg: Implement VECTOR LOAD ELEMENT
-  s390x/tcg: Implement VECTOR LOAD ELEMENT IMMEDIATE
-  s390x/tcg: Implement VECTOR LOAD GR FROM VR ELEMENT
-  s390x/tcg: Implement VECTOR LOAD LOGICAL ELEMENT AND ZERO
-  s390x/tcg: Implement VECTOR LOAD MULTIPLE
-  s390x/tcg: Implement VECTOR LOAD TO BLOCK BOUNDARY
-  s390x/tcg: Implement VECTOR LOAD VR ELEMENT FROM GR
-  s390x/tcg: Implement VECTOR LOAD VR FROM GRS DISJOINT
-  s390x/tcg: Implement VECTOR LOAD WITH LENGTH
-  s390x/tcg: Implement VECTOR MERGE (HIGH|LOW)
-  s390x/tcg: Implement VECTOR PACK *
-  s390x/tcg: Implement VECTOR PERMUTE
-  s390x/tcg: Implement VECTOR PERMUTE DOUBLEWORD IMMEDIATE
-  s390x/tcg: Implement VECTOR REPLICATE
-  s390x/tcg: Implement VECTOR REPLICATE IMMEDIATE
-  s390x/tcg: Implement VECTOR SCATTER ELEMENT
-  s390x/tcg: Implement VECTOR SELECT
-  s390x/tcg: Implement VECTOR SIGN EXTEND TO DOUBLEWORD
-  s390x/tcg: Provide probe_write_access helper
-  s390x/tcg: Implement VECTOR STORE
-  s390x/tcg: Implement VECTOR STORE ELEMENT
-  s390x/tcg: Implement VECTOR STORE MULTIPLE
-  s390x/tcg: Implement VECTOR STORE WITH LENGTH
-  s390x/tcg: Implement VECTOR UNPACK *
-
-Thomas Huth (1):
-  target/s390x: Remove non-architected entries from struct LowCore
-
- target/s390x/Makefile.objs      |   1 +
- target/s390x/cpu.h              |   7 +
- target/s390x/helper.h           |  21 +
- target/s390x/insn-data.def      |  82 +++
- target/s390x/insn-format.def    |  25 +
- target/s390x/internal.h         |  43 +-
- target/s390x/mem_helper.c       |  26 +
- target/s390x/translate.c        |  61 ++-
- target/s390x/translate_vx.inc.c | 935 ++++++++++++++++++++++++++++++++
- target/s390x/vec.h              | 101 ++++
- target/s390x/vec_helper.c       | 193 +++++++
- 11 files changed, 1455 insertions(+), 40 deletions(-)
- create mode 100644 target/s390x/translate_vx.inc.c
- create mode 100644 target/s390x/vec.h
- create mode 100644 target/s390x/vec_helper.c
-
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 7baf0e2404b4..07b69b8ea000 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -63,45 +63,7 @@ typedef struct LowCore {
+     PSW             program_new_psw;          /* 0x1d0 */
+     PSW             mcck_new_psw;             /* 0x1e0 */
+     PSW             io_new_psw;               /* 0x1f0 */
+-    PSW             return_psw;               /* 0x200 */
+-    uint8_t         irb[64];                  /* 0x210 */
+-    uint64_t        sync_enter_timer;         /* 0x250 */
+-    uint64_t        async_enter_timer;        /* 0x258 */
+-    uint64_t        exit_timer;               /* 0x260 */
+-    uint64_t        last_update_timer;        /* 0x268 */
+-    uint64_t        user_timer;               /* 0x270 */
+-    uint64_t        system_timer;             /* 0x278 */
+-    uint64_t        last_update_clock;        /* 0x280 */
+-    uint64_t        steal_clock;              /* 0x288 */
+-    PSW             return_mcck_psw;          /* 0x290 */
+-    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+-    /* System info area */
+-    uint64_t        save_area[16];            /* 0xc00 */
+-    uint8_t         pad10[0xd40 - 0xc80];     /* 0xc80 */
+-    uint64_t        kernel_stack;             /* 0xd40 */
+-    uint64_t        thread_info;              /* 0xd48 */
+-    uint64_t        async_stack;              /* 0xd50 */
+-    uint64_t        kernel_asce;              /* 0xd58 */
+-    uint64_t        user_asce;                /* 0xd60 */
+-    uint64_t        panic_stack;              /* 0xd68 */
+-    uint64_t        user_exec_asce;           /* 0xd70 */
+-    uint8_t         pad11[0xdc0 - 0xd78];     /* 0xd78 */
+-
+-    /* SMP info area: defined by DJB */
+-    uint64_t        clock_comparator;         /* 0xdc0 */
+-    uint64_t        ext_call_fast;            /* 0xdc8 */
+-    uint64_t        percpu_offset;            /* 0xdd0 */
+-    uint64_t        current_task;             /* 0xdd8 */
+-    uint32_t        softirq_pending;          /* 0xde0 */
+-    uint32_t        pad_0x0de4;               /* 0xde4 */
+-    uint64_t        int_clock;                /* 0xde8 */
+-    uint8_t         pad12[0xe00 - 0xdf0];     /* 0xdf0 */
+-
+-    /* 0xe00 is used as indicator for dump tools */
+-    /* whether the kernel died with panic() or not */
+-    uint32_t        panic_magic;              /* 0xe00 */
+-
+-    uint8_t         pad13[0x11b0 - 0xe04];    /* 0xe04 */
++    uint8_t         pad13[0x11b0 - 0x200];    /* 0x200 */
+ 
+     uint64_t        mcesad;                    /* 0x11B0 */
+ 
+@@ -130,6 +92,7 @@ typedef struct LowCore {
+ 
+     uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
+ } QEMU_PACKED LowCore;
++QEMU_BUILD_BUG_ON(sizeof(LowCore) != 8192);
+ #endif /* CONFIG_USER_ONLY */
+ 
+ #define MAX_ILEN 6
 -- 
 2.17.2
