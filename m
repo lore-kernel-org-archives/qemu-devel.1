@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57805)
+Received: from eggs.gnu.org ([209.51.188.92]:57821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h3YBA-0002xt-Ox
+	(envelope-from <dgibson@ozlabs.org>) id 1h3YBB-0002xw-O2
 	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h3YB9-0005Ci-KK
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:12 -0400
-Date: Tue, 12 Mar 2019 11:44:22 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1h3YBA-0005Dj-Iu
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:13 -0400
+Date: Tue, 12 Mar 2019 12:08:01 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190312004422.GB3303@umbus.fritz.box>
+Message-ID: <20190312010801.GC3303@umbus.fritz.box>
 References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
-	<CAFEAcA--XHtUhOzSdNBDOVXbEceHkWSFiBcgNMTr5B-zz2fajA@mail.gmail.com>
+	<20190310082703.1245-5-david@gibson.dropbear.id.au>
+	<20190311115228.30efc27b@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jq0ap7NbKX2Kqbes"
+	protocol="application/pgp-signature"; boundary="7qSK/uQB79J36Y4o"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA--XHtUhOzSdNBDOVXbEceHkWSFiBcgNMTr5B-zz2fajA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/60] ppc-for-4.0 queue 20190310
+In-Reply-To: <20190311115228.30efc27b@bahia.lan>
+Subject: Re: [Qemu-devel] [PULL 04/60] Revert "spapr: support memory unplug
+ for qtest"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: peter.maydell@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 
---jq0ap7NbKX2Kqbes
+--7qSK/uQB79J36Y4o
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 10, 2019 at 04:06:38PM +0000, Peter Maydell wrote:
-> On Sun, 10 Mar 2019 at 08:27, David Gibson <david@gibson.dropbear.id.au> =
-wrote:
-> >
-> > The following changes since commit f5b4c31030f45293bb451744572276843482=
-9d91:
-> >
-> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-reques=
-t' into staging (2019-03-09 17:35:48 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190310
-> >
-> > for you to fetch changes up to 08d020471fcd41cb020fc9987ed1945eefcc8805:
-> >
-> >   spapr: Use CamelCase properly (2019-03-10 14:35:44 +1100)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue for 2019-03-10
-> >
-> > Here's a final pull request before the 4.0 soft freeze.  Changes
-> > include:
-> >   * A Great Renaming to use camel case properly in spapr code
-> >   * Optimization of some vector instructions
-> >   * Support for POWER9 cpus in the powernv machine
-> >   * Fixes a regression from the last pull request in handling VSX
-> >     instructions with mixed operands from the FPR and VMX parts of the
-> >     register array
-> >   * Optimization hack to avoid scanning all the (empty) entries on a
-> >     new IOMMU window
-> >   * Add FSL I2C controller model for E500
-> >   * Support for KVM acceleration of the H_PAGE_INIT hypercall on spapr
-> >   * Update u-boot image for E500
-> >   * Enable Specre/Meltdown mitigations by default on the new machine ty=
-pe
-> >   * Enable large decrementer support for POWER9
-> >
-> > Plus a number of assorted bugfixes and cleanups.
-> >
+On Mon, Mar 11, 2019 at 11:52:28AM +0100, Greg Kurz wrote:
+> On Sun, 10 Mar 2019 19:26:07 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> Hi. This pullreq generates a pile of new 'warning' messages
-> during 'make check':
+> > From: Greg Kurz <groug@kaod.org>
+> >=20
+> > Commit b8165118f52c broke CPU hotplug tests for old machine types:
+> >=20
+> > $ QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-=
+test -m=3Dslow
+> > /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=3D6: OK
+> > /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=3D6: **
+> > ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_t=
+o_source: assertion failed: (source->enabled)
+> > Broken pipe
+> > /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU =
+death from signal 6 (Aborted) (core dumped)
+> > Aborted (core dumped)
+> >=20
+> > The approach of faking the availability of OV5_HP_EVT causes the
+> > code to assume the hotplug event source is enabled, which is wrong
+> > for older machines.
+> >=20
+> > This reverts commit b8165118f52ce5ee88565d3cec83d30374efdc96.
+> >=20
+> > A subsequent patch will address the problem of CAS under qtest from
+> > a different angle.
+> >=20
 >=20
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64
-> QTEST_QEMU_IMG=3Dqemu-img tests/
-> boot-serial-test -m=3Dquick -k --tap < /dev/null |
-> ./scripts/tap-driver.pl --test-name=3D"boot-serial-test"
-> PASS 1 boot-serial-test /ppc64/boot-serial/ppce500
-> PASS 2 boot-serial-test /ppc64/boot-serial/40p
-> PASS 3 boot-serial-test /ppc64/boot-serial/mac99
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-cfpc=3Dworkaround
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-sbbc=3Dworkaround
-> qemu-system-ppc64: warning: TCG doesn't support requested feature,
-> cap-ibs=3Dworkaround
-> PASS 4 boot-serial-test /ppc64/boot-serial/pseries
-> PASS 5 boot-serial-test /ppc64/boot-serial/powernv
-> PASS 6 boot-serial-test /ppc64/boot-serial/sam460ex
->=20
-> and similarly during the boot-pxe-test.
->=20
-> Could you silence these, please?
+> Since the patches got re-ordered, this sentence is wrong. In case
+> you re-send this pull request, maybe you can update the changelog
+> accordingly ?
 
-Ok, done.  As a rule these warnings are there intentionally for TCG -
-we want to enable Spectre/Meltdown mitigations by default, but no-one
-really knows if and how to implement them for TCG.
+Done.
 
-But I can and have suppressed the warnings for the qtest case.
+>=20
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > Message-Id: <155146875097.147873.1732264036668112686.stgit@bahia.lan>
+> > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_ovec.c | 6 ------
+> >  1 file changed, 6 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> > index 12510b236a..318bf33de4 100644
+> > --- a/hw/ppc/spapr_ovec.c
+> > +++ b/hw/ppc/spapr_ovec.c
+> > @@ -16,7 +16,6 @@
+> >  #include "qemu/bitmap.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "qemu/error-report.h"
+> > -#include "sysemu/qtest.h"
+> >  #include "trace.h"
+> >  #include <libfdt.h>
+> > =20
+> > @@ -132,11 +131,6 @@ bool spapr_ovec_test(sPAPROptionVector *ov, long b=
+itnr)
+> >      g_assert(ov);
+> >      g_assert(bitnr < OV_MAXBITS);
+> > =20
+> > -    /* support memory unplug for qtest */
+> > -    if (qtest_enabled() && bitnr =3D=3D OV5_HP_EVT) {
+> > -        return true;
+> > -    }
+> > -
+> >      return test_bit(bitnr, ov->bitmap) ? true : false;
+> >  }
+> > =20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -111,24 +120,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---jq0ap7NbKX2Kqbes
+--7qSK/uQB79J36Y4o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyHAOYACgkQbDjKyiDZ
-s5LZUw/+KiwR/7ZIZv7wfKSKIBbQ1k9SP2V6W7dE6vH4G62DBM9H+juXROV2gJ27
-2roD30GFem1uBHUr4jL8Vb9LtSufAph6hkshR0ts6BnujR+h7+IGV6RG/yQwM+/4
-91mp3nDkiQmAK4IEt0j8oWOz/d+SVtxl+ZBNfZNd57LDasGjVp9T5D/US1UNIq3S
-V9dpAt6wA/ZCEvcJW72+huaP3ymkQZRWrH7H1U2ccgfoCg2Mln3TqnpCaufVbbiY
-TzW8ePm6/XnppTliMtxAfTCT7JwDqWAc2cBWeOWS7CIyDc3WyMWv8JOHFWd62QUB
-tm8V08TRmwg0tQzjam8Qu1IKrkI3Ok2oM+CfUYfOKtuyvj0auR9MGrVjjqSvS/f3
-4Pwi/g3jiuEdex0FA8n4WQeqFXzyZsjXyItSsSe19iOLj14OtUFVVSPq+Ha9pwaR
-omvWDv3MZuBGECMNOxKYi0tgZlS5DYQM7pPYNb8GfPiuTgC1YqRK2zr1SY0i67nQ
-lwdSQPuWUHQ2RF2dwfCaDoeOaDpdLHDbGZnX7XRDRsThkFcZ8RUd26S5rnCk7LfU
-44Gs2ONGpB4VZ3ezMxJrvltbWXwzLdGE+Eek41WY/NSfPNKk+AV4Qozj1egGDTEo
-26h5sOSLZNvNH5Knc7J+4cLqx2sThEgqiN4Nh16UHB/dfcjs4Ag=
-=zQxO
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyHBm4ACgkQbDjKyiDZ
+s5JBhBAAh57tiNhmt31v94qo7u2Gds/8FHdq18TIrREC2CgqPXGzJsPLT7sEeKVn
+OjNawuaEvBMN753LM705i3yB33YXrkn4KfO4FK9pjFP27z1ZX8wHOMmukwDDwcmD
+OYpXrusscUofsPcgi3ypGKz47lEjcQTv3hwvnfrFIaxUcKHgg78xPqE2WtJUE/FT
+0MGz7Hwau3IsjX2jsOqBfEvc/5ppN7sDFqF/hsRxx4gTryEuqRoGekUfN85eBjWf
+LEGVut6vbha/ZVksLmWhMiwLCgDFbrpXqcUK83zPpufrI8RK5NqY7lusXF7+wfgN
+stHF71QGcgHHusQPYXWRbIa0+33pxksoHSFAELKdUsGs/Zu6oXN1RAQuZs0B4Nym
+dqWwpjaterfAliT8XSGYPS4PAkJVa0tph84ICegMxGfUUg7iobABlQMLPiFEQ06k
+0p3Ljw2qiUX9sDMj4aweOIZxpYqiyB1gXnmQhNPB4Z6aqAJ+46axJ6vItuN30ps6
+lxqDyghdTbAMoprp86BiYntOtIl9CpsAfXkmjy9gXytVsrX87BVU1ylgZuKwgs5Y
+ZrD4gZTbHb65hsjhe9FbTJC7U9f3fUCyfifk6o6HpECVlhJWsoaxFD3/kfASfbTL
+WSF4SaINnvyEpzqkJrZFFhjXt6LqA7fa0AbcO9BWORjQWKLRevU=
+=FyIJ
 -----END PGP SIGNATURE-----
 
---jq0ap7NbKX2Kqbes--
+--7qSK/uQB79J36Y4o--
