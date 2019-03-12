@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57821)
+Received: from eggs.gnu.org ([209.51.188.92]:34474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h3YBB-0002xw-O2
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1h3Ybi-0004fS-7w
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 00:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1h3YBA-0005Dj-Iu
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:13 -0400
-Date: Tue, 12 Mar 2019 12:08:01 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190312010801.GC3303@umbus.fritz.box>
-References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
-	<20190310082703.1245-5-david@gibson.dropbear.id.au>
-	<20190311115228.30efc27b@bahia.lan>
+	(envelope-from <richard.henderson@linaro.org>) id 1h3Ybh-0004HZ-Cd
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 00:01:38 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1h3Ybh-0004GV-2U
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 00:01:37 -0400
+Received: by mail-pg1-x541.google.com with SMTP id e17so793276pgd.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 21:01:36 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20190311191602.25796-1-svens@stackframe.org>
+	<20190311191602.25796-12-svens@stackframe.org>
+	<60efee59-c608-d796-884a-c9cb1ff9a98c@linaro.org>
+Message-ID: <3e69c18b-b1a1-4cb8-45fe-6e7574544ab6@linaro.org>
+Date: Mon, 11 Mar 2019 21:01:32 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7qSK/uQB79J36Y4o"
-Content-Disposition: inline
-In-Reply-To: <20190311115228.30efc27b@bahia.lan>
-Subject: Re: [Qemu-devel] [PULL 04/60] Revert "spapr: support memory unplug
- for qtest"
+In-Reply-To: <60efee59-c608-d796-884a-c9cb1ff9a98c@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/11] target/hppa: call eval_interrupt()
+ after ssm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: peter.maydell@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Sven Schnelle <svens@stackframe.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+
+On 3/11/19 8:28 PM, Richard Henderson wrote:
+> On 3/11/19 12:16 PM, Sven Schnelle wrote:
+>> HP-UX (all versions) is losing timer interrupts, which leads to
+>> hangs. Pressing a key on the console fixes this, so it looks like
+>> QEMU is just looping trough TBs without checking for interrupts.
+>> Further investion showed that this happens when interrupts are
+>> triggered, without PSW_I enabled. Calling eval_interrupt() after
+>> PSW_I is set seems to fix this.
+>>
+>> Signed-off-by: Sven Schnelle <svens@stackframe.org>
+>> ---
+>>  target/hppa/cpu.h        | 1 +
+>>  target/hppa/int_helper.c | 2 +-
+>>  target/hppa/op_helper.c  | 6 ++++++
+>>  3 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> The correct fix is to exit to the main loop.
+
+... except what we're already doing that.  So I don't see what
+can be changed to help.  This doesn't seem to make a difference.
 
 
---7qSK/uQB79J36Y4o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Mar 11, 2019 at 11:52:28AM +0100, Greg Kurz wrote:
-> On Sun, 10 Mar 2019 19:26:07 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > From: Greg Kurz <groug@kaod.org>
-> >=20
-> > Commit b8165118f52c broke CPU hotplug tests for old machine types:
-> >=20
-> > $ QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64 ./tests/cpu-plug-=
-test -m=3Dslow
-> > /ppc64/cpu-plug/pseries-3.1/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.12-sxxm/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-3.0/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.10/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.11/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.12/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.9/device-add/2x3x1&maxcpus=3D6: OK
-> > /ppc64/cpu-plug/pseries-2.7/device-add/2x3x1&maxcpus=3D6: **
-> > ERROR:/home/thuth/devel/qemu/hw/ppc/spapr_events.c:313:rtas_event_log_t=
-o_source: assertion failed: (source->enabled)
-> > Broken pipe
-> > /home/thuth/devel/qemu/tests/libqtest.c:143: kill_qemu() detected QEMU =
-death from signal 6 (Aborted) (core dumped)
-> > Aborted (core dumped)
-> >=20
-> > The approach of faking the availability of OV5_HP_EVT causes the
-> > code to assume the hotplug event source is enabled, which is wrong
-> > for older machines.
-> >=20
-> > This reverts commit b8165118f52ce5ee88565d3cec83d30374efdc96.
-> >=20
-> > A subsequent patch will address the problem of CAS under qtest from
-> > a different angle.
-> >=20
->=20
-> Since the patches got re-ordered, this sentence is wrong. In case
-> you re-send this pull request, maybe you can update the changelog
-> accordingly ?
-
-Done.
-
->=20
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > Message-Id: <155146875097.147873.1732264036668112686.stgit@bahia.lan>
-> > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_ovec.c | 6 ------
-> >  1 file changed, 6 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> > index 12510b236a..318bf33de4 100644
-> > --- a/hw/ppc/spapr_ovec.c
-> > +++ b/hw/ppc/spapr_ovec.c
-> > @@ -16,7 +16,6 @@
-> >  #include "qemu/bitmap.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "qemu/error-report.h"
-> > -#include "sysemu/qtest.h"
-> >  #include "trace.h"
-> >  #include <libfdt.h>
-> > =20
-> > @@ -132,11 +131,6 @@ bool spapr_ovec_test(sPAPROptionVector *ov, long b=
-itnr)
-> >      g_assert(ov);
-> >      g_assert(bitnr < OV_MAXBITS);
-> > =20
-> > -    /* support memory unplug for qtest */
-> > -    if (qtest_enabled() && bitnr =3D=3D OV5_HP_EVT) {
-> > -        return true;
-> > -    }
-> > -
-> >      return test_bit(bitnr, ov->bitmap) ? true : false;
-> >  }
-> > =20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---7qSK/uQB79J36Y4o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyHBm4ACgkQbDjKyiDZ
-s5JBhBAAh57tiNhmt31v94qo7u2Gds/8FHdq18TIrREC2CgqPXGzJsPLT7sEeKVn
-OjNawuaEvBMN753LM705i3yB33YXrkn4KfO4FK9pjFP27z1ZX8wHOMmukwDDwcmD
-OYpXrusscUofsPcgi3ypGKz47lEjcQTv3hwvnfrFIaxUcKHgg78xPqE2WtJUE/FT
-0MGz7Hwau3IsjX2jsOqBfEvc/5ppN7sDFqF/hsRxx4gTryEuqRoGekUfN85eBjWf
-LEGVut6vbha/ZVksLmWhMiwLCgDFbrpXqcUK83zPpufrI8RK5NqY7lusXF7+wfgN
-stHF71QGcgHHusQPYXWRbIa0+33pxksoHSFAELKdUsGs/Zu6oXN1RAQuZs0B4Nym
-dqWwpjaterfAliT8XSGYPS4PAkJVa0tph84ICegMxGfUUg7iobABlQMLPiFEQ06k
-0p3Ljw2qiUX9sDMj4aweOIZxpYqiyB1gXnmQhNPB4Z6aqAJ+46axJ6vItuN30ps6
-lxqDyghdTbAMoprp86BiYntOtIl9CpsAfXkmjy9gXytVsrX87BVU1ylgZuKwgs5Y
-ZrD4gZTbHb65hsjhe9FbTJC7U9f3fUCyfifk6o6HpECVlhJWsoaxFD3/kfASfbTL
-WSF4SaINnvyEpzqkJrZFFhjXt6LqA7fa0AbcO9BWORjQWKLRevU=
-=FyIJ
------END PGP SIGNATURE-----
-
---7qSK/uQB79J36Y4o--
+r~
