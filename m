@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54207)
+Received: from eggs.gnu.org ([209.51.188.92]:54352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.abdurachmanov@gmail.com>) id 1h3b7P-0007Ch-M0
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:42:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h3b7q-0007UW-3w
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.abdurachmanov@gmail.com>) id 1h3b7O-0006qj-Ca
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:42:31 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <david.abdurachmanov@gmail.com>)
-	id 1h3b7O-0006qT-7B
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:42:30 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e15so1517913otk.6
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 23:42:30 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1h3asn-0007mc-Bb
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:27:26 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 12 Mar 2019 06:22:17 +0000
+Message-ID: <0fee08a7-1c08-67f4-3766-91f0f7e234cf@virtuozzo.com>
+References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
+	<20190311185147.52309-2-vsementsov@virtuozzo.com>
+	<de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
+In-Reply-To: <de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <86B22C33BA2BDC42A9332963D604265F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190311085024.13780-1-kraxel@redhat.com>
-	<20190311085024.13780-5-kraxel@redhat.com>
-	<87ef7d8fh8.fsf@dusky.pond.sub.org>
-	<alpine.BSF.2.21.9999.1903112044360.69539@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1903112044360.69539@zero.eik.bme.hu>
-From: David Abdurachmanov <david.abdurachmanov@gmail.com>
-Date: Tue, 12 Mar 2019 07:42:17 +0100
-Message-ID: <CAEn-LTrkA-7x=ZS2ufNWrJQev69oj63tFW+Vs4CGTBA0STR9KQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 4/5] hw/display: Add basic ATI VGA emulation
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] docs/interop/qcow2: Improve bitmap
+ flag in_use specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Mon, Mar 11, 2019 at 8:51 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
->
-> On Mon, 11 Mar 2019, Markus Armbruster wrote:
-> > Gerd Hoffmann <kraxel@redhat.com> writes:
-> >> From: BALATON Zoltan <balaton@eik.bme.hu>
-> >>
-> >> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
-> >> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
-> >> guests running on these and the PMON2000 firmware of the fulong2e
-> >> expect this to be available. Fortunately these are very similar chips
-> >> so they can be mostly emulated in the same device model. This patch
-> >> adds basic emulation of these ATI VGA chips.
-> >>
-> >> While this is incomplete and currently only enough to run the MIPS
-> >> firmware and get framebuffer output with Linux, it allows the fulong2e
-> >> board to work more like the real hardware and having it in QEMU in
-> >> this state provides a way to experiment with it and allows others to
-> >> contribute to improve it. It is compiled for all archs but only the
-> >> fulong2e (which currently has no display output at all) is set to use
-> >> it by default (in a separate patch).
-> >>
-> >> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
-> >> Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
-> >> Message-id: 0b1b7c22873a6e37627261b04fb687412b25ff4f.1552152100.git.balaton@eik.bme.hu
-> >> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > [...]
-> >> diff --git a/hw/display/trace-events b/hw/display/trace-events
-> >> index 37d3264bb2e6..80993cc4d913 100644
-> >> --- a/hw/display/trace-events
-> >> +++ b/hw/display/trace-events
-> >> @@ -138,3 +138,7 @@ vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
-> >>  sii9022_read_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
-> >>  sii9022_write_reg(uint8_t addr, uint8_t val) "addr 0x%02x, val 0x%02x"
-> >>  sii9022_switch_mode(const char *mode) "mode: %s"
-> >> +
-> >> +# hw/display/ati*.c
-> >> +ati_mm_read(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s -> 0x%"PRIx64
-> >> +ati_mm_write(unsigned int size, uint64_t addr, const char *name, uint64_t val) "%u 0x%"HWADDR_PRIx " %s <- 0x%"PRIx64
-> >
-> > Blows up for me:
-> >
-> > Traceback (most recent call last):
-> >  File "/work/armbru/qemu/scripts/tracetool.py", line 152, in <module>
-> >    main(sys.argv)
-> >  File "/work/armbru/qemu/scripts/tracetool.py", line 147, in main
-> >    binary=binary, probe_prefix=probe_prefix)
-> >  File "/work/armbru/qemu/scripts/tracetool/__init__.py", line 472, in generate
-> >    tracetool.format.generate(events, format, backend, group)
-> >  File "/work/armbru/qemu/scripts/tracetool/format/__init__.py", line 85, in generate
-> >    func(events, backend, group)
-> >  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 121, in generate
-> >    fmt_str = "%d@%d " + e.name + " " + c_fmt_to_stap(e.fmt) + "\\n"
-> >  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 64, in c_fmt_to_stap
-> >    bits.append(c_macro_to_format(macro))
-> >  File "/work/armbru/qemu/scripts/tracetool/format/log_stap.py", line 36, in c_macro_to_format
-> >    raise Exception("Unhandled macro '%s'" % macro)
-> > Exception: Unhandled macro 'HWADDR_PRIx'
->
-> No idea. Nobody else reported a problem with this yet and the above error
-> makes no sense to me. Cc'd some tracetool related people who hopefully can
-> hint what might be wrong. Do you get error during build? What trace
-> backend do you use?
-
-I hit the same issue on my daily QEMU builds for Fedora this morning:
-https://copr-be.cloud.fedoraproject.org/results/davidlt/latest-qemu/fedora-29-x86_64/00867106-qemu/
-build.log.gz contains all the details.
-
-david
+DQoNCk9uIDEyLjAzLjIwMTkgMzowMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMy8xMS8xOSAx
+OjUxIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gV2UgYWxyZWFk
+eSB1c2UgKHdlIGRpZG4ndCBub3RpY2UgaXQpIElOX1VTRSBmbGFnIGZvciBtYXJraW5nIGJpdG1h
+cA0KPj4gbWV0YWRhdGEgb3V0ZGF0ZWQsIHN1Y2ggYXMgQVVUTyBmbGFnLCB3aGljaCBtaXJyb3Jz
+IGVuYWJsZWQvZGlzYWJsZWQNCj4+IGJpdG1hcHMuIE5vIHdlIGFyZSBnb2luZyB0byBzdXBwb3J0
+IGJpdG1hcCByZXNpemUsIHNvIGl0J3MgZ29vZCB0bw0KPiANCj4gcy9Oby9Ob3cvDQo+IA0KPj4g
+d3JpdGUgSU5fVVNFIG1lYW5pbmcgd2l0aCBtb3JlIGRldGFpbHMuDQo+Pg0KPj4gU2lnbmVkLW9m
+Zi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tPg0KPj4gLS0tDQo+PiAgIGRvY3MvaW50ZXJvcC9xY293Mi50eHQgfCAxOCArKysrKysrKysr
+KysrKystLS0NCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDMgZGVsZXRp
+b25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2RvY3MvaW50ZXJvcC9xY293Mi50eHQgYi9kb2Nz
+L2ludGVyb3AvcWNvdzIudHh0DQo+PiBpbmRleCBmYjVjYjQ3MjQ1Li41NzVhNWYyNWUyIDEwMDY0
+NA0KPj4gLS0tIGEvZG9jcy9pbnRlcm9wL3Fjb3cyLnR4dA0KPj4gKysrIGIvZG9jcy9pbnRlcm9w
+L3Fjb3cyLnR4dA0KPj4gQEAgLTU4OSw3ICs1ODksMTkgQEAgU3RydWN0dXJlIG9mIGEgYml0bWFw
+IGRpcmVjdG9yeSBlbnRyeToNCj4+ICAgICAgICAgICAgICAgICAgICAgICBCaXQNCj4+ICAgICAg
+ICAgICAgICAgICAgICAgICAgIDA6IGluX3VzZQ0KPj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgVGhlIGJpdG1hcCB3YXMgbm90IHNhdmVkIGNvcnJlY3RseSBhbmQgbWF5IGJlDQo+PiAtICAg
+ICAgICAgICAgICAgICAgICAgICAgIGluY29uc2lzdGVudC4NCj4+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgaW5jb25zaXN0ZW50LiBUaGlzIGluY29uc2l0ZW5jeSBtYXkgdG91Y2ggYm90aCBi
+aXRtYXANCj4gDQo+IGluY29uc2lzdGVuY3kNCj4gDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgIGRhdGEgYW5kIG1ldGFkYXRhLCBhbmQgdGhpcyBtZWFuIHRoYXQgYml0bWFwIHN0YXRlDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgIChpdHMgZGF0YSBhbmQgbWV0YWRhdGEpIHdhcyBj
+aGFuZ2VkIGJ1dCBub3Qgc3RvcmVkDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgIGJhY2sg
+dG8gdGhlIGltYWdlLiBUaGlzIGZsYWcgZG9lc24ndCByZWxhdGUgdG8gZm9ybWF0DQo+PiArICAg
+ICAgICAgICAgICAgICAgICAgICAgIGNvcnJ1cHRpb24sIGFsbCBmaWVsZHMgYXJlIHN0aWxsIGNv
+cnJlY3QgZnJvbSBxY293Mg0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICBwb2ludCBvZiB2
+aWV3LCB0aGV5IGp1c3QgbWF5IGJlIG91dGRhdGVkLg0KPj4gKw0KPj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICBOb3RlOiBDdXJyZW50bHksIFFlbXUgbWF5IGNoYW5nZSAoYWRkaXRpb25hbGx5
+IHRvDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgIGJpdG1hcCBkYXRhKSBAYXV0byBmbGFn
+IGFuZCBzaXplIG9mIHRoZSBiaXRtYXAgZHVyaW5nDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgIGltYWdlIHJlc2l6ZS4gVGhpcyBtZWFuLCB0aGF0IG5vdCBvbmx5IGJpdG1hcCBkYXRhDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgIG1heSBiZSBvdXRkYXRlZCBpZiBAaW5fdXNlIGZs
+YWcgc2V0LCBidXQgYWxzbyB2YWx1ZSBvZg0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICBA
+YXV0byBmbGFnIGFuZCBiaXRtYXAgc2l6ZSAod2hpY2ggaXMgaW5kaXJlY3RseQ0KPj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICByZWZlcmVuY2VkIGJ5IEBiaXRtYXBfdGFibGVfc2l6ZSkuDQo+
+IA0KPiBGZWVscyB3b3JkeS4gTWF5YmUgZHJvcCB0aGUgc2Vjb25kIHBhcmFncmFwaCBzdGFydGlu
+ZyB3aXRoIE5vdGUsIGFuZA0KPiBtZXJlbHkgdXNlIHRoaXMgZm9yIHRoZSBmaXJzdCBwYXJhZ3Jh
+cGg6DQo+IA0KPiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5IGFuZCBtYXkgYmUg
+aW5jb25zaXN0ZW50LiBBbHRob3VnaCB0aGUNCj4gYml0bWFwIG1ldGFkYXRhIGlzIHN0aWxsIHdl
+bGwtZm9ybWVkIGZyb20gYSBxY293MiBwZXJzcGVjdGl2ZSwgdGhlDQo+IG1ldGFkYXRhIChzdWNo
+IGFzIHRoZSBhdXRvIGZsYWcgb3IgYml0bWFwIHNpemUpIG9yIGRhdGEgY29udGVudHMgbWF5IGJl
+DQo+IG91dGRhdGVkLg0KDQpTb3VuZHMgZ29vZCAoYXMgYWx3YXlzKSwgdGhhbmtzKQ0KDQo+IA0K
+Pj4gICANCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIDE6IGF1dG8NCj4+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFRoZSBiaXRtYXAgbXVzdCByZWZsZWN0IGFsbCBjaGFuZ2VzIG9mIHRo
+ZSB2aXJ0dWFsDQo+PiBAQCAtNzE3LDggKzcyOSw4IEBAIGNvcnJlc3BvbmRpbmcgcmFuZ2Ugb2Yg
+dGhlIHZpcnR1YWwgZGlzayAoc2VlIGFib3ZlKSB3YXMgd3JpdHRlbiB0byB3aGlsZSB0aGUNCj4+
+ICAgYml0bWFwIHdhcyAnZW5hYmxlZCcuIEFuIHVuc2V0IGJpdCBtZWFucyB0aGF0IHRoaXMgcmFu
+Z2Ugd2FzIG5vdCB3cml0dGVuIHRvLg0KPj4gICANCj4+ICAgVGhlIHNvZnR3YXJlIGRvZXNuJ3Qg
+aGF2ZSB0byBzeW5jIHRoZSBiaXRtYXAgaW4gdGhlIGltYWdlIGZpbGUgd2l0aCBpdHMNCj4+IC1y
+ZXByZXNlbnRhdGlvbiBpbiBSQU0gYWZ0ZXIgZWFjaCB3cml0ZS4gRmxhZyAnaW5fdXNlJyBzaG91
+bGQgYmUgc2V0IHdoaWxlIHRoZQ0KPj4gLWJpdG1hcCBpcyBub3Qgc3luY2VkLg0KPj4gK3JlcHJl
+c2VudGF0aW9uIGluIFJBTSBhZnRlciBlYWNoIHdyaXRlIG9yIG1ldGFkYXRhIGNoYW5nZS4gRmxh
+ZyAnaW5fdXNlJw0KPj4gK3Nob3VsZCBiZSBzZXQgd2hpbGUgdGhlIGJpdG1hcCBpcyBub3Qgc3lu
+Y2VkLg0KPj4gICANCj4+ICAgSW4gdGhlIGltYWdlIGZpbGUgdGhlICdlbmFibGVkJyBzdGF0ZSBp
+cyByZWZsZWN0ZWQgYnkgdGhlICdhdXRvJyBmbGFnLiBJZiB0aGlzDQo+PiAgIGZsYWcgaXMgc2V0
+LCB0aGUgc29mdHdhcmUgbXVzdCBjb25zaWRlciB0aGUgYml0bWFwIGFzICdlbmFibGVkJyBhbmQg
+c3RhcnQNCj4+DQo+IA0K
