@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54352)
+Received: from eggs.gnu.org ([209.51.188.92]:56461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3b7q-0007UW-3w
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:42:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1h3bRF-0002nf-28
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 03:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1h3asn-0007mc-Bb
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:27:26 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 12 Mar 2019 06:22:17 +0000
-Message-ID: <0fee08a7-1c08-67f4-3766-91f0f7e234cf@virtuozzo.com>
-References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
-	<20190311185147.52309-2-vsementsov@virtuozzo.com>
-	<de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
-In-Reply-To: <de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <86B22C33BA2BDC42A9332963D604265F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1h3bPp-00008B-7E
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 03:01:34 -0400
+References: <20190311165538.6623-1-alex.bennee@linaro.org>
+	<532e5c6d-b93e-7fb3-f987-22e9b0362acb@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fdbdeb73-032b-229b-c25b-aeb60770c38c@redhat.com>
+Date: Tue, 12 Mar 2019 08:01:28 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] docs/interop/qcow2: Improve bitmap
- flag in_use specification
+In-Reply-To: <532e5c6d-b93e-7fb3-f987-22e9b0362acb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: re-license timers.py to
+ GPLv2 or later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-DQoNCk9uIDEyLjAzLjIwMTkgMzowMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMy8xMS8xOSAx
-OjUxIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gV2UgYWxyZWFk
-eSB1c2UgKHdlIGRpZG4ndCBub3RpY2UgaXQpIElOX1VTRSBmbGFnIGZvciBtYXJraW5nIGJpdG1h
-cA0KPj4gbWV0YWRhdGEgb3V0ZGF0ZWQsIHN1Y2ggYXMgQVVUTyBmbGFnLCB3aGljaCBtaXJyb3Jz
-IGVuYWJsZWQvZGlzYWJsZWQNCj4+IGJpdG1hcHMuIE5vIHdlIGFyZSBnb2luZyB0byBzdXBwb3J0
-IGJpdG1hcCByZXNpemUsIHNvIGl0J3MgZ29vZCB0bw0KPiANCj4gcy9Oby9Ob3cvDQo+IA0KPj4g
-d3JpdGUgSU5fVVNFIG1lYW5pbmcgd2l0aCBtb3JlIGRldGFpbHMuDQo+Pg0KPj4gU2lnbmVkLW9m
-Zi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPg0KPj4gLS0tDQo+PiAgIGRvY3MvaW50ZXJvcC9xY293Mi50eHQgfCAxOCArKysrKysrKysr
-KysrKystLS0NCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDMgZGVsZXRp
-b25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2RvY3MvaW50ZXJvcC9xY293Mi50eHQgYi9kb2Nz
-L2ludGVyb3AvcWNvdzIudHh0DQo+PiBpbmRleCBmYjVjYjQ3MjQ1Li41NzVhNWYyNWUyIDEwMDY0
-NA0KPj4gLS0tIGEvZG9jcy9pbnRlcm9wL3Fjb3cyLnR4dA0KPj4gKysrIGIvZG9jcy9pbnRlcm9w
-L3Fjb3cyLnR4dA0KPj4gQEAgLTU4OSw3ICs1ODksMTkgQEAgU3RydWN0dXJlIG9mIGEgYml0bWFw
-IGRpcmVjdG9yeSBlbnRyeToNCj4+ICAgICAgICAgICAgICAgICAgICAgICBCaXQNCj4+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIDA6IGluX3VzZQ0KPj4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgVGhlIGJpdG1hcCB3YXMgbm90IHNhdmVkIGNvcnJlY3RseSBhbmQgbWF5IGJlDQo+PiAtICAg
-ICAgICAgICAgICAgICAgICAgICAgIGluY29uc2lzdGVudC4NCj4+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgaW5jb25zaXN0ZW50LiBUaGlzIGluY29uc2l0ZW5jeSBtYXkgdG91Y2ggYm90aCBi
-aXRtYXANCj4gDQo+IGluY29uc2lzdGVuY3kNCj4gDQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgIGRhdGEgYW5kIG1ldGFkYXRhLCBhbmQgdGhpcyBtZWFuIHRoYXQgYml0bWFwIHN0YXRlDQo+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgIChpdHMgZGF0YSBhbmQgbWV0YWRhdGEpIHdhcyBj
-aGFuZ2VkIGJ1dCBub3Qgc3RvcmVkDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgIGJhY2sg
-dG8gdGhlIGltYWdlLiBUaGlzIGZsYWcgZG9lc24ndCByZWxhdGUgdG8gZm9ybWF0DQo+PiArICAg
-ICAgICAgICAgICAgICAgICAgICAgIGNvcnJ1cHRpb24sIGFsbCBmaWVsZHMgYXJlIHN0aWxsIGNv
-cnJlY3QgZnJvbSBxY293Mg0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICBwb2ludCBvZiB2
-aWV3LCB0aGV5IGp1c3QgbWF5IGJlIG91dGRhdGVkLg0KPj4gKw0KPj4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICBOb3RlOiBDdXJyZW50bHksIFFlbXUgbWF5IGNoYW5nZSAoYWRkaXRpb25hbGx5
-IHRvDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgIGJpdG1hcCBkYXRhKSBAYXV0byBmbGFn
-IGFuZCBzaXplIG9mIHRoZSBiaXRtYXAgZHVyaW5nDQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgIGltYWdlIHJlc2l6ZS4gVGhpcyBtZWFuLCB0aGF0IG5vdCBvbmx5IGJpdG1hcCBkYXRhDQo+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgIG1heSBiZSBvdXRkYXRlZCBpZiBAaW5fdXNlIGZs
-YWcgc2V0LCBidXQgYWxzbyB2YWx1ZSBvZg0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICBA
-YXV0byBmbGFnIGFuZCBiaXRtYXAgc2l6ZSAod2hpY2ggaXMgaW5kaXJlY3RseQ0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICByZWZlcmVuY2VkIGJ5IEBiaXRtYXBfdGFibGVfc2l6ZSkuDQo+
-IA0KPiBGZWVscyB3b3JkeS4gTWF5YmUgZHJvcCB0aGUgc2Vjb25kIHBhcmFncmFwaCBzdGFydGlu
-ZyB3aXRoIE5vdGUsIGFuZA0KPiBtZXJlbHkgdXNlIHRoaXMgZm9yIHRoZSBmaXJzdCBwYXJhZ3Jh
-cGg6DQo+IA0KPiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5IGFuZCBtYXkgYmUg
-aW5jb25zaXN0ZW50LiBBbHRob3VnaCB0aGUNCj4gYml0bWFwIG1ldGFkYXRhIGlzIHN0aWxsIHdl
-bGwtZm9ybWVkIGZyb20gYSBxY293MiBwZXJzcGVjdGl2ZSwgdGhlDQo+IG1ldGFkYXRhIChzdWNo
-IGFzIHRoZSBhdXRvIGZsYWcgb3IgYml0bWFwIHNpemUpIG9yIGRhdGEgY29udGVudHMgbWF5IGJl
-DQo+IG91dGRhdGVkLg0KDQpTb3VuZHMgZ29vZCAoYXMgYWx3YXlzKSwgdGhhbmtzKQ0KDQo+IA0K
-Pj4gICANCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIDE6IGF1dG8NCj4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFRoZSBiaXRtYXAgbXVzdCByZWZsZWN0IGFsbCBjaGFuZ2VzIG9mIHRo
-ZSB2aXJ0dWFsDQo+PiBAQCAtNzE3LDggKzcyOSw4IEBAIGNvcnJlc3BvbmRpbmcgcmFuZ2Ugb2Yg
-dGhlIHZpcnR1YWwgZGlzayAoc2VlIGFib3ZlKSB3YXMgd3JpdHRlbiB0byB3aGlsZSB0aGUNCj4+
-ICAgYml0bWFwIHdhcyAnZW5hYmxlZCcuIEFuIHVuc2V0IGJpdCBtZWFucyB0aGF0IHRoaXMgcmFu
-Z2Ugd2FzIG5vdCB3cml0dGVuIHRvLg0KPj4gICANCj4+ICAgVGhlIHNvZnR3YXJlIGRvZXNuJ3Qg
-aGF2ZSB0byBzeW5jIHRoZSBiaXRtYXAgaW4gdGhlIGltYWdlIGZpbGUgd2l0aCBpdHMNCj4+IC1y
-ZXByZXNlbnRhdGlvbiBpbiBSQU0gYWZ0ZXIgZWFjaCB3cml0ZS4gRmxhZyAnaW5fdXNlJyBzaG91
-bGQgYmUgc2V0IHdoaWxlIHRoZQ0KPj4gLWJpdG1hcCBpcyBub3Qgc3luY2VkLg0KPj4gK3JlcHJl
-c2VudGF0aW9uIGluIFJBTSBhZnRlciBlYWNoIHdyaXRlIG9yIG1ldGFkYXRhIGNoYW5nZS4gRmxh
-ZyAnaW5fdXNlJw0KPj4gK3Nob3VsZCBiZSBzZXQgd2hpbGUgdGhlIGJpdG1hcCBpcyBub3Qgc3lu
-Y2VkLg0KPj4gICANCj4+ICAgSW4gdGhlIGltYWdlIGZpbGUgdGhlICdlbmFibGVkJyBzdGF0ZSBp
-cyByZWZsZWN0ZWQgYnkgdGhlICdhdXRvJyBmbGFnLiBJZiB0aGlzDQo+PiAgIGZsYWcgaXMgc2V0
-LCB0aGUgc29mdHdhcmUgbXVzdCBjb25zaWRlciB0aGUgYml0bWFwIGFzICdlbmFibGVkJyBhbmQg
-c3RhcnQNCj4+DQo+IA0K
+On 11/03/2019 18.55, Paolo Bonzini wrote:
+> On 11/03/19 17:55, Alex Benn=C3=A9e wrote:
+>> I'm the sole author (aside from a one line by Greg fixing encoding)
+>> and I was asked nicely on IRC to bring it into line with the rest of
+>> the files.
+>>
+>> Cc: Greg Kurz <groug@kaod.org>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  scripts/qemugdb/timers.py | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+>> index 51ea04b5e2..f0e132d27a 100644
+>> --- a/scripts/qemugdb/timers.py
+>> +++ b/scripts/qemugdb/timers.py
+>> @@ -6,8 +6,10 @@
+>>  #
+>>  # Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>  #
+>> -# This work is licensed under the terms of the GNU GPL, version 2.  S=
+ee
+>> -# the COPYING file in the top-level directory.
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+>> +# See the COPYING file in the top-level directory.
+>> +#
+>> +# SPDX-License-Identifier: GPL-2.0-or-later
+>> =20
+>>  # 'qemu timers' -- display the current timerlists
+>=20
+> +qemu-trivial
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+... I think Laurent just sent his trivial PULL request for soft-freeze
+already ... I still plan to send another PULL request today, so if
+nobody else wants to pick it up for soft-freeze today, I can add it to
+my queue if you like.
