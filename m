@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56408)
+Received: from eggs.gnu.org ([209.51.188.92]:56674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h3Y6I-0007Np-O0
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:29:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1h3Y7N-0008MU-DQ
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h3Y13-0003eR-Bd
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:23:46 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h3Y12-0003dt-Vv
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:23:45 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h11so733654pgl.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 20:23:44 -0700 (PDT)
-References: <20190311191602.25796-1-svens@stackframe.org>
-	<20190311191602.25796-10-svens@stackframe.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <69de0f37-d254-ee42-c418-cfb3e79c11ea@linaro.org>
-Date: Mon, 11 Mar 2019 20:23:40 -0700
+	(envelope-from <eblake@redhat.com>) id 1h3XsL-0004mJ-NL
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:14:47 -0400
+References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
+	<20190311185147.52309-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2ac23c13-aef6-40ae-a99c-f6f1a6521318@redhat.com>
+Date: Mon, 11 Mar 2019 22:09:35 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190311191602.25796-10-svens@stackframe.org>
-Content-Type: multipart/mixed; boundary="------------A82E549C7881F9265068A6B9"
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 09/11] target/hppa: add TLB protection id
- check
+In-Reply-To: <20190311185147.52309-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="m15jCVEnuYQvYZAvRGcNvp0zWapki3kKH"
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] block/qcow2-bitmap: Don't check
+ size for IN_USE bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,173 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sven Schnelle <svens@stackframe.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@virtuozzo.com
 
-This is a multi-part message in MIME format.
---------------A82E549C7881F9265068A6B9
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m15jCVEnuYQvYZAvRGcNvp0zWapki3kKH
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@virtuozzo.com
+Message-ID: <2ac23c13-aef6-40ae-a99c-f6f1a6521318@redhat.com>
+Subject: Re: [PATCH v2 2/4] block/qcow2-bitmap: Don't check size for IN_USE
+ bitmap
+References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
+ <20190311185147.52309-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190311185147.52309-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 3/11/19 12:16 PM, Sven Schnelle wrote:
-> +    /* access_id == 0 means public page and no check is performed */
-> +    if ((env->psw & PSW_P) && ent->access_id) {
-> +            wd = 1;
-> +
-> +            if (ent->access_id == (env->cr[CR_PID1] >> 1)) {
-> +                wd &= env->cr[CR_PID1];
-> +            }
-> +
-> +            if (ent->access_id == (env->cr[CR_PID2] >> 1)) {
-> +                wd &= env->cr[CR_PID2];
-> +            }
-> +
-> +            if (ent->access_id == (env->cr[CR_PID3] >> 1)) {
-> +                wd &= env->cr[CR_PID3];
-> +            }
-> +
-> +            if (ent->access_id == (env->cr[CR_PID4] >> 1)) {
-> +                wd &= env->cr[CR_PID4];
-> +            }
-> +
-> +            if (wd && (type & w_prot)) {
-> +                ret = EXCP_DMPI;
-> +                goto egress;
-> +            }
+On 3/11/19 1:51 PM, Vladimir Sementsov-Ogievskiy wrote:
+> We are going to allow image resize when there are persistent bitmaps.
+> It may lead to appearing of inconsistent bitmaps (IN_USE=3D1) with
+> inconsistent size. But we still want to load them as inconsistent.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+
+> +    {
+> +        /*
+> +         * We've loaded valid bitmap (IN_USE not set) or we are going =
+to store
+> +         * valid bitmap. But allocated bitmap table size is not enough=
+ to store
+> +         * such bitmap.
+> +         *
+> +         * Note, that it's OK to have invalid bitmap with invalid size=
+ during to
+
+s/during/due/
+
+> +         * bitmap was not correctly saved after image resize.
+
+s/bitmap/a bitmap that/
+
+> +         */
+> +        return -EINVAL;
 > +    }
+> +
+> +    return 0;
+>  }
+> =20
+>  static inline void bitmap_directory_to_be(uint8_t *dir, size_t size)
+>=20
 
-This is insufficient.
-
-(1) The softmmu tlb much be flushed when PSW_P,
-    or any of the PID registers change.
-(2) If type != PAGE_WRITE, you need to remove PAGE_WRITE
-    from prot so that the next write doesn't see wrong permissions.
-
-I'll be testing something like the following.
-
-
-r~
-
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
---------------A82E549C7881F9265068A6B9
-Content-Type: text/plain; charset=UTF-8;
- name="z"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="z"
+--m15jCVEnuYQvYZAvRGcNvp0zWapki3kKH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-ZGlmZiAtLWdpdCBhL3RhcmdldC9ocHBhL2NwdS5oIGIvdGFyZ2V0L2hwcGEvY3B1LmgKaW5k
-ZXggODYxYmJiMWYxNi4uYzA2MmM3OTY5YyAxMDA2NDQKLS0tIGEvdGFyZ2V0L2hwcGEvY3B1
-LmgKKysrIGIvdGFyZ2V0L2hwcGEvY3B1LmgKQEAgLTE0Myw2ICsxNDMsMTAgQEAKICNlbmRp
-ZgogCiAjZGVmaW5lIENSX1JDICAgICAgICAgICAgMAorI2RlZmluZSBDUl9QSUQxICAgICAg
-ICAgIDgKKyNkZWZpbmUgQ1JfUElEMiAgICAgICAgICA5CisjZGVmaW5lIENSX1BJRDMgICAg
-ICAgICAgMTIKKyNkZWZpbmUgQ1JfUElENCAgICAgICAgICAxMwogI2RlZmluZSBDUl9TQ1JD
-Q1IgICAgICAgIDEwCiAjZGVmaW5lIENSX1NBUiAgICAgICAgICAgMTEKICNkZWZpbmUgQ1Jf
-SVZBICAgICAgICAgICAxNApAQCAtMzQxLDYgKzM0NSwxMiBAQCB0YXJnZXRfdXJlZyBjcHVf
-aHBwYV9nZXRfcHN3KENQVUhQUEFTdGF0ZSAqZW52KTsKIHZvaWQgY3B1X2hwcGFfcHV0X3Bz
-dyhDUFVIUFBBU3RhdGUgKmVudiwgdGFyZ2V0X3VyZWcpOwogdm9pZCBjcHVfaHBwYV9sb2Fk
-ZWRfZnIwKENQVUhQUEFTdGF0ZSAqZW52KTsKIAorI2lmZGVmIENPTkZJR19VU0VSX09OTFkK
-K3N0YXRpYyBpbmxpbmUgdm9pZCBjcHVfaHBwYV9jaGFuZ2VfcHJvdF9pZChDUFVIUFBBU3Rh
-dGUgKmVudikgeyB9CisjZWxzZQordm9pZCBjcHVfaHBwYV9jaGFuZ2VfcHJvdF9pZChDUFVI
-UFBBU3RhdGUgKmVudik7CisjZW5kaWYKKwogI2RlZmluZSBjcHVfc2lnbmFsX2hhbmRsZXIg
-Y3B1X2hwcGFfc2lnbmFsX2hhbmRsZXIKIAogaW50IGNwdV9ocHBhX3NpZ25hbF9oYW5kbGVy
-KGludCBob3N0X3NpZ251bSwgdm9pZCAqcGluZm8sIHZvaWQgKnB1Yyk7CmRpZmYgLS1naXQg
-YS90YXJnZXQvaHBwYS9oZWxwZXIuaCBiL3RhcmdldC9ocHBhL2hlbHBlci5oCmluZGV4IGJm
-ZTBkZDFkYjEuLjM4ZDgzNGVmNmIgMTAwNjQ0Ci0tLSBhL3RhcmdldC9ocHBhL2hlbHBlci5o
-CisrKyBiL3RhcmdldC9ocHBhL2hlbHBlci5oCkBAIC05Miw0ICs5Miw1IEBAIERFRl9IRUxQ
-RVJfRkxBR1NfMyhpdGxicCwgVENHX0NBTExfTk9fUldHLCB2b2lkLCBlbnYsIHRsLCB0cikK
-IERFRl9IRUxQRVJfRkxBR1NfMihwdGxiLCBUQ0dfQ0FMTF9OT19SV0csIHZvaWQsIGVudiwg
-dGwpCiBERUZfSEVMUEVSX0ZMQUdTXzEocHRsYmUsIFRDR19DQUxMX05PX1JXRywgdm9pZCwg
-ZW52KQogREVGX0hFTFBFUl9GTEFHU18yKGxwYSwgVENHX0NBTExfTk9fV0csIHRyLCBlbnYs
-IHRsKQorREVGX0hFTFBFUl9GTEFHU18xKGNoYW5nZV9wcm90X2lkLCBUQ0dfQ0FMTF9OT19S
-V0csIHZvaWQsIGVudikKICNlbmRpZgpkaWZmIC0tZ2l0IGEvdGFyZ2V0L2hwcGEvZ2Ric3R1
-Yi5jIGIvdGFyZ2V0L2hwcGEvZ2Ric3R1Yi5jCmluZGV4IDMxNTdhNjkwZjIuLjk4M2JmOTJh
-YWYgMTAwNjQ0Ci0tLSBhL3RhcmdldC9ocHBhL2dkYnN0dWIuYworKysgYi90YXJnZXQvaHBw
-YS9nZGJzdHViLmMKQEAgLTkzLDE5ICs5MywxOSBAQCBpbnQgaHBwYV9jcHVfZ2RiX3JlYWRf
-cmVnaXN0ZXIoQ1BVU3RhdGUgKmNzLCB1aW50OF90ICptZW1fYnVmLCBpbnQgbikKICAgICAg
-ICAgdmFsID0gZW52LT5jcltDUl9SQ107CiAgICAgICAgIGJyZWFrOwogICAgIGNhc2UgNTI6
-Ci0gICAgICAgIHZhbCA9IGVudi0+Y3JbOF07CisgICAgICAgIHZhbCA9IGVudi0+Y3JbQ1Jf
-UElEMV07CiAgICAgICAgIGJyZWFrOwogICAgIGNhc2UgNTM6Ci0gICAgICAgIHZhbCA9IGVu
-di0+Y3JbOV07CisgICAgICAgIHZhbCA9IGVudi0+Y3JbQ1JfUElEMl07CiAgICAgICAgIGJy
-ZWFrOwogICAgIGNhc2UgNTQ6CiAgICAgICAgIHZhbCA9IGVudi0+Y3JbQ1JfU0NSQ0NSXTsK
-ICAgICAgICAgYnJlYWs7CiAgICAgY2FzZSA1NToKLSAgICAgICAgdmFsID0gZW52LT5jclsx
-Ml07CisgICAgICAgIHZhbCA9IGVudi0+Y3JbQ1JfUElEM107CiAgICAgICAgIGJyZWFrOwog
-ICAgIGNhc2UgNTY6Ci0gICAgICAgIHZhbCA9IGVudi0+Y3JbMTNdOworICAgICAgICB2YWwg
-PSBlbnYtPmNyW0NSX1BJRDRdOwogICAgICAgICBicmVhazsKICAgICBjYXNlIDU3OgogICAg
-ICAgICB2YWwgPSBlbnYtPmNyWzI0XTsKQEAgLTIyNCwxOSArMjI0LDIzIEBAIGludCBocHBh
-X2NwdV9nZGJfd3JpdGVfcmVnaXN0ZXIoQ1BVU3RhdGUgKmNzLCB1aW50OF90ICptZW1fYnVm
-LCBpbnQgbikKICAgICAgICAgZW52LT5jcltDUl9SQ10gPSB2YWw7CiAgICAgICAgIGJyZWFr
-OwogICAgIGNhc2UgNTI6Ci0gICAgICAgIGVudi0+Y3JbOF0gPSB2YWw7CisgICAgICAgIGVu
-di0+Y3JbQ1JfUElEMV0gPSB2YWw7CisgICAgICAgIGNwdV9ocHBhX2NoYW5nZV9wcm90X2lk
-KGVudik7CiAgICAgICAgIGJyZWFrOwogICAgIGNhc2UgNTM6Ci0gICAgICAgIGVudi0+Y3Jb
-OV0gPSB2YWw7CisgICAgICAgIGVudi0+Y3JbQ1JfUElEMl0gPSB2YWw7CisgICAgICAgIGNw
-dV9ocHBhX2NoYW5nZV9wcm90X2lkKGVudik7CiAgICAgICAgIGJyZWFrOwogICAgIGNhc2Ug
-NTQ6CiAgICAgICAgIGVudi0+Y3JbQ1JfU0NSQ0NSXSA9IHZhbDsKICAgICAgICAgYnJlYWs7
-CiAgICAgY2FzZSA1NToKLSAgICAgICAgZW52LT5jclsxMl0gPSB2YWw7CisgICAgICAgIGVu
-di0+Y3JbQ1JfUElEM10gPSB2YWw7CisgICAgICAgIGNwdV9ocHBhX2NoYW5nZV9wcm90X2lk
-KGVudik7CiAgICAgICAgIGJyZWFrOwogICAgIGNhc2UgNTY6Ci0gICAgICAgIGVudi0+Y3Jb
-MTNdID0gdmFsOworICAgICAgICBlbnYtPmNyW0NSX1BJRDRdID0gdmFsOworICAgICAgICBj
-cHVfaHBwYV9jaGFuZ2VfcHJvdF9pZChlbnYpOwogICAgICAgICBicmVhazsKICAgICBjYXNl
-IDU3OgogICAgICAgICBlbnYtPmNyWzI0XSA9IHZhbDsKZGlmZiAtLWdpdCBhL3RhcmdldC9o
-cHBhL2hlbHBlci5jIGIvdGFyZ2V0L2hwcGEvaGVscGVyLmMKaW5kZXggNjUzOTA2MWU1Mi4u
-YWM3NTBiNjJlZiAxMDA2NDQKLS0tIGEvdGFyZ2V0L2hwcGEvaGVscGVyLmMKKysrIGIvdGFy
-Z2V0L2hwcGEvaGVscGVyLmMKQEAgLTIxLDYgKzIxLDcgQEAKIAogI2luY2x1ZGUgImNwdS5o
-IgogI2luY2x1ZGUgImZwdS9zb2Z0ZmxvYXQuaCIKKyNpbmNsdWRlICJleGVjL2V4ZWMtYWxs
-LmgiCiAjaW5jbHVkZSAiZXhlYy9oZWxwZXItcHJvdG8uaCIKIAogdGFyZ2V0X3VyZWcgY3B1
-X2hwcGFfZ2V0X3BzdyhDUFVIUFBBU3RhdGUgKmVudikKQEAgLTQ5LDYgKzUwLDcgQEAgdGFy
-Z2V0X3VyZWcgY3B1X2hwcGFfZ2V0X3BzdyhDUFVIUFBBU3RhdGUgKmVudikKIAogdm9pZCBj
-cHVfaHBwYV9wdXRfcHN3KENQVUhQUEFTdGF0ZSAqZW52LCB0YXJnZXRfdXJlZyBwc3cpCiB7
-CisgICAgdGFyZ2V0X3VyZWcgb2xkX3BzdyA9IGVudi0+cHN3OwogICAgIHRhcmdldF91cmVn
-IGNiID0gMDsKIAogICAgIGVudi0+cHN3ID0gcHN3ICYgfihQU1dfTiB8IFBTV19WIHwgUFNX
-X0NCKTsKQEAgLTY0LDYgKzY2LDE0IEBAIHZvaWQgY3B1X2hwcGFfcHV0X3BzdyhDUFVIUFBB
-U3RhdGUgKmVudiwgdGFyZ2V0X3VyZWcgcHN3KQogICAgIGNiIHw9ICgocHN3ID4+ICA5KSAm
-IDEpIDw8ICA4OwogICAgIGNiIHw9ICgocHN3ID4+ICA4KSAmIDEpIDw8ICA0OwogICAgIGVu
-di0+cHN3X2NiID0gY2I7CisKKyAgICAvKiBJZiBQU1dfUCBjaGFuZ2VzLCBpdCBhZmZlY3Rz
-IGhvdyB3ZSB0cmFuc2xhdGUgYWRkcmVzc2VzLiAgKi8KKyAgICBpZiAoKHBzdyBeIG9sZF9w
-c3cpICYgUFNXX1ApIHsKKyNpZm5kZWYgQ09ORklHX1VTRVJfT05MWQorICAgICAgICBDUFVT
-dGF0ZSAqc3JjID0gQ1BVKGhwcGFfZW52X2dldF9jcHUoZW52KSk7CisgICAgICAgIHRsYl9m
-bHVzaF9ieV9tbXVpZHgoc3JjLCAweGYpOworI2VuZGlmCisgICAgfQogfQogCiB2b2lkIGhw
-cGFfY3B1X2R1bXBfc3RhdGUoQ1BVU3RhdGUgKmNzLCBGSUxFICpmLApkaWZmIC0tZ2l0IGEv
-dGFyZ2V0L2hwcGEvbWVtX2hlbHBlci5jIGIvdGFyZ2V0L2hwcGEvbWVtX2hlbHBlci5jCmlu
-ZGV4IDY0NzQzYmY0MjUuLjlmYzI2ZDNjMjIgMTAwNjQ0Ci0tLSBhL3RhcmdldC9ocHBhL21l
-bV9oZWxwZXIuYworKysgYi90YXJnZXQvaHBwYS9tZW1faGVscGVyLmMKQEAgLTEzMCw3ICsx
-MzAsMjAgQEAgaW50IGhwcGFfZ2V0X3BoeXNpY2FsX2FkZHJlc3MoQ1BVSFBQQVN0YXRlICpl
-bnYsIHZhZGRyIGFkZHIsIGludCBtbXVfaWR4LAogICAgICAgICBicmVhazsKICAgICB9CiAK
-LSAgICAvKiA/Pz8gQ2hlY2sgUFNXX1AgYW5kIGVudC0+YWNjZXNzX3Byb3QuICBUaGlzIGNh
-biByZW1vdmUgUEFHRV9XUklURS4gICovCisgICAgLyogYWNjZXNzX2lkID09IDAgbWVhbnMg
-cHVibGljIHBhZ2UgYW5kIG5vIGNoZWNrIGlzIHBlcmZvcm1lZCAqLworICAgIGlmICgoZW52
-LT5wc3cgJiBQU1dfUCkgJiYgZW50LT5hY2Nlc3NfaWQpIHsKKyAgICAgICAgLyogSWYgYml0
-cyBbMzE6MV0gbWF0Y2gsIGFuZCBiaXQgMCBpcyBzZXQsIHN1cHByZXNzIHdyaXRlLiAgKi8K
-KyAgICAgICAgaW50IG1hdGNoID0gZW50LT5hY2Nlc3NfaWQgKiAyICsgMTsKKworICAgICAg
-ICBpZiAobWF0Y2ggPT0gZW52LT5jcltDUl9QSUQxXSB8fCBtYXRjaCA9PSBlbnYtPmNyW0NS
-X1BJRDJdIHx8CisgICAgICAgICAgICBtYXRjaCA9PSBlbnYtPmNyW0NSX1BJRDNdIHx8IG1h
-dGNoID09IGVudi0+Y3JbQ1JfUElENF0pIHsKKyAgICAgICAgICAgIHByb3QgJj0gUEFHRV9S
-RUFEIHwgUEFHRV9FWEVDOworICAgICAgICAgICAgaWYgKHR5cGUgPT0gUEFHRV9XUklURSkg
-eworICAgICAgICAgICAgICAgIHJldCA9IEVYQ1BfRE1QSTsKKyAgICAgICAgICAgICAgICBn
-b3RvIGVncmVzczsKKyAgICAgICAgICAgIH0KKyAgICAgICAgfQorICAgIH0KIAogICAgIC8q
-IE5vIGd1ZXN0IGFjY2VzcyB0eXBlIGluZGljYXRlcyBhIG5vbi1hcmNoaXRlY3R1cmFsIGFj
-Y2VzcyBmcm9tCiAgICAgICAgd2l0aGluIFFFTVUuICBCeXBhc3MgY2hlY2tzIGZvciBhY2Nl
-c3MsIEQsIEIgYW5kIFQgYml0cy4gICovCkBAIC0zMzMsNiArMzQ2LDE5IEBAIHZvaWQgSEVM
-UEVSKHB0bGJlKShDUFVIUFBBU3RhdGUgKmVudikKICAgICB0bGJfZmx1c2hfYnlfbW11aWR4
-KHNyYywgMHhmKTsKIH0KIAordm9pZCBjcHVfaHBwYV9jaGFuZ2VfcHJvdF9pZChDUFVIUFBB
-U3RhdGUgKmVudikKK3sKKyAgICBpZiAoZW52LT5wc3cgJiBQU1dfUCkgeworICAgICAgICBD
-UFVTdGF0ZSAqc3JjID0gQ1BVKGhwcGFfZW52X2dldF9jcHUoZW52KSk7CisgICAgICAgIHRs
-Yl9mbHVzaF9ieV9tbXVpZHgoc3JjLCAweGYpOworICAgIH0KK30KKwordm9pZCBIRUxQRVIo
-Y2hhbmdlX3Byb3RfaWQpKENQVUhQUEFTdGF0ZSAqZW52KQoreworICAgIGNwdV9ocHBhX2No
-YW5nZV9wcm90X2lkKGVudik7Cit9CisKIHRhcmdldF91cmVnIEhFTFBFUihscGEpKENQVUhQ
-UEFTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcgYWRkcikKIHsKICAgICBod2FkZHIgcGh5czsK
-ZGlmZiAtLWdpdCBhL3RhcmdldC9ocHBhL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L2hwcGEvdHJh
-bnNsYXRlLmMKaW5kZXggNmFjMTk2ODA0Yi4uNzBhN2NkNGE4OSAxMDA2NDQKLS0tIGEvdGFy
-Z2V0L2hwcGEvdHJhbnNsYXRlLmMKKysrIGIvdGFyZ2V0L2hwcGEvdHJhbnNsYXRlLmMKQEAg
-LTIyNTYsNiArMjI1NiwxNiBAQCBzdGF0aWMgYm9vbCB0cmFuc19tdGN0bChEaXNhc0NvbnRl
-eHQgKmN0eCwgYXJnX210Y3RsICphKQogICAgICAgICAgICAgICAgICAgICAgICBvZmZzZXRv
-ZihDUFVIUFBBU3RhdGUsIGNyX2JhY2tbY3RsIC0gQ1JfSUlBU1FdKSk7CiAgICAgICAgIGJy
-ZWFrOwogCisgICAgY2FzZSBDUl9QSUQxOgorICAgIGNhc2UgQ1JfUElEMjoKKyAgICBjYXNl
-IENSX1BJRDM6CisgICAgY2FzZSBDUl9QSUQ0OgorICAgICAgICB0Y2dfZ2VuX3N0X3JlZyhy
-ZWcsIGNwdV9lbnYsIG9mZnNldG9mKENQVUhQUEFTdGF0ZSwgY3JbY3RsXSkpOworI2lmbmRl
-ZiBDT05GSUdfVVNFUl9PTkxZCisgICAgICAgIGdlbl9oZWxwZXJfY2hhbmdlX3Byb3RfaWQo
-Y3B1X2Vudik7CisjZW5kaWYKKyAgICAgICAgYnJlYWs7CisKICAgICBkZWZhdWx0OgogICAg
-ICAgICB0Y2dfZ2VuX3N0X3JlZyhyZWcsIGNwdV9lbnYsIG9mZnNldG9mKENQVUhQUEFTdGF0
-ZSwgY3JbY3RsXSkpOwogICAgICAgICBicmVhazsK
---------------A82E549C7881F9265068A6B9--
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyHIu8ACgkQp6FrSiUn
+Q2rxXggAnp0gu2G8Ps0Qr2VLIHKCxqfcWxibZbjDwXYoD2gljaJLI/N1Yj/yn5Qc
+tEQGhX4OqVh09h5q+0wYta69hZ6y56pY9JWJdHujKc1ouWutZ1trhOCAOV5M7cK+
+4be5xhfKA6jvT/zD49+GkjtgCLZU99OTzqX/AlF9haAhoEjnWIGJrYPsHjGVJosp
+rEq1bcaGBN8zziwWqH8YDxaV4e1bEfvPxzJ1Yo/sODXkS9e3CVjDCVvGu0a/elet
+KEId5HLu/doSnfupsmLR8MKnxNxtRdHOrt7EjTwhfcFzBf//XyXFn76VCizHnsZD
+pVqW3eSdfZqA32DWQDmfQRJNr7EZTw==
+=gS8X
+-----END PGP SIGNATURE-----
+
+--m15jCVEnuYQvYZAvRGcNvp0zWapki3kKH--
