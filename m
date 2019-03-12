@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56461)
+Received: from eggs.gnu.org ([209.51.188.92]:56649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3bRF-0002nf-28
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 03:03:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1h3bRX-0002wC-UQ
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 03:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1h3bPp-00008B-7E
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 03:01:34 -0400
-References: <20190311165538.6623-1-alex.bennee@linaro.org>
-	<532e5c6d-b93e-7fb3-f987-22e9b0362acb@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fdbdeb73-032b-229b-c25b-aeb60770c38c@redhat.com>
-Date: Tue, 12 Mar 2019 08:01:28 +0100
+	(envelope-from <armbru@redhat.com>) id 1h3bHN-0003c5-2e
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:52:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190308131445.17502-1-armbru@redhat.com>
+	<20190308131445.17502-12-armbru@redhat.com>
+	<fde51cea-909c-6c63-7553-2b48d7d4ac45@redhat.com>
+	<87mum1l8o9.fsf@dusky.pond.sub.org>
+	<CAAdtpL5FQS+bBxHT0mvNv8gxiaRUVeZHZFBc-e11agS2majRiw@mail.gmail.com>
+Date: Tue, 12 Mar 2019 07:52:38 +0100
+In-Reply-To: <CAAdtpL5FQS+bBxHT0mvNv8gxiaRUVeZHZFBc-e11agS2majRiw@mail.gmail.com>
+	("Philippe =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
+	11 Mar 2019 18:18:17 +0100")
+Message-ID: <87ef7c7fex.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <532e5c6d-b93e-7fb3-f987-22e9b0362acb@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: re-license timers.py to
- GPLv2 or later
+Subject: Re: [Qemu-devel] [PATCH v3 11/12] pc: Support firmware
+ configuration with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-block@nongnu.org, mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, lersek@redhat.com
 
-On 11/03/2019 18.55, Paolo Bonzini wrote:
-> On 11/03/19 17:55, Alex Benn=C3=A9e wrote:
->> I'm the sole author (aside from a one line by Greg fixing encoding)
->> and I was asked nicely on IRC to bring it into line with the rest of
->> the files.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Le lun. 11 mars 2019 17:02, Markus Armbruster <armbru@redhat.com> a =C3=
+=A9crit :
+>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+[...]
+>> > Does it work if you add the device yourself as a child of /machine,
+>> > instead of relying on /machine/unattached?
 >>
->> Cc: Greg Kurz <groug@kaod.org>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  scripts/qemugdb/timers.py | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> I figure you're suggesting something like this incremental patch:
 >>
->> diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
->> index 51ea04b5e2..f0e132d27a 100644
->> --- a/scripts/qemugdb/timers.py
->> +++ b/scripts/qemugdb/timers.py
->> @@ -6,8 +6,10 @@
->>  #
->>  # Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>  #
->> -# This work is licensed under the terms of the GNU GPL, version 2.  S=
-ee
->> -# the COPYING file in the top-level directory.
->> +# This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
->> +# See the COPYING file in the top-level directory.
->> +#
->> +# SPDX-License-Identifier: GPL-2.0-or-later
->> =20
->>  # 'qemu timers' -- display the current timerlists
->=20
-> +qemu-trivial
+>>    diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+>>    index ccf2221acb..9d3a80c51a 100644
+>>    --- a/hw/i386/pc_sysfw.c
+>>    +++ b/hw/i386/pc_sysfw.c
+>>    @@ -99,6 +99,10 @@ void pc_system_flash_create(PCMachineState *pcms)
+>>         if (pcmc->pci_enabled) {
+>>             pcms->flash[0] =3D pc_pflash_create("system.flash0");
+>>             pcms->flash[1] =3D pc_pflash_create("system.flash1");
+>>    +        object_property_add_child(OBJECT(pcms), "pfl0",
+>>    +                                  OBJECT(pcms->flash[0]),
+>> &error_abort);
+>>    +        object_property_add_child(OBJECT(pcms), "pfl1",
+>>    +                                  OBJECT(pcms->flash[1]),
+>> &error_abort);
+>>             object_property_add_alias(OBJECT(pcms), "pflash0",
+>>                                       OBJECT(pcms->flash[0]), "drive",
+>>                                       &error_abort);
+>>    @@ -122,19 +126,7 @@ static void
+>> pc_system_flash_cleanup_unused(PCMachineState *pcms)
+>>                 prop_name =3D g_strdup_printf("pflash%d", i);
+>>                 object_property_del(OBJECT(pcms), prop_name, &error_abor=
+t);
+>>                 g_free(prop_name);
+>>    -            /*
+>>    -             * Delete @dev_obj.  Straight object_unref() is wrong,
+>>    -             * since it leaves dangling references in the parent bus
+>>    -             * behind.  object_unparent() doesn't work, either: since
+>>    -             * @dev_obj hasn't been realized, dev_obj->parent is nul=
+l,
+>>    -             * and object_unparent() does nothing.  DeviceClass meth=
+od
+>>    -             * device_unparent() works, but we have to take a
+>>    -             * temporary reference, or else device_unparent() commits
+>>    -             * a use-after-free error.
+>>    -             */
+>>    -            object_ref(dev_obj);
+>>    -            object_get_class(dev_obj)->unparent(dev_obj);
+>>    -            object_unref(dev_obj);
+>>    +            object_unparent(dev_obj);
+>>                 pcms->flash[i] =3D NULL;
+>>             }
+>>         }
+>>
+>> Passes "make check" and "info qtree" looks good both with and without
+>> -machine pflash0,...
+>>
+>> I'm not exactly happy with "pfl0" and "pfl1".  Got a favorite color for
+>> my bikeshed?
+>>
+>
+> ovmf_code & ovmf_vars?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tempting, since we use these guys only for OVMF so far.  However, we
+could also use them for SeaBIOS[*], or whatever other firmware comes up.
 
-... I think Laurent just sent his trivial PULL request for soft-freeze
-already ... I still plan to send another PULL request today, so if
-nobody else wants to pick it up for soft-freeze today, I can add it to
-my queue if you like.
+[...]
+
+
+[*] See also
+Subject: Re: Configuring pflash devices for OVMF firmware
+Message-ID: <9c4e222f-3941-426e-3195-5598b2af1501@redhat.com>
+https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg08145.html
