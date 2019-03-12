@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57126)
+Received: from eggs.gnu.org ([209.51.188.92]:57807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h3Y8t-0001GG-OT
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:31:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1h3YBA-0002xu-TS
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1h3Y8s-0003iE-9y
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:31:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1h3Y8s-0003fp-2Q
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:31:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC94810C6E
-	for <qemu-devel@nongnu.org>; Tue, 12 Mar 2019 03:23:47 +0000 (UTC)
-Date: Tue, 12 Mar 2019 11:23:42 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190312032342.GC14108@xz-x1>
-References: <871s3dg3si.fsf@redhat.com>
-	<3fd4f68a-9ce4-7e54-a763-ccdcf844890e@redhat.com>
-	<87zhq1ed33.fsf@redhat.com>
-	<21d96d05-b600-b115-3649-8d488aeec82b@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1h3YB9-0005Cr-LP
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:34:12 -0400
+Date: Tue, 12 Mar 2019 11:26:54 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190312002654.GA3303@umbus.fritz.box>
+References: <20190310082703.1245-1-david@gibson.dropbear.id.au>
+	<CAFEAcA--XHtUhOzSdNBDOVXbEceHkWSFiBcgNMTr5B-zz2fajA@mail.gmail.com>
+	<87zhq1ofrd.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tKW2IUtsqtDRztdT"
 Content-Disposition: inline
-In-Reply-To: <21d96d05-b600-b115-3649-8d488aeec82b@redhat.com>
-Subject: Re: [Qemu-devel] Flatview rendering scalability issue
+In-Reply-To: <87zhq1ofrd.fsf@zen.linaroharston>
+Subject: Re: [Qemu-devel] [PULL 00/60] ppc-for-4.0 queue 20190310
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +25,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>
 
-On Mon, Mar 11, 2019 at 03:07:43PM +0100, Paolo Bonzini wrote:
-> On 11/03/19 14:48, Sergio Lopez wrote:
-> >> The initialization is O(n^2) because the guest initializes one device at
-> >> a time, so you rebuild the FlatView first with 0 devices, then 1, then
-> >> 2, etc.  This is very hard to fix, if at all possible.
+
+--tKW2IUtsqtDRztdT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 11, 2019 at 10:40:54AM +0000, Alex Benn=E9e wrote:
+>=20
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+> > On Sun, 10 Mar 2019 at 08:27, David Gibson <david@gibson.dropbear.id.au=
+> wrote:
 > >>
-> >> However, each FlatView creation should be O(n) where n is the number of
-> >> devices currently configured.  Please check with "info mtree -f" that
-> >> you only have a fixed number of FlatViews.  Old versions had one per device.
-> > I'm seeing 9 FVs with 1 PCI, and 119 with 100 PCIs.
-> 
-> With
-> 
-> $ eval qemu-system-x86_64 -M q35 \
->     -device\ e1000,id=n{1,2,3,4,5,6,7,8}{1,2,3}
-> 
-> I only see 4 flat views ("system", "io", "memory", "(none)").
-> 
-> Probably you are using intel-iommu?  Peter, it should be possible to
-> reorganize the VT-d memory regions like this:
-> 
->     intel_iommu_ir (MMIO, not added to any container)
-> 
->     vtd_root_dmar (container)
->       intel_iommu_dmar (IOMMU), priority 0
->       alias to intel_iommu_ir, priority 1
-> 
->     vtd_root_nodmar
->       alias to get_system_memory(), priority 0
->       alias to intel_iommu_ir, priority 1
-> 
->     vtd_root_0 memory region (container)
->         vtd_root_dmar             # only one of these is enabled
->         vtd_root_nodmar
-> 
-> where the vtd_root_dmar and vtd_root_nodmar memory regions are created
-> in vtd_init once and for all.  Because all vtd_root_* memory regions
-> have only one child, memory.c will recognize that they represent the
-> same memory, and create at most two FlatViews (one for vtd_root_dmar,
-> one for vtd_root_nodmar).
+> >> The following changes since commit f5b4c31030f45293bb45174457227684348=
+29d91:
+> >>
+> >>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-reque=
+st' into staging (2019-03-09 17:35:48 +0000)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190310
+> >>
+> >> for you to fetch changes up to 08d020471fcd41cb020fc9987ed1945eefcc880=
+5:
+> >>
+> >>   spapr: Use CamelCase properly (2019-03-10 14:35:44 +1100)
+> >>
+> >> ----------------------------------------------------------------
+> >> ppc patch queue for 2019-03-10
+> >>
+> >> Here's a final pull request before the 4.0 soft freeze.  Changes
+> >> include:
+> >>   * A Great Renaming to use camel case properly in spapr code
+> >>   * Optimization of some vector instructions
+> >>   * Support for POWER9 cpus in the powernv machine
+> >>   * Fixes a regression from the last pull request in handling VSX
+> >>     instructions with mixed operands from the FPR and VMX parts of the
+> >>     register array
+> >>   * Optimization hack to avoid scanning all the (empty) entries on a
+> >>     new IOMMU window
+> >>   * Add FSL I2C controller model for E500
+> >>   * Support for KVM acceleration of the H_PAGE_INIT hypercall on spapr
+> >>   * Update u-boot image for E500
+> >>   * Enable Specre/Meltdown mitigations by default on the new machine t=
+ype
+> >>   * Enable large decrementer support for POWER9
+> >>
+> >> Plus a number of assorted bugfixes and cleanups.
+> >>
+> >
+> > Hi. This pullreq generates a pile of new 'warning' messages
+> > during 'make check':
+> >
+> > MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> > QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64
+> > QTEST_QEMU_IMG=3Dqemu-img tests/
+> > boot-serial-test -m=3Dquick -k --tap < /dev/null |
+> > ./scripts/tap-driver.pl --test-name=3D"boot-serial-test"
+> > PASS 1 boot-serial-test /ppc64/boot-serial/ppce500
+> > PASS 2 boot-serial-test /ppc64/boot-serial/40p
+> > PASS 3 boot-serial-test /ppc64/boot-serial/mac99
+> > qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> > cap-cfpc=3Dworkaround
+> > qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> > cap-sbbc=3Dworkaround
+> > qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> > cap-ibs=3Dworkaround
+> > PASS 4 boot-serial-test /ppc64/boot-serial/pseries
+> > PASS 5 boot-serial-test /ppc64/boot-serial/powernv
+> > PASS 6 boot-serial-test /ppc64/boot-serial/sam460ex
+> >
+> > and similarly during the boot-pxe-test.
+> >
+> > Could you silence these, please?
+>=20
+> FWIW this PR contains fixes that will finally get the gitlab CI green so
+> I look forward to v2 getting merged ;-)
 
-Yes this sounds good.  The only thing I'm still uncertain is about the
-IOMMU notifiers, which should be per-device (for real).  That's
-embedded in IOMMUMemoryRegion so far and it includes the real MR
-object:
+Huh.  I knew about the travis CI and the shippable CI, but not the
+gitlab one.  How do I see that?  It was surprisingly non-obvious from
+the gitlab qemu project page.
 
-struct IOMMUMemoryRegion {
-    MemoryRegion parent_obj;
-    QLIST_HEAD(, IOMMUNotifier) iommu_notify;
-    IOMMUNotifierFlag iommu_notify_flags;
-};
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Maybe I should also make parent_obj a pointer to the created MRs
-mentioned above, so IOMMUMemoryRegion only contains notification
-information rather than real MRs (otherwise we won't have a chance to
-share memory regions between devices)?
+--tKW2IUtsqtDRztdT
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(But if so then TYPE_INTEL_IOMMU_MEMORY_REGION might not be able to
- inherit TYPE_IOMMU_MEMORY_REGION directly, and I've not thought about
- the details of that, yet)
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyG/MsACgkQbDjKyiDZ
+s5JuPxAAlA6lykiS32K0eNTQQUJJSpWdnytRM4o8x0SG3xPg0wQZ6E8F1y4cJVUh
+P/SIZzG96bIpoPZr2AThm67NWE+5R/0JBRdi4sf1+3Cg1fY3ghVs5BY3G8Q1rcKJ
+as1irQ0LUTPHdxo6R/D6fK2EOzZ/sY0JI5Zg8BePTkzNuEJ/EZXDx91SrTWPLEnD
+fzfqt0MBrFZHmgk2z+asCfYDsa8nAOIeMDjgW54I8k4DncYaeaVZIvGqhgn3ew5E
+fU5Ztd2C1/3DGLXyODIo6O2Bpy3VioQPW/v/3XTCXLnMsCP3uD1K0tvCFkW8YKkB
+RSJksooYycI+6+grFmEROWu66QEQL0xgNdFQd6vNh8WV/FeDKxgZ1Cra942+THnt
+5DVZ5vMd69vHdt/cYXsvkYYuz9ULD9MtMHYiuq8Z/qXd0PPd5/MWCEqwPg5gv3W1
+TwQQTnXg7OeMrvg03g0qbuLsBqt4bEx/rG7GKNE7wxh/pfGSL/WwatrC/7qXRcp8
+disPmfMcoEiIfJIjODdID216eL/mZ6Uzp+pgB6sVUIVblHNUqtUg4M1M7NfCMS4n
+mmoMvuSB+w4eQAJayUMNMNmfGb+vPXogiJ05IXYr8RCMa/0TNJSI6MBtkfp264vx
+oSjQzRRvUOjy1hgSRmx94fo3eIw14JYK3hGHd9dphA4J+L6q8SU=
+=PDYK
+-----END PGP SIGNATURE-----
 
--- 
-Peter Xu
+--tKW2IUtsqtDRztdT--
