@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50125)
+Received: from eggs.gnu.org ([209.51.188.92]:51741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h3acn-0002Gv-2k
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:10:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1h3aoU-0004Dm-Cz
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1h3acm-0008Mf-0H
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:10:53 -0400
-From: Heyi Guo <guoheyi@huawei.com>
-Date: Tue, 12 Mar 2019 14:09:20 +0800
-Message-ID: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1h3aoT-0005fN-BS
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:22:58 -0400
+Resent-Message-Id: <E1h3aoT-0005fN-BS@eggs.gnu.org>
+Message-ID: <155237174511.17434.10843082675899599446@6acff2cf482b>
+In-Reply-To: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC] arm/cpu: fix soft lockup panic after resuming
- from stop
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Mar 2019 23:22:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC] arm/cpu: fix soft lockup panic after
+ resuming from stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,120 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: wanghaibin.wang@huawei.com, Heyi Guo <guoheyi@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
+To: guoheyi@huawei.com
+Cc: fam@euphon.net, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, peter.maydell@linaro.org
 
-When we stop a VM for more than 30 seconds and then resume it, by qemu
-monitor command "stop" and "cont", Linux on VM will complain of "soft
-lockup - CPU#x stuck for xxs!" as below:
-
-[ 2783.809517] watchdog: BUG: soft lockup - CPU#3 stuck for 2395s!
-[ 2783.809559] watchdog: BUG: soft lockup - CPU#2 stuck for 2395s!
-[ 2783.809561] watchdog: BUG: soft lockup - CPU#1 stuck for 2395s!
-[ 2783.809563] Modules linked in...
-
-This is because Guest Linux uses generic timer virtual counter as
-a software watchdog, and CNTVCT_EL0 does not stop when VM is stopped
-by qemu.
-
-This patch is to fix this issue by saving the value of CNTVCT_EL0 when
-stopping and restoring it when resuming.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
----
- target/arm/cpu.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 96f0ff0..7bbba3d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -896,6 +896,60 @@ static void arm_cpu_finalizefn(Object *obj)
- #endif
- }
- 
-+static int get_vcpu_timer_tick(CPUState *cs, uint64_t *tick_at_pause)
-+{
-+    int err;
-+    struct kvm_one_reg reg;
-+
-+    reg.id = KVM_REG_ARM_TIMER_CNT;
-+    reg.addr = (uintptr_t) tick_at_pause;
-+
-+    err = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+    return err;
-+}
-+
-+static int set_vcpu_timer_tick(CPUState *cs, uint64_t tick_at_pause)
-+{
-+    int err;
-+    struct kvm_one_reg reg;
-+
-+    reg.id = KVM_REG_ARM_TIMER_CNT;
-+    reg.addr = (uintptr_t) &tick_at_pause;
-+
-+    err = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+    return err;
-+}
-+
-+static void arch_timer_change_state_handler(void *opaque, int running,
-+                                            RunState state)
-+{
-+    static uint64_t hw_ticks_at_paused;
-+    static RunState pre_state = RUN_STATE__MAX;
-+    int err;
-+    CPUState *cs = (CPUState *)opaque;
-+
-+    switch (state) {
-+    case RUN_STATE_PAUSED:
-+        err = get_vcpu_timer_tick(cs, &hw_ticks_at_paused);
-+        if (err) {
-+            error_report("Get vcpu timer tick failed: %d", err);
-+        }
-+        break;
-+    case RUN_STATE_RUNNING:
-+        if (pre_state == RUN_STATE_PAUSED) {
-+            err = set_vcpu_timer_tick(cs, hw_ticks_at_paused);
-+            if (err) {
-+                error_report("Resume vcpu timer tick failed: %d", err);
-+            }
-+        }
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    pre_state = state;
-+}
-+
- static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-@@ -906,6 +960,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
-     bool no_aa32 = false;
- 
-+    /*
-+     * Only add change state handler for arch timer once, for KVM will help to
-+     * synchronize virtual timer of all VCPUs.
-+     */
-+    static bool arch_timer_change_state_handler_added;
-+
-     /* If we needed to query the host kernel for the CPU features
-      * then it's possible that might have failed in the initfn, but
-      * this is the first point where we can report it.
-@@ -1181,6 +1241,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     init_cpreg_list(cpu);
- 
-+    if (!arch_timer_change_state_handler_added && kvm_enabled()) {
-+        qemu_add_vm_change_state_handler(arch_timer_change_state_handler, cs);
-+        arch_timer_change_state_handler_added = true;
-+    }
-+
- #ifndef CONFIG_USER_ONLY
-     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         cs->num_ases = 2;
--- 
-1.8.3.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTUyMzcwOTYwLTIwNjEtMS1n
+aXQtc2VuZC1lbWFpbC1ndW9oZXlpQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
+ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
+ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1t
+aW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS90cmFuc2xhdGUtc3ZlLm8KL3Rt
+cC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1LmM6IEluIGZ1bmN0aW9uICdnZXRfdmNwdV90
+aW1lcl90aWNrJzoKL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1LmM6OTAyOjI0OiBl
+cnJvcjogc3RvcmFnZSBzaXplIG9mICdyZWcnIGlzbid0IGtub3duCiAgICAgc3RydWN0IGt2bV9v
+bmVfcmVnIHJlZzsKICAgICAgICAgICAgICAgICAgICAgICAgXn5+Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy90YXJnZXQvYXJtL2NwdS5jOjkwNDoxNDogZXJyb3I6ICdLVk1fUkVHX0FSTV9USU1FUl9DTlQn
+IHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQogICAgIHJlZy5pZCA9IEtW
+TV9SRUdfQVJNX1RJTUVSX0NOVDsKICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn4K
+L3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1LmM6OTA0OjE0OiBub3RlOiBlYWNoIHVu
+ZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRlZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rp
+b24gaXQgYXBwZWFycyBpbgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS9jcHUuYzo5MDc6
+MzA6IGVycm9yOiAnS1ZNX0dFVF9PTkVfUkVHJyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhp
+cyBmdW5jdGlvbikKICAgICBlcnIgPSBrdm1fdmNwdV9pb2N0bChjcywgS1ZNX0dFVF9PTkVfUkVH
+LCAmcmVnKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+Ci90
+bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvYXJtL2NwdS5jOjkwMjoyNDogZXJyb3I6IHVudXNlZCB2
+YXJpYWJsZSAncmVnJyBbLVdlcnJvcj11bnVzZWQtdmFyaWFibGVdCiAgICAgc3RydWN0IGt2bV9v
+bmVfcmVnIHJlZzsKICAgICAgICAgICAgICAgICAgICAgICAgXn5+Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy90YXJnZXQvYXJtL2NwdS5jOiBJbiBmdW5jdGlvbiAnc2V0X3ZjcHVfdGltZXJfdGljayc6Ci90
+bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvYXJtL2NwdS5jOjkxNDoyNDogZXJyb3I6IHN0b3JhZ2Ug
+c2l6ZSBvZiAncmVnJyBpc24ndCBrbm93bgogICAgIHN0cnVjdCBrdm1fb25lX3JlZyByZWc7CiAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+fgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS9j
+cHUuYzo5MTY6MTQ6IGVycm9yOiAnS1ZNX1JFR19BUk1fVElNRVJfQ05UJyB1bmRlY2xhcmVkIChm
+aXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKICAgICByZWcuaWQgPSBLVk1fUkVHX0FSTV9USU1F
+Ul9DTlQ7CiAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0
+L3NyYy90YXJnZXQvYXJtL2NwdS5jOjkxOTozMDogZXJyb3I6ICdLVk1fU0VUX09ORV9SRUcnIHVu
+ZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQogICAgIGVyciA9IGt2bV92Y3B1
+X2lvY3RsKGNzLCBLVk1fU0VUX09ORV9SRUcsICZyZWcpOwogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBefn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1
+LmM6OTE0OjI0OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlICdyZWcnIFstV2Vycm9yPXVudXNlZC12
+YXJpYWJsZV0KICAgICBzdHJ1Y3Qga3ZtX29uZV9yZWcgcmVnOwogICAgICAgICAgICAgICAgICAg
+ICAgICBefn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTIzNzA5
+NjAtMjA2MS0xLWdpdC1zZW5kLWVtYWlsLWd1b2hleWlAaHVhd2VpLmNvbS90ZXN0aW5nLmRvY2tl
+ci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
