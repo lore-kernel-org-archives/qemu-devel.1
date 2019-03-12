@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48993)
+Received: from eggs.gnu.org ([209.51.188.92]:50125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1h3aVz-0000h0-GF
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:03:52 -0400
+	(envelope-from <guoheyi@huawei.com>) id 1h3acn-0002Gv-2k
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1h3aVy-0003kR-0D
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:03:51 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38072)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1h3aVx-0003i3-9a
-	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:03:49 -0400
-Received: by mail-pg1-x542.google.com with SMTP id m2so1004684pgl.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 23:03:47 -0700 (PDT)
-References: <CAJ+F1CKBRNdLPb_wOLhURdUJd-j1RHY2toKSTEhCBt_zs4Xk1w@mail.gmail.com>
-	<e942cdab-fe1b-fdf4-3b9f-da16a4afa953@kaod.org>
-	<CAJ+F1C+hFfsa5gcSdttTP5J+uyDvNdYJWrm9OJM26+Zc1ZQkew@mail.gmail.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <cc62e1fd-c564-e1b7-d10c-30665b481352@ozlabs.ru>
-Date: Tue, 12 Mar 2019 17:03:36 +1100
+	(envelope-from <guoheyi@huawei.com>) id 1h3acm-0008Mf-0H
+	for qemu-devel@nongnu.org; Tue, 12 Mar 2019 02:10:53 -0400
+From: Heyi Guo <guoheyi@huawei.com>
+Date: Tue, 12 Mar 2019 14:09:20 +0800
+Message-ID: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+hFfsa5gcSdttTP5J+uyDvNdYJWrm9OJM26+Zc1ZQkew@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Clearing slirp/ license
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC] arm/cpu: fix soft lockup panic after resuming
+ from stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +20,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, gwshan@linux.vnet.ibm.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, shan.gavin@gmail.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wanghaibin.wang@huawei.com, Heyi Guo <guoheyi@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Gavig left the company sometime ago, cc:ing his gmail.
+When we stop a VM for more than 30 seconds and then resume it, by qemu
+monitor command "stop" and "cont", Linux on VM will complain of "soft
+lockup - CPU#x stuck for xxs!" as below:
 
+[ 2783.809517] watchdog: BUG: soft lockup - CPU#3 stuck for 2395s!
+[ 2783.809559] watchdog: BUG: soft lockup - CPU#2 stuck for 2395s!
+[ 2783.809561] watchdog: BUG: soft lockup - CPU#1 stuck for 2395s!
+[ 2783.809563] Modules linked in...
 
-On 12/03/2019 05:01, Marc-André Lureau wrote:
-> Hi Cédric, Gavin,
-> 
-> On Mon, Mar 11, 2019 at 4:23 PM Cédric Le Goater <clg@kaod.org> wrote:
->>
->> On 2/13/19 12:03 PM, Marc-André Lureau wrote:
->>> Hi,
->>>
->>> As we are trying to move slirp/ in a standalone project, which
->>> eventually could be installed as a shared library, we need to clear
->>> the license.
->>>
->>> slirp is supposed to be 3-Clause BSD license (according to
->>> https://git.qemu.org/?p=qemu.git;a=commit;h=2f5f89963186d42a7ded253bc6cf5b32abb45cec)
->>> but it seems to be effectively a 2-Clause BSD (the third clause is not
->>> in COPYRIGHT)
->>>
->>> However, there are two units that are GPL-2:
->>>
->>> - dhcpv6.c, dhcpv6.h:
->>>   The code was contributed by Thomas Huth <thuth@redhat.com>
->>>
->>> $ git shortlog -nes slirp/dhcpv6.{c,h}
->>>      6  Marc-André Lureau <marcandre.lureau@redhat.com>
->>>      1  Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>      1  Thomas Huth <thuth@redhat.com>
->>>      1  Yuval Shaia <yuval.shaia@oracle.com>
->>>
->>> - ncsi.c, ncsi-pkt.h:
->>>   The code was contributed by Cédric Le Goater <clg@kaod.org>
->>>
->>> $ git shortlog -nes slirp/ncsi.c slirp/ncsi-pkt.h
->>>      5  Marc-André Lureau <marcandre.lureau@redhat.com>
->>>      4  Cédric Le Goater <clg@kaod.org>
->>>
->>> Could you reply that you have no objection in relicensing those files
->>> are 3-Clause BSD?
->>
->> Fine for me. You can change the license of slirp/ncsi.c and
->> slirp/ncsi-pkt.hto a 3-Clause BSD.
-> 
-> I noticed that ncsi-pkt.h has "Copyright Gavin Shan, IBM Corporation 2016"
-> 
-> I suppose Gavin should also give his agreement to relicense the file.
-> 
-> 
-> Gavin, could you reply that you have no objection in relicensing
-> ncsi-pkt.h as 3-Clause BSD?
-> 
-> 
-> Thanks
-> 
->>
->> Thanks,
->>
->> C.
->>
->>> After "[Qemu-devel] [PATCH 0/7] slirp: make it a standalone project",
->>> the vmstate subset that I adapted would also need to be relicensed.
->>> There are more contributors here, I am not sure how it should be
->>> handled. Any idea?
->>>
->>> thanks
->>>
->>
-> 
-> 
+This is because Guest Linux uses generic timer virtual counter as
+a software watchdog, and CNTVCT_EL0 does not stop when VM is stopped
+by qemu.
 
+This patch is to fix this issue by saving the value of CNTVCT_EL0 when
+stopping and restoring it when resuming.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+---
+ target/arm/cpu.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 96f0ff0..7bbba3d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -896,6 +896,60 @@ static void arm_cpu_finalizefn(Object *obj)
+ #endif
+ }
+ 
++static int get_vcpu_timer_tick(CPUState *cs, uint64_t *tick_at_pause)
++{
++    int err;
++    struct kvm_one_reg reg;
++
++    reg.id = KVM_REG_ARM_TIMER_CNT;
++    reg.addr = (uintptr_t) tick_at_pause;
++
++    err = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    return err;
++}
++
++static int set_vcpu_timer_tick(CPUState *cs, uint64_t tick_at_pause)
++{
++    int err;
++    struct kvm_one_reg reg;
++
++    reg.id = KVM_REG_ARM_TIMER_CNT;
++    reg.addr = (uintptr_t) &tick_at_pause;
++
++    err = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    return err;
++}
++
++static void arch_timer_change_state_handler(void *opaque, int running,
++                                            RunState state)
++{
++    static uint64_t hw_ticks_at_paused;
++    static RunState pre_state = RUN_STATE__MAX;
++    int err;
++    CPUState *cs = (CPUState *)opaque;
++
++    switch (state) {
++    case RUN_STATE_PAUSED:
++        err = get_vcpu_timer_tick(cs, &hw_ticks_at_paused);
++        if (err) {
++            error_report("Get vcpu timer tick failed: %d", err);
++        }
++        break;
++    case RUN_STATE_RUNNING:
++        if (pre_state == RUN_STATE_PAUSED) {
++            err = set_vcpu_timer_tick(cs, hw_ticks_at_paused);
++            if (err) {
++                error_report("Resume vcpu timer tick failed: %d", err);
++            }
++        }
++        break;
++    default:
++        break;
++    }
++
++    pre_state = state;
++}
++
+ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
+@@ -906,6 +960,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     Error *local_err = NULL;
+     bool no_aa32 = false;
+ 
++    /*
++     * Only add change state handler for arch timer once, for KVM will help to
++     * synchronize virtual timer of all VCPUs.
++     */
++    static bool arch_timer_change_state_handler_added;
++
+     /* If we needed to query the host kernel for the CPU features
+      * then it's possible that might have failed in the initfn, but
+      * this is the first point where we can report it.
+@@ -1181,6 +1241,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     init_cpreg_list(cpu);
+ 
++    if (!arch_timer_change_state_handler_added && kvm_enabled()) {
++        qemu_add_vm_change_state_handler(arch_timer_change_state_handler, cs);
++        arch_timer_change_state_handler_added = true;
++    }
++
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+         cs->num_ases = 2;
 -- 
-Alexey
+1.8.3.1
