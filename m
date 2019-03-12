@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43882)
+Received: from eggs.gnu.org ([209.51.188.92]:44321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3Wgu-0002ZJ-9m
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:58:53 -0400
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h3WjL-0003fJ-Le
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 22:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1h3Wgt-0007L1-2d
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:58:52 -0400
-Resent-Message-Id: <E1h3Wgt-0007L1-2d@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21811)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1h3Wgr-0007IW-NU
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:58:51 -0400
-Message-ID: <155235589843.9137.10099052934572605659@6acff2cf482b>
-In-Reply-To: <BE04B88B-9AAC-4348-A165-E115CBE54077@me.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jerry.lilijun@huawei.com>) id 1h3WjK-00005r-85
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 22:01:23 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2425 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jerry.lilijun@huawei.com>)
+	id 1h3WjJ-0008TC-PA
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 22:01:22 -0400
+Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.53])
+	by Forcepoint Email with ESMTP id 644DC188D3E702BE430B
+	for <qemu-devel@nongnu.org>; Tue, 12 Mar 2019 10:01:13 +0800 (CST)
+From: "Lilijun (Jerry, Cloud Networking)" <jerry.lilijun@huawei.com>
+Date: Tue, 12 Mar 2019 02:01:04 +0000
+Message-ID: <40280F65B1B0B44E8089ED31C01616EBA43F939C@dggeml529-mbx.china.huawei.com>
+References: <40280F65B1B0B44E8089ED31C01616EBA3947B1A@dggeml529-mbx.china.huawei.com>
+	<20190306100646.GI22159@stefanha-x1.localdomain>
+	<40280F65B1B0B44E8089ED31C01616EBA394CD10@dggeml529-mbx.china.huawei.com>
+	<20190311094639.GA5991@stefanha-x1.localdomain>
+In-Reply-To: <20190311094639.GA5991@stefanha-x1.localdomain>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Mar 2019 18:58:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] ui/cocoa: Adding cursor support
+Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
+ vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, kraxel@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, wangyunjian <wangyunjian@huawei.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9CRTA0Qjg4Qi05QUFDLTQzNDgt
-QTE2NS1FMTE1Q0JFNTQwNzdAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogQkUwNEI4OEItOUFBQy00MzQ4
-LUExNjUtRTExNUNCRTU0MDc3QG1lLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSB1
-aS9jb2NvYTogQWRkaW5nIGN1cnNvciBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3L0JFMDRCODhCLTlBQUMtNDM0OC1BMTY1LUUxMTVD
-QkU1NDA3N0BtZS5jb20gLT4gcGF0Y2hldy9CRTA0Qjg4Qi05QUFDLTQzNDgtQTE2NS1FMTE1Q0JF
-NTQwNzdAbWUuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGZhNjY2ZmM5ZSB1
-aS9jb2NvYTogQWRkaW5nIGN1cnNvciBzdXBwb3J0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJP
-UjogQXV0aG9yIGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMy
-OiAKQXV0aG9yOiBDaGVuIFpoYW5nIHZpYSBRZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5v
-cmc+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMSBsaW5lcyBjaGVja2VkCgpDb21t
-aXQgMGZhNjY2ZmM5ZTI5ICh1aS9jb2NvYTogQWRkaW5nIGN1cnNvciBzdXBwb3J0KSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy9CRTA0Qjg4Qi05QUFDLTQzNDgtQTE2NS1FMTE1Q0JFNTQwNzdAbWUuY29t
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> Sent: Monday, March 11, 2019 5:47 PM
+> To: Lilijun (Jerry, Cloud Networking) <jerry.lilijun@huawei.com>
+> Cc: qemu-devel@nongnu.org; wangxin (U)
+> <wangxinxin.wang@huawei.com>; wangyunjian
+> <wangyunjian@huawei.com>
+> Subject: Re: [Qemu-devel] Question about VM inner route entry's lost when
+> vhost-user reconnect
+>=20
+> On Fri, Mar 08, 2019 at 02:31:12AM +0000, Lilijun (Jerry, Cloud Networkin=
+g)
+> wrote:
+> > This problem is related with backend vhost-user socket abnormal cases, =
+we
+> shouldn't ask customers to configure it manually for backend's issues or
+> depends on guest OS's network configuration.
+>=20
+> In Step 1 you said:
+>=20
+> > > >      1) In the VM, I add one route entry manually on the vNIC eth0
+> > > > using the
+> > > linux tool route.
+>=20
+> You configured the route manually inside the guest.  Seems like a guest
+> problem to me.
+>=20
+> If this was a physical machine that lost connectivity due to a link event=
+, what
+> would happen?
+
+Yes, the configuration can be recovered manually by customers.
+
+But in the virtualization machines, this configuration's lost is a result o=
+f backend process's software unexpected bugs or version update. So I think =
+we need hide this change to customers.
+>=20
+> Stefan
