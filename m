@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52676)
+Received: from eggs.gnu.org ([209.51.188.92]:52928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3Xf7-0001py-RG
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:01:06 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1h3XhD-0002kO-T7
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1h3Xf6-0007lv-PS
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:01:05 -0400
-References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
-	<20190311185147.52309-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
-Date: Mon, 11 Mar 2019 22:00:54 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1h3XhD-0008TR-5B
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:03:15 -0400
+Received: from mga09.intel.com ([134.134.136.24]:20425)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1h3XhC-0008Sc-RV
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 23:03:15 -0400
+Date: Mon, 11 Mar 2019 22:57:47 -0400
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20190312025747.GI21353@joy-OptiPlex-7040>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190221134051.2c28893e@w520.home>
+	<20190225022255.GP16456@joy-OptiPlex-7040>
+	<20190307104421.534ea56f@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20190311185147.52309-2-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="I9EqTL0aeB6QZQHLYrIIAMT69EFvciyf4"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] docs/interop/qcow2: Improve bitmap
- flag in_use specification
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307104421.534ea56f@w520.home>
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@virtuozzo.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu, Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "Tian, Kevin" <kevin.tian@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---I9EqTL0aeB6QZQHLYrIIAMT69EFvciyf4
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@virtuozzo.com
-Message-ID: <de12647d-746b-fe40-63b5-6ce7e8e1c54b@redhat.com>
-Subject: Re: [PATCH v2 1/4] docs/interop/qcow2: Improve bitmap flag in_use
- specification
-References: <20190311185147.52309-1-vsementsov@virtuozzo.com>
- <20190311185147.52309-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190311185147.52309-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+hi Alex
+thanks for your reply.
 
-On 3/11/19 1:51 PM, Vladimir Sementsov-Ogievskiy wrote:
-> We already use (we didn't notice it) IN_USE flag for marking bitmap
-> metadata outdated, such as AUTO flag, which mirrors enabled/disabled
-> bitmaps. No we are going to support bitmap resize, so it's good to
+So, if we choose migration data to be userspace opaque, do you think below
+sequence is the right behavior for vendor driver to follow:
 
-s/No/Now/
+1. initially LOGGING state is not set. If userspace calls GET_BUFFER to
+vendor driver,  vendor driver should reject and return 0.
 
-> write IN_USE meaning with more details.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  docs/interop/qcow2.txt | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
->=20
-> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-> index fb5cb47245..575a5f25e2 100644
-> --- a/docs/interop/qcow2.txt
-> +++ b/docs/interop/qcow2.txt
-> @@ -589,7 +589,19 @@ Structure of a bitmap directory entry:
->                      Bit
->                        0: in_use
->                           The bitmap was not saved correctly and may be=
+2. then LOGGING state is set, if userspace calls GET_BUFFER to vendor
+driver,
+   a. vendor driver shoud first query a whole snapshot of device memory
+   (let's use this term to represent device's standalone memory for now),
+   b. vendor driver returns a chunk of data just queried to userspace,
+   while recording current pos in data.
+   c. vendor driver finds all data just queried is finished transmitting to
+   userspace, and queries only dirty data in device memory now.
+   d. vendor driver returns a chunk of data just quered (this time is dirty
+   data )to userspace while recording current pos in data
+   e. if all data is transmited to usespace and still GET_BUFFERs come from
+   userspace, vendor driver starts another round of dirty data query.
 
-> -                         inconsistent.
-> +                         inconsistent. This inconsitency may touch bot=
-h bitmap
-
-inconsistency
-
-> +                         data and metadata, and this mean that bitmap =
-state
-> +                         (its data and metadata) was changed but not s=
-tored
-> +                         back to the image. This flag doesn't relate t=
-o format
-> +                         corruption, all fields are still correct from=
- qcow2
-> +                         point of view, they just may be outdated.
-> +
-> +                         Note: Currently, Qemu may change (additionall=
-y to
-> +                         bitmap data) @auto flag and size of the bitma=
-p during
-> +                         image resize. This mean, that not only bitmap=
- data
-> +                         may be outdated if @in_use flag set, but also=
- value of
-> +                         @auto flag and bitmap size (which is indirect=
-ly
-> +                         referenced by @bitmap_table_size).
-
-Feels wordy. Maybe drop the second paragraph starting with Note, and
-merely use this for the first paragraph:
-
-The bitmap was not saved correctly and may be inconsistent. Although the
-bitmap metadata is still well-formed from a qcow2 perspective, the
-metadata (such as the auto flag or bitmap size) or data contents may be
-outdated.
-
-> =20
->                        1: auto
->                           The bitmap must reflect all changes of the vi=
-rtual
-> @@ -717,8 +729,8 @@ corresponding range of the virtual disk (see above)=
- was written to while the
->  bitmap was 'enabled'. An unset bit means that this range was not writt=
-en to.
-> =20
->  The software doesn't have to sync the bitmap in the image file with it=
-s
-> -representation in RAM after each write. Flag 'in_use' should be set wh=
-ile the
-> -bitmap is not synced.
-> +representation in RAM after each write or metadata change. Flag 'in_us=
-e'
-> +should be set while the bitmap is not synced.
-> =20
->  In the image file the 'enabled' state is reflected by the 'auto' flag.=
- If this
->  flag is set, the software must consider the bitmap as 'enabled' and st=
-art
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+3. if LOGGING state is unset then, and userpace calls GET_BUFFER to vendor
+driver,
+   a. if vendor driver finds there's previously untransmitted data, returns
+   them until all transmitted.
+   b. vendor driver then queries dirty data again and transmits them.
+   c. at last, vendor driver queris device config data (which has to be
+   queried at last and sent once) and transmits them.
 
 
---I9EqTL0aeB6QZQHLYrIIAMT69EFvciyf4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+for the 1 bullet, if LOGGING state is firstly set and migration aborts
+then,  vendor driver has to be able to detect that condition. so seemingly,
+vendor driver has to know more qemu's migration state, like migration
+called and failed. Do you think that's acceptable?
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyHIOYACgkQp6FrSiUn
-Q2q3AwgAjb3NgVwPo5bsDzXlkx5i/koM9ZyGBviUh2KJm8eS1OGDMOP94hNLvfDv
-ilqAn2gppC5fo1edDJHPICR9W4Mom8uOb16dXn0CRQgXzDKPoVc44XvHdFKzeCJv
-4EwIwaGu6iZTJ1oc2DUexk2NV1pJKyGx8TNqm9QMOIrgUQJdMPnTJVjCeKHJiXnw
-enWiLj2ZSEFfTNDcvDDt4PwJgBV+S55UNa02RNBivXTc7XbnZ42STrQGfxVng3pA
-SokgIYDGmWXaySJdMdVwl6ZNgvP+DPbMAqLKAjv0LXmMoJSQ6DZPXW5YUmtqva+x
-0+Z/e0Ce6VSjcQnrRb+uBzn6bs/GWA==
-=bW7J
------END PGP SIGNATURE-----
-
---I9EqTL0aeB6QZQHLYrIIAMT69EFvciyf4--
+Thanks
+Yan
