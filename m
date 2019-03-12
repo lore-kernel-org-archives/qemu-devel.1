@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39276)
+Received: from eggs.gnu.org ([209.51.188.92]:43097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h3WCm-0001dT-V5
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:27:45 -0400
+	(envelope-from <tgfbeta@me.com>) id 1h3Wc3-0001Am-PB
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1h3W3E-0001GY-67
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:17:53 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1h3W3A-0001E0-Lc
-	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:17:50 -0400
-Received: by mail-pg1-x544.google.com with SMTP id b2so473062pgl.9
-	for <qemu-devel@nongnu.org>; Mon, 11 Mar 2019 18:17:48 -0700 (PDT)
-References: <20190311191602.25796-1-svens@stackframe.org>
-	<20190311191602.25796-8-svens@stackframe.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ef0b3df0-806d-bf50-1539-a57d925917d1@linaro.org>
-Date: Mon, 11 Mar 2019 18:17:44 -0700
-MIME-Version: 1.0
-In-Reply-To: <20190311191602.25796-8-svens@stackframe.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] target/hppa: fix b,gate instruction
+	(envelope-from <tgfbeta@me.com>) id 1h3WVc-0007fC-GX
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:47:13 -0400
+Received: from pv50p00im-ztdg10021801.me.com ([17.58.6.56]:37999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1h3WVc-0007du-7E
+	for qemu-devel@nongnu.org; Mon, 11 Mar 2019 21:47:12 -0400
+From: Chen Zhang <tgfbeta@me.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Message-Id: <BE04B88B-9AAC-4348-A165-E115CBE54077@me.com>
+Date: Tue, 12 Mar 2019 09:47:02 +0800
+Subject: [Qemu-devel] [PATCH] ui/cocoa: Adding cursor support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +25,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sven Schnelle <svens@stackframe.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 3/11/19 12:15 PM, Sven Schnelle wrote:
-> b,gate does GR[t] ← cat(GR[t]{0..29},IAOQ_Front{30..31});
-> instead of saving the link address to register t.
-> 
+This patch added cocoa_mouse_set() and cocoa_cursor_define(),
+supporting virtio-gpu simple rendering on macOS host.
 
-Quite right.  Silly mistake.
+Image content, rect and visibility of the cursor buffer were added as
+ivars in QemuCocoaView class. Corresponding accessors were added.
 
->  #ifndef CONFIG_USER_ONLY
-> +    TCGv_reg tmp;
->      if (ctx->tb_flags & PSW_C) {
->          CPUHPPAState *env = ctx->cs->env_ptr;
->          int type = hppa_artype_for_page(env, ctx->base.pc_next);
-> @@ -3480,12 +3481,13 @@ static bool trans_b_gate(DisasContext *ctx, arg_b_gate *a)
->          if (type >= 4 && type - 4 < ctx->privilege) {
->              dest = deposit32(dest, 0, 2, type - 4);
->          }
-> +        tmp = dest_gpr(ctx, a->l);
-> +        tcg_gen_deposit_reg(tmp, tmp, cpu_iaoq_f, 0, 2);
->      } else {
->          dest &= -4;  /* priv = 0 */
->      }
->  #endif
-> -
-> -    return do_dbranch(ctx, dest, a->l, a->n);
-> +    return do_dbranch(ctx, dest, 0, a->n);
+Note that the rect of the cursor was in coordinates of the QEMU
+screen, not the NSScreen or the NSView, for convenience of blending.
 
-This change needs to be outside the CONFIG_USER_ONLY.  It needs to handle
-nullification (which was previously all handled in do_dbranch).  I'm thinking
-of something like the following.
+Signed-off-by: Chen Zhang <tgfbeta@me.com>
+---
+ ui/cocoa.m | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-
-r~
-
-
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index f3e78b8e22..6ac196804b 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -3446,6 +3446,8 @@ static bool trans_b_gate
- {
-     target_ureg dest = iaoq_dest(ctx, a->disp);
-
-+    nullify_over(ctx);
-+
-     /* Make sure the caller hasn't done something weird with the queue.
-      * ??? This is not quite the same as the PSW[B] bit, which would be
-      * expensive to track.  Real hardware will trap for
-@@ -3483,7 +3485,16 @@ static bool trans_b_gate
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 420b2411c1..8beed6e514 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -334,6 +334,9 @@ static void handleAnyDeviceErrors(Error * err)
+     BOOL isFullscreen;
+     BOOL isAbsoluteEnabled;
+     BOOL isMouseDeassociated;
++    CGRect cursorRect;
++    CGImageRef cursorImage;
++    BOOL cursorVisible;
+ }
+ - (void) switchSurface:(pixman_image_t *)image;
+ - (void) grabMouse;
+@@ -362,6 +365,12 @@ static void handleAnyDeviceErrors(Error * err)
+ - (float) cdy;
+ - (QEMUScreen) gscreen;
+ - (void) raiseAllKeys;
++- (CGRect) cursorRect;
++- (void) setCursorRect:(CGRect)rect;
++- (CGImageRef) cursorImage;
++- (void) setCursorImage:(CGImageRef)image;
++- (BOOL) isCursorVisible;
++- (void) setCursorVisible:(BOOL)visible;
+ @end
+=20
+ QemuCocoaView *cocoaView;
+@@ -392,6 +401,10 @@ QemuCocoaView *cocoaView;
+         pixman_image_unref(pixman_image);
      }
- #endif
-
--    return do_dbranch(ctx, dest, a->l, a->n);
-+    if (a->l) {
-+        TCGv_reg tmp = dest_gpr(ctx, a->l);
-+        if (ctx->privilege < 3) {
-+            tcg_gen_andi_reg(tmp, tmp, -4);
-+        }
-+        tcg_gen_ori_reg(tmp, tmp, ctx->privilege);
-+        save_gpr(ctx, a->l, tmp);
+=20
++    if (cursorImage) {
++        CGImageRelease(cursorImage);
 +    }
 +
-+    return do_dbranch(ctx, dest, 0, a->n);
+     [super dealloc];
  }
-
- static bool trans_blr(DisasContext *ctx, arg_blr *a)
+=20
+@@ -479,6 +492,10 @@ QemuCocoaView *cocoaView;
+                                                         );
+             CGContextDrawImage (viewContextRef, cgrect(rectList[i]), =
+clipImageRef);
+             CGImageRelease (clipImageRef);
++
++        }
++        if (cursorVisible && cursorImage && NSIntersectsRect(rect, =
+cursorRect)) {
++            CGContextDrawImage (viewContextRef, cursorRect, =
+cursorImage);
+         }
+         CGImageRelease (imageRef);
+     }
+@@ -987,6 +1004,19 @@ QemuCocoaView *cocoaView;
+ - (float) cdy {return cdy;}
+ - (QEMUScreen) gscreen {return screen;}
+=20
++- (CGRect) cursorRect {return cursorRect;}
++- (void) setCursorRect:(CGRect)rect {cursorRect =3D rect;}
++- (CGImageRef) cursorImage {return cursorImage;}
++- (void) setCursorImage:(CGImageRef)image
++{
++    if (cursorImage && cursorImage !=3D image) {
++        CGImageRelease(cursorImage);
++    }
++    cursorImage =3D image;
++}
++- (BOOL) isCursorVisible {return cursorVisible;}
++- (void) setCursorVisible:(BOOL)visible {cursorVisible =3D visible;}
++
+ /*
+  * Makes the target think all down keys are being released.
+  * This prevents a stuck key problem, since we will not see
+@@ -1830,6 +1860,53 @@ static void cocoa_refresh(DisplayChangeListener =
+*dcl)
+     [pool release];
+ }
+=20
++static void cocoa_cursor_define(DisplayChangeListener *dcl, QEMUCursor =
+*c)
++{
++    NSAutoreleasePool * pool =3D [[NSAutoreleasePool alloc] init];
++    int bitsPerComponent =3D [cocoaView gscreen].bitsPerComponent;
++    int bitsPerPixel =3D [cocoaView gscreen].bitsPerPixel;
++    CGDataProviderRef provider =3D CGDataProviderCreateWithData(NULL, =
+c->data, c->width * 4 * c->height, NULL);
++
++    CGImageRef img =3D CGImageCreate(c->width, c->height,
++                                   bitsPerComponent, bitsPerPixel, =
+c->width * bitsPerComponent / 2,
++#ifdef __LITTLE_ENDIAN__
++                                   =
+CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), //colorspace for OS =
+X >=3D 10.4
++                                   kCGBitmapByteOrder32Little | =
+kCGImageAlphaFirst,
++#else
++                                   CGColorSpaceCreateDeviceRGB(), =
+//colorspace for OS X < 10.4 (actually ppc)
++                                   kCGImageAlphaFirst, //bitmapInfo
++#endif
++                                   provider, NULL, 0, =
+kCGRenderingIntentDefault);
++
++    CGDataProviderRelease(provider);
++    CGFloat width =3D c->width;
++    CGFloat height =3D c->height;
++    dispatch_async(dispatch_get_main_queue(), ^{
++        [cocoaView setCursorImage:img];
++        CGRect rect =3D [cocoaView cursorRect];
++        rect.size =3D CGSizeMake(width, height);
++        [cocoaView setCursorRect:rect];
++    });
++    [pool release];
++}
++static void cocoa_mouse_set(DisplayChangeListener *dcl,
++                            int x, int y, int visible)
++{
++    NSAutoreleasePool * pool =3D [[NSAutoreleasePool alloc] init];
++    dispatch_async(dispatch_get_main_queue(), ^{
++        QEMUScreen screen =3D [cocoaView gscreen];
++        CGRect rect =3D [cocoaView cursorRect];
++        // Mark old cursor rect as dirty
++        [cocoaView setNeedsDisplayInRect:rect];
++        rect.origin =3D CGPointMake(x, screen.height - (y + =
+rect.size.height));
++        [cocoaView setCursorRect:rect];
++        [cocoaView setCursorVisible:visible ? YES : NO];
++        // Mark new cursor rect as dirty
++        [cocoaView setNeedsDisplayInRect:rect];
++    });
++    [pool release];
++}
++
+ static void cocoa_cleanup(void)
+ {
+     COCOA_DEBUG("qemu_cocoa: cocoa_cleanup\n");
+@@ -1841,6 +1918,8 @@ static const DisplayChangeListenerOps dcl_ops =3D =
+{
+     .dpy_gfx_update =3D cocoa_update,
+     .dpy_gfx_switch =3D cocoa_switch,
+     .dpy_refresh =3D cocoa_refresh,
++    .dpy_mouse_set =3D cocoa_mouse_set,
++    .dpy_cursor_define =3D cocoa_cursor_define,
+ };
+=20
+ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+--=20
+2.19.2
