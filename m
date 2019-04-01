@@ -1,28 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33991)
+Received: from eggs.gnu.org ([209.51.188.92]:34366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hB186-0005fc-24
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:53:55 -0400
+	(envelope-from <groug@kaod.org>) id 1hB19r-0006aa-Kr
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hB184-0007gt-C3
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:53:53 -0400
-Received: from mail-eopbgr720101.outbound.protection.outlook.com
-	([40.107.72.101]:53593
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <groug@kaod.org>) id 1hB19p-00005o-Jr
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:55:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35756
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hB183-0007gO-VK
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:53:52 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 1 Apr 2019 17:53:48 +0000
-Message-ID: <CY4PR2201MB125406EDB6C28B4F84C6A5F7C6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
-References: <1553845000-6537-1-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1553845000-6537-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hB19n-0008Mg-MY
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:55:40 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x31HsdXd156891
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 13:55:15 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rkpvua0e0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 13:55:15 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 1 Apr 2019 18:55:13 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 01 Apr 2019 19:55:08 +0200
+In-Reply-To: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
+References: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add support for MSA instructions on
- a big endian host
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <155414130834.574858.16502276132110219890.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH for-4.0 2/2] spapr_pci: Fix extended config
+ space accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +41,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> Subject: [PATCH v3 0/5] Add support for MSA instructions on a big endian =
-host
+The PAPR PHB acts as a legacy PCI bus but it allows PCIe extended
+config space accesses anyway (for pseries-2.9 and newer machine
+types).
 
-"Add" -> "Fix"
+Introduce a specific PCI bus subtype to inform the common PCI code
+about that.
 
-Big endian host support should have worked from the moment MSA
-support is added to QEMU.
+Fixes: c2077e2ca0da7
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_pci.c |   26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
->
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->=20
-> Add support for MSA instructions while executing QEMU on a
-> machine that uses big endian MIPS CPU. Also change the
-> implementation of helpers for MSA instructions
-> ST.<B|H|W|D>, LD.<B|H|W|D>, INSERT.<B|H|W> (and D on MIPS64),
-> COPY_S.<B|H|W> (and D on MIPS64) and COPY_U.<B|H> (and W
-> on MIPS64). Instead of using a switch in a helper, which is
-> called many times, put a switch in translate.c file, which
-> is called only a few times.
->=20
-
-This paragraph suggests that there are essentially two independent
-changes in this series (one for big endian host, another for refactoring
-helpers), while in reality they are closely related. You should have
-started the second sentence with "This is achieved by changing the
-implementation of helpers for...".
-
-> v3:
->  - Unroll loops in ST.<B|H|W|D> and LD.<B|H|W|D>
->    instructions.
->  - Eliminate macro that generates the helpers for
->    the ST.<B|H|W|D> and LD.<B|H|W|D> instructions,
->    and add four helpers for each (for byte,
->    halfword, word and doubleword).
->  - Eliminate the helpers for INSERT.<B|H|W|D>,
->    COPY_S.<B|H|W|D> and COPY_U.<B|H|W> and add
->    four (three in case of COPY_U) helpers for
->    each one.
->=20
-
-The cover letter should contain the complete series history.
-
-Thanks,
-Aleksandar
-
-> Mateja Marjanovic (5):
->   target/mips: MSA instructions ld, big endian host fix
->   target/mips: MSA instructions st, big endian host fix
->   target/mips: Different approach toward COPY_S MSA instr. and big
->     endian fix
->   target/mips: Different approach toward COPY_U MSA instr. and big
->     endian fix
->   target/mips: Different approach toward INSERT MSA instr. and big
->     endian fix
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bba3a86dda6c..68cc15d2f534 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1642,6 +1642,28 @@ static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
+     memory_region_del_subregion(get_system_memory(), &sphb->mem32window);
+ }
+ 
++static bool spapr_phb_allows_extended_config_space(PCIBus *bus)
++{
++    SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(BUS(bus)->parent);
++
++    return sphb->pcie_ecs;
++}
++
++static void spapr_phb_root_bus_class_init(ObjectClass *klass, void *data)
++{
++    PCIBusClass *pbc = PCI_BUS_CLASS(klass);
++
++    pbc->allows_extended_config_space = spapr_phb_allows_extended_config_space;
++}
++
++#define TYPE_SPAPR_PHB_ROOT_BUS "spapr-pci-host-bridge-root-bus"
++
++static const TypeInfo spapr_phb_root_bus_info = {
++    .name = TYPE_SPAPR_PHB_ROOT_BUS,
++    .parent = TYPE_PCI_BUS,
++    .class_init = spapr_phb_root_bus_class_init,
++};
++
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ {
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
+@@ -1746,7 +1768,8 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     bus = pci_register_root_bus(dev, NULL,
+                                 pci_spapr_set_irq, pci_spapr_map_irq, sphb,
+                                 &sphb->memspace, &sphb->iospace,
+-                                PCI_DEVFN(0, 0), PCI_NUM_PINS, TYPE_PCI_BUS);
++                                PCI_DEVFN(0, 0), PCI_NUM_PINS,
++                                TYPE_SPAPR_PHB_ROOT_BUS);
+     phb->bus = bus;
+     qbus_set_hotplug_handler(BUS(phb->bus), OBJECT(sphb), NULL);
+ 
+@@ -2344,6 +2367,7 @@ void spapr_pci_rtas_init(void)
+ static void spapr_pci_register_types(void)
+ {
+     type_register_static(&spapr_phb_info);
++    type_register_static(&spapr_phb_root_bus_info);
+ }
+ 
+ type_init(spapr_pci_register_types)
