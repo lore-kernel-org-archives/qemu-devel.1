@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45682)
+Received: from eggs.gnu.org ([209.51.188.92]:45730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxca-0001oI-3L
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1hAxcc-0001r1-Nj
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxcY-0004fl-P7
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hAxcY-0004fF-HR
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9FAB3004425
-	for <qemu-devel@nongnu.org>; Mon,  1 Apr 2019 14:09:05 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-75.phx2.redhat.com [10.3.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 83E9119C7C
-	for <qemu-devel@nongnu.org>; Mon,  1 Apr 2019 14:09:05 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1hAxcb-0004hh-Qo
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:10 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  1 Apr 2019 09:08:49 -0500
-Message-Id: <20190401140903.19186-1-eblake@redhat.com>
+Date: Mon,  1 Apr 2019 09:08:50 -0500
+Message-Id: <20190401140903.19186-2-eblake@redhat.com>
+In-Reply-To: <20190401140903.19186-1-eblake@redhat.com>
+References: <20190401140903.19186-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/14] NBD patches for 4.0-rc2
+Subject: [Qemu-devel] [PULL 01/14] qemu-img: Report bdrv_block_status
+ failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +23,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Richard W . M . Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-The following changes since commit 230ce19814ecc6bff8edac3b5b86e7c82f422c=
-6c:
+If bdrv_block_status_above() fails, we are aborting the convert
+process but failing to print an error message.  Broken in commit
+690c7301 (v2.4) when rewriting convert's logic.
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-axp-20190325' into =
-staging (2019-03-29 19:29:00 +0000)
+Discovered when teaching nbdkit to support NBD_CMD_BLOCK_STATUS, and
+accidentally violating the protocol by returning more than one extent
+in spite of qemu asking for NBD_CMD_FLAG_REQ_ONE.  The qemu NBD code
+should probably handle the server's non-compliance more gracefully
+than failing with EINVAL, but qemu-img shouldn't be silently
+squelching any block status failures. It doesn't help that qemu 3.1
+masks the qemu-img bug with extra noise that the nbd code is dumping
+to stderr (that noise was cleaned up in d8b4bad8).
 
-are available in the Git repository at:
+Reported-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190323212639.579-2-eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qemu-img.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-04-01
-
-for you to fetch changes up to 75d34eb98ca0bb2f49d607fcaefd9c482e56b15d:
-
-  nbd/client: Trace server noncompliance on structured reads (2019-04-01 =
-08:58:04 -0500)
-
-----------------------------------------------------------------
-nbd patches for 2019-04-01
-
-- Better behavior of qemu-img map on NBD images
-- Fixes for NBD protocol alignment corner cases:
- - the server has fewer places where it sends reads or block status
-   not aligned to its advertised block size
- - the client has more cases where it can work around server
-   non-compliance present in qemu 3.1
- - the client now avoids non-compliant requests when interoperating
-   with nbdkit or other servers not advertising block size
-
-----------------------------------------------------------------
-Eric Blake (14):
-      qemu-img: Report bdrv_block_status failures
-      nbd: Tolerate some server non-compliance in NBD_CMD_BLOCK_STATUS
-      nbd: Don't lose server's error to NBD_CMD_BLOCK_STATUS
-      nbd: Permit simple error to NBD_CMD_BLOCK_STATUS
-      qemu-img: Gracefully shutdown when map can't finish
-      nbd-client: Work around server BLOCK_STATUS misalignment at EOF
-      iotests: Add 241 to test NBD on unaligned images
-      nbd/client: Lower min_block for block-status, unaligned size
-      nbd/client: Report offsets in bdrv_block_status
-      nbd/client: Reject inaccessible tail of inconsistent server
-      nbd/client: Support qemu-img convert from unaligned size
-      block: Add bdrv_get_request_alignment()
-      nbd/server: Advertise actual minimum block size
-      nbd/client: Trace server noncompliance on structured reads
-
- include/sysemu/block-backend.h |   1 +
- block/block-backend.c          |   7 +++
- block/nbd-client.c             | 124 +++++++++++++++++++++++++++++++++--=
-------
- block/nbd.c                    |  19 ++++++-
- nbd/client.c                   |   8 +++
- nbd/server.c                   |  13 +++--
- qemu-img.c                     |  16 ++++--
- block/trace-events             |   2 +
- tests/qemu-iotests/209.out     |   4 +-
- tests/qemu-iotests/223.out     |  22 ++++----
- tests/qemu-iotests/233.out     |   2 +-
- tests/qemu-iotests/241         | 100 +++++++++++++++++++++++++++++++++
- tests/qemu-iotests/241.out     |  28 ++++++++++
- tests/qemu-iotests/group       |   1 +
- 14 files changed, 299 insertions(+), 48 deletions(-)
- create mode 100755 tests/qemu-iotests/241
- create mode 100644 tests/qemu-iotests/241.out
-
+diff --git a/qemu-img.c b/qemu-img.c
+index 8ee63daeaeb..03a9a10dec1 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1630,6 +1630,8 @@ static int convert_iteration_sectors(ImgConvertStat=
+e *s, int64_t sector_num)
+                                           count, &count, NULL, NULL);
+         }
+         if (ret < 0) {
++            error_report("error while reading block status of sector %" =
+PRId64
++                         ": %s", sector_num, strerror(-ret));
+             return ret;
+         }
+         n =3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
 --=20
 2.20.1
