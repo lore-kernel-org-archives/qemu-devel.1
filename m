@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59864)
+Received: from eggs.gnu.org ([209.51.188.92]:33842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hAuMY-0002mi-V4
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:40:24 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hAuZt-0005MM-DG
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hAuMX-0004I2-6V
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:40:22 -0400
-Resent-Message-Id: <E1hAuMX-0004I2-6V@eggs.gnu.org>
-Message-ID: <155411518706.12882.12516941214438544771@76452e4e88f2>
-In-Reply-To: <20190401102911.8685-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <stefanha@gmail.com>) id 1hAuZs-00043H-Hx
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:54:09 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hAuZs-00042h-7b
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:54:08 -0400
+Received: by mail-wm1-x342.google.com with SMTP id q16so9875824wmj.3
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 03:54:07 -0700 (PDT)
+Date: Mon, 1 Apr 2019 10:07:24 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190401090724.GA643@stefanha-x1.localdomain>
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 1 Apr 2019 03:39:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/6] target/s390x: Clean up tcg
- exceptions
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZPt4rx8FFjLCG7dd"
+Content-Disposition: inline
+In-Reply-To: <2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: Wei Li <wei.d.li@oracle.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMTEwMjkxMS44Njg1
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDExMDI5MTEuODY4NS0xLXJp
-Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBm
-b3ItNC4xIDAvNl0gdGFyZ2V0L3MzOTB4OiBDbGVhbiB1cCB0Y2cgZXhjZXB0aW9ucwpUeXBlOiBz
-ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
-ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxOTA0MDExMDI5MTEuODY4NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4g
-cGF0Y2hldy8yMDE5MDQwMTEwMjkxMS44Njg1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
-ZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0ZGZjZTcxY2MgdGFyZ2V0L3MzOTB4
-OiBVc2UgdGNnX3MzOTBfcHJvZ3JhbV9pbnRlcnJ1cHQgaW4gVENHIGhlbHBlcnMKODdiZDZhZWJi
-NyB0YXJnZXQvczM5MHg6IFJlbW92ZSBpbGVuIHBhcmFtZXRlciBmcm9tIHMzOTBfcHJvZ3JhbV9p
-bnRlcnJ1cHQKZmQwZWY0ODBiNyB0YXJnZXQvczM5MHg6IFJlbW92ZSBpbGVuIHBhcmFtZXRlciBm
-cm9tIHRjZ19zMzkwX3Byb2dyYW1faW50ZXJydXB0CjQzZTY3ODcyYzQgdGFyZ2V0L3MzOTB4OiBV
-c2UgaWxlbiBmcm9tIHVud2luZCBpbiB0bGJfZmlsbAoxNGVjMjk2ODVhIHRhcmdldC9zMzkweDog
-QWRkIGlsZW4gdG8gdW53aW5kIGRhdGEKN2IzODkxNzY3ZSB0YXJnZXQvczM5MHg6IFRydW5jYXRl
-IDMyLWJpdCBwc3dfYWRkciBiZWZvcmUgY3JlYXRpbmcgVEIKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvNiBDaGVja2luZyBjb21taXQgN2IzODkxNzY3ZTBmICh0YXJnZXQvczM5MHg6IFRydW5jYXRl
-IDMyLWJpdCBwc3dfYWRkciBiZWZvcmUgY3JlYXRpbmcgVEIpCkVSUk9SOiAiZm9vKiBiYXIiIHNo
-b3VsZCBiZSAiZm9vICpiYXIiCiMyMzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdS5oOjM3MToKK3N0
-YXRpYyBpbmxpbmUgdm9pZCBjcHVfZ2V0X3RiX2NwdV9zdGF0ZShDUFVTMzkwWFN0YXRlKiBlbnYs
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEv
-NiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi82IENoZWNraW5nIGNvbW1pdCAxNGVjMjk2
-ODVhYWIgKHRhcmdldC9zMzkweDogQWRkIGlsZW4gdG8gdW53aW5kIGRhdGEpCjMvNiBDaGVja2lu
-ZyBjb21taXQgNDNlNjc4NzJjNDVlICh0YXJnZXQvczM5MHg6IFVzZSBpbGVuIGZyb20gdW53aW5k
-IGluIHRsYl9maWxsKQo0LzYgQ2hlY2tpbmcgY29tbWl0IGZkMGVmNDgwYjczMCAodGFyZ2V0L3Mz
-OTB4OiBSZW1vdmUgaWxlbiBwYXJhbWV0ZXIgZnJvbSB0Y2dfczM5MF9wcm9ncmFtX2ludGVycnVw
-dCkKNS82IENoZWNraW5nIGNvbW1pdCA4N2JkNmFlYmI3Y2UgKHRhcmdldC9zMzkweDogUmVtb3Zl
-IGlsZW4gcGFyYW1ldGVyIGZyb20gczM5MF9wcm9ncmFtX2ludGVycnVwdCkKNi82IENoZWNraW5n
-IGNvbW1pdCBhNGRmY2U3MWNjMmUgKHRhcmdldC9zMzkweDogVXNlIHRjZ19zMzkwX3Byb2dyYW1f
-aW50ZXJydXB0IGluIFRDRyBoZWxwZXJzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwMTEwMjkxMS44Njg1LTEtcmljaGFyZC5oZW5kZXJz
-b25AbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 29, 2019 at 08:16:36AM -0700, Wei Li wrote:
+> Thanks Stefan for your reply and guidance!
+>=20
+> We spent some time on exploring the multiple I/O Threads approach per you=
+r feedback. Based on the perf measurement data, we did see some IOPS improv=
+ement for multiple volumes, which is great. :)
+>=20
+> In addition, IOPS for single Volume will still be a bottleneck, it seems =
+like multiqueue block layer feature which Paolo is working on may be able t=
+o help improving the IOPS for single volume.
+>=20
+> @Paolo, @Stefan,=20
+> Would you mind sharing the multiqueue feature code branch with us? So tha=
+t we could get some rough idea about this feature and maybe start doing som=
+e exploration?=20
+
+Paolo last worked on this code, so he may be able to send you a link.
+
+Stefan
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcodTMAAoJEJykq7OBq3PI9E4H/jxWgrKtvSl0eqCWSf5Ge5Nv
+n5+P0r/Xe44nyiP70gk43IQHtr12HYPx2VakqHIPtPiVDiSCaUnl1SP/GuMeSjr0
+KkHdJB8Us1Enem1eirRMukWkE3QH5Mpc/ZQbTJBuppQ5iu6GJxTXIBJDGhKrOiq2
+k/d3qZqiwCfu5V/MozvYoShe6s+xWnzBoUgf4K2LfjaPdBKvRUEuyoSC+iC3knjD
+7rdCP1zjLWl+X4OCebcudZbJguvmnM45nlQpFHz7xRgsdsPSiQpoy6DYxwEJ/PeG
+nClD/9SP0b0+OKCz3NkZDUw6E0346hcmOOifYMyzeBksBjPsUbEiKF4TdUmyOZQ=
+=80a3
+-----END PGP SIGNATURE-----
+
+--ZPt4rx8FFjLCG7dd--
