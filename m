@@ -1,36 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42109)
+Received: from eggs.gnu.org ([209.51.188.92]:42106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46E-0002rb-2K
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:11 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46C-0004Pu-Rs
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46D-0002rX-VT
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52606
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46C-0004Pi-O4
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52622
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB46C-0004Il-HY
+	id 1hB46C-0004Ip-IV
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:08 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L3sR5062192
+	x31L3q45062154
 	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:57 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsy1s-1
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsynd-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:51 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:53 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:29 +0100
+	Mon, 1 Apr 2019 22:03:07 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:25 -0500
+Date: Mon,  1 Apr 2019 15:59:59 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-52-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 51/97] block-backend: Set werror/rerror
- defaults in blk_new()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190401210011.16009-86-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 85/97] tpm: Make sure new locality passed to
+ tpm_tis_prep_abort() is valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,60 +43,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.ibm.com>
 
-From: Kevin Wolf <kwolf@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Currently, the default values for werror and rerror have to be set
-explicitly with blk_set_on_error() by the callers of blk_new(). The only
-caller actually doing this is blockdev_init(), which is called for
-BlockBackends created using -drive.
+Make sure that the new locality passed to tpm_tis_prep_abort()
+is valid.
 
-In particular, anonymous BlockBackends created with
--device ...,drive=<node-name> didn't get the correct default set and
-instead defaulted to the integer value 0 (= BLOCKDEV_ON_ERROR_REPORT).
-This is the intended default for rerror anyway, but the default for
-werror should be BLOCKDEV_ON_ERROR_ENOSPC.
+Add a comment to aborting_locty that it may be any locality, including
+TPM_TIS_NO_LOCALITY.
 
-Set the defaults in blk_new() instead so that they apply no matter what
-way the BlockBackend was created.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-(cherry picked from commit cb53460b708db3617ab73248374d071d5552c263)
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+(cherry picked from commit e92b63ea610201bd743343fc6b11e6c39c8d3515)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/block-backend.c      | 3 +++
- tests/qemu-iotests/067.out | 1 +
- 2 files changed, 4 insertions(+)
+ hw/tpm/tpm_tis.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f2f75a977d..1b27a68ae7 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -324,6 +324,9 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->shared_perm = shared_perm;
-     blk_set_enable_write_cache(blk, true);
- 
-+    blk->on_read_error = BLOCKDEV_ON_ERROR_REPORT;
-+    blk->on_write_error = BLOCKDEV_ON_ERROR_ENOSPC;
-+
-     block_acct_init(&blk->stats);
- 
-     notifier_list_init(&blk->remove_bs_notifiers);
-diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
-index 2e71cff3ce..b10c71db03 100644
---- a/tests/qemu-iotests/067.out
-+++ b/tests/qemu-iotests/067.out
-@@ -385,6 +385,7 @@ Testing: -device virtio-scsi -device scsi-cd,id=cd0
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index d9322692ee..9a795ce96c 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -263,7 +263,9 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t l=
+octy, uint8_t newlocty)
  {
-     "return": [
-         {
-+            "io-status": "ok",
-             "device": "",
-             "locked": false,
-             "removable": true,
--- 
+     uint8_t busy_locty;
+=20
+-    s->aborting_locty =3D locty;
++    assert(TPM_TIS_IS_VALID_LOCTY(newlocty));
++
++    s->aborting_locty =3D locty; /* may also be TPM_TIS_NO_LOCALITY */
+     s->next_locty =3D newlocty;  /* locality after successful abort */
+=20
+     /*
+--=20
 2.17.1
