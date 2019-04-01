@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40444)
+Received: from eggs.gnu.org ([209.51.188.92]:40475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43x-0000oe-IW
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:52 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43y-0000pW-KA
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43u-00032z-7e
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46146)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43v-000344-IA
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43678
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB43t-00030h-KN
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:46 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31KrUhh087134
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:42 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksvqgykj-1
+	id 1hB43v-00033Y-5v
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:47 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x31KrbRZ029013
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:46 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rkr97p9ny-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:41 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:46 -0400
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:40 +0100
+	Mon, 1 Apr 2019 22:01:45 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:45 -0500
+Date: Mon,  1 Apr 2019 15:58:51 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190401210011.16009-12-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/97] target/arm: Add sve-max-vq cpu property
- to -cpu max
+Message-Id: <20190401210011.16009-18-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 17/97] block/qapi: Fix memory leak in
+ qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,189 +40,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Kevin Wolf <kwolf@redhat.com>
 
-This allows the default (and maximum) vector length to be set
-from the command-line.  Which is extraordinarily helpful in
-debugging problems depending on vector length without having to
-bake knowledge of PR_SET_SVE_VL into every guest binary.
+For BlockBackends that are skipped in query-blockstats, we would leak
+info since commit 567dcb31. Allocate info only later to avoid the memory
+leak.
 
-Cc: qemu-stable@nongnu.org (3.0.1)
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit adf92eab90e3f5f34c285da6d14d48952b7a8e72)
+Fixes: CID 1394727
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+(cherry picked from commit f62492bb8d1ea7f7e156ffbdf411de46107072c5)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- linux-user/syscall.c | 19 +++++++++++++------
- target/arm/cpu.c     |  6 +++---
- target/arm/cpu.h     |  3 +++
- target/arm/cpu64.c   | 29 +++++++++++++++++++++++++++++
- target/arm/helper.c  |  7 +++++--
- 5 files changed, 53 insertions(+), 11 deletions(-)
+ block/qapi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index dfc851cc35..5a4af76c03 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -10848,15 +10848,22 @@ abi_long do_syscall(void *cpu_env, int num, abi=
-_long arg1,
- #endif
- #ifdef TARGET_AARCH64
-         case TARGET_PR_SVE_SET_VL:
--            /* We cannot support either PR_SVE_SET_VL_ONEXEC
--               or PR_SVE_VL_INHERIT.  Therefore, anything above
--               ARM_MAX_VQ results in EINVAL.  */
-+            /*
-+             * We cannot support either PR_SVE_SET_VL_ONEXEC or
-+             * PR_SVE_VL_INHERIT.  Note the kernel definition
-+             * of sve_vl_valid allows for VQ=3D512, i.e. VL=3D8192,
-+             * even though the current architectural maximum is VQ=3D16.
-+             */
-             ret =3D -TARGET_EINVAL;
-             if (arm_feature(cpu_env, ARM_FEATURE_SVE)
--                && arg2 >=3D 0 && arg2 <=3D ARM_MAX_VQ * 16 && !(arg2 & =
-15)) {
-+                && arg2 >=3D 0 && arg2 <=3D 512 * 16 && !(arg2 & 15)) {
-                 CPUARMState *env =3D cpu_env;
--                int old_vq =3D (env->vfp.zcr_el[1] & 0xf) + 1;
--                int vq =3D MAX(arg2 / 16, 1);
-+                ARMCPU *cpu =3D arm_env_get_cpu(env);
-+                uint32_t vq, old_vq;
-+
-+                old_vq =3D (env->vfp.zcr_el[1] & 0xf) + 1;
-+                vq =3D MAX(arg2 / 16, 1);
-+                vq =3D MIN(vq, cpu->sve_max_vq);
-=20
-                 if (vq < old_vq) {
-                     aarch64_sve_narrow_vq(env, vq);
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 64a8005a4b..b25898ed4c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -168,9 +168,9 @@ static void arm_cpu_reset(CPUState *s)
-         env->cp15.cpacr_el1 =3D deposit64(env->cp15.cpacr_el1, 16, 2, 3)=
-;
-         env->cp15.cptr_el[3] |=3D CPTR_EZ;
-         /* with maximum vector length */
--        env->vfp.zcr_el[1] =3D ARM_MAX_VQ - 1;
--        env->vfp.zcr_el[2] =3D ARM_MAX_VQ - 1;
--        env->vfp.zcr_el[3] =3D ARM_MAX_VQ - 1;
-+        env->vfp.zcr_el[1] =3D cpu->sve_max_vq - 1;
-+        env->vfp.zcr_el[2] =3D env->vfp.zcr_el[1];
-+        env->vfp.zcr_el[3] =3D env->vfp.zcr_el[1];
- #else
-         /* Reset into the highest available EL */
-         if (arm_feature(env, ARM_FEATURE_EL3)) {
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e310ffc29d..9526ed27cb 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -857,6 +857,9 @@ struct ARMCPU {
-=20
-     /* Used to synchronize KVM and QEMU in-kernel device levels */
-     uint8_t device_irq_level;
-+
-+    /* Used to set the maximum vector length the cpu will support.  */
-+    uint32_t sve_max_vq;
- };
-=20
- static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index d0581d59d8..800bff780e 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -29,6 +29,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
-+#include "qapi/visitor.h"
-=20
- static inline void set_feature(CPUARMState *env, int feature)
- {
-@@ -217,6 +218,29 @@ static void aarch64_a53_initfn(Object *obj)
-     define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
- }
-=20
-+static void cpu_max_get_sve_vq(Object *obj, Visitor *v, const char *name=
-,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu =3D ARM_CPU(obj);
-+    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
-+}
-+
-+static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name=
-,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu =3D ARM_CPU(obj);
-+    Error *err =3D NULL;
-+
-+    visit_type_uint32(v, name, &cpu->sve_max_vq, &err);
-+
-+    if (!err && (cpu->sve_max_vq =3D=3D 0 || cpu->sve_max_vq > ARM_MAX_V=
-Q)) {
-+        error_setg(&err, "unsupported SVE vector length");
-+        error_append_hint(&err, "Valid sve-max-vq in range [1-%d]\n",
-+                          ARM_MAX_VQ);
-+    }
-+    error_propagate(errp, err);
-+}
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this =
-host);
-  * otherwise, a CPU with as many features enabled as our emulation suppo=
-rts.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -253,6 +277,10 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->ctr =3D 0x80038003; /* 32 byte I and D cacheline size, VIPT=
- icache */
-         cpu->dcz_blocksize =3D 7; /*  512 bytes */
- #endif
-+
-+        cpu->sve_max_vq =3D ARM_MAX_VQ;
-+        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
-_vq,
-+                            cpu_max_set_sve_vq, NULL, NULL, &error_fatal=
-);
-     }
- }
-=20
-@@ -405,6 +433,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned=
- vq)
-     uint64_t pmask;
-=20
-     assert(vq >=3D 1 && vq <=3D ARM_MAX_VQ);
-+    assert(vq <=3D arm_env_get_cpu(env)->sve_max_vq);
-=20
-     /* Zap the high bits of the zregs.  */
-     for (i =3D 0; i < 32; i++) {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 66afb08ee0..c24c66d43e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12408,9 +12408,12 @@ void cpu_get_tb_cpu_state(CPUARMState *env, targ=
-et_ulong *pc,
-             zcr_len =3D 0;
-         } else {
-             int current_el =3D arm_current_el(env);
-+            ARMCPU *cpu =3D arm_env_get_cpu(env);
-=20
--            zcr_len =3D env->vfp.zcr_el[current_el <=3D 1 ? 1 : current_=
-el];
--            zcr_len &=3D 0xf;
-+            zcr_len =3D cpu->sve_max_vq - 1;
-+            if (current_el <=3D 1) {
-+                zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el=
-[1]);
-+            }
-             if (current_el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-                 zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el=
-[2]);
-             }
---=20
+diff --git a/block/qapi.c b/block/qapi.c
+index 339727f0f4..c66f949db8 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -594,7 +594,7 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
+         }
+     } else {
+         for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
+-            BlockStatsList *info = g_malloc0(sizeof(*info));
++            BlockStatsList *info;
+             AioContext *ctx = blk_get_aio_context(blk);
+             BlockStats *s;
+             char *qdev;
+@@ -619,6 +619,7 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
+             bdrv_query_blk_stats(s->stats, blk);
+             aio_context_release(ctx);
+ 
++            info = g_malloc0(sizeof(*info));
+             info->value = s;
+             *p_next = info;
+             p_next = &info->next;
+-- 
 2.17.1
