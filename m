@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51273)
+Received: from eggs.gnu.org ([209.51.188.92]:56704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hB2Yh-0006l6-A3
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 15:25:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1hB30y-0007pG-EP
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 15:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hB2Yd-0002jt-Lv
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 15:25:25 -0400
-Date: Mon, 1 Apr 2019 13:25:12 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190401132512.2f84d036@x1.home>
-In-Reply-To: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
-References: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
+	(envelope-from <armbru@redhat.com>) id 1hB30x-0000NM-3j
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 15:54:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190328182810.21497-1-kwolf@redhat.com>
+	<20190328182810.21497-2-kwolf@redhat.com>
+	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
+	<87ftr5iy8i.fsf@dusky.pond.sub.org>
+	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
+	<20190329170439.GK5081@localhost.localdomain>
+	<87o95sa40r.fsf@dusky.pond.sub.org>
+	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
+	<20190401115410.GB4935@localhost.localdomain>
+	<87k1gdyinr.fsf@dusky.pond.sub.org>
+	<20190401140842.GD4935@localhost.localdomain>
+Date: Mon, 01 Apr 2019 21:54:12 +0200
+In-Reply-To: <20190401140842.GD4935@localhost.localdomain> (Kevin Wolf's
+	message of "Mon, 1 Apr 2019 16:08:42 +0200")
+Message-ID: <87k1gdjycb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] spapr: Fix extended config
- space accesses
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Options for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 01 Apr 2019 19:54:57 +0200
-Greg Kurz <groug@kaod.org> wrote:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> Recent commit c2077e2ca0da7 added stricter checks that now prevent
-> a guest to access the extended config space of a PCIe device connected
-> attached to a PHB on a pseries machine.
-> 
-> PAPR compatible PHBs act like legacy PCI busses, but they do allow access
-> to the full 4k config space of PCIe devices. As discussed several times on
-> the list ([1] and [2]), we cannot really change PAPR PHB to have a true
-> PCIe root bus since it would call for massive and unwanted changes in
-> libvirt.
-> 
-> This series tries to address the issue with a new PCI bus class method
-> that tells if the PCI bus supports extended config space accesses,
-> instead of relying on pci_bus_is_express() which wants a PCIe root bus.
-> A new legacy PCI bus type is added to implement the PAPR behaviour.
-> 
-> Note that this fixes a potential 4.0 regression, hence the for-4.0 tag.
+> Am 01.04.2019 um 15:11 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>> > Option 4:
+>> >
+>> > Add a dummy option to BlockdevOptionsFile:
+>> >
+>> >     '*x-auto-read-only-is-dynamic': { 'type': 'null',
+>> >                                       'if': 'defined(CONFIG_POSIX)' }
+>> >
+>> > Specifying it has no effect, so the ridiculous complexity of three bools
+>> > to select from three options is avoided. Its presence in the schema
+>> > indicates that file-posix implements dynamic auto-read-only.
+>> >
+>> > Basically this is features flags in the schema without having proper
+>> > feature flags yet.
+>> >
+>> > Once we add real annotations (hopefully 4.1), this dummy field can be
+>> > removed again.
+>> 
+>> Exact same patch as for option 3, with the parameter renamed and the
+>> sanity check for non-sensical use dropped.  *Shrug*
+>> 
+>> Puts more pressure on me to deliver QAPI feature flags sooner rather
+>> than later.  My QAPI pressure control valve has been shedding pressure
+>> for a while, so "bring it on".  I'd advise against holding your breath,
+>> though.
+>
+> Okay, let's stop beating around the bush.
+>
+> Nobody has told me so explicitly during this discussion, but implicitly
+> I understand that everyone seems to think doing annotations in the
+> schema is what we really want to have.
+>
+> Instead of continuing to argue which option to get around it is the
+> least ugly one - how bad is the following attempt at just implementing
+> what we really want?
+>
+> Only for structs for now, but that's all we need at the moment. Should
+> be easy to extend during the 4.1 cycle (or whenever we need something
+> else).
+>
+> Note that even if there are bugs in it, they are not user-visible and
+> can just be fixed in 4.1. Currently, a diff between old and new
+> query-qmp-schema output looks sane - just the added 'features' list
+> where we want it.
 
-Post-4.0, please also evaluate:
+[Patch snipped...]
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07164.html
+Caveat emptor: at this time of day, I'm perfectly capable of missing the
+obvious.  Assuming I don't: for once, something doesn't turn out six
+times as hard as anticipated.
 
-Seems that PAPR only has one IOMMU AddressSpace per bus to return
-through the iommu_fn so there should be no harm in aliasing the guest
-view of devices, but if anything this series warns never to assume that
-PAPR behaves normally.
+Missing:
 
-FWIW, this series might make it easier to create a PCI-X Mode 2 bus,
-which would otherwise be similar to conventional PCI for
-inter-connectivity, but does support extended config space.  Though a
-new bus type would be the more obvious way to do it, which clearly has
-been a problem here.  Thanks,
+* Test coverage: two negative tests for the two errors, positive
+  coverage in qapi-schema-test.json
 
-Alex
+* Update to introspect.json (without this, qmp-cmd-test fails, and with
+  qapi-schema-test.json updated, test /visitor/input/qapi-introspect
+  will fail, too),
+
+* Update a few tests/qapi-schema/*.err
+
+* Update docs/devel/qapi-code-gen.txt
+
+* A general idea how to document feature flags
+
+* Depending on that, perhaps an update to the documentation generator
+  scripts/qapi/doc.py
+
+* A rough idea on where else feature flags need to go
