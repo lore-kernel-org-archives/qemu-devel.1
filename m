@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40418)
+Received: from eggs.gnu.org ([209.51.188.92]:40413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43w-0000oZ-PQ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:50 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43w-0000oV-KB
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43v-00033f-19
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43u-00032N-2Y
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53136)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB43t-00030l-Q8
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:46 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1hB43t-00030W-ET
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:45 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31KrYJ4050042
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:42 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkqrc06gj-1
+	x31Kra5q096528
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:41 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkqt6041t-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:41 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Mon, 1 Apr 2019 22:01:40 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:47 -0500
+Date: Mon,  1 Apr 2019 15:58:46 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-14-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 13/97] target/arm: Adjust FPCR_MASK for FZ16
+Message-Id: <20190401210011.16009-13-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 12/97] spapr_cpu_core: vmstate_[un]register
+ per-CPU data from (un)realizefn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +39,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Bharata B Rao <bharata@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Bharata B Rao <bharata@linux.ibm.com>
 
-When support for FZ16 was added, we failed to include the bit
-within FPCR_MASK, which means that it could never be set.
-Continue to zero FZ16 when ARMv8.2-FP16 is not enabled.
+VMStateDescription vmstate_spapr_cpu_state was added by commit
+b94020268e0b6 (spapr_cpu_core: migrate per-CPU data) to migrate per-CPU
+data with the required vmstate registration and unregistration calls.
+However the unregistration is being done only from vcpu creation error path
+and not from CPU delete path.
 
-Fixes: d81ce0ef2c4
-Cc: qemu-stable@nongnu.org (3.0.1)
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180810193129.1556-2-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 0b62159be33d45d00dfa34a317c6d3da30ffb480)
+This causes migration to fail with the following error if migration is
+attempted after a CPU unplug like this:
+Unknown savevm section or instance 'spapr_cpu' 16
+Additionally this leaves the source VM unresponsive after migration failure.
+
+Fix this by ensuring the vmstate_unregister happens during CPU removal.
+Fixing this becomes easier when vmstate (un)registration calls are moved to
+vcpu (un)realize functions which is what this patch does.
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1785972
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit cc71c7760e263f808c4240a725425671eeeb7e4d)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/cpu.h    | 2 +-
- target/arm/helper.c | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_cpu_core.c | 62 +++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 30 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9526ed27cb..0dce472aae 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1263,7 +1263,7 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
-  * we store the underlying state in fpscr and just mask on read/write.
-  */
- #define FPSR_MASK 0xf800009f
--#define FPCR_MASK 0x07f79f00
-+#define FPCR_MASK 0x07ff9f00
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 993759db47..bb88a3ce4e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -113,26 +113,6 @@ const char *spapr_get_cpu_core_type(const char *cpu_type)
+     return object_class_get_name(oc);
+ }
  
- #define FPCR_FZ16   (1 << 19)   /* ARMv8.2+, FP16 flush-to-zero */
- #define FPCR_FZ     (1 << 24)   /* Flush-to-zero enable bit */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c24c66d43e..c2287c76e5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11320,6 +11320,11 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
-     int i;
-     uint32_t changed;
+-static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
+-{
+-    qemu_unregister_reset(spapr_cpu_reset, cpu);
+-    object_unparent(cpu->intc);
+-    cpu_remove_sync(CPU(cpu));
+-    object_unparent(OBJECT(cpu));
+-}
+-
+-static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+-{
+-    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+-    CPUCore *cc = CPU_CORE(dev);
+-    int i;
+-
+-    for (i = 0; i < cc->nr_threads; i++) {
+-        spapr_unrealize_vcpu(sc->threads[i]);
+-    }
+-    g_free(sc->threads);
+-}
+-
+ static bool slb_shadow_needed(void *opaque)
+ {
+     sPAPRCPUState *spapr_cpu = opaque;
+@@ -207,10 +187,34 @@ static const VMStateDescription vmstate_spapr_cpu_state = {
+     }
+ };
  
-+    /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
-+    if (!arm_feature(env, ARM_FEATURE_V8_FP16)) {
-+        val &= ~FPCR_FZ16;
++static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
++{
++    if (!sc->pre_3_0_migration) {
++        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
++    }
++    qemu_unregister_reset(spapr_cpu_reset, cpu);
++    object_unparent(cpu->intc);
++    cpu_remove_sync(CPU(cpu));
++    object_unparent(OBJECT(cpu));
++}
++
++static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
++{
++    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
++    CPUCore *cc = CPU_CORE(dev);
++    int i;
++
++    for (i = 0; i < cc->nr_threads; i++) {
++        spapr_unrealize_vcpu(sc->threads[i], sc);
++    }
++    g_free(sc->threads);
++}
++
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+-                               Error **errp)
++                               sPAPRCPUCore *sc, Error **errp)
+ {
+     CPUPPCState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
+     Error *local_err = NULL;
+ 
+     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+@@ -233,6 +237,11 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+         goto error_unregister;
+     }
+ 
++    if (!sc->pre_3_0_migration) {
++        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
++                         cpu->machine_data);
 +    }
 +
-     changed = env->vfp.xregs[ARM_VFP_FPSCR];
-     env->vfp.xregs[ARM_VFP_FPSCR] = (val & 0xffc8ffff);
-     env->vfp.vec_len = (val >> 16) & 7;
+     return;
+ 
+ error_unregister:
+@@ -272,10 +281,6 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
+     }
+ 
+     cpu->machine_data = g_new0(sPAPRCPUState, 1);
+-    if (!sc->pre_3_0_migration) {
+-        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+-                         cpu->machine_data);
+-    }
+ 
+     object_unref(obj);
+     return cpu;
+@@ -290,9 +295,6 @@ static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
+ {
+     sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+ 
+-    if (!sc->pre_3_0_migration) {
+-        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
+-    }
+     cpu->machine_data = NULL;
+     g_free(spapr_cpu);
+     object_unparent(OBJECT(cpu));
+@@ -325,7 +327,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     for (j = 0; j < cc->nr_threads; j++) {
+-        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
++        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
+         if (local_err) {
+             goto err_unrealize;
+         }
+@@ -334,7 +336,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ 
+ err_unrealize:
+     while (--j >= 0) {
+-        spapr_unrealize_vcpu(sc->threads[j]);
++        spapr_unrealize_vcpu(sc->threads[j], sc);
+     }
+ err:
+     while (--i >= 0) {
 -- 
 2.17.1
