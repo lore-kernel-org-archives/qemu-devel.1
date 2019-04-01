@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43265)
+Received: from eggs.gnu.org ([209.51.188.92]:43289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB47Z-0004Dk-6w
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:34 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB47e-0004Io-K8
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB47I-0005Fx-QG
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39580)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB47Z-0005RN-7G
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40018)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB47F-0004xG-Pz
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:14 -0400
+	id 1hB47J-0004yT-Cz
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:05:22 -0400
 Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L505h140533
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:05:01 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksqasqe4-1
+	x31L4urC140260
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:05:03 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksqasrj5-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:05:00 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:05:01 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:44 +0100
+	Mon, 1 Apr 2019 22:03:11 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:49 -0500
+Date: Mon,  1 Apr 2019 16:00:04 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-16-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 15/97] target/arm: Use fp_status_fp16 for
- do_fmpa_zpzzz_h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190401210011.16009-91-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 90/97] slirp: check sscanf result when
+ emulating ident
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +42,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, William Bowling <will@wbowling.info>, secalert@redhat.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: William Bowling <will@wbowling.info>
 
-This makes float16_muladd correctly use FZ16 not FZ.
+When emulating ident in tcp_emu, if the strchr checks passed but the
+sscanf check failed, two uninitialized variables would be copied and
+sent in the reply, so move this code inside the if(sscanf()) clause.
 
-Fixes: 6ceabaad110
-Cc: qemu-stable@nongnu.org (3.0.1)
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180810193129.1556-4-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 52a339b11d1719a6589de40606859939875fda9a)
+Signed-off-by: William Bowling <will@wbowling.info>
+Cc: qemu-stable@nongnu.org
+Cc: secalert@redhat.com
+Message-Id: <1551476756-25749-1-git-send-email-will@wbowling.info>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+(cherry picked from commit d3222975c7d6cda9e25809dea05241188457b113)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/sve_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ slirp/tcp_subr.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index e03f954a26..0f98097253 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3358,7 +3358,7 @@ static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
-                 e1 = *(uint16_t *)(vn + H1_2(i)) ^ neg1;
-                 e2 = *(uint16_t *)(vm + H1_2(i));
-                 e3 = *(uint16_t *)(va + H1_2(i)) ^ neg3;
--                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
-+                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status_f16);
-                 *(uint16_t *)(vd + H1_2(i)) = r;
-             }
-         } while (i & 63);
--- 
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 8d0f94b75f..473c8b04e6 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -662,12 +662,12 @@ tcp_emu(struct socket *so, struct mbuf *m)
+ 							break;
+ 						}
+ 					}
++					so_rcv->sb_cc =3D snprintf(so_rcv->sb_data,
++								 so_rcv->sb_datalen,
++								 "%d,%d\r\n", n1, n2);
++					so_rcv->sb_rptr =3D so_rcv->sb_data;
++					so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_cc;
+ 				}
+-                                so_rcv->sb_cc =3D snprintf(so_rcv->sb_da=
+ta,
+-                                                         so_rcv->sb_data=
+len,
+-                                                         "%d,%d\r\n", n1=
+, n2);
+-				so_rcv->sb_rptr =3D so_rcv->sb_data;
+-				so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_cc;
+ 			}
+ 			m_free(m);
+ 			return 0;
+--=20
 2.17.1
