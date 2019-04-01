@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41312)
+Received: from eggs.gnu.org ([209.51.188.92]:42229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hAvCo-0003IN-9Z
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 07:34:23 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hAvHS-0005cO-53
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 07:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hAvCn-0002AR-Co
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 07:34:22 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hAvCn-00028u-5k
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 07:34:21 -0400
-Received: by mail-wm1-f65.google.com with SMTP id w15so10973926wmc.3
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 04:34:19 -0700 (PDT)
-References: <20190329210804.22121-1-wainersm@redhat.com>
-	<20190329210804.22121-3-wainersm@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0e047167-9cc9-d837-e3a0-260a660edd1a@redhat.com>
-Date: Mon, 1 Apr 2019 13:34:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190329210804.22121-3-wainersm@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hAvHR-0006Mq-7h
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 07:39:10 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 1 Apr 2019 11:38:59 +0000
+Message-ID: <fe9d70c5-9296-a106-c1d7-7a69e18648a1@virtuozzo.com>
+References: <20190329042750.14704-1-eblake@redhat.com>
+	<20190330155704.24191-1-eblake@redhat.com>
+In-Reply-To: <20190330155704.24191-1-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] tests/vm: Port basevm to Python 3
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <81DD73CF5069D646967BD52A4B86ED88@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3.1 3.5/6] nbd/client: Reject inaccessible
+ tail of inconsistent server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: fam@euphon.net, alex.bennee@linaro.org, berrange@redhat.com, lersek@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>
 
-On 3/29/19 10:08 PM, Wainer dos Santos Moschetta wrote:
-> Fixed tests/vm/basevm.py to run with Python 3:
->  - hashlib.sha1() requires an binary encoded object.
->  - uses floor division ("//") (PEP 238).
->  - decode bytes to unicode when needed.
-> 
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  tests/vm/basevm.py | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 0556bdcf9e..083befce9f 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -85,12 +85,12 @@ class BaseVM(object):
->              if not sha256sum:
->                  return True
->              checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
-> -            return sha256sum == checksum
-> +            return sha256sum == checksum.decode()
->  
->          cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
->          if not os.path.exists(cache_dir):
->              os.makedirs(cache_dir)
-> -        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
-> +        fname = os.path.join(cache_dir, hashlib.sha1(url.encode()).hexdigest())
->          if os.path.exists(fname) and check_sha256sum(fname):
->              return fname
->          logging.debug("Downloading %s to %s...", url, fname)
-> @@ -134,7 +134,7 @@ class BaseVM(object):
->          raise NotImplementedError
->  
->      def add_source_dir(self, src_dir):
-> -        name = "data-" + hashlib.sha1(src_dir).hexdigest()[:5]
-> +        name = "data-" + hashlib.sha1(src_dir.encode()).hexdigest()[:5]
->          tarfile = os.path.join(self._tmpdir, name + ".tar")
->          logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
->          subprocess.check_call(["./scripts/archive-source.sh", tarfile],
-> @@ -204,7 +204,7 @@ def parse_args(vmcls):
->  
->      def get_default_jobs():
->          if kvm_available(vmcls.arch):
-> -            return multiprocessing.cpu_count() / 2
-> +            return multiprocessing.cpu_count() // 2
->          else:
->              return 1
->  
-> 
+MzAuMDMuMjAxOSAxODo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGhlIE5CRCBzcGVjIHN1Z2dl
+c3RzIHRoYXQgYSBzZXJ2ZXIgc2hvdWxkIG5ldmVyIGFkdmVydGlzZSBhIHNpemUNCj4gaW5jb25z
+aXN0ZW50IHdpdGggaXRzIG1pbmltdW0gYmxvY2sgYWxpZ25tZW50LCBhcyB0aGF0IHRhaWwgaXMN
+Cj4gZWZmZWN0aXZlbHkgaW5hY2Nlc3NpYmxlIHRvIGEgY29tcGxpYW50IGNsaWVudCBvYmV5aW5n
+IHRob3NlIGJsb2NrDQo+IGNvbnN0cmFpbnRzLiBTaW5jZSB3ZSBoYXZlIGEgaGFiaXQgb2Ygcm91
+bmRpbmcgdXAgcmF0aGVyIHRoYW4NCj4gdHJ1bmNhdGluZywgdG8gYXZvaWQgbG9zaW5nIHRoZSBs
+YXN0IGZldyBieXRlcyBvZiB1c2VyIGlucHV0LCBhbmQgd2UNCj4gY2Fubm90IGFjY2VzcyB0aGUg
+dGFpbCB3aGVuIHRoZSBzZXJ2ZXIgYWR2ZXJ0aXNlcyBib2d1cyBibG9jayBzaXppbmcsDQo+IGFi
+b3J0IHRoZSBjb25uZWN0aW9uIHRvIGFsZXJ0IHRoZSBzZXJ2ZXIgdG8gZml4IHRoZWlyIGJ1Zy4g
+IEFuZA0KPiByZWplY3Rpbmcgc3VjaCBzZXJ2ZXJzIG1hdGNoZXMgd2hhdCB3ZSBhbHJlYWR5IGRp
+ZCBmb3IgYSBtaW5fYmxvY2sNCj4gdGhhdCB3YXMgbm90IGEgcG93ZXIgb2YgMiBvciB3aGljaCB3
+YXMgbGFyZ2VyIHRoYW4gbWF4X2Jsb2NrLg0KPiANCj4gRG9lcyBub3QgaW1wYWN0IGVpdGhlciBx
+ZW11ICh3aGljaCBhbHdheXMgc2VuZHMgcHJvcGVybHkgYWxpZ25lZA0KPiBzaXplcykgb3IgbmJk
+a2l0ICh3aGljaCBkb2VzIG5vdCBzZW5kIG1pbmltdW0gYmxvY2sgcmVxdWlyZW1lbnRzIHlldCk7
+DQo+IHNvIHRoaXMgaXMgbW9zdGx5IGFpbWVkIGF0IG5ldyBOQkQgc2VydmVyIGltcGxlbWVudGF0
+aW9ucywgYW5kIGVuc3VyZXMNCj4gdGhhdCB0aGUgcmVzdCBvZiBvdXIgY29kZSBjYW4gYXNzdW1l
+IHRoZSBzaXplIGlzIGFsaWduZWQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxl
+Ymxha2VAcmVkaGF0LmNvbT4NCj4gTWVzc2FnZS1JZDogPDIwMTkwMzI5MTYzNDA3LjI2OTE5LTEt
+ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiANCj4gVGhpcyBpcyB0aGUgcmV3cml0ZSBvZiB0
+aGUgb3JpZ2luYWwgNy82IHRoYXQgSSBwb3N0ZWQsIHJldGl0bGVkIGFuZA0KPiBob2lzdGVkIGVh
+cmxpZXIgaW4gdGhlIHNlcmllcyAoc2luY2UgVmxhZGltaXIgd2FzIHJpZ2h0IHRoYXQgNC82DQo+
+IGRlcGVuZHMgb24gaXQpLiBJJ3ZlIGFkZGVkIHBhdGNoZXMgMS0zIHRvIG15IE5CRCBxdWV1ZSBm
+b3IgYSBwdWxsDQo+IHJlcXVlc3Qgb24gTW9uZGF5IGFzIHRoZXkgbm93IGhhdmUgUi1iOyBJJ2Qg
+bG92ZSB0byBhbHNvIGhhdmUgZW5vdWdoDQo+IHJldmlld3MgZm9yIDMuNSwgNCwgNSwgNiwgYW5k
+IGFsc28gYW5vdGhlciB0aHJlYWQgb24gZml4aW5nICdxZW11LWltZw0KPiBpbmZvJyBvdXRwdXQs
+IHRvIGluY2x1ZGUgdGhvc2UgYXMgd2VsbC4NCj4gDQo+ICAgbmJkL2NsaWVudC5jIHwgOCArKysr
+KysrKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1n
+aXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4gaW5kZXggZGU3ZGE0ODI0NmIuLjlm
+NWViNzk5MzBjIDEwMDY0NA0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4gKysrIGIvbmJkL2NsaWVu
+dC5jDQo+IEBAIC00MjYsNiArNDI2LDE0IEBAIHN0YXRpYyBpbnQgbmJkX29wdF9pbmZvX29yX2dv
+KFFJT0NoYW5uZWwgKmlvYywgdWludDMyX3Qgb3B0LA0KPiAgICAgICAgICAgICAgICAgICBuYmRf
+c2VuZF9vcHRfYWJvcnQoaW9jKTsNCj4gICAgICAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiAg
+ICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIGlmIChpbmZvLT5taW5fYmxvY2sgJiYNCj4g
+KyAgICAgICAgICAgICAgICAhUUVNVV9JU19BTElHTkVEKGluZm8tPnNpemUsIGluZm8tPm1pbl9i
+bG9jaykpIHsNCj4gKyAgICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJzZXJ2ZXIgc2l6
+ZSAlIiBQUkl1NjQgImlzIG5vdCBtdWx0aXBsZSBvZiAiDQoNCnMvc2VydmVyL2V4cG9ydC8gSSB0
+aGluaw0KDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAibWluaW11bSBibG9jayBzaXpl
+ICUiIFBSSXUzMiwgaW5mby0+c2l6ZSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIGlu
+Zm8tPm1pbl9ibG9jayk7DQo+ICsgICAgICAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlv
+Yyk7DQo+ICsgICAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgICAgICAgICAgfQ0KPiAg
+ICAgICAgICAgICAgIHRyYWNlX25iZF9yZWNlaXZlX25lZ290aWF0ZV9zaXplX2ZsYWdzKGluZm8t
+PnNpemUsIGluZm8tPmZsYWdzKTsNCj4gICAgICAgICAgICAgICBicmVhazsNCj4gDQoNClJldmll
+d2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
+by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
