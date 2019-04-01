@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56856)
+Received: from eggs.gnu.org ([209.51.188.92]:56883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hAuBy-0003LW-1i
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hAuC0-0003QX-4u
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hAuBw-0005s4-QM
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:26 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36144)
+	(envelope-from <richard.henderson@linaro.org>) id 1hAuBz-0005ua-9g
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:28 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hAuBw-0005rf-K1
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:24 -0400
-Received: by mail-pf1-x441.google.com with SMTP id z5so3326264pfn.3
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 03:29:24 -0700 (PDT)
+	id 1hAuBz-0005uF-3w
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:27 -0400
+Received: by mail-pg1-x543.google.com with SMTP id z9so4534228pgu.10
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 03:29:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  1 Apr 2019 17:29:07 +0700
-Message-Id: <20190401102911.8685-3-richard.henderson@linaro.org>
+Date: Mon,  1 Apr 2019 17:29:08 +0700
+Message-Id: <20190401102911.8685-4-richard.henderson@linaro.org>
 In-Reply-To: <20190401102911.8685-1-richard.henderson@linaro.org>
 References: <20190401102911.8685-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.1 2/6] target/s390x: Add ilen to unwind
- data
+Subject: [Qemu-devel] [PATCH for-4.1 3/6] target/s390x: Use ilen from unwind
+ in tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +32,36 @@ Cc: david@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org, Richard Henderso
 
 From: Richard Henderson <rth@twiddle.net>
 
-Use ILEN_UNWIND to signal that we have in fact that
-cpu_restore_state will have been called by the time
-we arrive in do_program_interrupt.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/cpu.h       |  4 +++-
- target/s390x/internal.h  |  2 +-
- target/s390x/interrupt.c |  7 +++++--
- target/s390x/translate.c | 10 +++++++++-
- 4 files changed, 18 insertions(+), 5 deletions(-)
+ target/s390x/mem_helper.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 6ccf41fc45..1498f3b7f4 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -44,7 +44,7 @@
- #include "exec/cpu-all.h"
- 
- #define NB_MMU_MODES 4
--#define TARGET_INSN_START_EXTRA_WORDS 1
-+#define TARGET_INSN_START_EXTRA_WORDS 2
- 
- #define MMU_MODE0_SUFFIX _primary
- #define MMU_MODE1_SUFFIX _secondary
-@@ -787,6 +787,8 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
- void s390_crw_mchk(void);
- void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
-                        uint32_t io_int_parm, uint32_t io_int_word);
-+/* instruction length set by unwind info */
-+#define ILEN_UNWIND                 0
- /* automatically detect the instruction length */
- #define ILEN_AUTO                   0xff
- #define RA_IGNORED                  0
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 3b4855c175..5f7901da5e 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -312,7 +312,7 @@ void cpu_unmap_lowcore(LowCore *lowcore);
- 
- 
- /* interrupt.c */
--void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen);
-+void trigger_pgm_exception(CPUS390XState *env, uint32_t code, int ilen);
- void cpu_inject_clock_comparator(S390CPU *cpu);
- void cpu_inject_cpu_timer(S390CPU *cpu);
- void cpu_inject_emergency_signal(S390CPU *cpu, uint16_t src_cpu_addr);
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index a17eff5ebc..901cd713de 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -21,13 +21,16 @@
- #endif
- 
- /* Ensure to exit the TB after this call! */
--void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
-+void trigger_pgm_exception(CPUS390XState *env, uint32_t code, int ilen)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 3f76a8abfd..838c32fc96 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -44,7 +44,20 @@ void tlb_fill(CPUState *cs, target_ulong addr, int size,
  {
-     CPUState *cs = CPU(s390_env_get_cpu(env));
- 
-     cs->exception_index = EXCP_PGM;
-     env->int_pgm_code = code;
--    env->int_pgm_ilen = ilen;
-+    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
-+    if (ilen != ILEN_UNWIND) {
-+        env->int_pgm_ilen = ilen;
-+    }
- }
- 
- void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index d22d0f7643..6f9cd19126 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -57,6 +57,7 @@ struct DisasContext {
-     DisasContextBase base;
-     const DisasInsn *insn;
-     DisasFields *fields;
-+    TCGOp *insn_start;
-     uint64_t ex_value;
-     /*
-      * During translate_one(), pc_tmp is used to determine the instruction
-@@ -6220,6 +6221,7 @@ static const DisasInsn *extract_insn(CPUS390XState *env, DisasContext *s,
+     int ret = s390_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+     if (unlikely(ret != 0)) {
+-        cpu_loop_exit_restore(cs, retaddr);
++        cpu_restore_state(cs, retaddr, true);
++
++        /*
++         * Note that handle_mmu_fault sets ilen to either 2 (for code)
++         * or AUTO (for data).  We can resolve AUTO now, as if it was
++         * set to UNWIND -- that will have been done via assignment
++         * in cpu_restore_state.  Otherwise re-examine access_type.
++         */
++        if (access_type == MMU_INST_FETCH) {
++            CPUS390XState *env = cs->env_ptr;
++            env->int_pgm_ilen = 2;
++        }
++
++        cpu_loop_exit(cs);
      }
-     s->pc_tmp = s->base.pc_next + ilen;
-     s->ilen = ilen;
-+    tcg_set_insn_param(s->insn_start, 2, ilen);
- 
-     /* We can't actually determine the insn format until we've looked up
-        the full insn opcode.  Which we can't do without locating the
-@@ -6455,7 +6457,12 @@ static void s390x_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-+    /*
-+     * ??? Alternately, delay emitting insn_start until after we
-+     * have computed the insn length in extract_insn.
-+     */
-+    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 0);
-+    dc->insn_start = tcg_last_op();
  }
  
- static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-@@ -6561,4 +6568,5 @@ void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
-     if ((cc_op != CC_OP_DYNAMIC) && (cc_op != CC_OP_STATIC)) {
-         env->cc_op = cc_op;
-     }
-+    env->int_pgm_ilen = data[2];
- }
 -- 
 2.17.1
