@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48173)
+Received: from eggs.gnu.org ([209.51.188.92]:50775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hAzrc-000844-01
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:32:49 -0400
+	(envelope-from <thuth@redhat.com>) id 1hB07C-0006nH-8L
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:48:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hAzra-0002Op-Rk
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:32:47 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hAzra-0002NX-Hb
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:32:46 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y197so93459wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 09:32:45 -0700 (PDT)
-Date: Mon, 1 Apr 2019 18:32:40 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190401163240.xw24ezsloy5ds2hz@steredhat>
+	(envelope-from <thuth@redhat.com>) id 1hB077-0000zs-PU
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:48:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hB077-0000yF-FZ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:48:49 -0400
+References: <20190401160849.26083-1-aruna.15@cse.mrt.ac.lk>
+	<CAH95U0gCsCE4zxHM3Lmim4jMi-pYHTPCkkOVKpCONyA5rG8_Uw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8597afaa-9bfb-d18d-a8b6-6bbab5d020ca@redhat.com>
+Date: Mon, 1 Apr 2019 18:48:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] VSOCK benchmark and optimizations
+In-Reply-To: <CAH95U0gCsCE4zxHM3Lmim4jMi-pYHTPCkkOVKpCONyA5rG8_Uw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] Header cleanups qemu_is* macros were
+ moved from qemu-common.h to qemu/cutils.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: qemu devel list <qemu-devel@nongnu.org>, netdev@vger.kernel.org
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Alex,
-I'm sending you some benchmarks and information about VSOCK CCing qemu-devel
-and linux-netdev (maybe this info could be useful for others :))
+On 01/04/2019 18.13, Aruna Jayasena wrote:
+> qemu_is* macros were moved from qemu-common.h to qemu/cutils.h
+> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+> * Description was combined with the subject of the email
+>=20
+> On Mon, 1 Apr 2019 at 21:39, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wr=
+ote:
+>=20
+>> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+>> ---
+>>  hw/core/qdev-properties.c |  1 +
+>>  include/qemu-common.h     | 11 -----------
+>>  include/qemu/cutils.h     | 12 ++++++++++++
+>>  qapi/qapi-util.c          |  2 +-
+>>  util/id.c                 |  2 +-
+>>  5 files changed, 15 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>> index 5da1439a8b..821a4ab311 100644
+>> --- a/hw/core/qdev-properties.c
+>> +++ b/hw/core/qdev-properties.c
+>> @@ -10,6 +10,7 @@
+>>  #include "qapi/visitor.h"
+>>  #include "chardev/char.h"
+>>  #include "qemu/uuid.h"
+>> +#include "qemu/cutils.h"
+>>
+>>  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>>                                    Error **errp)
+>> diff --git a/include/qemu-common.h b/include/qemu-common.h
+>> index a102245519..0066e45a6b 100644
+>> --- a/include/qemu-common.h
+>> +++ b/include/qemu-common.h
+>> @@ -33,17 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
+>>  void qemu_get_timedate(struct tm *tm, int offset);
+>>  int qemu_timedate_diff(struct tm *tm);
+>>
+>> -#define qemu_isalnum(c)                isalnum((unsigned char)(c))
+>> -#define qemu_isalpha(c)                isalpha((unsigned char)(c))
+>> -#define qemu_iscntrl(c)                iscntrl((unsigned char)(c))
+>> -#define qemu_isdigit(c)                isdigit((unsigned char)(c))
+>> -#define qemu_isgraph(c)                isgraph((unsigned char)(c))
+>> -#define qemu_islower(c)                islower((unsigned char)(c))
+>> -#define qemu_isprint(c)                isprint((unsigned char)(c))
+>> -#define qemu_ispunct(c)                ispunct((unsigned char)(c))
+>> -#define qemu_isspace(c)                isspace((unsigned char)(c))
+>> -#define qemu_isupper(c)                isupper((unsigned char)(c))
+>> -#define qemu_isxdigit(c)       isxdigit((unsigned char)(c))
+>>  #define qemu_tolower(c)                tolower((unsigned char)(c))
+>>  #define qemu_toupper(c)                toupper((unsigned char)(c))
+>>  #define qemu_isascii(c)                isascii((unsigned char)(c))
+>> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+>> index d2dad3057c..797c5bc560 100644
+>> --- a/include/qemu/cutils.h
+>> +++ b/include/qemu/cutils.h
+>> @@ -3,6 +3,18 @@
+>>
+>>  #include "qemu/fprintf-fn.h"
+>>
+>> +#define qemu_isalnum(c)    isalnum((unsigned char)(c))
+>> +#define qemu_isalpha(c)    isalpha((unsigned char)(c))
+>> +#define qemu_iscntrl(c)    iscntrl((unsigned char)(c))
+>> +#define qemu_isdigit(c)    isdigit((unsigned char)(c))
+>> +#define qemu_isgraph(c)    isgraph((unsigned char)(c))
+>> +#define qemu_islower(c)    islower((unsigned char)(c))
+>> +#define qemu_isprint(c)    isprint((unsigned char)(c))
+>> +#define qemu_ispunct(c)    ispunct((unsigned char)(c))
+>> +#define qemu_isspace(c)    isspace((unsigned char)(c))
+>> +#define qemu_isupper(c)    isupper((unsigned char)(c))
+>> +#define qemu_isxdigit(c)    isxdigit((unsigned char)(c))
 
-One of the VSOCK advantages is the simple configuration: you don't need to set
-up IP addresses for guest/host, and it can be used with the standard POSIX
-socket API. [1]
+ Hi,
 
-I'm currently working on it, so the "optimized" values are still work in
-progress and I'll send the patches upstream (Linux) as soon as possible.
-(I hope in 1 or 2 weeks)
+moving the qemu_is* macros around does not make too much sense to
+me... I've now tried to have a closer look at that BiteSizeTask,
+and it sounds to me like something different was meant here instead.
+And indeed, after looking through the QEMU history for a while, I
+spotted this commit here:
 
-Optimizations:
-+ reducing the number of credit update packets
-  - RX side sent, on every packet received, an empty packet only to inform the
-    TX side about the space in the RX buffer.
-+ increase RX buffers size to 64 KB (from 4 KB)
-+ merge packets to fill RX buffers
+ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df348b6d1a53e5271cf=
+1c9#patch81
 
-As benchmark tool I used iperf3 [2] modified with VSOCK support:
+So looks like this task has been handled in the past already and
+apparently we've forgotten to remove it from the BiteSizeTask page
+afterwards. Sorry for this, I'll remove it now...
 
-             host -> guest [Gbps]      guest -> host [Gbps]
-pkt_size    before opt.  optimized    before opt.  optimized
-  1K            0.5         1.6           1.4         1.4
-  2K            1.1         3.1           2.3         2.5
-  4K            2.0         5.6           4.2         4.4
-  8K            3.2        10.2           7.2         7.5
-  16K           6.4        14.2           9.4        11.3
-  32K           9.8        18.9           9.2        17.8
-  64K          13.8        22.9           8.8        25.0
-  128K         17.6        24.5           7.7        25.7
-  256K         19.0        24.8           8.1        25.6
-  512K         20.8        25.1           8.1        25.4
+May I suggest to you to have a look at the "avoid including files from
+include/exec/cpu-common.h" task instead? I think you could remove the
+#include "qemu/bswap.h" and #include "qemu/queue.h" lines in there withou=
+t
+too much hassle...
 
-
-How to reproduce:
-
-host$ modprobe vhost_vsock
-host$ qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=3
-      # Note: Guest CID should be >= 3
-      # (0, 1 are reserved and 2 identify the host)
-
-guest$ iperf3 --vsock -s
-
-host$ iperf3 --vsock -c 3 -l ${pkt_size}      # host -> guest
-host$ iperf3 --vsock -c 3 -l ${pkt_size} -R   # guest -> host
-
-
-If you want, I can do a similar benchmark (with iperf3) using a networking
-card (do you have a specific configuration?).
-
-Let me know if you need more details!
-
-Thanks,
-Stefano
-
-[1] https://wiki.qemu.org/Features/VirtioVsock
-[2] https://github.com/stefano-garzarella/iperf/
+ Thomas
