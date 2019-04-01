@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40578)
+Received: from eggs.gnu.org ([209.51.188.92]:40606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB444-0000wn-Ih
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:57 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44D-00014f-Dn
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB442-00039p-Tp
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59340)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44B-0003Ch-JX
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45082
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB442-00038g-G0
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:54 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1hB447-0003BE-Mo
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:01 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1ofw061892
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:53 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksw4ryr6-1
+	x31L1pc8095648
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:58 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkswegvh1-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:52 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:56 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:50 +0100
+	Mon, 1 Apr 2019 22:01:56 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:54 -0500
+Date: Mon,  1 Apr 2019 15:59:01 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-21-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 20/97] nvme: Fix nvme_init error handling
+Message-Id: <20190401210011.16009-28-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 27/97] block: iotest to catch abort on forced
+ blockjob cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,142 +40,162 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>
+Cc: qemu-stable@nongnu.org, Jeff Cody <jcody@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: Jeff Cody <jcody@redhat.com>
 
-It is wrong to leave this field as 1, as nvme_close() called in the
-error handling code in nvme_file_open() will use it and try to free
-s->queues again.
-
-Another problem is the cleaning ups are duplicated between the fail*
-labels of nvme_init() and nvme_file_open(), which calls nvme_close().
-
-A third problem is nvme_close() misses g_free() and
-event_notifier_cleanup().
-
-Fix all of them.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
-
-Message-Id: <20180712025420.4932-1-famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
-(cherry picked from commit 9582f357bb6f6573c9a452743d8f3ab41ba2e3fa)
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: df317f617fbe5affcf699cb8560e7b0c2e028a64.1534868459.git.jcody@redhat.com
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+(cherry picked from commit 26bf474ba92c76e61bea51726e22da6dfd185296)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/nvme.c | 37 ++++++++++++-------------------------
- 1 file changed, 12 insertions(+), 25 deletions(-)
+ tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/229.out | 23 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 119 insertions(+)
+ create mode 100755 tests/qemu-iotests/229
+ create mode 100644 tests/qemu-iotests/229.out
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 6f71122bf5..37805e8890 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -569,13 +569,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     s->vfio = qemu_vfio_open_pci(device, errp);
-     if (!s->vfio) {
-         ret = -EINVAL;
--        goto fail;
-+        goto out;
-     }
- 
-     s->regs = qemu_vfio_pci_map_bar(s->vfio, 0, 0, NVME_BAR_SIZE, errp);
-     if (!s->regs) {
-         ret = -EINVAL;
--        goto fail;
-+        goto out;
-     }
- 
-     /* Perform initialize sequence as described in NVMe spec "7.6.1
-@@ -585,7 +585,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     if (!(cap & (1ULL << 37))) {
-         error_setg(errp, "Device doesn't support NVMe command set");
-         ret = -EINVAL;
--        goto fail;
-+        goto out;
-     }
- 
-     s->page_size = MAX(4096, 1 << (12 + ((cap >> 48) & 0xF)));
-@@ -603,7 +603,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-                              PRId64 " ms)",
-                        timeout_ms);
-             ret = -ETIMEDOUT;
--            goto fail;
-+            goto out;
-         }
-     }
- 
-@@ -613,7 +613,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     s->queues[0] = nvme_create_queue_pair(bs, 0, NVME_QUEUE_SIZE, errp);
-     if (!s->queues[0]) {
-         ret = -EINVAL;
--        goto fail;
-+        goto out;
-     }
-     QEMU_BUILD_BUG_ON(NVME_QUEUE_SIZE & 0xF000);
-     s->regs->aqa = cpu_to_le32((NVME_QUEUE_SIZE << 16) | NVME_QUEUE_SIZE);
-@@ -633,14 +633,14 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-                              PRId64 " ms)",
-                        timeout_ms);
-             ret = -ETIMEDOUT;
--            goto fail_queue;
-+            goto out;
-         }
-     }
- 
-     ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
-                                  VFIO_PCI_MSIX_IRQ_INDEX, errp);
-     if (ret) {
--        goto fail_queue;
-+        goto out;
-     }
-     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-                            false, nvme_handle_event, nvme_poll_cb);
-@@ -649,30 +649,15 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     if (local_err) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
--        goto fail_handler;
-+        goto out;
-     }
- 
-     /* Set up command queues. */
-     if (!nvme_add_io_queue(bs, errp)) {
-         ret = -EIO;
--        goto fail_handler;
-     }
--    return 0;
--
--fail_handler:
--    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
--                           false, NULL, NULL);
--fail_queue:
--    nvme_free_queue_pair(bs, s->queues[0]);
--fail:
--    g_free(s->queues);
--    if (s->regs) {
--        qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
--    }
--    if (s->vfio) {
--        qemu_vfio_close(s->vfio);
--    }
--    event_notifier_cleanup(&s->irq_notifier);
-+out:
-+    /* Cleaning up is done in nvme_file_open() upon error. */
-     return ret;
- }
- 
-@@ -739,8 +724,10 @@ static void nvme_close(BlockDriverState *bs)
-     for (i = 0; i < s->nr_queues; ++i) {
-         nvme_free_queue_pair(bs, s->queues[i]);
-     }
-+    g_free(s->queues);
-     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-                            false, NULL, NULL);
-+    event_notifier_cleanup(&s->irq_notifier);
-     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
-     qemu_vfio_close(s->vfio);
- }
+diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
+new file mode 100755
+index 0000000000..ff851ec431
+--- /dev/null
++++ b/tests/qemu-iotests/229
+@@ -0,0 +1,95 @@
++#!/bin/bash
++#
++# Test for force canceling a running blockjob that is paused in
++# an error state.
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=jcody@redhat.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++here="$PWD"
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_qemu
++    _cleanup_test_img
++    rm -f "$TEST_IMG" "$DEST_IMG"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++# Needs backing file and backing format support
++_supported_fmt qcow2 qed
++_supported_proto file
++_supported_os Linux
++
++
++DEST_IMG="$TEST_DIR/d.$IMGFMT"
++TEST_IMG="$TEST_DIR/b.$IMGFMT"
++
++_make_test_img 2M
++
++# destination for mirror will be too small, causing error
++TEST_IMG=$DEST_IMG _make_test_img 1M
++
++$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
++
++_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'qmp_capabilities'}" \
++    'return'
++
++echo
++echo '=== Starting drive-mirror, causing error & stop  ==='
++echo
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'drive-mirror',
++                 'arguments': {'device': 'testdisk',
++                               'mode':   'absolute-paths',
++                               'format': '$IMGFMT',
++                               'target': '$DEST_IMG',
++                               'sync':   'full',
++                               'mode':   'existing',
++                               'on-source-error': 'stop',
++                               'on-target-error': 'stop' }}"    \
++     "JOB_STATUS_CHANGE.*pause"
++
++echo
++echo '=== Force cancel job paused in error state  ==='
++echo
++
++success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'block-job-cancel',
++                 'arguments': { 'device': 'testdisk',
++                                'force': true}}" \
++     "BLOCK_JOB_CANCELLED" "Assertion"
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
+new file mode 100644
+index 0000000000..4c4112805f
+--- /dev/null
++++ b/tests/qemu-iotests/229.out
+@@ -0,0 +1,23 @@
++QA output created by 229
++Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
++Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
++wrote 2097152/2097152 bytes at offset 0
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{"return": {}}
++
++=== Starting drive-mirror, causing error & stop  ===
++
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
++
++=== Force cancel job paused in error state  ===
++
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b973dc842d..743790745b 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -225,3 +225,4 @@
+ 225 rw auto quick
+ 226 auto quick
+ 227 auto quick
++229 auto quick
 -- 
 2.17.1
