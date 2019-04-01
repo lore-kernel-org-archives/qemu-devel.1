@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39788)
+Received: from eggs.gnu.org ([209.51.188.92]:60978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ayan@wavecomp.com>) id 1hAqYy-0002h6-JZ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:36:58 -0400
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAsHj-0003gM-HL
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 04:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ayan@wavecomp.com>) id 1hAqYx-0003fk-0x
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:36:56 -0400
-Received: from mail-cys01nam02on0709.outbound.protection.outlook.com
-	([2a01:111:f400:fe45::709]:39830
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ayan@wavecomp.com>) id 1hAqYw-0003el-JQ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:36:54 -0400
-From: Archer Yan <ayan@wavecomp.com>
-Date: Mon, 1 Apr 2019 06:36:51 +0000
-Message-ID: <20190401063639.18341-1-ayan@wavecomp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH] Support load kernel(vmlinux)/dtb/initrd
- separately for Boston in QEMU.
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAsHh-0002NY-5S
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 04:27:15 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
+	id 1hAsHf-0002MH-Uq
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 04:27:13 -0400
+Received: by mail-pg1-x542.google.com with SMTP id k3so4376867pga.6
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 01:27:10 -0700 (PDT)
+From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Date: Mon,  1 Apr 2019 13:56:54 +0530
+Message-Id: <20190401082655.8272-1-aruna.15@cse.mrt.ac.lk>
+Subject: [Qemu-devel] [PATCH 1/2] Header cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,316 +24,511 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Archer Yan <ayan@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 
-Currently boston in QEMU only supports boot with FIT format. Since ELF file
-can provide symbol infomation in debug, this patch enables Boston boot from
-vmlinux&dtb.
+Declarations were moved out of qemu-common.h for functions declared in utils/ files.
+This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
 
-Signed-off-by: Archer Yan <ayan@wavecomp.com>
+Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+
 ---
- hw/mips/boston.c | 224 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 201 insertions(+), 23 deletions(-)
+ include/qemu-common.h        | 6 ------
+ include/qemu/id.h            | 3 +++
+ include/qemu/iov.h           | 6 ++++++
+ include/qemu/readline.h      | 2 ++
+ util/aio-posix.c             | 1 -
+ util/aio-win32.c             | 1 -
+ util/async.c                 | 1 -
+ util/bufferiszero.c          | 1 -
+ util/compatfd.c              | 1 -
+ util/coroutine-sigaltstack.c | 1 -
+ util/coroutine-ucontext.c    | 1 -
+ util/coroutine-win32.c       | 1 -
+ util/crc32c.c                | 1 -
+ util/cutils.c                | 1 -
+ util/envlist.c               | 1 -
+ util/error.c                 | 1 -
+ util/event_notifier-posix.c  | 1 -
+ util/event_notifier-win32.c  | 1 -
+ util/fifo8.c                 | 1 -
+ util/getauxval.c             | 1 -
+ util/hexdump.c               | 2 +-
+ util/id.c                    | 1 -
+ util/iohandler.c             | 1 -
+ util/iov.c                   | 1 -
+ util/log.c                   | 1 -
+ util/module.c                | 1 -
+ util/notify.c                | 1 -
+ util/qemu-coroutine-io.c     | 1 -
+ util/qemu-coroutine.c        | 1 -
+ util/qemu-openpty.c          | 2 +-
+ util/qemu-option.c           | 1 -
+ util/qemu-progress.c         | 2 +-
+ util/qemu-thread-win32.c     | 1 -
+ util/rcu.c                   | 1 -
+ util/readline.c              | 1 -
+ util/thread-pool.c           | 1 -
+ util/uuid.c                  | 1 -
+ 37 files changed, 14 insertions(+), 39 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index e5bab3cadc..5910ffdc8a 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -39,6 +39,10 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "elf.h"
-+#include "sysemu/kvm.h"
-+#include "hw/mips/mips.h"
-+#include "qemu/option.h"
-=20
- #include <libfdt.h>
-=20
-@@ -58,6 +62,11 @@ typedef struct {
-=20
-     hwaddr kernel_entry;
-     hwaddr fdt_base;
-+    long kernel_size;
-+
-+    uint64_t initrd_size;
-+    uint64_t initrd_start;
-+    uint64_t initrd_offset;
- } BostonState;
-=20
- enum boston_plat_reg {
-@@ -328,31 +337,59 @@ static void gen_firmware(uint32_t *p, hwaddr kernel_e=
-ntry, hwaddr fdt_addr,
-     stl_p(p++, 0x03200009);                     /* jr   $25 */
- }
-=20
--static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
--                                     const void *match_data, hwaddr *load_=
-addr)
-+typedef uint64_t (*xlate_to_kseg0)(void *, uint64_t);
-+static xlate_to_kseg0 get_xlate_to_kseg0_fn(BostonState *s)
-+{
-+    /* Check where the kernel has been linked */
-+    if (s->kernel_entry & 0x80000000ll) {
-+        if (kvm_enabled()) {
-+            error_report("KVM guest kernels must be linked in useg. "
-+                         "Did you forget to enable CONFIG_KVM_GUEST?");
-+            return NULL;
-+        }
-+        return cpu_mips_phys_to_kseg0;
-+    } else {
-+        /* if kernel entry is in useg it is probably a KVM T&E kernel */
-+        mips_um_ksegs_enable();
-+        return cpu_mips_kvm_um_phys_to_kseg0;
-+    }
-+}
-+
-+/*Adapt fdt to insert initrd parameters*/
-+static int boston_initrd_fdt(BostonState *s, void *fdt)
- {
--    BostonState *s =3D BOSTON(opaque);
--    MachineState *machine =3D s->mach;
-     const char *cmdline;
-+    char *args_str =3D NULL;
-+    MachineState *machine =3D s->mach;
-+    int initrd_args_len =3D 64;
-     int err;
--    void *fdt;
--    size_t fdt_sz, ram_low_sz, ram_high_sz;
-+    size_t ram_low_sz, ram_high_sz;
-+    uint64_t (*xlate_to_kseg0_fn) (void *opaque, uint64_t addr);
-=20
--    fdt_sz =3D fdt_totalsize(fdt_orig) * 2;
--    fdt =3D g_malloc0(fdt_sz);
-+    cmdline =3D (machine->kernel_cmdline && machine->kernel_cmdline[0])
-+            ? machine->kernel_cmdline : " ";
-+    xlate_to_kseg0_fn =3D get_xlate_to_kseg0_fn(s);
-+    if (NULL =3D=3D xlate_to_kseg0_fn) {
-+        fprintf(stderr, "couldn't get xlate_to_kseg0\n");
-+        return -1;
-+    }
-=20
--    err =3D fdt_open_into(fdt_orig, fdt, fdt_sz);
--    if (err) {
--        fprintf(stderr, "unable to open FDT\n");
--        return NULL;
-+    s->initrd_start =3D xlate_to_kseg0_fn(NULL, s->initrd_offset);
-+
-+    if (s->initrd_size) {
-+        args_str =3D g_malloc(strlen(cmdline) + initrd_args_len);
-+        if (args_str !=3D NULL) {
-+            sprintf((char *)args_str, "rd_start=3D0x%lx rd_size=3D0x%lx %s=
-",
-+                    s->initrd_start, s->initrd_size, cmdline);
-+            cmdline =3D args_str;
-+        }
-     }
-=20
--    cmdline =3D (machine->kernel_cmdline && machine->kernel_cmdline[0])
--            ? machine->kernel_cmdline : " ";
-     err =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-     if (err < 0) {
-         fprintf(stderr, "couldn't set /chosen/bootargs\n");
--        return NULL;
-+        g_free(args_str);
-+        return -1;
-     }
-=20
-     ram_low_sz =3D MIN(256 * MiB, machine->ram_size);
-@@ -360,10 +397,41 @@ static const void *boston_fdt_filter(void *opaque, co=
-nst void *fdt_orig,
-     qemu_fdt_setprop_sized_cells(fdt, "/memory@0", "reg",
-                                  1, 0x00000000, 1, ram_low_sz,
-                                  1, 0x90000000, 1, ram_high_sz);
-+    g_free(args_str);
-+    return 0;
-+}
-=20
--    fdt =3D g_realloc(fdt, fdt_totalsize(fdt));
--    qemu_fdt_dumpdtb(fdt, fdt_sz);
-+static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
-+                                     const void *match_data, hwaddr *load_=
-addr)
-+{
-+    BostonState *s =3D BOSTON(opaque);
-+    MachineState *machine =3D s->mach;
-+    int err;
-+    void *fdt;
-+    int fdt_sz;
-+    if (machine->dtb) {
-+        /*Use QEMU cmd specified dtb*/
-+        fdt =3D load_device_tree(machine->dtb, &fdt_sz);
-+    } else {
-+        /*Use default dtb contained in FIT image*/
-+        fdt_sz =3D fdt_totalsize(fdt_orig) * 2;
-+        fdt =3D g_malloc0(fdt_sz);
-+
-+        err =3D fdt_open_into(fdt_orig, fdt, fdt_sz);
-+        if (err) {
-+            fprintf(stderr, "unable to open FDT\n");
-+            return NULL;
-+        }
-+
-+        fdt =3D g_realloc(fdt, fdt_totalsize(fdt));
-+    }
-=20
-+    err =3D boston_initrd_fdt(s, fdt);
-+    if (err) {
-+        return NULL;
-+    }
-+
-+    qemu_fdt_dumpdtb(fdt, fdt_sz);
-     s->fdt_base =3D *load_addr;
-=20
-     return fdt;
-@@ -391,6 +459,99 @@ static const struct fit_loader boston_fit_loader =3D {
-     .kernel_filter =3D boston_kernel_filter,
- };
-=20
-+static int boston_load_dtb(BostonState *s)
-+{
-+    void *fdt =3D NULL;
-+    int size =3D 0;
-+    int err;
-+    MachineState *machine =3D s->mach;
-+    hwaddr load_addr;
-+    hwaddr kernel_end =3D 0xffffffff80100000 + s->kernel_size;
-+
-+    fdt =3D load_device_tree(machine->dtb, &size);
-+    if (!fdt) {
-+        fprintf(stderr, "Couldn't open dtb file %s\n", machine->dtb);
-+        return -1;
-+    }
-+    load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
-+    err =3D boston_initrd_fdt(s, fdt);
-+    if (err) {
-+        return -1;
-+    }
-+
-+    qemu_fdt_dumpdtb(fdt, size);
-+
-+    s->fdt_base =3D load_addr;
-+    load_addr =3D cpu_mips_kseg0_to_phys(s, load_addr);
-+    rom_add_blob_fixed("fdt@boston", fdt, size, load_addr);
-+
-+    return 0;
-+
-+}
-+
-+static int boston_load_initrd(BostonState *s)
-+{
-+    int64_t initrd_size =3D 0;
-+    ram_addr_t initrd_offset =3D 0;
-+    int ram_low_size;
-+    MachineState *machine =3D s->mach;
-+    ram_low_size =3D MIN(machine->ram_size, 256 * MiB);
-+    if (machine->initrd_filename) {
-+        initrd_size =3D get_image_size(machine->initrd_filename);
-+        if (initrd_size > 0) {
-+            /*
-+             * The kernel allocates the bootmap memory in the low memory a=
-fter
-+             *  the initrd.  It takes at most 128kiB for 2GB RAM and 4kiB
-+             *  pages.
-+             */
-+            initrd_offset =3D (ram_low_size - initrd_size
-+                             - (128 * KiB)
-+                             - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
-+
-+            initrd_size =3D load_image_targphys(machine->initrd_filename,
-+                                              initrd_offset,
-+                                              ram_size - initrd_offset);
-+        }
-+        if (initrd_size =3D=3D (target_ulong) -1) {
-+            error_report("could not load initial ram disk '%s'",
-+                         machine->initrd_filename);
-+            return -1;
-+        }
-+    }
-+    s->initrd_offset =3D initrd_offset;
-+    s->initrd_size =3D initrd_size;
-+    return 0;
-+}
-+
-+static int boston_load_kernel(BostonState *s)
-+{
-+    int64_t kernel_entry, kernel_high;
-+    long kernel_size;
-+    int big_endian;
-+    MachineState *machine =3D s->mach;
-+
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    big_endian =3D 1;
-+#else
-+    big_endian =3D 0;
-+#endif
-+
-+    kernel_size =3D load_elf(machine->kernel_filename, NULL,
-+                           cpu_mips_kseg0_to_phys,  NULL,
-+                           (uint64_t *)&kernel_entry, NULL,
-+                           (uint64_t *)&kernel_high, big_endian, EM_MIPS, =
-1, 0);
-+    if (kernel_size < 0) {
-+        error_report("could not load kernel '%s': %s",
-+                     machine->kernel_filename,
-+                     load_elf_strerror(kernel_size));
-+        return -1;
-+    }
-+
-+    s->kernel_entry =3D kernel_entry;
-+    s->kernel_size =3D kernel_size;
-+    return 0;
-+}
-+
- static inline XilinxPCIEHost *
- xilinx_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
-                  hwaddr cfg_base, uint64_t cfg_size,
-@@ -433,7 +594,7 @@ static void boston_mach_init(MachineState *machine)
-     PCIDevice *ahci;
-     DriveInfo *hd[6];
-     Chardev *chr;
--    int fw_size, fit_err;
-+    int fw_size, load_err;
-     bool is_64b;
-=20
-     if ((machine->ram_size % GiB) ||
-@@ -533,12 +694,29 @@ static void boston_mach_init(MachineState *machine)
-             exit(1);
-         }
-     } else if (machine->kernel_filename) {
--        fit_err =3D load_fit(&boston_fit_loader, machine->kernel_filename,=
- s);
--        if (fit_err) {
--            error_printf("unable to load FIT image\n");
--            exit(1);
-+        if (machine->initrd_filename) {
-+            load_err =3D boston_load_initrd(s);
-+            if (load_err) {
-+                error_printf("unable to separately load initrd image\n");
-+                exit(1);
-+            }
-+        }
-+        load_err =3D load_fit(&boston_fit_loader, machine->kernel_filename=
-, s);
-+        if (load_err) {
-+            error_printf("unable to load FIT image, try load as ELF\n");
-+            load_err =3D boston_load_kernel(s);
-+            if (load_err) {
-+                error_printf("unable to separately load kernel image\n");
-+                exit(1);
-+            }
-+            if (machine->dtb) {
-+                load_err =3D boston_load_dtb(s);
-+                if (load_err) {
-+                    error_printf("unable to separately load dtb image\n");
-+                    exit(1);
-+                }
-+            }
-         }
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index a102245519..9543c469b6 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -141,12 +141,6 @@ int os_parse_cmd_args(int index, const char *optarg);
+ 
+ #include "qemu/module.h"
+ 
+-/*
+- * Hexdump a buffer to a file. An optional string prefix is added to every line
+- */
 -
-         gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
-                      s->kernel_entry, s->fdt_base, is_64b);
-     } else if (!qtest_enabled()) {
---=20
+-void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+-
+ /*
+  * helper to parse debug environment variables
+  */
+diff --git a/include/qemu/id.h b/include/qemu/id.h
+index 40c70103e4..3a651fb9d2 100644
+--- a/include/qemu/id.h
++++ b/include/qemu/id.h
+@@ -1,6 +1,9 @@
+ #ifndef QEMU_ID_H
+ #define QEMU_ID_H
+ 
++#define qemu_isalnum(c)		isalnum((unsigned char)(c))
++#define qemu_isalpha(c)		isalpha((unsigned char)(c))
++
+ typedef enum IdSubSystems {
+     ID_QDEV,
+     ID_BLOCK,
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+index 48b45987b7..84a4007165 100644
+--- a/include/qemu/iov.h
++++ b/include/qemu/iov.h
+@@ -108,6 +108,12 @@ ssize_t iov_send_recv(int sockfd, const struct iovec *iov, unsigned iov_cnt,
+ void iov_hexdump(const struct iovec *iov, const unsigned int iov_cnt,
+                  FILE *fp, const char *prefix, size_t limit);
+ 
++/*
++ * Hexdump a buffer to a file. An optional string prefix is added to every line
++ */
++void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
++
++
+ /*
+  * Partial copy of vector from iov to dst_iov (data is not copied).
+  * dst_iov overlaps iov at a specified offset.
+diff --git a/include/qemu/readline.h b/include/qemu/readline.h
+index e81258322b..4cbf7ead5a 100644
+--- a/include/qemu/readline.h
++++ b/include/qemu/readline.h
+@@ -1,6 +1,8 @@
+ #ifndef READLINE_H
+ #define READLINE_H
+ 
++#define qemu_isspace(c)		isspace((unsigned char)(c))
++
+ #define READLINE_CMD_BUF_SIZE 4095
+ #define READLINE_MAX_CMDS 64
+ #define READLINE_MAX_COMPLETIONS 256
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 6fbfa7924f..e36c76c4e0 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "block/block.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/sockets.h"
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index a23b9c364d..f270005422 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -16,7 +16,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "block/block.h"
+ #include "qemu/queue.h"
+ #include "qemu/sockets.h"
+diff --git a/util/async.c b/util/async.c
+index c10642a385..8d2105729c 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -25,7 +25,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "block/aio.h"
+ #include "block/thread-pool.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/bufferiszero.c b/util/bufferiszero.c
+index 2178d8ab9d..bfb2605466 100644
+--- a/util/bufferiszero.c
++++ b/util/bufferiszero.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/bswap.h"
+ 
+diff --git a/util/compatfd.c b/util/compatfd.c
+index 980bd33e52..c296f55d14 100644
+--- a/util/compatfd.c
++++ b/util/compatfd.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ 
+ #include <sys/syscall.h>
+diff --git a/util/coroutine-sigaltstack.c b/util/coroutine-sigaltstack.c
+index f6fc49a0e5..7d3ee49943 100644
+--- a/util/coroutine-sigaltstack.c
++++ b/util/coroutine-sigaltstack.c
+@@ -27,7 +27,6 @@
+ #endif
+ #include "qemu/osdep.h"
+ #include <pthread.h>
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ typedef struct {
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index 090ba21a13..bd593e61bc 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -24,7 +24,6 @@
+ #endif
+ #include "qemu/osdep.h"
+ #include <ucontext.h>
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ #ifdef CONFIG_VALGRIND_H
+diff --git a/util/coroutine-win32.c b/util/coroutine-win32.c
+index de6bd4fd3e..c196f956d2 100644
+--- a/util/coroutine-win32.c
++++ b/util/coroutine-win32.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ typedef struct
+diff --git a/util/crc32c.c b/util/crc32c.c
+index 7e99555c16..762657d853 100644
+--- a/util/crc32c.c
++++ b/util/crc32c.c
+@@ -26,7 +26,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/crc32c.h"
+ 
+ /*
+diff --git a/util/cutils.c b/util/cutils.c
+index e098debdc0..a157aafa55 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+ 
+diff --git a/util/envlist.c b/util/envlist.c
+index 1eeb7fca87..2bcc13f094 100644
+--- a/util/envlist.c
++++ b/util/envlist.c
+@@ -1,5 +1,4 @@
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "qemu/envlist.h"
+ 
+diff --git a/util/error.c b/util/error.c
+index 934a78e1b1..dc42e9398f 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -14,7 +14,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/error-report.h"
+ 
+ struct Error
+diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
+index 73c4046b58..4a379ffe4a 100644
+--- a/util/event_notifier-posix.c
++++ b/util/event_notifier-posix.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/event_notifier-win32.c b/util/event_notifier-win32.c
+index 62c53b0a99..9352da4699 100644
+--- a/util/event_notifier-win32.c
++++ b/util/event_notifier-win32.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/main-loop.h"
+ 
+diff --git a/util/fifo8.c b/util/fifo8.c
+index d38b3bdaa5..a9aa20a9f7 100644
+--- a/util/fifo8.c
++++ b/util/fifo8.c
+@@ -13,7 +13,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/fifo8.h"
+ 
+ void fifo8_create(Fifo8 *fifo, uint32_t capacity)
+diff --git a/util/getauxval.c b/util/getauxval.c
+index 0b3bae2dcb..36afdfb9e6 100644
+--- a/util/getauxval.c
++++ b/util/getauxval.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ 
+ #ifdef CONFIG_GETAUXVAL
+ /* Don't inline this in qemu/osdep.h, because pulling in <sys/auxv.h> for
+diff --git a/util/hexdump.c b/util/hexdump.c
+index f879ff0ad6..4917696a08 100644
+--- a/util/hexdump.c
++++ b/util/hexdump.c
+@@ -14,7 +14,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/hexdump.h"
+ 
+ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size)
+ {
+diff --git a/util/id.c b/util/id.c
+index 6141352955..834bb4ecd1 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/id.h"
+ 
+ bool id_wellformed(const char *id)
+diff --git a/util/iohandler.c b/util/iohandler.c
+index 623b55b9ec..bece8825dc 100644
+--- a/util/iohandler.c
++++ b/util/iohandler.c
+@@ -24,7 +24,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "block/aio.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/iov.c b/util/iov.c
+index 74e6ca8ed7..41434beaca 100644
+--- a/util/iov.c
++++ b/util/iov.c
+@@ -17,7 +17,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/iov.h"
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+diff --git a/util/log.c b/util/log.c
+index c0dbbd4700..1d1b33f7d9 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -18,7 +18,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/log.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+diff --git a/util/module.c b/util/module.c
+index 1259dd3686..142db7e911 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #ifdef CONFIG_MODULES
+ #include <gmodule.h>
+ #endif
+diff --git a/util/notify.c b/util/notify.c
+index 06de63a839..aee8d93cb0 100644
+--- a/util/notify.c
++++ b/util/notify.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/notify.h"
+ 
+ void notifier_list_init(NotifierList *list)
+diff --git a/util/qemu-coroutine-io.c b/util/qemu-coroutine-io.c
+index 44a8969a69..9c393bc8a9 100644
+--- a/util/qemu-coroutine-io.c
++++ b/util/qemu-coroutine-io.c
+@@ -23,7 +23,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/sockets.h"
+ #include "qemu/coroutine.h"
+ #include "qemu/iov.h"
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 2295928d33..c3caa6c770 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -14,7 +14,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "trace.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/atomic.h"
+ #include "qemu/coroutine.h"
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..07642e6cc6 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -33,7 +33,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/qemu-openpty.h"
+ 
+ #if defined(__GLIBC__)
+ # include <pty.h>
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index ef60af70fc..97172b5eaa 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -26,7 +26,6 @@
+ #include "qemu/osdep.h"
+ 
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..ad355f9241 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -23,7 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/qemu-progress.h"
+ 
+ struct progress_state {
+     float current;
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 572f88535d..d176943a27 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -12,7 +12,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+ #include "qemu-thread-common.h"
+diff --git a/util/rcu.c b/util/rcu.c
+index 5676c22bd1..177a675619 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/rcu.h"
+ #include "qemu/atomic.h"
+ #include "qemu/thread.h"
+diff --git a/util/readline.c b/util/readline.c
+index ec91ee0fea..f3d8b0698a 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
+ #include "qemu/cutils.h"
+ 
+diff --git a/util/thread-pool.c b/util/thread-pool.c
+index 610646d131..4ed9b89ab2 100644
+--- a/util/thread-pool.c
++++ b/util/thread-pool.c
+@@ -15,7 +15,6 @@
+  * GNU GPL, version 2 or (at your option) any later version.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "qemu/thread.h"
+ #include "qemu/coroutine.h"
+diff --git a/util/uuid.c b/util/uuid.c
+index 5787f0978c..b1108dde78 100644
+--- a/util/uuid.c
++++ b/util/uuid.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/uuid.h"
+ #include "qemu/bswap.h"
+ 
+-- 
 2.17.1
