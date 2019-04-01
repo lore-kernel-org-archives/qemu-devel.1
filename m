@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44652)
+Received: from eggs.gnu.org ([209.51.188.92]:44932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAtDQ-0002Gw-GL
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:26:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hAtEZ-0003BR-4f
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAtDP-0006fk-7X
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:26:52 -0400
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon, 1 Apr 2019 09:26:43 +0000
-Message-ID: <f8fc8749-00bd-f2dc-b993-c5535d13148b@virtuozzo.com>
-References: <1553866154-257311-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1553866154-257311-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<d556cecc-f3e4-a1f8-0cdb-3aa48ea0131c@virtuozzo.com>
-In-Reply-To: <d556cecc-f3e4-a1f8-0cdb-3aa48ea0131c@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F74D2E5D1123DF4CBC05517E72347E71@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1hAtEX-0007BY-NU
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:28:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40208)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hAtEX-0007BB-CK
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:28:01 -0400
+Date: Mon, 1 Apr 2019 10:27:49 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190401092748.GB2606@work-vm>
+References: <20190401090827.20793-1-armbru@redhat.com>
+	<20190401090827.20793-3-armbru@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: include base when checking
- image chain for block allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190401090827.20793-3-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] Revert "migration: move
+ only_migratable to MigrationState"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,121 +28,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, peterx@redhat.com, quintela@redhat.com, kwolf@redhat.com, imammedo@redhat.com
 
-DQoNCk9uIDI5LzAzLzIwMTkgMTk6MjQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3Jv
-dGU6DQo+IDI5LjAzLjIwMTkgMTY6MjksIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4gQSBj
-YWxsZXIgb2YgdGhlIGZ1bmN0aW9uIGJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlKCkgbWF5IHdhbnQg
-dG8NCj4+IGluY2x1ZGUgdGhlIGJhc2Ugbm9kZSBpbiB0aGUgc2VhcmNoLiBJdCBpcyB1c2VmdWwg
-d2hlbiB3ZSBoYXZlDQo+PiBwYXJhbGxlbCBjb21taXQvc3RyZWFtIGpvYnMgb24gdGhlIHNhbWUg
-YmFja2luZyBpbWFnZSBjaGFpbi4gVGhlDQo+PiBiYXNlIG5vZGUgbWF5IGJlIGEgdG9wIG9uZSBv
-ZiBhIHBhcmFsbGVsIGpvYiBhdCB0aGUgc2FtZSB0aW1lDQo+PiBhbmQgZ28gYXdheSBiZWZvcmUg
-dGhlIGZpcnN0IGpvYiBjb21wbGV0ZWQuIEluc3RlYWQgb2YgYmFzZSwgcGFzcw0KPj4gdGhlIG5v
-ZGUgdGhhdCBoYXMgdGhlIGJhc2UgYXMgaXRzIGJhY2tpbmcgb25lIHRvIHRoZSBuZXcgZnVuY3Rp
-b24NCj4+IGJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlX2luY2x1c2l2ZSgpIHRvIG1hbmFnZSB0aGUg
-aXNzdWUuDQo+IA0KPiBJIHRoaW5rIGl0IHdvdWxkIGJlIGVub3VnaCB0byBzYXkgdGhhdCBpdCBi
-ZSB1c2VkIGluIGZvbGxvd2luZyBwYXRjaA0KPiB0byBkcm9wIGRlcGVuZGVuY2Ugb24gYmFzZSBm
-cm9tIGJsb2NrLXN0cmVhbSBqb2IuDQo+IA0KPj4NCj4+IFN1Z2dlc3RlZC1ieTogVmxhZGltaXIg
-U2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gU2lnbmVk
-LW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5j
-b20+DQo+PiAtLS0NCj4+ICAgIGJsb2NrL2lvLmMgICAgICAgICAgICB8IDM5ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKystLS0tLQ0KPj4gICAgaW5jbHVkZS9ibG9jay9ibG9jay5o
-IHwgIDUgKysrKy0NCj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMzggaW5zZXJ0aW9ucygrKSwgNiBk
-ZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMN
-Cj4+IGluZGV4IGRmYzE1M2IuLjhiMjczZTUgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9pby5jDQo+
-PiArKysgYi9ibG9jay9pby5jDQo+PiBAQCAtMjMxNyw3ICsyMzE3LDggQEAgaW50IGNvcm91dGlu
-ZV9mbiBiZHJ2X2lzX2FsbG9jYXRlZChCbG9ja0RyaXZlclN0YXRlICpicywgaW50NjRfdCBvZmZz
-ZXQsDQo+PiAgICAgKiBHaXZlbiBhbiBpbWFnZSBjaGFpbjogLi4uIC0+IFtCQVNFXSAtPiBbSU5U
-RVIxXSAtPiBbSU5URVIyXSAtPiBbVE9QXQ0KPj4gICAgICoNCj4+ICAgICAqIFJldHVybiB0cnVl
-IGlmIChhIHByZWZpeCBvZikgdGhlIGdpdmVuIHJhbmdlIGlzIGFsbG9jYXRlZCBpbiBhbnkgaW1h
-Z2UNCj4+IC0gKiBiZXR3ZWVuIEJBU0UgYW5kIFRPUCAoaW5jbHVzaXZlKS4gIEJBU0UgY2FuIGJl
-IE5VTEwgdG8gY2hlY2sgaWYgdGhlIGdpdmVuDQo+PiArICogYmV0d2VlbiBCQVNFIGFuZCBUT1Ag
-KFRPUCBpbmNsdWRlZCkuIFRvIGNoZWNrIHRoZSBCQVNFIGltYWdlLCBzZXQgdGhlDQo+PiArICog
-J2Jhc2VfaW5jbHVkZWQnIHRvICd0cnVlJy4gVGhlIEJBU0UgY2FuIGJlIE5VTEwgdG8gY2hlY2sg
-aWYgdGhlIGdpdmVuDQo+PiAgICAgKiBvZmZzZXQgaXMgYWxsb2NhdGVkIGluIGFueSBpbWFnZSBv
-ZiB0aGUgY2hhaW4uICBSZXR1cm4gZmFsc2Ugb3RoZXJ3aXNlLA0KPj4gICAgICogb3IgbmVnYXRp
-dmUgZXJybm8gb24gZmFpbHVyZS4NCj4+ICAgICAqDQo+PiBAQCAtMjMyOSwxNiArMjMzMCwyMSBA
-QCBpbnQgY29yb3V0aW5lX2ZuIGJkcnZfaXNfYWxsb2NhdGVkKEJsb2NrRHJpdmVyU3RhdGUgKmJz
-LCBpbnQ2NF90IG9mZnNldCwNCj4+ICAgICAqIGJ1dCAncG51bScgd2lsbCBvbmx5IGJlIDAgd2hl
-biBlbmQgb2YgZmlsZSBpcyByZWFjaGVkLg0KPj4gICAgICoNCj4+ICAgICAqLw0KPj4gLWludCBi
-ZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZShCbG9ja0RyaXZlclN0YXRlICp0b3AsDQo+PiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+PiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGludDY0X3Qgb2Zmc2V0LCBpbnQ2NF90IGJ5dGVzLCBpbnQ2
-NF90ICpwbnVtKQ0KPj4gK3N0YXRpYyBpbnQgYmRydl9kb19pc19hbGxvY2F0ZWRfYWJvdmUoQmxv
-Y2tEcml2ZXJTdGF0ZSAqdG9wLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYmFzZSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIGJvb2wgYmFzZV9pbmNsdWRlZCwgaW50NjRfdCBvZmZzZXQsDQo+PiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IGJ5dGVzLCBpbnQ2
-NF90ICpwbnVtKQ0KPj4gICAgew0KPj4gICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmludGVybWVk
-aWF0ZTsNCj4+ICAgICAgICBpbnQgcmV0Ow0KPj4gICAgICAgIGludDY0X3QgbiA9IGJ5dGVzOw0K
-Pj4gKyAgICBib29sIGV4aXRfbG9vcCA9IHRvcCA9PSBiYXNlID8gdHJ1ZSA6IGZhbHNlOw0KPj4g
-KyAgICAvKiBTYW5pdHkgY2hlY2sgKi8NCj4+ICsgICAgYmFzZV9pbmNsdWRlZCA9IGJhc2UgPyBi
-YXNlX2luY2x1ZGVkIDogZmFsc2U7DQo+PiArICAgIGJvb2wgaW5jbHVkZV9ub2RlID0gdG9wID09
-IGJhc2UgPyBiYXNlX2luY2x1ZGVkIDogdHJ1ZTsNCj4+ICAgIA0KPj4gICAgICAgIGludGVybWVk
-aWF0ZSA9IHRvcDsNCj4+IC0gICAgd2hpbGUgKGludGVybWVkaWF0ZSAmJiBpbnRlcm1lZGlhdGUg
-IT0gYmFzZSkgew0KPj4gKyAgICB3aGlsZSAoaW50ZXJtZWRpYXRlICYmIGluY2x1ZGVfbm9kZSkg
-ew0KPj4gICAgICAgICAgICBpbnQ2NF90IHBudW1faW50ZXI7DQo+PiAgICAgICAgICAgIGludDY0
-X3Qgc2l6ZV9pbnRlcjsNCj4+ICAgIA0KPj4gQEAgLTIzNjEsMTIgKzIzNjcsMzUgQEAgaW50IGJk
-cnZfaXNfYWxsb2NhdGVkX2Fib3ZlKEJsb2NrRHJpdmVyU3RhdGUgKnRvcCwNCj4+ICAgICAgICAg
-ICAgfQ0KPj4gICAgDQo+PiAgICAgICAgICAgIGludGVybWVkaWF0ZSA9IGJhY2tpbmdfYnMoaW50
-ZXJtZWRpYXRlKTsNCj4+ICsgICAgICAgIGluY2x1ZGVfbm9kZSA9IGludGVybWVkaWF0ZSAhPSBi
-YXNlOw0KPj4gKyAgICAgICAgaWYgKGV4aXRfbG9vcCkgew0KPj4gKyAgICAgICAgICAgIGluY2x1
-ZGVfbm9kZSA9IGZhbHNlOw0KPj4gKyAgICAgICAgfSBlbHNlIGlmICghaW5jbHVkZV9ub2RlICYm
-IGJhc2VfaW5jbHVkZWQpIHsNCj4+ICsgICAgICAgICAgICAvKiBJdGVyYXRlIG9uY2UgbW9yZSAq
-Lw0KPj4gKyAgICAgICAgICAgIGluY2x1ZGVfbm9kZSA9IHRydWU7DQo+PiArICAgICAgICAgICAg
-ZXhpdF9sb29wID0gdHJ1ZTsNCj4+ICsgICAgICAgIH0NCj4gDQo+IGhvdyBhYm91dCB0aGlzLCB3
-aXRob3V0IGFkZGl0aW9uYWwgdmFyaWFibGVzOg0KDQpVbmZvcnR1bmF0ZWx5LCA5IHRlc3QgY2Fz
-ZXMgZG8gbm90IHBhc3MgaW4gdGhlIGZpbGUgMDMwLg0KDQo+IA0KPiAtaW50IGJkcnZfaXNfYWxs
-b2NhdGVkX2Fib3ZlKEJsb2NrRHJpdmVyU3RhdGUgKnRvcCwNCj4gLSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNlLA0KPiAtICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGludDY0X3Qgb2Zmc2V0LCBpbnQ2NF90IGJ5dGVzLCBpbnQ2NF90ICpwbnVtKQ0K
-PiArc3RhdGljIGludCBiZHJ2X2RvX2lzX2FsbG9jYXRlZF9hYm92ZShCbG9ja0RyaXZlclN0YXRl
-ICp0b3AsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJp
-dmVyU3RhdGUgKmJhc2UsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGJvb2wgYmFzZV9pbmNsdWRlZCwgaW50NjRfdCBvZmZzZXQsDQo+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGludDY0X3QgYnl0ZXMsIGludDY0X3QgKnBudW0pDQo+ICAg
-IHsNCj4gICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmludGVybWVkaWF0ZTsNCj4gICAgICAgIGlu
-dCByZXQ7DQo+ICAgICAgICBpbnQ2NF90IG4gPSBieXRlczsNCj4gDQo+ICAgICAgICBpbnRlcm1l
-ZGlhdGUgPSB0b3A7DQo+IC0gICAgd2hpbGUgKGludGVybWVkaWF0ZSAmJiBpbnRlcm1lZGlhdGUg
-IT0gYmFzZSkgew0KPiArICAgIHdoaWxlIChiYXNlX2luY2x1ZGVkIHx8IGludGVybWVkaWF0ZSAh
-PSBiYXNlKSB7DQo+ICAgICAgICAgICAgaW50NjRfdCBwbnVtX2ludGVyOw0KPiAgICAgICAgICAg
-IGludDY0X3Qgc2l6ZV9pbnRlcjsNCj4gDQo+IEBAIC0yMzYwLDYgKzIzNjEsMTEgQEAgaW50IGJk
-cnZfaXNfYWxsb2NhdGVkX2Fib3ZlKEJsb2NrRHJpdmVyU3RhdGUgKnRvcCwNCj4gICAgICAgICAg
-ICAgICAgbiA9IHBudW1faW50ZXI7DQo+ICAgICAgICAgICAgfQ0KPiANCj4gKyAgICAgICAgaWYg
-KGludGVybWVkaWF0ZSA9PSBiYXNlKSB7DQo+ICsgICAgICAgICAgICBhc3NlcnQoIWJhc2VfaW5j
-bHVkZWQpOw0KPiArICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgIH0NCj4gKw0KPiAgICAg
-ICAgICAgIGludGVybWVkaWF0ZSA9IGJhY2tpbmdfYnMoaW50ZXJtZWRpYXRlKTsNCj4gICAgICAg
-IH0NCj4gDQo+IA0KPiANCj4+ICAgICAgICB9DQo+PiAgICANCj4+ICAgICAgICAqcG51bSA9IG47
-DQo+PiAgICAgICAgcmV0dXJuIDA7DQo+PiAgICB9DQo+PiAgICANCj4+ICtpbnQgYmRydl9pc19h
-bGxvY2F0ZWRfYWJvdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLA0KPj4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNlLA0KPj4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcywgaW50NjRfdCAqcG51
-bSkNCj4+ICt7DQo+PiArICAgIHJldHVybiBiZHJ2X2RvX2lzX2FsbG9jYXRlZF9hYm92ZSh0b3As
-IGJhc2UsIGZhbHNlLCBvZmZzZXQsIGJ5dGVzLCBwbnVtKTsNCj4+ICt9DQo+PiArDQo+PiAraW50
-IGJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlX2luY2x1c2l2ZShCbG9ja0RyaXZlclN0YXRlICp0b3As
-DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0
-YXRlICpiYXNlLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50
-NjRfdCBvZmZzZXQsIGludDY0X3QgYnl0ZXMsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBpbnQ2NF90ICpwbnVtKQ0KPj4gK3sNCj4+ICsgICAgcmV0dXJuIGJkcnZf
-ZG9faXNfYWxsb2NhdGVkX2Fib3ZlKHRvcCwgYmFzZSwgdHJ1ZSwgb2Zmc2V0LCBieXRlcywgcG51
-bSk7DQo+PiArfQ0KPj4gKw0KPj4gICAgdHlwZWRlZiBzdHJ1Y3QgQmRydlZtc3RhdGVDbyB7DQo+
-PiAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAgICAqYnM7DQo+PiAgICAgICAgUUVNVUlPVmVjdG9y
-ICAgICAgICAqcWlvdjsNCj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmggYi9p
-bmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4+IGluZGV4IGM3YTI2MTkuLmE3ODQ2ZDkgMTAwNjQ0DQo+
-PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4+ICsrKyBiL2luY2x1ZGUvYmxvY2svYmxv
-Y2suaA0KPj4gQEAgLTQ0OCw3ICs0NDgsMTAgQEAgaW50IGJkcnZfaXNfYWxsb2NhdGVkKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcywNCj4+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICBpbnQ2NF90ICpwbnVtKTsNCj4+ICAgIGludCBiZHJ2X2lzX2Fs
-bG9jYXRlZF9hYm92ZShCbG9ja0RyaXZlclN0YXRlICp0b3AsIEJsb2NrRHJpdmVyU3RhdGUgKmJh
-c2UsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCBvZmZzZXQsIGlu
-dDY0X3QgYnl0ZXMsIGludDY0X3QgKnBudW0pOw0KPj4gLQ0KPj4gK2ludCBiZHJ2X2lzX2FsbG9j
-YXRlZF9hYm92ZV9pbmNsdXNpdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLA0KPj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYmFzZSwNCj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludDY0X3Qgb2Zmc2V0LCBp
-bnQ2NF90IGJ5dGVzLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-aW50NjRfdCAqcG51bSk7DQo+PiAgICBib29sIGJkcnZfaXNfcmVhZF9vbmx5KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzKTsNCj4+ICAgIGludCBiZHJ2X2Nhbl9zZXRfcmVhZF9vbmx5KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCBib29sIHJlYWRfb25seSwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGJvb2wgaWdub3JlX2FsbG93X3JkdywgRXJyb3IgKiplcnJwKTsNCj4+DQo+IA0KPiANCg0K
-LS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+* Markus Armbruster (armbru@redhat.com) wrote:
+> This reverts commit 3df663e575f1876d7f3bc684f80e72fca0703d39.
+> This reverts commit b605c47b57b58e61a901a50a0762dccf43d94783.
+> 
+> Command line option --only-migratable is for disallowing any
+> configuration that can block migration.
+> 
+> Initially, --only-migratable set global variable @only_migratable.
+> 
+> Commit 3df663e575 "migration: move only_migratable to MigrationState"
+> replaced it by MigrationState member @only_migratable.  That was a
+> mistake.
+> 
+> First, it doesn't make sense on the design level.  MigrationState
+> captures the state of an individual migration, but --only-migratable
+> isn't a property of an individual migration, it's a restriction on
+> QEMU configuration.  With fault tolerance, we could have several
+> migrations at once.  --only-migratable would certainly protect all of
+> them.  Storing it in MigrationState feels inappropriate.
+> 
+> Second, it contributes to a dependency cycle that manifests itself as
+> a bug now.
+> 
+> Putting @only_migratable into MigrationState means its available only
+> after migration_object_init().
+> 
+> We can't set it before migration_object_init(), so we delay setting it
+> with a global property (this is fixup commit b605c47b57 "migration:
+> fix handling for --only-migratable").
+> 
+> We can't get it before migration_object_init(), so anything that uses
+> it can only run afterwards.
+> 
+> Since migrate_add_blocker() needs to obey --only-migratable, any code
+> adding migration blockers can run only afterwards.  This contributes
+> to the following dependency cycle:
+> 
+> * configure_blockdev() must run before machine_set_property()
+>   so machine properties can refer to block backends
+> 
+> * machine_set_property() before configure_accelerator()
+>   so machine properties like kvm-irqchip get applied
+> 
+> * configure_accelerator() before migration_object_init()
+>   so that Xen's accelerator compat properties get applied.
+> 
+> * migration_object_init() before configure_blockdev()
+>   so configure_blockdev() can add migration blockers
+> 
+> The cycle was closed when recent commit cda4aa9a5a0 "Create block
+> backends before setting machine properties" added the first
+> dependency, and satisfied it by violating the last one.  Broke block
+> backends that add migration blockers.
+> 
+> Moving @only_migratable into MigrationState was a mistake.  Revert it.
+> 
+> This doesn't quite break the "migration_object_init() before
+> configure_blockdev() dependency, since migrate_add_blocker() still has
+> another dependency on migration_object_init().  To be addressed the
+> next commit
+> 
+> Conflicts:
+> 	include/migration/misc.h
+> 	migration/migration.c
+> 	migration/migration.h
+> 	vl.c
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/sysemu/sysemu.h | 1 +
+>  migration/migration.c   | 5 ++---
+>  migration/migration.h   | 3 ---
+>  migration/savevm.c      | 2 +-
+>  vl.c                    | 9 ++-------
+>  5 files changed, 6 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 6065d9e420..5f133cae83 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -14,6 +14,7 @@
+>  /* vl.c */
+>  
+>  extern const char *bios_name;
+> +extern int only_migratable;
+>  extern const char *qemu_name;
+>  extern QemuUUID qemu_uuid;
+>  extern bool qemu_uuid_set;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 69f75124c9..f6076e5295 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1707,7 +1707,7 @@ static GSList *migration_blockers;
+>  
+>  int migrate_add_blocker(Error *reason, Error **errp)
+>  {
+> -    if (migrate_get_current()->only_migratable) {
+> +    if (only_migratable) {
+>          error_propagate_prepend(errp, error_copy(reason),
+>                                  "disallowing migration blocker "
+>                                  "(--only_migratable) for: ");
+> @@ -3337,7 +3337,7 @@ void migration_global_dump(Monitor *mon)
+>      monitor_printf(mon, "store-global-state: %s\n",
+>                     ms->store_global_state ? "on" : "off");
+>      monitor_printf(mon, "only-migratable: %s\n",
+> -                   ms->only_migratable ? "on" : "off");
+> +                   only_migratable ? "on" : "off");
+>      monitor_printf(mon, "send-configuration: %s\n",
+>                     ms->send_configuration ? "on" : "off");
+>      monitor_printf(mon, "send-section-footer: %s\n",
+> @@ -3352,7 +3352,6 @@ void migration_global_dump(Monitor *mon)
+>  static Property migration_properties[] = {
+>      DEFINE_PROP_BOOL("store-global-state", MigrationState,
+>                       store_global_state, true),
+> -    DEFINE_PROP_BOOL("only-migratable", MigrationState, only_migratable, false),
+
+So I'm generally OK at this patch, but I'm worried whether this
+is API?
+
+Dave
+
+>      DEFINE_PROP_BOOL("send-configuration", MigrationState,
+>                       send_configuration, true),
+>      DEFINE_PROP_BOOL("send-section-footer", MigrationState,
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 0f986935e1..438f17edad 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -219,9 +219,6 @@ struct MigrationState
+>       */
+>      bool store_global_state;
+>  
+> -    /* Whether the VM is only allowing for migratable devices */
+> -    bool only_migratable;
+> -
+>      /* Whether we send QEMU_VM_CONFIGURATION during migration */
+>      bool send_configuration;
+>      /* Whether we send section footer during migration */
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 1415001d1c..34bcad3807 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2844,7 +2844,7 @@ void vmstate_register_ram_global(MemoryRegion *mr)
+>  bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
+>  {
+>      /* check needed if --only-migratable is specified */
+> -    if (!migrate_get_current()->only_migratable) {
+> +    if (!only_migratable) {
+>          return true;
+>      }
+>  
+> diff --git a/vl.c b/vl.c
+> index c1d5484e12..e4d7ad6b85 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -185,6 +185,7 @@ const char *prom_envs[MAX_PROM_ENVS];
+>  int boot_menu;
+>  bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+> +int only_migratable; /* turn it off unless user states otherwise */
+>  bool wakeup_suspend_enabled;
+>  
+>  int icount_align_option;
+> @@ -3799,13 +3800,7 @@ int main(int argc, char **argv, char **envp)
+>                  incoming = optarg;
+>                  break;
+>              case QEMU_OPTION_only_migratable:
+> -                /*
+> -                 * TODO: we can remove this option one day, and we
+> -                 * should all use:
+> -                 *
+> -                 * "-global migration.only-migratable=true"
+> -                 */
+> -                qemu_global_option("migration.only-migratable=true");
+> +                only_migratable = 1;
+>                  break;
+>              case QEMU_OPTION_nodefaults:
+>                  has_defaults = 0;
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
