@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37648)
+Received: from eggs.gnu.org ([209.51.188.92]:39071)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=987289301=Paul.Durrant@citrix.com>)
-	id 1hAsiv-0003jG-B5
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 04:55:22 -0400
+	id 1hAspO-0007rI-Gu
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=987289301=Paul.Durrant@citrix.com>)
-	id 1hAsit-0007fh-7z
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 04:55:21 -0400
+	id 1hAspJ-0001qi-7g
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:02:02 -0400
 From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 1 Apr 2019 08:54:47 +0000
-Message-ID: <cafdd6dfcc9540eaa920fe947c73e89e@AMSPEX02CL02.citrite.net>
+Date: Mon, 1 Apr 2019 09:01:50 +0000
+Message-ID: <b961ee21f8db448fab6b84bb79c37eab@AMSPEX02CL02.citrite.net>
 References: <20190327173206.9065-1-paul.durrant@citrix.com>
 	<3585a316-6349-b89e-99be-799b055594db@citrix.com>
 	<f9a7e4fa5b794cf88593a86923142a87@AMSPEX02CL02.citrite.net>
 	<20190328114012.GG1420@perard.uk.xensource.com>
 	<28bfdf32-916f-fb55-e2ab-13871b5e0fdd@citrix.com>
-In-Reply-To: <28bfdf32-916f-fb55-e2ab-13871b5e0fdd@citrix.com>
+	<20190328115619.GC4857@localhost.localdomain>
+In-Reply-To: <20190328115619.GC4857@localhost.localdomain>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v2 0/2] xen-block: fix sector
  size confusion
@@ -30,92 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Cooper <Andrew.Cooper3@citrix.com>, Anthony Perard <anthony.perard@citrix.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>, Andrew Cooper <Andrew.Cooper3@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Max
+	Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbmRyZXcgQ29vcGVyDQo+IFNl
-bnQ6IDI4IE1hcmNoIDIwMTkgMTE6NDYNCj4gVG86IEFudGhvbnkgUGVyYXJkIDxhbnRob255LnBl
-cmFyZEBjaXRyaXguY29tPjsgUGF1bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT4N
-Cj4gQ2M6IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgcWVtdS1ibG9ja0Bub25nbnUu
-b3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEtldmluIFdvbGYNCj4gPGt3b2xmQHJlZGhhdC5j
-b20+OyBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBNYXggUmVp
-dHogPG1yZWl0ekByZWRoYXQuY29tPjsgU3RlZmFuDQo+IEhham5vY3ppIDxzdGVmYW5oYUByZWRo
-YXQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1hlbi1kZXZlbF0gW1BBVENIIHYyIDAvMl0geGVuLWJs
-b2NrOiBmaXggc2VjdG9yIHNpemUgY29uZnVzaW9uDQo+IA0KPiBPbiAyOC8wMy8yMDE5IDExOjQw
-LCBBbnRob255IFBFUkFSRCB3cm90ZToNCj4gPiBPbiBXZWQsIE1hciAyNywgMjAxOSBhdCAwODoz
-MjoyOFBNICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6DQo+ID4+PiAtLS0tLU9yaWdpbmFsIE1l
-c3NhZ2UtLS0tLQ0KPiA+Pj4gRnJvbTogQW5kcmV3IENvb3Blcg0KPiA+Pj4gU2VudDogMjcgTWFy
-Y2ggMjAxOSAxODoyMA0KPiA+Pj4gVG86IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJp
-eC5jb20+OyB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IHFlbXUtYmxvY2tAbm9uZ251
-Lm9yZzsNCj4gPj4+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+Pj4gQ2M6IEtldmluIFdvbGYg
-PGt3b2xmQHJlZGhhdC5jb20+OyBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5l
-bC5vcmc+OyBNYXggUmVpdHoNCj4gPj4+IDxtcmVpdHpAcmVkaGF0LmNvbT47IFN0ZWZhbiBIYWpu
-b2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT47IEFudGhvbnkgUGVyYXJkDQo+IDxhbnRob255LnBl
-cmFyZEBjaXRyaXguY29tPg0KPiA+Pj4gU3ViamVjdDogUmU6IFtYZW4tZGV2ZWxdIFtQQVRDSCB2
-MiAwLzJdIHhlbi1ibG9jazogZml4IHNlY3RvciBzaXplIGNvbmZ1c2lvbg0KPiA+Pj4NCj4gPj4+
-IE9uIDI3LzAzLzIwMTkgMTc6MzIsIFBhdWwgRHVycmFudCB3cm90ZToNCj4gPj4+PiBUaGUgWGVu
-IGJsa2lmIHByb3RvY29sIGlzIGNvbmZ1c2luZyBidXQgZGlzY3Vzc2lvbiB3aXRoIHRoZSBtYWlu
-dGFpbmVyDQo+ID4+Pj4gaGFzIGNsYXJpZmllZCB0aGF0IHNlY3RvciBiYXNlZCBxdWFudGl0aWVz
-IGluIHJlcXVlc3RzIGFuZCB0aGUgJ3NlY3RvcnMnDQo+ID4+Pj4gdmFsdWUgYWR2ZXJ0aXplZCBp
-biB4ZW5zdG9yZSBzaG91bGQgYWx3YXlzIGJlIGluIHRlcm1zIG9mIDUxMi1ieXRlDQo+ID4+Pj4g
-dW5pdHMgYW5kIG5vdCB0aGUgYWR2ZXJ0aXNlZCBsb2dpY2FsICdzZWN0b3Itc2l6ZScgdmFsdWUu
-DQo+ID4+Pj4NCj4gPj4+PiBUaGlzIHNlcmllcyBmaXhlcyB4ZW4tYmxvY2sgdG8gYWRoZXJlIHRv
-IHRoZSBzcGVjLg0KPiA+Pj4gSSB0aG91Z2h0IHdlIGFncmVlZCB0aGF0IGhhcmRjb2RpbmcgdGhp
-bmdzIHRvIDUxMiBieXRlcyB3YXMgdGhlIHdyb25nDQo+ID4+PiB0aGluZyB0byBkby4NCj4gPj4g
-VG8gc29tZSBleHRlbnQgd2UgZGVjaWRlZCBpdCB3YXMgdGhlICpvbmx5KiB0aGluZyB0byBkby4N
-Cj4gPj4NCj4gPj4+IEkgd2FzIGV4cGVjdGluZyBzb21ldGhpbmcgbGlrZToNCj4gPj4+DQo+ID4+
-PiAxKSBDbGFyaWZ5IHRoZSBzcGVjIHdpdGggdGhlIGludGVuZGVkIG1lYW5pbmcsICh3aGljaCBp
-cyB3aGF0IHNvbWUNCj4gPj4+IGltcGxlbWVudGF0aW9ucyBhY3R1YWxseSB1c2UgYWxyZWFkeSkg
-YW5kIHdvbnQgY3JpcHBsZSA0ayBkYXRhcGF0aHMuDQo+ID4+PiAyKSBJbnRyb2R1Y2UgYSBjb21w
-YXRpYmlsaXR5IGtleSBmb3IgIkkgZG9uJ3QgcmVseSBvbiBzZWN0b3Itc2l6ZSBiZWluZw0KPiA+
-Pj4gNTEyIiwgd2hpY2ggZml4ZWQgaW1wbGVtZW50YXRpb25zIHNob3VsZCBhZHZlcnRpc2UuDQo+
-ID4+PiAzKSBTcGVjaWZ5IHRoYXQgYmVjYXVzZSBvZiBidWdzIGluIHRoZSBzcGVjIHdoaWNoIGdv
-dCBvdXQgaW50byB0aGUgd2lsZCwNCj4gPj4+IGRyaXZlcnMgd2hpY2ggZG9uJ3QgZmluZCB0aGUg
-a2V5IGJlaW5nIGFkdmVydGlzZWQgYnkgdGhlIG90aGVyIGVuZA0KPiA+Pj4gc2hvdWxkIGVtdWxh
-dGUgc2VjdG9yLXNpemU9NTEyIGZvciBjb21wYXRpYmlsaXR5IHdpdGggYnJva2VuDQo+ID4+PiBp
-bXBsZW1lbnRhdGlvbnMuDQo+ID4+IFllcywgdGhhdCdzIGhvdyB3ZSBhcmUgZ29pbmcgdG8gZml4
-IHRoaW5ncy4NCj4gPj4NCj4gPj4+IFdoYXRldmVyIHRoZSBldmVudHVhbCB3YXkgb3V0LCB0aGUg
-Zmlyc3QgdGhpbmcgd2hpY2ggbmVlZHMgdG8gaGFwcGVuIGlzDQo+ID4+PiBhbiB1cGRhdGUgdG8g
-dGhlIHNwZWMsIGJlZm9yZSBhY3Rpb25zIGFyZSB0YWtlbiB0byBhbHRlciBleGlzdGluZw0KPiA+
-Pj4gaW1wbGVtZW50YXRpb25zLg0KPiA+PiBXZWxsIHRoZSBpbXBsZW1lbnRhdGlvbiBpcyBjdXJy
-ZW50bHkgd3Jvbmcgdy5yLnQuIHRoZSBzcGVjIGFuZCB0aGVzZSBwYXRjaGVzIGZpeCB0aGF0LiBB
-cyBsb25nIGFzDQo+IHNlY3Rvci1zaXplIHJlbWFpbnMgYXQgNTEyIHRoZW4gbm8gZXhpc3Rpbmcg
-ZnJvbnRlbmQgc2hvdWxkIGJyZWFrLCBzbyBJIGd1ZXNzIHlvdSBjb3VsZCBhcmd1ZSB0aGF0DQo+
-IHBhdGNoICMyIHNob3VsZCBhbHNvIG1ha2Ugc3VyZSB0aGF0IHNlY3Rvci1zaXplIGlzIGFsc28g
-NTEyLi4uIGJ1dCB0aGF0IGlzIG5vdCB5ZXQgaW4gdGhlIHNwZWMuDQo+ID4+IEkgZ3Vlc3MgSSdt
-IG9rIHRvIGRlZmVyIHBhdGNoICMyIHVudGlsIGEgcmV2aXNlZCBzcGVjLiBpcyBhZ3JlZWQsIGJ1
-dCB0aGUgc2hpcCBoYXMgYWxyZWFkeSBzYWlsZWQNCj4gYXMgZmFyIGFzIHBhdGNoICMxIGdvZXMu
-DQo+ID4+DQo+ID4+IEFudGhvbnksIHRob3VnaHRzPw0KPiA+IFNvIFFFTVUgdXNlZCB0byBhbHdh
-eXMgc2V0ICJzZWN0b3Itc2l6ZSIgdG8gNTEyLCBhbmQgdXNlZCB0aGF0IGZvcg0KPiA+IHJlcXVl
-c3QuIFRoZSBuZXcgaW1wbGVtZW50YXRpb24gKG5vdCByZWxlYXNlZCB5ZXQpIGRvZXNuJ3QgZG8g
-dGhhdA0KPiA+IGFueW1vcmUsIGFuZCBtYXkgc2V0ICJzZWN0b3Itc2l6ZSIgdG8gYSBkaWZmZXJl
-bnQgdmFsdWUgYW5kIHVzZWQgdGhhdA0KPiA+IGZvciByZXF1ZXN0cy4NCj4gPg0KPiA+IHBhdGNo
-ICMxIGlzIG9uZSB3YXkgdG8gZml4IHRoZSByZXF1ZXN0cyAoYW5kIGF2b2lkIHJlZ3Jlc3Npb24p
-IGFuZA0KPiA+IG1vcmUgY2xlYXJseSBzcGVsbCBvdXQgdGhlIHdlaXJkIHRoaW5nIGFib3V0IHRo
-ZSBzcGVjLg0KPiA+DQo+ID4gSSBhbHNvIHRoaW5rIHBhdGNoICMyIGlzIHRvbyBzb29uIGFuZCBz
-aG91bGQgcG9pbnQgdG8gYSBjb21taXQgaW4NCj4gPiB4ZW4uZ2l0IGluc3RlYWQgb2YgYSB0aHJl
-YWQgb24geGVuLWRldmVsLg0KPiA+DQo+ID4gSW4gdGhlIG1lYW50aW1lLCB3ZSBzaG91bGQgcHJv
-YmFibHkgc2V0ICJzZWN0b3Itc2l6ZSIgdG8gNTEyLCBsaWtlIFFFTVUNCj4gPiB1c2VkIHRvIGRv
-IGFueXdheSwgd2l0aCBhIGNvbW1lbnQgYWJvdXQgdGhlIGZhY3QgdGhhdCBkaWZmZXJlbnQNCj4g
-PiBpbXBsZW1lbnRhdGlvbnMgdXNlcyBzZWN0b3Itc2l6ZSBkaWZmZXJlbnRseSBhbmQgYSB2YWx1
-ZSBvZiA1MTIgd291bGQNCj4gPiB3b3JrIGZpbmUuDQo+IA0KPiBIbW0gLSBJIGhhZG4ndCByZWFs
-aXNlZCB0aGlzIGlzIGFuIHVucmVsZWFzZWQgaXNzdWUgaW4gcWVtdS4NCj4gDQo+IFNvLCBRZW11
-IHVzZWQgdG8gdW5jb25kaXRpb25hbGx5IHNldCBzZWN0b3Itc2l6ZT01MTIsIGFuZCB5b3VyIHdv
-cmsgdG8NCj4gcWRldi1pZnkgZXZlcnl0aGluZyBpbnRyb2R1Y2VkIGEgY2hhbmdlIHdoaWNoIGhh
-cyBpZGVudGlmaWVkIGENCj4gc3BlYy9wcm90b2NvbCBpc3N1ZT8NCg0KQmFzaWNhbGx5LCB5ZXMu
-IEkgaGFkIG5vdCByZWFsaXplZCBhdCB0aGUgdGltZSBob3cgYmFkIHRoZSBzcGVjLiBpcy4gSSB3
-YXMgcmVmZXJyaW5nIHRvIHByZXZhaWxpbmcgaW1wbGVtZW50YXRpb25zLCB3aGljaCBzZWVtZWQg
-dG8gdXNlIHNlY3Rvci1zaXplIGFzIHRoZSBtdWx0aXBsZSBhbmQsIGluIHRoZSBXaW5kb3dzIGNh
-c2UsIGFwcGVhciB0byBjb3BlIHdpdGggYSBsb2dpY2FsIHNlY3RvciBzaXplIG90aGVyIHRoYW4g
-NTEyLg0KR2l2ZW4gd2hhdCBJIGtub3cgbm93LCBmaXhpbmcgc2VjdG9yLXNpemUgdG8gYmUgNTEy
-IHNlZW1zIGxpa2UgdGhlIG9ubHkgd2F5IHRvIGF2b2lkIHJlZ3Jlc3Npb25zLg0KDQo+IA0KPiBJ
-ZiBzbywgdGhlbiBJIHRoaW5rIGl0IGlzIGZpbmUgZm9yIHRoaXMgc2VyaWVzIHRvIHN0YXRlICht
-dWNoIG1vcmUNCj4gY2xlYXJseSB0aGFuIGl0IGRvZXMpIHRoYXQgaXQgaXMgcmV0dXJuaW5nIHFl
-bXUncyBiZWhhdmlvdXIgdG8gbWF0Y2ggdGhlDQo+IGN1cnJlbnRseSByZWxlYXNlZCB2ZXJzaW9u
-LCBiZWNhdXNlIHdlJ3ZlIGRpc2NvdmVyZWQgYW4gaXNzdWUgaW4gdGhlDQo+IHNwZWMvcHJvdG9j
-b2wsIGFuZCB0aGF0IHdlIHdpbGwgc3Vic2VxdWVudGx5IHdvcmsgYWRkcmVzcyB0aGUgaXNzdWUg
-aW4NCj4gdGhlIHNwZWMgYW5kIHByb3ZpZGUgYSBmb3J3YXJkcyBwYXRoIHdoaWNoIGRvZXNuJ3Qg
-aW52b2x2ZSBuYWlsaW5nIG91cg0KPiBmZWV0IHRvIHRoZSBmbG9vci4NCg0KT2ssIEknbGwgZXhw
-YW5kIHRoZSBjb21taXQgY29tbWVudCBhbmQgc3RhdGUgdGhhdCB0aGUgc3BlYy4gd2lsbCBiZSBy
-ZXZpc2VkIHRvIGFsbG93IGdyZWF0ZXIgbG9naWNhbCBibG9jayBzaXplcy4NCg0KICBQYXVsDQoN
-Cj4gDQo+IH5BbmRyZXcNCg==
+> -----Original Message-----
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Sent: 28 March 2019 11:56
+> To: Andrew Cooper <Andrew.Cooper3@citrix.com>
+> Cc: Anthony Perard <anthony.perard@citrix.com>; Paul Durrant <Paul.Durran=
+t@citrix.com>; xen-
+> devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-devel@nongnu.org;=
+ Stefano Stabellini
+> <sstabellini@kernel.org>; Max Reitz <mreitz@redhat.com>; Stefan Hajnoczi =
+<stefanha@redhat.com>
+> Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size confus=
+ion
+>=20
+> Am 28.03.2019 um 12:46 hat Andrew Cooper geschrieben:
+> > On 28/03/2019 11:40, Anthony PERARD wrote:
+> > > On Wed, Mar 27, 2019 at 08:32:28PM +0000, Paul Durrant wrote:
+> > >>> -----Original Message-----
+> > >>> From: Andrew Cooper
+> > >>> Sent: 27 March 2019 18:20
+> > >>> To: Paul Durrant <Paul.Durrant@citrix.com>; xen-devel@lists.xenproj=
+ect.org; qemu-
+> block@nongnu.org;
+> > >>> qemu-devel@nongnu.org
+> > >>> Cc: Kevin Wolf <kwolf@redhat.com>; Stefano Stabellini <sstabellini@=
+kernel.org>; Max Reitz
+> > >>> <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>; Anthony=
+ Perard
+> <anthony.perard@citrix.com>
+> > >>> Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size =
+confusion
+> > >>>
+> > >>> On 27/03/2019 17:32, Paul Durrant wrote:
+> > >>>> The Xen blkif protocol is confusing but discussion with the mainta=
+iner
+> > >>>> has clarified that sector based quantities in requests and the 'se=
+ctors'
+> > >>>> value advertized in xenstore should always be in terms of 512-byte
+> > >>>> units and not the advertised logical 'sector-size' value.
+> > >>>>
+> > >>>> This series fixes xen-block to adhere to the spec.
+> > >>> I thought we agreed that hardcoding things to 512 bytes was the wro=
+ng
+> > >>> thing to do.
+> > >> To some extent we decided it was the *only* thing to do.
+> > >>
+> > >>> I was expecting something like:
+> > >>>
+> > >>> 1) Clarify the spec with the intended meaning, (which is what some
+> > >>> implementations actually use already) and wont cripple 4k datapaths=
+.
+> > >>> 2) Introduce a compatibility key for "I don't rely on sector-size b=
+eing
+> > >>> 512", which fixed implementations should advertise.
+> > >>> 3) Specify that because of bugs in the spec which got out into the =
+wild,
+> > >>> drivers which don't find the key being advertised by the other end
+> > >>> should emulate sector-size=3D512 for compatibility with broken
+> > >>> implementations.
+> > >> Yes, that's how we are going to fix things.
+> > >>
+> > >>> Whatever the eventual way out, the first thing which needs to happe=
+n is
+> > >>> an update to the spec, before actions are taken to alter existing
+> > >>> implementations.
+> > >> Well the implementation is currently wrong w.r.t. the spec and these=
+ patches fix that. As long as
+> sector-size remains at 512 then no existing frontend should break, so I g=
+uess you could argue that
+> patch #2 should also make sure that sector-size is also 512... but that i=
+s not yet in the spec.
+> > >> I guess I'm ok to defer patch #2 until a revised spec. is agreed, bu=
+t the ship has already sailed
+> as far as patch #1 goes.
+> > >>
+> > >> Anthony, thoughts?
+> > > So QEMU used to always set "sector-size" to 512, and used that for
+> > > request. The new implementation (not released yet) doesn't do that
+> > > anymore, and may set "sector-size" to a different value and used that
+> > > for requests.
+> > >
+> > > patch #1 is one way to fix the requests (and avoid regression) and
+> > > more clearly spell out the weird thing about the spec.
+> > >
+> > > I also think patch #2 is too soon and should point to a commit in
+> > > xen.git instead of a thread on xen-devel.
+> > >
+> > > In the meantime, we should probably set "sector-size" to 512, like QE=
+MU
+> > > used to do anyway, with a comment about the fact that different
+> > > implementations uses sector-size differently and a value of 512 would
+> > > work fine.
+> >
+> > Hmm - I hadn't realised this is an unreleased issue in qemu.
+> >
+> > So, Qemu used to unconditionally set sector-size=3D512, and your work t=
+o
+> > qdev-ify everything introduced a change which has identified a
+> > spec/protocol issue?
+>=20
+> The old implementation has the sector size hardcoded:
+>=20
+>     #define BLOCK_SIZE  512
+>=20
+> Whereas the qdevified version uses DEFINE_BLOCK_PROPERTIES(), which
+> includes user-visible options for logical/physical_block_size.
+>=20
+> So before, you couldn't even define a different sector size and the
+> question whether 512 or the sector size should be used didn't make a
+> difference anyway.
+>=20
+> > If so, then I think it is fine for this series to state (much more
+> > clearly than it does) that it is returning qemu's behaviour to match th=
+e
+> > currently released version, because we've discovered an issue in the
+> > spec/protocol, and that we will subsequently work address the issue in
+> > the spec and provide a forwards path which doesn't involve nailing our
+> > feet to the floor.
+>=20
+> The closest thing to returning to the old behaviour would be erroring
+> out during device initialisation if logical_block_size !=3D 512.
+
+One thing I've not figured out... If I create a blockdev in QEMU that is po=
+inting at a real device with a logical_block_size of 4k, will the QEMU bloc=
+k layer perform the necessary read-modify-write cycles for accesses < 4k? I=
+OW would it be safe to always advertise a size of 512 to a frontend?
+
+The problem with erroring out during device init is that it does not give u=
+s a way of fixing things in future, as the frontend has not started at that=
+ time and thus we'd have no idea whether it could use whatever protocol fix=
+ we come up with. I think the only thing the backend could do is refuse to =
+connect to an old frontend if logical_block_size !=3D 512.
+
+  Paul
+
+>=20
+> Kevin
