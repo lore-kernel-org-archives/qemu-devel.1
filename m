@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37303)
+Received: from eggs.gnu.org ([209.51.188.92]:38264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hAyyk-0006xC-QE
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:36:07 -0400
+	(envelope-from <eroken1@gmail.com>) id 1hAz2t-00015d-6g
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:40:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hAyyj-0000Ae-It
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:36:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41814
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1hAyyj-0000AJ-BR
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:36:05 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31FVMbR143854
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 11:36:04 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rkmmy37bu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 11:36:04 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 1 Apr 2019 16:36:03 +0100
-Reply-To: jjherne@linux.ibm.com
-References: <1552494682-16788-1-git-send-email-jjherne@linux.ibm.com>
-	<1552494682-16788-16-git-send-email-jjherne@linux.ibm.com>
-	<fd2f7e0d-cfab-245e-8c06-9b9ed424b7e4@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 1 Apr 2019 11:35:56 -0400
+	(envelope-from <eroken1@gmail.com>) id 1hAz2s-0002mq-4M
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:40:23 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:41127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eroken1@gmail.com>) id 1hAz2r-0002mC-OZ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:40:22 -0400
+Received: by mail-wr1-x431.google.com with SMTP id r4so12671402wrq.8
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 08:40:21 -0700 (PDT)
+Date: Mon, 1 Apr 2019 16:40:28 +0100
+From: Ernest Esene <eroken1@gmail.com>
+Message-ID: <20190401154028.GA10574@erokenlabserver>
 MIME-Version: 1.0
-In-Reply-To: <fd2f7e0d-cfab-245e-8c06-9b9ed424b7e4@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2b819e81-b308-6989-1724-4d7fca7296e1@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5 15/15] s390-bios: Support
- booting from real dasd device
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v2] Replace calls to object_child_foreach()
+ with object_child_foreach_recursive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,98 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 3/29/19 4:33 AM, Thomas Huth wrote:
-> On 13/03/2019 17.31, Jason J. Herne wrote:
-> 
-> s/tansfers/transfers/
-> 
 
-Will fix this, and the other typos you've pointed out.
+--VbJkn9YxBvnuCH5J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-...
->> +static char prefix_page[PAGE_SIZE * 2]
->> +            __attribute__((__aligned__(PAGE_SIZE * 2)));
->> +
->> +static void enable_prefixing(void)
->> +{
->> +    memcpy(&prefix_page, (void *)0, 4096);
-> 
-> You could use the "lowcore" variable from s390-arch.h here instead of
-> "(void *)0", I guess.
->
+Replace calls to object_child_foreach() with object_child_foreach_recursive=
+()
+when applicable: nvdimm_device_list, nmi_monitor_handle,
+find_sysbus_device,
+pc_dimm_slot2bitmap, build_dimm_list.
 
-Agreed.
+Signed-off-by: Ernest Esene <eroken1@gmail.com>
 
->> +    set_prefix(ptr2u32(&prefix_page));
->> +}
->> +
->> +static void disable_prefixing(void)
->> +{
->> +    set_prefix(0);
->> +    /* Copy io interrupt info back to low core */
->> +    memcpy((void *)0xB8, prefix_page + 0xB8, 12);
-> 
-> Maybe use &lowcore->subchannel_id instead of 0xB8 ? ... not sure whether
-> that's nicer here, though...
-> 
+---
+v2:
+  * applied changes suggested by Paolo
+---
+ hw/acpi/nvdimm.c           |  4 +---
+ hw/core/sysbus.c           | 11 ++++-------
+ hw/mem/pc-dimm.c           |  3 +--
+ hw/virtio/virtio-balloon.c |  3 +--
+ 4 files changed, 7 insertions(+), 14 deletions(-)
 
-I think it is nicer using the named field. I Will make that change.
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index 9fdad6dc3f..36ff075a42 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -40,8 +40,6 @@ static int nvdimm_device_list(Object *obj, void *opaque)
+     if (object_dynamic_cast(obj, TYPE_NVDIMM)) {
+         *list =3D g_slist_append(*list, DEVICE(obj));
+     }
+-
+-    object_child_foreach(obj, nvdimm_device_list, opaque);
+     return 0;
+ }
+=20
+@@ -56,7 +54,7 @@ static GSList *nvdimm_get_device_list(void)
+ {
+     GSList *list =3D NULL;
+=20
+-    object_child_foreach(qdev_get_machine(), nvdimm_device_list, &list);
++    object_child_foreach_recursive(qdev_get_machine(), nvdimm_device_list,=
+ &list);
+     return list;
+ }
+=20
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 307cf90a51..3d0bf47a04 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -41,13 +41,10 @@ static int find_sysbus_device(Object *obj, void *opaque)
+     dev =3D object_dynamic_cast(obj, TYPE_SYS_BUS_DEVICE);
+     sbdev =3D (SysBusDevice *)dev;
+=20
+-    if (!sbdev) {
+-        /* Container, traverse it for children */
+-        return object_child_foreach(obj, find_sysbus_device, opaque);
++    if (sbdev) {
++        find->func(sbdev, find->opaque);
+     }
+=20
+-    find->func(sbdev, find->opaque);
+-
+     return 0;
+ }
+=20
+@@ -65,9 +62,9 @@ void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc *=
+func, void *opaque)
+=20
+     /* Loop through all sysbus devices that were spawened outside the mach=
+ine */
+     container =3D container_get(qdev_get_machine(), "/peripheral");
+-    find_sysbus_device(container, &find);
++    object_child_foreach_recursive(container, find_sysbus_device, &find);
+     container =3D container_get(qdev_get_machine(), "/peripheral-anon");
+-    find_sysbus_device(container, &find);
++    object_child_foreach_recursive(container, find_sysbus_device, &find);
+ }
+=20
+=20
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 19b9c0f406..6eaac49a22 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -84,7 +84,6 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
+         }
+     }
+=20
+-    object_child_foreach(obj, pc_dimm_slot2bitmap, opaque);
+     return 0;
+ }
+=20
+@@ -100,7 +99,7 @@ static int pc_dimm_get_free_slot(const int *hint, int ma=
+x_slots, Error **errp)
+     }
+=20
+     bitmap =3D bitmap_new(max_slots);
+-    object_child_foreach(qdev_get_machine(), pc_dimm_slot2bitmap, bitmap);
++    object_child_foreach_recursive(qdev_get_machine(), pc_dimm_slot2bitmap=
+, bitmap);
+=20
+     /* check if requested slot is not occupied */
+     if (hint) {
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 2112874055..7945637077 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -649,7 +649,6 @@ static int build_dimm_list(Object *obj, void *opaque)
+         }
+     }
+=20
+-    object_child_foreach(obj, build_dimm_list, opaque);
+     return 0;
+ }
+=20
+@@ -658,7 +657,7 @@ static ram_addr_t get_current_ram_size(void)
+     GSList *list =3D NULL, *item;
+     ram_addr_t size =3D ram_size;
+=20
+-    build_dimm_list(qdev_get_machine(), &list);
++    object_child_foreach_recursive(qdev_get_machine(), build_dimm_list, &l=
+ist);
+     for (item =3D list; item; item =3D g_slist_next(item)) {
+         Object *obj =3D OBJECT(item->data);
+         if (!strcmp(object_get_typename(obj), TYPE_PC_DIMM)) {
+--=20
+2.14.2
 
-Note: We need to keep the (void*) cast to prevent a compiler warning about discarding 
-const qualifier.
 
->> +static void ipl1_fixup(void)
->> +{
->> +    Ccw0 *ccwSeek = (Ccw0 *) 0x08;
->> +    Ccw0 *ccwSearchID = (Ccw0 *) 0x10;
->> +    Ccw0 *ccwSearchTic = (Ccw0 *) 0x18;
->> +    Ccw0 *ccwRead = (Ccw0 *) 0x20;
->> +    CcwSeekData *seekData = (CcwSeekData *) 0x30;
->> +    CcwSearchIdData *searchData = (CcwSearchIdData *) 0x38;
->> +
->> +    /* move IPL1 CCWs to make room for CCWs needed to locate record 2 */
->> +    memcpy(ccwRead, (void *)0x08, 16);
-> 
-> lowcore->ccw1 ?
-> 
+--VbJkn9YxBvnuCH5J
+Content-Type: application/pgp-signature; name="signature.asc"
 
-All the other CCWs in this section still need to use the numeric memory references. I 
-think it makes it slightly more confusing to switch just the one to using the struct. For 
-this reason I prefer it the way it is, if you're okay with that.
+-----BEGIN PGP SIGNATURE-----
 
-...
->> +static void lpsw(void *psw_addr)
->> +{
->> +    PSWLegacy *pswl = (PSWLegacy *) psw_addr;
->> +
->> +    pswl->mask |= PSW_MASK_EAMODE;   /* Force z-mode */
->> +    pswl->addr |= PSW_MASK_BAMODE;
->> +    asm volatile("  llgtr 0,0\n llgtr 1,1\n"     /* Some OS's expect to be */
->> +                 "  llgtr 2,2\n llgtr 3,3\n"     /* in 32-bit mode. Clear  */
->> +                 "  llgtr 4,4\n llgtr 5,5\n"     /* high part of regs to   */
->> +                 "  llgtr 6,6\n llgtr 7,7\n"     /* avoid messing up       */
->> +                 "  llgtr 8,8\n llgtr 9,9\n"     /* instructions that work */
->> +                 "  llgtr 10,10\n llgtr 11,11\n" /* in both addressing     */
->> +                 "  llgtr 12,12\n llgtr 13,13\n" /* modes, like servc.     */
->> +                 "  llgtr 14,14\n llgtr 15,15\n"
->> +                 "  lpsw %0\n"
->> +                 : : "Q" (*pswl) : "cc");
->> +}
-> 
-> Have you tried to use jump_to_low_kernel() already? ... it might be
-> cleaner to do the diag 0x308 reset here, too, to avoid that some part of
-> the machine is in an unexpected state...
-> 
->   Thomas
+iQIzBAABCAAdFiEEFkNmxXgplc+HqgQGJZ4JoaCvxKoFAlyiMOcACgkQJZ4JoaCv
+xKqCUxAAwNufJhTcmuf2DZenDjHsxnMHgbP7MEeZ7dzRSGCo0tY6ogxyGQuJ067L
+NigjWYH5wOBoGFkJdvFvshiR5LMy2WLWOioZT6aQUVToQWiX+I+fuW7221Pd9HyS
+LSm47OLVVwl6smbD3cOL9b8r7egvloGeoexPZwG94NxF23swz193zKi00S7HRSG3
+RKHmo0KUJYQgamBt/MbYOAoLkhkCK0YLxIZiDp3RXNHVcRN+IM9FqR4mUl4gbBBz
+aa0GeTx5JNi0NtmgtHfYnQLK8JTJTy+tzikxzlmSTxAEfU/WN7tzXahKjqEX74sT
+IgQtJV9KM/JcBqWZ04V9fj2ZJ5wbBmUVI99DluB6vAo2+a8d05nUz8YNzS1/BN/4
+rPK2GSVxEyPb6OwjCFJqKPgS6aN8epreQ5QVsYqX83+gKTXYuv6pvOIV296Xk3WK
+0uudQ6E+kzH5QbIZjcz6xzf+H0yvBoEuZas5d2+Pnhioq6divnztTgdcj7YyB48X
+eZfLRnXc8jKRpfuTV18QD5Fa88Nh1lk4CA+tn3l8JM8sTQiQVaOo0w2fCWiLbfX8
+QN/SguLh8CyMbuUvhhq768qzAjJwaue7ESr19Ss6SY77mjouiBTeK3ngG4+ymfXq
+ojpw/qYnWWIsKZOvIsP+MJmNEvn5wAUP4fIjgJgeFOdAv3ebB5o=
+=zqnd
+-----END PGP SIGNATURE-----
 
-I had not tried jump_to_low_kernel() until just now. It *does* seem to work... and 
-eliminates the need for the manual register clearing. I assume the diag 308 reset baked 
-into the jump_to_low_kernel() is responsible for that? I guess switching to 
-jump_to_low_kernel() would be a good thing ... I'll admit I'm slightly uneasy about it 
-since I've been testing my way for so long :) But jump_to_low_kernel() works for all of my 
-manual test cases.
-
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+--VbJkn9YxBvnuCH5J--
