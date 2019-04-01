@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48105)
+Received: from eggs.gnu.org ([209.51.188.92]:49694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhd-0007Os-PI
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:06:14 -0400
+	(envelope-from <david@redhat.com>) id 1hAvoz-0003FW-2j
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhc-0006j7-75
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:06:13 -0400
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon,  1 Apr 2019 15:06:03 +0300
-Message-Id: <1554120365-39119-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] block: include base when checking image
- chain for block allocation
+	(envelope-from <david@redhat.com>) id 1hAvoy-0003E2-1Q
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:13:49 -0400
+References: <20190401102911.8685-1-richard.henderson@linaro.org>
+	<20190401102911.8685-2-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <643efe1a-e6a5-a882-8469-47001d879591@redhat.com>
+Date: Mon, 1 Apr 2019 14:13:42 +0200
+MIME-Version: 1.0
+In-Reply-To: <20190401102911.8685-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.1 1/6] target/s390x: Truncate 32-bit
+ psw_addr before creating TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,109 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com, berto@igalia.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, qemu-s390x@nongnu.org
 
-This patch is used in the 'block/stream: introduce a bottom node'
-that is following. Instead of the base node, the caller may pass
-the node that has the base as its backing image to the new function
-bdrv_is_allocated_above_inclusive() and get rid of the dependency
-on the base that may change during commit/stream parallel jobs.
-If the specified base is not found in the backing image chain, the
-function fails.
+On 01.04.19 12:29, Richard Henderson wrote:
+> If, somehow, the psw_addr is out of range, truncate early
+> rather than after we get into gen_intermediate_code.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/cpu.h       | 26 +++++++++++++++++++-------
+>  target/s390x/translate.c |  6 ------
+>  2 files changed, 19 insertions(+), 13 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index cb6d77053a..6ccf41fc45 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -368,18 +368,30 @@ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
+>      }
+>  }
+>  
+> -static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
+> -                                        target_ulong *cs_base, uint32_t *flags)
+> +static inline void cpu_get_tb_cpu_state(CPUS390XState* env,
+> +                                        target_ulong *p_pc,
+> +                                        target_ulong *cs_base,
+> +                                        uint32_t *p_flags)
+>  {
+> -    *pc = env->psw.addr;
+> -    *cs_base = env->ex_value;
+> -    *flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
+> +    uint32_t flags;
+> +    uint64_t pc;
+> +
+> +    flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
+>      if (env->cregs[0] & CR0_AFP) {
+> -        *flags |= FLAG_MASK_AFP;
+> +        flags |= FLAG_MASK_AFP;
+>      }
+>      if (env->cregs[0] & CR0_VECTOR) {
+> -        *flags |= FLAG_MASK_VECTOR;
+> +        flags |= FLAG_MASK_VECTOR;
+>      }
+> +
+> +    pc = env->psw.addr;
+> +    if (!(flags & FLAG_MASK_64)) {
+> +        pc &= 0x7fffffff;
+> +    }
+> +
+> +    *p_pc = pc;
+> +    *cs_base = env->ex_value;
+> +    *p_flags = flags;
+>  }
+>  
+>  /* PER bits from control register 9 */
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 0afa8f7ca5..d22d0f7643 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -6442,12 +6442,6 @@ static void s390x_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>  {
+>      DisasContext *dc = container_of(dcbase, DisasContext, base);
+>  
+> -    /* 31-bit mode */
+> -    if (!(dc->base.tb->flags & FLAG_MASK_64)) {
+> -        dc->base.pc_first &= 0x7fffffff;
+> -        dc->base.pc_next = dc->base.pc_first;
+> -    }
+> -
+>      dc->cc_op = CC_OP_DYNAMIC;
+>      dc->ex_value = dc->base.tb->cs_base;
+>      dc->do_debug = dc->base.singlestep_enabled;
+> 
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block/io.c            | 32 +++++++++++++++++++++++++++-----
- include/block/block.h |  5 ++++-
- 2 files changed, 31 insertions(+), 6 deletions(-)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/block/io.c b/block/io.c
-index dfc153b..7edeeb2 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2317,7 +2317,8 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-  * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
-  *
-  * Return true if (a prefix of) the given range is allocated in any image
-- * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
-+ * between BASE and TOP (TOP included). To check the BASE image, set the
-+ * 'base_included' to 'true'. The BASE can be NULL to check if the given
-  * offset is allocated in any image of the chain.  Return false otherwise,
-  * or negative errno on failure.
-  *
-@@ -2329,16 +2330,18 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-  * but 'pnum' will only be 0 when end of file is reached.
-  *
-  */
--int bdrv_is_allocated_above(BlockDriverState *top,
--                            BlockDriverState *base,
--                            int64_t offset, int64_t bytes, int64_t *pnum)
-+static int bdrv_do_is_allocated_above(BlockDriverState *top,
-+                                      BlockDriverState *base,
-+                                      bool base_included, int64_t offset,
-+                                      int64_t bytes, int64_t *pnum)
- {
-     BlockDriverState *intermediate;
-     int ret;
-     int64_t n = bytes;
-+    assert(base || !base_included);
- 
-     intermediate = top;
--    while (intermediate && intermediate != base) {
-+    while (base_included || intermediate != base) {
-         int64_t pnum_inter;
-         int64_t size_inter;
- 
-@@ -2360,6 +2363,10 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-             n = pnum_inter;
-         }
- 
-+        if (intermediate == base) {
-+            break;
-+        }
-+
-         intermediate = backing_bs(intermediate);
-     }
- 
-@@ -2367,6 +2374,21 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-     return 0;
- }
- 
-+int bdrv_is_allocated_above(BlockDriverState *top,
-+                            BlockDriverState *base,
-+                            int64_t offset, int64_t bytes, int64_t *pnum)
-+{
-+    return bdrv_do_is_allocated_above(top, base, false, offset, bytes, pnum);
-+}
-+
-+int bdrv_is_allocated_above_inclusive(BlockDriverState *top,
-+                                      BlockDriverState *base,
-+                                      int64_t offset, int64_t bytes,
-+                                      int64_t *pnum)
-+{
-+    return bdrv_do_is_allocated_above(top, base, true, offset, bytes, pnum);
-+}
-+
- typedef struct BdrvVmstateCo {
-     BlockDriverState    *bs;
-     QEMUIOVector        *qiov;
-diff --git a/include/block/block.h b/include/block/block.h
-index c7a2619..a7846d9 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -448,7 +448,10 @@ int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                       int64_t *pnum);
- int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             int64_t offset, int64_t bytes, int64_t *pnum);
--
-+int bdrv_is_allocated_above_inclusive(BlockDriverState *top,
-+                                      BlockDriverState *base,
-+                                      int64_t offset, int64_t bytes,
-+                                      int64_t *pnum);
- bool bdrv_is_read_only(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-                            bool ignore_allow_rdw, Error **errp);
 -- 
-1.8.3.1
+
+Thanks,
+
+David / dhildenb
