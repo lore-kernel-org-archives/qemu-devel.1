@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43404)
+Received: from eggs.gnu.org ([209.51.188.92]:43562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxU8-00045u-6I
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:00:28 -0400
+	(envelope-from <elijahsh@mellanox.com>) id 1hAxVF-0004ZE-Jk
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxU3-0006hl-B6
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:00:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hAxU2-0006gb-WD
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:00:19 -0400
-References: <20190329042750.14704-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e1117820-d4fb-8f9b-296a-a95f9f6fcd38@redhat.com>
-Date: Mon, 1 Apr 2019 09:00:14 -0500
+	(envelope-from <elijahsh@mellanox.com>) id 1hAxVE-0007dS-Bn
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:01:33 -0400
+Received: from mail-eopbgr70072.outbound.protection.outlook.com
+	([40.107.7.72]:63950
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elijahsh@mellanox.com>)
+	id 1hAxVD-0007ah-UE
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:01:32 -0400
+From: Elijah Shakkour <elijahsh@mellanox.com>
+Date: Mon, 1 Apr 2019 14:01:28 +0000
+Message-ID: <AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+References: <20190324221319-mutt-send-email-mst@kernel.org>
+	<AM6PR05MB66166ED74E2718150F0CBF62BD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190326085309-mutt-send-email-mst@kernel.org>
+	<AM6PR05MB661611FE4DD494AF9EFB6B8ABD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190327064143.GP9149@xz-x1>
+	<060498b58287775ce6bd7dd704f13b6d6e185f91.camel@oracle.com>
+	<20190327084255.GR9149@xz-x1>
+	<AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401024710.GB8853@xz-x1>
+	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401102515.GD8853@xz-x1>
+In-Reply-To: <20190401102515.GD8853@xz-x1>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190329042750.14704-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JMSvSeDKZMPiEyxq5LlcBnePXVBA8LuEe"
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 0/6] NBD server alignment
- improvement
+Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
+ passthrough to nested (L2) VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +41,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Knut Omang <knut.omang@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JMSvSeDKZMPiEyxq5LlcBnePXVBA8LuEe
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com
-Message-ID: <e1117820-d4fb-8f9b-296a-a95f9f6fcd38@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 0/6] NBD server alignment
- improvement
-References: <20190329042750.14704-1-eblake@redhat.com>
-In-Reply-To: <20190329042750.14704-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 3/28/19 11:27 PM, Eric Blake wrote:
-> I'm tired of nbdkit being able to trigger an assertion failure
-> in qemu-img convert.  Let's get this into 4.0-rc2.
->=20
-> Since v2:
-> - add more patches, including a respin of a separately-posted
-> nbd/client: Deal with unaligned size from server
-> - Don't make unaligned sector from server inaccessible; instead,
-> round our requests down and handle the tail locally
-> - fix another issue reported by Rich where 'qemu-img map' output
-> was less than stellar
->=20
-> Eric Blake (6):
->   iotests: Add 241 to test NBD on unaligned images
->   nbd/client: Lower min_block for block-status, unaligned size
->   nbd/client: Report offsets in bdrv_block_status
->   nbd/client: Support qemu-img convert from unaligned size
->   block: Add bdrv_get_request_alignment()
->   nbd/server: Advertise actual minimum block size
-
-I've queued this series on my NBD tree, and will send a pull request
-shortly.
-
-I have a couple more patches that I started work on that fix the final
-few alignment bugs, but as they have not been on the list yet, they may
-be too risky for 4.0; we'll see what happens based on how fast I can
-polish them.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---JMSvSeDKZMPiEyxq5LlcBnePXVBA8LuEe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyiGW4ACgkQp6FrSiUn
-Q2qhPAgAmGz+WW63XRsQ4kb9KTHflUXR1fUMET9/2l+LJX8MLcH+icQb9qK3ROVE
-LZFhSjigo7ll0SsE+D+50HR/N2Spit9wYCg0woUXOs+bMe6+TwjD1jowu6UXpB2f
-RZ1VLoCouh2qvwkG8zVyRgB+h9aiSCpXoQiAMfax+lQ2Da8lop3v1UwadJaJvsSp
-ZwWHyQ0zN7JHyIN/k11eqtqGGeK/y2b9p6Z/u8PN6ysgEhHZ1HPrP8XNecqM7PLh
-PTpBBRprzFTzSpKM21Om5bBRWzFWGjS//CRQItOy3erQ2k0HrLlJ0g5Ne3o8+yBs
-oOgYP+HoP2iJDCjsbnHVSy9DQYGspQ==
-=rZYa
------END PGP SIGNATURE-----
-
---JMSvSeDKZMPiEyxq5LlcBnePXVBA8LuEe--
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
+eEByZWRoYXQuY29tPg0KPiBTZW50OiBNb25kYXksIEFwcmlsIDEsIDIwMTkgMToyNSBQTQ0KPiBU
+bzogRWxpamFoIFNoYWtrb3VyIDxlbGlqYWhzaEBtZWxsYW5veC5jb20+DQo+IENjOiBLbnV0IE9t
+YW5nIDxrbnV0Lm9tYW5nQG9yYWNsZS5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPG1zdEBy
+ZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47
+DQo+IE1hcmNlbCBBcGZlbGJhdW0gPG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tPjsgU3RlZmFu
+IEhham5vY3ppDQo+IDxzdGVmYW5oYUBnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcN
+Cj4gU3ViamVjdDogUmU6IFFFTVUgYW5kIHZJT01NVSBzdXBwb3J0IGZvciBlbXVsYXRlZCBWRiBw
+YXNzdGhyb3VnaCB0bw0KPiBuZXN0ZWQgKEwyKSBWTQ0KPiANCj4gT24gTW9uLCBBcHIgMDEsIDIw
+MTkgYXQgMDk6MTI6MzhBTSArMDAwMCwgRWxpamFoIFNoYWtrb3VyIHdyb3RlOg0KPiA+DQo+ID4N
+Cj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBQZXRlciBYdSA8
+cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiBTZW50OiBNb25kYXksIEFwcmlsIDEsIDIwMTkgNTo0
+NyBBTQ0KPiA+ID4gVG86IEVsaWphaCBTaGFra291ciA8ZWxpamFoc2hAbWVsbGFub3guY29tPg0K
+PiA+ID4gQ2M6IEtudXQgT21hbmcgPGtudXQub21hbmdAb3JhY2xlLmNvbT47IE1pY2hhZWwgUy4g
+VHNpcmtpbg0KPiA+ID4gPG1zdEByZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uIDxhbGV4Lndp
+bGxpYW1zb25AcmVkaGF0LmNvbT47DQo+ID4gPiBNYXJjZWwgQXBmZWxiYXVtIDxtYXJjZWwuYXBm
+ZWxiYXVtQGdtYWlsLmNvbT47IFN0ZWZhbiBIYWpub2N6aQ0KPiA+ID4gPHN0ZWZhbmhhQGdtYWls
+LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+ID4gU3ViamVjdDogUmU6IFFFTVUgYW5k
+IHZJT01NVSBzdXBwb3J0IGZvciBlbXVsYXRlZCBWRiBwYXNzdGhyb3VnaA0KPiB0bw0KPiA+ID4g
+bmVzdGVkIChMMikgVk0NCj4gPiA+DQo+ID4gPiBPbiBTdW4sIE1hciAzMSwgMjAxOSBhdCAxMTox
+NTowMEFNICswMDAwLCBFbGlqYWggU2hha2tvdXIgd3JvdGU6DQo+ID4gPg0KPiA+ID4gWy4uLl0N
+Cj4gPiA+DQo+ID4gPiA+IEkgZGlkbid0IGhhdmUgRE1BIG5vciBNTUlPIHJlYWQvd3JpdGUgd29y
+a2luZyB3aXRoIG15IG9sZCBjb21tYW5kDQo+ID4gPiBsaW5lLg0KPiA+ID4gPiBCdXQsIHdoZW4g
+SSByZW1vdmVkIGFsbCBDUFUgZmxhZ3MgYW5kIG9ubHkgcHJvdmlkZWQgIi1jcHUgaG9zdCIsIEkN
+Cj4gPiA+ID4gc2VlIHRoYXQNCj4gPiA+IE1NSU8gd29ya3MuDQo+ID4gPiA+IFN0aWxsLCBETUEg
+cmVhZC93cml0ZSBmcm9tIGVtdWxhdGVkIGRldmljZSBkb2Vzbid0IHdvcmsgZm9yIFZGLg0KPiA+
+ID4gPiBGb3INCj4gPiA+IGV4YW1wbGU6DQo+ID4gPiA+IERyaXZlciBwcm92aWRlcyBtZSBhIGJ1
+ZmZlciBwb2ludGVyIHRocm91Z2ggTU1JTyB3cml0ZSwgdGhpcw0KPiA+ID4gPiBhZGRyZXNzDQo+
+ID4gPiAocG9pbnRlcikgaXMgR1BBIG9mIEwyLCBhbmQgd2hlbiBJIHRyeSB0byBjYWxsIHBjaV9k
+bWFfcmVhZCgpIHdpdGgNCj4gPiA+IHRoaXMgYWRkcmVzcyBJIGdldDoNCj4gPiA+ID4gIg0KPiA+
+ID4gPiBVbmFzc2lnbmVkIG1lbSByZWFkIDAwMDAwMDAwMDAwMDAwMDAgIg0KPiA+ID4NCj4gPiA+
+IEkgZG9uJ3Qga25vdyB3aGVyZSB0aGlzIGVycm9yIGxvZyB3YXMgZHVtcGVkIGJ1dCBpZiBpdCdz
+IGR1cmluZyBETUENCj4gPiA+IHRoZW4gSSBhZ3JlZSBpdCBjYW4gcHJvYmFibHkgYmUgcmVsYXRl
+ZCB0byB2SU9NTVUuDQo+ID4gPg0KPiA+DQo+ID4gVGhpcyBsb2cgaXMgZHVtcGVkIGZyb206DQo+
+ID4gbWVtb3J5LmM6IHVuYXNzaWduZWRfbWVtX3JlYWQoKQ0KPiA+DQo+ID4gPiA+IEFzIEkgc2Fp
+ZCwgbXkgcHJvYmxlbSBub3cgaXMgaW4gdHJhbnNsYXRpb24gb2YgTDIgR1BBIHByb3ZpZGVkIGJ5
+DQo+ID4gPiA+IGRyaXZlciwNCj4gPiA+IHdoZW4gSSBjYWxsIERNQSByZWFkL3dyaXRlIGZvciB0
+aGlzIGFkZHJlc3MgZnJvbSBWRi4NCj4gPiA+ID4gQW55IGluc2lnaHRzPw0KPiA+ID4NCj4gPiA+
+IEkganVzdCBub3RpY2VkIHRoYXQgeW91IHdlcmUgdXNpbmcgUUVNVSAyLjEyIFsxXS4gIElmIHRo
+YXQncyB0aGUNCj4gPiA+IGNhc2UsIHBsZWFzZSByZWJhc2UgdG8gdGhlIGxhdGVzdCBRRU1VLCBh
+dCBsZWFzdCA+PTMuMCBiZWNhdXNlDQo+ID4gPiB0aGVyZSdzIG1ham9yIHJlZmFjdG9yIG9mIHRo
+ZSBzaGFkb3cgbG9naWMgZHVyaW5nIDMuMCBkZXZlbCBjeWNsZSBBRkFJQ1QuDQo+ID4gPg0KPiA+
+DQo+ID4gUmViYXNlZCB0byBRRU1VIDMuMQ0KPiA+IE5vdyBJIHNlZSB0aGUgYWRkcmVzcyBJJ20g
+dHJ5aW5nIHRvIHJlYWQgZnJvbSBpbiBsb2cgYnV0IHN0aWxsIHNhbWUgZXJyb3I6DQo+ID4gIg0K
+PiA+IFVuYXNzaWduZWQgbWVtIHJlYWQgMDAwMDAwMDBmMDQ4MTAwMA0KPiA+ICINCj4gPiBXaGF0
+IGRvIHlvdSBzdWdnZXN0Pw0KPiANCj4gV291bGQgeW91IHBsZWFzZSBhbnN3ZXIgdGhlIHF1ZXN0
+aW9ucyB0aGF0IEtudXQgYXNrZWQ/ICBJcyBpdCB3b3JraW5nIGZvciBMMQ0KPiBndWVzdD8gIEhv
+dyBhYm91dCBQRj8NCg0KQm90aCBWRiBhbmQgUEYgYXJlIHdvcmtpbmcgZm9yIEwxIGd1ZXN0Lg0K
+SSBkb24ndCBrbm93IGhvdyB0byBwYXNzdGhyb3VnaCBQRiB0byBuZXN0ZWQgVk0gaW4gaHlwZXIt
+di4NCkkgZG9uJ3QgaW52b2tlIFZGIG1hbnVhbGx5IGluIGh5cGVyLXYgYW5kIHBhc3MgaXQgdGhy
+b3VnaCB0byBuZXN0ZWQgVk0uIEkgdXNlIGh5cGVyLXYgbWFuYWdlciB0byBjb25maWd1cmUgYW5k
+IHByb3ZpZGUgYSBWRiBmb3IgbmVzdGVkIFZNIChJIGNhbiBzZWUgdGhlIFZGIG9ubHkgaW4gdGhl
+IG5lc3RlZCBWTSkuDQoNCkRpZCBzb21lb25lIHRyeSB0byBydW4gZW11bGF0ZWQgZGV2aWNlIGlu
+IGxpbnV4IFJIIGFzIG5lc3RlZCBMMiB3aGVyZSBMMSBpcyB3aW5kb3dzIGh5cGVyLXY/IERvZXMg
+RE1BIHJlYWQvd3JpdGUgd29yayBmb3IgdGhpcyBlbXVsYXRlZCBkZXZpY2UgaW4gdGhpcyBjYXNl
+Pw0KDQo+IA0KPiBZb3UgY2FuIGFsc28gdHJ5IHRvIGVuYWJsZSBWVC1kIGRldmljZSBsb2cgYnkg
+YXBwZW5kaW5nOg0KPiANCj4gICAtdHJhY2UgZW5hYmxlPSJ2dGRfKiINCj4gDQo+IEluIGNhc2Ug
+aXQgZHVtcHMgYW55dGhpbmcgdXNlZnVsIGZvciB5b3UuDQoNCklzIHRoZXJlIGEgd2F5IHRvIG9w
+ZW4gdGhvc2UgdHJhY2VzIHRvIGJlIGR1bXBlZCB0byBzdGRvdXQvc3RkZXJyIG9uIHRoZSBmbHks
+IGluc3RlYWQgb2YgZHRyYWNlPw0KDQo+IA0KPiAtLQ0KPiBQZXRlciBYdQ0K
