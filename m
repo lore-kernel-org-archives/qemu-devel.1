@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48782)
+Received: from eggs.gnu.org ([209.51.188.92]:48811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hAtU5-0003HZ-OP
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1hAtUC-0003Pv-Lc
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hAtU4-0006qc-CH
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:05 -0400
-Date: Mon, 1 Apr 2019 11:34:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190401093405.GA4935@localhost.localdomain>
-References: <20190327173206.9065-1-paul.durrant@citrix.com>
-	<3585a316-6349-b89e-99be-799b055594db@citrix.com>
-	<f9a7e4fa5b794cf88593a86923142a87@AMSPEX02CL02.citrite.net>
-	<20190328114012.GG1420@perard.uk.xensource.com>
-	<28bfdf32-916f-fb55-e2ab-13871b5e0fdd@citrix.com>
-	<20190328115619.GC4857@localhost.localdomain>
-	<b961ee21f8db448fab6b84bb79c37eab@AMSPEX02CL02.citrite.net>
+	(envelope-from <berrange@redhat.com>) id 1hAtUB-0006u4-J7
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:12 -0400
+Date: Mon, 1 Apr 2019 10:39:04 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190401093904.GB3524@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190401082655.8272-1-aruna.15@cse.mrt.ac.lk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b961ee21f8db448fab6b84bb79c37eab@AMSPEX02CL02.citrite.net>
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v2 0/2] xen-block: fix sector
- size confusion
+In-Reply-To: <20190401082655.8272-1-aruna.15@cse.mrt.ac.lk>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Header cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +23,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Am 01.04.2019 um 11:01 hat Paul Durrant geschrieben:
-> > -----Original Message-----
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Sent: 28 March 2019 11:56
-> > To: Andrew Cooper <Andrew.Cooper3@citrix.com>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>; Paul Durrant <Paul.Durrant@citrix.com>; xen-
-> > devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-devel@nongnu.org; Stefano Stabellini
-> > <sstabellini@kernel.org>; Max Reitz <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>
-> > Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size confusion
-> > 
-> > Am 28.03.2019 um 12:46 hat Andrew Cooper geschrieben:
-> > > On 28/03/2019 11:40, Anthony PERARD wrote:
-> > > > On Wed, Mar 27, 2019 at 08:32:28PM +0000, Paul Durrant wrote:
-> > > >>> -----Original Message-----
-> > > >>> From: Andrew Cooper
-> > > >>> Sent: 27 March 2019 18:20
-> > > >>> To: Paul Durrant <Paul.Durrant@citrix.com>; xen-devel@lists.xenproject.org; qemu-
-> > block@nongnu.org;
-> > > >>> qemu-devel@nongnu.org
-> > > >>> Cc: Kevin Wolf <kwolf@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>; Max Reitz
-> > > >>> <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>; Anthony Perard
-> > <anthony.perard@citrix.com>
-> > > >>> Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size confusion
-> > > >>>
-> > > >>> On 27/03/2019 17:32, Paul Durrant wrote:
-> > > >>>> The Xen blkif protocol is confusing but discussion with the maintainer
-> > > >>>> has clarified that sector based quantities in requests and the 'sectors'
-> > > >>>> value advertized in xenstore should always be in terms of 512-byte
-> > > >>>> units and not the advertised logical 'sector-size' value.
-> > > >>>>
-> > > >>>> This series fixes xen-block to adhere to the spec.
-> > > >>> I thought we agreed that hardcoding things to 512 bytes was the wrong
-> > > >>> thing to do.
-> > > >> To some extent we decided it was the *only* thing to do.
-> > > >>
-> > > >>> I was expecting something like:
-> > > >>>
-> > > >>> 1) Clarify the spec with the intended meaning, (which is what some
-> > > >>> implementations actually use already) and wont cripple 4k datapaths.
-> > > >>> 2) Introduce a compatibility key for "I don't rely on sector-size being
-> > > >>> 512", which fixed implementations should advertise.
-> > > >>> 3) Specify that because of bugs in the spec which got out into the wild,
-> > > >>> drivers which don't find the key being advertised by the other end
-> > > >>> should emulate sector-size=512 for compatibility with broken
-> > > >>> implementations.
-> > > >> Yes, that's how we are going to fix things.
-> > > >>
-> > > >>> Whatever the eventual way out, the first thing which needs to happen is
-> > > >>> an update to the spec, before actions are taken to alter existing
-> > > >>> implementations.
-> > > >> Well the implementation is currently wrong w.r.t. the spec and these patches fix that. As long as
-> > sector-size remains at 512 then no existing frontend should break, so I guess you could argue that
-> > patch #2 should also make sure that sector-size is also 512... but that is not yet in the spec.
-> > > >> I guess I'm ok to defer patch #2 until a revised spec. is agreed, but the ship has already sailed
-> > as far as patch #1 goes.
-> > > >>
-> > > >> Anthony, thoughts?
-> > > > So QEMU used to always set "sector-size" to 512, and used that for
-> > > > request. The new implementation (not released yet) doesn't do that
-> > > > anymore, and may set "sector-size" to a different value and used that
-> > > > for requests.
-> > > >
-> > > > patch #1 is one way to fix the requests (and avoid regression) and
-> > > > more clearly spell out the weird thing about the spec.
-> > > >
-> > > > I also think patch #2 is too soon and should point to a commit in
-> > > > xen.git instead of a thread on xen-devel.
-> > > >
-> > > > In the meantime, we should probably set "sector-size" to 512, like QEMU
-> > > > used to do anyway, with a comment about the fact that different
-> > > > implementations uses sector-size differently and a value of 512 would
-> > > > work fine.
-> > >
-> > > Hmm - I hadn't realised this is an unreleased issue in qemu.
-> > >
-> > > So, Qemu used to unconditionally set sector-size=512, and your work to
-> > > qdev-ify everything introduced a change which has identified a
-> > > spec/protocol issue?
-> > 
-> > The old implementation has the sector size hardcoded:
-> > 
-> >     #define BLOCK_SIZE  512
-> > 
-> > Whereas the qdevified version uses DEFINE_BLOCK_PROPERTIES(), which
-> > includes user-visible options for logical/physical_block_size.
-> > 
-> > So before, you couldn't even define a different sector size and the
-> > question whether 512 or the sector size should be used didn't make a
-> > difference anyway.
-> > 
-> > > If so, then I think it is fine for this series to state (much more
-> > > clearly than it does) that it is returning qemu's behaviour to match the
-> > > currently released version, because we've discovered an issue in the
-> > > spec/protocol, and that we will subsequently work address the issue in
-> > > the spec and provide a forwards path which doesn't involve nailing our
-> > > feet to the floor.
-> > 
-> > The closest thing to returning to the old behaviour would be erroring
-> > out during device initialisation if logical_block_size != 512.
+On Mon, Apr 01, 2019 at 01:56:54PM +0530, Aruna Jayasena wrote:
+> Declarations were moved out of qemu-common.h for functions declared in utils/ files.
+> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
 > 
-> One thing I've not figured out... If I create a blockdev in QEMU that
-> is pointing at a real device with a logical_block_size of 4k, will the
-> QEMU block layer perform the necessary read-modify-write cycles for
-> accesses < 4k? IOW would it be safe to always advertise a size of 512
-> to a frontend?
+> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+> 
+> ---
+>  include/qemu-common.h        | 6 ------
+>  include/qemu/id.h            | 3 +++
+>  include/qemu/iov.h           | 6 ++++++
+>  include/qemu/readline.h      | 2 ++
+>  util/aio-posix.c             | 1 -
+>  util/aio-win32.c             | 1 -
+>  util/async.c                 | 1 -
+>  util/bufferiszero.c          | 1 -
+>  util/compatfd.c              | 1 -
+>  util/coroutine-sigaltstack.c | 1 -
+>  util/coroutine-ucontext.c    | 1 -
+>  util/coroutine-win32.c       | 1 -
+>  util/crc32c.c                | 1 -
+>  util/cutils.c                | 1 -
+>  util/envlist.c               | 1 -
+>  util/error.c                 | 1 -
+>  util/event_notifier-posix.c  | 1 -
+>  util/event_notifier-win32.c  | 1 -
+>  util/fifo8.c                 | 1 -
+>  util/getauxval.c             | 1 -
+>  util/hexdump.c               | 2 +-
+>  util/id.c                    | 1 -
+>  util/iohandler.c             | 1 -
+>  util/iov.c                   | 1 -
+>  util/log.c                   | 1 -
+>  util/module.c                | 1 -
+>  util/notify.c                | 1 -
+>  util/qemu-coroutine-io.c     | 1 -
+>  util/qemu-coroutine.c        | 1 -
+>  util/qemu-openpty.c          | 2 +-
+>  util/qemu-option.c           | 1 -
+>  util/qemu-progress.c         | 2 +-
+>  util/qemu-thread-win32.c     | 1 -
+>  util/rcu.c                   | 1 -
+>  util/readline.c              | 1 -
+>  util/thread-pool.c           | 1 -
+>  util/uuid.c                  | 1 -
+>  37 files changed, 14 insertions(+), 39 deletions(-)
+> 
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index a102245519..9543c469b6 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -141,12 +141,6 @@ int os_parse_cmd_args(int index, const char *optarg);
+>  
+>  #include "qemu/module.h"
+>  
+> -/*
+> - * Hexdump a buffer to a file. An optional string prefix is added to every line
+> - */
+> -
+> -void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+> -
+>  /*
+>   * helper to parse debug environment variables
+>   */
 
-Yes, for 512 accesses on native 4k disks with O_DIRECT, the QEMU block
-layer performs the necessary RMW. Of course, it still comes with a
-performance penalty, so you want to avoid such setups, but they do work.
+You forgot to remove
 
-> The problem with erroring out during device init is that it does not
-> give us a way of fixing things in future, as the frontend has not
-> started at that time and thus we'd have no idea whether it could use
-> whatever protocol fix we come up with. I think the only thing the
-> backend could do is refuse to connect to an old frontend if
-> logical_block_size != 512.
+> diff --git a/include/qemu/id.h b/include/qemu/id.h
+> index 40c70103e4..3a651fb9d2 100644
+> --- a/include/qemu/id.h
+> +++ b/include/qemu/id.h
+> @@ -1,6 +1,9 @@
+>  #ifndef QEMU_ID_H
+>  #define QEMU_ID_H
+>  
+> +#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+> +#define qemu_isalpha(c)		isalpha((unsigned char)(c))
 
-I was just thinking of getting back to the old state, with a quick fix
-(by making the problematic new setting inaccessible) for the bug in 4.0
-that could possible be merged today or tomorrow for rc2.
+If we want to move these, they would be better off living in
+include/qemu/cutils.h   You should move *all* of the qemu_is*
+functions at the same time, not just 2 lof them & they should
+be removed from qemu-common.h.
 
-What you need to do for actually supporting 4k disks in the long term
-(QEMU 4.1 or later) depends on what the drivers look like currently and
-is a separate discussion.
+Ideally you would have multiple commits here, each doing a separate part of
+the cleanup.
 
-Kevin
+  1. Move the qemu-hexdump declaration
+  2. Move the qemu_is* macros
+  3. Remove qemu-common.h from source files which don't need it contents.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
