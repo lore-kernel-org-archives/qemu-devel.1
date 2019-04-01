@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48550)
+Received: from eggs.gnu.org ([209.51.188.92]:51995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hB6ZW-0000Gz-8I
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:42:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hB6fJ-0003an-Q3
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hB6ZV-0006Kt-1p
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:42:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hB6fH-0002ZP-KM
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:48:33 -0400
+Date: Mon, 1 Apr 2019 20:38:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190401233818.GA22884@habkost.net>
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<1553849325-44201-5-git-send-email-like.xu@linux.intel.com>
+	<87h8bmuj2d.fsf@zen.linaroharston>
+	<2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
 MIME-Version: 1.0
-References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-	<20190401210011.16009-60-mdroth@linux.vnet.ibm.com>
-	<CAMo8BfLMM7RSXMcvA-jPJFUzt23fCGU-q=3fXZBv_=S_6UszSQ@mail.gmail.com>
-	<155416128371.3333.10200489776884563434@sif>
-In-Reply-To: <155416128371.3333.10200489776884563434@sif>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 1 Apr 2019 16:42:10 -0700
-Message-ID: <CAMo8BfKDrfwONQ-8HWssbRqDhbpidvhBnswz4ytOp8ov9zR98w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 59/97] target/xtensa: drop num_[core_]regs
- from dc232b/dc233c configs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/9] cpu/topology: add ARM support for smp
+ machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Apr 1, 2019 at 4:28 PM Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > I'm curious why this change was picked for stable, it wasn't marked for it.
-> Looks like an earlier patch was tagged for stable:
-...
-> Since patches are often referred to qemu-stable via actual email Cc: and
-> often don't get tagged in the commit I don't rely too much on the
-> "Cc: qemu-stable@nongnu.org" tags in the commit messages currently.
+On Mon, Apr 01, 2019 at 10:56:30AM +0800, Like Xu wrote:
+> On 2019/3/29 17:27, Alex Benn=E9e wrote:
+[...]
+> > > @@ -1713,6 +1717,9 @@ static void cortex_a9_initfn(Object *obj)
+> > >   #ifndef CONFIG_USER_ONLY
+> > >   static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegI=
+nfo *ri)
+> > >   {
+> > > +    MachineState *ms =3D MACHINE(qdev_get_machine());
+> >=20
+> > How expensive is qdev_get_machine? This could potentially be a
+> > performance issue if this register is read a lot.
+>=20
+> It may not bother us cause the MachineState object would be feteched fr=
+om
+> qemu QOM at its first requested time and save it as static variable for
+> incoming requests.
 
-Oh, I see.
+We already have a current_machine variable declared in
+include/hw/boards.h.  We normally avoid using it and use
+MACHINE(qdev_get_machine()) instead, but I never understood why.
 
-> I should probably take note next time a tag is explicitly removed from the
-> final commit though, but the safest way to avoid this if a patch ends up
-> getting Cc'd to qemu-stable at some point is to reply to the patch on why
-> it should be kept out, since I'll usually see those.
-
-Ok, will do it next time.
-
--- 
-Thanks.
--- Max
+--=20
+Eduardo
