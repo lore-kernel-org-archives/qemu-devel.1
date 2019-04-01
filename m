@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40773)
+Received: from eggs.gnu.org ([209.51.188.92]:40780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAsvi-0005Lv-Lw
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:08:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1hAsvi-0005MW-SY
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:08:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAsvh-0004EU-NM
+	(envelope-from <armbru@redhat.com>) id 1hAsvh-0004Ea-Ol
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:08:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58222)
+Received: from mx1.redhat.com ([209.132.183.28]:37706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hAsvh-0004Dx-GL
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hAsvh-0004Dw-H0
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:08:33 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  1 Apr 2019 11:08:25 +0200
-Message-Id: <20190401090827.20793-4-armbru@redhat.com>
+Date: Mon,  1 Apr 2019 11:08:23 +0200
+Message-Id: <20190401090827.20793-2-armbru@redhat.com>
 In-Reply-To: <20190401090827.20793-1-armbru@redhat.com>
 References: <20190401090827.20793-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] migration: Support adding migration
- blockers earlier
+Subject: [Qemu-devel] [PATCH v2 1/5] Revert "vl: Fix to create migration
+ object before block backends again"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +27,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: anthony.perard@citrix.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, kwolf@redhat.com, imammedo@redhat.com
 
-migrate_add_blocker() asserts we have a current_migration object, in
-migrate_get_current().  We do only after migration_object_init().
+This reverts commit e60483f2f8498ae08ae79ca4c6fb03a3317f5e1e.
 
-This contributes to the following dependency cycle:
+Recent commit cda4aa9a5a0 moved block backend creation before machine
+property evaluation.  This broke block backends registering migration
+blockers.  Commit e60483f2f84 fixed it by moving migration object
+creation before block backend creation.  This broke migration with
+Xen.  Turns out we need to configure the accelerator before we create
+the migration object so that Xen's accelerator compat properties get
+applied.  Revert the flawed commit.  This fixes the Xen regression,
+but brings back the block backend regression.  The next commits will
+fix it again.
 
-* configure_blockdev() must run before machine_set_property()
-  so machine properties can refer to block backends
-
-* machine_set_property() before configure_accelerator()
-  so machine properties like kvm-irqchip get applied
-
-* configure_accelerator() before migration_object_init()
-  so that Xen's accelerator compat properties get applied.
-
-* migration_object_init() before configure_blockdev()
-  so configure_blockdev() can add migration blockers
-
-The cycle was closed when recent commit cda4aa9a5a0 "Create block
-backends before setting machine properties" added the first
-dependency, and satisfied it by violating the last one.  Broke block
-backends that add migration blockers, as demonstrated by qemu-iotests
-055.
-
-To fix it, break the last dependency: make migrate_add_blocker()
-usable before migration_object_init().
-
-The previous commit already removed the use of migrate_get_current()
-from migrate_add_blocker() itself.  Didn't quite do the trick, as
-there's another one hiding in migration_is_idle().
-
-The use there isn't actually necessary: when no migration object has
-been created yet, migration is surely idle.  Make migration_is_idle()
-return true then.
-
-Fixes: cda4aa9a5a08777cf13e164c0543bd4888b8adce
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- migration/migration.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ vl.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index f6076e5295..609e0df5d0 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1646,7 +1646,11 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
+diff --git a/vl.c b/vl.c
+index d61d5604e5..c1d5484e12 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4276,17 +4276,10 @@ int main(int argc, char **argv, char **envp)
+         exit(0);
+     }
  
- bool migration_is_idle(void)
- {
--    MigrationState *s = migrate_get_current();
-+    MigrationState *s = current_migration;
+-    /*
+-     * Migration object can only be created after global properties
+-     * are applied correctly.
+-     */
+-    migration_object_init();
+-
+     /*
+      * Note: we need to create block backends before
+      * machine_set_property(), so machine properties can refer to
+-     * them, and after migration_object_init(), so we can create
+-     * migration blockers.
++     * them.
+      */
+     configure_blockdev(&bdo_queue, machine_class, snapshot);
+ 
+@@ -4304,6 +4297,12 @@ int main(int argc, char **argv, char **envp)
+                      machine_class->name, machine_class->deprecation_reason);
+     }
+ 
++    /*
++     * Migration object can only be created after global properties
++     * are applied correctly.
++     */
++    migration_object_init();
 +
-+    if (!s) {
-+        return true;
-+    }
- 
-     switch (s->state) {
-     case MIGRATION_STATUS_NONE:
+     if (qtest_chrdev) {
+         qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+     }
 -- 
 2.17.2
