@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39212)
+Received: from eggs.gnu.org ([209.51.188.92]:46855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eroken1@gmail.com>) id 1hB1To-0003PL-GB
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 14:16:21 -0400
+	(envelope-from <vr_qemu@t-online.de>) id 1hB29W-0007sj-C1
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 14:59:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eroken1@gmail.com>) id 1hB1Tn-0002BE-Gq
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 14:16:20 -0400
-Date: Mon, 1 Apr 2019 19:16:21 +0100
-From: Ernest Esene <eroken1@gmail.com>
-Message-ID: <20190401181621.GA31851@erokenlabserver>
+	(envelope-from <vr_qemu@t-online.de>) id 1hB29V-0004ap-6a
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 14:59:26 -0400
+Received: from mailout10.t-online.de ([194.25.134.21]:58026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1hB29U-0004ZG-OF
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 14:59:25 -0400
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Message-ID: <90b95e4f-39ef-2b01-da6a-857ebaee1ec5@t-online.de>
+Date: Mon, 1 Apr 2019 20:59:20 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
-Content-Disposition: inline
-Subject: [Qemu-devel]  [PATCH v3 3/3] Categorize devices: iommu
+Content-Language: en-GB
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] audio: fix audio timer rate conversion bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Currently the default audio timer frequency is 10000Hz instead of
+a period of 10000us. Also the audiodev timer-period property gets
+converted like a frequency. Only handling of the legacy
+QEMU_AUDIO_TIMER_PERIOD environment variable is correct because
+it's actually a frequency.
 
---nFreZHaLTZJo0R7j
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+With this patch the property timer-period is really a timer period
+and QEMU_AUDIO_TIMER_PERIOD remains a frequency.
 
-Set category and description for iommu devices.
+This fixes commit 71830221fb23388b32e6516c2fb7a698453a6c5a
+-audiodev command line option basic implementation.
 
-Signed-off-by: Ernest Esene <eroken1@gmail.com>
-
+Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 ---
-v3:
-  * set category and describe smmuv3 as suggested by Eric
-v2:
-  * split into separate patches
----
- hw/arm/smmuv3.c       | 2 ++
- hw/i386/amd_iommu.c   | 2 ++
- hw/i386/intel_iommu.c | 2 ++
- 3 files changed, 6 insertions(+)
+ audio/audio.c        | 2 +-
+ audio/audio_legacy.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 8c4e99fecc..d5a3df047d 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -1463,6 +1463,8 @@ static void smmuv3_class_init(ObjectClass *klass, voi=
-d *data)
-     device_class_set_parent_reset(dc, smmu_reset, &c->parent_reset);
-     c->parent_realize =3D dc->realize;
-     dc->realize =3D smmu_realize;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->desc =3D "ARM IOMMU (SMMUv3) DMA Remapping device"
- }
+diff --git a/audio/audio.c b/audio/audio.c
+index 5fd9a58a80..2040762fef 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -1471,7 +1471,7 @@ static int audio_init(Audiodev *dev)
+     if (dev->timer_period <=3D 0) {
+         s->period_ticks =3D 1;
+     } else {
+-        s->period_ticks =3D NANOSECONDS_PER_SECOND / dev->timer_period;
++        s->period_ticks =3D dev->timer_period * SCALE_US;
+     }
 =20
- static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 6eabdf9917..4a4e2c7fd4 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1601,6 +1601,8 @@ static void amdvi_class_init(ObjectClass *klass, void=
-* data)
-     dc_class->int_remap =3D amdvi_int_remap;
-     /* Supported by the pc-q35-* machine types */
-     dc->user_creatable =3D true;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->desc =3D "AMD IOMMU (AMD-Vi) DMA Remapping device";
- }
+     e =3D qemu_add_vm_change_state_handler (audio_vm_change_state_handle=
+r, s);
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index 6d140119d9..2fd58cb8ef 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -26,6 +26,7 @@
+ #include "audio_int.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
++#include "qemu/timer.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-visit-audio.h"
+ #include "qapi/visitor-impl.h"
+@@ -338,8 +339,13 @@ static AudiodevListEntry *legacy_opt(const char *drv=
+name)
+     handle_per_direction(audio_get_pdo_in(e->dev), "QEMU_AUDIO_ADC_");
+     handle_per_direction(audio_get_pdo_out(e->dev), "QEMU_AUDIO_DAC_");
 =20
- static const TypeInfo amdvi =3D {
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 055a1e865d..f9781a5d20 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3727,6 +3727,8 @@ static void vtd_class_init(ObjectClass *klass, void *=
-data)
-     x86_class->int_remap =3D vtd_int_remap;
-     /* Supported by the pc-q35-* machine types */
-     dc->user_creatable =3D true;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->desc =3D "Intel IOMMU (VT-d) DMA Remapping device";
- }
++    /* Original description: Timer period in HZ (0 - use lowest possible=
+) */
+     get_int("QEMU_AUDIO_TIMER_PERIOD",
+             &e->dev->timer_period, &e->dev->has_timer_period);
++    if (e->dev->has_timer_period && e->dev->timer_period) {
++        e->dev->timer_period =3D NANOSECONDS_PER_SECOND / 1000 /
++                               e->dev->timer_period;
++    }
 =20
- static const TypeInfo vtd_info =3D {
+     switch (e->dev->driver) {
+     case AUDIODEV_DRIVER_ALSA:
 --=20
-2.14.2
-
-
---nFreZHaLTZJo0R7j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEFkNmxXgplc+HqgQGJZ4JoaCvxKoFAlyiVXQACgkQJZ4JoaCv
-xKo5fhAAjefjbIaOLqRZ5RAF1ly2x3X/c7InbIQtQyqcRWn3CLulaZqqEmKvX2Bu
-JMsQ9towcyVodOezH5PEgS08mQEgyXIPqRlK9lDRdjezgF3R3cir/KBmv4QA2mzF
-cpJ4bF3fAazDEMX85bFfJ7Ro5d883/WpHlQj7p4sjfWlH1MOJndg7/kyrLK85U3z
-oIxdIVtVPJYEP161uS3nbxjPK12PVWP+JorFH+mgCpzGi4xkLcrLpEFcbq3N5qd8
-qUdAavZn5wGnIG+27ZxZ4ngQK3I++htJYU/usmzppokgG30fH0KIXi2p18PLwVsG
-erE1o4SkYV0rqUcB3DlAI4Y12hTB1TV4/JOrgywOohPDUEyG4zbk/H17FFUXHMtW
-ddYQJBDvm49qQclEmtQKVnLIOAcssictafLgBuqdqwcQ+B2fX0eJBdXT3qJ9eBRx
-j06r4i4fK3mtNNAUBSSE1qGfuz06h39AnQsuJEjgmYgW/cERiLOQ4Eeq3m2xkP69
-czx3luEvFBjK8Qb5sW2TxsLAPhAdm/yk3UTKC35kGa5ISs5SNXf4e6OIScnQagON
-BYWHqFGc4NBrhl0YdcqtriVHikdM9nJh2s9ZQH9jtKmhRS4vsBZD/qTwxu9r7McQ
-Tyx+Y7/Y63Wyh274Fb32MEXvUe6I7CrIoz9kmOc9G2vfvcwYrpk=
-=Rbt8
------END PGP SIGNATURE-----
-
---nFreZHaLTZJo0R7j--
+2.16.4
