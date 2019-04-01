@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51181)
+Received: from eggs.gnu.org ([209.51.188.92]:52858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hAvwU-0007Rv-Rz
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:21:36 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hAw52-0003Mx-0R
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hAvwT-0007se-Iu
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:21:34 -0400
-References: <20190401102911.8685-1-richard.henderson@linaro.org>
-	<20190401102911.8685-3-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3bc9c186-709b-ab28-f218-ebeaab8e6494@redhat.com>
-Date: Mon, 1 Apr 2019 14:21:30 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190401102911.8685-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hAw50-00044S-QR
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:30:23 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 1 Apr 2019 12:29:53 +0000
+Message-ID: <5caba5c9-0002-d3a8-844c-d5ed72889333@virtuozzo.com>
+References: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1554120365-39119-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1554120365-39119-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 2/6] target/s390x: Add ilen to
- unwind data
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A8047C40D57F5D41AFECB251C4FD71A2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] block: include base when checking
+ image chain for block allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "jsnow@redhat.com" <jsnow@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 01.04.19 12:29, Richard Henderson wrote:
-> From: Richard Henderson <rth@twiddle.net>
-> 
-> Use ILEN_UNWIND to signal that we have in fact that
-> cpu_restore_state will have been called by the time
-> we arrive in do_program_interrupt.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/s390x/cpu.h       |  4 +++-
->  target/s390x/internal.h  |  2 +-
->  target/s390x/interrupt.c |  7 +++++--
->  target/s390x/translate.c | 10 +++++++++-
->  4 files changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 6ccf41fc45..1498f3b7f4 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -44,7 +44,7 @@
->  #include "exec/cpu-all.h"
->  
->  #define NB_MMU_MODES 4
-> -#define TARGET_INSN_START_EXTRA_WORDS 1
-> +#define TARGET_INSN_START_EXTRA_WORDS 2
->  
->  #define MMU_MODE0_SUFFIX _primary
->  #define MMU_MODE1_SUFFIX _secondary
-> @@ -787,6 +787,8 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
->  void s390_crw_mchk(void);
->  void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
->                         uint32_t io_int_parm, uint32_t io_int_word);
-> +/* instruction length set by unwind info */
-> +#define ILEN_UNWIND                 0
->  /* automatically detect the instruction length */
->  #define ILEN_AUTO                   0xff
->  #define RA_IGNORED                  0
-> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-> index 3b4855c175..5f7901da5e 100644
-> --- a/target/s390x/internal.h
-> +++ b/target/s390x/internal.h
-> @@ -312,7 +312,7 @@ void cpu_unmap_lowcore(LowCore *lowcore);
->  
->  
->  /* interrupt.c */
-> -void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen);
-> +void trigger_pgm_exception(CPUS390XState *env, uint32_t code, int ilen);
->  void cpu_inject_clock_comparator(S390CPU *cpu);
->  void cpu_inject_cpu_timer(S390CPU *cpu);
->  void cpu_inject_emergency_signal(S390CPU *cpu, uint16_t src_cpu_addr);
-> diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-> index a17eff5ebc..901cd713de 100644
-> --- a/target/s390x/interrupt.c
-> +++ b/target/s390x/interrupt.c
-> @@ -21,13 +21,16 @@
->  #endif
->  
->  /* Ensure to exit the TB after this call! */
-> -void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
-> +void trigger_pgm_exception(CPUS390XState *env, uint32_t code, int ilen)
->  {
->      CPUState *cs = CPU(s390_env_get_cpu(env));
->  
->      cs->exception_index = EXCP_PGM;
->      env->int_pgm_code = code;
-> -    env->int_pgm_ilen = ilen;
-> +    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
-> +    if (ilen != ILEN_UNWIND) {
-> +        env->int_pgm_ilen = ilen;
-> +    }
->  }
->  
->  void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index d22d0f7643..6f9cd19126 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -57,6 +57,7 @@ struct DisasContext {
->      DisasContextBase base;
->      const DisasInsn *insn;
->      DisasFields *fields;
-> +    TCGOp *insn_start;
->      uint64_t ex_value;
->      /*
->       * During translate_one(), pc_tmp is used to determine the instruction
-> @@ -6220,6 +6221,7 @@ static const DisasInsn *extract_insn(CPUS390XState *env, DisasContext *s,
->      }
->      s->pc_tmp = s->base.pc_next + ilen;
->      s->ilen = ilen;
-> +    tcg_set_insn_param(s->insn_start, 2, ilen);
->  
->      /* We can't actually determine the insn format until we've looked up
->         the full insn opcode.  Which we can't do without locating the
-> @@ -6455,7 +6457,12 @@ static void s390x_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
->  {
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->  
-> -    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-> +    /*
-> +     * ??? Alternately, delay emitting insn_start until after we
-> +     * have computed the insn length in extract_insn.
-> +     */
-
-Or maybe change that comment to indicate where the actual ilen will be
-set (extract_insn) and that this is just a dummy value.
-
-> +    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 0);
-> +    dc->insn_start = tcg_last_op();
->  }
->  
->  static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-> @@ -6561,4 +6568,5 @@ void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
->      if ((cc_op != CC_OP_DYNAMIC) && (cc_op != CC_OP_STATIC)) {
->          env->cc_op = cc_op;
->      }
-> +    env->int_pgm_ilen = data[2];
->  }
-> 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+MDEuMDQuMjAxOSAxNTowNiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoaXMgcGF0Y2gg
+aXMgdXNlZCBpbiB0aGUgJ2Jsb2NrL3N0cmVhbTogaW50cm9kdWNlIGEgYm90dG9tIG5vZGUnDQo+
+IHRoYXQgaXMgZm9sbG93aW5nLiBJbnN0ZWFkIG9mIHRoZSBiYXNlIG5vZGUsIHRoZSBjYWxsZXIg
+bWF5IHBhc3MNCj4gdGhlIG5vZGUgdGhhdCBoYXMgdGhlIGJhc2UgYXMgaXRzIGJhY2tpbmcgaW1h
+Z2UgdG8gdGhlIG5ldyBmdW5jdGlvbg0KPiBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZV9pbmNsdXNp
+dmUoKSBhbmQgZ2V0IHJpZCBvZiB0aGUgZGVwZW5kZW5jeQ0KPiBvbiB0aGUgYmFzZSB0aGF0IG1h
+eSBjaGFuZ2UgZHVyaW5nIGNvbW1pdC9zdHJlYW0gcGFyYWxsZWwgam9icy4NCj4gSWYgdGhlIHNw
+ZWNpZmllZCBiYXNlIGlzIG5vdCBmb3VuZCBpbiB0aGUgYmFja2luZyBpbWFnZSBjaGFpbiwgdGhl
+DQo+IGZ1bmN0aW9uIGZhaWxzLg0KDQpNb3JlIGhvbmVzdDogcy9mYWlsL25vdyBjcmFzaGVzLw0K
+DQpBbmQgSSB0aGluayBpdCdzIGNvcnJlY3QuIEJ1dCBpdCB3b3VsZCBiZSBnb29kIHRvIGNoZWNr
+IGFsbCBjYWxsZXJzLi4gRG8gd2UNCmZyZWV6ZSBiYWNraW5nIGNoYWluIGluIGFsbCBjYXNlcyBi
+ZWZvcmUgY2FsbGluZyB0aGlzIGZ1bmN0aW9uPw0KDQo+IA0KPiBTdWdnZXN0ZWQtYnk6IFZsYWRp
+bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4gU2ln
+bmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6
+by5jb20+DQo+IC0tLQ0KPiAgIGJsb2NrL2lvLmMgICAgICAgICAgICB8IDMyICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKy0tLS0tDQo+ICAgaW5jbHVkZS9ibG9jay9ibG9jay5oIHwgIDUgKysr
+Ky0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDMxIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0p
+DQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4gaW5kZXggZGZj
+MTUzYi4uN2VkZWViMiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svaW8uYw0KPiArKysgYi9ibG9jay9p
+by5jDQo+IEBAIC0yMzE3LDcgKzIzMTcsOCBAQCBpbnQgY29yb3V0aW5lX2ZuIGJkcnZfaXNfYWxs
+b2NhdGVkKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNldCwNCj4gICAgKiBHaXZl
+biBhbiBpbWFnZSBjaGFpbjogLi4uIC0+IFtCQVNFXSAtPiBbSU5URVIxXSAtPiBbSU5URVIyXSAt
+PiBbVE9QXQ0KPiAgICAqDQo+ICAgICogUmV0dXJuIHRydWUgaWYgKGEgcHJlZml4IG9mKSB0aGUg
+Z2l2ZW4gcmFuZ2UgaXMgYWxsb2NhdGVkIGluIGFueSBpbWFnZQ0KPiAtICogYmV0d2VlbiBCQVNF
+IGFuZCBUT1AgKGluY2x1c2l2ZSkuICBCQVNFIGNhbiBiZSBOVUxMIHRvIGNoZWNrIGlmIHRoZSBn
+aXZlbg0KPiArICogYmV0d2VlbiBCQVNFIGFuZCBUT1AgKFRPUCBpbmNsdWRlZCkuIFRvIGNoZWNr
+IHRoZSBCQVNFIGltYWdlLCBzZXQgdGhlDQo+ICsgKiAnYmFzZV9pbmNsdWRlZCcgdG8gJ3RydWUn
+LiBUaGUgQkFTRSBjYW4gYmUgTlVMTCB0byBjaGVjayBpZiB0aGUgZ2l2ZW4NCj4gICAgKiBvZmZz
+ZXQgaXMgYWxsb2NhdGVkIGluIGFueSBpbWFnZSBvZiB0aGUgY2hhaW4uICBSZXR1cm4gZmFsc2Ug
+b3RoZXJ3aXNlLA0KPiAgICAqIG9yIG5lZ2F0aXZlIGVycm5vIG9uIGZhaWx1cmUuDQo+ICAgICoN
+Cj4gQEAgLTIzMjksMTYgKzIzMzAsMTggQEAgaW50IGNvcm91dGluZV9mbiBiZHJ2X2lzX2FsbG9j
+YXRlZChCbG9ja0RyaXZlclN0YXRlICpicywgaW50NjRfdCBvZmZzZXQsDQo+ICAgICogYnV0ICdw
+bnVtJyB3aWxsIG9ubHkgYmUgMCB3aGVuIGVuZCBvZiBmaWxlIGlzIHJlYWNoZWQuDQo+ICAgICoN
+Cj4gICAgKi8NCj4gLWludCBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZShCbG9ja0RyaXZlclN0YXRl
+ICp0b3AsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAq
+YmFzZSwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IG9mZnNldCwgaW50
+NjRfdCBieXRlcywgaW50NjRfdCAqcG51bSkNCj4gK3N0YXRpYyBpbnQgYmRydl9kb19pc19hbGxv
+Y2F0ZWRfYWJvdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLA0KPiArICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNlLA0KPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib29sIGJhc2VfaW5jbHVkZWQsIGludDY0X3Qg
+b2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90
+IGJ5dGVzLCBpbnQ2NF90ICpwbnVtKQ0KPiAgIHsNCj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAq
+aW50ZXJtZWRpYXRlOw0KPiAgICAgICBpbnQgcmV0Ow0KPiAgICAgICBpbnQ2NF90IG4gPSBieXRl
+czsNCg0KZW1wdHkgbGluZSBhZnRlciB2YXJpYWJsZSBkZWZpbml0aW9ucw0KDQo+ICsgICAgYXNz
+ZXJ0KGJhc2UgfHwgIWJhc2VfaW5jbHVkZWQpOw0KPiAgIA0KPiAgICAgICBpbnRlcm1lZGlhdGUg
+PSB0b3A7DQo+IC0gICAgd2hpbGUgKGludGVybWVkaWF0ZSAmJiBpbnRlcm1lZGlhdGUgIT0gYmFz
+ZSkgew0KPiArICAgIHdoaWxlIChiYXNlX2luY2x1ZGVkIHx8IGludGVybWVkaWF0ZSAhPSBiYXNl
+KSB7DQo+ICAgICAgICAgICBpbnQ2NF90IHBudW1faW50ZXI7DQo+ICAgICAgICAgICBpbnQ2NF90
+IHNpemVfaW50ZXI7DQo+ICAgDQo+IEBAIC0yMzYwLDYgKzIzNjMsMTAgQEAgaW50IGJkcnZfaXNf
+YWxsb2NhdGVkX2Fib3ZlKEJsb2NrRHJpdmVyU3RhdGUgKnRvcCwNCj4gICAgICAgICAgICAgICBu
+ID0gcG51bV9pbnRlcjsNCj4gICAgICAgICAgIH0NCj4gICANCj4gKyAgICAgICAgaWYgKGludGVy
+bWVkaWF0ZSA9PSBiYXNlKSB7DQo+ICsgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgfQ0K
+PiArDQo+ICAgICAgICAgICBpbnRlcm1lZGlhdGUgPSBiYWNraW5nX2JzKGludGVybWVkaWF0ZSk7
+DQo+ICAgICAgIH0NCj4gICANCj4gQEAgLTIzNjcsNiArMjM3NCwyMSBAQCBpbnQgYmRydl9pc19h
+bGxvY2F0ZWRfYWJvdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLA0KPiAgICAgICByZXR1cm4gMDsN
+Cj4gICB9DQo+ICAgDQo+ICtpbnQgYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUoQmxvY2tEcml2ZXJT
+dGF0ZSAqdG9wLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVyU3Rh
+dGUgKmJhc2UsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCBvZmZzZXQs
+IGludDY0X3QgYnl0ZXMsIGludDY0X3QgKnBudW0pDQo+ICt7DQo+ICsgICAgcmV0dXJuIGJkcnZf
+ZG9faXNfYWxsb2NhdGVkX2Fib3ZlKHRvcCwgYmFzZSwgZmFsc2UsIG9mZnNldCwgYnl0ZXMsIHBu
+dW0pOw0KPiArfQ0KPiArDQo+ICtpbnQgYmRydl9pc19hbGxvY2F0ZWRfYWJvdmVfaW5jbHVzaXZl
+KEJsb2NrRHJpdmVyU3RhdGUgKnRvcCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYmFzZSwNCj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgaW50NjRfdCBvZmZzZXQsIGludDY0X3QgYnl0ZXMsDQo+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludDY0X3QgKnBudW0pDQo+ICt7DQo+
+ICsgICAgcmV0dXJuIGJkcnZfZG9faXNfYWxsb2NhdGVkX2Fib3ZlKHRvcCwgYmFzZSwgdHJ1ZSwg
+b2Zmc2V0LCBieXRlcywgcG51bSk7DQo+ICt9DQo+ICsNCj4gICB0eXBlZGVmIHN0cnVjdCBCZHJ2
+Vm1zdGF0ZUNvIHsNCj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAgICAqYnM7DQo+ICAgICAgIFFF
+TVVJT1ZlY3RvciAgICAgICAgKnFpb3Y7DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Js
+b2NrLmggYi9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4gaW5kZXggYzdhMjYxOS4uYTc4NDZkOSAx
+MDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9ibG9jay5oDQo+ICsrKyBiL2luY2x1ZGUvYmxv
+Y2svYmxvY2suaA0KPiBAQCAtNDQ4LDcgKzQ0OCwxMCBAQCBpbnQgYmRydl9pc19hbGxvY2F0ZWQo
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qgb2Zmc2V0LCBpbnQ2NF90IGJ5dGVzLA0KPiAg
+ICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90ICpwbnVtKTsNCj4gICBpbnQgYmRydl9pc19h
+bGxvY2F0ZWRfYWJvdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLCBCbG9ja0RyaXZlclN0YXRlICpi
+YXNlLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IG9mZnNldCwgaW50
+NjRfdCBieXRlcywgaW50NjRfdCAqcG51bSk7DQo+IC0NCj4gK2ludCBiZHJ2X2lzX2FsbG9jYXRl
+ZF9hYm92ZV9pbmNsdXNpdmUoQmxvY2tEcml2ZXJTdGF0ZSAqdG9wLA0KPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNlLA0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IG9mZnNldCwgaW50NjRf
+dCBieXRlcywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRf
+dCAqcG51bSk7DQoNCmRyb3BwZWQgZW1wdHkgbGluZSBiZXR0ZXIgc3RheSBoZXJlLg0KDQo+ICAg
+Ym9vbCBiZHJ2X2lzX3JlYWRfb25seShCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+ICAgaW50IGJk
+cnZfY2FuX3NldF9yZWFkX29ubHkoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgcmVhZF9vbmx5
+LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaWdub3JlX2FsbG93X3Jkdywg
+RXJyb3IgKiplcnJwKTsNCj4gDQoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1P
+Z2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
