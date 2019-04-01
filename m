@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45984)
+Received: from eggs.gnu.org ([209.51.188.92]:46010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxcq-00027u-7Y
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1hAxcs-0002B8-2x
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAxco-0004vU-BP
+	(envelope-from <eblake@redhat.com>) id 1hAxco-0004wP-JT
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:09:24 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  1 Apr 2019 09:08:58 -0500
-Message-Id: <20190401140903.19186-10-eblake@redhat.com>
+Date: Mon,  1 Apr 2019 09:08:56 -0500
+Message-Id: <20190401140903.19186-8-eblake@redhat.com>
 In-Reply-To: <20190401140903.19186-1-eblake@redhat.com>
 References: <20190401140903.19186-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/14] nbd/client: Report offsets in
- bdrv_block_status
+Subject: [Qemu-devel] [PULL 07/14] iotests: Add 241 to test NBD on unaligned
+ images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,187 +23,195 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-It is desirable for 'qemu-img map' to have the same output for a file
-whether it is served over file or nbd protocols. However, ever since
-we implemented block status for NBD (2.12), the NBD protocol forgot to
-inform the block layer that as the final layer in the chain, the
-offset is valid; without an offset, the human-readable form of
-qemu-img map gives up with the unhelpful:
+Add a test for the NBD client workaround in the previous patch.  It's
+not really feasible for an iotest to assume a specific tracing engine,
+so we can't really probe trace_nbd_parse_blockstatus_compliance to see
+if the server was fixed vs. whether the client just worked around the
+server (other than by rearranging order between code patches and this
+test). But having a successful exchange sure beats the previous state
+of an error message. Since format probing can change alignment, we can
+use that as an easy way to test several configurations.
 
-$ nbdkit -U - data data=3D"1" size=3D512 --run 'qemu-img map $nbd'
-Offset          Length          Mapped to       File
-qemu-img: File contains external, encrypted or compressed clusters.
+Not tested yet, but worth adding to this test in future patches: an
+NBD server that can advertise a non-sector-aligned size (such as
+nbdkit) causes qemu as the NBD client to misbehave when it rounds the
+size up and accesses beyond the advertised size. Qemu as NBD server
+never advertises a non-sector-aligned size (since bdrv_getlength()
+currently rounds up to sector boundaries); until qemu can act as such
+a server, testing that flaw will have to rely on external binaries.
 
-The --output=3Djson form always works, because it is reporting the
-lower-level bdrv_block_status results directly rather than trying to
-filter out sparse ranges for human consumption - but now it also
-shows the offset member.
-
-With this patch, the human output changes to:
-
-Offset          Length          Mapped to       File
-0               0x200           0               nbd+unix://?socket=3D/tmp=
-/nbdkitOxeoLa/socket
-
-This change is observable to several iotests.
-
-Fixes: 78a33ab5
-Reported-by: Richard W.M. Jones <rjones@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190329042750.14704-4-eblake@redhat.com>
+Message-Id: <20190329042750.14704-2-eblake@redhat.com>
+Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[eblake: add forced-512 alignment, and nbdkit reproducer comment]
 ---
- block/nbd-client.c         |  9 +++++++--
- tests/qemu-iotests/209.out |  4 ++--
- tests/qemu-iotests/223.out | 18 +++++++++---------
- tests/qemu-iotests/241.out |  6 +++---
- 4 files changed, 21 insertions(+), 16 deletions(-)
+ tests/qemu-iotests/241     | 100 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/241.out |  26 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 127 insertions(+)
+ create mode 100755 tests/qemu-iotests/241
+ create mode 100644 tests/qemu-iotests/241.out
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 150af9cc46f..3edb508f668 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -972,7 +972,9 @@ int coroutine_fn nbd_client_co_block_status(BlockDriv=
-erState *bs,
-
-     if (!client->info.base_allocation) {
-         *pnum =3D bytes;
--        return BDRV_BLOCK_DATA;
-+        *map =3D offset;
-+        *file =3D bs;
-+        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-     }
-
-     ret =3D nbd_co_send_request(bs, &request, NULL);
-@@ -995,8 +997,11 @@ int coroutine_fn nbd_client_co_block_status(BlockDri=
-verState *bs,
-
-     assert(extent.length);
-     *pnum =3D extent.length;
-+    *map =3D offset;
-+    *file =3D bs;
-     return (extent.flags & NBD_STATE_HOLE ? 0 : BDRV_BLOCK_DATA) |
--           (extent.flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0);
-+        (extent.flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0) |
-+        BDRV_BLOCK_OFFSET_VALID;
- }
-
- void nbd_client_detach_aio_context(BlockDriverState *bs)
-diff --git a/tests/qemu-iotests/209.out b/tests/qemu-iotests/209.out
-index 0d29724e84a..214e27bfcec 100644
---- a/tests/qemu-iotests/209.out
-+++ b/tests/qemu-iotests/209.out
-@@ -1,2 +1,2 @@
--[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true=
-},
--{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data": f=
-alse}]
-+[{ "start": 0, "length": 524288, "depth": 0, "zero": false, "data": true=
-, "offset": 0},
-+{ "start": 524288, "length": 524288, "depth": 0, "zero": true, "data": f=
-alse, "offset": 524288}]
-diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-index 95c40a17ad7..7828a447392 100644
---- a/tests/qemu-iotests/223.out
-+++ b/tests/qemu-iotests/223.out
-@@ -67,18 +67,18 @@ read 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 2097152/2097152 bytes at offset 2097152
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true},
--{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": fa=
-lse},
--{ "start": 1048576, "length": 3145728, "depth": 0, "zero": false, "data"=
-: true}]
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, =
-"offset": OFFSET},
-+{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": fa=
-lse, "offset": OFFSET},
-+{ "start": 1048576, "length": 3145728, "depth": 0, "zero": false, "data"=
-: true, "offset": OFFSET}]
- [{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false=
-},
--{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
-true},
-+{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
-true, "offset": OFFSET},
- { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
-: false}]
-
- =3D=3D=3D Contrast to small granularity dirty-bitmap =3D=3D=3D
-
--[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true},
-+[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true, "=
-offset": OFFSET},
- { "start": 512, "length": 512, "depth": 0, "zero": false, "data": false}=
-,
--{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
-rue},
-+{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET},
- { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
-: false}]
-
- =3D=3D=3D End qemu NBD server =3D=3D=3D
-@@ -94,10 +94,10 @@ read 2097152/2097152 bytes at offset 2097152
- =3D=3D=3D Use qemu-nbd as server =3D=3D=3D
-
- [{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false=
-},
--{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
-true},
-+{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
-true, "offset": OFFSET},
- { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
-: false}]
--[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true},
-+[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true, "=
-offset": OFFSET},
- { "start": 512, "length": 512, "depth": 0, "zero": false, "data": false}=
-,
--{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
-rue},
-+{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET},
- { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
-: false}]
- *** done
+diff --git a/tests/qemu-iotests/241 b/tests/qemu-iotests/241
+new file mode 100755
+index 00000000000..4b196857387
+--- /dev/null
++++ b/tests/qemu-iotests/241
+@@ -0,0 +1,100 @@
++#!/bin/bash
++#
++# Test qemu-nbd vs. unaligned images
++#
++# Copyright (C) 2018-2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++seq=3D"$(basename $0)"
++echo "QA output created by $seq"
++
++status=3D1 # failure is the default!
++
++nbd_unix_socket=3D$TEST_DIR/test_qemu_nbd_socket
++
++_cleanup()
++{
++    _cleanup_test_img
++    nbd_server_stop
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.nbd
++
++_supported_fmt raw
++_supported_proto nbd
++_supported_os Linux
++_require_command QEMU_NBD
++
++# can't use _make_test_img, because qemu-img rounds image size up,
++# and because we want to use Unix socket rather than TCP port. Likewise,
++# we have to redirect TEST_IMG to our server.
++# This tests that we can deal with the hole at the end of an unaligned
++# raw file (either because the server doesn't advertise alignment too
++# large, or because the client ignores the server's noncompliance - even
++# though we can't actually wire iotests into checking trace messages).
++printf %01000d 0 > "$TEST_IMG_FILE"
++TEST_IMG=3D"nbd:unix:$nbd_unix_socket"
++
++echo
++echo "=3D=3D=3D Exporting unaligned raw image, natural alignment =3D=3D=3D=
+"
++echo
++
++nbd_server_start_unix_socket -f $IMGFMT "$TEST_IMG_FILE"
++
++$QEMU_NBD_PROG --list -k $nbd_unix_socket | grep '\(size\|min\)'
++$QEMU_IMG map -f raw --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
++$QEMU_IO -f raw -c map "$TEST_IMG"
++nbd_server_stop
++
++echo
++echo "=3D=3D=3D Exporting unaligned raw image, forced server sector alig=
+nment =3D=3D=3D"
++echo
++
++# Intentionally omit '-f' to force image probing, which in turn forces
++# sector alignment, here at the server.
++nbd_server_start_unix_socket "$TEST_IMG_FILE"
++
++$QEMU_NBD_PROG --list -k $nbd_unix_socket | grep '\(size\|min\)'
++$QEMU_IMG map -f raw --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
++$QEMU_IO -f raw -c map "$TEST_IMG"
++nbd_server_stop
++
++echo
++echo "=3D=3D=3D Exporting unaligned raw image, forced client sector alig=
+nment =3D=3D=3D"
++echo
++
++# Now force sector alignment at the client.
++nbd_server_start_unix_socket -f $IMGFMT "$TEST_IMG_FILE"
++
++$QEMU_NBD_PROG --list -k $nbd_unix_socket | grep '\(size\|min\)'
++$QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
++$QEMU_IO -c map "$TEST_IMG"
++nbd_server_stop
++
++# Not tested yet: we also want to ensure that qemu as NBD client does
++# not access beyond the end of a server's advertised unaligned size:
++#  nbdkit -U - memory size=3D513 --run 'qemu-io -f raw -c "r 512 512" $n=
+bd'
++# However, since qemu as server always rounds up to a sector alignment,
++# we would have to use nbdkit to provoke the current client failures.
++
++# success, all done
++echo '*** done'
++rm -f $seq.full
++status=3D0
 diff --git a/tests/qemu-iotests/241.out b/tests/qemu-iotests/241.out
-index b76a6234d72..f22eabbf324 100644
---- a/tests/qemu-iotests/241.out
+new file mode 100644
+index 00000000000..b76a6234d72
+--- /dev/null
 +++ b/tests/qemu-iotests/241.out
-@@ -4,7 +4,7 @@ QA output created by 241
-
-   size:  1024
-   min block: 512
--[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
-+[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, =
-"offset": OFFSET}]
- 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
-
- =3D=3D=3D Exporting unaligned raw image, forced server sector alignment =
+@@ -0,0 +1,26 @@
++QA output created by 241
++
++=3D=3D=3D Exporting unaligned raw image, natural alignment =3D=3D=3D
++
++  size:  1024
++  min block: 512
++[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
++1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
++
++=3D=3D=3D Exporting unaligned raw image, forced server sector alignment =
 =3D=3D=3D
-@@ -14,13 +14,13 @@ WARNING: Image format was not specified for '/home/eb=
-lake/qemu/tests/qemu-iotest
-          Specify the 'raw' format explicitly to remove the restrictions.
-   size:  1024
-   min block: 512
--[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
-+[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, =
-"offset": OFFSET}]
- 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
-
- =3D=3D=3D Exporting unaligned raw image, forced client sector alignment =
++
++WARNING: Image format was not specified for '/home/eblake/qemu/tests/qem=
+u-iotests/scratch/t.raw' and probing guessed raw.
++         Automatically detecting the format is dangerous for raw images,=
+ write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
++  size:  1024
++  min block: 512
++[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
++1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
++
++=3D=3D=3D Exporting unaligned raw image, forced client sector alignment =
 =3D=3D=3D
-
-   size:  1024
-   min block: 512
--[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
-+[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, =
-"offset": OFFSET}]
- 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
- *** done
++
++  size:  1024
++  min block: 512
++[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true}]
++1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 41da10c6cf5..bae77183809 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -240,6 +240,7 @@
+ 238 auto quick
+ 239 rw auto quick
+ 240 auto quick
++241 rw auto quick
+ 242 rw auto quick
+ 243 rw auto quick
+ 244 rw auto quick
 --=20
 2.20.1
