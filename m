@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42214)
+Received: from eggs.gnu.org ([209.51.188.92]:42185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46J-0002xl-Uf
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:18 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46I-0004US-Mu
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46I-0002wG-3g
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53978
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46G-0004TD-Mk
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53746
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB46I-0004Li-HP
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:14 -0400
+	id 1hB46G-0004LW-Hh
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:12 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L3tNK062270
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:04:02 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsyq4-1
+	x31L3qBf062130
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:04:01 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsxjh-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:58 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:52 -0400
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:03:10 +0100
+	Mon, 1 Apr 2019 22:02:02 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:41 -0500
+Date: Mon,  1 Apr 2019 15:59:07 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-8-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 07/97] target/arm: Fix offset for LD1R
- instructions
+Message-Id: <20190401210011.16009-34-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 33/97] pc: acpi: revert back to 1 SRAT entry
+ for hotpluggable area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,45 +40,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The immediate should be scaled by the size of the memory reference,
-not the size of the elements into which it is loaded.
+Commit
+  10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
+attemped to fix hotplug regression introduced by
+  848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
 
-Cc: qemu-stable@nongnu.org (3.0.1)
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit d0e372b0298f897993f831dbff7ad4f1c70f138e)
+fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
+kernels (RHEL6) to the point where guest might crash at boot.
+Reason is that 2.6 kernel discards SRAT table due too small last entry
+which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
+not ACPI spec compliant according to which whole possible RAM should be
+described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
+
+With 10efd7e108 reverted, I've also tried splitting SRAT table statically
+in different ways %/node and %/slot but Windows still fails to online
+2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
+sometimes even coldplugged pc-dimms where affected with static SRAT
+partitioning.
+The only known so far way where Windows stays happy is when we have 1
+SRAT entry in the last node covering all hotplug area.
+
+Revert 848a1cc1e until we come up with a way to avoid regression
+on Windows with hotplug area split in several entries.
+Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit dbb6da8ba7e02105bdbb33b527e088249c9843c8)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/translate-sve.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/i386/acpi-build.c | 73 ++++++++------------------------------------
+ 1 file changed, 12 insertions(+), 61 deletions(-)
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 9e63b5f8e5..f635822a61 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4819,6 +4819,7 @@ static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
-     unsigned vsz = vec_full_reg_size(s);
-     unsigned psz = pred_full_reg_size(s);
-     unsigned esz = dtype_esz[a->dtype];
-+    unsigned msz = dtype_msz(a->dtype);
-     TCGLabel *over = gen_new_label();
-     TCGv_i64 temp;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index e1ee8ae9e0..1599caa7c5 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+ #define HOLE_640K_START  (640 * KiB)
+ #define HOLE_640K_END   (1 * MiB)
  
-@@ -4842,7 +4843,7 @@ static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+-static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+-                                           uint64_t len, int default_node)
+-{
+-    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
+-    MemoryDeviceInfoList *info;
+-    MemoryDeviceInfo *mi;
+-    PCDIMMDeviceInfo *di;
+-    uint64_t end = base + len, cur, size;
+-    bool is_nvdimm;
+-    AcpiSratMemoryAffinity *numamem;
+-    MemoryAffinityFlags flags;
+-
+-    for (cur = base, info = info_list;
+-         cur < end;
+-         cur += size, info = info->next) {
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-
+-        if (!info) {
+-            /*
+-             * Entry is required for Windows to enable memory hotplug in OS
+-             * and for Linux to enable SWIOTLB when booted with less than
+-             * 4G of RAM. Windows works better if the entry sets proximity
+-             * to the highest NUMA node in the machine at the end of the
+-             * reserved space.
+-             * Memory devices may override proximity set by this entry,
+-             * providing _PXM method if necessary.
+-             */
+-            build_srat_memory(numamem, end - 1, 1, default_node,
+-                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-            break;
+-        }
+-
+-        mi = info->value;
+-        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+-        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
+-
+-        if (cur < di->addr) {
+-            build_srat_memory(numamem, cur, di->addr - cur, default_node,
+-                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-            numamem = acpi_data_push(table_data, sizeof *numamem);
+-        }
+-
+-        size = di->size;
+-
+-        flags = MEM_AFFINITY_ENABLED;
+-        if (di->hotpluggable) {
+-            flags |= MEM_AFFINITY_HOTPLUGGABLE;
+-        }
+-        if (is_nvdimm) {
+-            flags |= MEM_AFFINITY_NON_VOLATILE;
+-        }
+-
+-        build_srat_memory(numamem, di->addr, size, di->node, flags);
+-    }
+-
+-    qapi_free_MemoryDeviceInfoList(info_list);
+-}
+-
+ static void
+ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+ {
+@@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+     }
  
-     /* Load the data.  */
-     temp = tcg_temp_new_i64();
--    tcg_gen_addi_i64(temp, cpu_reg_sp(s, a->rn), a->imm << esz);
-+    tcg_gen_addi_i64(temp, cpu_reg_sp(s, a->rn), a->imm << msz);
-     tcg_gen_qemu_ld_i64(temp, temp, get_mem_index(s),
-                         s->be_data | dtype_mop[a->dtype]);
++    /*
++     * Entry is required for Windows to enable memory hotplug in OS
++     * and for Linux to enable SWIOTLB when booted with less than
++     * 4G of RAM. Windows works better if the entry sets proximity
++     * to the highest NUMA node in the machine.
++     * Memory devices may override proximity set by this entry,
++     * providing _PXM method if necessary.
++     */
+     if (hotplugabble_address_space_size) {
+-        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+-                                       hotplugabble_address_space_size,
+-                                       pcms->numa_nodes - 1);
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, machine->device_memory->base,
++                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+     }
  
+     build_header(linker, table_data,
 -- 
 2.17.1
