@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36445)
+Received: from eggs.gnu.org ([209.51.188.92]:37178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAyul-0005DS-08
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:32:01 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hAyyN-0006g9-En
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAyuj-0006WE-NI
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:31:58 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190328182810.21497-1-kwolf@redhat.com>
-	<20190328182810.21497-2-kwolf@redhat.com>
-	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
-	<87ftr5iy8i.fsf@dusky.pond.sub.org>
-	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
-	<20190329170439.GK5081@localhost.localdomain>
-	<87o95sa40r.fsf@dusky.pond.sub.org>
-	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
-	<20190401115410.GB4935@localhost.localdomain>
-	<87k1gdyinr.fsf@dusky.pond.sub.org>
-	<20190401140842.GD4935@localhost.localdomain>
-Date: Mon, 01 Apr 2019 17:31:49 +0200
-In-Reply-To: <20190401140842.GD4935@localhost.localdomain> (Kevin Wolf's
-	message of "Mon, 1 Apr 2019 16:08:42 +0200")
-Message-ID: <87tvfhlp22.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1hAyyL-0008TB-Ut
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:35:43 -0400
+Resent-Message-Id: <E1hAyyL-0008TB-Ut@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21533)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hAyyL-0008QS-Mp
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:35:41 -0400
+Message-ID: <155413290142.12882.1406474336766959784@76452e4e88f2>
+In-Reply-To: <20190401140318.80498-1-ysato@users.sourceforge.jp>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Options for 4.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 1 Apr 2019 08:35:02 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC v6 00/12] Add RX archtecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: ysato@users.sourceforge.jp
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org
 
-Kevin Wolf <kwolf@redhat.com> writes:
-
-> Am 01.04.2019 um 15:11 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> > Option 4:
->> >
->> > Add a dummy option to BlockdevOptionsFile:
->> >
->> >     '*x-auto-read-only-is-dynamic': { 'type': 'null',
->> >                                       'if': 'defined(CONFIG_POSIX)' }
->> >
->> > Specifying it has no effect, so the ridiculous complexity of three bools
->> > to select from three options is avoided. Its presence in the schema
->> > indicates that file-posix implements dynamic auto-read-only.
->> >
->> > Basically this is features flags in the schema without having proper
->> > feature flags yet.
->> >
->> > Once we add real annotations (hopefully 4.1), this dummy field can be
->> > removed again.
->> 
->> Exact same patch as for option 3, with the parameter renamed and the
->> sanity check for non-sensical use dropped.  *Shrug*
->> 
->> Puts more pressure on me to deliver QAPI feature flags sooner rather
->> than later.  My QAPI pressure control valve has been shedding pressure
->> for a while, so "bring it on".  I'd advise against holding your breath,
->> though.
->
-> Okay, let's stop beating around the bush.
->
-> Nobody has told me so explicitly during this discussion, but implicitly
-> I understand that everyone seems to think doing annotations in the
-> schema is what we really want to have.
-
-I think it would make a useful addition to QAPI.
-
-I don't think it's the ideal solution to the problem at hand.  But the
-problem at hand may not have ideal solutions.
-
-We put @auto-read-only in 3.1 unproven.  As specified, it gives QEMU
-wide latitude to open read-only instead of read-write, and to reopen.
-It doesn't *require* QEMU to do anything in particular.
-
-3.1's implementation conforms to this specification (it would be hard
-not to).
-
-Libvirt needs more than is specified (it would be hard not to), and more
-than is implemented in 3.1.
-
-We changed the implementation in 4.0 to give libvirt what it needs (to
-the best of our knowledge).  This implementation still conforms to the
-specification (again, hard not to).
-
-Libvirt needs to know whether it's dealing with a 3.1 implementation or
-a 4.0 implementation.  A feature bit in the schema can expose this
-cleanly in introspection.
-
-But it's still an awful interface, to be frank.  Let's try to write a
-doc comment for it.
-
-# @read-only:     whether the block device should be read-only (default: false).
-#                 Note that some block drivers support only read-only access,
-#                 either generally or in certain configurations. In this case,
-#                 the default value does not work and the option must be
-#                 specified explicitly.
-# @auto-read-only: if true and @read-only is false, QEMU may automatically
-#                  decide not to open the image read-write as requested, but
-#                  fall back to read-only instead (and switch between the modes
-#                  later), e.g. depending on whether the image file is writable
-#                  or whether a writing user is attached to the node.
-#                  If the variant part corresponding to @driver carries
-#                  feature flag dynamic-auto-read-only, then QEMU will
-#                  always open the image read-only, reopen it read/write
-#                  when the first writing user attaches to the node, and
-#                  reopen it read-only when the last writing user
-#                  detaches from the node.
-#                  (default: false, since 3.1)
-
-This still underspecifies fallback read-only.  If libvirt wants to rely
-on it, we'll get to tighten up that part.
-
-Behavior is governed by three separate entities: feature flag
-@dynamic-read-only, members @read-only and @auto-read-only.  Bonus: the
-feature flag lives somewhere else.  Where it'll also need documentation.
-
-Now compare to this hypothetical interface: @read-only can be true,
-false, "dynamic" (some drivers only) or "fallback (some drivers only,
-assuming we even need it).
-
-To make introspection show the values the driver accepts, @read-only has
-to move from BlockdevOptions into the BlockdevOptionsFoo.  In some of
-them, it remains bool, in BlockdevOptionsFile it becomes an alternate of
-bool and an enum with the single value "dynamic", and so forth.
-
-Perhaps this implementing this would be too onerous.
-
-> Instead of continuing to argue which option to get around it is the
-> least ugly one - how bad is the following attempt at just implementing
-> what we really want?
->
-> Only for structs for now, but that's all we need at the moment. Should
-> be easy to extend during the 4.1 cycle (or whenever we need something
-> else).
->
-> Note that even if there are bugs in it, they are not user-visible and
-> can just be fixed in 4.1. Currently, a diff between old and new
-> query-qmp-schema output looks sane - just the added 'features' list
-> where we want it.
-
-I'll try to review the patch later today.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMTE0MDMxOC44MDQ5
+OC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
+IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
+Cm1vcmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQwMTE0MDMxOC44MDQ5OC0xLXlz
+YXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggUkZD
+IHY2IDAwLzEyXSBBZGQgUlggYXJjaHRlY3R1cmUgc3VwcG9ydApUeXBlOiBzZXJpZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rl
+di9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+YmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MDEx
+MzM2NTkuMjA0MjEtMS12a3V6bmV0c0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA0MDExMzM2
+NTkuMjA0MjEtMS12a3V6bmV0c0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKNThiMjdhNzUxMSBpbmNsdWRlL2h3L3JlZ2lzZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5k
+IDE2Yml0IHJlZ2lzdGVycwo5OGZjM2E4NTNmIE1BSU5UQUlORVJTOiBBZGQgUlgKMGY3N2FiOGFi
+MCBBZGQgcngtc29mdG1tdQo3OThmZDFhMTVkIGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVm
+aW5pdGlvbgphZTFjODcyNGQ2IGh3L2NoYXI6IFJYNjJOIHNlcmljYWwgY29tbXVuaWNhdGlvbiBp
+bnRlcmZhY2UgKFNDSSkKOGU2MzM2Y2NiOCBody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIg
+bW9kdWxlcwo1NWM2MjliODg1IGh3L2ludGM6IFJYNjJOIGludGVycnVwdCBjb250cm9sbGVyIChJ
+Q1VhKQoyN2M0ZjU5NDZiIHRhcmdldC9yeDogTWlzY2VsbGFuZW91cyBmaWxlcwoxN2Q4MTQxNGVi
+IHRhcmdldC9yeDogUlggZGlzYXNzZW1ibGVyCmY1NmJjMjRiOWEgdGFyZ2V0L3J4OiBDUFUgZGVm
+aW5pdGlvbgphZThkZTQ0NzA0IHRhcmdldC9yeDogVENHIGhlbHBlcgpmYTM3OGNiZTEyIHRhcmdl
+dC9yeDogVENHIHRyYW5zbGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEyIENoZWNraW5n
+IGNvbW1pdCBmYTM3OGNiZTEyNjUgKHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogc3BhY2VzIHJlcXVp
+cmVkIGFyb3VuZCB0aGF0ICc8JyAoY3R4Old4VikKIzEyOTc6IEZJTEU6IHRhcmdldC9yeC90cmFu
+c2xhdGUuYzo2NTU6CisgICAgd2hpbGUgKHIgPD0gYS0+cmQyICYmIHIgPDE2KSB7CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE0NjQ6IEZJTEU6IHRhcmdldC9yeC90cmFuc2xhdGUuYzo4
+MjI6CisgICAgd2hpbGUoZHN0IDw9IGEtPnJkMiAmJiBkc3QgPCAxNikgewoKdG90YWw6IDIgZXJy
+b3JzLCAxIHdhcm5pbmdzLCAzMDUwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTIgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCjIvMTIgQ2hlY2tpbmcgY29tbWl0IGFlOGRlNDQ3MDQ2YiAodGFy
+Z2V0L3J4OiBUQ0cgaGVscGVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMTogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDY2MCBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCAyLzEyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvMTIgQ2hlY2tpbmcgY29tbWl0
+IGY1NmJjMjRiOWE5MCAodGFyZ2V0L3J4OiBDUFUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojMTE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
+LCA0ODEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo0LzEyIENoZWNraW5nIGNvbW1pdCAxN2Q4MTQxNGViYTggKHRhcmdldC9yeDogUlggZGlzYXNz
+ZW1ibGVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0OTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xMiBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzEyIENoZWNraW5nIGNvbW1pdCAyN2M0ZjU5NDZi
+ODkgKHRhcmdldC9yeDogTWlzY2VsbGFuZW91cyBmaWxlcykKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTE6
+IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjEg
+bGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzEy
+IENoZWNraW5nIGNvbW1pdCA1NWM2MjliODg1YzEgKGh3L2ludGM6IFJYNjJOIGludGVycnVwdCBj
+b250cm9sbGVyIChJQ1VhKSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
+KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjQ6IApuZXcgZmlsZSBtb2RlIDEw
+MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MjYgbGluZXMgY2hlY2tlZAoKUGF0
+Y2ggNi8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzEyIENoZWNraW5nIGNvbW1pdCA4
+ZTYzMzZjY2I4NDggKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJO
+SU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5l
+ZWQgdXBkYXRpbmc/CiM0NTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
+IDEgd2FybmluZ3MsIDc5OSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEyIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjgvMTIgQ2hlY2tpbmcgY29tbWl0IGFlMWM4NzI0ZDY1MyAoaHcvY2hhcjog
+Ulg2Mk4gc2VyaWNhbCBjb21tdW5pY2F0aW9uIGludGVyZmFjZSAoU0NJKSkKV0FSTklORzogYWRk
+ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
+aW5nPwojMzk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
+bmdzLCAzOTQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgo5LzEyIENoZWNraW5nIGNvbW1pdCA3OThmZDFhMTVkOTUgKGh3L3J4OiBSWCBUYXJnZXQg
+aGFyZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTQ6IApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzOTAgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggOS8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMC8xMiBDaGVja2luZyBjb21t
+aXQgMGY3N2FiOGFiMGM3IChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTA6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0OSBsaW5l
+cyBjaGVja2VkCgpQYXRjaCAxMC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xMiBD
+aGVja2luZyBjb21taXQgOThmYzNhODUzZmQwIChNQUlOVEFJTkVSUzogQWRkIFJYKQoxMi8xMiBD
+aGVja2luZyBjb21taXQgNThiMjdhNzUxMWQ1IChpbmNsdWRlL2h3L3JlZ2lzZXJmaWVsZHMuaDog
+QWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVycykKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxl
+IHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMyMTog
+RklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI1OgorI2RlZmluZSBSRUc4KHJlZywg
+YWRkcikgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBSXyAjIyByZWcgPSAoYWRkcikgfTsKCkVS
+Uk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBhIGRvIC0gd2hpbGUgbG9vcAojMjU6IEZJTEU6IGluY2x1ZGUvaHcvcmVnaXN0ZXJmaWVsZHMu
+aDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikg
+fTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7
+IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywg
+MjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+NDAxMTQwMzE4LjgwNDk4LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAvdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
