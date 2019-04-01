@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40413)
+Received: from eggs.gnu.org ([209.51.188.92]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43w-0000oV-KB
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:51 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43x-0000oe-IW
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43u-00032N-2Y
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38930)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43u-00032z-7e
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46146)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB43t-00030W-ET
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:45 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1hB43t-00030h-KN
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:46 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31Kra5q096528
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:41 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkqt6041t-1
+	x31KrUhh087134
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:42 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksvqgykj-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:41 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Mon, 1 Apr 2019 22:01:40 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:46 -0500
+Date: Mon,  1 Apr 2019 15:58:45 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-13-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 12/97] spapr_cpu_core: vmstate_[un]register
- per-CPU data from (un)realizefn
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190401210011.16009-12-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 11/97] target/arm: Add sve-max-vq cpu property
+ to -cpu max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,152 +42,189 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Bharata B Rao <bharata@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Bharata B Rao <bharata@linux.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-VMStateDescription vmstate_spapr_cpu_state was added by commit
-b94020268e0b6 (spapr_cpu_core: migrate per-CPU data) to migrate per-CPU
-data with the required vmstate registration and unregistration calls.
-However the unregistration is being done only from vcpu creation error path
-and not from CPU delete path.
+This allows the default (and maximum) vector length to be set
+from the command-line.  Which is extraordinarily helpful in
+debugging problems depending on vector length without having to
+bake knowledge of PR_SET_SVE_VL into every guest binary.
 
-This causes migration to fail with the following error if migration is
-attempted after a CPU unplug like this:
-Unknown savevm section or instance 'spapr_cpu' 16
-Additionally this leaves the source VM unresponsive after migration failure.
-
-Fix this by ensuring the vmstate_unregister happens during CPU removal.
-Fixing this becomes easier when vmstate (un)registration calls are moved to
-vcpu (un)realize functions which is what this patch does.
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1785972
-Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit cc71c7760e263f808c4240a725425671eeeb7e4d)
+Cc: qemu-stable@nongnu.org (3.0.1)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit adf92eab90e3f5f34c285da6d14d48952b7a8e72)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_cpu_core.c | 62 +++++++++++++++++++++--------------------
- 1 file changed, 32 insertions(+), 30 deletions(-)
+ linux-user/syscall.c | 19 +++++++++++++------
+ target/arm/cpu.c     |  6 +++---
+ target/arm/cpu.h     |  3 +++
+ target/arm/cpu64.c   | 29 +++++++++++++++++++++++++++++
+ target/arm/helper.c  |  7 +++++--
+ 5 files changed, 53 insertions(+), 11 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 993759db47..bb88a3ce4e 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -113,26 +113,6 @@ const char *spapr_get_cpu_core_type(const char *cpu_type)
-     return object_class_get_name(oc);
- }
- 
--static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
--{
--    qemu_unregister_reset(spapr_cpu_reset, cpu);
--    object_unparent(cpu->intc);
--    cpu_remove_sync(CPU(cpu));
--    object_unparent(OBJECT(cpu));
--}
--
--static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
--{
--    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
--    CPUCore *cc = CPU_CORE(dev);
--    int i;
--
--    for (i = 0; i < cc->nr_threads; i++) {
--        spapr_unrealize_vcpu(sc->threads[i]);
--    }
--    g_free(sc->threads);
--}
--
- static bool slb_shadow_needed(void *opaque)
- {
-     sPAPRCPUState *spapr_cpu = opaque;
-@@ -207,10 +187,34 @@ static const VMStateDescription vmstate_spapr_cpu_state = {
-     }
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index dfc851cc35..5a4af76c03 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -10848,15 +10848,22 @@ abi_long do_syscall(void *cpu_env, int num, abi=
+_long arg1,
+ #endif
+ #ifdef TARGET_AARCH64
+         case TARGET_PR_SVE_SET_VL:
+-            /* We cannot support either PR_SVE_SET_VL_ONEXEC
+-               or PR_SVE_VL_INHERIT.  Therefore, anything above
+-               ARM_MAX_VQ results in EINVAL.  */
++            /*
++             * We cannot support either PR_SVE_SET_VL_ONEXEC or
++             * PR_SVE_VL_INHERIT.  Note the kernel definition
++             * of sve_vl_valid allows for VQ=3D512, i.e. VL=3D8192,
++             * even though the current architectural maximum is VQ=3D16.
++             */
+             ret =3D -TARGET_EINVAL;
+             if (arm_feature(cpu_env, ARM_FEATURE_SVE)
+-                && arg2 >=3D 0 && arg2 <=3D ARM_MAX_VQ * 16 && !(arg2 & =
+15)) {
++                && arg2 >=3D 0 && arg2 <=3D 512 * 16 && !(arg2 & 15)) {
+                 CPUARMState *env =3D cpu_env;
+-                int old_vq =3D (env->vfp.zcr_el[1] & 0xf) + 1;
+-                int vq =3D MAX(arg2 / 16, 1);
++                ARMCPU *cpu =3D arm_env_get_cpu(env);
++                uint32_t vq, old_vq;
++
++                old_vq =3D (env->vfp.zcr_el[1] & 0xf) + 1;
++                vq =3D MAX(arg2 / 16, 1);
++                vq =3D MIN(vq, cpu->sve_max_vq);
+=20
+                 if (vq < old_vq) {
+                     aarch64_sve_narrow_vq(env, vq);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 64a8005a4b..b25898ed4c 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -168,9 +168,9 @@ static void arm_cpu_reset(CPUState *s)
+         env->cp15.cpacr_el1 =3D deposit64(env->cp15.cpacr_el1, 16, 2, 3)=
+;
+         env->cp15.cptr_el[3] |=3D CPTR_EZ;
+         /* with maximum vector length */
+-        env->vfp.zcr_el[1] =3D ARM_MAX_VQ - 1;
+-        env->vfp.zcr_el[2] =3D ARM_MAX_VQ - 1;
+-        env->vfp.zcr_el[3] =3D ARM_MAX_VQ - 1;
++        env->vfp.zcr_el[1] =3D cpu->sve_max_vq - 1;
++        env->vfp.zcr_el[2] =3D env->vfp.zcr_el[1];
++        env->vfp.zcr_el[3] =3D env->vfp.zcr_el[1];
+ #else
+         /* Reset into the highest available EL */
+         if (arm_feature(env, ARM_FEATURE_EL3)) {
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e310ffc29d..9526ed27cb 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -857,6 +857,9 @@ struct ARMCPU {
+=20
+     /* Used to synchronize KVM and QEMU in-kernel device levels */
+     uint8_t device_irq_level;
++
++    /* Used to set the maximum vector length the cpu will support.  */
++    uint32_t sve_max_vq;
  };
- 
-+static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
+=20
+ static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index d0581d59d8..800bff780e 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -29,6 +29,7 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
+ #include "kvm_arm.h"
++#include "qapi/visitor.h"
+=20
+ static inline void set_feature(CPUARMState *env, int feature)
+ {
+@@ -217,6 +218,29 @@ static void aarch64_a53_initfn(Object *obj)
+     define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+ }
+=20
++static void cpu_max_get_sve_vq(Object *obj, Visitor *v, const char *name=
+,
++                               void *opaque, Error **errp)
 +{
-+    if (!sc->pre_3_0_migration) {
-+        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
-+    }
-+    qemu_unregister_reset(spapr_cpu_reset, cpu);
-+    object_unparent(cpu->intc);
-+    cpu_remove_sync(CPU(cpu));
-+    object_unparent(OBJECT(cpu));
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
 +}
 +
-+static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
++static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name=
+,
++                               void *opaque, Error **errp)
 +{
-+    sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-+    CPUCore *cc = CPU_CORE(dev);
-+    int i;
++    ARMCPU *cpu =3D ARM_CPU(obj);
++    Error *err =3D NULL;
 +
-+    for (i = 0; i < cc->nr_threads; i++) {
-+        spapr_unrealize_vcpu(sc->threads[i], sc);
++    visit_type_uint32(v, name, &cpu->sve_max_vq, &err);
++
++    if (!err && (cpu->sve_max_vq =3D=3D 0 || cpu->sve_max_vq > ARM_MAX_V=
+Q)) {
++        error_setg(&err, "unsupported SVE vector length");
++        error_append_hint(&err, "Valid sve-max-vq in range [1-%d]\n",
++                          ARM_MAX_VQ);
 +    }
-+    g_free(sc->threads);
++    error_propagate(errp, err);
 +}
 +
- static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
--                               Error **errp)
-+                               sPAPRCPUCore *sc, Error **errp)
- {
-     CPUPPCState *env = &cpu->env;
-+    CPUState *cs = CPU(cpu);
-     Error *local_err = NULL;
- 
-     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-@@ -233,6 +237,11 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         goto error_unregister;
-     }
- 
-+    if (!sc->pre_3_0_migration) {
-+        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-+                         cpu->machine_data);
-+    }
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this =
+host);
+  * otherwise, a CPU with as many features enabled as our emulation suppo=
+rts.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -253,6 +277,10 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->ctr =3D 0x80038003; /* 32 byte I and D cacheline size, VIPT=
+ icache */
+         cpu->dcz_blocksize =3D 7; /*  512 bytes */
+ #endif
 +
-     return;
- 
- error_unregister:
-@@ -272,10 +281,6 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
++        cpu->sve_max_vq =3D ARM_MAX_VQ;
++        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
+_vq,
++                            cpu_max_set_sve_vq, NULL, NULL, &error_fatal=
+);
      }
- 
-     cpu->machine_data = g_new0(sPAPRCPUState, 1);
--    if (!sc->pre_3_0_migration) {
--        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
--                         cpu->machine_data);
--    }
- 
-     object_unref(obj);
-     return cpu;
-@@ -290,9 +295,6 @@ static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
- {
-     sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
- 
--    if (!sc->pre_3_0_migration) {
--        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
--    }
-     cpu->machine_data = NULL;
-     g_free(spapr_cpu);
-     object_unparent(OBJECT(cpu));
-@@ -325,7 +327,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     }
- 
-     for (j = 0; j < cc->nr_threads; j++) {
--        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
-+        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
-         if (local_err) {
-             goto err_unrealize;
-         }
-@@ -334,7 +336,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
- 
- err_unrealize:
-     while (--j >= 0) {
--        spapr_unrealize_vcpu(sc->threads[j]);
-+        spapr_unrealize_vcpu(sc->threads[j], sc);
-     }
- err:
-     while (--i >= 0) {
--- 
+ }
+=20
+@@ -405,6 +433,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned=
+ vq)
+     uint64_t pmask;
+=20
+     assert(vq >=3D 1 && vq <=3D ARM_MAX_VQ);
++    assert(vq <=3D arm_env_get_cpu(env)->sve_max_vq);
+=20
+     /* Zap the high bits of the zregs.  */
+     for (i =3D 0; i < 32; i++) {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 66afb08ee0..c24c66d43e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12408,9 +12408,12 @@ void cpu_get_tb_cpu_state(CPUARMState *env, targ=
+et_ulong *pc,
+             zcr_len =3D 0;
+         } else {
+             int current_el =3D arm_current_el(env);
++            ARMCPU *cpu =3D arm_env_get_cpu(env);
+=20
+-            zcr_len =3D env->vfp.zcr_el[current_el <=3D 1 ? 1 : current_=
+el];
+-            zcr_len &=3D 0xf;
++            zcr_len =3D cpu->sve_max_vq - 1;
++            if (current_el <=3D 1) {
++                zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el=
+[1]);
++            }
+             if (current_el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
+                 zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el=
+[2]);
+             }
+--=20
 2.17.1
