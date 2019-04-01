@@ -1,38 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41398)
+Received: from eggs.gnu.org ([209.51.188.92]:41457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB458-0001sK-6C
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:03 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45B-0001xt-DZ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB456-0003mQ-Rb
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49136)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45A-0003oO-6k
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB456-0003fW-E9
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:00 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1hB459-0003hi-Qz
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:04 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1qBG062115
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:02:49 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksw4s2k8-1
+	x31L2ASC119045
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:02:52 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkqt606pg-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:02:48 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:02:51 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:47 +0100
+	Mon, 1 Apr 2019 22:02:50 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:41 -0500
+Date: Mon,  1 Apr 2019 15:59:44 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190401210011.16009-68-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 67/97] i2c: Move typedef of
- bitbang_i2c_interface to i2c.h
+Message-Id: <20190401210011.16009-71-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 70/97] nbd/client: Make x-dirty-bitmap more
+ reliable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,68 +39,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Eric Blake <eblake@redhat.com>
 
-Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
-bitbang_i2c.h an error even if they are identical. Move it to a common
-place to allow building with this clang version.
+The implementation of x-dirty-bitmap in qemu 3.0 (commit 216ee365)
+silently falls back to treating the server as not supporting
+NBD_CMD_BLOCK_STATUS if a requested meta_context name was not
+negotiated, which in turn means treating the _entire_ image as
+data. Since our hack relied on using 'qemu-img map' to view
+which portions of the image were dirty by seeing what the
+redirected bdrv_block_status() treats as holes, this means
+that our fallback treats the entire image as clean.  Better
+would have been to treat the entire image as dirty, or to fail
+to connect because the user's request for a specific context
+could not be honored. This patch goes with the latter.
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-(cherry picked from commit 2b4c1125ac3db2734222ff43c25388a16aca4a99)
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181130023232.3079982-3-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+(cherry picked from commit 47829c40794160debdb33b4a042d182e776876d4)
+*avoid context dep. on 6c2e581d
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/i2c/bitbang_i2c.h        | 2 --
- include/hw/i2c/i2c.h        | 2 ++
- include/hw/i2c/ppc4xx_i2c.h | 3 ---
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ block/nbd-client.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
-index 3a7126d5de..9443021710 100644
---- a/hw/i2c/bitbang_i2c.h
-+++ b/hw/i2c/bitbang_i2c.h
-@@ -3,8 +3,6 @@
-=20
- #include "hw/i2c/i2c.h"
-=20
--typedef struct bitbang_i2c_interface bitbang_i2c_interface;
--
- #define BITBANG_I2C_SDA 0
- #define BITBANG_I2C_SCL 1
-=20
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index 5dc166158b..cf4c45a98f 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -82,6 +82,8 @@ int i2c_recv(I2CBus *bus);
-=20
- DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
-r);
-=20
-+typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-+
- /* lm832x.c */
- void lm832x_key_event(DeviceState *dev, int key, int state);
-=20
-diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-index 0891a9c948..b3450bacf7 100644
---- a/include/hw/i2c/ppc4xx_i2c.h
-+++ b/include/hw/i2c/ppc4xx_i2c.h
-@@ -31,9 +31,6 @@
- #include "hw/sysbus.h"
- #include "hw/i2c/i2c.h"
-=20
--/* from hw/i2c/bitbang_i2c.h */
--typedef struct bitbang_i2c_interface bitbang_i2c_interface;
--
- #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
- #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_=
-I2C)
-=20
---=20
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 9686ecbd5e..f8c42a6996 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -992,6 +992,11 @@ int nbd_client_init(BlockDriverState *bs,
+         logout("Failed to negotiate with the NBD server\n");
+         return ret;
+     }
++    if (x_dirty_bitmap && !client->info.base_allocation) {
++        error_setg(errp, "requested x-dirty-bitmap %s not found",
++                   x_dirty_bitmap);
++        return -EINVAL;
++    }
+     if (client->info.flags & NBD_FLAG_READ_ONLY &&
+         !bdrv_is_read_only(bs)) {
+         error_setg(errp,
+-- 
 2.17.1
