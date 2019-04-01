@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35038)
+Received: from eggs.gnu.org ([209.51.188.92]:35257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAwt9-0008J1-Iz
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:22:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1hAwts-0001Je-QN
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAwt8-0005P7-Cj
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:22:11 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44914)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hAwt7-0005Mr-2i
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:22:10 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id y7so11988087wrn.11
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 06:22:06 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1hAwtr-00064B-M0
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:22:56 -0400
+References: <20190330150702.11687-1-eblake@redhat.com>
+	<20190401130416.GC4935@localhost.localdomain>
+	<20190401131641.GJ3524@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4b1b86e0-f465-8bfa-f248-50cdf976f4bc@redhat.com>
+Date: Mon, 1 Apr 2019 08:22:45 -0500
 MIME-Version: 1.0
-References: <20190401092612.9658-1-aruna.15@cse.mrt.ac.lk>
-	<623ecf54-40ad-c811-8b60-41d82f99c778@redhat.com>
-In-Reply-To: <623ecf54-40ad-c811-8b60-41d82f99c778@redhat.com>
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Mon, 1 Apr 2019 18:51:54 +0530
-Message-ID: <CAH95U0jQuR5OLFf_8rk9VfZvyGAmvbwqHphaPopqhrWDP-guGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] Header cleanups for functions
- declared in utils/ files
+In-Reply-To: <20190401131641.GJ3524@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5d1qX4WflEfb3SdMzd4RGCgl2LiFvPQta"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Saner printing of large file
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, rjones@redhat.com, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
 
-Thanks for the feedback! I have recreated the patch according to Daniels
-suggestions by separating the modifications.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5d1qX4WflEfb3SdMzd4RGCgl2LiFvPQta
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, rjones@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
+Message-ID: <4b1b86e0-f465-8bfa-f248-50cdf976f4bc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Saner printing of large file sizes
+References: <20190330150702.11687-1-eblake@redhat.com>
+ <20190401130416.GC4935@localhost.localdomain>
+ <20190401131641.GJ3524@redhat.com>
+In-Reply-To: <20190401131641.GJ3524@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 1 Apr 2019 at 18:25, Eric Blake <eblake@redhat.com> wrote:
+On 4/1/19 8:16 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Apr 01, 2019 at 03:04:16PM +0200, Kevin Wolf wrote:
+>> Am 30.03.2019 um 16:07 hat Eric Blake geschrieben:
+>>> Disk sizes close to INT64_MAX cause overflow, for some pretty
+>>> ridiculous output:
+>>>
+>>>   $ ./nbdkit -U - memory size=3D$((2**63 - 512)) --run 'qemu-img info=
+ $nbd'
+>>>   image: nbd+unix://?socket=3D/tmp/nbdkitHSAzNz/socket
+>>>   file format: raw
+>>>   virtual size: -8388607T (9223372036854775296 bytes)
+>>>   disk size: unavailable
+>>>
 
-> On 4/1/19 4:26 AM, Aruna Jayasena wrote:
-> > Declarations were moved out of qemu-common.h for functions declared in
-> utils/ files.
-> > This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
-> >
-> > Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> >
-> > ---
->
-> Thanks for working on this! Some hints for better reviews:
->
-> - you sent a series, but did not include a 0/2 cover letter; our
-> automated CI tools do best when there is a cover letter
->
-> - you did not describe how v2 differs from v1; here after the --- is a
-> good spot to mention it, to help reviewers double-check your changes from
-> v1
->
-> More patch submission hints can be found at
-> https://wiki.qemu.org/Contribute/SubmitAPatch
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
+>> This is quite obviously a bug fix for some cases. This suggests that w=
+e
+>> want it in 4.0.
+>>
+>> It is also an output change for other cases, like going from "8M" to
+>> "8 MiB". We probably can't tell for sure whether some tools expect the=
+
+>> spelling "8M" (even if this is supposed to be the human interface and
+>> tools should be using JSON) or feed the change back to qemu-img or
+>> qemu-io (which accept "8M", but not "8 MiB" as sizes in most places).
+>> This suggests that we shouldn't make this change as late as -rc2.
+>=20
+> If it breaks our own tests, then it is possible to break other tools
+> too.
+>=20
+>> So what is the conclusion?
+>=20
+> The safe option is to do the minimal fix for the existing code and look=
+ at
+> the refactoring in the next dev cycle.
+
+It's not worth fixing the second implementation to match the first in
+terms of support for sizes > T with no overflow, but with the existing
+format of 8.0M vs. 8 MiB.  I'm happy to defer this patch to 4.1; the bug
+is not new to 4.0, so living with it for one more release doesn't hurt.
 
 --=20
-*Aruna* Jayasena
-Embedded Systems and Computer Science Engineering Undergraduate
-University of Moratuwa
-*=E2=9C=86 **+94719872152 *
-=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-<https://www.linkedin.com/in/arunajayasena/>
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--5d1qX4WflEfb3SdMzd4RGCgl2LiFvPQta
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyiEKUACgkQp6FrSiUn
+Q2o76gf9FDX3DnM6AiTMzy9+LDWsAhBpAEoN802irhkRmJGXyOhWsfIJVb/Pqg2N
+5LW1nlAXaUQr9j551g886iL5DSwSIe1TB4Poum1Pix/EIxkl3neiBXSD1CaTjTDl
+H500maptcvKc80Iq+Bt6PSVd6kh7vJz7LBfuRvegRBo56pYJ2kSsu7YWpRy26imK
+jE5Z5Bj/YTA3KgjnMsy4Y+Uc3/eVczr4JMa5EMcBIephX5M3VqH6reRirpbMTvu8
+slVP2BTFcJ6Dkmln9rAtE5Xrssy9YW77bcdCaUMpxnnC+1oXLdhinoxlNl/POGca
+I66RCHO2JBlhTbn2LH+53pKz9X1FUA==
+=83X2
+-----END PGP SIGNATURE-----
+
+--5d1qX4WflEfb3SdMzd4RGCgl2LiFvPQta--
