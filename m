@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42576)
+Received: from eggs.gnu.org ([209.51.188.92]:42601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46t-0003SI-UX
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:52 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46w-0003U0-21
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46o-0004mG-1O
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46788
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46t-0004p1-Ui
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47618
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB46j-0004dB-7R
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:42 -0400
+	id 1hB46o-0004eQ-QR
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:49 -0400
 Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L4LrE054914
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:04:29 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rkr97patp-1
+	x31L4La8054885
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:04:31 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rkr97pawa-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:04:22 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:04:23 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:51 +0100
+	Mon, 1 Apr 2019 22:02:56 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:45 -0500
+Date: Mon,  1 Apr 2019 15:59:50 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-72-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 71/97] nbd/client: Send NBD_CMD_DISC if open
- fails after connect
+Message-Id: <20190401210011.16009-77-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 76/97] pcie: set link state inactive/active
+ after hot unplug/plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,72 +40,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: qemu-stable@nongnu.org, Zheng Xiang <zhengxiang9@huawei.com>, Zheng Xiang <xiang.zheng@linaro.org>, Wang Haibin <wanghaibin.wang@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: Zheng Xiang <zhengxiang9@huawei.com>
 
-If nbd_client_init() fails after we are already connected,
-then the server will spam logs with:
+When VM boots from the latest version of linux kernel, after
+hot-unpluging virtio-blk disks which are hotplugged into
+pcie-root-port, the VM's dmesg log shows:
 
-Disconnect client, due to: Unexpected end-of-file before all bytes were read
+[  151.046242] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0001 from Slot Status
+[  151.046365] pciehp 0000:00:05.0:pcie004: Slot(0-3): Attention button pressed
+[  151.046369] pciehp 0000:00:05.0:pcie004: Slot(0-3): Powering off due to button press
+[  151.046420] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  151.046425] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
+[  151.046464] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  151.046468] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd c0
+[  156.163421] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 2f1
+[  156.163427] pciehp 0000:00:05.0:pcie004: pciehp_unconfigure_device: domain:bus:dev = 0000:06:00
+[  156.198736] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  156.198772] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
+[  157.224124] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0018 from Slot Status
+[  157.224194] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
+[  157.224220] pciehp 0000:00:05.0:pcie004: pciehp_check_link_active: lnk_status = 2011
+[  157.224223] pciehp 0000:00:05.0:pcie004: Slot(0-3): Link Up
+[  157.224233] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 7f1
+[  157.224281] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  157.224285] pciehp 0000:00:05.0:pcie004: pciehp_power_on_slot: SLOTCTRL a8 write cmd 0
+[  157.224300] pciehp 0000:00:05.0:pcie004: __pciehp_link_set: lnk_ctrl = 0
+[  157.224336] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  157.224339] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
+[  159.739294] pci 0000:06:00.0 id reading try 50 times with interval 20 ms to get ffffffff
+[  159.739315] pciehp 0000:00:05.0:pcie004: pciehp_check_link_status: lnk_status = 2011
+[  159.739318] pciehp 0000:00:05.0:pcie004: Failed to check link status
+[  159.739371] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  159.739394] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
+[  160.771426] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  160.771452] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
+[  160.771495] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  160.771499] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd 40
+[  160.771535] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+[  160.771539] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
 
-unless we gracefully disconnect before closing the connection.
+After analyzing the log information, it seems that qemu doesn't
+change the Link Status from active to inactive after hot-unplug.
+This results in the abnormal log after the linux kernel commit
+d331710ea78fea merged.
 
-Ways to trigger this:
+Furthermore, If I hotplug the same virtio-blk disk after hot-unplug,
+the virtio-blk would turn on and then back off.
 
-$ opts=driver=nbd,export=foo,server.type=inet,server.host=localhost,server.port=10809
-$  qemu-img map --output=json --image-opts $opts,read-only=off
-$  qemu-img map --output=json --image-opts $opts,x-dirty-bitmap=nosuch:
+So this patch set the Link Status inactive after hot-unplug and
+active after hot-plug.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181130023232.3079982-4-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-(cherry picked from commit c688e6ca7b41a105241054853d250df64addbf8f)
-*drop functional dep. on 6c2e581d4d7
+Signed-off-by: Zheng Xiang <zhengxiang9@huawei.com>
+Signed-off-by: Zheng Xiang <xiang.zheng@linaro.org>
+Cc: Wang Haibin <wanghaibin.wang@huawei.com>
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit 2f2b18f60bf17453b4c01197a9316615a3c1f1de)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/nbd-client.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ hw/pci/pcie.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index f8c42a6996..1b7b5b0a88 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -995,13 +995,15 @@ int nbd_client_init(BlockDriverState *bs,
-     if (x_dirty_bitmap && !client->info.base_allocation) {
-         error_setg(errp, "requested x-dirty-bitmap %s not found",
-                    x_dirty_bitmap);
--        return -EINVAL;
-+        ret = -EINVAL;
-+        goto fail;
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 6c91bd44a0..66b73b87c8 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -345,6 +345,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     if (!dev->hotplugged) {
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+                                    PCI_EXP_SLTSTA_PDS);
++        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
++            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
++                                       PCI_EXP_LNKSTA_DLLLA);
++        }
+         return;
      }
-     if (client->info.flags & NBD_FLAG_READ_ONLY &&
-         !bdrv_is_read_only(bs)) {
-         error_setg(errp,
-                    "request for write access conflicts with read-only export");
--        return -EACCES;
-+        ret = -EACCES;
-+        goto fail;
-     }
-     if (client->info.flags & NBD_FLAG_SEND_FUA) {
-         bs->supported_write_flags = BDRV_REQ_FUA;
-@@ -1029,4 +1031,17 @@ int nbd_client_init(BlockDriverState *bs,
  
-     logout("Established connection with NBD server\n");
-     return 0;
-+
-+ fail:
-+    /*
-+     * We have connected, but must fail for other reasons. The
-+     * connection is still blocking; send NBD_CMD_DISC as a courtesy
-+     * to the server.
-+     */
-+    {
-+        NBDRequest request = { .type = NBD_CMD_DISC };
-+
-+        nbd_send_request(client->ioc ?: QIO_CHANNEL(sioc), &request);
-+        return ret;
-+    }
- }
+@@ -355,6 +359,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     if (pci_get_function_0(pci_dev)) {
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+                                    PCI_EXP_SLTSTA_PDS);
++        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
++            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
++                                       PCI_EXP_LNKSTA_DLLLA);
++        }
+         pcie_cap_slot_event(PCI_DEVICE(hotplug_dev),
+                             PCI_EXP_HP_EV_PDC | PCI_EXP_HP_EV_ABP);
+     }
+@@ -531,6 +539,10 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
+ 
+         pci_word_test_and_clear_mask(exp_cap + PCI_EXP_SLTSTA,
+                                      PCI_EXP_SLTSTA_PDS);
++        if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
++            pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKSTA,
++                                         PCI_EXP_LNKSTA_DLLLA);
++        }
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+                                        PCI_EXP_SLTSTA_PDC);
+     }
 -- 
 2.17.1
