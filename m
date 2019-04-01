@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56134)
+Received: from eggs.gnu.org ([209.51.188.92]:56797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hAu8A-00025F-GR
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:25:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hAuBt-0003Gt-1N
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hAu89-0003mY-CA
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:25:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hAu89-0003jp-1I
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:25:29 -0400
-Date: Mon, 1 Apr 2019 18:25:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190401102515.GD8853@xz-x1>
-References: <20190324221319-mutt-send-email-mst@kernel.org>
-	<AM6PR05MB66166ED74E2718150F0CBF62BD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190326085309-mutt-send-email-mst@kernel.org>
-	<AM6PR05MB661611FE4DD494AF9EFB6B8ABD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190327064143.GP9149@xz-x1>
-	<060498b58287775ce6bd7dd704f13b6d6e185f91.camel@oracle.com>
-	<20190327084255.GR9149@xz-x1>
-	<AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190401024710.GB8853@xz-x1>
-	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
-Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
- passthrough to nested (L2) VM
+	(envelope-from <richard.henderson@linaro.org>) id 1hAuBs-0005pZ-22
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:21 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hAuBr-0005op-9n
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 06:29:19 -0400
+Received: by mail-pl1-x642.google.com with SMTP id b65so4277461plb.6
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 03:29:19 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon,  1 Apr 2019 17:29:05 +0700
+Message-Id: <20190401102911.8685-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH for-4.1 0/6] target/s390x: Clean up tcg
+ exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Elijah Shakkour <elijahsh@mellanox.com>
-Cc: Knut Omang <knut.omang@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: david@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org
 
-On Mon, Apr 01, 2019 at 09:12:38AM +0000, Elijah Shakkour wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Monday, April 1, 2019 5:47 AM
-> > To: Elijah Shakkour <elijahsh@mellanox.com>
-> > Cc: Knut Omang <knut.omang@oracle.com>; Michael S. Tsirkin
-> > <mst@redhat.com>; Alex Williamson <alex.williamson@redhat.com>;
-> > Marcel Apfelbaum <marcel.apfelbaum@gmail.com>; Stefan Hajnoczi
-> > <stefanha@gmail.com>; qemu-devel@nongnu.org
-> > Subject: Re: QEMU and vIOMMU support for emulated VF passthrough to
-> > nested (L2) VM
-> > 
-> > On Sun, Mar 31, 2019 at 11:15:00AM +0000, Elijah Shakkour wrote:
-> > 
-> > [...]
-> > 
-> > > I didn't have DMA nor MMIO read/write working with my old command
-> > line.
-> > > But, when I removed all CPU flags and only provided "-cpu host", I see that
-> > MMIO works.
-> > > Still, DMA read/write from emulated device doesn't work for VF. For
-> > example:
-> > > Driver provides me a buffer pointer through MMIO write, this address
-> > (pointer) is GPA of L2, and when I try to call pci_dma_read() with this address
-> > I get:
-> > > "
-> > > Unassigned mem read 0000000000000000
-> > > "
-> > 
-> > I don't know where this error log was dumped but if it's during DMA then I
-> > agree it can probably be related to vIOMMU.
-> > 
-> 
-> This log is dumped from:
-> memory.c: unassigned_mem_read()
-> 
-> > > As I said, my problem now is in translation of L2 GPA provided by driver,
-> > when I call DMA read/write for this address from VF.
-> > > Any insights?
-> > 
-> > I just noticed that you were using QEMU 2.12 [1].  If that's the case, please
-> > rebase to the latest QEMU, at least >=3.0 because there's major refactor of
-> > the shadow logic during 3.0 devel cycle AFAICT.
-> > 
-> 
-> Rebased to QEMU 3.1
-> Now I see the address I'm trying to read from in log but still same error:
-> "
-> Unassigned mem read 00000000f0481000
-> "
-> What do you suggest?
+I've been cleaning up some random branches and found this,
+dating from mid-2017(!)  My memory is that I wrote this going
+into some softfreeze and then failed to do anything with it
+once development opened again.  Oops.
 
-Would you please answer the questions that Knut asked?  Is it working
-for L1 guest?  How about PF?
+The major change is to handle ILEN via TCG unwinding, so that
+we don't have to Just Know about the ILEN (the majority of the
+calls to s390_program_interrupt use constants), or re-read from
+memory (which gets EX wrong).
 
-You can also try to enable VT-d device log by appending:
 
-  -trace enable="vtd_*"
+r~
 
-In case it dumps anything useful for you.
+
+Richard Henderson (6):
+  target/s390x: Truncate 32-bit psw_addr before creating TB
+  target/s390x: Add ilen to unwind data
+  target/s390x: Use ilen from unwind in tlb_fill
+  target/s390x: Remove ilen parameter from tcg_s390_program_interrupt
+  target/s390x: Remove ilen parameter from s390_program_interrupt
+  target/s390x: Use tcg_s390_program_interrupt in TCG helpers
+
+ target/s390x/cpu.h           | 33 +++++++++++++-------
+ target/s390x/internal.h      |  2 +-
+ target/s390x/tcg_s390x.h     |  4 +--
+ hw/s390x/s390-pci-inst.c     | 58 ++++++++++++++++++------------------
+ target/s390x/cc_helper.c     |  4 +--
+ target/s390x/crypto_helper.c |  7 ++---
+ target/s390x/diag.c          | 14 ++++-----
+ target/s390x/excp_helper.c   | 10 +++----
+ target/s390x/fpu_helper.c    |  6 ++--
+ target/s390x/int_helper.c    | 15 +++++-----
+ target/s390x/interrupt.c     | 12 ++++----
+ target/s390x/ioinst.c        | 40 ++++++++++++-------------
+ target/s390x/mem_helper.c    | 53 +++++++++++++++++++-------------
+ target/s390x/misc_helper.c   | 27 ++++++-----------
+ target/s390x/tcg-stub.c      |  4 +--
+ target/s390x/translate.c     | 16 +++++-----
+ 16 files changed, 163 insertions(+), 142 deletions(-)
 
 -- 
-Peter Xu
+2.17.1
