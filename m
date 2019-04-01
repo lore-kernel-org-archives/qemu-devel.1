@@ -1,39 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40308)
+Received: from eggs.gnu.org ([209.51.188.92]:40302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43t-0000ml-BQ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:46 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43r-0000mc-Ev
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43p-0002zy-HO
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54124
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB43o-0002xt-H1
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36700
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB43l-0002sV-KR
+	id 1hB43l-0002r8-KP
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:39 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31KrWCB136226
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:31 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rksx78tce-1
+	x31KrYUe156165
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:28 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rksyp8m6y-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:30 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:28 -0400
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:29 +0100
+	Mon, 1 Apr 2019 22:01:27 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:43 -0500
+Date: Mon,  1 Apr 2019 15:58:42 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190401210011.16009-10-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/97] target/arm: Reformat integer register
- dump
+Message-Id: <20190401210011.16009-9-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 08/97] target/arm: Fix offset scaling for
+ LD_zprr and ST_zprr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,43 +44,43 @@ Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pe
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-With PC, there are 33 registers.  Three per line lines up nicely
-without overflowing 80 columns.
+The scaling should be solely on the memory operation size; the number
+of registers being loaded does not come in to the initial computation.
 
 Cc: qemu-stable@nongnu.org (3.0.1)
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 3cb506a399854c481c2fd2efabecda0654700c47)
+(cherry picked from commit 50ef1cbf31caad21019ae6fa8036ed6f29244ba5)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/translate-a64.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ target/arm/translate-sve.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 45a6c2a3aa..358f169c75 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -137,14 +137,13 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-     int el =3D arm_current_el(env);
-     const char *ns_status;
-=20
--    cpu_fprintf(f, "PC=3D%016"PRIx64"  SP=3D%016"PRIx64"\n",
--            env->pc, env->xregs[31]);
--    for (i =3D 0; i < 31; i++) {
--        cpu_fprintf(f, "X%02d=3D%016"PRIx64, i, env->xregs[i]);
--        if ((i % 4) =3D=3D 3) {
--            cpu_fprintf(f, "\n");
-+    cpu_fprintf(f, " PC=3D%016" PRIx64 " ", env->pc);
-+    for (i =3D 0; i < 32; i++) {
-+        if (i =3D=3D 31) {
-+            cpu_fprintf(f, " SP=3D%016" PRIx64 "\n", env->xregs[i]);
-         } else {
--            cpu_fprintf(f, " ");
-+            cpu_fprintf(f, "X%02d=3D%016" PRIx64 "%s", i, env->xregs[i],
-+                        (i + 2) % 3 ? " " : "\n");
-         }
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index f635822a61..d27bc8c946 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4665,8 +4665,7 @@ static bool trans_LD_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
      }
-=20
---=20
+     if (sve_access_check(s)) {
+         TCGv_i64 addr = new_tmp_a64(s);
+-        tcg_gen_muli_i64(addr, cpu_reg(s, a->rm),
+-                         (a->nreg + 1) << dtype_msz(a->dtype));
++        tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), dtype_msz(a->dtype));
+         tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
+         do_ld_zpa(s, a->rd, a->pg, addr, a->dtype, a->nreg);
+     }
+@@ -4899,7 +4898,7 @@ static bool trans_ST_zprr(DisasContext *s, arg_rprr_store *a, uint32_t insn)
+     }
+     if (sve_access_check(s)) {
+         TCGv_i64 addr = new_tmp_a64(s);
+-        tcg_gen_muli_i64(addr, cpu_reg(s, a->rm), (a->nreg + 1) << a->msz);
++        tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), a->msz);
+         tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
+         do_st_zpa(s, a->rd, a->pg, addr, a->msz, a->esz, a->nreg);
+     }
+-- 
 2.17.1
