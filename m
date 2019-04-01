@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39225)
+Received: from eggs.gnu.org ([209.51.188.92]:39785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hAx9p-0001MB-BD
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:39:26 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hAxC6-0002Nr-PQ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hAx9o-0005O8-5n
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:39:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57972)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hAx9n-0005NU-QQ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:39:24 -0400
-References: <20190401133659.20421-1-vkuznets@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f402ff3c-3edd-2dce-6758-a301cfb2e061@redhat.com>
-Date: Mon, 1 Apr 2019 15:39:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190401133659.20421-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <brijesh.singh@amd.com>) id 1hAxC5-0006bK-7O
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:46 -0400
+Received: from mail-eopbgr760051.outbound.protection.outlook.com
+	([40.107.76.51]:20003
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hAxC4-0006XE-S2
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:45 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Mon, 1 Apr 2019 13:41:39 +0000
+Message-ID: <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
+References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
+	<20190329104904.450fefef@x1.home>
+In-Reply-To: <20190329104904.450fefef@x1.home>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ioapic: allow buggy guests mishandling
- level-triggered interrupts to make progress
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C5A0F6808630AD418F68C362468A4E9C@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
+ device IOMMU address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +33,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Liran Alon <liran.alon@oracle.com>
+To: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
 
-On 01/04/19 15:36, Vitaly Kuznetsov wrote:
-> It was found that Hyper-V 2016 on KVM in some configurations (q35 machine +
-> piix4-usb-uhci) hangs on boot. Trace analysis led us to the conclusion that
-> it is mishandling level-triggered interrupt performing EOI without fixing
-> the root cause. This causes immediate re-assertion and L2 VM (which is
-> supposedly expected to fix the cause of the interrupt) is not making any
-> progress.
-> 
-> Gory details: https://www.spinics.net/lists/kvm/msg184484.html
-> 
-> Turns out we were dealing with similar issues before; in-kernel IOAPIC
-> implementation has commit 184564efae4d ("kvm: ioapic: conditionally delay
-> irq delivery duringeoi broadcast") which describes a very similar issue.
-> 
-> Steal the idea from the above mentioned commit for IOAPIC implementation in
-> QEMU. SUCCESSIVE_IRQ_MAX_COUNT, delay and the comment are borrowed as well.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  hw/intc/ioapic.c                  | 43 ++++++++++++++++++++++++++++++-
->  hw/intc/trace-events              |  1 +
->  include/hw/i386/ioapic_internal.h |  3 +++
->  3 files changed, 46 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-> index 9d75f84d3b..daf45cc8a8 100644
-> --- a/hw/intc/ioapic.c
-> +++ b/hw/intc/ioapic.c
-> @@ -139,6 +139,15 @@ static void ioapic_service(IOAPICCommonState *s)
->      }
->  }
->  
-> +#define SUCCESSIVE_IRQ_MAX_COUNT 10000
-> +
-> +static void ioapic_timer(void *opaque)
-> +{
-> +    IOAPICCommonState *s = opaque;
-> +
-> +    ioapic_service(s);
-> +}
-> +
->  static void ioapic_set_irq(void *opaque, int vector, int level)
->  {
->      IOAPICCommonState *s = opaque;
-> @@ -227,7 +236,28 @@ void ioapic_eoi_broadcast(int vector)
->                  trace_ioapic_clear_remote_irr(n, vector);
->                  s->ioredtbl[n] = entry & ~IOAPIC_LVT_REMOTE_IRR;
->                  if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n))) {
-> -                    ioapic_service(s);
-> +                    bool level = ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1)
-> +                        == IOAPIC_TRIGGER_LEVEL;
-> +
-> +                    ++s->irq_reassert[vector];
-> +                    if (!level ||
-> +                        s->irq_reassert[vector] < SUCCESSIVE_IRQ_MAX_COUNT) {
-> +                        ioapic_service(s);
-> +                    } else {
-> +                        /*
-> +                         * Real hardware does not deliver the interrupt
-> +                         * immediately during eoi broadcast, and this lets a
-> +                         * buggy guest make slow progress even if it does not
-> +                         * correctly handle a level-triggered interrupt. Emulate
-> +                         * this behavior if we detect an interrupt storm.
-> +                         */
-> +                        trace_ioapic_eoi_delayed_reassert(vector);
-> +                        timer_mod(s->timer,
-> +                                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-> +                                  NANOSECONDS_PER_SECOND / 100);
-
-Should this be done only if the timer isn't pending?
-
-Paolo
+VGhhbmtzIGZvciBhZGRpbmcgQWxleC4NCg0KQWRkaW5nIFN1cmF2ZWUuDQoNCg0KT24gMy8yOS8x
+OSAxMTo0OSBBTSwgQWxleCBXaWxsaWFtc29uIHdyb3RlOg0KPiBbQ2MgK0JyaWplc2hdDQo+IA0K
+PiBIaSBCcmlqZXNoLCB3aWxsIHRoZSBjaGFuZ2UgYmVsb3cgcmVxdWlyZSB0aGUgSVZSUyB0byBi
+ZSB1cGRhdGVkIHRvDQo+IGluY2x1ZGUgYWxpYXNlcyBmb3IgYWxsIEJERiByYW5nZXMgYmVoaW5k
+IGEgY29udmVudGlvbmFsIGJyaWRnZT8gIEkNCj4gdGhpbmsgdGhlIExpbnV4IGNvZGUgaGFuZGxl
+cyB0aGlzIHJlZ2FyZGxlc3Mgb2YgdGhlIGZpcm13YXJlIHByb3ZpZGVkDQo+IGFsaWFzZXMsIGJ1
+dCBpcyBpdCByZXF1aXJlZCBwZXIgc3BlYyBmb3IgdGhlIEFDUEkgdGFibGVzIHRvIGluY2x1ZGUN
+Cj4gYnJpZGdlIGFsaWFzZXM/ICBUaGFua3MsDQo+IA0KDQpXZSBkbyBuZWVkIHRvIGluY2x1ZGVz
+IGFsaWFzZXMgaW4gQUNQSSB0YWJsZS4gV2UgbmVlZCB0byBwb3B1bGF0ZSB0aGUNCklWSEQgdHlw
+ZSAweDQzIGFuZCAweDQgZm9yIGFsaWFzIHJhbmdlIHN0YXJ0IGFuZCBlbmQuIEkgYmVsaWV2ZSBo
+b3N0DQpJVlJTIHdvdWxkIGNvbnRhaW4gc2ltaWxhciBpbmZvcm1hdGlvbi4NCg0KU3VyYXZlZSwg
+cGxlYXNlIGNvcnJlY3QgbWUgaWYgSSBhbSBtaXNzaW5nIHNvbWV0aGluZz8NCg0KdGhhbmtzDQoN
+Cj4gQWxleA0KPiANCj4gT24gVHVlLCAyNiBNYXIgMjAxOSAxNjo1NToxOSAtMDYwMA0KPiBBbGV4
+IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+PiBD
+b252ZW50aW9uYWwgUENJIGJ1c2VzIHByZS1kYXRlIHJlcXVlc3RlciBJRHMuICBBbiBJT01NVSBj
+YW5ub3QNCj4+IGRpc3Rpbmd1aXNoIGJ5IGRldmZuICYgYnVzIGJldHdlZW4gZGV2aWNlcyBpbiBh
+IGNvbnZlbnRpb25hbCBQQ0kNCj4+IHRvcG9sb2d5IGFuZCB0aGVyZWZvcmUgd2UgY2Fubm90IGFz
+c2lnbiB0aGVtIHNlcGFyYXRlIEFkZHJlc3NTcGFjZXMuDQo+PiBCeSB0YWtpbmcgdGhpcyByZXF1
+ZXN0ZXIgSUQgYWxpYXNpbmcgaW50byBhY2NvdW50LCBRRU1VIGJldHRlciBtYXRjaGVzDQo+PiB0
+aGUgYmFyZSBtZXRhbCBiZWhhdmlvciBhbmQgcmVzdHJpY3Rpb25zLCBhbmQgZW5hYmxlcyBzaGFy
+ZWQNCj4+IEFkZHJlc3NTcGFjZSBjb25maWd1cmF0aW9ucyB0aGF0IGFyZSBvdGhlcndpc2Ugbm90
+IHBvc3NpYmxlIHdpdGgNCj4+IGd1ZXN0IElPTU1VIHN1cHBvcnQuDQo+Pg0KPj4gRm9yIHRoZSBs
+YXR0ZXIgY2FzZSwgZ2l2ZW4gYW55IGV4YW1wbGUgd2hlcmUgYW4gSU9NTVUgZ3JvdXAgb24gdGhl
+DQo+PiBob3N0IGluY2x1ZGVzIG11bHRpcGxlIGRldmljZXM6DQo+Pg0KPj4gICAgJCBscyAgL3N5
+cy9rZXJuZWwvaW9tbXVfZ3JvdXBzLzEvZGV2aWNlcy8NCj4+ICAgIDAwMDA6MDA6MDEuMCAgMDAw
+MDowMTowMC4wICAwMDAwOjAxOjAwLjENCj4+DQo+PiBJZiB3ZSBpbmNvcnBvcmF0ZSBhIHZJT01N
+VSBpbnRvIHRoZSBWTSBjb25maWd1cmF0aW9uLCB3ZSdyZSByZXN0cmljdGVkDQo+PiB0aGF0IHdl
+IGNhbiBvbmx5IGFzc2lnbiBvbmUgb2YgdGhlIGVuZHBvaW50cyB0byB0aGUgZ3Vlc3QgYmVjYXVz
+ZSBhDQo+PiBzZWNvbmQgZW5kcG9pbnQgd2lsbCBhdHRlbXB0IHRvIHVzZSBhIGRpZmZlcmVudCBB
+ZGRyZXNzU3BhY2UuICBWRklPDQo+PiBvbmx5IHN1cHBvcnRzIElPTU1VIGdyb3VwIGxldmVsIGdy
+YW51bGFyaXR5IGF0IHRoZSBjb250YWluZXIgbGV2ZWwsDQo+PiBwcmV2ZW50aW5nIHRoaXMgc2Vj
+b25kIGVuZHBvaW50IGZyb20gYmVpbmcgYXNzaWduZWQ6DQo+Pg0KPj4gcWVtdS1zeXN0ZW0teDg2
+XzY0IC1tYWNoaW5lIHEzNS4uLiBcDQo+PiAgICAtZGV2aWNlIGludGVsLWlvbW11LGludHJlbWFw
+PW9uIFwNCj4+ICAgIC1kZXZpY2UgcGNpZS1yb290LXBvcnQsYWRkcj0xZS4wLGlkPXBjaWUuMSBc
+DQo+PiAgICAtZGV2aWNlIHZmaW8tcGNpLGhvc3Q9MTowMC4wLGJ1cz1wY2llLjEsYWRkcj0wLjAs
+bXVsdGlmdW5jdGlvbj1vbiBcDQo+PiAgICAtZGV2aWNlIHZmaW8tcGNpLGhvc3Q9MTowMC4xLGJ1
+cz1wY2llLjEsYWRkcj0wLjENCj4+DQo+PiBxZW11LXN5c3RlbS14ODZfNjQ6IC1kZXZpY2UgdmZp
+by1wY2ksaG9zdD0xOjAwLjEsYnVzPXBjaWUuMSxhZGRyPTAuMTogdmZpbyBcDQo+PiAwMDAwOjAx
+OjAwLjE6IGdyb3VwIDEgdXNlZCBpbiBtdWx0aXBsZSBhZGRyZXNzIHNwYWNlcw0KPj4NCj4+IEhv
+d2V2ZXIsIHdoZW4gUUVNVSBpbmNvcnBvcmF0ZXMgcHJvcGVyIGFsaWFzaW5nLCB3ZSBjYW4gbWFr
+ZSB1c2Ugb2YgYQ0KPj4gUENJZS10by1QQ0kgYnJpZGdlIHRvIG1hc2sgdGhlIHJlcXVlc3RlciBJ
+RCwgcmVzdWx0aW5nIGluIGEgaGFjayB0aGF0DQo+PiBwcm92aWRlcyB0aGUgZG93bnN0cmVhbSBk
+ZXZpY2VzIHdpdGggdGhlIHNhbWUgQWRkcmVzc1NwYWNlLCBleDoNCj4+DQo+PiBxZW11LXN5c3Rl
+bS14ODZfNjQgLW1hY2hpbmUgcTM1Li4uIFwNCj4+ICAgIC1kZXZpY2UgaW50ZWwtaW9tbXUsaW50
+cmVtYXA9b24gXA0KPj4gICAgLWRldmljZSBwY2llLXBjaS1icmlkZ2UsYWRkcj0xZS4wLGlkPXBj
+aS4xIFwNCj4+ICAgIC1kZXZpY2UgdmZpby1wY2ksaG9zdD0xOjAwLjAsYnVzPXBjaS4xLGFkZHI9
+MS4wLG11bHRpZnVuY3Rpb249b24gXA0KPj4gICAgLWRldmljZSB2ZmlvLXBjaSxob3N0PTE6MDAu
+MSxidXM9cGNpLjEsYWRkcj0xLjENCj4+DQo+PiBXaGlsZSB0aGUgdXRpbGl0eSBvZiB0aGlzIGhh
+Y2sgbWF5IGJlIGxpbWl0ZWQsIHRoaXMgQWRkcmVzc1NwYWNlDQo+PiBhbGlhc2luZyBpcyB0aGUg
+Y29ycmVjdCBiZWhhdmlvciBmb3IgUUVNVSB0byBlbXVsYXRlIGJhcmUgbWV0YWwuDQo+Pg0KPj4g
+U2lnbmVkLW9mZi1ieTogQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
+bT4NCj4+IC0tLQ0KPj4gICBody9wY2kvcGNpLmMgfCAgIDMzICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKystLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMzEgaW5zZXJ0aW9ucygrKSwgMiBk
+ZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaHcvcGNpL3BjaS5jIGIvaHcvcGNpL3Bj
+aS5jDQo+PiBpbmRleCAzNTQ1MWMxZTk5ODcuLjM4NDY3ZTY3NmYxZiAxMDA2NDQNCj4+IC0tLSBh
+L2h3L3BjaS9wY2kuYw0KPj4gKysrIGIvaHcvcGNpL3BjaS5jDQo+PiBAQCAtMjU5NCwxMiArMjU5
+NCw0MSBAQCBBZGRyZXNzU3BhY2UgKnBjaV9kZXZpY2VfaW9tbXVfYWRkcmVzc19zcGFjZShQQ0lE
+ZXZpY2UgKmRldikNCj4+ICAgew0KPj4gICAgICAgUENJQnVzICpidXMgPSBwY2lfZ2V0X2J1cyhk
+ZXYpOw0KPj4gICAgICAgUENJQnVzICppb21tdV9idXMgPSBidXM7DQo+PiArICAgIHVpbnQ4X3Qg
+ZGV2Zm4gPSBkZXYtPmRldmZuOw0KPj4gICANCj4+ICAgICAgIHdoaWxlKGlvbW11X2J1cyAmJiAh
+aW9tbXVfYnVzLT5pb21tdV9mbiAmJiBpb21tdV9idXMtPnBhcmVudF9kZXYpIHsNCj4+IC0gICAg
+ICAgIGlvbW11X2J1cyA9IHBjaV9nZXRfYnVzKGlvbW11X2J1cy0+cGFyZW50X2Rldik7DQo+PiAr
+ICAgICAgICBQQ0lCdXMgKnBhcmVudF9idXMgPSBwY2lfZ2V0X2J1cyhpb21tdV9idXMtPnBhcmVu
+dF9kZXYpOw0KPj4gKw0KPj4gKyAgICAgICAgLyoNCj4+ICsgICAgICAgICAqIERldGVybWluZSB3
+aGljaCByZXF1ZXN0ZXIgSUQgYWxpYXMgc2hvdWxkIGJlIHVzZWQgZm9yIHRoZSBkZXZpY2UNCj4+
+ICsgICAgICAgICAqIGJhc2VkIG9uIHRoZSBQQ0kgdG9wb2xvZ3kuICBUaGVyZSBhcmUgbm8gcmVx
+dWVzdGVyIElEcyBvbiBjb252ZXRpb25hbA0KPj4gKyAgICAgICAgICogUENJIGJ1c2VzLCB0aGVy
+ZWZvcmUgd2UgcHVzaCB0aGUgYWxpYXMgdXAgdG8gdGhlIHBhcmVudCBvbiBlYWNoIG5vbi0NCj4+
+ICsgICAgICAgICAqIGV4cHJlc3MgYnVzLiAgV2hpY2ggYWxpYXMgd2UgdXNlIGRlcGVuZHMgb24g
+d2hldGhlciB0aGlzIGlzIGEgbGVnYWN5DQo+PiArICAgICAgICAgKiBQQ0kgYnJpZGdlIG9yIFBD
+SWUtdG8tUENJL1ggYnJpZGdlIGFzIGluIGNoYXB0ZXIgMi4zIG9mIHRoZSBQQ0llLXRvLQ0KPj4g
+KyAgICAgICAgICogUENJIGJyaWRnZSBzcGVjLiAgTm90ZSB0aGF0IHdlIGNhbm5vdCB1c2UgcGNp
+X3JlcXVlc3Rlcl9pZCgpIGhlcmUNCj4+ICsgICAgICAgICAqIGJlY2F1c2UgdGhlIHJlc3VsdGlu
+ZyBCREYgZGVwZW5kcyBvbiB0aGUgc2Vjb25kYXJ5IGJyaWRnZSByZWdpc3Rlcg0KPj4gKyAgICAg
+ICAgICogcHJvZ3JhbW1pbmcuICBXZSBhbHNvIGNhbm5vdCBsb29rdXAgdGhlIFBDSUJ1cyBmcm9t
+IHRoZSBidXMgbnVtYmVyDQo+PiArICAgICAgICAgKiBhdCB0aGlzIHBvaW50IGZvciB0aGUgaW9t
+bXVfZm4uICBBbHNvLCByZXF1ZXN0ZXJfaWRfY2FjaGUgaXMgdGhlDQo+PiArICAgICAgICAgKiBh
+bGlhcyB0byB0aGUgcm9vdCBidXMsIHdoaWNoIGlzIHVzdWFsbHksIGJ1dCBub3QgbmVjZXNzYXJp
+bHkgYWx3YXlzDQo+PiArICAgICAgICAgKiB3aGVyZSB3ZSdsbCBmaW5kIG91ciBpb21tdV9mbi4N
+Cj4+ICsgICAgICAgICAqLw0KPj4gKyAgICAgICAgaWYgKCFwY2lfYnVzX2lzX2V4cHJlc3MoaW9t
+bXVfYnVzKSkgew0KPj4gKyAgICAgICAgICAgIFBDSURldmljZSAqcGFyZW50ID0gaW9tbXVfYnVz
+LT5wYXJlbnRfZGV2Ow0KPj4gKw0KPj4gKyAgICAgICAgICAgIGlmIChwY2lfaXNfZXhwcmVzcyhw
+YXJlbnQpICYmDQo+PiArICAgICAgICAgICAgICAgIHBjaWVfY2FwX2dldF90eXBlKHBhcmVudCkg
+PT0gUENJX0VYUF9UWVBFX1BDSV9CUklER0UpIHsNCj4+ICsgICAgICAgICAgICAgICAgZGV2Zm4g
+PSBQQ0lfREVWRk4oMCwgMCk7DQo+PiArICAgICAgICAgICAgICAgIGJ1cyA9IGlvbW11X2J1czsN
+Cj4+ICsgICAgICAgICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAgICAgICAgICBkZXZmbiA9IHBh
+cmVudC0+ZGV2Zm47DQo+PiArICAgICAgICAgICAgICAgIGJ1cyA9IHBhcmVudF9idXM7DQo+PiAr
+ICAgICAgICAgICAgfQ0KPj4gKyAgICAgICAgfQ0KPj4gKw0KPj4gKyAgICAgICAgaW9tbXVfYnVz
+ID0gcGFyZW50X2J1czsNCj4+ICAgICAgIH0NCj4+ICAgICAgIGlmIChpb21tdV9idXMgJiYgaW9t
+bXVfYnVzLT5pb21tdV9mbikgew0KPj4gLSAgICAgICAgcmV0dXJuIGlvbW11X2J1cy0+aW9tbXVf
+Zm4oYnVzLCBpb21tdV9idXMtPmlvbW11X29wYXF1ZSwgZGV2LT5kZXZmbik7DQo+PiArICAgICAg
+ICByZXR1cm4gaW9tbXVfYnVzLT5pb21tdV9mbihidXMsIGlvbW11X2J1cy0+aW9tbXVfb3BhcXVl
+LCBkZXZmbik7DQo+PiAgICAgICB9DQo+PiAgICAgICByZXR1cm4gJmFkZHJlc3Nfc3BhY2VfbWVt
+b3J5Ow0KPj4gICB9DQo+Pg0KPiANCg==
