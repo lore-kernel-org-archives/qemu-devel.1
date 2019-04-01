@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46689)
+Received: from eggs.gnu.org ([209.51.188.92]:46999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAzi8-0003ys-K1
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:23:01 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hAzjy-0005Nl-PT
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hAzi6-0007It-UN
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:23:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190328182810.21497-1-kwolf@redhat.com>
-	<20190328182810.21497-2-kwolf@redhat.com>
-	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
-	<87ftr5iy8i.fsf@dusky.pond.sub.org>
-	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
-	<20190329170439.GK5081@localhost.localdomain>
-	<87o95sa40r.fsf@dusky.pond.sub.org>
-	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
-	<20190401122054.GA2686@andariel.pipo.sk>
-	<87mul9n5ah.fsf@dusky.pond.sub.org>
-	<20190401160755.GB2686@andariel.pipo.sk>
-Date: Mon, 01 Apr 2019 18:22:45 +0200
-In-Reply-To: <20190401160755.GB2686@andariel.pipo.sk> (Peter Krempa's message
-	of "Mon, 1 Apr 2019 18:07:55 +0200")
-Message-ID: <87a7h9lmp6.fsf@dusky.pond.sub.org>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hAzjx-0007jE-8M
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:24:54 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 1 Apr 2019 16:24:40 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8393477CA@lhreml524-mbb.china.huawei.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-6-shameerali.kolothum.thodi@huawei.com>
+	<20190401153425.5d9bd5da@redhat.com>
+In-Reply-To: <20190401153425.5d9bd5da@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Options for 4.0
+Subject: Re: [Qemu-devel] [PATCH v3 05/10] hw/arm/virt: Add ACPI support for
+ device memory cold-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,144 +28,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
 
-Peter Krempa <pkrempa@redhat.com> writes:
 
-> On Mon, Apr 01, 2019 at 16:55:50 +0200, Markus Armbruster wrote:
->> Peter Krempa <pkrempa@redhat.com> writes:
->> 
->> > On Sun, Mar 31, 2019 at 14:56:19 +0200, Markus Armbruster wrote:
->> >> Let's review our options for 4.0.
->> >> 
->> >> Please note my analysis is handicapped by incomplete information, in
->> >> particular on libvirt's needs.
->> >
->> > Libvirt's needs are "simple" we need to do block-commit. It has a few
->> > caveats though. The selinux labels for backing images don't allow write
->> > operation when starting qemu. When doing block-commit libvirt relabels
->> > the backing chain prior to using block-commit.
->> 
->> Paraphrasing, to make sure I got you.
->> 
->> Consider the common read/write COW image with a backing image.
->> 
->> Libvirt wants to grant QEMU read/write access to the COW and read-only
->> access to the backing image.  It does that with SELinux.  QEMU has to
->> open the backing image read-only (read/write would fail).
->> 
->> But libvirt also wants to do block-commit.  Libvirt first relabels to
->> grant QEMU read/write access to the backing image, then $something makes
->> QEMU reopen the backing image read/write, block-commit does its job,
->> $something makes QEMU reopen the backing image read-only, libvirt
->> relabels to revoke read/write access.
->> 
->> Correct?
->
-> Yes.
 
-Thank you.
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: 01 April 2019 14:34
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> eric.auger@redhat.com; peter.maydell@linaro.org;
+> shannon.zhaosl@gmail.com; sameo@linux.intel.com;
+> sebastien.boeuf@intel.com; Linuxarm <linuxarm@huawei.com>; xuwei (O)
+> <xuwei5@huawei.com>
+> Subject: Re: [PATCH v3 05/10] hw/arm/virt: Add ACPI support for device
+> memory cold-plug
+>=20
+> On Thu, 21 Mar 2019 10:47:40 +0000
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
+> > This adds support to build the aml code so that Guest(ACPI boot)
+> > can see the cold-plugged device memory. Memory cold plug support
+> > with DT boot is not yet enabled.
+> >
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  default-configs/arm-softmmu.mak        |  2 ++
+> >  hw/acpi/generic_event_device.c         | 23
+> +++++++++++++++++++++++
+> >  hw/arm/virt-acpi-build.c               |  9 +++++++++
+> >  hw/arm/virt.c                          | 23
+> +++++++++++++++++++++++
+> >  include/hw/acpi/generic_event_device.h |  5 +++++
+> >  include/hw/arm/virt.h                  |  2 ++
+> >  6 files changed, 64 insertions(+)
+> >
+> > diff --git a/default-configs/arm-softmmu.mak
+> b/default-configs/arm-softmmu.mak
+> > index 795cb89..6db444e 100644
+> > --- a/default-configs/arm-softmmu.mak
+> > +++ b/default-configs/arm-softmmu.mak
+> > @@ -162,3 +162,5 @@ CONFIG_LSI_SCSI_PCI=3Dy
+> >
+> >  CONFIG_MEM_DEVICE=3Dy
+> >  CONFIG_DIMM=3Dy
+> > +CONFIG_ACPI_MEMORY_HOTPLUG=3Dy
+> > +CONFIG_ACPI_HW_REDUCED=3Dy
+> > diff --git a/hw/acpi/generic_event_device.c
+> b/hw/acpi/generic_event_device.c
+> > index b21a551..0b32fc9 100644
+> > --- a/hw/acpi/generic_event_device.c
+> > +++ b/hw/acpi/generic_event_device.c
+> > @@ -16,13 +16,26 @@
+> >   */
+> >
+> >  #include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "exec/address-spaces.h"
+> >  #include "hw/sysbus.h"
+> >  #include "hw/acpi/acpi.h"
+> >  #include "hw/acpi/generic_event_device.h"
+> > +#include "hw/mem/pc-dimm.h"
+> >
+> >  static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
+> >                                  DeviceState *dev, Error **errp)
+> >  {
+> > +    VirtAcpiState *s =3D VIRT_ACPI(hotplug_dev);
+> > +
+> > +    if (s->memhp_state.is_enabled &&
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
+> > +                                dev, errp);
+> > +    } else {
+> > +        error_setg(errp, "virt: device plug request for unsupported
+> device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    }
+> >  }
+> >
+> >  static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+> > @@ -31,9 +44,19 @@ static void virt_send_ged(AcpiDeviceIf *adev,
+> AcpiEventStatusBits ev)
+> >
+> >  static void virt_device_realize(DeviceState *dev, Error **errp)
+> >  {
+> > +    VirtAcpiState *s =3D VIRT_ACPI(dev);
+> > +
+> > +    if (s->memhp_state.is_enabled) {
+> > +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
+> > +                                 &s->memhp_state,
+> > +                                 s->memhp_base);
+> > +    }
+> >  }
+> >
+> >  static Property virt_acpi_properties[] =3D {
+> > +    DEFINE_PROP_UINT64("memhp_base", VirtAcpiState, memhp_base,
+> 0),
+>=20
+> it's preferred to use '-' in property names
 
->> With dynamic read-only, $something is the block commit job (a writer)
->> attaching and detaching to the backing image node.
->> 
->> > That works with -drive as qemu reopens the files internally, but does
->> > not work when using -blockdev.
->> 
->> Happy to take your word for it.
->> 
->> > Since we need to keep the images RO until doing  the blockjob there
->> > needs to be a way when either qemu automagically does what libvirt needs
->> > even if the image did not have the write permission originally.
->> >
->> > auto-read-only was a naive impl when qemu attempted to keep the storage
->> > access nodes RW. At the point when I was testing it I didn't enable
->> > s-virt as it's a hassle when you want to run git versions of libvirt and
->> > qemu and thus didn't see the problem with missing permissions.
->> 
->> Yes, fallback read-only is useless for the scenario above.
->> 
->> Kevin wrote "libvirt requires dynamic read-only for file-posix. It
->> prefers dynamic read-only for other drivers, but can live with fallback
->> read-only there."  I'm not sure how it can live with fallback read-only.
->> Is it because only *files* can labelled with SELinux?
->> 
->> If yes, then my next question is how libvirt makes use of fallback
->> read-only for non-files.  Can you give me an example?
->
-> For non-files libvirt usually does not have means to modify the access
-> permissions.
->
-> A simple example may be a NBD export. If the NBD server exports the
-> image readonly libvirt can't do much about it. Arguably you can consider
-> a situation where the user modifies the access to read-write manually
-> and then invokes the libvirt virDomainBlockCommit API and thus still
-> expects the automagic reopen to happen correctly. At this point I'm not
-> really certain to which extend this would work currently with -drive as
-> there are known issues when attempting to point to a non-file image by
-> path rather than node-name.
+Ok.
 
-Both automagic reopen and explicit reopen work here.  Both succeed when
-the user has granted access manually.  Libvirt would have to try the
-explicit reopen even in cases where it can't grant access itself.
+> > +    DEFINE_PROP_BOOL("memory-hotplug-support", VirtAcpiState,
+> > +                     memhp_state.is_enabled, true),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index bf9c0bc..20d3c83 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -40,6 +40,7 @@
+> >  #include "hw/loader.h"
+> >  #include "hw/hw.h"
+> >  #include "hw/acpi/aml-build.h"
+> > +#include "hw/acpi/memory_hotplug.h"
+> >  #include "hw/pci/pcie_host.h"
+> >  #include "hw/pci/pci.h"
+> >  #include "hw/arm/virt.h"
+> > @@ -49,6 +50,13 @@
+> >  #define ARM_SPI_BASE 32
+> >  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+> >
+> > +static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState
+> *ms)
+> > +{
+> it's dummy wrapper that never will be reused,
+> I suggest to just inline contents at call site and drop wrapper.
 
-Sounds like you don't have a use case for fallback read-only.  Correct?
+Ok. I will move it then.
 
->> > The dynamic version attempts to fix that. That is still the automagic
->> > approach. I don't really mind also doing a hands-on approach where we'd
->> > need to tell qemu to reopen given nodes.
->> 
->> Aha!  You just corrected my overly narrow idea of the solution space.
->> 
->> > I'm not sure what ends up being less work.
->> 
->> "Less work" is an important consideration.
->> 
->> We may be able to accept some extra work to get a saner interface.
->> Depends on how much saner and how much extra exactly, and on who needs
->> to do the work.
->
-> I agree. While the 'explicit reopen' approach may be more work for
-> libvirt I'll happily accept that solution.
+>=20
+> > +    uint32_t nr_mem =3D ms->ram_slots;
+> > +
+> > +    build_memory_hotplug_aml(scope, nr_mem, "\\_SB", NULL,
+> AML_SYSTEM_MEMORY);
+> > +}
+> > +
+> >  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+> >  {
+> >      uint16_t i;
+> > @@ -740,6 +748,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> VirtMachineState *vms)
+> >       * the RTC ACPI device at all when using UEFI.
+> >       */
+> >      scope =3D aml_scope("\\_SB");
+> > +    acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
+> >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+> >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+> >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index d0ff20d..13db0e9 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -133,6 +133,7 @@ static const MemMapEntry base_memmap[] =3D {
+> >      [VIRT_GPIO] =3D               { 0x09030000, 0x00001000 },
+> >      [VIRT_SECURE_UART] =3D        { 0x09040000, 0x00001000 },
+> >      [VIRT_SMMU] =3D               { 0x09050000, 0x00020000 },
+> > +    [VIRT_PCDIMM_ACPI] =3D        { 0x09070000, 0x00010000 },
+>                                                  ^^^^^^^^^^^
+> where from this magic number comes?
 
-Would x-blockdev-reopen do?
+I think the only requirement for size is >=3D MEMORY_HOTPLUG_IO_LEN(24).
+So may be 64K is bit too much, 4K might as well do the job.
 
-What exactly is hold it in x-space?
+Or is it best to just use MEMORY_HOTPLUG_IO_LEN directly here?
+=20
+>=20
+> >      [VIRT_MMIO] =3D               { 0x0a000000, 0x00000200 },
+> >      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that
+> size */
+> >      [VIRT_PLATFORM_BUS] =3D       { 0x0c000000, 0x02000000 },
+> > @@ -516,6 +517,18 @@ static void fdt_add_pmu_nodes(const
+> VirtMachineState *vms)
+> >      }
+> >  }
+> >
+> > +static DeviceState *create_virt_acpi(VirtMachineState *vms)
+> > +{
+> > +    DeviceState *dev;
+> > +
+> > +    dev =3D qdev_create(NULL, "virt-acpi");
+> > +    qdev_prop_set_uint64(dev, "memhp_base",
+> > +                         vms->memmap[VIRT_PCDIMM_ACPI].base);
+> > +    qdev_init_nofail(dev);
+> > +
+> > +    return dev;
+>=20
+> Probably no worth a wrapper either, since code is trivial and isn't reuse=
+d
+> elsewhere.
 
-I guess a specialized blockdev-set-read-only would do as well.
+Ok, I will make it an inline then.
 
->> >> Terminology:
->> >> 
->> >> * "Hard read-write" semantics: open read/write.
->> >> 
->> >> * "Hard read-only" semantics: open read-only.
->> >> 
->> >> * "Dynamic read-only" semantics: open read-only, reopen read/write when
->> >>   a writer attaches, reopen read-only when the last writer detaches.
->
-> [...]
->
->> >> * When libvirt sees a driver providing a dynamic-read-only parameter, it
->> >>   knows it can rely on the driver providing dynamic read-only semantics.
->> >> 
->> >> * Adding dynamic read-only capability to drivers creates no
->> >>   introspection problems: we simply add dynamic-read-only to their
->> >>   parameters.
->> >
->> > In the end libvirt does not care that much if the storage is open read
->> > only or read write. We need the format node or guest frontend to deny
->> > writes if the disk is declared as read-only. We also need to be able to
->> > do blockjobs. The requirement is that images may not be accessible in
->> > R/W mode when qemu is starting but later may become. Then it's expected
->> > that block-commit will succeed.
->> 
->> Fallback read-only can't help there.
->> 
->> Dynamic read-only should work.  Explicit reopen triggers could also
->> work.
->
-> The explicit trigger would work. With the tighter control of blockjobs
-> we should be able to control the lifecycle properly.
-
-Good to know, thanks!
+Thanks,
+Shameer
+=20
+> > +}
+> > +
+> >  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
+> >  {
+> >      const char *itsclass =3D its_class_name();
+> > @@ -1644,6 +1657,8 @@ static void machvirt_init(MachineState *machine)
+> >
+> >      create_platform_bus(vms, pic);
+> >
+> > +    vms->acpi =3D create_virt_acpi(vms);
+> > +
+> >      vms->bootinfo.ram_size =3D machine->ram_size;
+> >      vms->bootinfo.kernel_filename =3D machine->kernel_filename;
+> >      vms->bootinfo.kernel_cmdline =3D machine->kernel_cmdline;
+> > @@ -1828,11 +1843,19 @@ static void
+> virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >  static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> >                               DeviceState *dev, Error **errp)
+> >  {
+> > +    HotplugHandlerClass *hhc;
+> >      VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
+> >      Error *local_err =3D NULL;
+> >
+> >      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    hhc =3D HOTPLUG_HANDLER_GET_CLASS(vms->acpi);
+> > +    hhc->plug(HOTPLUG_HANDLER(vms->acpi), dev, &error_abort);
+> >
+> > +out:
+> >      error_propagate(errp, local_err);
+> >  }
+> >
+> > diff --git a/include/hw/acpi/generic_event_device.h
+> b/include/hw/acpi/generic_event_device.h
+> > index f314515..262ca7d 100644
+> > --- a/include/hw/acpi/generic_event_device.h
+> > +++ b/include/hw/acpi/generic_event_device.h
+> > @@ -18,12 +18,17 @@
+> >  #ifndef HW_ACPI_GED_H
+> >  #define HW_ACPI_GED_H
+> >
+> > +#include "hw/acpi/memory_hotplug.h"
+> > +
+> >  #define TYPE_VIRT_ACPI "virt-acpi"
+> >  #define VIRT_ACPI(obj) \
+> >      OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
+> >
+> >  typedef struct VirtAcpiState {
+> >      SysBusDevice parent_obj;
+> > +    MemHotplugState memhp_state;
+> > +    hwaddr memhp_base;
+> >  } VirtAcpiState;
+> >
+> > +
+> >  #endif
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > index 507517c..c5e4c96 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -77,6 +77,7 @@ enum {
+> >      VIRT_GPIO,
+> >      VIRT_SECURE_UART,
+> >      VIRT_SECURE_MEM,
+> > +    VIRT_PCDIMM_ACPI,
+> >      VIRT_LOWMEMMAP_LAST,
+> >  };
+> >
+> > @@ -132,6 +133,7 @@ typedef struct {
+> >      uint32_t iommu_phandle;
+> >      int psci_conduit;
+> >      hwaddr highest_gpa;
+> > +    DeviceState *acpi;
+> >  } VirtMachineState;
+> >
+> >  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
+> VIRT_PCIE_ECAM)
