@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53772)
+Received: from eggs.gnu.org ([209.51.188.92]:53803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hArqT-0003eL-Ao
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 03:59:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hArqV-0003ef-Ve
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 03:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hArqS-00020m-CR
+	(envelope-from <pbonzini@redhat.com>) id 1hArqV-00023i-0Z
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 03:59:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hArqT-00020G-By
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 03:59:05 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hArqR-0001w5-6o
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 03:59:03 -0400
-Received: by mail-oi1-x244.google.com with SMTP id x188so6446162oia.13
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 00:58:59 -0700 (PDT)
+References: <87h8c82woh.fsf@dusky.pond.sub.org>
+	<20190318115407.GD26287@redhat.com> <87sgvke48n.fsf@dusky.pond.sub.org>
+	<195ae49b-e167-137f-430b-a4616d3a45c0@redhat.com>
+	<87r2apczz4.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <234ca694-53c2-282c-eb57-de05724ebc77@redhat.com>
+Date: Mon, 1 Apr 2019 09:58:55 +0200
 MIME-Version: 1.0
-References: <20190305172139.32662-1-peter.maydell@linaro.org>
-	<20190305172139.32662-10-peter.maydell@linaro.org>
-	<92ffba93-e486-647a-01ef-86180fb2cbb2@redhat.com>
-In-Reply-To: <92ffba93-e486-647a-01ef-86180fb2cbb2@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Apr 2019 07:58:45 +0000
-Message-ID: <CAFEAcA8U1o7JZmAP4nhsiY+riFtZmxHBQCkOu0zmR++K70gnQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] Makefile,
- configure: Support building rST documentation
+In-Reply-To: <87r2apczz4.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Issues around TYPE_INTERFACE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-On Sat, 30 Mar 2019 at 22:05, Eric Blake <eblake@redhat.com> wrote:
-> Rich told me that qemu-nbd.8 was not being built, and I confirmed that
-> it failed to build for me. git bisect points to this commit as the
-> reason that 'touch qemu-nbd.texi; make' no longer rebuilds qemu-nbd.8
-> automatically. Is it merely because I don't have enough stuff installed,
-> or is it an actual broken dependency?
->
-> /me goes and runs 'dnf install "*/sphinx-build"...
->
-> Nope, even with that installed, qemu-nbd.8 is still not getting built by
-> 'make'; but 'make qemu-nbd.8' is working. We lost a dependency :(
+On 29/03/19 19:11, Markus Armbruster wrote:
+>>>>> Yet they're used for less than half of the interface names:
+>>>>>
+>>>>>     TYPE_ISADMA
+>>>>>     TYPE_MEMORY_DEVICE
+>>>>>     TYPE_NMI
 
-I just did a test build from clean and I get a qemu-nbd.8 in the
-build directory. I also  checked that 'touch qemu-nbd.texi; make -C build V=1'
-rebuilds the manpage, and it does:
+Could be renamed to TYPE_NMI_MONITOR_HANDLER.
 
-[snip other stuff]
-perl -Ww -- /home/pm215/qemu/scripts/texi2pod.pl -I docs -I
-/home/pm215/qemu -I . "-DVERSION=3.1.91"
-/home/pm215/qemu/qemu-nbd.texi qemu-nbd.8.pod && pod2man --utf8
---section=8 --center=" " --release=" " qemu-nbd.8.pod > qemu-nbd.8
-[...]
+>>>>>     TYPE_NVRAM
+>>>>>     TYPE_PPC_VIRTUAL_HYPERVISOR
+>>>>>     TYPE_STREAM_SLAVE
+>>>>>     TYPE_USER_CREATABLE
+>>>>>     TYPE_XICS_FABRIC
+>>>>>     TYPE_XIVE_NOTIFIER
+>>>>>
+>>>>> Can we agree on one naming convention, and enforce it?
+>>
+>> I tend to like interface names that express an ability ("foo-er",
+>> "foo-able").  Anything else should use a *_IF or *_IFACE suffix.
+>=20
+> I like the _IFACE suffix.
+>=20
+> Does eliding the _IFACE suffix for names ending with ER or ABLE improve
+> readability?
+>=20
+> "foo-er" interface types:
+>=20
+>     INTERFACE_RDMA_PROVIDER
+>     TYPE_FW_PATH_PROVIDER
+>     TYPE_HOTPLUG_HANDLER
+>     TYPE_INTERRUPT_STATS_PROVIDER
+>     TYPE_XIVE_NOTIFIER
+>=20
+> "foo-er" non-interface types:
 
-You will need sphinx-build in order to build
-the docs now, and without that we won't build the manpage, but
-if you have sphinx-build installed then it should work.
-Can you check that your config-host.mak has BUILD_DOCS=yes ?
-Did you definitely rerun configure after installing sphinx?
+Leaving out those where grammar threw a curve ball, or things that
+aren't QOM types, only the following remain (some of which could be
+debated further):
 
-thanks
--- PMM
+>     TYPE_EXYNOS4210_COMBINER
+>     TYPE_FILTER_REWRITER
+>     TYPE_GENERIC_LOADER
+>     TYPE_PC_SPEAKER
+>     TYPE_PR_MANAGER
+>     TYPE_PR_MANAGER_HELPER
+>     TYPE_QIO_DNS_RESOLVER
+>     TYPE_QIO_NET_LISTENER
+>     TYPE_XIVE_ROUTER
+>=20
+> "foo-able" interface types:
+>=20
+>     TYPE_USER_CREATABLE
+>=20
+> "foo-able" non-interface types:
+>=20
+>     TYPE_SPAPR_TCE_TABLE
+
+Same here, doesn't really count.
+
+Paolo
