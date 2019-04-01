@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57082)
+Received: from eggs.gnu.org ([209.51.188.92]:57628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAwPQ-0000Yb-M7
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:51:29 -0400
+	(envelope-from <philmd@redhat.com>) id 1hAwRj-00048u-Q0
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hAwPO-0008E4-HR
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:51:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hAwPM-000832-WA
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:51:25 -0400
-References: <20190305172139.32662-1-peter.maydell@linaro.org>
-	<20190305172139.32662-10-peter.maydell@linaro.org>
-	<92ffba93-e486-647a-01ef-86180fb2cbb2@redhat.com>
-	<CAFEAcA8U1o7JZmAP4nhsiY+riFtZmxHBQCkOu0zmR++K70gnQA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0d2c48da-dba9-6a8e-eca4-41fbd3c317b2@redhat.com>
-Date: Mon, 1 Apr 2019 07:51:18 -0500
+	(envelope-from <philmd@redhat.com>) id 1hAwRi-00015f-OM
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:53:51 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hAwRi-00014u-HH
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:53:50 -0400
+Received: by mail-wr1-f67.google.com with SMTP id k11so11906038wro.5
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 05:53:49 -0700 (PDT)
+References: <20190316223918.11917-1-philmd@redhat.com>
+	<20190316223918.11917-2-philmd@redhat.com>
+	<f199e63e-9d96-929c-7bbc-006fa5385e53@redhat.com>
+	<f4edff28-ba4f-4b50-c992-69051a115b69@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <542a726f-cf64-418d-9dfa-3d04798fa454@redhat.com>
+Date: Mon, 1 Apr 2019 14:53:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8U1o7JZmAP4nhsiY+riFtZmxHBQCkOu0zmR++K70gnQA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fsSAxjTYWlquzY9H6HY1Zt3aJdfPHWrso"
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] Makefile,
- configure: Support building rST documentation
+In-Reply-To: <f4edff28-ba4f-4b50-c992-69051a115b69@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] hw/isa/Kconfig: PIIX4 southbridge
+ requires USB UHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fsSAxjTYWlquzY9H6HY1Zt3aJdfPHWrso
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <0d2c48da-dba9-6a8e-eca4-41fbd3c317b2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] Makefile, configure: Support
- building rST documentation
-References: <20190305172139.32662-1-peter.maydell@linaro.org>
- <20190305172139.32662-10-peter.maydell@linaro.org>
- <92ffba93-e486-647a-01ef-86180fb2cbb2@redhat.com>
- <CAFEAcA8U1o7JZmAP4nhsiY+riFtZmxHBQCkOu0zmR++K70gnQA@mail.gmail.com>
-In-Reply-To: <CAFEAcA8U1o7JZmAP4nhsiY+riFtZmxHBQCkOu0zmR++K70gnQA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/1/19 2:58 AM, Peter Maydell wrote:
-> On Sat, 30 Mar 2019 at 22:05, Eric Blake <eblake@redhat.com> wrote:
->> Rich told me that qemu-nbd.8 was not being built, and I confirmed that=
-
->> it failed to build for me. git bisect points to this commit as the
->> reason that 'touch qemu-nbd.texi; make' no longer rebuilds qemu-nbd.8
->> automatically. Is it merely because I don't have enough stuff installe=
-d,
->> or is it an actual broken dependency?
+On 3/25/19 5:55 AM, Thomas Huth wrote:
+> On 25/03/2019 05.49, Thomas Huth wrote:
+>> On 16/03/2019 23.39, Philippe Mathieu-Daudé wrote:
+>>> This fixes when configuring with --without-default-devices:
+>>>
+>>>   $ qemu-system-mips64 -M malta --nodefaults -bios /dev/null
+>>>   qemu-system-mips64: Unknown device 'piix4-usb-uhci' for bus 'PCI'
+>>>   Aborted (core dumped)
+>>>
+>>>   (gdb) bt
+>>>   #0  0x00007ffff5a4353f in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+>>>   #1  0x00007ffff5a2d895 in __GI_abort () at abort.c:79
+>>>   #2  0x00005555558745c3 in qdev_create (bus=bus@entry=0x555556336260, name=name@entry=0x555555b13a4d "piix4-usb-uhci") at hw/core/qdev.c:131
+>>>   #3  0x00005555558cb3e1 in pci_create_multifunction (bus=bus@entry=0x555556336260, devfn=devfn@entry=82, multifunction=multifunction@entry=false, name=name@entry=0x555555b13a4d "piix4-usb-uhci") at hw/pci/pci.c:2104
+>>>   #4  0x00005555558cb88b in pci_create_simple_multifunction (name=name@entry=0x555555b13a4d "piix4-usb-uhci", multifunction=false, devfn=devfn@entry=82, bus=bus@entry=0x555556336260) at hw/pci/pci.c:2126
+>>>   #5  0x00005555558cb88b in pci_create_simple (bus=bus@entry=0x555556336260, devfn=devfn@entry=82, name=name@entry=0x555555b13a4d "piix4-usb-uhci") at hw/pci/pci.c:2126
+>>>   #6  0x000055555575ea38 in mips_malta_init (machine=0x555555ffe430) at hw/mips/mips_malta.c:1392
+>>>   #7  0x000055555587bf2b in machine_run_board_init (machine=0x555555ffe430) at hw/core/machine.c:1030
+>>>
+>>> Fixes: 7c28b925b7e
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>>  hw/isa/Kconfig | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+>>> index 57e09a0cb8..c942b47d03 100644
+>>> --- a/hw/isa/Kconfig
+>>> +++ b/hw/isa/Kconfig
+>>> @@ -29,6 +29,7 @@ config PIIX4
+>>>      # For historical reasons, SuperIO devices are created in the board
+>>>      # for PIIX4.
+>>>      select ISA_BUS
+>>> +    select USB_UHCI
 >>
->> /me goes and runs 'dnf install "*/sphinx-build"...
->>
->> Nope, even with that installed, qemu-nbd.8 is still not getting built =
-by
->> 'make'; but 'make qemu-nbd.8' is working. We lost a dependency :(
->=20
-> I just did a test build from clean and I get a qemu-nbd.8 in the
-> build directory. I also  checked that 'touch qemu-nbd.texi; make -C bui=
-ld V=3D1'
-> rebuilds the manpage, and it does:
->=20
-> [snip other stuff]
-> perl -Ww -- /home/pm215/qemu/scripts/texi2pod.pl -I docs -I
-> /home/pm215/qemu -I . "-DVERSION=3D3.1.91"
-> /home/pm215/qemu/qemu-nbd.texi qemu-nbd.8.pod && pod2man --utf8
-> --section=3D8 --center=3D" " --release=3D" " qemu-nbd.8.pod > qemu-nbd.=
-8
-> [...]
->=20
-> You will need sphinx-build in order to build
-> the docs now, and without that we won't build the manpage, but
-> if you have sphinx-build installed then it should work.
-> Can you check that your config-host.mak has BUILD_DOCS=3Dyes ?
+>> The UHCI controller is not instantiated by hw/isa/piix4.c, but by
+>> hw/mips/mips_malta.c as far as I can see. And you can use the "pc"
+>> machine also without uhci. So I think this patch is wrong, the select
+>> should be done by "MALTA" instead.
+> 
+> Ah, never mind, I mixed up piix3-usb-uhci (used by "pc") and
+> piix4-usb-uhci (used by "malta"). ... So this UHCI is part of the
+> chipset? Then I think your patch is fine.
 
-Not seeing it.
+Yes, UHCI is introduced in the PIIX3 chipset. In another series
+(postponed to 4.1) PIIX4 inherit of PIIX3 features.
+Meanwhile, this patch is a quick fix for 4.0.
 
-> Did you definitely rerun configure after installing sphinx?
+Thanks,
 
-Trying that again.  I did not specify anything special to configure to
-force-enable/disable docs, so this time, it should auto-detect that
-sphinx-build is present...
-
-and now BUILD_DOCS=3Dyes appears...
-
-And that fixes it. Thanks for helping me spot the added build dependency.=
-
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---fsSAxjTYWlquzY9H6HY1Zt3aJdfPHWrso
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyiCUYACgkQp6FrSiUn
-Q2okTQf/af74wSorGy0hEdNZ/UHhuTJbgA0KsY9GMLr/bR4UEFiO/BiCrFfGFb8x
-2yw0YbfEXD0dsO2XmEmLkuublz8FEGkOqunp2VFosSGQUM1GvXEqeqv8GpCUv03n
-OpnAUgDRbmXCq8erfG5GlJtvM7kUwxab3cPVKHL1+r8D1bjbUVn9KLsHAbLXiih6
-UEI1p3t9iw93E2kP9dHEIWhUYiZxIyIyfh1QOMw5Xtd+NVj+LcsgK8eF9UvbMrEs
-8P2lsadNLEqfdnlqY9xBgB0dIiQDeZsCz+2Xla213GGkoHZ0gdx8BZFOJo61+BSk
-Hk99tA3CdNBr6ix9Yx/RZvqA1V7TIQ==
-=xkvf
------END PGP SIGNATURE-----
-
---fsSAxjTYWlquzY9H6HY1Zt3aJdfPHWrso--
+Phil.
