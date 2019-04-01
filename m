@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50022)
+Received: from eggs.gnu.org ([209.51.188.92]:37965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hB5uT-0001kp-TU
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:00:11 -0400
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1hB6Je-0002Uo-TG
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hB5uS-00061Z-BS
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:00:09 -0400
-Date: Tue, 2 Apr 2019 09:52:14 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190401225214.GA9231@umbus.fritz.box>
-References: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1hB6Jd-0008Uo-LH
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:10 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1hB6JS-0008NW-Hs
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:02 -0400
+Received: by mail-wr1-x441.google.com with SMTP id y13so14188814wrd.3
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 16:25:54 -0700 (PDT)
+Received: from ?IPv6:fd00:835b:d940:d4fc:1::c9?
+	(2a01-036c-0113-47b9-0001-0000-0000-00c9.pool6.digikabel.hu.
+	[2a01:36c:113:47b9:1::c9]) by smtp.gmail.com with ESMTPSA id
+	61sm41589869wre.50.2019.04.01.16.25.51 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 01 Apr 2019 16:25:52 -0700 (PDT)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <90b95e4f-39ef-2b01-da6a-857ebaee1ec5@t-online.de>
+Message-ID: <c686741e-9dc6-97d4-5587-6fb8b0d0cabc@gmail.com>
+Date: Tue, 2 Apr 2019 01:25:50 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
-Content-Disposition: inline
-In-Reply-To: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] spapr: Fix extended config
- space accesses
+In-Reply-To: <90b95e4f-39ef-2b01-da6a-857ebaee1ec5@t-online.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] audio: fix audio timer rate conversion bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
 
+On 2019-04-01 20:59, Volker Rümelin wrote:
+> Currently the default audio timer frequency is 10000Hz instead of
+> a period of 10000us. Also the audiodev timer-period property gets
+> converted like a frequency. Only handling of the legacy
+> QEMU_AUDIO_TIMER_PERIOD environment variable is correct because
+> it's actually a frequency.
+> 
+> With this patch the property timer-period is really a timer period
+> and QEMU_AUDIO_TIMER_PERIOD remains a frequency.
 
---/9DWx/yDrRhgMJTb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Good catch!  The legacy config used Hz, frames, bytes, milliseconds and
+microseconds quite randomly to define lengths, this one slipped through
+my unification attempts.
 
-On Mon, Apr 01, 2019 at 07:54:57PM +0200, Greg Kurz wrote:
-> Recent commit c2077e2ca0da7 added stricter checks that now prevent
-> a guest to access the extended config space of a PCIe device connected
-> attached to a PHB on a pseries machine.
->=20
-> PAPR compatible PHBs act like legacy PCI busses, but they do allow access
-> to the full 4k config space of PCIe devices. As discussed several times on
-> the list ([1] and [2]), we cannot really change PAPR PHB to have a true
-> PCIe root bus since it would call for massive and unwanted changes in
-> libvirt.
->=20
-> This series tries to address the issue with a new PCI bus class method
-> that tells if the PCI bus supports extended config space accesses,
-> instead of relying on pci_bus_is_express() which wants a PCIe root bus.
-> A new legacy PCI bus type is added to implement the PAPR behaviour.
->=20
-> Note that this fixes a potential 4.0 regression, hence the for-4.0 tag.
->=20
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07377.html
->     https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02839.html
->=20
-> [2] https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00034.html
+> 
+> This fixes commit 71830221fb23388b32e6516c2fb7a698453a6c5a
+> -audiodev command line option basic implementation.
+> 
+> Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
+Reviewed-by: Zoltán Kővágó <DirtY.iCE.hu@gmail.com>
 
-So, I actually had some patches I'd been working on that address both
-the c2077e2ca0da7 issue and the PAPR fixup in what I think is a
-cleaner manner.  Can't remember now if I posted and they got lost, or
-I didn't get around to posting.
+> ---
+>  audio/audio.c        | 2 +-
+>  audio/audio_legacy.c | 6 ++++++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/audio/audio.c b/audio/audio.c
+> index 5fd9a58a80..2040762fef 100644
+> --- a/audio/audio.c
+> +++ b/audio/audio.c
+> @@ -1471,7 +1471,7 @@ static int audio_init(Audiodev *dev)
+>      if (dev->timer_period <= 0) {
+>          s->period_ticks = 1;
+>      } else {
+> -        s->period_ticks = NANOSECONDS_PER_SECOND / dev->timer_period;
+> +        s->period_ticks = dev->timer_period * SCALE_US;
+>      }
+>  
+>      e = qemu_add_vm_change_state_handler (audio_vm_change_state_handler, s);
+> diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+> index 6d140119d9..2fd58cb8ef 100644
+> --- a/audio/audio_legacy.c
+> +++ b/audio/audio_legacy.c
+> @@ -26,6 +26,7 @@
+>  #include "audio_int.h"
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+> +#include "qemu/timer.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-audio.h"
+>  #include "qapi/visitor-impl.h"
+> @@ -338,8 +339,13 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+>      handle_per_direction(audio_get_pdo_in(e->dev), "QEMU_AUDIO_ADC_");
+>      handle_per_direction(audio_get_pdo_out(e->dev), "QEMU_AUDIO_DAC_");
+>  
+> +    /* Original description: Timer period in HZ (0 - use lowest possible) */
+>      get_int("QEMU_AUDIO_TIMER_PERIOD",
+>              &e->dev->timer_period, &e->dev->has_timer_period);
+> +    if (e->dev->has_timer_period && e->dev->timer_period) {
+> +        e->dev->timer_period = NANOSECONDS_PER_SECOND / 1000 /
+> +                               e->dev->timer_period;
+> +    }
 
-Nonetheless, at this point we're fixing a real regression on PAPR.
-I'll look at cleaning this up post 4.0.
+I'd use SCALE_US instead of 1000 here.  If you have
+NANOSECONDS_PER_SECOND / SCALE_US / e->dev->timer_period, it's
+immediately obvious that if you multiply it with SCALE_US, you get back
+the old value of s->period_ticks above.
 
-Reviewed-by: David Gibson <david@gibson.dropbe
+>  
+>      switch (e->dev->driver) {
+>      case AUDIODEV_DRIVER_ALSA:
+> 
 
-I can take this through my tree if people are ok with that.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/9DWx/yDrRhgMJTb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyilhkACgkQbDjKyiDZ
-s5L4lBAAiqN8oWHdZRVu76Ses4cb/nzDnB7OPN7aPng0p/Bz93yUiL9stNA1LUGF
-LSyuVJcvc24N7/IjN8Xl+TL1iA+bdVo+2HkA+LpS1hvEFyeNye8Ti9LLXJ6iuBGC
-OAfF1CfPAl0Gka1mvJKFfx0Kf5VcKlXwHJ+1B4UU6Jnd/n6VxlsGjSMyVU0oo/RU
-uGS3iJsXYu4jd88qRA5Ea3Ae/mi744PGwWNk7veOfJch60l6VzgzBtv39w/wm5lg
-DuA0XZ7pzYKKAsvZ3GYxzrEjNqqfzNRwgzvPiJ2jikr7CIwq57ywAA0YZwaKQ56m
-ZXHoGp65WfQLAdVvT398MOPUVRMeDCLn3cGbgZM9eNgYA2hbEvHxwC6YmepUFKEl
-lrMq3+TVqlu65tcWR+mFXK+8toF2tKHJFqRTyyt1Ja7JAq6EZ/TEA2ZjKnCOxRrP
-O0/y5UkN7//m7H48ZTcoo30f+VsGO9AeaQMln3mz9lSMh/8uKFxOiK+etbozyIpv
-fnBY9a02N4ztxaS9ojB4H2U7KJ0lcW9ACQ/E2lVoqqEPMr28GUTGcBurmz9/00vi
-OJzevRUYsZNf2Q+U3tV4+4RfzAq/tirMs8C2f5M680usCPL3aL6+xrljErqqoHjT
-OL/g2LoIjdqsSbkQ8fuzx8yamfBZ1R4PwmdGnr5MFT0ZiQftdCY=
-=GiHv
------END PGP SIGNATURE-----
-
---/9DWx/yDrRhgMJTb--
+Regards,
+Zoltan
