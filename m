@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43628)
+Received: from eggs.gnu.org ([209.51.188.92]:44507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hAt98-0007NU-6a
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:22:27 -0400
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAtD4-0001yl-Mk
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hAt94-0004mv-DJ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:22:25 -0400
-Resent-Message-Id: <E1hAt94-0004mv-DJ@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hAt90-0004l7-Vm
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:22:20 -0400
-Message-ID: <155411052099.12882.8339618417265700553@76452e4e88f2>
-In-Reply-To: <1554096222-29539-2-git-send-email-tjin@wavecomp.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 1 Apr 2019 02:22:02 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Adds virtio_net as the default netcard for
- boston board
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAtD2-0006Uw-I3
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:26:30 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37429)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
+	id 1hAtD2-0006UA-9U
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:26:28 -0400
+Received: by mail-pg1-x543.google.com with SMTP id e6so95859pgc.4
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 02:26:27 -0700 (PDT)
+From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Date: Mon,  1 Apr 2019 14:56:11 +0530
+Message-Id: <20190401092612.9658-1-aruna.15@cse.mrt.ac.lk>
+Subject: [Qemu-devel] [PATCH v2 1/2] Header cleanups for functions declared
+ in utils/ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +25,511 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tjin@wavecomp.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU0MDk2MjIyLTI5NTM5LTIt
-Z2l0LXNlbmQtZW1haWwtdGppbkB3YXZlY29tcC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDE1NTQwOTYyMjItMjk1MzktMi1naXQt
-c2VuZC1lbWFpbC10amluQHdhdmVjb21wLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
-XSBBZGRzIHZpcnRpb19uZXQgYXMgdGhlIGRlZmF1bHQgbmV0Y2FyZCBmb3IgYm9zdG9uIGJvYXJk
-ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAg
-ICAgcGF0Y2hldy8xNTU0MDk2MjIyLTI5NTM5LTItZ2l0LXNlbmQtZW1haWwtdGppbkB3YXZlY29t
-cC5jb20gLT4gcGF0Y2hldy8xNTU0MDk2MjIyLTI5NTM5LTItZ2l0LXNlbmQtZW1haWwtdGppbkB3
-YXZlY29tcC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplYzhmYjk0YWVhIEFk
-ZHMgdmlydGlvX25ldCBhcyB0aGUgZGVmYXVsdCBuZXRjYXJkIGZvciBib3N0b24gYm9hcmQKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzM1OiBGSUxFOiBody9taXBzL2Jvc3Rvbi5jOjQyOToKK15JUENJRGV2aWNlICpldGg7JAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzc6IEZJTEU6IGh3L21p
-cHMvYm9zdG9uLmM6NDMxOgorXkkvKlBsZWFzZSBzZXQgQ09ORklHX1ZJUlRJTyAmJiBDT05GSUdf
-VklSVElPX1BDSSAmJiBDT05GSUdfVklSVElPX05FVCQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzNzogRklMRTogaHcvbWlwcy9i
-b3N0b24uYzo0MzE6CisgICAgICAgLypQbGVhc2Ugc2V0IENPTkZJR19WSVJUSU8gJiYgQ09ORklH
-X1ZJUlRJT19QQ0kgJiYgQ09ORklHX1ZJUlRJT19ORVQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzM4OiBGSUxFOiBody9taXBzL2Jvc3Rvbi5jOjQzMjoKK15Jb2Yg
-TGludXgga2VybmVsLiovJAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2Vx
-dWVudCBsaW5lcwojMzg6IEZJTEU6IGh3L21pcHMvYm9zdG9uLmM6NDMyOgorICAgICAgIC8qUGxl
-YXNlIHNldCBDT05GSUdfVklSVElPICYmIENPTkZJR19WSVJUSU9fUENJICYmIENPTkZJR19WSVJU
-SU9fTkVUCisgICAgICAgb2YgTGludXgga2VybmVsLiovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzM4OiBGSUxFOiBody9taXBz
-L2Jvc3Rvbi5jOjQzMjoKKyAgICAgICBvZiBMaW51eCBrZXJuZWwuKi8KCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM5OiBGSUxFOiBody9taXBzL2Jvc3Rvbi5jOjQz
-MzoKK15JZXRoID0gcGNpX2NyZWF0ZShidXMsJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojNDA6IEZJTEU6IGh3L21pcHMvYm9zdG9uLmM6NDM0OgorXkleSV5JXkle
-SSBQQ0lfREVWRk4oMCwgMSksICJ2aXJ0aW8tbmV0LXBjaSIpOyQKCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQyOiBGSUxFOiBody9taXBzL2Jvc3Rvbi5jOjQzNjoK
-K15JcWRldl9zZXRfbmljX3Byb3BlcnRpZXMoJmV0aC0+cWRldiwgJm5kX3RhYmxlWzBdKTskCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTogaHcvbWlw
-cy9ib3N0b24uYzo0Mzc6CiteSXFkZXZfaW5pdF9ub2ZhaWwoJmV0aC0+cWRldik7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTQ6IEZJTEU6IGh3L21pcHMvYm9z
-dG9uLmM6NTY0OgorXkkvKiBOZXR3b3JrIGNhcmQgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiM1NTogRklMRTogaHcvbWlwcy9ib3N0b24uYzo1NjU6CiteSW5l
-dHdvcmtfaW5pdCgmUENJX0JSSURHRSgmcGNpZTItPnJvb3QpLT5zZWNfYnVzKTskCgp0b3RhbDog
-OSBlcnJvcnMsIDMgd2FybmluZ3MsIDM2IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBlYzhmYjk0YWVh
-YmIgKEFkZHMgdmlydGlvX25ldCBhcyB0aGUgZGVmYXVsdCBuZXRjYXJkIGZvciBib3N0b24gYm9h
-cmQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NTQwOTYyMjItMjk1MzktMi1naXQtc2VuZC1lbWFp
-bC10amluQHdhdmVjb21wLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+Declarations were moved out of qemu-common.h for functions declared in utils/ files.
+This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+
+Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+
+---
+ include/qemu-common.h        | 6 ------
+ include/qemu/id.h            | 3 +++
+ include/qemu/iov.h           | 6 ++++++
+ include/qemu/readline.h      | 2 ++
+ util/aio-posix.c             | 1 -
+ util/aio-win32.c             | 1 -
+ util/async.c                 | 1 -
+ util/bufferiszero.c          | 1 -
+ util/compatfd.c              | 1 -
+ util/coroutine-sigaltstack.c | 1 -
+ util/coroutine-ucontext.c    | 1 -
+ util/coroutine-win32.c       | 1 -
+ util/crc32c.c                | 1 -
+ util/cutils.c                | 1 -
+ util/envlist.c               | 1 -
+ util/error.c                 | 1 -
+ util/event_notifier-posix.c  | 1 -
+ util/event_notifier-win32.c  | 1 -
+ util/fifo8.c                 | 1 -
+ util/getauxval.c             | 1 -
+ util/hexdump.c               | 2 +-
+ util/id.c                    | 1 -
+ util/iohandler.c             | 1 -
+ util/iov.c                   | 1 -
+ util/log.c                   | 1 -
+ util/module.c                | 1 -
+ util/notify.c                | 1 -
+ util/qemu-coroutine-io.c     | 1 -
+ util/qemu-coroutine.c        | 1 -
+ util/qemu-openpty.c          | 2 +-
+ util/qemu-option.c           | 1 -
+ util/qemu-progress.c         | 2 +-
+ util/qemu-thread-win32.c     | 1 -
+ util/rcu.c                   | 1 -
+ util/readline.c              | 1 -
+ util/thread-pool.c           | 1 -
+ util/uuid.c                  | 1 -
+ 37 files changed, 14 insertions(+), 39 deletions(-)
+
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index a102245519..9543c469b6 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -141,12 +141,6 @@ int os_parse_cmd_args(int index, const char *optarg);
+ 
+ #include "qemu/module.h"
+ 
+-/*
+- * Hexdump a buffer to a file. An optional string prefix is added to every line
+- */
+-
+-void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+-
+ /*
+  * helper to parse debug environment variables
+  */
+diff --git a/include/qemu/id.h b/include/qemu/id.h
+index 40c70103e4..3a651fb9d2 100644
+--- a/include/qemu/id.h
++++ b/include/qemu/id.h
+@@ -1,6 +1,9 @@
+ #ifndef QEMU_ID_H
+ #define QEMU_ID_H
+ 
++#define qemu_isalnum(c)		isalnum((unsigned char)(c))
++#define qemu_isalpha(c)		isalpha((unsigned char)(c))
++
+ typedef enum IdSubSystems {
+     ID_QDEV,
+     ID_BLOCK,
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+index 48b45987b7..84a4007165 100644
+--- a/include/qemu/iov.h
++++ b/include/qemu/iov.h
+@@ -108,6 +108,12 @@ ssize_t iov_send_recv(int sockfd, const struct iovec *iov, unsigned iov_cnt,
+ void iov_hexdump(const struct iovec *iov, const unsigned int iov_cnt,
+                  FILE *fp, const char *prefix, size_t limit);
+ 
++/*
++ * Hexdump a buffer to a file. An optional string prefix is added to every line
++ */
++void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
++
++
+ /*
+  * Partial copy of vector from iov to dst_iov (data is not copied).
+  * dst_iov overlaps iov at a specified offset.
+diff --git a/include/qemu/readline.h b/include/qemu/readline.h
+index e81258322b..4cbf7ead5a 100644
+--- a/include/qemu/readline.h
++++ b/include/qemu/readline.h
+@@ -1,6 +1,8 @@
+ #ifndef READLINE_H
+ #define READLINE_H
+ 
++#define qemu_isspace(c)		isspace((unsigned char)(c))
++
+ #define READLINE_CMD_BUF_SIZE 4095
+ #define READLINE_MAX_CMDS 64
+ #define READLINE_MAX_COMPLETIONS 256
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 6fbfa7924f..e36c76c4e0 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "block/block.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/sockets.h"
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index a23b9c364d..f270005422 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -16,7 +16,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "block/block.h"
+ #include "qemu/queue.h"
+ #include "qemu/sockets.h"
+diff --git a/util/async.c b/util/async.c
+index c10642a385..8d2105729c 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -25,7 +25,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "block/aio.h"
+ #include "block/thread-pool.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/bufferiszero.c b/util/bufferiszero.c
+index 2178d8ab9d..bfb2605466 100644
+--- a/util/bufferiszero.c
++++ b/util/bufferiszero.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/bswap.h"
+ 
+diff --git a/util/compatfd.c b/util/compatfd.c
+index 980bd33e52..c296f55d14 100644
+--- a/util/compatfd.c
++++ b/util/compatfd.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ 
+ #include <sys/syscall.h>
+diff --git a/util/coroutine-sigaltstack.c b/util/coroutine-sigaltstack.c
+index f6fc49a0e5..7d3ee49943 100644
+--- a/util/coroutine-sigaltstack.c
++++ b/util/coroutine-sigaltstack.c
+@@ -27,7 +27,6 @@
+ #endif
+ #include "qemu/osdep.h"
+ #include <pthread.h>
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ typedef struct {
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index 090ba21a13..bd593e61bc 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -24,7 +24,6 @@
+ #endif
+ #include "qemu/osdep.h"
+ #include <ucontext.h>
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ #ifdef CONFIG_VALGRIND_H
+diff --git a/util/coroutine-win32.c b/util/coroutine-win32.c
+index de6bd4fd3e..c196f956d2 100644
+--- a/util/coroutine-win32.c
++++ b/util/coroutine-win32.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
+ 
+ typedef struct
+diff --git a/util/crc32c.c b/util/crc32c.c
+index 7e99555c16..762657d853 100644
+--- a/util/crc32c.c
++++ b/util/crc32c.c
+@@ -26,7 +26,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/crc32c.h"
+ 
+ /*
+diff --git a/util/cutils.c b/util/cutils.c
+index e098debdc0..a157aafa55 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+ 
+diff --git a/util/envlist.c b/util/envlist.c
+index 1eeb7fca87..2bcc13f094 100644
+--- a/util/envlist.c
++++ b/util/envlist.c
+@@ -1,5 +1,4 @@
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "qemu/envlist.h"
+ 
+diff --git a/util/error.c b/util/error.c
+index 934a78e1b1..dc42e9398f 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -14,7 +14,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/error-report.h"
+ 
+ struct Error
+diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
+index 73c4046b58..4a379ffe4a 100644
+--- a/util/event_notifier-posix.c
++++ b/util/event_notifier-posix.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/event_notifier-win32.c b/util/event_notifier-win32.c
+index 62c53b0a99..9352da4699 100644
+--- a/util/event_notifier-win32.c
++++ b/util/event_notifier-win32.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/event_notifier.h"
+ #include "qemu/main-loop.h"
+ 
+diff --git a/util/fifo8.c b/util/fifo8.c
+index d38b3bdaa5..a9aa20a9f7 100644
+--- a/util/fifo8.c
++++ b/util/fifo8.c
+@@ -13,7 +13,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/fifo8.h"
+ 
+ void fifo8_create(Fifo8 *fifo, uint32_t capacity)
+diff --git a/util/getauxval.c b/util/getauxval.c
+index 0b3bae2dcb..36afdfb9e6 100644
+--- a/util/getauxval.c
++++ b/util/getauxval.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ 
+ #ifdef CONFIG_GETAUXVAL
+ /* Don't inline this in qemu/osdep.h, because pulling in <sys/auxv.h> for
+diff --git a/util/hexdump.c b/util/hexdump.c
+index f879ff0ad6..4917696a08 100644
+--- a/util/hexdump.c
++++ b/util/hexdump.c
+@@ -14,7 +14,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/hexdump.h"
+ 
+ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size)
+ {
+diff --git a/util/id.c b/util/id.c
+index 6141352955..834bb4ecd1 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/id.h"
+ 
+ bool id_wellformed(const char *id)
+diff --git a/util/iohandler.c b/util/iohandler.c
+index 623b55b9ec..bece8825dc 100644
+--- a/util/iohandler.c
++++ b/util/iohandler.c
+@@ -24,7 +24,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "block/aio.h"
+ #include "qemu/main-loop.h"
+diff --git a/util/iov.c b/util/iov.c
+index 74e6ca8ed7..41434beaca 100644
+--- a/util/iov.c
++++ b/util/iov.c
+@@ -17,7 +17,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/iov.h"
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+diff --git a/util/log.c b/util/log.c
+index c0dbbd4700..1d1b33f7d9 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -18,7 +18,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/log.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+diff --git a/util/module.c b/util/module.c
+index 1259dd3686..142db7e911 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #ifdef CONFIG_MODULES
+ #include <gmodule.h>
+ #endif
+diff --git a/util/notify.c b/util/notify.c
+index 06de63a839..aee8d93cb0 100644
+--- a/util/notify.c
++++ b/util/notify.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/notify.h"
+ 
+ void notifier_list_init(NotifierList *list)
+diff --git a/util/qemu-coroutine-io.c b/util/qemu-coroutine-io.c
+index 44a8969a69..9c393bc8a9 100644
+--- a/util/qemu-coroutine-io.c
++++ b/util/qemu-coroutine-io.c
+@@ -23,7 +23,6 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/sockets.h"
+ #include "qemu/coroutine.h"
+ #include "qemu/iov.h"
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 2295928d33..c3caa6c770 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -14,7 +14,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "trace.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/atomic.h"
+ #include "qemu/coroutine.h"
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..07642e6cc6 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -33,7 +33,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/qemu-openpty.h"
+ 
+ #if defined(__GLIBC__)
+ # include <pty.h>
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index ef60af70fc..97172b5eaa 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -26,7 +26,6 @@
+ #include "qemu/osdep.h"
+ 
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..ad355f9241 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -23,7 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/qemu-progress.h"
+ 
+ struct progress_state {
+     float current;
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 572f88535d..d176943a27 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -12,7 +12,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+ #include "qemu-thread-common.h"
+diff --git a/util/rcu.c b/util/rcu.c
+index 5676c22bd1..177a675619 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/rcu.h"
+ #include "qemu/atomic.h"
+ #include "qemu/thread.h"
+diff --git a/util/readline.c b/util/readline.c
+index ec91ee0fea..f3d8b0698a 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
+ #include "qemu/cutils.h"
+ 
+diff --git a/util/thread-pool.c b/util/thread-pool.c
+index 610646d131..4ed9b89ab2 100644
+--- a/util/thread-pool.c
++++ b/util/thread-pool.c
+@@ -15,7 +15,6 @@
+  * GNU GPL, version 2 or (at your option) any later version.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/queue.h"
+ #include "qemu/thread.h"
+ #include "qemu/coroutine.h"
+diff --git a/util/uuid.c b/util/uuid.c
+index 5787f0978c..b1108dde78 100644
+--- a/util/uuid.c
++++ b/util/uuid.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/uuid.h"
+ #include "qemu/bswap.h"
+ 
+-- 
+2.17.1
