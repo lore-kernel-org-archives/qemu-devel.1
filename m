@@ -1,33 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37965)
+Received: from eggs.gnu.org ([209.51.188.92]:39333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1hB6Je-0002Uo-TG
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:12 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB6Lo-0003f9-6Z
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1hB6Jd-0008Uo-LH
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:10 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1hB6JS-0008NW-Hs
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:26:02 -0400
-Received: by mail-wr1-x441.google.com with SMTP id y13so14188814wrd.3
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 16:25:54 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::c9?
-	(2a01-036c-0113-47b9-0001-0000-0000-00c9.pool6.digikabel.hu.
-	[2a01:36c:113:47b9:1::c9]) by smtp.gmail.com with ESMTPSA id
-	61sm41589869wre.50.2019.04.01.16.25.51 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 01 Apr 2019 16:25:52 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <90b95e4f-39ef-2b01-da6a-857ebaee1ec5@t-online.de>
-Message-ID: <c686741e-9dc6-97d4-5587-6fb8b0d0cabc@gmail.com>
-Date: Tue, 2 Apr 2019 01:25:50 +0200
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB6Lm-0001ug-5Z
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:28:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39348
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1hB6Lj-0001oY-IX
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:28:20 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x31NNbFS131996
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 19:28:13 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgygxn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 19:28:13 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 2 Apr 2019 00:28:12 +0100
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <90b95e4f-39ef-2b01-da6a-857ebaee1ec5@t-online.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] audio: fix audio timer rate conversion bug
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <CAMo8BfLMM7RSXMcvA-jPJFUzt23fCGU-q=3fXZBv_=S_6UszSQ@mail.gmail.com>
+References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
+	<20190401210011.16009-60-mdroth@linux.vnet.ibm.com>
+	<CAMo8BfLMM7RSXMcvA-jPJFUzt23fCGU-q=3fXZBv_=S_6UszSQ@mail.gmail.com>
+Date: Mon, 01 Apr 2019 18:28:03 -0500
+Message-Id: <155416128371.3333.10200489776884563434@sif>
+Subject: Re: [Qemu-devel] [PATCH 59/97] target/xtensa: drop num_[core_]regs
+ from dc232b/dc233c configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +44,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 2019-04-01 20:59, Volker Rümelin wrote:
-> Currently the default audio timer frequency is 10000Hz instead of
-> a period of 10000us. Also the audiodev timer-period property gets
-> converted like a frequency. Only handling of the legacy
-> QEMU_AUDIO_TIMER_PERIOD environment variable is correct because
-> it's actually a frequency.
-> 
-> With this patch the property timer-period is really a timer period
-> and QEMU_AUDIO_TIMER_PERIOD remains a frequency.
+Quoting Max Filippov (2019-04-01 16:19:59)
+> Hi Michael,
+> =
 
-Good catch!  The legacy config used Hz, frames, bytes, milliseconds and
-microseconds quite randomly to define lengths, this one slipped through
-my unification attempts.
+> On Mon, Apr 1, 2019 at 2:04 PM Michael Roth <mdroth@linux.vnet.ibm.com> w=
+rote:
+> > From: Max Filippov <jcmvbkbc@gmail.com>
+> >
+> > Now that xtensa_count_regs does the right thing, remove manual
+> > initialization of these fields from the affected configurations and let
+> > xtensa_finalize_config initialize them. Add XTREG_END to terminate
+> > register lists.
+> >
+> > Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> > (cherry picked from commit 7da9111e77b9cdb3a927dcd47642b7ffff9de636)
+> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> =
 
-> 
-> This fixes commit 71830221fb23388b32e6516c2fb7a698453a6c5a
-> -audiodev command line option basic implementation.
-> 
-> Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
-Reviewed-by: Zoltán Kővágó <DirtY.iCE.hu@gmail.com>
+> I'm curious why this change was picked for stable, it wasn't marked for i=
+t.
+> I'm pretty sure it's not going to work without the corresponding change
+> in the xtensa_count_regs, which is pretty big.
 
-> ---
->  audio/audio.c        | 2 +-
->  audio/audio_legacy.c | 6 ++++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 5fd9a58a80..2040762fef 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -1471,7 +1471,7 @@ static int audio_init(Audiodev *dev)
->      if (dev->timer_period <= 0) {
->          s->period_ticks = 1;
->      } else {
-> -        s->period_ticks = NANOSECONDS_PER_SECOND / dev->timer_period;
-> +        s->period_ticks = dev->timer_period * SCALE_US;
->      }
->  
->      e = qemu_add_vm_change_state_handler (audio_vm_change_state_handler, s);
-> diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
-> index 6d140119d9..2fd58cb8ef 100644
-> --- a/audio/audio_legacy.c
-> +++ b/audio/audio_legacy.c
-> @@ -26,6 +26,7 @@
->  #include "audio_int.h"
->  #include "qemu-common.h"
->  #include "qemu/cutils.h"
-> +#include "qemu/timer.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-visit-audio.h"
->  #include "qapi/visitor-impl.h"
-> @@ -338,8 +339,13 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
->      handle_per_direction(audio_get_pdo_in(e->dev), "QEMU_AUDIO_ADC_");
->      handle_per_direction(audio_get_pdo_out(e->dev), "QEMU_AUDIO_DAC_");
->  
-> +    /* Original description: Timer period in HZ (0 - use lowest possible) */
->      get_int("QEMU_AUDIO_TIMER_PERIOD",
->              &e->dev->timer_period, &e->dev->has_timer_period);
-> +    if (e->dev->has_timer_period && e->dev->timer_period) {
-> +        e->dev->timer_period = NANOSECONDS_PER_SECOND / 1000 /
-> +                               e->dev->timer_period;
-> +    }
+Looks like an earlier patch was tagged for stable:
 
-I'd use SCALE_US instead of 1000 here.  If you have
-NANOSECONDS_PER_SECOND / SCALE_US / e->dev->timer_period, it's
-immediately obvious that if you multiply it with SCALE_US, you get back
-the old value of s->period_ticks above.
+  https://patchwork.kernel.org/patch/10666423/
 
->  
->      switch (e->dev->driver) {
->      case AUDIODEV_DRIVER_ALSA:
-> 
+Since patches are often referred to qemu-stable via actual email Cc: and
+often don't get tagged in the commit I don't rely too much on the
+"Cc: qemu-stable@nongnu.org" tags in the commit messages currently.
 
-Regards,
-Zoltan
+I should probably take note next time a tag is explicitly removed from the
+final commit though, but the safest way to avoid this if a patch ends up
+getting Cc'd to qemu-stable at some point is to reply to the patch on why
+it should be kept out, since I'll usually see those.
+
+I'll make sure to back the patch out, thanks for checking!
+
+> =
+
+> -- =
+
+> Thanks.
+> -- Max
+>=20
