@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37741)
+Received: from eggs.gnu.org ([209.51.188.92]:38280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hAx5I-0006li-Nk
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:34:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hAx6A-0007SR-L6
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hAx5H-0003tH-9p
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:34:44 -0400
-Date: Mon, 1 Apr 2019 15:34:25 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190401153425.5d9bd5da@redhat.com>
-In-Reply-To: <20190321104745.28068-6-shameerali.kolothum.thodi@huawei.com>
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-6-shameerali.kolothum.thodi@huawei.com>
+	(envelope-from <dgilbert@redhat.com>) id 1hAx69-0004LX-4v
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:35:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hAx68-0004Ko-Os
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:35:37 -0400
+Date: Mon, 1 Apr 2019 14:35:26 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190401133525.GC2606@work-vm>
+References: <20190401090827.20793-1-armbru@redhat.com>
+	<20190401090827.20793-3-armbru@redhat.com>
+	<20190401092748.GB2606@work-vm> <20190401095139.GD3524@redhat.com>
+	<87d0m60xng.fsf@dusky.pond.sub.org>
+	<20190401114350.GI3524@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/10] hw/arm/virt: Add ACPI support for
- device memory cold-plug
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190401114350.GI3524@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] Revert "migration: move
+ only_migratable to MigrationState"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,232 +32,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, linuxarm@huawei.com, xuwei5@hisilicon.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, anthony.perard@citrix.com, imammedo@redhat.com
 
-On Thu, 21 Mar 2019 10:47:40 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Mon, Apr 01, 2019 at 01:31:47PM +0200, Markus Armbruster wrote:
+> > Daniel P. Berrang=E9 <berrange@redhat.com> writes:
+> >=20
+> > > On Mon, Apr 01, 2019 at 10:27:49AM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > >> * Markus Armbruster (armbru@redhat.com) wrote:
+> > >> > This reverts commit 3df663e575f1876d7f3bc684f80e72fca0703d39.
+> > >> > This reverts commit b605c47b57b58e61a901a50a0762dccf43d94783.
+> > >> >=20
+> > >> > Command line option --only-migratable is for disallowing any
+> > >> > configuration that can block migration.
+> > >> >=20
+> > >> > Initially, --only-migratable set global variable @only_migratabl=
+e.
+> > >> >=20
+> > >> > Commit 3df663e575 "migration: move only_migratable to MigrationS=
+tate"
+> > >> > replaced it by MigrationState member @only_migratable.  That was=
+ a
+> > >> > mistake.
+> > >> >=20
+> > >> > First, it doesn't make sense on the design level.  MigrationStat=
+e
+> > >> > captures the state of an individual migration, but --only-migrat=
+able
+> > >> > isn't a property of an individual migration, it's a restriction =
+on
+> > >> > QEMU configuration.  With fault tolerance, we could have several
+> > >> > migrations at once.  --only-migratable would certainly protect a=
+ll of
+> > >> > them.  Storing it in MigrationState feels inappropriate.
+> > >> >=20
+> > >> > Second, it contributes to a dependency cycle that manifests itse=
+lf as
+> > >> > a bug now.
+> > >> >=20
+> > >> > Putting @only_migratable into MigrationState means its available=
+ only
+> > >> > after migration_object_init().
+> > >> >=20
+> > >> > We can't set it before migration_object_init(), so we delay sett=
+ing it
+> > >> > with a global property (this is fixup commit b605c47b57 "migrati=
+on:
+> > >> > fix handling for --only-migratable").
+> > >> >=20
+> > >> > We can't get it before migration_object_init(), so anything that=
+ uses
+> > >> > it can only run afterwards.
+> > >> >=20
+> > >> > Since migrate_add_blocker() needs to obey --only-migratable, any=
+ code
+> > >> > adding migration blockers can run only afterwards.  This contrib=
+utes
+> > >> > to the following dependency cycle:
+> > >> >=20
+> > >> > * configure_blockdev() must run before machine_set_property()
+> > >> >   so machine properties can refer to block backends
+> > >> >=20
+> > >> > * machine_set_property() before configure_accelerator()
+> > >> >   so machine properties like kvm-irqchip get applied
+> > >> >=20
+> > >> > * configure_accelerator() before migration_object_init()
+> > >> >   so that Xen's accelerator compat properties get applied.
+> > >> >=20
+> > >> > * migration_object_init() before configure_blockdev()
+> > >> >   so configure_blockdev() can add migration blockers
+> > >> >=20
+> > >> > The cycle was closed when recent commit cda4aa9a5a0 "Create bloc=
+k
+> > >> > backends before setting machine properties" added the first
+> > >> > dependency, and satisfied it by violating the last one.  Broke b=
+lock
+> > >> > backends that add migration blockers.
+> > >> >=20
+> > >> > Moving @only_migratable into MigrationState was a mistake.  Reve=
+rt it.
+> > >> >=20
+> > >> > This doesn't quite break the "migration_object_init() before
+> > >> > configure_blockdev() dependency, since migrate_add_blocker() sti=
+ll has
+> > >> > another dependency on migration_object_init().  To be addressed =
+the
+> > >> > next commit
+> > >> >=20
+> > >> > Conflicts:
+> > >> > 	include/migration/misc.h
+> > >> > 	migration/migration.c
+> > >> > 	migration/migration.h
+> > >> > 	vl.c
+> > >> >=20
+> > >> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> > >> > ---
+> > >> >  include/sysemu/sysemu.h | 1 +
+> > >> >  migration/migration.c   | 5 ++---
+> > >> >  migration/migration.h   | 3 ---
+> > >> >  migration/savevm.c      | 2 +-
+> > >> >  vl.c                    | 9 ++-------
+> > >> >  5 files changed, 6 insertions(+), 14 deletions(-)
+> > >> >=20
+> > >> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > >> > index 6065d9e420..5f133cae83 100644
+> > >> > --- a/include/sysemu/sysemu.h
+> > >> > +++ b/include/sysemu/sysemu.h
+> > >> > @@ -14,6 +14,7 @@
+> > >> >  /* vl.c */
+> > >> > =20
+> > >> >  extern const char *bios_name;
+> > >> > +extern int only_migratable;
+> > >> >  extern const char *qemu_name;
+> > >> >  extern QemuUUID qemu_uuid;
+> > >> >  extern bool qemu_uuid_set;
+> > >> > diff --git a/migration/migration.c b/migration/migration.c
+> > >> > index 69f75124c9..f6076e5295 100644
+> > >> > --- a/migration/migration.c
+> > >> > +++ b/migration/migration.c
+> > >> > @@ -1707,7 +1707,7 @@ static GSList *migration_blockers;
+> > >> > =20
+> > >> >  int migrate_add_blocker(Error *reason, Error **errp)
+> > >> >  {
+> > >> > -    if (migrate_get_current()->only_migratable) {
+> > >> > +    if (only_migratable) {
+> > >> >          error_propagate_prepend(errp, error_copy(reason),
+> > >> >                                  "disallowing migration blocker =
+"
+> > >> >                                  "(--only_migratable) for: ");
+> > >> > @@ -3337,7 +3337,7 @@ void migration_global_dump(Monitor *mon)
+> > >> >      monitor_printf(mon, "store-global-state: %s\n",
+> > >> >                     ms->store_global_state ? "on" : "off");
+> > >> >      monitor_printf(mon, "only-migratable: %s\n",
+> > >> > -                   ms->only_migratable ? "on" : "off");
+> > >> > +                   only_migratable ? "on" : "off");
+> > >> >      monitor_printf(mon, "send-configuration: %s\n",
+> > >> >                     ms->send_configuration ? "on" : "off");
+> > >> >      monitor_printf(mon, "send-section-footer: %s\n",
+> > >> > @@ -3352,7 +3352,6 @@ void migration_global_dump(Monitor *mon)
+> > >> >  static Property migration_properties[] =3D {
+> > >> >      DEFINE_PROP_BOOL("store-global-state", MigrationState,
+> > >> >                       store_global_state, true),
+> > >> > -    DEFINE_PROP_BOOL("only-migratable", MigrationState, only_mi=
+gratable, false),
+> > >>=20
+> > >> So I'm generally OK at this patch, but I'm worried whether this
+> > >> is API?
+> >=20
+> > Uh, forgot to discuss this in my commit message, sorry!
+> >=20
+> > > IIUC, old code can use either
+> > >
+> > >   -global migration.only-migratable=3Dtrue
+> > >   -only-migratable
+> > >
+> > > After this patch only
+> > >
+> > >   -only-migratable
+> > >
+> > > is valid. So from that POV it is an API break.=20
+> > >
+> > > From libvirt's POV this is a non-issue as we never use either of th=
+ese options.
+> > > We did have a BZ filed to support it, but never did.
+> > >
+> > > To avoid the API break I guess there would been to be a special cas=
+e early
+> > > loop iterating over argv[] looking for '-global migration.only-migr=
+atable=3Dtrue',
+> > > making that set the static 'bool only_migratable', instead of letti=
+ng it get
+> > > handled by the object infra.
+> >=20
+> > Is this is worth the trouble?
+>=20
+> Probably not.
+>=20
+> > -global migration.only-migratable=3Don is entirely undocumented.  The
+> > property appears in -device migration,help and device-list-properties=
+,
+> > but that's all.
+> >=20
+> > Why would any sane person risk using arcane & undocumented -global
+> > migration.only-migratable=3Don instead of the obvious & documented
+> > -only-migratable?
+>=20
+> Given the combination of no known users, current broken impl, and its
+> existance not documented, I think there's a reasonable case for just
+> removing it.
 
-> This adds support to build the aml code so that Guest(ACPI boot)
-> can see the cold-plugged device memory. Memory cold plug support
-> with DT boot is not yet enabled.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  default-configs/arm-softmmu.mak        |  2 ++
->  hw/acpi/generic_event_device.c         | 23 +++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c               |  9 +++++++++
->  hw/arm/virt.c                          | 23 +++++++++++++++++++++++
->  include/hw/acpi/generic_event_device.h |  5 +++++
->  include/hw/arm/virt.h                  |  2 ++
->  6 files changed, 64 insertions(+)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 795cb89..6db444e 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -162,3 +162,5 @@ CONFIG_LSI_SCSI_PCI=y
->  
->  CONFIG_MEM_DEVICE=y
->  CONFIG_DIMM=y
-> +CONFIG_ACPI_MEMORY_HOTPLUG=y
-> +CONFIG_ACPI_HW_REDUCED=y
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index b21a551..0b32fc9 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -16,13 +16,26 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "exec/address-spaces.h"
->  #include "hw/sysbus.h"
->  #include "hw/acpi/acpi.h"
->  #include "hw/acpi/generic_event_device.h"
-> +#include "hw/mem/pc-dimm.h"
->  
->  static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
->                                  DeviceState *dev, Error **errp)
->  {
-> +    VirtAcpiState *s = VIRT_ACPI(hotplug_dev);
-> +
-> +    if (s->memhp_state.is_enabled &&
-> +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
-> +                                dev, errp);
-> +    } else {
-> +        error_setg(errp, "virt: device plug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
->  }
->  
->  static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-> @@ -31,9 +44,19 @@ static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
->  
->  static void virt_device_realize(DeviceState *dev, Error **errp)
->  {
-> +    VirtAcpiState *s = VIRT_ACPI(dev);
-> +
-> +    if (s->memhp_state.is_enabled) {
-> +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
-> +                                 &s->memhp_state,
-> +                                 s->memhp_base);
-> +    }
->  }
->  
->  static Property virt_acpi_properties[] = {
-> +    DEFINE_PROP_UINT64("memhp_base", VirtAcpiState, memhp_base, 0),
+Yes, agreed - it should be noted though.
 
-it's preferred to use '-' in property names
+Dave
 
-> +    DEFINE_PROP_BOOL("memory-hotplug-support", VirtAcpiState,
-> +                     memhp_state.is_enabled, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index bf9c0bc..20d3c83 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -40,6 +40,7 @@
->  #include "hw/loader.h"
->  #include "hw/hw.h"
->  #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/memory_hotplug.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
-> @@ -49,6 +50,13 @@
->  #define ARM_SPI_BASE 32
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> +static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState *ms)
-> +{
-it's dummy wrapper that never will be reused,
-I suggest to just inline contents at call site and drop wrapper.
-
-> +    uint32_t nr_mem = ms->ram_slots;
-> +
-> +    build_memory_hotplug_aml(scope, nr_mem, "\\_SB", NULL, AML_SYSTEM_MEMORY);
-> +}
-> +
->  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
->  {
->      uint16_t i;
-> @@ -740,6 +748,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->       * the RTC ACPI device at all when using UEFI.
->       */
->      scope = aml_scope("\\_SB");
-> +    acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
->      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
->      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
->                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d0ff20d..13db0e9 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -133,6 +133,7 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, 0x00010000 },
-                                                 ^^^^^^^^^^^
-where from this magic number comes?
-
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -516,6 +517,18 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
->      }
->  }
->  
-> +static DeviceState *create_virt_acpi(VirtMachineState *vms)
-> +{
-> +    DeviceState *dev;
-> +
-> +    dev = qdev_create(NULL, "virt-acpi");
-> +    qdev_prop_set_uint64(dev, "memhp_base",
-> +                         vms->memmap[VIRT_PCDIMM_ACPI].base);
-> +    qdev_init_nofail(dev);
-> +
-> +    return dev;
-
-Probably no worth a wrapper either, since code is trivial and isn't reused elsewhere.
-
-> +}
-> +
->  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
->  {
->      const char *itsclass = its_class_name();
-> @@ -1644,6 +1657,8 @@ static void machvirt_init(MachineState *machine)
->  
->      create_platform_bus(vms, pic);
->  
-> +    vms->acpi = create_virt_acpi(vms);
-> +
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
->      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> @@ -1828,11 +1843,19 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
-> +    HotplugHandlerClass *hhc;
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->      Error *local_err = NULL;
->  
->      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
-> +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi);
-> +    hhc->plug(HOTPLUG_HANDLER(vms->acpi), dev, &error_abort);
->  
-> +out:
->      error_propagate(errp, local_err);
->  }
->  
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> index f314515..262ca7d 100644
-> --- a/include/hw/acpi/generic_event_device.h
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -18,12 +18,17 @@
->  #ifndef HW_ACPI_GED_H
->  #define HW_ACPI_GED_H
->  
-> +#include "hw/acpi/memory_hotplug.h"
-> +
->  #define TYPE_VIRT_ACPI "virt-acpi"
->  #define VIRT_ACPI(obj) \
->      OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
->  
->  typedef struct VirtAcpiState {
->      SysBusDevice parent_obj;
-> +    MemHotplugState memhp_state;
-> +    hwaddr memhp_base;
->  } VirtAcpiState;
->  
-> +
->  #endif
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 507517c..c5e4c96 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -77,6 +77,7 @@ enum {
->      VIRT_GPIO,
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
-> +    VIRT_PCDIMM_ACPI,
->      VIRT_LOWMEMMAP_LAST,
->  };
->  
-> @@ -132,6 +133,7 @@ typedef struct {
->      uint32_t iommu_phandle;
->      int psci_conduit;
->      hwaddr highest_gpa;
-> +    DeviceState *acpi;
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
