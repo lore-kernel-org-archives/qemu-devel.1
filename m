@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41532)
+Received: from eggs.gnu.org ([209.51.188.92]:43782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hAzKf-0001eu-SC
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:58:47 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1hAzTq-000798-EZ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hAzKe-00037H-4w
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:58:45 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hAzKd-00036t-Ps
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 11:58:44 -0400
-Received: by mail-wr1-f66.google.com with SMTP id y13so12776867wrd.3
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 08:58:43 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <DF798996-57F7-405A-93D8-F77244B38553@oracle.com>
-References: <20190401133659.20421-1-vkuznets@redhat.com>
-	<DF798996-57F7-405A-93D8-F77244B38553@oracle.com>
-Date: Mon, 01 Apr 2019 17:58:40 +0200
-Message-ID: <87a7h91zv3.fsf@vitty.brq.redhat.com>
+	(envelope-from <pkrempa@redhat.com>) id 1hAzTp-0006ro-7G
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:08:14 -0400
+Date: Mon, 1 Apr 2019 18:07:55 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190401160755.GB2686@andariel.pipo.sk>
+References: <20190328182810.21497-1-kwolf@redhat.com>
+	<20190328182810.21497-2-kwolf@redhat.com>
+	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
+	<87ftr5iy8i.fsf@dusky.pond.sub.org>
+	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
+	<20190329170439.GK5081@localhost.localdomain>
+	<87o95sa40r.fsf@dusky.pond.sub.org>
+	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
+	<20190401122054.GA2686@andariel.pipo.sk>
+	<87mul9n5ah.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ioapic: allow buggy guests mishandling
- level-triggered interrupts to make progress
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qlTNgmc+xy1dBmNv"
+Content-Disposition: inline
+In-Reply-To: <87mul9n5ah.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Options for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,251 +32,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Liran Alon <liran.alon@oracle.com> writes:
 
->> On 1 Apr 2019, at 16:36, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> 
->> It was found that Hyper-V 2016 on KVM in some configurations (q35 machine +
->> piix4-usb-uhci) hangs on boot. Trace analysis led us to the conclusion that
->> it is mishandling level-triggered interrupt performing EOI without fixing
->> the root cause.
->
-> I would rephrase as:
-> It was found that Hyper-V 2016 on KVM in some configurations (q35 machine + piix4-usb-uhci) hangs on boot.
-> Root-cause was that one of Hyper-V level-triggered interrupt handler performs EOI before fixing the root-cause.
-> This results in IOAPIC keep re-raising the level-triggered interrupt
-> after EOI because irq-line remains asserted.
+--qlTNgmc+xy1dBmNv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Ok, thanks for the suggestion.
+On Mon, Apr 01, 2019 at 16:55:50 +0200, Markus Armbruster wrote:
+> Peter Krempa <pkrempa@redhat.com> writes:
+>=20
+> > On Sun, Mar 31, 2019 at 14:56:19 +0200, Markus Armbruster wrote:
+> >> Let's review our options for 4.0.
+> >>=20
+> >> Please note my analysis is handicapped by incomplete information, in
+> >> particular on libvirt's needs.
+> >
+> > Libvirt's needs are "simple" we need to do block-commit. It has a few
+> > caveats though. The selinux labels for backing images don't allow write
+> > operation when starting qemu. When doing block-commit libvirt relabels
+> > the backing chain prior to using block-commit.
+>=20
+> Paraphrasing, to make sure I got you.
+>=20
+> Consider the common read/write COW image with a backing image.
+>=20
+> Libvirt wants to grant QEMU read/write access to the COW and read-only
+> access to the backing image.  It does that with SELinux.  QEMU has to
+> open the backing image read-only (read/write would fail).
+>=20
+> But libvirt also wants to do block-commit.  Libvirt first relabels to
+> grant QEMU read/write access to the backing image, then $something makes
+> QEMU reopen the backing image read/write, block-commit does its job,
+> $something makes QEMU reopen the backing image read-only, libvirt
+> relabels to revoke read/write access.
+>=20
+> Correct?
 
->
->> This causes immediate re-assertion and L2 VM (which is
->> supposedly expected to fix the cause of the interrupt) is not making any
->> progress.
->
-> I don’t know why you assume this.
-> From the trace we have examined, it seems that the EOI is performed by Hyper-V and not it’s guest
-> This means that the handler for this level-triggered interrupt is on
-> Hyper-V and not it’s guest.
+Yes.
 
-If you let it run (with e.g. this patch or by setting preemtion timer >
-0) you'll see that MMIO write fixing the cause of the interrupt is
-happening from L2:
+>=20
+> With dynamic read-only, $something is the block commit job (a writer)
+> attaching and detaching to the backing image node.
+>=20
+> > That works with -drive as qemu reopens the files internally, but does
+> > not work when using -blockdev.
+>=20
+> Happy to take your word for it.
+>=20
+> > Since we need to keep the images RO until doing  the blockjob there
+> > needs to be a way when either qemu automagically does what libvirt needs
+> > even if the image did not have the write permission originally.
+> >
+> > auto-read-only was a naive impl when qemu attempted to keep the storage
+> > access nodes RW. At the point when I was testing it I didn't enable
+> > s-virt as it's a hassle when you want to run git versions of libvirt and
+> > qemu and thus didn't see the problem with missing permissions.
+>=20
+> Yes, fallback read-only is useless for the scenario above.
+>=20
+> Kevin wrote "libvirt requires dynamic read-only for file-posix. It
+> prefers dynamic read-only for other drivers, but can live with fallback
+> read-only there."  I'm not sure how it can live with fallback read-only.
+> Is it because only *files* can labelled with SELinux?
+>=20
+> If yes, then my next question is how libvirt makes use of fallback
+> read-only for non-files.  Can you give me an example?
 
-(qemu) info pci:
+For non-files libvirt usually does not have means to modify the access
+permissions.
 
-  Bus  0, device   4, function 0:
-    USB controller: PCI device 8086:7112
-      PCI subsystem 1af4:1100
-      IRQ 23.
-      BAR4: I/O at 0x6060 [0x607f].
-      id ""
+A simple example may be a NBD export. If the NBD server exports the
+image readonly libvirt can't do much about it. Arguably you can consider
+a situation where the user modifies the access to read-write manually
+and then invokes the libvirt virDomainBlockCommit API and thus still
+expects the automagic reopen to happen correctly. At this point I'm not
+really certain to which extend this would work currently with -drive as
+there are known issues when attempting to point to a non-file image by
+path rather than node-name.
 
-...
-  538597.212494: kvm_exit:             reason VMRESUME rip 0xfffff80004250115 info 0 0
-  538597.212499: kvm_entry:            vcpu 0
-  538597.212506: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a27 info 60620009 0
-  538597.212507: kvm_nested_vmexit:    rip fffff80e02ac6a27 reason IO_INSTRUCTION info1 60620009 info2 0 int_info 0 int_info_err 0
-  538597.212509: kvm_fpu:              unload
-  538597.212511: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
-  538597.212516: kvm_fpu:              load
-  538597.212518: kvm_pio:              pio_read at 0x6062 size 2 count 1 val 0x1 
-  538597.212519: kvm_entry:            vcpu 0
-  538597.212523: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a61 info 60640009 0
-  538597.212523: kvm_nested_vmexit:    rip fffff80e02ac6a61 reason IO_INSTRUCTION info1 60640009 info2 0 int_info 0 int_info_err 0
-  538597.212524: kvm_fpu:              unload
-  538597.212525: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
-  538597.212528: kvm_fpu:              load
-  538597.212528: kvm_pio:              pio_read at 0x6064 size 2 count 1 val 0xf 
-...
+> > The dynamic version attempts to fix that. That is still the automagic
+> > approach. I don't really mind also doing a hands-on approach where we'd
+> > need to tell qemu to reopen given nodes.
+>=20
+> Aha!  You just corrected my overly narrow idea of the solution space.
+>=20
+> > I'm not sure what ends up being less work.
+>=20
+> "Less work" is an important consideration.
+>=20
+> We may be able to accept some extra work to get a saner interface.
+> Depends on how much saner and how much extra exactly, and on who needs
+> to do the work.
 
-and this happens after EOI from L1.
+I agree. While the 'explicit reopen' approach may be more work for
+libvirt I'll happily accept that solution.
 
->
->> 
->> Gory details: https://urldefense.proofpoint.com/v2/url?u=https-3A__www.spinics.net_lists_kvm_msg184484.html&d=DwIDAg&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=Jk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=Q0Ico0Nb_DGRDrDgXkjkRr-xjzIbOLteVOhDJXBD_pU&s=d_H4_-qzqGvyi8X7g_KA0hZ5a8zjfHQhe1BhLPIokcA&e=
->
-> Maybe worth to note that one should read the entire thread to understand the analysis.
->
+>=20
+> >> Terminology:
+> >>=20
+> >> * "Hard read-write" semantics: open read/write.
+> >>=20
+> >> * "Hard read-only" semantics: open read-only.
+> >>=20
+> >> * "Dynamic read-only" semantics: open read-only, reopen read/write when
+> >>   a writer attaches, reopen read-only when the last writer detaches.
 
-Sure.
+[...]
 
->> 
->> Turns out we were dealing with similar issues before; in-kernel IOAPIC
->> implementation has commit 184564efae4d ("kvm: ioapic: conditionally delay
->> irq delivery duringeoi broadcast") which describes a very similar issue.
->> 
->> Steal the idea from the above mentioned commit for IOAPIC implementation in
->> QEMU. SUCCESSIVE_IRQ_MAX_COUNT, delay and the comment are borrowed as well.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->> hw/intc/ioapic.c                  | 43 ++++++++++++++++++++++++++++++-
->> hw/intc/trace-events              |  1 +
->> include/hw/i386/ioapic_internal.h |  3 +++
->> 3 files changed, 46 insertions(+), 1 deletion(-)
->> 
->> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
->> index 9d75f84d3b..daf45cc8a8 100644
->> --- a/hw/intc/ioapic.c
->> +++ b/hw/intc/ioapic.c
->> @@ -139,6 +139,15 @@ static void ioapic_service(IOAPICCommonState *s)
->>    }
->> }
->> 
->> +#define SUCCESSIVE_IRQ_MAX_COUNT 10000
->> +
->> +static void ioapic_timer(void *opaque)
->> +{
->> +    IOAPICCommonState *s = opaque;
->> +
->> +    ioapic_service(s);
->> +}
->> +
->> static void ioapic_set_irq(void *opaque, int vector, int level)
->> {
->>    IOAPICCommonState *s = opaque;
->> @@ -227,7 +236,28 @@ void ioapic_eoi_broadcast(int vector)
->>                trace_ioapic_clear_remote_irr(n, vector);
->>                s->ioredtbl[n] = entry & ~IOAPIC_LVT_REMOTE_IRR;
->
-> This clear of remote-irr should happen only for level-triggered interrupts.
-> So we can make the code here more structured like KVM’s __kvm_ioapic_update_eoi().
-> It also have an extra-value of not advancing "s->irq_reassert[vector]” for vectors which are edge-triggered which is a bit misleading.
->
->>                if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n))) {
->> -                    ioapic_service(s);
->> +                    bool level = ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1)
->> +                        == IOAPIC_TRIGGER_LEVEL;
->
-> Nit: I would declare variable “trig_mode” and compare it later
-> explicitly to IOAPIC_TRIGGER_LEVEL.
+> >> * When libvirt sees a driver providing a dynamic-read-only parameter, =
+it
+> >>   knows it can rely on the driver providing dynamic read-only semantic=
+s.
+> >>=20
+> >> * Adding dynamic read-only capability to drivers creates no
+> >>   introspection problems: we simply add dynamic-read-only to their
+> >>   parameters.
+> >
+> > In the end libvirt does not care that much if the storage is open read
+> > only or read write. We need the format node or guest frontend to deny
+> > writes if the disk is declared as read-only. We also need to be able to
+> > do blockjobs. The requirement is that images may not be accessible in
+> > R/W mode when qemu is starting but later may become. Then it's expected
+> > that block-commit will succeed.
+>=20
+> Fallback read-only can't help there.
+>=20
+> Dynamic read-only should work.  Explicit reopen triggers could also
+> work.
 
-Ok.
+The explicit trigger would work. With the tighter control of blockjobs
+we should be able to control the lifecycle properly.
 
->
->> +
->> +                    ++s->irq_reassert[vector];
->
-> Nit: I would rename “irq_reassert” to “irq_eoi” as it is named in KVM
-> IOAPIC code.
+--qlTNgmc+xy1dBmNv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Honestly, I did this change on purpose: we're counting how many times the
-irq was re-asserted on eoi and 'irq_eoi' sounds more like an EOI flag to
-me. 
+-----BEGIN PGP SIGNATURE-----
 
->
->> +                    if (!level ||
->> +                        s->irq_reassert[vector] < SUCCESSIVE_IRQ_MAX_COUNT) {
->> +                        ioapic_service(s);
->> +                    } else {
->> +                        /*
->> +                         * Real hardware does not deliver the interrupt
->> +                         * immediately during eoi broadcast, and this lets a
->> +                         * buggy guest make slow progress even if it does not
->> +                         * correctly handle a level-triggered interrupt. Emulate
->> +                         * this behavior if we detect an interrupt storm.
->> +                         */
->> +                        trace_ioapic_eoi_delayed_reassert(vector);
->> +                        timer_mod(s->timer,
->> +                                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
->> +                                  NANOSECONDS_PER_SECOND / 100);
->
-> You need to zero here s->irq_reassert[vector].
-> I think you would avoid these kind of little mistakes if you will
-> attempt to follow KVM’s commit code structure.
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlyiN1gACgkQHGwCByjY
+1Gq1NhAAxMWUZZ5cnJDDfUwpyy2BjXSTs6Vscx69fNqN77iO9w3TxRThUCDrOpZf
+HOEML40iJBg1GOETVGOKOWdFmMmjyAZrB4+fq7FFlgjmIab0kJ6Y0GAlhvDlwCjQ
+wiMMNJU0TmX5HoxgarEMNuR588yCKCZETgWdhYctjdTpwO4jZsksyXh/6iYtZYUF
+UlT9rktrFLUSym5SIm244AlK/i6ENQY44idzFsoi7MRmrHW4mjGQyrZ1xXfu8oND
+06YHAfAHuPUafZb36j50Ri7dtShzt3yFyl2E1fDY7tOSkxtDNDYV02HVIAalYx3n
+8LopoX64kDxcT/0M5Eevx3s44L74FVsJm2oO+O/uakMFaKNBiUAZvNJJDLvCqvhP
+fcpHWqryEH5ZqP8fHeG7Hjc+7fgz3GgC93REawRP4FR3pPMce4rHr0b6BisFKdoZ
+wuFA66pPyLLhX8UfeG1Q1FZHSvhnWNUTwi4azwipXKNqbz7+bKxP4AzgEcQwFf2v
+oIirGIxo7hTvIBEPNS003gm2Ukd8xS84Xh8uxB2Geag+KwIFkM9KOOMYdEJInFv2
+j0shij/5Y6JPbENTuuge34W6UZAJADWShf0x2hJfitswV4rIar3oGIatSfBL1GZT
+DaP5Sn879wQVs0UH3+ZZAkj6ckJEtSWztu7ESgTKvcZ5K8hN5sA=
+=FED8
+-----END PGP SIGNATURE-----
 
-Oh, I borrowed the idea for the commit and you'd like me to borrow the
-commit itself :-)
-
-We can, of couse, zero s->irq_reassert[vector] here, however, that would
-change the behavior: with my patch we will be delaying all re-assertions
-after SUCCESSIVE_IRQ_MAX_COUNT until the line is lowered, not just
-one. I'm not sure which is better.
-
-Anyway, I checked and the issue is gone even if we delay once and you're
-right that there's no reason to differ from kernel commit. Will fix in
-v2, thanks!
-
->
->> +                    }
->> +                } else {
->> +                    s->irq_reassert[vector] = 0;
->>                }
->>            }
->>        }
->> @@ -401,6 +431,8 @@ static void ioapic_realize(DeviceState *dev, Error **errp)
->>    memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
->>                          "ioapic", 0x1000);
->> 
->> +    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, ioapic_timer, s);
->> +
->>    qdev_init_gpio_in(dev, ioapic_set_irq, IOAPIC_NUM_PINS);
->> 
->>    ioapics[ioapic_no] = s;
->> @@ -408,6 +440,14 @@ static void ioapic_realize(DeviceState *dev, Error **errp)
->>    qemu_add_machine_init_done_notifier(&s->machine_done);
->> }
->> 
->> +static void ioapic_unrealize(DeviceState *dev, Error **errp)
->> +{
->> +    IOAPICCommonState *s = IOAPIC_COMMON(dev);
->> +
->> +    timer_del(s->timer);
->> +    timer_free(s->timer);
->> +}
->> +
->> static Property ioapic_properties[] = {
->>    DEFINE_PROP_UINT8("version", IOAPICCommonState, version, IOAPIC_VER_DEF),
->>    DEFINE_PROP_END_OF_LIST(),
->> @@ -419,6 +459,7 @@ static void ioapic_class_init(ObjectClass *klass, void *data)
->>    DeviceClass *dc = DEVICE_CLASS(klass);
->> 
->>    k->realize = ioapic_realize;
->> +    k->unrealize = ioapic_unrealize;
->>    /*
->>     * If APIC is in kernel, we need to update the kernel cache after
->>     * migration, otherwise first 24 gsi routes will be invalid.
->> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
->> index a28bdce925..90c9d07c1a 100644
->> --- a/hw/intc/trace-events
->> +++ b/hw/intc/trace-events
->> @@ -25,6 +25,7 @@ apic_mem_writel(uint64_t addr, uint32_t val) "0x%"PRIx64" = 0x%08x"
->> ioapic_set_remote_irr(int n) "set remote irr for pin %d"
->> ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin %d vector %d"
->> ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
->> +ioapic_eoi_delayed_reassert(int vector) "delayed reassert on EOI broadcast for vector %d"
->> ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
->> ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
->> ioapic_set_irq(int vector, int level) "vector: %d level: %d"
->> diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_internal.h
->> index 9848f391bb..e0ee88db40 100644
->> --- a/include/hw/i386/ioapic_internal.h
->> +++ b/include/hw/i386/ioapic_internal.h
->> @@ -96,6 +96,7 @@ typedef struct IOAPICCommonClass {
->>    SysBusDeviceClass parent_class;
->> 
->>    DeviceRealize realize;
->> +    DeviceUnrealize unrealize;
->>    void (*pre_save)(IOAPICCommonState *s);
->>    void (*post_load)(IOAPICCommonState *s);
->> } IOAPICCommonClass;
->> @@ -111,6 +112,8 @@ struct IOAPICCommonState {
->>    uint8_t version;
->>    uint64_t irq_count[IOAPIC_NUM_PINS];
->>    int irq_level[IOAPIC_NUM_PINS];
->> +    int irq_reassert[IOAPIC_NUM_PINS];
->> +    QEMUTimer *timer;
->> };
->> 
->> void ioapic_reset_common(DeviceState *dev);
->> -- 
->> 2.20.1
->> 
->
-
--- 
-Vitaly
+--qlTNgmc+xy1dBmNv--
