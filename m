@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41492)
+Received: from eggs.gnu.org ([209.51.188.92]:41482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45D-000204-6N
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:08 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45B-0003pl-ST
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45C-0001zL-HK
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44860)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45A-0003p1-RB
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34802
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB45B-0003ie-EG
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:05 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1hB45A-0003iV-IW
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:04 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1rqJ122295
+	x31L1qYL095735
 	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:02:54 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksyg8sjj-1
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkswegyhg-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:02:53 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:53 +0100
+	Mon, 1 Apr 2019 22:02:52 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:46 -0500
+Date: Mon,  1 Apr 2019 15:59:47 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-73-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 72/97] mirror: fix dead-lock
+Message-Id: <20190401210011.16009-74-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 73/97] iotests: simple mirror test with kvm on
+ 1G image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,150 +40,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Let start from the beginning:
-
-Commit b9e413dd375 (in 2.9)
-"block: explicitly acquire aiocontext in aio callbacks that need it"
-added pairs of aio_context_acquire/release to mirror_write_complete and
-mirror_read_complete, when they were aio callbacks for blk_aio_* calls.
-
-Then, commit 2e1990b26e5 (in 3.0) "block/mirror: Convert to coroutines"
-dropped these blk_aio_* calls, than mirror_write_complete and
-mirror_read_complete are not callbacks more, and don't need additional
-aiocontext acquiring. Furthermore, mirror_read_complete calls
-blk_co_pwritev inside these pair of aio_context_acquire/release, which
-leads to the following dead-lock with mirror:
-
- (gdb) info thr
-   Id   Target Id         Frame
-   3    Thread (LWP 145412) "qemu-system-x86" syscall ()
-   2    Thread (LWP 145416) "qemu-system-x86" __lll_lock_wait ()
- * 1    Thread (LWP 145411) "qemu-system-x86" __lll_lock_wait ()
-
- (gdb) bt
- #0  __lll_lock_wait ()
- #1  _L_lock_812 ()
- #2  __GI___pthread_mutex_lock
- #3  qemu_mutex_lock_impl (mutex=0x561032dce420 <qemu_global_mutex>,
-     file=0x5610327d8654 "util/main-loop.c", line=236) at
-     util/qemu-thread-posix.c:66
- #4  qemu_mutex_lock_iothread_impl
- #5  os_host_main_loop_wait (timeout=480116000) at util/main-loop.c:236
- #6  main_loop_wait (nonblocking=0) at util/main-loop.c:497
- #7  main_loop () at vl.c:1892
- #8  main
-
-Printing contents of qemu_global_mutex, I see that "__owner = 145416",
-so, thr1 is main loop, and now it wants BQL, which is owned by thr2.
-
- (gdb) thr 2
- (gdb) bt
- #0  __lll_lock_wait ()
- #1  _L_lock_870 ()
- #2  __GI___pthread_mutex_lock
- #3  qemu_mutex_lock_impl (mutex=0x561034d25dc0, ...
- #4  aio_context_acquire (ctx=0x561034d25d60)
- #5  dma_blk_cb
- #6  dma_blk_io
- #7  dma_blk_read
- #8  ide_dma_cb
- #9  bmdma_cmd_writeb
- #10 bmdma_write
- #11 memory_region_write_accessor
- #12 access_with_adjusted_size
- #15 flatview_write
- #16 address_space_write
- #17 address_space_rw
- #18 kvm_handle_io
- #19 kvm_cpu_exec
- #20 qemu_kvm_cpu_thread_fn
- #21 qemu_thread_start
- #22 start_thread
- #23 clone ()
-
-Printing mutex in fr 2, I see "__owner = 145411", so thr2 wants aio
-context mutex, which is owned by thr1. Classic dead-lock.
-
-Then, let's check that aio context is hold by mirror coroutine: just
-print coroutine stack of first tracked request in mirror job target:
-
- (gdb) [...]
- (gdb) qemu coroutine 0x561035dd0860
- #0  qemu_coroutine_switch
- #1  qemu_coroutine_yield
- #2  qemu_co_mutex_lock_slowpath
- #3  qemu_co_mutex_lock
- #4  qcow2_co_pwritev
- #5  bdrv_driver_pwritev
- #6  bdrv_aligned_pwritev
- #7  bdrv_co_pwritev
- #8  blk_co_pwritev
- #9  mirror_read_complete () at block/mirror.c:232
- #10 mirror_co_read () at block/mirror.c:370
- #11 coroutine_trampoline
- #12 __start_context
-
-Yes it is mirror_read_complete calling blk_co_pwritev after acquiring
-aio context.
+This test is broken without previous commit fixing dead-lock in mirror.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Acked-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit d12ade5732c4d2d293735a39b4bd943da8d64db6)
+(cherry picked from commit db5e8210adbafe9c6383d8364345a8c545d38e62)
+*drop context deps from test groups not in 3.0
+*modify expected QMP output to match encoding for 3.0
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/mirror.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/235     | 76 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/235.out |  3 ++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 80 insertions(+)
+ create mode 100755 tests/qemu-iotests/235
+ create mode 100644 tests/qemu-iotests/235.out
 
-diff --git a/block/mirror.c b/block/mirror.c
-index dd5ca02b09..b097853983 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -198,7 +198,6 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
- {
-     MirrorBlockJob *s = op->s;
- 
--    aio_context_acquire(blk_get_aio_context(s->common.blk));
-     if (ret < 0) {
-         BlockErrorAction action;
- 
-@@ -208,15 +207,14 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
-             s->ret = ret;
-         }
-     }
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+new file mode 100755
+index 0000000000..da044ed34e
+--- /dev/null
++++ b/tests/qemu-iotests/235
+@@ -0,0 +1,76 @@
++#!/usr/bin/env python
++#
++# Simple mirror test
++#
++# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     mirror_iteration_done(op, ret);
--    aio_context_release(blk_get_aio_context(s->common.blk));
- }
- 
- static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
- {
-     MirrorBlockJob *s = op->s;
- 
--    aio_context_acquire(blk_get_aio_context(s->common.blk));
-     if (ret < 0) {
-         BlockErrorAction action;
- 
-@@ -227,12 +225,11 @@ static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
-         }
- 
-         mirror_iteration_done(op, ret);
--    } else {
--        ret = blk_co_pwritev(s->target, op->offset,
--                             op->qiov.size, &op->qiov, 0);
--        mirror_write_complete(op, ret);
-+        return;
-     }
--    aio_context_release(blk_get_aio_context(s->common.blk));
++import sys
++import os
++import iotests
++from iotests import qemu_img_create, qemu_io, file_path, log
 +
-+    ret = blk_co_pwritev(s->target, op->offset, op->qiov.size, &op->qiov, 0);
-+    mirror_write_complete(op, ret);
- }
- 
- /* Clip bytes relative to offset to not exceed end-of-file */
++sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
++
++from qemu import QEMUMachine
++
++# Note:
++# This test was added to check that mirror dead-lock was fixed (see previous
++# commit before this test addition).
++# And it didn't reproduce if at least one of the following:
++# 1. use small image size
++# 2. use raw format (not qcow2)
++# 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
++#    reproduces, if just drop kvm, but gdb failed to produce full backtraces
++#    for me)
++# 4. add iothread
++
++size = 1 * 1024 * 1024 * 1024
++
++iotests.verify_image_format(supported_fmts=['qcow2'])
++
++disk = file_path('disk')
++
++# prepare source image
++qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
++                str(size))
++
++vm = QEMUMachine(iotests.qemu_prog)
++vm.add_args('-machine', 'pc,accel=kvm')
++vm.add_args('-drive', 'id=src,file=' + disk)
++vm.launch()
++
++log(vm.qmp('object-add', qom_type='throttle-group', id='tg0',
++           props={ 'x-bps-total': size }))
++
++log(vm.qmp('blockdev-add',
++           **{ 'node-name': 'target',
++               'driver': 'throttle',
++               'throttle-group': 'tg0',
++               'file': {
++                   'driver': 'null-co',
++                   'size': size
++                } }))
++
++log(vm.qmp('blockdev-mirror', device='src', target='target', sync='full'))
++
++try:
++    vm.event_wait('BLOCK_JOB_READY', timeout=10.0)
++except:
++    vm.shutdown()
++    raise
++
++vm.shutdown()
+diff --git a/tests/qemu-iotests/235.out b/tests/qemu-iotests/235.out
+new file mode 100644
+index 0000000000..db7882d4cc
+--- /dev/null
++++ b/tests/qemu-iotests/235.out
+@@ -0,0 +1,3 @@
++{u'return': {}}
++{u'return': {}}
++{u'return': {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 31f6e77dcb..d098120afa 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -227,3 +227,4 @@
+ 227 auto quick
+ 229 auto quick
+ 231 auto quick
++235 auto quick
 -- 
 2.17.1
