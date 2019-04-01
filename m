@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40606)
+Received: from eggs.gnu.org ([209.51.188.92]:40676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44D-00014f-Dn
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:06 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44P-0001F7-Dg
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44B-0003Ch-JX
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45082
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44M-0003IQ-Sr
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52922)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB447-0003BE-Mo
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:01 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1hB44J-0003Av-4n
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:13 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1pc8095648
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:58 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkswegvh1-1
+	x31L1rPm122274
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:57 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksyg8pqf-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:56 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:56 +0100
+	Mon, 1 Apr 2019 22:01:54 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:01 -0500
+Date: Mon,  1 Apr 2019 15:58:58 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-28-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 27/97] block: iotest to catch abort on forced
- blockjob cancel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190401210011.16009-25-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 24/97] vnc: fix memleak of the
+ "vnc-worker-output" name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,162 +42,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Jeff Cody <jcody@redhat.com>
+Cc: qemu-stable@nongnu.org, Peter Wu <peter@lekensteyn.nl>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Jeff Cody <jcody@redhat.com>
+From: Peter Wu <peter@lekensteyn.nl>
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: df317f617fbe5affcf699cb8560e7b0c2e028a64.1534868459.git.jcody@redhat.com
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-(cherry picked from commit 26bf474ba92c76e61bea51726e22da6dfd185296)
+Fixes repeated memory leaks of 18 bytes when using VNC:
+
+    Direct leak of 831024 byte(s) in 46168 object(s) allocated from:
+        ...
+        #4 0x7f6d2f919bdd in g_strdup_vprintf glib/gstrfuncs.c:514
+        #5 0x56085cdcf660 in buffer_init util/buffer.c:59
+        #6 0x56085ca6a7ec in vnc_async_encoding_start ui/vnc-jobs.c:177
+        #7 0x56085ca6b815 in vnc_worker_thread_loop ui/vnc-jobs.c:240
+
+Fixes: 543b95801f98 ("vnc: attach names to buffers")
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+CC: qemu-stable@nongnu.org
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180807221830.3844-1-peter@lekensteyn.nl
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 0ae0b069aa8f23a138cc6d2d83edaa5c22f948a5)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/229.out | 23 +++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 119 insertions(+)
- create mode 100755 tests/qemu-iotests/229
- create mode 100644 tests/qemu-iotests/229.out
+ ui/vnc-jobs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-new file mode 100755
-index 0000000000..ff851ec431
---- /dev/null
-+++ b/tests/qemu-iotests/229
-@@ -0,0 +1,95 @@
-+#!/bin/bash
-+#
-+# Test for force canceling a running blockjob that is paused in
-+# an error state.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=jcody@redhat.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_IMG" "$DEST_IMG"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+# Needs backing file and backing format support
-+_supported_fmt qcow2 qed
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+DEST_IMG="$TEST_DIR/d.$IMGFMT"
-+TEST_IMG="$TEST_DIR/b.$IMGFMT"
-+
-+_make_test_img 2M
-+
-+# destination for mirror will be too small, causing error
-+TEST_IMG=$DEST_IMG _make_test_img 1M
-+
-+$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
-+
-+_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'qmp_capabilities'}" \
-+    'return'
-+
-+echo
-+echo '=== Starting drive-mirror, causing error & stop  ==='
-+echo
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'drive-mirror',
-+                 'arguments': {'device': 'testdisk',
-+                               'mode':   'absolute-paths',
-+                               'format': '$IMGFMT',
-+                               'target': '$DEST_IMG',
-+                               'sync':   'full',
-+                               'mode':   'existing',
-+                               'on-source-error': 'stop',
-+                               'on-target-error': 'stop' }}"    \
-+     "JOB_STATUS_CHANGE.*pause"
-+
-+echo
-+echo '=== Force cancel job paused in error state  ==='
-+echo
-+
-+success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'block-job-cancel',
-+                 'arguments': { 'device': 'testdisk',
-+                                'force': true}}" \
-+     "BLOCK_JOB_CANCELLED" "Assertion"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-new file mode 100644
-index 0000000000..4c4112805f
---- /dev/null
-+++ b/tests/qemu-iotests/229.out
-@@ -0,0 +1,23 @@
-+QA output created by 229
-+Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
-+Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+
-+=== Starting drive-mirror, causing error & stop  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
-+
-+=== Force cancel job paused in error state  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b973dc842d..743790745b 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -225,3 +225,4 @@
- 225 rw auto quick
- 226 auto quick
- 227 auto quick
-+229 auto quick
--- 
+diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+index b0b15d42a8..929391f85d 100644
+--- a/ui/vnc-jobs.c
++++ b/ui/vnc-jobs.c
+@@ -193,6 +193,7 @@ static void vnc_async_encoding_start(VncState *orig, =
+VncState *local)
+=20
+ static void vnc_async_encoding_end(VncState *orig, VncState *local)
+ {
++    buffer_free(&local->output);
+     orig->tight =3D local->tight;
+     orig->zlib =3D local->zlib;
+     orig->hextile =3D local->hextile;
+@@ -278,7 +279,7 @@ static int vnc_worker_thread_loop(VncJobQueue *queue)
+         /* Copy persistent encoding data */
+         vnc_async_encoding_end(job->vs, &vs);
+=20
+-	qemu_bh_schedule(job->vs->bh);
++        qemu_bh_schedule(job->vs->bh);
+     }  else {
+         buffer_reset(&vs.output);
+         /* Copy persistent encoding data */
+--=20
 2.17.1
