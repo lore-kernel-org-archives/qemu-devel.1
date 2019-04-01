@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46687)
+Received: from eggs.gnu.org ([209.51.188.92]:46721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hAxg1-0005eA-0Z
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:12:41 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hAxg3-0005jG-Q3
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hAxg0-0006qv-2C
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:12:40 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hAxg2-0006rb-HP
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:12:43 -0400
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Mon,  1 Apr 2019 16:12:17 +0200
-Message-Id: <20190401141222.30034-1-lvivier@redhat.com>
+Date: Mon,  1 Apr 2019 16:12:18 +0200
+Message-Id: <20190401141222.30034-2-lvivier@redhat.com>
+In-Reply-To: <20190401141222.30034-1-lvivier@redhat.com>
+References: <20190401141222.30034-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/5] build: cleanup in Makefile.objs
+Subject: [Qemu-devel] [PATCH v3 1/5] trace: only include trace-event-subdirs
+ when they are needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,38 +25,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-This cleanup removes hardware objects from the list of files to be
-built for linux-user only targets.
+Some directories are built only for softmmu targets,
+and the related trace-event-subdirs must do the same
 
-It also builds traces files only when the related file is built.
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ Makefile.objs | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Tested with all combinations of --{disable,enable}-{system,user,tools}
-
-v3:
-  - don't move hw/display to CONFIG_BLOCK section
-v2:
-  - add CONFIG_TOOLS and CONFIG_BLOCK
-  - replace GENERATED_FILES by generated-files-y
-    and use generated-files-${CONFIG_TRACE_UST} and
-    generated-files-${CONFIG_SOFTMMU}
-  - move chardev-obj-y from SUBDIR_RULES to SOFTMMU_SUBDIR_RULES
-  - use $(CONFIG_BLOCK) in tests/Makefile.include
-  - disable qemu-ga with linux-user only
-
-Laurent Vivier (5):
-  trace: only include trace-event-subdirs when they are needed
-  build: replace GENERATED_FILES by generated-files-y
-  configure: qemu-ga is only needed with softmmu targets
-  build: chardev is only needed for softmmu targets
-  build: don't build hardware objects with linux-user
-
- Makefile                   |  43 +++++++-------
- Makefile.objs              |  22 ++++---
- Makefile.target            |   6 +-
- configure                  |   4 +-
- target/s390x/Makefile.objs |   2 +-
- tests/Makefile.include     | 116 ++++++++++++++++++-------------------
- 6 files changed, 102 insertions(+), 91 deletions(-)
-
+diff --git a/Makefile.objs b/Makefile.objs
+index cf065de5ed44..dda5bbc9101f 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -127,11 +127,12 @@ rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
+ trace-events-subdirs =3D
+ trace-events-subdirs +=3D accel/kvm
+ trace-events-subdirs +=3D accel/tcg
+-trace-events-subdirs +=3D audio
+ trace-events-subdirs +=3D authz
+ trace-events-subdirs +=3D block
+ trace-events-subdirs +=3D chardev
+ trace-events-subdirs +=3D crypto
++ifeq ($(CONFIG_SOFTMMU),y)
++trace-events-subdirs +=3D audio
+ trace-events-subdirs +=3D hw/9pfs
+ trace-events-subdirs +=3D hw/acpi
+ trace-events-subdirs +=3D hw/alpha
+@@ -140,7 +141,6 @@ trace-events-subdirs +=3D hw/audio
+ trace-events-subdirs +=3D hw/block
+ trace-events-subdirs +=3D hw/block/dataplane
+ trace-events-subdirs +=3D hw/char
+-trace-events-subdirs +=3D hw/display
+ trace-events-subdirs +=3D hw/dma
+ trace-events-subdirs +=3D hw/hppa
+ trace-events-subdirs +=3D hw/i2c
+@@ -173,11 +173,14 @@ trace-events-subdirs +=3D hw/virtio
+ trace-events-subdirs +=3D hw/watchdog
+ trace-events-subdirs +=3D hw/xen
+ trace-events-subdirs +=3D hw/gpio
++trace-events-subdirs +=3D migration
++trace-events-subdirs +=3D net
++trace-events-subdirs +=3D ui
++endif
++trace-events-subdirs +=3D hw/display
+ trace-events-subdirs +=3D io
+ trace-events-subdirs +=3D linux-user
+-trace-events-subdirs +=3D migration
+ trace-events-subdirs +=3D nbd
+-trace-events-subdirs +=3D net
+ trace-events-subdirs +=3D qapi
+ trace-events-subdirs +=3D qom
+ trace-events-subdirs +=3D scsi
+@@ -189,7 +192,6 @@ trace-events-subdirs +=3D target/ppc
+ trace-events-subdirs +=3D target/riscv
+ trace-events-subdirs +=3D target/s390x
+ trace-events-subdirs +=3D target/sparc
+-trace-events-subdirs +=3D ui
+ trace-events-subdirs +=3D util
+=20
+ trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
+=3D$(SRC_PATH)/%/trace-events)
 --=20
 2.20.1
