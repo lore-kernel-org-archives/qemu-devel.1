@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49361)
+Received: from eggs.gnu.org ([209.51.188.92]:49820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hAxqC-0000PD-RO
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:23:14 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1hAxrp-0001fc-HN
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hAxqB-00030O-1Q
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:23:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hAxq9-0002y8-Dp
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:23:09 -0400
-Date: Mon, 1 Apr 2019 08:15:26 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190401081526.5f50d160@x1.home>
-In-Reply-To: <20190401084003.GA1530@joy-OptiPlex-7040>
-References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
-	<20190219113212.GC2941@work-vm>
-	<20190220052838.GC16456@joy-OptiPlex-7040>
-	<20190220110142.GD2608@work-vm>
-	<33183CC9F5247A488A2544077AF19020DB25D30F@dggeml511-mbx.china.huawei.com>
-	<20190220124242.5a1685c5.cohuck@redhat.com>
-	<20190327063509.GD14681@joy-OptiPlex-7040>
-	<20190327201854.GG2636@work-vm> <20190327161020.1c013e65@x1.home>
-	<20190401101430.72d2ef9e.cohuck@redhat.com>
-	<20190401084003.GA1530@joy-OptiPlex-7040>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <knut.omang@oracle.com>) id 1hAxrn-0003iB-IM
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:24:53 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:44018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1hAxrm-0003gx-Mg
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:24:51 -0400
+Message-ID: <c89218b50e3b015edc4d7f9490138929a97b8268.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 01 Apr 2019 16:24:29 +0200
+In-Reply-To: <AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+References: <20190324221319-mutt-send-email-mst@kernel.org>
+	<AM6PR05MB66166ED74E2718150F0CBF62BD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190326085309-mutt-send-email-mst@kernel.org>
+	<AM6PR05MB661611FE4DD494AF9EFB6B8ABD5F0@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190327064143.GP9149@xz-x1>
+	<060498b58287775ce6bd7dd704f13b6d6e185f91.camel@oracle.com>
+	<20190327084255.GR9149@xz-x1>
+	<AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401024710.GB8853@xz-x1>
+	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401102515.GD8853@xz-x1>
+	<AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
+Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
+ passthrough to nested (L2) VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,96 +39,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi
-	L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Liu, Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
+To: Elijah Shakkour <elijahsh@mellanox.com>, Peter Xu <peterx@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, 1 Apr 2019 04:40:03 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Mon, Apr 01, 2019 at 04:14:30PM +0800, Cornelia Huck wrote:
-> > On Wed, 27 Mar 2019 16:10:20 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> > > On Wed, 27 Mar 2019 20:18:54 +0000
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >   
-> > > > * Zhao Yan (yan.y.zhao@intel.com) wrote:    
-> > > > > On Wed, Feb 20, 2019 at 07:42:42PM +0800, Cornelia Huck wrote:      
-> > > > > > > > > >   b) How do we detect if we're migrating from/to the wrong device or
-> > > > > > > > > > version of device?  Or say to a device with older firmware or perhaps
-> > > > > > > > > > a device that has less device memory ?        
-> > > > > > > > > Actually it's still an open for VFIO migration. Need to think about
-> > > > > > > > > whether it's better to check that in libvirt or qemu (like a device magic
-> > > > > > > > > along with verion ?).        
-> > > > > > > 
-> > > > > > > We must keep the hardware generation is the same with one POD of public cloud
-> > > > > > > providers. But we still think about the live migration between from the the lower
-> > > > > > > generation of hardware migrated to the higher generation.      
-> > > > > > 
-> > > > > > Agreed, lower->higher is the one direction that might make sense to
-> > > > > > support.
-> > > > > > 
-> > > > > > But regardless of that, I think we need to make sure that incompatible
-> > > > > > devices/versions fail directly instead of failing in a subtle, hard to
-> > > > > > debug way. Might be useful to do some initial sanity checks in libvirt
-> > > > > > as well.
-> > > > > > 
-> > > > > > How easy is it to obtain that information in a form that can be
-> > > > > > consumed by higher layers? Can we find out the device type at least?
-> > > > > > What about some kind of revision?      
-> > > > > hi Alex and Cornelia
-> > > > > for device compatibility, do you think it's a good idea to use "version"
-> > > > > and "device version" fields?
-> > > > > 
-> > > > > version field: identify live migration interface's version. it can have a
-> > > > > sort of backward compatibility, like target machine's version >= source
-> > > > > machine's version. something like that.    
-> > > 
-> > > Don't we essentially already have this via the device specific region?
-> > > The struct vfio_info_cap_header includes id and version fields, so we
-> > > can declare a migration id and increment the version for any
-> > > incompatible changes to the protocol.
-> > >   
-> > > > > 
-> > > > > device_version field consists two parts:
-> > > > > 1. vendor id : it takes 32 bits. e.g. 0x8086.    
-> > > 
-> > > Who allocates IDs?  If we're going to use PCI vendor IDs, then I'd
-> > > suggest we use a bit to flag it as such so we can reserve that portion
-> > > of the 32bit address space.  See for example:
-> > > 
-> > > #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE        (1 << 31)
-> > > #define VFIO_REGION_TYPE_PCI_VENDOR_MASK        (0xffff)
-> > > 
-> > > For vendor specific regions.  
+On Mon, 2019-04-01 at 14:01 +0000, Elijah Shakkour wrote:
+> 
+> > -----Original Message-----
+> > From: Peter Xu <peterx@redhat.com>
+> > Sent: Monday, April 1, 2019 1:25 PM
+> > To: Elijah Shakkour <elijahsh@mellanox.com>
+> > Cc: Knut Omang <knut.omang@oracle.com>; Michael S. Tsirkin
+> > <mst@redhat.com>; Alex Williamson <alex.williamson@redhat.com>;
+> > Marcel Apfelbaum <marcel.apfelbaum@gmail.com>; Stefan Hajnoczi
+> > <stefanha@gmail.com>; qemu-devel@nongnu.org
+> > Subject: Re: QEMU and vIOMMU support for emulated VF passthrough to
+> > nested (L2) VM
 > > 
-> > Just browsing through the thread... if I don't misunderstand, we could
-> > use a vfio-ccw region type id here for ccw, couldn't we? Just to make
-> > sure that this is not pci-specific.  
-> CCW could use another bit other than bit 31?
-> e.g.
-> #define VFIO_REGION_TYPE_CCW_VENDOR_TYPE        (1 << 30)
-> then ccw device use (VFIO_REGION_TYPE_CCW_VENDOR_TYPE | vendor id) as its
-> first 32 bit for device version string.
+> > On Mon, Apr 01, 2019 at 09:12:38AM +0000, Elijah Shakkour wrote:
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Peter Xu <peterx@redhat.com>
+> > > > Sent: Monday, April 1, 2019 5:47 AM
+> > > > To: Elijah Shakkour <elijahsh@mellanox.com>
+> > > > Cc: Knut Omang <knut.omang@oracle.com>; Michael S. Tsirkin
+> > > > <mst@redhat.com>; Alex Williamson <alex.williamson@redhat.com>;
+> > > > Marcel Apfelbaum <marcel.apfelbaum@gmail.com>; Stefan Hajnoczi
+> > > > <stefanha@gmail.com>; qemu-devel@nongnu.org
+> > > > Subject: Re: QEMU and vIOMMU support for emulated VF passthrough
+> > to
+> > > > nested (L2) VM
+> > > >
+> > > > On Sun, Mar 31, 2019 at 11:15:00AM +0000, Elijah Shakkour wrote:
+> > > >
+> > > > [...]
+> > > >
+> > > > > I didn't have DMA nor MMIO read/write working with my old command
+> > > > line.
+> > > > > But, when I removed all CPU flags and only provided "-cpu host", I
+> > > > > see that
+> > > > MMIO works.
+> > > > > Still, DMA read/write from emulated device doesn't work for VF.
+> > > > > For
+> > > > example:
+> > > > > Driver provides me a buffer pointer through MMIO write, this
+> > > > > address
+> > > > (pointer) is GPA of L2, and when I try to call pci_dma_read() with
+> > > > this address I get:
+> > > > > "
+> > > > > Unassigned mem read 0000000000000000 "
+> > > >
+> > > > I don't know where this error log was dumped but if it's during DMA
+> > > > then I agree it can probably be related to vIOMMU.
+> > > >
+> > >
+> > > This log is dumped from:
+> > > memory.c: unassigned_mem_read()
+> > >
+> > > > > As I said, my problem now is in translation of L2 GPA provided by
+> > > > > driver,
+> > > > when I call DMA read/write for this address from VF.
+> > > > > Any insights?
+> > > >
+> > > > I just noticed that you were using QEMU 2.12 [1].  If that's the
+> > > > case, please rebase to the latest QEMU, at least >=3.0 because
+> > > > there's major refactor of the shadow logic during 3.0 devel cycle AFAICT.
+> > > >
+> > >
+> > > Rebased to QEMU 3.1
+> > > Now I see the address I'm trying to read from in log but still same error:
+> > > "
+> > > Unassigned mem read 00000000f0481000
+> > > "
+> > > What do you suggest?
+> > 
+> > Would you please answer the questions that Knut asked?  Is it working for L1
+> > guest?  How about PF?
 > 
-> But as Alex said we'll not provide an extra region to get device version,
-> and device version is only exported in sysfs, probably we should define them as
-> below:
-> #define VFIO_DEVICE_VERSION_TYPE_PCI (1<<31)
-> #define VFIO_DEVICE_VERSION_TYPE_CCW (1<<30)
+> Both VF and PF are working for L1 guest.
+> I don't know how to passthrough PF to nested VM in hyper-v.
+
+On Linux passing through VFs and PFs are the same. 
+Maybe you can try passthrough with all Linux first? (first PF then VF) ?
+
+> I don't invoke VF manually in hyper-v and pass it through to nested VM. I use hyper-v
+> manager to configure and provide a VF for nested VM (I can see the VF only in the nested
+> VM).
 > 
-> Do you think it's ok?
+> Did someone try to run emulated device in linux RH as nested L2 where L1 is windows
+> hyper-v? Does DMA read/write work for this emulated device in this case?
 
-We already had this discussion for device specific regions and decided
-that CCW doesn't have enough vendors to justify a full subset of the
-available address space.  Also, this doesn't need to imply the device
-interface, we're simply specifying a vendor registrar such that we can
-give each vendor their own namespace, so I don't think it would be a
-problem for a CCW to specify a namespace using a PCI vendor ID.
-Finally, if we have such need for this in the future, because I'm not
-sure where we stand with this in the current proposals, maybe we should
-make use of an IEEE OUI rather than a PCI database to avoid this sort
-of confusion and mis-association if we have further need.  Thanks,
+I have never tried that, I have only used Linux as L2, Windows might be pickier about what
+it expects, so starting with Linux to rule that out is probably a good idea.
 
-Alex
+> > 
+> > You can also try to enable VT-d device log by appending:
+> > 
+> >   -trace enable="vtd_*"
+> > 
+> > In case it dumps anything useful for you.
+> 
+> Is there a way to open those traces to be dumped to stdout/stderr on the fly, instead of
+> dtrace?
+
+It's up to you what tracer(s) to configure when you build QEMU - check out 
+docs/devel/tracing.txt . There's a few trace events defined in the SR/IOV patch set, you
+might want to enable them as well.
+
+Knut
+
+> > --
+> > Peter Xu
