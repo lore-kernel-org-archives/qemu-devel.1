@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40550)
+Received: from eggs.gnu.org ([209.51.188.92]:40578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB442-0000um-Nv
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:55 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB444-0000wn-Ih
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB441-00038c-IG
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43376
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB442-00039p-Tp
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB441-00038A-9z
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:53 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1hB442-00038g-G0
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:01:54 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1p1l095691
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:52 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkswegv8j-1
+	x31L1ofw061892
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:53 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksw4ryr6-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:52 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:01:46 +0100
+	Mon, 1 Apr 2019 22:01:50 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:53 -0500
+Date: Mon,  1 Apr 2019 15:58:54 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190401210011.16009-20-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 19/97] qemu-img: fix regression copying secrets
- during convert
+Message-Id: <20190401210011.16009-21-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 20/97] nvme: Fix nvme_init error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,114 +38,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>
 
-From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-When the convert command is creating an output file that needs
-secrets, we need to ensure those secrets are passed to both the
-blk_new_open and bdrv_create API calls.
+It is wrong to leave this field as 1, as nvme_close() called in the
+error handling code in nvme_file_open() will use it and try to free
+s->queues again.
 
-This is done by qemu-img extracting all opts matching the name
-suffix "key-secret". Unfortunately the code doing this was run after the
-call to bdrv_create(), which meant the QemuOpts it was extracting
-secrets from was now empty.
+Another problem is the cleaning ups are duplicated between the fail*
+labels of nvme_init() and nvme_file_open(), which calls nvme_close().
 
-Previously this worked by luks as a bug meant the "key-secret"
-parameters were not purged from the QemuOpts. This bug was fixed in
+A third problem is nvme_close() misses g_free() and
+event_notifier_cleanup().
 
-  commit b76b4f604521e59f857d6177bc55f6f2e41fd392
-  Author: Kevin Wolf <kwolf@redhat.com>
-  Date:   Thu Jan 11 16:18:08 2018 +0100
-
-    qcow2: Use visitor for options in qcow2_create()
-
-Exposing the latent bug in qemu-img. This fix simply moves the copying
-of secrets to before the bdrv_create() call.
+Fix all of them.
 
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit 8d65a3ccfd5db7f0436e095cd952f5d0c3a873ba)
+Signed-off-by: Fam Zheng <famz@redhat.com>
+
+Message-Id: <20180712025420.4932-1-famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+(cherry picked from commit 9582f357bb6f6573c9a452743d8f3ab41ba2e3fa)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qemu-img.c | 32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
+ block/nvme.c | 37 ++++++++++++-------------------------
+ 1 file changed, 12 insertions(+), 25 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 1acddf693c..b12f4cd19b 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -345,21 +345,6 @@ static int img_add_key_secrets(void *opaque,
-     return 0;
- }
-=20
--static BlockBackend *img_open_new_file(const char *filename,
--                                       QemuOpts *create_opts,
--                                       const char *fmt, int flags,
--                                       bool writethrough, bool quiet,
--                                       bool force_share)
--{
--    QDict *options =3D NULL;
--
--    options =3D qdict_new();
--    qemu_opt_foreach(create_opts, img_add_key_secrets, options, &error_a=
-bort);
--
--    return img_open_file(filename, options, fmt, flags, writethrough, qu=
-iet,
--                         force_share);
--}
--
-=20
- static BlockBackend *img_open(bool image_opts,
-                               const char *filename,
-@@ -2018,6 +2003,7 @@ static int img_convert(int argc, char **argv)
-     BlockDriverState *out_bs;
-     QemuOpts *opts =3D NULL, *sn_opts =3D NULL;
-     QemuOptsList *create_opts =3D NULL;
-+    QDict *open_opts =3D NULL;
-     char *options =3D NULL;
-     Error *local_err =3D NULL;
-     bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
- false,
-@@ -2362,6 +2348,16 @@ static int img_convert(int argc, char **argv)
+diff --git a/block/nvme.c b/block/nvme.c
+index 6f71122bf5..37805e8890 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -569,13 +569,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     s->vfio = qemu_vfio_open_pci(device, errp);
+     if (!s->vfio) {
+         ret = -EINVAL;
+-        goto fail;
++        goto out;
+     }
+ 
+     s->regs = qemu_vfio_pci_map_bar(s->vfio, 0, 0, NVME_BAR_SIZE, errp);
+     if (!s->regs) {
+         ret = -EINVAL;
+-        goto fail;
++        goto out;
+     }
+ 
+     /* Perform initialize sequence as described in NVMe spec "7.6.1
+@@ -585,7 +585,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     if (!(cap & (1ULL << 37))) {
+         error_setg(errp, "Device doesn't support NVMe command set");
+         ret = -EINVAL;
+-        goto fail;
++        goto out;
+     }
+ 
+     s->page_size = MAX(4096, 1 << (12 + ((cap >> 48) & 0xF)));
+@@ -603,7 +603,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+                              PRId64 " ms)",
+                        timeout_ms);
+             ret = -ETIMEDOUT;
+-            goto fail;
++            goto out;
          }
      }
-=20
-+    /*
-+     * The later open call will need any decryption secrets, and
-+     * bdrv_create() will purge "opts", so extract them now before
-+     * they are lost.
-+     */
-+    if (!skip_create) {
-+        open_opts =3D qdict_new();
-+        qemu_opt_foreach(opts, img_add_key_secrets, open_opts, &error_ab=
-ort);
-+    }
-+
-     if (!skip_create) {
-         /* Create the new image */
-         ret =3D bdrv_create(drv, out_filename, opts, &local_err);
-@@ -2388,8 +2384,9 @@ static int img_convert(int argc, char **argv)
-          * That has to wait for bdrv_create to be improved
-          * to allow filenames in option syntax
-          */
--        s.target =3D img_open_new_file(out_filename, opts, out_fmt,
--                                     flags, writethrough, quiet, false);
-+        s.target =3D img_open_file(out_filename, open_opts, out_fmt,
-+                                 flags, writethrough, quiet, false);
-+        open_opts =3D NULL; /* blk_new_open will have freed it */
+ 
+@@ -613,7 +613,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     s->queues[0] = nvme_create_queue_pair(bs, 0, NVME_QUEUE_SIZE, errp);
+     if (!s->queues[0]) {
+         ret = -EINVAL;
+-        goto fail;
++        goto out;
      }
-     if (!s.target) {
-         ret =3D -1;
-@@ -2464,6 +2461,7 @@ out:
-     qemu_opts_del(opts);
-     qemu_opts_free(create_opts);
-     qemu_opts_del(sn_opts);
-+    qobject_unref(open_opts);
-     blk_unref(s.target);
-     if (s.src) {
-         for (bs_i =3D 0; bs_i < s.src_num; bs_i++) {
---=20
+     QEMU_BUILD_BUG_ON(NVME_QUEUE_SIZE & 0xF000);
+     s->regs->aqa = cpu_to_le32((NVME_QUEUE_SIZE << 16) | NVME_QUEUE_SIZE);
+@@ -633,14 +633,14 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+                              PRId64 " ms)",
+                        timeout_ms);
+             ret = -ETIMEDOUT;
+-            goto fail_queue;
++            goto out;
+         }
+     }
+ 
+     ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
+                                  VFIO_PCI_MSIX_IRQ_INDEX, errp);
+     if (ret) {
+-        goto fail_queue;
++        goto out;
+     }
+     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+                            false, nvme_handle_event, nvme_poll_cb);
+@@ -649,30 +649,15 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     if (local_err) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+-        goto fail_handler;
++        goto out;
+     }
+ 
+     /* Set up command queues. */
+     if (!nvme_add_io_queue(bs, errp)) {
+         ret = -EIO;
+-        goto fail_handler;
+     }
+-    return 0;
+-
+-fail_handler:
+-    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+-                           false, NULL, NULL);
+-fail_queue:
+-    nvme_free_queue_pair(bs, s->queues[0]);
+-fail:
+-    g_free(s->queues);
+-    if (s->regs) {
+-        qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+-    }
+-    if (s->vfio) {
+-        qemu_vfio_close(s->vfio);
+-    }
+-    event_notifier_cleanup(&s->irq_notifier);
++out:
++    /* Cleaning up is done in nvme_file_open() upon error. */
+     return ret;
+ }
+ 
+@@ -739,8 +724,10 @@ static void nvme_close(BlockDriverState *bs)
+     for (i = 0; i < s->nr_queues; ++i) {
+         nvme_free_queue_pair(bs, s->queues[i]);
+     }
++    g_free(s->queues);
+     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+                            false, NULL, NULL);
++    event_notifier_cleanup(&s->irq_notifier);
+     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+     qemu_vfio_close(s->vfio);
+ }
+-- 
 2.17.1
