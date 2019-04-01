@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42408)
+Received: from eggs.gnu.org ([209.51.188.92]:55914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tedheadster@gmail.com>) id 1hAnkS-0000f2-Lb
-	for qemu-devel@nongnu.org; Sun, 31 Mar 2019 23:36:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1hApPk-0006AM-Rm
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 01:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tedheadster@gmail.com>) id 1hAnkK-0004l3-E2
-	for qemu-devel@nongnu.org; Sun, 31 Mar 2019 23:36:30 -0400
-Received: from mail-ua1-x92f.google.com ([2607:f8b0:4864:20::92f]:42186)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tedheadster@gmail.com>)
-	id 1hAnkC-0004ea-L4
-	for qemu-devel@nongnu.org; Sun, 31 Mar 2019 23:36:22 -0400
-Received: by mail-ua1-x92f.google.com with SMTP id h4so127438uaj.9
-	for <qemu-devel@nongnu.org>; Sun, 31 Mar 2019 20:36:14 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hApPj-00011O-Uv
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 01:23:20 -0400
+References: <20190401024406.10819-1-jbi.octave@gmail.com>
+	<20190401024406.10819-2-jbi.octave@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <acd65b38-9a74-cd43-0841-b5da0f5fcc5b@redhat.com>
+Date: Mon, 1 Apr 2019 07:23:12 +0200
 MIME-Version: 1.0
-Reply-To: whiteheadm@acm.org
-From: tedheadster <tedheadster@gmail.com>
-Date: Sun, 31 Mar 2019 23:36:02 -0400
-Message-ID: <CAP8WD_bf=0=tyCumcNpVLtneio+vbd4JuFMmtWqSwXWFC-7PMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Pentium Pro Feature Bugs
+In-Reply-To: <20190401024406.10819-2-jbi.octave@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] util/readline: add a space to fix
+ errors by checkpatch tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jules Irenge <jbi.octave@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-I just noticed this in the code regarding MMX and I wonder if it is correct:
+On 01/04/2019 04.44, Jules Irenge wrote:
+> util/readline: add a space to fix errors reported by checkpatch.pl tool
+> "ERROR: space required before the open parenthesis"
+> "ERROR: space required after that ..."
+> within "util/redline.c" file
+> 
+> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+> ---
+>  util/readline.c | 34 +++++++++++++++++-----------------
+>  1 file changed, 17 insertions(+), 17 deletions(-)
 
-target/i386/cpu.c:
-
-#define PPRO_FEATURES (CPUID_FP87 | CPUID_DE | CPUID_PSE | CPUID_TSC | \
-          CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_PGE | CPUID_CMOV | \
-          CPUID_PAT | CPUID_FXSR | CPUID_MMX | CPUID_SSE | CPUID_SSE2 | \
-          CPUID_PAE | CPUID_SEP | CPUID_APIC)
-
-The problem I see is that the PentiumPro never supported the MMX
-instruction extensions (oddly supported in the the Pentium MMX), nor
-the even later SSE (Pentium III) and SSE2 (Pentium 4) features.
-
-Also, the Pentium Pro never officially supported  SYSENTER/SYSEXIT
-(CPUID_SEP), though they originally intended to. Intel discovered
-shortly before the product release that the hardware didn't work
-correctly, so they never documented it as a feature to prevent its
-use.
-
-Should these be removed?
-
-- Matthew
+Reviewed-by: Thomas Huth <thuth@redhat.com>
