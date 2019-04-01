@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42157)
+Received: from eggs.gnu.org ([209.51.188.92]:42153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46G-0002tt-5W
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46F-0002td-V4
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46E-0004Rj-Qq
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52778
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46E-0004Ra-ON
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52432
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB46E-0004JA-HQ
+	id 1hB46E-0004IO-Io
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:10 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L3pmx062123
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:58 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsy1t-1
+	x31L3phw062114
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:56 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsxcy-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:54 -0400
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:29 +0100
+	Mon, 1 Apr 2019 22:01:52 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:58:37 -0500
+Date: Mon,  1 Apr 2019 15:58:57 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190401210011.16009-4-mdroth@linux.vnet.ibm.com>
+Message-Id: <20190401210011.16009-24-mdroth@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/97] target/arm: Reorganize SVE WHILE
+Subject: [Qemu-devel] [PATCH 23/97] monitor: fix oob command leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,144 +42,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The pseudocode for this operation is an increment + compare loop,
-so comparing <=3D the maximum integer produces an all-true predicate.
+Spotted by ASAN, during make check...
 
-Rather than bound in both the inline code and the helper, pass the
-helper the number of predicate bits to set instead of the number
-of predicate elements to set.
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7f8e27262c48 in malloc (/lib64/libasan.so.5+0xeec48)
+    #1 0x7f8e26a5f3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+    #2 0x555ab67078a8 in qstring_from_str /home/elmarco/src/qq/qobject/qs=
+tring.c:67
+    #3 0x555ab67071e4 in qstring_new /home/elmarco/src/qq/qobject/qstring=
+.c:24
+    #4 0x555ab6713fbf in qstring_from_escaped_str /home/elmarco/src/qq/qo=
+bject/json-parser.c:144
+    #5 0x555ab671738c in parse_literal /home/elmarco/src/qq/qobject/json-=
+parser.c:506
+    #6 0x555ab67179c3 in parse_value /home/elmarco/src/qq/qobject/json-pa=
+rser.c:569
+    #7 0x555ab6715123 in parse_pair /home/elmarco/src/qq/qobject/json-par=
+ser.c:306
+    #8 0x555ab6715483 in parse_object /home/elmarco/src/qq/qobject/json-p=
+arser.c:357
+    #9 0x555ab671798b in parse_value /home/elmarco/src/qq/qobject/json-pa=
+rser.c:561
+    #10 0x555ab6717a6b in json_parser_parse_err /home/elmarco/src/qq/qobj=
+ect/json-parser.c:592
+    #11 0x555ab4fd4dcf in handle_qmp_command /home/elmarco/src/qq/monitor=
+.c:4257
+    #12 0x555ab6712c4d in json_message_process_token /home/elmarco/src/qq=
+/qobject/json-streamer.c:105
+    #13 0x555ab67e01e2 in json_lexer_feed_char /home/elmarco/src/qq/qobje=
+ct/json-lexer.c:323
+    #14 0x555ab67e0af6 in json_lexer_feed /home/elmarco/src/qq/qobject/js=
+on-lexer.c:373
+    #15 0x555ab6713010 in json_message_parser_feed /home/elmarco/src/qq/q=
+object/json-streamer.c:124
+    #16 0x555ab4fd58ec in monitor_qmp_read /home/elmarco/src/qq/monitor.c=
+:4337
+    #17 0x555ab6559df2 in qemu_chr_be_write_impl /home/elmarco/src/qq/cha=
+rdev/char.c:175
+    #18 0x555ab6559e95 in qemu_chr_be_write /home/elmarco/src/qq/chardev/=
+char.c:187
+    #19 0x555ab6560127 in fd_chr_read /home/elmarco/src/qq/chardev/char-f=
+d.c:66
+    #20 0x555ab65d9c73 in qio_channel_fd_source_dispatch /home/elmarco/sr=
+c/qq/io/channel-watch.c:84
+    #21 0x7f8e26a598ac in g_main_context_dispatch (/lib64/libglib-2.0.so.=
+0+0x4c8ac)
 
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180801123111.3595-4-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit bbd0968c458d48e34a08b8694fa3309a9fe1c9e7)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180809114417.28718-4-marcandre.lureau@redhat.com>
+[Screwed up in commit b27314567d4]
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+(cherry picked from commit cb9ec42f33c07cd07d2e2971422bf7636c761202)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/sve_helper.c    |  5 ----
- target/arm/translate-sve.c | 49 +++++++++++++++++++++++++-------------
- 2 files changed, 32 insertions(+), 22 deletions(-)
+ monitor.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 9bd0694d55..87594a8adb 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2846,11 +2846,6 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t coun=
-t, uint32_t pred_desc)
-         return flags;
+diff --git a/monitor.c b/monitor.c
+index 77861e96af..a1999e396c 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4277,6 +4277,8 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
+                                           ?: "");
+         monitor_qmp_dispatch(mon, req, id);
++        qobject_unref(req);
++        qobject_unref(id);
+         return;
      }
 =20
--    /* Scale from predicate element count to bits.  */
--    count <<=3D esz;
--    /* Bound to the bits in the predicate.  */
--    count =3D MIN(count, oprsz * 8);
--
-     /* Set all of the requested bits.  */
-     for (i =3D 0; i < count / 64; ++i) {
-         d->p[i] =3D esz_mask;
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 9dd4c38bab..89efc80ee7 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3173,19 +3173,19 @@ static bool trans_CTERM(DisasContext *s, arg_CTER=
-M *a, uint32_t insn)
-=20
- static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
- {
--    if (!sve_access_check(s)) {
--        return true;
--    }
--
--    TCGv_i64 op0 =3D read_cpu_reg(s, a->rn, 1);
--    TCGv_i64 op1 =3D read_cpu_reg(s, a->rm, 1);
--    TCGv_i64 t0 =3D tcg_temp_new_i64();
--    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 op0, op1, t0, t1, tmax;
-     TCGv_i32 t2, t3;
-     TCGv_ptr ptr;
-     unsigned desc, vsz =3D vec_full_reg_size(s);
-     TCGCond cond;
-=20
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    op0 =3D read_cpu_reg(s, a->rn, 1);
-+    op1 =3D read_cpu_reg(s, a->rm, 1);
-+
-     if (!a->sf) {
-         if (a->u) {
-             tcg_gen_ext32u_i64(op0, op0);
-@@ -3198,32 +3198,47 @@ static bool trans_WHILE(DisasContext *s, arg_WHIL=
-E *a, uint32_t insn)
-=20
-     /* For the helper, compress the different conditions into a computat=
-ion
-      * of how many iterations for which the condition is true.
--     *
--     * This is slightly complicated by 0 <=3D UINT64_MAX, which is nomin=
-ally
--     * 2**64 iterations, overflowing to 0.  Of course, predicate registe=
-rs
--     * aren't that large, so any value >=3D predicate size is sufficient.
-      */
-+    t0 =3D tcg_temp_new_i64();
-+    t1 =3D tcg_temp_new_i64();
-     tcg_gen_sub_i64(t0, op1, op0);
-=20
--    /* t0 =3D MIN(op1 - op0, vsz).  */
--    tcg_gen_movi_i64(t1, vsz);
--    tcg_gen_umin_i64(t0, t0, t1);
-+    tmax =3D tcg_const_i64(vsz >> a->esz);
-     if (a->eq) {
-         /* Equality means one more iteration.  */
-         tcg_gen_addi_i64(t0, t0, 1);
-+
-+        /* If op1 is max (un)signed integer (and the only time the addit=
-ion
-+         * above could overflow), then we produce an all-true predicate =
-by
-+         * setting the count to the vector length.  This is because the
-+         * pseudocode is described as an increment + compare loop, and t=
-he
-+         * max integer would always compare true.
-+         */
-+        tcg_gen_movi_i64(t1, (a->sf
-+                              ? (a->u ? UINT64_MAX : INT64_MAX)
-+                              : (a->u ? UINT32_MAX : INT32_MAX)));
-+        tcg_gen_movcond_i64(TCG_COND_EQ, t0, op1, t1, tmax, t0);
-     }
-=20
--    /* t0 =3D (condition true ? t0 : 0).  */
-+    /* Bound to the maximum.  */
-+    tcg_gen_umin_i64(t0, t0, tmax);
-+    tcg_temp_free_i64(tmax);
-+
-+    /* Set the count to zero if the condition is false.  */
-     cond =3D (a->u
-             ? (a->eq ? TCG_COND_LEU : TCG_COND_LTU)
-             : (a->eq ? TCG_COND_LE : TCG_COND_LT));
-     tcg_gen_movi_i64(t1, 0);
-     tcg_gen_movcond_i64(cond, t0, op0, op1, t0, t1);
-+    tcg_temp_free_i64(t1);
-=20
-+    /* Since we're bounded, pass as a 32-bit type.  */
-     t2 =3D tcg_temp_new_i32();
-     tcg_gen_extrl_i64_i32(t2, t0);
-     tcg_temp_free_i64(t0);
--    tcg_temp_free_i64(t1);
-+
-+    /* Scale elements to bits.  */
-+    tcg_gen_shli_i32(t2, t2, a->esz);
-=20
-     desc =3D (vsz / 8) - 2;
-     desc =3D deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
 --=20
 2.17.1
