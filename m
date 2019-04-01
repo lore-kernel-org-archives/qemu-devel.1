@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57990)
+Received: from eggs.gnu.org ([209.51.188.92]:58003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hB0ja-0003wT-EI
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:35 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hB0jf-0003yC-Kw
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hB0jZ-0001Dg-0O
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:34 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40316)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hB0jY-0001DD-Nb
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:32 -0400
-Received: by mail-wr1-f65.google.com with SMTP id h4so13083809wre.7
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 10:28:32 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <85937523-29B7-4D0B-820A-F28376D4D9F3@oracle.com>
-References: <20190401133659.20421-1-vkuznets@redhat.com>
-	<DF798996-57F7-405A-93D8-F77244B38553@oracle.com>
-	<87a7h91zv3.fsf@vitty.brq.redhat.com>
-	<85937523-29B7-4D0B-820A-F28376D4D9F3@oracle.com>
-Date: Mon, 01 Apr 2019 19:28:29 +0200
-Message-ID: <877ecd1vpe.fsf@vitty.brq.redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hB0je-0001H3-2P
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:39 -0400
+Received: from mail-eopbgr690115.outbound.protection.outlook.com
+	([40.107.69.115]:45927
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hB0jd-0001Fv-Mo
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:28:38 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 1 Apr 2019 17:28:34 +0000
+Message-ID: <CY4PR2201MB1254A518F1B7BF965D82E941C6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
+References: <1554129501-27175-1-git-send-email-mateja.marjanovic@rt-rk.com>,
+	<1554129501-27175-2-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1554129501-27175-2-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ioapic: allow buggy guests mishandling
- level-triggered interrupts to make progress
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/mips: DIV_<U|S>.<B|H|W|D> MSA
+ insturctions fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,101 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Liran Alon <liran.alon@oracle.com> writes:
+> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> Subject: [PATCH 1/2] target/mips: DIV_<U|S>.<B|H|W|D> MSA insturctions fi=
+xed
 
->> On 1 Apr 2019, at 18:58, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> 
->> Liran Alon <liran.alon@oracle.com> writes:
->> 
->>>> On 1 Apr 2019, at 16:36, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>>> 
->>>> It was found that Hyper-V 2016 on KVM in some configurations (q35 machine +
->>>> piix4-usb-uhci) hangs on boot. Trace analysis led us to the conclusion that
->>>> it is mishandling level-triggered interrupt performing EOI without fixing
->>>> the root cause.
->>> 
->>> I would rephrase as:
->>> It was found that Hyper-V 2016 on KVM in some configurations (q35 machine + piix4-usb-uhci) hangs on boot.
->>> Root-cause was that one of Hyper-V level-triggered interrupt handler performs EOI before fixing the root-cause.
->>> This results in IOAPIC keep re-raising the level-triggered interrupt
->>> after EOI because irq-line remains asserted.
->> 
->> Ok, thanks for the suggestion.
->> 
->>> 
->>>> This causes immediate re-assertion and L2 VM (which is
->>>> supposedly expected to fix the cause of the interrupt) is not making any
->>>> progress.
->>> 
->>> I don’t know why you assume this.
->>> From the trace we have examined, it seems that the EOI is performed by Hyper-V and not it’s guest
->>> This means that the handler for this level-triggered interrupt is on
->>> Hyper-V and not it’s guest.
->> 
->> If you let it run (with e.g. this patch or by setting preemtion timer >
->> 0) you'll see that MMIO write fixing the cause of the interrupt is
->> happening from L2:
->> 
->> (qemu) info pci:
->> 
->>  Bus  0, device   4, function 0:
->>    USB controller: PCI device 8086:7112
->>      PCI subsystem 1af4:1100
->>      IRQ 23.
->>      BAR4: I/O at 0x6060 [0x607f].
->>      id ""
->> 
->> ...
->>  538597.212494: kvm_exit:             reason VMRESUME rip 0xfffff80004250115 info 0 0
->>  538597.212499: kvm_entry:            vcpu 0
->>  538597.212506: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a27 info 60620009 0
->>  538597.212507: kvm_nested_vmexit:    rip fffff80e02ac6a27 reason IO_INSTRUCTION info1 60620009 info2 0 int_info 0 int_info_err 0
->>  538597.212509: kvm_fpu:              unload
->>  538597.212511: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
->>  538597.212516: kvm_fpu:              load
->>  538597.212518: kvm_pio:              pio_read at 0x6062 size 2 count 1 val 0x1 
->>  538597.212519: kvm_entry:            vcpu 0
->>  538597.212523: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a61 info 60640009 0
->>  538597.212523: kvm_nested_vmexit:    rip fffff80e02ac6a61 reason IO_INSTRUCTION info1 60640009 info2 0 int_info 0 int_info_err 0
->>  538597.212524: kvm_fpu:              unload
->>  538597.212525: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
->>  538597.212528: kvm_fpu:              load
->>  538597.212528: kvm_pio:              pio_read at 0x6064 size 2 count 1 val 0xf 
->> ...
->> 
->> and this happens after EOI from L1.
+"insturctions" -> "instructions". Try to find a spell checking tool that wi=
+ll help
+you avoid such cases in the future, especially since you tend to make the
+same mistakes over and over.
+
+The title of the patch (after "target/mips:") should begin with an imperati=
+ve.
+
+Also, using the word "fix" here is debatable - there is no wrong behavior o=
+f
+the emulator, since these cases are "unpredictable", so any result is right=
+.
+The expression "Make results of division by zero be the same as on the
+reference hardware", or similar, would be more appropriate.
+
 >
-> I see that the L2 guest is doing I/O read to the device BAR4 but do these reads lower the irq-line?
-> I would expect a write to lower the irq-line.
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>=20
+> In case of dividing integers by zero, the result is unpredictable [1],
+
+Page number(s) is(are) missing.
+
+> but according to the hardware, the result is 1 or -1, depending on
+
+"but according to the hardware," -> "but, if executed on the reference hard=
+ware,"
+
+> the sign of the dividend.
+>=20
+> [1] MIPS=AE Architecture for Programmers
+>     Volume IV-j: The MIPS64=AE SIMD
+>     Architecture Module, Revision 1.12
+>=20
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 >
-> Looking at uhci_port_read(), it seems that offset 0x02 and 0x04 just return a value. Doesn’t lower irq-line.
-> (Even though offset 0x04 returns the "interrupt enable register”).
-> In contrast, looking at uhci_port_write(), it seems that writing to either offset 0x02 or 0x04 could lower the irq-line.
-> So you should look for pio_write to port 0x6062 or 0x6064 to see who
-> is actually responsible for lowering the irq-line.
+> ---
+> target/mips/msa_helper.c | 7 +++++--
+> 1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> index 655148d..46a5aac 100644
+> --- a/target/mips/msa_helper.c
+> +++ b/target/mips/msa_helper.c
+> @@ -641,14 +641,17 @@ static inline int64_t msa_div_s_df(uint32_t df, int=
+64_t arg1, int64_t arg2)
+>      if (arg1 =3D=3D DF_MIN_INT(df) && arg2 =3D=3D -1) {
+>          return DF_MIN_INT(df);
+>      }
+> -    return arg2 ? arg1 / arg2 : 0;
+> +    if (arg2 =3D=3D 0) {
+> +        return arg1 >=3D 0 ? -1 : 1;
+> +    }
+> +    return arg1 / arg2;
+>  }
+>
+> static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t arg=
+2)
+> {
+>     uint64_t u_arg1 =3D UNSIGNED(arg1, df);
+>     uint64_t u_arg2 =3D UNSIGNED(arg2, df);
+> -    return u_arg2 ? u_arg1 / u_arg2 : 0;
+> +    return arg2 ? u_arg1 / u_arg2 : -1;
+> }
 
-Sorry, I probably like trimming traces too much. Writes happen too:
+Unnecessary inconsistency. For DIV_S.<B|H|W|D>, you use a full
+"if" statement, and for DUV_U.<B|H|W|D> a conditional operator.
+Use the same in both cases.
 
- [005] 538597.212532: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a8f info 60620001 0
- [005] 538597.212533: kvm_nested_vmexit:    rip fffff80e02ac6a8f reason IO_INSTRUCTION info1 60620001 info2 0 int_info 0 int_info_err 0
- [005] 538597.212534: kvm_pio:              pio_write at 0x6062 size 2 count 1 val 0x1 
- [005] 538597.212534: kvm_fpu:              unload
- [005] 538597.212535: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
- [005] 538597.212543: kvm_fpu:              load
- [005] 538597.212544: kvm_entry:            vcpu 0
- [005] 538597.212547: kvm_exit:             reason IO_INSTRUCTION rip 0xfffff80e02ac6a9c info 60640001 0
- [005] 538597.212548: kvm_nested_vmexit:    rip fffff80e02ac6a9c reason IO_INSTRUCTION info1 60640001 info2 0 int_info 0 int_info_err 0
- [005] 538597.212548: kvm_pio:              pio_write at 0x6064 size 2 count 1 val 0x0 
- [005] 538597.212549: kvm_fpu:              unload
- [005] 538597.212550: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
+Thanks,
+Aleksandar
 
-and this likely lowers the line. I honestly have no idea how this all
-works on real hw but the comment in kernel ioapic says something about
-non-immediate delivery of the reasserted interrupt. True or not, this
-gives me some peace of mind :-)
-
--- 
-Vitaly
+>=20
+> static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg=
+2)
+> --
+> 2.7.4
