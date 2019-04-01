@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59354)
+Received: from eggs.gnu.org ([209.51.188.92]:59480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hAwbj-0008UJ-9d
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:04:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hAwc4-0000Fs-Io
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hAwbg-00063G-Em
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:04:11 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41175)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hAwbd-00062b-Uw
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:04:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r4so11926676wrq.8
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 06:04:05 -0700 (PDT)
-References: <20190401082655.8272-1-aruna.15@cse.mrt.ac.lk>
-	<20190401082655.8272-2-aruna.15@cse.mrt.ac.lk>
-	<20190401093932.GC3524@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7cc37594-f222-dbb8-8a6f-d315d18e3647@redhat.com>
-Date: Mon, 1 Apr 2019 15:04:02 +0200
+	(envelope-from <kwolf@redhat.com>) id 1hAwc3-0006HD-IG
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:04:32 -0400
+Date: Mon, 1 Apr 2019 15:04:16 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190401130416.GC4935@localhost.localdomain>
+References: <20190330150702.11687-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190401093932.GC3524@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] Header cleanups- Tabs replaced with
- spaces
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190330150702.11687-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Saner printing of large file
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 4/1/19 11:39 AM, Daniel P. Berrangé wrote:
-> On Mon, Apr 01, 2019 at 01:56:55PM +0530, Aruna Jayasena wrote:
->> Declarations were moved out of qemu-common.h for functions declared in utils/ files.
->> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
->>
->> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
->>
->> ---
->>  include/qemu/id.h       | 4 ++--
->>  include/qemu/readline.h | 2 +-
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/qemu/id.h b/include/qemu/id.h
->> index 3a651fb9d2..f3451344e2 100644
->> --- a/include/qemu/id.h
->> +++ b/include/qemu/id.h
->> @@ -1,8 +1,8 @@
->>  #ifndef QEMU_ID_H
->>  #define QEMU_ID_H
->>  
->> -#define qemu_isalnum(c)		isalnum((unsigned char)(c))
->> -#define qemu_isalpha(c)		isalpha((unsigned char)(c))
->> +#define qemu_isalnum(c)    isalnum((unsigned char)(c))
->> +#define qemu_isalpha(c)    isalpha((unsigned char)(c))
->>  
->>  typedef enum IdSubSystems {
->>      ID_QDEV,
->> diff --git a/include/qemu/readline.h b/include/qemu/readline.h
->> index 4cbf7ead5a..67859a3028 100644
->> --- a/include/qemu/readline.h
->> +++ b/include/qemu/readline.h
->> @@ -1,7 +1,7 @@
->>  #ifndef READLINE_H
->>  #define READLINE_H
->>  
->> -#define qemu_isspace(c)		isspace((unsigned char)(c))
->> +#define qemu_isspace(c)    isspace((unsigned char)(c))
->>  
->>  #define READLINE_CMD_BUF_SIZE 4095
->>  #define READLINE_MAX_CMDS 64
+Am 30.03.2019 um 16:07 hat Eric Blake geschrieben:
+> Disk sizes close to INT64_MAX cause overflow, for some pretty
+> ridiculous output:
 > 
-> This should just be fixed when moving the macros out of qemu-common.h
+>   $ ./nbdkit -U - memory size=$((2**63 - 512)) --run 'qemu-img info $nbd'
+>   image: nbd+unix://?socket=/tmp/nbdkitHSAzNz/socket
+>   file format: raw
+>   virtual size: -8388607T (9223372036854775296 bytes)
+>   disk size: unavailable
+> 
+> But there's no reason to have two separate implementations of integer
+> to human-readable abbreviation, where one has overflow and stops at
+> 'T', while the other avoids overflow and goes all the way to 'E'. With
+> this patch, the output now claims 8EiB instead of -8388607T, which
+> really is the correct rounding of largest file size supported by qemu
+> (we could go 511 bytes larger if we used byte-accurate sizing instead
+> of rounding up to the next sector boundary, but that wouldn't change
+> the human-readable result).
+> 
+> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Hmm I did a series following your suggestion of using g_ascii_*()
-instead of qemu_* helpers, and plan to send it for 4.1. Eventually
-Aruna's work can go on top...
+This is quite obviously a bug fix for some cases. This suggests that we
+want it in 4.0.
 
-> 
-> Regards,
-> Daniel
-> 
+It is also an output change for other cases, like going from "8M" to
+"8 MiB". We probably can't tell for sure whether some tools expect the
+spelling "8M" (even if this is supposed to be the human interface and
+tools should be using JSON) or feed the change back to qemu-img or
+qemu-io (which accept "8M", but not "8 MiB" as sizes in most places).
+This suggests that we shouldn't make this change as late as -rc2.
+
+So what is the conclusion?
+
+Kevin
