@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47788)
+Received: from eggs.gnu.org ([209.51.188.92]:48782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hAtPC-0000ju-Pt
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:39:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hAtU5-0003HZ-OP
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hAtPB-0004hp-RF
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:39:02 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36588)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hAtPB-0004hF-Fh
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:39:01 -0400
-Received: by mail-ot1-x342.google.com with SMTP id o74so8029617ota.3
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 02:39:00 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hAtU4-0006qc-CH
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 05:44:05 -0400
+Date: Mon, 1 Apr 2019 11:34:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190401093405.GA4935@localhost.localdomain>
+References: <20190327173206.9065-1-paul.durrant@citrix.com>
+	<3585a316-6349-b89e-99be-799b055594db@citrix.com>
+	<f9a7e4fa5b794cf88593a86923142a87@AMSPEX02CL02.citrite.net>
+	<20190328114012.GG1420@perard.uk.xensource.com>
+	<28bfdf32-916f-fb55-e2ab-13871b5e0fdd@citrix.com>
+	<20190328115619.GC4857@localhost.localdomain>
+	<b961ee21f8db448fab6b84bb79c37eab@AMSPEX02CL02.citrite.net>
 MIME-Version: 1.0
-References: <1554099897-28606-1-git-send-email-tjin@wavecomp.com>
-	<1554099897-28606-2-git-send-email-tjin@wavecomp.com>
-In-Reply-To: <1554099897-28606-2-git-send-email-tjin@wavecomp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Apr 2019 09:38:46 +0000
-Message-ID: <CAFEAcA8eVfmLdPQs0YKsAUYP5LzsFrcF96xknjfKtzbzY97BNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Adds virtio_net as the default netcard for
- mips boston board.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b961ee21f8db448fab6b84bb79c37eab@AMSPEX02CL02.citrite.net>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v2 0/2] xen-block: fix sector
+ size confusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tommy Jin <tjin@wavecomp.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, 1 Apr 2019 at 16:23, Tommy Jin <tjin@wavecomp.com> wrote:
->
-> Boston didn't bring up any netcard by default, this is not so convenient for users who are verifying network related functionalities on this board.
-> As the linux kernel has already supported virtio_net, now add a virtio netcard for boston, to make virtio work properly, please:
-> 1. set virtio net options in linux kernel, saying CONFIG_VIRTIO && CONFIG_VIRTIO_PCI && CONFIG_VIRTIO_NET
-> 2. specify model=virtio when you start boston in qemu.
->
-> Signed-off-by: tjin <tjin@wavecomp.com>
-> ---
->  hw/mips/boston.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index cac0e22..5d3239e 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -428,10 +428,10 @@ static void network_init(PCIBus *bus)
->  {
->      PCIDevice *eth;
->
-> -    /*Please set CONFIG_VIRTIO && CONFIG_VIRTIO_PCI && CONFIG_VIRTIO_NET
-> -        of Linux kernel.*/
-> +    /* Please set CONFIG_VIRTIO && CONFIG_VIRTIO_PCI && CONFIG_VIRTIO_NET */
-> +    /* of Linux kernel. */
+Am 01.04.2019 um 11:01 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Sent: 28 March 2019 11:56
+> > To: Andrew Cooper <Andrew.Cooper3@citrix.com>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>; Paul Durrant <Paul.Durrant@citrix.com>; xen-
+> > devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-devel@nongnu.org; Stefano Stabellini
+> > <sstabellini@kernel.org>; Max Reitz <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>
+> > Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size confusion
+> > 
+> > Am 28.03.2019 um 12:46 hat Andrew Cooper geschrieben:
+> > > On 28/03/2019 11:40, Anthony PERARD wrote:
+> > > > On Wed, Mar 27, 2019 at 08:32:28PM +0000, Paul Durrant wrote:
+> > > >>> -----Original Message-----
+> > > >>> From: Andrew Cooper
+> > > >>> Sent: 27 March 2019 18:20
+> > > >>> To: Paul Durrant <Paul.Durrant@citrix.com>; xen-devel@lists.xenproject.org; qemu-
+> > block@nongnu.org;
+> > > >>> qemu-devel@nongnu.org
+> > > >>> Cc: Kevin Wolf <kwolf@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>; Max Reitz
+> > > >>> <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>; Anthony Perard
+> > <anthony.perard@citrix.com>
+> > > >>> Subject: Re: [Xen-devel] [PATCH v2 0/2] xen-block: fix sector size confusion
+> > > >>>
+> > > >>> On 27/03/2019 17:32, Paul Durrant wrote:
+> > > >>>> The Xen blkif protocol is confusing but discussion with the maintainer
+> > > >>>> has clarified that sector based quantities in requests and the 'sectors'
+> > > >>>> value advertized in xenstore should always be in terms of 512-byte
+> > > >>>> units and not the advertised logical 'sector-size' value.
+> > > >>>>
+> > > >>>> This series fixes xen-block to adhere to the spec.
+> > > >>> I thought we agreed that hardcoding things to 512 bytes was the wrong
+> > > >>> thing to do.
+> > > >> To some extent we decided it was the *only* thing to do.
+> > > >>
+> > > >>> I was expecting something like:
+> > > >>>
+> > > >>> 1) Clarify the spec with the intended meaning, (which is what some
+> > > >>> implementations actually use already) and wont cripple 4k datapaths.
+> > > >>> 2) Introduce a compatibility key for "I don't rely on sector-size being
+> > > >>> 512", which fixed implementations should advertise.
+> > > >>> 3) Specify that because of bugs in the spec which got out into the wild,
+> > > >>> drivers which don't find the key being advertised by the other end
+> > > >>> should emulate sector-size=512 for compatibility with broken
+> > > >>> implementations.
+> > > >> Yes, that's how we are going to fix things.
+> > > >>
+> > > >>> Whatever the eventual way out, the first thing which needs to happen is
+> > > >>> an update to the spec, before actions are taken to alter existing
+> > > >>> implementations.
+> > > >> Well the implementation is currently wrong w.r.t. the spec and these patches fix that. As long as
+> > sector-size remains at 512 then no existing frontend should break, so I guess you could argue that
+> > patch #2 should also make sure that sector-size is also 512... but that is not yet in the spec.
+> > > >> I guess I'm ok to defer patch #2 until a revised spec. is agreed, but the ship has already sailed
+> > as far as patch #1 goes.
+> > > >>
+> > > >> Anthony, thoughts?
+> > > > So QEMU used to always set "sector-size" to 512, and used that for
+> > > > request. The new implementation (not released yet) doesn't do that
+> > > > anymore, and may set "sector-size" to a different value and used that
+> > > > for requests.
+> > > >
+> > > > patch #1 is one way to fix the requests (and avoid regression) and
+> > > > more clearly spell out the weird thing about the spec.
+> > > >
+> > > > I also think patch #2 is too soon and should point to a commit in
+> > > > xen.git instead of a thread on xen-devel.
+> > > >
+> > > > In the meantime, we should probably set "sector-size" to 512, like QEMU
+> > > > used to do anyway, with a comment about the fact that different
+> > > > implementations uses sector-size differently and a value of 512 would
+> > > > work fine.
+> > >
+> > > Hmm - I hadn't realised this is an unreleased issue in qemu.
+> > >
+> > > So, Qemu used to unconditionally set sector-size=512, and your work to
+> > > qdev-ify everything introduced a change which has identified a
+> > > spec/protocol issue?
+> > 
+> > The old implementation has the sector size hardcoded:
+> > 
+> >     #define BLOCK_SIZE  512
+> > 
+> > Whereas the qdevified version uses DEFINE_BLOCK_PROPERTIES(), which
+> > includes user-visible options for logical/physical_block_size.
+> > 
+> > So before, you couldn't even define a different sector size and the
+> > question whether 512 or the sector size should be used didn't make a
+> > difference anyway.
+> > 
+> > > If so, then I think it is fine for this series to state (much more
+> > > clearly than it does) that it is returning qemu's behaviour to match the
+> > > currently released version, because we've discovered an issue in the
+> > > spec/protocol, and that we will subsequently work address the issue in
+> > > the spec and provide a forwards path which doesn't involve nailing our
+> > > feet to the floor.
+> > 
+> > The closest thing to returning to the old behaviour would be erroring
+> > out during device initialisation if logical_block_size != 512.
+> 
+> One thing I've not figured out... If I create a blockdev in QEMU that
+> is pointing at a real device with a logical_block_size of 4k, will the
+> QEMU block layer perform the necessary read-modify-write cycles for
+> accesses < 4k? IOW would it be safe to always advertise a size of 512
+> to a frontend?
 
-This sort of thing should go in documentation, not as a comment
-in the code.
+Yes, for 512 accesses on native 4k disks with O_DIRECT, the QEMU block
+layer performs the necessary RMW. Of course, it still comes with a
+performance penalty, so you want to avoid such setups, but they do work.
 
->      eth = pci_create(bus,
-> -                                        PCI_DEVFN(0, 1), "virtio-net-pci");
-> +                     PCI_DEVFN(0, 1), "virtio-net-pci");
+> The problem with erroring out during device init is that it does not
+> give us a way of fixing things in future, as the frontend has not
+> started at that time and thus we'd have no idea whether it could use
+> whatever protocol fix we come up with. I think the only thing the
+> backend could do is refuse to connect to an old frontend if
+> logical_block_size != 512.
 
+I was just thinking of getting back to the old state, with a quick fix
+(by making the problematic new setting inaccessible) for the bug in 4.0
+that could possible be merged today or tomorrow for rc2.
 
-Am I missing something, or is this patch not actually changing
-any code? Maybe you made a mistake somehow when creating it?
+What you need to do for actually supporting 4k disks in the long term
+(QEMU 4.1 or later) depends on what the drivers look like currently and
+is a separate discussion.
 
-I'm not sure if we want to create a default network card
-for this board -- the user (or more usually the management
-layer like libvirt) can create it on the command line, and
-if we always create a virtio-net-pci device in the code then
-the user has no way to say they *don't* want the device.
-
-Also, this board is a model of a real piece of hardware, and
-the real hardware doesn't have a virtio-net device in it.
-
->
->      qdev_set_nic_properties(&eth->qdev, &nd_table[0]);
->      qdev_init_nofail(&eth->qdev);
-> --
-
-thanks
--- PMM
+Kevin
