@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41760)
+Received: from eggs.gnu.org ([209.51.188.92]:41757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45X-0002H3-PK
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45X-0002Gh-Db
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45W-00042k-Oj
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45W-00042Z-8A
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40600
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB45W-0003wG-Hd
+	id 1hB45V-0003us-EF
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:26 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1ptj095688
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:16 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksweh0j5-1
+	x31L2AZ3119067
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:14 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkqt6070k-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:15 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:12 -0400
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:03:14 +0100
+	Mon, 1 Apr 2019 22:03:02 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 16:00:06 -0500
+Date: Mon,  1 Apr 2019 15:58:40 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-93-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 92/97] bitmap: Update count after a merge
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190401210011.16009-7-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 06/97] target/arm: Fix sign-extension in sve
+ do_ldr/do_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,46 +42,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We need an accurate count of the number of bits set in a bitmap
-after a merge. In particular, since the merge operation short-circuits
-a merge from an empty source, if you have bitmaps A, B, and C where
-B started empty, then merge C into B, and B into A, an inaccurate
-count meant that A did not get the contents of C.
+The expression (int) imm + (uint32_t) len_align turns into uint32_t
+and thus with negative imm produces a memory operation at the wrong
+offset.  None of the numbers involved are particularly large, so
+change everything to use int.
 
-In the worst case, we may falsely regard the bitmap as empty when
-it has had new writes merged into it.
-
-Fixes: be58721db
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20181002233314.30159-1-jsnow@redhat.com
-Signed-off-by: John Snow <jsnow@redhat.com>
-(cherry picked from commit d1dde7149e376d72b422a529ec4bf3ed47f3ba30)
-*drop functional dep. on fa000f2f
+Cc: qemu-stable@nongnu.org (3.0.1)
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 19f2acc915a0f8f443a959844540a6f09133cc96)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- util/hbitmap.c | 3 +++
- 1 file changed, 3 insertions(+)
+ target/arm/translate-sve.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index bcd304041a..f686e8015f 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -754,6 +754,9 @@ bool hbitmap_merge(HBitmap *a, const HBitmap *b)
-         }
-     }
- 
-+    /* Recompute the dirty count */
-+    a->count = hb_count_between(a, 0, a->size - 1);
-+
-     return true;
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 89efc80ee7..9e63b5f8e5 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4372,12 +4372,11 @@ static bool trans_UCVTF_dd(DisasContext *s, arg_r=
+pr_esz *a, uint32_t insn)
+  * The load should begin at the address Rn + IMM.
+  */
+=20
+-static void do_ldr(DisasContext *s, uint32_t vofs, uint32_t len,
+-                   int rn, int imm)
++static void do_ldr(DisasContext *s, uint32_t vofs, int len, int rn, int =
+imm)
+ {
+-    uint32_t len_align =3D QEMU_ALIGN_DOWN(len, 8);
+-    uint32_t len_remain =3D len % 8;
+-    uint32_t nparts =3D len / 8 + ctpop8(len_remain);
++    int len_align =3D QEMU_ALIGN_DOWN(len, 8);
++    int len_remain =3D len % 8;
++    int nparts =3D len / 8 + ctpop8(len_remain);
+     int midx =3D get_mem_index(s);
+     TCGv_i64 addr, t0, t1;
+=20
+@@ -4458,12 +4457,11 @@ static void do_ldr(DisasContext *s, uint32_t vofs=
+, uint32_t len,
  }
- 
--- 
+=20
+ /* Similarly for stores.  */
+-static void do_str(DisasContext *s, uint32_t vofs, uint32_t len,
+-                   int rn, int imm)
++static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int =
+imm)
+ {
+-    uint32_t len_align =3D QEMU_ALIGN_DOWN(len, 8);
+-    uint32_t len_remain =3D len % 8;
+-    uint32_t nparts =3D len / 8 + ctpop8(len_remain);
++    int len_align =3D QEMU_ALIGN_DOWN(len, 8);
++    int len_remain =3D len % 8;
++    int nparts =3D len / 8 + ctpop8(len_remain);
+     int midx =3D get_mem_index(s);
+     TCGv_i64 addr, t0;
+=20
+--=20
 2.17.1
