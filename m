@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40805)
+Received: from eggs.gnu.org ([209.51.188.92]:40807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44X-0001Jx-2j
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44X-0001K0-3X
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44V-0003NJ-5P
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50602
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB44V-0003Nc-8d
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52462)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB44U-0003Ha-Rq
+	id 1hB44U-0003AO-Sa
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:02:23 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1raU095864
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:02:13 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkswegwck-1
+	x31L1r12122331
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:01:56 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksyg8phq-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:02:13 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:01:55 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:11 +0100
+	Mon, 1 Apr 2019 22:01:46 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:10 -0500
+Date: Mon,  1 Apr 2019 15:58:52 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-37-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 36/97] job: Fix nested aio_poll() hanging in
- job_txn_apply
+Message-Id: <20190401210011.16009-19-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 18/97] mirror: Fail gracefully for source ==
+ target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,94 +39,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: Kevin Wolf <kwolf@redhat.com>
 
-All callers have acquired ctx already. Doing that again results in
-aio_poll() hang. This fixes the problem that a BDRV_POLL_WHILE() in the
-callback cannot make progress because ctx is recursively locked, for
-example, when drive-backup finishes.
+blockdev-mirror with the same node for source and target segfaults
+today: A node is in its own backing chain, so mirror_start_job() decides
+that this is an active commit. When adding the intermediate nodes with
+block_job_add_bdrv(), it starts the iteration through the subchain with
+the backing file of source, though, so it never reaches target and
+instead runs into NULL at the base.
 
-There are two callers of job_finalize():
+While we could fix that by starting with source itself, there is no
+point in allowing mirroring a node into itself and I wouldn't be
+surprised if this caused more problems later.
 
-    fam@lemon:~/work/qemu [master]$ git grep -w -A1 '^\s*job_finalize'
-    blockdev.c:    job_finalize(&job->job, errp);
-    blockdev.c-    aio_context_release(aio_context);
-    --
-    job-qmp.c:    job_finalize(job, errp);
-    job-qmp.c-    aio_context_release(aio_context);
-    --
-    tests/test-blockjob.c:    job_finalize(&job->job, &error_abort);
-    tests/test-blockjob.c-    assert(job->job.status == JOB_STATUS_CONCLUDED);
-
-Ignoring the test, it's easy to see both callers to job_finalize (and
-job_do_finalize) have acquired the context.
+So just check for this scenario and error out.
 
 Cc: qemu-stable@nongnu.org
-Reported-by: Gu Nini <ngu@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit 49880165a44f26dc84651858750facdee31f2513)
+Reviewed-by: Eric Blake <eblake@redhat.com>
+(cherry picked from commit 86fae10c64d642256cf019e6829929fa0d259c7a)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- job.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ block/mirror.c             | 5 +++++
+ tests/qemu-iotests/041     | 6 ++++++
+ tests/qemu-iotests/041.out | 4 ++--
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/job.c b/job.c
-index e36ebaafd8..a3bec7fb22 100644
---- a/job.c
-+++ b/job.c
-@@ -136,21 +136,13 @@ static void job_txn_del_job(Job *job)
-     }
- }
- 
--static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
-+static int job_txn_apply(JobTxn *txn, int fn(Job *))
- {
--    AioContext *ctx;
-     Job *job, *next;
-     int rc = 0;
- 
-     QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
--        if (lock) {
--            ctx = job->aio_context;
--            aio_context_acquire(ctx);
--        }
-         rc = fn(job);
--        if (lock) {
--            aio_context_release(ctx);
--        }
-         if (rc) {
-             break;
-         }
-@@ -807,11 +799,11 @@ static void job_do_finalize(Job *job)
-     assert(job && job->txn);
- 
-     /* prepare the transaction to complete */
--    rc = job_txn_apply(job->txn, job_prepare, true);
-+    rc = job_txn_apply(job->txn, job_prepare);
-     if (rc) {
-         job_completed_txn_abort(job);
-     } else {
--        job_txn_apply(job->txn, job_finalize_single, true);
-+        job_txn_apply(job->txn, job_finalize_single);
-     }
- }
- 
-@@ -857,10 +849,10 @@ static void job_completed_txn_success(Job *job)
-         assert(other_job->ret == 0);
+diff --git a/block/mirror.c b/block/mirror.c
+index b48c3f8cf5..dd5ca02b09 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1499,6 +1499,11 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+         buf_size = DEFAULT_MIRROR_BUF_SIZE;
      }
  
--    job_txn_apply(txn, job_transition_to_pending, false);
-+    job_txn_apply(txn, job_transition_to_pending);
++    if (bs == target) {
++        error_setg(errp, "Can't mirror node into itself");
++        return;
++    }
++
+     /* In the case of active commit, add dummy driver to provide consistent
+      * reads on the top, while disabling it in the intermediate nodes, and make
+      * the backing chain writable. */
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index c20ac7da87..9336ab6ff5 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -234,6 +234,12 @@ class TestSingleBlockdev(TestSingleDrive):
+         result = self.vm.qmp("blockdev-add", **args)
+         self.assert_qmp(result, 'return', {})
  
-     /* If no jobs need manual finalization, automatically do so */
--    if (job_txn_apply(txn, job_needs_finalize, false) == 0) {
-+    if (job_txn_apply(txn, job_needs_finalize) == 0) {
-         job_do_finalize(job);
-     }
- }
++    def test_mirror_to_self(self):
++        result = self.vm.qmp(self.qmp_cmd, job_id='job0',
++                             device=self.qmp_target, sync='full',
++                             target=self.qmp_target)
++        self.assert_qmp(result, 'error/class', 'GenericError')
++
+     test_large_cluster = None
+     test_image_not_found = None
+     test_small_buffer2 = None
+diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
+index c28b392b87..e071d0b261 100644
+--- a/tests/qemu-iotests/041.out
++++ b/tests/qemu-iotests/041.out
+@@ -1,5 +1,5 @@
+-.....................................................................................
++........................................................................................
+ ----------------------------------------------------------------------
+-Ran 85 tests
++Ran 88 tests
+ 
+ OK
 -- 
 2.17.1
