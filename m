@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58778)
+Received: from eggs.gnu.org ([209.51.188.92]:50022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hB5Sv-0004fu-Hw
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:31:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hB5uT-0001kp-TU
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hB5St-0002GA-Q6
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:31:41 -0400
-Resent-Message-Id: <E1hB5St-0002GA-Q6@eggs.gnu.org>
-Message-ID: <155415785652.12882.6768623089892460575@76452e4e88f2>
-In-Reply-To: <20190401214847.27600-1-walling@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1hB5uS-00061Z-BS
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:00:09 -0400
+Date: Tue, 2 Apr 2019 09:52:14 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190401225214.GA9231@umbus.fritz.box>
+References: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 1 Apr 2019 15:30:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3] s390: diagnose 318 info reset and
- migration support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+Content-Disposition: inline
+In-Reply-To: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] spapr: Fix extended config
+ space accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMTIxNDg0Ny4yNzYw
-MC0xLXdhbGxpbmdAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDEyMTQ4NDcuMjc2MDAtMS13YWxsaW5n
-QGxpbnV4LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2M10gczM5MDogZGlh
-Z25vc2UgMzE4IGluZm8gcmVzZXQgYW5kIG1pZ3JhdGlvbiBzdXBwb3J0ClR5cGU6IHNlcmllcwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2Ug
-PiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5
-MDQwMTIxNDg0Ny4yNzYwMC0xLXdhbGxpbmdAbGludXguaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTkw
-NDAxMjE0ODQ3LjI3NjAwLTEtd2FsbGluZ0BsaW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKM2QzZmUxMWE5OSBzMzkwOiBkaWFnbm9zZSAzMTggaW5mbyByZXNldCBh
-bmQgbWlncmF0aW9uIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBpbml0aWFs
-aXplciBmb3Igc3RydWN0IFZNU3RhdGVEZXNjcmlwdGlvbiBzaG91bGQgbm9ybWFsbHkgYmUgY29u
-c3QKIzE0MzogRklMRTogdGFyZ2V0L3MzOTB4L2RpYWcuYzoxNzM6CitWTVN0YXRlRGVzY3JpcHRp
-b24gdm1zdGF0ZV9kaWFnMzE4ID0gewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDMg
-bGluZXMgY2hlY2tlZAoKQ29tbWl0IDNkM2ZlMTFhOTllNyAoczM5MDogZGlhZ25vc2UgMzE4IGlu
-Zm8gcmVzZXQgYW5kIG1pZ3JhdGlvbiBzdXBwb3J0KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
-MDQwMTIxNDg0Ny4yNzYwMC0xLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--/9DWx/yDrRhgMJTb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Apr 01, 2019 at 07:54:57PM +0200, Greg Kurz wrote:
+> Recent commit c2077e2ca0da7 added stricter checks that now prevent
+> a guest to access the extended config space of a PCIe device connected
+> attached to a PHB on a pseries machine.
+>=20
+> PAPR compatible PHBs act like legacy PCI busses, but they do allow access
+> to the full 4k config space of PCIe devices. As discussed several times on
+> the list ([1] and [2]), we cannot really change PAPR PHB to have a true
+> PCIe root bus since it would call for massive and unwanted changes in
+> libvirt.
+>=20
+> This series tries to address the issue with a new PCI bus class method
+> that tells if the PCI bus supports extended config space accesses,
+> instead of relying on pci_bus_is_express() which wants a PCIe root bus.
+> A new legacy PCI bus type is added to implement the PAPR behaviour.
+>=20
+> Note that this fixes a potential 4.0 regression, hence the for-4.0 tag.
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07377.html
+>     https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02839.html
+>=20
+> [2] https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00034.html
+
+So, I actually had some patches I'd been working on that address both
+the c2077e2ca0da7 issue and the PAPR fixup in what I think is a
+cleaner manner.  Can't remember now if I posted and they got lost, or
+I didn't get around to posting.
+
+Nonetheless, at this point we're fixing a real regression on PAPR.
+I'll look at cleaning this up post 4.0.
+
+Reviewed-by: David Gibson <david@gibson.dropbe
+
+I can take this through my tree if people are ok with that.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/9DWx/yDrRhgMJTb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyilhkACgkQbDjKyiDZ
+s5L4lBAAiqN8oWHdZRVu76Ses4cb/nzDnB7OPN7aPng0p/Bz93yUiL9stNA1LUGF
+LSyuVJcvc24N7/IjN8Xl+TL1iA+bdVo+2HkA+LpS1hvEFyeNye8Ti9LLXJ6iuBGC
+OAfF1CfPAl0Gka1mvJKFfx0Kf5VcKlXwHJ+1B4UU6Jnd/n6VxlsGjSMyVU0oo/RU
+uGS3iJsXYu4jd88qRA5Ea3Ae/mi744PGwWNk7veOfJch60l6VzgzBtv39w/wm5lg
+DuA0XZ7pzYKKAsvZ3GYxzrEjNqqfzNRwgzvPiJ2jikr7CIwq57ywAA0YZwaKQ56m
+ZXHoGp65WfQLAdVvT398MOPUVRMeDCLn3cGbgZM9eNgYA2hbEvHxwC6YmepUFKEl
+lrMq3+TVqlu65tcWR+mFXK+8toF2tKHJFqRTyyt1Ja7JAq6EZ/TEA2ZjKnCOxRrP
+O0/y5UkN7//m7H48ZTcoo30f+VsGO9AeaQMln3mz9lSMh/8uKFxOiK+etbozyIpv
+fnBY9a02N4ztxaS9ojB4H2U7KJ0lcW9ACQ/E2lVoqqEPMr28GUTGcBurmz9/00vi
+OJzevRUYsZNf2Q+U3tV4+4RfzAq/tirMs8C2f5M680usCPL3aL6+xrljErqqoHjT
+OL/g2LoIjdqsSbkQ8fuzx8yamfBZ1R4PwmdGnr5MFT0ZiQftdCY=
+=GiHv
+-----END PGP SIGNATURE-----
+
+--/9DWx/yDrRhgMJTb--
