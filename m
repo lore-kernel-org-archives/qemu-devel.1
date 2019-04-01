@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60607)
+Received: from eggs.gnu.org ([209.51.188.92]:33253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hB0xt-0001Wn-Gb
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:43:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hB13V-0003nF-6s
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hB0xs-0000Dy-Ih
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:43:21 -0400
-Received: from mail-eopbgr700128.outbound.protection.outlook.com
-	([40.107.70.128]:31681
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hB0xs-0000BQ-Aw
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:43:20 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 1 Apr 2019 17:43:16 +0000
-Message-ID: <CY4PR2201MB1254B9E68F5103DE4ECBD140C6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
-References: <1554129501-27175-1-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1554129501-27175-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cohuck@redhat.com>) id 1hB13U-0004jO-7p
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 13:49:09 -0400
+Date: Mon, 1 Apr 2019 19:48:57 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190401194857.681f65d6.cohuck@redhat.com>
+In-Reply-To: <20190328113458.8405-1-david@redhat.com>
+References: <20190328113458.8405-1-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/mips: Integer division by zero
- in MSA insturctions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] s390x/kvm: Properly detect page
+ size of initial memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> Subject: [PATCH 0/2] target/mips: Integer division by zero in MSA insturc=
-tions
->
+On Thu, 28 Mar 2019 12:34:56 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-The title look incomplete and uninformative: it mentions "the division by z=
-ero"
-- but what is done in this case? Is this an implementation of that case? Or=
- fix?
-Or something else?
+> This is based on the patch
+>     [PATCH for-4.0?] exec: Only count mapped memory backends for
+>     qemu_getrampagesize()
+> 
+> While the detection on s390x of the maximum ram pagesize works by pure luck,
+> we should try to do better. Especially, once "-mem-path" is replaced
+> by memory backends, the current approach will break.
+> 
+> Configure the maximum page size after configuring initital memory. Provide
+> a function to detect the maximum ram pagesize
+> 
+> I think this can be deferred to 4.1 as I don't think anything is actually
+> broken right now.
 
-The title should clearly and in a condensed form explain what is done in th=
-e
-series.
+I agree.
 
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->
-> Integer division by zero in MSA insturctions results in unpredictable
-> behaviour, but according to the hardware, it depends on the sign of
-> the dividend, or always returns the same value.
->=20
+> 
+> v1 -> v2:
+> - Add a better comment describing that only initial memory is considered
+> - Add "exec: Introduce qemu_getmaxrampagesize() and rename
+>   qemu_getrampagesize()"
+> 
+> David Hildenbrand (2):
+>   s390x/kvm: Configure page size after memory has actually been
+>     initialized
 
-This is a very unclear sentence.
+I can queue that one to s390-next (not s390-fixes)... has this been tested?
 
-A sentence that says that the series makes the behavior of QEMU
-and the reference hardware the same in cases of division and modulus
-operations with zero divisor is missing.
-
-> Mateja Marjanovic (2):
->  target/mips: DIV_<U|S>.<B|H|W|D> MSA insturctions fixed
->  target/mips: MOD_<U|S>.<B|H|W|D> MSA insturctions fixed
->
-> target/mips/msa_helper.c | 11 +++++++----
-> 1 file changed, 7 insertions(+), 4 deletions(-)
-
-Check spelling.
-
-Thanks,
-Aleksandar=
+>   exec: Introduce qemu_getmaxrampagesize() and rename
+>     qemu_getrampagesize()
+> 
+>  exec.c                     | 39 ++++++++++++++++++++++++++++++++++----
+>  hw/ppc/spapr_caps.c        |  4 ++--
+>  hw/s390x/s390-virtio-ccw.c | 12 ++++++++++++
+>  hw/vfio/spapr.c            |  2 +-
+>  target/ppc/kvm.c           |  2 +-
+>  target/s390x/cpu.c         |  7 +++++++
+>  target/s390x/cpu.h         |  1 +
+>  target/s390x/kvm-stub.c    |  4 ++++
+>  target/s390x/kvm.c         | 35 ++++++++++++++--------------------
+>  target/s390x/kvm_s390x.h   |  1 +
+>  10 files changed, 78 insertions(+), 29 deletions(-)
+> 
