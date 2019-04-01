@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39785)
+Received: from eggs.gnu.org ([209.51.188.92]:40180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hAxC6-0002Nr-PQ
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hAxDo-0003ZF-GA
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hAxC5-0006bK-7O
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:46 -0400
-Received: from mail-eopbgr760051.outbound.protection.outlook.com
-	([40.107.76.51]:20003
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hAxC4-0006XE-S2
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:41:45 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Mon, 1 Apr 2019 13:41:39 +0000
-Message-ID: <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
-References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
-	<20190329104904.450fefef@x1.home>
-In-Reply-To: <20190329104904.450fefef@x1.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C5A0F6808630AD418F68C362468A4E9C@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1hAxDl-0007pd-VU
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 09:43:31 -0400
+Date: Mon, 1 Apr 2019 15:43:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190401154301.06a581b2@redhat.com>
+In-Reply-To: <a264329c-5e4d-5f98-3137-502f0a37abb7@redhat.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-6-shameerali.kolothum.thodi@huawei.com>
+	<a264329c-5e4d-5f98-3137-502f0a37abb7@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
- device IOMMU address space
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 05/10] hw/arm/virt: Add ACPI support for
+ device memory cold-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +25,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "peterx@redhat.com" <peterx@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, linuxarm@huawei.com, xuwei5@hisilicon.com
 
-VGhhbmtzIGZvciBhZGRpbmcgQWxleC4NCg0KQWRkaW5nIFN1cmF2ZWUuDQoNCg0KT24gMy8yOS8x
-OSAxMTo0OSBBTSwgQWxleCBXaWxsaWFtc29uIHdyb3RlOg0KPiBbQ2MgK0JyaWplc2hdDQo+IA0K
-PiBIaSBCcmlqZXNoLCB3aWxsIHRoZSBjaGFuZ2UgYmVsb3cgcmVxdWlyZSB0aGUgSVZSUyB0byBi
-ZSB1cGRhdGVkIHRvDQo+IGluY2x1ZGUgYWxpYXNlcyBmb3IgYWxsIEJERiByYW5nZXMgYmVoaW5k
-IGEgY29udmVudGlvbmFsIGJyaWRnZT8gIEkNCj4gdGhpbmsgdGhlIExpbnV4IGNvZGUgaGFuZGxl
-cyB0aGlzIHJlZ2FyZGxlc3Mgb2YgdGhlIGZpcm13YXJlIHByb3ZpZGVkDQo+IGFsaWFzZXMsIGJ1
-dCBpcyBpdCByZXF1aXJlZCBwZXIgc3BlYyBmb3IgdGhlIEFDUEkgdGFibGVzIHRvIGluY2x1ZGUN
-Cj4gYnJpZGdlIGFsaWFzZXM/ICBUaGFua3MsDQo+IA0KDQpXZSBkbyBuZWVkIHRvIGluY2x1ZGVz
-IGFsaWFzZXMgaW4gQUNQSSB0YWJsZS4gV2UgbmVlZCB0byBwb3B1bGF0ZSB0aGUNCklWSEQgdHlw
-ZSAweDQzIGFuZCAweDQgZm9yIGFsaWFzIHJhbmdlIHN0YXJ0IGFuZCBlbmQuIEkgYmVsaWV2ZSBo
-b3N0DQpJVlJTIHdvdWxkIGNvbnRhaW4gc2ltaWxhciBpbmZvcm1hdGlvbi4NCg0KU3VyYXZlZSwg
-cGxlYXNlIGNvcnJlY3QgbWUgaWYgSSBhbSBtaXNzaW5nIHNvbWV0aGluZz8NCg0KdGhhbmtzDQoN
-Cj4gQWxleA0KPiANCj4gT24gVHVlLCAyNiBNYXIgMjAxOSAxNjo1NToxOSAtMDYwMA0KPiBBbGV4
-IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+PiBD
-b252ZW50aW9uYWwgUENJIGJ1c2VzIHByZS1kYXRlIHJlcXVlc3RlciBJRHMuICBBbiBJT01NVSBj
-YW5ub3QNCj4+IGRpc3Rpbmd1aXNoIGJ5IGRldmZuICYgYnVzIGJldHdlZW4gZGV2aWNlcyBpbiBh
-IGNvbnZlbnRpb25hbCBQQ0kNCj4+IHRvcG9sb2d5IGFuZCB0aGVyZWZvcmUgd2UgY2Fubm90IGFz
-c2lnbiB0aGVtIHNlcGFyYXRlIEFkZHJlc3NTcGFjZXMuDQo+PiBCeSB0YWtpbmcgdGhpcyByZXF1
-ZXN0ZXIgSUQgYWxpYXNpbmcgaW50byBhY2NvdW50LCBRRU1VIGJldHRlciBtYXRjaGVzDQo+PiB0
-aGUgYmFyZSBtZXRhbCBiZWhhdmlvciBhbmQgcmVzdHJpY3Rpb25zLCBhbmQgZW5hYmxlcyBzaGFy
-ZWQNCj4+IEFkZHJlc3NTcGFjZSBjb25maWd1cmF0aW9ucyB0aGF0IGFyZSBvdGhlcndpc2Ugbm90
-IHBvc3NpYmxlIHdpdGgNCj4+IGd1ZXN0IElPTU1VIHN1cHBvcnQuDQo+Pg0KPj4gRm9yIHRoZSBs
-YXR0ZXIgY2FzZSwgZ2l2ZW4gYW55IGV4YW1wbGUgd2hlcmUgYW4gSU9NTVUgZ3JvdXAgb24gdGhl
-DQo+PiBob3N0IGluY2x1ZGVzIG11bHRpcGxlIGRldmljZXM6DQo+Pg0KPj4gICAgJCBscyAgL3N5
-cy9rZXJuZWwvaW9tbXVfZ3JvdXBzLzEvZGV2aWNlcy8NCj4+ICAgIDAwMDA6MDA6MDEuMCAgMDAw
-MDowMTowMC4wICAwMDAwOjAxOjAwLjENCj4+DQo+PiBJZiB3ZSBpbmNvcnBvcmF0ZSBhIHZJT01N
-VSBpbnRvIHRoZSBWTSBjb25maWd1cmF0aW9uLCB3ZSdyZSByZXN0cmljdGVkDQo+PiB0aGF0IHdl
-IGNhbiBvbmx5IGFzc2lnbiBvbmUgb2YgdGhlIGVuZHBvaW50cyB0byB0aGUgZ3Vlc3QgYmVjYXVz
-ZSBhDQo+PiBzZWNvbmQgZW5kcG9pbnQgd2lsbCBhdHRlbXB0IHRvIHVzZSBhIGRpZmZlcmVudCBB
-ZGRyZXNzU3BhY2UuICBWRklPDQo+PiBvbmx5IHN1cHBvcnRzIElPTU1VIGdyb3VwIGxldmVsIGdy
-YW51bGFyaXR5IGF0IHRoZSBjb250YWluZXIgbGV2ZWwsDQo+PiBwcmV2ZW50aW5nIHRoaXMgc2Vj
-b25kIGVuZHBvaW50IGZyb20gYmVpbmcgYXNzaWduZWQ6DQo+Pg0KPj4gcWVtdS1zeXN0ZW0teDg2
-XzY0IC1tYWNoaW5lIHEzNS4uLiBcDQo+PiAgICAtZGV2aWNlIGludGVsLWlvbW11LGludHJlbWFw
-PW9uIFwNCj4+ICAgIC1kZXZpY2UgcGNpZS1yb290LXBvcnQsYWRkcj0xZS4wLGlkPXBjaWUuMSBc
-DQo+PiAgICAtZGV2aWNlIHZmaW8tcGNpLGhvc3Q9MTowMC4wLGJ1cz1wY2llLjEsYWRkcj0wLjAs
-bXVsdGlmdW5jdGlvbj1vbiBcDQo+PiAgICAtZGV2aWNlIHZmaW8tcGNpLGhvc3Q9MTowMC4xLGJ1
-cz1wY2llLjEsYWRkcj0wLjENCj4+DQo+PiBxZW11LXN5c3RlbS14ODZfNjQ6IC1kZXZpY2UgdmZp
-by1wY2ksaG9zdD0xOjAwLjEsYnVzPXBjaWUuMSxhZGRyPTAuMTogdmZpbyBcDQo+PiAwMDAwOjAx
-OjAwLjE6IGdyb3VwIDEgdXNlZCBpbiBtdWx0aXBsZSBhZGRyZXNzIHNwYWNlcw0KPj4NCj4+IEhv
-d2V2ZXIsIHdoZW4gUUVNVSBpbmNvcnBvcmF0ZXMgcHJvcGVyIGFsaWFzaW5nLCB3ZSBjYW4gbWFr
-ZSB1c2Ugb2YgYQ0KPj4gUENJZS10by1QQ0kgYnJpZGdlIHRvIG1hc2sgdGhlIHJlcXVlc3RlciBJ
-RCwgcmVzdWx0aW5nIGluIGEgaGFjayB0aGF0DQo+PiBwcm92aWRlcyB0aGUgZG93bnN0cmVhbSBk
-ZXZpY2VzIHdpdGggdGhlIHNhbWUgQWRkcmVzc1NwYWNlLCBleDoNCj4+DQo+PiBxZW11LXN5c3Rl
-bS14ODZfNjQgLW1hY2hpbmUgcTM1Li4uIFwNCj4+ICAgIC1kZXZpY2UgaW50ZWwtaW9tbXUsaW50
-cmVtYXA9b24gXA0KPj4gICAgLWRldmljZSBwY2llLXBjaS1icmlkZ2UsYWRkcj0xZS4wLGlkPXBj
-aS4xIFwNCj4+ICAgIC1kZXZpY2UgdmZpby1wY2ksaG9zdD0xOjAwLjAsYnVzPXBjaS4xLGFkZHI9
-MS4wLG11bHRpZnVuY3Rpb249b24gXA0KPj4gICAgLWRldmljZSB2ZmlvLXBjaSxob3N0PTE6MDAu
-MSxidXM9cGNpLjEsYWRkcj0xLjENCj4+DQo+PiBXaGlsZSB0aGUgdXRpbGl0eSBvZiB0aGlzIGhh
-Y2sgbWF5IGJlIGxpbWl0ZWQsIHRoaXMgQWRkcmVzc1NwYWNlDQo+PiBhbGlhc2luZyBpcyB0aGUg
-Y29ycmVjdCBiZWhhdmlvciBmb3IgUUVNVSB0byBlbXVsYXRlIGJhcmUgbWV0YWwuDQo+Pg0KPj4g
-U2lnbmVkLW9mZi1ieTogQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
-bT4NCj4+IC0tLQ0KPj4gICBody9wY2kvcGNpLmMgfCAgIDMzICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKystLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMzEgaW5zZXJ0aW9ucygrKSwgMiBk
-ZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaHcvcGNpL3BjaS5jIGIvaHcvcGNpL3Bj
-aS5jDQo+PiBpbmRleCAzNTQ1MWMxZTk5ODcuLjM4NDY3ZTY3NmYxZiAxMDA2NDQNCj4+IC0tLSBh
-L2h3L3BjaS9wY2kuYw0KPj4gKysrIGIvaHcvcGNpL3BjaS5jDQo+PiBAQCAtMjU5NCwxMiArMjU5
-NCw0MSBAQCBBZGRyZXNzU3BhY2UgKnBjaV9kZXZpY2VfaW9tbXVfYWRkcmVzc19zcGFjZShQQ0lE
-ZXZpY2UgKmRldikNCj4+ICAgew0KPj4gICAgICAgUENJQnVzICpidXMgPSBwY2lfZ2V0X2J1cyhk
-ZXYpOw0KPj4gICAgICAgUENJQnVzICppb21tdV9idXMgPSBidXM7DQo+PiArICAgIHVpbnQ4X3Qg
-ZGV2Zm4gPSBkZXYtPmRldmZuOw0KPj4gICANCj4+ICAgICAgIHdoaWxlKGlvbW11X2J1cyAmJiAh
-aW9tbXVfYnVzLT5pb21tdV9mbiAmJiBpb21tdV9idXMtPnBhcmVudF9kZXYpIHsNCj4+IC0gICAg
-ICAgIGlvbW11X2J1cyA9IHBjaV9nZXRfYnVzKGlvbW11X2J1cy0+cGFyZW50X2Rldik7DQo+PiAr
-ICAgICAgICBQQ0lCdXMgKnBhcmVudF9idXMgPSBwY2lfZ2V0X2J1cyhpb21tdV9idXMtPnBhcmVu
-dF9kZXYpOw0KPj4gKw0KPj4gKyAgICAgICAgLyoNCj4+ICsgICAgICAgICAqIERldGVybWluZSB3
-aGljaCByZXF1ZXN0ZXIgSUQgYWxpYXMgc2hvdWxkIGJlIHVzZWQgZm9yIHRoZSBkZXZpY2UNCj4+
-ICsgICAgICAgICAqIGJhc2VkIG9uIHRoZSBQQ0kgdG9wb2xvZ3kuICBUaGVyZSBhcmUgbm8gcmVx
-dWVzdGVyIElEcyBvbiBjb252ZXRpb25hbA0KPj4gKyAgICAgICAgICogUENJIGJ1c2VzLCB0aGVy
-ZWZvcmUgd2UgcHVzaCB0aGUgYWxpYXMgdXAgdG8gdGhlIHBhcmVudCBvbiBlYWNoIG5vbi0NCj4+
-ICsgICAgICAgICAqIGV4cHJlc3MgYnVzLiAgV2hpY2ggYWxpYXMgd2UgdXNlIGRlcGVuZHMgb24g
-d2hldGhlciB0aGlzIGlzIGEgbGVnYWN5DQo+PiArICAgICAgICAgKiBQQ0kgYnJpZGdlIG9yIFBD
-SWUtdG8tUENJL1ggYnJpZGdlIGFzIGluIGNoYXB0ZXIgMi4zIG9mIHRoZSBQQ0llLXRvLQ0KPj4g
-KyAgICAgICAgICogUENJIGJyaWRnZSBzcGVjLiAgTm90ZSB0aGF0IHdlIGNhbm5vdCB1c2UgcGNp
-X3JlcXVlc3Rlcl9pZCgpIGhlcmUNCj4+ICsgICAgICAgICAqIGJlY2F1c2UgdGhlIHJlc3VsdGlu
-ZyBCREYgZGVwZW5kcyBvbiB0aGUgc2Vjb25kYXJ5IGJyaWRnZSByZWdpc3Rlcg0KPj4gKyAgICAg
-ICAgICogcHJvZ3JhbW1pbmcuICBXZSBhbHNvIGNhbm5vdCBsb29rdXAgdGhlIFBDSUJ1cyBmcm9t
-IHRoZSBidXMgbnVtYmVyDQo+PiArICAgICAgICAgKiBhdCB0aGlzIHBvaW50IGZvciB0aGUgaW9t
-bXVfZm4uICBBbHNvLCByZXF1ZXN0ZXJfaWRfY2FjaGUgaXMgdGhlDQo+PiArICAgICAgICAgKiBh
-bGlhcyB0byB0aGUgcm9vdCBidXMsIHdoaWNoIGlzIHVzdWFsbHksIGJ1dCBub3QgbmVjZXNzYXJp
-bHkgYWx3YXlzDQo+PiArICAgICAgICAgKiB3aGVyZSB3ZSdsbCBmaW5kIG91ciBpb21tdV9mbi4N
-Cj4+ICsgICAgICAgICAqLw0KPj4gKyAgICAgICAgaWYgKCFwY2lfYnVzX2lzX2V4cHJlc3MoaW9t
-bXVfYnVzKSkgew0KPj4gKyAgICAgICAgICAgIFBDSURldmljZSAqcGFyZW50ID0gaW9tbXVfYnVz
-LT5wYXJlbnRfZGV2Ow0KPj4gKw0KPj4gKyAgICAgICAgICAgIGlmIChwY2lfaXNfZXhwcmVzcyhw
-YXJlbnQpICYmDQo+PiArICAgICAgICAgICAgICAgIHBjaWVfY2FwX2dldF90eXBlKHBhcmVudCkg
-PT0gUENJX0VYUF9UWVBFX1BDSV9CUklER0UpIHsNCj4+ICsgICAgICAgICAgICAgICAgZGV2Zm4g
-PSBQQ0lfREVWRk4oMCwgMCk7DQo+PiArICAgICAgICAgICAgICAgIGJ1cyA9IGlvbW11X2J1czsN
-Cj4+ICsgICAgICAgICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAgICAgICAgICBkZXZmbiA9IHBh
-cmVudC0+ZGV2Zm47DQo+PiArICAgICAgICAgICAgICAgIGJ1cyA9IHBhcmVudF9idXM7DQo+PiAr
-ICAgICAgICAgICAgfQ0KPj4gKyAgICAgICAgfQ0KPj4gKw0KPj4gKyAgICAgICAgaW9tbXVfYnVz
-ID0gcGFyZW50X2J1czsNCj4+ICAgICAgIH0NCj4+ICAgICAgIGlmIChpb21tdV9idXMgJiYgaW9t
-bXVfYnVzLT5pb21tdV9mbikgew0KPj4gLSAgICAgICAgcmV0dXJuIGlvbW11X2J1cy0+aW9tbXVf
-Zm4oYnVzLCBpb21tdV9idXMtPmlvbW11X29wYXF1ZSwgZGV2LT5kZXZmbik7DQo+PiArICAgICAg
-ICByZXR1cm4gaW9tbXVfYnVzLT5pb21tdV9mbihidXMsIGlvbW11X2J1cy0+aW9tbXVfb3BhcXVl
-LCBkZXZmbik7DQo+PiAgICAgICB9DQo+PiAgICAgICByZXR1cm4gJmFkZHJlc3Nfc3BhY2VfbWVt
-b3J5Ow0KPj4gICB9DQo+Pg0KPiANCg==
+On Fri, 29 Mar 2019 10:31:14 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Shameer,
+> 
+> On 3/21/19 11:47 AM, Shameer Kolothum wrote:
+> > This adds support to build the aml code so that Guest(ACPI boot)
+> > can see the cold-plugged device memory. Memory cold plug support
+> > with DT boot is not yet enabled.
+> > 
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  default-configs/arm-softmmu.mak        |  2 ++
+> >  hw/acpi/generic_event_device.c         | 23 +++++++++++++++++++++++
+> >  hw/arm/virt-acpi-build.c               |  9 +++++++++
+> >  hw/arm/virt.c                          | 23 +++++++++++++++++++++++
+> >  include/hw/acpi/generic_event_device.h |  5 +++++
+> >  include/hw/arm/virt.h                  |  2 ++
+> >  6 files changed, 64 insertions(+)
+> > 
+> > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> > index 795cb89..6db444e 100644
+> > --- a/default-configs/arm-softmmu.mak
+> > +++ b/default-configs/arm-softmmu.mak
+> > @@ -162,3 +162,5 @@ CONFIG_LSI_SCSI_PCI=y
+> >  
+> >  CONFIG_MEM_DEVICE=y
+> >  CONFIG_DIMM=y
+> > +CONFIG_ACPI_MEMORY_HOTPLUG=y
+> > +CONFIG_ACPI_HW_REDUCED=y
+> > diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> > index b21a551..0b32fc9 100644
+> > --- a/hw/acpi/generic_event_device.c
+> > +++ b/hw/acpi/generic_event_device.c
+> > @@ -16,13 +16,26 @@
+> >   */
+> >  
+> >  #include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "exec/address-spaces.h"
+> >  #include "hw/sysbus.h"
+> >  #include "hw/acpi/acpi.h"
+> >  #include "hw/acpi/generic_event_device.h"
+> > +#include "hw/mem/pc-dimm.h"
+> >  
+> >  static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
+> >                                  DeviceState *dev, Error **errp)
+> >  {
+> > +    VirtAcpiState *s = VIRT_ACPI(hotplug_dev);
+> > +
+> > +    if (s->memhp_state.is_enabled &&
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
+> > +                                dev, errp);
+> > +    } else {
+> > +        error_setg(errp, "virt: device plug request for unsupported device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    }
+> >  }
+> >  
+> >  static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+> > @@ -31,9 +44,19 @@ static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+> >  
+> >  static void virt_device_realize(DeviceState *dev, Error **errp)
+> >  {
+> > +    VirtAcpiState *s = VIRT_ACPI(dev);
+> > +
+> > +    if (s->memhp_state.is_enabled) {
+> > +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
+> > +                                 &s->memhp_state,
+> > +                                 s->memhp_base);
+> > +    }
+> >  }
+> >  
+> >  static Property virt_acpi_properties[] = {
+> > +    DEFINE_PROP_UINT64("memhp_base", VirtAcpiState, memhp_base, 0),
+> > +    DEFINE_PROP_BOOL("memory-hotplug-support", VirtAcpiState,
+> > +                     memhp_state.is_enabled, true),>      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >  
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index bf9c0bc..20d3c83 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -40,6 +40,7 @@
+> >  #include "hw/loader.h"
+> >  #include "hw/hw.h"
+> >  #include "hw/acpi/aml-build.h"
+> > +#include "hw/acpi/memory_hotplug.h"
+> >  #include "hw/pci/pcie_host.h"
+> >  #include "hw/pci/pci.h"
+> >  #include "hw/arm/virt.h"
+> > @@ -49,6 +50,13 @@
+> >  #define ARM_SPI_BASE 32
+> >  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+> >  
+> > +static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState *ms)
+> > +{
+> > +    uint32_t nr_mem = ms->ram_slots;
+> > +
+> > +    build_memory_hotplug_aml(scope, nr_mem, "\\_SB", NULL, AML_SYSTEM_MEMORY);
+> > +}
+> > +
+> >  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+> >  {
+> >      uint16_t i;
+> > @@ -740,6 +748,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> >       * the RTC ACPI device at all when using UEFI.
+> >       */
+> >      scope = aml_scope("\\_SB");
+> > +    acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
+> >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+> >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+> >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index d0ff20d..13db0e9 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -133,6 +133,7 @@ static const MemMapEntry base_memmap[] = {
+> >      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+> >      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+> >      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> > +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, 0x00010000 },
+> >      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+> >      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+> >      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> > @@ -516,6 +517,18 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+> >      }
+> >  }
+> >  
+> > +static DeviceState *create_virt_acpi(VirtMachineState *vms)
+> > +{
+> > +    DeviceState *dev;
+> > +
+> > +    dev = qdev_create(NULL, "virt-acpi");
+> > +    qdev_prop_set_uint64(dev, "memhp_base",
+> > +                         vms->memmap[VIRT_PCDIMM_ACPI].base);  
+> Maybe add a comment that a property is requested to integrated with
+> acpi_memory_hotplug_init() (if I am not wrong). Otherwise we can wonder
+> why sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, <base>) is not used as for
+> standard sysbus devices?
+
+Why it's inherited from SYS_BUS_DEVICE to begin with?
+
+> 
+> > +    qdev_init_nofail(dev);
+> > +
+> > +    return dev;
+> > +}
+> > +
+> >  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
+> >  {
+> >      const char *itsclass = its_class_name();
+> > @@ -1644,6 +1657,8 @@ static void machvirt_init(MachineState *machine)
+> >  
+> >      create_platform_bus(vms, pic);
+> >  
+> > +    vms->acpi = create_virt_acpi(vms);I can see that on PC machines, they use a link property to set the  
+> acpi_dev. I am unsure about the exact reason, any idea?
+
+pc and q35 machine have different devices that implement ACPI interface
+and live somewhere else in the system and also honor -no-acpi CLI option.
+Link allows to cache reference to whatever device in use and manage CLI
+expectations (if I recall it correctly).
+
+> > +
+> >      vms->bootinfo.ram_size = machine->ram_size;
+> >      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+> > @@ -1828,11 +1843,19 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >  static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> >                               DeviceState *dev, Error **errp)
+> >  {
+> > +    HotplugHandlerClass *hhc;
+> >      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> >      Error *local_err = NULL;
+> >  
+> >      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi);
+> > +    hhc->plug(HOTPLUG_HANDLER(vms->acpi), dev, &error_abort);  
+> Why error_abort instead of propagating the error?
+
+After last round of changes to hotplug handler, it's deemed that plug() handler
+should not fail (I didn't get my hands on removing error argument from interface
+yet). All checks and graceful abort should happen at pre_plug() stage.
+
+> >  
+> > +out:
+> >      error_propagate(errp, local_err);
+> >  }
+> >  
+> > diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+> > index f314515..262ca7d 100644
+> > --- a/include/hw/acpi/generic_event_device.h
+> > +++ b/include/hw/acpi/generic_event_device.h
+> > @@ -18,12 +18,17 @@
+> >  #ifndef HW_ACPI_GED_H
+> >  #define HW_ACPI_GED_H
+> >  
+> > +#include "hw/acpi/memory_hotplug.h"
+> > +
+> >  #define TYPE_VIRT_ACPI "virt-acpi"
+> >  #define VIRT_ACPI(obj) \
+> >      OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
+> >  
+> >  typedef struct VirtAcpiState {
+> >      SysBusDevice parent_obj;
+> > +    MemHotplugState memhp_state;
+> > +    hwaddr memhp_base;
+> >  } VirtAcpiState;
+> >  
+> > +  
+> spurious newline
+> 
+> Thanks
+> 
+> Eric
+> >  #endif
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > index 507517c..c5e4c96 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -77,6 +77,7 @@ enum {
+> >      VIRT_GPIO,
+> >      VIRT_SECURE_UART,
+> >      VIRT_SECURE_MEM,
+> > +    VIRT_PCDIMM_ACPI,
+> >      VIRT_LOWMEMMAP_LAST,
+> >  };
+> >  
+> > @@ -132,6 +133,7 @@ typedef struct {
+> >      uint32_t iommu_phandle;
+> >      int psci_conduit;
+> >      hwaddr highest_gpa;
+> > +    DeviceState *acpi;
+> >  } VirtMachineState;
+> >  
+> >  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+> >   
