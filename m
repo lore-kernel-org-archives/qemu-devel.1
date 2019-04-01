@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37697)
+Received: from eggs.gnu.org ([209.51.188.92]:38011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hAqLP-0006FP-8B
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:22:56 -0400
+	(envelope-from <armbru@redhat.com>) id 1hAqNq-0006zH-SZ
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hAqLO-0003Sx-1B
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:22:55 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kamalheib1@gmail.com>)
-	id 1hAqLN-0003SZ-Lm
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:22:53 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w10so10275896wrm.4
-	for <qemu-devel@nongnu.org>; Sun, 31 Mar 2019 23:22:53 -0700 (PDT)
-References: <20190326125433.475-1-kamalheib1@gmail.com>
-	<20190326125433.475-3-kamalheib1@gmail.com>
-	<20190327160330.GC10207@lap1>
-From: Kamal Heib <kamalheib1@gmail.com>
-Message-ID: <86f0f2bd-a8a5-045e-da58-e694fd2f92a9@gmail.com>
-Date: Mon, 1 Apr 2019 09:22:49 +0300
+	(envelope-from <armbru@redhat.com>) id 1hAqNp-0004Uj-0P
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:25:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hAqNn-0004Sv-1y
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 02:25:24 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190327150347.8974-1-armbru@redhat.com>
+	<20190327150347.8974-2-armbru@redhat.com>
+	<20190329142706.4bfb524e@redhat.com>
+	<87o95thhpo.fsf@dusky.pond.sub.org>
+	<20190329162526.3b531e4d@redhat.com>
+	<87wokhd0q7.fsf@dusky.pond.sub.org>
+Date: Mon, 01 Apr 2019 08:25:15 +0200
+In-Reply-To: <87wokhd0q7.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 29 Mar 2019 18:55:28 +0100")
+Message-ID: <871s2m44z8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190327160330.GC10207@lap1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/rdma: Add support for managing
- SRQ resource
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Fix to create accel compat props
+ before migration object again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,193 +32,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: anthony.perard@citrix.com, qemu-devel@nongnu.org
 
+Markus Armbruster <armbru@redhat.com> writes:
 
-
-On 3/27/19 6:03 PM, Yuval Shaia wrote:
-> On Tue, Mar 26, 2019 at 02:54:31PM +0200, Kamal Heib wrote:
->> Adding the required functions and definitions for support managing the
->> shared receive queues (SRQs).
+> Igor Mammedov <imammedo@redhat.com> writes:
+>
+>> On Fri, 29 Mar 2019 15:34:59 +0100
+>> Markus Armbruster <armbru@redhat.com> wrote:
 >>
->> Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
->> ---
->>  hw/rdma/rdma_rm.c      | 83 ++++++++++++++++++++++++++++++++++++++++++
->>  hw/rdma/rdma_rm.h      | 10 +++++
->>  hw/rdma/rdma_rm_defs.h |  8 ++++
->>  3 files changed, 101 insertions(+)
->>
->> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
->> index bac3b2f4a6c3..bc5873cb4c14 100644
->> --- a/hw/rdma/rdma_rm.c
->> +++ b/hw/rdma/rdma_rm.c
->> @@ -542,6 +542,86 @@ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
->>      rdma_res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
->>  }
->>  
->> +RdmaRmSRQ *rdma_rm_get_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle)
->> +{
->> +    return rdma_res_tbl_get(&dev_res->srq_tbl, srq_handle);
->> +}
->> +
->> +int rdma_rm_alloc_srq(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->> +                      uint32_t max_wr, uint32_t max_sge, uint32_t srq_limit,
->> +                      uint32_t *srq_handle, void *opaque)
->> +{
->> +    RdmaRmSRQ *srq;
->> +    RdmaRmPD *pd;
->> +    int rc;
->> +
->> +    pd = rdma_rm_get_pd(dev_res, pd_handle);
->> +    if (!pd) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    srq = rdma_res_tbl_alloc(&dev_res->srq_tbl, srq_handle);
->> +    if (!srq) {
->> +        return -ENOMEM;
->> +    }
->> +
->> +    rc = rdma_backend_create_srq(&srq->backend_srq, &pd->backend_pd,
->> +                                 max_wr, max_sge, srq_limit);
->> +    if (rc) {
->> +        rc = -EIO;
->> +        goto out_dealloc_srq;
->> +    }
->> +
->> +    srq->opaque = opaque;
->> +
->> +    return 0;
->> +
->> +out_dealloc_srq:
->> +    rdma_res_tbl_dealloc(&dev_res->srq_tbl, *srq_handle);
->> +
->> +    return rc;
->> +}
->> +
->> +int rdma_rm_query_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle,
->> +                      struct ibv_srq_attr *srq_attr)
->> +{
->> +    RdmaRmSRQ *srq;
->> +
->> +    srq = rdma_rm_get_srq(dev_res, srq_handle);
->> +    if (!srq) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return rdma_backend_query_srq(&srq->backend_srq, srq_attr);
->> +}
->> +
->> +int rdma_rm_modify_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle,
->> +                       struct ibv_srq_attr *srq_attr, int srq_attr_mask)
->> +{
->> +    RdmaRmSRQ *srq;
->> +
->> +    srq = rdma_rm_get_srq(dev_res, srq_handle);
->> +    if (!srq) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return rdma_backend_modify_srq(&srq->backend_srq, srq_attr,
->> +                                   srq_attr_mask);
-> 
-> Such a blind pass-through?? don't you want to make sure that for example
-> max_sge is valid? I mean just for the sake of being fair to caller?
-> 
-
-I agree, I'll fix it in v3.
-
->> +}
->> +
->> +void rdma_rm_dealloc_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle)
->> +{
->> +    RdmaRmSRQ *srq;
->> +
->> +    srq = rdma_rm_get_srq(dev_res, srq_handle);
->> +    if (!srq) {
->> +        return;
->> +    }
->> +
->> +    rdma_backend_destroy_srq(&srq->backend_srq, dev_res);
->> +    rdma_res_tbl_dealloc(&dev_res->srq_tbl, srq_handle);
->> +}
->> +
->>  void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id)
->>  {
->>      void **cqe_ctx;
->> @@ -671,6 +751,8 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr)
->>      res_tbl_init("CQE_CTX", &dev_res->cqe_ctx_tbl, dev_attr->max_qp *
->>                         dev_attr->max_qp_wr, sizeof(void *));
->>      res_tbl_init("UC", &dev_res->uc_tbl, MAX_UCS, sizeof(RdmaRmUC));
->> +    res_tbl_init("SRQ", &dev_res->srq_tbl, dev_attr->max_srq,
->> +                 sizeof(RdmaRmSRQ));
->>  
->>      init_ports(dev_res);
->>  
->> @@ -689,6 +771,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
->>  
->>      fini_ports(dev_res, backend_dev, ifname);
->>  
->> +    res_tbl_free(&dev_res->srq_tbl);
->>      res_tbl_free(&dev_res->uc_tbl);
->>      res_tbl_free(&dev_res->cqe_ctx_tbl);
->>      res_tbl_free(&dev_res->qp_tbl);
->> diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
->> index 4f03f9b8c5f1..e88ab95e264b 100644
->> --- a/hw/rdma/rdma_rm.h
->> +++ b/hw/rdma/rdma_rm.h
->> @@ -65,6 +65,16 @@ int rdma_rm_query_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
->>                       int attr_mask, struct ibv_qp_init_attr *init_attr);
->>  void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle);
->>  
->> +RdmaRmSRQ *rdma_rm_get_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle);
->> +int rdma_rm_alloc_srq(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->> +                      uint32_t max_wr, uint32_t max_sge, uint32_t srq_limit,
->> +                      uint32_t *srq_handle, void *opaque);
->> +int rdma_rm_query_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle,
->> +                      struct ibv_srq_attr *srq_attr);
->> +int rdma_rm_modify_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle,
->> +                       struct ibv_srq_attr *srq_attr, int srq_attr_mask);
->> +void rdma_rm_dealloc_srq(RdmaDeviceResources *dev_res, uint32_t srq_handle);
->> +
->>  int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
->>                            void *ctx);
->>  void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id);
->> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
->> index c200d311de37..2a3a409d92a0 100644
->> --- a/hw/rdma/rdma_rm_defs.h
->> +++ b/hw/rdma/rdma_rm_defs.h
->> @@ -33,6 +33,7 @@
->>  #define MAX_QP_RD_ATOM        16
->>  #define MAX_QP_INIT_RD_ATOM   16
->>  #define MAX_AH                64
->> +#define MAX_SRQ               512
->>  
->>  #define MAX_RM_TBL_NAME             16
->>  #define MAX_CONSEQ_EMPTY_POLL_CQ    4096 /* considered as error above this */
->> @@ -89,6 +90,12 @@ typedef struct RdmaRmQP {
->>      enum ibv_qp_state qp_state;
->>  } RdmaRmQP;
->>  
->> +typedef struct RdmaRmSRQ {
->> +    RdmaBackendSRQ backend_srq;
->> +    uint32_t recv_cq_handle;
->> +    void *opaque;
->> +} RdmaRmSRQ;
->> +
->>  typedef struct RdmaRmGid {
->>      union ibv_gid gid;
->>      int backend_gid_index;
->> @@ -128,6 +135,7 @@ struct RdmaDeviceResources {
->>      RdmaRmResTbl qp_tbl;
->>      RdmaRmResTbl cq_tbl;
->>      RdmaRmResTbl cqe_ctx_tbl;
->> +    RdmaRmResTbl srq_tbl;
->>      GHashTable *qp_hash; /* Keeps mapping between real and emulated */
->>      QemuMutex lock;
->>      RdmaRmStats stats;
->> -- 
->> 2.20.1
+>>> Igor Mammedov <imammedo@redhat.com> writes:
+>>> 
+>>> > On Wed, 27 Mar 2019 16:03:46 +0100
+>>> > Markus Armbruster <armbru@redhat.com> wrote:
+>>> >  
+>>> >> Recent commit cda4aa9a5a0 moved block backend creation before machine
+>>> >> property evaluation.  This broke block backends registering migration
+>>> >> blockers.  Commit e60483f2f84 fixed it by moving migration object
+>>> >> creation before block backend creation.  This broke migration with
+>>> >> Xen.  Turns out we need to configure the accelerator before we create
+>>> >> the migration object so that Xen's accelerator compat properties get
+>>> >> applied.  Fix by calling configure_accelerator() earlier, right before
+>>> >> migration_object_init().
+>>> >> 
+>>> >> Fixes: e60483f2f8498ae08ae79ca4c6fb03a3317f5e1e
+>>> >> Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+>>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> >> ---
+>>> >>  vl.c | 8 ++++++--
+>>> >>  1 file changed, 6 insertions(+), 2 deletions(-)
+>>> >> 
+>>> >> diff --git a/vl.c b/vl.c
+>>> >> index d61d5604e5..28b9e9a170 100644
+>>> >> --- a/vl.c
+>>> >> +++ b/vl.c
+>>> >> @@ -4276,6 +4276,12 @@ int main(int argc, char **argv, char **envp)
+>>> >>          exit(0);
+>>> >>      }
+>>> >>  
+>>> >> +    /*
+>>> >> +     * Must run before migration_object_init() to make Xen's
+>>> >> +     * accelerator compat properties stick
+>>> >> +     */
+>>> >> +    configure_accelerator(current_machine, argv[0]);
+>>> >> +  
+>>> > Setting machine properties with this change happens after
+>>> > accelerator was initialized.
+>>> >
+>>> > It probably will break initialization of accelerator features
+>>> > (to name a couple kernel-irqchip, memory-encryption) that depend
+>>> > on machine properties being set before accelerator is initialized.  
+>>> 
+>>> I'm blind.  Can you suggest a potential reproducer for me to try?
+>> sure (it' difficult to move things around in vl.c and spot implicit
+>> dependency or not to break something while at it)
 >>
 >>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index 241db49..9b0d89a 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -1724,6 +1724,7 @@ static int kvm_init(MachineState *ms)
+>>      }
+>>  
+>>      if (machine_kernel_irqchip_allowed(ms)) {
+>> +fprintf(stderr, "kvm_irqchip_create\n");
+>>          kvm_irqchip_create(ms, s);
+>>      }
+>>
+>> with:
+>>
+>> qemu-system-x86_64 -machine accel=kvm,kernel-irqchip=off
+>>
+>> prints "kvm_irqchip_create" after patch and doesn't with current master
+>
+> Now I see.  Thank you!
+>
+> machine_kernel_irqchip_allowed(m) returns m->kernel_irqchip_allowed.
+> machine_initfn() sets the default value, true.  -machine
+> kernel-irqchip=off sets it to false.
+>
+> To make the latter stick, kvm_init() must run after
+> machine_set_property().
+>
+> kvm_init() is AccelClass method init_machine(), called by
+> configure_accelerator() via accel_init_machine().
+>
+> We have a depencency cycle:
+>
+>     configure_accelerator()
+>     before migration_object_init()
+>         to make Xen's accel compat props stick
+>     before configure_blockdev()
+>         so we can create migration blockers
+>     before machine_set_property()
+>         so machine props can refer to blockdevs
+>     before configure_accelerator()
+>         to make -machine kvm-irqchip=off and similar stick
+>
+> To break it, we need to split one of them.
+>
+> I've long had a queasy feeling about configure_accelerator().  It needs
+> to run early so accelerator properties work, and it needs to run late so
+> it can use machine properties.
+>
+> Can we split it into
+>
+>     part 1: runs early, can fail, can't use machine properties
+>     part 2: runs late, can't fail, can use machine properties
+>
+> ?
+
+Too risky for 4.0.
+
+> If we can't, or can't for 4.0, then I guess we need to split
+> migration_object_init() along similar lines:
+>
+>     part 1: runs early, makes migration blockers usable,
+>             can't use migration properties
+>     part 2: runs late, can use migration properties
+
+No dice: what we need to make migration blockers usable is the exactly
+what may only run after configure_accelerator(): object_new().
+
+We need to decouple migration blockers from the migration object.  I'll
+post patches later today.
