@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45133)
+Received: from eggs.gnu.org ([209.51.188.92]:46689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAzZR-0001Kp-2P
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:14:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1hAzi8-0003ys-K1
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:23:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hAzZL-0001qA-Qq
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:13:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39683)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hAzZH-0001Uq-HP
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:13:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id n25so12195382wmk.4
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 09:13:49 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hAzi6-0007It-UN
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 12:23:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190328182810.21497-1-kwolf@redhat.com>
+	<20190328182810.21497-2-kwolf@redhat.com>
+	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
+	<87ftr5iy8i.fsf@dusky.pond.sub.org>
+	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
+	<20190329170439.GK5081@localhost.localdomain>
+	<87o95sa40r.fsf@dusky.pond.sub.org>
+	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
+	<20190401122054.GA2686@andariel.pipo.sk>
+	<87mul9n5ah.fsf@dusky.pond.sub.org>
+	<20190401160755.GB2686@andariel.pipo.sk>
+Date: Mon, 01 Apr 2019 18:22:45 +0200
+In-Reply-To: <20190401160755.GB2686@andariel.pipo.sk> (Peter Krempa's message
+	of "Mon, 1 Apr 2019 18:07:55 +0200")
+Message-ID: <87a7h9lmp6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190401160849.26083-1-aruna.15@cse.mrt.ac.lk>
-In-Reply-To: <20190401160849.26083-1-aruna.15@cse.mrt.ac.lk>
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Mon, 1 Apr 2019 21:43:36 +0530
-Message-ID: <CAH95U0gCsCE4zxHM3Lmim4jMi-pYHTPCkkOVKpCONyA5rG8_Uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] Header cleanups qemu_is* macros were
- moved from qemu-common.h to qemu/cutils.h
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Options for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +32,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-qemu_is* macros were moved from qemu-common.h to qemu/cutils.h
-This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
-* Description was combined with the subject of the email
+Peter Krempa <pkrempa@redhat.com> writes:
 
-On Mon, 1 Apr 2019 at 21:39, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
+> On Mon, Apr 01, 2019 at 16:55:50 +0200, Markus Armbruster wrote:
+>> Peter Krempa <pkrempa@redhat.com> writes:
+>> 
+>> > On Sun, Mar 31, 2019 at 14:56:19 +0200, Markus Armbruster wrote:
+>> >> Let's review our options for 4.0.
+>> >> 
+>> >> Please note my analysis is handicapped by incomplete information, in
+>> >> particular on libvirt's needs.
+>> >
+>> > Libvirt's needs are "simple" we need to do block-commit. It has a few
+>> > caveats though. The selinux labels for backing images don't allow write
+>> > operation when starting qemu. When doing block-commit libvirt relabels
+>> > the backing chain prior to using block-commit.
+>> 
+>> Paraphrasing, to make sure I got you.
+>> 
+>> Consider the common read/write COW image with a backing image.
+>> 
+>> Libvirt wants to grant QEMU read/write access to the COW and read-only
+>> access to the backing image.  It does that with SELinux.  QEMU has to
+>> open the backing image read-only (read/write would fail).
+>> 
+>> But libvirt also wants to do block-commit.  Libvirt first relabels to
+>> grant QEMU read/write access to the backing image, then $something makes
+>> QEMU reopen the backing image read/write, block-commit does its job,
+>> $something makes QEMU reopen the backing image read-only, libvirt
+>> relabels to revoke read/write access.
+>> 
+>> Correct?
+>
+> Yes.
 
-> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> ---
->  hw/core/qdev-properties.c |  1 +
->  include/qemu-common.h     | 11 -----------
->  include/qemu/cutils.h     | 12 ++++++++++++
->  qapi/qapi-util.c          |  2 +-
->  util/id.c                 |  2 +-
->  5 files changed, 15 insertions(+), 13 deletions(-)
->
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 5da1439a8b..821a4ab311 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -10,6 +10,7 @@
->  #include "qapi/visitor.h"
->  #include "chardev/char.h"
->  #include "qemu/uuid.h"
-> +#include "qemu/cutils.h"
->
->  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->                                    Error **errp)
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index a102245519..0066e45a6b 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -33,17 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
->  void qemu_get_timedate(struct tm *tm, int offset);
->  int qemu_timedate_diff(struct tm *tm);
->
-> -#define qemu_isalnum(c)                isalnum((unsigned char)(c))
-> -#define qemu_isalpha(c)                isalpha((unsigned char)(c))
-> -#define qemu_iscntrl(c)                iscntrl((unsigned char)(c))
-> -#define qemu_isdigit(c)                isdigit((unsigned char)(c))
-> -#define qemu_isgraph(c)                isgraph((unsigned char)(c))
-> -#define qemu_islower(c)                islower((unsigned char)(c))
-> -#define qemu_isprint(c)                isprint((unsigned char)(c))
-> -#define qemu_ispunct(c)                ispunct((unsigned char)(c))
-> -#define qemu_isspace(c)                isspace((unsigned char)(c))
-> -#define qemu_isupper(c)                isupper((unsigned char)(c))
-> -#define qemu_isxdigit(c)       isxdigit((unsigned char)(c))
->  #define qemu_tolower(c)                tolower((unsigned char)(c))
->  #define qemu_toupper(c)                toupper((unsigned char)(c))
->  #define qemu_isascii(c)                isascii((unsigned char)(c))
-> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> index d2dad3057c..797c5bc560 100644
-> --- a/include/qemu/cutils.h
-> +++ b/include/qemu/cutils.h
-> @@ -3,6 +3,18 @@
->
->  #include "qemu/fprintf-fn.h"
->
-> +#define qemu_isalnum(c)    isalnum((unsigned char)(c))
-> +#define qemu_isalpha(c)    isalpha((unsigned char)(c))
-> +#define qemu_iscntrl(c)    iscntrl((unsigned char)(c))
-> +#define qemu_isdigit(c)    isdigit((unsigned char)(c))
-> +#define qemu_isgraph(c)    isgraph((unsigned char)(c))
-> +#define qemu_islower(c)    islower((unsigned char)(c))
-> +#define qemu_isprint(c)    isprint((unsigned char)(c))
-> +#define qemu_ispunct(c)    ispunct((unsigned char)(c))
-> +#define qemu_isspace(c)    isspace((unsigned char)(c))
-> +#define qemu_isupper(c)    isupper((unsigned char)(c))
-> +#define qemu_isxdigit(c)    isxdigit((unsigned char)(c))
-> +
->  /**
->   * pstrcpy:
->   * @buf: buffer to copy string into
-> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-> index e9b266bb70..944347cc76 100644
-> --- a/qapi/qapi-util.c
-> +++ b/qapi/qapi-util.c
-> @@ -12,7 +12,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "qemu-common.h"
-> +#include "qemu/cutils.h"
->
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
->  {
-> diff --git a/util/id.c b/util/id.c
-> index 3f8e13bd6f..a1faff1f9e 100644
-> --- a/util/id.c
-> +++ b/util/id.c
-> @@ -12,7 +12,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu/id.h"
-> -#include "qemu-common.h"
-> +#include "qemu/cutils.h"
->
->  bool id_wellformed(const char *id)
->  {
-> --
-> 2.17.1
->
->
+Thank you.
 
---=20
-*Aruna* Jayasena
-Embedded Systems and Computer Science Engineering Undergraduate
-University of Moratuwa
-*=E2=9C=86 **+94719872152 *
-=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-<https://www.linkedin.com/in/arunajayasena/>
+>> With dynamic read-only, $something is the block commit job (a writer)
+>> attaching and detaching to the backing image node.
+>> 
+>> > That works with -drive as qemu reopens the files internally, but does
+>> > not work when using -blockdev.
+>> 
+>> Happy to take your word for it.
+>> 
+>> > Since we need to keep the images RO until doing  the blockjob there
+>> > needs to be a way when either qemu automagically does what libvirt needs
+>> > even if the image did not have the write permission originally.
+>> >
+>> > auto-read-only was a naive impl when qemu attempted to keep the storage
+>> > access nodes RW. At the point when I was testing it I didn't enable
+>> > s-virt as it's a hassle when you want to run git versions of libvirt and
+>> > qemu and thus didn't see the problem with missing permissions.
+>> 
+>> Yes, fallback read-only is useless for the scenario above.
+>> 
+>> Kevin wrote "libvirt requires dynamic read-only for file-posix. It
+>> prefers dynamic read-only for other drivers, but can live with fallback
+>> read-only there."  I'm not sure how it can live with fallback read-only.
+>> Is it because only *files* can labelled with SELinux?
+>> 
+>> If yes, then my next question is how libvirt makes use of fallback
+>> read-only for non-files.  Can you give me an example?
+>
+> For non-files libvirt usually does not have means to modify the access
+> permissions.
+>
+> A simple example may be a NBD export. If the NBD server exports the
+> image readonly libvirt can't do much about it. Arguably you can consider
+> a situation where the user modifies the access to read-write manually
+> and then invokes the libvirt virDomainBlockCommit API and thus still
+> expects the automagic reopen to happen correctly. At this point I'm not
+> really certain to which extend this would work currently with -drive as
+> there are known issues when attempting to point to a non-file image by
+> path rather than node-name.
+
+Both automagic reopen and explicit reopen work here.  Both succeed when
+the user has granted access manually.  Libvirt would have to try the
+explicit reopen even in cases where it can't grant access itself.
+
+Sounds like you don't have a use case for fallback read-only.  Correct?
+
+>> > The dynamic version attempts to fix that. That is still the automagic
+>> > approach. I don't really mind also doing a hands-on approach where we'd
+>> > need to tell qemu to reopen given nodes.
+>> 
+>> Aha!  You just corrected my overly narrow idea of the solution space.
+>> 
+>> > I'm not sure what ends up being less work.
+>> 
+>> "Less work" is an important consideration.
+>> 
+>> We may be able to accept some extra work to get a saner interface.
+>> Depends on how much saner and how much extra exactly, and on who needs
+>> to do the work.
+>
+> I agree. While the 'explicit reopen' approach may be more work for
+> libvirt I'll happily accept that solution.
+
+Would x-blockdev-reopen do?
+
+What exactly is hold it in x-space?
+
+I guess a specialized blockdev-set-read-only would do as well.
+
+>> >> Terminology:
+>> >> 
+>> >> * "Hard read-write" semantics: open read/write.
+>> >> 
+>> >> * "Hard read-only" semantics: open read-only.
+>> >> 
+>> >> * "Dynamic read-only" semantics: open read-only, reopen read/write when
+>> >>   a writer attaches, reopen read-only when the last writer detaches.
+>
+> [...]
+>
+>> >> * When libvirt sees a driver providing a dynamic-read-only parameter, it
+>> >>   knows it can rely on the driver providing dynamic read-only semantics.
+>> >> 
+>> >> * Adding dynamic read-only capability to drivers creates no
+>> >>   introspection problems: we simply add dynamic-read-only to their
+>> >>   parameters.
+>> >
+>> > In the end libvirt does not care that much if the storage is open read
+>> > only or read write. We need the format node or guest frontend to deny
+>> > writes if the disk is declared as read-only. We also need to be able to
+>> > do blockjobs. The requirement is that images may not be accessible in
+>> > R/W mode when qemu is starting but later may become. Then it's expected
+>> > that block-commit will succeed.
+>> 
+>> Fallback read-only can't help there.
+>> 
+>> Dynamic read-only should work.  Explicit reopen triggers could also
+>> work.
+>
+> The explicit trigger would work. With the tighter control of blockjobs
+> we should be able to control the lifecycle properly.
+
+Good to know, thanks!
