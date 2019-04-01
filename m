@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45283)
+Received: from eggs.gnu.org ([209.51.188.92]:45623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1hAxb0-0000El-JF
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:07:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hAxcQ-0001dK-5K
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1hAxaz-0003x4-Kb
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:07:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45740
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1hAxaz-0003wk-FV
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:07:29 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31E1HZ8107799
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 10:07:29 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkku59hhp-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 10:07:28 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Mon, 1 Apr 2019 15:07:22 +0100
-Date: Mon, 1 Apr 2019 16:07:09 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20190329111104.17223-12-berrange@redhat.com>
-References: <20190329111104.17223-1-berrange@redhat.com>
-	<20190329111104.17223-12-berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1hAxcO-0004Ze-Ly
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:08:58 -0400
+Date: Mon, 1 Apr 2019 16:08:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190401140842.GD4935@localhost.localdomain>
+References: <20190328182810.21497-1-kwolf@redhat.com>
+	<20190328182810.21497-2-kwolf@redhat.com>
+	<2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
+	<87ftr5iy8i.fsf@dusky.pond.sub.org>
+	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
+	<20190329170439.GK5081@localhost.localdomain>
+	<87o95sa40r.fsf@dusky.pond.sub.org>
+	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
+	<20190401115410.GB4935@localhost.localdomain>
+	<87k1gdyinr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20190401160709.03cddb89@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
- members in packed structs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k1gdyinr.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Options for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,49 +31,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>, qemu-s390x@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: pkrempa@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, qemu-devel@nongnu.org
 
-On Fri, 29 Mar 2019 11:11:01 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+Am 01.04.2019 um 15:11 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> > Option 4:
+> >
+> > Add a dummy option to BlockdevOptionsFile:
+> >
+> >     '*x-auto-read-only-is-dynamic': { 'type': 'null',
+> >                                       'if': 'defined(CONFIG_POSIX)' }
+> >
+> > Specifying it has no effect, so the ridiculous complexity of three bools
+> > to select from three options is avoided. Its presence in the schema
+> > indicates that file-posix implements dynamic auto-read-only.
+> >
+> > Basically this is features flags in the schema without having proper
+> > feature flags yet.
+> >
+> > Once we add real annotations (hopefully 4.1), this dummy field can be
+> > removed again.
+> 
+> Exact same patch as for option 3, with the parameter renamed and the
+> sanity check for non-sensical use dropped.  *Shrug*
+> 
+> Puts more pressure on me to deliver QAPI feature flags sooner rather
+> than later.  My QAPI pressure control valve has been shedding pressure
+> for a while, so "bring it on".  I'd advise against holding your breath,
+> though.
 
-> The GCC 9 compiler complains about many places in s390 code
-> that take the address of members of the 'struct SCHIB' which
-> is marked packed:
->=20
-> hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=80=99:
-> hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=80=
-=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> [-Waddress-of-packed-member]
->   133 |     SCSW *s =3D &sch->curr_status.scsw;
->       |               ^~~~~~~~~~~~~~~~~~~~~~
-> hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=80=
-=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> [-Waddress-of-packed-member]
->   134 |     PMCW *p =3D &sch->curr_status.pmcw;
->       |               ^~~~~~~~~~~~~~~~~~~~~~
->=20
-> ...snip many more...
->=20
-> Almost all of these are just done for convenience to avoid
-> typing out long variable/field names when referencing struct
-> members. We can get most of this convenience by taking the
-> address of the 'struct SCHIB' instead, avoiding triggering
-> the compiler warnings.
->=20
-> In a couple of places we copy via a local variable which is
-> a technique already applied elsewhere in s390 code for this
-> problem.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Okay, let's stop beating around the bush.
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Nobody has told me so explicitly during this discussion, but implicitly
+I understand that everyone seems to think doing annotations in the
+schema is what we really want to have.
 
-BTW the reason for SCHIB being packed is the padding that
-would emerge at the end of the struct (sizeof(SCHIB) =3D=3D 52
-and non-packed sizeof(SCHIB) =3D=3D 54). So getting rid of packed
-seems to be viable as long as we write guest memory
-with the correct size (52 bytes).
+Instead of continuing to argue which option to get around it is the
+least ugly one - how bad is the following attempt at just implementing
+what we really want?
 
-Regards,
-Halil=20
+Only for structs for now, but that's all we need at the moment. Should
+be easy to extend during the 4.1 cycle (or whenever we need something
+else).
+
+Note that even if there are bugs in it, they are not user-visible and
+can just be fixed in 4.1. Currently, a diff between old and new
+query-qmp-schema output looks sane - just the added 'features' list
+where we want it.
+
+Kevin
+
+
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ccbfff9d0..d74bf4a88a 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2852,7 +2852,8 @@
+             '*aio': 'BlockdevAioOptions',
+ 	    '*drop-cache': {'type': 'bool',
+ 	                    'if': 'defined(CONFIG_LINUX)'},
+-            '*x-check-cache-dropped': 'bool' } }
++            '*x-check-cache-dropped': 'bool' },
++  'features': [ 'dynamic-auto-read-only' ] }
+ 
+ ##
+ # @BlockdevOptionsNull:
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index f07869ec73..668ebb654a 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -886,12 +886,22 @@ def check_enum(expr, info):
+ def check_struct(expr, info):
+     name = expr['struct']
+     members = expr['data']
++    features = expr.get('features')
+ 
+     check_type(info, "'data' for struct '%s'" % name, members,
+                allow_dict=True, allow_optional=True)
+     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
+                allow_metas=['struct'])
+ 
++    if features:
++        if not isinstance(features, list):
++            raise QAPISemError(info,
++                               "Struct '%s' requires an array for 'features'" %
++                               name)
++        for s in features:
++            if not isinstance(s, str):
++                raise QAPISemError(info, "'features' for struct '%s' must "
++                                         "contain strings" % name)
+ 
+ def check_known_keys(info, source, keys, required, optional):
+ 
+@@ -986,7 +996,7 @@ def check_exprs(exprs):
+             normalize_members(expr['data'])
+         elif 'struct' in expr:
+             meta = 'struct'
+-            check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
++            check_keys(expr_elem, 'struct', ['data'], ['base', 'if', 'features'])
+             normalize_members(expr['data'])
+             struct_types[expr[meta]] = expr
+         elif 'command' in expr:
+@@ -1129,7 +1139,8 @@ class QAPISchemaVisitor(object):
+     def visit_object_type(self, name, info, ifcond, base, members, variants):
+         pass
+ 
+-    def visit_object_type_flat(self, name, info, ifcond, members, variants):
++    def visit_object_type_flat(self, name, info, ifcond, members, variants,
++                               features):
+         pass
+ 
+     def visit_alternate_type(self, name, info, ifcond, variants):
+@@ -1290,7 +1301,7 @@ class QAPISchemaArrayType(QAPISchemaType):
+ 
+ class QAPISchemaObjectType(QAPISchemaType):
+     def __init__(self, name, info, doc, ifcond,
+-                 base, local_members, variants):
++                 base, local_members, variants, features):
+         # struct has local_members, optional base, and no variants
+         # flat union has base, variants, and no local_members
+         # simple union has local_members, variants, and no base
+@@ -1307,6 +1318,7 @@ class QAPISchemaObjectType(QAPISchemaType):
+         self.local_members = local_members
+         self.variants = variants
+         self.members = None
++        self.features = features
+ 
+     def check(self, schema):
+         QAPISchemaType.check(self, schema)
+@@ -1370,7 +1382,8 @@ class QAPISchemaObjectType(QAPISchemaType):
+         visitor.visit_object_type(self.name, self.info, self.ifcond,
+                                   self.base, self.local_members, self.variants)
+         visitor.visit_object_type_flat(self.name, self.info, self.ifcond,
+-                                       self.members, self.variants)
++                                       self.members, self.variants,
++                                       self.features)
+ 
+ 
+ class QAPISchemaMember(object):
+@@ -1675,7 +1688,7 @@ class QAPISchema(object):
+                   ('null',   'null',    'QNull' + pointer_suffix)]:
+             self._def_builtin_type(*t)
+         self.the_empty_object_type = QAPISchemaObjectType(
+-            'q_empty', None, None, None, None, [], None)
++            'q_empty', None, None, None, None, [], None, [])
+         self._def_entity(self.the_empty_object_type)
+ 
+         qtypes = ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist',
+@@ -1721,7 +1734,7 @@ class QAPISchema(object):
+             assert ifcond == typ._ifcond # pylint: disable=protected-access
+         else:
+             self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond,
+-                                                  None, members, None))
++                                                  None, members, None, []))
+         return name
+ 
+     def _def_enum_type(self, expr, info, doc):
+@@ -1752,9 +1765,10 @@ class QAPISchema(object):
+         base = expr.get('base')
+         data = expr['data']
+         ifcond = expr.get('if')
++        features = expr.get('features')
+         self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond, base,
+                                               self._make_members(data, info),
+-                                              None))
++                                              None, features))
+ 
+     def _make_variant(self, case, typ, ifcond):
+         return QAPISchemaObjectTypeVariant(case, typ, ifcond)
+@@ -1795,7 +1809,7 @@ class QAPISchema(object):
+             QAPISchemaObjectType(name, info, doc, ifcond, base, members,
+                                  QAPISchemaObjectTypeVariants(tag_name,
+                                                               tag_member,
+-                                                              variants)))
++                                                              variants), []))
+ 
+     def _def_alternate_type(self, expr, info, doc):
+         name = expr['alternate']
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index f7f2ca07e4..f93a31aaa8 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -188,11 +188,15 @@ const QLitObject %(c_name)s = %(c_string)s;
+         self._gen_qlit('[' + element + ']', 'array', {'element-type': element},
+                        ifcond)
+ 
+-    def visit_object_type_flat(self, name, info, ifcond, members, variants):
++    def visit_object_type_flat(self, name, info, ifcond, members, variants,
++                               features):
+         obj = {'members': [self._gen_member(m) for m in members]}
+         if variants:
+             obj.update(self._gen_variants(variants.tag_member.name,
+                                           variants.variants))
++        if features:
++            obj['features'] = features
++
+         self._gen_qlit(name, 'object', obj, ifcond)
+ 
+     def visit_alternate_type(self, name, info, ifcond, variants):
