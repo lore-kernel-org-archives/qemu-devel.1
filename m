@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43465)
+Received: from eggs.gnu.org ([209.51.188.92]:58778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hB56c-0006Wg-L7
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:08:39 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hB5Sv-0004fu-Hw
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hB56Z-0007qC-0w
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:08:36 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:40844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hB56P-0007cz-Jc
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:08:28 -0400
-Received: by mail-it1-x142.google.com with SMTP id k64so1823381itb.5
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 15:08:21 -0700 (PDT)
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Date: Mon,  1 Apr 2019 18:07:52 -0400
-Message-Id: <20190401220752.22577-1-stephen.checkoway@oberlin.edu>
+	(envelope-from <no-reply@patchew.org>) id 1hB5St-0002GA-Q6
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 18:31:41 -0400
+Resent-Message-Id: <E1hB5St-0002GA-Q6@eggs.gnu.org>
+Message-ID: <155415785652.12882.6768623089892460575@76452e4e88f2>
+In-Reply-To: <20190401214847.27600-1-walling@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] capstone: Support capstone/capstone.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 1 Apr 2019 15:30:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3] s390: diagnose 318 info reset and
+ migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+To: walling@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com
 
-Starting with version 4 of capstone, the header files live in the
-`$prefix/include/capstone` directory.
-
-This modifies the configure script to check for <capstone/capstone.h> if
-<capstone.h> cannot be found.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
----
- configure                | 9 +++++++++
- include/disas/capstone.h | 4 ++++
- 2 files changed, 13 insertions(+)
-
-diff --git a/configure b/configure
-index 1c563a7027..da87c18f14 100755
---- a/configure
-+++ b/configure
-@@ -5039,6 +5039,12 @@ case "$capstone" in
-     ;;
- esac
- 
-+if test "$capstone" != no; then
-+  if ! check_include "capstone.h" && check_include "capstone/capstone.h"; then
-+    have_capstone_capstone_h=yes
-+  fi
-+fi
-+
- ##########################################
- # check if we have fdatasync
- 
-@@ -7199,6 +7205,9 @@ if test "$ivshmem" = "yes" ; then
- fi
- if test "$capstone" != "no" ; then
-   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
-+  if test "$have_capstone_capstone_h" = "yes" ; then
-+    echo "HAVE_CAPSTONE_CAPSTONE_H=y" >> $config_host_mak
-+  fi
- fi
- if test "$debug_mutex" = "yes" ; then
-   echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
-diff --git a/include/disas/capstone.h b/include/disas/capstone.h
-index 84e214956d..e1477bf6a2 100644
---- a/include/disas/capstone.h
-+++ b/include/disas/capstone.h
-@@ -3,7 +3,11 @@
- 
- #ifdef CONFIG_CAPSTONE
- 
-+#ifdef HAVE_CAPSTONE_CAPSTONE_H
-+#include <capstone/capstone.h>
-+#else
- #include <capstone.h>
-+#endif
- 
- #else
- 
--- 
-2.20.1 (Apple Git-117)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMTIxNDg0Ny4yNzYw
+MC0xLXdhbGxpbmdAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDEyMTQ4NDcuMjc2MDAtMS13YWxsaW5n
+QGxpbnV4LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2M10gczM5MDogZGlh
+Z25vc2UgMzE4IGluZm8gcmVzZXQgYW5kIG1pZ3JhdGlvbiBzdXBwb3J0ClR5cGU6IHNlcmllcwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2Ug
+PiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5
+MDQwMTIxNDg0Ny4yNzYwMC0xLXdhbGxpbmdAbGludXguaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTkw
+NDAxMjE0ODQ3LjI3NjAwLTEtd2FsbGluZ0BsaW51eC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKM2QzZmUxMWE5OSBzMzkwOiBkaWFnbm9zZSAzMTggaW5mbyByZXNldCBh
+bmQgbWlncmF0aW9uIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBpbml0aWFs
+aXplciBmb3Igc3RydWN0IFZNU3RhdGVEZXNjcmlwdGlvbiBzaG91bGQgbm9ybWFsbHkgYmUgY29u
+c3QKIzE0MzogRklMRTogdGFyZ2V0L3MzOTB4L2RpYWcuYzoxNzM6CitWTVN0YXRlRGVzY3JpcHRp
+b24gdm1zdGF0ZV9kaWFnMzE4ID0gewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDMg
+bGluZXMgY2hlY2tlZAoKQ29tbWl0IDNkM2ZlMTFhOTllNyAoczM5MDogZGlhZ25vc2UgMzE4IGlu
+Zm8gcmVzZXQgYW5kIG1pZ3JhdGlvbiBzdXBwb3J0KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
+MDQwMTIxNDg0Ny4yNzYwMC0xLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0
+Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
