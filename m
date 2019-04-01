@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46814)
+Received: from eggs.gnu.org ([209.51.188.92]:46828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hAxgO-00064l-TI
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:13:05 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hAxgQ-00066p-34
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hAxgJ-0006wD-LR
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:13:04 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hAxgO-0006xH-TI
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 10:13:05 -0400
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Mon,  1 Apr 2019 16:12:20 +0200
-Message-Id: <20190401141222.30034-4-lvivier@redhat.com>
+Date: Mon,  1 Apr 2019 16:12:21 +0200
+Message-Id: <20190401141222.30034-5-lvivier@redhat.com>
 In-Reply-To: <20190401141222.30034-1-lvivier@redhat.com>
 References: <20190401141222.30034-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/5] configure: qemu-ga is only needed with
+Subject: [Qemu-devel] [PATCH v3 4/5] build: chardev is only needed for
  softmmu targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,33 +25,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-Remove it from the list of tools if --disable-system
-and --disable-tools are used as we don't need it for
-linux-user targets.
+Move the dependency from SUBDIR_RULES to SOFTMMU_SUBDIR_RULES
 
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-[lv: I also disable it with disable-tools, not only with disable-system]
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- configure | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Makefile      | 3 ++-
+ Makefile.objs | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 1c563a70276a..b627efede6cf 100755
---- a/configure
-+++ b/configure
-@@ -6083,7 +6083,9 @@ fi
- # Probe for guest agent support/options
+diff --git a/Makefile b/Makefile
+index 10ae5e31fc0a..d2de0b6e56cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -440,6 +440,7 @@ SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_RU=
+LES))
 =20
- if [ "$guest_agent" !=3D "no" ]; then
--  if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" -o=
- "$mingw32" =3D "yes" ] ; then
-+  if [ "$softmmu" =3D no -a "$want_tools" =3D no ] ; then
-+      guest_agent=3Dno
-+  elif [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" =
--o "$mingw32" =3D "yes" ] ; then
-       tools=3D"qemu-ga $tools"
-       guest_agent=3Dyes
-   elif [ "$guest_agent" !=3D yes ]; then
+ $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
++$(SOFTMMU_SUBDIR_RULES): $(chardev-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+@@ -475,7 +476,7 @@ subdir-capstone: .git-submodule-status
+ subdir-slirp: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUILD_=
+DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)" C=
+FLAGS=3D"$(QEMU_CFLAGS)")
+=20
+-$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
++$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
+ 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+=20
+ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+diff --git a/Makefile.objs b/Makefile.objs
+index dda5bbc9101f..43c9e4503297 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -129,9 +129,9 @@ trace-events-subdirs +=3D accel/kvm
+ trace-events-subdirs +=3D accel/tcg
+ trace-events-subdirs +=3D authz
+ trace-events-subdirs +=3D block
+-trace-events-subdirs +=3D chardev
+ trace-events-subdirs +=3D crypto
+ ifeq ($(CONFIG_SOFTMMU),y)
++trace-events-subdirs +=3D chardev
+ trace-events-subdirs +=3D audio
+ trace-events-subdirs +=3D hw/9pfs
+ trace-events-subdirs +=3D hw/acpi
 --=20
 2.20.1
