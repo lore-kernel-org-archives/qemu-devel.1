@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41561)
+Received: from eggs.gnu.org ([209.51.188.92]:41642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45I-00025a-Gu
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:15 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45M-000285-JH
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45H-0003t6-Go
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52052)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB45L-0003vl-Hp
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB45H-0003ly-22
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:11 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1hB45L-0003oY-6m
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:03:15 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L1piC062060
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:02:59 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rksw4s319-1
+	x31KrcmM128186
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:03 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkq85hrfh-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:02:59 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:00 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:02:58 +0100
+	Mon, 1 Apr 2019 22:02:04 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 15:59:52 -0500
+Date: Mon,  1 Apr 2019 15:59:09 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-79-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 78/97] hw/s390x: Fix bad mask in time2tod()
+Message-Id: <20190401210011.16009-36-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 35/97] block: Fix use after free error in
+ bdrv_open_inherit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +39,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-stable@nongnu.org, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Since "s390x/tcg: avoid overflows in time2tod/tod2time", the
-time2tod() function tries to deal with the 9 uppermost bits in the
-time value, but uses the wrong mask for this: 0xff80000000000000 should
-be used instead of 0xff10000000000000 here.
+When a block device is opened with BDRV_O_SNAPSHOT and the
+bdrv_append_temp_snapshot() call fails then the error code path tries
+to unref the already destroyed 'options' QDict.
 
-Fixes: 14055ce53c2d901d826ffad7fb7d6bb8ab46bdfd
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1544792887-14575-1-git-send-email-thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-[CH: tweaked commit message]
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-(cherry picked from commit aba7a5a2de3dba5917024df25441f715b9249e31)
+This can be reproduced easily by setting TMPDIR to a location where
+the QEMU process can't write:
+
+   $ TMPDIR=/nonexistent $QEMU -drive driver=null-co,snapshot=on
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 8961be33e8ca7e809c603223803ea66ef7ea5be7)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/hw/s390x/tod.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
-index 413c0d7c02..442f45b2f5 100644
---- a/include/hw/s390x/tod.h
-+++ b/include/hw/s390x/tod.h
-@@ -50,7 +50,7 @@ typedef struct S390TODClass {
- /* Converts ns to s390's clock format */
- static inline uint64_t time2tod(uint64_t ns)
- {
--    return (ns << 9) / 125 + (((ns & 0xff10000000000000ull) / 125) << 9);
-+    return (ns << 9) / 125 + (((ns & 0xff80000000000000ull) / 125) << 9);
- }
+diff --git a/block.c b/block.c
+index 39f373e035..a7f6a13a74 100644
+--- a/block.c
++++ b/block.c
+@@ -2787,6 +2787,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     bdrv_parent_cb_change_media(bs, true);
  
- /* Converts s390's clock format to ns */
+     qobject_unref(options);
++    options = NULL;
+ 
+     /* For snapshot=on, create a temporary qcow2 overlay. bs points to the
+      * temporary snapshot afterwards. */
 -- 
 2.17.1
