@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49694)
+Received: from eggs.gnu.org ([209.51.188.92]:50089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hAvoz-0003FW-2j
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:13:49 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hAvrS-0004Lk-B5
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hAvoy-0003E2-1Q
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:13:49 -0400
-References: <20190401102911.8685-1-richard.henderson@linaro.org>
-	<20190401102911.8685-2-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <643efe1a-e6a5-a882-8469-47001d879591@redhat.com>
-Date: Mon, 1 Apr 2019 14:13:42 +0200
+	(envelope-from <imammedo@redhat.com>) id 1hAvrR-0004fJ-8t
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:16:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hAvrQ-0004eG-VD
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:16:21 -0400
+Date: Mon, 1 Apr 2019 14:16:14 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190401141614.45d31d9e@redhat.com>
+In-Reply-To: <f9dd683b32136bd4f5d5705b1ce6b7e3b421eccb.camel@intel.com>
+References: <f9dd683b32136bd4f5d5705b1ce6b7e3b421eccb.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190401102911.8685-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 1/6] target/s390x: Truncate 32-bit
- psw_addr before creating TB
+Subject: Re: [Qemu-devel] Thoughts about introducing virtio-cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, qemu-s390x@nongnu.org
+To: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Ortiz, Samuel" <samuel.ortiz@intel.com>, "Castelino, Manohar R" <manohar.r.castelino@intel.com>
 
-On 01.04.19 12:29, Richard Henderson wrote:
-> If, somehow, the psw_addr is out of range, truncate early
-> rather than after we get into gen_intermediate_code.
+On Wed, 27 Mar 2019 14:45:09 +0000
+"Boeuf, Sebastien" <sebastien.boeuf@intel.com> wrote:
+
+> Hi everyone,
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/cpu.h       | 26 +++++++++++++++++++-------
->  target/s390x/translate.c |  6 ------
->  2 files changed, 19 insertions(+), 13 deletions(-)
+> I have recently learned about the on-going work from David Hildenbrand
+> about virtio-mem, with a strong focus on proposing a unified solution
+> for every architecture, which is the point of using paravirtualization
+> here.
+> This proposes a standardized way across different hypervisors to manage
+> the guest RAM available, which at the same time will allow for a clean
+> memory hot(un)plug support.
+It was born mainly as the result of inability to deliver fine granularity
+memory hotplug for guests that support memory hotplug with current kernel-mm
+subsystem implementation. Ability to use virtio-mem on architectures that
+do not have platform specific means to do hotplug is very useful but was
+a nice side-effect.
+
+It's still remains to see how much it will be able to deliver.
+(I'm more interested in lessons it it will teach us in process).
+
+> Based on this, I was thinking that once this will be ready, and
+> assuming you manage your devices through a PCI bus, the last bit to get
+> rid of ACPI dependency would be about CPU. We could standardize the way
+> vCPUs are created and managed by each hypervisors by introducing
+> virtio-cpu. And the same way I mentioned architecture agnostic and
+> clean hotplug for virtio-mem, I would expect this new virtio device to
+> target the same goals.
 > 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index cb6d77053a..6ccf41fc45 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -368,18 +368,30 @@ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
->      }
->  }
->  
-> -static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
-> -                                        target_ulong *cs_base, uint32_t *flags)
-> +static inline void cpu_get_tb_cpu_state(CPUS390XState* env,
-> +                                        target_ulong *p_pc,
-> +                                        target_ulong *cs_base,
-> +                                        uint32_t *p_flags)
->  {
-> -    *pc = env->psw.addr;
-> -    *cs_base = env->ex_value;
-> -    *flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
-> +    uint32_t flags;
-> +    uint64_t pc;
-> +
-> +    flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
->      if (env->cregs[0] & CR0_AFP) {
-> -        *flags |= FLAG_MASK_AFP;
-> +        flags |= FLAG_MASK_AFP;
->      }
->      if (env->cregs[0] & CR0_VECTOR) {
-> -        *flags |= FLAG_MASK_VECTOR;
-> +        flags |= FLAG_MASK_VECTOR;
->      }
-> +
-> +    pc = env->psw.addr;
-> +    if (!(flags & FLAG_MASK_64)) {
-> +        pc &= 0x7fffffff;
-> +    }
-> +
-> +    *p_pc = pc;
-> +    *cs_base = env->ex_value;
-> +    *p_flags = flags;
->  }
->  
->  /* PER bits from control register 9 */
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 0afa8f7ca5..d22d0f7643 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -6442,12 +6442,6 @@ static void s390x_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->  {
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->  
-> -    /* 31-bit mode */
-> -    if (!(dc->base.tb->flags & FLAG_MASK_64)) {
-> -        dc->base.pc_first &= 0x7fffffff;
-> -        dc->base.pc_next = dc->base.pc_first;
-> -    }
-> -
->      dc->cc_op = CC_OP_DYNAMIC;
->      dc->ex_value = dc->base.tb->cs_base;
->      dc->do_debug = dc->base.singlestep_enabled;
-> 
+> The end goal is to propose an approach where hypervisors could be
+> unified across architectures, which would be convenient to support CPU
+> hotplug features, without being forced to use ACPI only for this
+> purpose.
+Current cpu hotplug (ACPI one) in QEMU is combination of both static
+part describing what CPUs are possible on given instance and dynamic
+that notifies when and which CPUs are present. Hardware impl. is
+hidden behind ACPI so guest OS doesn't know about details and QEMU
+is free to change interface when it's necessary without need for
+matching guest OS update.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+So what is the purpose of getting rid of ACPI and what you'd
+gain from it?
+What alternatives do you have in mind to describe hardware?
 
--- 
-
-Thanks,
-
-David / dhildenb
+> I am really looking for community's feedback here, as I would like to
+> understand if there are some technical reasons why this approach would
+> not be feasible/acceptable. Also, please let me know if there is
+> already some on-going work, I'd be happy to participate!
+>
+> Thanks,
+> Sebastien
