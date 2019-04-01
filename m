@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42040)
+Received: from eggs.gnu.org ([209.51.188.92]:42109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46A-0002oD-FX
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:07 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46E-0002rb-2K
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB468-0004Mj-Fw
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52074
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hB46C-0004Pu-Rs
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52606
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hB464-0004GW-I2
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:02 -0400
+	id 1hB46C-0004Il-HY
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 17:04:08 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x31L3sVl062213
-	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:54 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsyp4-1
+	x31L3sR5062192
+	for <qemu-devel@nongnu.org>; Mon, 1 Apr 2019 17:03:57 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rkskgsy1s-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:52 -0400
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:03:51 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 1 Apr 2019 22:03:08 +0100
+	Mon, 1 Apr 2019 22:02:29 +0100
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  1 Apr 2019 16:00:01 -0500
+Date: Mon,  1 Apr 2019 15:59:25 -0500
 In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
 References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20190401210011.16009-88-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 87/97] block: Fix invalidate_cache error path
- for parent activation
+Message-Id: <20190401210011.16009-52-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 51/97] block-backend: Set werror/rerror
+ defaults in blk_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,55 +44,56 @@ Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 From: Kevin Wolf <kwolf@redhat.com>
 
-bdrv_co_invalidate_cache() clears the BDRV_O_INACTIVE flag before
-actually activating a node so that the correct permissions etc. are
-taken. In case of errors, the flag must be restored so that the next
-call to bdrv_co_invalidate_cache() retries activation.
+Currently, the default values for werror and rerror have to be set
+explicitly with blk_set_on_error() by the callers of blk_new(). The only
+caller actually doing this is blockdev_init(), which is called for
+BlockBackends created using -drive.
 
-Restoring the flag was missing in the error path for a failed
-parent->role->activate() call. The consequence is that this attempt to
-activate all images correctly fails because we still set errp, however
-on the next attempt BDRV_O_INACTIVE is already clear, so we return
-success without actually retrying the failed action.
+In particular, anonymous BlockBackends created with
+-device ...,drive=<node-name> didn't get the correct default set and
+instead defaulted to the integer value 0 (= BLOCKDEV_ON_ERROR_REPORT).
+This is the intended default for rerror anyway, but the default for
+werror should be BLOCKDEV_ON_ERROR_ENOSPC.
 
-An example where this is observable in practice is migration to a QEMU
-instance that has a raw format block node attached to a guest device
-with share-rw=off (the default) while another process holds
-BLK_PERM_WRITE for the same image. In this case, all activation steps
-before parent->role->activate() succeed because raw can tolerate other
-writers to the image. Only the parent callback (in particular
-blk_root_activate()) tries to implement the share-rw=on property and
-requests exclusive write permissions. This fails when the migration
-completes and correctly displays an error. However, a manual 'cont' will
-incorrectly resume the VM without calling blk_root_activate() again.
-
-This case is described in more detail in the following bug report:
-https://bugzilla.redhat.com/show_bug.cgi?id=1531888
-
-Fix this by correctly restoring the BDRV_O_INACTIVE flag in the error
-path.
+Set the defaults in blk_new() instead so that they apply no matter what
+way the BlockBackend was created.
 
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Tested-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-(cherry picked from commit 78fc3b3a26c145eebcdee992988644974b243a74)
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+(cherry picked from commit cb53460b708db3617ab73248374d071d5552c263)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/block-backend.c      | 3 +++
+ tests/qemu-iotests/067.out | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/block.c b/block.c
-index a7f6a13a74..50b9bd695d 100644
---- a/block.c
-+++ b/block.c
-@@ -4395,6 +4395,7 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
-         if (parent->role->activate) {
-             parent->role->activate(parent, &local_err);
-             if (local_err) {
-+                bs->open_flags |= BDRV_O_INACTIVE;
-                 error_propagate(errp, local_err);
-                 return;
-             }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index f2f75a977d..1b27a68ae7 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -324,6 +324,9 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
+     blk->shared_perm = shared_perm;
+     blk_set_enable_write_cache(blk, true);
+ 
++    blk->on_read_error = BLOCKDEV_ON_ERROR_REPORT;
++    blk->on_write_error = BLOCKDEV_ON_ERROR_ENOSPC;
++
+     block_acct_init(&blk->stats);
+ 
+     notifier_list_init(&blk->remove_bs_notifiers);
+diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
+index 2e71cff3ce..b10c71db03 100644
+--- a/tests/qemu-iotests/067.out
++++ b/tests/qemu-iotests/067.out
+@@ -385,6 +385,7 @@ Testing: -device virtio-scsi -device scsi-cd,id=cd0
+ {
+     "return": [
+         {
++            "io-status": "ok",
+             "device": "",
+             "locked": false,
+             "removable": true,
 -- 
 2.17.1
