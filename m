@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48083)
+Received: from eggs.gnu.org ([209.51.188.92]:48079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhd-0007Oo-2i
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhd-0007On-1Y
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhc-0006j1-4c
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hAvhc-0006ip-29
 	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 08:06:13 -0400
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon,  1 Apr 2019 15:06:04 +0300
-Message-Id: <1554120365-39119-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] block/stream: refactor stream_run: drop
- goto
+Date: Mon,  1 Apr 2019 15:06:02 +0300
+Message-Id: <1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] block/stream: get rid of the base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +20,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: stefanha@redhat.com, fam@euphon.net, jsnow@redhat.com, armbru@redhat.com, berto@igalia.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This series introduces a bottom intermediate node that eliminates the
+dependency on the base that may change while stream job is running.
+It happens when stream/commit parallel jobs are running on the same
+backing chain. The base node of the stream job may be a top node of
+the parallel commit job and can change before the stream job is
+completed. We avoid that dependency by introducing the bottom node.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block/stream.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+v2:
+The function bdrv_find_overlay() with the same functionality has been
+used in the qmp_block_stream() to find a bottom node.
+The algorithm in the bdrv_do_is_allocated_above() was simplified.
+The commit messages were modified.
 
-diff --git a/block/stream.c b/block/stream.c
-index 6253c86..c065e99 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -122,13 +122,12 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-     void *buf;
- 
-     if (!bs->backing) {
--        goto out;
-+        return 0;
-     }
- 
-     len = bdrv_getlength(bs);
-     if (len < 0) {
--        ret = len;
--        goto out;
-+        return len;
-     }
-     job_progress_set_remaining(&s->common.job, len);
- 
-@@ -205,14 +204,10 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         bdrv_disable_copy_on_read(bs);
-     }
- 
--    /* Do not remove the backing file if an error was there but ignored.  */
--    ret = error;
--
-     qemu_vfree(buf);
- 
--out:
--    /* Modify backing chain and close BDSes in main loop */
--    return ret;
-+    /* Do not remove the backing file if an error was there but ignored. */
-+    return error;
- }
- 
- static const BlockJobDriver stream_job_driver = {
+Discussed in the e-mail threads with the message IDs
+<1553866154-257311-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+<1550762799-830661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+
+Andrey Shinkevich (2):
+  block: include base when checking image chain for block allocation
+  block/stream: introduce a bottom node
+
+Vladimir Sementsov-Ogievskiy (1):
+  block/stream: refactor stream_run: drop goto
+
+ block/io.c                | 32 ++++++++++++++++++----
+ block/stream.c            | 67 ++++++++++++++++++++++-------------------------
+ block/trace-events        |  2 +-
+ blockdev.c                |  7 ++++-
+ include/block/block.h     |  5 +++-
+ include/block/block_int.h |  6 ++---
+ tests/qemu-iotests/245    |  4 +--
+ 7 files changed, 74 insertions(+), 49 deletions(-)
+
 -- 
 1.8.3.1
