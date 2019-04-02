@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38230)
+Received: from eggs.gnu.org ([209.51.188.92]:38589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBEJC-00029k-5a
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:16 -0400
+	(envelope-from <peterx@redhat.com>) id 1hBEJB-0002Xe-DX
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBE4n-0006sP-Sj
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:43:23 -0400
-Date: Tue, 2 Apr 2019 09:42:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190402094257.218aa0e5@redhat.com>
-In-Reply-To: <459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
-	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
-	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
-	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
-	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1hBEJA-0004Km-95
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hBEJ9-0004C5-Tw
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:12 -0400
+Date: Tue, 2 Apr 2019 15:58:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190402075801.GE11008@xz-x1>
+References: <CAEn6zmEzwQD_Ot8sttJj0KwML3Zkhfg9+QBxbOLn6bUsDpVn7w@mail.gmail.com>
+	<20190321061024.GB9149@xz-x1>
+	<CAEn6zmGFv+UbhyriwakFKB=UhnC6=thhybDF9D1E9JzoYL-1oA@mail.gmail.com>
+	<CAFEAcA8q0c5BFh-11KNRJWCi6+Yer_5peekmQptmaw8Ag3SNhw@mail.gmail.com>
+	<20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
+	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
+	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
+	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
+	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
- feature "fdt"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
+ ramblock when in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,210 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
+To: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
 
-On Mon, 1 Apr 2019 15:07:05 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+On Tue, Apr 02, 2019 at 03:47:16PM +0800, Catherine Ho wrote:
+> Hi Peter Maydell
+>=20
+> On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+>=20
+> > On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com>
+> > wrote:
+> > > The root cause is the used idx is moved forward after 1st time inco=
+ming,
+> > and in 2nd time incoming,
+> > > the last_avail_idx will be incorrectly restored from the saved devi=
+ce
+> > state file(not in the ram).
+> > >
+> > > I watched this even on x86 for a virtio-scsi disk
+> > >
+> > > Any ideas for supporting 2nd time, 3rd time... incoming restoring?
+> >
+> > Does the destination end go through reset between the 1st and 2nd
+> >
+> seems not, please see my step below
+>=20
+> > incoming attempts? I'm not a migration expert, but I thought that
+> > devices were allowed to assume that their state is "state of the
+> > device following QEMU reset" before the start of an incoming
+> > migration attempt.
+> >
+>=20
+> Here  is my step:
+> 1. start guest normal by qemu with shared memory-backend file
+> 2. stop the vm. save the device state to another file via monitor migra=
+te
+> "exec: cat>..."
+> 3. quit the vm
+> 4. retore the vm by qemu -incoming "exec:cat ..."
+> 5. continue the vm via monito, the 1st incoming works fine
+> 6. quit the vm
+> 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
+> 8. continue   -> error happened
+> Actually, this can be fixed by forcely restore the idx by
+> virtio_queue_restore_last_avail_idx(=EF=BC=89
+> But I am sure whether it is reasonable.
 
-> On 03/29/19 14:56, Auger Eric wrote:
-> > Hi Ard,
-> > 
-> > On 3/29/19 2:14 PM, Ard Biesheuvel wrote:  
-> >> On Fri, 29 Mar 2019 at 14:12, Auger Eric <eric.auger@redhat.com> wrote:  
-> >>>
-> >>> Hi Shameer,
-> >>>
-> >>> On 3/29/19 10:59 AM, Shameerali Kolothum Thodi wrote:  
-> >>>>
-> >>>>  
-> >>>>> -----Original Message-----
-> >>>>> From: Auger Eric [mailto:eric.auger@redhat.com]
-> >>>>> Sent: 29 March 2019 09:32
-> >>>>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> >>>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; imammedo@redhat.com;
-> >>>>> peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> >>>>> sameo@linux.intel.com; sebastien.boeuf@intel.com
-> >>>>> Cc: Linuxarm <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
-> >>>>> Laszlo Ersek <lersek@redhat.com>; Ard Biesheuvel
-> >>>>> <ard.biesheuvel@linaro.org>; Leif Lindholm <Leif.Lindholm@arm.com>
-> >>>>> Subject: Re: [PATCH v3 07/10] hw/arm/virt: Introduce opt-in feature "fdt"
-> >>>>>
-> >>>>> Hi Shameer,
-> >>>>>
-> >>>>> [ + Laszlo, Ard, Leif ]
-> >>>>>
-> >>>>> On 3/21/19 11:47 AM, Shameer Kolothum wrote:  
-> >>>>>> This is to disable/enable populating DT nodes in case
-> >>>>>> any conflict with acpi tables. The default is "off".  
-> >>>>> The name of the option sounds misleading to me. Also we don't really
-> >>>>> know the scope of the disablement. At the moment this just aims to
-> >>>>> prevent the hotpluggable dt nodes from being added if we boot in ACPI mode.
-> >>>>>  
-> >>>>>>
-> >>>>>> This will be used in subsequent patch where cold plug
-> >>>>>> device-memory support is added for DT boot.  
-> >>>>> I am concerned about the fact that in dt mode, by default, you won't see
-> >>>>> any PCDIMM nodes.  
-> >>>>>>
-> >>>>>> If DT memory node support is added for cold-plugged device
-> >>>>>> memory, those memory will be visible to Guest kernel via
-> >>>>>> UEFI GetMemoryMap() and gets treated as early boot memory.  
-> >>>>> Don't we have an issue in UEFI then. Normally the SRAT indicates whether
-> >>>>> the slots are hotpluggable or not. Shouldn't the UEFI code look at this
-> >>>>> info.  
-> >>>>
-> >>>> Sorry I missed this part. Yes, that will be a more cleaner solution.
-> >>>>
-> >>>> Also, to be more clear on what happens,
-> >>>>
-> >>>> Guest ACPI boot with "fdt=on" ,
-> >>>>
-> >>>> From kernel log,
-> >>>>
-> >>>> [    0.000000] Early memory node ranges
-> >>>> [    0.000000]   node   0: [mem 0x0000000040000000-0x00000000bbf5ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bbf60000-0x00000000bbffffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc000000-0x00000000bc02ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc030000-0x00000000bc36ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc370000-0x00000000bf64ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf650000-0x00000000bf6dffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf6e0000-0x00000000bf6effff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf6f0000-0x00000000bf80ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf810000-0x00000000bfffffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000c0000000-0x00000000ffffffff]  --> This is the hotpluggable memory node from DT.
-> >>>> [    0.000000] Zeroed struct page in unavailable ranges: 1040 pages
-> >>>> [    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x00000000ffffffff]
-> >>>>
-> >>>>
-> >>>> Guest ACPI boot with "fdt=off" ,
-> >>>>
-> >>>> [    0.000000] Movable zone start for each node
-> >>>> [    0.000000] Early memory node ranges
-> >>>> [    0.000000]   node   0: [mem 0x0000000040000000-0x00000000bbf5ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bbf60000-0x00000000bbffffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc000000-0x00000000bc02ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc030000-0x00000000bc36ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bc370000-0x00000000bf64ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf650000-0x00000000bf6dffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf6e0000-0x00000000bf6effff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf6f0000-0x00000000bf80ffff]
-> >>>> [    0.000000]   node   0: [mem 0x00000000bf810000-0x00000000bfffffff]
-> >>>> [    0.000000] Zeroed struct page in unavailable ranges: 1040 pages
-> >>>> [    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x00000000bfffffff
-> >>>>
-> >>>> The hotpluggable memory node is absent from early memory nodes here.  
-> >>>
-> >>> OK thank you for the example illustrating the concern.  
-> >>>>
-> >>>> As you said, it could be possible to detect this node using SRAT in UEFI.  
-> >>>
-> >>> Let's wait for EDK2 experts on this.
-> >>>  
-> >>
-> >> Happy to chime in, but I need a bit more context here.
-> >>
-> >> What is the problem, how does this path try to solve it, and why is
-> >> that a bad idea?
-> >>  
-> > Sure, sorry.
-> > 
-> > This series:
-> > - [PATCH v3 00/10] ARM virt: ACPI memory hotplug support,
-> > https://patchwork.kernel.org/cover/10863301/
-> > 
-> > aims to introduce PCDIMM support in qemu. In ACPI mode, it builds the
-> > SRAT and DSDT parts and relies on GED to trigger the hotplug.
-> > 
-> > We noticed that if we build the hotpluggable memory dt nodes on top of
-> > the above ACPI tables, the DIMM slots are interpreted as not
-> > hotpluggable memory slots (at least we think so).
-> > 
-> > We think the EDK2 GetMemoryMap() uses the dt node info and ignores the
-> > fact that those slots are exposed as hotpluggable in the SRAT for example.
-> > 
-> > So in this series, we are forced to not generate the hotpluggable memory
-> > dt nodes if we want the DIMM slots to be effectively recognized as
-> > hotpluggable.
-> > 
-> > Could you confirm we have a correct understanding of the EDK2 behaviour
-> > and if so, would there be any solution for EDK2 to absorb both the DT
-> > nodes and the relevant SRAT/DSDT tables and make the slots hotpluggable.
-> > 
-> > At qemu level, detecting we are booting in ACPI mode and purposely
-> > removing the above mentioned DT nodes does not look straightforward.  
-> 
-> The firmware is not enlightened about the ACPI content that comes from
-> QEMU / fw_cfg. That ACPI content is *blindly* processed by the firmware,
-> as instructed through the ACPI linker/loader script, in order to install
-> the ACPI content for the OS. No actual information is consumed by the
-> firmware from the ACPI payload -- and that's a feature.
-> 
-> The firmware does consume DT:
-> 
-> - If you start QEMU *with* "-no-acpi", then the DT is both consumed by
-> the firmware (for its own information needs), and passed on to the OS.
-> 
-> - If you start QEMU *without* "-no-acpi" (the default), then the DT is
-> consumed only by the firmware (for its own information needs), and the
-> DT is hidden from the OS. The OS gets only the ACPI content
-> (processed/prepared as described above).
-> 
-> 
-> In the firmware, the "ArmVirtPkg/HighMemDxe" driver iterates over the
-> base/size pairs in all the memory nodes in the DT. For each such base
-> address that is currently tracked as "nonexistent" in the GCD memory
-> space map, the driver currently adds the base/size range as "system
-> memory". This in turn is reflected by the UEFI memmap that the OS gets
-> to see as "conventional memory".
-> 
-> If you need some memory ranges to show up as "special" in the UEFI
-> memmap, then you need to distinguish them somehow from the "regular"
-> memory areas, in the DT. And then extend "ArmVirtPkg/HighMemDxe" in the
-> firmware, so that it act upon the discriminator that you set in the DT.
-> 
-> 
-> Now... from a brief look at the Platform Init and UEFI specs, my
-> impression is that the hotpluggable (but presently not plugged) DIMM
-> ranges should simply be *absent* from the UEFI memmap; is that correct?
-> (I didn't check the ACPI spec, maybe it specifies the expected behavior
-> in full.) If my impression is correct, then two options (alternatives)
-> exist:
-> 
-> (1) Hide the affected memory nodes -- or at least the affected base/size
-> pairs -- from the DT, in case you boot without "-no-acpi" but with an
-> external firmware loaded. Then the firmware will not expose those ranges
-> as "conventional memory" in the UEFI memmap. This approach requires no
-> changes to edk2.
-> 
-> This option is precisely what Eric described up-thread, at
-> <http://mid.mail-archive.com/3f0a5793-dd35-a497-2248-8eb0cd3c3a16@redhat.com>:
-> 
-> > in machvirt_init, there is firmware_loaded that tells you whether you
-> > have a FW image. If this one is not set, you can induce dt. But if
-> > there is a FW it can be either DT or ACPI booted. You also have the
-> > acpi_enabled knob.  
-> 
-> (The "-no-acpi" cmdline option clears the "acpi_enabled" variable in
-> "vl.c").
-> 
-> So, the condition for hiding the hotpluggable memory nodes in question
-> from the DT is:
-> 
->   (aarch64 && firmware_loaded && acpi_enabled)
-I'd go with this one, though I have a question for firmware side.
-Let's assume we would want in future to expose hotpluggable & present
-memory via GetMemoryMap() (like bare-metal does) (guest OS theoretically
-can avoid using it for Normal zone based on hint from SRAT table early
-at boot), but what about firmware can it inspect SRAT table and not use
-hotpluggable ranges for its own use (or at least do not canibalize
-them permanently)?
- 
+Yeah I really suspect its validity.
 
-> 
-> (2) Invent and set an "ignore me, firmware" property for the
-> hotpluggable memory nodes in the DT, and update the firmware to honor
-> that property.
-> 
-> Thanks
-> Laszlo
+IMHO normal migration streams keep the device state and RAM data
+together in the dumped file, so they always match.
+
+In your shared case, the device states are in the dumped file however
+the RAM data is located somewhere else.  After you quit the VM from
+the 1st incoming migration the RAM is new (because that's a shared
+memory file) and the device data is still old.  They do not match
+already, then I'd say you can't migrate with that any more.
+
+If you want to do that, you'd better take snapshot of the RAM backend
+file if your filesystem supports (or even simpler, to back it up
+before hand) before you start any incoming migration.  Then with the
+dumped file (which contains the device states) and that snapshot file
+(which contains the exact RAM data that matches the device states)
+you'll alway be able to migrate for as many times as you want.
+
+Regards,
+
+--=20
+Peter Xu
