@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43850)
+Received: from eggs.gnu.org ([209.51.188.92]:44057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBL9R-000628-72
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBLAP-0006lF-Eb
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBL9P-0003FU-Tl
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44687 helo=mail.rt-rk.com)
+	(envelope-from <armbru@redhat.com>) id 1hBLAO-0003za-H2
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:17:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hBL9P-0001cw-GA
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:35 -0400
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Tue,  2 Apr 2019 17:15:21 +0200
-Message-Id: <1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize ILVEV.<B|H|W|D>
- MSA instructions
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBLAO-0003yZ-73
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:17:36 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190311060823.18360-2-richardw.yang@linux.intel.com>
+	<87pnq4hq6z.fsf@dusky.pond.sub.org>
+	<20190402150710.gz4rs3rn4sy7khcl@master>
+Date: Tue, 02 Apr 2019 17:17:32 +0200
+In-Reply-To: <20190402150710.gz4rs3rn4sy7khcl@master> (Wei Yang's message of
+	"Tue, 2 Apr 2019 15:07:10 +0000")
+Message-ID: <87sgv08mib.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl.c: make find_default_machine() local
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,191 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Wei Yang <richard.weiyang@gmail.com>
+Cc: pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+Wei Yang <richard.weiyang@gmail.com> writes:
 
-Optimize set of MSA instructions ILVEV, using directly
-tcg registers and performing logic on them instead of
-using helpers.
+> On Tue, Apr 02, 2019 at 08:33:08AM +0200, Markus Armbruster wrote:
+>>Wei Yang <richardw.yang@linux.intel.com> writes:
+>>
+>>> Function find_default_machine() is introduced by commit 2c8cffa599b7
+>>> "vl: make find_default_machine externally visible", while it seems no
+>>> one outside use it.
+>>It was used outside of vl.c until commit a904410af5f.
+>>
+>>> This patch make it local again.
+>>
+>>Suggest:
+>>
+>>  Commit a904410af5f removed the only user of find_default_machine()
+>>  outside vl.c, but neglected to make it static.  Do that now.
+>>
+>
+> Markus
+>
+> Thanks for your comments.
+>
+> BTW, I think I need to spin a v2, right?
 
-In the following table, the first column is the performance
-before this patch. The second represents the performance,
-after converting from helpers to tcg, but without using
-tcg_gen_deposit function. The third one is the solution
-which is implemented in this patch.
-
- instr    ||   before    || no-deposit ||  with-deposit
-========================================================
- ilvev.b  ||  126.92 ms  ||  24.52 ms  ||  24.43 ms
- ilvev.h  ||   93.67 ms  ||  23.92 ms  ||  23.86 ms
- ilvev.w  ||  117.86 ms  ||  23.83 ms  ||  22.17 ms
- ilvev.d  ||   45.49 ms  ||  19.74 ms  ||  19.71 ms
-
-The solution with deposit is suggested by Richard Henderson.
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/helper.h     |   1 -
- target/mips/msa_helper.c |   9 ----
- target/mips/translate.c  | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 104 insertions(+), 11 deletions(-)
-
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 02e16c7..82f6a40 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a7ea6aa..d5c3842 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
-     } while (0)
- MSA_FN_DF(ilvr_df)
- #undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   = pwt->DF[2*i];  \
--        pwx->DF[2*i+1] = pws->DF[2*i];  \
--    } while (0)
--MSA_FN_DF(ilvev_df)
--#undef MSA_DO
--
- #undef MSA_LOOP_COND
- 
- #define MSA_LOOP_COND(DF) \
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 04406d6..e26c6a6 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28974,6 +28974,94 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
-     tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
- }
- 
-+/*
-+ * [MSA] ILVEV.B wd, ws, wt
-+ *
-+ *   Vector Interleave Even (byte data elements)
-+ *
-+ */
-+static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+    const uint64_t mask = 0x00ff00ff00ff00ffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t2, t2, 8);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shli_i64(t2, t2, 8);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVEV.H wd, ws, wt
-+ *
-+ *   Vector Interleave Even (halfword data elements)
-+ *
-+ */
-+static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+    const uint64_t mask = 0x0000ffff0000ffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t2, t2, 16);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shli_i64(t2, t2, 16);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVEV.W wd, ws, wt
-+ *
-+ *   Vector Interleave Even (word data elements)
-+ *
-+ */
-+static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    const uint64_t mask = 0x00000000ffffffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2], t1, msa_wr_d[ws * 2], 32, 32);
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], t1, msa_wr_d[ws * 2 + 1], 32, 32);
-+
-+    tcg_temp_free_i64(t1);
-+}
-+
-+/*
-+ * [MSA] ILVEV.D wd, ws, wt
-+ *
-+ *   Vector Interleave Even (Double data elements)
-+ *
-+ */
-+static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-+}
-+
- static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
- {
- #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
-@@ -29130,7 +29218,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-         gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVEV_df:
--        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_ilvev_b(env, wd, ws, wt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvev_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvev_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvev_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BINSR_df:
-         gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
--- 
-2.7.4
+A v2 with the review comments addressed and my two patches included
+would help.
