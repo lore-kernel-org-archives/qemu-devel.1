@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60734)
+Received: from eggs.gnu.org ([209.51.188.92]:32963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBDxF-0007qA-DV
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:35:34 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hBDyq-0000lN-Lw
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBDxE-0004E0-Dl
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:35:33 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40175)
+	(envelope-from <sgarzare@redhat.com>) id 1hBDyp-0006UJ-BK
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:37:12 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBDxD-0004DD-TU
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:35:32 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t8so11109859otp.7
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 00:35:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hBDyo-0006Ql-Uo
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:37:11 -0400
+Received: by mail-wr1-f66.google.com with SMTP id w1so15254984wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 00:37:10 -0700 (PDT)
+Date: Tue, 2 Apr 2019 09:37:06 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190402073706.7t5w5gyj5tf7quwk@steredhat>
+References: <20190401163240.xw24ezsloy5ds2hz@steredhat>
+	<87zhp9599u.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <1554099897-28606-1-git-send-email-tjin@wavecomp.com>
-	<1554099897-28606-2-git-send-email-tjin@wavecomp.com>
-	<CAFEAcA8eVfmLdPQs0YKsAUYP5LzsFrcF96xknjfKtzbzY97BNw@mail.gmail.com>
-	<CAL1e-=jj4y=_ViZPepZ15VQnQQ++tbD2FYcmNST88O59GcjXfA@mail.gmail.com>
-	<MWHPR2201MB11199232622EFEFBF361C3A9B8560@MWHPR2201MB1119.namprd22.prod.outlook.com>
-	<CAFEAcA9NDmKV0EdrEM6BGWqLwXpqbdBLXz-YHcWhxEgBSQttQw@mail.gmail.com>
-	<MWHPR2201MB11190F1FFDE9CD41E3674DDFB8560@MWHPR2201MB1119.namprd22.prod.outlook.com>
-In-Reply-To: <MWHPR2201MB11190F1FFDE9CD41E3674DDFB8560@MWHPR2201MB1119.namprd22.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Apr 2019 07:35:19 +0000
-Message-ID: <CAFEAcA9ooDF8O+LexHnnmVAFsikdo1nhjYafJDYWopN3fva87g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Adds virtio_net as the default netcard for
- mips boston board.
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87zhp9599u.fsf@zen.linaroharston>
+Subject: Re: [Qemu-devel] VSOCK benchmark and optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tommy Jin <tjin@wavecomp.com>
-Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pburton.wavecomp.com@gmail.com" <pburton.wavecomp.com@gmail.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu devel list <qemu-devel@nongnu.org>, netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 2 Apr 2019 at 14:24, Tommy Jin <tjin@wavecomp.com> wrote:
-> For the option2, I think specify the network model in command line is
-> not enough, per my understanding, we still need to create the device
-> using API like pci_create && qdev_set_nic_properties && qdev_init_nofail,
-> otherwise we'll get error prompts like "requested NIC (anonymous, model
-> virtio) was not created (not supported by this machine?)", currently I
-> just add these pieces of code in /hw/mips/boston.c, Do you call these
-> pieces of code board code and what's your suggestion?
+On Tue, Apr 02, 2019 at 04:19:25AM +0000, Alex Bennée wrote:
+> 
+> Stefano Garzarella <sgarzare@redhat.com> writes:
+> 
+> > Hi Alex,
+> > I'm sending you some benchmarks and information about VSOCK CCing qemu-devel
+> > and linux-netdev (maybe this info could be useful for others :))
+> >
+> > One of the VSOCK advantages is the simple configuration: you don't need to set
+> > up IP addresses for guest/host, and it can be used with the standard POSIX
+> > socket API. [1]
+> >
+> > I'm currently working on it, so the "optimized" values are still work in
+> > progress and I'll send the patches upstream (Linux) as soon as possible.
+> > (I hope in 1 or 2 weeks)
+> >
+> > Optimizations:
+> > + reducing the number of credit update packets
+> >   - RX side sent, on every packet received, an empty packet only to inform the
+> >     TX side about the space in the RX buffer.
+> > + increase RX buffers size to 64 KB (from 4 KB)
+> > + merge packets to fill RX buffers
+> >
+> > As benchmark tool I used iperf3 [2] modified with VSOCK support:
+> >
+> >              host -> guest [Gbps]      guest -> host [Gbps]
+> > pkt_size    before opt.  optimized    before opt.  optimized
+> >   1K            0.5         1.6           1.4         1.4
+> >   2K            1.1         3.1           2.3         2.5
+> >   4K            2.0         5.6           4.2         4.4
+> >   8K            3.2        10.2           7.2         7.5
+> >   16K           6.4        14.2           9.4        11.3
+> >   32K           9.8        18.9           9.2        17.8
+> >   64K          13.8        22.9           8.8        25.0
+> >   128K         17.6        24.5           7.7        25.7
+> >   256K         19.0        24.8           8.1        25.6
+> >   512K         20.8        25.1           8.1        25.4
+> >
+> >
+> > How to reproduce:
+> >
+> > host$ modprobe vhost_vsock
+> > host$ qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=3
+> >       # Note: Guest CID should be >= 3
+> >       # (0, 1 are reserved and 2 identify the host)
+> >
+> > guest$ iperf3 --vsock -s
+> >
+> > host$ iperf3 --vsock -c 3 -l ${pkt_size}      # host -> guest
+> > host$ iperf3 --vsock -c 3 -l ${pkt_size} -R   # guest -> host
+> >
+> >
+> > If you want, I can do a similar benchmark (with iperf3) using a networking
+> > card (do you have a specific configuration?).
+> 
+> My main interest is how it stacks up against:
+> 
+>   --device virtio-net-pci and I guess the vhost equivalent
 
-If the boston board has PCI support and it is implemented correctly
-then you should be able to create a virtio network setup with
-command line options like
- -netdev user,id=mynet -device virtio-net-pci,netdev=mynet
+I'll do some tests with virtio-net and vhost.
 
-(or any other netdev backend, eg tun/tap).
+> 
+> AIUI one of the motivators was being able to run something like NFS for
+> a guest FS over vsock instead of the overhead from UDP and having to
+> deal with the additional complication of having a working network setup.
+> 
 
-I don't have a boston image/command line to test that with,
-but it works for arm boards and should be the same for any
-pci capable board model.
+CCing Stefan.
 
-thanks
--- PMM
+I know he is working on virtio-fs that maybe suite better with your use cases.
+He also worked on VSOCK support for NFS, but I think it is not merged upstream.
+
+Thanks,
+Stefano
