@@ -1,10 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54360)
+Received: from eggs.gnu.org ([209.51.188.92]:56427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hBBsb-0002j4-TI
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:22:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBBxZ-0004X7-OZ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hBBr1-0006zL-W3
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:21:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBBxY-0002a5-Tf
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:45 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33327)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hBBxY-0002Zb-Lb
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:44 -0400
+Received: by mail-oi1-x242.google.com with SMTP id e5so9452911oii.0
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 22:27:44 -0700 (PDT)
+MIME-Version: 1.0
 References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
 	<1553849325-44201-5-git-send-email-like.xu@linux.intel.com>
 	<87h8bmuj2d.fsf@zen.linaroharston>
@@ -12,14 +20,12 @@ References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
 	<20190401233818.GA22884@habkost.net>
 	<965d5d2f-1717-dcd0-8707-f6629f54e504@linux.intel.com>
 	<CAFEAcA_i9Te5Gs9GWnqH+JvTPFbp80+n2D=VAoC0e2DS7OfSeg@mail.gmail.com>
-From: Like Xu <like.xu@linux.intel.com>
-Message-ID: <ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
-Date: Tue, 2 Apr 2019 13:20:51 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_i9Te5Gs9GWnqH+JvTPFbp80+n2D=VAoC0e2DS7OfSeg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+	<ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
+In-Reply-To: <ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Apr 2019 05:27:32 +0000
+Message-ID: <CAFEAcA__F84deXVLxTp4PCBtGD-8sr1nKz9cvQx4=QsV1ttnfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 4/9] cpu/topology: add ARM support for smp
  machine properties
 List-Id: <qemu-devel.nongnu.org>
@@ -30,44 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 2019/4/2 12:45, Peter Maydell wrote:
-> On Tue, 2 Apr 2019 at 09:46, Like Xu <like.xu@linux.intel.com> wrote:
->>
->> On 2019/4/2 7:38, Eduardo Habkost wrote:
->>> On Mon, Apr 01, 2019 at 10:56:30AM +0800, Like Xu wrote:
->>>> On 2019/3/29 17:27, Alex Bennée wrote:
->>> [...]
->>>>>> @@ -1713,6 +1717,9 @@ static void cortex_a9_initfn(Object *obj)
->>>>>>     #ifndef CONFIG_USER_ONLY
->>>>>>     static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
->>>>>>     {
->>>>>> +    MachineState *ms = MACHINE(qdev_get_machine());
->>>>>
->>>>> How expensive is qdev_get_machine? This could potentially be a
->>>>> performance issue if this register is read a lot.
->>>>
->>>> It may not bother us cause the MachineState object would be feteched from
->>>> qemu QOM at its first requested time and save it as static variable for
->>>> incoming requests.
->>>
->>> We already have a current_machine variable declared in
->>> include/hw/boards.h.  We normally avoid using it and use
->>> MACHINE(qdev_get_machine()) instead, but I never understood why.
->>>
->> Which one do you prefer to access smp machine properties?
-> 
-> My suggestion would be that we use qdev_get_machine(). I think
-> it would be nice to make the remaining dozen or so uses of
-> the global current_machine outside vl.c use qdev_get_machine()
-> instead, and then make current_machine local to vl.c instead
-> of global.
-> 
-> thanks
-> -- PMM
-> 
-> 
-It looks good to me and I am not sure if this refactoring should be 
-added in next patch series or as a separate patch.
+On Tue, 2 Apr 2019 at 12:20, Like Xu <like.xu@linux.intel.com> wrote:
+>
+> On 2019/4/2 12:45, Peter Maydell wrote:
+> > My suggestion would be that we use qdev_get_machine(). I think
+> > it would be nice to make the remaining dozen or so uses of
+> > the global current_machine outside vl.c use qdev_get_machine()
+> > instead, and then make current_machine local to vl.c instead
+> > of global.
+
+> It looks good to me and I am not sure if this refactoring should be
+> added in next patch series or as a separate patch.
+
+Changing the other uses of current_machine is definitely a
+refactoring that should be a separate patch series.
+
+thanks
+-- PMM
