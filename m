@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38278)
+Received: from eggs.gnu.org ([209.51.188.92]:38230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hBEIz-0002D0-7X
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:02 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hBEJ1-00029k-Pa
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hBEBS-0007od-QX
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:50:16 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35031)
+	(envelope-from <catherine.hecx@gmail.com>) id 1hBE8m-0004Il-QM
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:47:29 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hBEBQ-0007jW-Le
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:50:14 -0400
-Received: by mail-ot1-x343.google.com with SMTP id m10so11252577otp.2
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 00:50:10 -0700 (PDT)
+	id 1hBE8m-0004IU-Ga
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:47:28 -0400
+Received: by mail-ot1-x342.google.com with SMTP id t8so11135650otp.7
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 00:47:28 -0700 (PDT)
 MIME-Version: 1.0
 References: <1553010562-13561-1-git-send-email-catherine.hecx@gmail.com>
 	<20190320050735.GB8956@xz-x1>
@@ -23,11 +23,10 @@ References: <1553010562-13561-1-git-send-email-catherine.hecx@gmail.com>
 	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
 	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
 	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
-	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
-In-Reply-To: <CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
 From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Tue, 2 Apr 2019 15:49:58 +0800
-Message-ID: <CAEn6zmFUoSLnEGSySY6vbSznLKUjSz+J8Y8KTND3AtftAv_U7A@mail.gmail.com>
+Date: Tue, 2 Apr 2019 15:47:16 +0800
+Message-ID: <CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
@@ -43,58 +42,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
 
-On Tue, 2 Apr 2019 at 15:47, Catherine Ho <catherine.hecx@gmail.com> wrote:
+Hi Peter Maydell
 
-> Hi Peter Maydell
->
-> On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.org>
+On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+
+> On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com>
 > wrote:
+> > The root cause is the used idx is moved forward after 1st time incoming=
+,
+> and in 2nd time incoming,
+> > the last_avail_idx will be incorrectly restored from the saved device
+> state file(not in the ram).
+> >
+> > I watched this even on x86 for a virtio-scsi disk
+> >
+> > Any ideas for supporting 2nd time, 3rd time... incoming restoring?
 >
->> On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com>
->> wrote:
->> > The root cause is the used idx is moved forward after 1st time
->> incoming, and in 2nd time incoming,
->> > the last_avail_idx will be incorrectly restored from the saved device
->> state file(not in the ram).
->> >
->> > I watched this even on x86 for a virtio-scsi disk
->> >
->> > Any ideas for supporting 2nd time, 3rd time... incoming restoring?
->>
->> Does the destination end go through reset between the 1st and 2nd
->>
-> seems not, please see my step below
+> Does the destination end go through reset between the 1st and 2nd
 >
->> incoming attempts? I'm not a migration expert, but I thought that
->> devices were allowed to assume that their state is "state of the
->> device following QEMU reset" before the start of an incoming
->> migration attempt.
->>
->
-> Here  is my step:
-> 1. start guest normal by qemu with shared memory-backend file
-> 2. stop the vm. save the device state to another file via monitor migrate
-> "exec: cat>..."
-> 3. quit the vm
->
-via "quit" command of monitor
+seems not, please see my step below
 
-> 4. retore the vm by qemu -incoming "exec:cat ..."
-> 5. continue the vm via monito, the 1st incoming works fine
-> 6. quit the vm
-> 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
-> 8. continue   -> error happened
-> Actually, this can be fixed by forcely restore the idx by
-> virtio_queue_restore_last_avail_idx(=EF=BC=89
-> But I am sure whether it is reasonable.
+> incoming attempts? I'm not a migration expert, but I thought that
+> devices were allowed to assume that their state is "state of the
+> device following QEMU reset" before the start of an incoming
+> migration attempt.
 >
-s/sure/not sure
+
+Here  is my step:
+1. start guest normal by qemu with shared memory-backend file
+2. stop the vm. save the device state to another file via monitor migrate
+"exec: cat>..."
+3. quit the vm
+4. retore the vm by qemu -incoming "exec:cat ..."
+5. continue the vm via monito, the 1st incoming works fine
+6. quit the vm
+7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
+8. continue   -> error happened
+Actually, this can be fixed by forcely restore the idx by
+virtio_queue_restore_last_avail_idx(=EF=BC=89
+But I am sure whether it is reasonable.
+
+B.R.
 
 >
-> B.R.
->
->>
->> thanks
->> -- PMM
->>
+> thanks
+> -- PMM
 >
