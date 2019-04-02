@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60200)
+Received: from eggs.gnu.org ([209.51.188.92]:60632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBLzX-000254-U3
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1hBM0p-00036p-8Y
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBLzW-0006op-OH
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBLzW-0006m3-De
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
-	<20190311060823.18360-3-richardw.yang@linux.intel.com>
-	<87a7h8bkof.fsf@dusky.pond.sub.org>
-	<20190402151630.pdmwljy7d6fkcu3u@master>
-Date: Tue, 02 Apr 2019 18:10:23 +0200
-In-Reply-To: <20190402151630.pdmwljy7d6fkcu3u@master> (Wei Yang's message of
-	"Tue, 2 Apr 2019 15:16:30 +0000")
-Message-ID: <875zrw8k28.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1hBM0o-0000WN-6c
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:11:47 -0400
+Date: Tue, 2 Apr 2019 17:11:29 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190402161129.GL413@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190329111104.17223-1-berrange@redhat.com>
+	<20190329111104.17223-12-berrange@redhat.com>
+	<20190402180033.77510387.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl.c: allocate TYPE_MACHINE list once
- during bootup
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190402180033.77510387.cohuck@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
+ members in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-Wei Yang <richard.weiyang@gmail.com> writes:
+On Tue, Apr 02, 2019 at 06:00:33PM +0200, Cornelia Huck wrote:
+> On Fri, 29 Mar 2019 11:11:01 +0000
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> > The GCC 9 compiler complains about many places in s390 code
+> > that take the address of members of the 'struct SCHIB' which
+> > is marked packed:
+> >=20
+> > hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=80=
+=99:
+> > hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=
+=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> > [-Waddress-of-packed-member]
+> >   133 |     SCSW *s =3D &sch->curr_status.scsw;
+> >       |               ^~~~~~~~~~~~~~~~~~~~~~
+> > hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=
+=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> > [-Waddress-of-packed-member]
+> >   134 |     PMCW *p =3D &sch->curr_status.pmcw;
+> >       |               ^~~~~~~~~~~~~~~~~~~~~~
+> >=20
+> > ...snip many more...
+> >=20
+> > Almost all of these are just done for convenience to avoid
+> > typing out long variable/field names when referencing struct
+> > members. We can get most of this convenience by taking the
+> > address of the 'struct SCHIB' instead, avoiding triggering
+> > the compiler warnings.
+> >=20
+> > In a couple of places we copy via a local variable which is
+> > a technique already applied elsewhere in s390 code for this
+> > problem.
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  hw/vfio/ccw.c | 42 ++++++++++++++++++++++--------------------
+> >  1 file changed, 22 insertions(+), 20 deletions(-)
+>=20
+> I'm currently in the process of queuing this and the other three s390x
+> fixes, but I'm inclined to do so for 4.1 (it feels a bit late in the
+> cycle for 4.0.)
+>=20
+> Other opinions?
 
-> On Tue, Apr 02, 2019 at 03:28:48PM +0200, Markus Armbruster wrote:
->>Wei Yang <richardw.yang@linux.intel.com> writes:
->>
->>> Now all the functions used to select machine is local and the call flow
->>> looks like below:
->>>
->>>     select_machine()
->>>         find_default_machine()
->>>         machine_parse()
->>>             find_machine()
->>>
->>> All these related function will need a GSList for TYPE_MACHINE.
->>> Currently we allocate this list each time we use it, while this is not
->>> necessary to do so because we don't need to modify this.
->>>
->>> This patch make the TYPE_MACHINE list allocation in select_machine and
->>> pass this to its child for use.
->>>
->>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>> ---
->>>  vl.c | 24 +++++++++++-------------
->>>  1 file changed, 11 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/vl.c b/vl.c
->>> index 3688e2bc98..cf08d96ce4 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -1418,9 +1418,9 @@ static int usb_parse(const char *cmdline)
->>>  
->>>  MachineState *current_machine;
->>>  
->>> -static MachineClass *find_machine(const char *name)
->>> +static MachineClass *find_machine(const char *name, GSList *machines)
->>>  {
->>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
->>> +    GSList *el;
->>>      MachineClass *mc = NULL;
->>>  
->>>      for (el = machines; el; el = el->next) {
->>> @@ -1437,13 +1437,12 @@ static MachineClass *find_machine(const char *name)
->>>          }
->>>      }
->>>  
->>> -    g_slist_free(machines);
->>>      return mc;
->>>  }
->>
->>Can be simplified further.  I'll post it as PATCH 3.
->>
->
-> Markus
->
-> Thanks for your comment. Do you sugest to simplify it in this patch? I
-> am confused here.
+It would be nice to be warning free for 4.0, but I agree that it feels
+kind of late to be making these changes. They're not fixing real world
+bugs, and even if you queue the s390 bits we're unlikely to get all the
+others merged, especially the usb-mtp one is a nasty mess. So we'll
+not be 100% warning free.
 
-I feel the additional simplifcations I posted as PATCH 3 and 4 are best
-kept as separate patches.
-
-Remark [*] below is the only one that's not addressed by my PATCH 3+4.
-
->>> -static MachineClass *find_default_machine(void)
->>> +static MachineClass *find_default_machine(GSList *machines)
->>>  {
->>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
->>> +    GSList *el;
->>>      MachineClass *mc = NULL;
->>>  
->>>      for (el = machines; el; el = el->next) {
->>> @@ -1455,7 +1454,6 @@ static MachineClass *find_default_machine(void)
->>>          }
->>>      }
->>>  
->>> -    g_slist_free(machines);
->>>      return mc;
->>>  }
->>
->>Likewise.
->>
->>>  
->>> @@ -2538,16 +2536,15 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->>>                    object_class_get_name(OBJECT_CLASS(mc1)));
->>>  }
->>>  
->>> -static MachineClass *machine_parse(const char *name)
->>> +static MachineClass *machine_parse(const char *name, GSList *machines)
->>>  {
->>>      MachineClass *mc = NULL;
->>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
->>> +    GSList *el;
->>>  
->>>      if (name) {
->>> -        mc = find_machine(name);
->>> +        mc = find_machine(name, machines);
->>>      }
->>>      if (mc) {
->>> -        g_slist_free(machines);
->>>          return mc;
->>>      }
->>>      if (name && !is_help_option(name)) {
->>> @@ -2567,7 +2564,6 @@ static MachineClass *machine_parse(const char *name)
->>>          }
->>>      }
->>>  
->>> -    g_slist_free(machines);
->>>      exit(!name || !is_help_option(name));
->>>  }
->>
->>Additional cleanup is possible: argument @name is never null.
->>
->>While there, I'd check is_help_option() first rather than only after
->>find_machine() returns null, because "first" is what we commonly do.
->>
->>I'll post this as PATCH 4.
->>
->>>  
->>> @@ -2659,7 +2655,8 @@ static const QEMUOption *lookup_opt(int argc, char **argv,
->>>  
->>>  static MachineClass *select_machine(void)
->>>  {
->>> -    MachineClass *machine_class = find_default_machine();
->>> +    GSList *machines = object_class_get_list(TYPE_MACHINE, false);
->>> +    MachineClass *machine_class = find_default_machine(machines);
->>>      const char *optarg;
->>>      QemuOpts *opts;
->>>      Location loc;
->>> @@ -2671,7 +2668,7 @@ static MachineClass *select_machine(void)
->>>  
->>>      optarg = qemu_opt_get(opts, "type");
->>>      if (optarg) {
->>> -        machine_class = machine_parse(optarg);
->>> +        machine_class = machine_parse(optarg, machines);
->>
->>Could create and destroy @machines here:
->>
->>  -        machine_class = machine_parse(optarg);
->>  +        GSList *machines = object_class_get_list(TYPE_MACHINE, false);
->>  +        machine_class = machine_parse(optarg, machines);
->>  +        g_slist_free(machines);
->>
->>Matter of taste.
-
-[*]
-
-Matter of taste means the choice between your version and mine is up to
-the maintainer, or if the maintainer remains silent, up to you.
-
->>>      }
->>>  
->>>      if (!machine_class) {
->>> @@ -2681,6 +2678,7 @@ static MachineClass *select_machine(void)
->>>      }
->>>  
->>>      loc_pop(&loc);
->>> +    g_slist_free(machines);
->>>      return machine_class;
->>>  }
->>
->>Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
