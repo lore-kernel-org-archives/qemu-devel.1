@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60231)
+Received: from eggs.gnu.org ([209.51.188.92]:60324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hBIt9-0004Jj-UQ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:43 -0400
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBItR-0004Wt-Ib
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hBIt8-0000zg-Ss
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:39 -0400
-Received: from mail-eopbgr810127.outbound.protection.outlook.com
-	([40.107.81.127]:60778
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hBIt8-0000yC-K6
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:38 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 2 Apr 2019 12:51:34 +0000
-Message-ID: <BN6PR2201MB1251131A588B0B9576A8E8BEC6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1554207110-9113-1-git-send-email-mateja.marjanovic@rt-rk.com>,
-	<1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/mips: Make the results of
- DIV_<U|S>.<B|H|W|D> the same as on hardware
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBItN-0001Bg-Bm
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:56 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36337)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
+	id 1hBItK-00015X-N7
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:51:52 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z5so5323708pfn.3
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 05:51:47 -0700 (PDT)
+From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Date: Tue,  2 Apr 2019 18:21:31 +0530
+Message-Id: <20190402125131.10275-1-aruna.15@cse.mrt.ac.lk>
+Subject: [Qemu-devel] [PATCH 2/3] Header cleanups qemu_is* macros were moved
+ from qemu-common.h to qemu/cutils.h This task was under
+ https://wiki.qemu.org/Contribute/BiteSizedTasks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 
-> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> Subject: [PATCH v2 1/2] target/mips: Make the results of DIV_<U|S>.<B|H|W=
-|D> the same as on > hardware
->=20
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->=20
-> MSA instructions DIV_<U|S>.<B|H|W|D> when dividing by zero,
-> didn't return the same value when executed on a referent hardware
-> (FPGA MIPS 64 r6, little endian) and when executed on QEMU, which
-> is not a real bug, because the result when dividing by zero is
-> UNPREDICTABLE [1] (page 141, 142).
->=20
-> [1] MIPS Architecture for Programmers
->     Volume IV-j: The MIPS64 SIMD
->     Architecture Module, Revision 1.12
->=20
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> ---
+---
+ hw/core/qdev-properties.c |  1 +
+ include/qemu-common.h     | 11 -----------
+ include/qemu/cutils.h     | 12 ++++++++++++
+ qapi/qapi-util.c          |  2 +-
+ util/id.c                 |  2 +-
+ 5 files changed, 15 insertions(+), 13 deletions(-)
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
->  target/mips/msa_helper.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-> index 655148d..8c77f12 100644
-> --- a/target/mips/msa_helper.c
-> +++ b/target/mips/msa_helper.c
-> @@ -641,14 +641,15 @@ static inline int64_t msa_div_s_df(uint32_t df, int=
-64_t arg1, int64_t > arg2)
->      if (arg1 =3D=3D DF_MIN_INT(df) && arg2 =3D=3D -1) {
->          return DF_MIN_INT(df);
->      }
-> -    return arg2 ? arg1 / arg2 : 0;
-> +    return arg2 ? arg1 / arg2
-> +                : arg1 >=3D 0 ? -1 : 1;
->  }
->=20
->  static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t ar=
-g2)
->  {
->      uint64_t u_arg1 =3D UNSIGNED(arg1, df);
->      uint64_t u_arg2 =3D UNSIGNED(arg2, df);
-> -    return u_arg2 ? u_arg1 / u_arg2 : 0;
-> +    return arg2 ? u_arg1 / u_arg2 : -1;
->  }
->=20
->  static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t ar=
-g2)
-> --
-> 2.7.4
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5da1439a8b..821a4ab311 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -10,6 +10,7 @@
+ #include "qapi/visitor.h"
+ #include "chardev/char.h"
+ #include "qemu/uuid.h"
++#include "qemu/cutils.h"
+ 
+ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+                                   Error **errp)
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index a102245519..0066e45a6b 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -33,17 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
+ void qemu_get_timedate(struct tm *tm, int offset);
+ int qemu_timedate_diff(struct tm *tm);
+ 
+-#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+-#define qemu_isalpha(c)		isalpha((unsigned char)(c))
+-#define qemu_iscntrl(c)		iscntrl((unsigned char)(c))
+-#define qemu_isdigit(c)		isdigit((unsigned char)(c))
+-#define qemu_isgraph(c)		isgraph((unsigned char)(c))
+-#define qemu_islower(c)		islower((unsigned char)(c))
+-#define qemu_isprint(c)		isprint((unsigned char)(c))
+-#define qemu_ispunct(c)		ispunct((unsigned char)(c))
+-#define qemu_isspace(c)		isspace((unsigned char)(c))
+-#define qemu_isupper(c)		isupper((unsigned char)(c))
+-#define qemu_isxdigit(c)	isxdigit((unsigned char)(c))
+ #define qemu_tolower(c)		tolower((unsigned char)(c))
+ #define qemu_toupper(c)		toupper((unsigned char)(c))
+ #define qemu_isascii(c)		isascii((unsigned char)(c))
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index d2dad3057c..797c5bc560 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -3,6 +3,18 @@
+ 
+ #include "qemu/fprintf-fn.h"
+ 
++#define qemu_isalnum(c)    isalnum((unsigned char)(c))
++#define qemu_isalpha(c)    isalpha((unsigned char)(c))
++#define qemu_iscntrl(c)    iscntrl((unsigned char)(c))
++#define qemu_isdigit(c)    isdigit((unsigned char)(c))
++#define qemu_isgraph(c)    isgraph((unsigned char)(c))
++#define qemu_islower(c)    islower((unsigned char)(c))
++#define qemu_isprint(c)    isprint((unsigned char)(c))
++#define qemu_ispunct(c)    ispunct((unsigned char)(c))
++#define qemu_isspace(c)    isspace((unsigned char)(c))
++#define qemu_isupper(c)    isupper((unsigned char)(c))
++#define qemu_isxdigit(c)    isxdigit((unsigned char)(c))
++
+ /**
+  * pstrcpy:
+  * @buf: buffer to copy string into
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e9b266bb70..944347cc76 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/cutils.h"
+ 
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+diff --git a/util/id.c b/util/id.c
+index 3f8e13bd6f..a1faff1f9e 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/id.h"
+-#include "qemu-common.h"
++#include "qemu/cutils.h"
+ 
+ bool id_wellformed(const char *id)
+ {
+-- 
+2.17.1
