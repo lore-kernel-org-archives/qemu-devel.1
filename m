@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56586)
+Received: from eggs.gnu.org ([209.51.188.92]:56758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBH2h-0007ix-1y
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:24 -0400
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH33-0007xV-I7
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBH2f-0000ct-F4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34840)
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH31-0000rp-Cr
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:45 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:37391 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hBH2e-0000cD-VW
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:21 -0400
-Date: Tue, 2 Apr 2019 12:53:17 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190402125317.634f53a6@redhat.com>
-In-Reply-To: <20190401090827.20793-4-armbru@redhat.com>
-References: <20190401090827.20793-1-armbru@redhat.com>
-	<20190401090827.20793-4-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
+	id 1hBH2y-0000l5-CW
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:41 -0400
+References: <1553845000-6537-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1553845000-6537-3-git-send-email-mateja.marjanovic@rt-rk.com>
+	<CY4PR2201MB1254FCEE59DB7763A7E71EFAC6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+Message-ID: <1dac2b0f-03eb-b1cf-aa25-89aa533f5869@rt-rk.com>
+Date: Tue, 2 Apr 2019 12:53:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CY4PR2201MB1254FCEE59DB7763A7E71EFAC6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: Support adding migration
- blockers earlier
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/mips: MSA instructions st,
+ big endian host fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, kwolf@redhat.com
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Mon,  1 Apr 2019 11:08:25 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
 
-> migrate_add_blocker() asserts we have a current_migration object, in
-> migrate_get_current().  We do only after migration_object_init().
-> 
-> This contributes to the following dependency cycle:
-> 
-> * configure_blockdev() must run before machine_set_property()
->   so machine properties can refer to block backends
-> 
-> * machine_set_property() before configure_accelerator()
->   so machine properties like kvm-irqchip get applied
-> 
-> * configure_accelerator() before migration_object_init()
->   so that Xen's accelerator compat properties get applied.
-> 
-> * migration_object_init() before configure_blockdev()
->   so configure_blockdev() can add migration blockers
-> 
-> The cycle was closed when recent commit cda4aa9a5a0 "Create block
-> backends before setting machine properties" added the first
-> dependency, and satisfied it by violating the last one.  Broke block
-> backends that add migration blockers, as demonstrated by qemu-iotests
-> 055.
-> 
-> To fix it, break the last dependency: make migrate_add_blocker()
-> usable before migration_object_init().
-> 
-> The previous commit already removed the use of migrate_get_current()
-> from migrate_add_blocker() itself.  Didn't quite do the trick, as
-> there's another one hiding in migration_is_idle().
-> 
-> The use there isn't actually necessary: when no migration object has
-> been created yet, migration is surely idle.  Make migration_is_idle()
-> return true then.
-> 
-> Fixes: cda4aa9a5a08777cf13e164c0543bd4888b8adce
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  migration/migration.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f6076e5295..609e0df5d0 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1646,7 +1646,11 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
->  
->  bool migration_is_idle(void)
->  {
-> -    MigrationState *s = migrate_get_current();
-> +    MigrationState *s = current_migration;
-> +
-> +    if (!s) {
-> +        return true;
-> +    }
->  
->      switch (s->state) {
->      case MIGRATION_STATUS_NONE:
+On 1.4.19. 19:58, Aleksandar Markovic wrote:
+>> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> Subject: [PATCH v3 2/5] target/mips: MSA instructions st, big endian host fix
+>>
+>> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>>
+>> Fix the case when the host is running on a big endian machine,
+>> and change the approach toward st instruction helpers.
+>>
+>> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> ---
+> The same comment as in the patch 1/5.
+>
+> Also, please align both equation signs and argument indexes in the
+> new bodies of the helpers.
+It will be done in v4.
+>
+> Thanks,
+> Aleksandar
+Thanks,
+Mateja
