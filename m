@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56359)
+Received: from eggs.gnu.org ([209.51.188.92]:57687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hBK8G-00012h-Ki
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:11:21 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1hBKDR-0004Q4-12
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hBK8F-00052U-L2
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:11:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56444)
+	(envelope-from <alifm@linux.ibm.com>) id 1hBKDP-0007k7-SR
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59612)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hBK8F-0004yX-9i
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:11:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hBKDP-0007eb-DQ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:39 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x32E5c0I010164
-	for <qemu-devel@nongnu.org>; Tue, 2 Apr 2019 10:11:17 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rm92t923h-1
+	x32EGGX5000693
+	for <qemu-devel@nongnu.org>; Tue, 2 Apr 2019 10:16:37 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rm9bjr0mh-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 10:11:16 -0400
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 10:16:37 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Tue, 2 Apr 2019 15:11:14 +0100
+	Tue, 2 Apr 2019 15:16:35 +0100
 References: <20190329111104.17223-1-berrange@redhat.com>
-	<20190329111104.17223-14-berrange@redhat.com>
+	<20190329111104.17223-12-berrange@redhat.com>
 From: Farhan Ali <alifm@linux.ibm.com>
-Date: Tue, 2 Apr 2019 10:11:08 -0400
+Date: Tue, 2 Apr 2019 10:16:30 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190329111104.17223-14-berrange@redhat.com>
+In-Reply-To: <20190329111104.17223-12-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <80307b7b-3ca2-d91f-3411-0825d02f1edd@linux.ibm.com>
+Message-Id: <597baf23-80fb-b79b-e4f2-edd912a7e939@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/14] hw/s390x/ipl: avoid taking address
- of fields in packed struct
+Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
+ members in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,78 +48,129 @@ Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <c
 
 
 On 03/29/2019 07:11 AM, Daniel P. Berrang=C3=A9 wrote:
-> Compiling with GCC 9 complains
+> The GCC 9 compiler complains about many places in s390 code
+> that take the address of members of the 'struct SCHIB' which
+> is marked packed:
 >=20
-> hw/s390x/ipl.c: In function =E2=80=98s390_ipl_set_boot_menu=E2=80=99:
-> hw/s390x/ipl.c:256:25: warning: taking address of packed member of =E2=80=
-=98struct QemuIplParameters=E2=80=99 may result in an unaligned pointer v=
-alue [-Waddress-of-packed-member]
->    256 |     uint32_t *timeout =3D &ipl->qipl.boot_menu_timeout;
->        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=80=99=
+:
+> hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=80=
+=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> [-Waddress-of-packed-member]
+>    133 |     SCSW *s =3D &sch->curr_status.scsw;
+>        |               ^~~~~~~~~~~~~~~~~~~~~~
+> hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=80=
+=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> [-Waddress-of-packed-member]
+>    134 |     PMCW *p =3D &sch->curr_status.pmcw;
+>        |               ^~~~~~~~~~~~~~~~~~~~~~
 >=20
-> This local variable is only present to save a little bit of
-> typing when setting the field later. Get rid of this to avoid
-> the warning about unaligned accesses.
+> ...snip many more...
+>=20
+> Almost all of these are just done for convenience to avoid
+> typing out long variable/field names when referencing struct
+> members. We can get most of this convenience by taking the
+> address of the 'struct SCHIB' instead, avoiding triggering
+> the compiler warnings.
+>=20
+> In a couple of places we copy via a local variable which is
+> a technique already applied elsewhere in s390 code for this
+> problem.
 >=20
 > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
->   hw/s390x/ipl.c | 12 +++++-------
->   1 file changed, 5 insertions(+), 7 deletions(-)
+>   hw/vfio/ccw.c | 42 ++++++++++++++++++++++--------------------
+>   1 file changed, 22 insertions(+), 20 deletions(-)
 >=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 896888bf8f..51b272e190 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -252,8 +252,6 @@ static void s390_ipl_set_boot_menu(S390IPLState *ip=
-l)
->   {
->       QemuOptsList *plist =3D qemu_find_opts("boot-opts");
->       QemuOpts *opts =3D QTAILQ_FIRST(&plist->head);
-> -    uint8_t *flags =3D &ipl->qipl.qipl_flags;
-> -    uint32_t *timeout =3D &ipl->qipl.boot_menu_timeout;
->       const char *tmp;
->       unsigned long splash_time =3D 0;
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 9246729a75..c44d13cc50 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -130,8 +130,8 @@ static void vfio_ccw_io_notifier_handler(void *opaq=
+ue)
+>       S390CCWDevice *cdev =3D S390_CCW_DEVICE(vcdev);
+>       CcwDevice *ccw_dev =3D CCW_DEVICE(cdev);
+>       SubchDev *sch =3D ccw_dev->sch;
+> -    SCSW *s =3D &sch->curr_status.scsw;
+> -    PMCW *p =3D &sch->curr_status.pmcw;
+> +    SCHIB *schib =3D &sch->curr_status;
+> +    SCSW s;
+>       IRB irb;
+>       int size;
 >  =20
-> @@ -269,7 +267,7 @@ static void s390_ipl_set_boot_menu(S390IPLState *ip=
-l)
->       case S390_IPL_TYPE_CCW:
->           /* In the absence of -boot menu, use zipl parameters */
->           if (!qemu_opt_get(opts, "menu")) {
-> -            *flags |=3D QIPL_FLAG_BM_OPTS_ZIPL;
-> +            ipl->qipl.qipl_flags |=3D QIPL_FLAG_BM_OPTS_ZIPL;
->               return;
+> @@ -145,33 +145,33 @@ static void vfio_ccw_io_notifier_handler(void *op=
+aque)
+>           switch (errno) {
+>           case ENODEV:
+>               /* Generate a deferred cc 3 condition. */
+> -            s->flags |=3D SCSW_FLAGS_MASK_CC;
+> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> -            s->ctrl |=3D (SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND);
+> +            schib->scsw.flags |=3D SCSW_FLAGS_MASK_CC;
+> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> +            schib->scsw.ctrl |=3D (SCSW_STCTL_ALERT | SCSW_STCTL_STATU=
+S_PEND);
+>               goto read_err;
+>           case EFAULT:
+>               /* Memory problem, generate channel data check. */
+> -            s->ctrl &=3D ~SCSW_ACTL_START_PEND;
+> -            s->cstat =3D SCSW_CSTAT_DATA_CHECK;
+> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> -            s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> +            schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
+> +            schib->scsw.cstat =3D SCSW_CSTAT_DATA_CHECK;
+> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> +            schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECO=
+NDARY |
+>                          SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>               goto read_err;
+>           default:
+>               /* Error, generate channel program check. */
+> -            s->ctrl &=3D ~SCSW_ACTL_START_PEND;
+> -            s->cstat =3D SCSW_CSTAT_PROG_CHECK;
+> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> -            s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> +            schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
+> +            schib->scsw.cstat =3D SCSW_CSTAT_PROG_CHECK;
+> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> +            schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECO=
+NDARY |
+>                          SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>               goto read_err;
 >           }
->           break;
-> @@ -286,23 +284,23 @@ static void s390_ipl_set_boot_menu(S390IPLState *=
-ipl)
->           return;
+>       } else if (size !=3D vcdev->io_region_size) {
+>           /* Information transfer error, generate channel-control check=
+. */
+> -        s->ctrl &=3D ~SCSW_ACTL_START_PEND;
+> -        s->cstat =3D SCSW_CSTAT_CHN_CTRL_CHK;
+> -        s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> -        s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> +        schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
+> +        schib->scsw.cstat =3D SCSW_CSTAT_CHN_CTRL_CHK;
+> +        schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+> +        schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDAR=
+Y |
+>                      SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>           goto read_err;
+>       }
+> @@ -179,11 +179,13 @@ static void vfio_ccw_io_notifier_handler(void *op=
+aque)
+>       memcpy(&irb, region->irb_area, sizeof(IRB));
+>  =20
+>       /* Update control block via irb. */
+> -    copy_scsw_to_guest(s, &irb.scsw);
+> +    s =3D schib->scsw;
+> +    copy_scsw_to_guest(&s, &irb.scsw);
+> +    schib->scsw =3D s;
+>  =20
+>       /* If a uint check is pending, copy sense data. */
+> -    if ((s->dstat & SCSW_DSTAT_UNIT_CHECK) &&
+> -        (p->chars & PMCW_CHARS_MASK_CSENSE)) {
+> +    if ((schib->scsw.dstat & SCSW_DSTAT_UNIT_CHECK) &&
+> +        (schib->pmcw.chars & PMCW_CHARS_MASK_CSENSE)) {
+>           memcpy(sch->sense_data, irb.ecw, sizeof(irb.ecw));
 >       }
 >  =20
-> -    *flags |=3D QIPL_FLAG_BM_OPTS_CMD;
-> +    ipl->qipl.qipl_flags |=3D QIPL_FLAG_BM_OPTS_CMD;
->  =20
->       tmp =3D qemu_opt_get(opts, "splash-time");
->  =20
->       if (tmp && qemu_strtoul(tmp, NULL, 10, &splash_time)) {
->           error_report("splash-time is invalid, forcing it to 0");
-> -        *timeout =3D 0;
-> +        ipl->qipl.boot_menu_timeout =3D 0;
->           return;
->       }
->  =20
->       if (splash_time > 0xffffffff) {
->           error_report("splash-time is too large, forcing it to max val=
-ue");
-> -        *timeout =3D 0xffffffff;
-> +        ipl->qipl.boot_menu_timeout =3D 0xffffffff;
->           return;
->       }
->  =20
-> -    *timeout =3D cpu_to_be32(splash_time);
-> +    ipl->qipl.boot_menu_timeout =3D cpu_to_be32(splash_time);
->   }
->  =20
->   static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
 >=20
 
 Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
