@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52466)
+Received: from eggs.gnu.org ([209.51.188.92]:52921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hBF74-0008Fh-Sk
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:49:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBF8T-0000yw-4H
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:51:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hBF71-0001n5-Dm
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:49:46 -0400
-From: Like Xu <like.xu@linux.intel.com>
-Date: Tue,  2 Apr 2019 16:48:20 +0800
-Message-Id: <1554194900-22817-1-git-send-email-like.xu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2] vl.c: make current_machine as non-global
- variable
+	(envelope-from <kwolf@redhat.com>) id 1hBF8Q-00061n-E0
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:51:13 -0400
+Date: Tue, 2 Apr 2019 10:50:47 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190402085047.GB5352@localhost.localdomain>
+References: <2fc10494-0f79-8d18-610d-be21cfc6c30b@redhat.com>
+	<87ftr5iy8i.fsf@dusky.pond.sub.org>
+	<c233c2b4-5257-2df7-3c1a-06bcf269d657@redhat.com>
+	<20190329170439.GK5081@localhost.localdomain>
+	<87o95sa40r.fsf@dusky.pond.sub.org>
+	<87y34v42z0.fsf_-_@dusky.pond.sub.org>
+	<20190401122054.GA2686@andariel.pipo.sk>
+	<87mul9n5ah.fsf@dusky.pond.sub.org>
+	<20190401160755.GB2686@andariel.pipo.sk>
+	<87a7h9lmp6.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7h9lmp6.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Options for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,262 +31,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, like.xu@linux.intel.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-This patch makes the remaining dozen or so uses of the global
-current_machine outside vl.c use qdev_get_machine() instead,
-and then make current_machine local to vl.c instead of global.
+Am 01.04.2019 um 18:22 hat Markus Armbruster geschrieben:
+> Peter Krempa <pkrempa@redhat.com> writes:
+> > On Mon, Apr 01, 2019 at 16:55:50 +0200, Markus Armbruster wrote:
+> >> Peter Krempa <pkrempa@redhat.com> writes:
+> >> > That works with -drive as qemu reopens the files internally, but does
+> >> > not work when using -blockdev.
+> >> 
+> >> Happy to take your word for it.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
+The difference is actually not -blockdev vs. -drive, but whether you
+define the 'file' node separately in its own -blockdev option or whether
+you create it in the context of the format node (using file.* dotted
+syntax for its options).
 
----
-Changes in v2:
-    - make the variable current_machine "static" (Thomas Huth)
+Effectively this doesn't change what Peter says because -drive only
+supports the latter, and for -blockdev we only want to use the former.
 
----
- accel/kvm/kvm-all.c | 6 ++++--
- device-hotplug.c    | 3 ++-
- device_tree.c       | 3 ++-
- exec.c              | 6 ++++--
- hw/ppc/spapr_rtas.c | 3 ++-
- include/hw/boards.h | 1 -
- migration/savevm.c  | 9 ++++++---
- qmp.c               | 3 ++-
- target/i386/kvm.c   | 3 ++-
- target/ppc/kvm.c    | 3 ++-
- vl.c                | 4 ++--
- 11 files changed, 28 insertions(+), 16 deletions(-)
+> >> > Since we need to keep the images RO until doing  the blockjob there
+> >> > needs to be a way when either qemu automagically does what libvirt needs
+> >> > even if the image did not have the write permission originally.
+> >> >
+> >> > auto-read-only was a naive impl when qemu attempted to keep the storage
+> >> > access nodes RW. At the point when I was testing it I didn't enable
+> >> > s-virt as it's a hassle when you want to run git versions of libvirt and
+> >> > qemu and thus didn't see the problem with missing permissions.
+> >> 
+> >> Yes, fallback read-only is useless for the scenario above.
+> >> 
+> >> Kevin wrote "libvirt requires dynamic read-only for file-posix. It
+> >> prefers dynamic read-only for other drivers, but can live with fallback
+> >> read-only there."  I'm not sure how it can live with fallback read-only.
+> >> Is it because only *files* can labelled with SELinux?
+> >> 
+> >> If yes, then my next question is how libvirt makes use of fallback
+> >> read-only for non-files.  Can you give me an example?
+> >
+> > For non-files libvirt usually does not have means to modify the access
+> > permissions.
+> >
+> > A simple example may be a NBD export. If the NBD server exports the
+> > image readonly libvirt can't do much about it. Arguably you can consider
+> > a situation where the user modifies the access to read-write manually
+> > and then invokes the libvirt virDomainBlockCommit API and thus still
+> > expects the automagic reopen to happen correctly. At this point I'm not
+> > really certain to which extend this would work currently with -drive as
+> > there are known issues when attempting to point to a non-file image by
+> > path rather than node-name.
+> 
+> Both automagic reopen and explicit reopen work here.  Both succeed when
+> the user has granted access manually.  Libvirt would have to try the
+> explicit reopen even in cases where it can't grant access itself.
+> 
+> Sounds like you don't have a use case for fallback read-only.  Correct?
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 241db49..d103de2 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -140,7 +140,8 @@ static const KVMCapabilityInfo kvm_required_capabilites[] = {
- 
- int kvm_get_max_memslots(void)
- {
--    KVMState *s = KVM_STATE(current_machine->accelerator);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    KVMState *s = KVM_STATE(ms->accelerator);
- 
-     return s->nr_slots;
- }
-@@ -1519,7 +1520,8 @@ static int kvm_max_vcpu_id(KVMState *s)
- 
- bool kvm_vcpu_id_is_valid(int vcpu_id)
- {
--    KVMState *s = KVM_STATE(current_machine->accelerator);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    KVMState *s = KVM_STATE(ms->accelerator);
-     return vcpu_id >= 0 && vcpu_id < kvm_max_vcpu_id(s);
- }
- 
-diff --git a/device-hotplug.c b/device-hotplug.c
-index 6090d5f..3d033f5 100644
---- a/device-hotplug.c
-+++ b/device-hotplug.c
-@@ -37,6 +37,7 @@
- 
- static DriveInfo *add_init_drive(const char *optstr)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     Error *err = NULL;
-     DriveInfo *dinfo;
-     QemuOpts *opts;
-@@ -46,7 +47,7 @@ static DriveInfo *add_init_drive(const char *optstr)
-     if (!opts)
-         return NULL;
- 
--    mc = MACHINE_GET_CLASS(current_machine);
-+    mc = MACHINE_GET_CLASS(ms);
-     dinfo = drive_new(opts, mc->block_default_type, &err);
-     if (!dinfo) {
-         error_report_err(err);
-diff --git a/device_tree.c b/device_tree.c
-index 296278e..370b74e 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -455,6 +455,7 @@ int qemu_fdt_setprop_phandle(void *fdt, const char *node_path,
- 
- uint32_t qemu_fdt_alloc_phandle(void *fdt)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     static int phandle = 0x0;
- 
-     /*
-@@ -462,7 +463,7 @@ uint32_t qemu_fdt_alloc_phandle(void *fdt)
-      * which phandle id to start allocating phandles.
-      */
-     if (!phandle) {
--        phandle = machine_phandle_start(current_machine);
-+        phandle = machine_phandle_start(ms);
-     }
- 
-     if (!phandle) {
-diff --git a/exec.c b/exec.c
-index 6ab62f4..15ff2b1 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1969,10 +1969,11 @@ static unsigned long last_ram_page(void)
- 
- static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     int ret;
- 
-     /* Use MADV_DONTDUMP, if user doesn't want the guest memory in the core */
--    if (!machine_dump_guest_core(current_machine)) {
-+    if (!machine_dump_guest_core(ms)) {
-         ret = qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
-         if (ret) {
-             perror("qemu_madvise");
-@@ -2094,7 +2095,8 @@ size_t qemu_ram_pagesize_largest(void)
- 
- static int memory_try_enable_merging(void *addr, size_t len)
- {
--    if (!machine_mem_merge(current_machine)) {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    if (!machine_mem_merge(ms)) {
-         /* disabled by the user */
-         return 0;
-     }
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 24c45b1..51e320d 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -231,6 +231,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-                                           target_ulong args,
-                                           uint32_t nret, target_ulong rets)
- {
-+    MachineState *ms = MACHINE(spapr);
-     target_ulong parameter = rtas_ld(args, 0);
-     target_ulong buffer = rtas_ld(args, 1);
-     target_ulong length = rtas_ld(args, 2);
-@@ -243,7 +244,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-                                           "DesProcs=%d,"
-                                           "MaxPlatProcs=%d",
-                                           max_cpus,
--                                          current_machine->ram_size / MiB,
-+                                          ms->ram_size / MiB,
-                                           smp_cpus,
-                                           max_cpus);
-         ret = sysparm_st(buffer, length, param_val, strlen(param_val) + 1);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index e231860..1d598c8 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -58,7 +58,6 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
-     OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
- 
- MachineClass *find_default_machine(void);
--extern MachineState *current_machine;
- 
- void machine_run_board_init(MachineState *machine);
- bool machine_usb(MachineState *machine);
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 1415001..8077ac5 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -286,8 +286,9 @@ static uint32_t get_validatable_capabilities_count(void)
- 
- static int configuration_pre_save(void *opaque)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     SaveState *state = opaque;
--    const char *current_name = MACHINE_GET_CLASS(current_machine)->name;
-+    const char *current_name = MACHINE_GET_CLASS(ms)->name;
-     MigrationState *s = migrate_get_current();
-     int i, j;
- 
-@@ -355,8 +356,9 @@ static bool configuration_validate_capabilities(SaveState *state)
- 
- static int configuration_post_load(void *opaque, int version_id)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     SaveState *state = opaque;
--    const char *current_name = MACHINE_GET_CLASS(current_machine)->name;
-+    const char *current_name = MACHINE_GET_CLASS(ms)->name;
- 
-     if (strncmp(state->name, current_name, state->len) != 0) {
-         error_report("Machine type received is '%.*s' and local is '%s'",
-@@ -566,9 +568,10 @@ static void dump_vmstate_vmsd(FILE *out_file,
- 
- static void dump_machine_type(FILE *out_file)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     MachineClass *mc;
- 
--    mc = MACHINE_GET_CLASS(current_machine);
-+    mc = MACHINE_GET_CLASS(ms);
- 
-     fprintf(out_file, "  \"vmschkmachine\": {\n");
-     fprintf(out_file, "    \"Name\": \"%s\"\n", mc->name);
-diff --git a/qmp.c b/qmp.c
-index b92d62c..f2a5473 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -119,9 +119,10 @@ void qmp_system_powerdown(Error **erp)
- 
- void qmp_cpu_add(int64_t id, Error **errp)
- {
-+    MachineState *ms = MACHINE(qdev_get_machine());
-     MachineClass *mc;
- 
--    mc = MACHINE_GET_CLASS(current_machine);
-+    mc = MACHINE_GET_CLASS(ms);
-     if (mc->hot_add_cpu) {
-         mc->hot_add_cpu(id, errp);
-     } else {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3b29ce5..b25d766 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -134,7 +134,8 @@ bool kvm_allows_irq0_override(void)
- 
- static bool kvm_x2apic_api_set_flags(uint64_t flags)
- {
--    KVMState *s = KVM_STATE(current_machine->accelerator);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    KVMState *s = KVM_STATE(ms->accelerator);
- 
-     return !kvm_vm_enable_cap(s, KVM_CAP_X2APIC_API, 0, flags);
- }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2427c8e..c3bea37 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -276,7 +276,8 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
- 
- struct ppc_radix_page_info *kvm_get_radix_page_info(void)
- {
--    KVMState *s = KVM_STATE(current_machine->accelerator);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    KVMState *s = KVM_STATE(ms->accelerator);
-     struct ppc_radix_page_info *radix_page_info;
-     struct kvm_ppc_rmmu_info rmmu_info;
-     int i;
-diff --git a/vl.c b/vl.c
-index d61d560..4c34907 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1265,6 +1265,8 @@ static QemuOptsList qemu_smp_opts = {
-     },
- };
- 
-+static MachineState *current_machine;
-+
- static void smp_parse(QemuOpts *opts)
- {
-     if (opts) {
-@@ -1462,8 +1464,6 @@ static int usb_parse(const char *cmdline)
- /***********************************************************/
- /* machine registration */
- 
--MachineState *current_machine;
--
- static MachineClass *find_machine(const char *name)
- {
-     GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
--- 
-1.8.3.1
+If everything supports dynamic read-only, I don't think anyone would
+have a use for fallback read-only. The long-term vision was that we
+would remove the read-only option and add a new force-read-only option
+that would allow selecting between "force read-only" and "do whatever is
+needed to support what the attached parents requested". This should be
+all we really need. I don't think there is even a use case for a hard
+read-write option.
+
+It's just that dynamic read-only is a bit harder to implement, so we
+started with fallback read-only as "good enough for libvirt" (seemingly,
+turned out to be wrong for file-posix).
+
+The definition of the option was kept intentionally vague so that it
+would allow switching to dynamic read-only. The idea was that it only
+turns an error into working cases, so we can safely do the switch and
+libvirt would automatically be upgraded from an error case to a working
+case, too.
+
+Of course, in this reasoning we forgot that libvirt might want to just
+switch back to -drive in the cases that would error out instead of
+actually receiving that error.
+
+> >> > The dynamic version attempts to fix that. That is still the automagic
+> >> > approach. I don't really mind also doing a hands-on approach where we'd
+> >> > need to tell qemu to reopen given nodes.
+> >> 
+> >> Aha!  You just corrected my overly narrow idea of the solution space.
+> >> 
+> >> > I'm not sure what ends up being less work.
+> >> 
+> >> "Less work" is an important consideration.
+> >> 
+> >> We may be able to accept some extra work to get a saner interface.
+> >> Depends on how much saner and how much extra exactly, and on who needs
+> >> to do the work.
+> >
+> > I agree. While the 'explicit reopen' approach may be more work for
+> > libvirt I'll happily accept that solution.
+> 
+> Would x-blockdev-reopen do?
+> 
+> What exactly is hold it in x-space?
+> 
+> I guess a specialized blockdev-set-read-only would do as well.
+
+x-blockdev-reopen was only just added. It provides the same options as
+blockdev-add, so a first estimation would be that it's roughly the same
+complexity. Experience from blockdev-add tells us that getting it stable
+the next release was completely unrealistic because we didn't even fully
+understand the problems yet. I expect the same for x-blockdev-reopen.
+
+Maybe what impresses you more is that x-blockdev-reopen doesn't only
+change options like read-only, but also references to other nodes. So
+it's the dynamic graph reconfiguration thing we've talking about for
+years. This seems hard to get right in the first attempt.
+
+But we also know a few more concrete shortcomings. For example, changing
+child nodes doesn't work if iothreads are involved.
+
+Also: Not all option that could theoretically be changed in
+x-blockdev-reopen are actually supported yet. If we mark it stable
+before everything is covered, we'll need some kind of schema annotations
+again that describe in which version changing which option was added.
+Maybe this time we'd better figure out how to do that before creating
+the problem.
+
+For blockdev-add, we decided to only mark it stable as soon as full
+feature parity with -drive was achieved (except for options that we
+_really_ don't want to have in QAPI).
+
+So I'm very doubtful of marking x-blockdev-reopen stable in 4.1.
+
+A specialised blockdev-set-read-only seems more realistic for 4.1, but
+it still wouldn't solve the problem now in 4.0 and once we have a stable
+blockdev-reopen, it's duplicated functionality.
+
+Kevin
