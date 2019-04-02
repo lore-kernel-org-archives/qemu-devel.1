@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59563)
+Received: from eggs.gnu.org ([209.51.188.92]:59587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBIqz-0002Ji-5L
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBIr0-0002Kx-6d
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBIqx-00033J-L2
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBIqz-0003A4-7o
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:26 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  2 Apr 2019 14:49:01 +0200
-Message-Id: <20190402124907.24421-4-kwolf@redhat.com>
+Date: Tue,  2 Apr 2019 14:49:05 +0200
+Message-Id: <20190402124907.24421-8-kwolf@redhat.com>
 In-Reply-To: <20190402124907.24421-1-kwolf@redhat.com>
 References: <20190402124907.24421-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/9] block/gluster: limit the transfer size to
- 512 MiB
+Subject: [Qemu-devel] [PULL 7/9] block: freeze the backing chain earlier in
+ stream_start()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Several versions of GlusterFS (3.12? -> 6.0.1) fail when the
-transfer size is greater or equal to 1024 MiB, so we are
-limiting the transfer size to 512 MiB to avoid this rare issue.
+Commit 6585493369819a48d34a86d57ec6b97cb5cd9bc0 added code to freeze
+the backing chain from 'top' to 'base' for the duration of the
+block-stream job.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1691320
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Niels de Vos <ndevos@redhat.com>
+The problem is that the freezing happens too late in stream_start():
+during the bdrv_reopen_set_read_only() call earlier in that function
+another job can jump in and remove the base image. If that happens we
+have an invalid chain and QEMU crashes.
+
+This patch puts the bdrv_freeze_backing_chain() call at the beginning
+of the function.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/gluster.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ block/stream.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 51f184cbd8..e664ca4462 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/block/stream.c b/block/stream.c
+index 6253c86fae..bfaebb861a 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -238,11 +238,16 @@ void stream_start(const char *job_id, BlockDriverSt=
+ate *bs,
+     BlockDriverState *iter;
+     bool bs_read_only;
 =20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include <glusterfs/api/glfs.h>
- #include "block/block_int.h"
- #include "block/qdict.h"
-@@ -41,6 +42,12 @@
- #define GLUSTER_DEBUG_MAX           9
- #define GLUSTER_OPT_LOGFILE         "logfile"
- #define GLUSTER_LOGFILE_DEFAULT     "-" /* handled in libgfapi as /dev/s=
-tderr */
-+/*
-+ * Several versions of GlusterFS (3.12? -> 6.0.1) fail when the transfer=
- size
-+ * is greater or equal to 1024 MiB, so we are limiting the transfer size=
- to 512
-+ * MiB to avoid this rare issue.
-+ */
-+#define GLUSTER_MAX_TRANSFER        (512 * MiB)
-=20
- #define GERR_INDEX_HINT "hint: check in 'server' array index '%d'\n"
-=20
-@@ -887,6 +894,11 @@ out:
-     return ret;
- }
-=20
-+static void qemu_gluster_refresh_limits(BlockDriverState *bs, Error **er=
-rp)
-+{
-+    bs->bl.max_transfer =3D GLUSTER_MAX_TRANSFER;
-+}
++    if (bdrv_freeze_backing_chain(bs, base, errp) < 0) {
++        return;
++    }
 +
- static int qemu_gluster_reopen_prepare(BDRVReopenState *state,
-                                        BlockReopenQueue *queue, Error **=
-errp)
- {
-@@ -1544,6 +1556,7 @@ static BlockDriver bdrv_gluster =3D {
-     .bdrv_co_pwrite_zeroes        =3D qemu_gluster_co_pwrite_zeroes,
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-+    .bdrv_refresh_limits          =3D qemu_gluster_refresh_limits,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-     .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-@@ -1574,6 +1587,7 @@ static BlockDriver bdrv_gluster_tcp =3D {
-     .bdrv_co_pwrite_zeroes        =3D qemu_gluster_co_pwrite_zeroes,
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-+    .bdrv_refresh_limits          =3D qemu_gluster_refresh_limits,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-     .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-@@ -1604,6 +1618,7 @@ static BlockDriver bdrv_gluster_unix =3D {
-     .bdrv_co_pwrite_zeroes        =3D qemu_gluster_co_pwrite_zeroes,
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-+    .bdrv_refresh_limits          =3D qemu_gluster_refresh_limits,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-     .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-@@ -1640,6 +1655,7 @@ static BlockDriver bdrv_gluster_rdma =3D {
-     .bdrv_co_pwrite_zeroes        =3D qemu_gluster_co_pwrite_zeroes,
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-+    .bdrv_refresh_limits          =3D qemu_gluster_refresh_limits,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-     .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
+     /* Make sure that the image is opened in read-write mode */
+     bs_read_only =3D bdrv_is_read_only(bs);
+     if (bs_read_only) {
+         if (bdrv_reopen_set_read_only(bs, false, errp) !=3D 0) {
+-            return;
++            bs_read_only =3D false;
++            goto fail;
+         }
+     }
+=20
+@@ -269,11 +274,6 @@ void stream_start(const char *job_id, BlockDriverSta=
+te *bs,
+                            &error_abort);
+     }
+=20
+-    if (bdrv_freeze_backing_chain(bs, base, errp) < 0) {
+-        job_early_fail(&s->common.job);
+-        goto fail;
+-    }
+-
+     s->base =3D base;
+     s->backing_file_str =3D g_strdup(backing_file_str);
+     s->bs_read_only =3D bs_read_only;
+@@ -288,4 +288,5 @@ fail:
+     if (bs_read_only) {
+         bdrv_reopen_set_read_only(bs, true, NULL);
+     }
++    bdrv_unfreeze_backing_chain(bs, base);
+ }
 --=20
 2.20.1
