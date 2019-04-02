@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45549)
+Received: from eggs.gnu.org ([209.51.188.92]:49935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hBEiL-0005LM-Mw
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:24:16 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hBEzy-0002wZ-Fe
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hBEiE-0007M3-Gp
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:24:10 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1hBEi9-00076Q-Mb
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:24:02 -0400
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190402080215.10747-1-vkuznets@redhat.com>
-Date: Tue, 2 Apr 2019 11:23:51 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7B2302D0-7277-4C14-9FEA-DDAE70EF005E@oracle.com>
-References: <20190402080215.10747-1-vkuznets@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] ioapic: allow buggy guests mishandling
- level-triggered interrupts to make progress
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hBEtD-0005K1-2E
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:35:28 -0400
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Tue, 2 Apr 2019 08:35:14 +0000
+Message-ID: <101bbf98-0456-5022-e117-fd6f693a8786@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+	<20181213122039.GC5427@linux.fritz.box>
+	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+	<20190313160412.GF5167@linux.fritz.box>
+In-Reply-To: <20190313160412.GF5167@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4B08AC81828326439930069F3B48D145@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,235 +32,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-
-
-> On 2 Apr 2019, at 11:02, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->=20
-> It was found that Hyper-V 2016 on KVM in some configurations (q35 =
-machine +
-> piix4-usb-uhci) hangs on boot. Root-cause was that one of Hyper-V
-> level-triggered interrupt handler performs EOI before fixing the cause =
-of
-> the interrupt. This results in IOAPIC keep re-raising the =
-level-triggered
-> interrupt after EOI because irq-line remains asserted.
->=20
-> Gory details: =
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__www.spinics.net_lis=
-ts_kvm_msg184484.html&d=3DDwIDAg&c=3DRoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65ea=
-pI_JnE&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3DGChegdKds--tabG=
-xr5GuYEYOixhXJSy1NdM1z1HllzY&s=3D1eaLCEy8KZxs9hcxJGI2MMfmsL0jIRhem8QAeeBge=
-hM&e=3D
-> (the whole thread).
->=20
-> Turns out we were dealing with similar issues before; in-kernel IOAPIC
-> implementation has commit 184564efae4d ("kvm: ioapic: conditionally =
-delay
-> irq delivery duringeoi broadcast") which describes a very similar =
-issue.
->=20
-> Steal the idea from the above mentioned commit for IOAPIC =
-implementation in
-> QEMU. SUCCESSIVE_IRQ_MAX_COUNT, delay and the comment are borrowed as =
-well.
->=20
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-I have only small minor refactoring comments inline.
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-
--Liran
-
-> ---
-> Changes since v1:
-> - timer_mod() -> timer_mod_anticipate() [Paolo Bonzini]
-> - Massaged changelog [Liran Alon]
-> - Make implementation look like in-kernel one [Liran Alon]
-> ---
-> hw/intc/ioapic.c                  | 57 ++++++++++++++++++++++++++++---
-> hw/intc/trace-events              |  1 +
-> include/hw/i386/ioapic_internal.h |  3 ++
-> 3 files changed, 56 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-> index 9d75f84d3b..9fb8dd3450 100644
-> --- a/hw/intc/ioapic.c
-> +++ b/hw/intc/ioapic.c
-> @@ -139,6 +139,15 @@ static void ioapic_service(IOAPICCommonState *s)
->     }
-> }
->=20
-> +#define SUCCESSIVE_IRQ_MAX_COUNT 10000
-> +
-> +static void ioapic_timer(void *opaque)
-
-I suggest rename method to something such as =
-=E2=80=9Cdelayed_ioapic_service_timer_handler()=E2=80=9D.
-
-> +{
-> +    IOAPICCommonState *s =3D opaque;
-> +
-> +    ioapic_service(s);
-> +}
-> +
-> static void ioapic_set_irq(void *opaque, int vector, int level)
-> {
->     IOAPICCommonState *s =3D opaque;
-> @@ -222,13 +231,40 @@ void ioapic_eoi_broadcast(int vector)
->         }
->         for (n =3D 0; n < IOAPIC_NUM_PINS; n++) {
->             entry =3D s->ioredtbl[n];
-> -            if ((entry & IOAPIC_LVT_REMOTE_IRR)
-> -                && (entry & IOAPIC_VECTOR_MASK) =3D=3D vector) {
-> -                trace_ioapic_clear_remote_irr(n, vector);
-> -                s->ioredtbl[n] =3D entry & ~IOAPIC_LVT_REMOTE_IRR;
-> -                if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << =
-n))) {
-> +
-> +            if (((entry & IOAPIC_VECTOR_MASK) !=3D vector) ||
-> +                !(entry & IOAPIC_LVT_REMOTE_IRR)) {
-> +                continue;
-> +            }
-> +
-> +            trace_ioapic_clear_remote_irr(n, vector);
-> +            s->ioredtbl[n] =3D entry & ~IOAPIC_LVT_REMOTE_IRR;
-
-remote-irr is only set for level-triggered interrupt.
-Thus, I think in the =E2=80=9Cif=E2=80=9D above you should =
-=E2=80=9Ccontinue;=E2=80=9D in case trigger-mode !=3D =
-IOAPIC_TRIGGER_LEVEL.
-i.e. Replace condition "!(entry & IOAPIC_LVT_REMOTE_IRR)=E2=80=9D with =
-=E2=80=9Ctrigger-mode !=3D IOAPIC_TRIGGER_LEVEL=E2=80=9D.
-Then you can also remove the =E2=80=9Cif=E2=80=9D below.
-
-> +
-> +            if (((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) !=3D
-> +                IOAPIC_TRIGGER_LEVEL) {
-> +                continue;
-> +            }
-> +
-> +            if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n))) =
-{
-> +                ++s->irq_eoi[vector];
-> +                if (s->irq_eoi[vector] >=3D SUCCESSIVE_IRQ_MAX_COUNT) =
-{
-
-This can just be =E2=80=9C=3D=3D=E2=80=9C as you should never reach =
-beyond SUCCESSIVE_IRQ_MAX_COUNT.
-But you can remain with =E2=80=9C>=3D=E2=80=9C if you want to be on the =
-safe side?
-
-> +                    /*
-> +                     * Real hardware does not deliver the interrupt =
-immediately
-> +                     * during eoi broadcast, and this lets a buggy =
-guest make
-> +                     * slow progress even if it does not correctly =
-handle a
-> +                     * level-triggered interrupt. Emulate this =
-behavior if we
-> +                     * detect an interrupt storm.
-> +                     */
-> +                    s->irq_eoi[vector] =3D 0;
-> +                    timer_mod_anticipate(s->timer,
-> +                                         =
-qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-> +                                         NANOSECONDS_PER_SECOND / =
-100);
-> +                    trace_ioapic_eoi_delayed_reassert(vector);
-> +                } else {
->                     ioapic_service(s);
->                 }
-> +            } else {
-> +                s->irq_eoi[vector] =3D 0;
->             }
->         }
->     }
-> @@ -401,6 +437,8 @@ static void ioapic_realize(DeviceState *dev, Error =
-**errp)
->     memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
->                           "ioapic", 0x1000);
->=20
-> +    s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, ioapic_timer, s);
-> +
->     qdev_init_gpio_in(dev, ioapic_set_irq, IOAPIC_NUM_PINS);
->=20
->     ioapics[ioapic_no] =3D s;
-> @@ -408,6 +446,14 @@ static void ioapic_realize(DeviceState *dev, =
-Error **errp)
->     qemu_add_machine_init_done_notifier(&s->machine_done);
-> }
->=20
-> +static void ioapic_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
-> +
-> +    timer_del(s->timer);
-> +    timer_free(s->timer);
-> +}
-> +
-> static Property ioapic_properties[] =3D {
->     DEFINE_PROP_UINT8("version", IOAPICCommonState, version, =
-IOAPIC_VER_DEF),
->     DEFINE_PROP_END_OF_LIST(),
-> @@ -419,6 +465,7 @@ static void ioapic_class_init(ObjectClass *klass, =
-void *data)
->     DeviceClass *dc =3D DEVICE_CLASS(klass);
->=20
->     k->realize =3D ioapic_realize;
-> +    k->unrealize =3D ioapic_unrealize;
->     /*
->      * If APIC is in kernel, we need to update the kernel cache after
->      * migration, otherwise first 24 gsi routes will be invalid.
-> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-> index a28bdce925..90c9d07c1a 100644
-> --- a/hw/intc/trace-events
-> +++ b/hw/intc/trace-events
-> @@ -25,6 +25,7 @@ apic_mem_writel(uint64_t addr, uint32_t val) =
-"0x%"PRIx64" =3D 0x%08x"
-> ioapic_set_remote_irr(int n) "set remote irr for pin %d"
-> ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin =
-%d vector %d"
-> ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
-> +ioapic_eoi_delayed_reassert(int vector) "delayed reassert on EOI =
-broadcast for vector %d"
-> ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t =
-val) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" =
-retval 0x%"PRIx32
-> ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t =
-val) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size =
-0x%"PRIx8" val 0x%"PRIx32
-> ioapic_set_irq(int vector, int level) "vector: %d level: %d"
-> diff --git a/include/hw/i386/ioapic_internal.h =
-b/include/hw/i386/ioapic_internal.h
-> index 9848f391bb..70f9fc750a 100644
-> --- a/include/hw/i386/ioapic_internal.h
-> +++ b/include/hw/i386/ioapic_internal.h
-> @@ -96,6 +96,7 @@ typedef struct IOAPICCommonClass {
->     SysBusDeviceClass parent_class;
->=20
->     DeviceRealize realize;
-> +    DeviceUnrealize unrealize;
->     void (*pre_save)(IOAPICCommonState *s);
->     void (*post_load)(IOAPICCommonState *s);
-> } IOAPICCommonClass;
-> @@ -111,6 +112,8 @@ struct IOAPICCommonState {
->     uint8_t version;
->     uint64_t irq_count[IOAPIC_NUM_PINS];
->     int irq_level[IOAPIC_NUM_PINS];
-> +    int irq_eoi[IOAPIC_NUM_PINS];
-> +    QEMUTimer *timer;
-
-I suggest rename =E2=80=9Ctimer=E2=80=9D to something more indicative as =
-one can confuse it with a generic IOAPIC timer.
-Something such as =E2=80=9Cdelayed_ioapic_service_timer=E2=80=9D.
-
-> };
->=20
-> void ioapic_reset_common(DeviceState *dev);
-> --=20
-> 2.20.1
->=20
+DQoNCk9uIDEzLjAzLjIwMTkgMTk6MDQsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDE0LjEyLjIw
+MTggdW0gMTI6NTQgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IE9uIDEzLjEy
+LjIwMTggMTU6MjAsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTMuMTIuMjAxOCB1bSAxMjow
+NyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+PiBTb3VuZHMgaXQgc2hvdWxk
+IGJlIHNvLCBidXQgaXQgZG9lc24ndCB3b3JrIHRoYXQgd2F5IGFuZCB0aGF0J3Mgd2h5Og0KPj4+
+PiB3aGVuIGRvaW5nIG1pcnJvciB3ZSBtYXkgcmVzdW1lIHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRv
+byBlYXJseSB3aGVuIHRoZQ0KPj4+PiB1bmRlcmx5aW5nIGJzIGlzIHByb3RlY3RlZCBmcm9tIHdy
+aXRpbmcgYXQgYW5kIHRodXMgd2UgZW5jb3VudGVyIHRoZQ0KPj4+PiBhc3NlcnQgb24gYSB3cml0
+ZSByZXF1ZXN0IGV4ZWN1dGlvbiBhdCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlIHdoZW4NCj4+
+Pj4gcmVzdW1pbmcgdGhlIHBvc3Rwb25lZCBjb3JvdXRpbmVzLg0KPj4+Pg0KPj4+PiBUaGUgdGhp
+bmcgaXMgdGhhdCB0aGUgYnMgaXMgcHJvdGVjdGVkIGZvciB3cml0aW5nIGJlZm9yZSBleGVjdXRp
+b24gb2YNCj4+Pj4gYmRydl9yZXBsYWNlX25vZGUgYXQgbWlycm9yX2V4aXRfY29tbW9uIGFuZCBi
+ZHJ2X3JlcGxhY2Vfbm9kZSBjYWxscw0KPj4+PiBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtIHdo
+aWNoLCBpbiB0dXJuLCBjYWxscyBjaGlsZC0+cm9sZS0+ZHJhaW5lZF9lbmQNCj4+Pj4gd2hlcmUg
+b25lIG9mIHRoZSBjYWxsYmFja3MgaXMgYmxrX3Jvb3RfZHJhaW5lZF9lbmQgd2hpY2ggY2hlY2sN
+Cj4+Pj4gaWYoLS1ibGstPnF1aWVzY2VfY291bnRlciA9PSAwKSBhbmQgcnVucyB0aGUgcG9zdHBv
+bmVkIHJlcXVlc3RzDQo+Pj4+IChjb3JvdXRpbmVzKSBpZiB0aGUgY291bmRpdGlvbiBpcyB0cnVl
+Lg0KPj4+DQo+Pj4gSG0sIHNvIHNvbWV0aGluZyBpcyBtZXNzZWQgdXAgd2l0aCB0aGUgZHJhaW4g
+c2VjdGlvbnMgaW4gdGhlIG1pcnJvcg0KPj4+IGRyaXZlci4gV2UgaGF2ZToNCj4+Pg0KPj4+ICAg
+ICAgIGJkcnZfZHJhaW5lZF9iZWdpbih0YXJnZXRfYnMpOw0KPj4+ICAgICAgIGJkcnZfcmVwbGFj
+ZV9ub2RlKHRvX3JlcGxhY2UsIHRhcmdldF9icywgJmxvY2FsX2Vycik7DQo+Pj4gICAgICAgYmRy
+dl9kcmFpbmVkX2VuZCh0YXJnZXRfYnMpOw0KPj4+DQo+Pj4gT2J2aW91c2x5LCB0aGUgaW50ZW50
+aW9uIHdhcyB0byBrZWVwIHRoZSBCbG9ja0JhY2tlbmQgZHJhaW5lZCBkdXJpbmcNCj4+PiBiZHJ2
+X3JlcGxhY2Vfbm9kZSgpLiBTbyBob3cgY291bGQgYmxrLT5xdWllc2NlX2NvdW50ZXIgZXZlciBn
+ZXQgdG8gMA0KPj4+IGluc2lkZSBiZHJ2X3JlcGxhY2Vfbm9kZSgpIHdoZW4gdGFyZ2V0X2JzIGlz
+IGRyYWluZWQ/DQo+Pj4NCj4+PiBMb29raW5nIGF0IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0o
+KSwgaXQgc2VlbXMgdGhhdCB0aGUgZnVuY3Rpb24gaGFzDQo+Pj4gYSBidWc6IEV2ZW4gaWYgb2xk
+X2JzIGFuZCBuZXdfYnMgYXJlIGJvdGggZHJhaW5lZCwgdGhlIHF1aWVzY2VfY291bnRlcg0KPj4+
+IGZvciB0aGUgcGFyZW50IHJlYWNoZXMgMCBmb3IgYSBtb21lbnQgYmVjYXVzZSB3ZSBjYWxsIC5k
+cmFpbmVkX2VuZCBmb3INCj4+PiB0aGUgb2xkIGNoaWxkIGZpcnN0IGFuZCAuZHJhaW5lZF9iZWdp
+biBmb3IgdGhlIG5ldyBvbmUgbGF0ZXIuDQo+Pj4NCj4+PiBTbyBpdCBzZWVtcyB0aGUgZml4IHdv
+dWxkIGJlIHRvIHJldmVyc2UgdGhlIG9yZGVyIGFuZCBmaXJzdCBjYWxsDQo+Pj4gLmRyYWluZWRf
+YmVnaW4gZm9yIHRoZSBuZXcgY2hpbGQgYW5kIHRoZW4gLmRyYWluZWRfZW5kIGZvciB0aGUgb2xk
+DQo+Pj4gY2hpbGQuIFNvdW5kcyBsaWtlIGEgZ29vZCBuZXcgdGVzdGNhc2UgZm9yIHRlc3RzL3Rl
+c3QtYmRydi1kcmFpbi5jLCB0b28uDQo+PiBZZXMsIGl0J3MgdHJ1ZSwgYnV0IGl0J3Mgbm90IGVu
+b3VnaC4uLg0KPiANCj4gRGlkIHlvdSBldmVyIGltcGxlbWVudCB0aGUgY2hhbmdlcyBzdWdnZXN0
+ZWQgc28gZmFyLCBzbyB0aGF0IHdlIGNvdWxkDQo+IGNvbnRpbnVlIGZyb20gdGhlcmU/IE9yIHNo
+b3VsZCBJIHRyeSBhbmQgY29tZSB1cCB3aXRoIHNvbWV0aGluZyBteXNlbGY/DQoNClNvcnJ5IGZv
+ciB0aGUgbGF0ZSByZXBseS4uLg0KWWVzLCBJIGRpZCAuLi4NCj4gDQo+PiBJbiBtaXJyb3JfZXhp
+dF9jb21tb24oKSB3ZSBhY3RpdmVseSBtYW5pcHVsYXRlIHdpdGggYmxvY2sgZHJpdmVyIHN0YXRl
+cy4NCj4+IFdoZW4gd2UgcmVwbGFjZWQgYSBub2RlIGluIHRoZSBzbmlwcGV0IHlvdSBzaG93ZWQg
+d2UgY2FuJ3QgYWxsb3cgdGhlDQo+PiBwb3N0cG9uZWQgY29yb3V0aW5lcyB0byBydW4gYmVjYXVz
+ZSB0aGUgYmxvY2sgdHJlZSBpc24ndCByZWFkeSB0bw0KPj4gcmVjZWl2ZSB0aGUgcmVxdWVzdHMg
+eWV0Lg0KPj4gVG8gYmUgcmVhZHksIHdlIG5lZWQgdG8gaW5zZXJ0IGEgcHJvcGVyIGJsb2NrIGRy
+aXZlciBzdGF0ZSB0byB0aGUgYmxvY2sNCj4+IGJhY2tlbmQgd2hpY2ggaXMgZG9uZSBoZXJlDQo+
+Pg0KPj4gICAgICAgYmxrX3JlbW92ZV9icyhiam9iLT5ibGspOw0KPj4gICAgICAgYmxrX3NldF9w
+ZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4gICAgICAg
+YmxrX2luc2VydF9icyhiam9iLT5ibGssIG1pcnJvcl90b3BfYnMsICZlcnJvcl9hYm9ydCk7IDw8
+IDw8IDw8IDw8DQo+Pg0KPj4gICAgICAgYnNfb3BhcXVlLT5qb2IgPSBOVUxMOw0KPj4NCj4+ICAg
+ICAgIGJkcnZfZHJhaW5lZF9lbmQoc3JjKTsNCj4gDQo+IERpZCB5b3UgYWN0dWFsbHkgZW5jb3Vu
+dGVyIGEgYnVnIGhlcmUgb3IgaXMgdGhpcyBqdXN0IHRoZW9yeT8gYmpvYi0+YmxrDQo+IGlzIHRo
+ZSBCbG9ja0JhY2tlbmQgb2YgdGhlIGpvYiBhbmQgaXNuJ3QgaW4gdXNlIGF0IHRoaXMgcG9pbnQg
+YW55IG1vcmUuDQo+IFdlIG9ubHkgaW5zZXJ0IHRoZSBvbGQgbm9kZSBpbiBpdCBhZ2FpbiBiZWNh
+dXNlIGJsb2NrX2pvYl9mcmVlKCkgbXVzdA0KPiBzZXQgYnMtPmpvYiA9IE5VTEwsIGFuZCBpdCBn
+ZXRzIGJzIHdpdGggYmxrX2JzKGJqb2ItPmJsaykuDQo+IA0KPiBTbyBpZiB0aGVyZSBpcyBhbiBh
+Y3R1YWwgYnVnIGhlcmUsIEkgZG9uJ3QgdW5kZXJzdGFuZCBpdCB5ZXQuDQpBbmQgZGlkIGVuY291
+bnRlciB0aGUgYnVnIHRoYXQgSSBkZXNjcmliZWQgYWJvdmUuDQpXaGVuIGEgcG9zdHBvbmVkIGNv
+cm91dGluZSByZXN1bWVzIGl0IGZhaWxzIG9uIGFzc2VydDoNCg0KYmRydl9jb193cml0ZV9yZXFf
+cHJlcGFyZTogQXNzZXJ0aW9uIGBjaGlsZC0+cGVybSAmIEJMS19QRVJNX1dSSVRFJyBmYWlsZWQN
+Cg0KVGhhdCdzIHdoeSBpdCBoYXBwZW5zOiB3ZSBoYXZlIHRoZSBtaXJyb3IgZmlsdGVyIGJkcyBp
+biBibGsgcm9vdCB3aGljaCANCnJlY2VpdmVzIGFsbCB0aGUgcmVxdWVzdHMuIE9uIG1pcnJvciBj
+b21wbGV0aW9uIHdlIGNhbGwgDQptaXJyb3JfZXhpdF9jb21tb24gdG8gZmluaXNoIG1pcnJvcmlu
+Zy4gVG8gZmluaXNoIG1pcnJvcmluZyB3ZSBuZWVkIHRvIA0KcmVtb3ZlIHRoZSBtaXJyb3IgZmls
+dGVyIGZyb20gdGhlIGdyYXBoIGFuZCBzZXQgbWlycm9yIGZpbGUgYmxrIHJvb3QuDQpXZSBjYWxs
+IGJsb2NrX2pvYl9jb21wbGV0ZS4gQXNzdW1lIHRoZSBpZGUgcmVxdWVzdCBoYXMgY2FtZSBhZnRl
+ciB0aGUgDQpjb21wbGV0aW9uIGNhbGxpbmcgYW5kIGhhcyBiZWVuIHBvc3Rwb25lZCBiZWNhdXNl
+IGJsay0+cXVpZXNjZV9jb3VudGVyIA0KaXMgbm90IDAuIGJsb2NrX2pvYl9jb21wbGV0ZSBkb2Vz
+IG1pcnJvcl9leGl0X2NvbW1vbiB3aGljaCBkcm9wcyB0aGUgDQpwZXJtaXNzaW9ucy4NCg0KICAg
+ICAvKiBXZSBkb24ndCBhY2Nlc3MgdGhlIHNvdXJjZSBhbnkgbW9yZS4gRHJvcHBpbmcgYW55IFdS
+SVRFL1JFU0laRSBpcw0KICAgICAgKiByZXF1aXJlZCBiZWZvcmUgaXQgY291bGQgYmVjb21lIGEg
+YmFja2luZyBmaWxlIG9mIHRhcmdldF9icy4gKi8NCiAgICAgYmRydl9jaGlsZF90cnlfc2V0X3Bl
+cm0obWlycm9yX3RvcF9icy0+YmFja2luZywgMCwgQkxLX1BFUk1fQUxMLA0KICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAmZXJyb3JfYWJvcnQpOw0KDQp0aGVuLCBpdCByZXBsYWNlcyB0aGUg
+c291cmNlIHdpdGggdGhlIHRhcmdldA0KDQogICAgICAgICAvKiBUaGUgbWlycm9yIGpvYiBoYXMg
+bm8gcmVxdWVzdHMgaW4gZmxpZ2h0IGFueSBtb3JlLCBidXQgd2UgDQpuZWVkIHRvDQogICAgICAg
+ICAgKiBkcmFpbiBwb3RlbnRpYWwgb3RoZXIgdXNlcnMgb2YgdGhlIEJEUyBiZWZvcmUgY2hhbmdp
+bmcgdGhlIA0KZ3JhcGguICovDQoNCiAgICAgICAgIC8vIGhlcmUsIHRhcmdldF9icyBoYXMgbm8g
+cGFyZW50cyBhbmQgZG9lc24ndCBiZWdpbiB0byBkcmFpbmcNCg0KICAgICAgICAgYmRydl9kcmFp
+bmVkX2JlZ2luKHRhcmdldF9icyk7DQoNCiAgICAgICAgIC8vIGFmdGVyIGV4ZWN1dGlvbiBvZiB0
+aGUgZnVuY3Rpb24gYmVsb3cNCiAgICAgICAgIC8vIHRhcmdldCBicyBoYXMgbWlycm9yX3RvcF9i
+cy0+YmFja2luZyBhcyBhIHBhcmVudA0KDQogICAgICAgICBiZHJ2X3JlcGxhY2Vfbm9kZSh0b19y
+ZXBsYWNlLCB0YXJnZXRfYnMsICZsb2NhbF9lcnIpOw0KDQogICAgICAgICAvLyBub3cgdGFyZ2V0
+X2JzIGhhcyBzb3VyY2UncyBibGsgYXMgYSBwYXJlbnQNCiAgICAgICAgIC8vIHRoZSBmb2xsb3dp
+bmcgY2FsbCBzZXRzIGJsay0+cXVpZXNjZV9jb3VudGVyIHRvIDANCiAgICAgICAgIC8vIGFuZCBl
+eGVjdXRlcyB0aGUgcG9zdHBvbmVkIGNvcm91dGluZSBvbiBibGsgd2l0aA0KICAgICAgICAgLy8g
+bWlycm9yIGZpbHRlciBzZXQgd2hpY2ggZXZlbnR1YWxseSBkb2VzIHdyaXRpbmcNCiAgICAgICAg
+IC8vIG9uIG1pcnJvcl90b3BfYnMtPmJhY2tpbmcgY2hpbGQgd2hpY2ggaGFzIG5vIHdyaXRpbmcN
+CiAgICAgICAgIC8vIChhbmQgcmVhZGluZykgcGVybWlzc2lvbnMNCg0KICAgICAgICAgYmRydl9k
+cmFpbmVkX2VuZCh0YXJnZXRfYnMpOw0KDQoNCkRvZXMgaXQgbWFrZSB0aGluZyBtb3JlIGNsZWFy
+Pw0KDQpEZW5pcw0KDQo+IA0KPj4gSWYgdGhlIHRyZWUgaXNuJ3QgcmVhZHkgYW5kIHdlIHJlc3Vt
+ZSB0aGUgY29yb3V0aW5lcywgd2UnbGwgZW5kIHVwIHdpdGgNCj4+IHRoZSByZXF1ZXN0IGxhbmRl
+ZCBpbiBhIHdyb25nIGJsb2NrIGRyaXZlciBzdGF0ZS4NCj4+DQo+PiBTbywgd2UgZXhwbGljaXRs
+eSBzaG91bGQgc3RvcCBhbGwgYWN0aXZpdGllcyBvbiBhbGwgdGhlIGRyaXZlciBzdGF0ZXMNCj4+
+IGFuZCBpdHMgcGFyZW50cyBhbmQgYWxsb3cgdGhlIGFjdGl2aXRpZXMgd2hlbiBldmVyeXRoaW5n
+IGlzIHJlYWR5IHRvIGdvLg0KPj4NCj4+IFdoeSBleHBsaWNpdGx5LCBiZWNhdXNlIHRoZSBibG9j
+ayBkcml2ZXIgc3RhdGVzIG1heSBiZWxvbmcgdG8gZGlmZmVyZW50DQo+PiBibG9jayBiYWNrZW5k
+cyBhdCB0aGUgbW9tZW50IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5nLg0KPj4NCj4+IFNv
+LCBpdCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxsIHRoZWlyIGNvbnRleHRzIHVudGlsIHRo
+ZQ0KPj4gbWFuaXB1bGF0aW9uIGVuZHMuDQo+IA0KPiBJZiB0aGVyZSBhY3R1YWxseSBpcyBhIGJ1
+ZywgaXQgaXMgY2VydGFpbmx5IG5vdCBzb2x2ZWQgYnkgY2FsbGluZw0KPiBhaW9fZGlzYWJsZV9l
+eHRlcm5hbCgpIChpdCBpcyBiYWQgZW5vdWdoIHRoYXQgdGhpcyBldmVuIGV4aXN0cyksIGJ1dCBi
+eQ0KPiBrZWVwaW5nIHRoZSBub2RlIGRyYWluZWQuDQo+IA0KPiBLZXZpbg0KPiANCg0KLS0gDQpC
+ZXN0LA0KRGVuaXMNCg==
