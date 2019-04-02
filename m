@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51995)
+Received: from eggs.gnu.org ([209.51.188.92]:45704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hB6fJ-0003an-Q3
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:48:34 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hB7FE-0006Ee-RY
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 20:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hB6fH-0002ZP-KM
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 19:48:33 -0400
-Date: Mon, 1 Apr 2019 20:38:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190401233818.GA22884@habkost.net>
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<1553849325-44201-5-git-send-email-like.xu@linux.intel.com>
-	<87h8bmuj2d.fsf@zen.linaroharston>
-	<2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hB7FC-0003B1-Js
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 20:25:39 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:39239)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hB7F8-00031c-Dg
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 20:25:38 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id k3so5599686pga.6
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 17:25:34 -0700 (PDT)
+References: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3b820a9d-a807-d3d9-b574-a6de2c5d29d1@linaro.org>
+Date: Tue, 2 Apr 2019 07:25:25 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/9] cpu/topology: add ARM support for smp
- machine properties
+In-Reply-To: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Do not allow sfence.vma from
+ user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Like Xu <like.xu@linux.intel.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Jonathan Behrens <fintelia@gmail.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On Mon, Apr 01, 2019 at 10:56:30AM +0800, Like Xu wrote:
-> On 2019/3/29 17:27, Alex Benn=E9e wrote:
-[...]
-> > > @@ -1713,6 +1717,9 @@ static void cortex_a9_initfn(Object *obj)
-> > >   #ifndef CONFIG_USER_ONLY
-> > >   static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegI=
-nfo *ri)
-> > >   {
-> > > +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> >=20
-> > How expensive is qdev_get_machine? This could potentially be a
-> > performance issue if this register is read a lot.
->=20
-> It may not bother us cause the MachineState object would be feteched fr=
-om
-> qemu QOM at its first requested time and save it as static variable for
-> incoming requests.
+On 4/2/19 2:12 AM, Jonathan Behrens wrote:
+> The 'sfence.vma' instruction is privileged, and should only ever be allowed
+> when executing in supervisor mode or higher.
+> 
+> Jonathan
+> 
+> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> ---
+>  target/riscv/op_helper.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-We already have a current_machine variable declared in
-include/hw/boards.h.  We normally avoid using it and use
-MACHINE(qdev_get_machine()) instead, but I never understood why.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
---=20
-Eduardo
+
+r~
