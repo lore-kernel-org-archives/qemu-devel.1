@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37333)
+Received: from eggs.gnu.org ([209.51.188.92]:42076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hBCWL-0002QJ-MM
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:03:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBCoV-0001Sg-JI
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hBCWK-0004ss-BK
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:03:41 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  2 Apr 2019 16:40:24 +1100
-Message-Id: <20190402054028.20926-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20190402054028.20926-1-david@gibson.dropbear.id.au>
-References: <20190402054028.20926-1-david@gibson.dropbear.id.au>
+	(envelope-from <armbru@redhat.com>) id 1hBCmj-0007gM-U7
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:20:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBCmj-0007fM-MV
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:20:37 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190326174510.13303-1-chen.zhang@intel.com>
+Date: Tue, 02 Apr 2019 08:20:29 +0200
+In-Reply-To: <20190326174510.13303-1-chen.zhang@intel.com> (Zhang Chen's
+	message of "Wed, 27 Mar 2019 01:45:10 +0800")
+Message-ID: <87y34tgc7m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC for-4.1 1/5] pci: Allow PCI bus subtypes to
- support extended config space accesses
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qapi/migration.json: Fix documentation
+ issue about query_colo_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,134 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+To: Zhang Chen <chen.zhang@intel.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+Zhang Chen <chen.zhang@intel.com > writes:
 
-Some PHB implementations, eg. PAPR used on pseries machine, act like
-a regular PCI bus rather than a PCIe bus, but allow access to the
-PCIe extended config space anyway.
+> From: Zhang Chen <chen.zhang@intel.com>
+>
+> The documentation with the wrong initial version number of last_mode field,
+> This patch just fix this issue.
+>
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> ---
+>  qapi/migration.json | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index cfde29acf8..798c6ac2df 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1382,7 +1382,7 @@
+>  #
+>  # @last_mode: COLO last running mode. If COLO is running, this field
+>  #             will return same like mode field, after failover we can
+> -#             use this field to get last colo mode. (since 4.1)
+> +#             use this field to get last colo mode. (since 4.0)
+>  #
+>  # @reason: describes the reason for the COLO exit.
+>  #
 
-Introduce a new PCI bus class method to modelize this behaviour and
-use it when adjusting the config space size limit during accesses.
+What's the excuse for spelling last_mode with '_' instead of '-'?
 
-No behaviour change for existing PCI bus types.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155414130271.574858.4253514266378127489.stgit@bahia.lan>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/pci/pci.c             | 24 ++++++++++++++++++++++++
- hw/pci/pci_host.c        |  2 +-
- include/hw/pci/pci.h     |  2 ++
- include/hw/pci/pci_bus.h |  1 +
- 4 files changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 35451c1e99..6d13ef877b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -147,6 +147,11 @@ static uint16_t pcibus_numa_node(PCIBus *bus)
-     return NUMA_NODE_UNASSIGNED;
- }
-=20
-+static bool pcibus_allows_extended_config_space(PCIBus *bus)
-+{
-+    return false;
-+}
-+
- static void pci_bus_class_init(ObjectClass *klass, void *data)
- {
-     BusClass *k =3D BUS_CLASS(klass);
-@@ -162,6 +167,7 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
-id *data)
-     pbc->is_root =3D pcibus_is_root;
-     pbc->bus_num =3D pcibus_num;
-     pbc->numa_node =3D pcibus_numa_node;
-+    pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
-space;
- }
-=20
- static const TypeInfo pci_bus_info =3D {
-@@ -182,9 +188,22 @@ static const TypeInfo conventional_pci_interface_inf=
-o =3D {
-     .parent        =3D TYPE_INTERFACE,
- };
-=20
-+static bool pciebus_allows_extended_config_space(PCIBus *bus)
-+{
-+    return true;
-+}
-+
-+static void pcie_bus_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIBusClass *pbc =3D PCI_BUS_CLASS(klass);
-+
-+    pbc->allows_extended_config_space =3D pciebus_allows_extended_config=
-_space;
-+}
-+
- static const TypeInfo pcie_bus_info =3D {
-     .name =3D TYPE_PCIE_BUS,
-     .parent =3D TYPE_PCI_BUS,
-+    .class_init =3D pcie_bus_class_init,
- };
-=20
- static PCIBus *pci_find_bus_nr(PCIBus *bus, int bus_num);
-@@ -401,6 +420,11 @@ bool pci_bus_is_root(PCIBus *bus)
-     return PCI_BUS_GET_CLASS(bus)->is_root(bus);
- }
-=20
-+bool pci_bus_allows_extended_config_space(PCIBus *bus)
-+{
-+    return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
-+}
-+
- void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
-*parent,
-                               const char *name,
-                               MemoryRegion *address_space_mem,
-diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-index 5f5345dbac..9d64b2e12f 100644
---- a/hw/pci/pci_host.c
-+++ b/hw/pci/pci_host.c
-@@ -54,7 +54,7 @@ static inline PCIDevice *pci_dev_find_by_addr(PCIBus *b=
-us, uint32_t addr)
- static void pci_adjust_config_limit(PCIBus *bus, uint32_t *limit)
- {
-     if (*limit > PCI_CONFIG_SPACE_SIZE) {
--        if (!pci_bus_is_express(bus)) {
-+        if (!pci_bus_allows_extended_config_space(bus)) {
-             *limit =3D PCI_CONFIG_SPACE_SIZE;
-             return;
-         }
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index d87f5f93e9..0abb06b357 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -396,6 +396,8 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque=
-, int pin);
-=20
- bool pci_bus_is_express(PCIBus *bus);
- bool pci_bus_is_root(PCIBus *bus);
-+bool pci_bus_allows_extended_config_space(PCIBus *bus);
-+
- void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
-*parent,
-                               const char *name,
-                               MemoryRegion *address_space_mem,
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index dfb75752cb..f6df834170 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -18,6 +18,7 @@ typedef struct PCIBusClass {
-     bool (*is_root)(PCIBus *bus);
-     int (*bus_num)(PCIBus *bus);
-     uint16_t (*numa_node)(PCIBus *bus);
-+    bool (*allows_extended_config_space)(PCIBus *bus);
- } PCIBusClass;
-=20
- struct PCIBus {
---=20
-2.20.1
+Any objection to changing it to last-mode?
