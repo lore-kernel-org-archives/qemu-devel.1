@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34737)
+Received: from eggs.gnu.org ([209.51.188.92]:38970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBM8H-0007ut-I5
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:30 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hBMPY-0006Jk-03
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBM8F-0006sr-JT
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:29 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42218)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hBM8B-0006nA-Jf
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g3so17417816wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 09:19:23 -0700 (PDT)
-References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9d208883-c16b-e24a-7aa3-97688897acc2@redhat.com>
-Date: Tue, 2 Apr 2019 18:19:19 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1hBMDu-0001VM-TV
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:25:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hBMDu-0001SG-G2
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:25:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA5F43082134
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 16:25:17 +0000 (UTC)
+References: <20190326131822.GD15011@stefanha-x1.localdomain>
+	<55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
+	<20190402161853.GE5352@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b4f5997d-e42a-aaaa-e145-b55d5f6efd93@redhat.com>
+Date: Tue, 2 Apr 2019 18:25:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <20190402161853.GE5352@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize
- ILVEV.<B|H|W|D> MSA instructions
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU event loop optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,243 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 
-Hi Mateja,
-
-On 4/2/19 5:15 PM, Mateja Marjanovic wrote:
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+On 02/04/19 18:18, Kevin Wolf wrote:
+> Am 26.03.2019 um 15:11 hat Paolo Bonzini geschrieben:
+>> - but actually (and a precursor to using IOCB_CMD_POLL) it should be
+>> possible to have just one LinuxAioState per AioContext, and then
+>> it can simply share the AioContext's EventNotifier.  This removes
+>> the need to do the event_notifier_test_and_clear in linux-aio.c.
 > 
-> Optimize set of MSA instructions ILVEV, using directly
-> tcg registers and performing logic on them instead of
-> using helpers.
+> Isn't having only one LinuxAioState per AioContext what we already do?
+> See aio_get_linux_aio().
 
-Maybe you can still let this previous comment (if still valid):
+And I should have known that:
 
-  Performance measurement is done by executing the
-  instructions large number of times on a computer
-  with Intel Core i7-3770 CPU @ 3.40GHz×8.
+    commit 0187f5c9cb172771ba85c66e3bf61f8cde6d6561
+    Author: Paolo Bonzini <pbonzini@redhat.com>
+    Date:   Mon Jul 4 18:33:20 2016 +0200
 
-> 
-> In the following table, the first column is the performance
-> before this patch. The second represents the performance,
-> after converting from helpers to tcg, but without using
-> tcg_gen_deposit function. The third one is the solution
-> which is implemented in this patch.
+    linux-aio: share one LinuxAioState within an AioContext
 
-You are describing the "no-deposit" which refers to a previous series
-but won't be accessible in the git repository.
+    This has better performance because it executes fewer system calls
+    and does not use a bottom half per disk.
 
-I think this table is useful in the cover of this series, and in the
-commit message you should use || before || after || and drop the
-"no-deposit" case.
+    Originally proposed by Ming Lei.
 
-> 
->  instr    ||   before    || no-deposit ||  with-deposit
-> ========================================================
->  ilvev.b  ||  126.92 ms  ||  24.52 ms  ||  24.43 ms
->  ilvev.h  ||   93.67 ms  ||  23.92 ms  ||  23.86 ms
->  ilvev.w  ||  117.86 ms  ||  23.83 ms  ||  22.17 ms
->  ilvev.d  ||   45.49 ms  ||  19.74 ms  ||  19.71 ms
-> 
-> The solution with deposit is suggested by Richard Henderson.
-> 
+The second point, which is to share the AioContext's EventNotifier,
+still stands.
 
-The gitdm parsable form is:
-
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> ---
->  target/mips/helper.h     |   1 -
->  target/mips/msa_helper.c |   9 ----
->  target/mips/translate.c  | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 104 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/mips/helper.h b/target/mips/helper.h
-> index 02e16c7..82f6a40 100644
-> --- a/target/mips/helper.h
-> +++ b/target/mips/helper.h
-> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
-> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-> index a7ea6aa..d5c3842 100644
-> --- a/target/mips/msa_helper.c
-> +++ b/target/mips/msa_helper.c
-> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
->      } while (0)
->  MSA_FN_DF(ilvr_df)
->  #undef MSA_DO
-> -
-> -#define MSA_DO(DF)                      \
-> -    do {                                \
-> -        pwx->DF[2*i]   = pwt->DF[2*i];  \
-> -        pwx->DF[2*i+1] = pws->DF[2*i];  \
-> -    } while (0)
-> -MSA_FN_DF(ilvev_df)
-> -#undef MSA_DO
-> -
->  #undef MSA_LOOP_COND
->  
->  #define MSA_LOOP_COND(DF) \
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 04406d6..e26c6a6 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -28974,6 +28974,94 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
->      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
->  }
->  
-> +/*
-> + * [MSA] ILVEV.B wd, ws, wt
-> + *
-> + *   Vector Interleave Even (byte data elements)
-> + *
-> + */
-> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
-> +                               uint32_t ws, uint32_t wt)
-> +{
-> +    TCGv_i64 t1 = tcg_temp_new_i64();
-> +    TCGv_i64 t2 = tcg_temp_new_i64();
-> +    const uint64_t mask = 0x00ff00ff00ff00ffULL;
-> +
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-> +    tcg_gen_shli_i64(t2, t2, 8);
-> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-> +
-
-Richard, is it cheaper to use another register to keep the constant mask
-(here reused 4x)?
-
-Such:
-
-       TCGv_i64 mask = tcg_const_i64(0x00ff00ff00ff00ffULL);
-
-       tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
-       tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
-       tcg_gen_shli_i64(t2, t2, 8);
-       tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-
-Here use tcg_gen_and_i64() too.
-
-> +    tcg_gen_shli_i64(t2, t2, 8);
-> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-> +
-
-       tcg_temp_free_i64(mask);
-
-> +    tcg_temp_free_i64(t1);
-> +    tcg_temp_free_i64(t2);
-
-Mateja: Can you test for perf easily?
-
-> +}
-> +
-> +/*
-> + * [MSA] ILVEV.H wd, ws, wt
-> + *
-> + *   Vector Interleave Even (halfword data elements)
-> + *
-> + */
-> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
-> +                               uint32_t ws, uint32_t wt)
-> +{
-> +    TCGv_i64 t1 = tcg_temp_new_i64();
-> +    TCGv_i64 t2 = tcg_temp_new_i64();
-> +    const uint64_t mask = 0x0000ffff0000ffffULL;
-> +
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-> +    tcg_gen_shli_i64(t2, t2, 16);
-> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-> +
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-> +    tcg_gen_shli_i64(t2, t2, 16);
-> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-> +
-> +    tcg_temp_free_i64(t1);
-> +    tcg_temp_free_i64(t2);
-
-Very similiar to gen_ilvev_b(), changing the mask and shift. Maybe worth
-a refactor.
-
-> +}
-> +
-> +/*
-> + * [MSA] ILVEV.W wd, ws, wt
-> + *
-> + *   Vector Interleave Even (word data elements)
-> + *
-> + */
-> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-> +                               uint32_t ws, uint32_t wt)
-> +{
-> +    TCGv_i64 t1 = tcg_temp_new_i64();
-> +    const uint64_t mask = 0x00000000ffffffffULL;
-> +
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], t1, msa_wr_d[ws * 2], 32, 32);
-> +
-> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], t1, msa_wr_d[ws * 2 + 1], 32, 32);
-> +
-> +    tcg_temp_free_i64(t1);
-> +}
-> +
-> +/*
-> + * [MSA] ILVEV.D wd, ws, wt
-> + *
-> + *   Vector Interleave Even (Double data elements)
-> + *
-> + */
-> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
-> +                               uint32_t ws, uint32_t wt)
-> +{
-> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-> +}
-> +
->  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->  {
->  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
-> @@ -29130,7 +29218,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
->          break;
->      case OPC_ILVEV_df:
-> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
-> +        switch (df) {
-> +        case DF_BYTE:
-> +            gen_ilvev_b(env, wd, ws, wt);
-> +            break;
-> +        case DF_HALF:
-> +            gen_ilvev_h(env, wd, ws, wt);
-> +            break;
-> +        case DF_WORD:
-> +            gen_ilvev_w(env, wd, ws, wt);
-> +            break;
-> +        case DF_DOUBLE:
-> +            gen_ilvev_d(env, wd, ws, wt);
-> +            break;
-> +        default:
-> +            assert(0);
-> +        }
->          break;
->      case OPC_BINSR_df:
->          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
-> 
-
-Thanks,
-
-Phil.
+Paolo
