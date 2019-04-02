@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49566)
+Received: from eggs.gnu.org ([209.51.188.92]:49564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTm-0001eV-3y
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTm-0001eU-2w
 	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTk-0000Vi-OG
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:37:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTk-0000VS-NC
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:37:37 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  2 Apr 2019 18:37:25 +0300
-Message-Id: <20190402153730.54145-6-vsementsov@virtuozzo.com>
+Date: Tue,  2 Apr 2019 18:37:24 +0300
+Message-Id: <20190402153730.54145-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20190402153730.54145-1-vsementsov@virtuozzo.com>
 References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 05/10] qcow2-threads: qcow2_co_do_compress:
- protect queuing by mutex
+Subject: [Qemu-devel] [PATCH v5 04/10] qcow2-threads: use
+ thread_pool_submit_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, berrange@redhat.com
 
-Drop dependence on AioContext lock.
+Use thread_pool_submit_co, instead of reinventing it here. Note, that
+thread_pool_submit_aio() never returns NULL, so checking it was an
+extra thing.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qcow2-threads.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ block/qcow2-threads.c | 17 ++---------------
+ 1 file changed, 2 insertions(+), 15 deletions(-)
 
 diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 20b2616529..156e0667be 100644
+index dea9ac431c..20b2616529 100644
 --- a/block/qcow2-threads.c
 +++ b/block/qcow2-threads.c
-@@ -158,15 +158,19 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-         .func = func,
-     };
+@@ -144,17 +144,11 @@ static int qcow2_compress_pool_func(void *opaque)
+     return 0;
+ }
  
-+    qemu_co_mutex_lock(&s->lock);
-     while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
--        qemu_co_queue_wait(&s->compress_wait_queue, NULL);
-+        qemu_co_queue_wait(&s->compress_wait_queue, &s->lock);
-     }
+-static void qcow2_compress_complete(void *opaque, int ret)
+-{
+-    qemu_coroutine_enter(opaque);
+-}
 -
-     s->nb_compress_threads++;
-+    qemu_co_mutex_unlock(&s->lock);
-+
-     thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
--    s->nb_compress_threads--;
+ static ssize_t coroutine_fn
+ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                      const void *src, size_t src_size, Qcow2CompressFunc func)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    BlockAIOCB *acb;
+     ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+     Qcow2CompressData arg = {
+         .dest = dest,
+@@ -169,16 +163,9 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     }
  
-+    qemu_co_mutex_lock(&s->lock);
-+    s->nb_compress_threads--;
+     s->nb_compress_threads++;
+-    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
+-                                 qcow2_compress_complete,
+-                                 qemu_coroutine_self());
+-
+-    if (!acb) {
+-        s->nb_compress_threads--;
+-        return -EINVAL;
+-    }
+-    qemu_coroutine_yield();
++    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
+     s->nb_compress_threads--;
++
      qemu_co_queue_next(&s->compress_wait_queue);
-+    qemu_co_mutex_unlock(&s->lock);
  
      return arg.ret;
- }
 -- 
 2.18.0
