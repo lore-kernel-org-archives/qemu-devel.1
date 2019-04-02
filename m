@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41981)
+Received: from eggs.gnu.org ([209.51.188.92]:45804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hBJTB-0005Y5-04
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:28:54 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hBJgh-0006ze-IQ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hBJT9-0004jr-KP
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:28:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hBJT9-0004jT-An
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:28:51 -0400
-Date: Tue, 2 Apr 2019 14:28:46 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190402132846.GG413@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190402144725.fc998797b28431d714cbacfc@wanadoo.fr>
+	(envelope-from <cohuck@redhat.com>) id 1hBJgg-0006WL-Lb
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:42:51 -0400
+Date: Tue, 2 Apr 2019 15:42:42 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190402154242.789ebfde.cohuck@redhat.com>
+In-Reply-To: <559babc4-5b67-37c7-eced-c350fc28baf6@linux.ibm.com>
+References: <20190301093949.27955-1-cohuck@redhat.com>
+	<20190301093949.27955-3-cohuck@redhat.com>
+	<559babc4-5b67-37c7-eced-c350fc28baf6@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190402144725.fc998797b28431d714cbacfc@wanadoo.fr>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Unknown X11 keycode mapping  report
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] vfio-ccw: support async command
+ subregion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Louis SOLATGES <jean-louis.solatges@wanadoo.fr>
-Cc: qemu-devel@nongnu.org
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Tue, Apr 02, 2019 at 02:47:25PM +0200, Jean-Louis SOLATGES wrote:
-> Bonjour, par tightvnc server sur clipper depuis un linux connect=C3=A9 =
-en vncviewer,
+On Thu, 21 Mar 2019 21:38:16 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Google translate doesn't do a good job here.
+> On 3/1/19 4:39 AM, Cornelia Huck wrote:
+> > A vfio-ccw device may provide an async command subregion for
+> > issuing halt/clear subchannel requests. If it is present, use
+> > it for sending halt/clear request to the device; if not, fall
+> > back to emulation (as done today).
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   hw/s390x/css.c              |  27 +++++++--
+> >   hw/vfio/ccw.c               | 109 +++++++++++++++++++++++++++++++++++-
+> >   include/hw/s390x/s390-ccw.h |   3 +
+> >   3 files changed, 133 insertions(+), 6 deletions(-)
 
-Is this saying that you are running QEMU from inside a TightVNC server
-session running on Linux ?  IOW the X11 server would be Xvnc, not your
-regular desktop Xorg server ?
+> > @@ -307,6 +398,20 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+> >       vcdev->io_region_offset = info->offset;
+> >       vcdev->io_region = g_malloc0(info->size);
+> >   
+> > +    /* check for the optional async command region */
+> > +    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
+> > +                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &info);
+> > +    if (!ret) {
+> > +        vcdev->async_cmd_region_size = info->size;
+> > +        if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
+> > +            error_setg(errp, "vfio: Unexpected size of the async cmd region");
+> > +            g_free(info);
+> > +            return;
+> > +        }
+> > +        vcdev->async_cmd_region_offset = info->offset;
+> > +        vcdev->async_cmd_region = g_malloc0(info->size);  
+> 
+> Probably need to g_free() this in vfio_ccw_put_region()
 
->=20
-> je lance :
-> qemu-system-x86_64 -m 16G -cpu kvm64 -accel kvm,thread=3Dmulti -smp 6,m=
-axcpus=3D12 -net nic -net tap -net socket,listen=3D127.0.0.1:1234 -vga ci=
-rrus -boot c -hda uis1.img
+Ah yes, thanks. Will add.
 
-
-Can you say what version of QEMU you are using too ?
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> 
+> > +    }
+> > +
+> >       g_free(info);
+> >   }
+> >   
