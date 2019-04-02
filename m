@@ -1,39 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57687)
+Received: from eggs.gnu.org ([209.51.188.92]:57909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hBKDR-0004Q4-12
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:42 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hBKEH-000572-Dg
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hBKDP-0007k7-SR
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59612)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hBKDP-0007eb-DQ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:16:39 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x32EGGX5000693
-	for <qemu-devel@nongnu.org>; Tue, 2 Apr 2019 10:16:37 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rm9bjr0mh-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 10:16:37 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Tue, 2 Apr 2019 15:16:35 +0100
-References: <20190329111104.17223-1-berrange@redhat.com>
-	<20190329111104.17223-12-berrange@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Tue, 2 Apr 2019 10:16:30 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hBKEF-0000Kr-Id
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:17:33 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34161)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hBKEF-0000J5-51
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:17:31 -0400
+Received: by mail-ot1-x342.google.com with SMTP id k21so12252139otf.1
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 07:17:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190329111104.17223-12-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <597baf23-80fb-b79b-e4f2-edd912a7e939@linux.ibm.com>
+References: <CAEn6zmGFv+UbhyriwakFKB=UhnC6=thhybDF9D1E9JzoYL-1oA@mail.gmail.com>
+	<CAFEAcA8q0c5BFh-11KNRJWCi6+Yer_5peekmQptmaw8Ag3SNhw@mail.gmail.com>
+	<20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
+	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
+	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
+	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
+	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
+	<20190402075801.GE11008@xz-x1>
+	<CAEn6zmEjYh6uK3Y5cyenLKDKe+cCpjC5HOnNNoM6SniDAKPwzQ@mail.gmail.com>
+	<20190402123659.GG11008@xz-x1>
+In-Reply-To: <20190402123659.GG11008@xz-x1>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Tue, 2 Apr 2019 22:17:17 +0800
+Message-ID: <CAEn6zmG6GMgYkDNwYFtBPx0XYWNoixDAgiasso+BL_Vyrs74yQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
- members in packed structs
+Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
+ ramblock when in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,135 +39,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Eric Farman <farman@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
 
+On Tue, 2 Apr 2019 at 20:37, Peter Xu <peterx@redhat.com> wrote:
 
+> On Tue, Apr 02, 2019 at 05:06:15PM +0800, Catherine Ho wrote:
+> > On Tue, 2 Apr 2019 at 15:58, Peter Xu <peterx@redhat.com> wrote:
+> >
+> > > On Tue, Apr 02, 2019 at 03:47:16PM +0800, Catherine Ho wrote:
+> > > > Hi Peter Maydell
+> > > >
+> > > > On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.or=
+g
+> >
+> > > wrote:
+> > > >
+> > > > > On Tue, 2 Apr 2019 at 09:57, Catherine Ho <
+> catherine.hecx@gmail.com>
+> > > > > wrote:
+> > > > > > The root cause is the used idx is moved forward after 1st time
+> > > incoming,
+> > > > > and in 2nd time incoming,
+> > > > > > the last_avail_idx will be incorrectly restored from the saved
+> device
+> > > > > state file(not in the ram).
+> > > > > >
+> > > > > > I watched this even on x86 for a virtio-scsi disk
+> > > > > >
+> > > > > > Any ideas for supporting 2nd time, 3rd time... incoming
+> restoring?
+> > > > >
+> > > > > Does the destination end go through reset between the 1st and 2nd
+> > > > >
+> > > > seems not, please see my step below
+> > > >
+> > > > > incoming attempts? I'm not a migration expert, but I thought that
+> > > > > devices were allowed to assume that their state is "state of the
+> > > > > device following QEMU reset" before the start of an incoming
+> > > > > migration attempt.
+> > > > >
+> > > >
+> > > > Here  is my step:
+> > > > 1. start guest normal by qemu with shared memory-backend file
+> > > > 2. stop the vm. save the device state to another file via monitor
+> migrate
+> > > > "exec: cat>..."
+> > > > 3. quit the vm
+> > > > 4. retore the vm by qemu -incoming "exec:cat ..."
+> > > > 5. continue the vm via monito, the 1st incoming works fine
+> > > > 6. quit the vm
+> > > > 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
+> > > > 8. continue   -> error happened
+> > > > Actually, this can be fixed by forcely restore the idx by
+> > > > virtio_queue_restore_last_avail_idx(=EF=BC=89
+> > > > But I am sure whether it is reasonable.
+> > >
+> > > Yeah I really suspect its validity.
+> > >
+> > > IMHO normal migration streams keep the device state and RAM data
+> > > together in the dumped file, so they always match.
+> > >
+> > > In your shared case, the device states are in the dumped file however
+> > > the RAM data is located somewhere else.  After you quit the VM from
+> > > the 1st incoming migration the RAM is new (because that's a shared
+> > > memory file) and the device data is still old.  They do not match
+> > > already, then I'd say you can't migrate with that any more.
+> > >
+> > > If you want to do that, you'd better take snapshot of the RAM backend
+> > > file if your filesystem supports (or even simpler, to back it up
+> > > before hand) before you start any incoming migration.  Then with the
+> > > dumped file (which contains the device states) and that snapshot file
+> > > (which contains the exact RAM data that matches the device states)
+> > > you'll alway be able to migrate for as many times as you want.
+> > >
+> >
+> > Understood, thanks Peter Xu
+> > Is there any feasible way to indicate the snapshot of the RAM backend
+> file
+> > is
+> > matched with the device data?
+> > >VQ 2 size 0x400 < last_avail_idx 0x1639 - used_idx 0x2688
+> > >Failed to load virtio-scsi:virtio
+> >
+> > Because I thought reporting above error is not so friendly. Could we ad=
+d
+> a
+> > version id in both RAM backend file and device date file?
+>
+> It would be non-trivial I'd say - AFAIK we don't have an existing way
+> to tag the memory-backend-file content (IIUC that's what you use).
+>
+> And since you mentioned about versioning of these states, I just
+> remembered that even with this you may not be able to get a complete
+> matched state of the VM, because AFAICT actually besides RAM state &
+> device state, you probably also need to consider the disk state as
+> well.  After you started the VM of the 1st incoming, there could be
+> data flushed to the VM backend disk and then that state is changed as
+> well.  So here even if you snapshot the RAM file you'll still lose the
+> disk state IIUC so it could still be broken.  In other words, to make
+> a migration/snapshot to work you'll need to make all these three
+> states to match.
+>
 
-On 03/29/2019 07:11 AM, Daniel P. Berrang=C3=A9 wrote:
-> The GCC 9 compiler complains about many places in s390 code
-> that take the address of members of the 'struct SCHIB' which
-> is marked packed:
->=20
-> hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=80=99=
-:
-> hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=80=
-=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> [-Waddress-of-packed-member]
->    133 |     SCSW *s =3D &sch->curr_status.scsw;
->        |               ^~~~~~~~~~~~~~~~~~~~~~
-> hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=80=
-=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> [-Waddress-of-packed-member]
->    134 |     PMCW *p =3D &sch->curr_status.pmcw;
->        |               ^~~~~~~~~~~~~~~~~~~~~~
->=20
-> ...snip many more...
->=20
-> Almost all of these are just done for convenience to avoid
-> typing out long variable/field names when referencing struct
-> members. We can get most of this convenience by taking the
-> address of the 'struct SCHIB' instead, avoiding triggering
-> the compiler warnings.
->=20
-> In a couple of places we copy via a local variable which is
-> a technique already applied elsewhere in s390 code for this
-> problem.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->   hw/vfio/ccw.c | 42 ++++++++++++++++++++++--------------------
->   1 file changed, 22 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 9246729a75..c44d13cc50 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -130,8 +130,8 @@ static void vfio_ccw_io_notifier_handler(void *opaq=
-ue)
->       S390CCWDevice *cdev =3D S390_CCW_DEVICE(vcdev);
->       CcwDevice *ccw_dev =3D CCW_DEVICE(cdev);
->       SubchDev *sch =3D ccw_dev->sch;
-> -    SCSW *s =3D &sch->curr_status.scsw;
-> -    PMCW *p =3D &sch->curr_status.pmcw;
-> +    SCHIB *schib =3D &sch->curr_status;
-> +    SCSW s;
->       IRB irb;
->       int size;
->  =20
-> @@ -145,33 +145,33 @@ static void vfio_ccw_io_notifier_handler(void *op=
-aque)
->           switch (errno) {
->           case ENODEV:
->               /* Generate a deferred cc 3 condition. */
-> -            s->flags |=3D SCSW_FLAGS_MASK_CC;
-> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> -            s->ctrl |=3D (SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND);
-> +            schib->scsw.flags |=3D SCSW_FLAGS_MASK_CC;
-> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> +            schib->scsw.ctrl |=3D (SCSW_STCTL_ALERT | SCSW_STCTL_STATU=
-S_PEND);
->               goto read_err;
->           case EFAULT:
->               /* Memory problem, generate channel data check. */
-> -            s->ctrl &=3D ~SCSW_ACTL_START_PEND;
-> -            s->cstat =3D SCSW_CSTAT_DATA_CHECK;
-> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> -            s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-> +            schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
-> +            schib->scsw.cstat =3D SCSW_CSTAT_DATA_CHECK;
-> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> +            schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECO=
-NDARY |
->                          SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->               goto read_err;
->           default:
->               /* Error, generate channel program check. */
-> -            s->ctrl &=3D ~SCSW_ACTL_START_PEND;
-> -            s->cstat =3D SCSW_CSTAT_PROG_CHECK;
-> -            s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> -            s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-> +            schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
-> +            schib->scsw.cstat =3D SCSW_CSTAT_PROG_CHECK;
-> +            schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> +            schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECO=
-NDARY |
->                          SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->               goto read_err;
->           }
->       } else if (size !=3D vcdev->io_region_size) {
->           /* Information transfer error, generate channel-control check=
-. */
-> -        s->ctrl &=3D ~SCSW_ACTL_START_PEND;
-> -        s->cstat =3D SCSW_CSTAT_CHN_CTRL_CHK;
-> -        s->ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> -        s->ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-> +        schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
-> +        schib->scsw.cstat =3D SCSW_CSTAT_CHN_CTRL_CHK;
-> +        schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
-> +        schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDAR=
-Y |
->                      SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->           goto read_err;
->       }
-> @@ -179,11 +179,13 @@ static void vfio_ccw_io_notifier_handler(void *op=
-aque)
->       memcpy(&irb, region->irb_area, sizeof(IRB));
->  =20
->       /* Update control block via irb. */
-> -    copy_scsw_to_guest(s, &irb.scsw);
-> +    s =3D schib->scsw;
-> +    copy_scsw_to_guest(&s, &irb.scsw);
-> +    schib->scsw =3D s;
->  =20
->       /* If a uint check is pending, copy sense data. */
-> -    if ((s->dstat & SCSW_DSTAT_UNIT_CHECK) &&
-> -        (p->chars & PMCW_CHARS_MASK_CSENSE)) {
-> +    if ((schib->scsw.dstat & SCSW_DSTAT_UNIT_CHECK) &&
-> +        (schib->pmcw.chars & PMCW_CHARS_MASK_CSENSE)) {
->           memcpy(sch->sense_data, irb.ecw, sizeof(irb.ecw));
->       }
->  =20
->=20
+Yes, thanks
 
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+>
+> Before we discuss further on the topic... could you share me with your
+> requirement first?  I started to get a bit confused now since when I
+> thought about shared mem I was thinking about migrating within the
+> same host to e.g. upgrade the hypervisor but that obviously does not
+> need you to do incoming migration for multiple times.  Then what do
+> you finally want to achieve?
+>
+Actually, I am investigating the ignore-shared capability case support on
+arm64. This feature is used in Kata containers project as "vm template"
+ The rom reset failure is the first bug.
+Ok, now I can confirm that doing incoming migration for multiple times is
+supported. Thanks for the detailed explanation :)
+B.R.
+Catherine
