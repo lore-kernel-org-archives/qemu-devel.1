@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46391)
+Received: from eggs.gnu.org ([209.51.188.92]:48647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hBJib-0008Lv-J9
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:44:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBJpV-0007OX-E4
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hBJiY-00080T-BU
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:44:47 -0400
-Date: Tue, 2 Apr 2019 15:44:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190402154437.6cb10f0d.cohuck@redhat.com>
-In-Reply-To: <7c196819-c0b1-9c8d-b43d-786189c82cac@linux.ibm.com>
-References: <20190301093949.27955-1-cohuck@redhat.com>
-	<7c196819-c0b1-9c8d-b43d-786189c82cac@linux.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hBJpU-00053b-5j
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:51:57 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hBJpT-00053I-Td
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:51:56 -0400
+Received: by mail-oi1-x242.google.com with SMTP id 3so10504155oir.7
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 06:51:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] vfio-ccw: support hsch/csch (QEMU
- part)
+References: <20190402124907.24421-1-kwolf@redhat.com>
+In-Reply-To: <20190402124907.24421-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Apr 2019 13:51:42 +0000
+Message-ID: <CAFEAcA9Zd7wx9U0jcXjvDKwC8gyQW773YdLJ5hBtgBHoQ7AxFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,19 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 21 Mar 2019 21:49:54 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+On Tue, 2 Apr 2019 at 19:49, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit d61d1a1fb2f1db6c54651844a28389c523f3f8c7:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20190402-pull-request' into staging (2019-04-02 08:18:24 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to f18957b854495129f2e8d6838df3bf47d1c1479c:
+>
+>   tests/qemu-iotests/235: Allow fallback to tcg (2019-04-02 12:04:56 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - file-posix: Ignore unlock failure instead of crashing
+> - gluster: Limit the transfer size to 512 MiB
+> - stream: Fix backing chain freezing
+> - qemu-img: Enable BDRV_REQ_MAY_UNMAP for zero writes in convert
+> - iotests fixes
 
-> On 3/1/19 4:39 AM, Cornelia Huck wrote:
-> > 
-> > [I'm not quite happy with how this async processing hooks up in css.c;
-> > ideas welcome.]  
-> 
-> I guess I'm not unhappy with it, but it does look a little odd.  Not 
-> sure I have a better idea right now...  Will ponder that for a while.
+Applied, thanks.
 
-If we don't come up with something better right now, we can still change
-this later, I think.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
