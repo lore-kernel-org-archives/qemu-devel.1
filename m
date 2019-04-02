@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41292)
+Received: from eggs.gnu.org ([209.51.188.92]:43026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBOOc-0005la-7d
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:31 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBOVo-0008My-7z
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBOOb-0001ou-AO
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBOOb-0001mQ-2C
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:29 -0400
-Date: Tue, 2 Apr 2019 19:44:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190402184423.GJ2861@work-vm>
-References: <20190402025728.5636-1-richardw.yang@linux.intel.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBOVm-0001jD-Is
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:51:56 -0400
+Received: from mail-eopbgr710132.outbound.protection.outlook.com
+	([40.107.71.132]:48206
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hBOVk-0001W2-Qr
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:51:53 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 2 Apr 2019 18:51:49 +0000
+Message-ID: <BN6PR2201MB1251AB337EE1A659E78D8742C6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>,
+	<1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190402025728.5636-1-richardw.yang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] vmstate: check subsection_found is enough
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize
+ ILVEV.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +32,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> subsection_found is true implies vmdesc is not NULL.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  migration/vmstate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index e2bbb7b5f7..8327179eea 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -533,7 +533,7 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
->          sub++;
->      }
->  
-> -    if (vmdesc && subsection_found) {
-> +    if (subsection_found) {
+> +/*
+> + * [MSA] ILVEV.D wd, ws, wt
+> + *
+> + *   Vector Interleave Even (Double data elements)
+> + *
+> + */
 
-That's true, however it's not obvious from the names; I think
-we should probably rename 'subsection_found' to something like
-'vmdesc_has_subsections'  then it's more obvious that subsection_found
-is more specialised in this routine.
-
-Dave
-
-
->          json_end_array(vmdesc);
->      }
->  
-> -- 
-> 2.19.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Double -> Doubleword
