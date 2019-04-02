@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41412)
+Received: from eggs.gnu.org ([209.51.188.92]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hBL0R-0008Og-1M
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:07:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBL1D-0000n8-2o
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hBL0N-0002Ka-L0
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:07:17 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:43034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hBL0N-0002G8-91
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:07:15 -0400
-Received: by mail-ed1-x542.google.com with SMTP id d26so11967216ede.10
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 08:07:14 -0700 (PDT)
-Date: Tue, 2 Apr 2019 15:07:10 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190402150710.gz4rs3rn4sy7khcl@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
-	<20190311060823.18360-2-richardw.yang@linux.intel.com>
-	<87pnq4hq6z.fsf@dusky.pond.sub.org>
+	(envelope-from <armbru@redhat.com>) id 1hBL1C-0002xJ-1q
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58532)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBL1B-0002wM-QA
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AD698762F
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 15:08:05 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DF75F6B919
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 15:08:04 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  2 Apr 2019 17:08:03 +0200
+Message-Id: <20190402150803.23863-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pnq4hq6z.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] vl.c: make find_default_machine() local
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 0/8] Miscellaneous patches for 2019-04-02
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 02, 2019 at 08:33:08AM +0200, Markus Armbruster wrote:
->Wei Yang <richardw.yang@linux.intel.com> writes:
->
->> Function find_default_machine() is introduced by commit 2c8cffa599b7
->> "vl: make find_default_machine externally visible", while it seems no
->> one outside use it.
->It was used outside of vl.c until commit a904410af5f.
->
->> This patch make it local again.
->
->Suggest:
->
->  Commit a904410af5f removed the only user of find_default_machine()
->  outside vl.c, but neglected to make it static.  Do that now.
->
+The following changes since commit d61d1a1fb2f1db6c54651844a28389c523f3f8=
+c7:
 
-Markus
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20190402-pull-r=
+equest' into staging (2019-04-02 08:18:24 +0100)
 
-Thanks for your comments.
+are available in the Git repository at:
 
-BTW, I think I need to spin a v2, right?
+  git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-04-02
 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  include/hw/boards.h | 1 -
->>  vl.c                | 4 ++--
->>  2 files changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index 21212f0859..e911d56c28 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -57,7 +57,6 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
->>  #define MACHINE_CLASS(klass) \
->>      OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
->>  
->> -MachineClass *find_default_machine(void);
->>  extern MachineState *current_machine;
->>  
->>  void machine_run_board_init(MachineState *machine);
->> diff --git a/vl.c b/vl.c
->> index 502857a176..3688e2bc98 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -1441,7 +1441,7 @@ static MachineClass *find_machine(const char *name)
->>      return mc;
->>  }
->>  
->> -MachineClass *find_default_machine(void)
->> +static MachineClass *find_default_machine(void)
->>  {
->>      GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
->>      MachineClass *mc = NULL;
->> @@ -2538,7 +2538,7 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->>                    object_class_get_name(OBJECT_CLASS(mc1)));
->>  }
->>  
->> - static MachineClass *machine_parse(const char *name)
->> +static MachineClass *machine_parse(const char *name)
->>  {
->>      MachineClass *mc = NULL;
->>      GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
->
->Not related to this patch's stated purpose.  Should go into PATCH 2,
->where you're changing this line anyway.
+for you to fetch changes up to 79b9d4bde7db3f760851217b329c68a883184c6b:
 
--- 
-Wei Yang
-Help you, Help me
+  accel: Unbreak accelerator fallback (2019-04-02 13:50:09 +0200)
+
+----------------------------------------------------------------
+Miscellaneous patches for 2019-04-02
+
+Two regression fixes for 4.0:
+
+* Unbreak migration for Xen
+* Unbreak accelerator fallback
+
+Three safe bug fixes thrown in:
+
+* Fix error location of qemu-system-FOO positional arguments
+* COLOStatus minor doc fix
+* COLOStatus member rename to conform to naming rules
+
+----------------------------------------------------------------
+Markus Armbruster (6):
+      vl: Fix error location of positional arguments
+      Revert "vl: Fix to create migration object before block backends ag=
+ain"
+      Revert "migration: move only_migratable to MigrationState"
+      migration: Support adding migration blockers earlier
+      vl: Document dependencies hiding in global and compat props
+      accel: Unbreak accelerator fallback
+
+Zhang Chen (2):
+      qapi/migration.json: Fix ColoStatus member last_mode's version
+      qapi/migration.json: Rename COLOStatus last_mode to last-mode
+
+ accel/accel.c           |  3 ++-
+ include/sysemu/sysemu.h |  1 +
+ migration/migration.c   | 11 +++++++----
+ migration/migration.h   |  3 ---
+ migration/savevm.c      |  2 +-
+ qapi/migration.json     |  6 +++---
+ vl.c                    | 45 ++++++++++++++++++++++++++++++-------------=
+--
+ 7 files changed, 44 insertions(+), 27 deletions(-)
+
+--=20
+2.17.2
