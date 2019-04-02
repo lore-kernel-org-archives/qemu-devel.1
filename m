@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56784)
+Received: from eggs.gnu.org ([209.51.188.92]:57137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBH35-0007yU-0F
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:49 -0400
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH3l-0000OM-0y
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBH33-0000u8-Dz
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47494)
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH3j-0001Z8-R7
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:54:28 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34282 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hBH32-0000sx-VD
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:45 -0400
-Date: Tue, 2 Apr 2019 12:53:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190402125341.6bfd0ea9@redhat.com>
-In-Reply-To: <20190401090827.20793-5-armbru@redhat.com>
-References: <20190401090827.20793-1-armbru@redhat.com>
-	<20190401090827.20793-5-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
+	id 1hBH3j-0001Xl-B5
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:54:27 -0400
+References: <1553845000-6537-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1553845000-6537-4-git-send-email-mateja.marjanovic@rt-rk.com>
+	<CY4PR2201MB125474BCF00E6B16576EE851C6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+Message-ID: <4989b987-2a0f-1942-5838-3b5c4e9ba249@rt-rk.com>
+Date: Tue, 2 Apr 2019 12:54:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CY4PR2201MB125474BCF00E6B16576EE851C6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] vl: Document dependencies hiding in
- global and compat props
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] target/mips: Different approach
+ toward COPY_S MSA instr. and big endian fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, kwolf@redhat.com
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Mon,  1 Apr 2019 11:08:26 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  vl.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index e4d7ad6b85..8c6d06b01d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4285,16 +4285,36 @@ int main(int argc, char **argv, char **envp)
->      current_machine->maxram_size = maxram_size;
->      current_machine->ram_slots = ram_slots;
->  
-> +    /*
-> +     * Note: uses machine properties such as kernel-irqchip, must run
-> +     * after machine_set_property().
-> +     */
->      configure_accelerator(current_machine, argv[0]);
->  
-> +    /*
-> +     * Beware, QOM objects created before this point miss global and
-> +     * compat properties.
-> +     *
-> +     * Global properties get set up by qdev_prop_register_global(),
-> +     * called from user_register_global_props(), and certain option
-> +     * desugaring.  Also in CPU feature desugaring (buried in
-> +     * parse_cpu_model()), which happens below this point, but may
-> +     * only target the CPU type, which can only be created after
-> +     * parse_cpu_model() returned the type.
-> +     *
-> +     * Machine compat properties: object_set_machine_compat_props().
-> +     * Accelerator compat props: object_set_accelerator_compat_props(),
-> +     * called from configure_accelerator().
-> +     */
-> +
->      if (!qtest_enabled() && machine_class->deprecation_reason) {
->          error_report("Machine type '%s' is deprecated: %s",
->                       machine_class->name, machine_class->deprecation_reason);
->      }
->  
->      /*
-> -     * Migration object can only be created after global properties
-> -     * are applied correctly.
-> +     * Note: creates a QOM object, must run only after global and
-> +     * compat properties have been set up.
->       */
->      migration_object_init();
->  
+On 1.4.19. 20:01, Aleksandar Markovic wrote:
+>> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> Subject: [PATCH v3 3/5] target/mips: Different approach toward COPY_S MSA instr. and big endian fix
+>>
+> "Different approach toward..." -> "Refactor and fix COPY_S.<B|H|W|D> instructions"
+I will change that in v4.
+>
+>> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>>
+>> The old version of the helper for the COPY_S.<B|H|W|D> MSA instructions
+>> has been replaced with a four helpers that don't use switch, and change
+>> the endianness of the given index, when executed on a big endian host.
+>>
+>> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+>> ---
+Thanks,
+Mateja
