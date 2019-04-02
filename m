@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32829)
+Received: from eggs.gnu.org ([209.51.188.92]:34568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBM2D-00048E-2W
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:13:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBM7s-0007Yy-Rc
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBM2B-00051a-Vr
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:13:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1554194900-22817-1-git-send-email-like.xu@linux.intel.com>
-	<871s2kejg1.fsf@dusky.pond.sub.org>
-	<e72befe5-c931-5c80-6769-12e1a8e7d4fa@linux.intel.com>
-	<20190402174749.71da1efe@redhat.com>
-Date: Tue, 02 Apr 2019 18:13:07 +0200
-In-Reply-To: <20190402174749.71da1efe@redhat.com> (Igor Mammedov's message of
-	"Tue, 2 Apr 2019 17:47:49 +0200")
-Message-ID: <871s2k8jxo.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1hBM7r-0006W1-WB
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19867)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hBM7r-0006UV-NU
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FC3D5947B
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 16:19:02 +0000 (UTC)
+Date: Tue, 2 Apr 2019 18:18:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190402161853.GE5352@localhost.localdomain>
+References: <20190326131822.GD15011@stefanha-x1.localdomain>
+	<55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] vl.c: make current_machine as
- non-global variable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
+Subject: Re: [Qemu-devel] QEMU event loop optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Like Xu <like.xu@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
+Am 26.03.2019 um 15:11 hat Paolo Bonzini geschrieben:
+> - but actually (and a precursor to using IOCB_CMD_POLL) it should be
+> possible to have just one LinuxAioState per AioContext, and then
+> it can simply share the AioContext's EventNotifier.  This removes
+> the need to do the event_notifier_test_and_clear in linux-aio.c.
 
-> On Tue, 2 Apr 2019 21:09:39 +0800
-> Like Xu <like.xu@linux.intel.com> wrote:
->
->> On 2019/4/2 19:27, Markus Armbruster wrote:
->> > Like Xu <like.xu@linux.intel.com> writes:
->> >   
->> >> This patch makes the remaining dozen or so uses of the global
->> >> current_machine outside vl.c use qdev_get_machine() instead,
->> >> and then make current_machine local to vl.c instead of global.
->> >>
->> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>  
->> > 
->> > You effectively replace
->> > 
->> >      current_machine
->> > 
->> > by
->> > 
->> >      MACHINE(qdev_get_machine())
->> > 
->> > qdev_get_machine() uses container_get(), which has a side effect: any
->> > path component that doesn't exist already gets created as "container"
->> > object.  In case of qdev_get_machine(), that's just "/machine".
->> > 
->> > Creating "/machine" as "container" is of course wrong.  You therefore
->> > must not use qdev_get_machine() before main() creates "/machine".  It
->> > does like this:
->> > 
->> >      object_property_add_child(object_get_root(), "machine",
->> >                                OBJECT(current_machine), &error_abort);
->> > 
->> > I recently had several cases of code rearrangements explode because the
->> > reordered code called qdev_get_machine() too early.  Makes me rather
->> > skeptical about this patch.  To be frank, I consider qdev_get_machine()
->> > a trap for the unwary.  container_get(), too.
->> > 
->> > If we decide using it to make current_machine static a good idea anyway,
->> > we need to check the new uses carefully to make sure they can't run
->> > before main() creates "/machine".
->
-> maybe we can assert in qdev_get_machine() if machine hasn't been created yet?
-> with this at least it will be hard to misuse function or catch invalid users.
-> (but it still might miss some use cases/CLI options which are not tested)
+Isn't having only one LinuxAioState per AioContext what we already do?
+See aio_get_linux_aio().
 
-Good idea.  When my code created "/machine" as a container, debugging
-the resulting crash took me a bit of time.  The assertion you propose
-would've saved me some.
+Kevin
