@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41098)
+Received: from eggs.gnu.org ([209.51.188.92]:54360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hBBPZ-0002HW-99
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 00:52:38 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hBBsb-0002j4-TI
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:22:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hBBPX-0003l0-5n
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 00:52:37 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:33199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hBBPV-0003JR-12
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 00:52:34 -0400
-Received: by mail-it1-x142.google.com with SMTP id v8so1760447itf.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 21:52:13 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <af4fdce2-10f2-de5d-d2b9-93b86e9443a6@linaro.org>
-Date: Tue, 2 Apr 2019 00:52:08 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <32C90A0D-5B12-4C63-9874-1F6BDD1907C4@oberlin.edu>
-References: <20190401220752.22577-1-stephen.checkoway@oberlin.edu>
-	<af4fdce2-10f2-de5d-d2b9-93b86e9443a6@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] capstone: Support capstone/capstone.h
+	(envelope-from <like.xu@linux.intel.com>) id 1hBBr1-0006zL-W3
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:21:00 -0400
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<1553849325-44201-5-git-send-email-like.xu@linux.intel.com>
+	<87h8bmuj2d.fsf@zen.linaroharston>
+	<2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
+	<20190401233818.GA22884@habkost.net>
+	<965d5d2f-1717-dcd0-8707-f6629f54e504@linux.intel.com>
+	<CAFEAcA_i9Te5Gs9GWnqH+JvTPFbp80+n2D=VAoC0e2DS7OfSeg@mail.gmail.com>
+From: Like Xu <like.xu@linux.intel.com>
+Message-ID: <ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
+Date: Tue, 2 Apr 2019 13:20:51 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_i9Te5Gs9GWnqH+JvTPFbp80+n2D=VAoC0e2DS7OfSeg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/9] cpu/topology: add ARM support for smp
+ machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-
-
-On Apr 1, 2019, at 21:28, Richard Henderson =
-<richard.henderson@linaro.org> wrote:
-
-> Thanks.  We should probably update our submodule to the v4 release as =
-well.
-
-Is that something that you want with this patch?
-
---=20
-Stephen Checkoway
+On 2019/4/2 12:45, Peter Maydell wrote:
+> On Tue, 2 Apr 2019 at 09:46, Like Xu <like.xu@linux.intel.com> wrote:
+>>
+>> On 2019/4/2 7:38, Eduardo Habkost wrote:
+>>> On Mon, Apr 01, 2019 at 10:56:30AM +0800, Like Xu wrote:
+>>>> On 2019/3/29 17:27, Alex Bennée wrote:
+>>> [...]
+>>>>>> @@ -1713,6 +1717,9 @@ static void cortex_a9_initfn(Object *obj)
+>>>>>>     #ifndef CONFIG_USER_ONLY
+>>>>>>     static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>>>>>>     {
+>>>>>> +    MachineState *ms = MACHINE(qdev_get_machine());
+>>>>>
+>>>>> How expensive is qdev_get_machine? This could potentially be a
+>>>>> performance issue if this register is read a lot.
+>>>>
+>>>> It may not bother us cause the MachineState object would be feteched from
+>>>> qemu QOM at its first requested time and save it as static variable for
+>>>> incoming requests.
+>>>
+>>> We already have a current_machine variable declared in
+>>> include/hw/boards.h.  We normally avoid using it and use
+>>> MACHINE(qdev_get_machine()) instead, but I never understood why.
+>>>
+>> Which one do you prefer to access smp machine properties?
+> 
+> My suggestion would be that we use qdev_get_machine(). I think
+> it would be nice to make the remaining dozen or so uses of
+> the global current_machine outside vl.c use qdev_get_machine()
+> instead, and then make current_machine local to vl.c instead
+> of global.
+> 
+> thanks
+> -- PMM
+> 
+> 
+It looks good to me and I am not sure if this refactoring should be 
+added in next patch series or as a separate patch.
