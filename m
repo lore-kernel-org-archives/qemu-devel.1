@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56427)
+Received: from eggs.gnu.org ([209.51.188.92]:56765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBBxZ-0004X7-OZ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBBz4-0005OL-IC
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBBxY-0002a5-Tf
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:45 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33327)
+	(envelope-from <peter.maydell@linaro.org>) id 1hBBz3-00035F-FN
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:29:18 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:37859)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBBxY-0002Zb-Lb
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:27:44 -0400
-Received: by mail-oi1-x242.google.com with SMTP id e5so9452911oii.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 22:27:44 -0700 (PDT)
+	id 1hBBz3-000353-7A
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 01:29:17 -0400
+Received: by mail-oi1-x235.google.com with SMTP id v84so9422669oif.4
+	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 22:29:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<1553849325-44201-5-git-send-email-like.xu@linux.intel.com>
-	<87h8bmuj2d.fsf@zen.linaroharston>
-	<2546bf3e-2009-5a76-bc63-0ad73d333a78@linux.intel.com>
-	<20190401233818.GA22884@habkost.net>
-	<965d5d2f-1717-dcd0-8707-f6629f54e504@linux.intel.com>
-	<CAFEAcA_i9Te5Gs9GWnqH+JvTPFbp80+n2D=VAoC0e2DS7OfSeg@mail.gmail.com>
-	<ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
-In-Reply-To: <ca73da94-df07-ac0e-67a4-8c9b18b7dc20@linux.intel.com>
+References: <20190401140903.19186-1-eblake@redhat.com>
+In-Reply-To: <20190401140903.19186-1-eblake@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Apr 2019 05:27:32 +0000
-Message-ID: <CAFEAcA__F84deXVLxTp4PCBtGD-8sr1nKz9cvQx4=QsV1ttnfw@mail.gmail.com>
+Date: Tue, 2 Apr 2019 05:29:05 +0000
+Message-ID: <CAFEAcA-bLOJBKzborVxwyxGR8Mpy9ODZh3crL2241j6Rhp8DZQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 4/9] cpu/topology: add ARM support for smp
- machine properties
+Subject: Re: [Qemu-devel] [PULL 00/14] NBD patches for 4.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Like Xu <like.xu@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 2 Apr 2019 at 12:20, Like Xu <like.xu@linux.intel.com> wrote:
+On Mon, 1 Apr 2019 at 21:14, Eric Blake <eblake@redhat.com> wrote:
 >
-> On 2019/4/2 12:45, Peter Maydell wrote:
-> > My suggestion would be that we use qdev_get_machine(). I think
-> > it would be nice to make the remaining dozen or so uses of
-> > the global current_machine outside vl.c use qdev_get_machine()
-> > instead, and then make current_machine local to vl.c instead
-> > of global.
+> The following changes since commit 230ce19814ecc6bff8edac3b5b86e7c82f422c6c:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-axp-20190325' into staging (2019-03-29 19:29:00 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-04-01
+>
+> for you to fetch changes up to 75d34eb98ca0bb2f49d607fcaefd9c482e56b15d:
+>
+>   nbd/client: Trace server noncompliance on structured reads (2019-04-01 08:58:04 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2019-04-01
+>
+> - Better behavior of qemu-img map on NBD images
+> - Fixes for NBD protocol alignment corner cases:
+>  - the server has fewer places where it sends reads or block status
+>    not aligned to its advertised block size
+>  - the client has more cases where it can work around server
+>    non-compliance present in qemu 3.1
+>  - the client now avoids non-compliant requests when interoperating
+>    with nbdkit or other servers not advertising block size
 
-> It looks good to me and I am not sure if this refactoring should be
-> added in next patch series or as a separate patch.
+Applied, thanks.
 
-Changing the other uses of current_machine is definitely a
-refactoring that should be a separate patch series.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-thanks
 -- PMM
