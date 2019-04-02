@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56758)
+Received: from eggs.gnu.org ([209.51.188.92]:56784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH33-0007xV-I7
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hBH35-0007yU-0F
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hBH31-0000rp-Cr
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:37391 helo=mail.rt-rk.com)
+	(envelope-from <imammedo@redhat.com>) id 1hBH33-0000u8-Dz
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
-	id 1hBH2y-0000l5-CW
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:41 -0400
-References: <1553845000-6537-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1553845000-6537-3-git-send-email-mateja.marjanovic@rt-rk.com>
-	<CY4PR2201MB1254FCEE59DB7763A7E71EFAC6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-Message-ID: <1dac2b0f-03eb-b1cf-aa25-89aa533f5869@rt-rk.com>
-Date: Tue, 2 Apr 2019 12:53:27 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hBH32-0000sx-VD
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 06:53:45 -0400
+Date: Tue, 2 Apr 2019 12:53:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190402125341.6bfd0ea9@redhat.com>
+In-Reply-To: <20190401090827.20793-5-armbru@redhat.com>
+References: <20190401090827.20793-1-armbru@redhat.com>
+	<20190401090827.20793-5-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CY4PR2201MB1254FCEE59DB7763A7E71EFAC6550@CY4PR2201MB1254.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/mips: MSA instructions st,
- big endian host fix
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] vl: Document dependencies hiding in
+ global and compat props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, anthony.perard@citrix.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, kwolf@redhat.com
 
+On Mon,  1 Apr 2019 11:08:26 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-On 1.4.19. 19:58, Aleksandar Markovic wrote:
->> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
->> Subject: [PATCH v3 2/5] target/mips: MSA instructions st, big endian host fix
->>
->> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->>
->> Fix the case when the host is running on a big endian machine,
->> and change the approach toward st instruction helpers.
->>
->> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
->> ---
-> The same comment as in the patch 1/5.
->
-> Also, please align both equation signs and argument indexes in the
-> new bodies of the helpers.
-It will be done in v4.
->
-> Thanks,
-> Aleksandar
-Thanks,
-Mateja
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  vl.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index e4d7ad6b85..8c6d06b01d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4285,16 +4285,36 @@ int main(int argc, char **argv, char **envp)
+>      current_machine->maxram_size = maxram_size;
+>      current_machine->ram_slots = ram_slots;
+>  
+> +    /*
+> +     * Note: uses machine properties such as kernel-irqchip, must run
+> +     * after machine_set_property().
+> +     */
+>      configure_accelerator(current_machine, argv[0]);
+>  
+> +    /*
+> +     * Beware, QOM objects created before this point miss global and
+> +     * compat properties.
+> +     *
+> +     * Global properties get set up by qdev_prop_register_global(),
+> +     * called from user_register_global_props(), and certain option
+> +     * desugaring.  Also in CPU feature desugaring (buried in
+> +     * parse_cpu_model()), which happens below this point, but may
+> +     * only target the CPU type, which can only be created after
+> +     * parse_cpu_model() returned the type.
+> +     *
+> +     * Machine compat properties: object_set_machine_compat_props().
+> +     * Accelerator compat props: object_set_accelerator_compat_props(),
+> +     * called from configure_accelerator().
+> +     */
+> +
+>      if (!qtest_enabled() && machine_class->deprecation_reason) {
+>          error_report("Machine type '%s' is deprecated: %s",
+>                       machine_class->name, machine_class->deprecation_reason);
+>      }
+>  
+>      /*
+> -     * Migration object can only be created after global properties
+> -     * are applied correctly.
+> +     * Note: creates a QOM object, must run only after global and
+> +     * compat properties have been set up.
+>       */
+>      migration_object_init();
+>  
