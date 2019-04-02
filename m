@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59386)
+Received: from eggs.gnu.org ([209.51.188.92]:59925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBDu5-0004vM-F4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:32:19 -0400
+	(envelope-from <chen.zhang@intel.com>) id 1hBDub-0005Za-Ic
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hBDhd-0002En-P4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:19:28 -0400
-Date: Tue, 2 Apr 2019 09:19:06 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190402091906.640a8042@redhat.com>
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83934764B@lhreml524-mbb.china.huawei.com>
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-6-shameerali.kolothum.thodi@huawei.com>
-	<a264329c-5e4d-5f98-3137-502f0a37abb7@redhat.com>
-	<20190401154301.06a581b2@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83934764B@lhreml524-mbb.china.huawei.com>
+	(envelope-from <chen.zhang@intel.com>) id 1hBDua-0008IQ-8T
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:32:49 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+	id 1hBDuZ-0008Ep-RA
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:32:48 -0400
+From: "Zhang, Chen" <chen.zhang@intel.com>
+Date: Tue, 2 Apr 2019 07:32:40 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78060B1D99@shsmsx102.ccr.corp.intel.com>
+References: <20190326174510.13303-1-chen.zhang@intel.com>
+	<87y34tgc7m.fsf@dusky.pond.sub.org>
+In-Reply-To: <87y34tgc7m.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/10] hw/arm/virt: Add ACPI support for
- device memory cold-plug
+Subject: Re: [Qemu-devel] [PATCH] qapi/migration.json: Fix documentation
+ issue about query_colo_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,306 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>
-
-On Mon, 1 Apr 2019 14:51:51 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> Hi Igor,
-> 
-> > -----Original Message-----
-> > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > Sent: 01 April 2019 14:43
-> > To: Auger Eric <eric.auger@redhat.com>
-> > Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> > qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
-> > shannon.zhaosl@gmail.com; sameo@linux.intel.com;
-> > sebastien.boeuf@intel.com; Linuxarm <linuxarm@huawei.com>; xuwei (O)
-> > <xuwei5@huawei.com>
-> > Subject: Re: [PATCH v3 05/10] hw/arm/virt: Add ACPI support for device
-> > memory cold-plug
-> > 
-> > On Fri, 29 Mar 2019 10:31:14 +0100
-> > Auger Eric <eric.auger@redhat.com> wrote:
-> >   
-> > > Hi Shameer,
-> > >
-> > > On 3/21/19 11:47 AM, Shameer Kolothum wrote:  
-> > > > This adds support to build the aml code so that Guest(ACPI boot)
-> > > > can see the cold-plugged device memory. Memory cold plug support
-> > > > with DT boot is not yet enabled.
-> > > >
-> > > > Signed-off-by: Shameer Kolothum  
-> > <shameerali.kolothum.thodi@huawei.com>  
-> > > > ---
-> > > >  default-configs/arm-softmmu.mak        |  2 ++
-> > > >  hw/acpi/generic_event_device.c         | 23  
-> > +++++++++++++++++++++++  
-> > > >  hw/arm/virt-acpi-build.c               |  9 +++++++++
-> > > >  hw/arm/virt.c                          | 23  
-> > +++++++++++++++++++++++  
-> > > >  include/hw/acpi/generic_event_device.h |  5 +++++
-> > > >  include/hw/arm/virt.h                  |  2 ++
-> > > >  6 files changed, 64 insertions(+)
-> > > >
-> > > > diff --git a/default-configs/arm-softmmu.mak  
-> > b/default-configs/arm-softmmu.mak  
-> > > > index 795cb89..6db444e 100644
-> > > > --- a/default-configs/arm-softmmu.mak
-> > > > +++ b/default-configs/arm-softmmu.mak
-> > > > @@ -162,3 +162,5 @@ CONFIG_LSI_SCSI_PCI=y
-> > > >
-> > > >  CONFIG_MEM_DEVICE=y
-> > > >  CONFIG_DIMM=y
-> > > > +CONFIG_ACPI_MEMORY_HOTPLUG=y
-> > > > +CONFIG_ACPI_HW_REDUCED=y
-> > > > diff --git a/hw/acpi/generic_event_device.c  
-> > b/hw/acpi/generic_event_device.c  
-> > > > index b21a551..0b32fc9 100644
-> > > > --- a/hw/acpi/generic_event_device.c
-> > > > +++ b/hw/acpi/generic_event_device.c
-> > > > @@ -16,13 +16,26 @@
-> > > >   */
-> > > >
-> > > >  #include "qemu/osdep.h"
-> > > > +#include "qapi/error.h"
-> > > > +#include "exec/address-spaces.h"
-> > > >  #include "hw/sysbus.h"
-> > > >  #include "hw/acpi/acpi.h"
-> > > >  #include "hw/acpi/generic_event_device.h"
-> > > > +#include "hw/mem/pc-dimm.h"
-> > > >
-> > > >  static void virt_device_plug_cb(HotplugHandler *hotplug_dev,
-> > > >                                  DeviceState *dev, Error **errp)
-> > > >  {
-> > > > +    VirtAcpiState *s = VIRT_ACPI(hotplug_dev);
-> > > > +
-> > > > +    if (s->memhp_state.is_enabled &&
-> > > > +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > > > +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
-> > > > +                                dev, errp);
-> > > > +    } else {
-> > > > +        error_setg(errp, "virt: device plug request for unsupported  
-> > device"  
-> > > > +                   " type: %s", object_get_typename(OBJECT(dev)));
-> > > > +    }
-> > > >  }
-> > > >
-> > > >  static void virt_send_ged(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-> > > > @@ -31,9 +44,19 @@ static void virt_send_ged(AcpiDeviceIf *adev,  
-> > AcpiEventStatusBits ev)  
-> > > >
-> > > >  static void virt_device_realize(DeviceState *dev, Error **errp)
-> > > >  {
-> > > > +    VirtAcpiState *s = VIRT_ACPI(dev);
-> > > > +
-> > > > +    if (s->memhp_state.is_enabled) {
-> > > > +        acpi_memory_hotplug_init(get_system_memory(),  
-> > OBJECT(dev),  
-> > > > +                                 &s->memhp_state,
-> > > > +                                 s->memhp_base);
-> > > > +    }
-> > > >  }
-> > > >
-> > > >  static Property virt_acpi_properties[] = {
-> > > > +    DEFINE_PROP_UINT64("memhp_base", VirtAcpiState, memhp_base,  
-> > 0),  
-> > > > +    DEFINE_PROP_BOOL("memory-hotplug-support", VirtAcpiState,
-> > > > +                     memhp_state.is_enabled, true),>  
-> > DEFINE_PROP_END_OF_LIST(),  
-> > > >  };
-> > > >
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index bf9c0bc..20d3c83 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -40,6 +40,7 @@
-> > > >  #include "hw/loader.h"
-> > > >  #include "hw/hw.h"
-> > > >  #include "hw/acpi/aml-build.h"
-> > > > +#include "hw/acpi/memory_hotplug.h"
-> > > >  #include "hw/pci/pcie_host.h"
-> > > >  #include "hw/pci/pci.h"
-> > > >  #include "hw/arm/virt.h"
-> > > > @@ -49,6 +50,13 @@
-> > > >  #define ARM_SPI_BASE 32
-> > > >  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
-> > > >
-> > > > +static void acpi_dsdt_add_memory_hotplug(Aml *scope, MachineState  
-> > *ms)  
-> > > > +{
-> > > > +    uint32_t nr_mem = ms->ram_slots;
-> > > > +
-> > > > +    build_memory_hotplug_aml(scope, nr_mem, "\\_SB", NULL,  
-> > AML_SYSTEM_MEMORY);  
-> > > > +}
-> > > > +
-> > > >  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-> > > >  {
-> > > >      uint16_t i;
-> > > > @@ -740,6 +748,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,  
-> > VirtMachineState *vms)  
-> > > >       * the RTC ACPI device at all when using UEFI.
-> > > >       */
-> > > >      scope = aml_scope("\\_SB");
-> > > > +    acpi_dsdt_add_memory_hotplug(scope, MACHINE(vms));
-> > > >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
-> > > >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-> > > >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > > index d0ff20d..13db0e9 100644
-> > > > --- a/hw/arm/virt.c
-> > > > +++ b/hw/arm/virt.c
-> > > > @@ -133,6 +133,7 @@ static const MemMapEntry base_memmap[] = {
-> > > >      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-> > > >      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-> > > >      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> > > > +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, 0x00010000 },
-> > > >      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-> > > >      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of  
-> > that size */  
-> > > >      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> > > > @@ -516,6 +517,18 @@ static void fdt_add_pmu_nodes(const  
-> > VirtMachineState *vms)  
-> > > >      }
-> > > >  }
-> > > >
-> > > > +static DeviceState *create_virt_acpi(VirtMachineState *vms)
-> > > > +{
-> > > > +    DeviceState *dev;
-> > > > +
-> > > > +    dev = qdev_create(NULL, "virt-acpi");
-> > > > +    qdev_prop_set_uint64(dev, "memhp_base",
-> > > > +  
-> > vms->memmap[VIRT_PCDIMM_ACPI].base);  
-> > > Maybe add a comment that a property is requested to integrated with
-> > > acpi_memory_hotplug_init() (if I am not wrong). Otherwise we can wonder
-> > > why sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, <base>) is not used as for
-> > > standard sysbus devices?  
-> > 
-> > Why it's inherited from SYS_BUS_DEVICE to begin with?  
-> 
-> Hmm..I don't have a clear answer to that other than the fact that just reused 
-> the way other platform devices are created pl011/pl061/smmu etc. Also PCI
-> doesn't look like an obvious one here. Please let me know if there is a better
-> way of doing this.
-If we don't need any of SYSBUS facilities then it's possible to inherit from plain DEVICE.
-and use object_property_add_child() to tie it to machine object explicitly.
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
 
-> > >  
-> > > > +    qdev_init_nofail(dev);
-> > > > +
-> > > > +    return dev;
-> > > > +}
-> > > > +
-> > > >  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
-> > > >  {
-> > > >      const char *itsclass = its_class_name();
-> > > > @@ -1644,6 +1657,8 @@ static void machvirt_init(MachineState  
-> > *machine)  
-> > > >
-> > > >      create_platform_bus(vms, pic);
-> > > >
-> > > > +    vms->acpi = create_virt_acpi(vms);I can see that on PC machines,  
-> > they use a link property to set the  
-> > > acpi_dev. I am unsure about the exact reason, any idea?  
-> > 
-> > pc and q35 machine have different devices that implement ACPI interface
-> > and live somewhere else in the system and also honor -no-acpi CLI option.
-> > Link allows to cache reference to whatever device in use and manage CLI
-> > expectations (if I recall it correctly).  
-> 
-> Thanks for clarifying this.
-> 
-> >   
-> > > > +
-> > > >      vms->bootinfo.ram_size = machine->ram_size;
-> > > >      vms->bootinfo.kernel_filename = machine->kernel_filename;
-> > > >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> > > > @@ -1828,11 +1843,19 @@ static void  
-> > virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,  
-> > > >  static void virt_memory_plug(HotplugHandler *hotplug_dev,
-> > > >                               DeviceState *dev, Error **errp)
-> > > >  {
-> > > > +    HotplugHandlerClass *hhc;
-> > > >      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> > > >      Error *local_err = NULL;
-> > > >
-> > > >      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> > > > +    if (local_err) {
-> > > > +        goto out;
-> > > > +    }
-> > > > +
-> > > > +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi);
-> > > > +    hhc->plug(HOTPLUG_HANDLER(vms->acpi), dev, &error_abort);  
-> > > Why error_abort instead of propagating the error?  
-> > 
-> > After last round of changes to hotplug handler, it's deemed that plug() handler
-> > should not fail (I didn't get my hands on removing error argument from
-> > interface
-> > yet). All checks and graceful abort should happen at pre_plug() stage.  
-> 
-> Ok. I will address this in next revision.
-> 
-> Thanks,
-> Shameer
->  
-> > > >
-> > > > +out:
-> > > >      error_propagate(errp, local_err);
-> > > >  }
-> > > >
-> > > > diff --git a/include/hw/acpi/generic_event_device.h  
-> > b/include/hw/acpi/generic_event_device.h  
-> > > > index f314515..262ca7d 100644
-> > > > --- a/include/hw/acpi/generic_event_device.h
-> > > > +++ b/include/hw/acpi/generic_event_device.h
-> > > > @@ -18,12 +18,17 @@
-> > > >  #ifndef HW_ACPI_GED_H
-> > > >  #define HW_ACPI_GED_H
-> > > >
-> > > > +#include "hw/acpi/memory_hotplug.h"
-> > > > +
-> > > >  #define TYPE_VIRT_ACPI "virt-acpi"
-> > > >  #define VIRT_ACPI(obj) \
-> > > >      OBJECT_CHECK(VirtAcpiState, (obj), TYPE_VIRT_ACPI)
-> > > >
-> > > >  typedef struct VirtAcpiState {
-> > > >      SysBusDevice parent_obj;
-> > > > +    MemHotplugState memhp_state;
-> > > > +    hwaddr memhp_base;
-> > > >  } VirtAcpiState;
-> > > >
-> > > > +  
-> > > spurious newline
-> > >
-> > > Thanks
-> > >
-> > > Eric  
-> > > >  #endif
-> > > > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > > > index 507517c..c5e4c96 100644
-> > > > --- a/include/hw/arm/virt.h
-> > > > +++ b/include/hw/arm/virt.h
-> > > > @@ -77,6 +77,7 @@ enum {
-> > > >      VIRT_GPIO,
-> > > >      VIRT_SECURE_UART,
-> > > >      VIRT_SECURE_MEM,
-> > > > +    VIRT_PCDIMM_ACPI,
-> > > >      VIRT_LOWMEMMAP_LAST,
-> > > >  };
-> > > >
-> > > > @@ -132,6 +133,7 @@ typedef struct {
-> > > >      uint32_t iommu_phandle;
-> > > >      int psci_conduit;
-> > > >      hwaddr highest_gpa;
-> > > > +    DeviceState *acpi;
-> > > >  } VirtMachineState;
-> > > >
-> > > >  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :  
-> > VIRT_PCIE_ECAM)  
-> > > >  
-> 
-> 
+> -----Original Message-----
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> Sent: Tuesday, April 2, 2019 2:20 PM
+> To: Zhang, Chen <chen.zhang@intel.com>
+> Cc: Zhang Chen <zhangckid@gmail.com>; Dr. David Alan Gilbert
+> <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; zhanghailiang
+> <zhang.zhanghailiang@huawei.com>; Eric Blake <eblake@redhat.com>; qemu-
+> dev <qemu-devel@nongnu.org>; Zhang, Chen <chen.zhang@intel.com>
+> Subject: Re: [Qemu-devel] [PATCH] qapi/migration.json: Fix documentation
+> issue about query_colo_status
+>=20
+> Zhang Chen <chen.zhang@intel.com > writes:
+>=20
+> > From: Zhang Chen <chen.zhang@intel.com>
+> >
+> > The documentation with the wrong initial version number of last_mode
+> > field, This patch just fix this issue.
+> >
+> > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > ---
+> >  qapi/migration.json | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/qapi/migration.json b/qapi/migration.json index
+> > cfde29acf8..798c6ac2df 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -1382,7 +1382,7 @@
+> >  #
+> >  # @last_mode: COLO last running mode. If COLO is running, this field
+> >  #             will return same like mode field, after failover we can
+> > -#             use this field to get last colo mode. (since 4.1)
+> > +#             use this field to get last colo mode. (since 4.0)
+> >  #
+> >  # @reason: describes the reason for the COLO exit.
+> >  #
+>=20
+> What's the excuse for spelling last_mode with '_' instead of '-'?
+>=20
+> Any objection to changing it to last-mode?
+
+No, I just found in migration.json have both '_' and  '-', for example "mig=
+rate_cancel" and "migrate-continue".
+If you think we should use the '-' format in this migration.qapi file, I wi=
+ll send a patch to change all command format to the '-'.
+
+Thanks
+Zhang Chen
