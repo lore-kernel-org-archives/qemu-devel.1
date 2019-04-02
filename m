@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49732)
+Received: from eggs.gnu.org ([209.51.188.92]:50058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTs-0001jT-Fx
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:37:45 -0400
+	(envelope-from <lersek@redhat.com>) id 1hBLV5-0002ls-GJ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hBLTq-0000ZI-LN
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:37:44 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  2 Apr 2019 18:37:30 +0300
-Message-Id: <20190402153730.54145-11-vsementsov@virtuozzo.com>
-In-Reply-To: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 10/10] qcow2: do encryption in threads
+	(envelope-from <lersek@redhat.com>) id 1hBLV3-00025H-Ml
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:38:59 -0400
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
+Date: Tue, 2 Apr 2019 17:38:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,200 +32,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, berrange@redhat.com
+To: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
-Do encryption/decryption in threads, like it is already done for
-compression. This improves asynchronous encrypted io.
+On 04/02/19 17:29, Auger Eric wrote:
+> Hi Laszlo,
+> 
+> On 4/1/19 3:07 PM, Laszlo Ersek wrote:
+>> On 03/29/19 14:56, Auger Eric wrote:
+>>> Hi Ard,
+>>>
+>>> On 3/29/19 2:14 PM, Ard Biesheuvel wrote:
+>>>> On Fri, 29 Mar 2019 at 14:12, Auger Eric <eric.auger@redhat.com> wrote:
+>>>>>
+>>>>> Hi Shameer,
+>>>>>
+>>>>> On 3/29/19 10:59 AM, Shameerali Kolothum Thodi wrote:
+>>>>>>
+>>>>>>
+>>>>>>> -----Original Message-----
+>>>>>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>>>>>>> Sent: 29 March 2019 09:32
+>>>>>>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>>>>>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; imammedo@redhat.com;
+>>>>>>> peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+>>>>>>> sameo@linux.intel.com; sebastien.boeuf@intel.com
+>>>>>>> Cc: Linuxarm <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
+>>>>>>> Laszlo Ersek <lersek@redhat.com>; Ard Biesheuvel
+>>>>>>> <ard.biesheuvel@linaro.org>; Leif Lindholm <Leif.Lindholm@arm.com>
+>>>>>>> Subject: Re: [PATCH v3 07/10] hw/arm/virt: Introduce opt-in feature "fdt"
+>>>>>>>
+>>>>>>> Hi Shameer,
+>>>>>>>
+>>>>>>> [ + Laszlo, Ard, Leif ]
+>>>>>>>
+>>>>>>> On 3/21/19 11:47 AM, Shameer Kolothum wrote:
+>>>>>>>> This is to disable/enable populating DT nodes in case
+>>>>>>>> any conflict with acpi tables. The default is "off".
+>>>>>>> The name of the option sounds misleading to me. Also we don't really
+>>>>>>> know the scope of the disablement. At the moment this just aims to
+>>>>>>> prevent the hotpluggable dt nodes from being added if we boot in ACPI mode.
+>>>>>>>
+>>>>>>>>
+>>>>>>>> This will be used in subsequent patch where cold plug
+>>>>>>>> device-memory support is added for DT boot.
+>>>>>>> I am concerned about the fact that in dt mode, by default, you won't see
+>>>>>>> any PCDIMM nodes.
+>>>>>>>>
+>>>>>>>> If DT memory node support is added for cold-plugged device
+>>>>>>>> memory, those memory will be visible to Guest kernel via
+>>>>>>>> UEFI GetMemoryMap() and gets treated as early boot memory.
+>>>>>>> Don't we have an issue in UEFI then. Normally the SRAT indicates whether
+>>>>>>> the slots are hotpluggable or not. Shouldn't the UEFI code look at this
+>>>>>>> info.
+>>>>>>
+>>>>>> Sorry I missed this part. Yes, that will be a more cleaner solution.
+>>>>>>
+>>>>>> Also, to be more clear on what happens,
+>>>>>>
+>>>>>> Guest ACPI boot with "fdt=on" ,
+>>>>>>
+>>>>>> From kernel log,
+>>>>>>
+>>>>>> [    0.000000] Early memory node ranges
+>>>>>> [    0.000000]   node   0: [mem 0x0000000040000000-0x00000000bbf5ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bbf60000-0x00000000bbffffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc000000-0x00000000bc02ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc030000-0x00000000bc36ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc370000-0x00000000bf64ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf650000-0x00000000bf6dffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf6e0000-0x00000000bf6effff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf6f0000-0x00000000bf80ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf810000-0x00000000bfffffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000c0000000-0x00000000ffffffff]  --> This is the hotpluggable memory node from DT.
+>>>>>> [    0.000000] Zeroed struct page in unavailable ranges: 1040 pages
+>>>>>> [    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x00000000ffffffff]
+>>>>>>
+>>>>>>
+>>>>>> Guest ACPI boot with "fdt=off" ,
+>>>>>>
+>>>>>> [    0.000000] Movable zone start for each node
+>>>>>> [    0.000000] Early memory node ranges
+>>>>>> [    0.000000]   node   0: [mem 0x0000000040000000-0x00000000bbf5ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bbf60000-0x00000000bbffffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc000000-0x00000000bc02ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc030000-0x00000000bc36ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bc370000-0x00000000bf64ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf650000-0x00000000bf6dffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf6e0000-0x00000000bf6effff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf6f0000-0x00000000bf80ffff]
+>>>>>> [    0.000000]   node   0: [mem 0x00000000bf810000-0x00000000bfffffff]
+>>>>>> [    0.000000] Zeroed struct page in unavailable ranges: 1040 pages
+>>>>>> [    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x00000000bfffffff
+>>>>>>
+>>>>>> The hotpluggable memory node is absent from early memory nodes here.
+>>>>>
+>>>>> OK thank you for the example illustrating the concern.
+>>>>>>
+>>>>>> As you said, it could be possible to detect this node using SRAT in UEFI.
+>>>>>
+>>>>> Let's wait for EDK2 experts on this.
+>>>>>
+>>>>
+>>>> Happy to chime in, but I need a bit more context here.
+>>>>
+>>>> What is the problem, how does this path try to solve it, and why is
+>>>> that a bad idea?
+>>>>
+>>> Sure, sorry.
+>>>
+>>> This series:
+>>> - [PATCH v3 00/10] ARM virt: ACPI memory hotplug support,
+>>> https://patchwork.kernel.org/cover/10863301/
+>>>
+>>> aims to introduce PCDIMM support in qemu. In ACPI mode, it builds the
+>>> SRAT and DSDT parts and relies on GED to trigger the hotplug.
+>>>
+>>> We noticed that if we build the hotpluggable memory dt nodes on top of
+>>> the above ACPI tables, the DIMM slots are interpreted as not
+>>> hotpluggable memory slots (at least we think so).
+>>>
+>>> We think the EDK2 GetMemoryMap() uses the dt node info and ignores the
+>>> fact that those slots are exposed as hotpluggable in the SRAT for example.
+>>>
+>>> So in this series, we are forced to not generate the hotpluggable memory
+>>> dt nodes if we want the DIMM slots to be effectively recognized as
+>>> hotpluggable.
+>>>
+>>> Could you confirm we have a correct understanding of the EDK2 behaviour
+>>> and if so, would there be any solution for EDK2 to absorb both the DT
+>>> nodes and the relevant SRAT/DSDT tables and make the slots hotpluggable.
+>>>
+>>> At qemu level, detecting we are booting in ACPI mode and purposely
+>>> removing the above mentioned DT nodes does not look straightforward.
+>>
+>> The firmware is not enlightened about the ACPI content that comes from
+>> QEMU / fw_cfg. That ACPI content is *blindly* processed by the firmware,
+>> as instructed through the ACPI linker/loader script, in order to install
+>> the ACPI content for the OS. No actual information is consumed by the
+>> firmware from the ACPI payload -- and that's a feature.
+>>
+>> The firmware does consume DT:
+>>
+>> - If you start QEMU *with* "-no-acpi", then the DT is both consumed by
+>> the firmware (for its own information needs), and passed on to the OS.
+>>
+>> - If you start QEMU *without* "-no-acpi" (the default), then the DT is
+>> consumed only by the firmware (for its own information needs), and the
+>> DT is hidden from the OS. The OS gets only the ACPI content
+>> (processed/prepared as described above).
+>>
+>>
+>> In the firmware, the "ArmVirtPkg/HighMemDxe" driver iterates over the
+>> base/size pairs in all the memory nodes in the DT. For each such base
+>> address that is currently tracked as "nonexistent" in the GCD memory
+>> space map, the driver currently adds the base/size range as "system
+>> memory". This in turn is reflected by the UEFI memmap that the OS gets
+>> to see as "conventional memory".
+>>
+>> If you need some memory ranges to show up as "special" in the UEFI
+>> memmap, then you need to distinguish them somehow from the "regular"
+>> memory areas, in the DT. And then extend "ArmVirtPkg/HighMemDxe" in the
+>> firmware, so that it act upon the discriminator that you set in the DT.
+>>
+>>
+>> Now... from a brief look at the Platform Init and UEFI specs, my
+>> impression is that the hotpluggable (but presently not plugged) DIMM
+>> ranges should simply be *absent* from the UEFI memmap; is that correct?
+>> (I didn't check the ACPI spec, maybe it specifies the expected behavior
+>> in full.) If my impression is correct, then two options (alternatives)
+>> exist:
+>>
+>> (1) Hide the affected memory nodes -- or at least the affected base/size
+>> pairs -- from the DT, in case you boot without "-no-acpi" but with an
+>> external firmware loaded. Then the firmware will not expose those ranges
+>> as "conventional memory" in the UEFI memmap. This approach requires no
+>> changes to edk2.
+>>
+>> This option is precisely what Eric described up-thread, at
+>> <http://mid.mail-archive.com/3f0a5793-dd35-a497-2248-8eb0cd3c3a16@redhat.com>:
+>>
+>>> in machvirt_init, there is firmware_loaded that tells you whether you
+>>> have a FW image. If this one is not set, you can induce dt. But if
+>>> there is a FW it can be either DT or ACPI booted. You also have the
+>>> acpi_enabled knob.
+>>
+>> (The "-no-acpi" cmdline option clears the "acpi_enabled" variable in
+>> "vl.c").
+>>
+>> So, the condition for hiding the hotpluggable memory nodes in question
+>> from the DT is:
+> 
+>>
+>>   (aarch64 && firmware_loaded && acpi_enabled)
+> 
+> Thanks a lot for all those inputs!
+> 
+> I don't get why we test aarch64 in above condition (this was useful for
+> high ECAM range as the aarch32 FW was not supporting it but here, is it
+> still meaningful?)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2.h         |  8 ++++++
- block/qcow2-cluster.c |  7 ++---
- block/qcow2-threads.c | 65 +++++++++++++++++++++++++++++++++++++++++--
- block/qcow2.c         | 22 +++++----------
- 4 files changed, 81 insertions(+), 21 deletions(-)
+Sorry, I should have clarified that. Yes, it is meaningful:
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 3089e9a68b..5169c0d8ab 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -264,6 +264,8 @@ typedef struct Qcow2BitmapHeaderExt {
-     uint64_t bitmap_directory_offset;
- } QEMU_PACKED Qcow2BitmapHeaderExt;
- 
-+#define QCOW2_MAX_THREADS 4
-+
- typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
-@@ -741,5 +743,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
- ssize_t coroutine_fn
- qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-                     const void *src, size_t src_size);
-+int coroutine_fn
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len);
-+int coroutine_fn
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len);
- 
- #endif
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index c4965479f6..e6624c6e4e 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -471,13 +471,12 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
- {
-     if (bytes && bs->encrypted) {
-         BDRVQcow2State *s = bs->opaque;
--        int64_t offset = (s->crypt_physical_offset ?
--                          (cluster_offset + offset_in_cluster) :
--                          (src_cluster_offset + offset_in_cluster));
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
-         assert(s->crypto);
--        if (qcrypto_block_encrypt(s->crypto, offset, buffer, bytes, NULL) < 0) {
-+        if (qcow2_co_encrypt(bs, cluster_offset,
-+                             src_cluster_offset + offset_in_cluster,
-+                             buffer, bytes) < 0) {
-             return false;
-         }
-     }
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index e3066075da..0e20723a4b 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -30,8 +30,7 @@
- 
- #include "qcow2.h"
- #include "block/thread-pool.h"
--
--#define QCOW2_MAX_THREADS 4
-+#include "crypto.h"
- 
- static int coroutine_fn
- qcow2_co_process(BlockDriverState *bs, ThreadPoolFunc *func, void *arg)
-@@ -205,3 +204,65 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-     return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
-                                 qcow2_decompress);
- }
-+
-+
-+/*
-+ * Cryptography
-+ */
-+
-+/*
-+ * Qcow2EncDecFunc: common prototype of qcrypto_block_encrypt() and
-+ * qcrypto_block_decrypt() functions.
-+ */
-+typedef int (*Qcow2EncDecFunc)(QCryptoBlock *block, uint64_t offset,
-+                               uint8_t *buf, size_t len, Error **errp);
-+
-+typedef struct Qcow2EncDecData {
-+    QCryptoBlock *block;
-+    uint64_t offset;
-+    uint8_t *buf;
-+    size_t len;
-+
-+    Qcow2EncDecFunc func;
-+} Qcow2EncDecData;
-+
-+static int qcow2_encdec_pool_func(void *opaque)
-+{
-+    Qcow2EncDecData *data = opaque;
-+
-+    return data->func(data->block, data->offset, data->buf, data->len, NULL);
-+}
-+
-+static int coroutine_fn
-+qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2EncDecData arg = {
-+        .block = s->crypto,
-+        .offset = s->crypt_physical_offset ?
-+                      file_cluster_offset + offset_into_cluster(s, offset) :
-+                      offset,
-+        .buf = buf,
-+        .len = len,
-+        .func = func,
-+    };
-+
-+    return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
-+}
-+
-+int coroutine_fn
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len)
-+{
-+    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-+                             qcrypto_block_encrypt);
-+}
-+
-+int coroutine_fn
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len)
-+{
-+    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-+                             qcrypto_block_decrypt);
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 9bd5e8e48c..ba9725bcd5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -297,7 +297,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-             }
-             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
-                                            qcow2_crypto_hdr_read_func,
--                                           bs, cflags, 1, errp);
-+                                           bs, cflags, QCOW2_MAX_THREADS, errp);
-             if (!s->crypto) {
-                 return -EINVAL;
-             }
-@@ -1539,7 +1539,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
-             }
-             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
--                                           NULL, NULL, cflags, 1, errp);
-+                                           NULL, NULL, cflags,
-+                                           QCOW2_MAX_THREADS, errp);
-             if (!s->crypto) {
-                 ret = -EINVAL;
-                 goto fail;
-@@ -2064,13 +2065,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 assert(s->crypto);
-                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
--                if (qcrypto_block_decrypt(s->crypto,
--                                          (s->crypt_physical_offset ?
--                                           cluster_offset + offset_in_cluster :
--                                           offset),
--                                          cluster_data,
--                                          cur_bytes,
--                                          NULL) < 0) {
-+                if (qcow2_co_decrypt(bs, cluster_offset, offset,
-+                                     cluster_data, cur_bytes) < 0) {
-                     ret = -EIO;
-                     goto fail;
-                 }
-@@ -2208,12 +2204,8 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
-             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
- 
--            if (qcrypto_block_encrypt(s->crypto,
--                                      (s->crypt_physical_offset ?
--                                       cluster_offset + offset_in_cluster :
--                                       offset),
--                                      cluster_data,
--                                      cur_bytes, NULL) < 0) {
-+            if (qcow2_co_encrypt(bs, cluster_offset, offset,
-+                                 cluster_data, cur_bytes) < 0) {
-                 ret = -EIO;
-                 goto out_unlocked;
-             }
--- 
-2.18.0
+While UEFI has bindings for both 32-bit and 64-bit ARM, ACPI has a
+64-bit-only binding for ARM. (And you can have UEFI without ACPI, but
+not the reverse, on ARM.) So if you run the 32-bit build of the
+ArmVirtQemu firmware, you get no ACPI at all; all you can rely on with
+the OS is the DT.
+
+This "bitness distinction" is implemented in the firmware already. If
+you hid the memory nodes from the DT under the condition
+
+  (!aarch64 && firmware_loaded && acpi_enabled)
+
+then the nodes would not be seen by the OS at all (because
+"acpi_enabled" is irrelevant for the 32-bit build of ArmVirtQemu, and
+all the OS can ever get is DT).
+
+Thanks,
+Laszlo
+
+> 
+> Thanks
+> 
+> Eric
+> 
+>>
+>>
+>> (2) Invent and set an "ignore me, firmware" property for the
+>> hotpluggable memory nodes in the DT, and update the firmware to honor
+>> that property.
+>>
+>> Thanks
+>> Laszlo
+>>
