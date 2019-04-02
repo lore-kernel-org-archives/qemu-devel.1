@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59537)
+Received: from eggs.gnu.org ([209.51.188.92]:59605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBIqy-0002Ib-Ew
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBIr1-0002M3-AG
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBIqx-00032U-Cg
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hBIr0-0003ED-8J
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:49:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  2 Apr 2019 14:49:03 +0200
-Message-Id: <20190402124907.24421-6-kwolf@redhat.com>
+Date: Tue,  2 Apr 2019 14:49:06 +0200
+Message-Id: <20190402124907.24421-9-kwolf@redhat.com>
 In-Reply-To: <20190402124907.24421-1-kwolf@redhat.com>
 References: <20190402124907.24421-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 5/9] block/file-posix: do not fail on unlock
- bytes
+Subject: [Qemu-devel] [PULL 8/9] block: test block-stream with a base node
+ that is used by block-commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +25,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Alberto Garcia <berto@igalia.com>
 
-bdrv_replace_child() calls bdrv_check_perm() with error_abort on
-loosening permissions. However file-locking operations may fail even
-in this case, for example on NFS. And this leads to Qemu crash.
+The base node of a block-stream operation indicates the first image
+from the backing chain starting from which no data is copied to the
+top node.
 
-Let's avoid such errors. Note, that we ignore such things anyway on
-permission update commit and abort.
+The block-stream job allows others to use that base image, so a second
+block-stream job could be writing to it at the same time. An important
+restriction is that the base image must not disappear while the stream
+job is ongoing. stream_start() freezes the backing chain from top to
+base with that purpose but it does it too late in the code so there is
+a race condition there.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This bug was fixed in the previous commit, and this patch contains an
+iotest for this scenario.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tests/qemu-iotests/030     | 17 +++++++++++++++++
+ tests/qemu-iotests/030.out |  4 ++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index db4cccbe51..1cf4ee49eb 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -815,6 +815,18 @@ static int raw_handle_perm_lock(BlockDriverState *bs=
-,
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 276e06b5ba..c6311d1825 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -314,6 +314,23 @@ class TestParallelOps(iotests.QMPTestCase):
 =20
-     switch (op) {
-     case RAW_PL_PREPARE:
-+        if ((s->perm | new_perm) =3D=3D s->perm &&
-+            (s->shared_perm & new_shared) =3D=3D s->shared_perm)
-+        {
-+            /*
-+             * We are going to unlock bytes, it should not fail. If it f=
-ail due
-+             * to some fs-dependent permission-unrelated reasons (which =
-occurs
-+             * sometimes on NFS and leads to abort in bdrv_replace_child=
-) we
-+             * can't prevent such errors by any check here. And we ignor=
-e them
-+             * anyway in ABORT and COMMIT.
-+             */
-+            return 0;
-+        }
-         ret =3D raw_apply_lock_bytes(s, s->fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
+         self.wait_until_completed(drive=3D'commit-drive0')
+=20
++    # In this case the base node of the stream job is the same as the
++    # top node of commit job. Since block-commit removes the top node
++    # when it finishes, this is not allowed.
++    def test_overlapping_4(self):
++        self.assert_no_active_block_jobs()
++
++        # Commit from node2 into node0
++        result =3D self.vm.qmp('block-commit', device=3D'drive0', top=3D=
+self.imgs[2], base=3Dself.imgs[0])
++        self.assert_qmp(result, 'return', {})
++
++        # Stream from node2 into node4
++        result =3D self.vm.qmp('block-stream', device=3D'node4', base_no=
+de=3D'node2', job_id=3D'node4')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++
++        self.wait_until_completed()
++        self.assert_no_active_block_jobs()
++
+     # Test a block-stream and a block-commit job in parallel
+     # Here the stream job is supposed to finish quickly in order to repr=
+oduce
+     # the scenario that triggers the bug fixed in 3d5d319e1221 and 1a63a=
+907507
+diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
+index 42314e9c00..4fd1c2dcd2 100644
+--- a/tests/qemu-iotests/030.out
++++ b/tests/qemu-iotests/030.out
+@@ -1,5 +1,5 @@
+-........................
++.........................
+ ----------------------------------------------------------------------
+-Ran 24 tests
++Ran 25 tests
+=20
+ OK
 --=20
 2.20.1
