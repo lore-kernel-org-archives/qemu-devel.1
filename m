@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33688)
+Received: from eggs.gnu.org ([209.51.188.92]:34483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hBIzC-0002yN-CS
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:57:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBJ2S-0005RM-AQ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hBIzB-0006t1-9r
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:57:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41910)
+	(envelope-from <armbru@redhat.com>) id 1hBJ2R-0001Gj-8C
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:01:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hBIzA-0006rj-S2
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:57:53 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBJ2Q-0001F2-W0
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 09:01:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B3B33078AA7
-	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 12:57:51 +0000 (UTC)
-References: <20190402073018.17747-1-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ccd76d0f-19f4-9a66-8f64-4f9498d95ea1@redhat.com>
-Date: Tue, 2 Apr 2019 07:57:47 -0500
-MIME-Version: 1.0
-In-Reply-To: <20190402073018.17747-1-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cv98q7f0IXp1Za8GHtRokmvhgyyHgtTQV"
-Subject: Re: [Qemu-devel] [PATCH] curses: fix wchar_t printf warning
+	by mx1.redhat.com (Postfix) with ESMTPS id 309603688E
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 13:01:14 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D89757F2F6
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 13:01:13 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  2 Apr 2019 15:01:08 +0200
+Message-Id: <20190402130112.15142-5-armbru@redhat.com>
+In-Reply-To: <20190402130112.15142-1-armbru@redhat.com>
+References: <20190402130112.15142-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 4/8] Revert "vl: Fix to create migration object
+ before block backends again"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cv98q7f0IXp1Za8GHtRokmvhgyyHgtTQV
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <ccd76d0f-19f4-9a66-8f64-4f9498d95ea1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] curses: fix wchar_t printf warning
-References: <20190402073018.17747-1-kraxel@redhat.com>
-In-Reply-To: <20190402073018.17747-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This reverts commit e60483f2f8498ae08ae79ca4c6fb03a3317f5e1e.
 
-On 4/2/19 2:30 AM, Gerd Hoffmann wrote:
-> On some systems wchar_t is "long int", on others just "int".
+Recent commit cda4aa9a5a0 moved block backend creation before machine
+property evaluation.  This broke block backends registering migration
+blockers.  Commit e60483f2f84 fixed it by moving migration object
+creation before block backend creation.  This broke migration with
+Xen.  Turns out we need to configure the accelerator before we create
+the migration object so that Xen's accelerator compat properties get
+applied.  Revert the flawed commit.  This fixes the Xen regression,
+but brings back the block backend regression.  The next commits will
+fix it again.
 
-And elsewhere, it's 'short'.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190401090827.20793-2-armbru@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ vl.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-> So go cast to "long int" and adjust the printf format accordingly.
->=20
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/curses.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/ui/curses.c b/ui/curses.c
-> index cc6d6da68463..fb63945188b2 100644
-> --- a/ui/curses.c
-> +++ b/ui/curses.c
-> @@ -453,8 +453,8 @@ static uint16_t get_ucs(wchar_t wch, iconv_t conv)
->      swch =3D sizeof(wch);
-> =20
->      if (iconv(conv, &pwch, &swch, &pch, &sch) =3D=3D (size_t) -1) {
-> -        fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UCS-=
-2: %s\n",
-> -                        wch, strerror(errno));
-> +        fprintf(stderr, "Could not convert 0x%02lx from WCHAR_T to UCS=
--2: %s\n",
-> +                (unsigned long)wch, strerror(errno));
-
-Sadly, I think you are right that a cast is necessary; there is no
-reserved printf character for printing wchar_t as an integer, and the
-width of wchar_t is unspecified (on 32-bit systems where it is 'long
-int', it does not promote to 'int').
-
-You could have also stuck with %02x and (int)wch, for less typing, but
-it's not worth the respin.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---cv98q7f0IXp1Za8GHtRokmvhgyyHgtTQV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyjXEsACgkQp6FrSiUn
-Q2pqrgf+LgtgkCDXYtVaZjs6WUhR8Kg4z3WzkMtt1HD2r9ON0AAT8cLcueJT8IrP
-aId8JBoPf2zFQ6zzWjg26+gjcjtrn0J/S5kPe9Ryk5BDnVbfbOXeR9TFHqdKbdMh
-jtCtUg3g81eOZ815Wbx+uzf14oGen9gK23sME7yqomcAG8R1Dq+ldTHG1+nanE3d
-sqpXeyL+Y8V7ddQ9TsNEeReI/MiH2E6QLf8QjlGFHEvjWkYEKMTX3Y+JWdF+2pUi
-z/mwrdBqSpQACbtwHSoY3s1dZMR++vQ8Y7AFyx29Tym2SBwemFyQLqwvkYxQJ9pd
-UOY9z/yEah9KXTO/sUlg9ZNCH9EhrA==
-=j4Aq
------END PGP SIGNATURE-----
-
---cv98q7f0IXp1Za8GHtRokmvhgyyHgtTQV--
+diff --git a/vl.c b/vl.c
+index 24572de0bd..9b215341a3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4277,17 +4277,10 @@ int main(int argc, char **argv, char **envp)
+         exit(0);
+     }
+ 
+-    /*
+-     * Migration object can only be created after global properties
+-     * are applied correctly.
+-     */
+-    migration_object_init();
+-
+     /*
+      * Note: we need to create block backends before
+      * machine_set_property(), so machine properties can refer to
+-     * them, and after migration_object_init(), so we can create
+-     * migration blockers.
++     * them.
+      */
+     configure_blockdev(&bdo_queue, machine_class, snapshot);
+ 
+@@ -4305,6 +4298,12 @@ int main(int argc, char **argv, char **envp)
+                      machine_class->name, machine_class->deprecation_reason);
+     }
+ 
++    /*
++     * Migration object can only be created after global properties
++     * are applied correctly.
++     */
++    migration_object_init();
++
+     if (qtest_chrdev) {
+         qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+     }
+-- 
+2.17.2
