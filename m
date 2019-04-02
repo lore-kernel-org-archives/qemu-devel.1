@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60945)
+Received: from eggs.gnu.org ([209.51.188.92]:36744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1hBPqN-00017U-IX
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:17:16 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBQAc-0006Hx-TD
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1hBPqM-0003kW-Hk
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:17:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33378
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBQAb-0002Sx-SE
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:38:10 -0400
+Received: from mail-eopbgr820115.outbound.protection.outlook.com
+	([40.107.82.115]:35252
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1hBPqM-0003jp-AV
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:17:14 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x32KDxj5047408
-	for <qemu-devel@nongnu.org>; Tue, 2 Apr 2019 16:17:13 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rmedggmsf-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 16:17:13 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Tue, 2 Apr 2019 21:17:12 +0100
-From: Collin Walling <walling@linux.ibm.com>
-References: <20190401214847.27600-1-walling@linux.ibm.com>
-Date: Tue, 2 Apr 2019 16:17:07 -0400
-MIME-Version: 1.0
-In-Reply-To: <20190401214847.27600-1-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hBQAb-0002SH-FG
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:38:09 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 2 Apr 2019 20:38:07 +0000
+Message-ID: <BN6PR2201MB1251D092C38E5F936A3D1962C6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>,
+	<1554212605-16457-2-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1554212605-16457-2-git-send-email-mateja.marjanovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a7bb6f96-5275-2181-7ea3-2f7187883f4c@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] s390: diagnose 318 info reset and
- migration support
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] target/mips: Fix MSA instructions
+ LD.<B|H|W|D> on big endian host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,19 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On 4/1/19 5:48 PM, Collin Walling wrote:
-
-[...]
-
+> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> Subject: [PATCH v4 1/5] target/mips: Fix MSA instructions LD.<B|H|W|D> on=
+ big endian host
+>
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>
+> Fix the case when the host is a big endian machine, and change
+> the approach toward LD.<B|H|W|D> instruction helpers.
+>
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 > ---
-> 
-> This version is posted in tandem with a new kernel patch that changes
-> how the execution of the diag 0x318 instruction is handled. A link to
-> this series will be attached as a reply to this series for convenience.
-> 
 
-https://www.spinics.net/lists/linux-s390/msg24661.html
-
-[...]
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
