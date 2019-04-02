@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39812)
+Received: from eggs.gnu.org ([209.51.188.92]:41292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBOHc-0003gz-U2
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:37:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hBOOc-0005la-7d
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBOHa-0006uv-OO
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:37:16 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hBOHa-0006u4-Bg
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:37:14 -0400
-Received: by mail-wm1-f66.google.com with SMTP id c1so4509749wml.4
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 11:37:13 -0700 (PDT)
-References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
-	<9d208883-c16b-e24a-7aa3-97688897acc2@redhat.com>
-	<BN6PR2201MB1251EDD95B45D5553187A510C6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a896f02e-0839-89cf-4252-47e73eddd3ab@redhat.com>
-Date: Tue, 2 Apr 2019 20:37:10 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1hBOOb-0001ou-AO
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBOOb-0001mQ-2C
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 14:44:29 -0400
+Date: Tue, 2 Apr 2019 19:44:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190402184423.GJ2861@work-vm>
+References: <20190402025728.5636-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251EDD95B45D5553187A510C6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize
- ILVEV.<B|H|W|D> MSA instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190402025728.5636-1-richardw.yang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] vmstate: check subsection_found is enough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,511 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-On 4/2/19 7:07 PM, Aleksandar Markovic wrote:
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize ILVEV.<B|H|W|D> MSA instructions
->>
->> Hi Mateja,
->>
->> On 4/2/19 5:15 PM, Mateja Marjanovic wrote:
->>> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->>>
->>> Optimize set of MSA instructions ILVEV, using directly
->>> tcg registers and performing logic on them instead of
->>> using helpers.
->>
->> Maybe you can still let this previous comment (if still valid):
->>
->>   Performance measurement is done by executing the
->>   instructions large number of times on a computer
->>   with Intel Core i7-3770 CPU @ 3.40GHz×8.
->>
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> subsection_found is true implies vmdesc is not NULL.
 > 
-> Agreed.
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  migration/vmstate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->>>
->>> In the following table, the first column is the performance
->>> before this patch. The second represents the performance,
->>> after converting from helpers to tcg, but without using
->>> tcg_gen_deposit function. The third one is the solution
->>> which is implemented in this patch.
->>
->> You are describing the "no-deposit" which refers to a previous series
->> but won't be accessible in the git repository.
->>
->> I think this table is useful in the cover of this series, and in the
->> commit message you should use || before || after || and drop the
->> "no-deposit" case.
->>
->>>
->>>  instr    ||   before    || no-deposit ||  with-deposit
->>> ========================================================
->>>  ilvev.b  ||  126.92 ms  ||  24.52 ms  ||  24.43 ms
->>>  ilvev.h  ||   93.67 ms  ||  23.92 ms  ||  23.86 ms
->>>  ilvev.w  ||  117.86 ms  ||  23.83 ms  ||  22.17 ms
->>>  ilvev.d  ||   45.49 ms  ||  19.74 ms  ||  19.71 ms
->>>
->>> The solution with deposit is suggested by Richard Henderson.
->>>
->>
-> 
-> I think the table should remain in the commit message, to keep it
-> visible in the git logs.
-> 
-> You could insert the "no-deposit" source code of gen_ilvev_w()
-> in the commit message, for reference reasons - it is not a too
-> large function.
+> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> index e2bbb7b5f7..8327179eea 100644
+> --- a/migration/vmstate.c
+> +++ b/migration/vmstate.c
+> @@ -533,7 +533,7 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+>          sub++;
+>      }
+>  
+> -    if (vmdesc && subsection_found) {
+> +    if (subsection_found) {
 
-Clever :)
+That's true, however it's not obvious from the names; I think
+we should probably rename 'subsection_found' to something like
+'vmdesc_has_subsections'  then it's more obvious that subsection_found
+is more specialised in this routine.
 
+Dave
+
+
+>          json_end_array(vmdesc);
+>      }
+>  
+> -- 
+> 2.19.1
 > 
-> Thanks,
-> Aleksandar
-> 
->> The gitdm parsable form is:
->>
->> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
->>
->>> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
->>> ---
->>>  target/mips/helper.h     |   1 -
->>>  target/mips/msa_helper.c |   9 ----
->>>  target/mips/translate.c  | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
->>>  3 files changed, 104 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/target/mips/helper.h b/target/mips/helper.h
->>> index 02e16c7..82f6a40 100644
->>> --- a/target/mips/helper.h
->>> +++ b/target/mips/helper.h
->>> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
->>> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
->>>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
->>> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
->>> index a7ea6aa..d5c3842 100644
->>> --- a/target/mips/msa_helper.c
->>> +++ b/target/mips/msa_helper.c
->>> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
->>>      } while (0)
->>>  MSA_FN_DF(ilvr_df)
->>>  #undef MSA_DO
->>> -
->>> -#define MSA_DO(DF)                      \
->>> -    do {                                \
->>> -        pwx->DF[2*i]   = pwt->DF[2*i];  \
->>> -        pwx->DF[2*i+1] = pws->DF[2*i];  \
->>> -    } while (0)
->>> -MSA_FN_DF(ilvev_df)
->>> -#undef MSA_DO
->>> -
->>>  #undef MSA_LOOP_COND
->>>
->>>  #define MSA_LOOP_COND(DF) \
->>> diff --git a/target/mips/translate.c b/target/mips/translate.c
->>> index 04406d6..e26c6a6 100644
->>> --- a/target/mips/translate.c
->>> +++ b/target/mips/translate.c
->>> @@ -28974,6 +28974,94 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
->>>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
->>>  }
->>>
->>> +/*
->>> + * [MSA] ILVEV.B wd, ws, wt
->>> + *
->>> + *   Vector Interleave Even (byte data elements)
->>> + *
->>> + */
->>> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
->>> +                               uint32_t ws, uint32_t wt)
->>> +{
->>> +    TCGv_i64 t1 = tcg_temp_new_i64();
->>> +    TCGv_i64 t2 = tcg_temp_new_i64();
->>> +    const uint64_t mask = 0x00ff00ff00ff00ffULL;
->>> +
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->>> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
->>> +    tcg_gen_shli_i64(t2, t2, 8);
->>> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
->>> +
->>
->> Richard, is it cheaper to use another register to keep the constant mask
->> (here reused 4x)?
->>
->> Such:
->>
->>        TCGv_i64 mask = tcg_const_i64(0x00ff00ff00ff00ffULL);
->>
->>        tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
->>        tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
->>        tcg_gen_shli_i64(t2, t2, 8);
->>        tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
->>
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->>> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
->>
->> Here use tcg_gen_and_i64() too.
->>
->>> +    tcg_gen_shli_i64(t2, t2, 8);
->>> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
->>> +
->>
->>        tcg_temp_free_i64(mask);
->>
->>> +    tcg_temp_free_i64(t1);
->>> +    tcg_temp_free_i64(t2);
->>
->> Mateja: Can you test for perf easily?
->>
->>> +}
->>> +
->>> +/*
->>> + * [MSA] ILVEV.H wd, ws, wt
->>> + *
->>> + *   Vector Interleave Even (halfword data elements)
->>> + *
->>> + */
->>> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
->>> +                               uint32_t ws, uint32_t wt)
->>> +{
->>> +    TCGv_i64 t1 = tcg_temp_new_i64();
->>> +    TCGv_i64 t2 = tcg_temp_new_i64();
->>> +    const uint64_t mask = 0x0000ffff0000ffffULL;
->>> +
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->>> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
->>> +    tcg_gen_shli_i64(t2, t2, 16);
->>> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
->>> +
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->>> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
->>> +    tcg_gen_shli_i64(t2, t2, 16);
->>> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
->>> +
->>> +    tcg_temp_free_i64(t1);
->>> +    tcg_temp_free_i64(t2);
->>
->> Very similiar to gen_ilvev_b(), changing the mask and shift. Maybe worth
->> a refactor.
->>
->>> +}
->>> +
->>> +/*
->>> + * [MSA] ILVEV.W wd, ws, wt
->>> + *
->>> + *   Vector Interleave Even (word data elements)
->>> + *
->>> + */
->>> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
->>> +                               uint32_t ws, uint32_t wt)
->>> +{
->>> +    TCGv_i64 t1 = tcg_temp_new_i64();
->>> +    const uint64_t mask = 0x00000000ffffffffULL;
->>> +
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->>> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], t1, msa_wr_d[ws * 2], 32, 32);
->>> +
->>> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->>> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], t1, msa_wr_d[ws * 2 + 1], 32, 32);
->>> +
->>> +    tcg_temp_free_i64(t1);
->>> +}
->>> +
->>> +/*
->>> + * [MSA] ILVEV.D wd, ws, wt
->>> + *
->>> + *   Vector Interleave Even (Double data elements)
->>> + *
->>> + */
->>> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
->>> +                               uint32_t ws, uint32_t wt)
->>> +{
->>> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
->>> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
->>> +}
->>> +
->>>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->>>  {
->>>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
->>> @@ -29130,7 +29218,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->>>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
->>>          break;
->>>      case OPC_ILVEV_df:
->>> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
->>> +        switch (df) {
->>> +        case DF_BYTE:
->>> +            gen_ilvev_b(env, wd, ws, wt);
->>> +            break;
->>> +        case DF_HALF:
->>> +            gen_ilvev_h(env, wd, ws, wt);
->>> +            break;
->>> +        case DF_WORD:
->>> +            gen_ilvev_w(env, wd, ws, wt);
->>> +            break;
->>> +        case DF_DOUBLE:
->>> +            gen_ilvev_d(env, wd, ws, wt);
->>> +            break;
->>> +        default:
->>> +            assert(0);
->>> +        }
->>>          break;
->>>      case OPC_BINSR_df:
->>>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
->>>
->>
->> Thanks,
->>
->> Phil.
->>
-> 
-> ________________________________________
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Sent: Tuesday, April 2, 2019 6:19:19 PM
-> To: Mateja Marjanovic; qemu-devel@nongnu.org
-> Cc: Aleksandar Rikalo; richard.henderson@linaro.org; Aleksandar Markovic; aurelien@aurel32.net
-> Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize ILVEV.<B|H|W|D> MSA instructions
-> 
-> Hi Mateja,
-> 
-> On 4/2/19 5:15 PM, Mateja Marjanovic wrote:
->> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->>
->> Optimize set of MSA instructions ILVEV, using directly
->> tcg registers and performing logic on them instead of
->> using helpers.
-> 
-> Maybe you can still let this previous comment (if still valid):
-> 
->   Performance measurement is done by executing the
->   instructions large number of times on a computer
->   with Intel Core i7-3770 CPU @ 3.40GHz×8.
-> 
->>
->> In the following table, the first column is the performance
->> before this patch. The second represents the performance,
->> after converting from helpers to tcg, but without using
->> tcg_gen_deposit function. The third one is the solution
->> which is implemented in this patch.
-> 
-> You are describing the "no-deposit" which refers to a previous series
-> but won't be accessible in the git repository.
-> 
-> I think this table is useful in the cover of this series, and in the
-> commit message you should use || before || after || and drop the
-> "no-deposit" case.
-> 
->>
->>  instr    ||   before    || no-deposit ||  with-deposit
->> ========================================================
->>  ilvev.b  ||  126.92 ms  ||  24.52 ms  ||  24.43 ms
->>  ilvev.h  ||   93.67 ms  ||  23.92 ms  ||  23.86 ms
->>  ilvev.w  ||  117.86 ms  ||  23.83 ms  ||  22.17 ms
->>  ilvev.d  ||   45.49 ms  ||  19.74 ms  ||  19.71 ms
->>
->> The solution with deposit is suggested by Richard Henderson.
->>
-> 
-> The gitdm parsable form is:
-> 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> 
->> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
->> ---
->>  target/mips/helper.h     |   1 -
->>  target/mips/msa_helper.c |   9 ----
->>  target/mips/translate.c  | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  3 files changed, 104 insertions(+), 11 deletions(-)
->>
->> diff --git a/target/mips/helper.h b/target/mips/helper.h
->> index 02e16c7..82f6a40 100644
->> --- a/target/mips/helper.h
->> +++ b/target/mips/helper.h
->> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
->> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
->>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
->> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
->> index a7ea6aa..d5c3842 100644
->> --- a/target/mips/msa_helper.c
->> +++ b/target/mips/msa_helper.c
->> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
->>      } while (0)
->>  MSA_FN_DF(ilvr_df)
->>  #undef MSA_DO
->> -
->> -#define MSA_DO(DF)                      \
->> -    do {                                \
->> -        pwx->DF[2*i]   = pwt->DF[2*i];  \
->> -        pwx->DF[2*i+1] = pws->DF[2*i];  \
->> -    } while (0)
->> -MSA_FN_DF(ilvev_df)
->> -#undef MSA_DO
->> -
->>  #undef MSA_LOOP_COND
->>
->>  #define MSA_LOOP_COND(DF) \
->> diff --git a/target/mips/translate.c b/target/mips/translate.c
->> index 04406d6..e26c6a6 100644
->> --- a/target/mips/translate.c
->> +++ b/target/mips/translate.c
->> @@ -28974,6 +28974,94 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
->>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
->>  }
->>
->> +/*
->> + * [MSA] ILVEV.B wd, ws, wt
->> + *
->> + *   Vector Interleave Even (byte data elements)
->> + *
->> + */
->> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
->> +                               uint32_t ws, uint32_t wt)
->> +{
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    const uint64_t mask = 0x00ff00ff00ff00ffULL;
->> +
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
->> +    tcg_gen_shli_i64(t2, t2, 8);
->> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
->> +
-> 
-> Richard, is it cheaper to use another register to keep the constant mask
-> (here reused 4x)?
-> 
-> Such:
-> 
->        TCGv_i64 mask = tcg_const_i64(0x00ff00ff00ff00ffULL);
-> 
->        tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
->        tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
->        tcg_gen_shli_i64(t2, t2, 8);
->        tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-> 
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-> 
-> Here use tcg_gen_and_i64() too.
-> 
->> +    tcg_gen_shli_i64(t2, t2, 8);
->> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
->> +
-> 
->        tcg_temp_free_i64(mask);
-> 
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
-> 
-> Mateja: Can you test for perf easily?
-> 
->> +}
->> +
->> +/*
->> + * [MSA] ILVEV.H wd, ws, wt
->> + *
->> + *   Vector Interleave Even (halfword data elements)
->> + *
->> + */
->> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
->> +                               uint32_t ws, uint32_t wt)
->> +{
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    const uint64_t mask = 0x0000ffff0000ffffULL;
->> +
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
->> +    tcg_gen_shli_i64(t2, t2, 16);
->> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
->> +
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
->> +    tcg_gen_shli_i64(t2, t2, 16);
->> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
->> +
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
-> 
-> Very similiar to gen_ilvev_b(), changing the mask and shift. Maybe worth
-> a refactor.
-> 
->> +}
->> +
->> +/*
->> + * [MSA] ILVEV.W wd, ws, wt
->> + *
->> + *   Vector Interleave Even (word data elements)
->> + *
->> + */
->> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
->> +                               uint32_t ws, uint32_t wt)
->> +{
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    const uint64_t mask = 0x00000000ffffffffULL;
->> +
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
->> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], t1, msa_wr_d[ws * 2], 32, 32);
->> +
->> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
->> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], t1, msa_wr_d[ws * 2 + 1], 32, 32);
->> +
->> +    tcg_temp_free_i64(t1);
->> +}
->> +
->> +/*
->> + * [MSA] ILVEV.D wd, ws, wt
->> + *
->> + *   Vector Interleave Even (Double data elements)
->> + *
->> + */
->> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
->> +                               uint32_t ws, uint32_t wt)
->> +{
->> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
->> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
->> +}
->> +
->>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->>  {
->>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
->> @@ -29130,7 +29218,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
->>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
->>          break;
->>      case OPC_ILVEV_df:
->> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
->> +        switch (df) {
->> +        case DF_BYTE:
->> +            gen_ilvev_b(env, wd, ws, wt);
->> +            break;
->> +        case DF_HALF:
->> +            gen_ilvev_h(env, wd, ws, wt);
->> +            break;
->> +        case DF_WORD:
->> +            gen_ilvev_w(env, wd, ws, wt);
->> +            break;
->> +        case DF_DOUBLE:
->> +            gen_ilvev_d(env, wd, ws, wt);
->> +            break;
->> +        default:
->> +            assert(0);
->> +        }
->>          break;
->>      case OPC_BINSR_df:
->>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
->>
-> 
-> Thanks,
-> 
-> Phil.
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
