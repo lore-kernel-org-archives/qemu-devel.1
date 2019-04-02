@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54385)
+Received: from eggs.gnu.org ([209.51.188.92]:57419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBNLr-0005Hs-Bz
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:37:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1hBNYe-0008QN-7w
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBNLq-0007BN-0l
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:37:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBNLp-00079z-A4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:37:33 -0400
-Date: Tue, 2 Apr 2019 18:37:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190402173722.GI2861@work-vm>
-References: <20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
-	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
-	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
-	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
-	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
-	<20190402075801.GE11008@xz-x1>
-	<CAEn6zmEjYh6uK3Y5cyenLKDKe+cCpjC5HOnNNoM6SniDAKPwzQ@mail.gmail.com>
-	<20190402123659.GG11008@xz-x1>
-	<CAEn6zmG6GMgYkDNwYFtBPx0XYWNoixDAgiasso+BL_Vyrs74yQ@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1hBNYc-0007DG-KI
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:50:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hBNYc-0007CC-62
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 13:50:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hBNYa-0006y4-0v
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 17:50:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 65F812E817B
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 17:50:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAEn6zmG6GMgYkDNwYFtBPx0XYWNoixDAgiasso+BL_Vyrs74yQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
- ramblock when in incoming migration
+Date: Tue, 02 Apr 2019 17:38:08 -0000
+From: Daniel Berrange <1815889@bugs.launchpad.net>
+Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
+Message-Id: <155422668873.21090.14194628601898762658.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
+ signal 31 in __pthread_setaffinity_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,152 +37,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
+To: qemu-devel@nongnu.org
 
-* Catherine Ho (catherine.hecx@gmail.com) wrote:
-> On Tue, 2 Apr 2019 at 20:37, Peter Xu <peterx@redhat.com> wrote:
->=20
-> > On Tue, Apr 02, 2019 at 05:06:15PM +0800, Catherine Ho wrote:
-> > > On Tue, 2 Apr 2019 at 15:58, Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > > On Tue, Apr 02, 2019 at 03:47:16PM +0800, Catherine Ho wrote:
-> > > > > Hi Peter Maydell
-> > > > >
-> > > > > On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linar=
-o.org
-> > >
-> > > > wrote:
-> > > > >
-> > > > > > On Tue, 2 Apr 2019 at 09:57, Catherine Ho <
-> > catherine.hecx@gmail.com>
-> > > > > > wrote:
-> > > > > > > The root cause is the used idx is moved forward after 1st t=
-ime
-> > > > incoming,
-> > > > > > and in 2nd time incoming,
-> > > > > > > the last_avail_idx will be incorrectly restored from the sa=
-ved
-> > device
-> > > > > > state file(not in the ram).
-> > > > > > >
-> > > > > > > I watched this even on x86 for a virtio-scsi disk
-> > > > > > >
-> > > > > > > Any ideas for supporting 2nd time, 3rd time... incoming
-> > restoring?
-> > > > > >
-> > > > > > Does the destination end go through reset between the 1st and=
- 2nd
-> > > > > >
-> > > > > seems not, please see my step below
-> > > > >
-> > > > > > incoming attempts? I'm not a migration expert, but I thought =
-that
-> > > > > > devices were allowed to assume that their state is "state of =
-the
-> > > > > > device following QEMU reset" before the start of an incoming
-> > > > > > migration attempt.
-> > > > > >
-> > > > >
-> > > > > Here  is my step:
-> > > > > 1. start guest normal by qemu with shared memory-backend file
-> > > > > 2. stop the vm. save the device state to another file via monit=
-or
-> > migrate
-> > > > > "exec: cat>..."
-> > > > > 3. quit the vm
-> > > > > 4. retore the vm by qemu -incoming "exec:cat ..."
-> > > > > 5. continue the vm via monito, the 1st incoming works fine
-> > > > > 6. quit the vm
-> > > > > 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
-> > > > > 8. continue   -> error happened
-> > > > > Actually, this can be fixed by forcely restore the idx by
-> > > > > virtio_queue_restore_last_avail_idx(=EF=BC=89
-> > > > > But I am sure whether it is reasonable.
-> > > >
-> > > > Yeah I really suspect its validity.
-> > > >
-> > > > IMHO normal migration streams keep the device state and RAM data
-> > > > together in the dumped file, so they always match.
-> > > >
-> > > > In your shared case, the device states are in the dumped file how=
-ever
-> > > > the RAM data is located somewhere else.  After you quit the VM fr=
-om
-> > > > the 1st incoming migration the RAM is new (because that's a share=
-d
-> > > > memory file) and the device data is still old.  They do not match
-> > > > already, then I'd say you can't migrate with that any more.
-> > > >
-> > > > If you want to do that, you'd better take snapshot of the RAM bac=
-kend
-> > > > file if your filesystem supports (or even simpler, to back it up
-> > > > before hand) before you start any incoming migration.  Then with =
-the
-> > > > dumped file (which contains the device states) and that snapshot =
-file
-> > > > (which contains the exact RAM data that matches the device states=
-)
-> > > > you'll alway be able to migrate for as many times as you want.
-> > > >
-> > >
-> > > Understood, thanks Peter Xu
-> > > Is there any feasible way to indicate the snapshot of the RAM backe=
-nd
-> > file
-> > > is
-> > > matched with the device data?
-> > > >VQ 2 size 0x400 < last_avail_idx 0x1639 - used_idx 0x2688
-> > > >Failed to load virtio-scsi:virtio
-> > >
-> > > Because I thought reporting above error is not so friendly. Could w=
-e add
-> > a
-> > > version id in both RAM backend file and device date file?
-> >
-> > It would be non-trivial I'd say - AFAIK we don't have an existing way
-> > to tag the memory-backend-file content (IIUC that's what you use).
-> >
-> > And since you mentioned about versioning of these states, I just
-> > remembered that even with this you may not be able to get a complete
-> > matched state of the VM, because AFAICT actually besides RAM state &
-> > device state, you probably also need to consider the disk state as
-> > well.  After you started the VM of the 1st incoming, there could be
-> > data flushed to the VM backend disk and then that state is changed as
-> > well.  So here even if you snapshot the RAM file you'll still lose th=
-e
-> > disk state IIUC so it could still be broken.  In other words, to make
-> > a migration/snapshot to work you'll need to make all these three
-> > states to match.
-> >
->=20
-> Yes, thanks
->=20
-> >
-> > Before we discuss further on the topic... could you share me with you=
-r
-> > requirement first?  I started to get a bit confused now since when I
-> > thought about shared mem I was thinking about migrating within the
-> > same host to e.g. upgrade the hypervisor but that obviously does not
-> > need you to do incoming migration for multiple times.  Then what do
-> > you finally want to achieve?
-> >
-> Actually, I am investigating the ignore-shared capability case support =
-on
-> arm64. This feature is used in Kata containers project as "vm template"
->  The rom reset failure is the first bug.
-> Ok, now I can confirm that doing incoming migration for multiple times =
-is
-> supported. Thanks for the detailed explanation :)
+FYI the QEMU change merged in the following pull request changed to
+return an EPERM errno for the thread affinity syscalls:
 
-I think the kata case should be OK;  it's just you've got to be
-careful of what you're doing once you start splitting the state into
-separate chunks.  That's always been true with the disk/ram split and
-it just gets a bit hairier when you split the RAM/devices.
+commit 12f067cc14b90aef60b2b7d03e1df74cc50a0459
+Merge: 84bdc58c06 035121d23a
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu Mar 28 12:04:52 2019 +0000
 
-Dave
+    Merge remote-tracking branch 'remotes/otubo/tags/pull-seccomp-20190327'=
+ into staging
+    =
 
-> B.R.
-> Catherine
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    pull-seccomp-20190327
+    =
+
+    # gpg: Signature made Wed 27 Mar 2019 12:12:39 GMT
+    # gpg:                using RSA key DF32E7C0F0FFF9A2
+    # gpg: Good signature from "Eduardo Otubo (Senior Software Engineer) <o=
+tubo@redhat.com>" [full]
+    # Primary key fingerprint: D67E 1B50 9374 86B4 0723  DBAB DF32 E7C0 F0F=
+F F9A2
+    =
+
+    * remotes/otubo/tags/pull-seccomp-20190327:
+      seccomp: report more useful errors from seccomp
+      seccomp: don't kill process for resource control syscalls
+    =
+
+    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+IOW, mesa's usage of this syscalls will still be blocked, but it will no
+longer kill the process.
+
+** Changed in: qemu
+       Status: New =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815889
+
+Title:
+  qemu-system-x86_64 crashed with signal 31 in
+  __pthread_setaffinity_new()
+
+Status in Mesa:
+  Confirmed
+Status in QEMU:
+  Fix Committed
+Status in mesa package in Ubuntu:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Triaged
+Status in mesa source package in Disco:
+  Fix Released
+
+Bug description:
+  Unable to launch Default Fedora 29 images in gnome-boxes
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 19.04
+  Package: qemu-system-x86 1:3.1+dfsg-2ubuntu1
+  ProcVersionSignature: Ubuntu 4.19.0-12.13-generic 4.19.18
+  Uname: Linux 4.19.0-12-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu20
+  Architecture: amd64
+  Date: Thu Feb 14 11:00:45 2019
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: Dell Inc. Precision T3610
+  ProcEnviron: PATH=3D(custom, user)
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.19.0-12-generic root=3DUU=
+ID=3D939b509b-d627-4642-a655-979b44972d17 ro splash quiet vt.handoff=3D1
+  Signal: 31
+  SourcePackage: qemu
+  StacktraceTop:
+   __pthread_setaffinity_new (th=3D<optimized out>, cpusetsize=3D128, cpuse=
+t=3D0x7f5771fbf680) at ../sysdeps/unix/sysv/linux/pthread_setaffinity.c:34
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   () at /usr/lib/x86_64-linux-gnu/dri/radeonsi_dri.so
+   start_thread (arg=3D<optimized out>) at pthread_create.c:486
+   clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+  Title: qemu-system-x86_64 crashed with signal 31 in __pthread_setaffinity=
+_new()
+  UpgradeStatus: Upgraded to disco on 2018-11-14 (91 days ago)
+  UserGroups: adm cdrom dip lpadmin plugdev sambashare sudo video
+  dmi.bios.date: 11/14/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: A18
+  dmi.board.name: 09M8Y8
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A01
+  dmi.chassis.type: 7
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvrA18:bd11/14/2018:svnDellInc.:pnPrecision=
+T3610:pvr00:rvnDellInc.:rn09M8Y8:rvrA01:cvnDellInc.:ct7:cvr:
+  dmi.product.name: Precision T3610
+  dmi.product.sku: 05D2
+  dmi.product.version: 00
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/mesa/+bug/1815889/+subscriptions
