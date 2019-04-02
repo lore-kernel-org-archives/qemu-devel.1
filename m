@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48011)
+Received: from eggs.gnu.org ([209.51.188.92]:49784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hBOtC-00082k-HZ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:16:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hBP0s-0002Ou-7J
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hBOtB-0001ed-Mk
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:16:06 -0400
-Date: Tue, 2 Apr 2019 16:16:02 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1hBP0r-0006mR-2m
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:24:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hBP0q-0006kK-Pj
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:24:01 -0400
+Date: Tue, 2 Apr 2019 16:23:54 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190402191602.GE22884@habkost.net>
-References: <1554194900-22817-1-git-send-email-like.xu@linux.intel.com>
-	<871s2kejg1.fsf@dusky.pond.sub.org>
-	<e72befe5-c931-5c80-6769-12e1a8e7d4fa@linux.intel.com>
-	<20190402174749.71da1efe@redhat.com>
-	<871s2k8jxo.fsf@dusky.pond.sub.org>
-	<CAFEAcA8ogWn50wWBttM2QpfQoZ8UYnXfG3NSkuSc8j8WOWt6FA@mail.gmail.com>
+Message-ID: <20190402192354.GF22884@habkost.net>
+References: <20190131071658.29120-1-tao3.xu@intel.com>
+	<20190131071658.29120-5-tao3.xu@intel.com>
+	<20190206111124.73c99f4e@Igors-MacBook-Pro.local>
+	<ea1cf631-2c4c-9b66-c5d3-147d67181fab@intel.com>
+	<20190402114637.24cb44cc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8ogWn50wWBttM2QpfQoZ8UYnXfG3NSkuSc8j8WOWt6FA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vl.c: make current_machine as
- non-global variable
+In-Reply-To: <20190402114637.24cb44cc@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] Extend the command-line to provide
+ memory latency and bandwidth information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Like Xu <like.xu@linux.intel.com>, Thomas Huth <thuth@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Tao Xu <tao3.xu@intel.com>, eblake@redhat.com, mst@redhat.com, xiaoguangrong.eric@gmail.com, jingqi.liu@intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com, danmei.wei@intel.com, karl.heubaum@oracle.com, rth@twiddle.net, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Apr 02, 2019 at 11:23:42PM +0700, Peter Maydell wrote:
-> On Tue, 2 Apr 2019 at 23:13, Markus Armbruster <armbru@redhat.com> wrote:
-> >
-> > Igor Mammedov <imammedo@redhat.com> writes:
-> > > maybe we can assert in qdev_get_machine() if machine hasn't been created yet?
-> > > with this at least it will be hard to misuse function or catch invalid users.
-> > > (but it still might miss some use cases/CLI options which are not tested)
-> >
-> > Good idea.  When my code created "/machine" as a container, debugging
-> > the resulting crash took me a bit of time.  The assertion you propose
-> > would've saved me some.
-> 
-> One wrinkle to watch out for is code paths that are used in the
-> linux-user emulator, where there is no machine at all... For instance
-> cpu_common_realizefn() handles this case by explicitly checking
-> whether the thing it gets back from qdev_get_machine() is a
-> TYPE_MACHINE or not.
+On Tue, Apr 02, 2019 at 11:46:37AM +0200, Igor Mammedov wrote:
+> On Tue, 2 Apr 2019 12:42:37 +0800
+> Tao Xu <tao3.xu@intel.com> wrote:
+>=20
+> > On 2/6/19 6:11 PM, Igor Mammedov wrote:
+> > > On Thu, 31 Jan 2019 15:16:54 +0800
+> > > Tao Xu <tao3.xu@intel.com> wrote:
+> > >  =20
+> > >> From: Liu Jingqi <jingqi.liu@intel.com>
+> > >>
+> > >> Add -numa hmat-lb option to provide System Locality Latency and
+> > >> Bandwidth Information. These memory attributes help to build
+> > >> System Locality Latency and Bandwidth Information Structure(s)
+> > >> in ACPI Heterogeneous Memory Attribute Table (HMAT). =20
+> > > Maybe instead of adding/using more globals since the rest of numa.c=
+ was
+> > > written so, it's time to introduce NumaMachine type which inherits
+> > > form base Machine and extends it with numa extensions.
+> > >=20
+> > > You don't have to refactor all old numa code for that (just the par=
+ts
+> > > you use in HMAT) and later we could gradually refactor the rest of
+> > > numa handling.
+> > >  =20
+> > Hi Igor,
+> >=20
+> > I am sorry for replying after so long, because I am preparing the nex=
+t=20
+> > version of patch and confusing about the implementation of NumaMachin=
+e.
+> > If NumaMachine inherits from Machine, and then the PCmachine and othe=
+r=20
+> > platform machine inherits from NumaMachine (Implementation a)? Or=20
+> > PCmachine and other platform machine inherits from Machine=20
+> > (Implementation b)?
+> >=20
+> > Implementation a:		Implementation b:
+> > Machine                         Machine
+> > =E2=94=82                               =E2=94=82
+> > =E2=94=94=E2=94=80=E2=94=80 NumaMachine                 =E2=94=9C=E2=94=
+=80=E2=94=80 NumaMachine
+> >      =E2=94=82                           =E2=94=82
+> >      =E2=94=9C=E2=94=80=E2=94=80 PCMachine               =E2=94=9C=E2=
+=94=80=E2=94=80 PCMachine
+> >      =E2=94=82                           =E2=94=82
+> >      =E2=94=94=E2=94=80=E2=94=80 none-PCMachine          =E2=94=94=E2=
+=94=80=E2=94=80 none-PCMachine
+>=20
+> I'd imagine 'a', where none-PCMachine is arm/virt and spapr machines th=
+at
+> support numa today. The rest would inherit from plain Machine.
+>=20
+> > And how about add numa.c's globals into MachineState? This may not=20
+> > change a lot.
+> That's another possible way, but it's polluting generic machine with
+> numa specifics about which only 3-4 boards care.
+> From my point of view it's a bit better then globals but not much.
 
-Is there a real use case for calling qdev_get_machine() in user
-mode?
+I suggest following the pattern used for
+MachineState::device_memory and MachineState::nvdimms_state
+(pointer to optional feature-specific state) intead of
+inheritance.
 
-I'd prefer to make qdev_get_machine() unavailable in user mode,
-so we could detect these cases at compile time (and treat them as
-bugs).
-
--- 
+--=20
 Eduardo
