@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34633)
+Received: from eggs.gnu.org ([209.51.188.92]:34737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBM7y-0007eS-Ro
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1hBM8H-0007ut-I5
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hBM7x-0006Zj-SZ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59554)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBM7x-0006Z8-KD
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:09 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  2 Apr 2019 18:19:00 +0200
-Message-Id: <20190402161900.7374-4-armbru@redhat.com>
-In-Reply-To: <20190402161900.7374-1-armbru@redhat.com>
-References: <20190402161900.7374-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] acpi/pcihp: Add a few more trace points
- related to unplug
+	(envelope-from <philmd@redhat.com>) id 1hBM8F-0006sr-JT
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:29 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42218)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hBM8B-0006nA-Jf
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:19:25 -0400
+Received: by mail-wr1-f68.google.com with SMTP id g3so17417816wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 09:19:23 -0700 (PDT)
+References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9d208883-c16b-e24a-7aa3-97688897acc2@redhat.com>
+Date: Tue, 2 Apr 2019 18:19:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <1554218121-26766-3-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] target/mips: Optimize
+ ILVEV.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +31,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/acpi/pcihp.c      | 7 +++++++
- hw/acpi/trace-events | 3 +++
- 2 files changed, 10 insertions(+)
+Hi Mateja,
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 7729c5338b..613406d09b 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -152,6 +152,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
-     int slot = ctz32(slots);
-     PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
- 
-+    trace_acpi_pci_eject_slot(bsel, slot);
-+
-     if (!bus) {
-         return;
-     }
-@@ -263,6 +265,8 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
- void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                  DeviceState *dev, Error **errp)
- {
-+    trace_acpi_pci_unplug(PCI_SLOT(PCI_DEVICE(dev)->devfn),
-+                          acpi_pcihp_get_bsel(pci_get_bus(PCI_DEVICE(dev))));
-     object_property_set_bool(OBJECT(dev), false, "realized", NULL);
- }
- 
-@@ -273,6 +277,9 @@ void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-     PCIDevice *pdev = PCI_DEVICE(dev);
-     int slot = PCI_SLOT(pdev->devfn);
-     int bsel = acpi_pcihp_get_bsel(pci_get_bus(pdev));
-+
-+    trace_acpi_pci_unplug_request(bsel, slot);
-+
-     if (bsel < 0) {
-         error_setg(errp, "Unsupported bus. Bus doesn't have property '"
-                    ACPI_PCIHP_PROP_BSEL "' set");
-diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-index 98a56baa6f..96b8273297 100644
---- a/hw/acpi/trace-events
-+++ b/hw/acpi/trace-events
-@@ -32,6 +32,9 @@ cpuhp_acpi_write_ost_ev(uint32_t slot, uint32_t ev) "idx[0x%"PRIx32"] OST EVENT:
- cpuhp_acpi_write_ost_status(uint32_t slot, uint32_t st) "idx[0x%"PRIx32"] OST STATUS: 0x%"PRIx32
- 
- # pcihp.c
-+acpi_pci_eject_slot(unsigned bsel, unsigned slot) "bsel: %u slot: %u"
-+acpi_pci_unplug(int bsel, int slot) "bsel: %d slot: %d"
-+acpi_pci_unplug_request(int bsel, int slot) "bsel: %d slot: %d"
- acpi_pci_up_read(uint32_t val) "%" PRIu32
- acpi_pci_down_read(uint32_t val) "%" PRIu32
- acpi_pci_features_read(uint32_t val) "%" PRIu32
--- 
-2.17.2
+On 4/2/19 5:15 PM, Mateja Marjanovic wrote:
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> 
+> Optimize set of MSA instructions ILVEV, using directly
+> tcg registers and performing logic on them instead of
+> using helpers.
+
+Maybe you can still let this previous comment (if still valid):
+
+  Performance measurement is done by executing the
+  instructions large number of times on a computer
+  with Intel Core i7-3770 CPU @ 3.40GHz×8.
+
+> 
+> In the following table, the first column is the performance
+> before this patch. The second represents the performance,
+> after converting from helpers to tcg, but without using
+> tcg_gen_deposit function. The third one is the solution
+> which is implemented in this patch.
+
+You are describing the "no-deposit" which refers to a previous series
+but won't be accessible in the git repository.
+
+I think this table is useful in the cover of this series, and in the
+commit message you should use || before || after || and drop the
+"no-deposit" case.
+
+> 
+>  instr    ||   before    || no-deposit ||  with-deposit
+> ========================================================
+>  ilvev.b  ||  126.92 ms  ||  24.52 ms  ||  24.43 ms
+>  ilvev.h  ||   93.67 ms  ||  23.92 ms  ||  23.86 ms
+>  ilvev.w  ||  117.86 ms  ||  23.83 ms  ||  22.17 ms
+>  ilvev.d  ||   45.49 ms  ||  19.74 ms  ||  19.71 ms
+> 
+> The solution with deposit is suggested by Richard Henderson.
+> 
+
+The gitdm parsable form is:
+
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> ---
+>  target/mips/helper.h     |   1 -
+>  target/mips/msa_helper.c |   9 ----
+>  target/mips/translate.c  | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 104 insertions(+), 11 deletions(-)
+> 
+> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> index 02e16c7..82f6a40 100644
+> --- a/target/mips/helper.h
+> +++ b/target/mips/helper.h
+> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> index a7ea6aa..d5c3842 100644
+> --- a/target/mips/msa_helper.c
+> +++ b/target/mips/msa_helper.c
+> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
+>      } while (0)
+>  MSA_FN_DF(ilvr_df)
+>  #undef MSA_DO
+> -
+> -#define MSA_DO(DF)                      \
+> -    do {                                \
+> -        pwx->DF[2*i]   = pwt->DF[2*i];  \
+> -        pwx->DF[2*i+1] = pws->DF[2*i];  \
+> -    } while (0)
+> -MSA_FN_DF(ilvev_df)
+> -#undef MSA_DO
+> -
+>  #undef MSA_LOOP_COND
+>  
+>  #define MSA_LOOP_COND(DF) \
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 04406d6..e26c6a6 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -28974,6 +28974,94 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
+>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+>  }
+>  
+> +/*
+> + * [MSA] ILVEV.B wd, ws, wt
+> + *
+> + *   Vector Interleave Even (byte data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    TCGv_i64 t2 = tcg_temp_new_i64();
+> +    const uint64_t mask = 0x00ff00ff00ff00ffULL;
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_shli_i64(t2, t2, 8);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+
+Richard, is it cheaper to use another register to keep the constant mask
+(here reused 4x)?
+
+Such:
+
+       TCGv_i64 mask = tcg_const_i64(0x00ff00ff00ff00ffULL);
+
+       tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+       tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+       tcg_gen_shli_i64(t2, t2, 8);
+       tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+
+Here use tcg_gen_and_i64() too.
+
+> +    tcg_gen_shli_i64(t2, t2, 8);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+
+       tcg_temp_free_i64(mask);
+
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+
+Mateja: Can you test for perf easily?
+
+> +}
+> +
+> +/*
+> + * [MSA] ILVEV.H wd, ws, wt
+> + *
+> + *   Vector Interleave Even (halfword data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    TCGv_i64 t2 = tcg_temp_new_i64();
+> +    const uint64_t mask = 0x0000ffff0000ffffULL;
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_shli_i64(t2, t2, 16);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> +    tcg_gen_shli_i64(t2, t2, 16);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+
+Very similiar to gen_ilvev_b(), changing the mask and shift. Maybe worth
+a refactor.
+
+> +}
+> +
+> +/*
+> + * [MSA] ILVEV.W wd, ws, wt
+> + *
+> + *   Vector Interleave Even (word data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    const uint64_t mask = 0x00000000ffffffffULL;
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], t1, msa_wr_d[ws * 2], 32, 32);
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], t1, msa_wr_d[ws * 2 + 1], 32, 32);
+> +
+> +    tcg_temp_free_i64(t1);
+> +}
+> +
+> +/*
+> + * [MSA] ILVEV.D wd, ws, wt
+> + *
+> + *   Vector Interleave Even (Double data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
+> +}
+> +
+>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+>  {
+>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+> @@ -29130,7 +29218,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+>          break;
+>      case OPC_ILVEV_df:
+> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+> +        switch (df) {
+> +        case DF_BYTE:
+> +            gen_ilvev_b(env, wd, ws, wt);
+> +            break;
+> +        case DF_HALF:
+> +            gen_ilvev_h(env, wd, ws, wt);
+> +            break;
+> +        case DF_WORD:
+> +            gen_ilvev_w(env, wd, ws, wt);
+> +            break;
+> +        case DF_DOUBLE:
+> +            gen_ilvev_d(env, wd, ws, wt);
+> +            break;
+> +        default:
+> +            assert(0);
+> +        }
+>          break;
+>      case OPC_BINSR_df:
+>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
+> 
+
+Thanks,
+
+Phil.
