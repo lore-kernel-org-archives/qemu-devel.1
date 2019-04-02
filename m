@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50591)
+Received: from eggs.gnu.org ([209.51.188.92]:51223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hBDPc-0008Hw-Lw
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:00:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hBDQp-0000rc-0o
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hBDHy-0003yX-Ur
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:52:56 -0400
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Tue, 2 Apr 2019 06:52:49 +0000
-Message-ID: <6b9f76bc-c4d2-92b7-438b-c9eb41898b0b@virtuozzo.com>
-References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
-	<efdc687a-239e-3f30-c2d8-e46a47029496@redhat.com>
-	<7414a532-3005-5cfe-6f29-77cf95eeb4d2@virtuozzo.com>
-	<7dc5a22b-88fe-883d-0dd8-1101d67891f5@redhat.com>
-	<1205dd10-25a4-ab53-d7ab-162e257cbba7@virtuozzo.com>
-	<dc493087-f0e8-91d1-69fc-ff63e5ec345d@redhat.com>
-	<fae8b60f-a55f-2998-e136-0925ae2d737c@virtuozzo.com>
-	<4c4be643-357e-14ac-f2c6-0097276c704e@redhat.com>
-In-Reply-To: <4c4be643-357e-14ac-f2c6-0097276c704e@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5F8C7751098FA349A12AF096BEBB4916@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kraxel@redhat.com>) id 1hBDQn-0005bJ-1Y
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:02:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hBDC0-0005Qi-L3
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 02:46:44 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  2 Apr 2019 08:46:36 +0200
+Message-Id: <20190402064639.27108-3-kraxel@redhat.com>
+In-Reply-To: <20190402064639.27108-1-kraxel@redhat.com>
+References: <20190402064639.27108-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
- image
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/5] hw/usb/bus.c: Handle "no speed matched"
+ case in usb_mask_to_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-DQoNCk9uIDAxLzA0LzIwMTkgMjE6MDAsIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMjcuMDIuMTkg
-MTY6NDgsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4NCj4+DQo+PiBPbiAyNy8wMi8yMDE5
-IDE4OjIyLCBNYXggUmVpdHogd3JvdGU6DQo+Pj4gT24gMjcuMDIuMTkgMTY6MTUsIEFuZHJleSBT
-aGlua2V2aWNoIHdyb3RlOg0KPj4+Pg0KPj4+Pg0KPj4+PiBPbiAyNy8wMi8yMDE5IDE2OjI1LCBN
-YXggUmVpdHogd3JvdGU6DQo+Pj4+PiBPbiAyNy4wMi4xOSAxNDoxNiwgRGVuaXMgTHVuZXYgd3Jv
-dGU6DQo+Pj4+Pj4gT24gMi8yNy8xOSA0OjAwIFBNLCBNYXggUmVpdHogd3JvdGU6DQo+Pj4+Pj4+
-IE9uIDE4LjAyLjE5IDE2OjM2LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0K
-Pj4+Pj4+Pj4gMTIuMDIuMjAxOSAxNTozNSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+Pj4+
-Pj4+Pj4gQ2xlYW4gUUNPVzIgaW1hZ2UgZnJvbSBiaXRtYXAgb2Jzb2xldGUgZGlyZWN0b3J5IHdo
-ZW4gYSBuZXcgb25lDQo+Pj4+Pj4+Pj4gaXMgYWxsb2NhdGVkIGFuZCBzdG9yZWQuIEl0IHNsb3dz
-IGRvd24gdGhlIGltYWdlIGdyb3d0aCBhIGxpdHRsZSBiaXQuDQo+Pj4+Pj4+Pj4gVGhlIGZsYWcg
-UUNPVzJfRElTQ0FSRF9BTFdBWVMgYWxsb3dzIGEgY2FsbCB0byByYXdfY29fcGRpc2NhcmQoKQ0K
-Pj4+Pj4+Pj4+IHRoYXQgZG9lcyB0aGUgYWN0dWFsIGNsZWFuaW5nIG9mIHRoZSBpbWFnZSBvbiBk
-aXNrLg0KPj4+Pj4+Pj4+IFdpdGggdGhlIGZsYWcgUUNPVzJfRElTQ0FSRF9PVEhFUiwgYSByZWZl
-cmVuY2UgY291bnQgb2YgdGhlIGNsdXN0ZXINCj4+Pj4+Pj4+PiBpcyB1cGRhdGVkIG9ubHkuDQo+
-Pj4+Pj4+Pj4NCj4+Pj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5k
-cmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4+Pj4+Pj4+IFJldmlld2VkLWJ5OiBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4+
-Pj4+Pg0KPj4+Pj4+Pj4gc2lkZSBxdWVzdGlvbjogc2hvdWxkIG5vdCB3ZSBjaGFuZ2UgZGlzY2Fy
-ZF9wYXNzdGhyb3VnaFtRQ09XMl9ESVNDQVJEX09USEVSXSB0bw0KPj4+Pj4+Pj4gdHJ1ZSBvciBh
-dCBsZWFzdCBmbGFncyZCRFJWX09fVU5NQVAgYnkgZGVmYXVsdD8gV2hhdCBpcyB0aGUgcmVhc29u
-IG9mIG5vdCBkaXNjYXJkaW5nDQo+Pj4+Pj4+PiB0aGluZ3MgaW4gcWNvdzItY2x1c3Rlcj8NCj4+
-Pj4+Pj4gQXMgZmFyIGFzIEkgcmVtZW1iZXIgdGhlIHJlYXNvbiBpcyB0aGF0IHdoZW5ldmVyIHlv
-dSBjbGVhbiB1cCBzb21ldGhpbmcNCj4+Pj4+Pj4gaXRzIGNsdXN0ZXIgaXMgcHJvYmFibHkgZ29p
-bmcgdG8gYmUgcmV1c2VkIHJhdGhlciBzb29uLiAgU28gY2xlYW5pbmcgdXANCj4+Pj4+Pj4gdGFr
-ZXMgbG9uZ2VyLCByZXBvcHVsYXRpbmcgdGhhdCBjbHVzdGVyIHRha2VzIGxvbmdlciwgYW5kIHlv
-dSBzYXZlIG9ubHkNCj4+Pj4+Pj4gcmF0aGVyIGxpdHRsZSBzcGFjZS4NCj4+Pj4+Pj4NCj4+Pj4+
-Pj4gVGhpcyBpcyBhbHNvIHdoeSBJIGRvbid0IGtub3cgd2hldGhlciB0aGlzIHBhdGNoIG1ha2Vz
-IG11Y2ggc2Vuc2UuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IE1heA0KPj4+Pj4+Pg0KPj4+Pj4+IFRoaXMg
-ZGVwYW5kcyB1cG9uIHRoZSBhbW91bnQgb2YgYWN0dWFsbHkgZnJlZSBjbHVzdGVycyBpbiB0aGUg
-aW1hZ2UuDQo+Pj4+Pj4gSWYgdGhlcmUgYSBsb3Qgb2YgdGhlbSBhdCB0aGUgbW9tZW50LCB0aGlz
-IG9uZSBjb3VsZCBiZSByZWZpbGxlZA0KPj4+Pj4+IGFueSB0aW1lIGxhdGVyIG9uLg0KPj4+Pj4N
-Cj4+Pj4+IFdlbGwsIGl0J3MgYSB0cmFkZS1vZmYuICBGb3Igc21hbGwgc3RydWN0dXJlcyBsaWtl
-IHRoZSBiaXRtYXAgZGlyZWN0b3J5LA0KPj4+Pj4gSSBkb24ndCBzZWUgdGhlIHBvaW50IGluIGZv
-cmNlZnVsbHkgdW5tYXBwaW5nIHRoZW0uICBXZSBkb24ndCBkbyBpdCBmb3INCj4+Pj4+IHRoZSBv
-bGQgTDEgdGFibGUgZWl0aGVyIHdoZW4gdGhhdCBoYXMgdG8gYmUgcmVzaXplZC4NCj4+Pj4+DQo+
-Pj4+PiBEaXNjYXJkaW5nIGEgd2hvbGUgYml0bWFwIChsaWtlIGluIGNsZWFyX2JpdG1hcF90YWJs
-ZSgpKSBpcyBzb21ldGhpbmcNCj4+Pj4+IGVsc2UsIHRob3VnaC4gIFNvIEkgd2FzIHRvbyBxdWlj
-ayB0byBkaXNtaXNzIHRoZSB3aG9sZSBwYXRjaDsgcGFydHMgb2YNCj4+Pj4+IGl0IGRvIG1ha2Ug
-c2Vuc2UuDQo+Pj4+Pg0KPj4+Pj4gRm9yIGJpdG1hcCB0YWJsZXMuLi4gIEkgZG9uJ3Qga25vdyBl
-eGFjdGx5LiAgSSBkb24ndCB0aGluayBhIGJpdG1hcA0KPj4+Pj4gdGFibGUgaXMgZXZlciBnb2lu
-ZyB0byBiZSBsYXJnZXIgdGhhbiB0aGUgTDEgdGFibGUsIHNvIGl0IHNob3VsZA0KPj4+Pj4gcHJv
-YmFibHkgYmUgaGFuZGxlZCB0aGUgc2FtZSB3YXkgLS0gd2hpY2ggaXMgdG8ga2VlcCBRQ09XMl9E
-SVNDQVJEX09USEVSLg0KPj4+Pj4NCj4+Pj4+IE1heA0KPj4+Pj4NCj4+Pj4gWWVzLCBNYXguIEFs
-bCB3aGF0IHlvdSB3cm90ZSBhYm91dCBkbyBtYWtlIHRoZSBzZW5zZS4NCj4+Pj4gVGhlIHJlYXNv
-biBiZWhpbmQgdGhlIHByb3Bvc2l0aW9uIHRvIGRpc2NhcmQgdGhlIG9ic29sZXRlIGJpdG1hcA0K
-Pj4+PiBkaXJlY3RvcmllcyBpbiB0aGUgaW1hZ2UgaXMgdGhhdCBpdCBtYWtlcyBkZWJ1Z2dpbmcg
-b2YgdGhlIGlvdGVzdHMNCj4+Pj4gZWFzaWVyIGZvciBhIGRldmVsb3Blci4gT3RoZXJ3aXNlLCBs
-b3RzIG9mIGlycmVsZXZhbnQgc3ltYm9saWMNCj4+Pj4gaW5mb3JtYXRpb24gaW4gdGhlIGltYWdl
-IGZvcmNlcyB0byB0cmFjayB3aGljaCBvbmUgaXMgdmFsaWQuDQo+Pj4+IFBhcnRpY3VsYXJseSwg
-SSBsb2NhdGUgdGhlIGJ5dGUgdGhhdCBkZXNpZ25hdGVzIHRoZSBiaXRtYXAgZmxhZ3MgdG8gc2Vl
-DQo+Pj4+IGlmIHRoZSBmbGFnICdpbi11c2UnIGlzIG5vdCBzZXQuIEFuZCBJIGRvIHRoYXQgZm9y
-IGV2ZXJ5IHNpbmdsZSBiaXRtYXANCj4+Pj4gZGlyZWN0b3J5IGluIHRoZSBpbWFnZS4NCj4+Pj4g
-QWdhaW4sIGNsZWFuaW5nIHVwIHRoZSBvYnNvbGV0ZSBiaXRtYXAgZGlyZWN0b3JpZXMgaW4gdGhl
-IGltYWdlIHNlcnZlcw0KPj4+PiBmb3IgdGhlIGNvbnZlbmllbmNlIG9mIGRlYnVnZ2luZy4gV2hh
-dCBkbyB5b3UgdGhpbmsgYWJvdXQgaXQ/DQo+Pj4NCj4+PiBJIGRvbid0IHRoaW5rIGNvbnZlbmll
-bmNlIG9mIGRlYnVnZ2luZyBpcyBhIGdvb2QgcmVhc29uIHRvIGltcGxlbWVudA0KPj4+IHNvbWV0
-aGluZyB0aGF0IGlzIHByb2JhYmx5IHdvcnNlIGJlaGF2aW9yIHdoZW4gbm90IGRlYnVnZ2luZy4g
-IE9mDQo+Pj4gY291cnNlLCBpZiB0aGUgY2hhbmdlZCBiZWhhdmlvciBpcyBuZWl0aGVyIHdvcnNl
-IG5vciBiZXR0ZXIsIHRoZW4gd2UNCj4+PiBtaWdodCBhcyB3ZWxsIGdvIGZvciBpdCBpZiBpdCBl
-YXNlcyBkZWJ1Z2dpbmcuICBCdXQgSSB0aGluayBpdCBpcyBhIGJpdA0KPj4+IHdvcnNlLg0KPj4+
-DQo+Pj4gQWxzbywgaWYgeW91IHdhbnQgdG8gZGVidWcgaW1hZ2VzIHlvdSBoYXZlIGNyZWF0ZWQg
-eW91cnNlbGYgKG9yIGF0IGxlYXN0DQo+Pj4gYXJlIHVzZWQgYnkgVk1zIHlvdSBoYXZlIGNvbnRy
-b2wgb3ZlciksIHlvdSBjYW4gc2ltcGx5IHNldA0KPj4+IHBhc3MtZGlzY2FyZC1vdGhlcj1vbi4N
-Cj4+Pg0KPj4+IE1heA0KPj4+DQo+PiBUaGFuayB5b3UgZm9yIHlvdXIgYW5zd2VyLiBTbywgSSB3
-aWxsIGxlYXZlIHRoZSBRQ09XMl9ESVNDQVJEX0FMV0FZUw0KPj4gaW4gdGhlIGNsZWFyX2JpdG1h
-cF90YWJsZSgpIG9ubHkgYW5kIHdpbGwgcHJlcGFyZSB0aGUgbmV4dCB2ZXJzaW9uIG9mDQo+PiB0
-aGUgcGF0Y2gsIHNoYWxsIEk/DQo+IA0KPiAoU29ycnkgZm9yIHRoZSBsYXRlIHJlcGx5LCBJIHdh
-cyBvbiB2YWNhdGlvbiA6LS8pDQo+IA0KPiBTb3VuZHMgZ29vZCB0byBtZSwgeWVzLg0KPiANCj4g
-TWF4DQo+IA0KDQpIZWxsbywgTWF4IQ0KV2VsY29tZSBiYWNrLg0KSSBzZW50IHRoZSB1cGRhdGVk
-IHBhdGNoIG9uIDI4LzAyLzIwMTksIHRoZSBtZXNzYWdlIElEIGlzDQo8MTU1MTM0NjAxOS0yOTMy
-MDItMS1naXQtc2VuZC1lbWFpbC1hbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KLS0g
-DQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+From: Peter Maydell <peter.maydell@linaro.org>
+
+In usb_mask_to_str() we convert a mask of USB speeds into
+a human-readable string (like "full+high") for use in
+tracing and error messages. However the conversion code
+doesn't do anything to the string buffer if the passed in
+speedmask doesn't match any of the recognized speeds,
+which means that the tracing and error messages will
+end up with random garbage in them. This can happen if
+we're doing USB device passthrough.
+
+Handle the "unrecognized speed" case by using the
+string "unknown".
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1603785
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20190328133503.6490-1-peter.maydell@linaro.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/bus.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index 6fffab7bfa44..9a74dc956010 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -500,6 +500,10 @@ static void usb_mask_to_str(char *dest, size_t size,
+                             speeds[i].name);
+         }
+     }
++
++    if (pos =3D=3D 0) {
++        snprintf(dest, size, "unknown");
++    }
+ }
+=20
+ void usb_check_attach(USBDevice *dev, Error **errp)
+--=20
+2.18.1
