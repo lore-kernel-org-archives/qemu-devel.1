@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60742)
+Received: from eggs.gnu.org ([209.51.188.92]:32786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIvA-0006Xt-SF
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1hBIvw-0007Yi-Ph
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIv2-0003VB-IZ
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:43 -0400
-Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:39228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hBIuz-00035P-9w
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:33 -0400
-Received: by mail-pf1-x432.google.com with SMTP id i17so6350140pfo.6
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 05:53:06 -0700 (PDT)
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Tue,  2 Apr 2019 18:22:50 +0530
-Message-Id: <20190402125250.10347-1-aruna.15@cse.mrt.ac.lk>
-Subject: [Qemu-devel] [PATCH 3/3] Header cleanups Moved the qemu-hexdump
- declaration from qemu-common.h to qemu/hexdump.h
+	(envelope-from <berrange@redhat.com>) id 1hBIvv-0003xX-B6
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:54:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hBIvv-0003vj-38
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:54:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C27B4308794F
+	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 12:54:25 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue,  2 Apr 2019 13:54:14 +0100
+Message-Id: <20190402125417.21573-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] Filemon next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +31,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Bandan Das <bsd@redhat.com>
 
-Qemu-hexdump declaration was moved from qemu-common.h to qemu/hexdump.h
+The following changes since commit d61d1a1fb2f1db6c54651844a28389c523f3f8=
+c7:
 
-Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20190402-pull-r=
+equest' into staging (2019-04-02 08:18:24 +0100)
 
----
- hw/dma/pl330.c        | 1 +
- hw/dma/xlnx_dpdma.c   | 1 +
- include/qemu-common.h | 6 ------
- net/colo-compare.c    | 2 +-
- util/hexdump.c        | 2 +-
- util/iov.c            | 2 +-
- 6 files changed, 5 insertions(+), 9 deletions(-)
+are available in the Git repository at:
 
-diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-index d071049233..6f7c79324d 100644
---- a/hw/dma/pl330.c
-+++ b/hw/dma/pl330.c
-@@ -20,6 +20,7 @@
- #include "qemu/timer.h"
- #include "sysemu/dma.h"
- #include "qemu/log.h"
-+#include "qemu/hexdump.h"
- 
- #ifndef PL330_ERR_DEBUG
- #define PL330_ERR_DEBUG 0
-diff --git a/hw/dma/xlnx_dpdma.c b/hw/dma/xlnx_dpdma.c
-index 077c7da9cc..c937384b54 100644
---- a/hw/dma/xlnx_dpdma.c
-+++ b/hw/dma/xlnx_dpdma.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "hw/dma/xlnx_dpdma.h"
-+#include "qemu/hexdump.h"
- 
- #ifndef DEBUG_DPDMA
- #define DEBUG_DPDMA 0
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 0066e45a6b..bdd65914b8 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -130,12 +130,6 @@ int os_parse_cmd_args(int index, const char *optarg);
- 
- #include "qemu/module.h"
- 
--/*
-- * Hexdump a buffer to a file. An optional string prefix is added to every line
-- */
--
--void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
--
- /*
-  * helper to parse debug environment variables
-  */
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index bf10526f05..f654ee5713 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -15,7 +15,6 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "trace.h"
--#include "qemu-common.h"
- #include "qapi/error.h"
- #include "net/net.h"
- #include "net/eth.h"
-@@ -31,6 +30,7 @@
- #include "migration/colo.h"
- #include "migration/migration.h"
- #include "util.h"
-+#include "qemu/hexdump.h"
- 
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-diff --git a/util/hexdump.c b/util/hexdump.c
-index f879ff0ad6..4917696a08 100644
---- a/util/hexdump.c
-+++ b/util/hexdump.c
-@@ -14,7 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu-common.h"
-+#include "qemu/hexdump.h"
- 
- void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size)
- {
-diff --git a/util/iov.c b/util/iov.c
-index 2f960fc38d..1293f7ad22 100644
---- a/util/iov.c
-+++ b/util/iov.c
-@@ -18,7 +18,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/iov.h"
--#include "qemu-common.h"
-+#include "qemu/hexdump.h"
- #include "qemu/sockets.h"
- #include "qemu/cutils.h"
- 
--- 
-2.17.1
+  https://github.com/berrange/qemu tags/filemon-next-pull-request
+
+for you to fetch changes up to b4682a63f86ed81abcaa543ea6135e17f9e99d01:
+
+  filemon: fix watch IDs to avoid potential wraparound issues (2019-04-02=
+ 13:52:02 +0100)
+
+----------------------------------------------------------------
+filemon: various fixes / improvements to file monitor for USB MTP
+
+Ensure watch IDs unique within a monitor and avoid integer wraparound
+issues when many watches are set & unset over time.
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (3):
+  tests: refactor file monitor test to make it more understandable
+  filemon: ensure watch IDs are unique to QFileMonitor scope
+  filemon: fix watch IDs to avoid potential wraparound issues
+
+ authz/listfile.c              |   2 +-
+ hw/usb/dev-mtp.c              |  10 +-
+ include/authz/listfile.h      |   2 +-
+ include/qemu/filemonitor.h    |  16 +-
+ tests/test-util-filemonitor.c | 650 +++++++++++++++++-----------------
+ util/filemonitor-inotify.c    |  26 +-
+ util/filemonitor-stub.c       |   4 +-
+ util/trace-events             |   6 +-
+ 8 files changed, 356 insertions(+), 360 deletions(-)
+
+--=20
+2.20.1
