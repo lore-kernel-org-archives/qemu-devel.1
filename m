@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60947)
+Received: from eggs.gnu.org ([209.51.188.92]:32829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hBM1p-0003qH-QW
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:12:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBM2D-00048E-2W
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:13:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hBM1o-0003Hw-HN
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:12:49 -0400
-Date: Tue, 2 Apr 2019 18:12:36 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190402181236.5ac1d890.cohuck@redhat.com>
-In-Reply-To: <dbc99a49-68f8-ffdb-2a0e-670889a2a068@redhat.com>
-References: <20190329111104.17223-1-berrange@redhat.com>
-	<20190329111104.17223-12-berrange@redhat.com>
-	<20190402180033.77510387.cohuck@redhat.com>
-	<dbc99a49-68f8-ffdb-2a0e-670889a2a068@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1hBM2B-00051a-Vr
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:13:13 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1554194900-22817-1-git-send-email-like.xu@linux.intel.com>
+	<871s2kejg1.fsf@dusky.pond.sub.org>
+	<e72befe5-c931-5c80-6769-12e1a8e7d4fa@linux.intel.com>
+	<20190402174749.71da1efe@redhat.com>
+Date: Tue, 02 Apr 2019 18:13:07 +0200
+In-Reply-To: <20190402174749.71da1efe@redhat.com> (Igor Mammedov's message of
+	"Tue, 2 Apr 2019 17:47:49 +0200")
+Message-ID: <871s2k8jxo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
- members in packed structs
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] vl.c: make current_machine as
+ non-global variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Laurent Vivier <laurent@vivier.eu>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Like Xu <like.xu@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 2 Apr 2019 18:05:15 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Igor Mammedov <imammedo@redhat.com> writes:
 
-> On 02/04/2019 18.00, Cornelia Huck wrote:
-> > On Fri, 29 Mar 2019 11:11:01 +0000
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> >  =20
-> >> The GCC 9 compiler complains about many places in s390 code
-> >> that take the address of members of the 'struct SCHIB' which
-> >> is marked packed:
-> >>
-> >> hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=80=
-=99:
-> >> hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=
-=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> >> [-Waddress-of-packed-member]
-> >>   133 |     SCSW *s =3D &sch->curr_status.scsw;
-> >>       |               ^~~~~~~~~~~~~~~~~~~~~~
-> >> hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=
-=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
-> >> [-Waddress-of-packed-member]
-> >>   134 |     PMCW *p =3D &sch->curr_status.pmcw;
-> >>       |               ^~~~~~~~~~~~~~~~~~~~~~
-> >>
-> >> ...snip many more...
-> >>
-> >> Almost all of these are just done for convenience to avoid
-> >> typing out long variable/field names when referencing struct
-> >> members. We can get most of this convenience by taking the
-> >> address of the 'struct SCHIB' instead, avoiding triggering
-> >> the compiler warnings.
-> >>
-> >> In a couple of places we copy via a local variable which is
-> >> a technique already applied elsewhere in s390 code for this
-> >> problem.
-> >>
-> >> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >> ---
-> >>  hw/vfio/ccw.c | 42 ++++++++++++++++++++++--------------------
-> >>  1 file changed, 22 insertions(+), 20 deletions(-) =20
-> >=20
-> > I'm currently in the process of queuing this and the other three s390x
-> > fixes, but I'm inclined to do so for 4.1 (it feels a bit late in the
-> > cycle for 4.0.)
-> >=20
-> > Other opinions? =20
->=20
-> IMHO it would be nice to get rid of the compiler warnings for the
-> release. Multiple people reviewed the patches, so I think it should
-> still be fine to include them.
+> On Tue, 2 Apr 2019 21:09:39 +0800
+> Like Xu <like.xu@linux.intel.com> wrote:
+>
+>> On 2019/4/2 19:27, Markus Armbruster wrote:
+>> > Like Xu <like.xu@linux.intel.com> writes:
+>> >   
+>> >> This patch makes the remaining dozen or so uses of the global
+>> >> current_machine outside vl.c use qdev_get_machine() instead,
+>> >> and then make current_machine local to vl.c instead of global.
+>> >>
+>> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>  
+>> > 
+>> > You effectively replace
+>> > 
+>> >      current_machine
+>> > 
+>> > by
+>> > 
+>> >      MACHINE(qdev_get_machine())
+>> > 
+>> > qdev_get_machine() uses container_get(), which has a side effect: any
+>> > path component that doesn't exist already gets created as "container"
+>> > object.  In case of qdev_get_machine(), that's just "/machine".
+>> > 
+>> > Creating "/machine" as "container" is of course wrong.  You therefore
+>> > must not use qdev_get_machine() before main() creates "/machine".  It
+>> > does like this:
+>> > 
+>> >      object_property_add_child(object_get_root(), "machine",
+>> >                                OBJECT(current_machine), &error_abort);
+>> > 
+>> > I recently had several cases of code rearrangements explode because the
+>> > reordered code called qdev_get_machine() too early.  Makes me rather
+>> > skeptical about this patch.  To be frank, I consider qdev_get_machine()
+>> > a trap for the unwary.  container_get(), too.
+>> > 
+>> > If we decide using it to make current_machine static a good idea anyway,
+>> > we need to check the new uses carefully to make sure they can't run
+>> > before main() creates "/machine".
+>
+> maybe we can assert in qdev_get_machine() if machine hasn't been created yet?
+> with this at least it will be hard to misuse function or catch invalid users.
+> (but it still might miss some use cases/CLI options which are not tested)
 
-Still need to run my smoke tests, but I can send a pull req tomorrow
-for -rc3.
+Good idea.  When my code created "/machine" as a container, debugging
+the resulting crash took me a bit of time.  The assertion you propose
+would've saved me some.
