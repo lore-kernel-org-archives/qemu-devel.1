@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50318)
+Received: from eggs.gnu.org ([209.51.188.92]:50310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBIGm-0001qn-10
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBIGl-0001ql-Km
 	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBIGk-0007JB-NP
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:12:00 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59639 helo=mail.rt-rk.com)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hBIGk-0007J6-N3
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:11:59 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59662 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hBIGk-0007HD-Da
+	id 1hBIGk-0007HF-DI
 	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:11:58 -0400
 From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Tue,  2 Apr 2019 14:11:49 +0200
-Message-Id: <1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
+Date: Tue,  2 Apr 2019 14:11:50 +0200
+Message-Id: <1554207110-9113-3-git-send-email-mateja.marjanovic@rt-rk.com>
 In-Reply-To: <1554207110-9113-1-git-send-email-mateja.marjanovic@rt-rk.com>
 References: <1554207110-9113-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] target/mips: Make the results of
- DIV_<U|S>.<B|H|W|D> the same as on hardware
+Subject: [Qemu-devel] [PATCH v2 2/2] target/mips: Make the results of
+ MOD_<U|S>.<B|H|W|D> the same as on hardware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,11 +30,11 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-MSA instructions DIV_<U|S>.<B|H|W|D> when dividing by zero,
+MSA instructions MOD_<U|S>.<B|H|W|D> when dividing by zero,
 didn't return the same value when executed on a referent hardware
 (FPGA MIPS 64 r6, little endian) and when executed on QEMU, which
 is not a real bug, because the result when dividing by zero is
-UNPREDICTABLE [1] (page 141, 142).
+UNPREDICTABLE [1] (page 255, 256).
 
 [1] MIPS Architecture for Programmers
     Volume IV-j: The MIPS64 SIMD
@@ -42,30 +42,29 @@ UNPREDICTABLE [1] (page 141, 142).
 
 Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 ---
- target/mips/msa_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/mips/msa_helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 655148d..8c77f12 100644
+index 8c77f12..6693ba6 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -641,14 +641,15 @@ static inline int64_t msa_div_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+@@ -657,14 +657,14 @@ static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
      if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
-         return DF_MIN_INT(df);
+         return 0;
      }
--    return arg2 ? arg1 / arg2 : 0;
-+    return arg2 ? arg1 / arg2
-+                : arg1 >= 0 ? -1 : 1;
+-    return arg2 ? arg1 % arg2 : 0;
++    return arg2 ? arg1 % arg2 : arg1;
  }
  
- static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+ static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
  {
      uint64_t u_arg1 = UNSIGNED(arg1, df);
      uint64_t u_arg2 = UNSIGNED(arg2, df);
--    return u_arg2 ? u_arg1 / u_arg2 : 0;
-+    return arg2 ? u_arg1 / u_arg2 : -1;
+-    return u_arg2 ? u_arg1 % u_arg2 : 0;
++    return u_arg2 ? u_arg1 % u_arg2 : u_arg1;
  }
  
- static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+ #define SIGNED_EVEN(a, df) \
 -- 
 2.7.4
