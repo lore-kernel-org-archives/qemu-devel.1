@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38589)
+Received: from eggs.gnu.org ([209.51.188.92]:40219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hBEJB-0002Xe-DX
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:14 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1hBENG-0005Sg-LJ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hBEJA-0004Km-95
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54722)
+	(envelope-from <vkuznets@redhat.com>) id 1hBENE-0002In-OM
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:02:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31143)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hBEJ9-0004C5-Tw
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 03:58:12 -0400
-Date: Tue, 2 Apr 2019 15:58:01 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190402075801.GE11008@xz-x1>
-References: <CAEn6zmEzwQD_Ot8sttJj0KwML3Zkhfg9+QBxbOLn6bUsDpVn7w@mail.gmail.com>
-	<20190321061024.GB9149@xz-x1>
-	<CAEn6zmGFv+UbhyriwakFKB=UhnC6=thhybDF9D1E9JzoYL-1oA@mail.gmail.com>
-	<CAFEAcA8q0c5BFh-11KNRJWCi6+Yer_5peekmQptmaw8Ag3SNhw@mail.gmail.com>
-	<20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
-	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
-	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
-	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
-	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hBENE-0002Hp-Bb
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:02:24 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Tue,  2 Apr 2019 10:02:15 +0200
+Message-Id: <20190402080215.10747-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
- ramblock when in incoming migration
+Subject: [Qemu-devel] [PATCH v2] ioapic: allow buggy guests mishandling
+ level-triggered interrupts to make progress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +24,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Liran Alon <liran.alon@oracle.com>
 
-On Tue, Apr 02, 2019 at 03:47:16PM +0800, Catherine Ho wrote:
-> Hi Peter Maydell
->=20
-> On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->=20
-> > On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com>
-> > wrote:
-> > > The root cause is the used idx is moved forward after 1st time inco=
-ming,
-> > and in 2nd time incoming,
-> > > the last_avail_idx will be incorrectly restored from the saved devi=
-ce
-> > state file(not in the ram).
-> > >
-> > > I watched this even on x86 for a virtio-scsi disk
-> > >
-> > > Any ideas for supporting 2nd time, 3rd time... incoming restoring?
-> >
-> > Does the destination end go through reset between the 1st and 2nd
-> >
-> seems not, please see my step below
->=20
-> > incoming attempts? I'm not a migration expert, but I thought that
-> > devices were allowed to assume that their state is "state of the
-> > device following QEMU reset" before the start of an incoming
-> > migration attempt.
-> >
->=20
-> Here  is my step:
-> 1. start guest normal by qemu with shared memory-backend file
-> 2. stop the vm. save the device state to another file via monitor migra=
-te
-> "exec: cat>..."
-> 3. quit the vm
-> 4. retore the vm by qemu -incoming "exec:cat ..."
-> 5. continue the vm via monito, the 1st incoming works fine
-> 6. quit the vm
-> 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
-> 8. continue   -> error happened
-> Actually, this can be fixed by forcely restore the idx by
-> virtio_queue_restore_last_avail_idx(=EF=BC=89
-> But I am sure whether it is reasonable.
+It was found that Hyper-V 2016 on KVM in some configurations (q35 machine=
+ +
+piix4-usb-uhci) hangs on boot. Root-cause was that one of Hyper-V
+level-triggered interrupt handler performs EOI before fixing the cause of
+the interrupt. This results in IOAPIC keep re-raising the level-triggered
+interrupt after EOI because irq-line remains asserted.
 
-Yeah I really suspect its validity.
+Gory details: https://www.spinics.net/lists/kvm/msg184484.html
+(the whole thread).
 
-IMHO normal migration streams keep the device state and RAM data
-together in the dumped file, so they always match.
+Turns out we were dealing with similar issues before; in-kernel IOAPIC
+implementation has commit 184564efae4d ("kvm: ioapic: conditionally delay
+irq delivery duringeoi broadcast") which describes a very similar issue.
 
-In your shared case, the device states are in the dumped file however
-the RAM data is located somewhere else.  After you quit the VM from
-the 1st incoming migration the RAM is new (because that's a shared
-memory file) and the device data is still old.  They do not match
-already, then I'd say you can't migrate with that any more.
+Steal the idea from the above mentioned commit for IOAPIC implementation =
+in
+QEMU. SUCCESSIVE_IRQ_MAX_COUNT, delay and the comment are borrowed as wel=
+l.
 
-If you want to do that, you'd better take snapshot of the RAM backend
-file if your filesystem supports (or even simpler, to back it up
-before hand) before you start any incoming migration.  Then with the
-dumped file (which contains the device states) and that snapshot file
-(which contains the exact RAM data that matches the device states)
-you'll alway be able to migrate for as many times as you want.
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+Changes since v1:
+- timer_mod() -> timer_mod_anticipate() [Paolo Bonzini]
+- Massaged changelog [Liran Alon]
+- Make implementation look like in-kernel one [Liran Alon]
+---
+ hw/intc/ioapic.c                  | 57 ++++++++++++++++++++++++++++---
+ hw/intc/trace-events              |  1 +
+ include/hw/i386/ioapic_internal.h |  3 ++
+ 3 files changed, 56 insertions(+), 5 deletions(-)
 
-Regards,
-
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index 9d75f84d3b..9fb8dd3450 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -139,6 +139,15 @@ static void ioapic_service(IOAPICCommonState *s)
+     }
+ }
+=20
++#define SUCCESSIVE_IRQ_MAX_COUNT 10000
++
++static void ioapic_timer(void *opaque)
++{
++    IOAPICCommonState *s =3D opaque;
++
++    ioapic_service(s);
++}
++
+ static void ioapic_set_irq(void *opaque, int vector, int level)
+ {
+     IOAPICCommonState *s =3D opaque;
+@@ -222,13 +231,40 @@ void ioapic_eoi_broadcast(int vector)
+         }
+         for (n =3D 0; n < IOAPIC_NUM_PINS; n++) {
+             entry =3D s->ioredtbl[n];
+-            if ((entry & IOAPIC_LVT_REMOTE_IRR)
+-                && (entry & IOAPIC_VECTOR_MASK) =3D=3D vector) {
+-                trace_ioapic_clear_remote_irr(n, vector);
+-                s->ioredtbl[n] =3D entry & ~IOAPIC_LVT_REMOTE_IRR;
+-                if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n)))=
+ {
++
++            if (((entry & IOAPIC_VECTOR_MASK) !=3D vector) ||
++                !(entry & IOAPIC_LVT_REMOTE_IRR)) {
++                continue;
++            }
++
++            trace_ioapic_clear_remote_irr(n, vector);
++            s->ioredtbl[n] =3D entry & ~IOAPIC_LVT_REMOTE_IRR;
++
++            if (((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) !=3D
++                IOAPIC_TRIGGER_LEVEL) {
++                continue;
++            }
++
++            if (!(entry & IOAPIC_LVT_MASKED) && (s->irr & (1 << n))) {
++                ++s->irq_eoi[vector];
++                if (s->irq_eoi[vector] >=3D SUCCESSIVE_IRQ_MAX_COUNT) {
++                    /*
++                     * Real hardware does not deliver the interrupt imme=
+diately
++                     * during eoi broadcast, and this lets a buggy guest=
+ make
++                     * slow progress even if it does not correctly handl=
+e a
++                     * level-triggered interrupt. Emulate this behavior =
+if we
++                     * detect an interrupt storm.
++                     */
++                    s->irq_eoi[vector] =3D 0;
++                    timer_mod_anticipate(s->timer,
++                                         qemu_clock_get_ns(QEMU_CLOCK_VI=
+RTUAL) +
++                                         NANOSECONDS_PER_SECOND / 100);
++                    trace_ioapic_eoi_delayed_reassert(vector);
++                } else {
+                     ioapic_service(s);
+                 }
++            } else {
++                s->irq_eoi[vector] =3D 0;
+             }
+         }
+     }
+@@ -401,6 +437,8 @@ static void ioapic_realize(DeviceState *dev, Error **=
+errp)
+     memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
+                           "ioapic", 0x1000);
+=20
++    s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, ioapic_timer, s);
++
+     qdev_init_gpio_in(dev, ioapic_set_irq, IOAPIC_NUM_PINS);
+=20
+     ioapics[ioapic_no] =3D s;
+@@ -408,6 +446,14 @@ static void ioapic_realize(DeviceState *dev, Error *=
+*errp)
+     qemu_add_machine_init_done_notifier(&s->machine_done);
+ }
+=20
++static void ioapic_unrealize(DeviceState *dev, Error **errp)
++{
++    IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
++
++    timer_del(s->timer);
++    timer_free(s->timer);
++}
++
+ static Property ioapic_properties[] =3D {
+     DEFINE_PROP_UINT8("version", IOAPICCommonState, version, IOAPIC_VER_=
+DEF),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -419,6 +465,7 @@ static void ioapic_class_init(ObjectClass *klass, voi=
+d *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+     k->realize =3D ioapic_realize;
++    k->unrealize =3D ioapic_unrealize;
+     /*
+      * If APIC is in kernel, we need to update the kernel cache after
+      * migration, otherwise first 24 gsi routes will be invalid.
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index a28bdce925..90c9d07c1a 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -25,6 +25,7 @@ apic_mem_writel(uint64_t addr, uint32_t val) "0x%"PRIx6=
+4" =3D 0x%08x"
+ ioapic_set_remote_irr(int n) "set remote irr for pin %d"
+ ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin %d =
+vector %d"
+ ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
++ioapic_eoi_delayed_reassert(int vector) "delayed reassert on EOI broadca=
+st for vector %d"
+ ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val=
+) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" ret=
+val 0x%"PRIx32
+ ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t va=
+l) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" v=
+al 0x%"PRIx32
+ ioapic_set_irq(int vector, int level) "vector: %d level: %d"
+diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_i=
+nternal.h
+index 9848f391bb..70f9fc750a 100644
+--- a/include/hw/i386/ioapic_internal.h
++++ b/include/hw/i386/ioapic_internal.h
+@@ -96,6 +96,7 @@ typedef struct IOAPICCommonClass {
+     SysBusDeviceClass parent_class;
+=20
+     DeviceRealize realize;
++    DeviceUnrealize unrealize;
+     void (*pre_save)(IOAPICCommonState *s);
+     void (*post_load)(IOAPICCommonState *s);
+ } IOAPICCommonClass;
+@@ -111,6 +112,8 @@ struct IOAPICCommonState {
+     uint8_t version;
+     uint64_t irq_count[IOAPIC_NUM_PINS];
+     int irq_level[IOAPIC_NUM_PINS];
++    int irq_eoi[IOAPIC_NUM_PINS];
++    QEMUTimer *timer;
+ };
+=20
+ void ioapic_reset_common(DeviceState *dev);
 --=20
-Peter Xu
+2.20.1
