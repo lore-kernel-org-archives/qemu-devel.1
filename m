@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60953)
+Received: from eggs.gnu.org ([209.51.188.92]:60869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hBFe2-000281-4r
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 05:23:52 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hBFe4-00025i-6N
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 05:23:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hBFNE-00042Q-7J
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 05:06:31 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hBFND-0003zF-RW
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 05:06:28 -0400
-Received: by mail-ot1-x341.google.com with SMTP id d24so11282084otl.11
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 02:06:27 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hBFLM-0006zd-0D
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 05:04:33 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 2 Apr 2019 08:59:25 +0000
+Message-ID: <0281e339-181e-1d31-9ff9-730fc3ccc1de@virtuozzo.com>
+References: <1553866154-257311-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1553866154-257311-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51sgv54qaz.fsf@maestria.local.igalia.com>
+	<85b426d8-0d8a-1180-fe80-46450b83582b@virtuozzo.com>
+	<w51y34t4to4.fsf@maestria.local.igalia.com>
+	<1c21c139-a98d-1510-a1ec-1f9131c219bc@virtuozzo.com>
+In-Reply-To: <1c21c139-a98d-1510-a1ec-1f9131c219bc@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C810F80DEA42134C988A29EA70FB4FC8@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <CAEn6zmEzwQD_Ot8sttJj0KwML3Zkhfg9+QBxbOLn6bUsDpVn7w@mail.gmail.com>
-	<20190321061024.GB9149@xz-x1>
-	<CAEn6zmGFv+UbhyriwakFKB=UhnC6=thhybDF9D1E9JzoYL-1oA@mail.gmail.com>
-	<CAFEAcA8q0c5BFh-11KNRJWCi6+Yer_5peekmQptmaw8Ag3SNhw@mail.gmail.com>
-	<20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
-	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
-	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
-	<CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
-	<CAEn6zmGmNLp5dF-1ViQn_HFnim9+FuGSXAptrReouQCQbsa=KQ@mail.gmail.com>
-	<20190402075801.GE11008@xz-x1>
-In-Reply-To: <20190402075801.GE11008@xz-x1>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Tue, 2 Apr 2019 17:06:15 +0800
-Message-ID: <CAEn6zmEjYh6uK3Y5cyenLKDKe+cCpjC5HOnNNoM6SniDAKPwzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
- ramblock when in incoming migration
+Subject: Re: [Qemu-devel] [PATCH 3/3] block/stream: introduce a bottom node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,90 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Tue, 2 Apr 2019 at 15:58, Peter Xu <peterx@redhat.com> wrote:
-
-> On Tue, Apr 02, 2019 at 03:47:16PM +0800, Catherine Ho wrote:
-> > Hi Peter Maydell
-> >
-> > On Tue, 2 Apr 2019 at 11:05, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > > On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com>
-> > > wrote:
-> > > > The root cause is the used idx is moved forward after 1st time
-> incoming,
-> > > and in 2nd time incoming,
-> > > > the last_avail_idx will be incorrectly restored from the saved devi=
-ce
-> > > state file(not in the ram).
-> > > >
-> > > > I watched this even on x86 for a virtio-scsi disk
-> > > >
-> > > > Any ideas for supporting 2nd time, 3rd time... incoming restoring?
-> > >
-> > > Does the destination end go through reset between the 1st and 2nd
-> > >
-> > seems not, please see my step below
-> >
-> > > incoming attempts? I'm not a migration expert, but I thought that
-> > > devices were allowed to assume that their state is "state of the
-> > > device following QEMU reset" before the start of an incoming
-> > > migration attempt.
-> > >
-> >
-> > Here  is my step:
-> > 1. start guest normal by qemu with shared memory-backend file
-> > 2. stop the vm. save the device state to another file via monitor migra=
-te
-> > "exec: cat>..."
-> > 3. quit the vm
-> > 4. retore the vm by qemu -incoming "exec:cat ..."
-> > 5. continue the vm via monito, the 1st incoming works fine
-> > 6. quit the vm
-> > 7. retore the vm by qemu -incoming "exec:cat ..." for 2nd time
-> > 8. continue   -> error happened
-> > Actually, this can be fixed by forcely restore the idx by
-> > virtio_queue_restore_last_avail_idx(=EF=BC=89
-> > But I am sure whether it is reasonable.
->
-> Yeah I really suspect its validity.
->
-> IMHO normal migration streams keep the device state and RAM data
-> together in the dumped file, so they always match.
->
-> In your shared case, the device states are in the dumped file however
-> the RAM data is located somewhere else.  After you quit the VM from
-> the 1st incoming migration the RAM is new (because that's a shared
-> memory file) and the device data is still old.  They do not match
-> already, then I'd say you can't migrate with that any more.
->
-> If you want to do that, you'd better take snapshot of the RAM backend
-> file if your filesystem supports (or even simpler, to back it up
-> before hand) before you start any incoming migration.  Then with the
-> dumped file (which contains the device states) and that snapshot file
-> (which contains the exact RAM data that matches the device states)
-> you'll alway be able to migrate for as many times as you want.
->
-
-Understood, thanks Peter Xu
-Is there any feasible way to indicate the snapshot of the RAM backend file
-is
-matched with the device data?
->VQ 2 size 0x400 < last_avail_idx 0x1639 - used_idx 0x2688
->Failed to load virtio-scsi:virtio
-
-Because I thought reporting above error is not so friendly. Could we add a
-version id in both RAM backend file and device date file?
-
-B.R.
-Catherine
->
->
-> Regards,
->
-> --
-> Peter Xu
->
+MDIuMDQuMjAxOSAxMTo1MSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IA0KPiANCj4gT24g
+MDEvMDQvMjAxOSAxODo0NCwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+PiBPbiBGcmkgMjkgTWFy
+IDIwMTkgMDU6MTU6NDMgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPj4+Pj4gQEAgLTMyMzcsNyArMzIzOCwxNCBAQCB2b2lkIHFtcF9ibG9ja19zdHJlYW0oYm9v
+bCBoYXNfam9iX2lkLCBjb25zdCBjaGFyICpqb2JfaWQsIGNvbnN0IGNoYXIgKmRldmljZSwNCj4+
+Pj4+ICAgICAgICAgICAgIGpvYl9mbGFncyB8PSBKT0JfTUFOVUFMX0RJU01JU1M7DQo+Pj4+PiAg
+ICAgICAgIH0NCj4+Pj4+ICAgICANCj4+Pj4+IC0gICAgc3RyZWFtX3N0YXJ0KGhhc19qb2JfaWQg
+PyBqb2JfaWQgOiBOVUxMLCBicywgYmFzZV9icywgYmFzZV9uYW1lLA0KPj4+Pj4gKyAgICAvKiBG
+aW5kIHRoZSBib3R0b20gbm9kZSB0aGF0IGhhcyB0aGUgYmFzZSBhcyBpdHMgYmFja2luZyBpbWFn
+ZSAqLw0KPj4+Pj4gKyAgICBib3R0b21fbm9kZSA9IGJzOw0KPj4+Pj4gKyAgICB3aGlsZSAoKGl0
+ZXIgPSBiYWNraW5nX2JzKGJvdHRvbV9ub2RlKSkgIT0gYmFzZV9icykgew0KPj4+Pj4gKyAgICAg
+ICAgYm90dG9tX25vZGUgPSBpdGVyOw0KPj4+Pj4gKyAgICB9DQo+Pj4+PiArICAgIGFzc2VydChi
+b3R0b21fbm9kZSk7DQo+Pj4+PiArDQo+Pj4+PiArICAgIHN0cmVhbV9zdGFydChoYXNfam9iX2lk
+ID8gam9iX2lkIDogTlVMTCwgYnMsIGJvdHRvbV9ub2RlLCBiYXNlX25hbWUsDQo+Pj4+PiAgICAg
+ICAgICAgICAgICAgICAgICBqb2JfZmxhZ3MsIGhhc19zcGVlZCA/IHNwZWVkIDogMCwgb25fZXJy
+b3IsICZsb2NhbF9lcnIpOw0KPj4+Pg0KPj4+PiBJc24ndCBpdCBzaW1wbGVyIHRvIHBhc3MgJ2Jh
+c2UnIHRvIHN0cmVhbV9zdGFydCgpIGFuZCBmaW5kIHRoZSBib3R0b20NCj4+Pj4gbm9kZSB0aGVy
+ZT8gKHdpdGggYmRydl9maW5kX292ZXJsYXkoKSkuDQo+Pj4+DQo+Pj4+IEkgdGhpbmsgYm90dG9t
+IHNob3VsZCBiZSBhbiBpbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiBkZXRhaWwgb2YgdGhlDQo+Pj4+
+IGJsb2NrLXN0cmVhbSBkcml2ZXIsIGNhbGxlcnMgZG9uJ3QgbmVlZCB0byBrbm93IGFib3V0IGl0
+LCBvciBkbyB0aGV5Pw0KPj4+Pg0KPj4+IE15IGlkZWEgaXMgdGhhdCB3ZSBzaG91bGQgZ2V0IHJp
+ZCBvZiBiYXNlIGJlZm9yZSBhbnkgeWllbGQsIGFuZCBiZXR0ZXINCj4+PiBkbyBpdCBhcyBzb29u
+IGFzIHBvc3NpYmxlLg0KPj4NCj4+IEJ1dCB5b3UgY2FuIGRvIGl0IGF0IHRoZSBiZWdpbm5pbmcg
+b2Ygc3RyZWFtX3N0YXJ0KCkgd2l0aG91dCBleHBvc2luZw0KPj4gJ2JvdHRvbScgdG8gdGhlIGNh
+bGxlcnMgd2hpY2gsIGFnYWluLCBpcyBhbiBpbXBsZW1lbnRhdGlvbiBkZXRhaWwuDQo+Pg0KPj4g
+QmVydG8NCj4+DQo+IA0KPiBXZSBoYXZlIGdvdCBhIGxhdGVudCB0cm91YmxlIHdpdGggdGhlIGJh
+c2UgaW52b2x2ZWQgaW50byB0aGUgcHJvY2Vzcy4NCj4gRm9yIGluc3RhbmNlLCBpZiB3ZSBlbmNv
+dW50ZXIgYSBmaWx0ZXIgd2hpbGUgc2VhcmNoaW5nIGZvciB0aGUgYmFzZSwNCj4gd2Ugd2lsbCB3
+YW50IHRvIG1hbmFnZSBpdCBzb21laG93LiBJZiB0aGUgYmFzZSBpcyBpZGVudGlmaWVkIGJ5IHRo
+ZQ0KPiBub2RlIG5hbWUgcmF0aGVyIHRoYW4gYnkgZmlsZSBuYW1lLCBpdCB3b3VsZCBiZSBlYXNp
+ZXIuIFNvLCB3ZSB3b3VsZA0KPiBhc3NpZ24gdGhlIG5vZGUgbmFtZSB0byB0aGUgYmFzZSBlYXJs
+aWVzdCBhcyBwb3NzaWJsZS4gQW5vdGhlciBhcHByb2FjaA0KPiBzdWdnZXN0ZWQgYnkgVmxhZGlt
+aXIgc3VwcG9zZWQgdG8gZWxpbWluYXRlIHRoZSBiYXNlIGZyb20gdGhlIGludGVyZmFjZS4NCj4g
+SXQgaXMgYSBzZW5zaXRpdmUgY2hhbmdlIGFuZCB3ZSBhbGwgbmVlZCB0byBjb21lIHRvIGFuIGFn
+cmVlbWVudC4NCj4gDQoNCg0KT24gdGhlIG90aGVyIGhhbmQgd2UgZnJlZXplIGJhY2tpbmcgY2hh
+aW4gaW4gc3RyZWFtX3N0YXJ0IGFueXdheS4gU28sIHdlJ2QgbGlrZQ0KdG8gYmUgc3VyZSBhbnl3
+YXksIHRoYXQgdGhlcmUgYXJlIG5vIHlpZWxkcyBiZWZvcmUgc3RyZWFtX3N0YXJ0KCkgY2FsbC4N
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
