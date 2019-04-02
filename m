@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35078)
+Received: from eggs.gnu.org ([209.51.188.92]:36409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hB9kU-00056N-Pa
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 23:06:07 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hBAW0-0000gU-0F
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 23:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hB9kS-0006u7-LW
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 23:06:06 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hB9kP-0006eZ-WA
-	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 23:06:04 -0400
-Received: by mail-ot1-x344.google.com with SMTP id m10so10767847otp.2
-	for <qemu-devel@nongnu.org>; Mon, 01 Apr 2019 20:05:58 -0700 (PDT)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hBAVt-0000fs-BW
+	for qemu-devel@nongnu.org; Mon, 01 Apr 2019 23:55:10 -0400
+Date: Tue, 2 Apr 2019 11:53:43 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190402035343.GA6527@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190313044253.31988-1-richardw.yang@linux.intel.com>
+	<20190313044253.31988-4-richardw.yang@linux.intel.com>
+	<20190313132300.3f56a5ca@redhat.com>
+	<20190313133359.h2njohyijgvkcbtv@master>
+	<20190313170943.5384f5cf@redhat.com>
 MIME-Version: 1.0
-References: <1553010562-13561-1-git-send-email-catherine.hecx@gmail.com>
-	<20190320050735.GB8956@xz-x1>
-	<CAEn6zmEzwQD_Ot8sttJj0KwML3Zkhfg9+QBxbOLn6bUsDpVn7w@mail.gmail.com>
-	<20190321061024.GB9149@xz-x1>
-	<CAEn6zmGFv+UbhyriwakFKB=UhnC6=thhybDF9D1E9JzoYL-1oA@mail.gmail.com>
-	<CAFEAcA8q0c5BFh-11KNRJWCi6+Yer_5peekmQptmaw8Ag3SNhw@mail.gmail.com>
-	<20190322101211.GA2703@work-vm> <20190325033948.GG9149@xz-x1>
-	<CAEn6zmF0DRqqUxjKpdxWYdb_ofGXV_wACfELA991qLfvo9N6vA@mail.gmail.com>
-	<CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
-In-Reply-To: <CAEn6zmEzcNJGQWrkbP2_v3aidj5o=S39pQgm8kPHqSn8Os=J+g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Apr 2019 03:05:46 +0000
-Message-ID: <CAFEAcA_=7E9nrFLLmhXBwk5k10ufhKQKX+ZCttfWOxOYt=hZog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] migration: avoid copying ignore-shared
- ramblock when in incoming migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190313170943.5384f5cf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] hw/acpi: Extract build_mcfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,22 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Yury Kotov <yury-kotov@yandex-team.ru>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org
 
-On Tue, 2 Apr 2019 at 09:57, Catherine Ho <catherine.hecx@gmail.com> wrote:
-> The root cause is the used idx is moved forward after 1st time incoming, and in 2nd time incoming,
-> the last_avail_idx will be incorrectly restored from the saved device state file(not in the ram).
+On Wed, Mar 13, 2019 at 05:09:43PM +0100, Igor Mammedov wrote:
+>On Wed, 13 Mar 2019 13:33:59 +0000
+>Wei Yang <richard.weiyang@gmail.com> wrote:
 >
-> I watched this even on x86 for a virtio-scsi disk
+>> 
+>> I am lost at this place.
+>> 
+>> sig is a part of ACPI table header, you mean the sig is not necessary to
+>> be set in ACPI table header?
+>> 
+>> "skip table generation" means remove build_header() in build_mcfg()?
+>I mean do not call build_mcfg() at all when you don't have to.
 >
-> Any ideas for supporting 2nd time, 3rd time... incoming restoring?
+>And when you need to keep table_blob the same size (for old machines)
+>using acpi_data_push() to reserve space instead of build_mcfg(sig="QEMU")
+>might just work as well. it's still hack but it can live in x86 specific
+>acpi_build() keeping build_mcfg() generic.
+>
+>As for defining what to use as criteria to decide when we need to keep
+>table_blob size the same, I don't remember history of it, so I'd suggest
+>to look at commit a1666142, study history of acpi_ram_update() and
+>legacy_acpi_table_size to figure out since which machine type one doesn't
+>have to keep table_blob size the same.
+>
 
-Does the destination end go through reset between the 1st and 2nd
-incoming attempts? I'm not a migration expert, but I thought that
-devices were allowed to assume that their state is "state of the
-device following QEMU reset" before the start of an incoming
-migration attempt.
+Hi, Igor
 
-thanks
--- PMM
+It took me sometime to go through the migration infrastructure.
+
+Before continuing, I'd like to talk about what I understand to make sure my
+direction is correct.
+
+ACPI has a structure named AcpiBuildState, which contains all related
+information. During migration, those data in AcpiBuildState should be
+transferred to destination, e.g. table_mr, rsdp_mr and link_mr.
+
+In the case related to mcfg, the problem lies in table_mr. And the reason
+breaking migration is the size of table_mr is different between source and
+destination.(This reason is a guess from those change logs and mails.)
+
+The migration infrastructure has several SaveStateEntry to help migrate
+different elements. The one with name "ram" take charge of RAMBlock. So this
+SaveStateEntry and its ops is the next step for me to investigate. And from
+this to see the effect of different size MemoryRegion during migration.
+
+Is this sounds correct?
+
+-- 
+Wei Yang
+Help you, Help me
