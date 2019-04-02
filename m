@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41654)
+Received: from eggs.gnu.org ([209.51.188.92]:43828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBL1K-0000rY-Ds
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:15 -0400
+	(envelope-from <richard.weiyang@gmail.com>) id 1hBL9Q-00061N-Ch
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBL1F-000311-Fx
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:14 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:41209)
+	(envelope-from <richard.weiyang@gmail.com>) id 1hBL9O-0003Dm-Ga
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:36 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41662)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hBL1F-00030L-5c
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:08:09 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r4so17116198wrq.8
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 08:08:09 -0700 (PDT)
-References: <1554207110-9113-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8dd10edf-a799-1c3b-2421-601d91eff0ac@redhat.com>
-Date: Tue, 2 Apr 2019 17:08:06 +0200
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1hBL9O-0003Bh-8B
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 11:16:34 -0400
+Received: by mail-ed1-x543.google.com with SMTP id a25so12000858edc.8
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 08:16:34 -0700 (PDT)
+Date: Tue, 2 Apr 2019 15:16:30 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190402151630.pdmwljy7d6fkcu3u@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190311060823.18360-3-richardw.yang@linux.intel.com>
+	<87a7h8bkof.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/mips: Make the results of
- DIV_<U|S>.<B|H|W|D> the same as on hardware
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7h8bkof.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl.c: allocate TYPE_MACHINE list once
+ during bootup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +33,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, Richard Henderson <rth@twiddle.net>, aurelien@aurel32.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Hi Mateja,
+On Tue, Apr 02, 2019 at 03:28:48PM +0200, Markus Armbruster wrote:
+>Wei Yang <richardw.yang@linux.intel.com> writes:
+>
+>> Now all the functions used to select machine is local and the call flow
+>> looks like below:
+>>
+>>     select_machine()
+>>         find_default_machine()
+>>         machine_parse()
+>>             find_machine()
+>>
+>> All these related function will need a GSList for TYPE_MACHINE.
+>> Currently we allocate this list each time we use it, while this is not
+>> necessary to do so because we don't need to modify this.
+>>
+>> This patch make the TYPE_MACHINE list allocation in select_machine and
+>> pass this to its child for use.
+>>
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  vl.c | 24 +++++++++++-------------
+>>  1 file changed, 11 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/vl.c b/vl.c
+>> index 3688e2bc98..cf08d96ce4 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1418,9 +1418,9 @@ static int usb_parse(const char *cmdline)
+>>  
+>>  MachineState *current_machine;
+>>  
+>> -static MachineClass *find_machine(const char *name)
+>> +static MachineClass *find_machine(const char *name, GSList *machines)
+>>  {
+>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>> +    GSList *el;
+>>      MachineClass *mc = NULL;
+>>  
+>>      for (el = machines; el; el = el->next) {
+>> @@ -1437,13 +1437,12 @@ static MachineClass *find_machine(const char *name)
+>>          }
+>>      }
+>>  
+>> -    g_slist_free(machines);
+>>      return mc;
+>>  }
+>
+>Can be simplified further.  I'll post it as PATCH 3.
+>
 
-On 4/2/19 2:11 PM, Mateja Marjanovic wrote:
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-> 
-> MSA instructions DIV_<U|S>.<B|H|W|D> when dividing by zero,
-> didn't return the same value when executed on a referent hardware
-> (FPGA MIPS 64 r6, little endian) and when executed on QEMU, which
-> is not a real bug, because the result when dividing by zero is
-> UNPREDICTABLE [1] (page 141, 142).
+Markus
 
-I'm surprised by the arch, I'd have expected a MSA floating point
-exception instead of UNPREDICTABLE.
+Thanks for your comment. Do you sugest to simplify it in this patch? I
+am confused here.
 
-So here we decide to follow the FPGA model behavior rather than the
-architecture...
-If the community agree, my only request is to add a comment in the code
-that this is the "FPGA MIPS 64 r6" behavior (else while looking at this
-code later I'd be tempted to revert to a 0 return value instead of -1/1).
+>>  
+>> -static MachineClass *find_default_machine(void)
+>> +static MachineClass *find_default_machine(GSList *machines)
+>>  {
+>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>> +    GSList *el;
+>>      MachineClass *mc = NULL;
+>>  
+>>      for (el = machines; el; el = el->next) {
+>> @@ -1455,7 +1454,6 @@ static MachineClass *find_default_machine(void)
+>>          }
+>>      }
+>>  
+>> -    g_slist_free(machines);
+>>      return mc;
+>>  }
+>
+>Likewise.
+>
+>>  
+>> @@ -2538,16 +2536,15 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>>                    object_class_get_name(OBJECT_CLASS(mc1)));
+>>  }
+>>  
+>> -static MachineClass *machine_parse(const char *name)
+>> +static MachineClass *machine_parse(const char *name, GSList *machines)
+>>  {
+>>      MachineClass *mc = NULL;
+>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>> +    GSList *el;
+>>  
+>>      if (name) {
+>> -        mc = find_machine(name);
+>> +        mc = find_machine(name, machines);
+>>      }
+>>      if (mc) {
+>> -        g_slist_free(machines);
+>>          return mc;
+>>      }
+>>      if (name && !is_help_option(name)) {
+>> @@ -2567,7 +2564,6 @@ static MachineClass *machine_parse(const char *name)
+>>          }
+>>      }
+>>  
+>> -    g_slist_free(machines);
+>>      exit(!name || !is_help_option(name));
+>>  }
+>
+>Additional cleanup is possible: argument @name is never null.
+>
+>While there, I'd check is_help_option() first rather than only after
+>find_machine() returns null, because "first" is what we commonly do.
+>
+>I'll post this as PATCH 4.
+>
+>>  
+>> @@ -2659,7 +2655,8 @@ static const QEMUOption *lookup_opt(int argc, char **argv,
+>>  
+>>  static MachineClass *select_machine(void)
+>>  {
+>> -    MachineClass *machine_class = find_default_machine();
+>> +    GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>> +    MachineClass *machine_class = find_default_machine(machines);
+>>      const char *optarg;
+>>      QemuOpts *opts;
+>>      Location loc;
+>> @@ -2671,7 +2668,7 @@ static MachineClass *select_machine(void)
+>>  
+>>      optarg = qemu_opt_get(opts, "type");
+>>      if (optarg) {
+>> -        machine_class = machine_parse(optarg);
+>> +        machine_class = machine_parse(optarg, machines);
+>
+>Could create and destroy @machines here:
+>
+>  -        machine_class = machine_parse(optarg);
+>  +        GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>  +        machine_class = machine_parse(optarg, machines);
+>  +        g_slist_free(machines);
+>
+>Matter of taste.
+>
+>>      }
+>>  
+>>      if (!machine_class) {
+>> @@ -2681,6 +2678,7 @@ static MachineClass *select_machine(void)
+>>      }
+>>  
+>>      loc_pop(&loc);
+>> +    g_slist_free(machines);
+>>      return machine_class;
+>>  }
+>
+>Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-> 
-> [1] MIPS Architecture for Programmers
->     Volume IV-j: The MIPS64 SIMD
->     Architecture Module, Revision 1.12
-> 
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> ---
->  target/mips/msa_helper.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-> index 655148d..8c77f12 100644
-> --- a/target/mips/msa_helper.c
-> +++ b/target/mips/msa_helper.c
-> @@ -641,14 +641,15 @@ static inline int64_t msa_div_s_df(uint32_t df, int64_t arg1, int64_t arg2)
->      if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
->          return DF_MIN_INT(df);
->      }
-> -    return arg2 ? arg1 / arg2 : 0;
-> +    return arg2 ? arg1 / arg2
-> +                : arg1 >= 0 ? -1 : 1;
->  }
->  
->  static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t arg2)
->  {
->      uint64_t u_arg1 = UNSIGNED(arg1, df);
->      uint64_t u_arg2 = UNSIGNED(arg2, df);
-> -    return u_arg2 ? u_arg1 / u_arg2 : 0;
-> +    return arg2 ? u_arg1 / u_arg2 : -1;
->  }
->  
->  static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
-> 
+-- 
+Wei Yang
+Help you, Help me
