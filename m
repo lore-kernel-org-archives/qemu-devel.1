@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38970)
+Received: from eggs.gnu.org ([209.51.188.92]:39164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hBMPY-0006Jk-03
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:37:20 -0400
+	(envelope-from <crobinso@redhat.com>) id 1hBMPj-0006Pe-8Y
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hBMDu-0001VM-TV
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:25:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hBMDu-0001SG-G2
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:25:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA5F43082134
-	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 16:25:17 +0000 (UTC)
-References: <20190326131822.GD15011@stefanha-x1.localdomain>
-	<55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
-	<20190402161853.GE5352@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b4f5997d-e42a-aaaa-e145-b55d5f6efd93@redhat.com>
-Date: Tue, 2 Apr 2019 18:25:04 +0200
+	(envelope-from <crobinso@redhat.com>) id 1hBMIo-0003s1-7h
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:30:23 -0400
+References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <4d41daa4-743e-400b-d350-e89ca93b6c58@redhat.com>
+Date: Tue, 2 Apr 2019 12:22:59 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190402161853.GE5352@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU event loop optimizations
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/97] Patch Round-up for
+ stable 3.0.1, freeze on 2019-04-08
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org
 
-On 02/04/19 18:18, Kevin Wolf wrote:
-> Am 26.03.2019 um 15:11 hat Paolo Bonzini geschrieben:
->> - but actually (and a precursor to using IOCB_CMD_POLL) it should be
->> possible to have just one LinuxAioState per AioContext, and then
->> it can simply share the AioContext's EventNotifier.  This removes
->> the need to do the event_notifier_test_and_clear in linux-aio.c.
+On 4/1/19 4:58 PM, Michael Roth wrote:
+> Hi everyone,                                                                                              
 > 
-> Isn't having only one LinuxAioState per AioContext what we already do?
-> See aio_get_linux_aio().
+> The following new patches are queued for QEMU stable v3.0.1:
+> 
+>   https://github.com/mdroth/qemu/commits/stable-3.0-staging
+> 
+> The release is planned for 2019-04-11:
+> 
+>   https://wiki.qemu.org/Planning/3.0
+> 
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
+> 
+> Note that this update falls outside the normal stable release support
+> window (~1 development cycle), but is being release now since it was
+> delayed from its intended release date.
+> 
+> Thanks!
+> 
 
-And I should have known that:
+Here's some extra patches we are carrying in Fedora 29
 
-    commit 0187f5c9cb172771ba85c66e3bf61f8cde6d6561
-    Author: Paolo Bonzini <pbonzini@redhat.com>
-    Date:   Mon Jul 4 18:33:20 2016 +0200
+https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2018-15746
+6f2231e9b0 seccomp: use SIGSYS signal instead of killing the thread
+bda08a5764 seccomp: prefer SCMP_ACT_KILL_PROCESS if available
+d0699bd37c configure: require libseccomp 2.2.0
+70dfabeaa7 seccomp: set the seccomp filter to all threads
 
-    linux-aio: share one LinuxAioState within an AioContext
+https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2018-18849
+e58ccf0396 lsi53c895a: check message length value is valid
 
-    This has better performance because it executes fewer system calls
-    and does not use a bottom half per disk.
+https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2019-6778
+a907458ad8 slirp: check data length while emulating ident function
 
-    Originally proposed by Ming Lei.
+https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2018-18954
+d07945e78e ppc/pnv: check size before data buffer access
 
-The second point, which is to share the AioContext's EventNotifier,
-still stands.
+https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2018-19364
+5b76ef50f6 9p: write lock path in v9fs_co_open2()
+5b3c77aa58 9p: take write lock on fid path updates (CVE-2018-19364)
 
-Paolo
+Thanks,
+Cole
