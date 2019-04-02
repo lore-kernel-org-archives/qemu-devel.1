@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49908)
+Received: from eggs.gnu.org ([209.51.188.92]:49982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBF00-0002wO-RS
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:42:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBF08-0002xJ-AY
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBExZ-00063e-PW
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:39:58 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41168)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBExZ-0005xZ-G6
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:39:57 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 64so11235627otb.8
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 01:39:57 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hBEup-0008B4-PR
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:37:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBEup-00084h-Eb
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:37:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190326174510.13303-1-chen.zhang@intel.com>
+	<87y34tgc7m.fsf@dusky.pond.sub.org>
+	<9CFF81C0F6B98A43A459C9EDAD400D78060B1D99@shsmsx102.ccr.corp.intel.com>
+Date: Tue, 02 Apr 2019 10:37:04 +0200
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78060B1D99@shsmsx102.ccr.corp.intel.com>
+	(Chen Zhang's message of "Tue, 2 Apr 2019 07:32:40 +0000")
+Message-ID: <87lg0sg5vz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
-	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
-	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
-	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
-	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-In-Reply-To: <a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Apr 2019 08:39:45 +0000
-Message-ID: <CAFEAcA9mf3HxzYkCA1rj8xQVRGo5Nbe72KEPXtQtQgA2GYaHmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
- feature "fdt"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qapi/migration.json: Fix documentation
+ issue about query_colo_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Laszlo Ersek <lersek@redhat.com>, Leif Lindholm <Leif.Lindholm@arm.com>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Cc: Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>
 
-On Fri, 29 Mar 2019 at 20:56, Auger Eric <eric.auger@redhat.com> wrote:
-> This series:
-> - [PATCH v3 00/10] ARM virt: ACPI memory hotplug support,
-> https://patchwork.kernel.org/cover/10863301/
->
-> aims to introduce PCDIMM support in qemu. In ACPI mode, it builds the
-> SRAT and DSDT parts and relies on GED to trigger the hotplug.
->
-> We noticed that if we build the hotpluggable memory dt nodes on top of
-> the above ACPI tables, the DIMM slots are interpreted as not
-> hotpluggable memory slots (at least we think so).
->
-> We think the EDK2 GetMemoryMap() uses the dt node info and ignores the
-> fact that those slots are exposed as hotpluggable in the SRAT for example.
->
-> So in this series, we are forced to not generate the hotpluggable memory
-> dt nodes if we want the DIMM slots to be effectively recognized as
-> hotpluggable.
->
-> Could you confirm we have a correct understanding of the EDK2 behaviour
-> and if so, would there be any solution for EDK2 to absorb both the DT
-> nodes and the relevant SRAT/DSDT tables and make the slots hotpluggable.
->
-> At qemu level, detecting we are booting in ACPI mode and purposely
-> removing the above mentioned DT nodes does not look straightforward.
+"Zhang, Chen" <chen.zhang@intel.com> writes:
 
-My initial response would be to say that hotpluggable memory
-should be suitably marked up in both the DTB and the ACPI tables
-so that guest software that cares can tell that it is hotplugged
-whether it is choosing to consume the DT or the ACPI tables.
-QEMU should definitely not be reporting the hardware as looking
-different to the guest based on some guess about what guest
-software it is booting.
+>> -----Original Message-----
+>> From: Markus Armbruster [mailto:armbru@redhat.com]
+>> Sent: Tuesday, April 2, 2019 2:20 PM
+>> To: Zhang, Chen <chen.zhang@intel.com>
+>> Cc: Zhang Chen <zhangckid@gmail.com>; Dr. David Alan Gilbert
+>> <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; zhanghailiang
+>> <zhang.zhanghailiang@huawei.com>; Eric Blake <eblake@redhat.com>; qemu-
+>> dev <qemu-devel@nongnu.org>; Zhang, Chen <chen.zhang@intel.com>
+>> Subject: Re: [Qemu-devel] [PATCH] qapi/migration.json: Fix documentation
+>> issue about query_colo_status
+>> 
+>> Zhang Chen <chen.zhang@intel.com > writes:
+>> 
+>> > From: Zhang Chen <chen.zhang@intel.com>
+>> >
+>> > The documentation with the wrong initial version number of last_mode
+>> > field, This patch just fix this issue.
+>> >
+>> > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+>> > ---
+>> >  qapi/migration.json | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/qapi/migration.json b/qapi/migration.json index
+>> > cfde29acf8..798c6ac2df 100644
+>> > --- a/qapi/migration.json
+>> > +++ b/qapi/migration.json
+>> > @@ -1382,7 +1382,7 @@
+>> >  #
+>> >  # @last_mode: COLO last running mode. If COLO is running, this field
+>> >  #             will return same like mode field, after failover we can
+>> > -#             use this field to get last colo mode. (since 4.1)
+>> > +#             use this field to get last colo mode. (since 4.0)
+>> >  #
+>> >  # @reason: describes the reason for the COLO exit.
+>> >  #
+>> 
+>> What's the excuse for spelling last_mode with '_' instead of '-'?
+>> 
+>> Any objection to changing it to last-mode?
+>
+> No, I just found in migration.json have both '_' and  '-', for example "migrate_cancel" and "migrate-continue".
+> If you think we should use the '-' format in this migration.qapi file, I will send a patch to change all command format to the '-'.
 
-thanks
--- PMM
+Quote docs/devel/qapi-code-gen.txt:
+
+    Command names, and member names within a type, should be all lower
+    case with words separated by a hyphen.  However, some existing older
+    commands and complex types use underscore; when extending such
+    expressions, consistency is preferred over blindly avoiding
+    underscore.
+
+The consistency argument doesn't apply here.
+
+I'd prefer to have this cleaned up, and I'd prefer to have it done in
+-rc2.  If I see a patch from you before I do my pull request, I'll use
+it, otherweise I'll patch it myself.
