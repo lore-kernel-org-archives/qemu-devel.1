@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50214)
+Received: from eggs.gnu.org ([209.51.188.92]:58672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBP1q-00031C-7l
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:25:04 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBPey-0004hj-DM
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hBP1p-0007zk-B4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:25:02 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hBP1o-0007x2-RE
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 15:25:01 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r4so18098035wrq.8
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 12:25:00 -0700 (PDT)
-References: <20190402161900.7374-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6f392ee5-d2c6-36b3-b2e2-6ec704d51277@redhat.com>
-Date: Tue, 2 Apr 2019 21:24:58 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190402161900.7374-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBPex-0004ou-3r
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:05:28 -0400
+Received: from mail-eopbgr820118.outbound.protection.outlook.com
+	([40.107.82.118]:6377
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hBPet-0004j6-Ep
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 16:05:25 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 2 Apr 2019 20:05:19 +0000
+Message-ID: <BN6PR2201MB12514F104F4AFE2D03767E31C6560@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190327181650.23992-1-jbi.octave@gmail.com>
+In-Reply-To: <20190327181650.23992-1-jbi.octave@gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] acpi: More trace points
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] target/mips: add * to comments and
+ realign them to fix checkpatch warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, mst@redhat.com
+To: Jules Irenge <jbi.octave@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 4/2/19 6:18 PM, Markus Armbruster wrote:
-> I wrote these patches to help me debug an unplug failure.  I expect
-> them to be helpful for others, too.
+> From: Jules Irenge <jbi.octave@gmail.com>
+> Subject: [PATCH v2] target/mips: add * to comments and realign them to fi=
+x checkpatch warnings
+>=20
+> Add * to comments and realign to fix warnings issued by checkpatch.pl too=
+l
+> "WARNING: Block comments use a leading /* on a separate line"
+> within the file "target/mips/cp0_timer.c".
+>=20
+> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+> ---
 
-Appreciated.
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FYI I have a WiP branch where I use existing tracepoints to check events
-order and timing (using Avocado).
+Jules,
 
-Series:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+would you perhapsh like to clean up files cpu.h,  mips-defs.h, and trace.h =
+in target/mips dir (from all checkpatch errors and warnings, if possible)? =
+I wanted to do it for a long time.
 
-> 
-> Markus Armbruster (3):
->   acpi/piix4: Convert debug printf()s to trace events
->   acpi/pcihp: Convert debug printf()s to trace events
->   acpi/pcihp: Add a few more trace points related to unplug
-> 
->  hw/acpi/pcihp.c      | 32 +++++++++++++++-----------------
->  hw/acpi/piix4.c      | 14 +++-----------
->  hw/acpi/trace-events | 16 ++++++++++++++++
->  3 files changed, 34 insertions(+), 28 deletions(-)
-> 
+Sincerelly,
+Aleksandar
