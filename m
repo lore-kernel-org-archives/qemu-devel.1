@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49935)
+Received: from eggs.gnu.org ([209.51.188.92]:49908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hBEzy-0002wZ-Fe
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:42:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBF00-0002wO-RS
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hBEtD-0005K1-2E
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:35:28 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Tue, 2 Apr 2019 08:35:14 +0000
-Message-ID: <101bbf98-0456-5022-e117-fd6f693a8786@virtuozzo.com>
-References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
-	<20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-	<20190313160412.GF5167@linux.fritz.box>
-In-Reply-To: <20190313160412.GF5167@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4B08AC81828326439930069F3B48D145@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1hBExZ-00063e-PW
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:39:58 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41168)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hBExZ-0005xZ-G6
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 04:39:57 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 64so11235627otb.8
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 01:39:57 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+In-Reply-To: <a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 2 Apr 2019 08:39:45 +0000
+Message-ID: <CAFEAcA9mf3HxzYkCA1rj8xQVRGo5Nbe72KEPXtQtQgA2GYaHmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Laszlo Ersek <lersek@redhat.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
-DQoNCk9uIDEzLjAzLjIwMTkgMTk6MDQsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDE0LjEyLjIw
-MTggdW0gMTI6NTQgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IE9uIDEzLjEy
-LjIwMTggMTU6MjAsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTMuMTIuMjAxOCB1bSAxMjow
-NyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+PiBTb3VuZHMgaXQgc2hvdWxk
-IGJlIHNvLCBidXQgaXQgZG9lc24ndCB3b3JrIHRoYXQgd2F5IGFuZCB0aGF0J3Mgd2h5Og0KPj4+
-PiB3aGVuIGRvaW5nIG1pcnJvciB3ZSBtYXkgcmVzdW1lIHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRv
-byBlYXJseSB3aGVuIHRoZQ0KPj4+PiB1bmRlcmx5aW5nIGJzIGlzIHByb3RlY3RlZCBmcm9tIHdy
-aXRpbmcgYXQgYW5kIHRodXMgd2UgZW5jb3VudGVyIHRoZQ0KPj4+PiBhc3NlcnQgb24gYSB3cml0
-ZSByZXF1ZXN0IGV4ZWN1dGlvbiBhdCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlIHdoZW4NCj4+
-Pj4gcmVzdW1pbmcgdGhlIHBvc3Rwb25lZCBjb3JvdXRpbmVzLg0KPj4+Pg0KPj4+PiBUaGUgdGhp
-bmcgaXMgdGhhdCB0aGUgYnMgaXMgcHJvdGVjdGVkIGZvciB3cml0aW5nIGJlZm9yZSBleGVjdXRp
-b24gb2YNCj4+Pj4gYmRydl9yZXBsYWNlX25vZGUgYXQgbWlycm9yX2V4aXRfY29tbW9uIGFuZCBi
-ZHJ2X3JlcGxhY2Vfbm9kZSBjYWxscw0KPj4+PiBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtIHdo
-aWNoLCBpbiB0dXJuLCBjYWxscyBjaGlsZC0+cm9sZS0+ZHJhaW5lZF9lbmQNCj4+Pj4gd2hlcmUg
-b25lIG9mIHRoZSBjYWxsYmFja3MgaXMgYmxrX3Jvb3RfZHJhaW5lZF9lbmQgd2hpY2ggY2hlY2sN
-Cj4+Pj4gaWYoLS1ibGstPnF1aWVzY2VfY291bnRlciA9PSAwKSBhbmQgcnVucyB0aGUgcG9zdHBv
-bmVkIHJlcXVlc3RzDQo+Pj4+IChjb3JvdXRpbmVzKSBpZiB0aGUgY291bmRpdGlvbiBpcyB0cnVl
-Lg0KPj4+DQo+Pj4gSG0sIHNvIHNvbWV0aGluZyBpcyBtZXNzZWQgdXAgd2l0aCB0aGUgZHJhaW4g
-c2VjdGlvbnMgaW4gdGhlIG1pcnJvcg0KPj4+IGRyaXZlci4gV2UgaGF2ZToNCj4+Pg0KPj4+ICAg
-ICAgIGJkcnZfZHJhaW5lZF9iZWdpbih0YXJnZXRfYnMpOw0KPj4+ICAgICAgIGJkcnZfcmVwbGFj
-ZV9ub2RlKHRvX3JlcGxhY2UsIHRhcmdldF9icywgJmxvY2FsX2Vycik7DQo+Pj4gICAgICAgYmRy
-dl9kcmFpbmVkX2VuZCh0YXJnZXRfYnMpOw0KPj4+DQo+Pj4gT2J2aW91c2x5LCB0aGUgaW50ZW50
-aW9uIHdhcyB0byBrZWVwIHRoZSBCbG9ja0JhY2tlbmQgZHJhaW5lZCBkdXJpbmcNCj4+PiBiZHJ2
-X3JlcGxhY2Vfbm9kZSgpLiBTbyBob3cgY291bGQgYmxrLT5xdWllc2NlX2NvdW50ZXIgZXZlciBn
-ZXQgdG8gMA0KPj4+IGluc2lkZSBiZHJ2X3JlcGxhY2Vfbm9kZSgpIHdoZW4gdGFyZ2V0X2JzIGlz
-IGRyYWluZWQ/DQo+Pj4NCj4+PiBMb29raW5nIGF0IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0o
-KSwgaXQgc2VlbXMgdGhhdCB0aGUgZnVuY3Rpb24gaGFzDQo+Pj4gYSBidWc6IEV2ZW4gaWYgb2xk
-X2JzIGFuZCBuZXdfYnMgYXJlIGJvdGggZHJhaW5lZCwgdGhlIHF1aWVzY2VfY291bnRlcg0KPj4+
-IGZvciB0aGUgcGFyZW50IHJlYWNoZXMgMCBmb3IgYSBtb21lbnQgYmVjYXVzZSB3ZSBjYWxsIC5k
-cmFpbmVkX2VuZCBmb3INCj4+PiB0aGUgb2xkIGNoaWxkIGZpcnN0IGFuZCAuZHJhaW5lZF9iZWdp
-biBmb3IgdGhlIG5ldyBvbmUgbGF0ZXIuDQo+Pj4NCj4+PiBTbyBpdCBzZWVtcyB0aGUgZml4IHdv
-dWxkIGJlIHRvIHJldmVyc2UgdGhlIG9yZGVyIGFuZCBmaXJzdCBjYWxsDQo+Pj4gLmRyYWluZWRf
-YmVnaW4gZm9yIHRoZSBuZXcgY2hpbGQgYW5kIHRoZW4gLmRyYWluZWRfZW5kIGZvciB0aGUgb2xk
-DQo+Pj4gY2hpbGQuIFNvdW5kcyBsaWtlIGEgZ29vZCBuZXcgdGVzdGNhc2UgZm9yIHRlc3RzL3Rl
-c3QtYmRydi1kcmFpbi5jLCB0b28uDQo+PiBZZXMsIGl0J3MgdHJ1ZSwgYnV0IGl0J3Mgbm90IGVu
-b3VnaC4uLg0KPiANCj4gRGlkIHlvdSBldmVyIGltcGxlbWVudCB0aGUgY2hhbmdlcyBzdWdnZXN0
-ZWQgc28gZmFyLCBzbyB0aGF0IHdlIGNvdWxkDQo+IGNvbnRpbnVlIGZyb20gdGhlcmU/IE9yIHNo
-b3VsZCBJIHRyeSBhbmQgY29tZSB1cCB3aXRoIHNvbWV0aGluZyBteXNlbGY/DQoNClNvcnJ5IGZv
-ciB0aGUgbGF0ZSByZXBseS4uLg0KWWVzLCBJIGRpZCAuLi4NCj4gDQo+PiBJbiBtaXJyb3JfZXhp
-dF9jb21tb24oKSB3ZSBhY3RpdmVseSBtYW5pcHVsYXRlIHdpdGggYmxvY2sgZHJpdmVyIHN0YXRl
-cy4NCj4+IFdoZW4gd2UgcmVwbGFjZWQgYSBub2RlIGluIHRoZSBzbmlwcGV0IHlvdSBzaG93ZWQg
-d2UgY2FuJ3QgYWxsb3cgdGhlDQo+PiBwb3N0cG9uZWQgY29yb3V0aW5lcyB0byBydW4gYmVjYXVz
-ZSB0aGUgYmxvY2sgdHJlZSBpc24ndCByZWFkeSB0bw0KPj4gcmVjZWl2ZSB0aGUgcmVxdWVzdHMg
-eWV0Lg0KPj4gVG8gYmUgcmVhZHksIHdlIG5lZWQgdG8gaW5zZXJ0IGEgcHJvcGVyIGJsb2NrIGRy
-aXZlciBzdGF0ZSB0byB0aGUgYmxvY2sNCj4+IGJhY2tlbmQgd2hpY2ggaXMgZG9uZSBoZXJlDQo+
-Pg0KPj4gICAgICAgYmxrX3JlbW92ZV9icyhiam9iLT5ibGspOw0KPj4gICAgICAgYmxrX3NldF9w
-ZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4gICAgICAg
-YmxrX2luc2VydF9icyhiam9iLT5ibGssIG1pcnJvcl90b3BfYnMsICZlcnJvcl9hYm9ydCk7IDw8
-IDw8IDw8IDw8DQo+Pg0KPj4gICAgICAgYnNfb3BhcXVlLT5qb2IgPSBOVUxMOw0KPj4NCj4+ICAg
-ICAgIGJkcnZfZHJhaW5lZF9lbmQoc3JjKTsNCj4gDQo+IERpZCB5b3UgYWN0dWFsbHkgZW5jb3Vu
-dGVyIGEgYnVnIGhlcmUgb3IgaXMgdGhpcyBqdXN0IHRoZW9yeT8gYmpvYi0+YmxrDQo+IGlzIHRo
-ZSBCbG9ja0JhY2tlbmQgb2YgdGhlIGpvYiBhbmQgaXNuJ3QgaW4gdXNlIGF0IHRoaXMgcG9pbnQg
-YW55IG1vcmUuDQo+IFdlIG9ubHkgaW5zZXJ0IHRoZSBvbGQgbm9kZSBpbiBpdCBhZ2FpbiBiZWNh
-dXNlIGJsb2NrX2pvYl9mcmVlKCkgbXVzdA0KPiBzZXQgYnMtPmpvYiA9IE5VTEwsIGFuZCBpdCBn
-ZXRzIGJzIHdpdGggYmxrX2JzKGJqb2ItPmJsaykuDQo+IA0KPiBTbyBpZiB0aGVyZSBpcyBhbiBh
-Y3R1YWwgYnVnIGhlcmUsIEkgZG9uJ3QgdW5kZXJzdGFuZCBpdCB5ZXQuDQpBbmQgZGlkIGVuY291
-bnRlciB0aGUgYnVnIHRoYXQgSSBkZXNjcmliZWQgYWJvdmUuDQpXaGVuIGEgcG9zdHBvbmVkIGNv
-cm91dGluZSByZXN1bWVzIGl0IGZhaWxzIG9uIGFzc2VydDoNCg0KYmRydl9jb193cml0ZV9yZXFf
-cHJlcGFyZTogQXNzZXJ0aW9uIGBjaGlsZC0+cGVybSAmIEJMS19QRVJNX1dSSVRFJyBmYWlsZWQN
-Cg0KVGhhdCdzIHdoeSBpdCBoYXBwZW5zOiB3ZSBoYXZlIHRoZSBtaXJyb3IgZmlsdGVyIGJkcyBp
-biBibGsgcm9vdCB3aGljaCANCnJlY2VpdmVzIGFsbCB0aGUgcmVxdWVzdHMuIE9uIG1pcnJvciBj
-b21wbGV0aW9uIHdlIGNhbGwgDQptaXJyb3JfZXhpdF9jb21tb24gdG8gZmluaXNoIG1pcnJvcmlu
-Zy4gVG8gZmluaXNoIG1pcnJvcmluZyB3ZSBuZWVkIHRvIA0KcmVtb3ZlIHRoZSBtaXJyb3IgZmls
-dGVyIGZyb20gdGhlIGdyYXBoIGFuZCBzZXQgbWlycm9yIGZpbGUgYmxrIHJvb3QuDQpXZSBjYWxs
-IGJsb2NrX2pvYl9jb21wbGV0ZS4gQXNzdW1lIHRoZSBpZGUgcmVxdWVzdCBoYXMgY2FtZSBhZnRl
-ciB0aGUgDQpjb21wbGV0aW9uIGNhbGxpbmcgYW5kIGhhcyBiZWVuIHBvc3Rwb25lZCBiZWNhdXNl
-IGJsay0+cXVpZXNjZV9jb3VudGVyIA0KaXMgbm90IDAuIGJsb2NrX2pvYl9jb21wbGV0ZSBkb2Vz
-IG1pcnJvcl9leGl0X2NvbW1vbiB3aGljaCBkcm9wcyB0aGUgDQpwZXJtaXNzaW9ucy4NCg0KICAg
-ICAvKiBXZSBkb24ndCBhY2Nlc3MgdGhlIHNvdXJjZSBhbnkgbW9yZS4gRHJvcHBpbmcgYW55IFdS
-SVRFL1JFU0laRSBpcw0KICAgICAgKiByZXF1aXJlZCBiZWZvcmUgaXQgY291bGQgYmVjb21lIGEg
-YmFja2luZyBmaWxlIG9mIHRhcmdldF9icy4gKi8NCiAgICAgYmRydl9jaGlsZF90cnlfc2V0X3Bl
-cm0obWlycm9yX3RvcF9icy0+YmFja2luZywgMCwgQkxLX1BFUk1fQUxMLA0KICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAmZXJyb3JfYWJvcnQpOw0KDQp0aGVuLCBpdCByZXBsYWNlcyB0aGUg
-c291cmNlIHdpdGggdGhlIHRhcmdldA0KDQogICAgICAgICAvKiBUaGUgbWlycm9yIGpvYiBoYXMg
-bm8gcmVxdWVzdHMgaW4gZmxpZ2h0IGFueSBtb3JlLCBidXQgd2UgDQpuZWVkIHRvDQogICAgICAg
-ICAgKiBkcmFpbiBwb3RlbnRpYWwgb3RoZXIgdXNlcnMgb2YgdGhlIEJEUyBiZWZvcmUgY2hhbmdp
-bmcgdGhlIA0KZ3JhcGguICovDQoNCiAgICAgICAgIC8vIGhlcmUsIHRhcmdldF9icyBoYXMgbm8g
-cGFyZW50cyBhbmQgZG9lc24ndCBiZWdpbiB0byBkcmFpbmcNCg0KICAgICAgICAgYmRydl9kcmFp
-bmVkX2JlZ2luKHRhcmdldF9icyk7DQoNCiAgICAgICAgIC8vIGFmdGVyIGV4ZWN1dGlvbiBvZiB0
-aGUgZnVuY3Rpb24gYmVsb3cNCiAgICAgICAgIC8vIHRhcmdldCBicyBoYXMgbWlycm9yX3RvcF9i
-cy0+YmFja2luZyBhcyBhIHBhcmVudA0KDQogICAgICAgICBiZHJ2X3JlcGxhY2Vfbm9kZSh0b19y
-ZXBsYWNlLCB0YXJnZXRfYnMsICZsb2NhbF9lcnIpOw0KDQogICAgICAgICAvLyBub3cgdGFyZ2V0
-X2JzIGhhcyBzb3VyY2UncyBibGsgYXMgYSBwYXJlbnQNCiAgICAgICAgIC8vIHRoZSBmb2xsb3dp
-bmcgY2FsbCBzZXRzIGJsay0+cXVpZXNjZV9jb3VudGVyIHRvIDANCiAgICAgICAgIC8vIGFuZCBl
-eGVjdXRlcyB0aGUgcG9zdHBvbmVkIGNvcm91dGluZSBvbiBibGsgd2l0aA0KICAgICAgICAgLy8g
-bWlycm9yIGZpbHRlciBzZXQgd2hpY2ggZXZlbnR1YWxseSBkb2VzIHdyaXRpbmcNCiAgICAgICAg
-IC8vIG9uIG1pcnJvcl90b3BfYnMtPmJhY2tpbmcgY2hpbGQgd2hpY2ggaGFzIG5vIHdyaXRpbmcN
-CiAgICAgICAgIC8vIChhbmQgcmVhZGluZykgcGVybWlzc2lvbnMNCg0KICAgICAgICAgYmRydl9k
-cmFpbmVkX2VuZCh0YXJnZXRfYnMpOw0KDQoNCkRvZXMgaXQgbWFrZSB0aGluZyBtb3JlIGNsZWFy
-Pw0KDQpEZW5pcw0KDQo+IA0KPj4gSWYgdGhlIHRyZWUgaXNuJ3QgcmVhZHkgYW5kIHdlIHJlc3Vt
-ZSB0aGUgY29yb3V0aW5lcywgd2UnbGwgZW5kIHVwIHdpdGgNCj4+IHRoZSByZXF1ZXN0IGxhbmRl
-ZCBpbiBhIHdyb25nIGJsb2NrIGRyaXZlciBzdGF0ZS4NCj4+DQo+PiBTbywgd2UgZXhwbGljaXRs
-eSBzaG91bGQgc3RvcCBhbGwgYWN0aXZpdGllcyBvbiBhbGwgdGhlIGRyaXZlciBzdGF0ZXMNCj4+
-IGFuZCBpdHMgcGFyZW50cyBhbmQgYWxsb3cgdGhlIGFjdGl2aXRpZXMgd2hlbiBldmVyeXRoaW5n
-IGlzIHJlYWR5IHRvIGdvLg0KPj4NCj4+IFdoeSBleHBsaWNpdGx5LCBiZWNhdXNlIHRoZSBibG9j
-ayBkcml2ZXIgc3RhdGVzIG1heSBiZWxvbmcgdG8gZGlmZmVyZW50DQo+PiBibG9jayBiYWNrZW5k
-cyBhdCB0aGUgbW9tZW50IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5nLg0KPj4NCj4+IFNv
-LCBpdCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxsIHRoZWlyIGNvbnRleHRzIHVudGlsIHRo
-ZQ0KPj4gbWFuaXB1bGF0aW9uIGVuZHMuDQo+IA0KPiBJZiB0aGVyZSBhY3R1YWxseSBpcyBhIGJ1
-ZywgaXQgaXMgY2VydGFpbmx5IG5vdCBzb2x2ZWQgYnkgY2FsbGluZw0KPiBhaW9fZGlzYWJsZV9l
-eHRlcm5hbCgpIChpdCBpcyBiYWQgZW5vdWdoIHRoYXQgdGhpcyBldmVuIGV4aXN0cyksIGJ1dCBi
-eQ0KPiBrZWVwaW5nIHRoZSBub2RlIGRyYWluZWQuDQo+IA0KPiBLZXZpbg0KPiANCg0KLS0gDQpC
-ZXN0LA0KRGVuaXMNCg==
+On Fri, 29 Mar 2019 at 20:56, Auger Eric <eric.auger@redhat.com> wrote:
+> This series:
+> - [PATCH v3 00/10] ARM virt: ACPI memory hotplug support,
+> https://patchwork.kernel.org/cover/10863301/
+>
+> aims to introduce PCDIMM support in qemu. In ACPI mode, it builds the
+> SRAT and DSDT parts and relies on GED to trigger the hotplug.
+>
+> We noticed that if we build the hotpluggable memory dt nodes on top of
+> the above ACPI tables, the DIMM slots are interpreted as not
+> hotpluggable memory slots (at least we think so).
+>
+> We think the EDK2 GetMemoryMap() uses the dt node info and ignores the
+> fact that those slots are exposed as hotpluggable in the SRAT for example.
+>
+> So in this series, we are forced to not generate the hotpluggable memory
+> dt nodes if we want the DIMM slots to be effectively recognized as
+> hotpluggable.
+>
+> Could you confirm we have a correct understanding of the EDK2 behaviour
+> and if so, would there be any solution for EDK2 to absorb both the DT
+> nodes and the relevant SRAT/DSDT tables and make the slots hotpluggable.
+>
+> At qemu level, detecting we are booting in ACPI mode and purposely
+> removing the above mentioned DT nodes does not look straightforward.
+
+My initial response would be to say that hotpluggable memory
+should be suitably marked up in both the DTB and the ACPI tables
+so that guest software that cares can tell that it is hotplugged
+whether it is choosing to consume the DT or the ACPI tables.
+QEMU should definitely not be reporting the hardware as looking
+different to the guest based on some guess about what guest
+software it is booting.
+
+thanks
+-- PMM
