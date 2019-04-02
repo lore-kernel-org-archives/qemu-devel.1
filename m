@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58585)
+Received: from eggs.gnu.org ([209.51.188.92]:60070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBKHP-0007ZR-8I
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:20:48 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hBKNm-00038b-Db
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBKHO-0003P6-6h
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:20:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hBKHN-0003Ng-Tv
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:20:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hBKHM-0007FV-Ma
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 14:20:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A315F2E86B5
-	for <qemu-devel@nongnu.org>; Tue,  2 Apr 2019 14:20:44 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hBKNj-0007tZ-1I
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 10:27:22 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 2 Apr 2019 14:26:49 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83934970E@lhreml524-mbb.china.huawei.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+In-Reply-To: <459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Apr 2019 14:09:27 -0000
-From: Jayshree Phulare <1822798@bugs.launchpad.net>
-Reply-To: Bug 1822798 <1822798@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155421416733.11748.993612847677239700.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1822798] [NEW] The hover of " Full list of
- releases " is not effective even not visible.
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +33,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
-Public bug reported:
-
-The hover effect of "Full list of releases " on QEMU website that is
-https://www.qemu.org/ is not visible and hence effective so made it the
-issue on git hub and even committed it.
-
-** Affects: qemu
-     Importance: Undecided
-     Assignee: Jayshree Phulare (jayshreephulare1)
-         Status: New
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Jayshree Phulare (jayshreephulare1)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1822798
-
-Title:
-  The hover of " Full list of releases " is not effective even not
-  visible.
-
-Status in QEMU:
-  New
-
-Bug description:
-  The hover effect of "Full list of releases " on QEMU website that is
-  https://www.qemu.org/ is not visible and hence effective so made it
-  the issue on git hub and even committed it.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1822798/+subscriptions
+SGkgTGFzemxvLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IExhc3ps
+byBFcnNlayBbbWFpbHRvOmxlcnNla0ByZWRoYXQuY29tXQ0KPiBTZW50OiAwMSBBcHJpbCAyMDE5
+IDE0OjA3DQo+IFRvOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+OyBBcmQgQmll
+c2hldXZlbA0KPiA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gQ2M6IHBldGVyLm1heWRl
+bGxAbGluYXJvLm9yZzsgc2FtZW9AbGludXguaW50ZWwuY29tOw0KPiBxZW11LWRldmVsQG5vbmdu
+dS5vcmc7IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29sb3RodW0u
+dGhvZGlAaHVhd2VpLmNvbT47IExpbnV4YXJtDQo+IDxsaW51eGFybUBodWF3ZWkuY29tPjsgc2hh
+bm5vbi56aGFvc2xAZ21haWwuY29tOw0KPiBxZW11LWFybUBub25nbnUub3JnOyB4dXdlaSAoTykg
+PHh1d2VpNUBodWF3ZWkuY29tPjsNCj4gaW1hbW1lZG9AcmVkaGF0LmNvbTsgc2ViYXN0aWVuLmJv
+ZXVmQGludGVsLmNvbTsgTGVpZiBMaW5kaG9sbQ0KPiA8TGVpZi5MaW5kaG9sbUBhcm0uY29tPg0K
+PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwNy8xMF0gaHcvYXJtL3ZpcnQ6
+IEludHJvZHVjZSBvcHQtaW4NCj4gZmVhdHVyZSAiZmR0Ig0KPiANCj4gT24gMDMvMjkvMTkgMTQ6
+NTYsIEF1Z2VyIEVyaWMgd3JvdGU6DQoNClsuLi5dDQoNCj4gPiBTdXJlLCBzb3JyeS4NCj4gPg0K
+PiA+IFRoaXMgc2VyaWVzOg0KPiA+IC0gW1BBVENIIHYzIDAwLzEwXSBBUk0gdmlydDogQUNQSSBt
+ZW1vcnkgaG90cGx1ZyBzdXBwb3J0LA0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcv
+Y292ZXIvMTA4NjMzMDEvDQo+ID4NCj4gPiBhaW1zIHRvIGludHJvZHVjZSBQQ0RJTU0gc3VwcG9y
+dCBpbiBxZW11LiBJbiBBQ1BJIG1vZGUsIGl0IGJ1aWxkcyB0aGUNCj4gPiBTUkFUIGFuZCBEU0RU
+IHBhcnRzIGFuZCByZWxpZXMgb24gR0VEIHRvIHRyaWdnZXIgdGhlIGhvdHBsdWcuDQo+ID4NCj4g
+PiBXZSBub3RpY2VkIHRoYXQgaWYgd2UgYnVpbGQgdGhlIGhvdHBsdWdnYWJsZSBtZW1vcnkgZHQg
+bm9kZXMgb24gdG9wIG9mDQo+ID4gdGhlIGFib3ZlIEFDUEkgdGFibGVzLCB0aGUgRElNTSBzbG90
+cyBhcmUgaW50ZXJwcmV0ZWQgYXMgbm90DQo+ID4gaG90cGx1Z2dhYmxlIG1lbW9yeSBzbG90cyAo
+YXQgbGVhc3Qgd2UgdGhpbmsgc28pLg0KPiA+DQo+ID4gV2UgdGhpbmsgdGhlIEVESzIgR2V0TWVt
+b3J5TWFwKCkgdXNlcyB0aGUgZHQgbm9kZSBpbmZvIGFuZCBpZ25vcmVzIHRoZQ0KPiA+IGZhY3Qg
+dGhhdCB0aG9zZSBzbG90cyBhcmUgZXhwb3NlZCBhcyBob3RwbHVnZ2FibGUgaW4gdGhlIFNSQVQg
+Zm9yIGV4YW1wbGUuDQo+ID4NCj4gPiBTbyBpbiB0aGlzIHNlcmllcywgd2UgYXJlIGZvcmNlZCB0
+byBub3QgZ2VuZXJhdGUgdGhlIGhvdHBsdWdnYWJsZSBtZW1vcnkNCj4gPiBkdCBub2RlcyBpZiB3
+ZSB3YW50IHRoZSBESU1NIHNsb3RzIHRvIGJlIGVmZmVjdGl2ZWx5IHJlY29nbml6ZWQgYXMNCj4g
+PiBob3RwbHVnZ2FibGUuDQo+ID4NCj4gPiBDb3VsZCB5b3UgY29uZmlybSB3ZSBoYXZlIGEgY29y
+cmVjdCB1bmRlcnN0YW5kaW5nIG9mIHRoZSBFREsyIGJlaGF2aW91cg0KPiA+IGFuZCBpZiBzbywg
+d291bGQgdGhlcmUgYmUgYW55IHNvbHV0aW9uIGZvciBFREsyIHRvIGFic29yYiBib3RoIHRoZSBE
+VA0KPiA+IG5vZGVzIGFuZCB0aGUgcmVsZXZhbnQgU1JBVC9EU0RUIHRhYmxlcyBhbmQgbWFrZSB0
+aGUgc2xvdHMgaG90cGx1Z2dhYmxlLg0KPiA+DQo+ID4gQXQgcWVtdSBsZXZlbCwgZGV0ZWN0aW5n
+IHdlIGFyZSBib290aW5nIGluIEFDUEkgbW9kZSBhbmQgcHVycG9zZWx5DQo+ID4gcmVtb3Zpbmcg
+dGhlIGFib3ZlIG1lbnRpb25lZCBEVCBub2RlcyBkb2VzIG5vdCBsb29rIHN0cmFpZ2h0Zm9yd2Fy
+ZC4NCj4gDQo+IFRoZSBmaXJtd2FyZSBpcyBub3QgZW5saWdodGVuZWQgYWJvdXQgdGhlIEFDUEkg
+Y29udGVudCB0aGF0IGNvbWVzIGZyb20NCj4gUUVNVSAvIGZ3X2NmZy4gVGhhdCBBQ1BJIGNvbnRl
+bnQgaXMgKmJsaW5kbHkqIHByb2Nlc3NlZCBieSB0aGUgZmlybXdhcmUsDQo+IGFzIGluc3RydWN0
+ZWQgdGhyb3VnaCB0aGUgQUNQSSBsaW5rZXIvbG9hZGVyIHNjcmlwdCwgaW4gb3JkZXIgdG8gaW5z
+dGFsbA0KPiB0aGUgQUNQSSBjb250ZW50IGZvciB0aGUgT1MuIE5vIGFjdHVhbCBpbmZvcm1hdGlv
+biBpcyBjb25zdW1lZCBieSB0aGUNCj4gZmlybXdhcmUgZnJvbSB0aGUgQUNQSSBwYXlsb2FkIC0t
+IGFuZCB0aGF0J3MgYSBmZWF0dXJlLg0KPiANCj4gVGhlIGZpcm13YXJlIGRvZXMgY29uc3VtZSBE
+VDoNCj4gDQo+IC0gSWYgeW91IHN0YXJ0IFFFTVUgKndpdGgqICItbm8tYWNwaSIsIHRoZW4gdGhl
+IERUIGlzIGJvdGggY29uc3VtZWQgYnkNCj4gdGhlIGZpcm13YXJlIChmb3IgaXRzIG93biBpbmZv
+cm1hdGlvbiBuZWVkcyksIGFuZCBwYXNzZWQgb24gdG8gdGhlIE9TLg0KPiANCj4gLSBJZiB5b3Ug
+c3RhcnQgUUVNVSAqd2l0aG91dCogIi1uby1hY3BpIiAodGhlIGRlZmF1bHQpLCB0aGVuIHRoZSBE
+VCBpcw0KPiBjb25zdW1lZCBvbmx5IGJ5IHRoZSBmaXJtd2FyZSAoZm9yIGl0cyBvd24gaW5mb3Jt
+YXRpb24gbmVlZHMpLCBhbmQgdGhlDQo+IERUIGlzIGhpZGRlbiBmcm9tIHRoZSBPUy4gVGhlIE9T
+IGdldHMgb25seSB0aGUgQUNQSSBjb250ZW50DQo+IChwcm9jZXNzZWQvcHJlcGFyZWQgYXMgZGVz
+Y3JpYmVkIGFib3ZlKS4NCj4gDQo+IA0KPiBJbiB0aGUgZmlybXdhcmUsIHRoZSAiQXJtVmlydFBr
+Zy9IaWdoTWVtRHhlIiBkcml2ZXIgaXRlcmF0ZXMgb3ZlciB0aGUNCj4gYmFzZS9zaXplIHBhaXJz
+IGluIGFsbCB0aGUgbWVtb3J5IG5vZGVzIGluIHRoZSBEVC4gRm9yIGVhY2ggc3VjaCBiYXNlDQo+
+IGFkZHJlc3MgdGhhdCBpcyBjdXJyZW50bHkgdHJhY2tlZCBhcyAibm9uZXhpc3RlbnQiIGluIHRo
+ZSBHQ0QgbWVtb3J5DQo+IHNwYWNlIG1hcCwgdGhlIGRyaXZlciBjdXJyZW50bHkgYWRkcyB0aGUg
+YmFzZS9zaXplIHJhbmdlIGFzICJzeXN0ZW0NCj4gbWVtb3J5Ii4gVGhpcyBpbiB0dXJuIGlzIHJl
+ZmxlY3RlZCBieSB0aGUgVUVGSSBtZW1tYXAgdGhhdCB0aGUgT1MgZ2V0cw0KPiB0byBzZWUgYXMg
+ImNvbnZlbnRpb25hbCBtZW1vcnkiLg0KPiANCj4gSWYgeW91IG5lZWQgc29tZSBtZW1vcnkgcmFu
+Z2VzIHRvIHNob3cgdXAgYXMgInNwZWNpYWwiIGluIHRoZSBVRUZJDQo+IG1lbW1hcCwgdGhlbiB5
+b3UgbmVlZCB0byBkaXN0aW5ndWlzaCB0aGVtIHNvbWVob3cgZnJvbSB0aGUgInJlZ3VsYXIiDQo+
+IG1lbW9yeSBhcmVhcywgaW4gdGhlIERULiBBbmQgdGhlbiBleHRlbmQgIkFybVZpcnRQa2cvSGln
+aE1lbUR4ZSIgaW4gdGhlDQo+IGZpcm13YXJlLCBzbyB0aGF0IGl0IGFjdCB1cG9uIHRoZSBkaXNj
+cmltaW5hdG9yIHRoYXQgeW91IHNldCBpbiB0aGUgRFQuDQo+IA0KPiANCj4gTm93Li4uIGZyb20g
+YSBicmllZiBsb29rIGF0IHRoZSBQbGF0Zm9ybSBJbml0IGFuZCBVRUZJIHNwZWNzLCBteQ0KPiBp
+bXByZXNzaW9uIGlzIHRoYXQgdGhlIGhvdHBsdWdnYWJsZSAoYnV0IHByZXNlbnRseSBub3QgcGx1
+Z2dlZCkgRElNTQ0KPiByYW5nZXMgc2hvdWxkIHNpbXBseSBiZSAqYWJzZW50KiBmcm9tIHRoZSBV
+RUZJIG1lbW1hcDsgaXMgdGhhdCBjb3JyZWN0Pw0KPiAoSSBkaWRuJ3QgY2hlY2sgdGhlIEFDUEkg
+c3BlYywgbWF5YmUgaXQgc3BlY2lmaWVzIHRoZSBleHBlY3RlZCBiZWhhdmlvcg0KPiBpbiBmdWxs
+LikgSWYgbXkgaW1wcmVzc2lvbiBpcyBjb3JyZWN0LCB0aGVuIHR3byBvcHRpb25zIChhbHRlcm5h
+dGl2ZXMpDQo+IGV4aXN0Og0KPiANCj4gKDEpIEhpZGUgdGhlIGFmZmVjdGVkIG1lbW9yeSBub2Rl
+cyAtLSBvciBhdCBsZWFzdCB0aGUgYWZmZWN0ZWQgYmFzZS9zaXplDQo+IHBhaXJzIC0tIGZyb20g
+dGhlIERULCBpbiBjYXNlIHlvdSBib290IHdpdGhvdXQgIi1uby1hY3BpIiBidXQgd2l0aCBhbg0K
+PiBleHRlcm5hbCBmaXJtd2FyZSBsb2FkZWQuIFRoZW4gdGhlIGZpcm13YXJlIHdpbGwgbm90IGV4
+cG9zZSB0aG9zZSByYW5nZXMNCj4gYXMgImNvbnZlbnRpb25hbCBtZW1vcnkiIGluIHRoZSBVRUZJ
+IG1lbW1hcC4gVGhpcyBhcHByb2FjaCByZXF1aXJlcyBubw0KPiBjaGFuZ2VzIHRvIGVkazIuDQo+
+IA0KPiBUaGlzIG9wdGlvbiBpcyBwcmVjaXNlbHkgd2hhdCBFcmljIGRlc2NyaWJlZCB1cC10aHJl
+YWQsIGF0DQo+IDxodHRwOi8vbWlkLm1haWwtYXJjaGl2ZS5jb20vM2YwYTU3OTMtZGQzNS1hNDk3
+LTIyNDgtOGViMGNkM2MzYTE2QHJlZGgNCj4gYXQuY29tPjoNCj4gDQo+ID4gaW4gbWFjaHZpcnRf
+aW5pdCwgdGhlcmUgaXMgZmlybXdhcmVfbG9hZGVkIHRoYXQgdGVsbHMgeW91IHdoZXRoZXIgeW91
+DQo+ID4gaGF2ZSBhIEZXIGltYWdlLiBJZiB0aGlzIG9uZSBpcyBub3Qgc2V0LCB5b3UgY2FuIGlu
+ZHVjZSBkdC4gQnV0IGlmDQo+ID4gdGhlcmUgaXMgYSBGVyBpdCBjYW4gYmUgZWl0aGVyIERUIG9y
+IEFDUEkgYm9vdGVkLiBZb3UgYWxzbyBoYXZlIHRoZQ0KPiA+IGFjcGlfZW5hYmxlZCBrbm9iLg0K
+PiANCj4gKFRoZSAiLW5vLWFjcGkiIGNtZGxpbmUgb3B0aW9uIGNsZWFycyB0aGUgImFjcGlfZW5h
+YmxlZCIgdmFyaWFibGUgaW4NCj4gInZsLmMiKS4NCj4gDQo+IFNvLCB0aGUgY29uZGl0aW9uIGZv
+ciBoaWRpbmcgdGhlIGhvdHBsdWdnYWJsZSBtZW1vcnkgbm9kZXMgaW4gcXVlc3Rpb24NCj4gZnJv
+bSB0aGUgRFQgaXM6DQo+IA0KPiAgIChhYXJjaDY0ICYmIGZpcm13YXJlX2xvYWRlZCAmJiBhY3Bp
+X2VuYWJsZWQpDQoNClRoYW5rcyBmb3IgeW91ciBleHBsYW5hdGlvbiBhbmQgc3VnZ2VzdGlvbnMu
+IEkgaGFkIGEgcXVpY2sgcnVuIHdpdGggdGhlIGFib3ZlDQphbmQgaXQgc2VlbXMgdG8gZG8gdGhl
+IGpvYi4gSSB3aWxsIGRyb3AgdGhpcyBleHRyYSBvcHQtaW4gZmVhdHVyZSBwYXRjaCBmcm9tIHRo
+aXMNCnNlcmllcyBhbmQgaW5zdGVhZCBoYXZlIHRoaXMgY2hlY2suDQoNClRoYW5rcywNClNoYW1l
+ZXINCg0KPiANCj4gDQo+ICgyKSBJbnZlbnQgYW5kIHNldCBhbiAiaWdub3JlIG1lLCBmaXJtd2Fy
+ZSIgcHJvcGVydHkgZm9yIHRoZQ0KPiBob3RwbHVnZ2FibGUgbWVtb3J5IG5vZGVzIGluIHRoZSBE
+VCwgYW5kIHVwZGF0ZSB0aGUgZmlybXdhcmUgdG8gaG9ub3INCj4gdGhhdCBwcm9wZXJ0eS4NCj4g
+DQo+IFRoYW5rcw0KPiBMYXN6bG8NCg==
