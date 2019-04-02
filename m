@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60595)
+Received: from eggs.gnu.org ([209.51.188.92]:60742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIuP-0005VM-Mb
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:52:59 -0400
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIvA-0006Xt-SF
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIuN-0002wS-2y
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:52:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34297)
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hBIv2-0003VB-IZ
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:43 -0400
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:39228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hBIuM-0002tE-AE
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:52:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r186so2336877wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 05:52:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190402125131.10275-1-aruna.15@cse.mrt.ac.lk>
-In-Reply-To: <20190402125131.10275-1-aruna.15@cse.mrt.ac.lk>
+	id 1hBIuz-00035P-9w
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 08:53:33 -0400
+Received: by mail-pf1-x432.google.com with SMTP id i17so6350140pfo.6
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 05:53:06 -0700 (PDT)
 From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Tue, 2 Apr 2019 18:22:40 +0530
-Message-ID: <CAH95U0hNVm0o+1sSuc7zX0zM1URewN6b6+7Fieo81k9xXfYycg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] Header cleanups qemu_is* macros were
- moved from qemu-common.h to qemu/cutils.h This task was under
- https://wiki.qemu.org/Contribute/BiteSizedTasks
+Date: Tue,  2 Apr 2019 18:22:50 +0530
+Message-Id: <20190402125250.10347-1-aruna.15@cse.mrt.ac.lk>
+Subject: [Qemu-devel] [PATCH 3/3] Header cleanups Moved the qemu-hexdump
+ declaration from qemu-common.h to qemu/hexdump.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +26,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+Cc: qemu-stable@nongnu.org, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 
-Please Ignore this, Mistake
+Qemu-hexdump declaration was moved from qemu-common.h to qemu/hexdump.h
 
-On Tue, 2 Apr 2019 at 18:21, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
+Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 
-> ---
->  hw/core/qdev-properties.c |  1 +
->  include/qemu-common.h     | 11 -----------
->  include/qemu/cutils.h     | 12 ++++++++++++
->  qapi/qapi-util.c          |  2 +-
->  util/id.c                 |  2 +-
->  5 files changed, 15 insertions(+), 13 deletions(-)
->
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 5da1439a8b..821a4ab311 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -10,6 +10,7 @@
->  #include "qapi/visitor.h"
->  #include "chardev/char.h"
->  #include "qemu/uuid.h"
-> +#include "qemu/cutils.h"
->
->  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->                                    Error **errp)
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index a102245519..0066e45a6b 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -33,17 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
->  void qemu_get_timedate(struct tm *tm, int offset);
->  int qemu_timedate_diff(struct tm *tm);
->
-> -#define qemu_isalnum(c)                isalnum((unsigned char)(c))
-> -#define qemu_isalpha(c)                isalpha((unsigned char)(c))
-> -#define qemu_iscntrl(c)                iscntrl((unsigned char)(c))
-> -#define qemu_isdigit(c)                isdigit((unsigned char)(c))
-> -#define qemu_isgraph(c)                isgraph((unsigned char)(c))
-> -#define qemu_islower(c)                islower((unsigned char)(c))
-> -#define qemu_isprint(c)                isprint((unsigned char)(c))
-> -#define qemu_ispunct(c)                ispunct((unsigned char)(c))
-> -#define qemu_isspace(c)                isspace((unsigned char)(c))
-> -#define qemu_isupper(c)                isupper((unsigned char)(c))
-> -#define qemu_isxdigit(c)       isxdigit((unsigned char)(c))
->  #define qemu_tolower(c)                tolower((unsigned char)(c))
->  #define qemu_toupper(c)                toupper((unsigned char)(c))
->  #define qemu_isascii(c)                isascii((unsigned char)(c))
-> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> index d2dad3057c..797c5bc560 100644
-> --- a/include/qemu/cutils.h
-> +++ b/include/qemu/cutils.h
-> @@ -3,6 +3,18 @@
->
->  #include "qemu/fprintf-fn.h"
->
-> +#define qemu_isalnum(c)    isalnum((unsigned char)(c))
-> +#define qemu_isalpha(c)    isalpha((unsigned char)(c))
-> +#define qemu_iscntrl(c)    iscntrl((unsigned char)(c))
-> +#define qemu_isdigit(c)    isdigit((unsigned char)(c))
-> +#define qemu_isgraph(c)    isgraph((unsigned char)(c))
-> +#define qemu_islower(c)    islower((unsigned char)(c))
-> +#define qemu_isprint(c)    isprint((unsigned char)(c))
-> +#define qemu_ispunct(c)    ispunct((unsigned char)(c))
-> +#define qemu_isspace(c)    isspace((unsigned char)(c))
-> +#define qemu_isupper(c)    isupper((unsigned char)(c))
-> +#define qemu_isxdigit(c)    isxdigit((unsigned char)(c))
-> +
->  /**
->   * pstrcpy:
->   * @buf: buffer to copy string into
-> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-> index e9b266bb70..944347cc76 100644
-> --- a/qapi/qapi-util.c
-> +++ b/qapi/qapi-util.c
-> @@ -12,7 +12,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "qemu-common.h"
-> +#include "qemu/cutils.h"
->
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
->  {
-> diff --git a/util/id.c b/util/id.c
-> index 3f8e13bd6f..a1faff1f9e 100644
-> --- a/util/id.c
-> +++ b/util/id.c
-> @@ -12,7 +12,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu/id.h"
-> -#include "qemu-common.h"
-> +#include "qemu/cutils.h"
->
->  bool id_wellformed(const char *id)
->  {
-> --
-> 2.17.1
->
->
+---
+ hw/dma/pl330.c        | 1 +
+ hw/dma/xlnx_dpdma.c   | 1 +
+ include/qemu-common.h | 6 ------
+ net/colo-compare.c    | 2 +-
+ util/hexdump.c        | 2 +-
+ util/iov.c            | 2 +-
+ 6 files changed, 5 insertions(+), 9 deletions(-)
 
---=20
-*Aruna* Jayasena
-Embedded Systems and Computer Science Engineering Undergraduate
-University of Moratuwa
-*=E2=9C=86 **+94719872152 *
-=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-<https://www.linkedin.com/in/arunajayasena/>
+diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
+index d071049233..6f7c79324d 100644
+--- a/hw/dma/pl330.c
++++ b/hw/dma/pl330.c
+@@ -20,6 +20,7 @@
+ #include "qemu/timer.h"
+ #include "sysemu/dma.h"
+ #include "qemu/log.h"
++#include "qemu/hexdump.h"
+ 
+ #ifndef PL330_ERR_DEBUG
+ #define PL330_ERR_DEBUG 0
+diff --git a/hw/dma/xlnx_dpdma.c b/hw/dma/xlnx_dpdma.c
+index 077c7da9cc..c937384b54 100644
+--- a/hw/dma/xlnx_dpdma.c
++++ b/hw/dma/xlnx_dpdma.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/log.h"
+ #include "hw/dma/xlnx_dpdma.h"
++#include "qemu/hexdump.h"
+ 
+ #ifndef DEBUG_DPDMA
+ #define DEBUG_DPDMA 0
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 0066e45a6b..bdd65914b8 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -130,12 +130,6 @@ int os_parse_cmd_args(int index, const char *optarg);
+ 
+ #include "qemu/module.h"
+ 
+-/*
+- * Hexdump a buffer to a file. An optional string prefix is added to every line
+- */
+-
+-void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+-
+ /*
+  * helper to parse debug environment variables
+  */
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index bf10526f05..f654ee5713 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -15,7 +15,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+-#include "qemu-common.h"
+ #include "qapi/error.h"
+ #include "net/net.h"
+ #include "net/eth.h"
+@@ -31,6 +30,7 @@
+ #include "migration/colo.h"
+ #include "migration/migration.h"
+ #include "util.h"
++#include "qemu/hexdump.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+diff --git a/util/hexdump.c b/util/hexdump.c
+index f879ff0ad6..4917696a08 100644
+--- a/util/hexdump.c
++++ b/util/hexdump.c
+@@ -14,7 +14,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/hexdump.h"
+ 
+ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size)
+ {
+diff --git a/util/iov.c b/util/iov.c
+index 2f960fc38d..1293f7ad22 100644
+--- a/util/iov.c
++++ b/util/iov.c
+@@ -18,7 +18,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/iov.h"
+-#include "qemu-common.h"
++#include "qemu/hexdump.h"
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+ 
+-- 
+2.17.1
