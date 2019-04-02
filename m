@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60179)
+Received: from eggs.gnu.org ([209.51.188.92]:60200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBLzV-00021D-Cf
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1hBLzX-000254-U3
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hBLzU-0006gw-G4
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45310)
+	(envelope-from <armbru@redhat.com>) id 1hBLzW-0006op-OH
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hBLzU-0006ev-8G
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:24 -0400
-Date: Tue, 2 Apr 2019 18:10:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190402161020.GD5352@localhost.localdomain>
-References: <20190328165648.76c5527d@kitsune.suse.cz>
-	<20190328214807.65f99b94@kitsune.suse.cz>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hBLzW-0006m3-De
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 12:10:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190311060823.18360-3-richardw.yang@linux.intel.com>
+	<87a7h8bkof.fsf@dusky.pond.sub.org>
+	<20190402151630.pdmwljy7d6fkcu3u@master>
+Date: Tue, 02 Apr 2019 18:10:23 +0200
+In-Reply-To: <20190402151630.pdmwljy7d6fkcu3u@master> (Wei Yang's message of
+	"Tue, 2 Apr 2019 15:16:30 +0000")
+Message-ID: <875zrw8k28.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190328214807.65f99b94@kitsune.suse.cz>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'share-rw'
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl.c: allocate TYPE_MACHINE list once
+ during bootup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +30,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-Cc: qemu-devel@nongnu.org
+To: Wei Yang <richard.weiyang@gmail.com>
+Cc: pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-Am 28.03.2019 um 21:48 hat Michal Such=E1nek geschrieben:
-> On Thu, 28 Mar 2019 16:56:48 +0100
-> Michal Such=E1nek <msuchanek@suse.de> wrote:
->=20
-> > Hello,
-> >=20
-> > I tried to update my machine definitions to work with current qemu.
-> >=20
-> > Unfortunately, while qemu 2.11 supports disk sharing with raw images
-> > qemu 3.1 does not. That looks bogus to me. What is not supported abou=
-t
-> > writing random block into a file in parallel?
->=20
-> And of course it is because the option is supported on a different
-> option (yes, options that have options get convoluted) and the error
-> message is quite unhelpful in diagnosing that.
->=20
-> Now if different formats can register new option handlers which
-> magically make an option supported I don't see how the diagnostic can
-> do much better, unfortunately.
+Wei Yang <richard.weiyang@gmail.com> writes:
 
-That's not really what happens. This is an option of the virtual device,
-not of the format driver. The format driver is not involved at all,
-which is why it's just an unknown option for it.
+> On Tue, Apr 02, 2019 at 03:28:48PM +0200, Markus Armbruster wrote:
+>>Wei Yang <richardw.yang@linux.intel.com> writes:
+>>
+>>> Now all the functions used to select machine is local and the call flow
+>>> looks like below:
+>>>
+>>>     select_machine()
+>>>         find_default_machine()
+>>>         machine_parse()
+>>>             find_machine()
+>>>
+>>> All these related function will need a GSList for TYPE_MACHINE.
+>>> Currently we allocate this list each time we use it, while this is not
+>>> necessary to do so because we don't need to modify this.
+>>>
+>>> This patch make the TYPE_MACHINE list allocation in select_machine and
+>>> pass this to its child for use.
+>>>
+>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>> ---
+>>>  vl.c | 24 +++++++++++-------------
+>>>  1 file changed, 11 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/vl.c b/vl.c
+>>> index 3688e2bc98..cf08d96ce4 100644
+>>> --- a/vl.c
+>>> +++ b/vl.c
+>>> @@ -1418,9 +1418,9 @@ static int usb_parse(const char *cmdline)
+>>>  
+>>>  MachineState *current_machine;
+>>>  
+>>> -static MachineClass *find_machine(const char *name)
+>>> +static MachineClass *find_machine(const char *name, GSList *machines)
+>>>  {
+>>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>>> +    GSList *el;
+>>>      MachineClass *mc = NULL;
+>>>  
+>>>      for (el = machines; el; el = el->next) {
+>>> @@ -1437,13 +1437,12 @@ static MachineClass *find_machine(const char *name)
+>>>          }
+>>>      }
+>>>  
+>>> -    g_slist_free(machines);
+>>>      return mc;
+>>>  }
+>>
+>>Can be simplified further.  I'll post it as PATCH 3.
+>>
+>
+> Markus
+>
+> Thanks for your comment. Do you sugest to simplify it in this patch? I
+> am confused here.
 
-Kevin
+I feel the additional simplifcations I posted as PATCH 3 and 4 are best
+kept as separate patches.
+
+Remark [*] below is the only one that's not addressed by my PATCH 3+4.
+
+>>> -static MachineClass *find_default_machine(void)
+>>> +static MachineClass *find_default_machine(GSList *machines)
+>>>  {
+>>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>>> +    GSList *el;
+>>>      MachineClass *mc = NULL;
+>>>  
+>>>      for (el = machines; el; el = el->next) {
+>>> @@ -1455,7 +1454,6 @@ static MachineClass *find_default_machine(void)
+>>>          }
+>>>      }
+>>>  
+>>> -    g_slist_free(machines);
+>>>      return mc;
+>>>  }
+>>
+>>Likewise.
+>>
+>>>  
+>>> @@ -2538,16 +2536,15 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>>>                    object_class_get_name(OBJECT_CLASS(mc1)));
+>>>  }
+>>>  
+>>> -static MachineClass *machine_parse(const char *name)
+>>> +static MachineClass *machine_parse(const char *name, GSList *machines)
+>>>  {
+>>>      MachineClass *mc = NULL;
+>>> -    GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+>>> +    GSList *el;
+>>>  
+>>>      if (name) {
+>>> -        mc = find_machine(name);
+>>> +        mc = find_machine(name, machines);
+>>>      }
+>>>      if (mc) {
+>>> -        g_slist_free(machines);
+>>>          return mc;
+>>>      }
+>>>      if (name && !is_help_option(name)) {
+>>> @@ -2567,7 +2564,6 @@ static MachineClass *machine_parse(const char *name)
+>>>          }
+>>>      }
+>>>  
+>>> -    g_slist_free(machines);
+>>>      exit(!name || !is_help_option(name));
+>>>  }
+>>
+>>Additional cleanup is possible: argument @name is never null.
+>>
+>>While there, I'd check is_help_option() first rather than only after
+>>find_machine() returns null, because "first" is what we commonly do.
+>>
+>>I'll post this as PATCH 4.
+>>
+>>>  
+>>> @@ -2659,7 +2655,8 @@ static const QEMUOption *lookup_opt(int argc, char **argv,
+>>>  
+>>>  static MachineClass *select_machine(void)
+>>>  {
+>>> -    MachineClass *machine_class = find_default_machine();
+>>> +    GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>>> +    MachineClass *machine_class = find_default_machine(machines);
+>>>      const char *optarg;
+>>>      QemuOpts *opts;
+>>>      Location loc;
+>>> @@ -2671,7 +2668,7 @@ static MachineClass *select_machine(void)
+>>>  
+>>>      optarg = qemu_opt_get(opts, "type");
+>>>      if (optarg) {
+>>> -        machine_class = machine_parse(optarg);
+>>> +        machine_class = machine_parse(optarg, machines);
+>>
+>>Could create and destroy @machines here:
+>>
+>>  -        machine_class = machine_parse(optarg);
+>>  +        GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>>  +        machine_class = machine_parse(optarg, machines);
+>>  +        g_slist_free(machines);
+>>
+>>Matter of taste.
+
+[*]
+
+Matter of taste means the choice between your version and mine is up to
+the maintainer, or if the maintainer remains silent, up to you.
+
+>>>      }
+>>>  
+>>>      if (!machine_class) {
+>>> @@ -2681,6 +2678,7 @@ static MachineClass *select_machine(void)
+>>>      }
+>>>  
+>>>      loc_pop(&loc);
+>>> +    g_slist_free(machines);
+>>>      return machine_class;
+>>>  }
+>>
+>>Reviewed-by: Markus Armbruster <armbru@redhat.com>
