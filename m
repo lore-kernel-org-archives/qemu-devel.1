@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48755)
+Received: from eggs.gnu.org ([209.51.188.92]:48774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hBWpM-00033P-H8
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hBWpO-00035f-GS
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hBWpK-00009E-UN
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:40 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39889)
+	(envelope-from <richard.henderson@linaro.org>) id 1hBWpM-0000B3-VD
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:42 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hBWpK-00008M-LX
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:38 -0400
-Received: by mail-pg1-x541.google.com with SMTP id k3so7586196pga.6
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 20:44:38 -0700 (PDT)
+	id 1hBWpM-0000AM-Jd
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 23:44:40 -0400
+Received: by mail-pl1-x642.google.com with SMTP id cv12so7314086plb.9
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 20:44:40 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  3 Apr 2019 10:43:49 +0700
-Message-Id: <20190403034358.21999-18-richard.henderson@linaro.org>
+Date: Wed,  3 Apr 2019 10:43:50 +0700
+Message-Id: <20190403034358.21999-19-richard.henderson@linaro.org>
 In-Reply-To: <20190403034358.21999-1-richard.henderson@linaro.org>
 References: <20190403034358.21999-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 17/26] target/s390x: Convert to
- CPUClass::tlb_fill
+Subject: [Qemu-devel] [PATCH 18/26] target/sh4: Convert to CPUClass::tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,270 +27,304 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-Cc: qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/internal.h    |   5 +-
- target/s390x/cpu.c         |   5 +-
- target/s390x/excp_helper.c | 156 +++++++++++++++++++++----------------
- target/s390x/mem_helper.c  |  29 -------
- 4 files changed, 94 insertions(+), 101 deletions(-)
+ target/sh4/cpu.h       |   5 +-
+ target/sh4/cpu.c       |   5 +-
+ target/sh4/helper.c    | 197 ++++++++++++++++++++---------------------
+ target/sh4/op_helper.c |  12 ---
+ 4 files changed, 101 insertions(+), 118 deletions(-)
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 5f7901da5e..424e8ce406 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -263,8 +263,9 @@ ObjectClass *s390_cpu_class_by_name(const char *name);
- void s390x_cpu_debug_excp_handler(CPUState *cs);
- void s390_cpu_do_interrupt(CPUState *cpu);
- bool s390_cpu_exec_interrupt(CPUState *cpu, int int_req);
--int s390_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
--                              int mmu_idx);
-+bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool probe, uintptr_t retaddr);
- void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                    MMUAccessType access_type,
-                                    int mmu_idx, uintptr_t retaddr);
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 698dd9cb82..9dd94b1395 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -471,9 +471,8 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     cc->set_pc = s390_cpu_set_pc;
-     cc->gdb_read_register = s390_cpu_gdb_read_register;
-     cc->gdb_write_register = s390_cpu_gdb_write_register;
--#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = s390_cpu_handle_mmu_fault;
--#else
-+    cc->tlb_fill = s390_cpu_tlb_fill;
-+#ifndef CONFIG_USER_ONLY
-     cc->get_phys_page_debug = s390_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_s390_cpu;
-     cc->write_elf64_note = s390_cpu_write_elf64_note;
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index bc781c14c3..aeeaeb523d 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -74,20 +74,14 @@ void s390_cpu_do_interrupt(CPUState *cs)
-     cs->exception_index = -1;
- }
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index 775b5743bf..80a256e0be 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -244,8 +244,9 @@ void superh_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+ void sh4_translate_init(void);
+ int cpu_sh4_signal_handler(int host_signum, void *pinfo,
+                            void *puc);
+-int superh_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+-                                int mmu_idx);
++bool superh_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                         MMUAccessType access_type, int mmu_idx,
++                         bool probe, uintptr_t retaddr);
  
--int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
--                              int rw, int mmu_idx)
--{
--    S390CPU *cpu = S390_CPU(cs);
+ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index b9f393b7c7..886483caaa 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -238,9 +238,8 @@ static void superh_cpu_class_init(ObjectClass *oc, void *data)
+     cc->synchronize_from_tb = superh_cpu_synchronize_from_tb;
+     cc->gdb_read_register = superh_cpu_gdb_read_register;
+     cc->gdb_write_register = superh_cpu_gdb_write_register;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = superh_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = superh_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->do_unaligned_access = superh_cpu_do_unaligned_access;
+     cc->get_phys_page_debug = superh_cpu_get_phys_page_debug;
+ #endif
+diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+index 2ff0cf4060..1df1e02a14 100644
+--- a/target/sh4/helper.c
++++ b/target/sh4/helper.c
+@@ -27,43 +27,6 @@
+ #include "hw/sh4/sh_intc.h"
+ #endif
+ 
+-#if defined(CONFIG_USER_ONLY)
 -
--    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
--    /* On real machines this value is dropped into LowMem.  Since this
--       is userland, simply put this someplace that cpu_loop can find it.  */
--    cpu->env.__excp_addr = address;
+-void superh_cpu_do_interrupt(CPUState *cs)
+-{
+-    cs->exception_index = -1;
+-}
+-
+-int superh_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                                int mmu_idx)
+-{
+-    SuperHCPU *cpu = SUPERH_CPU(cs);
+-    CPUSH4State *env = &cpu->env;
+-
+-    env->tea = address;
+-    cs->exception_index = -1;
+-    switch (rw) {
+-    case 0:
+-        cs->exception_index = 0x0a0;
+-        break;
+-    case 1:
+-        cs->exception_index = 0x0c0;
+-        break;
+-    case 2:
+-        cs->exception_index = 0x0a0;
+-        break;
+-    }
 -    return 1;
 -}
 -
- #else /* !CONFIG_USER_ONLY */
+-int cpu_sh4_is_cached(CPUSH4State * env, target_ulong addr)
+-{
+-    /* For user mode, only U0 area is cacheable. */
+-    return !(addr & 0x80000000);
+-}
+-
+-#else /* !CONFIG_USER_ONLY */
+-
+ #define MMU_OK                   0
+ #define MMU_ITLB_MISS            (-1)
+ #define MMU_ITLB_MULTIPLE        (-2)
+@@ -79,6 +42,21 @@ int cpu_sh4_is_cached(CPUSH4State * env, target_ulong addr)
+ #define MMU_DADDR_ERROR_READ     (-12)
+ #define MMU_DADDR_ERROR_WRITE    (-13)
  
-+void tlb_fill(CPUState *cs, target_ulong addr, int size,
-+              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++#if defined(CONFIG_USER_ONLY)
++
++void superh_cpu_do_interrupt(CPUState *cs)
 +{
-+    s390_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++    cs->exception_index = -1;
 +}
 +
- static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
++int cpu_sh4_is_cached(CPUSH4State *env, target_ulong addr)
++{
++    /* For user mode, only U0 area is cacheable. */
++    return !(addr & 0x80000000);
++}
++
++#else /* !CONFIG_USER_ONLY */
++
+ void superh_cpu_do_interrupt(CPUState *cs)
  {
-     switch (mmu_idx) {
-@@ -102,61 +96,6 @@ static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
-     }
+     SuperHCPU *cpu = SUPERH_CPU(cs);
+@@ -458,69 +436,6 @@ static int get_physical_address(CPUSH4State * env, target_ulong * physical,
+     return get_mmu_address(env, physical, prot, address, rw, access_type);
  }
  
--int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
--                              int rw, int mmu_idx)
+-int superh_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                                int mmu_idx)
 -{
--    S390CPU *cpu = S390_CPU(cs);
--    CPUS390XState *env = &cpu->env;
--    target_ulong vaddr, raddr;
--    uint64_t asc;
--    int prot;
+-    SuperHCPU *cpu = SUPERH_CPU(cs);
+-    CPUSH4State *env = &cpu->env;
+-    target_ulong physical;
+-    int prot, ret, access_type;
 -
--    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
--                  __func__, orig_vaddr, rw, mmu_idx);
+-    access_type = ACCESS_INT;
+-    ret =
+-	get_physical_address(env, &physical, &prot, address, rw,
+-			     access_type);
 -
--    vaddr = orig_vaddr;
--
--    if (mmu_idx < MMU_REAL_IDX) {
--        asc = cpu_mmu_idx_to_asc(mmu_idx);
--        /* 31-Bit mode */
--        if (!(env->psw.mask & PSW_MASK_64)) {
--            vaddr &= 0x7fffffff;
--        }
--        if (mmu_translate(env, vaddr, rw, asc, &raddr, &prot, true)) {
--            return 1;
--        }
--    } else if (mmu_idx == MMU_REAL_IDX) {
--        /* 31-Bit mode */
--        if (!(env->psw.mask & PSW_MASK_64)) {
--            vaddr &= 0x7fffffff;
--        }
--        if (mmu_translate_real(env, vaddr, rw, &raddr, &prot)) {
--            return 1;
--        }
--    } else {
--        abort();
+-    if (ret != MMU_OK) {
+-	env->tea = address;
+-	if (ret != MMU_DTLB_MULTIPLE && ret != MMU_ITLB_MULTIPLE) {
+-	    env->pteh = (env->pteh & PTEH_ASID_MASK) |
+-		    (address & PTEH_VPN_MASK);
+-	}
+-	switch (ret) {
+-	case MMU_ITLB_MISS:
+-	case MMU_DTLB_MISS_READ:
+-            cs->exception_index = 0x040;
+-	    break;
+-	case MMU_DTLB_MULTIPLE:
+-	case MMU_ITLB_MULTIPLE:
+-            cs->exception_index = 0x140;
+-	    break;
+-	case MMU_ITLB_VIOLATION:
+-            cs->exception_index = 0x0a0;
+-	    break;
+-	case MMU_DTLB_MISS_WRITE:
+-            cs->exception_index = 0x060;
+-	    break;
+-	case MMU_DTLB_INITIAL_WRITE:
+-            cs->exception_index = 0x080;
+-	    break;
+-	case MMU_DTLB_VIOLATION_READ:
+-            cs->exception_index = 0x0a0;
+-	    break;
+-	case MMU_DTLB_VIOLATION_WRITE:
+-            cs->exception_index = 0x0c0;
+-	    break;
+-	case MMU_IADDR_ERROR:
+-	case MMU_DADDR_ERROR_READ:
+-            cs->exception_index = 0x0e0;
+-	    break;
+-	case MMU_DADDR_ERROR_WRITE:
+-            cs->exception_index = 0x100;
+-	    break;
+-	default:
+-            cpu_abort(cs, "Unhandled MMU fault");
+-	}
+-	return 1;
 -    }
 -
--    /* check out of RAM access */
--    if (!address_space_access_valid(&address_space_memory, raddr,
--                                    TARGET_PAGE_SIZE, rw,
--                                    MEMTXATTRS_UNSPECIFIED)) {
--        qemu_log_mask(CPU_LOG_MMU,
--                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
--                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
--        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
--        return 1;
--    }
+-    address &= TARGET_PAGE_MASK;
+-    physical &= TARGET_PAGE_MASK;
 -
--    qemu_log_mask(CPU_LOG_MMU, "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
--            __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
--
--    tlb_set_page(cs, orig_vaddr & TARGET_PAGE_MASK, raddr, prot,
--                 mmu_idx, TARGET_PAGE_SIZE);
--
+-    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE);
 -    return 0;
 -}
 -
- static void do_program_interrupt(CPUS390XState *env)
+ hwaddr superh_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  {
-     uint64_t mask, addr;
-@@ -577,3 +516,86 @@ void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     SuperHCPU *cpu = SUPERH_CPU(cs);
+@@ -745,7 +660,6 @@ void cpu_sh4_write_mmaped_utlb_addr(CPUSH4State *s, hwaddr addr,
+         if (needs_tlb_flush) {
+             tlb_flush_page(CPU(sh_env_get_cpu(s)), vpn << 10);
+         }
+-        
+     } else {
+         int index = (addr & 0x00003f00) >> 8;
+         tlb_t * entry = &s->utlb[index];
+@@ -885,3 +799,84 @@ bool superh_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     }
+     return false;
  }
- 
- #endif /* CONFIG_USER_ONLY */
 +
-+bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool probe, uintptr_t retaddr)
++bool superh_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                         MMUAccessType access_type, int mmu_idx,
++                         bool probe, uintptr_t retaddr)
 +{
-+    S390CPU *cpu = S390_CPU(cs);
++    SuperHCPU *cpu = SUPERH_CPU(cs);
++    CPUSH4State *env = &cpu->env;
++    int ret;
 +
-+#ifndef CONFIG_USER_ONLY
-+    CPUS390XState *env = &cpu->env;
-+    target_ulong vaddr, raddr;
-+    uint64_t asc;
-+    int prot, fail;
++#ifdef CONFIG_USER_ONLY
++    ret = (access_type == MMU_DATA_STORE ? MMU_DTLB_VIOLATION_WRITE :
++           access_type == MMU_INST_FETCH ? MMU_ITLB_VIOLATION :
++           MMU_DTLB_VIOLATION_READ);
++#else
++    target_ulong physical;
++    int prot, sh_access_type;
 +
-+    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-+                  __func__, address, access_type, mmu_idx);
++    sh_access_type = ACCESS_INT;
++    ret = get_physical_address(env, &physical, &prot, address,
++                               access_type, sh_access_type);
 +
-+    vaddr = address;
-+
-+    if (mmu_idx < MMU_REAL_IDX) {
-+        asc = cpu_mmu_idx_to_asc(mmu_idx);
-+        /* 31-Bit mode */
-+        if (!(env->psw.mask & PSW_MASK_64)) {
-+            vaddr &= 0x7fffffff;
-+        }
-+        fail = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, true);
-+    } else if (mmu_idx == MMU_REAL_IDX) {
-+        /* 31-Bit mode */
-+        if (!(env->psw.mask & PSW_MASK_64)) {
-+            vaddr &= 0x7fffffff;
-+        }
-+        fail = mmu_translate_real(env, vaddr, access_type, &raddr, &prot);
-+    } else {
-+        g_assert_not_reached();
-+    }
-+
-+    /* check out of RAM access */
-+    if (!fail &&
-+        !address_space_access_valid(&address_space_memory, raddr,
-+                                    TARGET_PAGE_SIZE, access_type,
-+                                    MEMTXATTRS_UNSPECIFIED)) {
-+        qemu_log_mask(CPU_LOG_MMU,
-+                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
-+                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
-+        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-+        fail = 1;
-+    }
-+
-+    if (!fail) {
-+        qemu_log_mask(CPU_LOG_MMU,
-+                      "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
-+                      __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
-+        tlb_set_page(cs, address & TARGET_PAGE_MASK, raddr, prot,
-+                     mmu_idx, TARGET_PAGE_SIZE);
++    if (ret == MMU_OK) {
++        address &= TARGET_PAGE_MASK;
++        physical &= TARGET_PAGE_MASK;
++        tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE);
 +        return true;
 +    }
 +    if (probe) {
 +        return false;
 +    }
-+#else
-+    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
-+    /*
-+     * On real machines this value is dropped into LowMem.  Since this
-+     * is userland, simply put this someplace that cpu_loop can find it.
-+     */
-+    cpu->env.__excp_addr = address;
++
++    if (ret != MMU_DTLB_MULTIPLE && ret != MMU_ITLB_MULTIPLE) {
++        env->pteh = (env->pteh & PTEH_ASID_MASK) | (address & PTEH_VPN_MASK);
++    }
 +#endif
 +
-+    cpu_restore_state(cs, retaddr, true);
-+
-+    /*
-+     * Note that handle_mmu_fault sets ilen to either 2 (for code)
-+     * or AUTO (for data).  We can resolve AUTO now, as if it was
-+     * set to UNWIND -- that will have been done via assignment
-+     * in cpu_restore_state.  Otherwise re-examine access_type.
-+     */
-+    if (access_type == MMU_INST_FETCH) {
-+        CPUS390XState *env = cs->env_ptr;
-+        env->int_pgm_ilen = 2;
++    env->tea = address;
++    switch (ret) {
++    case MMU_ITLB_MISS:
++    case MMU_DTLB_MISS_READ:
++        cs->exception_index = 0x040;
++        break;
++    case MMU_DTLB_MULTIPLE:
++    case MMU_ITLB_MULTIPLE:
++        cs->exception_index = 0x140;
++        break;
++    case MMU_ITLB_VIOLATION:
++        cs->exception_index = 0x0a0;
++        break;
++    case MMU_DTLB_MISS_WRITE:
++        cs->exception_index = 0x060;
++        break;
++    case MMU_DTLB_INITIAL_WRITE:
++        cs->exception_index = 0x080;
++        break;
++    case MMU_DTLB_VIOLATION_READ:
++        cs->exception_index = 0x0a0;
++        break;
++    case MMU_DTLB_VIOLATION_WRITE:
++        cs->exception_index = 0x0c0;
++        break;
++    case MMU_IADDR_ERROR:
++    case MMU_DADDR_ERROR_READ:
++        cs->exception_index = 0x0e0;
++        break;
++    case MMU_DADDR_ERROR_WRITE:
++        cs->exception_index = 0x100;
++        break;
++    default:
++        cpu_abort(cs, "Unhandled MMU fault");
 +    }
-+
-+    cpu_loop_exit(cs);
++    cpu_loop_exit_restore(cs, retaddr);
 +}
 +
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index d54907696d..0c5ca36823 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -34,35 +34,6 @@
++#ifndef CONFIG_USER_ONLY
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    superh_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++}
++#endif
+diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
+index 4f825bae5a..599731966b 100644
+--- a/target/sh4/op_helper.c
++++ b/target/sh4/op_helper.c
+@@ -41,18 +41,6 @@ void superh_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     cpu_loop_exit_restore(cs, retaddr);
+ }
  
- /*****************************************************************************/
- /* Softmmu support */
--#if !defined(CONFIG_USER_ONLY)
--
--/* try to fill the TLB and return an exception if error. If retaddr is
--   NULL, it means that the function was called in C code (i.e. not
--   from generated code or from helper.c) */
--/* XXX: fix it to restore all registers */
 -void tlb_fill(CPUState *cs, target_ulong addr, int size,
 -              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 -{
--    int ret = s390_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (unlikely(ret != 0)) {
--        cpu_restore_state(cs, retaddr, true);
+-    int ret;
 -
--        /*
--         * Note that handle_mmu_fault sets ilen to either 2 (for code)
--         * or AUTO (for data).  We can resolve AUTO now, as if it was
--         * set to UNWIND -- that will have been done via assignment
--         * in cpu_restore_state.  Otherwise re-examine access_type.
--         */
--        if (access_type == MMU_INST_FETCH) {
--            CPUS390XState *env = cs->env_ptr;
--            env->int_pgm_ilen = 2;
--        }
--
--        cpu_loop_exit(cs);
+-    ret = superh_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (ret) {
+-        /* now we have a real cpu fault */
+-        cpu_loop_exit_restore(cs, retaddr);
 -    }
 -}
 -
--#endif
+ #endif
  
- /* #define DEBUG_HELPER */
- #ifdef DEBUG_HELPER
+ void helper_ldtlb(CPUSH4State *env)
 -- 
 2.17.1
