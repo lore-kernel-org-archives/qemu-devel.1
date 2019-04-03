@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42430)
+Received: from eggs.gnu.org ([209.51.188.92]:50032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBTNp-00031v-59
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:04:01 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hBU5u-0004CR-9v
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBTNo-0004FV-AG
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:04:01 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBTNn-0004F9-QM
-	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:04:00 -0400
-Received: by mail-ot1-x341.google.com with SMTP id s24so13706613otk.13
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 17:03:59 -0700 (PDT)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hBU5t-0005Ln-Dx
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:49:34 -0400
+Received: from mga14.intel.com ([192.55.52.115]:61909)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hBU5s-0005I4-TU
+	for qemu-devel@nongnu.org; Tue, 02 Apr 2019 20:49:33 -0400
+Date: Wed, 3 Apr 2019 08:49:07 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190403004907.GA18346@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190311060823.18360-3-richardw.yang@linux.intel.com>
+	<87a7h8bkof.fsf@dusky.pond.sub.org>
+	<20190402151630.pdmwljy7d6fkcu3u@master>
+	<875zrw8k28.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <1554194900-22817-1-git-send-email-like.xu@linux.intel.com>
-	<871s2kejg1.fsf@dusky.pond.sub.org>
-	<e72befe5-c931-5c80-6769-12e1a8e7d4fa@linux.intel.com>
-	<20190402174749.71da1efe@redhat.com>
-	<871s2k8jxo.fsf@dusky.pond.sub.org>
-	<CAFEAcA8ogWn50wWBttM2QpfQoZ8UYnXfG3NSkuSc8j8WOWt6FA@mail.gmail.com>
-	<20190402191602.GE22884@habkost.net>
-In-Reply-To: <20190402191602.GE22884@habkost.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 3 Apr 2019 07:03:47 +0700
-Message-ID: <CAFEAcA_qtqE_N-JOZn=M-NqHg4GjohU44R7A6hOXTxbOCqjrtA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] vl.c: make current_machine as
- non-global variable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875zrw8k28.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl.c: allocate TYPE_MACHINE list once
+ during bootup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Like Xu <like.xu@linux.intel.com>, Thomas Huth <thuth@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Wei Yang <richard.weiyang@gmail.com>, pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 3 Apr 2019 at 02:16, Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Tue, Apr 02, 2019 at 06:10:23PM +0200, Markus Armbruster wrote:
+>Wei Yang <richard.weiyang@gmail.com> writes:
+
+[...]
+
+>>>>  
+>>>> @@ -2659,7 +2655,8 @@ static const QEMUOption *lookup_opt(int argc, char **argv,
+>>>>  
+>>>>  static MachineClass *select_machine(void)
+>>>>  {
+>>>> -    MachineClass *machine_class = find_default_machine();
+>>>> +    GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>>>> +    MachineClass *machine_class = find_default_machine(machines);
+>>>>      const char *optarg;
+>>>>      QemuOpts *opts;
+>>>>      Location loc;
+>>>> @@ -2671,7 +2668,7 @@ static MachineClass *select_machine(void)
+>>>>  
+>>>>      optarg = qemu_opt_get(opts, "type");
+>>>>      if (optarg) {
+>>>> -        machine_class = machine_parse(optarg);
+>>>> +        machine_class = machine_parse(optarg, machines);
+>>>
+>>>Could create and destroy @machines here:
+>>>
+>>>  -        machine_class = machine_parse(optarg);
+>>>  +        GSList *machines = object_class_get_list(TYPE_MACHINE, false);
+>>>  +        machine_class = machine_parse(optarg, machines);
+>>>  +        g_slist_free(machines);
+>>>
+>>>Matter of taste.
 >
-> On Tue, Apr 02, 2019 at 11:23:42PM +0700, Peter Maydell wrote:
-> > One wrinkle to watch out for is code paths that are used in the
-> > linux-user emulator, where there is no machine at all... For instance
-> > cpu_common_realizefn() handles this case by explicitly checking
-> > whether the thing it gets back from qdev_get_machine() is a
-> > TYPE_MACHINE or not.
+>[*]
 >
-> Is there a real use case for calling qdev_get_machine() in user
-> mode?
+>Matter of taste means the choice between your version and mine is up to
+>the maintainer, or if the maintainer remains silent, up to you.
+>
 
-In this case it's "I'm in a function which is in obj-common (so shared
-between user-only and system-emulation) and I need to do something
-if we're in system emulation mode". It could probably be restructured
-somehow.
+Ok, I get your meaning.
 
-thanks
--- PMM
+But machines should be used in find_default_machine(), after move the
+allocation in "if", would there be a problem?
+
+I may not understand your point here.
+
+-- 
+Wei Yang
+Help you, Help me
