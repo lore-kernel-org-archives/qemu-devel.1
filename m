@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34751)
+Received: from eggs.gnu.org ([209.51.188.92]:34830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hBekk-0005aB-3y
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hBel2-0005mV-It
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hBekj-0005Fc-3W
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:26 -0400
-Received: from mail-eopbgr750090.outbound.protection.outlook.com
-	([40.107.75.90]:17888
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	(envelope-from <no-reply@patchew.org>) id 1hBel0-0005VI-Vg
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:44 -0400
+Resent-Message-Id: <E1hBel0-0005VI-Vg@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hBeki-0005Ei-Na
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:25 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 3 Apr 2019 12:12:21 +0000
-Message-ID: <BN6PR2201MB12513ADADA13DA0F9D19D0F7C6570@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554212605-16457-6-git-send-email-mateja.marjanovic@rt-rk.com>
-	<BN6PR2201MB12517DB6F0F0B64C4A2CD62CC6560@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<4aa5f2b4-5288-ef42-1a56-f427a779ab60@rt-rk.com>
-In-Reply-To: <4aa5f2b4-5288-ef42-1a56-f427a779ab60@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hBel0-0005Kq-OC
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:42 -0400
+Message-ID: <155429351604.12882.303470204884520967@76452e4e88f2>
+In-Reply-To: <20190403114958.3705-1-quintela@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] target/mips: Refactor and fix
- INSERT.<B|H|W|D> instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 3 Apr 2019 05:11:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] WIP: Multifd compression support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,58 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: quintela@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, lvivier@redhat.com, thuth@redhat.com, armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-> Subject: Re: [PATCH v4 5/5] target/mips: Refactor and fix INSERT.<B|H|W|D=
-> instructions
->=20
-> On 2.4.19. 22:50, Aleksandar Markovic wrote:
-> >> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> >> Subject: [PATCH v4 5/5] target/mips: Refactor and fix INSERT.<B|H|W|D>=
- instructions
-> >>
-> >> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-> >>
-> >> The old version of the helper for the INSERT.<B|H|W|D> MSA instruction=
-s
-> >> has been replaced with four helpers that don't use switch, and change
-> >> the endianness of the given index, when executed on a big endian host.
-> >>
-> >> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> >> ---
-> > ...
-> >
-> >
-> >> +    n %=3D 16;
-> > Mateja, could you just clarify what is the purpose of this line (and
-> > similar three lines involving "%=3D")? It looks to me that n is already
-> > limited here to be between 0 and 15, isn't it? (that follows from the
-> > source code of gen_msa_elm().) What made you insert this line,
-> > as it stands?
->=20
-> It was
->=20
-> n %=3D DF_ELEMENTS(df);
->=20
-> but when I deleted the df argument, so it had to be done like
-> this. I think it's a matter of precaution (in case a number
-> greater than 15, or 8... is passed as an argument).
-
-Oh, I see.
-=20
-At this moment, I think a more appropriate code would be:
-
-assert(n < 16)
-
-The whole set of functions decoding this group of instructions is
-too complicated (several layers, repeated calculations), and could
-be further simplified. But let's say that would be outside of the
-scope of this patch and series. Your series, in fact, begins that
-simplification by removing redundant decoding of "df" in helpers,
-so it is a good step towards better code organization, and we'll
-leave more detailed cleanup for some future endeavors.
-
-Yours,
-Aleksandar
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMzExNDk1OC4zNzA1
+LTEtcXVpbnRlbGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDMxMTQ5NTguMzcwNS0xLXF1aW50ZWxhQHJl
+ZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzhdIFdJUDogTXVsdGlm
+ZCBjb21wcmVzc2lvbiBzdXBwb3J0ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
+b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQwMzExNDk1OC4zNzA1LTEtcXVp
+bnRlbGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDAzMTE0OTU4LjM3MDUtMS1xdWludGVs
+YUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmUwNzAyNTExYyBt
+dWx0aWZkOiByZXN0IG9mIHpsaWIgY29tcHJlc3Npb24gKFdJUCkKMWY2N2Y5NmE2MyBtdWx0aWZk
+OiBBZGQgemxpYiBjb21wcmVzc2lvbiBzdXBwb3J0CmY1YzNhZDMwYmMgbWlncmF0aW9uOiBBZGQg
+bXVsdGlmZC1jb21wcmVzcyBwYXJhbWV0ZXIKYzVjNzdmOTdiZSBtaWdyYXRpb24tdGVzdDogaW50
+cm9kdWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMKOTRhYjhiYjRmMyB0
+ZXN0czogQWRkIG1pZ3JhdGlvbiBtdWx0aWZkIHRlc3QKZDczYzlkMzFiYiBtaWdyYXRpb24tdGVz
+dDogcmVuYW1lIHBhcmFtZXRlciB0byBwYXJhbWV0ZXJfaW50CjVjMGRiZGEyZjcgbWlncmF0aW9u
+OiBmaXggbXVsdGlmZF9yZWN2IGV2ZW50IHR5cG8KMjI3ZGNhYjM0YSBtaWdyYXRpb246IEZpeCBt
+aWdyYXRlX3NldF9wYXJhbWV0ZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2luZyBj
+b21taXQgMjI3ZGNhYjM0YTYxIChtaWdyYXRpb246IEZpeCBtaWdyYXRlX3NldF9wYXJhbWV0ZXIp
+CjIvOCBDaGVja2luZyBjb21taXQgNWMwZGJkYTJmN2I0IChtaWdyYXRpb246IGZpeCBtdWx0aWZk
+X3JlY3YgZXZlbnQgdHlwbykKMy84IENoZWNraW5nIGNvbW1pdCBkNzNjOWQzMWJiNjIgKG1pZ3Jh
+dGlvbi10ZXN0OiByZW5hbWUgcGFyYW1ldGVyIHRvIHBhcmFtZXRlcl9pbnQpCjQvOCBDaGVja2lu
+ZyBjb21taXQgOTRhYjhiYjRmM2M2ICh0ZXN0czogQWRkIG1pZ3JhdGlvbiBtdWx0aWZkIHRlc3Qp
+CjUvOCBDaGVja2luZyBjb21taXQgYzVjNzdmOTdiZTllIChtaWdyYXRpb24tdGVzdDogaW50cm9k
+dWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMpCjYvOCBDaGVja2luZyBj
+b21taXQgZjVjM2FkMzBiYzYyIChtaWdyYXRpb246IEFkZCBtdWx0aWZkLWNvbXByZXNzIHBhcmFt
+ZXRlcikKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMzogRklMRTogbWlncmF0
+aW9uL21pZ3JhdGlvbi5jOjMzNjY6CisgICAgREVGSU5FX1BST1BfU0lHTkVEKF9uLCBfcywgX2Ys
+IF9kLCBxZGV2X3Byb3BfbXVsdGlmZF9jb21wcmVzcywgTXVsdGlmZENvbXByZXNzKQoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi84IGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvOCBDaGVja2luZyBjb21taXQgMWY2N2Y5NmE2MzZhICht
+dWx0aWZkOiBBZGQgemxpYiBjb21wcmVzc2lvbiBzdXBwb3J0KQo4LzggQ2hlY2tpbmcgY29tbWl0
+IDJlMDcwMjUxMWM4MiAobXVsdGlmZDogcmVzdCBvZiB6bGliIGNvbXByZXNzaW9uIChXSVApKQpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScK
+IzI5OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTEyODoKKyAgICAgICAgICAgICAgICAgICAgZm9y
+IChpID0gMDsgaSA8IHVzZWQ7IGkrKyApIHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
+ZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMTAwOiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6
+MTQ0NDoKKyAgICAgICAgICAgICAgICBmb3IgKGkgPSAwOyBpIDwgdXNlZDsgaSsrICkgewoKdG90
+YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC84IGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwMzExNDk1OC4zNzA1LTEtcXVpbnRlbGFAcmVkaGF0
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
