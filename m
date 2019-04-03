@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34472)
+Received: from eggs.gnu.org ([209.51.188.92]:34751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hBeje-0004ww-1C
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:11:19 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBekk-0005aB-3y
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hBejZ-0004Vj-Ul
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:11:18 -0400
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Wed, 3 Apr 2019 12:10:55 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
-	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
-	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
-	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
-	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
-	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
-	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
-	<20190403114901.6e4ea653@redhat.com>
-In-Reply-To: <20190403114901.6e4ea653@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hBekj-0005Fc-3W
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:26 -0400
+Received: from mail-eopbgr750090.outbound.protection.outlook.com
+	([40.107.75.90]:17888
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hBeki-0005Ei-Na
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:25 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 3 Apr 2019 12:12:21 +0000
+Message-ID: <BN6PR2201MB12513ADADA13DA0F9D19D0F7C6570@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554212605-16457-6-git-send-email-mateja.marjanovic@rt-rk.com>
+	<BN6PR2201MB12517DB6F0F0B64C4A2CD62CC6560@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<4aa5f2b4-5288-ef42-1a56-f427a779ab60@rt-rk.com>
+In-Reply-To: <4aa5f2b4-5288-ef42-1a56-f427a779ab60@rt-rk.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
- feature "fdt"
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] target/mips: Refactor and fix
+ INSERT.<B|H|W|D> instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,219 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
+To: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-
-
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: 03 April 2019 10:49
-> To: Laszlo Ersek <lersek@redhat.com>
-> Cc: Auger Eric <eric.auger@redhat.com>; Ard Biesheuvel
-> <ard.biesheuvel@linaro.org>; peter.maydell@linaro.org;
-> sameo@linux.intel.com; qemu-devel@nongnu.org; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; Linuxarm
-> <linuxarm@huawei.com>; shannon.zhaosl@gmail.com;
-> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
-> sebastien.boeuf@intel.com; Leif Lindholm <Leif.Lindholm@arm.com>
-> Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
-> feature "fdt"
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> Subject: Re: [PATCH v4 5/5] target/mips: Refactor and fix INSERT.<B|H|W|D=
+> instructions
 >=20
-> On Tue, 2 Apr 2019 17:38:26 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
-
-[...]
-
-> > >>> Sure, sorry.
-> > >>>
-> > >>> This series:
-> > >>> - [PATCH v3 00/10] ARM virt: ACPI memory hotplug support,
-> > >>> https://patchwork.kernel.org/cover/10863301/
-> > >>>
-> > >>> aims to introduce PCDIMM support in qemu. In ACPI mode, it builds t=
-he
-> > >>> SRAT and DSDT parts and relies on GED to trigger the hotplug.
-> > >>>
-> > >>> We noticed that if we build the hotpluggable memory dt nodes on top=
- of
-> > >>> the above ACPI tables, the DIMM slots are interpreted as not
-> > >>> hotpluggable memory slots (at least we think so).
-> > >>>
-> > >>> We think the EDK2 GetMemoryMap() uses the dt node info and ignores
-> the
-> > >>> fact that those slots are exposed as hotpluggable in the SRAT for
-> example.
-> > >>>
-> > >>> So in this series, we are forced to not generate the hotpluggable m=
-emory
-> > >>> dt nodes if we want the DIMM slots to be effectively recognized as
-> > >>> hotpluggable.
-> > >>>
-> > >>> Could you confirm we have a correct understanding of the EDK2
-> behaviour
-> > >>> and if so, would there be any solution for EDK2 to absorb both the =
-DT
-> > >>> nodes and the relevant SRAT/DSDT tables and make the slots
-> hotpluggable.
-> > >>>
-> > >>> At qemu level, detecting we are booting in ACPI mode and purposely
-> > >>> removing the above mentioned DT nodes does not look straightforward=
-.
-> > >>
-> > >> The firmware is not enlightened about the ACPI content that comes fr=
-om
-> > >> QEMU / fw_cfg. That ACPI content is *blindly* processed by the firmw=
-are,
-> > >> as instructed through the ACPI linker/loader script, in order to ins=
-tall
-> > >> the ACPI content for the OS. No actual information is consumed by th=
-e
-> > >> firmware from the ACPI payload -- and that's a feature.
-> > >>
-> > >> The firmware does consume DT:
-> > >>
-> > >> - If you start QEMU *with* "-no-acpi", then the DT is both consumed =
-by
-> > >> the firmware (for its own information needs), and passed on to the O=
-S.
-> > >>
-> > >> - If you start QEMU *without* "-no-acpi" (the default), then the DT =
-is
-> > >> consumed only by the firmware (for its own information needs), and t=
-he
-> > >> DT is hidden from the OS. The OS gets only the ACPI content
-> > >> (processed/prepared as described above).
-> > >>
-> > >>
-> > >> In the firmware, the "ArmVirtPkg/HighMemDxe" driver iterates over th=
-e
-> > >> base/size pairs in all the memory nodes in the DT. For each such bas=
-e
-> > >> address that is currently tracked as "nonexistent" in the GCD memory
-> > >> space map, the driver currently adds the base/size range as "system
-> > >> memory". This in turn is reflected by the UEFI memmap that the OS ge=
-ts
-> > >> to see as "conventional memory".
-> > >>
-> > >> If you need some memory ranges to show up as "special" in the UEFI
-> > >> memmap, then you need to distinguish them somehow from the "regular"
-> > >> memory areas, in the DT. And then extend "ArmVirtPkg/HighMemDxe" in
-> the
-> > >> firmware, so that it act upon the discriminator that you set in the =
-DT.
-> > >>
-> > >>
-> > >> Now... from a brief look at the Platform Init and UEFI specs, my
-> > >> impression is that the hotpluggable (but presently not plugged) DIMM
-> > >> ranges should simply be *absent* from the UEFI memmap; is that
-> correct?
-> > >> (I didn't check the ACPI spec, maybe it specifies the expected behav=
-ior
-> > >> in full.) If my impression is correct, then two options (alternative=
-s)
-> > >> exist:
-> > >>
-> > >> (1) Hide the affected memory nodes -- or at least the affected base/=
-size
-> > >> pairs -- from the DT, in case you boot without "-no-acpi" but with a=
-n
-> > >> external firmware loaded. Then the firmware will not expose those ra=
-nges
-> > >> as "conventional memory" in the UEFI memmap. This approach requires
-> no
-> > >> changes to edk2.
-> > >>
-> > >> This option is precisely what Eric described up-thread, at
-> > >>
-> <http://mid.mail-archive.com/3f0a5793-dd35-a497-2248-8eb0cd3c3a16@redh
-> at.com>:
-> > >>
-> > >>> in machvirt_init, there is firmware_loaded that tells you whether y=
-ou
-> > >>> have a FW image. If this one is not set, you can induce dt. But if
-> > >>> there is a FW it can be either DT or ACPI booted. You also have the
-> > >>> acpi_enabled knob.
-> > >>
-> > >> (The "-no-acpi" cmdline option clears the "acpi_enabled" variable in
-> > >> "vl.c").
-> > >>
-> > >> So, the condition for hiding the hotpluggable memory nodes in questi=
-on
-> > >> from the DT is:
-> > >
-> > >>
-> > >>   (aarch64 && firmware_loaded && acpi_enabled)
-> > >
-> > > Thanks a lot for all those inputs!
-> > >
-> > > I don't get why we test aarch64 in above condition (this was useful f=
-or
-> > > high ECAM range as the aarch32 FW was not supporting it but here, is =
-it
-> > > still meaningful?)
+> On 2.4.19. 22:50, Aleksandar Markovic wrote:
+> >> From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> >> Subject: [PATCH v4 5/5] target/mips: Refactor and fix INSERT.<B|H|W|D>=
+ instructions
+> >>
+> >> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> >>
+> >> The old version of the helper for the INSERT.<B|H|W|D> MSA instruction=
+s
+> >> has been replaced with four helpers that don't use switch, and change
+> >> the endianness of the given index, when executed on a big endian host.
+> >>
+> >> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> >> ---
+> > ...
 > >
-> > Sorry, I should have clarified that. Yes, it is meaningful:
 > >
-> > While UEFI has bindings for both 32-bit and 64-bit ARM, ACPI has a
-> > 64-bit-only binding for ARM. (And you can have UEFI without ACPI, but
-> > not the reverse, on ARM.) So if you run the 32-bit build of the
-> > ArmVirtQemu firmware, you get no ACPI at all; all you can rely on with
-> > the OS is the DT.
-
-Just to confirm, does that mean with 32-bit build of the UEFI, the OS canno=
-t
-boot with ACPI and uses DT only. So,
-
-If ((aarch64 && firmware_loaded && acpi_enabled) {
-   Hide_hotpluggable_memory_nodes()
-} else {
-   Add_ hotpluggable_memory_nodes()
-}
-
-should work for all cases?
-
-> > This "bitness distinction" is implemented in the firmware already. If
-> > you hid the memory nodes from the DT under the condition
-> >
-> >   (!aarch64 && firmware_loaded && acpi_enabled)
-> >
-> > then the nodes would not be seen by the OS at all (because
-> > "acpi_enabled" is irrelevant for the 32-bit build of ArmVirtQemu, and
-> > all the OS can ever get is DT).
+> >> +    n %=3D 16;
+> > Mateja, could you just clarify what is the purpose of this line (and
+> > similar three lines involving "%=3D")? It looks to me that n is already
+> > limited here to be between 0 and 15, isn't it? (that follows from the
+> > source code of gen_msa_elm().) What made you insert this line,
+> > as it stands?
 >=20
-> It's getting tricky and I don't like a bit that we are trying to carter
-> 64 bit only UEFI build (or any other build) on QEMU side. Also Peter has
-> a valid about guessing on QEMU side (that's usually a source of problem
-> in the future).
+> It was
+>=20
+> n %=3D DF_ELEMENTS(df);
+>=20
+> but when I deleted the df argument, so it had to be done like
+> this. I think it's a matter of precaution (in case a number
+> greater than 15, or 8... is passed as an argument).
 
-If the above is correct(with 32-bit variant of UEFI, OS cannot have ACPI bo=
-ot),
-then do we really have the issue of memory becoming non hot-un-unpluggable?
-May be I am missing something.=20
-
-Thanks,
-Shameer
+Oh, I see.
 =20
-> Perhaps we should reconsider and think about marking hotplugbbale RAM
-> in DT and let firmware to exclude it from memory map.
->=20
-> > Thanks,
-> > Laszlo
-> >
-> > >
-> > > Thanks
-> > >
-> > > Eric
-> > >
-> > >>
-> > >>
-> > >> (2) Invent and set an "ignore me, firmware" property for the
-> > >> hotpluggable memory nodes in the DT, and update the firmware to hono=
-r
-> > >> that property.
-> > >>
-> > >> Thanks
-> > >> Laszlo
-> > >>
-> >
+At this moment, I think a more appropriate code would be:
+
+assert(n < 16)
+
+The whole set of functions decoding this group of instructions is
+too complicated (several layers, repeated calculations), and could
+be further simplified. But let's say that would be outside of the
+scope of this patch and series. Your series, in fact, begins that
+simplification by removing redundant decoding of "df" in helpers,
+so it is a good step towards better code organization, and we'll
+leave more detailed cleanup for some future endeavors.
+
+Yours,
+Aleksandar
