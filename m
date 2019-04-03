@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55834)
+Received: from eggs.gnu.org ([209.51.188.92]:56682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBcDM-0006YQ-5A
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 05:29:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hBcHd-0007p1-F2
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 05:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBcDK-0003hr-RW
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 05:29:48 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:54900)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBcDK-0003hL-EZ
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 05:29:46 -0400
-From: =?utf-8?B?0K7RgNC40Lkg0JrQvtGC0L7Qsg==?= <yury-kotov@yandex-team.ru>
+	(envelope-from <cohuck@redhat.com>) id 1hBcHc-00006g-Af
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 05:34:13 -0400
+Date: Wed, 3 Apr 2019 11:33:54 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190403113354.0b9706c5.cohuck@redhat.com>
+In-Reply-To: <20190402161129.GL413@redhat.com>
+References: <20190329111104.17223-1-berrange@redhat.com>
+	<20190329111104.17223-12-berrange@redhat.com>
+	<20190402180033.77510387.cohuck@redhat.com>
+	<20190402161129.GL413@redhat.com>
 MIME-Version: 1.0
-Date: Wed, 03 Apr 2019 12:29:43 +0300
-Message-Id: <156671554283778@vla1-1374b6242101.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] QEMU may write to system_memory before
- guest starts
+Subject: Re: [Qemu-devel] [PATCH 11/14] hw/vfio/ccw: avoid taking address
+ members in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-Ping
+On Tue, 2 Apr 2019 17:11:29 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-21.03.2019, 19:27, "Yury Kotov" <yury-kotov@yandex-team.ru>:
-> Hi,
->
-> 19.03.2019, 14:52, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
->> =C2=A0* Peter Maydell (peter.maydell@linaro.org) wrote:
->>> =C2=A0=C2=A0On Tue, 19 Mar 2019 at 11:03, Dr. David Alan Gilbert
->>> =C2=A0=C2=A0<dgilbert@redhat.com> wrote:
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>> =C2=A0=C2=A0> > I didn't think migration distinguished between "main =
-memory"
->>> =C2=A0=C2=A0> > and any other kind of RAMBlock-backed memory ?
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> In Yury's case there's a distinction between RAMBlock's=
- that are mapped
->>> =C2=A0=C2=A0> with RAM_SHARED (which normally ends up as MAP_SHARED) =
-and all others.
->>> =C2=A0=C2=A0> You can set that for main memory by using -numa to spec=
-ify a memdev
->>> =C2=A0=C2=A0> that's backed by a file and has the share=3Don property=
-.
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> On x86 the ROMs end up as separate RAMBlock's that aren=
-'t affected
->>> =C2=A0=C2=A0> by that -numa/share=3Don - so they don't fight Yury's t=
-rick.
->>>
->>> =C2=A0=C2=A0You can use the generic loader on x86 to load an ELF file
->>> =C2=A0=C2=A0into RAM if you want, which would I think also trigger th=
-is.
->>
->> =C2=A0OK, although that doesn't worry me too much - since in the major=
-ity
->> =C2=A0of cases Yury's trick still works well.
->>
->> =C2=A0I wonder if there's a way to make Yury's code to detect these ca=
-ses
->> =C2=A0and not allow the feature; the best thing for the moment would s=
-eem to
->> =C2=A0be to skip the aarch test that uses elf loading.
->
-> Currently, I've no idea how to detect such cases, but there is an abili=
-ty to
-> detect memory corruption. I want to update the RFC patch to let user to=
- map some
-> memory regions as readonly until incoming migration start.
->
-> E.g.
-> 1) If x-ignore-shared is enabled in command line or memory region is ma=
-rked
-> =C2=A0=C2=A0=C2=A0(something like ',readonly=3Don'),
-> 2) Memory region is shared (,share=3Don),
-> 3) And qemu is started with '-incoming' option
->
-> Then map such regions as readonly until incoming migration finished.
-> Thus, the patch will be able to detect memory corruption and will not a=
-ffect
-> normal cases.
->
-> How do you think, is it needed?
->
-> I already have a cleaner version of the RFC patch, but I'm not sure abo=
-ut 1).
-> Which way is better: enable capability in command line, add a new optio=
-n for
-> memory-backend or something else.
->
->> =C2=A0Dave
->>
->>> =C2=A0=C2=A0thanks
->>> =C2=A0=C2=A0-- PMM
->> =C2=A0--
->> =C2=A0Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
-> Regards,
-> Yury
+> On Tue, Apr 02, 2019 at 06:00:33PM +0200, Cornelia Huck wrote:
+> > On Fri, 29 Mar 2019 11:11:01 +0000
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > The GCC 9 compiler complains about many places in s390 code
+> > > that take the address of members of the 'struct SCHIB' which
+> > > is marked packed:
+> > >=20
+> > > hw/vfio/ccw.c: In function =E2=80=98vfio_ccw_io_notifier_handler=E2=
+=80=99:
+> > > hw/vfio/ccw.c:133:15: warning: taking address of packed member of =E2=
+=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> > > [-Waddress-of-packed-member]
+> > >   133 |     SCSW *s =3D &sch->curr_status.scsw;
+> > >       |               ^~~~~~~~~~~~~~~~~~~~~~
+> > > hw/vfio/ccw.c:134:15: warning: taking address of packed member of =E2=
+=80=98struct SCHIB=E2=80=99 may result in an unaligned pointer value \
+> > > [-Waddress-of-packed-member]
+> > >   134 |     PMCW *p =3D &sch->curr_status.pmcw;
+> > >       |               ^~~~~~~~~~~~~~~~~~~~~~
+> > >=20
+> > > ...snip many more...
+> > >=20
+> > > Almost all of these are just done for convenience to avoid
+> > > typing out long variable/field names when referencing struct
+> > > members. We can get most of this convenience by taking the
+> > > address of the 'struct SCHIB' instead, avoiding triggering
+> > > the compiler warnings.
+> > >=20
+> > > In a couple of places we copy via a local variable which is
+> > > a technique already applied elsewhere in s390 code for this
+> > > problem.
+> > >=20
+> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > ---
+> > >  hw/vfio/ccw.c | 42 ++++++++++++++++++++++--------------------
+> > >  1 file changed, 22 insertions(+), 20 deletions(-) =20
+> >=20
+> > I'm currently in the process of queuing this and the other three s390x
+> > fixes, but I'm inclined to do so for 4.1 (it feels a bit late in the
+> > cycle for 4.0.)
+> >=20
+> > Other opinions? =20
+>=20
+> It would be nice to be warning free for 4.0, but I agree that it feels
+> kind of late to be making these changes. They're not fixing real world
+> bugs, and even if you queue the s390 bits we're unlikely to get all the
+> others merged, especially the usb-mtp one is a nasty mess. So we'll
+> not be 100% warning free.
+
+Yeah, but OTOH, the s390x changes are straightforward and have been
+reviewed by several people.
+
+So I changed my mind and queued them to s390-fixes :)
