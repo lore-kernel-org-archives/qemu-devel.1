@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39902)
+Received: from eggs.gnu.org ([209.51.188.92]:49845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hBn6w-00080N-BL
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:07:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1hBnJm-0006Ps-EK
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hBn6r-0008UH-VZ
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:07:53 -0400
-References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
-	<20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20190328183923.lcd3p6fpy4qvvxoo@maxibm>
-	<20190329132951.451d4ef0@bahia.lan>
-	<20190401145858.lw7v3xt7fqanp6nc@maxibm>
-	<20190402122807.1a141e37@bahia.lan>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <cd1b1889-7e03-6268-8d1e-f1ccfb388588@gmail.com>
-Date: Wed, 3 Apr 2019 18:07:24 -0300
+	(envelope-from <bounces@canonical.com>) id 1hBnJi-0000p7-Eg
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hBnJa-0000Zz-HU
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hBnJS-0007EH-Ag
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 21:20:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3C7272E80C8
+	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 21:20:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190402122807.1a141e37@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 Apr 2019 21:07:54 -0000
+From: =?utf-8?q?salvador_li=C3=A9bana?= <1821839@bugs.launchpad.net>
+Reply-To: Bug 1821839 <1821839@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155365513189.10025.3834324325375490887.malonedeb@wampee.canonical.com>
+Message-Id: <155432567483.7949.4389703810646582266.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1821839] Re: qemu 4.0 doesnt support glsl 3.0 but
+ yes older versions, that have no sense IMO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,262 +37,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
+I didnt understand properly the output, it only can use opengl es 3.0.
+you should put that info because when i compile qemu it pass and it
+should if doesnt support my opengl setup.
 
+-- =
 
-On 4/2/19 7:28 AM, Greg Kurz wrote:
-> On Mon, 1 Apr 2019 12:01:48 -0300
-> "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
->
->> Hi Greg,
->>
->> Thanks for your review. I added some comments below...
->>
->> On Fri, Mar 29, 2019 at 01:29:51PM +0100, Greg Kurz wrote:
->>> On Thu, 28 Mar 2019 15:39:45 -0300
->>> "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
->>>    
->>>> Hi,
->>>>
->>>> On Thu, Mar 28, 2019 at 02:21:51PM +0100, Greg Kurz wrote:
->>>>> On Wed, 27 Mar 2019 17:41:00 -0300
->>>>> "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
->>>>>      
->>>>>> Here are two patches to add a handler for ibm,get-vpd RTAS calls.
->>>>>> This RTAS exposes host information in case of set QEMU options
->>>>>> 'host-serial' and 'host-model' as 'passthrough'.
->>>>>>
->>>>>> The patch 1 creates helper functions to get valid 'host-serial'
->>>>>> and 'host-model' parameters, guided by QEMU command line. These
->>>>>> parameters are useful to build the guest device tree and to return
->>>>>> get-vpd RTAS calls. The patch 2 adds the ibm,get-vpd itself.
->>>>>>
->>>>>> Update v7:
->>>>>> * rtas_get_vpd_fields as a static array in spapr machine state
->>>>>>
->>>>>> Maxiwell S. Garcia (2):
->>>>>>    spapr: helper functions to get valid host fields
->>>>>>    spapr-rtas: add ibm,get-vpd RTAS interface
->>>>>>
->>>>>>   hw/ppc/spapr.c         | 48 +++++++++++----------
->>>>>>   hw/ppc/spapr_rtas.c    | 96 ++++++++++++++++++++++++++++++++++++++++++
->>>>>>   include/hw/ppc/spapr.h | 14 +++++-
->>>>>>   3 files changed, 135 insertions(+), 23 deletions(-)
->>>>>>      
->>>>> Hi Maxiwell,
->>>>>
->>>>> David sent a patch to rework how the host data is exposed to the guest.
->>>>> Especially, the special casing of the "none" and "passthrough" strings
->>>>> is no more... I'm afraid you'll have to rework your patches accordingly:
->>>>> code+changelog in patch 1 and at least changelog in patch 2.
->>>>>
->>>>> Cheers,
->>>> IIUC, the 'ibm,get-vpd' RTAS should return information about the
->>>> platform/cabinet. Thus, it's not necessary to add new nodes in the guest
->>>> device tree to export information like that.
->>> I agree that these "host-model" and "host-serial" props, which aren't
->>> described anywhere and not used by either the linux kernel or the
->>> powerpc-utils, look like a QEMU-specific poor man's version of VPD.
->>>
->>> Not quite sure why they were even created since this is the purpose
->>> of "system-id" and "model" as explained in PAPR, and supposedly
->>> exposed in /proc/ppc64/lparcfg according to the LPARCFG(5) manual
->>> page:
->>>
->>>         serial_number
->>>         The serial number of the physical system in which the partition resides
->>>
->>>         system_type
->>>         The  machine,type-model  of  the physical system in which the partition
->>>         resides
->>>
->>> This is indeed what we get in a PowerVM LPAR running on a tuleta system:
->>>
->>> [root@furax1 ~]# head -3 /proc/ppc64/lparcfg
->>> lparcfg 1.9
->>> serial_number=IBM,032116A9A
->>> system_type=IBM,8247-22L
->>>
->>> [root@furax1 ~]# echo $(cat /proc/device-tree/system-id)
->>> IBM,032116A9A
->>> [root@furax1 ~]# echo $(cat /proc/device-tree/model)
->>> IBM,8247-22L
->>>
->>> But QEMU generates a hard coded "IBM pSeries (emulated by qemu)" model,
->>> which is clearly not PAPR compliant according to this requirement:
->>>
->>> 	R1–12.2–13. There must be a property, “model”, under the root node
->>> 	in the format, “<vendor>,xxxx-yyy”, where <vendor> is replaced by
->>> 	one to five letters representing the stock symbol of the company
->>> 	(for example, for IBM: “IBM,xxxx-yyy”), and where xxxx-yyy is
->>> 	derived from the VPD TM field (see Table 160‚ “LoPAPR VPD Fields‚”
->>> 	on page 343) of the first or ‘marked’ processor enclosure.
->>>
->>> And worse, it mixes "vm,uuid" which is QEMU specific concept to uniquely
->>> identify guests, with "system-id" which is about the host :-\
->>>
->>> All of this is very confusing and need to be sorted out before building
->>> anything on top of it. Especially since "model" and "system-id" are
->>> supposed to derive from VPD IIUC.
->>>
->>> I guess that we should first decide what we really want to expose
->>> in "system-id" and "model": what we have now ? the same as in
->>> "host-serial" and "host-model", ie. user configurable ? Must we
->>> stay compatible with existing setups ? In any case, I'm afraid that
->>> we have to diverge from PAPR somehow, since it obviously doesn't
->>> care about the security concerns that motivated recent changes
->>> for "host-serial" and "host-model"...
->>>    
->> Many important changes should be done to solve these inconsistencies.
->> So, I saw in the 'get-vpd' RTAS a manner to return host information
->> and that works with live-migration.
->>
-> Yes it does indeed allow that, among other things. My concern is more that
-> PAPR clearly indicates that the "system-id" and "model" in the root node
-> are derived from the VPD, and this series is about to tie the VPD TM and
-> VPD SE keywords to something else that isn't documented in PAPR...
->
-> The more I look at the "host-serial" and "host-model" properties, the more
-> I have the impression that they serve the same purpose as "system-id" and
-> "model" in PAPR (at least when peeking into the device tree of a PowerVM
-> LPAR as shown somewhere ^^)... what about unifying these ? It would likely
-> impact some guest software that use this to guess the platform type, like
-> powerpc-utils for example:
->
-> 		} else if (strstr(line, "IBM pSeries (emulated by qemu)")) {
-> 			rc = PLATFORM_POWERKVM_GUEST;
-> 			break;
-> 		} else if (strstr(line, "pSeries")) {
->
-> but this is fragile and should be improved anyway...
->
->>>    
->>>> Since it's a POWER specific
->>>> functionality, may 'ibm,get-vpd' export host information if the
->>>> guest instance allows it? Or is it better return only the 'host-serial'
->>>> and 'host-model' content, like in the patch "spapr: Simplify handling
->>>> of host-serial and host-model values"?
->>>>    
->>> I've spent some time reading PAPR on this topic and I'm not sure that
->>> "ibm,get-vpd" is the way to go for what you were trying to achieve
->>> initially (ie, obtain up-to-date host model and serial after migration).
->>>
->>> Have you looked at RTAS "ibm,update-properties" ?
->>> 	7.4.8 ibm,update-properties RTAS Call
->>>
->>> 	This RTAS call is used to report updates to the properties changed
->>> 	due to a massive platform reconfiguration such as when the partition
->>> 	is migrated between machines.
->>>
->>> This explicitly covers updates to "system-id" and "model". Maybe it is
->>> time to do as Ben was suggesting a long time ago when "host-serial"
->>> and "host-model" were introduced [1]:
->>>
->>> 	On Tue, 2014-07-08 at 12:49 +0200, Alexander Graf wrote:
->>> 	> Please be aware that all of the above is bogus when you start
->>> 	> thinking
->>> 	> about live migration.
->>>
->>> 	What's probably where we need to start thinking about implementing
->>> 	migration according to PAPR :-)
->>>
->>> 	IE. With pre and post-migration notifications to the guest including
->>> 	device-tree updates.
->>>
->>> 	Cheers,
->>> 	Ben.
->>>
->>> [1] https://patchwork.ozlabs.org/patch/367792/#813547
->>>
->>> Cheers,
->>>    
->> The 'ibm,update-properties' and 'ibm,update-nodes' RTAS report which DT
->> nodes was modified. So, to implement this approach, the QEMU should change
->> the DT nodes when the live-migration finish and some service in the guest
->> need to call these RTAS to discovery what nodes was changed. Is it the
->> right way?
->>
-> If QEMU on the target is started with different "host-serial" and
-> "host-model", the DT in QEMU already has the new value. No need to
-> change anything. Appart from that, yes, QEMU should generate a PRRN
-> event at post load to notify the guest, which in turns do the RTAS
-> calls to get the updates.
->
->> Assuming that in new pseries machine won't be possible choose
->> 'passthrough' options to 'host-serial' and 'host-model' (last patch of
->> dgibson about this), it's necessary get the host information and set it
->> as string in these options. So, if we use the same qemu options in a
->> live-migration scenario for src and dst (libvirt do that), these
->> properties will remain the same. Is this behavior expected?
->>
-> The recent fixes around "host-serial" and "host-model" simply moved
-> the decision to expose host data to the upper layer, ie. libvirt
-> which should be involved in this discussion.
->
-> Cc'ing Andrea for expertise. Problem exposed below.
->
-> The pseries machine used to expose the content of the host's
-> /proc/device-tree/system-id and /proc/device-tree/model in the guest
-> DT. This led to a CVE and QEMU doesn't do that anymore for new machine
-> types. Instead, two new properties where added to the pseries machine:
->
-> pseries-4.0.host-serial=string (Host serial number to advertise in guest device tree)
-> pseries-4.0.host-model=string (Host model to advertise in guest device tree)
->
-> It is up to the caller to pass something... which may be anything,
-> including something like $(cat /proc/device-tree/system-id) or
-> randomly generated.
->
-> Is there a chance libvirt can be taught to pass a different string
-> to the target QEMU in case of migration ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1821839
 
+Title:
+  qemu 4.0 doesnt support glsl 3.0 but yes older versions, that have no
+  sense IMO
 
-Isn't that just pushing up the same problem (in this case, CVE-2019-8934)
-to Libvirt? By the CVE description [1], the problem is exactly the exposure
-of /proc/device-tree/system-id and /proc/device-tree/model system attributes
-in the guest. The only difference is that instead of QEMU doing it, Libvirt
-wll end up doing it if anything meaninful (i.e. anything that can identify
-the host) is passed in host-serial in the destination during a migration.
+Status in QEMU:
+  New
 
-I am no security expert (and please correct me if I'm wrong), but in the 
-end,
-what this CVE is telling is "the guest shouldn't know any host details 
-or anything
-that can uniquely identify the host". This means that we can't populate 
-these
-attributes with meaninful host data (serial number, hostname, etc).
+Bug description:
+  tested on qemu 4.0.rc1 on rpi3, mesa 19.x
+  maybe I am a bit confused, but why it can use and older version from my m=
+esa driver, it should pickup the right version instead of going to the late=
+st.
 
-This kind of obliterates the point of Max patch - the idea is that the 
-user wants
-to be able do pinpoint, after migrating, which host is running the VM, by
-checking host_serial. Perhaps we should just discourage this usage 
-altogether
-and show this CVE as proof. The user will need to go to the VM management
-layer to discover where the guest is (which is the proper way of doing it,
-anyway).
+  pi@pi:~/Desktop/armbian/windows_95_vdi $ qemu-system-i386 -cpu qemu32  -m=
+ 32 -display sdl,gl=3Don -device virtio-vga,virgl=3Don -soundhw sb16 =
 
+  qemu_gl_create_compile_shader: compile vertex error
+  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
+10, 1.20, and 1.00 ES
 
-Thanks,
+  qemu_gl_create_compile_shader: compile fragment error
+  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
+10, 1.20, and 1.00 ES
 
+  qemu_gl_create_compile_shader: compile vertex error
+  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
+10, 1.20, and 1.00 ES
 
-DHB
+  qemu_gl_create_compile_shader: compile fragment error
+  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
+10, 1.20, and 1.00 ES
 
+  the sames happen on mesa 13.x (default mesa included on raspbian)
 
-[1] https://access.redhat.com/security/cve/cve-2019-8934
+  GLXINFO
 
+  pi@pi:~/Desktop/armbian/windows_95_vdi $ glxinfo
+  name of display: :0
+  display: :0  screen: 0
+  direct rendering: Yes
+  server glx vendor string: SGI
+  server glx version string: 1.4
+  server glx extensions:
+      GLX_ARB_create_context, GLX_ARB_create_context_profile, =
 
+      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, GLX_ARB_multisample=
+, =
 
->
->>> --
->>> Greg
->>>
->>>    
->>>>> --
->>>>> Greg
->>>>>      
->>>>    
->>>    
->>
->
+      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
+, =
+
+      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
+
+      GLX_EXT_import_context, GLX_EXT_libglvnd, GLX_EXT_texture_from_pixmap=
+, =
+
+      GLX_EXT_visual_info, GLX_EXT_visual_rating, GLX_INTEL_swap_event, =
+
+      GLX_MESA_copy_sub_buffer, GLX_OML_swap_method, GLX_SGIS_multisample, =
+
+      GLX_SGIX_fbconfig, GLX_SGIX_pbuffer, GLX_SGIX_visual_select_group, =
+
+      GLX_SGI_make_current_read, GLX_SGI_swap_control
+  client glx vendor string: Mesa Project and SGI
+  client glx version string: 1.4
+  client glx extensions:
+      GLX_ARB_context_flush_control, GLX_ARB_create_context, =
+
+      GLX_ARB_create_context_profile, GLX_ARB_create_context_robustness, =
+
+      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, =
+
+      GLX_ARB_get_proc_address, GLX_ARB_multisample, GLX_EXT_buffer_age, =
+
+      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
+, =
+
+      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
+
+      GLX_EXT_import_context, GLX_EXT_texture_from_pixmap, GLX_EXT_visual_i=
+nfo, =
+
+      GLX_EXT_visual_rating, GLX_INTEL_swap_event, GLX_MESA_copy_sub_buffer=
+, =
+
+      GLX_MESA_multithread_makecurrent, GLX_MESA_query_renderer, =
+
+      GLX_MESA_swap_control, GLX_OML_swap_method, GLX_OML_sync_control, =
+
+      GLX_SGIS_multisample, GLX_SGIX_fbconfig, GLX_SGIX_pbuffer, =
+
+      GLX_SGIX_visual_select_group, GLX_SGI_make_current_read, =
+
+      GLX_SGI_swap_control, GLX_SGI_video_sync
+  GLX version: 1.4
+  GLX extensions:
+      GLX_ARB_create_context, GLX_ARB_create_context_profile, =
+
+      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, =
+
+      GLX_ARB_get_proc_address, GLX_ARB_multisample, GLX_EXT_buffer_age, =
+
+      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
+, =
+
+      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
+
+      GLX_EXT_import_context, GLX_EXT_texture_from_pixmap, GLX_EXT_visual_i=
+nfo, =
+
+      GLX_EXT_visual_rating, GLX_INTEL_swap_event, GLX_MESA_copy_sub_buffer=
+, =
+
+      GLX_MESA_query_renderer, GLX_MESA_swap_control, GLX_OML_swap_method, =
+
+      GLX_OML_sync_control, GLX_SGIS_multisample, GLX_SGIX_fbconfig, =
+
+      GLX_SGIX_pbuffer, GLX_SGIX_visual_select_group, GLX_SGI_make_current_=
+read, =
+
+      GLX_SGI_swap_control, GLX_SGI_video_sync
+  Extended renderer info (GLX_MESA_query_renderer):
+      Vendor: Broadcom (0x14e4)
+      Device: VC4 V3D 2.1 (0xffffffff)
+      Version: 19.1.0
+      Accelerated: yes
+      Video memory: 938MB
+      Unified memory: yes
+      Preferred profile: compat (0x2)
+      Max core profile version: 0.0
+      Max compat profile version: 2.1
+      Max GLES1 profile version: 1.1
+      Max GLES[23] profile version: 2.0
+  OpenGL vendor string: Broadcom
+  OpenGL renderer string: VC4 V3D 2.1
+  OpenGL version string: 2.1 Mesa 19.1.0-devel (git-f1122f78b7)
+  OpenGL shading language version string: 1.20
+  OpenGL extensions:
+      GL_AMD_shader_trinary_minmax, GL_APPLE_packed_pixels, =
+
+      GL_ARB_ES2_compatibility, GL_ARB_buffer_storage, =
+
+      GL_ARB_clear_buffer_object, GL_ARB_color_buffer_float, =
+
+      GL_ARB_compressed_texture_pixel_storage, GL_ARB_copy_buffer, =
+
+      GL_ARB_debug_output, GL_ARB_depth_texture, GL_ARB_draw_buffers, =
+
+      GL_ARB_draw_elements_base_vertex, GL_ARB_explicit_attrib_location, =
+
+      GL_ARB_explicit_uniform_location, GL_ARB_fragment_coord_conventions, =
+
+      GL_ARB_fragment_program, GL_ARB_fragment_program_shadow, =
+
+      GL_ARB_fragment_shader, GL_ARB_framebuffer_object, =
+
+      GL_ARB_framebuffer_sRGB, GL_ARB_get_program_binary, =
+
+      GL_ARB_get_texture_sub_image, GL_ARB_half_float_pixel, =
+
+      GL_ARB_half_float_vertex, GL_ARB_internalformat_query, =
+
+      GL_ARB_internalformat_query2, GL_ARB_invalidate_subdata, =
+
+      GL_ARB_map_buffer_alignment, GL_ARB_map_buffer_range, GL_ARB_multi_bi=
+nd, =
+
+      GL_ARB_multisample, GL_ARB_multitexture, GL_ARB_occlusion_query, =
+
+      GL_ARB_occlusion_query2, GL_ARB_pixel_buffer_object, =
+
+      GL_ARB_point_parameters, GL_ARB_point_sprite, =
+
+      GL_ARB_program_interface_query, GL_ARB_provoking_vertex, =
+
+      GL_ARB_robustness, GL_ARB_sampler_objects, GL_ARB_separate_shader_obj=
+ects, =
+
+      GL_ARB_shader_objects, GL_ARB_shading_language_100, GL_ARB_shadow, =
+
+      GL_ARB_sync, GL_ARB_texture_barrier, GL_ARB_texture_border_clamp, =
+
+      GL_ARB_texture_compression, GL_ARB_texture_cube_map, =
+
+      GL_ARB_texture_env_add, GL_ARB_texture_env_combine, =
+
+      GL_ARB_texture_env_crossbar, GL_ARB_texture_env_dot3, =
+
+      GL_ARB_texture_mirrored_repeat, GL_ARB_texture_multisample, =
+
+      GL_ARB_texture_non_power_of_two, GL_ARB_texture_rectangle, =
+
+      GL_ARB_texture_storage, GL_ARB_texture_storage_multisample, =
+
+      GL_ARB_texture_swizzle, GL_ARB_transpose_matrix, =
+
+      GL_ARB_vertex_array_object, GL_ARB_vertex_attrib_binding, =
+
+      GL_ARB_vertex_buffer_object, GL_ARB_vertex_program, GL_ARB_vertex_sha=
+der, =
+
+      GL_ARB_window_pos, GL_ATI_blend_equation_separate, GL_ATI_draw_buffer=
+s, =
+
+      GL_ATI_fragment_shader, GL_ATI_separate_stencil, =
+
+      GL_ATI_texture_env_combine3, GL_EXT_abgr, GL_EXT_bgra, =
+
+      GL_EXT_blend_color, GL_EXT_blend_equation_separate, =
+
+      GL_EXT_blend_func_separate, GL_EXT_blend_minmax, GL_EXT_blend_subtrac=
+t, =
+
+      GL_EXT_compiled_vertex_array, GL_EXT_copy_texture, =
+
+      GL_EXT_draw_range_elements, GL_EXT_fog_coord, GL_EXT_framebuffer_blit=
+, =
+
+      GL_EXT_framebuffer_multisample, GL_EXT_framebuffer_multisample_blit_s=
+caled, =
+
+      GL_EXT_framebuffer_object, GL_EXT_framebuffer_sRGB, =
+
+      GL_EXT_gpu_program_parameters, GL_EXT_multi_draw_arrays, =
+
+      GL_EXT_packed_depth_stencil, GL_EXT_packed_pixels, =
+
+      GL_EXT_pixel_buffer_object, GL_EXT_point_parameters, =
+
+      GL_EXT_provoking_vertex, GL_EXT_rescale_normal, GL_EXT_secondary_colo=
+r, =
+
+      GL_EXT_separate_specular_color, GL_EXT_shader_integer_mix, =
+
+      GL_EXT_shadow_funcs, GL_EXT_stencil_two_side, GL_EXT_stencil_wrap, =
+
+      GL_EXT_subtexture, GL_EXT_texture, GL_EXT_texture3D, =
+
+      GL_EXT_texture_cube_map, GL_EXT_texture_edge_clamp, =
+
+      GL_EXT_texture_env_add, GL_EXT_texture_env_combine, =
+
+      GL_EXT_texture_env_dot3, GL_EXT_texture_lod_bias, GL_EXT_texture_obje=
+ct, =
+
+      GL_EXT_texture_rectangle, GL_EXT_texture_sRGB, GL_EXT_texture_sRGB_de=
+code, =
+
+      GL_EXT_texture_swizzle, GL_EXT_vertex_array, GL_IBM_multimode_draw_ar=
+rays, =
+
+      GL_IBM_rasterpos_clip, GL_IBM_texture_mirrored_repeat, =
+
+      GL_INGR_blend_func_separate, GL_KHR_context_flush_control, GL_KHR_deb=
+ug, =
+
+      GL_KHR_no_error, GL_KHR_texture_compression_astc_ldr, =
+
+      GL_KHR_texture_compression_astc_sliced_3d, GL_MESA_pack_invert, =
+
+      GL_MESA_tile_raster_order, GL_MESA_window_pos, GL_NV_blend_square, =
+
+      GL_NV_fog_distance, GL_NV_light_max_exponent, GL_NV_packed_depth_sten=
+cil, =
+
+      GL_NV_texgen_reflection, GL_NV_texture_barrier, =
+
+      GL_NV_texture_env_combine4, GL_NV_texture_rectangle, GL_OES_EGL_image=
+, =
+
+      GL_OES_read_format, GL_SGIS_generate_mipmap, GL_SGIS_texture_border_c=
+lamp, =
+
+      GL_SGIS_texture_edge_clamp, GL_SGIS_texture_lod, GL_SUN_multi_draw_ar=
+rays
+
+  OpenGL ES profile version string: OpenGL ES 2.0 Mesa 19.1.0-devel (git-f1=
+122f78b7)
+  OpenGL ES profile shading language version string: OpenGL ES GLSL ES 1.0.=
+16
+  OpenGL ES profile extensions:
+      GL_APPLE_texture_max_level, GL_EXT_blend_minmax, =
+
+      GL_EXT_compressed_ETC1_RGB8_sub_texture, GL_EXT_discard_framebuffer, =
+
+      GL_EXT_draw_buffers, GL_EXT_draw_elements_base_vertex, GL_EXT_frag_de=
+pth, =
+
+      GL_EXT_map_buffer_range, GL_EXT_multi_draw_arrays, =
+
+      GL_EXT_occlusion_query_boolean, GL_EXT_read_format_bgra, =
+
+      GL_EXT_separate_shader_objects, GL_EXT_texture_border_clamp, =
+
+      GL_EXT_texture_format_BGRA8888, GL_EXT_unpack_subimage, =
+
+      GL_KHR_context_flush_control, GL_KHR_debug, GL_KHR_no_error, =
+
+      GL_KHR_texture_compression_astc_ldr, =
+
+      GL_KHR_texture_compression_astc_sliced_3d, GL_MESA_tile_raster_order, =
+
+      GL_NV_draw_buffers, GL_NV_fbo_color_attachments, GL_NV_read_buffer, =
+
+      GL_NV_read_depth, GL_NV_read_depth_stencil, GL_NV_read_stencil, =
+
+      GL_OES_EGL_image, GL_OES_EGL_image_external, GL_OES_EGL_sync, =
+
+      GL_OES_compressed_ETC1_RGB8_texture, GL_OES_depth24, GL_OES_depth_tex=
+ture, =
+
+      GL_OES_draw_elements_base_vertex, GL_OES_element_index_uint, =
+
+      GL_OES_fbo_render_mipmap, GL_OES_get_program_binary, GL_OES_mapbuffer=
+, =
+
+      GL_OES_packed_depth_stencil, GL_OES_required_internalformat, =
+
+      GL_OES_rgb8_rgba8, GL_OES_stencil8, GL_OES_surfaceless_context, =
+
+      GL_OES_texture_3D, GL_OES_texture_border_clamp, GL_OES_texture_npot, =
+
+      GL_OES_vertex_array_object, GL_OES_vertex_half_float
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1821839/+subscriptions
