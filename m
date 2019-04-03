@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46158)
+Received: from eggs.gnu.org ([209.51.188.92]:46188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1hBlwy-0003HV-R1
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 15:53:34 -0400
+	(envelope-from <Sandra_Loosemore@mentor.com>) id 1hBlx4-0003Jw-78
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 15:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1hBlww-0001l4-PL
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 15:53:32 -0400
-Received: from relay1.mentorg.com ([192.94.38.131]:43846)
+	(envelope-from <Sandra_Loosemore@mentor.com>) id 1hBlww-0001l9-Pv
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 15:53:34 -0400
+Received: from relay1.mentorg.com ([192.94.38.131]:43851)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
-	id 1hBlwr-0001Vl-1d
+	id 1hBlwr-0001W6-2E
 	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 15:53:27 -0400
 From: Sandra Loosemore <sandra@codesourcery.com>
-Date: Wed, 3 Apr 2019 13:53:04 -0600
-Message-ID: <1554321185-2825-2-git-send-email-sandra@codesourcery.com>
+Date: Wed, 3 Apr 2019 13:53:05 -0600
+Message-ID: <1554321185-2825-3-git-send-email-sandra@codesourcery.com>
 In-Reply-To: <1554321185-2825-1-git-send-email-sandra@codesourcery.com>
 References: <1554321185-2825-1-git-send-email-sandra@codesourcery.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 1/2] Add generic Nios II board.
+Subject: [Qemu-devel] [PATCH v7 2/2] Add Nios II semihosting support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,215 +29,576 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: crwulff@gmail.com, marex@denx.de, peter.maydell@linaro.org
 
-This patch adds support for a generic MMU-less Nios II board that can
-be used e.g. for bare-metal compiler testing with the linker script
-and startup code provided by libgloss.  Nios II booting is also
-tweaked so that bare-metal binaries start executing in RAM starting at
-0x00000000, rather than an alias at 0xc0000000, which allows features
-such as unwinding to work when binaries are linked to start at the
-beginning of the address space.
-
-The generic_nommu.c parts are based on code by Andrew Jenner, which was
-in turn based on code by Marek Vasut.
-
-Originally by Marek Vasut and Andrew Jenner.
+This patch adds support for libgloss semihosting to Nios II bare-metal
+emulation.  The specification for the protocol can be found in the
+libgloss sources.
 
 Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
 Signed-off-by: Julian Brown <julian@codesourcery.com>
-Signed-off-by: Andrew Jenner <andrew@codesourcery.com>
-Signed-off-by: Marek Vasut <marex@denx.de>
 ---
- default-configs/nios2-softmmu.mak |   1 +
- hw/nios2/Kconfig                  |   4 ++
- hw/nios2/Makefile.objs            |   1 +
- hw/nios2/boot.c                   |  18 ++++---
- hw/nios2/generic_nommu.c          | 105 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 123 insertions(+), 6 deletions(-)
- create mode 100644 hw/nios2/generic_nommu.c
+ qemu-options.hx            |   8 +-
+ target/nios2/Makefile.objs |   2 +-
+ target/nios2/cpu.h         |   4 +-
+ target/nios2/helper.c      |  13 ++
+ target/nios2/nios2-semi.c  | 455 +++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 476 insertions(+), 6 deletions(-)
+ create mode 100644 target/nios2/nios2-semi.c
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index e11dc54..e130d02 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -3,3 +3,4 @@
- # Boards:
- #
- CONFIG_NIOS2_10M50=y
-+CONFIG_NIOS2_GENERIC_NOMMU=y
-diff --git a/hw/nios2/Kconfig b/hw/nios2/Kconfig
-index ab953e0..b10ea64 100644
---- a/hw/nios2/Kconfig
-+++ b/hw/nios2/Kconfig
-@@ -4,5 +4,9 @@ config NIOS2_10M50
-     select SERIAL
-     select ALTERA_TIMER
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 08749a3..4135d5d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3968,21 +3968,21 @@ ETEXI
+ DEF("semihosting", 0, QEMU_OPTION_semihosting,
+     "-semihosting    semihosting mode\n",
+     QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
+-    QEMU_ARCH_MIPS)
++    QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
+ STEXI
+ @item -semihosting
+ @findex -semihosting
+-Enable semihosting mode (ARM, M68K, Xtensa, MIPS only).
++Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only).
+ ETEXI
+ DEF("semihosting-config", HAS_ARG, QEMU_OPTION_semihosting_config,
+     "-semihosting-config [enable=on|off][,target=native|gdb|auto][,arg=str[,...]]\n" \
+     "                semihosting configuration\n",
+ QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
+-QEMU_ARCH_MIPS)
++QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
+ STEXI
+ @item -semihosting-config [enable=on|off][,target=native|gdb|auto][,arg=str[,...]]
+ @findex -semihosting-config
+-Enable and configure semihosting (ARM, M68K, Xtensa, MIPS only).
++Enable and configure semihosting (ARM, M68K, Xtensa, MIPS, Nios II only).
+ @table @option
+ @item target=@code{native|gdb|auto}
+ Defines where the semihosting calls will be addressed, to QEMU (@code{native})
+diff --git a/target/nios2/Makefile.objs b/target/nios2/Makefile.objs
+index 2a11c5c..010de0e 100644
+--- a/target/nios2/Makefile.objs
++++ b/target/nios2/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y += translate.o op_helper.o helper.o cpu.o mmu.o
++obj-y += translate.o op_helper.o helper.o cpu.o mmu.o nios2-semi.o
+ obj-$(CONFIG_SOFTMMU) += monitor.o
  
-+config NIOS2_GENERIC_NOMMU
-+    bool
-+    select NIOS2
+ $(obj)/op_helper.o: QEMU_CFLAGS += $(HELPER_CFLAGS)
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 047f376..afd30d5 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -141,7 +141,7 @@ typedef struct Nios2CPUClass {
+ #define R_PC         64
+ 
+ /* Exceptions */
+-#define EXCP_BREAK    -1
++#define EXCP_BREAK    0x1000
+ #define EXCP_RESET    0
+ #define EXCP_PRESET   1
+ #define EXCP_IRQ      2
+@@ -223,6 +223,8 @@ void nios2_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+ qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu);
+ void nios2_check_interrupts(CPUNios2State *env);
+ 
++void do_nios2_semihosting(CPUNios2State *env);
 +
- config NIOS2
-     bool
-diff --git a/hw/nios2/Makefile.objs b/hw/nios2/Makefile.objs
-index 89a419a..3e01798 100644
---- a/hw/nios2/Makefile.objs
-+++ b/hw/nios2/Makefile.objs
-@@ -1,2 +1,3 @@
- obj-y = boot.o cpu_pic.o
- obj-$(CONFIG_NIOS2_10M50) += 10m50_devboard.o
-+obj-$(CONFIG_NIOS2_GENERIC_NOMMU) += generic_nommu.o
-diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-index 5f0ab2f..276068c 100644
---- a/hw/nios2/boot.c
-+++ b/hw/nios2/boot.c
-@@ -138,7 +138,6 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
-     if (kernel_filename) {
-         int kernel_size, fdt_size;
-         uint64_t entry, low, high;
--        uint32_t base32;
-         int big_endian = 0;
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
+ #ifdef CONFIG_USER_ONLY
+ # define TARGET_VIRT_ADDR_SPACE_BITS 31
+diff --git a/target/nios2/helper.c b/target/nios2/helper.c
+index a8b8ec6..bb0a784 100644
+--- a/target/nios2/helper.c
++++ b/target/nios2/helper.c
+@@ -23,8 +23,10 @@
+ #include "cpu.h"
+ #include "qemu/host-utils.h"
+ #include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
+ #include "exec/log.h"
+ #include "exec/helper-proto.h"
++#include "exec/semihost.h"
  
- #ifdef TARGET_WORDS_BIGENDIAN
-@@ -149,17 +148,24 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-                                &entry, &low, &high,
-                                big_endian, EM_ALTERA_NIOS2, 0, 0);
--        base32 = entry;
--        if (base32 == 0xc0000000) {
-+        if ((uint32_t)entry == 0xc0000000) {
-+            /*
-+             * The Nios II processor reference guide documents that the
-+             * kernel is placed at virtual memory address 0xc0000000,
-+             * and we've got something that points there.  Reload it
-+             * and adjust the entry to get the address in physical RAM.
-+             */
-             kernel_size = load_elf(kernel_filename, NULL,
-                                    translate_kernel_address, NULL,
-                                    &entry, NULL, NULL,
-                                    big_endian, EM_ALTERA_NIOS2, 0, 0);
-+            boot_info.bootstrap_pc = ddr_base + 0xc0000000 +
-+                (entry & 0x07ffffff);
-+        } else {
-+            /* Use the entry point in the ELF image.  */
-+            boot_info.bootstrap_pc = (uint32_t)entry;
-         }
+ #if defined(CONFIG_USER_ONLY)
  
--        /* Always boot into physical ram. */
--        boot_info.bootstrap_pc = ddr_base + 0xc0000000 + (entry & 0x07ffffff);
--
-         /* If it wasn't an ELF image, try an u-boot image. */
-         if (kernel_size < 0) {
-             hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
-diff --git a/hw/nios2/generic_nommu.c b/hw/nios2/generic_nommu.c
+@@ -169,6 +171,17 @@ void nios2_cpu_do_interrupt(CPUState *cs)
+         break;
+ 
+     case EXCP_BREAK:
++        qemu_log_mask(CPU_LOG_INT, "BREAK exception at pc=%x\n",
++                      env->regs[R_PC]);
++        /* The semihosting instruction is "break 1".  */
++        if (semihosting_enabled() &&
++            cpu_ldl_code(env, env->regs[R_PC]) == 0x003da07a)  {
++            qemu_log_mask(CPU_LOG_INT, "Entering semihosting\n");
++            env->regs[R_PC] += 4;
++            do_nios2_semihosting(env);
++            break;
++        }
++
+         if ((env->regs[CR_STATUS] & CR_STATUS_EH) == 0) {
+             env->regs[CR_BSTATUS] = env->regs[CR_STATUS];
+             env->regs[R_BA] = env->regs[R_PC] + 4;
+diff --git a/target/nios2/nios2-semi.c b/target/nios2/nios2-semi.c
 new file mode 100644
-index 0000000..1788ffa
+index 0000000..cc2777d
 --- /dev/null
-+++ b/hw/nios2/generic_nommu.c
-@@ -0,0 +1,105 @@
++++ b/target/nios2/nios2-semi.c
+@@ -0,0 +1,455 @@
 +/*
-+ * Generic simulator target with no MMU or devices.  This emulation is
-+ * compatible with the libgloss qemu-hosted.ld linker script for using
-+ * QEMU as an instruction set simulator.
++ *  Nios II Semihosting syscall interface.
++ *  This code is derived from m68k-semi.c.
++ *  The semihosting protocol implemented here is described in the
++ *  libgloss sources:
++ *  https://sourceware.org/git/gitweb.cgi?p=newlib-cygwin.git;a=blob;f=libgloss/nios2/nios2-semi.txt;hb=HEAD
 + *
-+ * Copyright (c) 2018-2019 Mentor Graphics
++ *  Copyright (c) 2017-2019 Mentor Graphics
 + *
-+ * Copyright (c) 2016 Marek Vasut <marek.vasut@gmail.com>
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
 + *
-+ * Based on LabX device code
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
 + *
-+ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
++
 +#include "cpu.h"
-+
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
-+#include "hw/char/serial.h"
++#if defined(CONFIG_USER_ONLY)
++#include "qemu.h"
++#else
++#include "qemu-common.h"
++#include "exec/gdbstub.h"
++#include "exec/softmmu-semi.h"
++#endif
++#include "qemu/log.h"
 +#include "sysemu/sysemu.h"
-+#include "hw/boards.h"
-+#include "exec/memory.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/config-file.h"
 +
-+#include "boot.h"
++#define HOSTED_EXIT  0
++#define HOSTED_INIT_SIM 1
++#define HOSTED_OPEN 2
++#define HOSTED_CLOSE 3
++#define HOSTED_READ 4
++#define HOSTED_WRITE 5
++#define HOSTED_LSEEK 6
++#define HOSTED_RENAME 7
++#define HOSTED_UNLINK 8
++#define HOSTED_STAT 9
++#define HOSTED_FSTAT 10
++#define HOSTED_GETTIMEOFDAY 11
++#define HOSTED_ISATTY 12
++#define HOSTED_SYSTEM 13
 +
-+#define BINARY_DEVICE_TREE_FILE    "generic-nommu.dtb"
++typedef uint32_t gdb_mode_t;
++typedef uint32_t gdb_time_t;
 +
-+static void nios2_generic_nommu_init(MachineState *machine)
++struct nios2_gdb_stat {
++  uint32_t    gdb_st_dev;     /* device */
++  uint32_t    gdb_st_ino;     /* inode */
++  gdb_mode_t  gdb_st_mode;    /* protection */
++  uint32_t    gdb_st_nlink;   /* number of hard links */
++  uint32_t    gdb_st_uid;     /* user ID of owner */
++  uint32_t    gdb_st_gid;     /* group ID of owner */
++  uint32_t    gdb_st_rdev;    /* device type (if inode device) */
++  uint64_t    gdb_st_size;    /* total size, in bytes */
++  uint64_t    gdb_st_blksize; /* blocksize for filesystem I/O */
++  uint64_t    gdb_st_blocks;  /* number of blocks allocated */
++  gdb_time_t  gdb_st_atime;   /* time of last access */
++  gdb_time_t  gdb_st_mtime;   /* time of last modification */
++  gdb_time_t  gdb_st_ctime;   /* time of last change */
++} QEMU_PACKED;
++
++struct gdb_timeval {
++  gdb_time_t tv_sec;  /* second */
++  uint64_t tv_usec;   /* microsecond */
++} QEMU_PACKED;
++
++#define GDB_O_RDONLY   0x0
++#define GDB_O_WRONLY   0x1
++#define GDB_O_RDWR     0x2
++#define GDB_O_APPEND   0x8
++#define GDB_O_CREAT  0x200
++#define GDB_O_TRUNC  0x400
++#define GDB_O_EXCL   0x800
++
++static int translate_openflags(int flags)
 +{
-+    Nios2CPU *cpu;
-+    MemoryRegion *address_space_mem = get_system_memory();
-+    MemoryRegion *phys_tcm = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_tcm_alias = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_ram_alias = g_new(MemoryRegion, 1);
-+    ram_addr_t tcm_base = 0x0;
-+    ram_addr_t tcm_size = 0x1000;    /* 1 kiB, but QEMU limit is 4 kiB */
-+    ram_addr_t ram_base = 0x10000000;
-+    ram_addr_t ram_size = 0x08000000;
++    int hf;
 +
-+    /* Physical TCM (tb_ram_1k) with alias at 0xc0000000 */
-+    memory_region_init_ram(phys_tcm, NULL, "nios2.tcm", tcm_size,
-+                           &error_abort);
-+    memory_region_init_alias(phys_tcm_alias, NULL, "nios2.tcm.alias",
-+                             phys_tcm, 0, tcm_size);
-+    memory_region_add_subregion(address_space_mem, tcm_base, phys_tcm);
-+    memory_region_add_subregion(address_space_mem, 0xc0000000 + tcm_base,
-+                                phys_tcm_alias);
++    if (flags & GDB_O_WRONLY) {
++        hf = O_WRONLY;
++    } else if (flags & GDB_O_RDWR) {
++        hf = O_RDWR;
++    } else {
++        hf = O_RDONLY;
++    }
 +
-+    /* Physical DRAM with alias at 0xc0000000 */
-+    memory_region_init_ram(phys_ram, NULL, "nios2.ram", ram_size,
-+                           &error_abort);
-+    memory_region_init_alias(phys_ram_alias, NULL, "nios2.ram.alias",
-+                             phys_ram, 0, ram_size);
-+    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-+    memory_region_add_subregion(address_space_mem, 0xc0000000 + ram_base,
-+                                phys_ram_alias);
++    if (flags & GDB_O_APPEND) {
++        hf |= O_APPEND;
++    }
++    if (flags & GDB_O_CREAT) {
++        hf |= O_CREAT;
++    }
++    if (flags & GDB_O_TRUNC) {
++        hf |= O_TRUNC;
++    }
++    if (flags & GDB_O_EXCL) {
++        hf |= O_EXCL;
++    }
 +
-+    cpu = NIOS2_CPU(cpu_create(TYPE_NIOS2_CPU));
-+
-+    /* Remove MMU */
-+    cpu->mmu_present = false;
-+
-+    /* Reset vector is the first 32 bytes of RAM.  */
-+    cpu->reset_addr = ram_base;
-+
-+    /* The interrupt vector comes right after reset.  */
-+    cpu->exception_addr = ram_base + 0x20;
-+
-+    /*
-+     * The linker script does have a TLB miss memory region declared,
-+     * but this should never be used with no MMU.
-+     */
-+    cpu->fast_tlb_miss_addr = 0x7fff400;
-+
-+    nios2_load_kernel(cpu, ram_base, ram_size, machine->initrd_filename,
-+                      BINARY_DEVICE_TREE_FILE, NULL);
++    return hf;
 +}
 +
-+static void nios2_generic_nommu_machine_init(struct MachineClass *mc)
++static bool translate_stat(CPUNios2State *env, target_ulong addr,
++                           struct stat *s)
 +{
-+    mc->desc = "Generic NOMMU Nios II design";
-+    mc->init = nios2_generic_nommu_init;
++    struct nios2_gdb_stat *p;
++
++    p = lock_user(VERIFY_WRITE, addr, sizeof(struct nios2_gdb_stat), 0);
++
++    if (!p) {
++        return false;
++    }
++    p->gdb_st_dev = cpu_to_be32(s->st_dev);
++    p->gdb_st_ino = cpu_to_be32(s->st_ino);
++    p->gdb_st_mode = cpu_to_be32(s->st_mode);
++    p->gdb_st_nlink = cpu_to_be32(s->st_nlink);
++    p->gdb_st_uid = cpu_to_be32(s->st_uid);
++    p->gdb_st_gid = cpu_to_be32(s->st_gid);
++    p->gdb_st_rdev = cpu_to_be32(s->st_rdev);
++    p->gdb_st_size = cpu_to_be64(s->st_size);
++#ifdef _WIN32
++    /* Windows stat is missing some fields.  */
++    p->gdb_st_blksize = 0;
++    p->gdb_st_blocks = 0;
++#else
++    p->gdb_st_blksize = cpu_to_be64(s->st_blksize);
++    p->gdb_st_blocks = cpu_to_be64(s->st_blocks);
++#endif
++    p->gdb_st_atime = cpu_to_be32(s->st_atime);
++    p->gdb_st_mtime = cpu_to_be32(s->st_mtime);
++    p->gdb_st_ctime = cpu_to_be32(s->st_ctime);
++    unlock_user(p, addr, sizeof(struct nios2_gdb_stat));
++    return true;
 +}
 +
-+DEFINE_MACHINE("nios2-generic-nommu", nios2_generic_nommu_machine_init);
++static void nios2_semi_return_u32(CPUNios2State *env, uint32_t ret,
++                                  uint32_t err)
++{
++    target_ulong args = env->regs[R_ARG1];
++    if (put_user_u32(ret, args) ||
++        put_user_u32(err, args + 4)) {
++        /*
++         * The nios2 semihosting ABI does not provide any way to report this
++         * error to the guest, so the best we can do is log it in qemu.
++         * It is always a guest error not to pass us a valid argument block.
++         */
++        qemu_log_mask(LOG_GUEST_ERROR, "nios2-semihosting: return value "
++                      "discarded because argument block not writable\n");
++    }
++}
++
++static void nios2_semi_return_u64(CPUNios2State *env, uint64_t ret,
++                                  uint32_t err)
++{
++    target_ulong args = env->regs[R_ARG1];
++    if (put_user_u32(ret >> 32, args) ||
++        put_user_u32(ret, args + 4) ||
++        put_user_u32(err, args + 8)) {
++        /* No way to report this via nios2 semihosting ABI; just log it */
++        qemu_log_mask(LOG_GUEST_ERROR, "nios2-semihosting: return value "
++                      "discarded because argument block not writable\n");
++    }
++}
++
++static int nios2_semi_is_lseek;
++
++static void nios2_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++
++    if (nios2_semi_is_lseek) {
++        /*
++         * FIXME: We've already lost the high bits of the lseek
++         * return value.
++         */
++        nios2_semi_return_u64(env, ret, err);
++        nios2_semi_is_lseek = 0;
++    } else {
++        nios2_semi_return_u32(env, ret, err);
++    }
++}
++
++/*
++ * Read the input value from the argument block; fail the semihosting
++ * call if the memory read fails.
++ */
++#define GET_ARG(n) do {                                 \
++    if (get_user_ual(arg ## n, args + (n) * 4)) {       \
++        result = -1;                                    \
++        errno = EFAULT;                                 \
++        goto failed;                                    \
++    }                                                   \
++} while (0)
++
++void do_nios2_semihosting(CPUNios2State *env)
++{
++    int nr;
++    uint32_t args;
++    target_ulong arg0, arg1, arg2, arg3;
++    void *p;
++    void *q;
++    uint32_t len;
++    uint32_t result;
++
++    nr = env->regs[R_ARG0];
++    args = env->regs[R_ARG1];
++    switch (nr) {
++    case HOSTED_EXIT:
++        gdb_exit(env, env->regs[R_ARG0]);
++        exit(env->regs[R_ARG0]);
++    case HOSTED_OPEN:
++        GET_ARG(0);
++        GET_ARG(1);
++        GET_ARG(2);
++        GET_ARG(3);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "open,%s,%x,%x", arg0, (int)arg1,
++                           arg2, arg3);
++            return;
++        } else {
++            p = lock_user_string(arg0);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = open(p, translate_openflags(arg2), arg3);
++                unlock_user(p, arg0, 0);
++            }
++        }
++        break;
++    case HOSTED_CLOSE:
++        {
++            /* Ignore attempts to close stdin/out/err.  */
++            GET_ARG(0);
++            int fd = arg0;
++            if (fd > 2) {
++                if (use_gdb_syscalls()) {
++                    gdb_do_syscall(nios2_semi_cb, "close,%x", arg0);
++                    return;
++                } else {
++                    result = close(fd);
++                }
++            } else {
++                result = 0;
++            }
++            break;
++        }
++    case HOSTED_READ:
++        GET_ARG(0);
++        GET_ARG(1);
++        GET_ARG(2);
++        len = arg2;
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "read,%x,%x,%x",
++                           arg0, arg1, len);
++            return;
++        } else {
++            p = lock_user(VERIFY_WRITE, arg1, len, 0);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = read(arg0, p, len);
++                unlock_user(p, arg1, len);
++            }
++        }
++        break;
++    case HOSTED_WRITE:
++        GET_ARG(0);
++        GET_ARG(1);
++        GET_ARG(2);
++        len = arg2;
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "write,%x,%x,%x",
++                           arg0, arg1, len);
++            return;
++        } else {
++            p = lock_user(VERIFY_READ, arg1, len, 1);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = write(arg0, p, len);
++                unlock_user(p, arg0, 0);
++            }
++        }
++        break;
++    case HOSTED_LSEEK:
++        {
++            uint64_t off;
++            GET_ARG(0);
++            GET_ARG(1);
++            GET_ARG(2);
++            GET_ARG(3);
++            off = (uint32_t)arg2 | ((uint64_t)arg1 << 32);
++            if (use_gdb_syscalls()) {
++                nios2_semi_is_lseek = 1;
++                gdb_do_syscall(nios2_semi_cb, "lseek,%x,%lx,%x",
++                               arg0, off, arg3);
++            } else {
++                off = lseek(arg0, off, arg3);
++                nios2_semi_return_u64(env, off, errno);
++            }
++            return;
++        }
++    case HOSTED_RENAME:
++        GET_ARG(0);
++        GET_ARG(1);
++        GET_ARG(2);
++        GET_ARG(3);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "rename,%s,%s",
++                           arg0, (int)arg1, arg2, (int)arg3);
++            return;
++        } else {
++            p = lock_user_string(arg0);
++            q = lock_user_string(arg2);
++            if (!p || !q) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = rename(p, q);
++            }
++            unlock_user(p, arg0, 0);
++            unlock_user(q, arg2, 0);
++        }
++        break;
++    case HOSTED_UNLINK:
++        GET_ARG(0);
++        GET_ARG(1);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "unlink,%s",
++                           arg0, (int)arg1);
++            return;
++        } else {
++            p = lock_user_string(arg0);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = unlink(p);
++                unlock_user(p, arg0, 0);
++            }
++        }
++        break;
++    case HOSTED_STAT:
++        GET_ARG(0);
++        GET_ARG(1);
++        GET_ARG(2);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "stat,%s,%x",
++                           arg0, (int)arg1, arg2);
++            return;
++        } else {
++            struct stat s;
++            p = lock_user_string(arg0);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = stat(p, &s);
++                unlock_user(p, arg0, 0);
++            }
++            if (result == 0 && !translate_stat(env, arg2, &s)) {
++                result = -1;
++                errno = EFAULT;
++            }
++        }
++        break;
++    case HOSTED_FSTAT:
++        GET_ARG(0);
++        GET_ARG(1);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "fstat,%x,%x",
++                           arg0, arg1);
++            return;
++        } else {
++            struct stat s;
++            result = fstat(arg0, &s);
++            if (result == 0 && !translate_stat(env, arg1, &s)) {
++                result = -1;
++                errno = EFAULT;
++            }
++        }
++        break;
++    case HOSTED_GETTIMEOFDAY:
++        /* Only the tv parameter is used.  tz is assumed NULL.  */
++        GET_ARG(0);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "gettimeofday,%x,%x",
++                           arg0, 0);
++            return;
++        } else {
++            qemu_timeval tv;
++            struct gdb_timeval *p;
++            result = qemu_gettimeofday(&tv);
++            if (result != 0) {
++                p = lock_user(VERIFY_WRITE, arg0, sizeof(struct gdb_timeval),
++                              0);
++                if (!p) {
++                    result = -1;
++                    errno = EFAULT;
++                } else {
++                    p->tv_sec = cpu_to_be32(tv.tv_sec);
++                    p->tv_usec = cpu_to_be64(tv.tv_usec);
++                    unlock_user(p, arg0, sizeof(struct gdb_timeval));
++                }
++            }
++        }
++        break;
++    case HOSTED_ISATTY:
++        GET_ARG(0);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "isatty,%x", arg0);
++            return;
++        } else {
++            result = isatty(arg0);
++        }
++        break;
++    case HOSTED_SYSTEM:
++        GET_ARG(0);
++        GET_ARG(1);
++        if (use_gdb_syscalls()) {
++            gdb_do_syscall(nios2_semi_cb, "system,%s",
++                           arg0, (int)arg1);
++            return;
++        } else {
++            p = lock_user_string(arg0);
++            if (!p) {
++                result = -1;
++                errno = EFAULT;
++            } else {
++                result = system(p);
++                unlock_user(p, arg0, 0);
++            }
++        }
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "nios2-semihosting: unsupported "
++                      "semihosting syscall %d\n", nr);
++        result = 0;
++    }
++failed:
++    nios2_semi_return_u32(env, result, errno);
++}
 -- 
 2.8.1
