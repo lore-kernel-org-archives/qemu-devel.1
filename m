@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45326)
+Received: from eggs.gnu.org ([209.51.188.92]:45763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBhUV-00076E-E1
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:52 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hBhWu-0007oF-T6
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBhUS-0003Ri-PO
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:51 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:41351)
+	(envelope-from <sgarzare@redhat.com>) id 1hBhWt-0002XW-Tz
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:10:20 -0400
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:40023)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBhUS-0003LY-H7
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:48 -0400
-Received: by mail-ot1-x329.google.com with SMTP id 64so15669177otb.8
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 08:07:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hBhWt-0002Tc-Lf
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:10:19 -0400
+Received: by mail-wr1-f50.google.com with SMTP id h4so21845889wre.7
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 08:10:19 -0700 (PDT)
+Date: Wed, 3 Apr 2019 17:10:09 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190403151009.vuh34k24ti3wy4rx@steredhat>
+References: <20190401163240.xw24ezsloy5ds2hz@steredhat>
+	<20190403123438.GE32425@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20190403100505.7550-1-cohuck@redhat.com>
-In-Reply-To: <20190403100505.7550-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 3 Apr 2019 22:07:35 +0700
-Message-ID: <CAFEAcA-N=28tgOYa6euwybLP0DdJoU2jSnqzVUBqL5PMfasF8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-4.0 0/4] s390x gcc 9 warning fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190403123438.GE32425@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] VSOCK benchmark and optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: alex.bennee@linaro.org, netdev@vger.kernel.org, qemu devel list <qemu-devel@nongnu.org>
 
-On Wed, 3 Apr 2019 at 17:05, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 061b51e9195670e9d190cdec46fabcb3c77763fb:
->
->   Update version for v4.0.0-rc2 release (2019-04-02 17:01:20 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20190403
->
-> for you to fetch changes up to 7357b2215978debf2fd17b525ba745d3c69272a3:
->
->   hw/s390x/3270-ccw: avoid taking address of fields in packed struct (2019-04-03 11:19:57 +0200)
->
-> ----------------------------------------------------------------
-> Fix taking address of fields in packed structs warnings
-> by gcc 9
->
-> ----------------------------------------------------------------
+On Wed, Apr 03, 2019 at 01:34:38PM +0100, Stefan Hajnoczi wrote:
+> On Mon, Apr 01, 2019 at 06:32:40PM +0200, Stefano Garzarella wrote:
+> > Hi Alex,
+> > I'm sending you some benchmarks and information about VSOCK CCing qemu-devel
+> > and linux-netdev (maybe this info could be useful for others :))
+> > 
+> > One of the VSOCK advantages is the simple configuration: you don't need to set
+> > up IP addresses for guest/host, and it can be used with the standard POSIX
+> > socket API. [1]
+> > 
+> > I'm currently working on it, so the "optimized" values are still work in
+> > progress and I'll send the patches upstream (Linux) as soon as possible.
+> > (I hope in 1 or 2 weeks)
+> > 
+> > Optimizations:
+> > + reducing the number of credit update packets
+> >   - RX side sent, on every packet received, an empty packet only to inform the
+> >     TX side about the space in the RX buffer.
+> > + increase RX buffers size to 64 KB (from 4 KB)
+> > + merge packets to fill RX buffers
+> > 
+> > As benchmark tool I used iperf3 [2] modified with VSOCK support:
+> > 
+> >              host -> guest [Gbps]      guest -> host [Gbps]
+> > pkt_size    before opt.  optimized    before opt.  optimized
+> >   1K            0.5         1.6           1.4         1.4
+> 
+> This is a "large" small package size.  I think 64 bytes is a common
+> "small" packet size and is worth benchmarking too.
+> 
 
-Applied, thanks.
+Okay, I'll add more small packet sizes for the benchmark.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+> >   2K            1.1         3.1           2.3         2.5
+> >   4K            2.0         5.6           4.2         4.4
+> >   8K            3.2        10.2           7.2         7.5
+> >   16K           6.4        14.2           9.4        11.3
+> >   32K           9.8        18.9           9.2        17.8
+> >   64K          13.8        22.9           8.8        25.0
+> >   128K         17.6        24.5           7.7        25.7
+> >   256K         19.0        24.8           8.1        25.6
+> >   512K         20.8        25.1           8.1        25.4
+> 
+> Nice improvements!
 
--- PMM
+Thanks :)
+
+I'm cleaning the patches, doing step by step benchmarks and I hope I'll
+send the series upstream in these days.
+
+Stefano
