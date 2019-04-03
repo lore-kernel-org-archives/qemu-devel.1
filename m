@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34830)
+Received: from eggs.gnu.org ([209.51.188.92]:35609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hBel2-0005mV-It
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1hBeoi-0008PO-Ue
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:16:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hBel0-0005VI-Vg
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:44 -0400
-Resent-Message-Id: <E1hBel0-0005VI-Vg@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hBel0-0005Kq-OC
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:12:42 -0400
-Message-ID: <155429351604.12882.303470204884520967@76452e4e88f2>
-In-Reply-To: <20190403114958.3705-1-quintela@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philmd@redhat.com>) id 1hBeoh-0001CI-WF
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:16:32 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed,  3 Apr 2019 14:16:20 +0200
+Message-Id: <20190403121620.5228-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 3 Apr 2019 05:11:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] WIP: Multifd compression support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] sockets: Fix stringop-truncation warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +20,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, lvivier@redhat.com, thuth@redhat.com, armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMzExNDk1OC4zNzA1
-LTEtcXVpbnRlbGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDMxMTQ5NTguMzcwNS0xLXF1aW50ZWxhQHJl
-ZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzhdIFdJUDogTXVsdGlm
-ZCBjb21wcmVzc2lvbiBzdXBwb3J0ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
-b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
-W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQwMzExNDk1OC4zNzA1LTEtcXVp
-bnRlbGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDAzMTE0OTU4LjM3MDUtMS1xdWludGVs
-YUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmUwNzAyNTExYyBt
-dWx0aWZkOiByZXN0IG9mIHpsaWIgY29tcHJlc3Npb24gKFdJUCkKMWY2N2Y5NmE2MyBtdWx0aWZk
-OiBBZGQgemxpYiBjb21wcmVzc2lvbiBzdXBwb3J0CmY1YzNhZDMwYmMgbWlncmF0aW9uOiBBZGQg
-bXVsdGlmZC1jb21wcmVzcyBwYXJhbWV0ZXIKYzVjNzdmOTdiZSBtaWdyYXRpb24tdGVzdDogaW50
-cm9kdWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMKOTRhYjhiYjRmMyB0
-ZXN0czogQWRkIG1pZ3JhdGlvbiBtdWx0aWZkIHRlc3QKZDczYzlkMzFiYiBtaWdyYXRpb24tdGVz
-dDogcmVuYW1lIHBhcmFtZXRlciB0byBwYXJhbWV0ZXJfaW50CjVjMGRiZGEyZjcgbWlncmF0aW9u
-OiBmaXggbXVsdGlmZF9yZWN2IGV2ZW50IHR5cG8KMjI3ZGNhYjM0YSBtaWdyYXRpb246IEZpeCBt
-aWdyYXRlX3NldF9wYXJhbWV0ZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2luZyBj
-b21taXQgMjI3ZGNhYjM0YTYxIChtaWdyYXRpb246IEZpeCBtaWdyYXRlX3NldF9wYXJhbWV0ZXIp
-CjIvOCBDaGVja2luZyBjb21taXQgNWMwZGJkYTJmN2I0IChtaWdyYXRpb246IGZpeCBtdWx0aWZk
-X3JlY3YgZXZlbnQgdHlwbykKMy84IENoZWNraW5nIGNvbW1pdCBkNzNjOWQzMWJiNjIgKG1pZ3Jh
-dGlvbi10ZXN0OiByZW5hbWUgcGFyYW1ldGVyIHRvIHBhcmFtZXRlcl9pbnQpCjQvOCBDaGVja2lu
-ZyBjb21taXQgOTRhYjhiYjRmM2M2ICh0ZXN0czogQWRkIG1pZ3JhdGlvbiBtdWx0aWZkIHRlc3Qp
-CjUvOCBDaGVja2luZyBjb21taXQgYzVjNzdmOTdiZTllIChtaWdyYXRpb24tdGVzdDogaW50cm9k
-dWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMpCjYvOCBDaGVja2luZyBj
-b21taXQgZjVjM2FkMzBiYzYyIChtaWdyYXRpb246IEFkZCBtdWx0aWZkLWNvbXByZXNzIHBhcmFt
-ZXRlcikKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMzogRklMRTogbWlncmF0
-aW9uL21pZ3JhdGlvbi5jOjMzNjY6CisgICAgREVGSU5FX1BST1BfU0lHTkVEKF9uLCBfcywgX2Ys
-IF9kLCBxZGV2X3Byb3BfbXVsdGlmZF9jb21wcmVzcywgTXVsdGlmZENvbXByZXNzKQoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi84IGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvOCBDaGVja2luZyBjb21taXQgMWY2N2Y5NmE2MzZhICht
-dWx0aWZkOiBBZGQgemxpYiBjb21wcmVzc2lvbiBzdXBwb3J0KQo4LzggQ2hlY2tpbmcgY29tbWl0
-IDJlMDcwMjUxMWM4MiAobXVsdGlmZDogcmVzdCBvZiB6bGliIGNvbXByZXNzaW9uIChXSVApKQpF
-UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScK
-IzI5OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTEyODoKKyAgICAgICAgICAgICAgICAgICAgZm9y
-IChpID0gMDsgaSA8IHVzZWQ7IGkrKyApIHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9y
-ZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMTAwOiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6
-MTQ0NDoKKyAgICAgICAgICAgICAgICBmb3IgKGkgPSAwOyBpIDwgdXNlZDsgaSsrICkgewoKdG90
-YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC84IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwMzExNDk1OC4zNzA1LTEtcXVpbnRlbGFAcmVkaGF0
-LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Compiling with clang-8 fails with:
+
+    CC      util/qemu-sockets.o
+  util/qemu-sockets.c: In function 'unix_connect_saddr':
+  util/qemu-sockets.c:925:5: error: 'strncpy' specified bound 108 equals =
+destination size [-Werror=3Dstringop-truncation]
+       strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  util/qemu-sockets.c: In function 'unix_listen_saddr':
+  util/qemu-sockets.c:880:5: error: 'strncpy' specified bound 108 equals =
+destination size [-Werror=3Dstringop-truncation]
+       strncpy(un.sun_path, path, sizeof(un.sun_path));
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Per the unix socket manpage:
+
+  UNIX(7)
+
+  Pathname sockets
+  When binding a socket to a pathname, a few rules should be observed for=
+ maximum portability and ease of coding:
+  *  The pathname in sun_path should be null-terminated.
+  *  The length of the pathname, including the terminating null byte, sho=
+uld not exceed the size of sun_path.
+
+Reduce the length of the unix socket path by 1 to hold the NUL byte.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ util/qemu-sockets.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 97050516900..935271d58c0 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -845,10 +845,10 @@ static int unix_listen_saddr(UnixSocketAddress *sad=
+dr,
+         path =3D pathbuf =3D g_strdup_printf("%s/qemu-socket-XXXXXX", tm=
+pdir);
+     }
+=20
+-    if (strlen(path) > sizeof(un.sun_path)) {
++    if (strlen(path) > sizeof(un.sun_path) - 1) {
+         error_setg(errp, "UNIX socket path '%s' is too long", path);
+         error_append_hint(errp, "Path must be less than %zu bytes\n",
+-                          sizeof(un.sun_path));
++                          sizeof(un.sun_path) - 1);
+         goto err;
+     }
+=20
+@@ -877,7 +877,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
+,
+=20
+     memset(&un, 0, sizeof(un));
+     un.sun_family =3D AF_UNIX;
+-    strncpy(un.sun_path, path, sizeof(un.sun_path));
++    strncpy(un.sun_path, path, sizeof(un.sun_path) - 1);
+=20
+     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+         error_setg_errno(errp, errno, "Failed to bind socket to %s", pat=
+h);
+@@ -913,16 +913,16 @@ static int unix_connect_saddr(UnixSocketAddress *sa=
+ddr, Error **errp)
+         return -1;
+     }
+=20
+-    if (strlen(saddr->path) > sizeof(un.sun_path)) {
++    if (strlen(saddr->path) > sizeof(un.sun_path) - 1) {
+         error_setg(errp, "UNIX socket path '%s' is too long", saddr->pat=
+h);
+         error_append_hint(errp, "Path must be less than %zu bytes\n",
+-                          sizeof(un.sun_path));
++                          sizeof(un.sun_path) - 1);
+         goto err;
+     }
+=20
+     memset(&un, 0, sizeof(un));
+     un.sun_family =3D AF_UNIX;
+-    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
++    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path) - 1);
+=20
+     /* connect to peer */
+     do {
+--=20
+2.20.1
