@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33248)
+Received: from eggs.gnu.org ([209.51.188.92]:35057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBY3W-0001rW-PD
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:03:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBYE3-0003uB-30
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:14:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBY3V-0000q4-PR
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:03:22 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33411)
+	(envelope-from <peter.maydell@linaro.org>) id 1hBYE2-0005UL-7L
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:14:15 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:36648)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBY3V-0000oP-HN
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:03:21 -0400
-Received: by mail-ot1-x344.google.com with SMTP id j10so14340551otq.0
-	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 22:03:21 -0700 (PDT)
+	id 1hBYE1-0005Sj-VW
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 01:14:14 -0400
+Received: by mail-ot1-x334.google.com with SMTP id o74so14328289ota.3
+	for <qemu-devel@nongnu.org>; Tue, 02 Apr 2019 22:14:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <1554099897-28606-1-git-send-email-tjin@wavecomp.com>
-	<1554099897-28606-2-git-send-email-tjin@wavecomp.com>
-	<CAFEAcA8eVfmLdPQs0YKsAUYP5LzsFrcF96xknjfKtzbzY97BNw@mail.gmail.com>
-	<CAL1e-=jj4y=_ViZPepZ15VQnQQ++tbD2FYcmNST88O59GcjXfA@mail.gmail.com>
-	<MWHPR2201MB11199232622EFEFBF361C3A9B8560@MWHPR2201MB1119.namprd22.prod.outlook.com>
-	<CAFEAcA9NDmKV0EdrEM6BGWqLwXpqbdBLXz-YHcWhxEgBSQttQw@mail.gmail.com>
-	<MWHPR2201MB11190F1FFDE9CD41E3674DDFB8560@MWHPR2201MB1119.namprd22.prod.outlook.com>
-	<CAFEAcA9ooDF8O+LexHnnmVAFsikdo1nhjYafJDYWopN3fva87g@mail.gmail.com>
-	<MWHPR2201MB11197A7C98CD47E491559F61B8570@MWHPR2201MB1119.namprd22.prod.outlook.com>
-In-Reply-To: <MWHPR2201MB11197A7C98CD47E491559F61B8570@MWHPR2201MB1119.namprd22.prod.outlook.com>
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-5-richard.henderson@linaro.org>
+In-Reply-To: <20190403034358.21999-5-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 3 Apr 2019 12:03:08 +0700
-Message-ID: <CAFEAcA81xjt7Hy9XqR76G4jKkcC4B=Zwr1g8=bu98tdKLUEdmQ@mail.gmail.com>
+Date: Wed, 3 Apr 2019 12:14:01 +0700
+Message-ID: <CAFEAcA_c+RSOmxHcoNueRtAoQAZZCfeSt-4F2GFe=BhSg_1jXg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Adds virtio_net as the default netcard for
- mips boston board.
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 04/26] target/arm: Convert to
+ CPUClass::tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,21 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tommy Jin <tjin@wavecomp.com>
-Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pburton.wavecomp.com@gmail.com" <pburton.wavecomp.com@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Wed, 3 Apr 2019 at 11:52, Tommy Jin <tjin@wavecomp.com> wrote:
-> That command line option doesn't work for boston, although I didn't get any obvious error, no Ethernet card appears either.
+On Wed, 3 Apr 2019 at 10:44, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 
-Does the guest kernel find the PCI device (eg appears in kernel bootup
-messages, appears in 'lspci' output)? It's worth double-checking that
-your guest kernel's config has enabled support for PCI, for the PCI
-controller used by the boston board, for virtio-net, etc.
+> +bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> +                      MMUAccessType access_type, int mmu_idx,
+> +                      bool probe, uintptr_t retaddr)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +
+> +#ifdef CONFIG_USER_ONLY
+> +    cpu->env.exception.vaddress = address;
+> +    if (access_type == MMU_INST_FETCH) {
+> +        cs->exception_index = EXCP_PREFETCH_ABORT;
+> +    } else {
+> +        cs->exception_index = EXCP_DATA_ABORT;
+> +    }
+> +    cpu_loop_exit_restore(cs, retaddr);
+> +#else
+> +    hwaddr phys_addr;
+> +    target_ulong page_size;
+> +    int prot, ret;
+> +    MemTxAttrs attrs = {};
+> +    ARMMMUFaultInfo fi = {};
+> +
+> +    /*
+> +     * Walk the page table and (if the mapping exists) add the page
+> +     * to the TLB. Return false on success, or true on failure. Populate
+> +     * fsr with ARM DFSR/IFSR fault register format value on failure.
+> +     */
 
-> Where can I get that arm image/command which can work well for you with " -netdev user,id=mynet -device virtio-net-pci,netdev=mynet" ?
-
-https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-board/
-has instructions for booting Debian which use that command line.
+This comment about what we return doesn't seem to match what
+the code is doing.
 
 thanks
 -- PMM
