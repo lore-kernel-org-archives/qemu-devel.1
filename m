@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53726)
+Received: from eggs.gnu.org ([209.51.188.92]:54497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hBe9j-0002YJ-FU
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:34:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hBeCb-0004xu-Ql
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:37:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hBe9h-0006PR-T0
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:34:11 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38898)
+	(envelope-from <richard.henderson@linaro.org>) id 1hBeCa-0001Op-UG
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:37:09 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36656)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kamalheib1@gmail.com>)
-	id 1hBe9h-0006Gh-HD
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:34:09 -0400
-Received: by mail-wr1-x444.google.com with SMTP id k11so20866248wro.5
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 04:34:03 -0700 (PDT)
-From: Kamal Heib <kamalheib1@gmail.com>
-Date: Wed,  3 Apr 2019 14:33:43 +0300
-Message-Id: <20190403113343.26384-5-kamalheib1@gmail.com>
-In-Reply-To: <20190403113343.26384-1-kamalheib1@gmail.com>
-References: <20190403113343.26384-1-kamalheib1@gmail.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hBeCa-0001Ni-IX
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:37:08 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 85so8197414pgc.3
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 04:37:08 -0700 (PDT)
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+	<20190307144126.31847-3-richard.henderson@linaro.org>
+	<CAFEAcA8JwtiBSgUg_8kg52GETGd3vbX86nvziXa6ZyvqDPLt5g@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a17fffd5-6242-8efc-a8a6-2ca5a8ae9c3d@linaro.org>
+Date: Wed, 3 Apr 2019 18:37:00 +0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 4/4] hw/pvrdma: Add support for SRQ
+In-Reply-To: <CAFEAcA8JwtiBSgUg_8kg52GETGd3vbX86nvziXa6ZyvqDPLt5g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/9] tcg: Add INDEX_op_extract2_{i32,i64}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,307 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Yuval Shaia <yuval.shaia@oracle.com>, Kamal Heib <kamalheib1@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
 
-Implement the pvrdma device commands for supporting SRQ
+On 3/26/19 8:35 PM, Peter Maydell wrote:
+> On Thu, 7 Mar 2019 at 14:47, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> This will let backends implement the double-word shift operation.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> diff --git a/tcg/README b/tcg/README
+>> index 603f4df659..ddabf33017 100644
+>> --- a/tcg/README
+>> +++ b/tcg/README
+>> @@ -343,6 +343,11 @@ at bit 8.  This operation would be equivalent to
+>>
+>>  (using an arithmetic right shift).
+>>
+>> +* extract2_i64 dest, t1, t2, pos
+>> +
+>> +Extract a 64-bit quantity from the concatenation of t2:t1,
+>> +beginning at pos.
+>> +
+> 
+> I think we should document the valid values of 'pos'.
+> My guess is "0 <= pos <= 63".
 
-Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
----
- hw/rdma/vmw/pvrdma_cmd.c    | 147 ++++++++++++++++++++++++++++++++++++
- hw/rdma/vmw/pvrdma_main.c   |  16 ++++
- hw/rdma/vmw/pvrdma_qp_ops.c |  46 ++++++++++-
- hw/rdma/vmw/pvrdma_qp_ops.h |   1 +
- 4 files changed, 209 insertions(+), 1 deletion(-)
+How about
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index b931bb6dc9d4..8d70c0d23de4 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -609,6 +609,149 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     return 0;
- }
- 
-+static int create_srq_ring(PCIDevice *pci_dev, PvrdmaRing **ring,
-+                           uint64_t pdir_dma, uint32_t max_wr,
-+                           uint32_t max_sge, uint32_t nchunks)
-+{
-+    uint64_t *dir = NULL, *tbl = NULL;
-+    PvrdmaRing *r;
-+    int rc = -EINVAL;
-+    char ring_name[MAX_RING_NAME_SZ];
-+    uint32_t wqe_sz;
-+
-+    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
-+        rdma_error_report("Got invalid page count for SRQ ring: %d",
-+                          nchunks);
-+        return rc;
-+    }
-+
-+    dir = rdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        rdma_error_report("Failed to map to SRQ page directory");
-+        goto out;
-+    }
-+
-+    tbl = rdma_pci_dma_map(pci_dev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        rdma_error_report("Failed to map to SRQ page table");
-+        goto out;
-+    }
-+
-+    r = g_malloc(sizeof(*r));
-+    *ring = r;
-+
-+    r->ring_state = (struct pvrdma_ring *)
-+            rdma_pci_dma_map(pci_dev, tbl[0], TARGET_PAGE_SIZE);
-+    if (!r->ring_state) {
-+        rdma_error_report("Failed to map tp SRQ ring state");
-+        goto out_free_ring_mem;
-+    }
-+
-+    wqe_sz = pow2ceil(sizeof(struct pvrdma_rq_wqe_hdr) +
-+                      sizeof(struct pvrdma_sge) * max_sge - 1);
-+    sprintf(ring_name, "srq_ring_%" PRIx64, pdir_dma);
-+    rc = pvrdma_ring_init(r, ring_name, pci_dev, &r->ring_state[1], max_wr,
-+                          wqe_sz, (dma_addr_t *)&tbl[1], nchunks - 1);
-+    if (rc) {
-+        goto out_unmap_ring_state;
-+    }
-+
-+    goto out;
-+
-+out_unmap_ring_state:
-+    rdma_pci_dma_unmap(pci_dev, r->ring_state, TARGET_PAGE_SIZE);
-+
-+out_free_ring_mem:
-+    g_free(r);
-+
-+out:
-+    rdma_pci_dma_unmap(pci_dev, tbl, TARGET_PAGE_SIZE);
-+    rdma_pci_dma_unmap(pci_dev, dir, TARGET_PAGE_SIZE);
-+
-+    return rc;
-+}
-+
-+static void destroy_srq_ring(PvrdmaRing *ring)
-+{
-+    pvrdma_ring_free(ring);
-+    rdma_pci_dma_unmap(ring->dev, ring->ring_state, TARGET_PAGE_SIZE);
-+    g_free(ring);
-+}
-+
-+static int create_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_srq *cmd = &req->create_srq;
-+    struct pvrdma_cmd_create_srq_resp *resp = &rsp->create_srq_resp;
-+    PvrdmaRing *ring = NULL;
-+    int rc;
-+
-+    memset(resp, 0, sizeof(*resp));
-+
-+    rc = create_srq_ring(PCI_DEVICE(dev), &ring, cmd->pdir_dma,
-+                         cmd->attrs.max_wr, cmd->attrs.max_sge,
-+                         cmd->nchunks);
-+    if (rc) {
-+        return rc;
-+    }
-+
-+    rc = rdma_rm_alloc_srq(&dev->rdma_dev_res, cmd->pd_handle,
-+                           cmd->attrs.max_wr, cmd->attrs.max_sge,
-+                           cmd->attrs.srq_limit, &resp->srqn, ring);
-+    if (rc) {
-+        destroy_srq_ring(ring);
-+        return rc;
-+    }
-+
-+    return 0;
-+}
-+
-+static int query_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_query_srq *cmd = &req->query_srq;
-+    struct pvrdma_cmd_query_srq_resp *resp = &rsp->query_srq_resp;
-+
-+    memset(resp, 0, sizeof(*resp));
-+
-+    return rdma_rm_query_srq(&dev->rdma_dev_res, cmd->srq_handle,
-+                             (struct ibv_srq_attr *)&resp->attrs);
-+}
-+
-+static int modify_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_modify_srq *cmd = &req->modify_srq;
-+
-+    /* Only support SRQ limit */
-+    if (!(cmd->attr_mask & IBV_SRQ_LIMIT) ||
-+        (cmd->attr_mask & IBV_SRQ_MAX_WR))
-+            return -EINVAL;
-+
-+    return rdma_rm_modify_srq(&dev->rdma_dev_res, cmd->srq_handle,
-+                              (struct ibv_srq_attr *)&cmd->attrs,
-+                              cmd->attr_mask);
-+}
-+
-+static int destroy_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                       union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_srq *cmd = &req->destroy_srq;
-+    RdmaRmSRQ *srq;
-+    PvrdmaRing *ring;
-+
-+    srq = rdma_rm_get_srq(&dev->rdma_dev_res, cmd->srq_handle);
-+    if (!srq) {
-+        return -EINVAL;
-+    }
-+
-+    ring = (PvrdmaRing *)srq->opaque;
-+    destroy_srq_ring(ring);
-+    rdma_rm_dealloc_srq(&dev->rdma_dev_res, cmd->srq_handle);
-+
-+    return 0;
-+}
-+
- struct cmd_handler {
-     uint32_t cmd;
-     uint32_t ack;
-@@ -634,6 +777,10 @@ static struct cmd_handler cmd_handlers[] = {
-     {PVRDMA_CMD_DESTROY_UC,   PVRDMA_CMD_DESTROY_UC_RESP_NOOP,   destroy_uc},
-     {PVRDMA_CMD_CREATE_BIND,  PVRDMA_CMD_CREATE_BIND_RESP_NOOP,  create_bind},
-     {PVRDMA_CMD_DESTROY_BIND, PVRDMA_CMD_DESTROY_BIND_RESP_NOOP, destroy_bind},
-+    {PVRDMA_CMD_CREATE_SRQ,   PVRDMA_CMD_CREATE_SRQ_RESP,        create_srq},
-+    {PVRDMA_CMD_QUERY_SRQ,    PVRDMA_CMD_QUERY_SRQ_RESP,         query_srq},
-+    {PVRDMA_CMD_MODIFY_SRQ,   PVRDMA_CMD_MODIFY_SRQ_RESP,        modify_srq},
-+    {PVRDMA_CMD_DESTROY_SRQ,  PVRDMA_CMD_DESTROY_SRQ_RESP,       destroy_srq},
- };
- 
- int pvrdma_exec_cmd(PVRDMADev *dev)
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 0b46561bad11..769f7990f864 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -53,6 +53,7 @@ static Property pvrdma_dev_properties[] = {
-     DEFINE_PROP_INT32("dev-caps-max-qp-init-rd-atom", PVRDMADev,
-                       dev_attr.max_qp_init_rd_atom, MAX_QP_INIT_RD_ATOM),
-     DEFINE_PROP_INT32("dev-caps-max-ah", PVRDMADev, dev_attr.max_ah, MAX_AH),
-+    DEFINE_PROP_INT32("dev-caps-max-srq", PVRDMADev, dev_attr.max_srq, MAX_SRQ),
-     DEFINE_PROP_CHR("mad-chardev", PVRDMADev, mad_chr),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -261,6 +262,9 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
-     dsr->caps.max_mr = dev->dev_attr.max_mr;
-     dsr->caps.max_pd = dev->dev_attr.max_pd;
-     dsr->caps.max_ah = dev->dev_attr.max_ah;
-+    dsr->caps.max_srq = dev->dev_attr.max_srq;
-+    dsr->caps.max_srq_wr = dev->dev_attr.max_srq_wr;
-+    dsr->caps.max_srq_sge = dev->dev_attr.max_srq_sge;
-     dsr->caps.gid_tbl_len = MAX_GIDS;
-     dsr->caps.sys_image_guid = 0;
-     dsr->caps.node_guid = dev->node_guid;
-@@ -485,6 +489,13 @@ static void pvrdma_uar_write(void *opaque, hwaddr addr, uint64_t val,
-             pvrdma_cq_poll(&dev->rdma_dev_res, val & PVRDMA_UAR_HANDLE_MASK);
-         }
-         break;
-+    case PVRDMA_UAR_SRQ_OFFSET:
-+        if (val & PVRDMA_UAR_SRQ_RECV) {
-+            trace_pvrdma_uar_write(addr, val, "QP", "SRQ",
-+                                   val & PVRDMA_UAR_HANDLE_MASK, 0);
-+            pvrdma_srq_recv(dev, val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        break;
-     default:
-         rdma_error_report("Unsupported command, addr=0x%"PRIx64", val=0x%"PRIx64,
-                           addr, val);
-@@ -554,6 +565,11 @@ static void init_dev_caps(PVRDMADev *dev)
- 
-     dev->dev_attr.max_cqe = pg_tbl_bytes / sizeof(struct pvrdma_cqe) -
-                             TARGET_PAGE_SIZE; /* First page is ring state */
-+
-+    dev->dev_attr.max_srq_wr = pg_tbl_bytes /
-+                                ((sizeof(struct pvrdma_rq_wqe_hdr) +
-+                                sizeof(struct pvrdma_sge)) *
-+                                dev->dev_attr.max_sge) - TARGET_PAGE_SIZE;
- }
- 
- static int pvrdma_check_ram_shared(Object *obj, void *opaque)
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 5b9786efbe4b..bd6db858de32 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -70,7 +70,7 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
- 
-     memset(cqe1, 0, sizeof(*cqe1));
-     cqe1->wr_id = cqe->wr_id;
--    cqe1->qp = cqe->qp;
-+    cqe1->qp = cqe->qp ? cqe->qp : wc->qp_num;
-     cqe1->opcode = cqe->opcode;
-     cqe1->status = wc->status;
-     cqe1->byte_len = wc->byte_len;
-@@ -241,6 +241,50 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-     }
- }
- 
-+void pvrdma_srq_recv(PVRDMADev *dev, uint32_t srq_handle)
-+{
-+    RdmaRmSRQ *srq;
-+    PvrdmaRqWqe *wqe;
-+    PvrdmaRing *ring;
-+
-+    srq = rdma_rm_get_srq(&dev->rdma_dev_res, srq_handle);
-+    if (unlikely(!srq)) {
-+        return;
-+    }
-+
-+    ring = (PvrdmaRing *)srq->opaque;
-+
-+    wqe = (struct PvrdmaRqWqe *)pvrdma_ring_next_elem_read(ring);
-+    while (wqe) {
-+        CompHandlerCtx *comp_ctx;
-+
-+        /* Prepare CQE */
-+        comp_ctx = g_malloc(sizeof(CompHandlerCtx));
-+        comp_ctx->dev = dev;
-+        comp_ctx->cq_handle = srq->recv_cq_handle;
-+        comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-+        comp_ctx->cqe.qp = 0;
-+        comp_ctx->cqe.opcode = IBV_WC_RECV;
-+
-+        if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
-+            rdma_error_report("Invalid num_sge=%d (max %d)", wqe->hdr.num_sge,
-+                              dev->dev_attr.max_sge);
-+            complete_with_error(VENDOR_ERR_INV_NUM_SGE, comp_ctx);
-+            continue;
-+        }
-+
-+        rdma_backend_post_srq_recv(&dev->backend_dev, &srq->backend_srq,
-+                                   (struct ibv_sge *)&wqe->sge[0],
-+                                   wqe->hdr.num_sge,
-+                                   comp_ctx);
-+
-+        pvrdma_ring_read_inc(ring);
-+
-+        wqe = pvrdma_ring_next_elem_read(ring);
-+    }
-+
-+}
-+
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle)
- {
-     RdmaRmCQ *cq;
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.h b/hw/rdma/vmw/pvrdma_qp_ops.h
-index 31cb48ba29f1..82e720a76fb4 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.h
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.h
-@@ -22,6 +22,7 @@ int pvrdma_qp_ops_init(void);
- void pvrdma_qp_ops_fini(void);
- void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle);
- void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle);
-+void pvrdma_srq_recv(PVRDMADev *dev, uint32_t srq_handle);
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle);
- 
- #endif
--- 
-2.20.1
+----
+* extract2_i32/i64 dest, t1, t2, pos
+
+For N = {32,64}, extract an N-bit quantity from the concatenation
+of t2:t1, beginning at pos.  The tcg_gen_extract2_* expander allows
+values 0 <= pos <= N, but will expand 0 and N with mov, so only
+1 <= pos <= N-1 will be seen by the host tcg_out_op.
+----
+
+?
+
+
+r~
