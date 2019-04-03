@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35786)
+Received: from eggs.gnu.org ([209.51.188.92]:37488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBj34-0004Vf-72
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:47:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hBjBe-00072g-7Y
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBj31-0005Ed-S5
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:47:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBj31-0004zy-4n
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:47:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08C2B7D7CD
-	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 16:47:31 +0000 (UTC)
-Date: Wed, 3 Apr 2019 17:47:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190403164724.GG2790@work-vm>
-References: <20190403114958.3705-1-quintela@redhat.com>
-	<20190403114958.3705-4-quintela@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1hBjBc-0006Aj-EJ
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:56:30 -0400
+From: Max Reitz <mreitz@redhat.com>
+References: <20190329110454.82409-1-vsementsov@virtuozzo.com>
+	<5d4b5522-c31b-f69c-93c2-506fef535745@redhat.com>
+	<20190329172411.GM5081@localhost.localdomain>
+	<85784659-e4ed-4a21-8606-c12de3db064a@redhat.com>
+	<20190329174059.GO5081@localhost.localdomain>
+	<2f820393-b9e1-cd23-a220-bae14b98ab4a@redhat.com>
+	<993ee436-f998-bba4-cd50-03142174b7cd@virtuozzo.com>
+	<4f035f02-ded6-7796-836e-937ce45079f0@virtuozzo.com>
+	<20190329193224.GP5081@localhost.localdomain>
+	<8e2bf8a6-6755-fb4b-4ad6-90ef037dd589@virtuozzo.com>
+	<45b9861a-8ad4-43d6-3b1a-55495adfc866@redhat.com>
+Message-ID: <87cf561c-9634-c9ce-a9fe-07e635c3c3ec@redhat.com>
+Date: Wed, 3 Apr 2019 18:56:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190403114958.3705-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] migration-test: rename parameter to
- parameter_int
+In-Reply-To: <45b9861a-8ad4-43d6-3b1a-55495adfc866@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2yNBUclUuVkyZwWpgBLMxHBEids7hali3"
+Subject: Re: [Qemu-devel] [PATCH v3] block/file-posix: do not fail on unlock
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,190 +34,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>, "fam@euphon.net" <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We would need _str ones on the next patch.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2yNBUclUuVkyZwWpgBLMxHBEids7hali3
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>, "fam@euphon.net" <fam@euphon.net>,
+ "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>
+Message-ID: <87cf561c-9634-c9ce-a9fe-07e635c3c3ec@redhat.com>
+Subject: Re: [PATCH v3] block/file-posix: do not fail on unlock bytes
+References: <20190329110454.82409-1-vsementsov@virtuozzo.com>
+ <5d4b5522-c31b-f69c-93c2-506fef535745@redhat.com>
+ <20190329172411.GM5081@localhost.localdomain>
+ <85784659-e4ed-4a21-8606-c12de3db064a@redhat.com>
+ <20190329174059.GO5081@localhost.localdomain>
+ <2f820393-b9e1-cd23-a220-bae14b98ab4a@redhat.com>
+ <993ee436-f998-bba4-cd50-03142174b7cd@virtuozzo.com>
+ <4f035f02-ded6-7796-836e-937ce45079f0@virtuozzo.com>
+ <20190329193224.GP5081@localhost.localdomain>
+ <8e2bf8a6-6755-fb4b-4ad6-90ef037dd589@virtuozzo.com>
+ <45b9861a-8ad4-43d6-3b1a-55495adfc866@redhat.com>
+In-Reply-To: <45b9861a-8ad4-43d6-3b1a-55495adfc866@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 03.04.19 18:41, Max Reitz wrote:
+> On 01.04.19 09:21, Vladimir Sementsov-Ogievskiy wrote:
+>> 29.03.2019 22:32, Kevin Wolf wrote:
+>>> Am 29.03.2019 um 19:00 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> 29.03.2019 20:58, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 29.03.2019 20:44, Max Reitz wrote:
+>>>>>> On 29.03.19 18:40, Kevin Wolf wrote:
+>>>>>>> Am 29.03.2019 um 18:30 hat Max Reitz geschrieben:
+>>>>>>>> On 29.03.19 18:24, Kevin Wolf wrote:
+>>>>>>>>> Am 29.03.2019 um 18:15 hat Max Reitz geschrieben:
+>>>>>>>>>> On 29.03.19 12:04, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>>>>> bdrv_replace_child() calls bdrv_check_perm() with error_abort=
+ on
+>>>>>>>>>>> loosening permissions. However file-locking operations may fa=
+il even
+>>>>>>>>>>> in this case, for example on NFS. And this leads to Qemu cras=
+h.
+>>>>>>>>>>>
+>>>>>>>>>>> Let's avoid such errors. Note, that we ignore such things any=
+way on
+>>>>>>>>>>> permission update commit and abort.
+>>>>>>>>>>>
+>>>>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtu=
+ozzo.com>
+>>>>>>>>>>> ---
+>>>>>>>>>>>  =C2=A0 block/file-posix.c | 12 ++++++++++++
+>>>>>>>>>>>  =C2=A0 1 file changed, 12 insertions(+)
+>>>>>>>>>>>
+>>>>>>>>>>> diff --git a/block/file-posix.c b/block/file-posix.c
+>>>>>>>>>>> index db4cccbe51..1cf4ee49eb 100644
+>>>>>>>>>>> --- a/block/file-posix.c
+>>>>>>>>>>> +++ b/block/file-posix.c
+>>>>>>>>>>> @@ -815,6 +815,18 @@ static int raw_handle_perm_lock(BlockDri=
+verState *bs,
+>>>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (op) {
+>>>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case RAW_PL_PREPARE:
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((s->perm | ne=
+w_perm) =3D=3D s->perm &&
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 (s->shared_perm & new_shared) =3D=3D s->shared_perm)
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 /*
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 * We are going to unlock bytes, it should not fail. If it fa=
+il due
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 * to some fs-dependent permission-unrelated reasons (which o=
+ccurs
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 * sometimes on NFS and leads to abort in bdrv_replace_child)=
+ we
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 * can't prevent such errors by any check here. And we ignore=
+ them
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 * anyway in ABORT and COMMIT.
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 */
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 return 0;
+>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D=
+ raw_apply_lock_bytes(s, s->fd, s->perm | new_perm,
+>>>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 ~s->shared_perm | ~new_shared,
+>>>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 false, errp);
+>>>>>>>>>>
+>>>>>>>>>> Help me understand the exact issue, please.=C2=A0 I understand=
+ that there are
+>>>>>>>>>> operations like bdrv_replace_child() that pass &error_abort to=
 
-> ---
->  tests/migration-test.c | 49 +++++++++++++++++++++---------------------
->  1 file changed, 25 insertions(+), 24 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index bd3f5c3125..0b25aa3d6c 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -392,7 +392,8 @@ static char *migrate_get_socket_address(QTestState *who, const char *parameter)
->      return result;
->  }
->  
-> -static long long migrate_get_parameter(QTestState *who, const char *parameter)
-> +static long long migrate_get_parameter_int(QTestState *who,
-> +                                           const char *parameter)
->  {
->      QDict *rsp;
->      long long result;
-> @@ -403,17 +404,17 @@ static long long migrate_get_parameter(QTestState *who, const char *parameter)
->      return result;
->  }
->  
-> -static void migrate_check_parameter(QTestState *who, const char *parameter,
-> -                                    long long value)
-> +static void migrate_check_parameter_int(QTestState *who, const char *parameter,
-> +                                        long long value)
->  {
->      long long result;
->  
-> -    result = migrate_get_parameter(who, parameter);
-> +    result = migrate_get_parameter_int(who, parameter);
->      g_assert_cmpint(result, ==, value);
->  }
->  
-> -static void migrate_set_parameter(QTestState *who, const char *parameter,
-> -                                  long long value)
-> +static void migrate_set_parameter_int(QTestState *who, const char *parameter,
-> +                                      long long value)
->  {
->      QDict *rsp;
->  
-> @@ -423,7 +424,7 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
->                      parameter, value);
->      g_assert(qdict_haskey(rsp, "return"));
->      qobject_unref(rsp);
-> -    migrate_check_parameter(who, parameter, value);
-> +    migrate_check_parameter_int(who, parameter, value);
->  }
->  
->  static void migrate_pause(QTestState *who)
-> @@ -672,7 +673,7 @@ static void deprecated_set_downtime(QTestState *who, const double value)
->                      " 'arguments': { 'value': %f } }", value);
->      g_assert(qdict_haskey(rsp, "return"));
->      qobject_unref(rsp);
-> -    migrate_check_parameter(who, "downtime-limit", value * 1000);
-> +    migrate_check_parameter_int(who, "downtime-limit", value * 1000);
->  }
->  
->  static void deprecated_set_speed(QTestState *who, long long value)
-> @@ -683,7 +684,7 @@ static void deprecated_set_speed(QTestState *who, long long value)
->                            "'arguments': { 'value': %lld } }", value);
->      g_assert(qdict_haskey(rsp, "return"));
->      qobject_unref(rsp);
-> -    migrate_check_parameter(who, "max-bandwidth", value);
-> +    migrate_check_parameter_int(who, "max-bandwidth", value);
->  }
->  
->  static void deprecated_set_cache_size(QTestState *who, long long value)
-> @@ -694,7 +695,7 @@ static void deprecated_set_cache_size(QTestState *who, long long value)
->                           "'arguments': { 'value': %lld } }", value);
->      g_assert(qdict_haskey(rsp, "return"));
->      qobject_unref(rsp);
-> -    migrate_check_parameter(who, "xbzrle-cache-size", value);
-> +    migrate_check_parameter_int(who, "xbzrle-cache-size", value);
->  }
->  
->  static void test_deprecated(void)
-> @@ -729,8 +730,8 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
->       * quickly, but that it doesn't complete precopy even on a slow
->       * machine, so also set the downtime.
->       */
-> -    migrate_set_parameter(from, "max-bandwidth", 100000000);
-> -    migrate_set_parameter(from, "downtime-limit", 1);
-> +    migrate_set_parameter_int(from, "max-bandwidth", 100000000);
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
->  
->      /* Wait for the first serial output from the source */
->      wait_for_serial("src_serial");
-> @@ -781,7 +782,7 @@ static void test_postcopy_recovery(void)
->      }
->  
->      /* Turn postcopy speed down, 4K/s is slow enough on any machines */
-> -    migrate_set_parameter(from, "max-postcopy-bandwidth", 4096);
-> +    migrate_set_parameter_int(from, "max-postcopy-bandwidth", 4096);
->  
->      /* Now we start the postcopy */
->      migrate_postcopy_start(from, to);
-> @@ -822,7 +823,7 @@ static void test_postcopy_recovery(void)
->      g_free(uri);
->  
->      /* Restore the postcopy bandwidth to unlimited */
-> -    migrate_set_parameter(from, "max-postcopy-bandwidth", 0);
-> +    migrate_set_parameter_int(from, "max-postcopy-bandwidth", 0);
->  
->      migrate_postcopy_complete(from, to);
->  }
-> @@ -868,9 +869,9 @@ static void test_precopy_unix(void)
->       * machine, so also set the downtime.
->       */
->      /* 1 ms should make it not converge*/
-> -    migrate_set_parameter(from, "downtime-limit", 1);
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
->      /* 1GB/s */
-> -    migrate_set_parameter(from, "max-bandwidth", 1000000000);
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
->  
->      /* Wait for the first serial output from the source */
->      wait_for_serial("src_serial");
-> @@ -880,7 +881,7 @@ static void test_precopy_unix(void)
->      wait_for_migration_pass(from);
->  
->      /* 300 ms should converge */
-> -    migrate_set_parameter(from, "downtime-limit", 300);
-> +    migrate_set_parameter_int(from, "downtime-limit", 300);
->  
->      if (!got_stop) {
->          qtest_qmp_eventwait(from, "STOP");
-> @@ -947,11 +948,11 @@ static void test_xbzrle(const char *uri)
->       * machine, so also set the downtime.
->       */
->      /* 1 ms should make it not converge*/
-> -    migrate_set_parameter(from, "downtime-limit", 1);
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
->      /* 1GB/s */
-> -    migrate_set_parameter(from, "max-bandwidth", 1000000000);
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
->  
-> -    migrate_set_parameter(from, "xbzrle-cache-size", 33554432);
-> +    migrate_set_parameter_int(from, "xbzrle-cache-size", 33554432);
->  
->      migrate_set_capability(from, "xbzrle", "true");
->      migrate_set_capability(to, "xbzrle", "true");
-> @@ -963,7 +964,7 @@ static void test_xbzrle(const char *uri)
->      wait_for_migration_pass(from);
->  
->      /* 300ms should converge */
-> -    migrate_set_parameter(from, "downtime-limit", 300);
-> +    migrate_set_parameter_int(from, "downtime-limit", 300);
->  
->      if (!got_stop) {
->          qtest_qmp_eventwait(from, "STOP");
-> @@ -999,9 +1000,9 @@ static void test_precopy_tcp(void)
->       * machine, so also set the downtime.
->       */
->      /* 1 ms should make it not converge*/
-> -    migrate_set_parameter(from, "downtime-limit", 1);
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
->      /* 1GB/s */
-> -    migrate_set_parameter(from, "max-bandwidth", 1000000000);
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
->  
->      /* Wait for the first serial output from the source */
->      wait_for_serial("src_serial");
-> @@ -1013,7 +1014,7 @@ static void test_precopy_tcp(void)
->      wait_for_migration_pass(from);
->  
->      /* 300ms should converge */
-> -    migrate_set_parameter(from, "downtime-limit", 300);
-> +    migrate_set_parameter_int(from, "downtime-limit", 300);
->  
->      if (!got_stop) {
->          qtest_qmp_eventwait(from, "STOP");
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>>>>>> bdrv_check_perm() because they just loosen the permissions, so=
+ it should
+>>>>>>>>>> not fail.
+>>>>>>>>>>
+>>>>>>>>>> However, if the whole effect really would be to loosen permiss=
+ions,
+>>>>>>>>>> raw_apply_lock_bytes() wouldn't have failed here in PREPARE an=
+yway:
+>>>>>>>>>> @unlock is passed as false, so no bytes will be unlocked.=C2=A0=
+ And if
+>>>>>>>>>> permissions are just loosened (as your condition checks), it s=
+hould not
+>>>>>>>>>> lock any bytes.
+>>>>>>>>>>
+>>>>>>>>>> So why does it attempt lock any bytes in the first place?=C2=A0=
+ There must be
+>>>>>>>>>> some discrepancy between s->perm and s->locked_perm, or ~s->sh=
+ared_perm
+>>>>>>>>>> and s->locked_shared_perm.=C2=A0 How does that occur?
+>>>>>>>>>
+>>>>>>>>> I suppose raw_check_lock_bytes() is what is failing, not
+>>>>>>>>> raw_apply_lock_bytes().
+>>>>>>>>
+>>>>>>>> Hm, maybe in Vladimir's case, but not in e.g.
+>>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1652572 .
+>>>>>>>
+>>>>>>> This is reported against 3.0, which didn't avoid re-locking permi=
+ssions
+>>>>>>> that we already hold, so there raw_apply_lock_bytes() can still f=
+ail.
+>>>>>>
+>>>>>> That makes sense.=C2=A0 Which leaves the question why Vladimir sti=
+ll seems to
+>>>>>> see the error there...?
+>>>>>>
+>>>>>
+>>>>> I'm sorry :(. I'm trying to fix bug based on 2.10, and now I see th=
+at is already fixed
+>>>>>   =C2=A0upstream. I don't have a reproducer, only old coredumps.
+>>>>>
+>>>>> So, now it looks like we don't need this patch, as on permission lo=
+osening file-posix
+>>>>> don't call any FS apis, yes?
+>>>>>
+>>>>
+>>>>
+>>>> Ah, you mentioned, that raw_check_lock_bytes is still buggy.
+>>>
+>>> I haven't tried it out, but from looking at the code it seems so. May=
+be
+>>> you can reproduce on master just to be sure?
+>>>
+>>
+>> I don't have a reproducer :(
+>=20
+> I have one, but it only breaks before
+> 2996ffad3acabe890fbb4f84a069cdc325a68108:
+>=20
+> First, setup on an NFS mount on /mnt/nfs.  Second:
+>=20
+> $ qemu-img create -f qcow2 /mnt/nfs/foo.qcow2 64M
+> Formatting '/mnt/nfs/foo.qcow2', fmt=3Dqcow2 size=3D67108864
+> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> $ (sleep 5; echo "{'execute':'qmp_capabilities'}"; \
+>    echo "{'execute':'blockdev-del','arguments':{'node-name':'fmt'}}";
+>    echo "{'execute':'quit'}") \
+>   | x86_64-softmmu/qemu-system-x86_64 -qmp stdio \
+>     -blockdev node-name=3Dproto,driver=3Dfile,filename=3D/mnt/nfs/foo.q=
+cow2 \
+>     -blockdev node-name=3Dfmt,driver=3Dqcow2,file=3Dproto
+> {"QMP": {"version": {"qemu": {"micro": 90, "minor": 0, "major": 3},
+> "package": "v3.1.0-rc0-71-ga883d6a0bc"}, "capabilities": []}}
+>=20
+> Before the sleep is done, stop the service on the NFS host:
+>=20
+> $ systemctl stop nfs-service
+>=20
+> Once the sleep has run out (you get a {"return": {}} over QMP), start
+> the service again:
+>=20
+> $ systemctl start nfs-service
+>=20
+> And then this happens:
+>=20
+> Unexpected error in raw_apply_lock_bytes() at block/file-posix.c:705:
+> Failed to lock byte 100
+> [1]    30486 done                 ( sleep 5; echo
+> "{'execute':'qmp_capabilities'}"; echo ; echo ; ) |
+>        30487 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qm=
+p
+> stdio -blockdev  -blockdev
+>=20
+> It works fine after 2996ffad3acabe890fbb4f84a069cdc325a68108.
+
+Now I have a reproducer that breaks before this patch here and works
+afterwards: You just need two parents and delete one of them, so some
+permissions stay taken.
+
+So, we can do this:
+
+$ (echo "{'execute':'qmp_capabilities'}"; \
+   echo "{'execute':'nbd-server-start',
+          'arguments':{'addr':{'type':'inet',
+              'data':{'host':'0.0.0.0','port':'10809'}}}}"; \
+   echo "{'execute':'nbd-server-add',
+          'arguments':{'device':'proto'}}"; \
+   sleep 5; \
+   echo "{'execute':'nbd-server-stop'}"; \
+   echo "{'execute':'quit'}") \
+  | x86_64-softmmu/qemu-system-x86_64 -qmp stdio \
+     -blockdev node-name=3Dproto,driver=3Dfile,filename=3D/mnt/nfs/foo.im=
+g \
+     -device virtio-blk,drive=3Dproto
+{"QMP": {"version": {"qemu": {"micro": 91, "minor": 1, "major": 3},
+"package": "v4.0.0-rc1-74-g38e694fcc9"}, "capabilities": ["oob"]}}
+{"return": {}}
+{"return": {}}
+{"return": {}}
+
+Then immediately this on the NFS host:
+
+$ sudo systemctl stop nfs-server; sleep 6; \
+  sudo systemctl start nfs-server
+
+And this happens on the client:
+
+Unexpected error in raw_check_lock_bytes() at block/file-posix.c:775:
+Failed to get "consistent read" lock
+[1]    21289 done                 ( echo
+"{'execute':'qmp_capabilities'}"; echo ; echo ; sleep 5; echo ; echo ;  |=
+
+       21290 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qmp
+stdio -blockdev  -device
+
+No issues after 696aaaed579ac5bf5fa336216909b46d3d8f07a8 (this patch here=
+).
+
+Max
+
+
+--2yNBUclUuVkyZwWpgBLMxHBEids7hali3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyk5akACgkQ9AfbAGHV
+z0DAngf/Tarf5Bl8vKs/OdJN5f0kQymZbX0qC2Z8qI2z4A5V5lhrcy3tYhhTIdiR
+B/VxLE73u3ihdD8b3Ww5c9ukuPgbcGNmItnazr3M7q6uB+EY2VXAEfpUpLxONpjn
+x6i6nA2V5YQxFS0uAVG7ML9Kt92KHmRPmsnLz4yjDoCtbAMyqfPH7dtOjm9GnkYa
+MJVyN/bzFPJ1oBQmzCucOLp5nz4MTCH3HI+++M+nmjxbBNGFPsXqkJbIEVQSSX4M
+785cdPtGSe6Io1qZkUYL0KeGBLNfSo2gjO0Y7F/Bvtq8Q6LhrvXn8jf3qwWtdIy7
+2u1ooc0eIlnAqZ+yrq94uc+IPhaUyA==
+=FF7O
+-----END PGP SIGNATURE-----
+
+--2yNBUclUuVkyZwWpgBLMxHBEids7hali3--
