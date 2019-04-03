@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54280)
+Received: from eggs.gnu.org ([209.51.188.92]:59958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hBkUE-0004NK-NT
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:19:47 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hBl5K-0003mB-AQ
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:58:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hBkUD-0003fa-PD
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:19:46 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:56718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hBkUD-0003eS-EN
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:19:45 -0400
-Date: Wed, 3 Apr 2019 21:19:38 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190403181937.GE3446@lap1>
-References: <20190403113343.26384-1-kamalheib1@gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1hBl0r-00031N-33
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:53:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hBl0q-00030d-NG
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 14:53:29 -0400
+References: <20190329202003.30988-1-chen.zhang@intel.com>
+	<1910f60f-c234-f8de-ee03-970c3c3f8bce@redhat.com>
+	<9CFF81C0F6B98A43A459C9EDAD400D78060B54DD@shsmsx102.ccr.corp.intel.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <f6450855-94fb-c18d-448c-e3ca658087c2@redhat.com>
+Date: Wed, 3 Apr 2019 14:53:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190403113343.26384-1-kamalheib1@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] pvrdma: Add support for SRQ
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78060B54DD@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add unmaintained bitmap file
+ to related field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamal Heib <kamalheib1@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: "Zhang, Chen" <chen.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-dev <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>
 
-On Wed, Apr 03, 2019 at 02:33:39PM +0300, Kamal Heib wrote:
-> This series implements the SRQ (Shared Receive Queue) for the pvrdma
-> device, It also includes all the needed functions and definitions for
-> support SRQ in the backend and resource management layers.
-> 
-> Changes from v2->3:
-> - Patch #1:
-> -- Fix commit message.
-> -- Remove initialization of backend_qp from rdma_backend_post_srq_recv().
-> -- Add rx_srq counter.
-> - Patch #2:
-> -- Add checks for srq attrs.
-> - Patch #3:
-> -- Move initialization of recv_cq_handle to be under is_srq.
-> -- Rearrange destroy_qp() to avoid use after free.
-> - Patch #4:
-> -- Avoid use after free.
-> -- Fix indentation.
-> 
-> Changes from v1->v2:
-> - Handle checkpatch.pl warnings. 
 
-Appreciate if you can post v4 with a new patch to display the new counter
-(function rdma_dump_device_counters).
 
+On 4/2/19 9:25 PM, Zhang, Chen wrote:
 > 
-> Kamal Heib (4):
->   hw/rdma: Add SRQ support to backend layer
->   hw/rdma: Add support for managing SRQ resource
->   hw/rdma: Modify create/destroy QP to support SRQ
->   hw/pvrdma: Add support for SRQ
+>> -----Original Message-----
+>> From: John Snow [mailto:jsnow@redhat.com]
+>> Sent: Wednesday, April 3, 2019 5:07 AM
+>> To: Zhang, Chen <chen.zhang@intel.com>; Laurent Vivier <laurent@vivier.eu>;
+>> qemu-dev <qemu-devel@nongnu.org>; Fam Zheng <fam@euphon.net>
+>> Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add unmaintained bitmap
+>> file to related field
+>>
+>>
+>>
+>> On 3/29/19 4:20 PM, Zhang Chen wrote:
+>>> From: Zhang Chen <chen.zhang@intel.com>
+>>>
+>>> Add bitmap.h and bitops.h to Dirty Bitmaps field.
+>>>
+>>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+>>> ---
+>>>  MAINTAINERS | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS index 56139ac8ab..360af3e8ca
+>>> 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -1773,6 +1773,8 @@ S: Supported
+>>>  F: util/hbitmap.c
+>>>  F: block/dirty-bitmap.c
+>>>  F: include/qemu/hbitmap.h
+>>> +F: include/qemu/bitmap.h
+>>> +F: include/qemu/bitops.h
+>>>  F: include/block/dirty-bitmap.h
+>>>  F: tests/test-hbitmap.c
+>>>  F: docs/interop/bitmaps.rst
+>>>
+>>
+>> Actually, these bitmaps aren't the same kind as is used by the block storage
+>> module -- these are a more generic, primitive kind that I have no association
+>> with.
 > 
->  hw/rdma/rdma_backend.c      | 125 +++++++++++++++++++++-
->  hw/rdma/rdma_backend.h      |  18 +++-
->  hw/rdma/rdma_backend_defs.h |   5 +
->  hw/rdma/rdma_rm.c           | 117 +++++++++++++++++++-
->  hw/rdma/rdma_rm.h           |  13 ++-
->  hw/rdma/rdma_rm_defs.h      |  10 ++
->  hw/rdma/vmw/pvrdma_cmd.c    | 206 ++++++++++++++++++++++++++++++++----
->  hw/rdma/vmw/pvrdma_main.c   |  16 +++
->  hw/rdma/vmw/pvrdma_qp_ops.c |  46 +++++++-
->  hw/rdma/vmw/pvrdma_qp_ops.h |   1 +
->  10 files changed, 521 insertions(+), 36 deletions(-)
-> 
-> -- 
-> 2.20.1
+> OK, but these two files are lack of maintenance.
+> Which maintenance area do you think these two files should belong to?
 > 
 > 
+> Thanks
+> Zhang Chen
+> 
+> 
+
+Ehm, I'm not sure. Looks like Paolo and Stefan are the active developers
+who have touched it the most.
+
+Do the two of you want me to fold this into the bitmaps section so that
+it has a point of contact?
+
+--js
