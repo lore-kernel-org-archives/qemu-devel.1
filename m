@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59544)
+Received: from eggs.gnu.org ([209.51.188.92]:60137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hBihR-0003lZ-DC
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:25:22 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hBiiw-0004q2-T2
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hBia4-0008Ew-0d
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:17:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hBia3-0007Zo-NG
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:17:39 -0400
-Date: Wed, 3 Apr 2019 17:17:29 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190403161729.GW25150@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190403124948.GA14129@ls3530.dellerweb.de>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hBiir-0007G1-Ix
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 12:26:47 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Wed, 3 Apr 2019 16:25:49 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8393564E2@lhreml524-mbs.china.huawei.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
+	<20190403114901.6e4ea653@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
+	<ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
+In-Reply-To: <ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190403124948.GA14129@ls3530.dellerweb.de>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Relax check for libseccomp
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +38,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Helge Deller <deller@gmx.de>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
-On Wed, Apr 03, 2019 at 02:49:48PM +0200, Helge Deller wrote:
-> On a non-release architecture, the configure program aborts if the
-> --enable-seccomp flag was given (with no way to work around it on the
-> command line):
->=20
-> ERROR: User requested feature libseccomp
-> 	configure was not able to find it.
-> 	libseccomp is not supported for host cpu parisc64
->=20
-> Instead of aborting, fall back to require libseccomp version 2.2.0
-> (or any higher version currently installed) which should be OK for
-> non-release architectures.
->=20
-> Signed-off-by: Helge Deller <deller@gmx.de>
->=20
-> diff --git a/configure b/configure
-> index 1c563a7027..8632267049 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2389,7 +2389,6 @@ if test "$seccomp" !=3D "no" ; then
->          libseccomp_minver=3D"2.3.0"
->          ;;
->      *)
-> -        libseccomp_minver=3D""
->          ;;
->      esac
-
-This makes sense to me. From a QEMU source POV we are able to build with
-libseccomp >=3D 2.2.0, which our default libseccomp_minver=3D env express=
-es
-a few lines earlier.
-
-If libseccomp isn't supported on a platform, then I think we should just
-assume that libseccomp won't be present in the OS install we are building
-against. I don't think QEMU needs to second-guess whether or not it is
-supported on the given architecture. In fact I'd go as far as to say we
-could probably just remove all this per-arch checking and just have a
-generic >=3D 2.2.0 check, and just rely on fact libseccomp won't exist
-on a s390/ppc/etc host if the distro had version < 2.3.0
-
-Anyway, this particular patch is better than what we have so on that
-basis I think we can just apply this as-is:
-
-  Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+SGkgTGFzemxvLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IExhc3ps
+byBFcnNlayBbbWFpbHRvOmxlcnNla0ByZWRoYXQuY29tXQ0KPiBTZW50OiAwMyBBcHJpbCAyMDE5
+IDE0OjI5DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90
+aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQu
+Y29tPg0KPiBDYzogQXVnZXIgRXJpYyA8ZXJpYy5hdWdlckByZWRoYXQuY29tPjsgQXJkIEJpZXNo
+ZXV2ZWwNCj4gPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+OyBwZXRlci5tYXlkZWxsQGxpbmFy
+by5vcmc7DQo+IHNhbWVvQGxpbnV4LmludGVsLmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBM
+aW51eGFybQ0KPiA8bGludXhhcm1AaHVhd2VpLmNvbT47IHNoYW5ub24uemhhb3NsQGdtYWlsLmNv
+bTsNCj4gcWVtdS1hcm1Abm9uZ251Lm9yZzsgeHV3ZWkgKE8pIDx4dXdlaTVAaHVhd2VpLmNvbT47
+DQo+IHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb207IExlaWYgTGluZGhvbG0gPExlaWYuTGluZGhv
+bG1AYXJtLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDcvMTBd
+IGh3L2FybS92aXJ0OiBJbnRyb2R1Y2Ugb3B0LWluDQo+IGZlYXR1cmUgImZkdCINCj4gDQo+IE9u
+IDA0LzAzLzE5IDE0OjEwLCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIHdyb3RlOg0KPiANCj4g
+Pj4+Pj4gU28sIHRoZSBjb25kaXRpb24gZm9yIGhpZGluZyB0aGUgaG90cGx1Z2dhYmxlIG1lbW9y
+eSBub2RlcyBpbiBxdWVzdGlvbg0KPiA+Pj4+PiBmcm9tIHRoZSBEVCBpczoNCj4gPj4+Pg0KPiA+
+Pj4+Pg0KPiA+Pj4+PiAgIChhYXJjaDY0ICYmIGZpcm13YXJlX2xvYWRlZCAmJiBhY3BpX2VuYWJs
+ZWQpDQo+IA0KPiA+Pj4gV2hpbGUgVUVGSSBoYXMgYmluZGluZ3MgZm9yIGJvdGggMzItYml0IGFu
+ZCA2NC1iaXQgQVJNLCBBQ1BJIGhhcyBhDQo+ID4+PiA2NC1iaXQtb25seSBiaW5kaW5nIGZvciBB
+Uk0uIChBbmQgeW91IGNhbiBoYXZlIFVFRkkgd2l0aG91dCBBQ1BJLCBidXQNCj4gPj4+IG5vdCB0
+aGUgcmV2ZXJzZSwgb24gQVJNLikgU28gaWYgeW91IHJ1biB0aGUgMzItYml0IGJ1aWxkIG9mIHRo
+ZQ0KPiA+Pj4gQXJtVmlydFFlbXUgZmlybXdhcmUsIHlvdSBnZXQgbm8gQUNQSSBhdCBhbGw7IGFs
+bCB5b3UgY2FuIHJlbHkgb24gd2l0aA0KPiA+Pj4gdGhlIE9TIGlzIHRoZSBEVC4NCj4gPg0KPiA+
+IEp1c3QgdG8gY29uZmlybSwgZG9lcyB0aGF0IG1lYW4gd2l0aCAzMi1iaXQgYnVpbGQgb2YgdGhl
+IFVFRkksIHRoZSBPUyBjYW5ub3QNCj4gPiBib290IHdpdGggQUNQSSBhbmQgdXNlcyBEVCBvbmx5
+Lg0KPiANCj4gSW5kZWVkLg0KPiANCj4gPiBTbywNCj4gPg0KPiA+IElmICgoYWFyY2g2NCAmJiBm
+aXJtd2FyZV9sb2FkZWQgJiYgYWNwaV9lbmFibGVkKSB7DQo+ID4gICAgSGlkZV9ob3RwbHVnZ2Fi
+bGVfbWVtb3J5X25vZGVzKCkNCj4gPiB9IGVsc2Ugew0KPiA+ICAgIEFkZF8gaG90cGx1Z2dhYmxl
+X21lbW9yeV9ub2RlcygpDQo+ID4gfQ0KPiA+DQo+ID4gc2hvdWxkIHdvcmsgZm9yIGFsbCBjYXNl
+cz8NCj4gDQo+IFllcy4NCj4gDQo+IEhlcmUncyB3aGF0IGhhcHBlbnMgd2hlbiBhbnkgb25lIG9m
+IHRoZSBzdWJjb25kaXRpb25zIGV2YWx1YXRlcyB0byBmYWxzZToNCj4gDQo+IC0gQVJNMzIgaGFz
+IG5vIEFDUEkgYmluZGluZ3MsIHNvIHRoZSBndWVzdCBrZXJuZWwgY2FuIG9ubHkgdXNlIERULg0K
+PiANCj4gLSBPbiBBQVJDSDY0LCBpZiB5b3UgZG9uJ3QgImxvYWQgdGhlIGZpcm13YXJlIiAoPSBk
+b24ndCB1c2UgVUVGSSksIHRoZW4NCj4gICB0aGVyZSB3b24ndCBiZSBhbiBBQ1BJIGVudHJ5IHBv
+aW50IGZvciB0aGUgT1MgdG8gbG9jYXRlICh0aGUgUlNEIFBUUg0KPiAgIGlzIGRlZmluZWQgYnkg
+dGhlIEFDUEkgc3BlYyBpbiBVRUZJIHRlcm1zLCBmb3IgQUFSQ0g2NCkuIFNvIHRoZSBndWVzdA0K
+PiAgIGtlcm5lbCBjYW4gb25seSB1c2UgRFQuDQo+IA0KPiAtIFdoZW4gb24gQUFSQ0g2NCBhbmQg
+dXNpbmcgVUVGSSwgYnV0IGFza2luZyBRRU1VIG5vdCB0byBnZW5lcmF0ZSBBQ1BJDQo+ICAgY29u
+dGVudCwgdGhlIGZpcm13YXJlIHdpbGwgbm90IGluc3RhbGwgYW55IEFDUEkgdGFibGVzLCBzbyB0
+aGUgZ3Vlc3QNCj4gICBrZXJuZWwgY2FuIG9ubHkgdXNlIERULg0KPiANCg0KVGhhbmtzLiBUaGF0
+IG1ha2VzIGl0IHZlcnkgY2xlYXIuIE11Y2ggYXBwcmVjaWF0ZWQuDQoNCj4gPj4+IFRoaXMgImJp
+dG5lc3MgZGlzdGluY3Rpb24iIGlzIGltcGxlbWVudGVkIGluIHRoZSBmaXJtd2FyZSBhbHJlYWR5
+LiBJZg0KPiA+Pj4geW91IGhpZCB0aGUgbWVtb3J5IG5vZGVzIGZyb20gdGhlIERUIHVuZGVyIHRo
+ZSBjb25kaXRpb24NCj4gPj4+DQo+ID4+PiAgICghYWFyY2g2NCAmJiBmaXJtd2FyZV9sb2FkZWQg
+JiYgYWNwaV9lbmFibGVkKQ0KPiA+Pj4NCj4gPj4+IHRoZW4gdGhlIG5vZGVzIHdvdWxkIG5vdCBi
+ZSBzZWVuIGJ5IHRoZSBPUyBhdCBhbGwgKGJlY2F1c2UNCj4gPj4+ICJhY3BpX2VuYWJsZWQiIGlz
+IGlycmVsZXZhbnQgZm9yIHRoZSAzMi1iaXQgYnVpbGQgb2YgQXJtVmlydFFlbXUsIGFuZA0KPiA+
+Pj4gYWxsIHRoZSBPUyBjYW4gZXZlciBnZXQgaXMgRFQpLg0KPiA+Pg0KPiA+PiBJdCdzIGdldHRp
+bmcgdHJpY2t5IGFuZCBJIGRvbid0IGxpa2UgYSBiaXQgdGhhdCB3ZSBhcmUgdHJ5aW5nIHRvIGNh
+cnRlcg0KPiA+PiA2NCBiaXQgb25seSBVRUZJIGJ1aWxkIChvciBhbnkgb3RoZXIgYnVpbGQpIG9u
+IFFFTVUgc2lkZS4gQWxzbyBQZXRlciBoYXMNCj4gPj4gYSB2YWxpZCBhYm91dCBndWVzc2luZyBv
+biBRRU1VIHNpZGUgKHRoYXQncyB1c3VhbGx5IGEgc291cmNlIG9mIHByb2JsZW0NCj4gPj4gaW4g
+dGhlIGZ1dHVyZSkuDQo+ID4NCj4gPiBJZiB0aGUgYWJvdmUgaXMgY29ycmVjdCh3aXRoIDMyLWJp
+dCB2YXJpYW50IG9mIFVFRkksIE9TIGNhbm5vdCBoYXZlIEFDUEkgYm9vdCksDQo+ID4gdGhlbiBk
+byB3ZSByZWFsbHkgaGF2ZSB0aGUgaXNzdWUgb2YgbWVtb3J5IGJlY29taW5nIG5vbg0KPiBob3Qt
+dW4tdW5wbHVnZ2FibGU/DQo+ID4gTWF5IGJlIEkgYW0gbWlzc2luZyBzb21ldGhpbmcuDQo+IA0K
+PiBJIHRoaW5rIElnb3IgYW5kIFBldGVyIGRpc2xpa2UgYWRkaW5nIGNvbXBsZXggbG9naWMgdG8g
+UUVNVSB0aGF0DQo+IHJlZmxlY3RzIHRoZSBiZWhhdmlvciBvZiBhIHNwZWNpZmljIGZpcm13YXJl
+LiBBSVVJIHRoZWlyIG9iamVjdGlvbiBpc24ndA0KPiB0aGF0IGl0IHdvdWxkbid0IHdvcmssIGJ1
+dCB0aGF0IGl0J3Mgbm90IHRoZSByaWdodCB0aGluZyB0byBkbywgZnJvbSBhDQo+IGRlc2lnbiBw
+ZXJzcGVjdGl2ZS4NCg0KVW5kZXJzdG9vZC4gSG9wZSB3ZSBjYW4gY29udmVyZ2Ugb24gc29tZXRo
+aW5nIHNvb24uDQoNCkNoZWVycywNClNoYW1lZXINCg==
