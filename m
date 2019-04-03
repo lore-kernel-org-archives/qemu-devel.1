@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42705)
+Received: from eggs.gnu.org ([209.51.188.92]:45326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBhJH-0003kI-3H
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 10:56:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hBhUV-00076E-E1
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBhJF-0001TO-Lx
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 10:56:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33988)
+	(envelope-from <peter.maydell@linaro.org>) id 1hBhUS-0003Ri-PO
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:51 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:41351)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hBhJF-0001Pg-CH
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 10:56:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hBhJE-0005Vb-B0
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 14:56:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 516DD2E8076
-	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 14:56:12 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hBhUS-0003LY-H7
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 11:07:48 -0400
+Received: by mail-ot1-x329.google.com with SMTP id 64so15669177otb.8
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 08:07:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Apr 2019 14:45:25 -0000
-From: YunQiang Su <wzssyqa@gmail.com>
-Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155430272590.20821.11511730337898179925.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
- binfmt_misc config with flags include "P"
+References: <20190403100505.7550-1-cohuck@redhat.com>
+In-Reply-To: <20190403100505.7550-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Apr 2019 22:07:35 +0700
+Message-ID: <CAFEAcA-N=28tgOYa6euwybLP0DdJoU2jSnqzVUBqL5PMfasF8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-4.0 0/4] s390x gcc 9 warning fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This patch is for linux kernel.
+On Wed, 3 Apr 2019 at 17:05, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 061b51e9195670e9d190cdec46fabcb3c77763fb:
+>
+>   Update version for v4.0.0-rc2 release (2019-04-02 17:01:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190403
+>
+> for you to fetch changes up to 7357b2215978debf2fd17b525ba745d3c69272a3:
+>
+>   hw/s390x/3270-ccw: avoid taking address of fields in packed struct (2019-04-03 11:19:57 +0200)
+>
+> ----------------------------------------------------------------
+> Fix taking address of fields in packed structs warnings
+> by gcc 9
+>
+> ----------------------------------------------------------------
 
-It will set the 3rd bit of AT_FLAGS, if P is set for binfmt_misc.
+Applied, thanks.
 
-The major concern is that AT_FLAGS is never used, then, should we use it
-here?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-** Patch added: "binfmt_preserve_argv0.patch"
-   https://bugs.launchpad.net/qemu/+bug/1818483/+attachment/5252516/+files/=
-binfmt_preserve_argv0.patch
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818483
-
-Title:
-  qemu user mode does not support binfmt_misc config with flags include
-  "P"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi Sir:
-  During our test in chroot environment with qemu-user-static, we got some =
-test cases failed because of program output warning with unexpected full pa=
-th name.
-  For example in test module "Devscripts"
-  the test item for broken tarball expected the warning info:
-  <tar: This does not look like a tar archive
-  tar: ******* >
-  but the output was:
-  </bin/tar: This does not look like a tar archive
-  /bin/tar: ******>
-  the cause is the config file of binfmt_misc was set not to send argv0, fo=
-r example:
-  type command "tar" after chroot:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
-  [sudo] password for lpeng: =
-
-  root@lpeng-VirtualBox:/# tar
-  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
-abel' options
-  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
-  root@lpeng-VirtualBox:/# =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-
-  by adding output log in main()@qemu/Linux-user/main.c
-  we found the original input command was changed, and qemu do not know tha=
-t, we got the input args:
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----NULL---
-
-  Next step we modified the flags=3DP in the corresponding config under fol=
-der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
-  But chroot could not start bash because in current qemu dose not consider=
- about this unexpected one more"argv[0]"
-
-  =
-
-  After modified qemu code temporary to handle the new argv list we got the=
- input args, and from argv[2] is the original input command
-  argv_0----/usr/bin/qemu-mips64el-static---
-  argv_1----/bin/tar---
-  argv_2----tar---
-
-  We need the original input from command line, so is it possible that let =
-binfmt_misc to pass one more additional args or env to qemu as a token of t=
-he binfmt_misc flag, then qemu can judge how to parse the input args by it?
-  looking forward your suggestions.
-
-  Thanks
-  luyou
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
+-- PMM
