@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49703)
+Received: from eggs.gnu.org ([209.51.188.92]:38262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hBmkc-0007og-1G
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 16:44:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hBn4M-0006lv-JY
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hBmkY-0007rC-5F
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 16:44:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43214)
+	(envelope-from <ehabkost@redhat.com>) id 1hBn4I-0005ih-Q3
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:05:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hBmkM-0007JE-IR
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 16:44:43 -0400
-References: <20190329200445.28512-1-chen.zhang@intel.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <cca666f7-3cc7-92bc-8360-660c673df739@redhat.com>
-Date: Wed, 3 Apr 2019 16:44:28 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hBn4D-0005Rt-JX
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:05:10 -0400
+Date: Wed, 3 Apr 2019 18:04:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190403210458.GB7238@habkost.net>
+References: <20190403124948.GA14129@ls3530.dellerweb.de>
+	<CAFEAcA8qyunxOtqrWLPsr34fUt5t2kCrXa8hOMti0bYYbZDpyA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190329200445.28512-1-chen.zhang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] bitops.h: Remove unused bitops function
- test_and_change_bit()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8qyunxOtqrWLPsr34fUt5t2kCrXa8hOMti0bYYbZDpyA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: Relax check for libseccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <chen.zhang@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-dev <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Helge Deller <deller@gmx.de>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Eduardo Otubo <otubo@redhat.com>
 
 
+CCing the right Eduardo.  :)
 
-On 3/29/19 4:04 PM, Zhang Chen wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
+On Wed, Apr 03, 2019 at 10:16:15PM +0700, Peter Maydell wrote:
+> On Wed, 3 Apr 2019 at 19:51, Helge Deller <deller@gmx.de> wrote:
 > 
-> In current codes we use change_bit() to finish the job.
+> [cc'ing Eduardo as the seccomp submaintainer]
 > 
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->  include/qemu/bitmap.h |  1 -
->  include/qemu/bitops.h | 15 ---------------
->  2 files changed, 16 deletions(-)
+> > On a non-release architecture, the configure program aborts if the
+> > --enable-seccomp flag was given (with no way to work around it on the
+> > command line):
+> >
+> > ERROR: User requested feature libseccomp
+> >         configure was not able to find it.
+> >         libseccomp is not supported for host cpu parisc64
 > 
-> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-> index 5c313346b9..6b71ef631c 100644
-> --- a/include/qemu/bitmap.h
-> +++ b/include/qemu/bitmap.h
-> @@ -52,7 +52,6 @@
->   * test_bit(bit, addr)			Is bit set in *addr?
->   * test_and_set_bit(bit, addr)		Set bit and return old value
->   * test_and_clear_bit(bit, addr)	Clear bit and return old value
-> - * test_and_change_bit(bit, addr)	Change bit and return old value
->   * find_first_zero_bit(addr, nbits)	Position first zero bit in *addr
->   * find_first_bit(addr, nbits)		Position first set bit in *addr
->   * find_next_zero_bit(addr, nbits, bit)	Position next zero bit in *addr >= bit
-> diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
-> index 3f0926cf40..1f98ffcdc0 100644
-> --- a/include/qemu/bitops.h
-> +++ b/include/qemu/bitops.h
-> @@ -109,21 +109,6 @@ static inline int test_and_clear_bit(long nr, unsigned long *addr)
->      return (old & mask) != 0;
->  }
->  
-> -/**
-> - * test_and_change_bit - Change a bit and return its old value
-> - * @nr: Bit to change
-> - * @addr: Address to count from
-> - */
-> -static inline int test_and_change_bit(long nr, unsigned long *addr)
-> -{
-> -    unsigned long mask = BIT_MASK(nr);
-> -    unsigned long *p = addr + BIT_WORD(nr);
-> -    unsigned long old = *p;
-> -
-> -    *p = old ^ mask;
-> -    return (old & mask) != 0;
-> -}
-> -
->  /**
->   * test_bit - Determine whether a bit is set
->   * @nr: bit number to test
+> Surely the workaround is "don't pass --enable-seccomp on
+> the configure command line" ?
 > 
+> Our general approach with configure arguments is:
+>  --disable-foo means "don't try to look for or use foo"
+>  --enable-foo means "use foo, and stop with an error if we can't use
+>      foo for any reason (eg not found, version too old)"
+> passing nothing means "look for foo, use it if we can,
+>      but if we can't then just silently don't use foo"
+> 
+> So I think if the user specifically asks us to use seccomp on a
+> host architecture where it won't work then configure should fail.
+> 
+> Is the underlying problem here:
+>  * we use a whitelist of host architectures to enable seccomp for
+>    and we should not do that (eg blacklist instead, or just allow it
+>    for any host architecture)?
+>  * using a whitelist is ok, but we should add some more host archs to it?
+>  * something else?
+> 
+> What particular host arch are you using?
+> 
+> thanks
+> -- PMM
 
-I personally don't see the harm in keeping this, but it is indeed
-unused, so:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-
-As for merging other sibling functions, I guess the desire is a small
-decrease in SLOC; I'm not sure if you'll run into any uses where the
-changed signatures for a combined function causes issues. I am not sure
-it's worth the hassle.
+-- 
+Eduardo
