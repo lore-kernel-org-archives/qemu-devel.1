@@ -1,34 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49890)
+Received: from eggs.gnu.org ([209.51.188.92]:46328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBnJp-0006T4-7d
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:15 -0400
+	(envelope-from <elijahsh@mellanox.com>) id 1hBnt6-00007e-Kd
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBnJm-0000u8-Pf
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hBnJi-0000bZ-5e
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hBnJS-0007BO-Ss
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 21:20:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D5E702E8078
-	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 21:20:50 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <elijahsh@mellanox.com>) id 1hBnt4-0001ME-In
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:40 -0400
+Received: from mail-eopbgr50053.outbound.protection.outlook.com
+	([40.107.5.53]:41729
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elijahsh@mellanox.com>)
+	id 1hBnt2-0001AR-6W
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:36 -0400
+From: Elijah Shakkour <elijahsh@mellanox.com>
+Date: Wed, 3 Apr 2019 21:57:26 +0000
+Message-ID: <AM6PR05MB6616802C8D185F294565E74CBD570@AM6PR05MB6616.eurprd05.prod.outlook.com>
+References: <20190327064143.GP9149@xz-x1>
+	<060498b58287775ce6bd7dd704f13b6d6e185f91.camel@oracle.com>
+	<20190327084255.GR9149@xz-x1>
+	<AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401024710.GB8853@xz-x1>
+	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401102515.GD8853@xz-x1>
+	<AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<c89218b50e3b015edc4d7f9490138929a97b8268.camel@oracle.com>
+	<AM6PR05MB6616081C90DBA9C552B847BEBD560@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190403024018.GK11008@xz-x1>
+In-Reply-To: <20190403024018.GK11008@xz-x1>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Apr 2019 21:09:05 -0000
-From: =?utf-8?q?salvador_li=C3=A9bana?= <1821839@bugs.launchpad.net>
-Reply-To: Bug 1821839 <1821839@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155365513189.10025.3834324325375490887.malonedeb@wampee.canonical.com>
-Message-Id: <155432574549.8246.14065404242394142945.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1821839] Re: qemu 4.0 doesnt support glsl 3.0 but
- yes older versions, that have no sense IMO
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
+ passthrough to nested (L2) VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,339 +41,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-it shouldn't+
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1821839
-
-Title:
-  qemu 4.0 doesnt support glsl 3.0 but yes older versions, that have no
-  sense IMO
-
-Status in QEMU:
-  New
-
-Bug description:
-  tested on qemu 4.0.rc1 on rpi3, mesa 19.x
-  maybe I am a bit confused, but why it can use and older version from my m=
-esa driver, it should pickup the right version instead of going to the late=
-st.
-
-  pi@pi:~/Desktop/armbian/windows_95_vdi $ qemu-system-i386 -cpu qemu32  -m=
- 32 -display sdl,gl=3Don -device virtio-vga,virgl=3Don -soundhw sb16 =
-
-  qemu_gl_create_compile_shader: compile vertex error
-  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
-10, 1.20, and 1.00 ES
-
-  qemu_gl_create_compile_shader: compile fragment error
-  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
-10, 1.20, and 1.00 ES
-
-  qemu_gl_create_compile_shader: compile vertex error
-  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
-10, 1.20, and 1.00 ES
-
-  qemu_gl_create_compile_shader: compile fragment error
-  0:2(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.=
-10, 1.20, and 1.00 ES
-
-  the sames happen on mesa 13.x (default mesa included on raspbian)
-
-  GLXINFO
-
-  pi@pi:~/Desktop/armbian/windows_95_vdi $ glxinfo
-  name of display: :0
-  display: :0  screen: 0
-  direct rendering: Yes
-  server glx vendor string: SGI
-  server glx version string: 1.4
-  server glx extensions:
-      GLX_ARB_create_context, GLX_ARB_create_context_profile, =
-
-      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, GLX_ARB_multisample=
-, =
-
-      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
-, =
-
-      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
-
-      GLX_EXT_import_context, GLX_EXT_libglvnd, GLX_EXT_texture_from_pixmap=
-, =
-
-      GLX_EXT_visual_info, GLX_EXT_visual_rating, GLX_INTEL_swap_event, =
-
-      GLX_MESA_copy_sub_buffer, GLX_OML_swap_method, GLX_SGIS_multisample, =
-
-      GLX_SGIX_fbconfig, GLX_SGIX_pbuffer, GLX_SGIX_visual_select_group, =
-
-      GLX_SGI_make_current_read, GLX_SGI_swap_control
-  client glx vendor string: Mesa Project and SGI
-  client glx version string: 1.4
-  client glx extensions:
-      GLX_ARB_context_flush_control, GLX_ARB_create_context, =
-
-      GLX_ARB_create_context_profile, GLX_ARB_create_context_robustness, =
-
-      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, =
-
-      GLX_ARB_get_proc_address, GLX_ARB_multisample, GLX_EXT_buffer_age, =
-
-      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
-, =
-
-      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
-
-      GLX_EXT_import_context, GLX_EXT_texture_from_pixmap, GLX_EXT_visual_i=
-nfo, =
-
-      GLX_EXT_visual_rating, GLX_INTEL_swap_event, GLX_MESA_copy_sub_buffer=
-, =
-
-      GLX_MESA_multithread_makecurrent, GLX_MESA_query_renderer, =
-
-      GLX_MESA_swap_control, GLX_OML_swap_method, GLX_OML_sync_control, =
-
-      GLX_SGIS_multisample, GLX_SGIX_fbconfig, GLX_SGIX_pbuffer, =
-
-      GLX_SGIX_visual_select_group, GLX_SGI_make_current_read, =
-
-      GLX_SGI_swap_control, GLX_SGI_video_sync
-  GLX version: 1.4
-  GLX extensions:
-      GLX_ARB_create_context, GLX_ARB_create_context_profile, =
-
-      GLX_ARB_fbconfig_float, GLX_ARB_framebuffer_sRGB, =
-
-      GLX_ARB_get_proc_address, GLX_ARB_multisample, GLX_EXT_buffer_age, =
-
-      GLX_EXT_create_context_es2_profile, GLX_EXT_create_context_es_profile=
-, =
-
-      GLX_EXT_fbconfig_packed_float, GLX_EXT_framebuffer_sRGB, =
-
-      GLX_EXT_import_context, GLX_EXT_texture_from_pixmap, GLX_EXT_visual_i=
-nfo, =
-
-      GLX_EXT_visual_rating, GLX_INTEL_swap_event, GLX_MESA_copy_sub_buffer=
-, =
-
-      GLX_MESA_query_renderer, GLX_MESA_swap_control, GLX_OML_swap_method, =
-
-      GLX_OML_sync_control, GLX_SGIS_multisample, GLX_SGIX_fbconfig, =
-
-      GLX_SGIX_pbuffer, GLX_SGIX_visual_select_group, GLX_SGI_make_current_=
-read, =
-
-      GLX_SGI_swap_control, GLX_SGI_video_sync
-  Extended renderer info (GLX_MESA_query_renderer):
-      Vendor: Broadcom (0x14e4)
-      Device: VC4 V3D 2.1 (0xffffffff)
-      Version: 19.1.0
-      Accelerated: yes
-      Video memory: 938MB
-      Unified memory: yes
-      Preferred profile: compat (0x2)
-      Max core profile version: 0.0
-      Max compat profile version: 2.1
-      Max GLES1 profile version: 1.1
-      Max GLES[23] profile version: 2.0
-  OpenGL vendor string: Broadcom
-  OpenGL renderer string: VC4 V3D 2.1
-  OpenGL version string: 2.1 Mesa 19.1.0-devel (git-f1122f78b7)
-  OpenGL shading language version string: 1.20
-  OpenGL extensions:
-      GL_AMD_shader_trinary_minmax, GL_APPLE_packed_pixels, =
-
-      GL_ARB_ES2_compatibility, GL_ARB_buffer_storage, =
-
-      GL_ARB_clear_buffer_object, GL_ARB_color_buffer_float, =
-
-      GL_ARB_compressed_texture_pixel_storage, GL_ARB_copy_buffer, =
-
-      GL_ARB_debug_output, GL_ARB_depth_texture, GL_ARB_draw_buffers, =
-
-      GL_ARB_draw_elements_base_vertex, GL_ARB_explicit_attrib_location, =
-
-      GL_ARB_explicit_uniform_location, GL_ARB_fragment_coord_conventions, =
-
-      GL_ARB_fragment_program, GL_ARB_fragment_program_shadow, =
-
-      GL_ARB_fragment_shader, GL_ARB_framebuffer_object, =
-
-      GL_ARB_framebuffer_sRGB, GL_ARB_get_program_binary, =
-
-      GL_ARB_get_texture_sub_image, GL_ARB_half_float_pixel, =
-
-      GL_ARB_half_float_vertex, GL_ARB_internalformat_query, =
-
-      GL_ARB_internalformat_query2, GL_ARB_invalidate_subdata, =
-
-      GL_ARB_map_buffer_alignment, GL_ARB_map_buffer_range, GL_ARB_multi_bi=
-nd, =
-
-      GL_ARB_multisample, GL_ARB_multitexture, GL_ARB_occlusion_query, =
-
-      GL_ARB_occlusion_query2, GL_ARB_pixel_buffer_object, =
-
-      GL_ARB_point_parameters, GL_ARB_point_sprite, =
-
-      GL_ARB_program_interface_query, GL_ARB_provoking_vertex, =
-
-      GL_ARB_robustness, GL_ARB_sampler_objects, GL_ARB_separate_shader_obj=
-ects, =
-
-      GL_ARB_shader_objects, GL_ARB_shading_language_100, GL_ARB_shadow, =
-
-      GL_ARB_sync, GL_ARB_texture_barrier, GL_ARB_texture_border_clamp, =
-
-      GL_ARB_texture_compression, GL_ARB_texture_cube_map, =
-
-      GL_ARB_texture_env_add, GL_ARB_texture_env_combine, =
-
-      GL_ARB_texture_env_crossbar, GL_ARB_texture_env_dot3, =
-
-      GL_ARB_texture_mirrored_repeat, GL_ARB_texture_multisample, =
-
-      GL_ARB_texture_non_power_of_two, GL_ARB_texture_rectangle, =
-
-      GL_ARB_texture_storage, GL_ARB_texture_storage_multisample, =
-
-      GL_ARB_texture_swizzle, GL_ARB_transpose_matrix, =
-
-      GL_ARB_vertex_array_object, GL_ARB_vertex_attrib_binding, =
-
-      GL_ARB_vertex_buffer_object, GL_ARB_vertex_program, GL_ARB_vertex_sha=
-der, =
-
-      GL_ARB_window_pos, GL_ATI_blend_equation_separate, GL_ATI_draw_buffer=
-s, =
-
-      GL_ATI_fragment_shader, GL_ATI_separate_stencil, =
-
-      GL_ATI_texture_env_combine3, GL_EXT_abgr, GL_EXT_bgra, =
-
-      GL_EXT_blend_color, GL_EXT_blend_equation_separate, =
-
-      GL_EXT_blend_func_separate, GL_EXT_blend_minmax, GL_EXT_blend_subtrac=
-t, =
-
-      GL_EXT_compiled_vertex_array, GL_EXT_copy_texture, =
-
-      GL_EXT_draw_range_elements, GL_EXT_fog_coord, GL_EXT_framebuffer_blit=
-, =
-
-      GL_EXT_framebuffer_multisample, GL_EXT_framebuffer_multisample_blit_s=
-caled, =
-
-      GL_EXT_framebuffer_object, GL_EXT_framebuffer_sRGB, =
-
-      GL_EXT_gpu_program_parameters, GL_EXT_multi_draw_arrays, =
-
-      GL_EXT_packed_depth_stencil, GL_EXT_packed_pixels, =
-
-      GL_EXT_pixel_buffer_object, GL_EXT_point_parameters, =
-
-      GL_EXT_provoking_vertex, GL_EXT_rescale_normal, GL_EXT_secondary_colo=
-r, =
-
-      GL_EXT_separate_specular_color, GL_EXT_shader_integer_mix, =
-
-      GL_EXT_shadow_funcs, GL_EXT_stencil_two_side, GL_EXT_stencil_wrap, =
-
-      GL_EXT_subtexture, GL_EXT_texture, GL_EXT_texture3D, =
-
-      GL_EXT_texture_cube_map, GL_EXT_texture_edge_clamp, =
-
-      GL_EXT_texture_env_add, GL_EXT_texture_env_combine, =
-
-      GL_EXT_texture_env_dot3, GL_EXT_texture_lod_bias, GL_EXT_texture_obje=
-ct, =
-
-      GL_EXT_texture_rectangle, GL_EXT_texture_sRGB, GL_EXT_texture_sRGB_de=
-code, =
-
-      GL_EXT_texture_swizzle, GL_EXT_vertex_array, GL_IBM_multimode_draw_ar=
-rays, =
-
-      GL_IBM_rasterpos_clip, GL_IBM_texture_mirrored_repeat, =
-
-      GL_INGR_blend_func_separate, GL_KHR_context_flush_control, GL_KHR_deb=
-ug, =
-
-      GL_KHR_no_error, GL_KHR_texture_compression_astc_ldr, =
-
-      GL_KHR_texture_compression_astc_sliced_3d, GL_MESA_pack_invert, =
-
-      GL_MESA_tile_raster_order, GL_MESA_window_pos, GL_NV_blend_square, =
-
-      GL_NV_fog_distance, GL_NV_light_max_exponent, GL_NV_packed_depth_sten=
-cil, =
-
-      GL_NV_texgen_reflection, GL_NV_texture_barrier, =
-
-      GL_NV_texture_env_combine4, GL_NV_texture_rectangle, GL_OES_EGL_image=
-, =
-
-      GL_OES_read_format, GL_SGIS_generate_mipmap, GL_SGIS_texture_border_c=
-lamp, =
-
-      GL_SGIS_texture_edge_clamp, GL_SGIS_texture_lod, GL_SUN_multi_draw_ar=
-rays
-
-  OpenGL ES profile version string: OpenGL ES 2.0 Mesa 19.1.0-devel (git-f1=
-122f78b7)
-  OpenGL ES profile shading language version string: OpenGL ES GLSL ES 1.0.=
-16
-  OpenGL ES profile extensions:
-      GL_APPLE_texture_max_level, GL_EXT_blend_minmax, =
-
-      GL_EXT_compressed_ETC1_RGB8_sub_texture, GL_EXT_discard_framebuffer, =
-
-      GL_EXT_draw_buffers, GL_EXT_draw_elements_base_vertex, GL_EXT_frag_de=
-pth, =
-
-      GL_EXT_map_buffer_range, GL_EXT_multi_draw_arrays, =
-
-      GL_EXT_occlusion_query_boolean, GL_EXT_read_format_bgra, =
-
-      GL_EXT_separate_shader_objects, GL_EXT_texture_border_clamp, =
-
-      GL_EXT_texture_format_BGRA8888, GL_EXT_unpack_subimage, =
-
-      GL_KHR_context_flush_control, GL_KHR_debug, GL_KHR_no_error, =
-
-      GL_KHR_texture_compression_astc_ldr, =
-
-      GL_KHR_texture_compression_astc_sliced_3d, GL_MESA_tile_raster_order, =
-
-      GL_NV_draw_buffers, GL_NV_fbo_color_attachments, GL_NV_read_buffer, =
-
-      GL_NV_read_depth, GL_NV_read_depth_stencil, GL_NV_read_stencil, =
-
-      GL_OES_EGL_image, GL_OES_EGL_image_external, GL_OES_EGL_sync, =
-
-      GL_OES_compressed_ETC1_RGB8_texture, GL_OES_depth24, GL_OES_depth_tex=
-ture, =
-
-      GL_OES_draw_elements_base_vertex, GL_OES_element_index_uint, =
-
-      GL_OES_fbo_render_mipmap, GL_OES_get_program_binary, GL_OES_mapbuffer=
-, =
-
-      GL_OES_packed_depth_stencil, GL_OES_required_internalformat, =
-
-      GL_OES_rgb8_rgba8, GL_OES_stencil8, GL_OES_surfaceless_context, =
-
-      GL_OES_texture_3D, GL_OES_texture_border_clamp, GL_OES_texture_npot, =
-
-      GL_OES_vertex_array_object, GL_OES_vertex_half_float
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1821839/+subscriptions
+To: Peter Xu <peterx@redhat.com>
+Cc: Knut Omang <knut.omang@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
+eEByZWRoYXQuY29tPg0KPiBTZW50OiBXZWRuZXNkYXksIEFwcmlsIDMsIDIwMTkgNTo0MCBBTQ0K
+PiBUbzogRWxpamFoIFNoYWtrb3VyIDxlbGlqYWhzaEBtZWxsYW5veC5jb20+DQo+IENjOiBLbnV0
+IE9tYW5nIDxrbnV0Lm9tYW5nQG9yYWNsZS5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPG1z
+dEByZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
+bT47DQo+IE1hcmNlbCBBcGZlbGJhdW0gPG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tPjsgU3Rl
+ZmFuIEhham5vY3ppDQo+IDxzdGVmYW5oYUBnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5v
+cmcNCj4gU3ViamVjdDogUmU6IFFFTVUgYW5kIHZJT01NVSBzdXBwb3J0IGZvciBlbXVsYXRlZCBW
+RiBwYXNzdGhyb3VnaCB0bw0KPiBuZXN0ZWQgKEwyKSBWTQ0KPiANCj4gT24gVHVlLCBBcHIgMDIs
+IDIwMTkgYXQgMDM6NDE6MTBQTSArMDAwMCwgRWxpamFoIFNoYWtrb3VyIHdyb3RlOg0KPiA+DQo+
+ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBLbnV0IE9t
+YW5nIDxrbnV0Lm9tYW5nQG9yYWNsZS5jb20+DQo+ID4gPiBTZW50OiBNb25kYXksIEFwcmlsIDEs
+IDIwMTkgNToyNCBQTQ0KPiA+ID4gVG86IEVsaWphaCBTaGFra291ciA8ZWxpamFoc2hAbWVsbGFu
+b3guY29tPjsgUGV0ZXIgWHUNCj4gPiA+IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IENjOiBN
+aWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uDQo+ID4g
+PiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+OyBNYXJjZWwgQXBmZWxiYXVtDQo+ID4gPiA8
+bWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20+OyBTdGVmYW4gSGFqbm9jemkNCj4gPHN0ZWZhbmhh
+QGdtYWlsLmNvbT47DQo+ID4gPiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiA+IFN1YmplY3Q6
+IFJlOiBRRU1VIGFuZCB2SU9NTVUgc3VwcG9ydCBmb3IgZW11bGF0ZWQgVkYgcGFzc3Rocm91Z2gN
+Cj4gdG8NCj4gPiA+IG5lc3RlZCAoTDIpIFZNDQo+ID4gPg0KPiA+ID4gT24gTW9uLCAyMDE5LTA0
+LTAxIGF0IDE0OjAxICswMDAwLCBFbGlqYWggU2hha2tvdXIgd3JvdGU6DQo+ID4gPiA+DQo+ID4g
+PiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiBGcm9tOiBQZXRlciBY
+dSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiA+ID4gU2VudDogTW9uZGF5LCBBcHJpbCAxLCAy
+MDE5IDE6MjUgUE0NCj4gPiA+ID4gPiBUbzogRWxpamFoIFNoYWtrb3VyIDxlbGlqYWhzaEBtZWxs
+YW5veC5jb20+DQo+ID4gPiA+ID4gQ2M6IEtudXQgT21hbmcgPGtudXQub21hbmdAb3JhY2xlLmNv
+bT47IE1pY2hhZWwgUy4gVHNpcmtpbg0KPiA+ID4gPiA+IDxtc3RAcmVkaGF0LmNvbT47IEFsZXgg
+V2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+Ow0KPiA+ID4gPiA+IE1hcmNl
+bCBBcGZlbGJhdW0gPG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tPjsgU3RlZmFuIEhham5vY3pp
+DQo+ID4gPiA+ID4gPHN0ZWZhbmhhQGdtYWlsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0K
+PiA+ID4gPiA+IFN1YmplY3Q6IFJlOiBRRU1VIGFuZCB2SU9NTVUgc3VwcG9ydCBmb3IgZW11bGF0
+ZWQgVkYNCj4gcGFzc3Rocm91Z2gNCj4gPiA+IHRvDQo+ID4gPiA+ID4gbmVzdGVkIChMMikgVk0N
+Cj4gPiA+ID4gPg0KPiA+ID4gPiA+IE9uIE1vbiwgQXByIDAxLCAyMDE5IGF0IDA5OjEyOjM4QU0g
+KzAwMDAsIEVsaWphaCBTaGFra291ciB3cm90ZToNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPg0K
+PiA+ID4gPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gPiA+ID4gPiBG
+cm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiA+ID4gPiA+IFNlbnQ6IE1v
+bmRheSwgQXByaWwgMSwgMjAxOSA1OjQ3IEFNDQo+ID4gPiA+ID4gPiA+IFRvOiBFbGlqYWggU2hh
+a2tvdXIgPGVsaWphaHNoQG1lbGxhbm94LmNvbT4NCj4gPiA+ID4gPiA+ID4gQ2M6IEtudXQgT21h
+bmcgPGtudXQub21hbmdAb3JhY2xlLmNvbT47IE1pY2hhZWwgUy4gVHNpcmtpbg0KPiA+ID4gPiA+
+ID4gPiA8bXN0QHJlZGhhdC5jb20+OyBBbGV4IFdpbGxpYW1zb24NCj4gPiA+ID4gPiA+ID4gPGFs
+ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsgTWFyY2VsIEFwZmVsYmF1bQ0KPiA+ID4gPiA+ID4g
+PiA8bWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20+OyBTdGVmYW4gSGFqbm9jemkNCj4gPiA+ID4g
+PiA+ID4gPHN0ZWZhbmhhQGdtYWlsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+ID4g
+PiA+ID4gPiBTdWJqZWN0OiBSZTogUUVNVSBhbmQgdklPTU1VIHN1cHBvcnQgZm9yIGVtdWxhdGVk
+IFZGDQo+ID4gPiBwYXNzdGhyb3VnaA0KPiA+ID4gPiA+IHRvDQo+ID4gPiA+ID4gPiA+IG5lc3Rl
+ZCAoTDIpIFZNDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IE9uIFN1biwgTWFyIDMxLCAy
+MDE5IGF0IDExOjE1OjAwQU0gKzAwMDAsIEVsaWphaCBTaGFra291ciB3cm90ZToNCj4gPiA+ID4g
+PiA+ID4NCj4gPiA+ID4gPiA+ID4gWy4uLl0NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4g
+PiBJIGRpZG4ndCBoYXZlIERNQSBub3IgTU1JTyByZWFkL3dyaXRlIHdvcmtpbmcgd2l0aCBteSBv
+bGQNCj4gPiA+ID4gPiA+ID4gPiBjb21tYW5kDQo+ID4gPiA+ID4gPiA+IGxpbmUuDQo+ID4gPiA+
+ID4gPiA+ID4gQnV0LCB3aGVuIEkgcmVtb3ZlZCBhbGwgQ1BVIGZsYWdzIGFuZCBvbmx5IHByb3Zp
+ZGVkICItY3B1DQo+ID4gPiA+ID4gPiA+ID4gaG9zdCIsIEkgc2VlIHRoYXQNCj4gPiA+ID4gPiA+
+ID4gTU1JTyB3b3Jrcy4NCj4gPiA+ID4gPiA+ID4gPiBTdGlsbCwgRE1BIHJlYWQvd3JpdGUgZnJv
+bSBlbXVsYXRlZCBkZXZpY2UgZG9lc24ndCB3b3JrIGZvciBWRi4NCj4gPiA+ID4gPiA+ID4gPiBG
+b3INCj4gPiA+ID4gPiA+ID4gZXhhbXBsZToNCj4gPiA+ID4gPiA+ID4gPiBEcml2ZXIgcHJvdmlk
+ZXMgbWUgYSBidWZmZXIgcG9pbnRlciB0aHJvdWdoIE1NSU8gd3JpdGUsDQo+ID4gPiA+ID4gPiA+
+ID4gdGhpcyBhZGRyZXNzDQo+ID4gPiA+ID4gPiA+IChwb2ludGVyKSBpcyBHUEEgb2YgTDIsIGFu
+ZCB3aGVuIEkgdHJ5IHRvIGNhbGwNCj4gPiA+ID4gPiA+ID4gcGNpX2RtYV9yZWFkKCkgd2l0aCB0
+aGlzIGFkZHJlc3MgSSBnZXQ6DQo+ID4gPiA+ID4gPiA+ID4gIg0KPiA+ID4gPiA+ID4gPiA+IFVu
+YXNzaWduZWQgbWVtIHJlYWQgMDAwMDAwMDAwMDAwMDAwMCAiDQo+ID4gPiA+ID4gPiA+DQo+ID4g
+PiA+ID4gPiA+IEkgZG9uJ3Qga25vdyB3aGVyZSB0aGlzIGVycm9yIGxvZyB3YXMgZHVtcGVkIGJ1
+dCBpZiBpdCdzDQo+ID4gPiA+ID4gPiA+IGR1cmluZyBETUEgdGhlbiBJIGFncmVlIGl0IGNhbiBw
+cm9iYWJseSBiZSByZWxhdGVkIHRvIHZJT01NVS4NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+
+DQo+ID4gPiA+ID4gPiBUaGlzIGxvZyBpcyBkdW1wZWQgZnJvbToNCj4gPiA+ID4gPiA+IG1lbW9y
+eS5jOiB1bmFzc2lnbmVkX21lbV9yZWFkKCkNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4g
+QXMgSSBzYWlkLCBteSBwcm9ibGVtIG5vdyBpcyBpbiB0cmFuc2xhdGlvbiBvZiBMMiBHUEENCj4g
+PiA+ID4gPiA+ID4gPiBwcm92aWRlZCBieSBkcml2ZXIsDQo+ID4gPiA+ID4gPiA+IHdoZW4gSSBj
+YWxsIERNQSByZWFkL3dyaXRlIGZvciB0aGlzIGFkZHJlc3MgZnJvbSBWRi4NCj4gPiA+ID4gPiA+
+ID4gPiBBbnkgaW5zaWdodHM/DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IEkganVzdCBu
+b3RpY2VkIHRoYXQgeW91IHdlcmUgdXNpbmcgUUVNVSAyLjEyIFsxXS4gIElmIHRoYXQncw0KPiA+
+ID4gPiA+ID4gPiB0aGUgY2FzZSwgcGxlYXNlIHJlYmFzZSB0byB0aGUgbGF0ZXN0IFFFTVUsIGF0
+IGxlYXN0ID49My4wDQo+ID4gPiA+ID4gPiA+IGJlY2F1c2UgdGhlcmUncyBtYWpvciByZWZhY3Rv
+ciBvZiB0aGUgc2hhZG93IGxvZ2ljIGR1cmluZw0KPiA+ID4gPiA+ID4gPiAzLjAgZGV2ZWwgY3lj
+bGUNCj4gPiA+IEFGQUlDVC4NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4g
+PiBSZWJhc2VkIHRvIFFFTVUgMy4xDQo+ID4gPiA+ID4gPiBOb3cgSSBzZWUgdGhlIGFkZHJlc3Mg
+SSdtIHRyeWluZyB0byByZWFkIGZyb20gaW4gbG9nIGJ1dCBzdGlsbCBzYW1lDQo+IGVycm9yOg0K
+PiA+ID4gPiA+ID4gIg0KPiA+ID4gPiA+ID4gVW5hc3NpZ25lZCBtZW0gcmVhZCAwMDAwMDAwMGYw
+NDgxMDAwICINCj4gPiA+ID4gPiA+IFdoYXQgZG8geW91IHN1Z2dlc3Q/DQo+ID4gPiA+ID4NCj4g
+PiA+ID4gPiBXb3VsZCB5b3UgcGxlYXNlIGFuc3dlciB0aGUgcXVlc3Rpb25zIHRoYXQgS251dCBh
+c2tlZD8gIElzIGl0DQo+ID4gPiA+ID4gd29ya2luZyBmb3IgTDEgZ3Vlc3Q/ICBIb3cgYWJvdXQg
+UEY/DQo+ID4gPiA+DQo+ID4gPiA+IEJvdGggVkYgYW5kIFBGIGFyZSB3b3JraW5nIGZvciBMMSBn
+dWVzdC4NCj4gPiA+ID4gSSBkb24ndCBrbm93IGhvdyB0byBwYXNzdGhyb3VnaCBQRiB0byBuZXN0
+ZWQgVk0gaW4gaHlwZXItdi4NCj4gPiA+DQo+ID4gPiBPbiBMaW51eCBwYXNzaW5nIHRocm91Z2gg
+VkZzIGFuZCBQRnMgYXJlIHRoZSBzYW1lLg0KPiA+ID4gTWF5YmUgeW91IGNhbiB0cnkgcGFzc3Ro
+cm91Z2ggd2l0aCBhbGwgTGludXggZmlyc3Q/IChmaXJzdCBQRiB0aGVuIFZGKSA/DQo+ID4gPg0K
+PiA+ID4gPiBJIGRvbid0IGludm9rZSBWRiBtYW51YWxseSBpbiBoeXBlci12IGFuZCBwYXNzIGl0
+IHRocm91Z2ggdG8NCj4gPiA+ID4gbmVzdGVkIFZNLiBJIHVzZSBoeXBlci12IG1hbmFnZXIgdG8g
+Y29uZmlndXJlIGFuZCBwcm92aWRlIGEgVkYgZm9yDQo+ID4gPiA+IG5lc3RlZCBWTSAoSSBjYW4g
+c2VlIHRoZSBWRiBvbmx5IGluIHRoZSBuZXN0ZWQgVk0pLg0KPiA+ID4gPg0KPiA+ID4gPiBEaWQg
+c29tZW9uZSB0cnkgdG8gcnVuIGVtdWxhdGVkIGRldmljZSBpbiBsaW51eCBSSCBhcyBuZXN0ZWQg
+TDINCj4gPiA+ID4gd2hlcmUNCj4gPiA+ID4gTDEgaXMgd2luZG93cyBoeXBlci12PyBEb2VzIERN
+QSByZWFkL3dyaXRlIHdvcmsgZm9yIHRoaXMgZW11bGF0ZWQNCj4gPiA+IGRldmljZSBpbiB0aGlz
+IGNhc2U/DQo+ID4gPg0KPiA+ID4gSSBoYXZlIG5ldmVyIHRyaWVkIHRoYXQsIEkgaGF2ZSBvbmx5
+IHVzZWQgTGludXggYXMgTDIsIFdpbmRvd3MgbWlnaHQNCj4gPiA+IGJlIHBpY2tpZXIgYWJvdXQg
+d2hhdCBpdCBleHBlY3RzLCBzbyBzdGFydGluZyB3aXRoIExpbnV4IHRvIHJ1bGUNCj4gPiA+IHRo
+YXQgb3V0IGlzIHByb2JhYmx5IGEgZ29vZCBpZGVhLg0KPiA+DQo+ID4gV2lsbCBtb3ZlIHRvIHRo
+aXMgc29sdXRpb24gYWZ0ZXIgSS93ZSBnaXZlIHVwIPCfmIoNCj4gPg0KPiA+ID4NCj4gPiA+ID4g
+Pg0KPiA+ID4gPiA+IFlvdSBjYW4gYWxzbyB0cnkgdG8gZW5hYmxlIFZULWQgZGV2aWNlIGxvZyBi
+eSBhcHBlbmRpbmc6DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiAgIC10cmFjZSBlbmFibGU9InZ0ZF8q
+Ig0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSW4gY2FzZSBpdCBkdW1wcyBhbnl0aGluZyB1c2VmdWwg
+Zm9yIHlvdS4NCj4gPg0KPiA+IEhlcmUgaXMgdGhlIHJlbGV2YW50IGR1bXAgKGRldiAwMTowMC4w
+MSBpcyBteSBWRik6DQo+ID4gIg0KPiA+IHZ0ZF9pbnZfZGVzY19jY19kZXZpY2UgY29udGV4dCBp
+bnZhbGlkYXRlIGRldmljZSAwMTowMC4wMQ0KPiA+IHZ0ZF9jZV9ub3RfcHJlc2VudCBDb250ZXh0
+IGVudHJ5IGJ1cyAxIGRldmZuIDEgbm90IHByZXNlbnQNCj4gPiB2dGRfc3dpdGNoX2FkZHJlc3Nf
+c3BhY2UgRGV2aWNlIDAxOjAwLjEgc3dpdGNoaW5nIGFkZHJlc3Mgc3BhY2UgKGlvbW11DQo+ID4g
+ZW5hYmxlZD0xKSB2dGRfY2Vfbm90X3ByZXNlbnQgQ29udGV4dCBlbnRyeSBidXMgMSBkZXZmbiAx
+IG5vdCBwcmVzZW50DQo+ID4gdnRkX2VyciBEZXRlY3RlZCBpbnZhbGlkIGNvbnRleHQgZW50cnkg
+d2hlbiB0cnlpbmcgdG8gc3luYyBzaGFkb3cgcGFnZQ0KPiA+IHRhYmxlDQo+IA0KPiBUaGVzZSBs
+aW5lcyBtZWFuIHRoYXQgdGhlIGd1ZXN0IHNlbnQgYSBkZXZpY2UgaW52YWxpZGF0aW9uIHRvIHlv
+dXIgVkYgYnV0IHRoZQ0KPiBJT01NVSBmb3VuZCB0aGF0IHRoZSBkZXZpY2UgY29udGV4dCBlbnRy
+eSBpcyBtaXNzaW5nLg0KPiANCj4gPiB2dGRfaW90bGJfY2NfdXBkYXRlIElPVExCIGNvbnRleHQg
+dXBkYXRlIGJ1cyAweDEgZGV2Zm4gMHgxIGhpZ2ggMHgxMDINCj4gPiBsb3cgMHgyZDAwNzAwMyBn
+ZW4gMCAtPiBnZW4gMiB2dGRfZXJyX2RtYXJfc2xwdGVfcmVzdl9lcnJvciBpb3ZhDQo+ID4gMHhm
+MDhlNzAwMCBsZXZlbCAyIHNscHRlIDB4MmE1NDAwOGY3DQo+IA0KPiBUaGlzIGxpbmUgc2hvdWxk
+IG5vdCBleGlzdCBpbiBsYXRlc3QgUUVNVS4gIEFyZSB5b3Ugc3VyZSB5b3UncmUgdXNpbmcgdGhl
+IGxhdGVzdA0KPiBRRU1VPw0KDQpJIG1vdmVkIG5vdyB0byBRRU1VIDQuMCBSQzIuDQpUaGlzIGlz
+IHRoZSB3aGF0IEkgZ2V0IG5vdzoNCnZ0ZF9pb3RsYl9jY191cGRhdGUgSU9UTEIgY29udGV4dCB1
+cGRhdGUgYnVzIDB4MSBkZXZmbiAweDEgaGlnaCAweDEwMiBsb3cgMHgyZjAwNzAwMyBnZW4gMCAt
+PiBnZW4gMQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB2dGRfaW92YV90b19zbHB0ZTogZGV0ZWN0ZWQg
+c3BsdGUgcmVzZXJ2ZSBub24temVybyBpb3ZhPTB4ZjBkMjkwMDAsIGxldmVsPTB4MnNscHRlPTB4
+MjlmNjAwOGY3KQ0KdnRkX2ZhdWx0X2Rpc2FibGVkIEZhdWx0IHByb2Nlc3NpbmcgZGlzYWJsZWQg
+Zm9yIGNvbnRleHQgZW50cnkNCnFlbXUtc3lzdGVtLXg4Nl82NDogdnRkX2lvbW11X3RyYW5zbGF0
+ZTogZGV0ZWN0ZWQgdHJhbnNsYXRpb24gZmFpbHVyZSAoZGV2PTAxOjAwOjAxLCBpb3ZhPTB4ZjBk
+MjkwMDApDQpVbmFzc2lnbmVkIG1lbSByZWFkIDAwMDAwMDAwZjBkMjkwMDANCg0KSSdtIG5vdCBm
+YW1pbGlhciB3aXRoIHZJT01NVSByZWdpc3RlcnMsIGJ1dCBJIG5vdGljZWQgdGhhdCBJIG11c3Qg
+cmVwb3J0IHNub29wIGNvbnRyb2wgc3VwcG9ydCB0byBIeXBlci1WIChpLmUuIGJpdCA3IGluIGV4
+dGVuZGVkIGNhcGFiaWxpdHkgcmVnaXN0ZXIgb2YgdklPTU1VKSBpbi1vcmRlciB0byBzYXRpc2Z5
+IElPTU1VIHN1cHBvcnQgZm9yIFNSSU9WLg0KdklPTU1VLmVjYXAgYmVmb3JlICAgIDB4ZjAwZjVl
+DQp2SU9NTVUuZWNhcCBhZnRlciAgICAgICAweGYwMGZkZQ0KQnV0IEkgc2VlIHRoYXQgdklPTU1V
+IGRvZXNuJ3QgcmVhbGx5IHN1cHBvcnQgc25vb3AgY29udHJvbC4NCkNvdWxkIHRoaXMgYmUgdGhl
+IHByb2JsZW0gdGhhdCBmYWlscyBJT1ZBIHJhbmdlIGNoZWNrIGluIHRoaXMgZnVuY3Rpb24gdnRk
+X2lvdmFfcmFuZ2VfY2hlY2soKT8NCklmIHNvLCBpcyB0aGVyZSBhIHdheSB0byB3b3JrLWFyb3Vu
+ZCB0aGlzIGlzc3VlPw0KDQo+IA0KPiBJIGFncmVlIHdpdGggS251dCB0aGF0IEkgd291bGQgc3Vn
+Z2VzdCB5b3UgdG8gdXNlIHVzZSBMaW51eCBpbiBib3RoIGhvc3QgYW5kDQo+IGd1ZXN0cyBmaXJz
+dCB0byB0cmlhZ2UgdGhlIGlzc3VlLg0KPiANCj4gUmVnYXJkcywNCj4gDQo+IC0tDQo+IFBldGVy
+IFh1DQo=
