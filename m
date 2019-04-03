@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58796)
+Received: from eggs.gnu.org ([209.51.188.92]:59023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBeW1-000363-Uh
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:14 -0400
+	(envelope-from <quintela@redhat.com>) id 1hBeWg-0003S1-KK
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBeVz-0000eB-Dl
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:13 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBeVw-0000XB-Fa
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:09 -0400
-Received: by mail-ot1-x343.google.com with SMTP id o74so15196984ota.3
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 04:57:06 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1hBeWe-0001ku-Oy
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hBeWc-0001fs-Qd
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:57:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 63AB4368E7
+	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 11:51:29 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  3 Apr 2019 13:49:50 +0200
+Message-Id: <20190403114958.3705-1-quintela@redhat.com>
 MIME-Version: 1.0
-References: <20190307144126.31847-1-richard.henderson@linaro.org>
-	<20190307144126.31847-3-richard.henderson@linaro.org>
-	<CAFEAcA8JwtiBSgUg_8kg52GETGd3vbX86nvziXa6ZyvqDPLt5g@mail.gmail.com>
-	<a17fffd5-6242-8efc-a8a6-2ca5a8ae9c3d@linaro.org>
-In-Reply-To: <a17fffd5-6242-8efc-a8a6-2ca5a8ae9c3d@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 3 Apr 2019 18:56:55 +0700
-Message-ID: <CAFEAcA-ee-WmGLn=OMTDpisovgz6wCEfGygZ3Fy+JoHVbfdPKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/9] tcg: Add INDEX_op_extract2_{i32,i64}
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/8] WIP: Multifd compression support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, 3 Apr 2019 at 18:37, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 3/26/19 8:35 PM, Peter Maydell wrote:
-> > On Thu, 7 Mar 2019 at 14:47, Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >>
-> >> This will let backends implement the double-word shift operation.
-> >>
-> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> >> diff --git a/tcg/README b/tcg/README
-> >> index 603f4df659..ddabf33017 100644
-> >> --- a/tcg/README
-> >> +++ b/tcg/README
-> >> @@ -343,6 +343,11 @@ at bit 8.  This operation would be equivalent to
-> >>
-> >>  (using an arithmetic right shift).
-> >>
-> >> +* extract2_i64 dest, t1, t2, pos
-> >> +
-> >> +Extract a 64-bit quantity from the concatenation of t2:t1,
-> >> +beginning at pos.
-> >> +
-> >
-> > I think we should document the valid values of 'pos'.
-> > My guess is "0 <= pos <= 63".
->
-> How about
->
-> ----
-> * extract2_i32/i64 dest, t1, t2, pos
->
-> For N = {32,64}, extract an N-bit quantity from the concatenation
-> of t2:t1, beginning at pos.  The tcg_gen_extract2_* expander allows
-> values 0 <= pos <= N, but will expand 0 and N with mov, so only
-> 1 <= pos <= N-1 will be seen by the host tcg_out_op.
+v2:
+- improve the code left and right
+- Split better the zlib code
+- rename everything to v4.1
+- Add tests for multifd-compress zlib
+- Parameter is now an enum (soon will see sztd)
 
-If I'm reading that correctly, it seems to be combining in one sentence
-the behaviour of the TCG API exposed to the front-end (pos can be
-between 0 and N inclusive) with a detail of the API that a backend
-needs to care about (that it can assume it never sees 0 or N).
-I think we should be more careful to keep those separate, because
-a reader of this document is almost always going to care only about
-one or the other, never both at the same time. Perhaps things that
-apply only to the backend end of the interface should go in section 4
-of tcg/README? At any rate I think they should at least be in
-different sentences :-)
+ToDo:
+- Make operations for diferent methods:
+  * multifd_prepare_send_none/zlib
+  * multifd_send_none/zlib
+  * multifd_recv_none/zlib
+- Use the MULTIFD_FLAG_ZLIB (it is unused so far).
 
-thanks
--- PMM
+Please review and comment.
+
+v1:
+
+This series create compression code on top of multifd.  It is still
+WIP, but it is already:
+- faster that current compression code
+- it does the minimum amount of copies possible
+- we allow support for other compression codes
+- it pass the multifd test sent in my previous series
+
+Test for existing code didn't work because code is too slow, I need to
+make downtime 10 times bigger to make it to converge on my test
+machine.  This code works with same limits that multifd no-
+
+ToDo:
+- move printf's  to traces
+- move code to a struct instead of if (zlib) inside the main threads.
+- improve error handling.
+
+Please, review and coment.
+
+Juan Quintela (8):
+  migration: Fix migrate_set_parameter
+  migration: fix multifd_recv event typo
+  migration-test: rename parameter to parameter_int
+  tests: Add migration multifd test
+  migration-test: introduce functions to handle string parameters
+  migration: Add multifd-compress parameter
+  multifd: Add zlib compression support
+  multifd: rest of zlib compression (WIP)
+
+ hmp.c                        |  23 +++++-
+ hw/core/qdev-properties.c    |  11 +++
+ include/hw/qdev-properties.h |   1 +
+ migration/migration.c        |  25 ++++++
+ migration/migration.h        |   1 +
+ migration/ram.c              | 140 +++++++++++++++++++++++++++++++--
+ migration/trace-events       |   2 +-
+ qapi/common.json             |  15 ++++
+ qapi/migration.json          |  19 ++++-
+ tests/migration-test.c       | 147 +++++++++++++++++++++++++++++------
+ 10 files changed, 348 insertions(+), 36 deletions(-)
+
+--=20
+2.20.1
