@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55975)
+Received: from eggs.gnu.org ([209.51.188.92]:56257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hBeJe-0007Q3-P1
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:44:28 -0400
+	(envelope-from <david@redhat.com>) id 1hBeLf-00004t-RG
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hBeJb-0000FQ-TM
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:44:26 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hBeJb-000089-DR
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:44:23 -0400
-Date: Wed, 3 Apr 2019 14:43:29 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190403114328.GA17696@lap1>
-References: <20190403104018.23947-1-pagupta@redhat.com>
-	<20190403104018.23947-3-pagupta@redhat.com>
+	(envelope-from <david@redhat.com>) id 1hBeLZ-0002P4-DX
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:46:27 -0400
+References: <20190401214847.27600-1-walling@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <77d41944-2ed2-bcdd-c434-faea3ec28486@redhat.com>
+Date: Wed, 3 Apr 2019 13:46:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190403104018.23947-3-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] virtio-pmem: Add virtio pmem driver
+In-Reply-To: <20190401214847.27600-1-walling@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] s390: diagnose 318 info reset and
+ migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,427 +24,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, mst@redhat.com, jasowang@redhat.com, david@fromorbit.com, lcapitulino@redhat.com, adilger.kernel@dilger.ca, zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com, darrick.wong@oracle.com, vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com, lenb@kernel.org, riel@surriel.com, stefanha@redhat.com, dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu, xiaoguangrong.eric@gmail.com, cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com
 
-On Wed, Apr 03, 2019 at 04:10:15PM +0530, Pankaj Gupta wrote:
-> This patch adds virtio-pmem driver for KVM guest.
-> 
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
-> 
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+On 01.04.19 23:48, Collin Walling wrote:
+> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
+> be intercepted by SIE and handled via KVM. Let's introduce some
+> functions to communicate between QEMU and KVM via ioctls. These
+> will be used to get/set the diag318 related information (also known
+> as the "Control Program Code" or "CPC"), as well as check the system
+> if KVM supports handling this instruction.
+>=20
+> Diag318 must also be reset on a load normal and modified clear, so
+> we use the set function (wrapped in a reset function) to explicitly
+> set the diag318 info to 0 for these cases.
+>=20
+> Lastly, we want to ensure the diag318 info is migrated. The diag318
+> info migration is handled via a VMStateDescription. This feature is
+> only supported on QEMU machines 4.0 and later.
+
+This has to become 4.1
+
+>=20
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
 > ---
->  drivers/nvdimm/virtio_pmem.c     |  84 +++++++++++++++++++++
->  drivers/virtio/Kconfig           |  10 +++
->  drivers/virtio/Makefile          |   1 +
->  drivers/virtio/pmem.c            | 125 +++++++++++++++++++++++++++++++
->  include/linux/virtio_pmem.h      |  60 +++++++++++++++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  10 +++
->  7 files changed, 291 insertions(+)
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 drivers/virtio/pmem.c
->  create mode 100644 include/linux/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
-> 
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> new file mode 100644
-> index 000000000000..2a1b1ba2c1ff
-> --- /dev/null
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -0,0 +1,84 @@
-> +// SPDX-License-Identifier: GPL-2.0
-
-Is this comment stile (//) acceptable?
-
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include "nd.h"
+>=20
+> This version is posted in tandem with a new kernel patch that changes
+> how the execution of the diag 0x318 instruction is handled. A link to
+> this series will be attached as a reply to this series for convenience.
+>=20
+> Changelog:
+>=20
+>     v3
+>         - removed CPU model code
+>         - removed RSCPI and SCLP code
+>         - reverted max cpus back to 248 (previous patches limited this
+>             to 247)
+>         - introduced VMStateDescription handlers for migration
+>         - disabled migration of diag318 info for machines 3.1 and older
+>             - a warning is printed if migration is disabled and KVM
+>               supports handling this instruction
+>=20
+> ---
+>  hw/s390x/s390-virtio-ccw.c   |  6 ++++
+>  linux-headers/asm-s390/kvm.h |  4 +++
+>  target/s390x/diag.c          | 63 ++++++++++++++++++++++++++++++++++++
+>  target/s390x/internal.h      |  5 ++-
+>  target/s390x/kvm-stub.c      | 15 +++++++++
+>  target/s390x/kvm.c           | 32 ++++++++++++++++++
+>  target/s390x/kvm_s390x.h     |  3 ++
+>  7 files changed, 127 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index d11069b860..2a50868496 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -36,6 +36,7 @@
+>  #include "cpu_models.h"
+>  #include "hw/nmi.h"
+>  #include "hw/s390x/tod.h"
+> +#include "internal.h"
+> =20
+>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>  {
+> @@ -302,6 +303,8 @@ static void ccw_init(MachineState *machine)
+> =20
+>      /* init the TOD clock */
+>      s390_init_tod();
 > +
-> + /* The interrupt handler */
-> +void host_ack(struct virtqueue *vq)
+> +    diag318_register_migration();
+>  }
+> =20
+>  static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+> @@ -352,6 +355,7 @@ static void s390_machine_reset(void)
+>          }
+>          subsystem_reset();
+>          s390_crypto_reset();
+> +        diag318_reset();
+
+Shouldn't this go into subsystem_reset?
+
+Aren't you missing resets during external/reipl resets?
+
+Also, I was wondering if this would be worth creating a fake device like
+diag288. The resets can be handled similar to diag288. Resets during
+external/reipl reset would come natural.
+> =20
+>  static void ccw_machine_3_1_class_options(MachineClass *mc)
+> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.=
+h
+> index 0265482f8f..735f5a46e8 100644
+> --- a/linux-headers/asm-s390/kvm.h
+> +++ b/linux-headers/asm-s390/kvm.h
+> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>  #define KVM_S390_VM_CRYPTO		2
+>  #define KVM_S390_VM_CPU_MODEL		3
+>  #define KVM_S390_VM_MIGRATION		4
+> +#define KVM_S390_VM_MISC		5
+> =20
+>  /* kvm attributes for mem_ctrl */
+>  #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+> @@ -168,6 +169,9 @@ struct kvm_s390_vm_cpu_subfunc {
+>  #define KVM_S390_VM_MIGRATION_START	1
+>  #define KVM_S390_VM_MIGRATION_STATUS	2
+> =20
+> +/* kvm attributes for KVM_S390_VM_MISC */
+> +#define KVM_S390_VM_MISC_CPC		0
+> +
+>  /* for KVM_GET_REGS and KVM_SET_REGS */
+>  struct kvm_regs {
+>  	/* general purpose regs for s390 */
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index aafa740f61..bbb151e3eb 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -20,6 +20,8 @@
+>  #include "sysemu/cpus.h"
+>  #include "hw/s390x/ipl.h"
+>  #include "hw/s390x/s390-virtio-ccw.h"
+> +#include "kvm_s390x.h"
+> +#include "sysemu/kvm.h"
+> =20
+>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+>  {
+> @@ -134,3 +136,64 @@ out:
+>          break;
+>      }
+>  }
+> +
+> +typedef struct Diag318Data {
+> +    uint64_t cpc;
+> +} Diag318Data;
+> +static Diag318Data diag318data;
+> +
+> +void diag318_reset(void)
 > +{
-> +	unsigned int len;
-> +	unsigned long flags;
-> +	struct virtio_pmem_request *req, *req_buf;
-> +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> +		req->done = true;
-> +		wake_up(&req->host_acked);
-> +
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf = list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			list_del(&vpmem->req_list);
-> +			req_buf->wq_buf_avail = true;
-> +			wake_up(&req_buf->wq_buf);
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +}
-> +EXPORT_SYMBOL_GPL(host_ack);
-> +
-> + /* The request submission function */
-> +int virtio_pmem_flush(struct nd_region *nd_region)
-> +{
-> +	int err;
-> +	unsigned long flags;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	struct virtio_device *vdev = nd_region->provider_data;
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct virtio_pmem_request *req;
-> +
-> +	might_sleep();
-
-[1]
-
-> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	req->done = req->wq_buf_avail = false;
-> +	strcpy(req->name, "FLUSH");
-> +	init_waitqueue_head(&req->host_acked);
-> +	init_waitqueue_head(&req->wq_buf);
-> +	sg_init_one(&sg, req->name, strlen(req->name));
-> +	sgs[0] = &sg;
-> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> +	sgs[1] = &ret;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-
-Is it okay to use GFP_ATOMIC in a might-sleep ([1]) function?
-
-> +	if (err) {
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> +
-> +		list_add_tail(&vpmem->req_list, &req->list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* When host has read buffer, this completes via host_ack */
-> +		wait_event(req->wq_buf, req->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
-> +	virtqueue_kick(vpmem->req_vq);
-
-You probably want to check return value here.
-
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +	/* When host has read buffer, this completes via host_ack */
-> +	wait_event(req->host_acked, req->done);
-> +	err = req->ret;
-> +	kfree(req);
-> +
-> +	return err;
-> +};
-> +EXPORT_SYMBOL_GPL(virtio_pmem_flush);
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 35897649c24f..9f634a2ed638 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
->  
->  	  If unsure, say Y.
->  
-> +config VIRTIO_PMEM
-> +	tristate "Support for virtio pmem driver"
-> +	depends on VIRTIO
-> +	depends on LIBNVDIMM
-> +	help
-> +	This driver provides support for virtio based flushing interface
-> +	for persistent memory range.
-> +
-> +	If unsure, say M.
-> +
->  config VIRTIO_BALLOON
->  	tristate "Virtio balloon driver"
->  	depends on VIRTIO
-> diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-> index 3a2b5c5dcf46..143ce91eabe9 100644
-> --- a/drivers/virtio/Makefile
-> +++ b/drivers/virtio/Makefile
-> @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
->  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
->  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
->  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
-> +obj-$(CONFIG_VIRTIO_PMEM) += pmem.o ../nvdimm/virtio_pmem.o
-> diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
-> new file mode 100644
-> index 000000000000..52f74064f67e
-> --- /dev/null
-> +++ b/drivers/virtio/pmem.c
-> @@ -0,0 +1,125 @@
-> +// SPDX-License-Identifier: GPL-2.0
-
-Ditto
-
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and registers the virtual pmem device
-> + * with libnvdimm core.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include <../../drivers/nvdimm/nd.h>
-
-Should this file be moved to include/ directory?
-
-> +
-> +static struct virtio_device_id id_table[] = {
-> +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> +	{ 0 },
-> +};
-> +
-> + /* Initialize virt queue */
-> +static int init_vq(struct virtio_pmem *vpmem)
-> +{
-> +	struct virtqueue *vq;
-> +
-> +	/* single vq */
-> +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
-> +				host_ack, "flush_queue");
-> +	if (IS_ERR(vq))
-> +		return PTR_ERR(vq);
-> +
-> +	spin_lock_init(&vpmem->pmem_lock);
-> +	INIT_LIST_HEAD(&vpmem->req_list);
-> +
-> +	return 0;
-> +};
-> +
-> +static int virtio_pmem_probe(struct virtio_device *vdev)
-> +{
-> +	int err = 0;
-> +	struct resource res;
-> +	struct virtio_pmem *vpmem;
-> +	struct nvdimm_bus *nvdimm_bus;
-> +	struct nd_region_desc ndr_desc;
-> +	int nid = dev_to_node(&vdev->dev);
-> +	struct nd_region *nd_region;
-> +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config disabled\n",
-> +			__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
-> +			GFP_KERNEL);
-
-Suggesting to indent it right so it will be under &vdev
-
-> +	if (!vpmem) {
-> +		err = -ENOMEM;
-> +		goto out_err;
-> +	}
-> +
-> +	vpmem->vdev = vdev;
-> +	err = init_vq(vpmem);
-> +	if (err)
-> +		goto out_err;
-
-No need to free vpmem here?
-
-> +
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			start, &vpmem->start);
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			size, &vpmem->size);
-> +
-> +	res.start = vpmem->start;
-> +	res.end   = vpmem->start + vpmem->size-1;
-> +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> +	vpmem->nd_desc.module = THIS_MODULE;
-> +
-> +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> +						&vpmem->nd_desc);
-> +	if (!nvdimm_bus)
-> +		goto out_vq;
-
-Ditto (i'm probably missing something here)
-
-> +
-> +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
-> +	memset(&ndr_desc, 0, sizeof(ndr_desc));
-
-Any reason not to use compiler initialization?
-i.e.
-	struct nd_region_desc ndr_desc = {};
-
-> +
-> +	ndr_desc.res = &res;
-> +	ndr_desc.numa_node = nid;
-> +	ndr_desc.flush = virtio_pmem_flush;
-> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
-> +	nd_region->provider_data =  dev_to_virtio
-> +					(nd_region->dev.parent->parent);
-> +
-> +	if (!nd_region)
-> +		goto out_nd;
-> +
-> +	//virtio_device_ready(vdev);
-
-Left over
-
-> +	return 0;
-> +out_nd:
-> +	err = -ENXIO;
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +out_vq:
-> +	vdev->config->del_vqs(vdev);
-> +out_err:
-> +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> +	return err;
+> +    if (kvm_s390_has_diag318()) {
+> +        kvm_s390_set_cpc(0);
+> +    }
 > +}
 > +
-> +static void virtio_pmem_remove(struct virtio_device *vdev)
+> +static int diag318_post_load(void *opaque, int version_id)
 > +{
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> +    Diag318Data *d =3D opaque;
 > +
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +	vdev->config->del_vqs(vdev);
-
-I think you should also call vdev->config->reset
-
-> +	kfree(vpmem);
+> +    kvm_s390_set_cpc(d->cpc);
+> +    return 0;
 > +}
 > +
-> +static struct virtio_driver virtio_pmem_driver = {
-> +	.driver.name		= KBUILD_MODNAME,
-> +	.driver.owner		= THIS_MODULE,
-> +	.id_table		= id_table,
-> +	.probe			= virtio_pmem_probe,
-> +	.remove			= virtio_pmem_remove,
+> +static int diag318_pre_save(void *opaque)
+> +{
+> +    Diag318Data *d =3D opaque;
+> +
+> +    kvm_s390_get_cpc(&d->cpc);
+> +    return 0;
+> +}
+> +
+> +static bool diag318_needed(void *opaque)
+> +{
+> +    return kvm_s390_has_diag318();
+> +}
+> +
+> +VMStateDescription vmstate_diag318 =3D {
+> +    .name =3D "diag318",
+> +    .post_load =3D diag318_post_load,
+> +    .pre_save =3D diag318_pre_save,
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .unmigratable =3D 0,
+> +    .needed =3D diag318_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(cpc, Diag318Data),
+> +        VMSTATE_END_OF_LIST()
+> +    }
 > +};
 > +
-> +module_virtio_driver(virtio_pmem_driver);
-> +MODULE_DEVICE_TABLE(virtio, id_table);
-> +MODULE_DESCRIPTION("Virtio pmem driver");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
-> new file mode 100644
-> index 000000000000..224f9d934be6
-> --- /dev/null
-> +++ b/include/linux/virtio_pmem.h
-> @@ -0,0 +1,60 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * virtio_pmem.h: virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + **/
+> +void diag318_register_migration(void)
+> +{
+> +    if (!vmstate_diag318.unmigratable)
+> +        vmstate_register(NULL, 0, &vmstate_diag318, &diag318data);
+> +    else if (kvm_s390_has_diag318())
+> +        printf("warning: diag318 info lacks migration support, this da=
+ta "
+> +               "will be lost if migrated.\n");
+> +}
 > +
-> +#ifndef _LINUX_VIRTIO_PMEM_H
-> +#define _LINUX_VIRTIO_PMEM_H
-> +
-> +#include <linux/virtio_ids.h>
-> +#include <linux/module.h>
-> +#include <linux/virtio_config.h>
-> +#include <uapi/linux/virtio_pmem.h>
-> +#include <linux/libnvdimm.h>
-> +#include <linux/spinlock.h>
-> +
-> +struct virtio_pmem_request {
-> +	/* Host return status corresponding to flush request */
-> +	int ret;
-> +
-> +	/* command name*/
-> +	char name[16];
-> +
-> +	/* Wait queue to process deferred work after ack from host */
-> +	wait_queue_head_t host_acked;
-> +	bool done;
-> +
-> +	/* Wait queue to process deferred work after virt queue buffer avail */
-> +	wait_queue_head_t wq_buf;
-> +	bool wq_buf_avail;
-> +	struct list_head list;
-> +};
-> +
-> +struct virtio_pmem {
-> +	struct virtio_device *vdev;
-> +
-> +	/* Virtio pmem request queue */
-> +	struct virtqueue *req_vq;
-> +
-> +	/* nvdimm bus registers virtio pmem device */
-> +	struct nvdimm_bus *nvdimm_bus;
-> +	struct nvdimm_bus_descriptor nd_desc;
-> +
-> +	/* List to store deferred work if virtqueue is full */
-> +	struct list_head req_list;
-> +
-> +	/* Synchronize virtqueue data */
-> +	spinlock_t pmem_lock;
-> +
-> +	/* Memory region information */
-> +	uint64_t start;
-> +	uint64_t size;
-> +};
-> +
-> +void host_ack(struct virtqueue *vq);
-> +int virtio_pmem_flush(struct nd_region *nd_region);
-> +#endif
-> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
-> index 6d5c3b2d4f4d..346389565ac1 100644
-> --- a/include/uapi/linux/virtio_ids.h
-> +++ b/include/uapi/linux/virtio_ids.h
-> @@ -43,5 +43,6 @@
->  #define VIRTIO_ID_INPUT        18 /* virtio input */
->  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
->  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+> +void diag318_disable_migration(void)
+> +{
+> +    vmstate_diag318.unmigratable =3D 1;
+> +}
 
-Any reason for the jump here? are 21 to 24 already taken or you just
-want to be on the safe side?
+I somewhat dislike registering/unregistering vmstates manually here.
+This would look better on an actual device. Opinions?
 
->  
->  #endif /* _LINUX_VIRTIO_IDS_H */
-> diff --git a/include/uapi/linux/virtio_pmem.h b/include/uapi/linux/virtio_pmem.h
-> new file mode 100644
-> index 000000000000..fa3f7d52717a
-> --- /dev/null
-> +++ b/include/uapi/linux/virtio_pmem.h
-> @@ -0,0 +1,10 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> +
-> +struct virtio_pmem_config {
-> +	__le64 start;
-> +	__le64 size;
-> +};
-> +#endif
-> -- 
-> 2.20.1
-> 
-> 
+--=20
+
+Thanks,
+
+David / dhildenb
