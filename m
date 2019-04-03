@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60289)
+Received: from eggs.gnu.org ([209.51.188.92]:33048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hBeas-0006hX-4M
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:02:15 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hBee7-0000Vg-OS
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:05:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hBeaq-0001xU-VO
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:02:13 -0400
-Date: Wed, 3 Apr 2019 13:01:59 +0100
+	(envelope-from <stefanha@gmail.com>) id 1hBee6-0005eC-Qu
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:05:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hBee6-0005cd-Go
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 08:05:34 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y13so21001770wrd.3
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 05:05:34 -0700 (PDT)
+Date: Wed, 3 Apr 2019 13:05:31 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190403120159.GB32425@stefanha-x1.localdomain>
-References: <20190401024406.10819-1-jbi.octave@gmail.com>
+Message-ID: <20190403120531.GC32425@stefanha-x1.localdomain>
+References: <20190401093051.16488-1-n.alekseev2104@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Yylu36WmvOXNoKYn"
+	protocol="application/pgp-signature"; boundary="QRj9sO5tAVLaXnSD"
 Content-Disposition: inline
-In-Reply-To: <20190401024406.10819-1-jbi.octave@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] util/readline: errors clean-ups
+In-Reply-To: <20190401093051.16488-1-n.alekseev2104@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] Add coroutine_fn to bdrv_check_co_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jules Irenge <jbi.octave@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: n.alekseev2104@gmail.com
+Cc: qemu-devel@nongnu.org, jusual@mail.ru, kwolf@redhat.com, mreitz@redhat.com
 
 
---Yylu36WmvOXNoKYn
+--QRj9sO5tAVLaXnSD
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 01, 2019 at 03:44:04AM +0100, Jules Irenge wrote:
-> This v2 version combines two fix of errors into one  and replace tab
-> indent by four spaces
+On Mon, Apr 01, 2019 at 12:30:51PM +0300, n.alekseev2104@gmail.com wrote:
+> From: Nikita Alekseev <n.alekseev2104@gmail.com>
 >=20
-> Jules Irenge (2):
->   util/readline: add a space to fix errors by checkpatch tool
->   util: readline: replace tab indent by four spaces to fix checkpatch
->     errors
+> bdrv_check_co_entry calls bdrv_co_check, which is a coroutine function.
+> Thus, it also needs to be marked as a coroutine.
 >=20
->  util/readline.c | 132 ++++++++++++++++++++++++------------------------
->  1 file changed, 66 insertions(+), 66 deletions(-)
+> Signed-off-by: Nikita Alekseev <n.alekseev2104@gmail.com>
+> ---
+>  block.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This file is unmaintained, I'll take this patch through my tree.
+Thank you!  I prefixed the commit message with "block: ".  Most commits
+have a subsystem prefix to make browsing/searching git log easier.  In
+the future you can add it yourself - look at git log for a file to
+discover what prefix other people recently used.
 
 Thanks, applied to my block-next tree:
 https://github.com/stefanha/qemu/commits/block-next
 
 Stefan
 
---Yylu36WmvOXNoKYn
+--QRj9sO5tAVLaXnSD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcpKC3AAoJEJykq7OBq3PIo2cIALmRVg5tmU0DZSQZMsihVOSn
-Imxgo03Z6rOZYtqbugKvV0HgOupBs4KSQULoj9z+leMcqv5GqdGAXr2iuiuIA1GM
-JUO8WzD1l4Xi3SlYTLVkxLphKKy68h2VSz03lY0Xp+NX59UUD7s9zLLLs+O/9S7e
-n4CAIHKp5uttlPFRU2dVFx3JVG2kxdeR79Xf5KsugJ+I2TCt6Nf8jLhjhF2K2oUJ
-weLOeDwfq/Ay55IU2EEswgvIPoItOuaXC2E/GRsQTwcRaKZOEtvr6y7vV2ISbAoT
-5tXywxrYa4fQxVp1t//+jXoCoo4M39Equ1DzIsj/3sK/VQHJukarGaGpn+BBen4=
-=nG44
+iQEcBAEBAgAGBQJcpKGLAAoJEJykq7OBq3PIHsAH/0XnEYJOJ/T6yraD+0pFSEEH
+mmrvyceIFcOAAgvoECSAtJNjSYwruUhwhxKoUfLQWhibDMovKEr9mYaGdOL2NjKA
+YxZ+37GMRUcSf6fVpa8dZ4L1SVOBWvusi3dBbKrITdZhpKHqMOJEbQ0GflNhzFeR
+yys2I5z3snoJVWy5mRBmMx6tdltPWxu8PspEUycUGsb6LtwClvufT+Se/GGx5DWp
+ibby8g/U6rKnia6Fba5ENWiZLJk00HpgoGTcyYT8QiPq1qkfxy21Q+HvqUeDTmHq
+DT/9Qa88WJV+fpsW22P8mIXPgPyW6pGVelcUI9PHLskZob9yF28jcR3QL0d7yLI=
+=/RTf
 -----END PGP SIGNATURE-----
 
---Yylu36WmvOXNoKYn--
+--QRj9sO5tAVLaXnSD--
