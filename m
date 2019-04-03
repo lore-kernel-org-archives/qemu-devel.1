@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49845)
+Received: from eggs.gnu.org ([209.51.188.92]:49890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBnJm-0006Ps-EK
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1hBnJp-0006T4-7d
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hBnJi-0000p7-Eg
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52170)
+	(envelope-from <bounces@canonical.com>) id 1hBnJm-0000u8-Pf
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hBnJa-0000Zz-HU
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:02 -0400
+	id 1hBnJi-0000bZ-5e
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:21:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hBnJS-0007EH-Ag
+	id 1hBnJS-0007BO-Ss
 	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 21:20:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3C7272E80C8
+	by loganberry.canonical.com (Postfix) with ESMTP id D5E702E8078
 	for <qemu-devel@nongnu.org>; Wed,  3 Apr 2019 21:20:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Apr 2019 21:07:54 -0000
+Date: Wed, 03 Apr 2019 21:09:05 -0000
 From: =?utf-8?q?salvador_li=C3=A9bana?= <1821839@bugs.launchpad.net>
 Reply-To: Bug 1821839 <1821839@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155365513189.10025.3834324325375490887.malonedeb@wampee.canonical.com>
-Message-Id: <155432567483.7949.4389703810646582266.malone@wampee.canonical.com>
+Message-Id: <155432574549.8246.14065404242394142945.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1821839] Re: qemu 4.0 doesnt support glsl 3.0 but
  yes older versions, that have no sense IMO
@@ -39,9 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I didnt understand properly the output, it only can use opengl es 3.0.
-you should put that info because when i compile qemu it pass and it
-should if doesnt support my opengl setup.
+it shouldn't+
 
 -- =
 
