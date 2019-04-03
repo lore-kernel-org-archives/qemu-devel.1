@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46328)
+Received: from eggs.gnu.org ([209.51.188.92]:54235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elijahsh@mellanox.com>) id 1hBnt6-00007e-Kd
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:42 -0400
+	(envelope-from <david@fromorbit.com>) id 1hBo4d-0002L3-NO
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 18:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elijahsh@mellanox.com>) id 1hBnt4-0001ME-In
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:40 -0400
-Received: from mail-eopbgr50053.outbound.protection.outlook.com
-	([40.107.5.53]:41729
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <elijahsh@mellanox.com>)
-	id 1hBnt2-0001AR-6W
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 17:57:36 -0400
-From: Elijah Shakkour <elijahsh@mellanox.com>
-Date: Wed, 3 Apr 2019 21:57:26 +0000
-Message-ID: <AM6PR05MB6616802C8D185F294565E74CBD570@AM6PR05MB6616.eurprd05.prod.outlook.com>
-References: <20190327064143.GP9149@xz-x1>
-	<060498b58287775ce6bd7dd704f13b6d6e185f91.camel@oracle.com>
-	<20190327084255.GR9149@xz-x1>
-	<AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190401024710.GB8853@xz-x1>
-	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190401102515.GD8853@xz-x1>
-	<AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<c89218b50e3b015edc4d7f9490138929a97b8268.camel@oracle.com>
-	<AM6PR05MB6616081C90DBA9C552B847BEBD560@AM6PR05MB6616.eurprd05.prod.outlook.com>
-	<20190403024018.GK11008@xz-x1>
-In-Reply-To: <20190403024018.GK11008@xz-x1>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <david@fromorbit.com>) id 1hBo4b-0007qj-KW
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 18:09:35 -0400
+Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:38080)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <david@fromorbit.com>) id 1hBo4W-0007VK-R7
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 18:09:31 -0400
+Date: Thu, 4 Apr 2019 09:09:12 +1100
+From: Dave Chinner <david@fromorbit.com>
+Message-ID: <20190403220912.GB26298@dastard>
+References: <20190403104018.23947-1-pagupta@redhat.com>
+	<20190403104018.23947-6-pagupta@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
- passthrough to nested (L2) VM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190403104018.23947-6-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,141 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Knut Omang <knut.omang@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
-eEByZWRoYXQuY29tPg0KPiBTZW50OiBXZWRuZXNkYXksIEFwcmlsIDMsIDIwMTkgNTo0MCBBTQ0K
-PiBUbzogRWxpamFoIFNoYWtrb3VyIDxlbGlqYWhzaEBtZWxsYW5veC5jb20+DQo+IENjOiBLbnV0
-IE9tYW5nIDxrbnV0Lm9tYW5nQG9yYWNsZS5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPG1z
-dEByZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
-bT47DQo+IE1hcmNlbCBBcGZlbGJhdW0gPG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tPjsgU3Rl
-ZmFuIEhham5vY3ppDQo+IDxzdGVmYW5oYUBnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5v
-cmcNCj4gU3ViamVjdDogUmU6IFFFTVUgYW5kIHZJT01NVSBzdXBwb3J0IGZvciBlbXVsYXRlZCBW
-RiBwYXNzdGhyb3VnaCB0bw0KPiBuZXN0ZWQgKEwyKSBWTQ0KPiANCj4gT24gVHVlLCBBcHIgMDIs
-IDIwMTkgYXQgMDM6NDE6MTBQTSArMDAwMCwgRWxpamFoIFNoYWtrb3VyIHdyb3RlOg0KPiA+DQo+
-ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBLbnV0IE9t
-YW5nIDxrbnV0Lm9tYW5nQG9yYWNsZS5jb20+DQo+ID4gPiBTZW50OiBNb25kYXksIEFwcmlsIDEs
-IDIwMTkgNToyNCBQTQ0KPiA+ID4gVG86IEVsaWphaCBTaGFra291ciA8ZWxpamFoc2hAbWVsbGFu
-b3guY29tPjsgUGV0ZXIgWHUNCj4gPiA+IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IENjOiBN
-aWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPjsgQWxleCBXaWxsaWFtc29uDQo+ID4g
-PiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+OyBNYXJjZWwgQXBmZWxiYXVtDQo+ID4gPiA8
-bWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20+OyBTdGVmYW4gSGFqbm9jemkNCj4gPHN0ZWZhbmhh
-QGdtYWlsLmNvbT47DQo+ID4gPiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiA+IFN1YmplY3Q6
-IFJlOiBRRU1VIGFuZCB2SU9NTVUgc3VwcG9ydCBmb3IgZW11bGF0ZWQgVkYgcGFzc3Rocm91Z2gN
-Cj4gdG8NCj4gPiA+IG5lc3RlZCAoTDIpIFZNDQo+ID4gPg0KPiA+ID4gT24gTW9uLCAyMDE5LTA0
-LTAxIGF0IDE0OjAxICswMDAwLCBFbGlqYWggU2hha2tvdXIgd3JvdGU6DQo+ID4gPiA+DQo+ID4g
-PiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiBGcm9tOiBQZXRlciBY
-dSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiA+ID4gU2VudDogTW9uZGF5LCBBcHJpbCAxLCAy
-MDE5IDE6MjUgUE0NCj4gPiA+ID4gPiBUbzogRWxpamFoIFNoYWtrb3VyIDxlbGlqYWhzaEBtZWxs
-YW5veC5jb20+DQo+ID4gPiA+ID4gQ2M6IEtudXQgT21hbmcgPGtudXQub21hbmdAb3JhY2xlLmNv
-bT47IE1pY2hhZWwgUy4gVHNpcmtpbg0KPiA+ID4gPiA+IDxtc3RAcmVkaGF0LmNvbT47IEFsZXgg
-V2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+Ow0KPiA+ID4gPiA+IE1hcmNl
-bCBBcGZlbGJhdW0gPG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tPjsgU3RlZmFuIEhham5vY3pp
-DQo+ID4gPiA+ID4gPHN0ZWZhbmhhQGdtYWlsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0K
-PiA+ID4gPiA+IFN1YmplY3Q6IFJlOiBRRU1VIGFuZCB2SU9NTVUgc3VwcG9ydCBmb3IgZW11bGF0
-ZWQgVkYNCj4gcGFzc3Rocm91Z2gNCj4gPiA+IHRvDQo+ID4gPiA+ID4gbmVzdGVkIChMMikgVk0N
-Cj4gPiA+ID4gPg0KPiA+ID4gPiA+IE9uIE1vbiwgQXByIDAxLCAyMDE5IGF0IDA5OjEyOjM4QU0g
-KzAwMDAsIEVsaWphaCBTaGFra291ciB3cm90ZToNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPg0K
-PiA+ID4gPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gPiA+ID4gPiBG
-cm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiA+ID4gPiA+IFNlbnQ6IE1v
-bmRheSwgQXByaWwgMSwgMjAxOSA1OjQ3IEFNDQo+ID4gPiA+ID4gPiA+IFRvOiBFbGlqYWggU2hh
-a2tvdXIgPGVsaWphaHNoQG1lbGxhbm94LmNvbT4NCj4gPiA+ID4gPiA+ID4gQ2M6IEtudXQgT21h
-bmcgPGtudXQub21hbmdAb3JhY2xlLmNvbT47IE1pY2hhZWwgUy4gVHNpcmtpbg0KPiA+ID4gPiA+
-ID4gPiA8bXN0QHJlZGhhdC5jb20+OyBBbGV4IFdpbGxpYW1zb24NCj4gPiA+ID4gPiA+ID4gPGFs
-ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsgTWFyY2VsIEFwZmVsYmF1bQ0KPiA+ID4gPiA+ID4g
-PiA8bWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20+OyBTdGVmYW4gSGFqbm9jemkNCj4gPiA+ID4g
-PiA+ID4gPHN0ZWZhbmhhQGdtYWlsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+ID4g
-PiA+ID4gPiBTdWJqZWN0OiBSZTogUUVNVSBhbmQgdklPTU1VIHN1cHBvcnQgZm9yIGVtdWxhdGVk
-IFZGDQo+ID4gPiBwYXNzdGhyb3VnaA0KPiA+ID4gPiA+IHRvDQo+ID4gPiA+ID4gPiA+IG5lc3Rl
-ZCAoTDIpIFZNDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IE9uIFN1biwgTWFyIDMxLCAy
-MDE5IGF0IDExOjE1OjAwQU0gKzAwMDAsIEVsaWphaCBTaGFra291ciB3cm90ZToNCj4gPiA+ID4g
-PiA+ID4NCj4gPiA+ID4gPiA+ID4gWy4uLl0NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4g
-PiBJIGRpZG4ndCBoYXZlIERNQSBub3IgTU1JTyByZWFkL3dyaXRlIHdvcmtpbmcgd2l0aCBteSBv
-bGQNCj4gPiA+ID4gPiA+ID4gPiBjb21tYW5kDQo+ID4gPiA+ID4gPiA+IGxpbmUuDQo+ID4gPiA+
-ID4gPiA+ID4gQnV0LCB3aGVuIEkgcmVtb3ZlZCBhbGwgQ1BVIGZsYWdzIGFuZCBvbmx5IHByb3Zp
-ZGVkICItY3B1DQo+ID4gPiA+ID4gPiA+ID4gaG9zdCIsIEkgc2VlIHRoYXQNCj4gPiA+ID4gPiA+
-ID4gTU1JTyB3b3Jrcy4NCj4gPiA+ID4gPiA+ID4gPiBTdGlsbCwgRE1BIHJlYWQvd3JpdGUgZnJv
-bSBlbXVsYXRlZCBkZXZpY2UgZG9lc24ndCB3b3JrIGZvciBWRi4NCj4gPiA+ID4gPiA+ID4gPiBG
-b3INCj4gPiA+ID4gPiA+ID4gZXhhbXBsZToNCj4gPiA+ID4gPiA+ID4gPiBEcml2ZXIgcHJvdmlk
-ZXMgbWUgYSBidWZmZXIgcG9pbnRlciB0aHJvdWdoIE1NSU8gd3JpdGUsDQo+ID4gPiA+ID4gPiA+
-ID4gdGhpcyBhZGRyZXNzDQo+ID4gPiA+ID4gPiA+IChwb2ludGVyKSBpcyBHUEEgb2YgTDIsIGFu
-ZCB3aGVuIEkgdHJ5IHRvIGNhbGwNCj4gPiA+ID4gPiA+ID4gcGNpX2RtYV9yZWFkKCkgd2l0aCB0
-aGlzIGFkZHJlc3MgSSBnZXQ6DQo+ID4gPiA+ID4gPiA+ID4gIg0KPiA+ID4gPiA+ID4gPiA+IFVu
-YXNzaWduZWQgbWVtIHJlYWQgMDAwMDAwMDAwMDAwMDAwMCAiDQo+ID4gPiA+ID4gPiA+DQo+ID4g
-PiA+ID4gPiA+IEkgZG9uJ3Qga25vdyB3aGVyZSB0aGlzIGVycm9yIGxvZyB3YXMgZHVtcGVkIGJ1
-dCBpZiBpdCdzDQo+ID4gPiA+ID4gPiA+IGR1cmluZyBETUEgdGhlbiBJIGFncmVlIGl0IGNhbiBw
-cm9iYWJseSBiZSByZWxhdGVkIHRvIHZJT01NVS4NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+
-DQo+ID4gPiA+ID4gPiBUaGlzIGxvZyBpcyBkdW1wZWQgZnJvbToNCj4gPiA+ID4gPiA+IG1lbW9y
-eS5jOiB1bmFzc2lnbmVkX21lbV9yZWFkKCkNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4g
-QXMgSSBzYWlkLCBteSBwcm9ibGVtIG5vdyBpcyBpbiB0cmFuc2xhdGlvbiBvZiBMMiBHUEENCj4g
-PiA+ID4gPiA+ID4gPiBwcm92aWRlZCBieSBkcml2ZXIsDQo+ID4gPiA+ID4gPiA+IHdoZW4gSSBj
-YWxsIERNQSByZWFkL3dyaXRlIGZvciB0aGlzIGFkZHJlc3MgZnJvbSBWRi4NCj4gPiA+ID4gPiA+
-ID4gPiBBbnkgaW5zaWdodHM/DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IEkganVzdCBu
-b3RpY2VkIHRoYXQgeW91IHdlcmUgdXNpbmcgUUVNVSAyLjEyIFsxXS4gIElmIHRoYXQncw0KPiA+
-ID4gPiA+ID4gPiB0aGUgY2FzZSwgcGxlYXNlIHJlYmFzZSB0byB0aGUgbGF0ZXN0IFFFTVUsIGF0
-IGxlYXN0ID49My4wDQo+ID4gPiA+ID4gPiA+IGJlY2F1c2UgdGhlcmUncyBtYWpvciByZWZhY3Rv
-ciBvZiB0aGUgc2hhZG93IGxvZ2ljIGR1cmluZw0KPiA+ID4gPiA+ID4gPiAzLjAgZGV2ZWwgY3lj
-bGUNCj4gPiA+IEFGQUlDVC4NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4g
-PiBSZWJhc2VkIHRvIFFFTVUgMy4xDQo+ID4gPiA+ID4gPiBOb3cgSSBzZWUgdGhlIGFkZHJlc3Mg
-SSdtIHRyeWluZyB0byByZWFkIGZyb20gaW4gbG9nIGJ1dCBzdGlsbCBzYW1lDQo+IGVycm9yOg0K
-PiA+ID4gPiA+ID4gIg0KPiA+ID4gPiA+ID4gVW5hc3NpZ25lZCBtZW0gcmVhZCAwMDAwMDAwMGYw
-NDgxMDAwICINCj4gPiA+ID4gPiA+IFdoYXQgZG8geW91IHN1Z2dlc3Q/DQo+ID4gPiA+ID4NCj4g
-PiA+ID4gPiBXb3VsZCB5b3UgcGxlYXNlIGFuc3dlciB0aGUgcXVlc3Rpb25zIHRoYXQgS251dCBh
-c2tlZD8gIElzIGl0DQo+ID4gPiA+ID4gd29ya2luZyBmb3IgTDEgZ3Vlc3Q/ICBIb3cgYWJvdXQg
-UEY/DQo+ID4gPiA+DQo+ID4gPiA+IEJvdGggVkYgYW5kIFBGIGFyZSB3b3JraW5nIGZvciBMMSBn
-dWVzdC4NCj4gPiA+ID4gSSBkb24ndCBrbm93IGhvdyB0byBwYXNzdGhyb3VnaCBQRiB0byBuZXN0
-ZWQgVk0gaW4gaHlwZXItdi4NCj4gPiA+DQo+ID4gPiBPbiBMaW51eCBwYXNzaW5nIHRocm91Z2gg
-VkZzIGFuZCBQRnMgYXJlIHRoZSBzYW1lLg0KPiA+ID4gTWF5YmUgeW91IGNhbiB0cnkgcGFzc3Ro
-cm91Z2ggd2l0aCBhbGwgTGludXggZmlyc3Q/IChmaXJzdCBQRiB0aGVuIFZGKSA/DQo+ID4gPg0K
-PiA+ID4gPiBJIGRvbid0IGludm9rZSBWRiBtYW51YWxseSBpbiBoeXBlci12IGFuZCBwYXNzIGl0
-IHRocm91Z2ggdG8NCj4gPiA+ID4gbmVzdGVkIFZNLiBJIHVzZSBoeXBlci12IG1hbmFnZXIgdG8g
-Y29uZmlndXJlIGFuZCBwcm92aWRlIGEgVkYgZm9yDQo+ID4gPiA+IG5lc3RlZCBWTSAoSSBjYW4g
-c2VlIHRoZSBWRiBvbmx5IGluIHRoZSBuZXN0ZWQgVk0pLg0KPiA+ID4gPg0KPiA+ID4gPiBEaWQg
-c29tZW9uZSB0cnkgdG8gcnVuIGVtdWxhdGVkIGRldmljZSBpbiBsaW51eCBSSCBhcyBuZXN0ZWQg
-TDINCj4gPiA+ID4gd2hlcmUNCj4gPiA+ID4gTDEgaXMgd2luZG93cyBoeXBlci12PyBEb2VzIERN
-QSByZWFkL3dyaXRlIHdvcmsgZm9yIHRoaXMgZW11bGF0ZWQNCj4gPiA+IGRldmljZSBpbiB0aGlz
-IGNhc2U/DQo+ID4gPg0KPiA+ID4gSSBoYXZlIG5ldmVyIHRyaWVkIHRoYXQsIEkgaGF2ZSBvbmx5
-IHVzZWQgTGludXggYXMgTDIsIFdpbmRvd3MgbWlnaHQNCj4gPiA+IGJlIHBpY2tpZXIgYWJvdXQg
-d2hhdCBpdCBleHBlY3RzLCBzbyBzdGFydGluZyB3aXRoIExpbnV4IHRvIHJ1bGUNCj4gPiA+IHRo
-YXQgb3V0IGlzIHByb2JhYmx5IGEgZ29vZCBpZGVhLg0KPiA+DQo+ID4gV2lsbCBtb3ZlIHRvIHRo
-aXMgc29sdXRpb24gYWZ0ZXIgSS93ZSBnaXZlIHVwIPCfmIoNCj4gPg0KPiA+ID4NCj4gPiA+ID4g
-Pg0KPiA+ID4gPiA+IFlvdSBjYW4gYWxzbyB0cnkgdG8gZW5hYmxlIFZULWQgZGV2aWNlIGxvZyBi
-eSBhcHBlbmRpbmc6DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiAgIC10cmFjZSBlbmFibGU9InZ0ZF8q
-Ig0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSW4gY2FzZSBpdCBkdW1wcyBhbnl0aGluZyB1c2VmdWwg
-Zm9yIHlvdS4NCj4gPg0KPiA+IEhlcmUgaXMgdGhlIHJlbGV2YW50IGR1bXAgKGRldiAwMTowMC4w
-MSBpcyBteSBWRik6DQo+ID4gIg0KPiA+IHZ0ZF9pbnZfZGVzY19jY19kZXZpY2UgY29udGV4dCBp
-bnZhbGlkYXRlIGRldmljZSAwMTowMC4wMQ0KPiA+IHZ0ZF9jZV9ub3RfcHJlc2VudCBDb250ZXh0
-IGVudHJ5IGJ1cyAxIGRldmZuIDEgbm90IHByZXNlbnQNCj4gPiB2dGRfc3dpdGNoX2FkZHJlc3Nf
-c3BhY2UgRGV2aWNlIDAxOjAwLjEgc3dpdGNoaW5nIGFkZHJlc3Mgc3BhY2UgKGlvbW11DQo+ID4g
-ZW5hYmxlZD0xKSB2dGRfY2Vfbm90X3ByZXNlbnQgQ29udGV4dCBlbnRyeSBidXMgMSBkZXZmbiAx
-IG5vdCBwcmVzZW50DQo+ID4gdnRkX2VyciBEZXRlY3RlZCBpbnZhbGlkIGNvbnRleHQgZW50cnkg
-d2hlbiB0cnlpbmcgdG8gc3luYyBzaGFkb3cgcGFnZQ0KPiA+IHRhYmxlDQo+IA0KPiBUaGVzZSBs
-aW5lcyBtZWFuIHRoYXQgdGhlIGd1ZXN0IHNlbnQgYSBkZXZpY2UgaW52YWxpZGF0aW9uIHRvIHlv
-dXIgVkYgYnV0IHRoZQ0KPiBJT01NVSBmb3VuZCB0aGF0IHRoZSBkZXZpY2UgY29udGV4dCBlbnRy
-eSBpcyBtaXNzaW5nLg0KPiANCj4gPiB2dGRfaW90bGJfY2NfdXBkYXRlIElPVExCIGNvbnRleHQg
-dXBkYXRlIGJ1cyAweDEgZGV2Zm4gMHgxIGhpZ2ggMHgxMDINCj4gPiBsb3cgMHgyZDAwNzAwMyBn
-ZW4gMCAtPiBnZW4gMiB2dGRfZXJyX2RtYXJfc2xwdGVfcmVzdl9lcnJvciBpb3ZhDQo+ID4gMHhm
-MDhlNzAwMCBsZXZlbCAyIHNscHRlIDB4MmE1NDAwOGY3DQo+IA0KPiBUaGlzIGxpbmUgc2hvdWxk
-IG5vdCBleGlzdCBpbiBsYXRlc3QgUUVNVS4gIEFyZSB5b3Ugc3VyZSB5b3UncmUgdXNpbmcgdGhl
-IGxhdGVzdA0KPiBRRU1VPw0KDQpJIG1vdmVkIG5vdyB0byBRRU1VIDQuMCBSQzIuDQpUaGlzIGlz
-IHRoZSB3aGF0IEkgZ2V0IG5vdzoNCnZ0ZF9pb3RsYl9jY191cGRhdGUgSU9UTEIgY29udGV4dCB1
-cGRhdGUgYnVzIDB4MSBkZXZmbiAweDEgaGlnaCAweDEwMiBsb3cgMHgyZjAwNzAwMyBnZW4gMCAt
-PiBnZW4gMQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiB2dGRfaW92YV90b19zbHB0ZTogZGV0ZWN0ZWQg
-c3BsdGUgcmVzZXJ2ZSBub24temVybyBpb3ZhPTB4ZjBkMjkwMDAsIGxldmVsPTB4MnNscHRlPTB4
-MjlmNjAwOGY3KQ0KdnRkX2ZhdWx0X2Rpc2FibGVkIEZhdWx0IHByb2Nlc3NpbmcgZGlzYWJsZWQg
-Zm9yIGNvbnRleHQgZW50cnkNCnFlbXUtc3lzdGVtLXg4Nl82NDogdnRkX2lvbW11X3RyYW5zbGF0
-ZTogZGV0ZWN0ZWQgdHJhbnNsYXRpb24gZmFpbHVyZSAoZGV2PTAxOjAwOjAxLCBpb3ZhPTB4ZjBk
-MjkwMDApDQpVbmFzc2lnbmVkIG1lbSByZWFkIDAwMDAwMDAwZjBkMjkwMDANCg0KSSdtIG5vdCBm
-YW1pbGlhciB3aXRoIHZJT01NVSByZWdpc3RlcnMsIGJ1dCBJIG5vdGljZWQgdGhhdCBJIG11c3Qg
-cmVwb3J0IHNub29wIGNvbnRyb2wgc3VwcG9ydCB0byBIeXBlci1WIChpLmUuIGJpdCA3IGluIGV4
-dGVuZGVkIGNhcGFiaWxpdHkgcmVnaXN0ZXIgb2YgdklPTU1VKSBpbi1vcmRlciB0byBzYXRpc2Z5
-IElPTU1VIHN1cHBvcnQgZm9yIFNSSU9WLg0KdklPTU1VLmVjYXAgYmVmb3JlICAgIDB4ZjAwZjVl
-DQp2SU9NTVUuZWNhcCBhZnRlciAgICAgICAweGYwMGZkZQ0KQnV0IEkgc2VlIHRoYXQgdklPTU1V
-IGRvZXNuJ3QgcmVhbGx5IHN1cHBvcnQgc25vb3AgY29udHJvbC4NCkNvdWxkIHRoaXMgYmUgdGhl
-IHByb2JsZW0gdGhhdCBmYWlscyBJT1ZBIHJhbmdlIGNoZWNrIGluIHRoaXMgZnVuY3Rpb24gdnRk
-X2lvdmFfcmFuZ2VfY2hlY2soKT8NCklmIHNvLCBpcyB0aGVyZSBhIHdheSB0byB3b3JrLWFyb3Vu
-ZCB0aGlzIGlzc3VlPw0KDQo+IA0KPiBJIGFncmVlIHdpdGggS251dCB0aGF0IEkgd291bGQgc3Vn
-Z2VzdCB5b3UgdG8gdXNlIHVzZSBMaW51eCBpbiBib3RoIGhvc3QgYW5kDQo+IGd1ZXN0cyBmaXJz
-dCB0byB0cmlhZ2UgdGhlIGlzc3VlLg0KPiANCj4gUmVnYXJkcywNCj4gDQo+IC0tDQo+IFBldGVy
-IFh1DQo=
+On Wed, Apr 03, 2019 at 04:10:18PM +0530, Pankaj Gupta wrote:
+> Virtio pmem provides asynchronous host page cache flush
+> mechanism. we don't support 'MAP_SYNC' with virtio pmem 
+> and xfs.
+> 
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  fs/xfs/xfs_file.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index 1f2e2845eb76..dced2eb8c91a 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -1203,6 +1203,14 @@ xfs_file_mmap(
+>  	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
+>  		return -EOPNOTSUPP;
+>  
+> +	/* We don't support synchronous mappings with DAX files if
+> +	 * dax_device is not synchronous.
+> +	 */
+> +	if (IS_DAX(file_inode(filp)) && !dax_synchronous(
+> +		xfs_find_daxdev_for_inode(file_inode(filp))) &&
+> +					(vma->vm_flags & VM_SYNC))
+> +		return -EOPNOTSUPP;
+> +
+>  	file_accessed(filp);
+>  	vma->vm_ops = &xfs_file_vm_ops;
+>  	if (IS_DAX(file_inode(filp)))
+
+All this ad hoc IS_DAX conditional logic is getting pretty nasty.
+
+xfs_file_mmap(
+....
+{
+	struct inode	*inode = file_inode(filp);
+
+	if (vma->vm_flags & VM_SYNC) {
+		if (!IS_DAX(inode))
+			return -EOPNOTSUPP;
+		if (!dax_synchronous(xfs_find_daxdev_for_inode(inode))
+			return -EOPNOTSUPP;
+	}
+
+	file_accessed(filp);
+	vma->vm_ops = &xfs_file_vm_ops;
+	if (IS_DAX(inode))
+		vma->vm_flags |= VM_HUGEPAGE;
+	return 0;
+}
+
+
+Even better, factor out all the "MAP_SYNC supported" checks into a
+helper so that the filesystem code just doesn't have to care about
+the details of checking for DAX+MAP_SYNC support....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
