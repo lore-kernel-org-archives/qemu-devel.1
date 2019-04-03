@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52892)
+Received: from eggs.gnu.org ([209.51.188.92]:53689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hBfxP-0003bw-5z
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:29:36 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hBg17-00051k-5R
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:33:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hBfxO-0003eS-8V
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:29:35 -0400
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
-	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
-	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
-	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
-	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
-	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
-	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
-	<20190403114901.6e4ea653@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
-Date: Wed, 3 Apr 2019 15:29:23 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hBg14-00077q-Gk
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:33:25 -0400
+Resent-Message-Id: <E1hBg14-00077q-Gk@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hBg14-00074R-6J
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:33:22 -0400
+Message-ID: <155429744666.12882.2447155274116200640@76452e4e88f2>
+In-Reply-To: <20190403125055.26564-1-jbi.octave@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
- feature "fdt"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 3 Apr 2019 06:17:31 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] target/mips/cpu: errors and warnings
+ coding style cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
+To: jbi.octave@gmail.com
+Cc: fam@euphon.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, qemu-devel@nongnu.org, aurelien@aurel32.net
 
-On 04/03/19 14:10, Shameerali Kolothum Thodi wrote:
-
->>>>> So, the condition for hiding the hotpluggable memory nodes in question
->>>>> from the DT is:
->>>>
->>>>>
->>>>>   (aarch64 && firmware_loaded && acpi_enabled)
-
->>> While UEFI has bindings for both 32-bit and 64-bit ARM, ACPI has a
->>> 64-bit-only binding for ARM. (And you can have UEFI without ACPI, but
->>> not the reverse, on ARM.) So if you run the 32-bit build of the
->>> ArmVirtQemu firmware, you get no ACPI at all; all you can rely on with
->>> the OS is the DT.
-> 
-> Just to confirm, does that mean with 32-bit build of the UEFI, the OS cannot
-> boot with ACPI and uses DT only.
-
-Indeed.
-
-> So,
-> 
-> If ((aarch64 && firmware_loaded && acpi_enabled) {
->    Hide_hotpluggable_memory_nodes()
-> } else {
->    Add_ hotpluggable_memory_nodes()
-> }
-> 
-> should work for all cases?
-
-Yes.
-
-Here's what happens when any one of the subconditions evaluates to false:
-
-- ARM32 has no ACPI bindings, so the guest kernel can only use DT.
-
-- On AARCH64, if you don't "load the firmware" (= don't use UEFI), then
-  there won't be an ACPI entry point for the OS to locate (the RSD PTR
-  is defined by the ACPI spec in UEFI terms, for AARCH64). So the guest
-  kernel can only use DT.
-
-- When on AARCH64 and using UEFI, but asking QEMU not to generate ACPI
-  content, the firmware will not install any ACPI tables, so the guest
-  kernel can only use DT.
-
->>> This "bitness distinction" is implemented in the firmware already. If
->>> you hid the memory nodes from the DT under the condition
->>>
->>>   (!aarch64 && firmware_loaded && acpi_enabled)
->>>
->>> then the nodes would not be seen by the OS at all (because
->>> "acpi_enabled" is irrelevant for the 32-bit build of ArmVirtQemu, and
->>> all the OS can ever get is DT).
->>
->> It's getting tricky and I don't like a bit that we are trying to carter
->> 64 bit only UEFI build (or any other build) on QEMU side. Also Peter has
->> a valid about guessing on QEMU side (that's usually a source of problem
->> in the future).
-> 
-> If the above is correct(with 32-bit variant of UEFI, OS cannot have ACPI boot),
-> then do we really have the issue of memory becoming non hot-un-unpluggable?
-> May be I am missing something. 
-
-I think Igor and Peter dislike adding complex logic to QEMU that
-reflects the behavior of a specific firmware. AIUI their objection isn't
-that it wouldn't work, but that it's not the right thing to do, from a
-design perspective.
-
-Thanks,
-Laszlo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwMzEyNTA1NS4yNjU2
+NC0xLWpiaS5vY3RhdmVAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQwMzEyNTA1NS4yNjU2NC0xLWpiaS5vY3Rh
+dmVAZ21haWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSB0YXJnZXQvbWlw
+cy9jcHU6IGVycm9ycyBhbmQgd2FybmluZ3MgY29kaW5nIHN0eWxlIGNsZWFudXAKVHlwZTogc2Vy
+aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2Ug
+YmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3
+LzIwMTkwMzE5MTQ0MDEzLjI2NTg0LTItcGJvbnppbmlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
+MTkwMzE5MTQ0MDEzLjI2NTg0LTItcGJvbnppbmlAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0g
+ICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDAxMTU0MDI4LkdBMTA1NzRAZXJva2VubGFic2VydmVy
+IC0+IHBhdGNoZXcvMjAxOTA0MDExNTQwMjguR0ExMDU3NEBlcm9rZW5sYWJzZXJ2ZXIKICogW25l
+dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQwMzEyNTA1NS4yNjU2NC0xLWpiaS5v
+Y3RhdmVAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MDMxMjUwNTUuMjY1NjQtMS1qYmkub2N0
+YXZlQGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjQ1YTYyMTJiNGEg
+dGFyZ2V0L21pcHM6IHdyYXAgbGluZSBpbnRvIG11bHRpcGxlIGxpbmVzIHRvIHRvIGZpeCBjaGVj
+a3BhdGNoIGVycm9ycwo3MWYxODY3MDk0IHRhcmdldC9taXBzOiByZW1vdmUgc3BhY2UgdG8gZml4
+IGNoZWNrcGF0Y2ggZXJyb3JzCjY4YjQ0NjNjNzIgdGFyZ2V0L21pcHM6IHJlcGxhY2UgaW5kZW50
+YXRpb24gd2l0aCBzcGFjZSB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKYjI2NTg1OTgzNyB0YXJn
+ZXQvbWlwczogcmVhbGlnbiBjb21tZW50cyB0byBmaXggY2hlY2twYXRjaCB3YXJuaW5ncwpmYmY2
+MWY3NTkxIHRhcmdldC9taXBzOiBhZGQgc3BhY2UgdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzUgQ2hlY2tpbmcgY29tbWl0IGZiZjYxZjc1OTE2NyAodGFy
+Z2V0L21pcHM6IGFkZCBzcGFjZSB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMpCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojNDA6IEZJTEU6IHRhcmdldC9taXBzL2NwdS5oOjc0OgorI2Rl
+ZmluZSBTRVRfRlBfQ09ORChudW0sIGVudikgICAgZG8geyAoKGVudikuZmNyMzEpIHw9ICgobnVt
+KSA/ICgxIDw8ICgobnVtKSArIDI0KSkgOiAoMSA8PCAyMykpOyB9IHdoaWxlICgwKQoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MTogRklMRTogdGFyZ2V0L21pcHMvY3B1Lmg6NzU6
+CisjZGVmaW5lIENMRUFSX0ZQX0NPTkQobnVtLCBlbnYpICAgZG8geyAoKGVudikuZmNyMzEpICY9
+IH4oKG51bSkgPyAoMSA8PCAoKG51bSkgKyAyNCkpIDogKDEgPDwgMjMpKTsgfSB3aGlsZSAoMCkK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTA6IEZJTEU6IHRhcmdldC9taXBzL2Nw
+dS5oOjgwOgorI2RlZmluZSBTRVRfRlBfQ0FVU0UocmVnLCB2KSAgICAgIGRvIHsgKHJlZykgPSAo
+KHJlZykgJiB+KDB4M2YgPDwgMTIpKSB8ICgodiAmIDB4M2YpIDw8IDEyKTsgfSB3aGlsZSAoMCkK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTE6IEZJTEU6IHRhcmdldC9taXBzL2Nw
+dS5oOjgxOgorI2RlZmluZSBTRVRfRlBfRU5BQkxFKHJlZywgdikgICAgIGRvIHsgKHJlZykgPSAo
+KHJlZykgJiB+KDB4MWYgPDwgIDcpKSB8ICgodiAmIDB4MWYpIDw8IDcpOyB9IHdoaWxlICgwKQoK
+RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MjogRklMRTogdGFyZ2V0L21pcHMvY3B1
+Lmg6ODI6CisjZGVmaW5lIFNFVF9GUF9GTEFHUyhyZWcsIHYpICAgICAgZG8geyAocmVnKSA9ICgo
+cmVnKSAmIH4oMHgxZiA8PCAgMikpIHwgKCh2ICYgMHgxZikgPDwgMik7IH0gd2hpbGUgKDApCgp0
+b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDM2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvNSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi81IENoZWNraW5nIGNvbW1pdCBiMjY1ODU5ODM3
+ZjUgKHRhcmdldC9taXBzOiByZWFsaWduIGNvbW1lbnRzIHRvIGZpeCBjaGVja3BhdGNoIHdhcm5p
+bmdzKQpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNjY6IEZJTEU6IHRhcmdldC9taXBzL2Nw
+dS5oOjk5NToKKyAgICAgKiB0aGlzIGZyb20gdGhyZWUgYml0cyB0byB0d28uICAkCgpFUlJPUjog
+dHJhaWxpbmcgd2hpdGVzcGFjZQojODk6IEZJTEU6IHRhcmdldC9taXBzL2NwdS5oOjExMDk6Cisv
+KiAkCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDcxIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDIvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA2OGI0
+NDYzYzcyN2YgKHRhcmdldC9taXBzOiByZXBsYWNlIGluZGVudGF0aW9uIHdpdGggc3BhY2UgdG8g
+Zml4IGNoZWNrcGF0Y2ggZXJyb3JzKQo0LzUgQ2hlY2tpbmcgY29tbWl0IDcxZjE4NjcwOTRjZiAo
+dGFyZ2V0L21pcHM6IHJlbW92ZSBzcGFjZSB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMpCjUvNSBD
+aGVja2luZyBjb21taXQgNDVhNjIxMmI0YWQ5ICh0YXJnZXQvbWlwczogd3JhcCBsaW5lIGludG8g
+bXVsdGlwbGUgbGluZXMgdG8gdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzKQo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwMzEyNTA1NS4yNjU2
+NC0xLWpiaS5vY3RhdmVAZ21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
