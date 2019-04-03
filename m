@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52625)
+Received: from eggs.gnu.org ([209.51.188.92]:52892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hBfwL-00033E-Bf
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:28:30 -0400
+	(envelope-from <lersek@redhat.com>) id 1hBfxP-0003bw-5z
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hBfwK-0002wg-63
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:28:29 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hBfwJ-0002vv-U2
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:28:28 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h4so21335194wre.7
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 06:28:26 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1hBfxO-0003eS-8V
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 09:29:35 -0400
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
+	<20190403114901.6e4ea653@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
+Date: Wed, 3 Apr 2019 15:29:23 +0200
 MIME-Version: 1.0
-References: <20190403121620.5228-1-philmd@redhat.com>
-	<20190403122328.GQ25150@redhat.com>
-In-Reply-To: <20190403122328.GQ25150@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Wed, 3 Apr 2019 15:28:14 +0200
-Message-ID: <CAP+75-UwjDEciweEeAdxYUw_gZFjjSxXkyBX_oq_RCE+Axm4Hg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sockets: Fix stringop-truncation warning
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
-On Wed, Apr 3, 2019 at 2:23 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
-> On Wed, Apr 03, 2019 at 02:16:20PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Compiling with clang-8 fails with:
-> >
-> >     CC      util/qemu-sockets.o
-> >   util/qemu-sockets.c: In function 'unix_connect_saddr':
-> >   util/qemu-sockets.c:925:5: error: 'strncpy' specified bound 108 equal=
-s destination size [-Werror=3Dstringop-truncation]
-> >        strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
-> >        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >   util/qemu-sockets.c: In function 'unix_listen_saddr':
-> >   util/qemu-sockets.c:880:5: error: 'strncpy' specified bound 108 equal=
-s destination size [-Werror=3Dstringop-truncation]
-> >        strncpy(un.sun_path, path, sizeof(un.sun_path));
-> >        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >
-> > Per the unix socket manpage:
-> >
-> >   UNIX(7)
-> >
-> >   Pathname sockets
-> >   When binding a socket to a pathname, a few rules should be observed f=
-or maximum portability and ease of coding:
-> >   *  The pathname in sun_path should be null-terminated.
-> >   *  The length of the pathname, including the terminating null byte, s=
-hould not exceed the size of sun_path.
-> >
-> > Reduce the length of the unix socket path by 1 to hold the NUL byte.
->
-> Note it just says "should", not "must" here. IOW, there is no requirement
-> to NUL terminate and so we should not artifically require that at QEMU
-> level either. If mgmt apps want to have NUL termination then they can
-> just pass a shorter path to QEMU to start with.
->
-> I've proposed the fix for the warning you mention here:
->
->   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07759.html
+On 04/03/19 14:10, Shameerali Kolothum Thodi wrote:
 
-Oh I missed it, thanks for pointing it.
+>>>>> So, the condition for hiding the hotpluggable memory nodes in question
+>>>>> from the DT is:
+>>>>
+>>>>>
+>>>>>   (aarch64 && firmware_loaded && acpi_enabled)
 
-Regards,
+>>> While UEFI has bindings for both 32-bit and 64-bit ARM, ACPI has a
+>>> 64-bit-only binding for ARM. (And you can have UEFI without ACPI, but
+>>> not the reverse, on ARM.) So if you run the 32-bit build of the
+>>> ArmVirtQemu firmware, you get no ACPI at all; all you can rely on with
+>>> the OS is the DT.
+> 
+> Just to confirm, does that mean with 32-bit build of the UEFI, the OS cannot
+> boot with ACPI and uses DT only.
 
-Phil.
+Indeed.
+
+> So,
+> 
+> If ((aarch64 && firmware_loaded && acpi_enabled) {
+>    Hide_hotpluggable_memory_nodes()
+> } else {
+>    Add_ hotpluggable_memory_nodes()
+> }
+> 
+> should work for all cases?
+
+Yes.
+
+Here's what happens when any one of the subconditions evaluates to false:
+
+- ARM32 has no ACPI bindings, so the guest kernel can only use DT.
+
+- On AARCH64, if you don't "load the firmware" (= don't use UEFI), then
+  there won't be an ACPI entry point for the OS to locate (the RSD PTR
+  is defined by the ACPI spec in UEFI terms, for AARCH64). So the guest
+  kernel can only use DT.
+
+- When on AARCH64 and using UEFI, but asking QEMU not to generate ACPI
+  content, the firmware will not install any ACPI tables, so the guest
+  kernel can only use DT.
+
+>>> This "bitness distinction" is implemented in the firmware already. If
+>>> you hid the memory nodes from the DT under the condition
+>>>
+>>>   (!aarch64 && firmware_loaded && acpi_enabled)
+>>>
+>>> then the nodes would not be seen by the OS at all (because
+>>> "acpi_enabled" is irrelevant for the 32-bit build of ArmVirtQemu, and
+>>> all the OS can ever get is DT).
+>>
+>> It's getting tricky and I don't like a bit that we are trying to carter
+>> 64 bit only UEFI build (or any other build) on QEMU side. Also Peter has
+>> a valid about guessing on QEMU side (that's usually a source of problem
+>> in the future).
+> 
+> If the above is correct(with 32-bit variant of UEFI, OS cannot have ACPI boot),
+> then do we really have the issue of memory becoming non hot-un-unpluggable?
+> May be I am missing something. 
+
+I think Igor and Peter dislike adding complex logic to QEMU that
+reflects the behavior of a specific firmware. AIUI their objection isn't
+that it wouldn't work, but that it's not the right thing to do, from a
+design perspective.
+
+Thanks,
+Laszlo
