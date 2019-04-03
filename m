@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51828)
+Received: from eggs.gnu.org ([209.51.188.92]:53106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hBe0k-0008Hs-Jt
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:24:55 -0400
+	(envelope-from <jack@suse.cz>) id 1hBe6a-0001Uf-6i
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hBe0j-00049r-Ik
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:24:54 -0400
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-18-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fbf79534-7e95-6999-ecd3-f142086c349a@redhat.com>
-Date: Wed, 3 Apr 2019 13:17:18 +0200
+	(envelope-from <jack@suse.cz>) id 1hBe6Z-0003z4-72
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:30:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43120 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1hBe6Y-0003wE-Ts
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 07:30:55 -0400
+Date: Wed, 3 Apr 2019 13:30:49 +0200
+From: Jan Kara <jack@suse.cz>
+Message-ID: <20190403113049.GF8836@quack2.suse.cz>
+References: <20190403104018.23947-1-pagupta@redhat.com>
+	<20190403104018.23947-5-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190403034358.21999-18-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/26] target/s390x: Convert to
- CPUClass::tlb_fill
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190403104018.23947-5-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] ext4: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com
 
->  #endif /* CONFIG_USER_ONLY */
-> +
-> +bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                       MMUAccessType access_type, int mmu_idx,
-> +                       bool probe, uintptr_t retaddr)
-> +{
-> +    S390CPU *cpu = S390_CPU(cs);
-> +
-> +#ifndef CONFIG_USER_ONLY
-> +    CPUS390XState *env = &cpu->env;
-> +    target_ulong vaddr, raddr;
-> +    uint64_t asc;
-> +    int prot, fail;
-> +
-> +    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-> +                  __func__, address, access_type, mmu_idx);
-> +
-> +    vaddr = address;
-> +
-> +    if (mmu_idx < MMU_REAL_IDX) {
-> +        asc = cpu_mmu_idx_to_asc(mmu_idx);
-> +        /* 31-Bit mode */
-> +        if (!(env->psw.mask & PSW_MASK_64)) {
-> +            vaddr &= 0x7fffffff;
-> +        }
-> +        fail = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, true);
-> +    } else if (mmu_idx == MMU_REAL_IDX) {
-> +        /* 31-Bit mode */
-> +        if (!(env->psw.mask & PSW_MASK_64)) {
-> +            vaddr &= 0x7fffffff;
-> +        }
-> +        fail = mmu_translate_real(env, vaddr, access_type, &raddr, &prot);
-> +    } else {
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    /* check out of RAM access */
-> +    if (!fail &&
-> +        !address_space_access_valid(&address_space_memory, raddr,
-> +                                    TARGET_PAGE_SIZE, access_type,
-> +                                    MEMTXATTRS_UNSPECIFIED)) {
-> +        qemu_log_mask(CPU_LOG_MMU,
-> +                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
-> +                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
-> +        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-> +        fail = 1;
-> +    }
-> +
-> +    if (!fail) {
-> +        qemu_log_mask(CPU_LOG_MMU,
-> +                      "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
-> +                      __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
-> +        tlb_set_page(cs, address & TARGET_PAGE_MASK, raddr, prot,
-> +                     mmu_idx, TARGET_PAGE_SIZE);
-> +        return true;
-> +    }
-> +    if (probe) {
-> +        return false;
-> +    }
-> +#else
-> +    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
-> +    /*
-> +     * On real machines this value is dropped into LowMem.  Since this
-> +     * is userland, simply put this someplace that cpu_loop can find it.
-> +     */
-> +    cpu->env.__excp_addr = address;
-> +#endif
-> +
-> +    cpu_restore_state(cs, retaddr, true);
-> +
-> +    /*
-> +     * Note that handle_mmu_fault sets ilen to either 2 (for code)
+On Wed 03-04-19 16:10:17, Pankaj Gupta wrote:
+> Virtio pmem provides asynchronous host page cache flush
+> mechanism. We don't support 'MAP_SYNC' with virtio pmem 
+> and ext4. 
+> 
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 
-This comment no longer matches.
+The patch looks good to me. You can add:
 
-> +     * or AUTO (for data).  We can resolve AUTO now, as if it was
-> +     * set to UNWIND -- that will have been done via assignment
-> +     * in cpu_restore_state.  Otherwise re-examine access_type.
-> +     */
-> +    if (access_type == MMU_INST_FETCH) {
-> +        CPUS390XState *env = cs->env_ptr;
-> +        env->int_pgm_ilen = 2;
-> +    }
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/ext4/file.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 69d65d49837b..86e4bf464320 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -360,8 +360,10 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
+>  static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
+>  {
+>  	struct inode *inode = file->f_mapping->host;
+> +	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+> +	struct dax_device *dax_dev = sbi->s_daxdev;
+>  
+> -	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+> +	if (unlikely(ext4_forced_shutdown(sbi)))
+>  		return -EIO;
+>  
+>  	/*
+> @@ -371,6 +373,13 @@ static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
+>  	if (!IS_DAX(file_inode(file)) && (vma->vm_flags & VM_SYNC))
+>  		return -EOPNOTSUPP;
+>  
+> +	/* We don't support synchronous mappings with DAX files if
+> +	 * dax_device is not synchronous.
+> +	 */
+> +	if (IS_DAX(file_inode(file)) && !dax_synchronous(dax_dev)
+> +						&& (vma->vm_flags & VM_SYNC))
+> +		return -EOPNOTSUPP;
 > +
-> +    cpu_loop_exit(cs);
-> +}
-> +
-
-Apart from that, looks good to me.
-
+>  	file_accessed(file);
+>  	if (IS_DAX(file_inode(file))) {
+>  		vma->vm_ops = &ext4_dax_vm_ops;
+> -- 
+> 2.20.1
+> 
 -- 
-
-Thanks,
-
-David / dhildenb
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
