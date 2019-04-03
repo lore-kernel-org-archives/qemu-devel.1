@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57581)
+Received: from eggs.gnu.org ([209.51.188.92]:60035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1hBaNk-0006pz-RY
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:32:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hBabG-0001l1-EN
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1hBaNj-0002b3-Sv
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:32:24 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41438 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1hBaNj-0002Yl-FK
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:32:23 -0400
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <f3a469aa-4a18-a8be-3a37-8989401e2db7@huawei.com>
-Date: Wed, 3 Apr 2019 15:32:09 +0800
+	(envelope-from <richard.henderson@linaro.org>) id 1hBabE-0006LB-Gv
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:46:22 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:45755)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hBabB-0006GW-FG
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 03:46:18 -0400
+Received: by mail-pg1-x530.google.com with SMTP id y3so7869645pgk.12
+	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 00:46:16 -0700 (PDT)
+References: <1554218121-26766-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554218121-26766-2-git-send-email-mateja.marjanovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <8258dcf8-d84a-c642-e18b-d16be001f587@linaro.org>
+Date: Wed, 3 Apr 2019 14:46:09 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <1554218121-26766-2-git-send-email-mateja.marjanovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Question: can we hot plug a PCIe switch on machine
- "virt"
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] target/mips: Optimize
+ ILVOD.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: wanghaibin 00208455 <wanghaibin.wang@huawei.com>
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-Hi folks,
+On 4/2/19 10:15 PM, Mateja Marjanovic wrote:
+> +static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    const uint64_t mask = 0xffffffff00000000ULL;
+> +
+> +    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_shri_i64(t1, t1, 32);
 
-In physical world, a PCIe switch including one upstream port and several downstream ports is a single physical device, however we treat each port as a device in qemu world. In qemu docs/pcie.txt, we have below statements:
+The andi is useless.  The bits that it discards are also discarded by the shift.
 
-Line 230: Be aware that PCI Express Downstream Ports can't be hot-plugged into
-Line 231: an existing PCI Express Upstream Port.
 
-To my understanding, it implies PCIe downstream ports *can* be hot-plugged into something which is not an existing upstream port. If it is true, how can we do that? AFAIK monitor command device_add can only add one device at a time.
-
-Please help to show the truth.
-
-Thanks,
-
-Heyi
+r~
