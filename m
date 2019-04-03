@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44285)
+Received: from eggs.gnu.org ([209.51.188.92]:58680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hBp3G-0003BW-0f
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 19:12:15 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hBpJV-0006XE-O0
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 19:29:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hBp3C-0007B5-Mq
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 19:12:13 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hBpJS-0003lw-15
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 19:28:59 -0400
 MIME-Version: 1.0
-References: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
-In-Reply-To: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
+References: <20190401031155.21293-1-richard.henderson@linaro.org>
+	<20190401031155.21293-2-richard.henderson@linaro.org>
+In-Reply-To: <20190401031155.21293-2-richard.henderson@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 3 Apr 2019 16:10:13 -0700
-Message-ID: <CAKmqyKNVno+jR_PYxgnyqQOSQFCn_ai7GH+hYPgaO=fkqHDa6A@mail.gmail.com>
+Date: Wed, 3 Apr 2019 16:27:15 -0700
+Message-ID: <CAKmqyKOAAC_NpxBCBwK+0R=GO8b2YxEfzU0Thh9QNSB_x1FAWQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/riscv: Do not allow sfence.vma from
- user mode
+Subject: Re: [Qemu-devel] [PATCH for-4.1 1/8] target/riscv: Name the
+ argument sets for all of insn32 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jonathan Behrens <fintelia@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>
 
-On Mon, Apr 1, 2019 at 1:39 PM Jonathan Behrens <fintelia@gmail.com> wrote:
+On Sun, Mar 31, 2019 at 8:12 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The 'sfence.vma' instruction is privileged, and should only ever be allowed
-> when executing in supervisor mode or higher.
->
-> Jonathan
->
-> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  target/riscv/op_helper.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  target/riscv/insn32.decode | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 >
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index b7dc18a41e..644d0fb35f 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -145,9 +145,10 @@ void helper_tlb_flush(CPURISCVState *env)
->  {
->      RISCVCPU *cpu = riscv_env_get_cpu(env);
->      CPUState *cs = CPU(cpu);
-> -    if (env->priv == PRV_S &&
-> -        env->priv_ver >= PRIV_VERSION_1_10_0 &&
-> -        get_field(env->mstatus, MSTATUS_TVM)) {
-> +    if (!(env->priv >= PRV_S) ||
-> +        (env->priv == PRV_S &&
-> +         env->priv_ver >= PRIV_VERSION_1_10_0 &&
-> +         get_field(env->mstatus, MSTATUS_TVM))) {
->          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
->      } else {
->          tlb_flush(cs);
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 6f3ab7aa52..77f794ed70 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -34,9 +34,13 @@
+>  %imm_u    12:s20                 !function=ex_shift_12
+>
+>  # Argument sets:
+> +&empty
+>  &b    imm rs2 rs1
+>  &i    imm rs1 rd
+> +&j    imm rd
+>  &r    rd rs1 rs2
+> +&s    imm rs1 rs2
+> +&u    imm rd
+>  &shift     shamt rs1 rd
+>  &atomic    aq rl rs2 rs1 rd
+>
+> @@ -44,9 +48,9 @@
+>  @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
+>  @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
+>  @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
+> -@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
+> -@u       ....................      ..... .......         imm=%imm_u          %rd
+> -@j       ....................      ..... .......         imm=%imm_j          %rd
+> +@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
+> +@u       ....................      ..... ....... &u      imm=%imm_u          %rd
+> +@j       ....................      ..... ....... &j      imm=%imm_j          %rd
+>
+>  @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
+>  @csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
 > --
-> 2.20.1
+> 2.17.1
+>
+>
