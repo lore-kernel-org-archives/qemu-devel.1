@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60753)
+Received: from eggs.gnu.org ([209.51.188.92]:60822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hC014-00044p-9r
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:54:43 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hC01B-00047b-JU
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hBzyn-0004f7-0g
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:52:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hBzym-0004WK-L6
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:52:20 -0400
-Date: Thu, 4 Apr 2019 06:52:16 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <511760533.17430856.1554375136102.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190404095649.GB8738@angband.pl>
-References: <20190403104018.23947-1-pagupta@redhat.com>
-	<20190403104018.23947-6-pagupta@redhat.com>
-	<20190403220912.GB26298@dastard>
-	<1518295599.17367903.1554358350929.JavaMail.zimbra@redhat.com>
-	<20190404095649.GB8738@angband.pl>
+	(envelope-from <sgarzare@redhat.com>) id 1hBzuF-0003oD-Ea
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:47:40 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hBzuF-0003me-40
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:47:39 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c1so2452420wml.4
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 03:47:38 -0700 (PDT)
+Date: Thu, 4 Apr 2019 12:47:34 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190404104734.ncgxybz5nyiipns5@steredhat>
+References: <20190401163240.xw24ezsloy5ds2hz@steredhat>
+	<87zhp9599u.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
- flush
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87zhp9599u.fsf@zen.linaroharston>
+Subject: Re: [Qemu-devel] VSOCK benchmark and optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Dave Chinner <david@fromorbit.com>, darrick wong <darrick.wong@oracle.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan j williams <dan.j.williams@intel.com>, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu devel list <qemu-devel@nongnu.org>, netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>
+
+On Tue, Apr 02, 2019 at 04:19:25AM +0000, Alex Bennée wrote:
+> 
+> My main interest is how it stacks up against:
+> 
+>   --device virtio-net-pci and I guess the vhost equivalent
+> 
+
+Hi Alex,
+I added TCP tests on virtio-net and I did also a test with TCP_NODELAY,
+just to be fair, because VSOCK doesn't implement something like this
+(maybe could be an improvement to add for maximizing the throughput).
+I set the MTU to the maximum allowed (65520).
+
+I also redo the VSOCK tests. There are some differences because now I'm
+using tuned to have fewer fluctuations and I removed batching in VSOCK
+optimization because it is not ready to be published.
+
+                   VSOCK               TCP + virtio-net + vhost
+             host -> guest [Gbps]         host -> guest [Gbps]
+pkt_size    before opt.  optimized      TCP_NODELAY
+  64            0.060       0.096           0.16        0.15
+  256           0.22        0.36            0.32        0.57
+  512           0.42        0.74            1.2         1.2
+  1K            0.7         1.5             2.1         2.1
+  2K            1.5         2.9             3.5         3.4
+  4K            2.5         5.3             5.5         5.3
+  8K            3.9         8.8             8.0         7.9
+  16K           6.6        12.8             9.8        10.2
+  32K           9.9        18.1            11.8        10.7
+  64K          13.5        21.4            11.4        11.3
+  128K         17.9        23.6            11.2        11.0
+  256K         18.0        24.4            11.1        11.0
+  512K         18.4        25.3            10.1        10.7
+
+Note: Maybe I have something miss configured because TCP on virtio-net
+doesn't exceed 11 Gbps.
+
+                   VSOCK               TCP + virtio-net + vhost
+             guest -> host [Gbps]         guest -> host [Gbps]
+pkt_size    before opt.  optimized      TCP_NODELAY
+  64            0.088       0.101           0.24        0.24
+  256           0.35        0.41            0.36        1.03
+  512           0.70        0.73            0.69        1.6
+  1K            1.1         1.3             1.1         3.0
+  2K            2.4         2.6             2.1         5.5
+  4K            4.3         4.5             3.8         8.8
+  8K            7.3         7.6             6.6        20.0
+  16K           9.2        11.1            12.3        29.4
+  32K           8.3        18.1            19.3        28.2
+  64K           8.3        25.4            20.6        28.7
+  128K          7.2        26.7            23.1        27.9
+  256K          7.7        24.9            28.5        29.4
+  512K          7.7        25.0            28.3        29.3
+
+virtio-net is well optimized than VSOCK, but we are near :). Maybe we
+will use virtio-net as a transport for VSOCK, in order to avoid duplicate
+optimizations.
+
+How to reproduce TCP tests:
+
+host$ ip link set dev br0 mtu 65520
+host$ ip link set dev tap0 mtu 65520
+host$ qemu-system-x86_64 ... \
+      -netdev tap,id=net0,vhost=on,ifname=tap0,script=no,downscript=no \
+      -device virtio-net-pci,netdev=net0
+
+guest$ ip link set dev eth0 mtu 65520
+guest$ iperf3 -s
+
+host$ iperf3 -c ${VM_IP} -N -l ${pkt_size}      # host -> guest
+host$ iperf3 -c ${VM_IP} -N -l ${pkt_size} -R   # guest -> host
 
 
->=20
-> On Thu, Apr 04, 2019 at 02:12:30AM -0400, Pankaj Gupta wrote:
-> > > All this ad hoc IS_DAX conditional logic is getting pretty nasty.
-> > >=20
-> > > xfs_file_mmap(
-> > > ....
-> > > {
-> > > =09struct inode=09*inode =3D file_inode(filp);
-> > >=20
-> > > =09if (vma->vm_flags & VM_SYNC) {
-> > > =09=09if (!IS_DAX(inode))
-> > > =09=09=09return -EOPNOTSUPP;
-> > > =09=09if (!dax_synchronous(xfs_find_daxdev_for_inode(inode))
-> > > =09=09=09return -EOPNOTSUPP;
-> > > =09}
-> > >=20
-> > > =09file_accessed(filp);
-> > > =09vma->vm_ops =3D &xfs_file_vm_ops;
-> > > =09if (IS_DAX(inode))
-> > > =09=09vma->vm_flags |=3D VM_HUGEPAGE;
-> > > =09return 0;
-> > > }
-> >=20
-> > Sure, this is better.
->=20
-> > > Even better, factor out all the "MAP_SYNC supported" checks into a
-> > > helper so that the filesystem code just doesn't have to care about
-> > > the details of checking for DAX+MAP_SYNC support....
-> >=20
-> > o.k. Will add one common helper function for both ext4 & xfs filesystem=
-s.
->=20
-> Note this pending patch for Goldwyn Rodrigues' patchset for btrfs:
->=20
-> https://lore.kernel.org/linux-btrfs/20190328102418.5466-1-kilobyte@angban=
-d.pl/
->=20
-> We might want to coordinate.
-
-Sure. Good to know.
-
-Thanks for the pointer. Will have a look.
-
-Best regards,
-Pankaj=20
-
->=20
->=20
-> Meow!
-> --
-> =E2=A2=80=E2=A3=B4=E2=A0=BE=E2=A0=BB=E2=A2=B6=E2=A3=A6=E2=A0=80
-> =E2=A3=BE=E2=A0=81=E2=A2=A0=E2=A0=92=E2=A0=80=E2=A3=BF=E2=A1=81 Did ya kn=
-ow that typing "test -j8" instead of "ctest -j8"
-> =E2=A2=BF=E2=A1=84=E2=A0=98=E2=A0=B7=E2=A0=9A=E2=A0=8B=E2=A0=80 will make=
- your testsuite pass much faster, and fix bugs?
-> =E2=A0=88=E2=A0=B3=E2=A3=84=E2=A0=80=E2=A0=80=E2=A0=80=E2=A0=80
->=20
+Cheers,
+Stefano
