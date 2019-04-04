@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50794)
+Received: from eggs.gnu.org ([209.51.188.92]:55037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBrZh-0003RA-5W
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:53:54 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hBt4B-00069n-5v
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 23:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hBrZd-0001wP-MP
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:53:50 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hBrZc-0001br-2M
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:53:49 -0400
-Received: by mail-oi1-x244.google.com with SMTP id v84so566364oif.4
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 18:53:38 -0700 (PDT)
+	(envelope-from <like.xu@linux.intel.com>) id 1hBt1B-0002U1-Su
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 23:26:23 -0400
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<20190329112152.0c7ad147@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
+Message-ID: <7b902f2b-64b9-9c73-eeb0-1be33f1f2b07@linux.intel.com>
+Date: Thu, 4 Apr 2019 11:26:09 +0800
 MIME-Version: 1.0
-References: <20190403124948.GA14129@ls3530.dellerweb.de>
-	<20190403161729.GW25150@redhat.com>
-In-Reply-To: <20190403161729.GW25150@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Apr 2019 08:53:26 +0700
-Message-ID: <CAFEAcA-85Z9wtZrf2AddGkrPZFOPgxFZ5sNOZCCBkqZRp8M2Dg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Relax check for libseccomp
+In-Reply-To: <20190329112152.0c7ad147@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/9] refactor cpu topo into machine
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-trivial@nongnu.org, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 3 Apr 2019 at 23:27, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
->
-> On Wed, Apr 03, 2019 at 02:49:48PM +0200, Helge Deller wrote:
-> > diff --git a/configure b/configure
-> > index 1c563a7027..8632267049 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -2389,7 +2389,6 @@ if test "$seccomp" !=3D "no" ; then
-> >          libseccomp_minver=3D"2.3.0"
-> >          ;;
-> >      *)
-> > -        libseccomp_minver=3D""
-> >          ;;
-> >      esac
->
-> This makes sense to me. From a QEMU source POV we are able to build with
-> libseccomp >=3D 2.2.0, which our default libseccomp_minver=3D env express=
-es
-> a few lines earlier.
->
-> If libseccomp isn't supported on a platform, then I think we should just
-> assume that libseccomp won't be present in the OS install we are building
-> against. I don't think QEMU needs to second-guess whether or not it is
-> supported on the given architecture.
+On 2019/3/29 18:21, Igor Mammedov wrote:
+> On Fri, 29 Mar 2019 16:48:36 +0800
+> Like Xu <like.xu@linux.intel.com> wrote:
+> 
+>> This patch series make existing cores/threads/sockets into machine
+>> properties and get rid of global variables they use currently.
+> Thanks for looking into it!
+> Its long overdue and rather desired conversion (albeit naive one,
+> but this series is a good starting point). I'll go over your patches
+> next week with comments and concrete suggestions how to implement
+> particular things.
 
-If we want to do this then we should handle all the archs which
-don't need to special case the seccomp version identically, ie
-remove the x86/mips case which with this patch would be the
-same as the default case.
+Hi Igor, any comments and suggestions on smp machine properties
+in this patch considering we may add die topology for PCMachine as an 
+extension?
 
-> In fact I'd go as far as to say we
-> could probably just remove all this per-arch checking and just have a
-> generic >=3D 2.2.0 check, and just rely on fact libseccomp won't exist
-> on a s390/ppc/etc host if the distro had version < 2.3.0
-
-The arm case at least is present because libseccomp 2.2.0 was
-being built but didn't actually work for us. See commit ae6e8ef11e6cb43ec83=
-.
-
-thanks
--- PMM
+> 
+>> Like Xu (9):
+>>    cpu/topology: add struct CpuTopology to MachineState
+>>    cpu/topology: add general support for machine properties
+>>    cpu/topology: add uncommon arch support for smp machine properties
+>>    cpu/topology: add ARM support for smp machine properties
+>>    cpu/topology: add i386 support for smp machine properties
+>>    cpu/topology: add PPC support for smp machine properties
+>>    cpu/topology: add riscv support for smp machine properties
+>>    cpu/topology: add s390x support for smp machine properties
+>>    cpu/topology: replace smp global variables with machine propertie
+>>
+>>   accel/kvm/kvm-all.c          |  3 +++
+>>   backends/hostmem.c           |  4 ++++
+>>   cpus.c                       |  4 ++++
+>>   exec.c                       |  2 ++
+>>   gdbstub.c                    |  7 ++++++-
+>>   hw/alpha/dp264.c             |  1 +
+>>   hw/arm/fsl-imx6.c            |  5 +++++
+>>   hw/arm/fsl-imx6ul.c          |  5 +++++
+>>   hw/arm/fsl-imx7.c            |  5 +++++
+>>   hw/arm/highbank.c            |  1 +
+>>   hw/arm/mcimx6ul-evk.c        |  1 +
+>>   hw/arm/mcimx7d-sabre.c       |  3 +++
+>>   hw/arm/raspi.c               |  2 ++
+>>   hw/arm/realview.c            |  1 +
+>>   hw/arm/sabrelite.c           |  1 +
+>>   hw/arm/vexpress.c            |  3 +++
+>>   hw/arm/virt.c                |  7 +++++++
+>>   hw/arm/xlnx-zynqmp.c         |  7 +++++++
+>>   hw/cpu/core.c                |  3 +++
+>>   hw/hppa/machine.c            |  4 ++++
+>>   hw/i386/acpi-build.c         |  3 +++
+>>   hw/i386/kvmvapic.c           |  5 +++++
+>>   hw/i386/pc.c                 | 12 +++++++++++
+>>   hw/mips/boston.c             |  1 +
+>>   hw/mips/mips_malta.c         |  9 +++++++++
+>>   hw/openrisc/openrisc_sim.c   |  1 +
+>>   hw/ppc/e500.c                |  3 +++
+>>   hw/ppc/mac_newworld.c        |  2 ++
+>>   hw/ppc/mac_oldworld.c        |  2 ++
+>>   hw/ppc/pnv.c                 |  3 +++
+>>   hw/ppc/prep.c                |  2 ++
+>>   hw/ppc/spapr.c               | 29 ++++++++++++++++++++++++++
+>>   hw/ppc/spapr_rtas.c          |  3 +++
+>>   hw/riscv/sifive_e.c          |  4 ++++
+>>   hw/riscv/sifive_plic.c       |  3 +++
+>>   hw/riscv/sifive_u.c          |  4 ++++
+>>   hw/riscv/spike.c             |  2 ++
+>>   hw/riscv/virt.c              |  1 +
+>>   hw/s390x/s390-virtio-ccw.c   |  2 ++
+>>   hw/s390x/sclp.c              |  1 +
+>>   hw/smbios/smbios.c           | 11 ++++++++++
+>>   hw/sparc/sun4m.c             |  2 ++
+>>   hw/sparc64/sun4u.c           |  2 ++
+>>   hw/xtensa/sim.c              |  1 +
+>>   hw/xtensa/xtfpga.c           |  1 +
+>>   include/hw/arm/virt.h        |  2 +-
+>>   include/hw/boards.h          |  8 ++++++++
+>>   include/sysemu/sysemu.h      |  2 +-
+>>   migration/postcopy-ram.c     |  7 +++++++
+>>   numa.c                       |  1 +
+>>   target/arm/cpu.c             |  7 +++++++
+>>   target/i386/cpu.c            |  4 ++++
+>>   target/openrisc/sys_helper.c |  5 +++++
+>>   target/s390x/cpu.c           |  3 +++
+>>   target/s390x/excp_helper.c   |  6 ++++++
+>>   tcg/tcg.c                    | 15 ++++++++++++++
+>>   vl.c                         | 48 ++++++++++++++++++++++++--------------------
+>>   57 files changed, 261 insertions(+), 25 deletions(-)
+>>
+> 
+> 
+> 
