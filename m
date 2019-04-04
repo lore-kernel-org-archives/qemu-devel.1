@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51319)
+Received: from eggs.gnu.org ([209.51.188.92]:54296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Du-00053N-Py
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:07 -0400
+	(envelope-from <groug@kaod.org>) id 1hC2Mo-0001DV-0k
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Dp-0004eM-U9
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:06 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40225 helo=mail.rt-rk.com)
+	(envelope-from <groug@kaod.org>) id 1hC2Ml-0007Bd-Cx
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:17 -0400
+Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:47000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hC2Dp-0003GT-IY
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:01 -0400
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Thu,  4 Apr 2019 15:14:46 +0200
-Message-Id: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 0/4] target/mips: Optimize MSA interleave
- instructions
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hC2Mg-0006Td-M0
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:11 -0400
+Received: from player734.ha.ovh.net (unknown [10.109.160.25])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id A5630EDE5C
+	for <qemu-devel@nongnu.org>; Thu,  4 Apr 2019 15:25:03 +0200 (CEST)
+Date: Thu, 4 Apr 2019 15:24:54 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190404152454.3c6b38ce@bahia.lan>
+In-Reply-To: <20181210173151.16629-1-dgilbert@redhat.com>
+References: <20181210173151.16629-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
+ virtual machines3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, philmd@redhat.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+On Mon, 10 Dec 2018 17:31:44 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-Optimize MSA instructions ILVEV.<B|H|W|D>, ILVOD.<B|H|W|D>,
-ILVL.<B|H|W|D> and ILVR.<B|H|W|D> using the hybrid approach,
-MSA helpers in some cases and directly tcg registers in other
-cases, so the performance would be better.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   This is the first RFC for the QEMU side of 'virtio-fs';
+> a new mechanism for mounting host directories into the guest
+> in a fast, consistent and secure manner.  Our primary use
+> case is kata containers, but it should be usable in other scenarios
+> as well.
+> 
+> There are corresponding patches being posted to Linux kernel,
+> libfuse and kata lists.
+> 
+> For a fuller design description, and benchmark numbers, please see
+> Vivek's posting of the kernel set here:
+> 
+> https://marc.info/?l=linux-kernel&m=154446243024251&w=2
+> 
+> We've got a small website with instructions on how to use it, here:
+> 
+> https://virtio-fs.gitlab.io/
+> 
+> and all the code is available on gitlab at:
+> 
+> https://gitlab.com/virtio-fs
+> 
 
-v6:
- - Add ILVL.<B|H|W|D> and ILVR.<B|H|W|D> MSA instructions
-   with mixed approaches (with helpers and with tcg
-   registers).
- - Test the performance for ILVL.<B|H|W|D> and
-   ILVR.<B|H|W|D> MSA instructions, with helpers,
-   with tcg and with the mixed approach.
- - Use a tcg register instead of an int variable for
-   storing a constant value of the mask (for logic
-   operations).
- - Eliminate some unnecessary tcg_gen calls.
- - Changes in commit messages and the cover letter.
+Hi !
 
-v5:
- - Use tcg_gen_deposit function.
- - Added performance number for no-deposit and
-   with-deposit cases of ILVEV.W.
- - Minor changes in commit messages and the cover letter.
+This looks like a very promising replacement for virtio-9p, at
+least with better chances of reaching a production quality level.
 
-v4:
- - Clean up typing errors.
- - Change the commit message and the cover letter.
- - Fix bug for ILVEV.D, in case where the destination
-   and one of the sources are the same register.
+Not sure I'll have enough time to step in, but please Cc me on
+future posts. As virtio-9p maintainer, I'll be happy to help if
+I can. Also I'll be happy to get rid of the fsdev proxy backend
+at some point (which I already wanted to replace with a vhost
+user based solution :-) ).
 
-v3:
- - Reduce the number of logic operations to a
-   minimum.
- - Add comments.
+Cheers,
 
-v2:
- - Minor changes in commit messages and the cover letter.
+--
+Greg
 
-Mateja Marjanovic (4):
-  target/mips: Optimize ILVOD.<B|H|W|D> MSA instructions
-  target/mips: Optimize ILVEV.<B|H|W|D> MSA instructions
-  target/mips: Optimize ILVL.<B|H|W|D> MSA instructions
-  target/mips: Optimize ILVR.<B|H|W|D> MSA instructions
-
- target/mips/helper.h     |   7 +-
- target/mips/msa_helper.c |  82 +++++---
- target/mips/translate.c  | 498 ++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 547 insertions(+), 40 deletions(-)
-
--- 
-2.7.4
+> QEMU's changes
+> --------------
+> 
+> The QEMU changes are pretty small; 
+> 
+> There's a new vhost-user device, which is used to carry a stream of
+> FUSE messages to an external daemon that actually performs
+> all the file IO.  The FUSE daemon is an external process in order to
+> achieve better isolation for security and resource control (e.g. number
+> of file descriptors) and also because it's cleaner than trying to
+> integrate libfuse into QEMU.
+> 
+> This device has an extra BAR that contains (up to) 3 regions:
+> 
+>  a) a DAX mapping range ('the cache') - into which QEMU mmap's
+>     files on behalf of the external daemon; those files are
+>     then directly mapped by the guest in a way similar to a DAX
+>     backed file system;  one advantage of this is that multiple
+>     guests all accessing the same files should all be sharing
+>     those pages of host cache.
+> 
+>  b) An experimental set of mappings for use by a metadata versioning
+>     daemon;  this mapping is shared between multiple guests and
+>     the daemon, but only contains a set of version counters that
+>     allow a guest to quickly tell if its metadata is stale.
+> 
+> TODO
+> ----
+> 
+> This is the first RFC, we know we have a bunch of things to clear up:
+> 
+>   a) The virtio device specificiation is still in flux and is expected
+>      to change
+> 
+>   b) We'd like to find ways of reducing the map/unmap latency for DAX
+> 
+>   c) The metadata versioning scheme needs to settle out.
+> 
+>   d) mmap'ing host files has some interesting side effects; for example
+>      if the file gets truncated by the host and then the guest accesses
+>      the mapping, KVM can fail the guest hard.
+> 
+> Dr. David Alan Gilbert (6):
+>   virtio: Add shared memory capability
+>   virtio-fs: Add cache BAR
+>   virtio-fs: Add vhost-user slave commands for mapping
+>   virtio-fs: Fill in slave commands for mapping
+>   virtio-fs: Allow mapping of meta data version table
+>   virtio-fs: Allow mapping of journal
+> 
+> Stefan Hajnoczi (1):
+>   virtio: add vhost-user-fs-pci device
+> 
+>  configure                                   |  10 +
+>  contrib/libvhost-user/libvhost-user.h       |   3 +
+>  docs/interop/vhost-user.txt                 |  35 ++
+>  hw/virtio/Makefile.objs                     |   1 +
+>  hw/virtio/vhost-user-fs.c                   | 517 ++++++++++++++++++++
+>  hw/virtio/vhost-user.c                      |  16 +
+>  hw/virtio/virtio-pci.c                      | 115 +++++
+>  hw/virtio/virtio-pci.h                      |  19 +
+>  include/hw/pci/pci.h                        |   1 +
+>  include/hw/virtio/vhost-user-fs.h           |  79 +++
+>  include/standard-headers/linux/virtio_fs.h  |  48 ++
+>  include/standard-headers/linux/virtio_ids.h |   1 +
+>  include/standard-headers/linux/virtio_pci.h |   9 +
+>  13 files changed, 854 insertions(+)
+>  create mode 100644 hw/virtio/vhost-user-fs.c
+>  create mode 100644 include/hw/virtio/vhost-user-fs.h
+>  create mode 100644 include/standard-headers/linux/virtio_fs.h
+> 
