@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33326)
+Received: from eggs.gnu.org ([209.51.188.92]:33719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hBy8K-0004kW-DQ
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:54:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hBy9M-0005QJ-D5
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hBy8J-00075C-ES
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:54:04 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43459)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1hBy8J-00070h-1X
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:54:03 -0400
-Received: by mail-lf1-x142.google.com with SMTP id g7so1165164lfh.10
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 01:54:02 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hBy9K-0000uJ-4v
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBy9J-0000qa-Ne
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:06 -0400
+Date: Thu, 4 Apr 2019 09:55:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190404085459.GA2678@work-vm>
+References: <20190329222951.28945-1-chen.zhang@intel.com>
+	<5CA1D5CE.6040400@intel.com>
+	<9CFF81C0F6B98A43A459C9EDAD400D78060B8B4C@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-References: <1552644466-24625-1-git-send-email-hongbo.zhang@linaro.org>
-	<1552644466-24625-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAKv+Gu-aZeYwegzFQ7pPqvm28ySR5xC6rZh8FBvQaWiNykgPEg@mail.gmail.com>
-	<CAHmQWvD8byf+4=J7+rnU9CiGRKnuA4NnRPHRw1Zki4-m4anwOA@mail.gmail.com>
-	<CAKv+Gu9cWgkH-ZTDQ42_HnN-LfAMoL-k7ysd1Hz07RrP+Pp94g@mail.gmail.com>
-	<CAHmQWvArKFj9WPwaLjHs11x75iD0Rk9PBsTRq8mXrhm-LZt7=A@mail.gmail.com>
-	<CAFEAcA_gA0Z1+K=TiPHbNz2XaCexujYvuqWBm3BBXHTtip_2Kg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_gA0Z1+K=TiPHbNz2XaCexujYvuqWBm3BBXHTtip_2Kg@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Thu, 4 Apr 2019 16:53:46 +0800
-Message-ID: <CAHmQWvDfpz2bRYfg9Ww-hYGhK-M1Tm2HTcg=ZAnsGKaE1w4+bA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] hw/arm: Add arm SBSA reference
- machine, skeleton part
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78060B8B4C@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/ram.c: Fix codes conflict about
+ bitmap_mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Cc: "Wang, Wei W" <wei.w.wang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
-On Thu, 4 Apr 2019 at 16:47, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Thu, 4 Apr 2019 at 15:27, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> > I would like to wait for more days to see if there are any further
-> > comments, and if no I will send another iteration with memory map
-> > slightly changed.
->
-> This is on my to-review list, but I've been a bit busy with work for
-> the 4.0 release -- sorry I haven't been able to get to this yet. I'll
-> try to have at least a first look over the next day or so, but I can't
-> promise I'll manage that, so please go ahead and send out your next
-> iteration whenever you're ready to do that.
->
-Understand, thanks.
+* Zhang, Chen (chen.zhang@intel.com) wrote:
+> Ping~  Anyone have comments about this patch?
 
-> thanks
-> -- PMM
+No, it looks good to me, we need to get it merged.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> Thanks
+> Zhang Chen
+> 
+> 
+> > -----Original Message-----
+> > From: Wang, Wei W
+> > Sent: Monday, April 1, 2019 5:12 PM
+> > To: Zhang, Chen <chen.zhang@intel.com>; Zhang Chen
+> > <zhangckid@gmail.com>; Dr. David Alan Gilbert <dgilbert@redhat.com>; Juan
+> > Quintela <quintela@redhat.com>; qemu-dev <qemu-devel@nongnu.org>
+> > Subject: Re: [PATCH] migration/ram.c: Fix codes conflict about bitmap_mutex
+> > 
+> > On 03/30/2019 06:29 AM, Zhang Chen wrote:
+> > > From: Zhang Chen <chen.zhang@intel.com>
+> > >
+> > > I found upstream codes conflict with COLO and lead to crash, and I
+> > > located to this patch:
+> > >
+> > > commit 386a907b37a9321bc5d699bc37104d6ffba1b34d
+> > > Author: Wei Wang <wei.w.wang@intel.com>
+> > > Date:   Tue Dec 11 16:24:49 2018 +0800
+> > >
+> > > migration: use bitmap_mutex in migration_bitmap_clear_dirty
+> > >
+> > > My colleague Wei's patch add bitmap_mutex in
+> > > migration_bitmap_clear_dirty, but COLO didn't initialize the
+> > > bitmap_mutex. So we always get an error when COLO start up. like that:
+> > > qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl:
+> > Assertion `mutex->initialized' failed.
+> > >
+> > > This patch add the bitmap_mutex initialize and destroy in COLO
+> > > lifecycle.
+> > >
+> > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > > ---
+> > >   migration/ram.c | 2 ++
+> > >   1 file changed, 2 insertions(+)
+> > >
+> > > diff --git a/migration/ram.c b/migration/ram.c index
+> > > d7f8fe45a8..f68beeeeff 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -3918,6 +3918,7 @@ int colo_init_ram_cache(void)
+> > >       }
+> > >       ram_state = g_new0(RAMState, 1);
+> > >       ram_state->migration_dirty_pages = 0;
+> > > +    qemu_mutex_init(&ram_state->bitmap_mutex);
+> > >       memory_global_dirty_log_start();
+> > >
+> > >       return 0;
+> > > @@ -3956,6 +3957,7 @@ void colo_release_ram_cache(void)
+> > >       }
+> > >
+> > >       rcu_read_unlock();
+> > > +    qemu_mutex_destroy(&ram_state->bitmap_mutex);
+> > >       g_free(ram_state);
+> > >       ram_state = NULL;
+> > >   }
+> > 
+> > Reviewed-by: Wei Wang <wei.w.wang@intel.com>
+> > 
+> > Best,
+> > Wei
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
