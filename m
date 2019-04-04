@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54296)
+Received: from eggs.gnu.org ([209.51.188.92]:55766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hC2Mo-0001DV-0k
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:19 -0400
+	(envelope-from <philmd@redhat.com>) id 1hC2RR-0002XO-5l
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hC2Ml-0007Bd-Cx
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:17 -0400
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:47000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hC2Mg-0006Td-M0
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:25:11 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.160.25])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id A5630EDE5C
-	for <qemu-devel@nongnu.org>; Thu,  4 Apr 2019 15:25:03 +0200 (CEST)
-Date: Thu, 4 Apr 2019 15:24:54 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190404152454.3c6b38ce@bahia.lan>
-In-Reply-To: <20181210173151.16629-1-dgilbert@redhat.com>
-References: <20181210173151.16629-1-dgilbert@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hC2RO-0007f9-Pa
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:30:04 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hC2RF-0007Qq-7q
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:29:55 -0400
+Received: by mail-wm1-f68.google.com with SMTP id c1so3069846wml.4
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 06:29:50 -0700 (PDT)
+References: <20190404071421.4891-1-thuth@redhat.com>
+	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
+Date: Thu, 4 Apr 2019 15:29:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
- virtual machines3
+Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
+ not be user_creatable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org
 
-On Mon, 10 Dec 2018 17:31:44 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On 4/4/19 12:07 PM, Paolo Bonzini wrote:
+> On 04/04/19 09:14, Thomas Huth wrote:
+>> The i8042 PS/2 controller is part of the chipset on the motherboard.
+>> It is instantiated by the machine init code, and it does not make sense
+>> to allow the user to plug an additional i8042 in any of the free ISA slots.
+>> Thus let's mark the device with user_creatable = false.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/input/pckbd.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+> 
+> user_creatable is not for devices that are not pluggable in real life;
+> it is for devices that crash QEMU (!) or always fail if plugged by the user.
+> 
+> So the question to ask is: would it make sense, and especially work, to
+> add an i8042 to machines that do have an ISA bridge (for example the Alpha?)
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Hi,
->   This is the first RFC for the QEMU side of 'virtio-fs';
-> a new mechanism for mounting host directories into the guest
-> in a fast, consistent and secure manner.  Our primary use
-> case is kata containers, but it should be usable in other scenarios
-> as well.
-> 
-> There are corresponding patches being posted to Linux kernel,
-> libfuse and kata lists.
-> 
-> For a fuller design description, and benchmark numbers, please see
-> Vivek's posting of the kernel set here:
-> 
-> https://marc.info/?l=linux-kernel&m=154446243024251&w=2
-> 
-> We've got a small website with instructions on how to use it, here:
-> 
-> https://virtio-fs.gitlab.io/
-> 
-> and all the code is available on gitlab at:
-> 
-> https://gitlab.com/virtio-fs
-> 
+Correct me if I'm wrong but it seems no machine directly use a 8042 on a
+ISA bus, it is always part of a SuperIO chipset. It is not reflected in
+the code (in particular the X86 machines, but I'm working on cleaning this).
 
-Hi !
+So I think this change is OK and will help to enforce using proper
+superio chipsets in the future.
 
-This looks like a very promising replacement for virtio-9p, at
-least with better chances of reaching a production quality level.
+> 
+> Paolo
+> 
+> 
+>> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+>> index 47a606f5e3..af393818fc 100644
+>> --- a/hw/input/pckbd.c
+>> +++ b/hw/input/pckbd.c
+>> @@ -568,6 +568,8 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
+>>      dc->realize = i8042_realizefn;
+>>      dc->vmsd = &vmstate_kbd_isa;
+>>      set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>> +    /* i8042 is a device on the motherboard, and not pluggable by the user */
 
-Not sure I'll have enough time to step in, but please Cc me on
-future posts. As virtio-9p maintainer, I'll be happy to help if
-I can. Also I'll be happy to get rid of the fsdev proxy backend
-at some point (which I already wanted to replace with a vhost
-user based solution :-) ).
+I'm not sure the comment is accurate, maybe "ISA i8042 are provided by
+Super I/O devices"?
 
-Cheers,
-
---
-Greg
-
-> QEMU's changes
-> --------------
+>> +    dc->user_creatable = false;
+>>  }
+>>  
+>>  static const TypeInfo i8042_info = {
+>>
 > 
-> The QEMU changes are pretty small; 
-> 
-> There's a new vhost-user device, which is used to carry a stream of
-> FUSE messages to an external daemon that actually performs
-> all the file IO.  The FUSE daemon is an external process in order to
-> achieve better isolation for security and resource control (e.g. number
-> of file descriptors) and also because it's cleaner than trying to
-> integrate libfuse into QEMU.
-> 
-> This device has an extra BAR that contains (up to) 3 regions:
-> 
->  a) a DAX mapping range ('the cache') - into which QEMU mmap's
->     files on behalf of the external daemon; those files are
->     then directly mapped by the guest in a way similar to a DAX
->     backed file system;  one advantage of this is that multiple
->     guests all accessing the same files should all be sharing
->     those pages of host cache.
-> 
->  b) An experimental set of mappings for use by a metadata versioning
->     daemon;  this mapping is shared between multiple guests and
->     the daemon, but only contains a set of version counters that
->     allow a guest to quickly tell if its metadata is stale.
-> 
-> TODO
-> ----
-> 
-> This is the first RFC, we know we have a bunch of things to clear up:
-> 
->   a) The virtio device specificiation is still in flux and is expected
->      to change
-> 
->   b) We'd like to find ways of reducing the map/unmap latency for DAX
-> 
->   c) The metadata versioning scheme needs to settle out.
-> 
->   d) mmap'ing host files has some interesting side effects; for example
->      if the file gets truncated by the host and then the guest accesses
->      the mapping, KVM can fail the guest hard.
-> 
-> Dr. David Alan Gilbert (6):
->   virtio: Add shared memory capability
->   virtio-fs: Add cache BAR
->   virtio-fs: Add vhost-user slave commands for mapping
->   virtio-fs: Fill in slave commands for mapping
->   virtio-fs: Allow mapping of meta data version table
->   virtio-fs: Allow mapping of journal
-> 
-> Stefan Hajnoczi (1):
->   virtio: add vhost-user-fs-pci device
-> 
->  configure                                   |  10 +
->  contrib/libvhost-user/libvhost-user.h       |   3 +
->  docs/interop/vhost-user.txt                 |  35 ++
->  hw/virtio/Makefile.objs                     |   1 +
->  hw/virtio/vhost-user-fs.c                   | 517 ++++++++++++++++++++
->  hw/virtio/vhost-user.c                      |  16 +
->  hw/virtio/virtio-pci.c                      | 115 +++++
->  hw/virtio/virtio-pci.h                      |  19 +
->  include/hw/pci/pci.h                        |   1 +
->  include/hw/virtio/vhost-user-fs.h           |  79 +++
->  include/standard-headers/linux/virtio_fs.h  |  48 ++
->  include/standard-headers/linux/virtio_ids.h |   1 +
->  include/standard-headers/linux/virtio_pci.h |   9 +
->  13 files changed, 854 insertions(+)
->  create mode 100644 hw/virtio/vhost-user-fs.c
->  create mode 100644 include/hw/virtio/vhost-user-fs.h
->  create mode 100644 include/standard-headers/linux/virtio_fs.h
 > 
