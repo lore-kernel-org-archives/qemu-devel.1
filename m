@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34119)
+Received: from eggs.gnu.org ([209.51.188.92]:34251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hByAj-0006u5-4k
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:35 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1hByBM-0007ZR-Gh
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hByAh-0004gF-7E
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hByAf-0004d2-8b
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:30 -0400
-Date: Thu, 4 Apr 2019 09:56:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190404085621.GD10471@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190403124948.GA14129@ls3530.dellerweb.de>
-	<20190403161729.GW25150@redhat.com>
-	<CAFEAcA-85Z9wtZrf2AddGkrPZFOPgxFZ5sNOZCCBkqZRp8M2Dg@mail.gmail.com>
-	<43102ef9-2f96-2863-00aa-b6f2906c2f4f@redhat.com>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1hByBL-0005Lp-9t
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:12 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1hByBK-0005KT-Uh
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:11 -0400
+Received: by mail-lf1-x143.google.com with SMTP id 5so1161742lft.12
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 01:57:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <43102ef9-2f96-2863-00aa-b6f2906c2f4f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Relax check for libseccomp
+References: <1552644466-24625-1-git-send-email-hongbo.zhang@linaro.org>
+	<1552644466-24625-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAKv+Gu-aZeYwegzFQ7pPqvm28ySR5xC6rZh8FBvQaWiNykgPEg@mail.gmail.com>
+	<CAHmQWvD8byf+4=J7+rnU9CiGRKnuA4NnRPHRw1Zki4-m4anwOA@mail.gmail.com>
+	<CAKv+Gu9cWgkH-ZTDQ42_HnN-LfAMoL-k7ysd1Hz07RrP+Pp94g@mail.gmail.com>
+	<CAHmQWvArKFj9WPwaLjHs11x75iD0Rk9PBsTRq8mXrhm-LZt7=A@mail.gmail.com>
+	<CAEK-wKnY=VutLC6Ke=UeuswfxGkGohahhxwFiq=kqRdT-W0rPQ@mail.gmail.com>
+In-Reply-To: <CAEK-wKnY=VutLC6Ke=UeuswfxGkGohahhxwFiq=kqRdT-W0rPQ@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 4 Apr 2019 16:56:54 +0800
+Message-ID: <CAHmQWvBDffcuGBUs7KCMEKwH-4a_ihd6Hmgab3ZoqQU3jETVPw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] hw/arm: Add arm SBSA reference
+ machine, skeleton part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +35,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>
 
-On Thu, Apr 04, 2019 at 08:59:14AM +0200, Thomas Huth wrote:
-> On 04/04/2019 03.53, Peter Maydell wrote:
-> > On Wed, 3 Apr 2019 at 23:27, Daniel P. Berrang=C3=A9 <berrange@redhat=
-.com> wrote:
-> >>
-> >> On Wed, Apr 03, 2019 at 02:49:48PM +0200, Helge Deller wrote:
-> >>> diff --git a/configure b/configure
-> >>> index 1c563a7027..8632267049 100755
-> >>> --- a/configure
-> >>> +++ b/configure
-> >>> @@ -2389,7 +2389,6 @@ if test "$seccomp" !=3D "no" ; then
-> >>>          libseccomp_minver=3D"2.3.0"
-> >>>          ;;
-> >>>      *)
-> >>> -        libseccomp_minver=3D""
-> >>>          ;;
-> >>>      esac
-> >>
-> >> This makes sense to me. From a QEMU source POV we are able to build =
-with
-> >> libseccomp >=3D 2.2.0, which our default libseccomp_minver=3D env ex=
-presses
-> >> a few lines earlier.
-> >>
-> >> If libseccomp isn't supported on a platform, then I think we should =
-just
-> >> assume that libseccomp won't be present in the OS install we are bui=
-lding
-> >> against. I don't think QEMU needs to second-guess whether or not it =
-is
-> >> supported on the given architecture.
-> >=20
-> > If we want to do this then we should handle all the archs which
-> > don't need to special case the seccomp version identically, ie
-> > remove the x86/mips case which with this patch would be the
-> > same as the default case.
-> >=20
-> >> In fact I'd go as far as to say we
-> >> could probably just remove all this per-arch checking and just have =
-a
-> >> generic >=3D 2.2.0 check, and just rely on fact libseccomp won't exi=
-st
-> >> on a s390/ppc/etc host if the distro had version < 2.3.0
-> >=20
-> > The arm case at least is present because libseccomp 2.2.0 was
-> > being built but didn't actually work for us. See commit ae6e8ef11e6cb=
-43ec83.
->=20
-> Looking at https://repology.org/project/libseccomp/versions it seems
-> like all major distro versions that we want to support feature at least
-> version 2.3.0 ... so I think we can simplify the check here for all
-> architectures and only test for a version >=3D 2.3.0.
+On Thu, 4 Apr 2019 at 16:51, Radoslaw Biernacki
+<radoslaw.biernacki@linaro.org> wrote:
+>
+> There is one additional need which we just discovered with Fu Wei.
+> We need second secure UART for RAS and MM from EL0.
+> I'm adding a patch here (not sure if addresses and IRQ's are in your style so please check those).
+> I will adapt FW to your changes in next patch.
+>
+OK, I will take this into my next version of patch.
+Thanks.
 
-That sounds good to me.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> From fbc84e29b966f94a27fe84195987e6ba0c55c1bc Mon Sep 17 00:00:00 2001
+> From: Radoslaw Biernacki <radoslaw.biernacki@gmail.com>
+> Date: Thu, 4 Apr 2019 14:41:21 +0700
+> Subject: [PATCH] Add 2nd secure uart Rebase of Fu Wei patch
+>
+> ---
+>  hw/arm/sbsa-ref.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> index 6b26111840..dcfb34ff5b 100644
+> --- a/hw/arm/sbsa-ref.c
+> +++ b/hw/arm/sbsa-ref.c
+> @@ -67,6 +67,7 @@ enum {
+>      SBSA_PCIE_ECAM,
+>      SBSA_GPIO,
+>      SBSA_SECURE_UART,
+> +    SBSA_SECURE_UART_MM,
+>      SBSA_SECURE_MEM,
+>      SBSA_AHCI,
+>      SBSA_EHCI,
+> @@ -105,7 +106,9 @@ static const MemMapEntry sbsa_ref_memmap[] = {
+>      [SBSA_RTC] =                { 0x60010000, 0x00001000 },
+>      [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
+>      [SBSA_SECURE_UART] =        { 0x60030000, 0x00001000 },
+> -    [SBSA_SMMU] =               { 0x60040000, 0x00020000 },
+> +    /* The UART is a secure UART for S-EL0 OS testing */
+> +    [SBSA_SECURE_UART_MM] =     { 0x60040000, 0x00001000 },
+> +    [SBSA_SMMU] =               { 0x60050000, 0x00020000 },
+>      /* Space here reserved for more SMMUs */
+>      [SBSA_AHCI] =               { 0x60100000, 0x00010000 },
+>      [SBSA_EHCI] =               { 0x60110000, 0x00010000 },
+> @@ -126,8 +129,9 @@ static const int sbsa_ref_irqmap[] = {
+>      [SBSA_PCIE] = 3, /* ... to 6 */
+>      [SBSA_GPIO] = 7,
+>      [SBSA_SECURE_UART] = 8,
+> -    [SBSA_AHCI] = 9,
+> -    [SBSA_EHCI] = 10,
+> +    [SBSA_SECURE_UART_MM] = 9,
+> +    [SBSA_AHCI] = 10,
+> +    [SBSA_EHCI] = 11,
+>  };
+>
+>  /*
+> @@ -645,6 +649,7 @@ static void sbsa_ref_init(MachineState *machine)
+>      create_uart(vms, pic, SBSA_UART, sysmem, serial_hd(0));
+>
+>      create_uart(vms, pic, SBSA_SECURE_UART, secure_sysmem, serial_hd(1));
+> +    create_uart(vms, pic, SBSA_SECURE_UART_MM, secure_sysmem, serial_hd(2));
+>
+>      create_rtc(vms, pic);
+>
+> --
+> 2.17.1
+>
+>
+> On Thu, 4 Apr 2019 at 15:27, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>>
+>> I would like to wait for more days to see if there are any further
+>> comments, and if no I will send another iteration with memory map
+>> slightly changed.
+>>
+>> On Wed, 20 Mar 2019 at 18:27, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> >
+>> > On Mon, 18 Mar 2019 at 03:39, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>> > >
+>> > > On Fri, 15 Mar 2019 at 18:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> > > >
+>> > > > On Fri, 15 Mar 2019 at 11:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>> > > > >
+>> > > > > For the Aarch64, there is one machine 'virt', it is primarily meant to
+>> > > > > run on KVM and execute virtualization workloads, but we need an
+>> > > > > environment as faithful as possible to physical hardware, for supporting
+>> > > > > firmware and OS development for pysical Aarch64 machines.
+>> > > > >
+>> > > > > This patch introduces new machine type 'sbsa-ref' with main features:
+>> > > > >  - Based on 'virt' machine type.
+>> > > > >  - A new memory map.
+>> > > > >  - CPU type cortex-a57.
+>> > > > >  - EL2 and EL3 are enabled.
+>> > > > >  - GIC version 3.
+>> > > > >  - System bus AHCI controller.
+>> > > > >  - System bus EHCI controller.
+>> > > >
+>> > > > Hello Hongbo,
+>> > > >
+>> > > > Apologies for bringing this up now, but I seem to remember that the
+>> > > > EHCI does not support 64-bit DMA. Did you run into any issues with
+>> > > > this? Or was this fixed in QEMU in the mean time?
+>> > > >
+>> > > Hi Ard,
+>> > > Which EHCI do you mean?
+>> > > This time I use a newly introduced system bus EHCI, commit 114529f7
+>> > > and I only tested USB mouse and key board, didn't test DMA function.
+>> > >
+>> >
+>> > The host controller doesn't work without DMA, so if mouse and keyboard
+>> > worked for you, and no DRAM exists below the 4 GB mark, this has
+>> > apparently been fixed in QEMU.
