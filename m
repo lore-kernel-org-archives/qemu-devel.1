@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51293)
+Received: from eggs.gnu.org ([209.51.188.92]:51319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Dr-0004xI-OM
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:05 -0400
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Du-00053N-Py
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Dq-0004fY-5x
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:03 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40269 helo=mail.rt-rk.com)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hC2Dp-0004eM-U9
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:06 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:40225 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hC2Dp-0003Gr-Ka
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:02 -0400
+	id 1hC2Dp-0003GT-IY
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:16:01 -0400
 From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Thu,  4 Apr 2019 15:14:50 +0200
-Message-Id: <1554383690-28338-5-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 4/4] target/mips: Optimize ILVR.<B|H|W|D>
- MSA instructions
+Date: Thu,  4 Apr 2019 15:14:46 +0200
+Message-Id: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v6 0/4] target/mips: Optimize MSA interleave
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,238 +28,54 @@ Cc: aurelien@aurel32.net, philmd@redhat.com, richard.henderson@linaro.org, amark
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Optimized ILVR.<B|H|W|D> instructions, using a hybrid
-approach. For byte data elements, use a helper with an
-unrolled loop (much better performance), for halfword,
-word and doubleword data elements use directly tcg
-registers and logic performed on them.
+Optimize MSA instructions ILVEV.<B|H|W|D>, ILVOD.<B|H|W|D>,
+ILVL.<B|H|W|D> and ILVR.<B|H|W|D> using the hybrid approach,
+MSA helpers in some cases and directly tcg registers in other
+cases, so the performance would be better.
 
-Performance measurement is done by executing the
-instructions a large number of times on a computer
-with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+v6:
+ - Add ILVL.<B|H|W|D> and ILVR.<B|H|W|D> MSA instructions
+   with mixed approaches (with helpers and with tcg
+   registers).
+ - Test the performance for ILVL.<B|H|W|D> and
+   ILVR.<B|H|W|D> MSA instructions, with helpers,
+   with tcg and with the mixed approach.
+ - Use a tcg register instead of an int variable for
+   storing a constant value of the mask (for logic
+   operations).
+ - Eliminate some unnecessary tcg_gen calls.
+ - Changes in commit messages and the cover letter.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-||  instr  ||  helper  ||    tcg    ||   hybrid  ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-|| ilvr.b: || 62.87 ms ||  74.76 ms ||  61.52 ms || <-- helper
-|| ilvr.h: || 44.11 ms ||  33.00 ms ||  33.55 ms || <-- tcg
-|| ilvr.w: || 34.97 ms ||  23.06 ms ||  22.67 ms || <-- tcg
-|| ilvr.d: || 27.33 ms ||  19.87 ms ||  20.02 ms || <-- tcg
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
+v5:
+ - Use tcg_gen_deposit function.
+ - Added performance number for no-deposit and
+   with-deposit cases of ILVEV.W.
+ - Minor changes in commit messages and the cover letter.
 
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/helper.h     |   2 +-
- target/mips/msa_helper.c |  33 +++++++++++----
- target/mips/translate.c  | 107 +++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 3 files changed, 132 insertions(+), 10 deletions(-)
+v4:
+ - Clean up typing errors.
+ - Change the commit message and the cover letter.
+ - Fix bug for ILVEV.D, in case where the destination
+   and one of the sources are the same register.
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index cd73723..d4755ef 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -862,7 +862,6 @@ DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i3=
-2)
- DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-@@ -946,6 +945,7 @@ DEF_HELPER_4(msa_insert_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_insert_d, void, env, i32, i32, i32)
-=20
- DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_ilvr_b, void, env, i32, i32, i32)
-=20
- DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 84bbe6f..2470cef 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1181,14 +1181,6 @@ MSA_FN_DF(pckev_df)
-     } while (0)
- MSA_FN_DF(pckod_df)
- #undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D R##DF(pwt, i); \
--        pwx->DF[2*i+1] =3D R##DF(pws, i); \
--    } while (0)
--MSA_FN_DF(ilvr_df)
--#undef MSA_DO
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-@@ -1249,6 +1241,31 @@ void helper_msa_ilvl_b(CPUMIPSState *env, uint32_t=
- wd,
-     pwd->b[15] =3D pws->b[15];
- }
-=20
-+void helper_msa_ilvr_b(CPUMIPSState *env, uint32_t wd,
-+                       uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[15] =3D pws->b[7];
-+    pwd->b[14] =3D pwt->b[7];
-+    pwd->b[13] =3D pws->b[6];
-+    pwd->b[12] =3D pwt->b[6];
-+    pwd->b[11] =3D pws->b[5];
-+    pwd->b[10] =3D pwt->b[5];
-+    pwd->b[9]  =3D pws->b[4];
-+    pwd->b[8]  =3D pwt->b[4];
-+    pwd->b[7]  =3D pws->b[3];
-+    pwd->b[6]  =3D pwt->b[3];
-+    pwd->b[5]  =3D pws->b[2];
-+    pwd->b[4]  =3D pwt->b[2];
-+    pwd->b[3]  =3D pws->b[1];
-+    pwd->b[2]  =3D pwt->b[1];
-+    pwd->b[1]  =3D pws->b[0];
-+    pwd->b[0]  =3D pwt->b[0];
-+}
-+
- void helper_msa_copy_s_b(CPUMIPSState *env, uint32_t rd,
-                          uint32_t ws, uint32_t n)
- {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6c6811e..90332fb 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28885,6 +28885,96 @@ static void gen_msa_bit(CPUMIPSState *env, Disas=
-Context *ctx)
- }
-=20
- /*
-+ * [MSA] ILVR.H wd, ws, wt
-+ *
-+ *   Vector Interleave Right (halfword data elements)
-+ *
-+ */
-+static inline void gen_ilvr_h(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x000000000000ffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask <<=3D 16;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask <<=3D 16;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask <<=3D 16;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVR.W wd, ws, wt
-+ *
-+ *   Vector Interleave Right (word data elements)
-+ *
-+ */
-+static inline void gen_ilvr_w(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x00000000ffffffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask <<=3D 32;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVR.D wd, ws, wt
-+ *
-+ *   Vector Interleave Right (doubleword data elements)
-+ *
-+ */
-+static inline void gen_ilvr_d(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-+}
-+
-+
-+/*
-  * [MSA] ILVL.B wd, ws, wt
-  *
-  *   Vector Interleave Left (byte data elements)
-@@ -29380,7 +29470,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
-ontext *ctx)
-         gen_helper_msa_div_u_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVR_df:
--        gen_helper_msa_ilvr_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvr_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvr_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvr_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvr_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BINSL_df:
-         gen_helper_msa_binsl_df(cpu_env, tdf, twd, tws, twt);
---=20
+v3:
+ - Reduce the number of logic operations to a
+   minimum.
+ - Add comments.
+
+v2:
+ - Minor changes in commit messages and the cover letter.
+
+Mateja Marjanovic (4):
+  target/mips: Optimize ILVOD.<B|H|W|D> MSA instructions
+  target/mips: Optimize ILVEV.<B|H|W|D> MSA instructions
+  target/mips: Optimize ILVL.<B|H|W|D> MSA instructions
+  target/mips: Optimize ILVR.<B|H|W|D> MSA instructions
+
+ target/mips/helper.h     |   7 +-
+ target/mips/msa_helper.c |  82 +++++---
+ target/mips/translate.c  | 498 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 547 insertions(+), 40 deletions(-)
+
+-- 
 2.7.4
