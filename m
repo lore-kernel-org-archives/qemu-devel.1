@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53802)
+Received: from eggs.gnu.org ([209.51.188.92]:54449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hC45g-0006iN-H6
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:15:46 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1hC48K-0007i2-Id
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hC45b-0004A1-LS
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:15:41 -0400
-Resent-Message-Id: <E1hC45b-0004A1-LS@eggs.gnu.org>
-Message-ID: <155439088236.12882.13533992772861944417@76452e4e88f2>
-In-Reply-To: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <frederic.konrad@adacore.com>) id 1hC48I-0008S3-M6
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:28 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:48252
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1hC48I-0008Qb-83
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:26 -0400
+References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
+	<20180827222322.26009-4-marcandre.lureau@redhat.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <08893010-9018-65df-bbcc-56796bba5062@adacore.com>
+Date: Thu, 4 Apr 2019 17:18:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 Apr 2019 08:14:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 00/16] s390: vfio-ccw dasd ipl support
+In-Reply-To: <20180827222322.26009-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/9] chardev: use a child source for qio
+ input source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +31,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU0Mzg4NDc1LTE4MzI5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAxNTU0Mzg4NDc1LTE4MzI5LTEt
-Z2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5pYm0uY29tClN1YmplY3Q6IFtRZW11LWRldmVs
-XSBbUEFUQ0ggdjYgMDAvMTZdIHMzOTA6IHZmaW8tY2N3IGRhc2QgaXBsIHN1cHBvcnQKVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
-aGV3LzE1NTQzODg0NzUtMTgzMjktMS1naXQtc2VuZC1lbWFpbC1qamhlcm5lQGxpbnV4LmlibS5j
-b20gLT4gcGF0Y2hldy8xNTU0Mzg4NDc1LTE4MzI5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBs
-aW51eC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MDIx
-NjE5MDAuNzM3NC0xLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA0MDIxNjE5MDAu
-NzM3NC0xLWFybWJydUByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxOTA0MDQwOTE3MjUuMjA1OTUtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+IHBhdGNoZXcv
-MjAxOTA0MDQwOTE3MjUuMjA1OTUtMS1kZ2lsYmVydEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAg
-ICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MDQxMTI5NTMuNDA1OC0xLWJlcnRvQGlnYWxpYS5j
-b20gLT4gcGF0Y2hldy8yMDE5MDQwNDExMjk1My40MDU4LTEtYmVydG9AaWdhbGlhLmNvbQogKiBb
-bmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDA0MTIxMDE1LjI4NjM0LTEtcGxA
-a2FtcC5kZSAtPiBwYXRjaGV3LzIwMTkwNDA0MTIxMDE1LjI4NjM0LTEtcGxAa2FtcC5kZQpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmU3OTRjNjM2N2UgczM5MC1iaW9zOiBVc2UgY29u
-dHJvbCB1bml0IHR5cGUgdG8gZmluZCBib290YWJsZSBkZXZpY2VzCmFlYTYzZTdkZmIgczM5MC1i
-aW9zOiBTdXBwb3J0IGJvb3RpbmcgZnJvbSByZWFsIGRhc2QgZGV2aWNlCjhmN2M2YTVhNDIgczM5
-MC1iaW9zOiBBZGQgY2hhbm5lbCBjb21tYW5kIGNvZGVzL3N0cnVjdHMgbmVlZGVkIGZvciBkYXNk
-LWlwbApkZDk1ZTVlYzUwIHMzOTAtYmlvczogVXNlIGNvbnRyb2wgdW5pdCB0eXBlIHRvIGRldGVy
-bWluZSBib290IG1ldGhvZAplNDA4Y2ZjMWYxIHMzOTAtYmlvczogUmVmYWN0b3IgdmlydGlvIHRv
-IHJ1biBjaGFubmVsIHByb2dyYW1zIHZpYSBjaW8KODM1N2JkMDg5ZSBzMzkwLWJpb3M6IEZhY3Rv
-ciBmaW5kaW5nIGJvb3QgZGV2aWNlIG91dCBvZiB2aXJ0aW8gY29kZSBwYXRoCjA1ZDJhYTg5Yzkg
-czM5MC1iaW9zOiBFeHRlbmQgZmluZF9kZXYoKSBmb3Igbm9uLXZpcnRpbyBkZXZpY2VzCjU0ZTcy
-Y2E2ZTEgczM5MC1iaW9zOiBjaW8gZXJyb3IgaGFuZGxpbmcKOTU3N2VlY2VjMSBzMzkwLWJpb3M6
-IFN1cHBvcnQgZm9yIHJ1bm5pbmcgZm9ybWF0LTAvMSBjaGFubmVsIHByb2dyYW1zCjEyNzRiODgw
-Y2MgczM5MC1iaW9zOiBwdHIydTMyIGFuZCB1MzJ0b3B0cgo2M2NlMGFlMjYwIHMzOTAtYmlvczog
-TWFwIGxvdyBjb3JlIG1lbW9yeQo5OTU1NzhhODdiIHMzOTAtYmlvczogRGVjb3VwbGUgY2hhbm5l
-bCBpL28gbG9naWMgZnJvbSB2aXJ0aW8KYzBjNDM4NDliOCBzMzkwLWJpb3M6IENsZWFuIHVwIGNp
-by5oCjFiODJlM2I2M2YgczM5MC1iaW9zOiBkZWNvdXBsZSBjb21tb24gYm9vdCBsb2dpYyBmcm9t
-IHZpcnRpbwo4OGRkZjlkY2IyIHMzOTAtYmlvczogZGVjb3VwbGUgY2lvIHNldHVwIGZyb20gdmly
-dGlvCjEzNTdlMzk5OTggczM5MCB2ZmlvLWNjdzogQWRkIGJvb3RpbmRleCBwcm9wZXJ0eSBhbmQg
-SVBMQiBkYXRhCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE2IENoZWNraW5nIGNvbW1pdCAxMzU3
-ZTM5OTk4MmIgKHMzOTAgdmZpby1jY3c6IEFkZCBib290aW5kZXggcHJvcGVydHkgYW5kIElQTEIg
-ZGF0YSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjIyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTYgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8xNiBDaGVja2luZyBjb21taXQgODhkZGY5ZGNiMjIy
-IChzMzkwLWJpb3M6IGRlY291cGxlIGNpbyBzZXR1cCBmcm9tIHZpcnRpbykKMy8xNiBDaGVja2lu
-ZyBjb21taXQgMWI4MmUzYjYzZjBmIChzMzkwLWJpb3M6IGRlY291cGxlIGNvbW1vbiBib290IGxv
-Z2ljIGZyb20gdmlydGlvKQpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBm
-aWxlcwojMzE6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvbWFpbi5jOjE5OgorSXBsUGFyYW1ldGVy
-QmxvY2sgaXBsYiBfX2F0dHJpYnV0ZV9fKChfX2FsaWduZWRfXyhQQUdFX1NJWkUpKSk7Cgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTYgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTYgQ2hlY2tpbmcgY29tbWl0IGMwYzQzODQ5Yjhh
-NiAoczM5MC1iaW9zOiBDbGVhbiB1cCBjaW8uaCkKNS8xNiBDaGVja2luZyBjb21taXQgOTk1NTc4
-YTg3YjdiIChzMzkwLWJpb3M6IERlY291cGxlIGNoYW5uZWwgaS9vIGxvZ2ljIGZyb20gdmlydGlv
-KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiMzMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDEyMyBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzE2IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjYvMTYgQ2hlY2tpbmcgY29tbWl0IDYzY2UwYWUyNjBjNiAoczM5
-MC1iaW9zOiBNYXAgbG93IGNvcmUgbWVtb3J5KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNzogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA2LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvMTYgQ2hlY2tp
-bmcgY29tbWl0IDEyNzRiODgwY2M2MCAoczM5MC1iaW9zOiBwdHIydTMyIGFuZCB1MzJ0b3B0cikK
-V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
-UyBuZWVkIHVwZGF0aW5nPwojMTc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAzMSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzE2IGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCjgvMTYgQ2hlY2tpbmcgY29tbWl0IDk1NzdlZWNlYzFmNiAoczM5MC1i
-aW9zOiBTdXBwb3J0IGZvciBydW5uaW5nIGZvcm1hdC0wLzEgY2hhbm5lbCBwcm9ncmFtcykKOS8x
-NiBDaGVja2luZyBjb21taXQgNTRlNzJjYTZlMWRjIChzMzkwLWJpb3M6IGNpbyBlcnJvciBoYW5k
-bGluZykKMTAvMTYgQ2hlY2tpbmcgY29tbWl0IDA1ZDJhYTg5YzkzZSAoczM5MC1iaW9zOiBFeHRl
-bmQgZmluZF9kZXYoKSBmb3Igbm9uLXZpcnRpbyBkZXZpY2VzKQoxMS8xNiBDaGVja2luZyBjb21t
-aXQgODM1N2JkMDg5ZTMwIChzMzkwLWJpb3M6IEZhY3RvciBmaW5kaW5nIGJvb3QgZGV2aWNlIG91
-dCBvZiB2aXJ0aW8gY29kZSBwYXRoKQoxMi8xNiBDaGVja2luZyBjb21taXQgZTQwOGNmYzFmMWNl
-IChzMzkwLWJpb3M6IFJlZmFjdG9yIHZpcnRpbyB0byBydW4gY2hhbm5lbCBwcm9ncmFtcyB2aWEg
-Y2lvKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA1OiBGSUxFOiBwYy1iaW9z
-L3MzOTAtY2N3L3ZpcnRpby5jOjI5ODoKKyAgICAgICAgICAgIHJ1bl9jY3codmRldiwgQ0NXX0NN
-RF9SRUFEX1ZRX0NPTkYsICZjb25maWcsIHNpemVvZihjb25maWcpLCBmYWxzZSkgPT0gMCwKCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTg6IEZJTEU6IHBjLWJpb3MvczM5MC1j
-Y3cvdmlydGlvLmM6MzA4OgorICAgICAgICBydW5fY2N3KHZkZXYsIENDV19DTURfV1JJVEVfU1RB
-VFVTLCAmc3RhdHVzLCBzaXplb2Yoc3RhdHVzKSwgZmFsc2UpID09IDAsCgp0b3RhbDogMCBlcnJv
-cnMsIDIgd2FybmluZ3MsIDExNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xNiBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxMy8xNiBDaGVja2luZyBjb21taXQgZGQ5NWU1ZWM1MDI4IChzMzkw
-LWJpb3M6IFVzZSBjb250cm9sIHVuaXQgdHlwZSB0byBkZXRlcm1pbmUgYm9vdCBtZXRob2QpCjE0
-LzE2IENoZWNraW5nIGNvbW1pdCA4ZjdjNmE1YTQyZjYgKHMzOTAtYmlvczogQWRkIGNoYW5uZWwg
-Y29tbWFuZCBjb2Rlcy9zdHJ1Y3RzIG5lZWRlZCBmb3IgZGFzZC1pcGwpCjE1LzE2IENoZWNraW5n
-IGNvbW1pdCBhZWE2M2U3ZGZiMWYgKHMzOTAtYmlvczogU3VwcG9ydCBib290aW5nIGZyb20gcmVh
-bCBkYXNkIGRldmljZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjY6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MzMgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-MTUvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTYvMTYgQ2hlY2tpbmcgY29tbWl0IGU3
-OTRjNjM2N2VhYSAoczM5MC1iaW9zOiBVc2UgY29udHJvbCB1bml0IHR5cGUgdG8gZmluZCBib290
-YWJsZSBkZXZpY2VzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8xNTU0Mzg4NDc1LTE4MzI5LTEtZ2l0LXNlbmQtZW1haWwtampoZXJuZUBsaW51eC5p
-Ym0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi guys,
+
+We have some random delays with gdbstub since this commit under Windows.
+Basically while debugging the next command can sometimes take more than 5
+seconds while it usually tooks 30ms before. It is not target dependent I =
+see
+that happening with sparc, ppc, riscv, etc.. but only on Windows host.
+
+Does that ring a bell?
+
+Cheers,
+Fred
+
+Le 8/28/18 =C3=A0 12:23 AM, Marc-Andr=C3=A9 Lureau a =C3=A9crit=C2=A0:
+> GLib child source were added with version 2.28. We can use them now
+> that we bumped our requirement to 2.40.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>   chardev/char-io.c | 48 +++++-----------------------------------------=
+-
+>   1 file changed, 5 insertions(+), 43 deletions(-)
+>=20
+> diff --git a/chardev/char-io.c b/chardev/char-io.c
+> index f81052481a..8ced184160 100644
+> --- a/chardev/char-io.c
+> +++ b/chardev/char-io.c
+> @@ -33,7 +33,6 @@ typedef struct IOWatchPoll {
+>       IOCanReadHandler *fd_can_read;
+>       GSourceFunc fd_read;
+>       void *opaque;
+> -    GMainContext *context;
+>   } IOWatchPoll;
+>  =20
+>   static IOWatchPoll *io_watch_poll_from_source(GSource *source)
+> @@ -55,47 +54,24 @@ static gboolean io_watch_poll_prepare(GSource *sour=
+ce,
+>           iwp->src =3D qio_channel_create_watch(
+>               iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
+>           g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NU=
+LL);
+> -        g_source_attach(iwp->src, iwp->context);
+> -    } else {
+> -        g_source_destroy(iwp->src);
+> +        g_source_add_child_source(source, iwp->src);
+>           g_source_unref(iwp->src);
+> +    } else {
+> +        g_source_remove_child_source(source, iwp->src);
+>           iwp->src =3D NULL;
+>       }
+>       return FALSE;
+>   }
+>  =20
+> -static gboolean io_watch_poll_check(GSource *source)
+> -{
+> -    return FALSE;
+> -}
+> -
+>   static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc c=
+allback,
+>                                          gpointer user_data)
+>   {
+> -    abort();
+> -}
+> -
+> -static void io_watch_poll_finalize(GSource *source)
+> -{
+> -    /* Due to a glib bug, removing the last reference to a source
+> -     * inside a finalize callback causes recursive locking (and a
+> -     * deadlock).  This is not a problem inside other callbacks,
+> -     * including dispatch callbacks, so we call io_remove_watch_poll
+> -     * to remove this source.  At this point, iwp->src must
+> -     * be NULL, or we would leak it.
+> -     *
+> -     * This would be solved much more elegantly by child sources,
+> -     * but we support older glib versions that do not have them.
+> -     */
+> -    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
+> -    assert(iwp->src =3D=3D NULL);
+> +    return G_SOURCE_CONTINUE;
+>   }
+>  =20
+>   static GSourceFuncs io_watch_poll_funcs =3D {
+>       .prepare =3D io_watch_poll_prepare,
+> -    .check =3D io_watch_poll_check,
+>       .dispatch =3D io_watch_poll_dispatch,
+> -    .finalize =3D io_watch_poll_finalize,
+>   };
+>  =20
+>   GSource *io_add_watch_poll(Chardev *chr,
+> @@ -115,7 +91,6 @@ GSource *io_add_watch_poll(Chardev *chr,
+>       iwp->ioc =3D ioc;
+>       iwp->fd_read =3D (GSourceFunc) fd_read;
+>       iwp->src =3D NULL;
+> -    iwp->context =3D context;
+>  =20
+>       name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
+>       g_source_set_name((GSource *)iwp, name);
+> @@ -126,23 +101,10 @@ GSource *io_add_watch_poll(Chardev *chr,
+>       return (GSource *)iwp;
+>   }
+>  =20
+> -static void io_remove_watch_poll(GSource *source)
+> -{
+> -    IOWatchPoll *iwp;
+> -
+> -    iwp =3D io_watch_poll_from_source(source);
+> -    if (iwp->src) {
+> -        g_source_destroy(iwp->src);
+> -        g_source_unref(iwp->src);
+> -        iwp->src =3D NULL;
+> -    }
+> -    g_source_destroy(&iwp->parent);
+> -}
+> -
+>   void remove_fd_in_watch(Chardev *chr)
+>   {
+>       if (chr->gsource) {
+> -        io_remove_watch_poll(chr->gsource);
+> +        g_source_destroy(chr->gsource);
+>           chr->gsource =3D NULL;
+>       }
+>   }
+>=20
