@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55766)
+Received: from eggs.gnu.org ([209.51.188.92]:58826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hC2RR-0002XO-5l
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:30:06 -0400
+	(envelope-from <philmd@redhat.com>) id 1hC2ds-0006LX-8g
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hC2RO-0007f9-Pa
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:30:04 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55044)
+	(envelope-from <philmd@redhat.com>) id 1hC2dq-0003na-HL
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:42:56 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hC2RF-0007Qq-7q
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:29:55 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c1so3069846wml.4
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 06:29:50 -0700 (PDT)
-References: <20190404071421.4891-1-thuth@redhat.com>
-	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hC2dq-0003jr-1u
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 09:42:54 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 4so3136628wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 06:42:53 -0700 (PDT)
+References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554383690-28338-3-git-send-email-mateja.marjanovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
-Date: Thu, 4 Apr 2019 15:29:47 +0200
+Message-ID: <e0e8ff46-2fa8-e0ce-8699-2cec076695d1@redhat.com>
+Date: Thu, 4 Apr 2019 15:42:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+In-Reply-To: <1554383690-28338-3-git-send-email-mateja.marjanovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
- not be user_creatable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] target/mips: Optimize
+ ILVEV.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +31,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-trivial@nongnu.org
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-On 4/4/19 12:07 PM, Paolo Bonzini wrote:
-> On 04/04/19 09:14, Thomas Huth wrote:
->> The i8042 PS/2 controller is part of the chipset on the motherboard.
->> It is instantiated by the machine init code, and it does not make sense
->> to allow the user to plug an additional i8042 in any of the free ISA slots.
->> Thus let's mark the device with user_creatable = false.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/input/pckbd.c | 2 ++
->>  1 file changed, 2 insertions(+)
-> 
-> user_creatable is not for devices that are not pluggable in real life;
-> it is for devices that crash QEMU (!) or always fail if plugged by the user.
-> 
-> So the question to ask is: would it make sense, and especially work, to
-> add an i8042 to machines that do have an ISA bridge (for example the Alpha?)
+Hi Mateja,
 
-Correct me if I'm wrong but it seems no machine directly use a 8042 on a
-ISA bus, it is always part of a SuperIO chipset. It is not reflected in
-the code (in particular the X86 machines, but I'm working on cleaning this).
-
-So I think this change is OK and will help to enforce using proper
-superio chipsets in the future.
-
+On 4/4/19 3:14 PM, Mateja Marjanovic wrote:
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 > 
-> Paolo
+> Optimize set of MSA instructions ILVEV.<B|H|W|D>, using
+> directly tcg registers and performing logic on them
+> instead of using helpers.
 > 
+> In the following table, the first column is the performance
+> before this patch. The second represents the performance,
+> after converting from helpers to tcg, but without using
+> tcg_gen_deposit function. The third one is the solution
+> which is implemented in this patch.
 > 
->> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
->> index 47a606f5e3..af393818fc 100644
->> --- a/hw/input/pckbd.c
->> +++ b/hw/input/pckbd.c
->> @@ -568,6 +568,8 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
->>      dc->realize = i8042_realizefn;
->>      dc->vmsd = &vmstate_kbd_isa;
->>      set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->> +    /* i8042 is a device on the motherboard, and not pluggable by the user */
+> Performance measurement is done by executing the
+> instructions a large number of times on a computer
+> with Intel Core i7-3770 CPU @ 3.40GHz×8.
+> 
+> ============================================================
+> || instr    ||   before    || no-deposit ||  with-deposit ||
+> ============================================================
+> || ilvev.b  ||  126.92 ms  ||  24.52 ms  ||   24.43 ms    ||
+> || ilvev.h  ||   93.67 ms  ||  23.92 ms  ||   23.86 ms    ||
 
-I'm not sure the comment is accurate, maybe "ISA i8042 are provided by
-Super I/O devices"?
+I'm quite surprised there is not a single change here since your v5, are
+you sure you used the correct result? I was expecting a slighly improvement.
 
->> +    dc->user_creatable = false;
->>  }
->>  
->>  static const TypeInfo i8042_info = {
->>
+> || ilvev.w  ||  117.86 ms  ||  23.83 ms  ||   22.17 ms    ||
+> || ilvev.d  ||   45.49 ms  ||  19.74 ms  ||   19.71 ms    ||
+> ============================================================
 > 
+> No-deposit column and with-deposit column have the
+> same statistical values in every row, except ILVEV.W,
+> which is the only function which uses the deposit
+> function.
+> 
+> No-deposit version of the ILVEV.W implementation:
+> 
+> static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+>                                uint32_t ws, uint32_t wt)
+> {
+>     TCGv_i64 t1 = tcg_temp_new_i64();
+>     TCGv_i64 t2 = tcg_temp_new_i64();
+>     uint64_t mask = 0x00000000ffffffffULL;
+> 
+>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
+>     tcg_gen_shli_i64(t2, t2, 32);
+>     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> 
+>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+>     tcg_gen_shli_i64(t2, t2, 32);
+>     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> 
+>     tcg_temp_free_i64(t1);
+>     tcg_temp_free_i64(t2);
+> }
+> 
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> ---
+>  target/mips/helper.h     |   1 -
+>  target/mips/msa_helper.c |   9 -----
+>  target/mips/translate.c  | 101 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 100 insertions(+), 11 deletions(-)
+> 
+> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> index 02e16c7..82f6a40 100644
+> --- a/target/mips/helper.h
+> +++ b/target/mips/helper.h
+> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> index a7ea6aa..d5c3842 100644
+> --- a/target/mips/msa_helper.c
+> +++ b/target/mips/msa_helper.c
+> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
+>      } while (0)
+>  MSA_FN_DF(ilvr_df)
+>  #undef MSA_DO
+> -
+> -#define MSA_DO(DF)                      \
+> -    do {                                \
+> -        pwx->DF[2*i]   = pwt->DF[2*i];  \
+> -        pwx->DF[2*i+1] = pws->DF[2*i];  \
+> -    } while (0)
+> -MSA_FN_DF(ilvev_df)
+> -#undef MSA_DO
+> -
+>  #undef MSA_LOOP_COND
+>  
+>  #define MSA_LOOP_COND(DF) \
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index df685e4..3057669 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -28973,6 +28973,90 @@ static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
+>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+>  }
+>  
+> +/*
+> + * [MSA] ILVEV.B wd, ws, wt
+> + *
+> + *   Vector Interleave Even (byte data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    TCGv_i64 t2 = tcg_temp_new_i64();
+> +    TCGv_i64 mask = tcg_const_i64(0x00ff00ff00ff00ffULL);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_shli_i64(t2, t2, 8);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> +    tcg_gen_shli_i64(t2, t2, 8);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+> +    tcg_temp_free_i64(mask);
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+> +}
+> +
+> +/*
+> + * [MSA] ILVEV.H wd, ws, wt
+> + *
+> + *   Vector Interleave Even (halfword data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    TCGv_i64 t2 = tcg_temp_new_i64();
+> +    TCGv_i64 mask = tcg_const_i64(0x0000ffff0000ffffULL);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_shli_i64(t2, t2, 16);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> +    tcg_gen_shli_i64(t2, t2, 16);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+> +    tcg_temp_free_i64(mask);
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+> +}
+
+Apparently you missed my comment about refactoring using mask/shift as
+arguments:
+
+static inline void gen_ilvev_hb(CPUMIPSState *env, uint32_t wd,
+                                uint32_t ws, uint32_t wt,
+                                int64_t mask, int64_t shift)
+{
+    TCGv_i64 t1 = tcg_temp_new_i64();
+    TCGv_i64 t2 = tcg_temp_new_i64();
+    TCGv_i64 tm = tcg_const_i64(mask);
+
+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], tm);
+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], tm);
+    tcg_gen_shli_i64(t2, t2, shift);
+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+
+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], tm);
+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], tm);
+    tcg_gen_shli_i64(t2, t2, shift);
+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+
+    tcg_temp_free_i64(tm);
+    tcg_temp_free_i64(t1);
+    tcg_temp_free_i64(t2);
+}
+
+static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+                               uint32_t ws, uint32_t wt)
+{
+    gen_ilvev_hb(env, wd, ws, wt, 0x00ff00ff00ff00ffLL, 8);
+}
+
+static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+                               uint32_t ws, uint32_t wt)
+{
+    gen_ilvev_hb(env, wd, ws, wt, 0x0000ffff0000ffffLL, 16);
+}
+
+
+> +
+> +/*
+> + * [MSA] ILVEV.W wd, ws, wt
+> + *
+> + *   Vector Interleave Even (word data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2],
+> +                        msa_wr_d[ws * 2], 32, 32);
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[wt * 2 + 1],
+> +                        msa_wr_d[ws * 2 + 1], 32, 32);
+> +}
+> +
+> +/*
+> + * [MSA] ILVEV.D wd, ws, wt
+> + *
+> + *   Vector Interleave Even (Doubleword data elements)
+> + *
+> + */
+> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
+> +}
+> +
+>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+>  {
+>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+> @@ -29129,7 +29213,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+>          break;
+>      case OPC_ILVEV_df:
+> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+> +        switch (df) {
+> +        case DF_BYTE:
+> +            gen_ilvev_b(env, wd, ws, wt);
+> +            break;
+> +        case DF_HALF:
+> +            gen_ilvev_h(env, wd, ws, wt);
+> +            break;
+> +        case DF_WORD:
+> +            gen_ilvev_w(env, wd, ws, wt);
+> +            break;
+> +        case DF_DOUBLE:
+> +            gen_ilvev_d(env, wd, ws, wt);
+> +            break;
+> +        default:
+> +            assert(0);
+> +        }
+>          break;
+>      case OPC_BINSR_df:
+>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
 > 
