@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54449)
+Received: from eggs.gnu.org ([209.51.188.92]:54654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hC48K-0007i2-Id
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:29 -0400
+	(envelope-from <jbi.octave@gmail.com>) id 1hC48l-00083l-2E
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hC48I-0008S3-M6
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:28 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:48252
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1hC48I-0008Qb-83
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:26 -0400
-References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
-	<20180827222322.26009-4-marcandre.lureau@redhat.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <08893010-9018-65df-bbcc-56796bba5062@adacore.com>
-Date: Thu, 4 Apr 2019 17:18:22 +0200
+	(envelope-from <jbi.octave@gmail.com>) id 1hC48j-0000gL-5C
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:54 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
+	id 1hC48h-0000QD-39
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:18:51 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s15so4239954wra.12
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 08:18:42 -0700 (PDT)
+From: Jules Irenge <jbi.octave@gmail.com>
+Date: Thu,  4 Apr 2019 16:18:33 +0100
+Message-Id: <20190404151833.20021-1-jbi.octave@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180827222322.26009-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/9] chardev: use a child source for qio
- input source
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/mips: realign comments to fix
+ checkpatch warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com
+To: amarkovic@wavecomp.com
+Cc: arikalo@wavecomp.com, qemu-devel@nongnu.org
 
-Hi guys,
+Realign comments to fix warnings issued by checkpatch.pl tool
+"WARNING: Block comments use a leading /* on a separate line"
+within "target/mips/cpu.h" file.
 
-We have some random delays with gdbstub since this commit under Windows.
-Basically while debugging the next command can sometimes take more than 5
-seconds while it usually tooks 30ms before. It is not target dependent I =
-see
-that happening with sparc, ppc, riscv, etc.. but only on Windows host.
+Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+---
+ target/mips/cpu.h | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-Does that ring a bell?
-
-Cheers,
-Fred
-
-Le 8/28/18 =C3=A0 12:23 AM, Marc-Andr=C3=A9 Lureau a =C3=A9crit=C2=A0:
-> GLib child source were added with version 2.28. We can use them now
-> that we bumped our requirement to 2.40.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->   chardev/char-io.c | 48 +++++-----------------------------------------=
--
->   1 file changed, 5 insertions(+), 43 deletions(-)
->=20
-> diff --git a/chardev/char-io.c b/chardev/char-io.c
-> index f81052481a..8ced184160 100644
-> --- a/chardev/char-io.c
-> +++ b/chardev/char-io.c
-> @@ -33,7 +33,6 @@ typedef struct IOWatchPoll {
->       IOCanReadHandler *fd_can_read;
->       GSourceFunc fd_read;
->       void *opaque;
-> -    GMainContext *context;
->   } IOWatchPoll;
->  =20
->   static IOWatchPoll *io_watch_poll_from_source(GSource *source)
-> @@ -55,47 +54,24 @@ static gboolean io_watch_poll_prepare(GSource *sour=
-ce,
->           iwp->src =3D qio_channel_create_watch(
->               iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
->           g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NU=
-LL);
-> -        g_source_attach(iwp->src, iwp->context);
-> -    } else {
-> -        g_source_destroy(iwp->src);
-> +        g_source_add_child_source(source, iwp->src);
->           g_source_unref(iwp->src);
-> +    } else {
-> +        g_source_remove_child_source(source, iwp->src);
->           iwp->src =3D NULL;
->       }
->       return FALSE;
->   }
->  =20
-> -static gboolean io_watch_poll_check(GSource *source)
-> -{
-> -    return FALSE;
-> -}
-> -
->   static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc c=
-allback,
->                                          gpointer user_data)
->   {
-> -    abort();
-> -}
-> -
-> -static void io_watch_poll_finalize(GSource *source)
-> -{
-> -    /* Due to a glib bug, removing the last reference to a source
-> -     * inside a finalize callback causes recursive locking (and a
-> -     * deadlock).  This is not a problem inside other callbacks,
-> -     * including dispatch callbacks, so we call io_remove_watch_poll
-> -     * to remove this source.  At this point, iwp->src must
-> -     * be NULL, or we would leak it.
-> -     *
-> -     * This would be solved much more elegantly by child sources,
-> -     * but we support older glib versions that do not have them.
-> -     */
-> -    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
-> -    assert(iwp->src =3D=3D NULL);
-> +    return G_SOURCE_CONTINUE;
->   }
->  =20
->   static GSourceFuncs io_watch_poll_funcs =3D {
->       .prepare =3D io_watch_poll_prepare,
-> -    .check =3D io_watch_poll_check,
->       .dispatch =3D io_watch_poll_dispatch,
-> -    .finalize =3D io_watch_poll_finalize,
->   };
->  =20
->   GSource *io_add_watch_poll(Chardev *chr,
-> @@ -115,7 +91,6 @@ GSource *io_add_watch_poll(Chardev *chr,
->       iwp->ioc =3D ioc;
->       iwp->fd_read =3D (GSourceFunc) fd_read;
->       iwp->src =3D NULL;
-> -    iwp->context =3D context;
->  =20
->       name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
->       g_source_set_name((GSource *)iwp, name);
-> @@ -126,23 +101,10 @@ GSource *io_add_watch_poll(Chardev *chr,
->       return (GSource *)iwp;
->   }
->  =20
-> -static void io_remove_watch_poll(GSource *source)
-> -{
-> -    IOWatchPoll *iwp;
-> -
-> -    iwp =3D io_watch_poll_from_source(source);
-> -    if (iwp->src) {
-> -        g_source_destroy(iwp->src);
-> -        g_source_unref(iwp->src);
-> -        iwp->src =3D NULL;
-> -    }
-> -    g_source_destroy(&iwp->parent);
-> -}
-> -
->   void remove_fd_in_watch(Chardev *chr)
->   {
->       if (chr->gsource) {
-> -        io_remove_watch_poll(chr->gsource);
-> +        g_source_destroy(chr->gsource);
->           chr->gsource =3D NULL;
->       }
->   }
->=20
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index a10eeb0de3..5dd71dbe21 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -37,7 +37,8 @@ union fpr_t {
+ /* FPU/MSA register mapping is not tested on big-endian hosts. */
+     wr_t     wr;   /* vector data */
+ };
+-/* define FP_ENDIAN_IDX to access the same location
++/*
++ * define FP_ENDIAN_IDX to access the same location
+  * in the fpr_t union regardless of the host endianness
+  */
+ #if defined(HOST_WORDS_BIGENDIAN)
+@@ -963,9 +964,11 @@ struct CPUMIPSState {
+     /* TMASK defines different execution modes */
+ #define MIPS_HFLAG_TMASK  0x1F5807FF
+ #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
+-    /* The KSU flags must be the lowest bits in hflags. The flag order
+-       must be the same as defined for CP0 Status. This allows to use
+-       the bits as the value of mmu_idx. */
++    /*
++     * The KSU flags must be the lowest bits in hflags. The flag order
++     * must be the same as defined for CP0 Status. This allows to use
++     * the bits as the value of mmu_idx.
++     */
+ #define MIPS_HFLAG_KSU    0x00003 /* kernel/supervisor/user mode mask   */
+ #define MIPS_HFLAG_UM     0x00002 /* user mode flag                     */
+ #define MIPS_HFLAG_SM     0x00001 /* supervisor mode flag               */
+@@ -975,18 +978,22 @@ struct CPUMIPSState {
+ #define MIPS_HFLAG_CP0    0x00010 /* CP0 enabled                        */
+ #define MIPS_HFLAG_FPU    0x00020 /* FPU enabled                        */
+ #define MIPS_HFLAG_F64    0x00040 /* 64-bit FPU enabled                 */
+-    /* True if the MIPS IV COP1X instructions can be used.  This also
+-       controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
+-       and RSQRT.D.  */
++    /*
++     * True if the MIPS IV COP1X instructions can be used.  This also
++     * controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
++     * and RSQRT.D.
++     */
+ #define MIPS_HFLAG_COP1X  0x00080 /* COP1X instructions enabled         */
+ #define MIPS_HFLAG_RE     0x00100 /* Reversed endianness                */
+ #define MIPS_HFLAG_AWRAP  0x00200 /* 32-bit compatibility address wrapping */
+ #define MIPS_HFLAG_M16    0x00400 /* MIPS16 mode flag                   */
+ #define MIPS_HFLAG_M16_SHIFT 10
+-    /* If translation is interrupted between the branch instruction and
++    /*
++     * If translation is interrupted between the branch instruction and
+      * the delay slot, record what type of branch it is so that we can
+      * resume translation properly.  It might be possible to reduce
+-     * this from three bits to two.  */
++     * this from three bits to two.
++     */
+ #define MIPS_HFLAG_BMASK_BASE  0x803800
+ #define MIPS_HFLAG_B      0x00800 /* Unconditional branch               */
+ #define MIPS_HFLAG_BC     0x01000 /* Conditional branch                 */
+@@ -1073,8 +1080,10 @@ void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf);
+ extern void cpu_wrdsp(uint32_t rs, uint32_t mask_num, CPUMIPSState *env);
+ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
+ 
+-/* MMU modes definitions. We carefully match the indices with our
+-   hflags layout. */
++/*
++ * MMU modes definitions. We carefully match the indices with our
++ * hflags layout.
++ */
+ #define MMU_MODE0_SUFFIX _kernel
+ #define MMU_MODE1_SUFFIX _super
+ #define MMU_MODE2_SUFFIX _user
+@@ -1097,7 +1106,8 @@ static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
+ 
+ #include "exec/cpu-all.h"
+ 
+-/* Memory access type :
++/*
++ * Memory access type :
+  * may be needed for precise access rights control and precise exceptions.
+  */
+ enum {
+-- 
+2.20.1
