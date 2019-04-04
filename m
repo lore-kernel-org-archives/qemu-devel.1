@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47349)
+Received: from eggs.gnu.org ([209.51.188.92]:49181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hBz5R-0005Y5-Il
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:10 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBzBS-0007We-F9
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hBz5Q-0007BD-3j
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hBz5P-0007AR-QS
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:08 -0400
-Date: Thu, 4 Apr 2019 17:45:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190404094550.GD23212@xz-x1>
-References: <1553010562-13561-1-git-send-email-catherine.hecx@gmail.com>
-	<1554219001-18301-1-git-send-email-catherine.hecx@gmail.com>
-	<20190403022532.GJ11008@xz-x1>
-	<CAEn6zmG_m1-NP00cL+cZw2PYjErGrDXZLVV9mGNiU2w5EU=7Bg@mail.gmail.com>
-	<20190404042503.GA23212@xz-x1>
-	<CAEn6zmH91NvHySpA32GY4m-1W=r2NHF2Y4-b-+XTADBjkYxNAQ@mail.gmail.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBzBO-0007HZ-FJ
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:01:22 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:51982)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hBzBM-000768-4U
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 06:01:16 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190404095212.GC2678@work-vm>
+References: <156671554283778@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190404095212.GC2678@work-vm>
 MIME-Version: 1.0
+Date: Thu, 04 Apr 2019 13:01:09 +0300
+Message-Id: <111121554372069@iva7-0f652523820f.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAEn6zmH91NvHySpA32GY4m-1W=r2NHF2Y4-b-+XTADBjkYxNAQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] migration: avoid filling ignore-shared
- ramblock when in incoming migration
+Subject: Re: [Qemu-devel] [RFC PATCH] QEMU may write to system_memory before
+ guest starts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,119 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Apr 04, 2019 at 03:33:20PM +0800, Catherine Ho wrote:
-> Hi Peter Xu
->=20
-> On Thu, 4 Apr 2019 at 12:25, Peter Xu <peterx@redhat.com> wrote:
->=20
-> > On Wed, Apr 03, 2019 at 11:21:47PM +0800, Catherine Ho wrote:
-> > > Hi Peter Xu
-> > >
-> > > On Wed, 3 Apr 2019 at 10:25, Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > > On Tue, Apr 02, 2019 at 11:30:01AM -0400, Catherine Ho wrote:
-> > > > > Commit 18269069c310 ("migration: Introduce ignore-shared capabi=
-lity")
-> > > > > addes ignore-shared capability to bypass the shared ramblock (e=
-,g,
-> > > > > membackend + numa node). It does good to live migration.
-> > > > >
-> > > > > This commit expectes that QEMU doesn't write to guest RAM until
-> > > > > VM starts, but it does on aarch64 qemu:
-> > > > > Backtrace:
-> > > > > 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-> > > > exec.c:3458
-> > > > > 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3=
-479
-> > > > > 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-> > > > > 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset=
-.c:69
-> > > > > 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-> > > > > 6  0x000055f4a2c9851d in main () at vl.c:4552
-> > > > >
-> > > > > Actually, on arm64 virt marchine, ramblock "dtb" will be filled=
- into
-> > ram
-> > > > > during rom_reset. In ignore-shared incoming case, this rom fill=
-ing
-> > > > > is not required since all the data has been stored in memory ba=
-ckend
-> > > > file.
-> > > > >
-> > > > > Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-> > > > capability")
-> > > > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > > > > Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> > > >
-> > > > (note: IIUC normally you should have your signed-off to be the la=
-st
-> > > >  line before the suggested-by :)
-> > > >
-> > > > About the patch content, I have had a question on whether we shou=
-ld
-> > > > need to check ignore-shared at all... That question lies in:
-> > > >
-> > > > https://patchwork.kernel.org/patch/10859889/#22546487
-> > > >
-> > > > And if my understanding was correct above, IMHO the patch could b=
-e as
-> > > > simply be as "if (runstate_check(RUN_STATE_INMIGRATE)) return;" a=
-t [1]
-> > > > below.
-> > > >
-> > > >
-> > > Thanks=EF=BC=8C but I thought this method would break the x86 rom_r=
-eset logic
-> > during
-> > > RUN_STATE_INMIGRATE.
-> > > Please see the debugging patch and log lines below:
-> > > diff --git a/hw/core/loader.c b/hw/core/loader.c
-> > > index fe5cb24122..b0c871af26 100644
-> > > --- a/hw/core/loader.c
-> > > +++ b/hw/core/loader.c
-> > > @@ -1086,8 +1086,9 @@ int rom_add_option(const char *file, int32_t
-> > > bootindex)
-> > >  static void rom_reset(void *unused)
-> > >  {
-> > >      Rom *rom;
-> > > -
-> > >      QTAILQ_FOREACH(rom, &roms, next) {
-> > > +        if (runstate_check(RUN_STATE_INMIGRATE))
-> > > +           printf("rom name=3D%s\n",rom->name);
-> > >          if (rom->fw_file) {
-> > >              continue;
-> > >          }
-> > >
-> > > rom name=3Dkvmvapic.bin
-> > > rom name=3Dlinuxboot_dma.bin
-> > > rom name=3Dbios-256k.bin
-> > > rom name=3Detc/acpi/tables
-> > > rom name=3Detc/table-loader
-> > > rom name=3Detc/acpi/rsdp
-> >
-> > Hi, Catherine,
-> >
-> > I only see that rom names were dumped.  Could you help explain what i=
-s
-> > broken?  Thanks,
-> >
-> > Sorry, I have another concern here. What if there is no memory_backen=
-d
-> file?
-> If there is no memory backend file (i.e. without -object
-> memory-backend-file,id=3Ddimm1,size=3D512M,mem-path=3D/path/memory)
->=20
-> Should the rom blobs still be written into ram in such case?
-
-Please see my previous reply - I think it shouldn't be needed because
-we should migrate very soon after this point for those RAM.  In other
-words, IIUC even if we do rom_reset() now with these ROMs then the RAM
-data should be re-filled again too with the migration stream coming in.
+I saw Catherine Ho's patch series and it seems ok to me, but in this RFC =
+I asked
+about a way how to detect other writes which may not be covered by partic=
+ular
+fixes.
+Perhaps this is excessive caution...
 
 Regards,
+Yury
 
---=20
-Peter Xu
+04.04.2019, 12:52, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> * =D0=AE=D1=80=D0=B8=D0=B9 =D0=9A=D0=BE=D1=82=D0=BE=D0=B2 (yury-kotov@y=
+andex-team.ru) wrote:
+>> =C2=A0Ping
+>
+> Is this fixed by Catherine Ho's patch series?
+>
+> Dave
+>
+>> =C2=A021.03.2019, 19:27, "Yury Kotov" <yury-kotov@yandex-team.ru>:
+>> =C2=A0> Hi,
+>> =C2=A0>
+>> =C2=A0> 19.03.2019, 14:52, "Dr. David Alan Gilbert" <dgilbert@redhat.c=
+om>:
+>> =C2=A0>> =C2=A0* Peter Maydell (peter.maydell@linaro.org) wrote:
+>> =C2=A0>>> =C2=A0=C2=A0On Tue, 19 Mar 2019 at 11:03, Dr. David Alan Gil=
+bert
+>> =C2=A0>>> =C2=A0=C2=A0<dgilbert@redhat.com> wrote:
+>> =C2=A0>>> =C2=A0=C2=A0>
+>> =C2=A0>>> =C2=A0=C2=A0> * Peter Maydell (peter.maydell@linaro.org) wro=
+te:
+>> =C2=A0>>> =C2=A0=C2=A0> > I didn't think migration distinguished betwe=
+en "main memory"
+>> =C2=A0>>> =C2=A0=C2=A0> > and any other kind of RAMBlock-backed memory=
+ ?
+>> =C2=A0>>> =C2=A0=C2=A0>
+>> =C2=A0>>> =C2=A0=C2=A0> In Yury's case there's a distinction between R=
+AMBlock's that are mapped
+>> =C2=A0>>> =C2=A0=C2=A0> with RAM_SHARED (which normally ends up as MAP=
+_SHARED) and all others.
+>> =C2=A0>>> =C2=A0=C2=A0> You can set that for main memory by using -num=
+a to specify a memdev
+>> =C2=A0>>> =C2=A0=C2=A0> that's backed by a file and has the share=3Don=
+ property.
+>> =C2=A0>>> =C2=A0=C2=A0>
+>> =C2=A0>>> =C2=A0=C2=A0> On x86 the ROMs end up as separate RAMBlock's =
+that aren't affected
+>> =C2=A0>>> =C2=A0=C2=A0> by that -numa/share=3Don - so they don't fight=
+ Yury's trick.
+>> =C2=A0>>>
+>> =C2=A0>>> =C2=A0=C2=A0You can use the generic loader on x86 to load an=
+ ELF file
+>> =C2=A0>>> =C2=A0=C2=A0into RAM if you want, which would I think also t=
+rigger this.
+>> =C2=A0>>
+>> =C2=A0>> =C2=A0OK, although that doesn't worry me too much - since in =
+the majority
+>> =C2=A0>> =C2=A0of cases Yury's trick still works well.
+>> =C2=A0>>
+>> =C2=A0>> =C2=A0I wonder if there's a way to make Yury's code to detect=
+ these cases
+>> =C2=A0>> =C2=A0and not allow the feature; the best thing for the momen=
+t would seem to
+>> =C2=A0>> =C2=A0be to skip the aarch test that uses elf loading.
+>> =C2=A0>
+>> =C2=A0> Currently, I've no idea how to detect such cases, but there is=
+ an ability to
+>> =C2=A0> detect memory corruption. I want to update the RFC patch to le=
+t user to map some
+>> =C2=A0> memory regions as readonly until incoming migration start.
+>> =C2=A0>
+>> =C2=A0> E.g.
+>> =C2=A0> 1) If x-ignore-shared is enabled in command line or memory reg=
+ion is marked
+>> =C2=A0> =C2=A0=C2=A0=C2=A0(something like ',readonly=3Don'),
+>> =C2=A0> 2) Memory region is shared (,share=3Don),
+>> =C2=A0> 3) And qemu is started with '-incoming' option
+>> =C2=A0>
+>> =C2=A0> Then map such regions as readonly until incoming migration fin=
+ished.
+>> =C2=A0> Thus, the patch will be able to detect memory corruption and w=
+ill not affect
+>> =C2=A0> normal cases.
+>> =C2=A0>
+>> =C2=A0> How do you think, is it needed?
+>> =C2=A0>
+>> =C2=A0> I already have a cleaner version of the RFC patch, but I'm not=
+ sure about 1).
+>> =C2=A0> Which way is better: enable capability in command line, add a =
+new option for
+>> =C2=A0> memory-backend or something else.
+>> =C2=A0>
+>> =C2=A0>> =C2=A0Dave
+>> =C2=A0>>
+>> =C2=A0>>> =C2=A0=C2=A0thanks
+>> =C2=A0>>> =C2=A0=C2=A0-- PMM
+>> =C2=A0>> =C2=A0--
+>> =C2=A0>> =C2=A0Dr. David Alan Gilbert / dgilbert@redhat.com / Manchest=
+er, UK
+>> =C2=A0>
+>> =C2=A0> Regards,
+>> =C2=A0> Yury
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
