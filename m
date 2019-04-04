@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43778)
+Received: from eggs.gnu.org ([209.51.188.92]:43812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hC3SM-0007Mw-R4
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:08 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hC3SO-0007PM-Tm
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hC3SK-0004Q7-Tj
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41074
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <jjherne@linux.ibm.com>) id 1hC3SN-0004W6-EV
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57990)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1hC3SK-0004OX-BB
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:04 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x34EPoi2012485
-	for <qemu-devel@nongnu.org>; Thu, 4 Apr 2019 10:35:03 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rnhmbg05x-1
+	id 1hC3SN-0004TM-3O
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:35:07 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x34EQZnM005552
+	for <qemu-devel@nongnu.org>; Thu, 4 Apr 2019 10:35:05 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rnk2m2w8h-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 10:34:52 -0400
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 10:35:04 -0400
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Thu, 4 Apr 2019 15:34:45 +0100
+	Thu, 4 Apr 2019 15:35:03 +0100
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Thu,  4 Apr 2019 10:34:20 -0400
+Date: Thu,  4 Apr 2019 10:34:30 -0400
 In-Reply-To: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
 References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1554388475-18329-2-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 01/16] s390 vfio-ccw: Add bootindex property
- and IPLB data
+Message-Id: <1554388475-18329-12-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 11/16] s390-bios: Factor finding boot device
+ out of virtio code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,261 +40,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Add bootindex property and iplb data for vfio-ccw devices. This allows us to
-forward boot information into the bios for vfio-ccw devices.
+Make a new routine find_boot_device to locate the boot device for all
+cases, not just virtio.
 
-Refactor s390_get_ccw_device() to return device type. This prevents us from
-having to use messy casting logic in several places.
+The error message for the case where no boot device has been specified
+and a suitable boot device cannot be auto detected was specific to
+virtio devices. We update this message to remove virtio specific wording.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- MAINTAINERS                 |  1 +
- hw/s390x/ipl.c              | 61 ++++++++++++++++++++++++++++++++++-----------
- hw/s390x/s390-ccw.c         |  9 +++++++
- hw/vfio/ccw.c               |  2 +-
- include/hw/s390x/s390-ccw.h |  1 +
- include/hw/s390x/vfio-ccw.h | 28 +++++++++++++++++++++
- 6 files changed, 86 insertions(+), 16 deletions(-)
- create mode 100644 include/hw/s390x/vfio-ccw.h
+ pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++++++----------------------
+ tests/boot-serial-test.c |  2 +-
+ 2 files changed, 47 insertions(+), 40 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 56139ac..f7976aa 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1445,6 +1445,7 @@ S: Supported
- F: hw/vfio/ccw.c
- F: hw/s390x/s390-ccw.c
- F: include/hw/s390x/s390-ccw.h
-+F: include/hw/s390x/vfio-ccw.h
- T: git https://github.com/cohuck/qemu.git s390-next
- L: qemu-s390x@nongnu.org
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index d04ea89..d3a161c 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -58,17 +58,18 @@ unsigned int get_loadparm_index(void)
+  * NOTE: The global variable blk_schid is updated to contain the subchannel
+  * information.
+  */
+-static bool find_dev(Schib *schib, int dev_no)
++static bool find_subch(int dev_no)
+ {
++    Schib schib;
+     int i, r;
  
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 896888b..2307e5b 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -19,6 +19,7 @@
- #include "hw/loader.h"
- #include "hw/boards.h"
- #include "hw/s390x/virtio-ccw.h"
-+#include "hw/s390x/vfio-ccw.h"
- #include "hw/s390x/css.h"
- #include "hw/s390x/ebcdic.h"
- #include "ipl.h"
-@@ -305,16 +306,36 @@ static void s390_ipl_set_boot_menu(S390IPLState *ipl)
-     *timeout = cpu_to_be32(splash_time);
+     for (i = 0; i < 0x10000; i++) {
+         blk_schid.sch_no = i;
+-        r = stsch_err(blk_schid, schib);
++        r = stsch_err(blk_schid, &schib);
+         if ((r == 3) || (r == -EIO)) {
+             break;
+         }
+-        if (!schib->pmcw.dnv) {
++        if (!schib.pmcw.dnv) {
+             continue;
+         }
+ 
+@@ -80,7 +81,7 @@ static bool find_dev(Schib *schib, int dev_no)
+             continue;
+         }
+ 
+-        if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
++        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
+             return true;
+         }
+     }
+@@ -136,56 +137,61 @@ static void boot_setup(void)
+     have_iplb = store_iplb(&iplb);
  }
  
--static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
-+#define CCW_DEVTYPE_NONE        0x00
-+#define CCW_DEVTYPE_VIRTIO      0x01
-+#define CCW_DEVTYPE_VIRTIO_NET  0x02
-+#define CCW_DEVTYPE_SCSI        0x03
-+#define CCW_DEVTYPE_VFIO        0x04
-+
-+static CcwDevice *s390_get_ccw_device(DeviceState *dev_st, int *devtype)
+-static void virtio_setup(void)
++static void find_boot_device(void)
  {
-     CcwDevice *ccw_dev = NULL;
-+    int tmp_dt = CCW_DEVTYPE_NONE;
+-    Schib schib;
+-    int ssid;
+-    bool found = false;
+-    uint16_t dev_no;
+     VDev *vdev = virtio_get_device();
+-    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+-
+-    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++    int ssid;
++    bool found;
  
-     if (dev_st) {
-+        VirtIONet *virtio_net_dev = (VirtIONet *)
-+            object_dynamic_cast(OBJECT(dev_st), TYPE_VIRTIO_NET);
-         VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
-             object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
-                                 TYPE_VIRTIO_CCW_DEVICE);
-+        VFIOCCWDevice *vfio_ccw_dev = (VFIOCCWDevice *)
-+            object_dynamic_cast(OBJECT(dev_st), TYPE_VFIO_CCW);
-+
-         if (virtio_ccw_dev) {
-             ccw_dev = CCW_DEVICE(virtio_ccw_dev);
-+            if (virtio_net_dev) {
-+                tmp_dt = CCW_DEVTYPE_VIRTIO_NET;
-+            } else {
-+                tmp_dt = CCW_DEVTYPE_VIRTIO;
-+            }
-+        } else if (vfio_ccw_dev) {
-+            ccw_dev = CCW_DEVICE(vfio_ccw_dev);
-+            tmp_dt = CCW_DEVTYPE_VFIO;
-         } else {
-             SCSIDevice *sd = (SCSIDevice *)
-                 object_dynamic_cast(OBJECT(dev_st),
-@@ -327,9 +348,13 @@ static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
- 
-                 ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-                                                            TYPE_CCW_DEVICE);
-+                tmp_dt = CCW_DEVTYPE_SCSI;
+-    if (have_iplb) {
+-        switch (iplb.pbt) {
+-        case S390_IPL_TYPE_CCW:
+-            dev_no = iplb.ccw.devno;
+-            debug_print_int("device no. ", dev_no);
+-            blk_schid.ssid = iplb.ccw.ssid & 0x3;
+-            debug_print_int("ssid ", blk_schid.ssid);
+-            found = find_dev(&schib, dev_no);
+-            break;
+-        case S390_IPL_TYPE_QEMU_SCSI:
+-            vdev->scsi_device_selected = true;
+-            vdev->selected_scsi_device.channel = iplb.scsi.channel;
+-            vdev->selected_scsi_device.target = iplb.scsi.target;
+-            vdev->selected_scsi_device.lun = iplb.scsi.lun;
+-            blk_schid.ssid = iplb.scsi.ssid & 0x3;
+-            found = find_dev(&schib, iplb.scsi.devno);
+-            break;
+-        default:
+-            panic("List-directed IPL not supported yet!\n");
+-        }
+-        menu_setup();
+-    } else {
++    if (!have_iplb) {
+         for (ssid = 0; ssid < 0x3; ssid++) {
+             blk_schid.ssid = ssid;
+-            found = find_dev(&schib, -1);
++            found = find_subch(-1);
+             if (found) {
+-                break;
++                return;
              }
          }
-     }
-+    if (devtype) {
-+        *devtype = tmp_dt;
++        panic("Could not find a suitable boot device (none specified)\n");
 +    }
-     return ccw_dev;
- }
- 
-@@ -337,20 +362,22 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
- {
-     DeviceState *dev_st;
-     CcwDevice *ccw_dev = NULL;
-+    SCSIDevice *sd;
-+    int devtype;
- 
-     dev_st = get_boot_device(0);
-     if (dev_st) {
--        ccw_dev = s390_get_ccw_device(dev_st);
-+        ccw_dev = s390_get_ccw_device(dev_st, &devtype);
++
++    switch (iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        debug_print_int("device no. ", iplb.ccw.devno);
++        blk_schid.ssid = iplb.ccw.ssid & 0x3;
++        debug_print_int("ssid ", blk_schid.ssid);
++        found = find_subch(iplb.ccw.devno);
++        break;
++    case S390_IPL_TYPE_QEMU_SCSI:
++        vdev->scsi_device_selected = true;
++        vdev->selected_scsi_device.channel = iplb.scsi.channel;
++        vdev->selected_scsi_device.target = iplb.scsi.target;
++        vdev->selected_scsi_device.lun = iplb.scsi.lun;
++        blk_schid.ssid = iplb.scsi.ssid & 0x3;
++        found = find_subch(iplb.scsi.devno);
++        break;
++    default:
++        panic("List-directed IPL not supported yet!\n");
      }
  
-     /*
-      * Currently allow IPL only from CCW devices.
-      */
-     if (ccw_dev) {
--        SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
--                                                            TYPE_SCSI_DEVICE);
--
--        if (sd) {
-+        switch (devtype) {
-+        case CCW_DEVTYPE_SCSI:
-+            sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
-+                                                           TYPE_SCSI_DEVICE);
-             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
-             ipl->iplb.blk0_len =
-                 cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN - S390_IPLB_HEADER_LEN);
-@@ -360,20 +387,24 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-             ipl->iplb.scsi.channel = cpu_to_be16(sd->channel);
-             ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
-             ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
--        } else {
--            VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
--                                                              TYPE_VIRTIO_NET);
--
-+            break;
-+        case CCW_DEVTYPE_VFIO:
-+            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
-+            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
-+            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
-+            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
-+            break;
-+        case CCW_DEVTYPE_VIRTIO_NET:
-+            ipl->netboot = true;
-+            /* Fall through to CCW_DEVTYPE_VIRTIO case */
-+        case CCW_DEVTYPE_VIRTIO:
-             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
-             ipl->iplb.blk0_len =
-                 cpu_to_be32(S390_IPLB_MIN_CCW_LEN - S390_IPLB_HEADER_LEN);
-             ipl->iplb.pbt = S390_IPL_TYPE_CCW;
-             ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
-             ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
--
--            if (vn) {
--                ipl->netboot = true;
--            }
-+            break;
-         }
- 
-         if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
-@@ -532,7 +563,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
-         !ipl->netboot &&
-         ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
-         is_virtio_scsi_device(&ipl->iplb)) {
--        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0));
-+        CcwDevice *ccw_dev = s390_get_ccw_device(get_boot_device(0), NULL);
- 
-         if (ccw_dev &&
-             cpu_to_be16(ccw_dev->sch->devno) == ipl->iplb.ccw.devno &&
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index cad91ee..f5f025d 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -124,6 +124,14 @@ static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
-     g_free(cdev->mdevid);
- }
- 
-+static void s390_ccw_instance_init(Object *obj)
-+{
-+    S390CCWDevice *dev = S390_CCW_DEVICE(obj);
-+
-+    device_add_bootindex_property(obj, &dev->bootindex, "bootindex",
-+                                  "/disk@0,0", DEVICE(obj), NULL);
+-    IPL_assert(found, "No virtio device found");
++    IPL_assert(found, "Boot device not found\n");
 +}
 +
- static void s390_ccw_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -137,6 +145,7 @@ static void s390_ccw_class_init(ObjectClass *klass, void *data)
- static const TypeInfo s390_ccw_info = {
-     .name          = TYPE_S390_CCW,
-     .parent        = TYPE_CCW_DEVICE,
-+    .instance_init = s390_ccw_instance_init,
-     .instance_size = sizeof(S390CCWDevice),
-     .class_size    = sizeof(S390CCWDeviceClass),
-     .class_init    = s390_ccw_class_init,
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 9246729..507d513 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -21,11 +21,11 @@
- #include "hw/vfio/vfio.h"
- #include "hw/vfio/vfio-common.h"
- #include "hw/s390x/s390-ccw.h"
-+#include "hw/s390x/vfio-ccw.h"
- #include "hw/s390x/ccw-device.h"
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
++static void virtio_setup(void)
++{
++    VDev *vdev = virtio_get_device();
++    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
++
++    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++
++    if (have_iplb) {
++        menu_setup();
++    }
  
--#define TYPE_VFIO_CCW "vfio-ccw"
- typedef struct VFIOCCWDevice {
-     S390CCWDevice cdev;
-     VFIODevice vdev;
-diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-index 7d15a1a..901d805 100644
---- a/include/hw/s390x/s390-ccw.h
-+++ b/include/hw/s390x/s390-ccw.h
-@@ -27,6 +27,7 @@ typedef struct S390CCWDevice {
-     CcwDevice parent_obj;
-     CssDevId hostid;
-     char *mdevid;
-+    int32_t bootindex;
- } S390CCWDevice;
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+         sclp_print("Network boot device detected\n");
+         vdev->netboot_start_addr = qipl.netboot_start_addr;
+     } else {
+         virtio_blk_setup_device(blk_schid);
+-
+         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
+     }
+ }
+@@ -195,8 +201,9 @@ int main(void)
+     sclp_setup();
+     css_setup();
+     boot_setup();
+-    virtio_setup();
++    find_boot_device();
  
- typedef struct S390CCWDeviceClass {
-diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
-new file mode 100644
-index 0000000..ee5250d
---- /dev/null
-+++ b/include/hw/s390x/vfio-ccw.h
-@@ -0,0 +1,28 @@
-+/*
-+ * vfio based subchannel assignment support
-+ *
-+ * Copyright 2017, 2019 IBM Corp.
-+ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-+ *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-+ *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_VFIO_CCW_H
-+#define HW_VFIO_CCW_H
-+
-+#include "hw/vfio/vfio-common.h"
-+#include "hw/s390x/s390-ccw.h"
-+#include "hw/s390x/ccw-device.h"
-+
-+#define TYPE_VFIO_CCW "vfio-ccw"
-+#define VFIO_CCW(obj) \
-+        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
-+
-+#define TYPE_VFIO_CCW "vfio-ccw"
-+typedef struct VFIOCCWDevice VFIOCCWDevice;
-+
-+#endif
++    virtio_setup();
+     zipl_load(); /* no return */
+ 
+     panic("Failed to load OS from hard disk\n");
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index c591748..24852d4 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -114,7 +114,7 @@ static testdef_t tests[] = {
+     { "sparc", "SS-4", "", "MB86904" },
+     { "sparc", "SS-600MP", "", "TMS390Z55" },
+     { "sparc64", "sun4u", "", "UltraSPARC" },
+-    { "s390x", "s390-ccw-virtio", "", "virtio device" },
++    { "s390x", "s390-ccw-virtio", "", "device" },
+     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
+     { "microblaze", "petalogix-s3adsp1800", "", "TT",
+       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
 -- 
 2.7.4
