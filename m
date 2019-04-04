@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36935)
+Received: from eggs.gnu.org ([209.51.188.92]:37321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hByN1-0002Hl-0D
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:16 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hByOj-00039A-Cl
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hByMz-0002gm-Uf
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hByMz-0002eO-HT
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:13 -0400
-Date: Thu, 4 Apr 2019 05:09:10 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <651986267.17402634.1554368950178.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
-References: <20190403104018.23947-1-pagupta@redhat.com>
-	<20190403104018.23947-6-pagupta@redhat.com>
-	<20190403220912.GB26298@dastard> <20190403223921.GM5147@magnolia>
-	<1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hByOg-0004hg-AN
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:11:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hByOf-0004ew-QI
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:10:58 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3496Gi6029496
+	for <qemu-devel@nongnu.org>; Thu, 4 Apr 2019 05:10:55 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rne4c3dms-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 05:10:54 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Thu, 4 Apr 2019 10:10:53 +0100
+References: <155323635511.18748.18133954505098138975.stgit@aravinda>
+	<155323643836.18748.13006461397179281455.stgit@aravinda>
+	<20190325062256.GO29295@umbus>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Thu, 4 Apr 2019 14:40:45 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190325062256.GO29295@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
- flush
+Message-Id: <1fdde5df-408a-f81d-d9ac-eb9636324b54@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/6] target/ppc: Handle NMI guest exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +43,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>, Dave Chinner <david@fromorbit.com>
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan j williams <dan.j.williams@intel.com>, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, paulus@ozlabs.org, mahesh@linux.vnet.ibm.com
 
 
-> > On Thu, Apr 04, 2019 at 09:09:12AM +1100, Dave Chinner wrote:
-> > > On Wed, Apr 03, 2019 at 04:10:18PM +0530, Pankaj Gupta wrote:
-> > > > Virtio pmem provides asynchronous host page cache flush
-> > > > mechanism. we don't support 'MAP_SYNC' with virtio pmem
-> > > > and xfs.
-> > > > 
-> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > > > ---
-> > > >  fs/xfs/xfs_file.c | 8 ++++++++
-> > > >  1 file changed, 8 insertions(+)
-> > > > 
-> > > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> > > > index 1f2e2845eb76..dced2eb8c91a 100644
-> > > > --- a/fs/xfs/xfs_file.c
-> > > > +++ b/fs/xfs/xfs_file.c
-> > > > @@ -1203,6 +1203,14 @@ xfs_file_mmap(
-> > > >  	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
-> > > >  		return -EOPNOTSUPP;
-> > > >  
-> > > > +	/* We don't support synchronous mappings with DAX files if
-> > > > +	 * dax_device is not synchronous.
-> > > > +	 */
-> > > > +	if (IS_DAX(file_inode(filp)) && !dax_synchronous(
-> > > > +		xfs_find_daxdev_for_inode(file_inode(filp))) &&
-> > > > +					(vma->vm_flags & VM_SYNC))
-> > > > +		return -EOPNOTSUPP;
-> > > > +
-> > > >  	file_accessed(filp);
-> > > >  	vma->vm_ops = &xfs_file_vm_ops;
-> > > >  	if (IS_DAX(file_inode(filp)))
-> > > 
-> > > All this ad hoc IS_DAX conditional logic is getting pretty nasty.
-> > > 
-> > > xfs_file_mmap(
-> > > ....
-> > > {
-> > > 	struct inode	*inode = file_inode(filp);
-> > > 
-> > > 	if (vma->vm_flags & VM_SYNC) {
-> > > 		if (!IS_DAX(inode))
-> > > 			return -EOPNOTSUPP;
-> > > 		if (!dax_synchronous(xfs_find_daxdev_for_inode(inode))
-> > > 			return -EOPNOTSUPP;
-> > > 	}
-> > > 
-> > > 	file_accessed(filp);
-> > > 	vma->vm_ops = &xfs_file_vm_ops;
-> > > 	if (IS_DAX(inode))
-> > > 		vma->vm_flags |= VM_HUGEPAGE;
-> > > 	return 0;
-> > > }
-> > > 
-> > > 
-> > > Even better, factor out all the "MAP_SYNC supported" checks into a
-> > > helper so that the filesystem code just doesn't have to care about
-> > > the details of checking for DAX+MAP_SYNC support....
-> > 
-> > Seconded, since ext4 has nearly the same flag validation logic.
+
+On Monday 25 March 2019 11:52 AM, David Gibson wrote:
+> On Fri, Mar 22, 2019 at 12:03:58PM +0530, Aravinda Prasad wrote:
+>> Memory error such as bit flips that cannot be corrected
+>> by hardware are passed on to the kernel for handling.
+>> If the memory address in error belongs to guest then
+>> the guest kernel is responsible for taking suitable action.
+>> Patch [1] enhances KVM to exit guest with exit reason
+>> set to KVM_EXIT_NMI in such cases. This patch handles
+>> KVM_EXIT_NMI exit.
+>>
+>> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+>>     (e20bbd3d and related commits)
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr_events.c  |   22 ++++++++++++++++++++++
+>>  include/hw/ppc/spapr.h |    1 +
+>>  target/ppc/kvm.c       |   16 ++++++++++++++++
+>>  target/ppc/kvm_ppc.h   |    2 ++
+>>  4 files changed, 41 insertions(+)
+>>
+
+[...]
+
+>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>> index 2427c8e..a593448 100644
+>> --- a/target/ppc/kvm.c
+>> +++ b/target/ppc/kvm.c
+>> @@ -1738,6 +1738,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>>          ret = 0;
+>>          break;
+>>  
+>> +    case KVM_EXIT_NMI:
+>> +        DPRINTF("handle NMI exception\n");
+> 
+> tracepoints are generally preferred to new DPRINTFs.
+
+I see DPRINTFs used in all other exit reasons in this function. Do you
+want me to change this particular exit case to tracepoints? I think it
+is better to keep this DPRINTF as of now and change all the DPRINTFs to
+tracepoints in a separate patch set.
+
+Regards,
+Aravinda
+
+> 
+>> +        ret = kvm_handle_nmi(cpu, run);
+>> +        break;
+>> +
+>>      default:
+>>          fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+>>          ret = -1;
+>> @@ -2803,6 +2808,17 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+>>      return data & 0xffff;
+>>  }
+>>  
+>> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
+>> +{
+>> +    bool recovered = run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
+>> +
+>> +    cpu_synchronize_state(CPU(cpu));
+>> +
+>> +    spapr_mce_req_event(cpu, recovered);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>  int kvmppc_enable_hwrng(void)
+>>  {
+>>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
+>> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+>> index 2c2ea30..df5e85f 100644
+>> --- a/target/ppc/kvm_ppc.h
+>> +++ b/target/ppc/kvm_ppc.h
+>> @@ -80,6 +80,8 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void);
+>>  void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+>>  void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
+>>  
+>> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
+>> +
+>>  #else
+>>  
+>>  static inline uint32_t kvmppc_get_tbfreq(void)
+>>
 > 
 
-Only issue with this I see is we need the helper function only for supported
-filesystems ext4 & xfs (right now). If I create the function in "fs.h" it 
-will be compiled for every filesystem, even for those don't need it.  
-
-Sample patch below, does below patch is near to what you have in mind?
-
-=================
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 1f2e2845eb76..614995170cac 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -1196,12 +1196,17 @@ xfs_file_mmap(
-        struct file     *filp,
-        struct vm_area_struct *vma)
- {
-+       struct dax_device *dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
-+
-        /*
--        * We don't support synchronous mappings for non-DAX files. At least
--        * until someone comes with a sensible use case.
-+        * We don't support synchronous mappings for non-DAX files and
-+        * for DAX files if underneath dax_device is not synchronous.
-         */
--       if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
--               return -EOPNOTSUPP;
-+       if (vma->vm_flags & VM_SYNC) {
-+               int err = is_synchronous(filp, dax_dev);
-+               if (err)
-+                       return err;
-+       }
- 
-        file_accessed(filp);
-        vma->vm_ops = &xfs_file_vm_ops;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 8b42df09b04c..add017de3dd7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2162,6 +2162,20 @@ static inline void file_accessed(struct file *file)
-                touch_atime(&file->f_path);
- }
- 
-+struct dax_device;
-+extern bool dax_synchronous(struct dax_device *dax_dev);
-+static inline int is_synchronous(struct file *filp, struct dax_device *dax_dev)
-+{
-+       struct inode *inode = file_inode(filp);
-+
-+       if (!IS_DAX(inode))
-+               return -EOPNOTSUPP;
-+       if (!dax_synchronous(dax_dev))
-+               return -EOPNOTSUPP;
-+
-+       return 0;
-+}
-+
- int sync_inode(struct inode *inode, struct writeback_control *wbc);
- int sync_inode_metadata(struct inode *inode, int wait);
- 
----------
-
-Thanks,
-Pankaj
+-- 
+Regards,
+Aravinda
