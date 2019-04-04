@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48577)
+Received: from eggs.gnu.org ([209.51.188.92]:49139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hC3hR-0004iG-E5
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:50:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1hC3jL-0006KN-Ql
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hC3hQ-0002mJ-ES
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:50:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44500)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hC3hQ-0002ik-7S
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:50:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hC3hN-0006dy-8n
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 14:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 411BE2E8078
-	for <qemu-devel@nongnu.org>; Thu,  4 Apr 2019 14:50:37 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1hC3jJ-00073m-SQ
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:52:39 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu,  4 Apr 2019 09:52:26 -0500
+Message-Id: <20190404145226.32649-1-eblake@redhat.com>
+In-Reply-To: <20190403030526.12258-1-eblake@redhat.com>
+References: <20190403030526.12258-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Apr 2019 14:43:49 -0000
-From: Thomas Huth <1823169@bugs.launchpad.net>
-Reply-To: Bug 1823169 <1823169@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155437966834.20937.13725906067731199360.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155438902923.20393.16593792674881286687.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823169] Re: qemu displays message "Setup failed,
- please check external storage is available and has enough room."
+Subject: [Qemu-devel] [PATCH for-4.0? 8/7] nbd/client: Fix error message for
+ server with unusable sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +23,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-This is the upstream QEMU bug tracker. Upstream QEMU does not support Andro=
-id apps. Did you maybe wanted to report a bug to the Android emulator fork =
-instead? Then please report the problem in their bug tracker.
-Otherwise, version 2.5.0 is also very old already and not supported anymore=
- (at least from the upstream QEMU project point of view). Please upgrade to=
- the latest version.
+Add a missing space to the error message used when giving up on a
+server that insists on an alignment which renders the last few bytes
+of the export unreadable.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Fixes: 3add3ab78
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
--- =
+We've already concluded that 5-7 are too risky for 4.0 (so qemu 4.0
+NBD servers will have non-compliance issues in alignment corner cases,
+although in fewer places than where 3.1 had similar bugs; and the 4.0
+client is able to work around those non-compliance cases).  But I'd
+still like a review on 1-3 and this patch 8, as trivial improvements
+worth having in 4.0. I'm borderline on whether having patch 4 in 4.0
+adds any value.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823169
+ nbd/client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Title:
-  qemu displays message "Setup failed, please check external storage is
-  available and has enough room."
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I tried to launch the Android app PokerStarsFR, and after it began
-  initialization, the launch failed with the above error. I'm running
-  qemu on a Dell XPS 13 (9370) laptop running Ubuntu 16.04 LTS. The
-  standard apps launch OK, but this one does not. I had downloaded it
-  from the PokerStars site
-  https://www.pokerstars.fr/en/poker/download/android/.
-
-  I am running qemu version 2.5.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823169/+subscriptions
+diff --git a/nbd/client.c b/nbd/client.c
+index 427980bdd22..4de30630c73 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -428,7 +428,7 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32=
+_t opt,
+             }
+             if (info->min_block &&
+                 !QEMU_IS_ALIGNED(info->size, info->min_block)) {
+-                error_setg(errp, "export size %" PRIu64 "is not multiple=
+ of "
++                error_setg(errp, "export size %" PRIu64 " is not multipl=
+e of "
+                            "minimum block size %" PRIu32, info->size,
+                            info->min_block);
+                 nbd_send_opt_abort(ioc);
+--=20
+2.20.1
