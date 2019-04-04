@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35133)
+Received: from eggs.gnu.org ([209.51.188.92]:38968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hC4d8-0005ix-9D
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:50:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1hC4rv-0004eq-LM
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hC4d5-0005An-LW
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:50:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53065)
+	(envelope-from <armbru@redhat.com>) id 1hC4rt-0000UG-3P
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hC4d1-00052h-P4
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:50:12 -0400
-Date: Thu, 4 Apr 2019 11:50:02 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <846216210.17971239.1554393002566.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190404150025.GN5147@magnolia>
-References: <20190403104018.23947-1-pagupta@redhat.com>
-	<20190403220912.GB26298@dastard> <20190403223921.GM5147@magnolia>
-	<1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
-	<651986267.17402634.1554368950178.JavaMail.zimbra@redhat.com>
-	<20190404094029.GD16131@quack2.suse.cz>
-	<527416483.17415178.1554372524196.JavaMail.zimbra@redhat.com>
-	<20190404150025.GN5147@magnolia>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hC4rs-0000Qz-On
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190402132650.23095-2-armbru@redhat.com>
+	<20190403223255.GB18809@richard>
+Date: Thu, 04 Apr 2019 18:05:25 +0200
+In-Reply-To: <20190403223255.GB18809@richard> (Wei Yang's message of "Thu, 4
+	Apr 2019 06:32:55 +0800")
+Message-ID: <875zrt69iy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
- flush
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/4] vl: Simplify machine_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +28,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Jan Kara <jack@suse.cz>, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com, Dave Chinner <david@fromorbit.com>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, aarcange@redhat.com, dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>, david@redhat.com, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org, riel@surriel.com, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, cohuck@redhat.com, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
+Wei Yang <richardw.yang@linux.intel.com> writes:
 
-> > > 
-> > > So I would put the helper in include/linux/dax.h and have it like:
-> > > 
-> > > bool daxdev_mapping_supported(struct vm_area_struct *vma,
-> 
-> Should this be static inline if you're putting it in the header file?
+> On Tue, Apr 02, 2019 at 03:26:50PM +0200, Markus Armbruster wrote:
+>>Exploit that argument @name is nerver null.  Check is_help_option()
+>>first, because that's what we do elsewhere.
+>>
+>>Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>---
+>> vl.c | 24 +++++++++++-------------
+>> 1 file changed, 11 insertions(+), 13 deletions(-)
+>>
+>>diff --git a/vl.c b/vl.c
+>>index 6a31e5bfac..da1af3e10d 100644
+>>--- a/vl.c
+>>+++ b/vl.c
+>>@@ -2573,19 +2573,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>> 
+>> static MachineClass *machine_parse(const char *name, GSList *machines)
+>> {
+>>-    MachineClass *mc = NULL;
+>>+    MachineClass *mc;
+>>     GSList *el;
+>> 
+>>-    if (name) {
+>>-        mc = find_machine(name, machines);
+>>-    }
+>>-    if (mc) {
+>>-        return mc;
+>>-    }
+>>-    if (name && !is_help_option(name)) {
+>>-        error_report("unsupported machine type");
+>>-        error_printf("Use -machine help to list supported machines\n");
+>>-    } else {
+>>+    if (is_help_option(name)) {
+>>         printf("Supported machines are:\n");
+>>         machines = g_slist_sort(machines, machine_class_cmp);
+>>         for (el = machines; el; el = el->next) {
+>>@@ -2597,9 +2588,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
+>>                    mc->is_default ? " (default)" : "",
+>>                    mc->deprecation_reason ? " (deprecated)" : "");
+>>         }
+>>+        exit(0);
+>>     }
+>>-
+>>-    exit(!name || !is_help_option(name));
+>>+        
+>>+    mc = find_machine(name, machines);
+>>+    if (!mc) {
+>>+        error_report("unsupported machine type");
+>>+        error_printf("Use -machine help to list supported machines\n");
+>>+        exit(1);
+>>+    }
+>>+    return mc;
+>
+> This change looks changed the original behavior.
+>
+> In original logic, if mc is not NULL, there is no message printed. While now
+> it rely on is_help_option(). And no it exit when !is_help_option(), while
+> before this change it exit when is_help_option().
+>
+> I don't understand the reason behind this. My suggestion is you may split this
+> patch into two:
+>
+>   1. remove check on name
+>   2. refine the logic with explanations.
 
-yes. Thanks.
+Cases:
 
-> 
-> A comment ought to be added to describe what this predicate function
-> does.
+(1) User asks for help, i.e. is_help_option(name)
 
-Sure, will add a comment describing the function.
+(1a) and no machine named @name exists, i.e.
+     is_help_option(name) && !find_machine(name, machines)
 
-> 
-> > > 			      struct dax_device *dax_dev)
-> > > {
-> > > 	if (!(vma->vm_flags & VM_SYNC))
-> > > 		return true;
-> > > 	if (!IS_DAX(file_inode(vma->vm_file)))
-> > > 		return false;
-> > > 	return dax_synchronous(dax_dev);
-> > > }
-> > 
-> > Sure. This is much better. I was also not sure what to name the helper
-> > function.
-> > I will go ahead with this unless 'Dave' & 'Darrick' have anything to add.
-> 
-> Jan's approach (modulo that one comment) looks good to me.
+(1b) and a machine named @name exists
+     is_help_option(name) && find_machine(name, machines)
 
-Sure. Thank you.
+(2) User asks for a machine that doesn't exist, i.e.
+    !is_help_option(name) && !find_machine(name, machines)
 
-Best regards,
-Pankaj
+(3) User asks for a machine that exists, i.e.
+    !is_help_option(name) && find_machine(name, machines)
 
-> 
-> --D
-> 
+Since no machines are called "help" or "?", case (1b) is not actually
+possible.
+
+Old code:
+
+    static MachineClass *machine_parse(const char *name, GSList *machines)
+    {
+        MachineClass *mc = NULL;
+        GSList *el;
+
+        if (name) {
+            mc = find_machine(name, machines);
+        }
+        if (mc) {
+            return mc;
+        }
+        if (name && !is_help_option(name)) {
+            error_report("unsupported machine type");
+            error_printf("Use -machine help to list supported machines\n");
+        } else {
+            printf("Supported machines are:\n");
+            machines = g_slist_sort(machines, machine_class_cmp);
+            for (el = machines; el; el = el->next) {
+                MachineClass *mc = el->data;
+                if (mc->alias) {
+                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+                }
+                printf("%-20s %s%s%s\n", mc->name, mc->desc,
+                       mc->is_default ? " (default)" : "",
+                       mc->deprecation_reason ? " (deprecated)" : "");
+            }
+        }
+
+        exit(!name || !is_help_option(name));
+    }
+
+Case (1a): print help, exit(0)
+
+Case (1b): return find_machine()
+
+Case (2): report error, exit(1)
+
+Case (3): return find_machine()
+
+New code:
+
+    static MachineClass *machine_parse(const char *name, GSList *machines)
+    {
+        MachineClass *mc;
+        GSList *el;
+
+        if (is_help_option(name)) {
+            printf("Supported machines are:\n");
+            machines = g_slist_sort(machines, machine_class_cmp);
+            for (el = machines; el; el = el->next) {
+                MachineClass *mc = el->data;
+                if (mc->alias) {
+                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+                }
+                printf("%-20s %s%s%s\n", mc->name, mc->desc,
+                       mc->is_default ? " (default)" : "",
+                       mc->deprecation_reason ? " (deprecated)" : "");
+            }
+            exit(0);
+        }
+
+        mc = find_machine(name, machines);
+        if (!mc) {
+            error_report("unsupported machine type");
+            error_printf("Use -machine help to list supported machines\n");
+            exit(1);
+        }
+        return mc;
+    }
+
+Case (1a): print help, exit(0)
+
+Case (1b): print help, exit(0)
+
+Case (2): report error, exit(1)
+
+Case (3): return find_machine()
+
+The patch changes "impossible" case (1b).  That's intentional (but my
+commit message could explain it better).
