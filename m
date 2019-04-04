@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46905)
+Received: from eggs.gnu.org ([209.51.188.92]:47349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBz2h-0004sP-QI
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:52:20 -0400
+	(envelope-from <peterx@redhat.com>) id 1hBz5R-0005Y5-Il
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBz2g-0004Dp-Mo
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:52:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41076)
+	(envelope-from <peterx@redhat.com>) id 1hBz5Q-0007BD-3j
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBz2g-0004DD-DX
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:52:18 -0400
-Date: Thu, 4 Apr 2019 10:52:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190404095212.GC2678@work-vm>
-References: <156671554283778@vla1-1374b6242101.qloud-c.yandex.net>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hBz5P-0007AR-QS
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:55:08 -0400
+Date: Thu, 4 Apr 2019 17:45:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190404094550.GD23212@xz-x1>
+References: <1553010562-13561-1-git-send-email-catherine.hecx@gmail.com>
+	<1554219001-18301-1-git-send-email-catherine.hecx@gmail.com>
+	<20190403022532.GJ11008@xz-x1>
+	<CAEn6zmG_m1-NP00cL+cZw2PYjErGrDXZLVV9mGNiU2w5EU=7Bg@mail.gmail.com>
+	<20190404042503.GA23212@xz-x1>
+	<CAEn6zmH91NvHySpA32GY4m-1W=r2NHF2Y4-b-+XTADBjkYxNAQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <156671554283778@vla1-1374b6242101.qloud-c.yandex.net>
+In-Reply-To: <CAEn6zmH91NvHySpA32GY4m-1W=r2NHF2Y4-b-+XTADBjkYxNAQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] QEMU may write to system_memory before
- guest starts
+Subject: Re: [Qemu-devel] [PATCH v2] migration: avoid filling ignore-shared
+ ramblock when in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +33,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?0K7RgNC40Lkg0JrQvtGC0L7Qsg==?= <yury-kotov@yandex-team.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
+To: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-* =D0=AE=D1=80=D0=B8=D0=B9 =D0=9A=D0=BE=D1=82=D0=BE=D0=B2 (yury-kotov@yan=
-dex-team.ru) wrote:
-> Ping
+On Thu, Apr 04, 2019 at 03:33:20PM +0800, Catherine Ho wrote:
+> Hi Peter Xu
+>=20
+> On Thu, 4 Apr 2019 at 12:25, Peter Xu <peterx@redhat.com> wrote:
+>=20
+> > On Wed, Apr 03, 2019 at 11:21:47PM +0800, Catherine Ho wrote:
+> > > Hi Peter Xu
+> > >
+> > > On Wed, 3 Apr 2019 at 10:25, Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > > On Tue, Apr 02, 2019 at 11:30:01AM -0400, Catherine Ho wrote:
+> > > > > Commit 18269069c310 ("migration: Introduce ignore-shared capabi=
+lity")
+> > > > > addes ignore-shared capability to bypass the shared ramblock (e=
+,g,
+> > > > > membackend + numa node). It does good to live migration.
+> > > > >
+> > > > > This commit expectes that QEMU doesn't write to guest RAM until
+> > > > > VM starts, but it does on aarch64 qemu:
+> > > > > Backtrace:
+> > > > > 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
+> > > > exec.c:3458
+> > > > > 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3=
+479
+> > > > > 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
+> > > > > 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset=
+.c:69
+> > > > > 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
+> > > > > 6  0x000055f4a2c9851d in main () at vl.c:4552
+> > > > >
+> > > > > Actually, on arm64 virt marchine, ramblock "dtb" will be filled=
+ into
+> > ram
+> > > > > during rom_reset. In ignore-shared incoming case, this rom fill=
+ing
+> > > > > is not required since all the data has been stored in memory ba=
+ckend
+> > > > file.
+> > > > >
+> > > > > Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
+> > > > capability")
+> > > > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> > > > > Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> > > >
+> > > > (note: IIUC normally you should have your signed-off to be the la=
+st
+> > > >  line before the suggested-by :)
+> > > >
+> > > > About the patch content, I have had a question on whether we shou=
+ld
+> > > > need to check ignore-shared at all... That question lies in:
+> > > >
+> > > > https://patchwork.kernel.org/patch/10859889/#22546487
+> > > >
+> > > > And if my understanding was correct above, IMHO the patch could b=
+e as
+> > > > simply be as "if (runstate_check(RUN_STATE_INMIGRATE)) return;" a=
+t [1]
+> > > > below.
+> > > >
+> > > >
+> > > Thanks=EF=BC=8C but I thought this method would break the x86 rom_r=
+eset logic
+> > during
+> > > RUN_STATE_INMIGRATE.
+> > > Please see the debugging patch and log lines below:
+> > > diff --git a/hw/core/loader.c b/hw/core/loader.c
+> > > index fe5cb24122..b0c871af26 100644
+> > > --- a/hw/core/loader.c
+> > > +++ b/hw/core/loader.c
+> > > @@ -1086,8 +1086,9 @@ int rom_add_option(const char *file, int32_t
+> > > bootindex)
+> > >  static void rom_reset(void *unused)
+> > >  {
+> > >      Rom *rom;
+> > > -
+> > >      QTAILQ_FOREACH(rom, &roms, next) {
+> > > +        if (runstate_check(RUN_STATE_INMIGRATE))
+> > > +           printf("rom name=3D%s\n",rom->name);
+> > >          if (rom->fw_file) {
+> > >              continue;
+> > >          }
+> > >
+> > > rom name=3Dkvmvapic.bin
+> > > rom name=3Dlinuxboot_dma.bin
+> > > rom name=3Dbios-256k.bin
+> > > rom name=3Detc/acpi/tables
+> > > rom name=3Detc/table-loader
+> > > rom name=3Detc/acpi/rsdp
+> >
+> > Hi, Catherine,
+> >
+> > I only see that rom names were dumped.  Could you help explain what i=
+s
+> > broken?  Thanks,
+> >
+> > Sorry, I have another concern here. What if there is no memory_backen=
+d
+> file?
+> If there is no memory backend file (i.e. without -object
+> memory-backend-file,id=3Ddimm1,size=3D512M,mem-path=3D/path/memory)
+>=20
+> Should the rom blobs still be written into ram in such case?
 
-Is this fixed by Catherine Ho's patch series?
+Please see my previous reply - I think it shouldn't be needed because
+we should migrate very soon after this point for those RAM.  In other
+words, IIUC even if we do rom_reset() now with these ROMs then the RAM
+data should be re-filled again too with the migration stream coming in.
 
-Dave
+Regards,
 
-> 21.03.2019, 19:27, "Yury Kotov" <yury-kotov@yandex-team.ru>:
-> > Hi,
-> >
-> > 19.03.2019, 14:52, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
-> >> =C2=A0* Peter Maydell (peter.maydell@linaro.org) wrote:
-> >>> =C2=A0=C2=A0On Tue, 19 Mar 2019 at 11:03, Dr. David Alan Gilbert
-> >>> =C2=A0=C2=A0<dgilbert@redhat.com> wrote:
-> >>> =C2=A0=C2=A0>
-> >>> =C2=A0=C2=A0> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >>> =C2=A0=C2=A0> > I didn't think migration distinguished between "mai=
-n memory"
-> >>> =C2=A0=C2=A0> > and any other kind of RAMBlock-backed memory ?
-> >>> =C2=A0=C2=A0>
-> >>> =C2=A0=C2=A0> In Yury's case there's a distinction between RAMBlock=
-'s that are mapped
-> >>> =C2=A0=C2=A0> with RAM_SHARED (which normally ends up as MAP_SHARED=
-) and all others.
-> >>> =C2=A0=C2=A0> You can set that for main memory by using -numa to sp=
-ecify a memdev
-> >>> =C2=A0=C2=A0> that's backed by a file and has the share=3Don proper=
-ty.
-> >>> =C2=A0=C2=A0>
-> >>> =C2=A0=C2=A0> On x86 the ROMs end up as separate RAMBlock's that ar=
-en't affected
-> >>> =C2=A0=C2=A0> by that -numa/share=3Don - so they don't fight Yury's=
- trick.
-> >>>
-> >>> =C2=A0=C2=A0You can use the generic loader on x86 to load an ELF fi=
-le
-> >>> =C2=A0=C2=A0into RAM if you want, which would I think also trigger =
-this.
-> >>
-> >> =C2=A0OK, although that doesn't worry me too much - since in the maj=
-ority
-> >> =C2=A0of cases Yury's trick still works well.
-> >>
-> >> =C2=A0I wonder if there's a way to make Yury's code to detect these =
-cases
-> >> =C2=A0and not allow the feature; the best thing for the moment would=
- seem to
-> >> =C2=A0be to skip the aarch test that uses elf loading.
-> >
-> > Currently, I've no idea how to detect such cases, but there is an abi=
-lity to
-> > detect memory corruption. I want to update the RFC patch to let user =
-to map some
-> > memory regions as readonly until incoming migration start.
-> >
-> > E.g.
-> > 1) If x-ignore-shared is enabled in command line or memory region is =
-marked
-> > =C2=A0=C2=A0=C2=A0(something like ',readonly=3Don'),
-> > 2) Memory region is shared (,share=3Don),
-> > 3) And qemu is started with '-incoming' option
-> >
-> > Then map such regions as readonly until incoming migration finished.
-> > Thus, the patch will be able to detect memory corruption and will not=
- affect
-> > normal cases.
-> >
-> > How do you think, is it needed?
-> >
-> > I already have a cleaner version of the RFC patch, but I'm not sure a=
-bout 1).
-> > Which way is better: enable capability in command line, add a new opt=
-ion for
-> > memory-backend or something else.
-> >
-> >> =C2=A0Dave
-> >>
-> >>> =C2=A0=C2=A0thanks
-> >>> =C2=A0=C2=A0-- PMM
-> >> =C2=A0--
-> >> =C2=A0Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
-> > Regards,
-> > Yury
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Peter Xu
