@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50729)
+Received: from eggs.gnu.org ([209.51.188.92]:50746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hC3rP-0000FI-Aa
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:01:00 -0400
+	(envelope-from <darrick.wong@oracle.com>) id 1hC3rT-0000JG-Id
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hC3rO-0005hO-1s
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hC3rN-0005gX-RF
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:00:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hC3rL-0000dI-EB
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 15:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 42E772E80D3
-	for <qemu-devel@nongnu.org>; Thu,  4 Apr 2019 15:00:55 +0000 (UTC)
+	(envelope-from <darrick.wong@oracle.com>) id 1hC3rR-0005kf-QQ
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:01:03 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:46112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darrick.wong@oracle.com>)
+	id 1hC3rR-0005iu-Be
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 11:01:01 -0400
+Date: Thu, 4 Apr 2019 08:00:25 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Message-ID: <20190404150025.GN5147@magnolia>
+References: <20190403104018.23947-1-pagupta@redhat.com>
+	<20190403104018.23947-6-pagupta@redhat.com>
+	<20190403220912.GB26298@dastard> <20190403223921.GM5147@magnolia>
+	<1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
+	<651986267.17402634.1554368950178.JavaMail.zimbra@redhat.com>
+	<20190404094029.GD16131@quack2.suse.cz>
+	<527416483.17415178.1554372524196.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Apr 2019 14:55:05 -0000
-From: Thomas Huth <1823152@bugs.launchpad.net>
-Reply-To: Bug 1823152 <1823152@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155437317153.8246.1283253665470856398.malonedeb@wampee.canonical.com>
-Message-Id: <155438970545.21090.11561231440131697277.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823152] Re: QEMU not able to boot ubuntu 18.04
- as a guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <527416483.17415178.1554372524196.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +34,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>, cohuck@redhat.com, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, aarcange@redhat.com, dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>, david@redhat.com, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org, riel@surriel.com, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, imammedo@redhat.com
 
-** No longer affects: qemu
+On Thu, Apr 04, 2019 at 06:08:44AM -0400, Pankaj Gupta wrote:
+> 
+> > On Thu 04-04-19 05:09:10, Pankaj Gupta wrote:
+> > > 
+> > > > > On Thu, Apr 04, 2019 at 09:09:12AM +1100, Dave Chinner wrote:
+> > > > > > On Wed, Apr 03, 2019 at 04:10:18PM +0530, Pankaj Gupta wrote:
+> > > > > > > Virtio pmem provides asynchronous host page cache flush
+> > > > > > > mechanism. we don't support 'MAP_SYNC' with virtio pmem
+> > > > > > > and xfs.
+> > > > > > > 
+> > > > > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > > > > ---
+> > > > > > >  fs/xfs/xfs_file.c | 8 ++++++++
+> > > > > > >  1 file changed, 8 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > > > > > > index 1f2e2845eb76..dced2eb8c91a 100644
+> > > > > > > --- a/fs/xfs/xfs_file.c
+> > > > > > > +++ b/fs/xfs/xfs_file.c
+> > > > > > > @@ -1203,6 +1203,14 @@ xfs_file_mmap(
+> > > > > > >  	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
+> > > > > > >  		return -EOPNOTSUPP;
+> > > > > > >  
+> > > > > > > +	/* We don't support synchronous mappings with DAX files if
+> > > > > > > +	 * dax_device is not synchronous.
+> > > > > > > +	 */
+> > > > > > > +	if (IS_DAX(file_inode(filp)) && !dax_synchronous(
+> > > > > > > +		xfs_find_daxdev_for_inode(file_inode(filp))) &&
+> > > > > > > +					(vma->vm_flags & VM_SYNC))
+> > > > > > > +		return -EOPNOTSUPP;
+> > > > > > > +
+> > > > > > >  	file_accessed(filp);
+> > > > > > >  	vma->vm_ops = &xfs_file_vm_ops;
+> > > > > > >  	if (IS_DAX(file_inode(filp)))
+> > > > > > 
+> > > > > > All this ad hoc IS_DAX conditional logic is getting pretty nasty.
+> > > > > > 
+> > > > > > xfs_file_mmap(
+> > > > > > ....
+> > > > > > {
+> > > > > > 	struct inode	*inode = file_inode(filp);
+> > > > > > 
+> > > > > > 	if (vma->vm_flags & VM_SYNC) {
+> > > > > > 		if (!IS_DAX(inode))
+> > > > > > 			return -EOPNOTSUPP;
+> > > > > > 		if (!dax_synchronous(xfs_find_daxdev_for_inode(inode))
+> > > > > > 			return -EOPNOTSUPP;
+> > > > > > 	}
+> > > > > > 
+> > > > > > 	file_accessed(filp);
+> > > > > > 	vma->vm_ops = &xfs_file_vm_ops;
+> > > > > > 	if (IS_DAX(inode))
+> > > > > > 		vma->vm_flags |= VM_HUGEPAGE;
+> > > > > > 	return 0;
+> > > > > > }
+> > > > > > 
+> > > > > > 
+> > > > > > Even better, factor out all the "MAP_SYNC supported" checks into a
+> > > > > > helper so that the filesystem code just doesn't have to care about
+> > > > > > the details of checking for DAX+MAP_SYNC support....
+> > > > > 
+> > > > > Seconded, since ext4 has nearly the same flag validation logic.
+> > > > 
+> > > 
+> > > Only issue with this I see is we need the helper function only for
+> > > supported
+> > > filesystems ext4 & xfs (right now). If I create the function in "fs.h" it
+> > > will be compiled for every filesystem, even for those don't need it.
+> > > 
+> > > Sample patch below, does below patch is near to what you have in mind?
+> > 
+> > So I would put the helper in include/linux/dax.h and have it like:
+> > 
+> > bool daxdev_mapping_supported(struct vm_area_struct *vma,
 
--- =
+Should this be static inline if you're putting it in the header file?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823152
+A comment ought to be added to describe what this predicate function
+does.
 
-Title:
-  QEMU not able to boot ubuntu 18.04 as a guest
+> > 			      struct dax_device *dax_dev)
+> > {
+> > 	if (!(vma->vm_flags & VM_SYNC))
+> > 		return true;
+> > 	if (!IS_DAX(file_inode(vma->vm_file)))
+> > 		return false;
+> > 	return dax_synchronous(dax_dev);
+> > }
+> 
+> Sure. This is much better. I was also not sure what to name the helper function.
+> I will go ahead with this unless 'Dave' & 'Darrick' have anything to add.
 
-Status in qemu package in Ubuntu:
-  New
+Jan's approach (modulo that one comment) looks good to me.
 
-Bug description:
-  Host information:
-  sushant@sushant-OptiPlex-7050:~$ lsb_release -a
-  No LSB modules are available.
-  Distributor ID:	Ubuntu
-  Description:	Ubuntu 18.04.2 LTS
-  Release:	18.04
-  Codename:	bionic
+--D
 
-  QEMU version:
-  sushant@sushant-OptiPlex-7050:~$ /usr/bin/qemu-system-x86_64   --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.12)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  I am trying to install xubuntu 18.04 as a qemu guest. The installation
-  process goes smoothly and I reboot. After reboot, the boot process
-  hangs with black screen and a blinking pointer. I used the following
-  steps to install and boot the machine:
-
-  STEP 1:
-  sudo qemu-img create /var/lib/libvirt/images/xubuntu18_04.qcow2 30G
-
-  =
-
-  STEP 2:
-  sudo qemu-system-x86_64-spice -enable-kvm -cpu host -boot d -cdrom /home/=
-sushant/Downloads/xubuntu-18.04.2-desktop-amd64.iso /var/lib/libvirt/images=
-/xubuntu18_04.qcow2   -m 8G
-
-  =
-
-  STEP 3:
-  sudo qemu-system-x86_64-spice -enable-kvm -cpu host  /var/lib/libvirt/ima=
-ges/xubuntu18_04.qcow2   -m 8G
-
-  I tried with ubuntu 18.04(deafult ubuntu) and it also hangs with error
-  "removed slice user slice of gdm"
-
-  Also, if I install ubuntu 16.04 as guest, it boots smoothly.
-
-  What should be done?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1823152/+subscriptions
+> Thank you very much.
+> 
+> Best regards,
+> Pankaj 
+> 
+> > 
+> > 								Honza
+> > > 
+> > > =================
+> > > 
+> > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > > index 1f2e2845eb76..614995170cac 100644
+> > > --- a/fs/xfs/xfs_file.c
+> > > +++ b/fs/xfs/xfs_file.c
+> > > @@ -1196,12 +1196,17 @@ xfs_file_mmap(
+> > >         struct file     *filp,
+> > >         struct vm_area_struct *vma)
+> > >  {
+> > > +       struct dax_device *dax_dev =
+> > > xfs_find_daxdev_for_inode(file_inode(filp));
+> > > +
+> > >         /*
+> > > -        * We don't support synchronous mappings for non-DAX files. At
+> > > least
+> > > -        * until someone comes with a sensible use case.
+> > > +        * We don't support synchronous mappings for non-DAX files and
+> > > +        * for DAX files if underneath dax_device is not synchronous.
+> > >          */
+> > > -       if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
+> > > -               return -EOPNOTSUPP;
+> > > +       if (vma->vm_flags & VM_SYNC) {
+> > > +               int err = is_synchronous(filp, dax_dev);
+> > > +               if (err)
+> > > +                       return err;
+> > > +       }
+> > >  
+> > >         file_accessed(filp);
+> > >         vma->vm_ops = &xfs_file_vm_ops;
+> > > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > > index 8b42df09b04c..add017de3dd7 100644
+> > > --- a/include/linux/fs.h
+> > > +++ b/include/linux/fs.h
+> > > @@ -2162,6 +2162,20 @@ static inline void file_accessed(struct file *file)
+> > >                 touch_atime(&file->f_path);
+> > >  }
+> > >  
+> > > +struct dax_device;
+> > > +extern bool dax_synchronous(struct dax_device *dax_dev);
+> > > +static inline int is_synchronous(struct file *filp, struct dax_device
+> > > *dax_dev)
+> > > +{
+> > > +       struct inode *inode = file_inode(filp);
+> > > +
+> > > +       if (!IS_DAX(inode))
+> > > +               return -EOPNOTSUPP;
+> > > +       if (!dax_synchronous(dax_dev))
+> > > +               return -EOPNOTSUPP;
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > >  int sync_inode(struct inode *inode, struct writeback_control *wbc);
+> > >  int sync_inode_metadata(struct inode *inode, int wait);
+> > >  
+> > > ---------
+> > > 
+> > > Thanks,
+> > > Pankaj
+> > > 
+> > > 
+> > > 
+> > --
+> > Jan Kara <jack@suse.com>
+> > SUSE Labs, CR
+> > 
+> > 
