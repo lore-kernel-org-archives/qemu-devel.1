@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34251)
+Received: from eggs.gnu.org ([209.51.188.92]:36935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hByBM-0007ZR-Gh
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:13 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hByN1-0002Hl-0D
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hByBL-0005Lp-9t
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:12 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1hByBK-0005KT-Uh
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:57:11 -0400
-Received: by mail-lf1-x143.google.com with SMTP id 5so1161742lft.12
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 01:57:10 -0700 (PDT)
+	(envelope-from <pagupta@redhat.com>) id 1hByMz-0002gm-Uf
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57448)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hByMz-0002eO-HT
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 05:09:13 -0400
+Date: Thu, 4 Apr 2019 05:09:10 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <651986267.17402634.1554368950178.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
+References: <20190403104018.23947-1-pagupta@redhat.com>
+	<20190403104018.23947-6-pagupta@redhat.com>
+	<20190403220912.GB26298@dastard> <20190403223921.GM5147@magnolia>
+	<1508883801.17367965.1554358418550.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-References: <1552644466-24625-1-git-send-email-hongbo.zhang@linaro.org>
-	<1552644466-24625-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAKv+Gu-aZeYwegzFQ7pPqvm28ySR5xC6rZh8FBvQaWiNykgPEg@mail.gmail.com>
-	<CAHmQWvD8byf+4=J7+rnU9CiGRKnuA4NnRPHRw1Zki4-m4anwOA@mail.gmail.com>
-	<CAKv+Gu9cWgkH-ZTDQ42_HnN-LfAMoL-k7ysd1Hz07RrP+Pp94g@mail.gmail.com>
-	<CAHmQWvArKFj9WPwaLjHs11x75iD0Rk9PBsTRq8mXrhm-LZt7=A@mail.gmail.com>
-	<CAEK-wKnY=VutLC6Ke=UeuswfxGkGohahhxwFiq=kqRdT-W0rPQ@mail.gmail.com>
-In-Reply-To: <CAEK-wKnY=VutLC6Ke=UeuswfxGkGohahhxwFiq=kqRdT-W0rPQ@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Thu, 4 Apr 2019 16:56:54 +0800
-Message-ID: <CAHmQWvBDffcuGBUs7KCMEKwH-4a_ihd6Hmgab3ZoqQU3jETVPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] hw/arm: Add arm SBSA reference
- machine, skeleton part
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] xfs: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,116 +30,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>, Dave Chinner <david@fromorbit.com>
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan j williams <dan.j.williams@intel.com>, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
 
-On Thu, 4 Apr 2019 at 16:51, Radoslaw Biernacki
-<radoslaw.biernacki@linaro.org> wrote:
->
-> There is one additional need which we just discovered with Fu Wei.
-> We need second secure UART for RAS and MM from EL0.
-> I'm adding a patch here (not sure if addresses and IRQ's are in your style so please check those).
-> I will adapt FW to your changes in next patch.
->
-OK, I will take this into my next version of patch.
-Thanks.
 
-> From fbc84e29b966f94a27fe84195987e6ba0c55c1bc Mon Sep 17 00:00:00 2001
-> From: Radoslaw Biernacki <radoslaw.biernacki@gmail.com>
-> Date: Thu, 4 Apr 2019 14:41:21 +0700
-> Subject: [PATCH] Add 2nd secure uart Rebase of Fu Wei patch
->
-> ---
->  hw/arm/sbsa-ref.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> index 6b26111840..dcfb34ff5b 100644
-> --- a/hw/arm/sbsa-ref.c
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -67,6 +67,7 @@ enum {
->      SBSA_PCIE_ECAM,
->      SBSA_GPIO,
->      SBSA_SECURE_UART,
-> +    SBSA_SECURE_UART_MM,
->      SBSA_SECURE_MEM,
->      SBSA_AHCI,
->      SBSA_EHCI,
-> @@ -105,7 +106,9 @@ static const MemMapEntry sbsa_ref_memmap[] = {
->      [SBSA_RTC] =                { 0x60010000, 0x00001000 },
->      [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
->      [SBSA_SECURE_UART] =        { 0x60030000, 0x00001000 },
-> -    [SBSA_SMMU] =               { 0x60040000, 0x00020000 },
-> +    /* The UART is a secure UART for S-EL0 OS testing */
-> +    [SBSA_SECURE_UART_MM] =     { 0x60040000, 0x00001000 },
-> +    [SBSA_SMMU] =               { 0x60050000, 0x00020000 },
->      /* Space here reserved for more SMMUs */
->      [SBSA_AHCI] =               { 0x60100000, 0x00010000 },
->      [SBSA_EHCI] =               { 0x60110000, 0x00010000 },
-> @@ -126,8 +129,9 @@ static const int sbsa_ref_irqmap[] = {
->      [SBSA_PCIE] = 3, /* ... to 6 */
->      [SBSA_GPIO] = 7,
->      [SBSA_SECURE_UART] = 8,
-> -    [SBSA_AHCI] = 9,
-> -    [SBSA_EHCI] = 10,
-> +    [SBSA_SECURE_UART_MM] = 9,
-> +    [SBSA_AHCI] = 10,
-> +    [SBSA_EHCI] = 11,
->  };
->
->  /*
-> @@ -645,6 +649,7 @@ static void sbsa_ref_init(MachineState *machine)
->      create_uart(vms, pic, SBSA_UART, sysmem, serial_hd(0));
->
->      create_uart(vms, pic, SBSA_SECURE_UART, secure_sysmem, serial_hd(1));
-> +    create_uart(vms, pic, SBSA_SECURE_UART_MM, secure_sysmem, serial_hd(2));
->
->      create_rtc(vms, pic);
->
-> --
-> 2.17.1
->
->
-> On Thu, 4 Apr 2019 at 15:27, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->>
->> I would like to wait for more days to see if there are any further
->> comments, and if no I will send another iteration with memory map
->> slightly changed.
->>
->> On Wed, 20 Mar 2019 at 18:27, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> >
->> > On Mon, 18 Mar 2019 at 03:39, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> > >
->> > > On Fri, 15 Mar 2019 at 18:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> > > >
->> > > > On Fri, 15 Mar 2019 at 11:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> > > > >
->> > > > > For the Aarch64, there is one machine 'virt', it is primarily meant to
->> > > > > run on KVM and execute virtualization workloads, but we need an
->> > > > > environment as faithful as possible to physical hardware, for supporting
->> > > > > firmware and OS development for pysical Aarch64 machines.
->> > > > >
->> > > > > This patch introduces new machine type 'sbsa-ref' with main features:
->> > > > >  - Based on 'virt' machine type.
->> > > > >  - A new memory map.
->> > > > >  - CPU type cortex-a57.
->> > > > >  - EL2 and EL3 are enabled.
->> > > > >  - GIC version 3.
->> > > > >  - System bus AHCI controller.
->> > > > >  - System bus EHCI controller.
->> > > >
->> > > > Hello Hongbo,
->> > > >
->> > > > Apologies for bringing this up now, but I seem to remember that the
->> > > > EHCI does not support 64-bit DMA. Did you run into any issues with
->> > > > this? Or was this fixed in QEMU in the mean time?
->> > > >
->> > > Hi Ard,
->> > > Which EHCI do you mean?
->> > > This time I use a newly introduced system bus EHCI, commit 114529f7
->> > > and I only tested USB mouse and key board, didn't test DMA function.
->> > >
->> >
->> > The host controller doesn't work without DMA, so if mouse and keyboard
->> > worked for you, and no DRAM exists below the 4 GB mark, this has
->> > apparently been fixed in QEMU.
+> > On Thu, Apr 04, 2019 at 09:09:12AM +1100, Dave Chinner wrote:
+> > > On Wed, Apr 03, 2019 at 04:10:18PM +0530, Pankaj Gupta wrote:
+> > > > Virtio pmem provides asynchronous host page cache flush
+> > > > mechanism. we don't support 'MAP_SYNC' with virtio pmem
+> > > > and xfs.
+> > > > 
+> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > ---
+> > > >  fs/xfs/xfs_file.c | 8 ++++++++
+> > > >  1 file changed, 8 insertions(+)
+> > > > 
+> > > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > > > index 1f2e2845eb76..dced2eb8c91a 100644
+> > > > --- a/fs/xfs/xfs_file.c
+> > > > +++ b/fs/xfs/xfs_file.c
+> > > > @@ -1203,6 +1203,14 @@ xfs_file_mmap(
+> > > >  	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
+> > > >  		return -EOPNOTSUPP;
+> > > >  
+> > > > +	/* We don't support synchronous mappings with DAX files if
+> > > > +	 * dax_device is not synchronous.
+> > > > +	 */
+> > > > +	if (IS_DAX(file_inode(filp)) && !dax_synchronous(
+> > > > +		xfs_find_daxdev_for_inode(file_inode(filp))) &&
+> > > > +					(vma->vm_flags & VM_SYNC))
+> > > > +		return -EOPNOTSUPP;
+> > > > +
+> > > >  	file_accessed(filp);
+> > > >  	vma->vm_ops = &xfs_file_vm_ops;
+> > > >  	if (IS_DAX(file_inode(filp)))
+> > > 
+> > > All this ad hoc IS_DAX conditional logic is getting pretty nasty.
+> > > 
+> > > xfs_file_mmap(
+> > > ....
+> > > {
+> > > 	struct inode	*inode = file_inode(filp);
+> > > 
+> > > 	if (vma->vm_flags & VM_SYNC) {
+> > > 		if (!IS_DAX(inode))
+> > > 			return -EOPNOTSUPP;
+> > > 		if (!dax_synchronous(xfs_find_daxdev_for_inode(inode))
+> > > 			return -EOPNOTSUPP;
+> > > 	}
+> > > 
+> > > 	file_accessed(filp);
+> > > 	vma->vm_ops = &xfs_file_vm_ops;
+> > > 	if (IS_DAX(inode))
+> > > 		vma->vm_flags |= VM_HUGEPAGE;
+> > > 	return 0;
+> > > }
+> > > 
+> > > 
+> > > Even better, factor out all the "MAP_SYNC supported" checks into a
+> > > helper so that the filesystem code just doesn't have to care about
+> > > the details of checking for DAX+MAP_SYNC support....
+> > 
+> > Seconded, since ext4 has nearly the same flag validation logic.
+> 
+
+Only issue with this I see is we need the helper function only for supported
+filesystems ext4 & xfs (right now). If I create the function in "fs.h" it 
+will be compiled for every filesystem, even for those don't need it.  
+
+Sample patch below, does below patch is near to what you have in mind?
+
+=================
+
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 1f2e2845eb76..614995170cac 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1196,12 +1196,17 @@ xfs_file_mmap(
+        struct file     *filp,
+        struct vm_area_struct *vma)
+ {
++       struct dax_device *dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
++
+        /*
+-        * We don't support synchronous mappings for non-DAX files. At least
+-        * until someone comes with a sensible use case.
++        * We don't support synchronous mappings for non-DAX files and
++        * for DAX files if underneath dax_device is not synchronous.
+         */
+-       if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
+-               return -EOPNOTSUPP;
++       if (vma->vm_flags & VM_SYNC) {
++               int err = is_synchronous(filp, dax_dev);
++               if (err)
++                       return err;
++       }
+ 
+        file_accessed(filp);
+        vma->vm_ops = &xfs_file_vm_ops;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 8b42df09b04c..add017de3dd7 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2162,6 +2162,20 @@ static inline void file_accessed(struct file *file)
+                touch_atime(&file->f_path);
+ }
+ 
++struct dax_device;
++extern bool dax_synchronous(struct dax_device *dax_dev);
++static inline int is_synchronous(struct file *filp, struct dax_device *dax_dev)
++{
++       struct inode *inode = file_inode(filp);
++
++       if (!IS_DAX(inode))
++               return -EOPNOTSUPP;
++       if (!dax_synchronous(dax_dev))
++               return -EOPNOTSUPP;
++
++       return 0;
++}
++
+ int sync_inode(struct inode *inode, struct writeback_control *wbc);
+ int sync_inode_metadata(struct inode *inode, int wait);
+ 
+---------
+
+Thanks,
+Pankaj
