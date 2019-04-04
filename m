@@ -1,28 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:54914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lepton@google.com>) id 1hBxjB-0001xe-BA
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:28:06 -0400
+	(envelope-from <chen.zhang@intel.com>) id 1hBxjG-0001xe-IE
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lepton@google.com>) id 1hBxd8-0008Gu-Vl
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:21:52 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:39824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lepton@google.com>) id 1hBxd3-00081O-5B
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:21:46 -0400
-Received: by mail-it1-x142.google.com with SMTP id 139so2312673ita.4
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 01:21:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <201904041010.10367.randrianasulu@gmail.com>
-	<CAOvqHj4JsRvm1vzu-VQ0GGGTLEPBT-wyRcRbUHTZGE6m8onjwg@mail.gmail.com>
-	<201904041044.49806.randrianasulu@gmail.com>
-In-Reply-To: <201904041044.49806.randrianasulu@gmail.com>
-From: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>
-Date: Thu, 4 Apr 2019 01:21:27 -0700
-Message-ID: <CAOvqHj4XcYypo3rJ1H1r7uQrn0ucMbrrfpBx_7M_iwKdwf32VA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <chen.zhang@intel.com>) id 1hBxYj-00011I-FL
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:17:19 -0400
+Received: from mga06.intel.com ([134.134.136.31]:7719)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+	id 1hBxYi-0000xx-Ub
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:17:17 -0400
+From: "Zhang, Chen" <chen.zhang@intel.com>
+Date: Thu, 4 Apr 2019 08:17:09 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78060B8B4C@shsmsx102.ccr.corp.intel.com>
+References: <20190329222951.28945-1-chen.zhang@intel.com>
+	<5CA1D5CE.6040400@intel.com>
+In-Reply-To: <5CA1D5CE.6040400@intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proof of concept for GPU forwarding for Linux
- guest on Linux host
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] migration/ram.c: Fix codes conflict about
+ bitmap_mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: "Wang, Wei W" <wei.w.wang@intel.com>, Zhang Chen <zhangckid@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
-On Thu, Apr 4, 2019 at 12:49 AM Andrew Randrianasulu <
-randrianasulu@gmail.com> wrote:
+Ping~  Anyone have comments about this patch?
 
-> =D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=
-=82 Thursday 04 April 2019 10:33:55 Tao Wu(=E5=90=B4=E6=B6=9B@Eng) =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BB(=D0=B0):
-> > On Thu, Apr 4, 2019 at 12:15 AM Andrew Randrianasulu <
-> > randrianasulu@gmail.com> wrote:
+Thanks
+Zhang Chen
+
+
+> -----Original Message-----
+> From: Wang, Wei W
+> Sent: Monday, April 1, 2019 5:12 PM
+> To: Zhang, Chen <chen.zhang@intel.com>; Zhang Chen
+> <zhangckid@gmail.com>; Dr. David Alan Gilbert <dgilbert@redhat.com>; Juan
+> Quintela <quintela@redhat.com>; qemu-dev <qemu-devel@nongnu.org>
+> Subject: Re: [PATCH] migration/ram.c: Fix codes conflict about bitmap_mut=
+ex
+>=20
+> On 03/30/2019 06:29 AM, Zhang Chen wrote:
+> > From: Zhang Chen <chen.zhang@intel.com>
 > >
-> > > Hi!
-> > >
-> > > I recall I saw something like this some time ago (but in connection
-> with
-> > > qemu-user + ALSA sycallls)
-> > > So far I found this:
-> > >
-> > > https://marc.info/?l=3Dqemu-devel&m=3D154349285205915
-> > >
-> > > List:       qemu-devel
-> > > Subject:    [Qemu-devel] Support for Intel GPU
-> > > From:       Allan Sandfeld Jensen <kde () carewolf ! com>
-> > > Date:       2018-11-29 11:54:19
-> > >
-> > > Ah, found alsa bits too:
-> > > https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg05334.html
+> > I found upstream codes conflict with COLO and lead to crash, and I
+> > located to this patch:
 > >
-> > Thanks, I took a look, the previous patches are targeting qemu user mod=
-e
-> > while mine is targeting full system virtualization.
-> > There is no plan to merge my code as it is now. I just want to get some
-> > feedbacks first.
->
-> I was thinking qemu's system mode was covered already by
->
->
-> https://www.kraxel.org/blog/2018/04/vgpu-display-support-finally-merged-u=
-pstream/
-> (intel's vGPU)
->
-> Personally I have never tested this.
-
->
-> https://www.kraxel.org/blog/2016/09/using-virtio-gpu-with-libvirt-and-spi=
-ce/
-> (virtio-gpu
-> <https://www.kraxel.org/blog/2016/09/using-virtio-gpu-with-libvirt-and-sp=
-ice/(virtio-gpu>,
-> via gallium framework)
->
-In the long term, this should be the right direction. But for now, it is
-lacking of something like vulkan support.
-Also, performance is not as great as it could be. In some use case
-(benchmark), GPU forwarding work much better
-than virtio-gpu and can get close native performance.
-
->
-> ?
->
-> But thanks anyway, may be some of those ideas can be fused together (I
-> only have nvidia/nouveau GPU,
-> and at best can forward-port something simple)
-
-Actually although I said GPU forwarding, the real code is doing "file
-handler" forwarding (by supporting
-mmap/ioctl/select...) etc. I am not sure if we should have a general frame
-work for things like this so we can forward
-any special device in host to guest with minimal efforts.
-
->
-
-
-
-
-
-
->
+> > commit 386a907b37a9321bc5d699bc37104d6ffba1b34d
+> > Author: Wei Wang <wei.w.wang@intel.com>
+> > Date:   Tue Dec 11 16:24:49 2018 +0800
 > >
+> > migration: use bitmap_mutex in migration_bitmap_clear_dirty
 > >
-> > >
-> > >
-> > > None of this was merged, as far as I understand.
-> > >
+> > My colleague Wei's patch add bitmap_mutex in
+> > migration_bitmap_clear_dirty, but COLO didn't initialize the
+> > bitmap_mutex. So we always get an error when COLO start up. like that:
+> > qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl:
+> Assertion `mutex->initialized' failed.
 > >
->
->
->
+> > This patch add the bitmap_mutex initialize and destroy in COLO
+> > lifecycle.
+> >
+> > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > ---
+> >   migration/ram.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> >
+> > diff --git a/migration/ram.c b/migration/ram.c index
+> > d7f8fe45a8..f68beeeeff 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -3918,6 +3918,7 @@ int colo_init_ram_cache(void)
+> >       }
+> >       ram_state =3D g_new0(RAMState, 1);
+> >       ram_state->migration_dirty_pages =3D 0;
+> > +    qemu_mutex_init(&ram_state->bitmap_mutex);
+> >       memory_global_dirty_log_start();
+> >
+> >       return 0;
+> > @@ -3956,6 +3957,7 @@ void colo_release_ram_cache(void)
+> >       }
+> >
+> >       rcu_read_unlock();
+> > +    qemu_mutex_destroy(&ram_state->bitmap_mutex);
+> >       g_free(ram_state);
+> >       ram_state =3D NULL;
+> >   }
+>=20
+> Reviewed-by: Wei Wang <wei.w.wang@intel.com>
+>=20
+> Best,
+> Wei
