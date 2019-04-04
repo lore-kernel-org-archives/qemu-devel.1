@@ -2,108 +2,71 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DATE_IN_PAST_24_48,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCF8C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 14:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70368C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 14:16:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4033721850
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 14:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3833121850
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 14:16:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="euyXXxEA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4033721850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="r3h582x0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3833121850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42706 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42708 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCPda-00022i-EM
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 10:16:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60591)
+	id 1hCPde-00025a-EH
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 10:16:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hCPbg-0000l2-BF
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:14:13 -0400
+	(envelope-from <706701795@qq.com>) id 1hCPLb-0001Hs-Mp
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hCPbf-0004fw-DZ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:14:12 -0400
-Received: from mail-eopbgr150107.outbound.protection.outlook.com
-	([40.107.15.107]:22336
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hCPbX-0004PT-KT; Fri, 05 Apr 2019 10:14:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=LGU0hKeWN8JypddQBDZEW1Cvi8lrqqFd9Ryn9Zy3xVw=;
-	b=euyXXxEASGPqjuffK30oXybEhJGLigEtphAEqyU/rwtdK0ncaRBVnIkFN110JE4wEsxge0ZZBZ18V/m49Zy96mJTWr1sIPylg9RCMmM8SSxnaaYUSymQ0NECLEE2etavWBF3+yPblMHf4HLEM7eA6q1vV/Amk8gGN7dhwXHeY74=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3243.eurprd08.prod.outlook.com (52.134.111.17) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1750.19; Fri, 5 Apr 2019 14:13:58 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%2]) with mapi id 15.20.1750.017;
-	Fri, 5 Apr 2019 14:13:58 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [PATCH 1/7] nbd/server: Fix blockstatus trace
-Thread-Index: AQHU6cocK8jWkrSt70+VETZEbFqarKYtoAaA
-Date: Fri, 5 Apr 2019 14:13:58 +0000
-Message-ID: <0fbd8e9e-c168-9f04-3982-b5d9b3088cb1@virtuozzo.com>
-References: <20190403030526.12258-1-eblake@redhat.com>
-	<20190403030526.12258-2-eblake@redhat.com>
-In-Reply-To: <20190403030526.12258-2-eblake@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P192CA0021.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::31)
-	To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190405171355229
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 72db1c89-b774-4a3f-924f-08d6b9d0f217
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600139)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3243; 
-x-ms-traffictypediagnostic: DB7PR08MB3243:
-x-microsoft-antispam-prvs: <DB7PR08MB324322C4CB038B9C3AA012D8C1510@DB7PR08MB3243.eurprd08.prod.outlook.com>
-x-forefront-prvs: 0998671D02
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(136003)(376002)(396003)(39850400004)(346002)(366004)(189003)(199004)(5660300002)(86362001)(102836004)(71200400001)(476003)(2501003)(81166006)(106356001)(25786009)(11346002)(6506007)(8676002)(66066001)(105586002)(256004)(486006)(7736002)(8936002)(2616005)(6246003)(3846002)(186003)(446003)(81156014)(2906002)(31696002)(26005)(305945005)(4744005)(97736004)(4326008)(31686004)(316002)(52116002)(71190400001)(6486002)(76176011)(229853002)(53936002)(6116002)(68736007)(478600001)(386003)(6436002)(14454004)(36756003)(110136005)(54906003)(99286004)(6512007);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3243;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: dJmSF/MzRC6zb5mSKRxyGlWpMfW3poKFnsK5CYkH+0J6qUwbJI3pu7Ljfb+2GCk+1eieW4k+lS6830fnJyS4aLxzjOUzzsVSlQo5HnnD/reqlCGft+VzqXmB1Jaif1Ks1dnnUAK2y2WZpjqWJQHtJlmjzt7U32qTJ20Eco8JVOOyDo1AZW51OYipnLWVVAS519txClG1e4c1qgBJiNcipRUgiWAhx1Bt6LlDMiubXcydGZp1C2j6ERzORuwdAlFFdktCtRXZipMh+1yBva2HhYdQ7n1eyrdj5uXA6YVF87t6PmNhBx7os7KkttfCGcmygJ+KjG4M1OsaJZAjljZIrqOt38Hk9/rsGKW50PdlwyBiOP1kV/UFtNIkYgwsGW1D/9rgGIUbEzLSbCNPYCR4JBGmdcON5BzkhwiC+xa77A4=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <DFE96042C696CB47B3ED10B9F0D0ED4F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72db1c89-b774-4a3f-924f-08d6b9d0f217
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2019 14:13:58.8713 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3243
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.107
-Subject: Re: [Qemu-devel] [PATCH 1/7] nbd/server: Fix blockstatus trace
+	(envelope-from <706701795@qq.com>) id 1hCP65-0006iV-1B
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:41:36 -0400
+Received: from smtpbgeu1.qq.com ([52.59.177.22]:36009)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <706701795@qq.com>) id 1hCP5z-0006bp-0S
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:41:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1554471672; bh=nyJNqCoMMURuCw8Q3fZCj65WLicCeE3Z4+/Xo4V6XEQ=;
+	h=From:To:Cc:Subject:Date:Message-Id;
+	b=r3h582x0j+hRwn1xpG7vwLbISTPoVfj83dSHs2ZnF6rnkcMGzgZTwbffYSZAZYDm+
+	+EQ44p1+D+T01m5Uvcm/OB1/I1t8W2dEOR6UqnLejH5qjdyL6Gc32fAA95jmVtHEzl
+	cug5Zkb3eLERjxcPDXVJFGis+3QwmL5n+XetGE98=
+X-QQ-mid: esmtp4t1554471671t7rysrxbz
+Received: from CentOS.localdomain (unknown [110.84.226.186])
+	by esmtp4.qq.com (ESMTP) with 
+	id ; Fri, 05 Apr 2019 21:41:10 +0800 (CST)
+X-QQ-SSF: B1000000000000F0FF101600000000Q
+X-QQ-FEAT: 8YYOEVtNMVk8R2tFsv/LgtwshEzvfUz/q0APUrWv2dgvsfg3+dU/eJTtOrH47
+	ksNOqoy979Xvgon+EL1VSdl1946vrmvXxIMkpxkY8KbeW+gbu4rGwSShEo09ogH6q9sXZxm
+	if2TWgj+cW49NUZ7ewLIBxl1pJk/GqjWel5WCuKO8+5lj5Cxpe7cWTbJdKweh7pcNNIjZwW
+	uKzE8J0HTmhf76tzxYO6Vj8nlXYYOl5/rBk0fDw3nU+e24UAiPdckf/ESdWRuEoqZufEnkK
+	EhyMnlhV3ZZnizeJulGZxClCip170qfvE6aA==
+X-QQ-GoodBg: 0
+From: lichun <706701795@qq.com>
+To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu,  4 Apr 2019 19:46:45 +0800
+Message-Id: <1554378405-11640-1-git-send-email-706701795@qq.com>
+X-Mailer: git-send-email 1.8.3.1
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtp:qq.com:bgforeign:bgforeign4
+X-QQ-Bgrelay: 1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 52.59.177.22
+X-Mailman-Approved-At: Fri, 05 Apr 2019 10:14:44 -0400
+Subject: [Qemu-devel] [PATCH] Fixed dump_buffer function parameter offset
+ does not take effect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,21 +78,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: lichun <706701795@qq.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405141358.41NJvTaQHHT9xm7oy-HsD9xpTQm_hfgEPRpR6nyLTyo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190404114645.kBqRCSPYl7mpzWicknp_QKs4ZGxeUs9YCkCdD8Tgom8@z>
 
-MDMuMDQuMjAxOSA2OjA1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBEb24ndCBpbmNyZW1lbnQgcmVt
-YWluaW5nX2J5dGVzIHVudGlsIHdlIGtub3cgdGhhdCB3ZSB3aWxsIGFjdHVhbGx5IGJlDQo+IGlu
-Y2x1ZGluZyB0aGUgY3VycmVudCBibG9jayBzdGF0dXMgZXh0ZW50IGluIHRoZSByZXBseTsgb3Ro
-ZXJ3aXNlLCB0aGUNCj4gdmFsdWUgdHJhY2VkIHdpbGwgaW5jbHVkZSBhIGJ5dGVzIHZhbHVlIHRo
-YXQgaXMgb3ZlcnNpemVkIGJ5IHRoZQ0KPiBsZW5ndGggb2YgdGhlIG5leHQgYmxvY2sgc3RhdHVz
-IGV4dGVudCB3aGljaCBkaWQgbm90IGdldCBzZW50IGJlY2F1c2UNCj4gaXQgaW5zdGVhZCBlbmRl
-ZCB0aGUgbG9vcC4NCj4gDQo+IEZpeGVzOiBmYjdhZmM3OQ0KPiBTaWduZWQtb2ZmLWJ5OiBFcmlj
-IEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVu
-dHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+Signed-off-by: lichun <706701795@qq.com>
+---
+ qemu-io-cmds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 09750a2..8d93dc6 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -357,7 +357,7 @@ static void dump_buffer(const void *buffer, int64_t offset, int64_t len)
+     int j;
+     const uint8_t *p;
+ 
+-    for (i = 0, p = buffer; i < len; i += 16) {
++    for (i = 0, p = buffer + offset; i < len; i += 16) {
+         const uint8_t *s = p;
+ 
+         printf("%08" PRIx64 ":  ", offset + i);
+-- 
+1.8.3.1
+
+
+
+
 
