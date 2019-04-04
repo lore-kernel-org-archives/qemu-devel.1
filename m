@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38968)
+Received: from eggs.gnu.org ([209.51.188.92]:43047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hC4rv-0004eq-LM
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hC57Q-0001Lm-RN
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hC4rt-0000UG-3P
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hC4rs-0000Qz-On
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:05:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
-	<20190402132650.23095-2-armbru@redhat.com>
-	<20190403223255.GB18809@richard>
-Date: Thu, 04 Apr 2019 18:05:25 +0200
-In-Reply-To: <20190403223255.GB18809@richard> (Wei Yang's message of "Thu, 4
-	Apr 2019 06:32:55 +0800")
-Message-ID: <875zrt69iy.fsf@dusky.pond.sub.org>
+	(envelope-from <dgilbert@redhat.com>) id 1hC57P-0001OA-PW
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 12:21:36 -0400
+Date: Thu, 4 Apr 2019 17:21:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190404162128.GF2678@work-vm>
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<1553849325-44201-3-git-send-email-like.xu@linux.intel.com>
+	<20190404162555.0a2267ee@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/4] vl: Simplify machine_parse()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190404162555.0a2267ee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/9] cpu/topology: add general support for
+ machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,173 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Like Xu <like.xu@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, like.xu@intel.com
 
-Wei Yang <richardw.yang@linux.intel.com> writes:
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Fri, 29 Mar 2019 16:48:38 +0800
+> Like Xu <like.xu@linux.intel.com> wrote:
+> 
+> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> > ---
 
-> On Tue, Apr 02, 2019 at 03:26:50PM +0200, Markus Armbruster wrote:
->>Exploit that argument @name is nerver null.  Check is_help_option()
->>first, because that's what we do elsewhere.
->>
->>Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>---
->> vl.c | 24 +++++++++++-------------
->> 1 file changed, 11 insertions(+), 13 deletions(-)
->>
->>diff --git a/vl.c b/vl.c
->>index 6a31e5bfac..da1af3e10d 100644
->>--- a/vl.c
->>+++ b/vl.c
->>@@ -2573,19 +2573,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->> 
->> static MachineClass *machine_parse(const char *name, GSList *machines)
->> {
->>-    MachineClass *mc = NULL;
->>+    MachineClass *mc;
->>     GSList *el;
->> 
->>-    if (name) {
->>-        mc = find_machine(name, machines);
->>-    }
->>-    if (mc) {
->>-        return mc;
->>-    }
->>-    if (name && !is_help_option(name)) {
->>-        error_report("unsupported machine type");
->>-        error_printf("Use -machine help to list supported machines\n");
->>-    } else {
->>+    if (is_help_option(name)) {
->>         printf("Supported machines are:\n");
->>         machines = g_slist_sort(machines, machine_class_cmp);
->>         for (el = machines; el; el = el->next) {
->>@@ -2597,9 +2588,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
->>                    mc->is_default ? " (default)" : "",
->>                    mc->deprecation_reason ? " (deprecated)" : "");
->>         }
->>+        exit(0);
->>     }
->>-
->>-    exit(!name || !is_help_option(name));
->>+        
->>+    mc = find_machine(name, machines);
->>+    if (!mc) {
->>+        error_report("unsupported machine type");
->>+        error_printf("Use -machine help to list supported machines\n");
->>+        exit(1);
->>+    }
->>+    return mc;
->
-> This change looks changed the original behavior.
->
-> In original logic, if mc is not NULL, there is no message printed. While now
-> it rely on is_help_option(). And no it exit when !is_help_option(), while
-> before this change it exit when is_help_option().
->
-> I don't understand the reason behind this. My suggestion is you may split this
-> patch into two:
->
->   1. remove check on name
->   2. refine the logic with explanations.
+<snipp>
 
-Cases:
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index e2aa57a..ae92f6e 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -29,6 +29,7 @@
+> >  #include "sysemu/balloon.h"
+> >  #include "qemu/error-report.h"
+> >  #include "trace.h"
+> > +#include "hw/boards.h"
+> >  
+> >  /* Arbitrary limit on size of each discard command,
+> >   * keeps them around ~200 bytes
+> > @@ -128,6 +129,8 @@ static void migration_exit_cb(Notifier *n, void *data)
+> >  
+> >  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+> >  {
+> > +    MachineState *ms = MACHINE(qdev_get_machine());
+> > +    unsigned int smp_cpus = ms->topo.smp_cpus;
+> >      PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+> >      ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+> >      ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+> > @@ -141,6 +144,8 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+> >  
+> >  static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+> >  {
+> > +    MachineState *ms = MACHINE(qdev_get_machine());
+> > +    unsigned int smp_cpus = ms->topo.smp_cpus;
+> >      uint32List *list = NULL, *entry = NULL;
+> >      int i;
+> >  
+> > @@ -806,8 +811,10 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+> >  static void mark_postcopy_blocktime_end(uintptr_t addr)
+> >  {
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    MachineState *ms = MACHINE(qdev_get_machine());
+> >      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> >      int i, affected_cpu = 0;
+> > +    unsigned int smp_cpus = ms->topo.smp_cpus;
+> >      bool vcpu_total_blocktime = false;
+> >      uint32_t read_vcpu_time, low_time_offset;
+> 
+> I don't know enough about migration to say some thing useful here,
+> CCin David for comments.
 
-(1) User asks for help, i.e. is_help_option(name)
+I think that's OK; we just need to know the total number of vcpus; this
+thing calculates some stats based on the number of the vCPUs that are
+blocked by postcopy page waits, and in particular if everyone is
+blocked.
 
-(1a) and no machine named @name exists, i.e.
-     is_help_option(name) && !find_machine(name, machines)
+(I'd slightly prefer macs there rather than ms, just because we tend to
+use ms in migration for MigrationState sometimes, but not always).
 
-(1b) and a machine named @name exists
-     is_help_option(name) && find_machine(name, machines)
+Dave
 
-(2) User asks for a machine that doesn't exist, i.e.
-    !is_help_option(name) && !find_machine(name, machines)
-
-(3) User asks for a machine that exists, i.e.
-    !is_help_option(name) && find_machine(name, machines)
-
-Since no machines are called "help" or "?", case (1b) is not actually
-possible.
-
-Old code:
-
-    static MachineClass *machine_parse(const char *name, GSList *machines)
-    {
-        MachineClass *mc = NULL;
-        GSList *el;
-
-        if (name) {
-            mc = find_machine(name, machines);
-        }
-        if (mc) {
-            return mc;
-        }
-        if (name && !is_help_option(name)) {
-            error_report("unsupported machine type");
-            error_printf("Use -machine help to list supported machines\n");
-        } else {
-            printf("Supported machines are:\n");
-            machines = g_slist_sort(machines, machine_class_cmp);
-            for (el = machines; el; el = el->next) {
-                MachineClass *mc = el->data;
-                if (mc->alias) {
-                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
-                }
-                printf("%-20s %s%s%s\n", mc->name, mc->desc,
-                       mc->is_default ? " (default)" : "",
-                       mc->deprecation_reason ? " (deprecated)" : "");
-            }
-        }
-
-        exit(!name || !is_help_option(name));
-    }
-
-Case (1a): print help, exit(0)
-
-Case (1b): return find_machine()
-
-Case (2): report error, exit(1)
-
-Case (3): return find_machine()
-
-New code:
-
-    static MachineClass *machine_parse(const char *name, GSList *machines)
-    {
-        MachineClass *mc;
-        GSList *el;
-
-        if (is_help_option(name)) {
-            printf("Supported machines are:\n");
-            machines = g_slist_sort(machines, machine_class_cmp);
-            for (el = machines; el; el = el->next) {
-                MachineClass *mc = el->data;
-                if (mc->alias) {
-                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
-                }
-                printf("%-20s %s%s%s\n", mc->name, mc->desc,
-                       mc->is_default ? " (default)" : "",
-                       mc->deprecation_reason ? " (deprecated)" : "");
-            }
-            exit(0);
-        }
-
-        mc = find_machine(name, machines);
-        if (!mc) {
-            error_report("unsupported machine type");
-            error_printf("Use -machine help to list supported machines\n");
-            exit(1);
-        }
-        return mc;
-    }
-
-Case (1a): print help, exit(0)
-
-Case (1b): print help, exit(0)
-
-Case (2): report error, exit(1)
-
-Case (3): return find_machine()
-
-The patch changes "impossible" case (1b).  That's intentional (but my
-commit message could explain it better).
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
