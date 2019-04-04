@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33719)
+Received: from eggs.gnu.org ([209.51.188.92]:34119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBy9M-0005QJ-D5
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1hByAj-0006u5-4k
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hBy9K-0000uJ-4v
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37114)
+	(envelope-from <berrange@redhat.com>) id 1hByAh-0004gF-7E
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hBy9J-0000qa-Ne
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:55:06 -0400
-Date: Thu, 4 Apr 2019 09:55:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190404085459.GA2678@work-vm>
-References: <20190329222951.28945-1-chen.zhang@intel.com>
-	<5CA1D5CE.6040400@intel.com>
-	<9CFF81C0F6B98A43A459C9EDAD400D78060B8B4C@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hByAf-0004d2-8b
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 04:56:30 -0400
+Date: Thu, 4 Apr 2019 09:56:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190404085621.GD10471@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190403124948.GA14129@ls3530.dellerweb.de>
+	<20190403161729.GW25150@redhat.com>
+	<CAFEAcA-85Z9wtZrf2AddGkrPZFOPgxFZ5sNOZCCBkqZRp8M2Dg@mail.gmail.com>
+	<43102ef9-2f96-2863-00aa-b6f2906c2f4f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78060B8B4C@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/ram.c: Fix codes conflict about
- bitmap_mutex
+In-Reply-To: <43102ef9-2f96-2863-00aa-b6f2906c2f4f@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Relax check for libseccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Chen" <chen.zhang@intel.com>
-Cc: "Wang, Wei W" <wei.w.wang@intel.com>, Zhang Chen <zhangckid@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Zhang, Chen (chen.zhang@intel.com) wrote:
-> Ping~  Anyone have comments about this patch?
+On Thu, Apr 04, 2019 at 08:59:14AM +0200, Thomas Huth wrote:
+> On 04/04/2019 03.53, Peter Maydell wrote:
+> > On Wed, 3 Apr 2019 at 23:27, Daniel P. Berrang=C3=A9 <berrange@redhat=
+.com> wrote:
+> >>
+> >> On Wed, Apr 03, 2019 at 02:49:48PM +0200, Helge Deller wrote:
+> >>> diff --git a/configure b/configure
+> >>> index 1c563a7027..8632267049 100755
+> >>> --- a/configure
+> >>> +++ b/configure
+> >>> @@ -2389,7 +2389,6 @@ if test "$seccomp" !=3D "no" ; then
+> >>>          libseccomp_minver=3D"2.3.0"
+> >>>          ;;
+> >>>      *)
+> >>> -        libseccomp_minver=3D""
+> >>>          ;;
+> >>>      esac
+> >>
+> >> This makes sense to me. From a QEMU source POV we are able to build =
+with
+> >> libseccomp >=3D 2.2.0, which our default libseccomp_minver=3D env ex=
+presses
+> >> a few lines earlier.
+> >>
+> >> If libseccomp isn't supported on a platform, then I think we should =
+just
+> >> assume that libseccomp won't be present in the OS install we are bui=
+lding
+> >> against. I don't think QEMU needs to second-guess whether or not it =
+is
+> >> supported on the given architecture.
+> >=20
+> > If we want to do this then we should handle all the archs which
+> > don't need to special case the seccomp version identically, ie
+> > remove the x86/mips case which with this patch would be the
+> > same as the default case.
+> >=20
+> >> In fact I'd go as far as to say we
+> >> could probably just remove all this per-arch checking and just have =
+a
+> >> generic >=3D 2.2.0 check, and just rely on fact libseccomp won't exi=
+st
+> >> on a s390/ppc/etc host if the distro had version < 2.3.0
+> >=20
+> > The arm case at least is present because libseccomp 2.2.0 was
+> > being built but didn't actually work for us. See commit ae6e8ef11e6cb=
+43ec83.
+>=20
+> Looking at https://repology.org/project/libseccomp/versions it seems
+> like all major distro versions that we want to support feature at least
+> version 2.3.0 ... so I think we can simplify the check here for all
+> architectures and only test for a version >=3D 2.3.0.
 
-No, it looks good to me, we need to get it merged.
+That sounds good to me.
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> Thanks
-> Zhang Chen
-> 
-> 
-> > -----Original Message-----
-> > From: Wang, Wei W
-> > Sent: Monday, April 1, 2019 5:12 PM
-> > To: Zhang, Chen <chen.zhang@intel.com>; Zhang Chen
-> > <zhangckid@gmail.com>; Dr. David Alan Gilbert <dgilbert@redhat.com>; Juan
-> > Quintela <quintela@redhat.com>; qemu-dev <qemu-devel@nongnu.org>
-> > Subject: Re: [PATCH] migration/ram.c: Fix codes conflict about bitmap_mutex
-> > 
-> > On 03/30/2019 06:29 AM, Zhang Chen wrote:
-> > > From: Zhang Chen <chen.zhang@intel.com>
-> > >
-> > > I found upstream codes conflict with COLO and lead to crash, and I
-> > > located to this patch:
-> > >
-> > > commit 386a907b37a9321bc5d699bc37104d6ffba1b34d
-> > > Author: Wei Wang <wei.w.wang@intel.com>
-> > > Date:   Tue Dec 11 16:24:49 2018 +0800
-> > >
-> > > migration: use bitmap_mutex in migration_bitmap_clear_dirty
-> > >
-> > > My colleague Wei's patch add bitmap_mutex in
-> > > migration_bitmap_clear_dirty, but COLO didn't initialize the
-> > > bitmap_mutex. So we always get an error when COLO start up. like that:
-> > > qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl:
-> > Assertion `mutex->initialized' failed.
-> > >
-> > > This patch add the bitmap_mutex initialize and destroy in COLO
-> > > lifecycle.
-> > >
-> > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> > > ---
-> > >   migration/ram.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/migration/ram.c b/migration/ram.c index
-> > > d7f8fe45a8..f68beeeeff 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -3918,6 +3918,7 @@ int colo_init_ram_cache(void)
-> > >       }
-> > >       ram_state = g_new0(RAMState, 1);
-> > >       ram_state->migration_dirty_pages = 0;
-> > > +    qemu_mutex_init(&ram_state->bitmap_mutex);
-> > >       memory_global_dirty_log_start();
-> > >
-> > >       return 0;
-> > > @@ -3956,6 +3957,7 @@ void colo_release_ram_cache(void)
-> > >       }
-> > >
-> > >       rcu_read_unlock();
-> > > +    qemu_mutex_destroy(&ram_state->bitmap_mutex);
-> > >       g_free(ram_state);
-> > >       ram_state = NULL;
-> > >   }
-> > 
-> > Reviewed-by: Wei Wang <wei.w.wang@intel.com>
-> > 
-> > Best,
-> > Wei
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
