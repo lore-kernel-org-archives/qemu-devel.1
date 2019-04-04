@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43525)
+Received: from eggs.gnu.org ([209.51.188.92]:43537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hC3S8-000761-5q
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:34:53 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hC3S8-00076S-Pp
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hC3S7-0003vP-3U
+	(envelope-from <jjherne@linux.ibm.com>) id 1hC3S7-0003wu-M7
 	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:34:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45460)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1hC3S6-0003j8-Mu
+	id 1hC3S7-0003u7-7J
 	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 10:34:51 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x34EQaN6005698
-	for <qemu-devel@nongnu.org>; Thu, 4 Apr 2019 10:34:43 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rnk2m2v2m-1
+	x34EQUE8003909
+	for <qemu-devel@nongnu.org>; Thu, 4 Apr 2019 10:34:49 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rnhyeeux4-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 10:34:42 -0400
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 10:34:49 -0400
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Thu, 4 Apr 2019 15:34:41 +0100
+	Thu, 4 Apr 2019 15:34:48 +0100
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Thu,  4 Apr 2019 10:34:19 -0400
-Message-Id: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 00/16] s390: vfio-ccw dasd ipl support
+Date: Thu,  4 Apr 2019 10:34:22 -0400
+In-Reply-To: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+Message-Id: <1554388475-18329-4-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 03/16] s390-bios: decouple common boot logic
+ from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +40,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-This is to support booting from vfio-ccw dasd devices. We basically implement
-the real hardware ipl procedure. This allows for booting Linux guests on
-vfio-ccw devices.
+Create a boot_setup function to handle getting boot information from
+the machine/hypervisor. This decouples common boot logic from the
+virtio code path and allows us to make use of it for the real dasd boot
+scenario.
 
-vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
-channel programs dynamically modify themselves. Details on the ipl process and
-how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-Changelog
-==========
-v6
-- Added patch #16 to fix regression whereby we attempted to boot from console
-  devices when no default boot device was specified.
-- Bug fix: Referencing a byte past end of sense data status array
-- Reorganized patch order slightly
-- Other misc wording/spelling fixups
-
-Jason J. Herne (16):
-  s390 vfio-ccw: Add bootindex property and IPLB data
-  s390-bios: decouple cio setup from virtio
-  s390-bios: decouple common boot logic from virtio
-  s390-bios: Clean up cio.h
-  s390-bios: Decouple channel i/o logic from virtio
-  s390-bios: Map low core memory
-  s390-bios: ptr2u32 and u32toptr
-  s390-bios: Support for running format-0/1 channel programs
-  s390-bios: cio error handling
-  s390-bios: Extend find_dev() for non-virtio devices
-  s390-bios: Factor finding boot device out of virtio code path
-  s390-bios: Refactor virtio to run channel programs via cio
-  s390-bios: Use control unit type to determine boot method
-  s390-bios: Add channel command codes/structs needed for dasd-ipl
-  s390-bios: Support booting from real dasd device
-  s390-bios: Use control unit type to find bootable devices
-
- MAINTAINERS                  |   2 +
- docs/devel/s390-dasd-ipl.txt | 133 ++++++++++++++
- hw/s390x/ipl.c               |  61 +++++--
- hw/s390x/s390-ccw.c          |   9 +
- hw/vfio/ccw.c                |   2 +-
- include/hw/s390x/s390-ccw.h  |   1 +
- include/hw/s390x/vfio-ccw.h  |  28 +++
- pc-bios/s390-ccw/Makefile    |   2 +-
- pc-bios/s390-ccw/cio.c       | 423 +++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/cio.h       | 270 +++++++++++++++++++++------
- pc-bios/s390-ccw/dasd-ipl.c  | 235 ++++++++++++++++++++++++
- pc-bios/s390-ccw/dasd-ipl.h  |  16 ++
- pc-bios/s390-ccw/helper.h    |  31 ++++
- pc-bios/s390-ccw/libc.h      |  11 ++
- pc-bios/s390-ccw/main.c      | 185 +++++++++++++------
- pc-bios/s390-ccw/netboot.mak |   2 +-
- pc-bios/s390-ccw/netmain.c   |   2 +
- pc-bios/s390-ccw/s390-arch.h | 103 +++++++++++
- pc-bios/s390-ccw/s390-ccw.h  |  10 +-
- pc-bios/s390-ccw/start.S     |  29 +++
- pc-bios/s390-ccw/virtio.c    |  81 +++------
- tests/boot-serial-test.c     |   2 +-
- 22 files changed, 1438 insertions(+), 200 deletions(-)
- create mode 100644 docs/devel/s390-dasd-ipl.txt
- create mode 100644 include/hw/s390x/vfio-ccw.h
- create mode 100644 pc-bios/s390-ccw/cio.c
- create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
- create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
- create mode 100644 pc-bios/s390-ccw/helper.h
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
-
---
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e82fe2c..67df421 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -14,16 +14,17 @@
+ 
+ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+ static SubChannelId blk_schid = { .one = 1 };
+-IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ QemuIplParameters qipl;
++IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
++static bool have_iplb;
+ 
+ #define LOADPARM_PROMPT "PROMPT  "
+ #define LOADPARM_EMPTY  "        "
+ #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+ 
+ /*
+- * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
++ * Principles of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+  * after list-directed-IPL and ccw-IPL.
+  */
+@@ -111,23 +112,33 @@ static void css_setup(void)
+     enable_mss_facility();
+ }
+ 
++/*
++ * Collect various pieces of information from the hypervisor/hardware that
++ * we'll use to determine exactly how we'll boot.
++ */
++static void boot_setup(void)
++{
++    char lpmsg[] = "LOADPARM=[________]\n";
++
++    sclp_get_loadparm_ascii(loadparm_str);
++    memcpy(lpmsg + 10, loadparm_str, 8);
++    sclp_print(lpmsg);
++
++    have_iplb = store_iplb(&iplb);
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+     int ssid;
+     bool found = false;
+     uint16_t dev_no;
+-    char ldp[] = "LOADPARM=[________]\n";
+     VDev *vdev = virtio_get_device();
+     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+ 
+-    sclp_get_loadparm_ascii(loadparm_str);
+-    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+-    sclp_print(ldp);
+-
+     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+ 
+-    if (store_iplb(&iplb)) {
++    if (have_iplb) {
+         switch (iplb.pbt) {
+         case S390_IPL_TYPE_CCW:
+             dev_no = iplb.ccw.devno;
+@@ -174,6 +185,7 @@ int main(void)
+ {
+     sclp_setup();
+     css_setup();
++    boot_setup();
+     virtio_setup();
+ 
+     zipl_load(); /* no return */
+-- 
 2.7.4
