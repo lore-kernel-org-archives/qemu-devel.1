@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39393)
+Received: from eggs.gnu.org ([209.51.188.92]:40624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=990829437=Alistair.Francis@wdc.com>)
-	id 1hC71s-0002CH-6R
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:24:01 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hC768-0005O1-Ts
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=990829437=Alistair.Francis@wdc.com>)
-	id 1hC6tV-0007JM-62
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:15:22 -0400
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 4 Apr 2019 18:15:14 +0000
-Message-ID: <cover.1554401615.git.alistair.francis@wdc.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hC767-0006PL-2Q
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:28:24 -0400
+Received: from mail-dm3nam05on0708.outbound.protection.outlook.com
+	([2a01:111:f400:fe51::708]:28007
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hC765-0006M3-9R
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:28:22 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 4 Apr 2019 18:28:18 +0000
+Message-ID: <BN6PR2201MB12518E58D2CE6BBFA3609922C6500@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190404173921.30841-1-jbi.octave@gmail.com>,
+	<20190404173921.30841-2-jbi.octave@gmail.com>
+In-Reply-To: <20190404173921.30841-2-jbi.octave@gmail.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH for 4.0 v3 0/2] Update the QEMU PLIC addresses
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/mips: realign comments to
+ fix checkpatch warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "palmer@sifive.com" <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Jules Irenge <jbi.octave@gmail.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-VGhpcyBzZXJpZXMgdXBkYXRlcyB0aGUgUExJQyBhZGRyZXNzIHRvIG1hdGNoIHRoZSBkb2N1bWVu
-dGF0aW9uLg0KVGhpcyBmaXhlczogaHR0cHM6Ly9naXRodWIuY29tL3Jpc2N2L29wZW5zYmkvaXNz
-dWVzLzk3DQpWMzoNCiAtIEZpeCBTaUZpdmUgVSBjcmFzaA0KVjI6DQogLSBTcXVhc2ggcGF0Y2hl
-cyB0byBlbnN1cmUgYmllc2N0YWJpbGl0eQ0KDQpBbGlzdGFpciBGcmFuY2lzICgyKToNCiAgcmlz
-Y3Y6IHBsaWM6IEZpeCBpbmNvcnJlY3QgaXJxIGNhbGN1bGF0aW9uDQogIHJpc2N2OiBwbGljOiBM
-b2cgZ3Vlc3QgZXJyb3JzDQoNCiBody9yaXNjdi9zaWZpdmVfcGxpYy5jICAgICAgfCAxNiArKysr
-KysrKysrKy0tLS0tDQogaW5jbHVkZS9ody9yaXNjdi9zaWZpdmVfZS5oIHwgIDIgKy0NCiBpbmNs
-dWRlL2h3L3Jpc2N2L3NpZml2ZV91LmggfCAgNCArKy0tDQogaW5jbHVkZS9ody9yaXNjdi92aXJ0
-LmggICAgIHwgIDIgKy0NCiA0IGZpbGVzIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDkgZGVs
-ZXRpb25zKC0pDQoNCi0tIA0KMi4yMS4wDQoNCg==
+> From: Jules Irenge <jbi.octave@gmail.com>
+> Sent: Thursday, April 4, 2019 7:39 PM
+> To: Aleksandar Markovic
+> Cc: Aleksandar Rikalo; qemu-devel@nongnu.org
+> Subject: [PATCH v2 1/2] target/mips: realign comments to fix checkpatch w=
+arnings
+>=20
+> Realign comments to fix warnings issued by checkpatch.pl tool
+> "WARNING: Block comments use a leading /* on a separate line"
+> within "target/mips/cpu.h" file.
+>=20
+> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+> ---
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
