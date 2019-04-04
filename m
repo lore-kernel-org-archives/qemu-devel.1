@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40557)
+Received: from eggs.gnu.org ([209.51.188.92]:41043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hBqkZ-00005H-FD
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:01:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1hBqks-0000T0-7w
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hBqkT-0005eA-Iu
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:00:59 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33340)
+	(envelope-from <bounces@canonical.com>) id 1hBqkq-0006ls-KD
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:01:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hBqkR-0005WZ-8F
-	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:00:57 -0400
-Received: by mail-pf1-x442.google.com with SMTP id i19so461249pfd.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Apr 2019 18:00:50 -0700 (PDT)
-Date: Wed, 03 Apr 2019 18:00:48 -0700 (PDT)
-In-Reply-To: <CAKmqyKOAMGBcgRscu9QzpQYsA=qTeGgkK+03F=0YRhtzUFaXVw@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-8467ed04-3f36-4b0c-a53c-270a3ef88074@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 4.0 v2 0/2] Update the QEMU PLIC
- addresses
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hBqkm-0006Y2-UZ
+	for qemu-devel@nongnu.org; Wed, 03 Apr 2019 21:01:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hBqkl-0000dj-2v
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 01:01:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D82C32E80C9
+	for <qemu-devel@nongnu.org>; Thu,  4 Apr 2019 01:01:14 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 04 Apr 2019 00:47:38 -0000
+From: YunQiang Su <wzssyqa@gmail.com>
+Reply-To: Bug 1818483 <1818483@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155168800961.29550.2360664198558693792.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155433885817.13466.6330910596232249449.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818483] Re: qemu user mode does not support
+ binfmt_misc config with flags include "P"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, 03 Apr 2019 16:32:11 PDT (-0700), alistair23@gmail.com wrote:
-> On Wed, Mar 27, 2019 at 8:23 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Wed, 27 Mar 2019 11:51:15 PDT (-0700), Alistair Francis wrote:
->> > This series updates the PLIC address to match the documentation.
->> >
->> > This fixes: https://github.com/riscv/opensbi/issues/97
->> >
->> > V2:
->> >  - Squash patches to ensure biesctability
->> >
->> > Alistair Francis (2):
->> >   riscv: plic: Fix incorrect irq calculation
->> >   riscv: plic: Log guest errors
->> >
->> >  hw/riscv/sifive_plic.c      | 16 +++++++++++-----
->> >  hw/riscv/sifive_u.c         |  2 +-
->> >  include/hw/riscv/sifive_e.h |  2 +-
->> >  include/hw/riscv/sifive_u.h |  4 ++--
->> >  include/hw/riscv/virt.h     |  2 +-
->> >  5 files changed, 16 insertions(+), 10 deletions(-)
->> >
->> > --
->> > 2.21.0
->>
->> Thanks, I've got these on for-master.  I'll let them sit for a bit to see if
->> there are any other comments, but
->>
->> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
->
-> Ping! Just want to make sure these make it into 4.0
+This patch is for qemu itself.
 
-Thanks, this got lost in the shuffle.  I just forwarded along the PR.
+It test AT_FLAGS and determine whether it is start by binfmt_misc and
+whether P flag is used.
+
+** Patch added: "preserve-argv0.patch"
+   https://bugs.launchpad.net/qemu/+bug/1818483/+attachment/5252630/+files/=
+preserve-argv0.patch
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818483
+
+Title:
+  qemu user mode does not support binfmt_misc config with flags include
+  "P"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi Sir:
+  During our test in chroot environment with qemu-user-static, we got some =
+test cases failed because of program output warning with unexpected full pa=
+th name.
+  For example in test module "Devscripts"
+  the test item for broken tarball expected the warning info:
+  <tar: This does not look like a tar archive
+  tar: ******* >
+  but the output was:
+  </bin/tar: This does not look like a tar archive
+  /bin/tar: ******>
+  the cause is the config file of binfmt_misc was set not to send argv0, fo=
+r example:
+  type command "tar" after chroot:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  lpeng@lpeng-VirtualBox:~/projects_lpeng/qemu/mips_2/sid$ sudo chroot .
+  [sudo] password for lpeng: =
+
+  root@lpeng-VirtualBox:/# tar
+  /bin/tar: You must specify one of the '-Acdtrux', '--delete' or '--test-l=
+abel' options
+  Try '/bin/tar --help' or '/bin/tar --usage' for more information.
+  root@lpeng-VirtualBox:/# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+  by adding output log in main()@qemu/Linux-user/main.c
+  we found the original input command was changed, and qemu do not know tha=
+t, we got the input args:
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----NULL---
+
+  Next step we modified the flags=3DP in the corresponding config under fol=
+der /proc/sys/fs/binfmt_misc, then binfmt_misc sent argv[0] to qemu.
+  But chroot could not start bash because in current qemu dose not consider=
+ about this unexpected one more"argv[0]"
+
+  =
+
+  After modified qemu code temporary to handle the new argv list we got the=
+ input args, and from argv[2] is the original input command
+  argv_0----/usr/bin/qemu-mips64el-static---
+  argv_1----/bin/tar---
+  argv_2----tar---
+
+  We need the original input from command line, so is it possible that let =
+binfmt_misc to pass one more additional args or env to qemu as a token of t=
+he binfmt_misc flag, then qemu can judge how to parse the input args by it?
+  looking forward your suggestions.
+
+  Thanks
+  luyou
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818483/+subscriptions
