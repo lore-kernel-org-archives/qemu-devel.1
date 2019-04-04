@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41272)
+Received: from eggs.gnu.org ([209.51.188.92]:42954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hC78S-0006ty-1V
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:30:48 -0400
+	(envelope-from <deller@gmx.de>) id 1hC7Gv-0000xo-D3
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hC78Q-0000VP-SB
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:30:48 -0400
-Received: from mail-eopbgr680106.outbound.protection.outlook.com
-	([40.107.68.106]:23013
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hC78Q-0000UJ-LR
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:30:46 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 4 Apr 2019 18:30:44 +0000
-Message-ID: <BN6PR2201MB1251F97F7A5B90E66EB3398CC6500@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190404173921.30841-1-jbi.octave@gmail.com>,
-	<20190404173921.30841-3-jbi.octave@gmail.com>
-In-Reply-To: <20190404173921.30841-3-jbi.octave@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <deller@gmx.de>) id 1hC7Gu-0001cl-Ee
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:39:33 -0400
+Received: from mout.gmx.net ([212.227.15.19]:50165)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1hC7Gu-0001aS-1k
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 14:39:32 -0400
+Date: Thu, 4 Apr 2019 20:39:23 +0200
+From: Helge Deller <deller@gmx.de>
+Message-ID: <20190404183923.GA22347@ls3530.dellerweb.de>
+References: <20190403124948.GA14129@ls3530.dellerweb.de>
+	<20190403161729.GW25150@redhat.com>
+	<CAFEAcA-85Z9wtZrf2AddGkrPZFOPgxFZ5sNOZCCBkqZRp8M2Dg@mail.gmail.com>
+	<43102ef9-2f96-2863-00aa-b6f2906c2f4f@redhat.com>
+	<20190404085621.GD10471@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] target/mips: add or remove space to
- fix checkpatch errors
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190404085621.GD10471@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] configure: Relax check for libseccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jules Irenge <jbi.octave@gmail.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, Richard Henderson <richard.henderson@linaro.org>, Daniel =?iso-8859-15?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-> From: Jules Irenge <jbi.octave@gmail.com>
-> Subject: [PATCH v2 2/2] target/mips: add or remove space to fix checkpatc=
-h errors
->=20
-> Add or remove space to fix errors issued by checkpatch.pl tool
-> "ERROR: spaces required around ..."
-> "ERROR: space required after that"
-> "ERROR: space required before the open parenthesis"
-> "ERROR: space prohibited between function name and open parenthesis"
-> within "target/mips/cpu.h" file.
->=20
-> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
-> ---
+All major distributions do support libseccomp version >=3D 2.3.0, so there
+is no need to special-case on various architectures any longer.
 
-This patch should also contain the fix for long lines, otherwise the
-checkpatch.pl complains about this very patch.
+Signed-off-by: Helge Deller <deller@gmx.de>
 
-In any case, thank you for sending this and other patches!
+diff --git a/configure b/configure
+index 1c563a7027..8fe4fc84d8 100755
+=2D-- a/configure
++++ b/configure
+@@ -2377,36 +2369,16 @@ fi
+ ##########################################
+ # libseccomp check
 
-Aleksandar=
+-libseccomp_minver=3D"2.2.0"
+ if test "$seccomp" !=3D "no" ; then
+-    case "$cpu" in
+-    i386|x86_64|mips)
+-        ;;
+-    arm|aarch64)
+-        libseccomp_minver=3D"2.2.3"
+-        ;;
+-    ppc|ppc64|s390x)
+-        libseccomp_minver=3D"2.3.0"
+-        ;;
+-    *)
+-        libseccomp_minver=3D""
+-        ;;
+-    esac
+-
+-    if test "$libseccomp_minver" !=3D "" &&
+-       $pkg_config --atleast-version=3D$libseccomp_minver libseccomp ; th=
+en
++    libseccomp_minver=3D"2.3.0"
++    if $pkg_config --atleast-version=3D$libseccomp_minver libseccomp ; th=
+en
+         seccomp_cflags=3D"$($pkg_config --cflags libseccomp)"
+         seccomp_libs=3D"$($pkg_config --libs libseccomp)"
+         seccomp=3D"yes"
+     else
+         if test "$seccomp" =3D "yes" ; then
+-            if test "$libseccomp_minver" !=3D "" ; then
+-                feature_not_found "libseccomp" \
+-                    "Install libseccomp devel >=3D $libseccomp_minver"
+-            else
+-                feature_not_found "libseccomp" \
+-                    "libseccomp is not supported for host cpu $cpu"
+-            fi
++            feature_not_found "libseccomp" \
++                 "Install libseccomp devel >=3D $libseccomp_minver"
+         fi
+         seccomp=3D"no"
+     fi
