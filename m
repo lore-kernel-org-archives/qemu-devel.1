@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53785)
+Received: from eggs.gnu.org ([209.51.188.92]:56297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1hCRpB-0006YB-MU
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:36:18 -0400
+	(envelope-from <slp@redhat.com>) id 1hCRtt-0007tC-H4
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:41:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1hCRp9-0006Yr-Pb
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:36:17 -0400
-Received: from iserv.reactos.org ([2a01:4f8:1c17:5ae1::1]:45656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1hCRoh-0005X4-Fs
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:36:14 -0400
-References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <ef6ca1d8-50ac-5239-34eb-be05fad7af69@reactos.org>
-Date: Fri, 5 Apr 2019 18:35:41 +0200
+	(envelope-from <slp@redhat.com>) id 1hCRtm-0003uC-6l
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:41:06 -0400
+Received: from mail-wm1-f49.google.com ([209.85.128.49]:52057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1hCRt6-0002MD-NU
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:40:56 -0400
+Received: by mail-wm1-f49.google.com with SMTP id 4so7393840wmf.1
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 09:40:11 -0700 (PDT)
+References: <20190326131822.GD15011@stefanha-x1.localdomain>
+	<55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
+From: Sergio Lopez <slp@redhat.com>
+In-reply-to: <55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
+Date: Fri, 05 Apr 2019 18:33:18 +0200
+Message-ID: <877ec8mmy9.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] QEMU event loop optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-Le 05/04/2019 à 12:29, Philippe Mathieu-Daudé a écrit :
-> Hi,
-> 
-> I am trying to understand the possible values for the MAX_FD variable
-> used by the floppy controller model (hw/block/fdc.c).
-> 
-> Looking at git history:
-> 
-> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
->    FDC introduced with "#define MAX_FD 2"
-> 
-> - 2008-04-29 78ae820cfeb0 (Hervé Poussineau):
->    Supports up to 4 floppy drives if MAX_FD is set to 4
->    Migration stream knows about runtime value of MAX_FD
-> 
-> - 2009-09-10 d7a6c2703577 (Juan Quintela):
->    FDC vmstate-ified
->    Migration stream use compile time value of MAX_FD
-> 
-> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
-> 
-> Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
-> migration.
-> 
-> If I understand correctly migration, first we should change in
-> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
-> 
-> Then to be able to use >2 floppy disks I have to modify the the
-> vmstate.version_id, and
-> 
-> 1/ add a new field in the vmstate_fdc containing the number of drives
-> and add code to check >2 and adapt
-> 
-> or
-> 
-> 2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
-> to older FDC with only 2 disks...
-> 
-> Another option I don't like is:
-> 
-> 3/ get ride of MAX_FD != 2 and clean the codebase...
-> 
-> $ git grep '#if MAX_FD'
-> hw/block/fdc.c:744:#if MAX_FD == 4
-> hw/block/fdc.c:758:#if MAX_FD == 4
-> hw/block/fdc.c:1317:#if MAX_FD == 4
-> hw/block/fdc.c:1340:#if MAX_FD == 4
-> hw/block/fdc.c:2041:#if MAX_FD == 4
-> hw/block/fdc.c:2079:#if MAX_FD == 4
-> hw/block/fdc.c:2104:#if MAX_FD == 4
-> 
-> Hervé, what board are/were you using with 4 floppy drives?
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-That was only an attempt to support 4 drives in code, as controller was able to do it.
-However, no emulated board took advantage of it, so that's why it kind-of regressed.
 
-Feel free to choose the solution you prefer.
+Paolo Bonzini writes:
 
-Hervé
+> On 26/03/19 14:18, Stefan Hajnoczi wrote:
+>> Hi Sergio,
+>> Here are the forgotten event loop optimizations I mentioned:
+>>=20
+>>   https://github.com/stefanha/qemu/commits/event-loop-optimizations
+>>=20
+>> The goal was to eliminate or reorder syscalls so that useful work (like
+>> executing BHs) occurs as soon as possible after an event is detected.
+>>=20
+>> I remember that these optimizations only shave off a handful of
+>> microseconds, so they aren't a huge win.  They do become attractive on
+>> fast SSDs with <10us read/write latency.
+>>=20
+>> These optimizations are aggressive and there is a possibility of
+>> introducing regressions.
+>>=20
+>> If you have time to pick up this work, try benchmarking each commit
+>> individually so performance changes are attributed individually.
+>> There's no need to send them together in a single patch series, the
+>> changes are quite independent.
+>
+> I reviewed the patches now:
+>
+> - qemu_bh_schedule_nested should not be necessary since we have=20
+> ctx->notify_me to also avoid the event_notifier_set call.  However, it=20
+> is possible to avoid the smp_mb at the beginning of aio_notify, since=20=
+=20
+> atomic_xchg already implies it.  Maybe add a "static void=20
+> aio_notify__after_smp_mb"?
 
-> BTW this link is somehow interesting :)
-> https://www.seasip.info/VintagePC/floppies.html
-> 
-> Thanks,
-> 
-> Phil.
-> 
+try_poll_mode() is called with ctx->notify_me !=3D 0, so we get at least
+one event_notifier_set() call while working in polling mode.
+
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAlyng04ACgkQ9GknjS8M
+AjUZvg//TMdHOS1Jgl7VNfIUbkinWzxCi4BFfzIO8hbJO6qHUCvHUKr/bp3DZy3Z
+wMEelRuHLDju+MMGAYYKCf2Tird1TlWQ7mPWfENfLWOZ3uslyX0KsKVTzV0ns81t
+sqHkqxvFX9clINIeVFaCxRsDTITmjwKCMvYpO/bRMvUoOl6uL5jNJ6qC/POotANq
+OmdwzF93SUbWK1AIDUEFIw+ORW2lZKYs6hIbXbEXbDTMACKI8NNAcqK8Z9Fk3YkM
+bteGL4TFqgG2y2SdH2xOGxrprQLMy45zNTgz4hEQRpEcOSWbfYhuO7uv0JFexfBa
+rBbOZQ+QT799l3J0mSr2ertdFH29nKXliSbd1TYmw8LhPASmnoOSavk2bAcvJ6L3
+cmRuL80eDEeWwjSzxdIvWrEMkMU3uPHtiMThKmZ3Lo/5XBuTb7alOeZxZ5/NTSnH
+FNGx3wJHbu1+Kgz6w+j69XZAQcRnCWdv6M6we3Q2bM9OARLVu1+rKCu7g6sTWBDW
+B643B/myW+11kHY1iQeqsTh7RpUUJN3zr2Z2EtcrE6yEma5DMJBvavU55sE0Ysa9
+bB2ulP2f52KsttkSd1h+vqFVu4lP9uOUxUTUYv19zP4QKpHa5Tuv3nfFfkjOcK/Y
+7P55bxSoKSRCVb9StLsntYi3l9kYO3djNx3FUFb7F906YnO30C8=
+=8OCT
+-----END PGP SIGNATURE-----
+--=-=-=--
