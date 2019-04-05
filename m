@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58175)
+Received: from eggs.gnu.org ([209.51.188.92]:44049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY9-0003fR-1w
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:08 -0400
+	(envelope-from <aik@linux.ibm.com>) id 1hCH8f-0007o5-32
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY8-0004YY-6V
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:05 -0400
-Received: from mga07.intel.com ([134.134.136.100]:40758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hCIY7-0004O6-TF
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:04 -0400
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Fri,  5 Apr 2019 14:41:21 +0800
-Message-Id: <20190405064121.23662-5-richardw.yang@linux.intel.com>
-In-Reply-To: <20190405064121.23662-1-richardw.yang@linux.intel.com>
-References: <20190405064121.23662-1-richardw.yang@linux.intel.com>
+	(envelope-from <aik@linux.ibm.com>) id 1hCH1u-00016w-VE
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:04:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aik@linux.ibm.com>) id 1hCH1u-0000YB-D8
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:04:42 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x354xY7f048828
+	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 01:04:35 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rny4qk01m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 01:04:35 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aik@linux.ibm.com>;
+	Fri, 5 Apr 2019 06:04:33 +0100
+References: <155323635511.18748.18133954505098138975.stgit@aravinda>
+	<155323643836.18748.13006461397179281455.stgit@aravinda>
+	<20190325062256.GO29295@umbus>
+	<1fdde5df-408a-f81d-d9ac-eb9636324b54@linux.vnet.ibm.com>
+	<20190404231707.GB25513@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@linux.ibm.com>
+Date: Fri, 5 Apr 2019 16:04:27 +1100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 4/4] vl: Simplify machine_parse()
+In-Reply-To: <20190404231707.GB25513@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <cd08ddbc-d289-04a5-c9ae-d7618fc22308@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/6] target/ppc: Handle NMI guest exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +44,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, armbru@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Cc: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, paulus@ozlabs.org, mahesh@linux.vnet.ibm.com
 
-From: Markus Armbruster <armbru@redhat.com>
 
-Exploit that argument @name is nerver null.  Check is_help_option()
-first, because that's what we do elsewhere.  If we (foolishly!)
-defined a machine named "help", -machine help would now print help
-instead of selecting the machine named "help".
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
----
- vl.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+On 05/04/2019 10:17, David Gibson wrote:
+> On Thu, Apr 04, 2019 at 02:40:45PM +0530, Aravinda Prasad wrote:
+>>
+>>
+>> On Monday 25 March 2019 11:52 AM, David Gibson wrote:
+>>> On Fri, Mar 22, 2019 at 12:03:58PM +0530, Aravinda Prasad wrote:
+>>>> Memory error such as bit flips that cannot be corrected
+>>>> by hardware are passed on to the kernel for handling.
+>>>> If the memory address in error belongs to guest then
+>>>> the guest kernel is responsible for taking suitable action.
+>>>> Patch [1] enhances KVM to exit guest with exit reason
+>>>> set to KVM_EXIT_NMI in such cases. This patch handles
+>>>> KVM_EXIT_NMI exit.
+>>>>
+>>>> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+>>>>     (e20bbd3d and related commits)
+>>>>
+>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>>> ---
+>>>>  hw/ppc/spapr_events.c  |   22 ++++++++++++++++++++++
+>>>>  include/hw/ppc/spapr.h |    1 +
+>>>>  target/ppc/kvm.c       |   16 ++++++++++++++++
+>>>>  target/ppc/kvm_ppc.h   |    2 ++
+>>>>  4 files changed, 41 insertions(+)
+>>>>
+>>
+>> [...]
+>>
+>>>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>>>> index 2427c8e..a593448 100644
+>>>> --- a/target/ppc/kvm.c
+>>>> +++ b/target/ppc/kvm.c
+>>>> @@ -1738,6 +1738,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>>>>          ret = 0;
+>>>>          break;
+>>>>  
+>>>> +    case KVM_EXIT_NMI:
+>>>> +        DPRINTF("handle NMI exception\n");
+>>>
+>>> tracepoints are generally preferred to new DPRINTFs.
+>>
+>> I see DPRINTFs used in all other exit reasons in this function. Do you
+>> want me to change this particular exit case to tracepoints? I think it
+>> is better to keep this DPRINTF as of now and change all the DPRINTFs to
+>> tracepoints in a separate patch set.
+> 
+> Ah, good point. 
 
-diff --git a/vl.c b/vl.c
-index 99f9cb2533..4f4d440bc4 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2529,19 +2529,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
- 
- static MachineClass *machine_parse(const char *name, GSList *machines)
- {
--    MachineClass *mc = NULL;
-+    MachineClass *mc;
-     GSList *el;
- 
--    if (name) {
--        mc = find_machine(name, machines);
--    }
--    if (mc) {
--        return mc;
--    }
--    if (name && !is_help_option(name)) {
--        error_report("unsupported machine type");
--        error_printf("Use -machine help to list supported machines\n");
--    } else {
-+    if (is_help_option(name)) {
-         printf("Supported machines are:\n");
-         machines = g_slist_sort(machines, machine_class_cmp);
-         for (el = machines; el; el = el->next) {
-@@ -2553,9 +2544,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
-                    mc->is_default ? " (default)" : "",
-                    mc->deprecation_reason ? " (deprecated)" : "");
-         }
-+        exit(0);
-     }
- 
--    exit(!name || !is_help_option(name));
-+    mc = find_machine(name, machines);
-+    if (!mc) {
-+        error_report("unsupported machine type");
-+        error_printf("Use -machine help to list supported machines\n");
-+        exit(1);
-+    }
-+    return mc;
- }
- 
- void qemu_add_exit_notifier(Notifier *notify)
+imho not. The kvm.c already knows about traces (there are two) and even
+if every other trace in kvm_arch_handle_exit() is DPRINTF (enabled all
+at once), having at least one which can be enabled without QEMU
+recompile and separately from the others is a small but nice bonus
+before someone gets rid of DPRINTF.
+
+
+> Tracepoints are generally preferred, but since
+> DPRINTFs are in use here, stick with that (at some point it would be
+> good to change the whole file, but that's out of scope here).
+
+
 -- 
-2.19.1
+Alexey Kardashevskiy
+IBM OzLabs, LTC Team
+
+e-mail: aik@linux.ibm.com
