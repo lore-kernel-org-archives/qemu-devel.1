@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50687)
+Received: from eggs.gnu.org ([209.51.188.92]:52221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hCY5d-0007Yy-MS
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:17:42 -0400
+	(envelope-from <mst@redhat.com>) id 1hCYAU-00018a-Iq
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hCY5c-0004Di-NK
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:17:41 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:37719)
+	(envelope-from <mst@redhat.com>) id 1hCYAS-0006Rl-Kh
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:22:42 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:36420)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hCY5b-00045k-SE
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:17:40 -0400
-Received: by mail-qt1-f196.google.com with SMTP id z16so9389438qtn.4
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 16:17:38 -0700 (PDT)
-Date: Fri, 5 Apr 2019 19:17:35 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hCYAQ-0006NM-JB
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:22:39 -0400
+Received: by mail-qt1-f193.google.com with SMTP id s15so1021992qtn.3
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 16:22:38 -0700 (PDT)
+Date: Fri, 5 Apr 2019 19:22:35 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190405191703-mutt-send-email-mst@kernel.org>
-References: <20190405115529.11590-1-philmd@redhat.com>
-	<20190405140917.3af9b91d.olaf@aepfle.de>
-	<6bdd3c91-1e65-db2d-8ff2-fa667a819a1f@redhat.com>
-	<20190405150438.48c1cc84.olaf@aepfle.de>
-	<3c212c03-80a3-a8bb-fbe0-0071ebfb6936@redhat.com>
+Message-ID: <20190405191850-mutt-send-email-mst@kernel.org>
+References: <20190322134447.14831-1-jfreimann@redhat.com>
+	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
+	<20190405085628.GA2819@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3c212c03-80a3-a8bb-fbe0-0071ebfb6936@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0] roms: Allow the EFIROM variable to
- be overridden
+In-Reply-To: <20190405085628.GA2819@work-vm>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
+ assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +31,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, ipxe-devel@lists.ipxe.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jens Freimann <jfreimann@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com, ailan@redhat.com
 
-On Fri, Apr 05, 2019 at 03:14:30PM +0200, Philippe Mathieu-Daudé wrote:
-> On 4/5/19 3:04 PM, Olaf Hering wrote:
-> > Am Fri, 5 Apr 2019 14:59:16 +0200
-> > schrieb Philippe Mathieu-Daudé <philmd@redhat.com>:
-> >> On 4/5/19 2:09 PM, Olaf Hering wrote:
-> >>> Am Fri,  5 Apr 2019 13:55:29 +0200
-> >>> schrieb Philippe Mathieu-Daudé <philmd@redhat.com>:
-> >>>   
-> >>>> +EFIROM ?= edk2/BaseTools/Source/C/bin/EfiRom  
-> >>>
-> >>> This name is too generic and will conflict with ipxe.git if any of "bios seavgabios pxerom" is used for 'make -C roms'.  
-> >>
-> >> This is similar to commit c9d18c1c150c84e where you said "it used to
-> >> work", what is the difference?
+On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
+> * Jens Freimann (jfreimann@redhat.com) wrote:
+> > ping
 > > 
-> > Before there was no need to pass EFIROM= to make, so ipxe.git was happy.
-> > Now it is required, and ipxe.git gets an unexpected value.
+> > FYI: I'm also working on a few related tools to detect driver behaviour when
+> > assigning a MAC to the vf device. Code is at https://github.com/jensfr/netfailover_driver_detect
+> 
+> Hi Jens,
+>   I've not been following this too uch, but:
+> 
+> > regards,
+> > Jens
 > > 
-> >> IPXE override the EFIROM variable, so there is no change there.
-> > 
-> > For me ipxe tries to rm $(type -P EfiRom). Let me double check.
+> > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
+> > > This is another attempt at implementing the host side of the
+> > > net_failover concept
+> > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+> > > 
+> > > The general idea is that we have a pair of devices, a vfio-pci and a
+> > > emulated device. Before migration the vfio device is unplugged and data
+> > > flows to the emulated device, on the target side another vfio-pci device
+> > > is plugged in to take over the data-path. In the guest the net_failover
+> > > module will pair net devices with the same MAC address.
+> > > 
+> > > * In the first patch the infrastructure for hiding the device is added
+> > >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
+> > >  state and it is set based on a callback to the standby device which
+> > >  registers itself for handling the assessment: "should the primary device
+> > >  be hidden?" by cross validating the ids of the devices.
+> > > 
+> > > * In the second patch the virtio-net uses the API to hide the vfio
+> > >  device and unhides it when the feature is acked.
+> > > 
+> > > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
+> > > 
+> > > To summarize concerns/feedback from previous discussion:
+> > > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+> > >  Migration might get stuck for unpredictable time with unclear reason.
+> > >  This approach combines two tricky things, hot/unplug and migration.
+> > >  -> We can surprise-remove the PCI device and in QEMU we can do all
+> > >     necessary rollbacks transparent to management software. Will it be
+> > >     easy, probably not.
 > 
-> Eh you are right...
-> 
-> $ make -C roms EFIROM=/bin/true clean
-> [...]
-> make -C ipxe/src veryclean
-> make[1]: Entering directory '/home/phil/source/qemu/roms/ipxe/src'
-> rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.*
-> bin{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin
-> ./util/elf2efi32 ./util/elf2efi64 /bin/true ./util/efifatbin
-> ./util/iccfix ./util/einfo TAGS bin{,-*}/symtab
-> rm: cannot remove '/bin/true': Permission denied
-> make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
-> 
-> This seems to be a pre-existent IPXE bug:
-> 
-> $ git checkout c9d18c1c150c84e7a976df989ad04ddf01083f46
-> $ make -C roms EFIROM=/bin/true clean
-> [...]
-> rm: cannot remove '/bin/true': Permission denied
-> make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
-> 
-> >> How can I trigger a SUSE package build with this patch?
-> > 
-> > Not so easy without a VM.
-> 
-> Oh, unfortunate :(
-> 
-> > 
-> > Olaf
-> > 
-> 
+> This sounds 'fun' - bonus cases are things like what happens if the
+> guest gets rebooted somewhere during the process or if it's currently
+> sitting in the bios/grub/etc
 
-Let's keep it simple: set a config variable, then
-check it here.
+Um, during which process? Guests are gradually fixed to support
+surprise removal well. Part of it is thunderbolt which makes
+it incredibly easy. Yes - bios/grub will need to learn to
+handle this well.
 
--- 
-MST
+> > > 2. PCI devices are a precious ressource. The primary device should never
+> > >  be added to QEMU if it won't be used by guest instead of hiding it in
+> > >  QEMU.
+> > >  -> We only hotplug the device when the standby feature bit was
+> > >     negotiated. We save the device cmdline options until we need it for
+> > >     qdev_device_add()
+> > >     Hiding a device can be a useful concept to model. For example a
+> > >     pci device in a powered-off slot could be marked as hidden until the slot is
+> > >     powered on (mst).
+> 
+> Are they really that precious? Personally it's not something I'd worry
+> about.
+> 
+> > > 3. Management layer software should handle this. Open Stack already has
+> > >  components/code to handle unplug/replug VFIO devices and metadata to
+> > >  provide to the guest for detecting which devices should be paired.
+> > >  -> An approach that includes all software from firmware to
+> > >     higher-level management software wasn't tried in the last years. This is
+> > >     an attempt to keep it simple and contained in QEMU as much as possible.
+> > > 4. Hotplugging a device and then making it part of a failover setup is
+> > >   not possible
+> > >  -> addressed by extending qdev hotplug functions to check for hidden
+> > >     attribute, so e.g. device_add can be used to plug a device.
+> > > 
+> > > There are still some open issues:
+> > > 
+> > > Migration: I'm looking for something like a pre-migration hook that I
+> > > could use to unplug the vfio-pci device. I tried with a migration
+> > > notifier but it is called to late, i.e. after migration is aborted due
+> > > to vfio-pci marked unmigrateable. I worked around this by setting it
+> > > to migrateable and used a migration notifier on the virtio-net device.
+> 
+> Why not just let this happen at the libvirt level; then you do the
+> hotunplug etc before you actually tell qemu anything about starting a
+> migration?
+
+If qemu frees up resources (as it does on unplug) then libvirt
+is not guaranteed it can roll the change back on e.g.
+migration failure.
+
+But really another issue is simply that it's a mechanism,
+there's no policy that management needs to decide on.
+Doing it at lowest possible level ensures all
+upper layers benefit with minimal pain.
+
+> > > Commandline: There is a dependency between vfio-pci and virtio-net
+> > > devices. One points to the other via new parameters
+> > > primar=<primary qdev id> and standby='<standby qdev id>'. This means
+> > > that the primary device needs to be specified after standby device on
+> > > the qemu command line. Not sure how to solve this.
+> > > 
+> > > Error handling: Patches don't cover all possible error scenarios yet.
+> > > 
+> > > I have tested this with a mlx5 NIC and was able to migrate the VM with
+> > > above mentioned workarounds for open problems.
+> > > 
+> > > Command line example:
+> > > 
+> > > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+> > >        -machine q35,kernel-irqchip=split -cpu host   \
+> > >        -k fr   \
+> > >        -serial stdio   \
+> > >        -net none \
+> > >        -qmp unix:/tmp/qmp.socket,server,nowait \
+> > >        -monitor telnet:127.0.0.1:5555,server,nowait \
+> > >        -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
+> > >        -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
+> > >        -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
+> > >        -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
+> > >        -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,primary=hostdev0 \
+> > >        -device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
+> 
+> Yes, that's a bit grim; it's circular dependency on the 'hostdev0' and
+> 'net1' id's.  cc'ing in Markus.
+> 
+> Dave
+> 
+> > >        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+> > > 
+> > > I'm grateful for any remarks or ideas!
+> > > 
+> > > Thanks!
+> > > 
+> > > regards,
+> > > Jens
+> > > 
+> > > Sameeh Jubran (2):
+> > >  qdev/qbus: Add hidden device support
+> > >  net/virtio: add failover support
+> > > 
+> > > hw/core/qdev.c                 | 27 ++++++++++
+> > > hw/net/virtio-net.c            | 95 ++++++++++++++++++++++++++++++++++
+> > > hw/pci/pci.c                   |  1 +
+> > > include/hw/pci/pci.h           |  2 +
+> > > include/hw/qdev-core.h         |  8 +++
+> > > include/hw/virtio/virtio-net.h |  7 +++
+> > > qdev-monitor.c                 | 48 +++++++++++++++--
+> > > vl.c                           |  7 ++-
+> > > 8 files changed, 189 insertions(+), 6 deletions(-)
+> > > 
+> > > -- 
+> > > 2.20.1
+> > > 
+> > > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
