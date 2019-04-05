@@ -2,72 +2,65 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE5C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECBCC10F13
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:47:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90F6820449
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:10:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="FX1xSIBB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F6820449
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	by mail.kernel.org (Postfix) with ESMTPS id 42EEB218AE
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:47:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42EEB218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41188 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41554 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCNfo-0007sT-PR
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 08:10:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35620)
+	id 1hCOGB-0002CV-F8
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 08:47:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCNex-0007bZ-UD
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hCOEg-00013n-3T
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCNex-0007Ma-1Q
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:27 -0400
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::10]:19593)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCNev-0007JZ-Qe
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1554466163;
-	s=strato-dkim-0002; d=aepfle.de;
-	h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
-	X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-	bh=QGbQwWcGSn1cmW0XWUkaPTABhCLJAkBVToAtmgoZsk8=;
-	b=FX1xSIBB783FSjotER/drSUNNyHf/MWl8d/Xh/rw1Xt6HkVrorZaQOPUKlag3S3B/H
-	fFL64VWwC/TES8oAwJxxTic89qbncm16pYX22g3lBtJ4n+y7do9OwuSY+J1a++BaX7+6
-	UEMRh18YQ+9gkoUAZuJajolL0IU2XQCCWLVvhx970bMlTrBnUujxS6xev19hHjfIR5JH
-	Ch2oQ9PQRhtryRpFxT3Ztd6V43BmrbQKwfiG6pVgx48on+kIilHRfWBFcZpCiZSC05gX
-	OaBxz0hJnXARygjhQwv8Unqxn6BtHxEw9kPBqa9WKn8T65B5RkCfDfGPscX0BBnfdtxV
-	npbg==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4oc0Nr2ihluivsAEtyZCGP8Vn3U6NBQHRrVwM9zJHX/gJPE7W8Q"
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 44.18 AUTH)
-	with ESMTPSA id 3086c5v35C9Lpgf
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1
-	with 521 ECDH bits, eq. 15360 bits RSA))
-	(Client did not present a certificate);
-	Fri, 5 Apr 2019 14:09:21 +0200 (CEST)
-Date: Fri, 5 Apr 2019 14:09:17 +0200
-From: Olaf Hering <olaf@aepfle.de>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Message-ID: <20190405140917.3af9b91d.olaf@aepfle.de>
-In-Reply-To: <20190405115529.11590-1-philmd@redhat.com>
-References: <20190405115529.11590-1-philmd@redhat.com>
-X-Mailer: Claws Mail 2019.03.13 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+	(envelope-from <kwolf@redhat.com>) id 1hCOEe-0006NF-Tv
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:46:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hCOEc-0006FX-43; Fri, 05 Apr 2019 08:46:18 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 12282306C9E5;
+	Fri,  5 Apr 2019 12:46:17 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D91FC1A7CA;
+	Fri,  5 Apr 2019 12:46:09 +0000 (UTC)
+Date: Fri, 5 Apr 2019 14:46:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190405124608.GA4597@linux.fritz.box>
+References: <20190328182810.21497-1-kwolf@redhat.com>
+	<20190405103247.GG25152@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf";
-	protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::10
-Subject: Re: [Qemu-devel] [PATCH for-4.0] roms: Allow the EFIROM variable to
- be overridden
+	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
+Content-Disposition: inline
+In-Reply-To: <20190405103247.GG25152@stefanha-x1.localdomain>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 05 Apr 2019 12:46:17 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] file-posix:
+ query-qemu-features for auto-read-only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,38 +72,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405120917.wzaIBI3SZ6wZ5PtsabKS8lnew_ca0L6YMVBWn6dOrYg@z>
+Message-ID: <20190405124608.n-SHnhQfdezt5RWEbRTqzQ8yTnjwvS7NnwbCOVg79E0@z>
 
---Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf
-Content-Type: text/plain; charset=UTF-8
+
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am Fri,  5 Apr 2019 13:55:29 +0200
-schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
+Am 05.04.2019 um 12:32 hat Stefan Hajnoczi geschrieben:
+> On Thu, Mar 28, 2019 at 07:28:08PM +0100, Kevin Wolf wrote:
+> > auto-read-only=3Don changed its behaviour in file-posix for the 4.0
+> > release. This change cannot be detected through the usual mechanisms
+> > like schema introspection.
+> >=20
+> > I took Stefan's patch 'qmp: add query-qemu-capabilities', removed the
+> > feature that he originally wanted this for and addressed the review
+> > comments. The introduction of the file-posix-dynamic-auto-read-only
+> > feature is a separate patch.
+> >=20
+> > Stefan, I kept you as the author of the first patch and also your
+> > Signed-off-by. Is this okay with you or would you prefer a change?
+>=20
+> Sorry I was unresponsive.  I'm fine with the authorship and
+> Signed-off-by: but won't be offended if either or both are removed when
+> the patch is reworked (my code is trivial).
 
-> +EFIROM ?=3D edk2/BaseTools/Source/C/bin/EfiRom
+The plan is now that we integrate features in the QAPI schema (attached
+to struct definitions), so they will be available with the normal schema
+introspection. Obviously, this will be a completely new patch series
+that isn't based on this patch any more.
 
-This name is too generic and will conflict with ipxe.git if any of "bios se=
-avgabios pxerom" is used for 'make -C roms'.
+Kevin
 
-Olaf
-
---Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+--VS++wcV0S1rZb1Fb
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKdFbQAKCRBdQqD6ppg2
-fkRNAJ99Ry8ACOCI8Oi3lFj0I4/1FKU9YACgxmjYmn095wUNKBxXZ1EiStfU5Dg=
-=tORK
+iQIcBAEBAgAGBQJcp04QAAoJEH8JsnLIjy/Wr+gP/1DVOdxvZnHw/UvD6eB9Ioay
+HSr3pthwSk/ClsVtyu9+rTnpmgIlxhVf/PKU1Xhwohv5dk5RRQtfUqY+FQRj9uW9
+eUlVAcuQ96xDg1pEjM0DWLSUBph0FvXD1xLChNMkt6LRxsaCj4Uqg4jPZvAWEg9s
+PEyE2Z2WEESlgsOvRGJG3KpgxW4hLFnNDpuDvm71JgysO2j2U2Huwpj38m0NQ91o
+Q/YvG6yBg2PtmKsCyH2+IwoWz/Gy8OYZBjq+WGbXSEo+QrhD18WYm83yqKbvfYx9
+R4MbDIO1vIaJy7i6thWmq5ssYBbxp1I7yZRXaPacVHVKnQRyACLpMgi6h7d5Ykju
+BrbwkAXQDJA5WF8VUbs10WGr/8umkDJb+43vr/6d/KUcfUiw13cs46PlcsCHTAT+
+tw1soH6UfmhABaByyWq+TEmh0m/VR1EbqQ6RxI8c8FBFvkvTeB+6SHayUfCO/8wN
+qO30sDI/J3z2fysWRo0gxE8sPANm5xzWSrL48Ep3mpShycqHaXXTUalME5+24Cdk
++9e1xhChEk8gXONnYZa+mf5p2ZcaolF4BoGvMPJsna017S7SnuHeLUQIuat1Hg9V
++A5pMItHeQxHRRfjIcoL+3w6gIRSvb1i//YJSjtgXX97iEMfYpIp1EuAni8fimIa
+Ry9j8hilGNeHQdUTOiwb
+=8iFh
 -----END PGP SIGNATURE-----
 
---Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf--
+--VS++wcV0S1rZb1Fb--
 
