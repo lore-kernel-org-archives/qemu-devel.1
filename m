@@ -2,115 +2,75 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E29C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 05:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D79EEC4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:06:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BBA8206BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 05:57:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBA8206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5A4206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:06:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5A4206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36546 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCHqo-0000fN-18
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 01:57:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50190)
+	id 1hCHzj-0003W7-Kg
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:06:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCHpO-00080t-Uj
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:55:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1hCHyu-0002tz-46
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCHp0-0000cZ-PU
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:55:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hCHp0-0000YP-Dy; Fri, 05 Apr 2019 01:55:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02E2966967;
-	Fri,  5 Apr 2019 05:55:25 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 377E85D9CD;
-	Fri,  5 Apr 2019 05:55:23 +0000 (UTC)
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
-	qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com,
-	alifm@linux.ibm.com, borntraeger@de.ibm.com
-References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
-	<1554388475-18329-17-git-send-email-jjherne@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <15d1851a-be5c-b816-56f3-cd31fb42f992@redhat.com>
-Date: Fri, 5 Apr 2019 07:55:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hCHys-0004Cj-Sn
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hCHys-0004AQ-Kw
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hCHyq-0002iA-TF
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 06:05:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D724C2E8078
+	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 06:05:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1554388475-18329-17-git-send-email-jjherne@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Fri, 05 Apr 2019 05:55:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 Apr 2019 05:59:09 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1823169@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fractalbob paelzer th-huth
+X-Launchpad-Bug-Reporter: Robert Uomini (fractalbob)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+	=?utf-8?q?=29?=
+References: <155437966834.20937.13725906067731199360.malonedeb@chaenomeles.canonical.com>
+Message-Id:
+ <155444394987.21192.3332237882695030786.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 719f81e571c2bed7d8fd17545053eb0dd776886e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 16/16] s390-bios: Use control unit type
- to find bootable devices
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1823169] Re: qemu displays message "Setup failed,
+ please check external storage is available and has enough room."
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -119,24 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1823169 <1823169@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405055522.kms41857JkxwRh1BCym9u3ENRzVX3TBlPhvo2131K_E@z>
+Message-ID: <20190405055909.f37PCJbvU038AB0gOiVoWxwjEs1oQCDr4wxrwuoeY0o@z>
 
-On 04/04/2019 16.34, Jason J. Herne wrote:
-> When the user does not specify which device to boot from then we end
-> up guessing. Instead of simply grabbing the first available device let's
-> be a little bit smarter and only choose devices that might be bootable
-> like disk, and not console devices.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/main.c | 38 ++++++++++++++++++++++++++++----------
->  1 file changed, 28 insertions(+), 10 deletions(-)
+I agree to Thomas, and in that case referring to your comment #2 - qemu ver=
+sions in Ubuntu are associated with the base Ubuntu version - so Ubuntu 16.=
+04 will stick to qemu 2.5 + fixes.
+Ubuntu 19.10 released next week has qemu 3.1 btw, see [1]
 
-Thanks for adding this patch, the problem with -device x-terminal3270 is
-fixed now, indeed.
+And vice versa for an upstream report (which is often helpful for deep
+technical discussions) you'll want to try with the latest version anyway
+- which for just a few days is 3.1 still, then it will be 4.0 :-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+[1]: https://launchpad.net/ubuntu/+source/qemu
+[2]: https://wiki.qemu.org/Planning/4.0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823169
+
+Title:
+  qemu displays message "Setup failed, please check external storage is
+  available and has enough room."
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I tried to launch the Android app PokerStarsFR, and after it began
+  initialization, the launch failed with the above error. I'm running
+  qemu on a Dell XPS 13 (9370) laptop running Ubuntu 16.04 LTS. The
+  standard apps launch OK, but this one does not. I had downloaded it
+  from the PokerStars site
+  https://www.pokerstars.fr/en/poker/download/android/.
+
+  I am running qemu version 2.5.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823169/+subscriptions
 
