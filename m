@@ -2,127 +2,95 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA4DC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03042C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86B122175B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B122175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B925B2175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B925B2175B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37833 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37837 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCJtT-0001hL-Sv
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 04:08:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44089)
+	id 1hCJtq-00021M-Tv
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 04:08:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hCJs8-00011q-Ex
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:49 -0400
+	(envelope-from <groug@kaod.org>) id 1hCJsM-00016i-Lk
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:07:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hCJs7-0001po-LM
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hCJs7-0001oO-Bt
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 593EA81DE0
-	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 07:58:58 +0000 (UTC)
-Received: from [10.36.112.30] (ovpn-112-30.ams2.redhat.com [10.36.112.30])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EBF97614EE;
-	Fri,  5 Apr 2019 07:58:39 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>
-References: <20190404071421.4891-1-thuth@redhat.com>
-	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
-	<158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
-	<3ba3c765-589f-4c0a-38dc-d9126f515e7b@redhat.com>
-	<fda6bc0b-9ea0-2770-f104-568b3f16ab90@redhat.com>
-	<265f98b8-675c-99fb-0ef8-0dcc13c14a91@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <02729d68-9714-141b-b221-74ff31dca977@redhat.com>
-Date: Fri, 5 Apr 2019 09:58:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.0
+	(envelope-from <groug@kaod.org>) id 1hCJsJ-00020z-AZ
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:07:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34022
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hCJsI-0001y7-WA
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:59 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3586Vw1107199
+	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 04:06:56 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rp0vswvx2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 04:06:40 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Fri, 5 Apr 2019 09:05:29 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Fri, 5 Apr 2019 09:05:26 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+	[9.149.105.62])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3585PZF50200590
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Fri, 5 Apr 2019 08:05:25 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 77FC8AE05D;
+	Fri,  5 Apr 2019 08:05:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3FA66AE05F;
+	Fri,  5 Apr 2019 08:05:25 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.20.25])
+	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2019 08:05:25 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 05 Apr 2019 10:05:24 +0200
+In-Reply-To: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
+References: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <265f98b8-675c-99fb-0ef8-0dcc13c14a91@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 05 Apr 2019 07:58:58 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
- not be user_creatable
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19040508-0028-0000-0000-0000035D8AA6
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19040508-0029-0000-0000-0000241C9C5B
+Message-Id: <155445152490.302073.17033451726459859333.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-05_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904050060
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH 2/2] target/ppc/kvm: Convert DPRINTF to traces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -134,18 +102,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+	Aravinda Prasad <aravinda@linux.vnet.ibm.com>,
+	qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405075821.s_75TS4W11Ge5LFGq-HtFF9XV5AvwjxK4kOOFqWwSw0@z>
+Message-ID: <20190405080524.p3a2DObzvTU4DJaEnLqZ1Fgtz0Wn3H_IlstkLtgLEi0@z>
 
-On 04/04/19 22:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> While I wonder if someone still use the r4k machine, I have more doubts
-> about users running with more the 2 -serial options...
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/kvm.c        |   68 +++++++++++++++++++----------------------------
+ target/ppc/trace-events |   25 +++++++++++++++++
+ 2 files changed, 52 insertions(+), 41 deletions(-)
 
-I sort of remember ISA extension cards that had jumpers or dip switches
-to choose between COM1/COM2/COM3/COM4...
-
-Paolo
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 2427c8ee13ae..3a11d2e1060c 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -49,16 +49,6 @@
+ #include "elf.h"
+ #include "sysemu/kvm_int.h"
+ 
+-//#define DEBUG_KVM
+-
+-#ifdef DEBUG_KVM
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+ #define PROC_DEVTREE_CPU      "/proc/device-tree/cpus/"
+ 
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+@@ -626,7 +616,7 @@ static int kvm_put_fp(CPUState *cs)
+         reg.addr = (uintptr_t)&fpscr;
+         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to set FPSCR to KVM: %s\n", strerror(errno));
++            trace_kvm_failed_fpscr_set(strerror(errno));
+             return ret;
+         }
+ 
+@@ -647,8 +637,8 @@ static int kvm_put_fp(CPUState *cs)
+ 
+             ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+             if (ret < 0) {
+-                DPRINTF("Unable to set %s%d to KVM: %s\n", vsx ? "VSR" : "FPR",
+-                        i, strerror(errno));
++                trace_kvm_failed_fp_set(vsx ? "VSR" : "FPR", i,
++                                        strerror(errno));
+                 return ret;
+             }
+         }
+@@ -659,7 +649,7 @@ static int kvm_put_fp(CPUState *cs)
+         reg.addr = (uintptr_t)&env->vscr;
+         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to set VSCR to KVM: %s\n", strerror(errno));
++            trace_kvm_failed_vscr_set(strerror(errno));
+             return ret;
+         }
+ 
+@@ -668,7 +658,7 @@ static int kvm_put_fp(CPUState *cs)
+             reg.addr = (uintptr_t)cpu_avr_ptr(env, i);
+             ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+             if (ret < 0) {
+-                DPRINTF("Unable to set VR%d to KVM: %s\n", i, strerror(errno));
++                trace_kvm_failed_vr_set(i, strerror(errno));
+                 return ret;
+             }
+         }
+@@ -693,7 +683,7 @@ static int kvm_get_fp(CPUState *cs)
+         reg.addr = (uintptr_t)&fpscr;
+         ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to get FPSCR from KVM: %s\n", strerror(errno));
++            trace_kvm_failed_fpscr_get(strerror(errno));
+             return ret;
+         } else {
+             env->fpscr = fpscr;
+@@ -709,8 +699,8 @@ static int kvm_get_fp(CPUState *cs)
+ 
+             ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+             if (ret < 0) {
+-                DPRINTF("Unable to get %s%d from KVM: %s\n",
+-                        vsx ? "VSR" : "FPR", i, strerror(errno));
++                trace_kvm_failed_fp_get(vsx ? "VSR" : "FPR", i,
++                                        strerror(errno));
+                 return ret;
+             } else {
+ #ifdef HOST_WORDS_BIGENDIAN
+@@ -733,7 +723,7 @@ static int kvm_get_fp(CPUState *cs)
+         reg.addr = (uintptr_t)&env->vscr;
+         ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to get VSCR from KVM: %s\n", strerror(errno));
++            trace_kvm_failed_vscr_get(strerror(errno));
+             return ret;
+         }
+ 
+@@ -742,8 +732,7 @@ static int kvm_get_fp(CPUState *cs)
+             reg.addr = (uintptr_t)cpu_avr_ptr(env, i);
+             ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+             if (ret < 0) {
+-                DPRINTF("Unable to get VR%d from KVM: %s\n",
+-                        i, strerror(errno));
++                trace_kvm_failed_vr_get(i, strerror(errno));
+                 return ret;
+             }
+         }
+@@ -764,7 +753,7 @@ static int kvm_get_vpa(CPUState *cs)
+     reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+     if (ret < 0) {
+-        DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(errno));
++        trace_kvm_failed_vpa_addr_get(strerror(errno));
+         return ret;
+     }
+ 
+@@ -774,8 +763,7 @@ static int kvm_get_vpa(CPUState *cs)
+     reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+     if (ret < 0) {
+-        DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
+-                strerror(errno));
++        trace_kvm_failed_slb_get(strerror(errno));
+         return ret;
+     }
+ 
+@@ -785,8 +773,7 @@ static int kvm_get_vpa(CPUState *cs)
+     reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+     if (ret < 0) {
+-        DPRINTF("Unable to get dispatch trace log state from KVM: %s\n",
+-                strerror(errno));
++        trace_kvm_failed_dtl_get(strerror(errno));
+         return ret;
+     }
+ 
+@@ -812,7 +799,7 @@ static int kvm_put_vpa(CPUState *cs)
+         reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
++            trace_kvm_failed_vpa_addr_set(strerror(errno));
+             return ret;
+         }
+     }
+@@ -823,7 +810,7 @@ static int kvm_put_vpa(CPUState *cs)
+     reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+     if (ret < 0) {
+-        DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerror(errno));
++        trace_kvm_failed_slb_set(strerror(errno));
+         return ret;
+     }
+ 
+@@ -833,8 +820,7 @@ static int kvm_put_vpa(CPUState *cs)
+     reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+     if (ret < 0) {
+-        DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
+-                strerror(errno));
++        trace_kvm_failed_dtl_set(strerror(errno));
+         return ret;
+     }
+ 
+@@ -843,7 +829,7 @@ static int kvm_put_vpa(CPUState *cs)
+         reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+         ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+         if (ret < 0) {
+-            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
++            trace_kvm_failed_null_vpa_addr_set(strerror(errno));
+             return ret;
+         }
+     }
+@@ -996,7 +982,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+ 
+         if (cap_papr) {
+             if (kvm_put_vpa(cs) < 0) {
+-                DPRINTF("Warning: Unable to set VPA information to KVM\n");
++                trace_kvm_failed_put_vpa();
+             }
+         }
+ 
+@@ -1296,7 +1282,7 @@ int kvm_arch_get_registers(CPUState *cs)
+ 
+         if (cap_papr) {
+             if (kvm_get_vpa(cs) < 0) {
+-                DPRINTF("Warning: Unable to get VPA information from KVM\n");
++                trace_kvm_failed_get_vpa();
+             }
+         }
+ 
+@@ -1352,7 +1338,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+          */
+         irq = KVM_INTERRUPT_SET;
+ 
+-        DPRINTF("injected interrupt %d\n", irq);
++        trace_kvm_injected_interrupt(irq);
+         r = kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
+         if (r < 0) {
+             printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
+@@ -1697,20 +1683,20 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+     switch (run->exit_reason) {
+     case KVM_EXIT_DCR:
+         if (run->dcr.is_write) {
+-            DPRINTF("handle dcr write\n");
++            trace_kvm_handle_dcr_write();
+             ret = kvmppc_handle_dcr_write(env, run->dcr.dcrn, run->dcr.data);
+         } else {
+-            DPRINTF("handle dcr read\n");
++            trace_kvm_handle_drc_read();
+             ret = kvmppc_handle_dcr_read(env, run->dcr.dcrn, &run->dcr.data);
+         }
+         break;
+     case KVM_EXIT_HLT:
+-        DPRINTF("handle halt\n");
++        trace_kvm_handle_halt();
+         ret = kvmppc_handle_halt(cpu);
+         break;
+ #if defined(TARGET_PPC64)
+     case KVM_EXIT_PAPR_HCALL:
+-        DPRINTF("handle PAPR hypercall\n");
++        trace_kvm_handle_papr_hcall();
+         run->papr_hcall.ret = spapr_hypercall(cpu,
+                                               run->papr_hcall.nr,
+                                               run->papr_hcall.args);
+@@ -1718,18 +1704,18 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         break;
+ #endif
+     case KVM_EXIT_EPR:
+-        DPRINTF("handle epr\n");
++        trace_kvm_handle_epr();
+         run->epr.epr = ldl_phys(cs->as, env->mpic_iack);
+         ret = 0;
+         break;
+     case KVM_EXIT_WATCHDOG:
+-        DPRINTF("handle watchdog expiry\n");
++        trace_kvm_handle_watchdog_expiry();
+         watchdog_perform_action();
+         ret = 0;
+         break;
+ 
+     case KVM_EXIT_DEBUG:
+-        DPRINTF("handle debug exception\n");
++        trace_kvm_handle_debug_exception();
+         if (kvm_handle_debug(cpu, run)) {
+             ret = EXCP_DEBUG;
+             break;
+diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+index ed4d57c6d9c1..7b3cfe11fdfe 100644
+--- a/target/ppc/trace-events
++++ b/target/ppc/trace-events
+@@ -3,3 +3,28 @@
+ # kvm.c
+ kvm_failed_spr_set(int spr, const char *msg) "Warning: Unable to set SPR %d to KVM: %s"
+ kvm_failed_spr_get(int spr, const char *msg) "Warning: Unable to retrieve SPR %d from KVM: %s"
++kvm_failed_fpscr_set(const char *msg) "Unable to set FPSCR to KVM: %s"
++kvm_failed_fp_set(const char *fpname, int fpnum, const char *msg) "Unable to set %s%d to KVM: %s"
++kvm_failed_vscr_set(const char *msg) "Unable to set VSCR to KVM: %s"
++kvm_failed_vr_set(int vr, const char *msg) "Unable to set VR%d to KVM: %s"
++kvm_failed_fpscr_get(const char *msg) "Unable to get FPSCR from KVM: %s"
++kvm_failed_fp_get(const char *fpname, int fpnum, const char *msg) "Unable to get %s%d from KVM: %s"
++kvm_failed_vscr_get(const char *msg) "Unable to get VSCR from KVM: %s"
++kvm_failed_vr_get(int vr, const char *msg) "Unable to get VR%d from KVM: %s"
++kvm_failed_vpa_addr_get(const char *msg) "Unable to get VPA address from KVM: %s"
++kvm_failed_slb_get(const char *msg) "Unable to get SLB shadow state from KVM: %s"
++kvm_failed_dtl_get(const char *msg) "Unable to get dispatch trace log state from KVM: %s"
++kvm_failed_vpa_addr_set(const char *msg) "Unable to set VPA address to KVM: %s"
++kvm_failed_slb_set(const char *msg) "Unable to set SLB shadow state to KVM: %s"
++kvm_failed_dtl_set(const char *msg) "Unable to set dispatch trace log state to KVM: %s"
++kvm_failed_null_vpa_addr_set(const char *msg) "Unable to set VPA address to KVM: %s"
++kvm_failed_put_vpa(void) "Warning: Unable to set VPA information to KVM"
++kvm_failed_get_vpa(void) "Warning: Unable to get VPA information from KVM"
++kvm_injected_interrupt(int irq) "injected interrupt %d"
++kvm_handle_dcr_write(void) "handle dcr write"
++kvm_handle_drc_read(void) "handle dcr read"
++kvm_handle_halt(void) "handle halt"
++kvm_handle_papr_hcall(void) "handle PAPR hypercall"
++kvm_handle_epr(void) "handle epr"
++kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
++kvm_handle_debug_exception(void) "handle debug exception"
 
 
