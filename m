@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58164)
+Received: from eggs.gnu.org ([209.51.188.92]:58175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY7-0003dr-84
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:04 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY9-0003fR-1w
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY6-0004VL-DW
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:03 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY8-0004YY-6V
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:05 -0400
 Received: from mga07.intel.com ([134.134.136.100]:40758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hCIY6-0004O6-2b
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:02 -0400
+	id 1hCIY7-0004O6-TF
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:04 -0400
 From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Fri,  5 Apr 2019 14:41:20 +0800
-Message-Id: <20190405064121.23662-4-richardw.yang@linux.intel.com>
+Date: Fri,  5 Apr 2019 14:41:21 +0800
+Message-Id: <20190405064121.23662-5-richardw.yang@linux.intel.com>
 In-Reply-To: <20190405064121.23662-1-richardw.yang@linux.intel.com>
 References: <20190405064121.23662-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 3/4] vl: Clean up after previous commit
+Subject: [Qemu-devel] [PATCH v2 4/4] vl: Simplify machine_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,60 @@ Cc: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, armbru
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Since the previous commit, find_machine() and find_default_machine()
-don't have to deallocate on return.  This permits further
-simplifications.
+Exploit that argument @name is nerver null.  Check is_help_option()
+first, because that's what we do elsewhere.  If we (foolishly!)
+defined a machine named "help", -machine help would now print help
+instead of selecting the machine named "help".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- vl.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+ vl.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
 diff --git a/vl.c b/vl.c
-index cf08d96ce4..99f9cb2533 100644
+index 99f9cb2533..4f4d440bc4 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -1421,40 +1421,31 @@ MachineState *current_machine;
- static MachineClass *find_machine(const char *name, GSList *machines)
+@@ -2529,19 +2529,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+ 
+ static MachineClass *machine_parse(const char *name, GSList *machines)
  {
-     GSList *el;
 -    MachineClass *mc = NULL;
++    MachineClass *mc;
+     GSList *el;
  
-     for (el = machines; el; el = el->next) {
--        MachineClass *temp = el->data;
-+        MachineClass *mc = el->data;
- 
--        if (!strcmp(temp->name, name)) {
--            mc = temp;
--            break;
--        }
--        if (temp->alias &&
--            !strcmp(temp->alias, name)) {
--            mc = temp;
--            break;
-+        if (!strcmp(mc->name, name) || !g_strcmp0(mc->alias, name)) {
-+            return mc;
+-    if (name) {
+-        mc = find_machine(name, machines);
+-    }
+-    if (mc) {
+-        return mc;
+-    }
+-    if (name && !is_help_option(name)) {
+-        error_report("unsupported machine type");
+-        error_printf("Use -machine help to list supported machines\n");
+-    } else {
++    if (is_help_option(name)) {
+         printf("Supported machines are:\n");
+         machines = g_slist_sort(machines, machine_class_cmp);
+         for (el = machines; el; el = el->next) {
+@@ -2553,9 +2544,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
+                    mc->is_default ? " (default)" : "",
+                    mc->deprecation_reason ? " (deprecated)" : "");
          }
++        exit(0);
      }
  
--    return mc;
-+    return NULL;
+-    exit(!name || !is_help_option(name));
++    mc = find_machine(name, machines);
++    if (!mc) {
++        error_report("unsupported machine type");
++        error_printf("Use -machine help to list supported machines\n");
++        exit(1);
++    }
++    return mc;
  }
  
- static MachineClass *find_default_machine(GSList *machines)
- {
-     GSList *el;
--    MachineClass *mc = NULL;
- 
-     for (el = machines; el; el = el->next) {
--        MachineClass *temp = el->data;
-+        MachineClass *mc = el->data;
- 
--        if (temp->is_default) {
--            mc = temp;
--            break;
-+        if (mc->is_default) {
-+            return mc;
-         }
-     }
- 
--    return mc;
-+    return NULL;
- }
- 
- MachineInfoList *qmp_query_machines(Error **errp)
+ void qemu_add_exit_notifier(Notifier *notify)
 -- 
 2.19.1
