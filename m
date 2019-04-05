@@ -2,73 +2,75 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BF1C282CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2A8C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77A2B2175B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:14:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77A2B2175B
+	by mail.kernel.org (Postfix) with ESMTPS id 4EFC92175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:14:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EFC92175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48026 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48028 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCY2L-0004Xy-HF
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 19:14:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48856)
+	id 1hCY2N-0004Y1-Cy
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 19:14:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hCY0p-0003Xb-Ob
+	(envelope-from <mst@redhat.com>) id 1hCY0p-0003Xa-5N
 	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hCY0n-0003Sn-Qa
+	(envelope-from <mst@redhat.com>) id 1hCY0o-0003V9-7M
 	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:43 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:34525)
+Received: from mail-qt1-f170.google.com ([209.85.160.170]:34373)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hCY0n-0003Gj-Fg
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:41 -0400
-Received: by mail-qt1-f196.google.com with SMTP id k2so9398603qtm.1
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 16:12:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hCY0n-0003QV-Lg
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:42 -0400
+Received: by mail-qt1-f170.google.com with SMTP id k2so9398652qtm.1
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 16:12:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-	:content-disposition;
-	bh=3dnkoVUDhzmj6V+sRTqhPfd8LX8au6zOhjXDFviKoPk=;
-	b=QSxm7HE+FeK+CctxJ17s0VxCv8v8gi/MOOpZlYBfGGwSEnVf2UsWZCXaM7waKm8EUR
-	igL4kYKLRNQx2a1BHPPD/J9BR3xFzENrobAs9JooCCPyekhHISogA4UXp0GiwthqtCl0
-	8cEMCRebDIZVdTquxA5tBf7lsxWHMmTChPxDkhEdbo6qQObxIYXtoVvdrSIyX1Z4G23M
-	8YIM+fw5k5QCzwDsDjWtFkP3GzjcEWceTMxFFHFeTtCuZmIuVfnrgGZ3I0qlDozOFbMD
-	bZf97EECaa4yCALXLDkjzeK7NbUONsKMZFkW5MurP8PlgEF8aql5OCJkC1UfB+VNNDyi
-	wodA==
-X-Gm-Message-State: APjAAAVVZgX2NAGJMQWZHLCYZ66vWKHBa2oNMEPiiF2GpLZnUS3tzh9w
-	YIcRn7UfeZcA8etELWs9iSVmn/YUnwk=
-X-Google-Smtp-Source: APXvYqypKdr70+INNmhq3573CODXy+0sYa1EMQp2YXDGth9B5wYHl0joIhSvI5IjMyhyu3QKnOLVNQ==
-X-Received: by 2002:ac8:44c3:: with SMTP id b3mr12900578qto.349.1554505958986; 
-	Fri, 05 Apr 2019 16:12:38 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=yAwnkjL068uH+yovrU/L/oje0/QyUNj3ge2/oaPBdeA=;
+	b=LLH3/Ja6RcnBB28Dx2oELsoLYJJXgy4qVJT8WpStCto59ou0y4fSPilFoK8EZoqT4U
+	iKcTYhozfJeM/dAGgQtbVlB/Q5yc38f7rgZon/DZTF8Gpr5QWCuoyIJpr6C3KYhJvwME
+	fT9NHefiaqhCs7pp3BlKhkiU0yfzmlBtW1/02YVSeLsaWdJRj9w5YJycKMYiPMpsq/3y
+	mXz6U4nMOXIM8vrStAzNVkFzKDTwNWf8mwmkbKbFzqqa/WPcgDA+cLnqb4F7pBDlWs6X
+	mzTwUj1dpu76WqJXzvm8wbQ4YOk3B8MFMy71T0l6hxr7X7zb4bXx8PTw0/g2pH9W7LS8
+	hAFg==
+X-Gm-Message-State: APjAAAVyz9sH1C43b73ebtN0X2OJo71brMSMxYbXeCpDroWfnKYTIh4K
+	AVK8MV7ErPiUJR1NAS910nMozraYgOc=
+X-Google-Smtp-Source: APXvYqwsdxfUz8CCrgYRxLKZyUwgmqLUFdW/Jr45DuAX/mw7o/b+hfYJ912rUJRUwjnbhOTgMAfxeA==
+X-Received: by 2002:ac8:29f1:: with SMTP id 46mr13872008qtt.126.1554505960819; 
+	Fri, 05 Apr 2019 16:12:40 -0700 (PDT)
 Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
 	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
-	k3sm15870041qtf.28.2019.04.05.16.12.37
+	q50sm15895851qtq.34.2019.04.05.16.12.39
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 05 Apr 2019 16:12:38 -0700 (PDT)
-Date: Fri, 5 Apr 2019 19:12:36 -0400
+	Fri, 05 Apr 2019 16:12:40 -0700 (PDT)
+Date: Fri, 5 Apr 2019 19:12:39 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190405231225.30165-1-mst@redhat.com>
+Message-ID: <1553199229-25318-1-git-send-email-liam.merwick@oracle.com>
+References: <20190405231225.30165-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
+In-Reply-To: <20190405231225.30165-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: [Qemu-devel] [PULL 0/5] pci, pc, virtio: fixes
+X-Received-From: 209.85.160.170
+Subject: [Qemu-devel] [PULL 1/5] acpi: verify file entries in
+ bios_linker_loader_add_pointer()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,53 +82,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405231236.onTf6aC-XA1Pdjm8OzK4BReObPKNNZNP-THdTgHQcMI@z>
+Message-ID: <20190405231239.NLtoS6k4o3m2d8yvn1WsTB4g3e2mafH-kY7NCSBsfVM@z>
 
-The following changes since commit 436960c95946007aca713330e7a488a6f2e0696f:
+From: Liam Merwick <liam.merwick@oracle.com>
 
-  Merge remote-tracking branch 'remotes/berrange/tags/filemon-next-pull-request' into staging (2019-04-02 14:52:17 +0100)
+The callers to bios_linker_find_file() assert that the file entry returned
+is not NULL, except for those in bios_linker_loader_add_pointer().  Add two
+asserts in that case for completeness and to facilitate static code analysis.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 81fb1e646e4da29f8e1639022241323b956b67e4:
-
-  intel_iommu: Drop extended root field (2019-04-02 11:49:14 -0400)
-
-----------------------------------------------------------------
-pci, pc, virtio: fixes
-
-intel-iommu fixes
-virtio typo fixes
-linker: a couple of asserts for consistency/security
-
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Message-Id: <1553199229-25318-1-git-send-email-liam.merwick@oracle.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/acpi/bios-linker-loader.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-----------------------------------------------------------------
-Alex Williamson (1):
-      intel_iommu: Correct caching-mode error message
-
-Liam Merwick (1):
-      acpi: verify file entries in bios_linker_loader_add_pointer()
-
-Peter Xu (2):
-      intel_iommu: Fix root_scalable migration breakage
-      intel_iommu: Drop extended root field
-
-Yuval Shaia (1):
-      virtio-net: Fix typo in comment
-
- hw/i386/intel_iommu_internal.h |  1 -
- include/hw/i386/intel_iommu.h  |  1 -
- hw/acpi/bios-linker-loader.c   |  2 ++
- hw/i386/intel_iommu.c          | 32 +++++++++++++++++++++++---------
- hw/net/virtio-net.c            |  2 +-
- hw/i386/trace-events           |  2 +-
- 6 files changed, 27 insertions(+), 13 deletions(-)
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index d16b8bbcb1..626c04a39f 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -283,6 +283,8 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+     const BiosLinkerFileEntry *source_file =
+         bios_linker_find_file(linker, src_file);
+ 
++    assert(dst_file);
++    assert(source_file);
+     assert(dst_patched_offset < dst_file->blob->len);
+     assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
+     assert(src_offset < source_file->blob->len);
+-- 
+MST
 
 
