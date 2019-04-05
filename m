@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54193)
+Received: from eggs.gnu.org ([209.51.188.92]:35222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1hCVaB-0005bN-2j
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:37:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1hCVjt-0001Be-2X
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1hCVa4-0008Qt-0h
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:36:58 -0400
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <eblake@redhat.com>) id 1hCVjr-00009c-Lo
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hCVjm-00089o-Mw
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:03 -0400
+References: <20190405184037.16799-1-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b0340220-870c-c3a6-9ce8-592ae2f6e061@redhat.com>
+Date: Fri, 5 Apr 2019 14:30:39 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <ce68c2dc-857a-aff0-0fb7-a8e48e921c54@redhat.com>
-References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
-	<ce68c2dc-857a-aff0-0fb7-a8e48e921c54@redhat.com>
-Message-ID: <155449613359.3739.8673708328232350625@sif>
-Date: Fri, 05 Apr 2019 15:28:53 -0500
-Subject: Re: [Qemu-devel] [PATCH 00/97] Patch Round-up for stable 3.0.1,
- freeze on 2019-04-08
+In-Reply-To: <20190405184037.16799-1-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p"
+Subject: Re: [Qemu-devel] [PATCH for-4.0] test qgraph.c: Fix segs due to out
+ of scope default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Lieven <pl@kamp.de>, Hannes Reinecke <hare@suse.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2019-04-04 17:31:31)
-> On 4/1/19 10:58 PM, Michael Roth wrote:
-> > Hi everyone,                                                           =
-                                   =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com,
+ pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
+Message-ID: <b0340220-870c-c3a6-9ce8-592ae2f6e061@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0] test qgraph.c: Fix segs due to out
+ of scope default
+References: <20190405184037.16799-1-dgilbert@redhat.com>
+In-Reply-To: <20190405184037.16799-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> > =
-
-> > The following new patches are queued for QEMU stable v3.0.1:
-> > =
-
-> >   https://github.com/mdroth/qemu/commits/stable-3.0-staging
-> > =
-
-> > The release is planned for 2019-04-11:
-> > =
-
-> >   https://wiki.qemu.org/Planning/3.0
-...
-> =
-
-> I'm not sure about 4c257911dcc7c4189768e9651755c849ce9db4e8
-> "i386: remove the 'INTEL_PT' CPUID bit from named CPU models"
-
-AFAICT this was only enabled by default via Icelake-*, Cascadelake-Server
-models, which are only in 3.1+. I have it queued for 3.1.1 though.
-
-> =
-
-> What about 334c43e2c342e878311c66b4e62343f0a7c2c6be?
-> "qemu-img: fix error reporting for -object"
-
-Looks like this fixes a regression introduced in 3.1 with 7e1e0c11, I'll
-make sure to queue it for 3.1.1 though.
-
-> =
-
-> Also ade0075523478fa015afd5c6f6cc70681687818d:
-> "contrib/rdmacm-mux: Fix out-of-bounds risk"
-
-Fixes regression introduced in 4.0 with a5d2f6f8773
-
-> =
-
-> And 3fd2092fd11b9e4220a08eca0663cc59178a6c3f:
-> "hw/usb: fix mistaken de-initialization of CCID state"
-
-
-Fixes regression introduced in 4.0 with 7dea29e4
-
-> =
-
-> Eventually:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg00843.html
-> "megasas: fix mapped frame size"
-
-Hopefully it makes it in by rc3 next week, otherwise we'd need to delay
-3.0.1 to pick it up. Will keep it eye on it.
-
-Thanks for the suggestions!
-
-> =
-
-> Regards,
-> =
-
-> Phil.
+On 4/5/19 1:40 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
+> The test uses the trick:
+>    if (!opts) {
+>      opts =3D &(QOSGraph...Options) { };
+>    }
+>=20
+>   in a couple of places, however the temporary created
+> by the &() {}  goes out of scope at the bottom of the if,
+> and results in a seg or assert when opts-> fields are
+> used (on fedora 30's gcc 9).
+>=20
+> Fixes: fc281c802022cb3a73a5
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  tests/libqos/qgraph.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+
+Fixing it for 4.0 would be nice (we can't promise that everything in 4.0
+is clean for gcc 9, but as long as we have to do -rc3 anyways, fixing
+undefined behavior into something well-defined like this seems reasonable=
+)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlynrN8ACgkQp6FrSiUn
+Q2pYJwf7Bz9t8TrzBGBhG/XemR+x0MtuDQBcuzMiOEOP40oigL5VpTbPzikxqWck
+ECd4snSHIa4TGbL527KKYPgGzm4+cl3PLLZjjmXUbQhFRQU6ZzJLJ8PJaMpUzciN
+uBafbIPSJgHPMw0sZBrxkMhrJWDam/Auo/IFfQ4D20TvvrRVCiw5xZUvDGxSYa2v
++hsS8jTqkjFvs0Ps14+3C8IWyJu5QeWvUWbHLrzkKtzz1metx91W5Uf6CuKdbC51
+DHG+v5qTCmO/9L1hrIrSbiTxjE8gVahfsQ9ISST9fgnBAmOQtAE2UmQeWv7xsoQ4
+fjuHIt8ruryOvKY+NOjQZclALodDfg==
+=rdjJ
+-----END PGP SIGNATURE-----
+
+--f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p--
