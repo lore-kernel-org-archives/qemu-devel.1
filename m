@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52295)
+Received: from eggs.gnu.org ([209.51.188.92]:56605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMpf-00033D-Pe
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:16:28 -0400
+	(envelope-from <olaf@aepfle.de>) id 1hCNCc-0000x4-IY
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMpe-0003Y7-Sa
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:16:27 -0400
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::10]:8830)
+	(envelope-from <olaf@aepfle.de>) id 1hCN47-0005sB-8n
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:31:25 -0400
+Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::11]:23162)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCMpd-0002zH-J7
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:16:26 -0400
-Date: Fri, 5 Apr 2019 13:16:16 +0200
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCN45-0005YF-J4
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:31:23 -0400
+Date: Fri, 5 Apr 2019 13:31:14 +0200
 From: Olaf Hering <olaf@aepfle.de>
-Message-ID: <20190405131616.071a6390.olaf@aepfle.de>
-In-Reply-To: <20190405125918.462c6ae4.olaf@aepfle.de>
+Message-ID: <20190405133114.485ca24e.olaf@aepfle.de>
+In-Reply-To: <b1c37e96-4679-b342-bf26-7043cc754220@redhat.com>
 References: <20190405123928.70da87e2.olaf@aepfle.de>
 	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
 	<20190405125918.462c6ae4.olaf@aepfle.de>
+	<20190405131616.071a6390.olaf@aepfle.de>
+	<b1c37e96-4679-b342-bf26-7043cc754220@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_//HIIvx4XHusNlIL9qTMU16i";
+	boundary="Sig_/BZMUf3vx_2P/1aun_wF1/QI";
 	protocol="application/pgp-signature"
 Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
 List-Id: <qemu-devel.nongnu.org>
@@ -33,30 +35,28 @@ To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S.
 	Tsirkin" <mst@redhat.com>
 
---Sig_//HIIvx4XHusNlIL9qTMU16i
-Content-Type: text/plain; charset=US-ASCII
+--Sig_/BZMUf3vx_2P/1aun_wF1/QI
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Am Fri, 5 Apr 2019 12:59:18 +0200
-schrieb Olaf Hering <olaf@aepfle.de>:
+Am Fri, 5 Apr 2019 13:29:44 +0200
+schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 
-> This used to work still in January with c9d18c1c150c84e7a976df989ad04ddf0=
-1083f46.
+> I'll submit that patch.
 
-It is not possible to just override EFIROM=3D$(type -P EfiRom) because this=
- variable is also used by ipxe.git.
+Can this actually work? It does not remove the naming conflict.
 
 Olaf
 
---Sig_//HIIvx4XHusNlIL9qTMU16i
+--Sig_/BZMUf3vx_2P/1aun_wF1/QI
 Content-Type: application/pgp-signature
 Content-Description: Digitale Signatur von OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKc5AAAKCRBdQqD6ppg2
-ftktAJ9zGqkhztmcHlXyz4W069+m22o9GQCg2h5J+QdpJX+j1Y9YTfdceAg1Oi8=
-=EMC/
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKc8ggAKCRBdQqD6ppg2
+fhouAKCRJ8C+XNoA5yb8mfDilhDtOqRI9ACeMU9AZNCrUzoPq3Aazgi4C7d/+qI=
+=yoFY
 -----END PGP SIGNATURE-----
 
---Sig_//HIIvx4XHusNlIL9qTMU16i--
+--Sig_/BZMUf3vx_2P/1aun_wF1/QI--
