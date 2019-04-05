@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42603)
+Received: from eggs.gnu.org ([209.51.188.92]:42668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCJhp-0005ne-MI
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:10 -0400
+	(envelope-from <deller@gmx.de>) id 1hCJiY-0006ML-UI
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCJho-0005yb-EK
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hCJho-0005vB-6g
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hCJhk-0003O1-SX
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 07:56:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 01A0E2E8181
-	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 07:56:03 +0000 (UTC)
+	(envelope-from <deller@gmx.de>) id 1hCJiX-00085G-Ci
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:54 -0400
+Received: from mout.gmx.net ([212.227.15.19]:56341)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1hCJiX-0007xI-0L
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:53 -0400
+References: <20190404185730.GA22512@ls3530.dellerweb.de>
+	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
+From: Helge Deller <deller@gmx.de>
+Message-ID: <b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
+Date: Fri, 5 Apr 2019 09:56:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Apr 2019 07:44:30 -0000
-From: Robert Uomini <1823169@bugs.launchpad.net>
-Reply-To: Bug 1823169 <1823169@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155437966834.20937.13725906067731199360.malonedeb@chaenomeles.canonical.com>
-	<155444394987.21192.3332237882695030786.malone@soybean.canonical.com>
-Message-Id: <CAB6aw5F4t7d2fqJCcXWAuAXBKmZFPa2vpeF906OZViFSn7KrzA@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1823169] Re: qemu displays message "Setup
- failed, please check external storage is available and has enough room."
+Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
+ on non-release architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,77 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On Fri, Apr 5, 2019 at 8:05 AM Christian Ehrhardt =EE=83=BF <
-1823169@bugs.launchpad.net> wrote:
+Hi Peter,
 
-> I agree to Thomas, and in that case referring to your comment #2 - qemu
-> versions in Ubuntu are associated with the base Ubuntu version - so Ubuntu
-> 16.04 will stick to qemu 2.5 + fixes.
-> Ubuntu 19.10 released next week has qemu 3.1 btw, see [1]
+On 05.04.19 03:34, Peter Maydell wrote:
+> On Fri, 5 Apr 2019 at 01:59, Helge Deller <deller@gmx.de> wrote:
+>> If a non-release architecture is found, and it's known that there is no
+>> native TCG support for that CPU, automatically fall back to the TCI
+>> implementation instead of requesting the user to run configure again
+>> with the --enable-tcg-interpreter option.
+>>
+>> This change simplifies building qemu in automatic build environments
+>> (like in my case the debian buildds) because one does not need to
+>> special case on the architectures.
 >
-Awesome!
+> I don't think we should do this. TCI is unmaintained, has several
+> known flaws,
 
->
-> And vice versa for an upstream report (which is often helpful for deep
-> technical discussions) you'll want to try with the latest version anyway
-> - which for just a few days is 3.1 still, then it will be 4.0 :-)
->
-Even better!
+Just out of interest: Is there a list with those flaws somewhere?
 
->
-> [1]: https://launchpad.net/ubuntu/+source/qemu
-> [2]: https://wiki.qemu.org/Planning/4.0
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1823169
->
-> Title:
->   qemu displays message "Setup failed, please check external storage is
->   available and has enough room."
->
-> Status in QEMU:
->   Invalid
->
-> Bug description:
->   I tried to launch the Android app PokerStarsFR, and after it began
->   initialization, the launch failed with the above error. I'm running
->   qemu on a Dell XPS 13 (9370) laptop running Ubuntu 16.04 LTS. The
->   standard apps launch OK, but this one does not. I had downloaded it
->   from the PokerStars site
->   https://www.pokerstars.fr/en/poker/download/android/.
->
->   I am running qemu version 2.5.0
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1823169/+subscriptions
->
+> does not provide the level of performance that
+> people expect from QEMU, and we've talked about removing it
+> altogether. In particular, distros should not automatically ship
+> a TCI QEMU -- it's something that a user can use if they
+> explicitly opt into but which I don't think we want to surprise
+> anybody with.
 
--- =
+I won't argue against your points. They are all valid.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823169
+> If we care about a host architecture we should support it
+> with a proper TCG backend. If we don't care that much we
+> shouldn't support it.
 
-Title:
-  qemu displays message "Setup failed, please check external storage is
-  available and has enough room."
+Looking just at some of the debian "ports" (non-release) architectures:
+alpha, hppa, ia64, m68k, powerpc, sh4, sparc64
+Most likely nobody will ever care enough to write a TCG backend for those,
+and it doesn't even make sense because they are so much slower than
+the currently supported TCG backend architectures. So why should one want
+to emulate a fast x86 machine on slow m68k for example?
 
-Status in QEMU:
-  Invalid
+The only reason when it *can* make sense is, when you need "basic"
+emulation or availability of binaries for cross-dependecies in distros,
+e.g. to build other packages or to be able to install other packages.
+As one example, many packages depend on libvirt (frontend tools, monitorin=
+g
+stuff, ...) and libvirt again depends on some qemu binaries.
+So, having qemu buildable (even if the result is slow) makes life easier.
 
-Bug description:
-  I tried to launch the Android app PokerStarsFR, and after it began
-  initialization, the launch failed with the above error. I'm running
-  qemu on a Dell XPS 13 (9370) laptop running Ubuntu 16.04 LTS. The
-  standard apps launch OK, but this one does not. I had downloaded it
-  from the PokerStars site
-  https://www.pokerstars.fr/en/poker/download/android/.
+I know, my point above now turns into a "distro packaging" issue.
+That's why I'm questioning, why should distros (or even direct end-users)
+be forced to distinguish between architectures?
+Shouldn't running "./configure" find out what's available and then
+ auto-configure itself to the *best* what's possible?
 
-  I am running qemu version 2.5.0
+And, my patch still prints the warning that that's an unsupported
+architecture, at the end of configure there is still the big warning
+about "*this architecture may go away*", and if someone complains about
+performance on such an architecture you can still happily invite him to
+write the TCG backend.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823169/+subscriptions
+Anyway, if you think Philippe's suggestion of "why not add a "hppa" case s=
+electing
+TCI in the switch?" is the better solution, then I'm happy to send such a =
+patch
+instead.
+
+Helge
