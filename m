@@ -3,57 +3,140 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD0DC282CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 21:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27879C282CE
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 22:36:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3427620663
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 21:52:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3427620663
+	by mail.kernel.org (Postfix) with ESMTPS id DFB07206BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 22:36:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB07206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47326 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47721 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCWlD-0005G0-C4
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 17:52:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33335)
+	id 1hCXRT-0002GE-0z
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 18:36:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hCWkQ-0004xK-UN
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:51:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hCXQO-0000zc-Lw
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hCWkO-0007Ta-9E
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:51:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38050)
+	(envelope-from <jsnow@redhat.com>) id 1hCXQN-00048q-NQ
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:35:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hCWfR-0007aM-Hu; Fri, 05 Apr 2019 17:46:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hCXQK-00040B-Fz; Fri, 05 Apr 2019 18:35:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D7F73084248;
-	Fri,  5 Apr 2019 19:16:39 +0000 (UTC)
-Received: from localhost (ovpn-204-52.brq.redhat.com [10.40.204.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A02D95D705;
-	Fri,  5 Apr 2019 19:16:38 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Fri,  5 Apr 2019 21:16:35 +0200
-Message-Id: <20190405191635.25740-1-mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id B1E033082B63;
+	Fri,  5 Apr 2019 22:34:58 +0000 (UTC)
+Received: from [10.18.17.206] (dhcp-17-206.bos.redhat.com [10.18.17.206])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CC64A60BFB;
+	Fri,  5 Apr 2019 22:34:56 +0000 (UTC)
+To: lichun <706701795@qq.com>, kwolf@redhat.com, mreitz@redhat.com,
+	qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <1554378405-11640-1-git-send-email-706701795@qq.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <f6d784b8-3702-e8bb-a79f-6887acbef354@redhat.com>
+Date: Fri, 5 Apr 2019 18:34:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1554378405-11640-1-git-send-email-706701795@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 05 Apr 2019 19:16:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.45]);
+	Fri, 05 Apr 2019 22:34:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] qemu-nbd: Look up flag names in array
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] Fixed dump_buffer function
+ parameter offset does not take effect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,145 +148,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190405191635.hNc1YkZo2KiP3hbrYz4VlCxV5gt40r_1JApuWpyDIa4@z>
+Message-ID: <20190405223456.CyFh4_opJZHAU6CmLSZubJfIVhPZaxAxNdl94EhdWAg@z>
 
-The existing code to convert flag bits into strings looks a bit strange
-now, and if we ever add more flags, it will look even stranger.  Prevent
-that from happening by making it look up the flag names in an array.
+Hi! Thank you for this patch.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-Looking at the diff stat I can't claim this patch really improves
-anything by much, but the current code just pains me so.
----
- include/block/nbd.h | 38 +++++++++++++++++++++++++------------
- qemu-nbd.c          | 46 +++++++++++++++++----------------------------
- 2 files changed, 43 insertions(+), 41 deletions(-)
+Some notes follow:
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 6d05983a55..bb9f5bc021 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -127,18 +127,32 @@ typedef struct NBDExtent {
-=20
- /* Transmission (export) flags: sent from server to client during handsh=
-ake,
-    but describe what will happen during transmission */
--#define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
--#define NBD_FLAG_READ_ONLY         (1 << 1) /* Device is read-only */
--#define NBD_FLAG_SEND_FLUSH        (1 << 2) /* Send FLUSH */
--#define NBD_FLAG_SEND_FUA          (1 << 3) /* Send FUA (Force Unit Acce=
-ss) */
--#define NBD_FLAG_ROTATIONAL        (1 << 4) /* Use elevator algorithm -
--                                               rotational media */
--#define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
--#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
--#define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragment)=
- */
--#define NBD_FLAG_CAN_MULTI_CONN    (1 << 8) /* Multi-client cache consis=
-tent */
--#define NBD_FLAG_SEND_RESIZE       (1 << 9) /* Send resize */
--#define NBD_FLAG_SEND_CACHE        (1 << 10) /* Send CACHE (prefetch) */
-+enum {
-+    NBD_FLAG_HAS_FLAGS_BIT          =3D  0, /* Flags are there */
-+    NBD_FLAG_READ_ONLY_BIT          =3D  1, /* Device is read-only */
-+    NBD_FLAG_SEND_FLUSH_BIT         =3D  2, /* Send FLUSH */
-+    NBD_FLAG_SEND_FUA_BIT           =3D  3, /* Send FUA (Force Unit Acce=
-ss) */
-+    NBD_FLAG_ROTATIONAL_BIT         =3D  4, /* Use elevator algorithm -
-+                                             rotational media */
-+    NBD_FLAG_SEND_TRIM_BIT          =3D  5, /* Send TRIM (discard) */
-+    NBD_FLAG_SEND_WRITE_ZEROES_BIT  =3D  6, /* Send WRITE_ZEROES */
-+    NBD_FLAG_SEND_DF_BIT            =3D  7, /* Send DF (Do not Fragment)=
- */
-+    NBD_FLAG_CAN_MULTI_CONN_BIT     =3D  8, /* Multi-client cache consis=
-tent */
-+    NBD_FLAG_SEND_RESIZE_BIT        =3D  9, /* Send resize */
-+    NBD_FLAG_SEND_CACHE_BIT         =3D 10, /* Send CACHE (prefetch) */
-+};
-+
-+#define NBD_FLAG_HAS_FLAGS         (1 << NBD_FLAG_HAS_FLAGS_BIT)
-+#define NBD_FLAG_READ_ONLY         (1 << NBD_FLAG_READ_ONLY_BIT)
-+#define NBD_FLAG_SEND_FLUSH        (1 << NBD_FLAG_SEND_FLUSH_BIT)
-+#define NBD_FLAG_SEND_FUA          (1 << NBD_FLAG_SEND_FUA_BIT)
-+#define NBD_FLAG_ROTATIONAL        (1 << NBD_FLAG_ROTATIONAL_BIT)
-+#define NBD_FLAG_SEND_TRIM         (1 << NBD_FLAG_SEND_TRIM_BIT)
-+#define NBD_FLAG_SEND_WRITE_ZEROES (1 << NBD_FLAG_SEND_WRITE_ZEROES_BIT)
-+#define NBD_FLAG_SEND_DF           (1 << NBD_FLAG_SEND_DF_BIT)
-+#define NBD_FLAG_CAN_MULTI_CONN    (1 << NBD_FLAG_CAN_MULTI_CONN_BIT)
-+#define NBD_FLAG_SEND_RESIZE       (1 << NBD_FLAG_SEND_RESIZE_BIT)
-+#define NBD_FLAG_SEND_CACHE        (1 << NBD_FLAG_SEND_CACHE_BIT)
-=20
- /* New-style handshake (global) flags, sent from server to client, and
-    control what will happen during handshake phase. */
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 941ba729c2..a9c85db58e 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -279,37 +279,25 @@ static int qemu_nbd_client_list(SocketAddress *sadd=
-r, QCryptoTLSCreds *tls,
-             printf("  description: %s\n", list[i].description);
-         }
-         if (list[i].flags & NBD_FLAG_HAS_FLAGS) {
-+            static const char *const flag_names[] =3D {
-+                [NBD_FLAG_READ_ONLY_BIT]            =3D "readonly",
-+                [NBD_FLAG_SEND_FLUSH_BIT]           =3D "flush",
-+                [NBD_FLAG_SEND_FUA_BIT]             =3D "fua",
-+                [NBD_FLAG_ROTATIONAL_BIT]           =3D "rotational",
-+                [NBD_FLAG_SEND_TRIM_BIT]            =3D "trim",
-+                [NBD_FLAG_SEND_WRITE_ZEROES_BIT]    =3D "zeroes",
-+                [NBD_FLAG_SEND_DF_BIT]              =3D "df",
-+                [NBD_FLAG_CAN_MULTI_CONN_BIT]       =3D "multi",
-+                [NBD_FLAG_SEND_RESIZE_BIT]          =3D "resize",
-+                [NBD_FLAG_SEND_CACHE_BIT]           =3D "cache",
-+            };
-+
-             printf("  size:  %" PRIu64 "\n", list[i].size);
-             printf("  flags: 0x%x (", list[i].flags);
--            if (list[i].flags & NBD_FLAG_READ_ONLY) {
--                printf(" readonly");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_FLUSH) {
--                printf(" flush");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_FUA) {
--                printf(" fua");
--            }
--            if (list[i].flags & NBD_FLAG_ROTATIONAL) {
--                printf(" rotational");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_TRIM) {
--                printf(" trim");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_WRITE_ZEROES) {
--                printf(" zeroes");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_DF) {
--                printf(" df");
--            }
--            if (list[i].flags & NBD_FLAG_CAN_MULTI_CONN) {
--                printf(" multi");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_RESIZE) {
--                printf(" resize");
--            }
--            if (list[i].flags & NBD_FLAG_SEND_CACHE) {
--                printf(" cache");
-+            for (size_t bit =3D 0; bit < ARRAY_SIZE(flag_names); bit++) =
-{
-+                if (flag_names[bit] && (list[i].flags & (1 << bit))) {
-+                    printf(" %s", flag_names[bit]);
-+                }
-             }
-             printf(" )\n");
-         }
---=20
-2.20.1
+On 4/4/19 7:46 AM, lichun wrote:
+> Signed-off-by: lichun <706701795@qq.com>
 
+You should write a commit message explaining the problem being fixed by
+this patch, even if it's very brief.
+
+In the future, try wording subject lines in terms of what the patch
+"does" instead of what it "did"; i.e.:
+
+"Fix dump_buffer function so that the offset parameter takes effect"
+is preferable to
+"Fixed dump_buffer function parameter offset does not take effect"
+
+> ---
+>  qemu-io-cmds.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index 09750a2..8d93dc6 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -357,7 +357,7 @@ static void dump_buffer(const void *buffer, int64_t offset, int64_t len)
+>      int j;
+>      const uint8_t *p;
+>  
+> -    for (i = 0, p = buffer; i < len; i += 16) {
+> +    for (i = 0, p = buffer + offset; i < len; i += 16) {
+>          const uint8_t *s = p;
+>  
+>          printf("%08" PRIx64 ":  ", offset + i);
+> 
+
+At a glance I am not sure that this patch is correct, it looks to me as
+if callers are expecting the entire buffer to be dumped and the offset
+is the offset of *this buffer* relative to some reference point (e.g.
+the disk being read from.)
+
+Can you point me to examples in which this is obviously wrong?
 
