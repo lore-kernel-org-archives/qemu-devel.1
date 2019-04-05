@@ -2,80 +2,111 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6D0C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 03:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0FBC4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:15:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FD05217D7
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 03:52:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sDLJtFmj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD05217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 099512175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:15:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099512175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35548 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35723 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCFtb-0006UE-EI
-	for qemu-devel@archiver.kernel.org; Thu, 04 Apr 2019 23:52:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60157)
+	id 1hCGGO-0002Ly-0f
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 00:15:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hCFsp-0006Dc-N8
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 23:51:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1hCGFR-0001xn-FH
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hCFso-0005G4-FT
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 23:51:15 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:33298)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hCFsn-0005E3-V3
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 23:51:14 -0400
-Received: by mail-ot1-x329.google.com with SMTP id j10so4441924otq.0
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 20:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=nN9/DL+QbGWqTYdzeLQqa/9gC8F19pFASh5zTbmnMNM=;
-	b=sDLJtFmjxryerNukEpLb6YMMs1/pKXU/y2baKcigvyuletvw75irJWxMIM2kF5IZho
-	ZBUcUnjcQML7Rl3nC3/X+n+NYfYEYqJNVh9FqYOtg5EJRCQmEvu8ftFnaIO2sBeuB1ug
-	R09VUGzK8V5vFutHlMYxHSgDxktYFzvM31LBz6Mjy5jKqeMWsYbA6W22LeoBfBC/VXNN
-	/7Fw+BDvyJEnB+OwaTt7Iz7aoBvgizYpZpXEOwvp8yt9pWCv2feZp/ZJ5lFUg6IiPXFW
-	FUI6q+DtGQ6dwrNH9maBA93Mb9oP+n+S7WU8i/EilQuYi4xrHPZPPGcrYsr392YsxIfu
-	AHlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=nN9/DL+QbGWqTYdzeLQqa/9gC8F19pFASh5zTbmnMNM=;
-	b=VoqqFUf3d/iZJCaWWP7C5QQv8Cqw2YRsuM74KpnWkMh193rPrSep/Ea+baQ1HL0yZh
-	T74xy2Ra+0MxO1o7Aswl9i7O3m0cFp0JNzAaYhZW2+mLUjKQzhUC3udG7nChYMsnm3wU
-	kCbHfsLhwRhs7vRyI81o92F+fJtz8v61QMGJi6GuiNP3oyArvLB1bt+whSVhZWhP0mb0
-	YGwTnzIUgvSaJp+8T1ucCDKUrI/sF6cJCPnVPcXSjzd9zYQkYKuhYZr22NsdJXbBXYuD
-	y/s07Zma4DKGyFauFoqs0qkOWGVMXw+l1mHSY2kAim0k/cpYVQnHI+PCcdqmb3Lz4bJ0
-	0d6Q==
-X-Gm-Message-State: APjAAAVDu3xQ8+C56gbNPCeEUol4ElGKb9GjU5NNyJRAcdqxpP1bhxFo
-	4ZpR+qQssCivdH0VoF2eCm1rc7dxBGiSHOR5TlWDyg==
-X-Google-Smtp-Source: APXvYqzScgHIz49bUOuXJyCAb5puXdccw4V1B3P5F3aK2RZqQLugCz4128WM4wdiTlDspWJ+KEG9VQDSmO9RYSsxcTw=
-X-Received: by 2002:a05:6830:1cb:: with SMTP id
-	r11mr2653433ota.302.1554436272879; 
-	Thu, 04 Apr 2019 20:51:12 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hCGFQ-00045b-Ig
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hCGFP-00040R-RH
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AF4D307D91E;
+	Fri,  5 Apr 2019 04:14:34 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B039E86811;
+	Fri,  5 Apr 2019 04:14:27 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190404221238.12468-1-philmd@redhat.com>
+	<20190404221238.12468-2-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <ef95f30c-38e0-d7bd-533f-d8b9831bc62a@redhat.com>
+Date: Fri, 5 Apr 2019 06:14:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190404170722.4492-1-anthony.perard@citrix.com>
-In-Reply-To: <20190404170722.4492-1-anthony.perard@citrix.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Apr 2019 10:51:01 +0700
-Message-ID:
- <CAFEAcA8RUYXrFM0vFBh+Om_60g3SW0RZDGC7UT6UQ26mk3uJjQ@mail.gmail.com>
-To: Anthony PERARD <anthony.perard@citrix.com>
+In-Reply-To: <20190404221238.12468-2-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::329
-Subject: Re: [Qemu-devel] [PULL 0/2] xen queue for 4.0-rc3
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 05 Apr 2019 04:14:34 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1 1/4] hw/isa/superio: Rename a
+ variable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,41 +118,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:X86" <xen-devel@lists.xenproject.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405035101.fd240VRQvmr2dB9agZB3IQqJkYIGuxUutOD1yxweIT4@z>
+Message-ID: <20190405041426.PPjwxonZjXwC9rDQD1ZddgHpXnNCgBRco3mX7-etxR8@z>
 
-On Fri, 5 Apr 2019 at 00:07, Anthony PERARD <anthony.perard@citrix.com> wrote:
->
-> The following changes since commit f4b37171378b0b1782570060c3411a504375d1bc:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190403' into staging (2019-04-03 13:13:30 +0100)
->
-> are available in the Git repository at:
->
->   https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190404
->
-> for you to fetch changes up to 2bcd05cf24a7de34e7e265247c010977e43f40bc:
->
->   xen-block: scale sector based quantities correctly (2019-04-04 18:00:07 +0100)
->
-> ----------------------------------------------------------------
-> Xen queue
->
-> xen-block fixes
->
-> ----------------------------------------------------------------
-> Paul Durrant (2):
->       xen-block: only advertize discard to the frontend when it is enabled...
->       xen-block: scale sector based quantities correctly
->
-Applied, thanks.
+On 05/04/2019 00.12, Philippe Mathieu-Daud=C3=A9 wrote:
+> This patch is purely cosmetic. No functional change.
+> This will ease the next patch where we re-indent an if() statement.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/isa/isa-superio.c | 69 ++++++++++++++++++++++----------------------
+>  1 file changed, 34 insertions(+), 35 deletions(-)
+>=20
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index d54463bf035..c6845eaf578 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -22,8 +22,8 @@
+> =20
+>  static void isa_superio_realize(DeviceState *dev, Error **errp)
+>  {
+> -    ISASuperIODevice *sio =3D ISA_SUPERIO(dev);
+> -    ISASuperIOClass *k =3D ISA_SUPERIO_GET_CLASS(sio);
+> +    ISASuperIODevice *s =3D ISA_SUPERIO(dev);
+> +    ISASuperIOClass *k =3D ISA_SUPERIO_GET_CLASS(s);
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Sorry, but I have to say that I normally really don't like single-letter
+variable names. They are much harder to search for, and way less
+self-describing.
 
--- PMM
+If you get problems with the line length in a later patch, what about
+refactoring the related code into a separate function? So that you'd
+only have something like this in the realize function:
+
+    for (i =3D 0, j =3D 0; i < bus_count; i++, j +=3D MAX_IDE_DEVS) {
+        if (!k->ide.is_enabled || k->ide.is_enabled(s, j)) {
+            isa_superio_init_ide(...);
+        }
+    }
+
+ Thomas
 
