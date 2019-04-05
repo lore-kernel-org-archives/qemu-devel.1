@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57352)
+Received: from eggs.gnu.org ([209.51.188.92]:57354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCNDI-0002Nn-Ts
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCNDI-0002No-Tz
 	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCND9-0007NR-7l
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCND8-0007Mk-Uj
 	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:45 -0400
-Received: from mail-eopbgr30112.outbound.protection.outlook.com
-	([40.107.3.112]:21758
+Received: from mail-eopbgr30136.outbound.protection.outlook.com
+	([40.107.3.136]:43778
 	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hCND7-0007DT-CR
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:43 -0400
+	id 1hCND3-0006rC-8T
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:39 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 5 Apr 2019 11:40:37 +0000
-Message-ID: <4b9f5045-d4b2-fa10-ab8a-39eaf6ed220c@virtuozzo.com>
+Date: Fri, 5 Apr 2019 11:40:29 +0000
+Message-ID: <084a53dc-642c-0219-3cc5-3cbe783db37b@virtuozzo.com>
 References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
 	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
 	<7abd40bc-963b-cf61-14e8-4c4187813c5c@virtuozzo.com>
@@ -23,10 +23,10 @@ References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
 In-Reply-To: <53b5c677-870e-56a0-402d-7fdc985ec3f5@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <97722ABF858899449DECB7D033A664A2@eurprd08.prod.outlook.com>
+Content-ID: <AB8DCA3B755443499A337B08DC87BF56@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PING] [PATCH 0/3] migration: add sztd compression
+Subject: [Qemu-devel] [PINGl] [PATCH 0/3] migration: add sztd compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
