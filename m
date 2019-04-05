@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56680)
+Received: from eggs.gnu.org ([209.51.188.92]:57352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCNCq-00013v-3c
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:25 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCNDI-0002Nn-Ts
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCMxw-0007Va-J3
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:25:01 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCMxv-0007R3-JG
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:25:00 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w1so7561522wrp.2
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 04:24:58 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190405123928.70da87e2.olaf@aepfle.de>
-	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
-	<20190405125918.462c6ae4.olaf@aepfle.de>
-	<7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
-Message-ID: <aba99e13-f034-3946-3da2-9cecd615cde6@redhat.com>
-Date: Fri, 5 Apr 2019 13:24:55 +0200
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hCND9-0007NR-7l
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:45 -0400
+Received: from mail-eopbgr30112.outbound.protection.outlook.com
+	([40.107.3.112]:21758
+	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1hCND7-0007DT-CR
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:40:43 -0400
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 5 Apr 2019 11:40:37 +0000
+Message-ID: <4b9f5045-d4b2-fa10-ab8a-39eaf6ed220c@virtuozzo.com>
+References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
+	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
+	<7abd40bc-963b-cf61-14e8-4c4187813c5c@virtuozzo.com>
+	<5c342066-30b6-e492-e23a-cb5accbfb11a@virtuozzo.com>
+	<53b5c677-870e-56a0-402d-7fdc985ec3f5@virtuozzo.com>
+In-Reply-To: <53b5c677-870e-56a0-402d-7fdc985ec3f5@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <97722ABF858899449DECB7D033A664A2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="P9cFa7yM8YcSGvDtuigNJwgnqsmyIDVNo"
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+Subject: [Qemu-devel] [PING] [PATCH 0/3] migration: add sztd compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P9cFa7yM8YcSGvDtuigNJwgnqsmyIDVNo
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <aba99e13-f034-3946-3da2-9cecd615cde6@redhat.com>
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
-References: <20190405123928.70da87e2.olaf@aepfle.de>
- <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
- <20190405125918.462c6ae4.olaf@aepfle.de>
- <7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
-In-Reply-To: <7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/5/19 1:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/5/19 12:59 PM, Olaf Hering wrote:
->> Am Fri, 5 Apr 2019 12:49:15 +0200
->> schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
->>
->>> The EDK2 submodule was added for UEFI testing, you don't need to comp=
-ile
->>> it to build/use QEMU.
->>>
->>> How did you end up compiling it?
->>
->> The qemu.spec file has this since a very long time:
->> make -C roms efirom ${unrelated_settings}
->=20
-> I don't have any qemu.spec, is it a SUSE file?
-
-I checked and apparently.
-
->>
->> This used to work still in January with c9d18c1c150c84e7a976df989ad04d=
-df01083f46.
->=20
-> Before f590a812c210 the EfiRom tool was not available, now we compile i=
-t
-> inconditionally.
->=20
-> So I assume your distribution already provides the EfiRom tool. Can you=
-
-> point me at the package which provides it? I wonder if your distributio=
-n
-> use a non-upstreamed patch that change the EDK2 BaseTools PIE/PIC flags=
-=2E
-
-I see EfiRom was previously provided by ovmf-tools-2017.src.rpm, and the
-latest ovmf-2019.src.rpm has this file:
-
-$ cat ovmf-pie.patch
-Index:
-ovmf-2018+git1534736099.43fe4c405292/BaseTools/Source/C/Makefiles/header.=
-makefile
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
----
-ovmf-2018+git1534736099.43fe4c405292.orig/BaseTools/Source/C/Makefiles/he=
-ader.makefile
-+++
-ovmf-2018+git1534736099.43fe4c405292/BaseTools/Source/C/Makefiles/header.=
-makefile
-@@ -77,7 +77,7 @@ ifeq ($(DARWIN),Darwin)
- # assume clang or clang compatible flags on OS X
- BUILD_CFLAGS =3D -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror
--Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result
--nostdlib -g
- else
--BUILD_CFLAGS =3D -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror
--Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict
--Wno-unused-result -nostdlib -g
-+BUILD_CFLAGS =3D -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror
--Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict
--Wno-unused-result -nostdlib -g -fPIE
- endif
- BUILD_LFLAGS =3D
- BUILD_CXXFLAGS =3D -Wno-unused-result
-
-
-
-
---P9cFa7yM8YcSGvDtuigNJwgnqsmyIDVNo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlynOwcACgkQoqP9bt6t
-wN4kSQ/9EhLOD/85yxc8bLIoxsKOb1uNa3J9tyiM02WiesVt8u4H13MkVNH5bw5c
-LqAab0+kFifkWqYqhgsVPfwB1yxPPCZu1KaUdMEwwu+GECaTOPjDcfkzVtgIrxSr
-zL/AXwMyWA0SNaVhqzEQtECZ+/hNjwZvCIcWeAq2MykFiEWqhgd8UqBtRnyRAMUj
-lMgtNYP4A6loxlE6zyVW+AuQySiCij8U98DXOQhZrLwQadj2SvGsDEyVxm1SiIvN
-cg3u6qcIRDvteSMRPpzjPOnzZRIMe++tv3FwJZpFp0cUojt0MrBmrRKZDBt4gYxP
-wdsVNrOZsIrpaxMS0cqyefaIT/p7xTI1PqHF2Gm2c4/PQdy/rgQ6Zpo2nbrTUPbi
-7p8lNBgoF31u4wNp8hn/sBvb+z5TljTY6OBjRjLl5LaXV2wLHwh/8UCD+yL6sC6Y
-/veYqZg2Mymv7w6G0ZX/q7PwlVx+E5cYdW91BHeWFYMy5q98rnByZw/SVCNxi2cp
-30lpAbiZWcmvsHuNFSXaozveHiDDMP2SdLJQ9tBrWlrB6WfOXZQQId+CaN+DWGM4
-8gM95PFaDXUwhWDKviNNF+tbZEcG3fi2Eo+/B3EXzdkRONNGYbNbEVIAHHk2SsFr
-H/QCOJWDPa8K6syf6sMrBohG86an8QWFv4OhqdPS5/ll8oG617Q=
-=OrYD
------END PGP SIGNATURE-----
-
---P9cFa7yM8YcSGvDtuigNJwgnqsmyIDVNo--
+cGluZyENCg0KT24gMjYuMDMuMjAxOSAxODo1MSwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPiBw
+aW5nIHBpbmcgcGluZyBwaW5nIHBpbmchDQo+IA0KPiBPbiAxOC4wMy4yMDE5IDEwOjUzLCBEZW5p
+cyBQbG90bmlrb3Ygd3JvdGU6DQo+PiBwaW5nIHBpbmcgcGluZyBwaW5nIQ0KPj4NCj4+IE9uIDEx
+LjAzLjIwMTkgMTE6MjAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+PiBwaW5nIHBpbmcgcGlu
+ZyENCj4+Pg0KPj4+IE9uIDA0LjAzLjIwMTkgMTg6MTAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToN
+Cj4+Pj4gcGluZyENCj4+Pj4NCj4+Pj4gT24gMjYuMDIuMjAxOSAxNjoxNSwgRGVuaXMgUGxvdG5p
+a292IHdyb3RlOg0KPj4+Pj4genN0ZCBkYXRlIGNvbXByZXNzaW9uIGFsZ29yaXRobSBzaG93cyBi
+ZXR0ZXIgcGVyZm9ybWFuY2Ugb24gZGF0YSBjb21wcmVzc2lvbi4NCj4+Pj4+IEl0IG1pZ2h0IGJl
+IHVzZWZ1bCB0byBlbXBsb3kgdGhlIGFsZ29yaXRobSBpbiBWTSBtaWdyYXRpb24gdG8gcmVkdWNl
+IENQVSB1c2FnZS4NCj4+Pj4+IEEgdXNlciB3aWxsIGJlIGFibGUgdG8gY2hvb3NlIGJldHdlZW4g
+dGhvc2UgYWxnb3JpdGhtcywgdGhlcmVmb3IgY29tcHJlc3MtdHlwZQ0KPj4+Pj4gbWlncmF0aW9u
+IHBhcmFtZXRlciBpcyBhZGRlZC4NCj4+Pj4+DQo+Pj4+PiBIZXJlIGFyZSBzb21lIHJlc3VsdHMg
+b2YgcGVyZm9ybWFuY2UgY29tcGFyaXNvbiB6c3RkIHZzIGd6aXA6DQo+Pj4+Pg0KPj4+Pj4gaG9z
+dDogaTctNDc5MCA4eENQVSBAIDMuNjBHSHosIDE2RyBSQU0NCj4+Pj4+IG1pZ3JhdGlvbiB0byB0
+aGUgc2FtZSBob3N0DQo+Pj4+PiBWTTogMnhWQ1BVLCA4RyBSQU0gdG90YWwNCj4+Pj4+IDVHIFJB
+TSB1c2VkLCBtZW1vcnkgcG9wdWxhdGVkIHdpdGggcG9zdGdyZXFzbCBkYXRhDQo+Pj4+PiBwcm9k
+dWNlZCBieSBwZ2JlbmNoIHBlcmZvcm1hbmNlIGJlbmNobWFyaw0KPj4+Pj4NCj4+Pj4+DQo+Pj4+
+PiBUaHJlYWRzOiAxIGNvbXByZXNzIOKAkyAxIGRlY29tcHJlc3MNCj4+Pj4+DQo+Pj4+PiB6c3Rk
+IHByb3ZpZGVzIHNsaWdodGx5IGxlc3MgY29tcHJlc3Npb24gcmF0aW8gd2l0aCBhbG1vc3QgdGhl
+IHNhbWUNCj4+Pj4+IENQVSB1c2FnZSBidXQgY29wZXMgd2l0aCBSQU0gIGNvbXByZXNzaW9uIHJv
+Z2hseSAyIHRpbWVzIGZhc3Rlcg0KPj4+Pj4NCj4+Pj4+IGNvbXByZXNzaW9uIHR5cGUgICAgICAg
+ICAgICAgIHpsaWIgICAgICAgfCAgICAgIHpzdGQNCj4+Pj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4+Pj4gY29tcHJlc3Npb24g
+bGV2ZWwgICAgICAgICAgMSAgICAgICA1ICAgICB8ICAgMSAgICAgICA1DQo+Pj4+PiBjb21wcmVz
+c2lvbiByYXRpbyAgICAgICAgICA2LjkyICAgIDcuMDUgIHwgICA2LjY5ICAgIDYuODkNCj4+Pj4+
+IGNwdSBpZGxlLCAlICAgICAgICAgICAgICAgIDgyICAgICAgODMgICAgfCAgIDg2ICAgICAgODAN
+Cj4+Pj4+IHRpbWUsIHNlYyAgICAgICAgICAgICAgICAgIDQ5ICAgICAgNzEgICAgfCAgIDI2ICAg
+ICAgMzENCj4+Pj4+IHRpbWUgZGlmZiB0byB6bGliLCBzZWMgICAgICAgICAgICAgICAgICAgICAg
+LTI1ICAgICAtNDENCj4+Pj4+DQo+Pj4+Pg0KPj4+Pj4gVGhyZWFkczogOCBjb21wcmVzcyDigJMg
+MiBkZWNvbXByZXNzDQo+Pj4+Pg0KPj4+Pj4genN0ZCBwcm92aWRlcyB0aGUgc2FtZSBtaWdyYXRp
+b24gdGltZSB3aXRoIGxlc3MgY3B1IGNvbnN1bXB0aW9uDQo+Pj4+Pg0KPj4+Pj4gY29tcHJlc3Np
+b24gdHlwZSAgICAgICAgIG5vbmUgIHwgICAgICAgIGd6aXAoemxpYikgICAgfCAgICAgICAgICB6
+c3RkDQo+Pj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+Pj4+IGNvbXByZXNzaW9uIGxldmVs
+ICAgICAgICAtICAgICB8ICAxICAgICAgNSAgICAgICA5ICAgIHwgICAxICAgICAgIDUgICAgICAg
+MTUNCj4+Pj4+IGNvbXByZXNzaW9uIHJhdGlvICAgICAgICAtICAgICB8ICA2Ljk0ICAgNi45OSAg
+ICA3LjE0IHwgICA2LjY0ICAgIDYuODkgICAgNi45Mw0KPj4+Pj4gdGltZSwgc2VjICAgICAgICAg
+ICAgICAgIDE1NCAgIHwgIDIyICAgICAyMyAgICAgIDI3ICAgfCAgIDIzICAgICAgMjMgICAgICAy
+NQ0KPj4+Pj4gY3B1IGlkbGUsICUgICAgICAgICAgICAgIDk5ICAgIHwgIDQ1ICAgICAzMCAgICAg
+IDEyICAgfCAgIDcwICAgICAgNTIgICAgICAyMw0KPj4+Pj4gY3B1IGlkbGUgZGlmZiB0byB6bGli
+ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgfCAgLTI1JSAgICAtMjIlICAgIC0xMSUN
+Cj4+Pj4+DQo+Pj4+Pg0KPj4+Pj4gRGVuaXMgUGxvdG5pa292ICgzKToNCj4+Pj4+ICAgICAgICBt
+aWdyYXRpb246IHJld29yayBjb21wcmVzc2lvbiBjb2RlIGZvciBhZGRpbmcgbW9yZSBkYXRhIGNv
+bXByZXNzb3JzDQo+Pj4+PiAgICAgICAgaG1wOiBhZGQgY29tcHJlc3MtdHlwZSBwYXJhbWV0ZXIg
+dG8gbWlncmF0aW9uIHBhcmFtZXRlcnMNCj4+Pj4+ICAgICAgICBtaWdyYXRpb246IGFkZCB6c3Rk
+IGNvbXByZXNzaW9uDQo+Pj4+Pg0KPj4+Pj4gICAgICAgY29uZmlndXJlICAgICAgICAgICAgIHwg
+IDI2ICsrKysNCj4+Pj4+ICAgICAgIGhtcC5jICAgICAgICAgICAgICAgICB8ICAgOCArKw0KPj4+
+Pj4gICAgICAgbWlncmF0aW9uL21pZ3JhdGlvbi5jIHwgIDQ1ICsrKysrKy0NCj4+Pj4+ICAgICAg
+IG1pZ3JhdGlvbi9taWdyYXRpb24uaCB8ICAgMSArDQo+Pj4+PiAgICAgICBtaWdyYXRpb24vcWVt
+dS1maWxlLmMgfCAgMzkgKystLS0tDQo+Pj4+PiAgICAgICBtaWdyYXRpb24vcWVtdS1maWxlLmgg
+fCAgMTggKystDQo+Pj4+PiAgICAgICBtaWdyYXRpb24vcmFtLmMgICAgICAgfCAyOTEgKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tDQo+Pj4+PiAgICAgICBxYXBpL21p
+Z3JhdGlvbi5qc29uICAgfCAgMjYgKysrLQ0KPj4+Pj4gICAgICAgOCBmaWxlcyBjaGFuZ2VkLCAz
+NjkgaW5zZXJ0aW9ucygrKSwgODUgZGVsZXRpb25zKC0pDQo+Pj4+Pg0KPj4+Pg0KPj4+DQo+Pg0K
+PiANCg0KLS0gDQpCZXN0LA0KRGVuaXMNCg==
