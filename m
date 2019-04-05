@@ -2,69 +2,78 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD7CC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC870C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A799421738
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:40:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="O1gUqubW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A799421738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	by mail.kernel.org (Postfix) with ESMTPS id A7DE42171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:50:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7DE42171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39712 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39802 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCMGx-0000W3-RB
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 06:40:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44667)
+	id 1hCMQI-0003HU-Mp
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 06:50:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMGB-0000Eb-Gj
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:39:48 -0400
+	(envelope-from <philmd@redhat.com>) id 1hCMPR-0002wa-FX
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMG9-0005xL-Ij
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:39:47 -0400
-Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::2]:35365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCMG5-0005rT-KI
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:39:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1554460775;
-	s=strato-dkim-0002; d=aepfle.de;
-	h=Message-ID:Subject:To:From:Date:X-RZG-CLASS-ID:X-RZG-AUTH:From:
-	Subject:Sender;
-	bh=uz1saOV920f9bn5MWqeEVmDQLo9MvJ9HXz9ZUME9tPE=;
-	b=O1gUqubWK3MClVREi9b18GATOW7ohoxgGLd8jNMElrwnNrhAGwTGw8srtY5FUqAh33
-	YKzEyZ5RHIKEzN2nGAPKy3aqd+BkxKUNqMsWxMwihoMPrsjvQQ4qdCLYinMXijALmufY
-	0Hwpr30vUaDZ6mdLXYKF/HhMVrGj80pL6QdJSueSBmBIFKeY7HPRF4Pcsd0i0Xun49fz
-	00VNnDjjLpeItfHkDqZJW2isjVuE8yTY3prl8uPxn+cvydCc5hQSIZHvY9clYN5Iokpm
-	TNqTsD24/S75SJLmssTLv8WBVHgoJNyH8XkeNdMD88IPMlxXEY9bQIOM7EP04zG1gZZv
-	lhNg==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4oc0Nr2ihluivsAEtyZCGP8Vn3U6NBQHRrVwM9zJHX/gJPE7W8Q"
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 44.18 AUTH)
-	with ESMTPSA id 3086c5v35AdZpHN
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1
-	with 521 ECDH bits, eq. 15360 bits RSA))
-	(Client did not present a certificate) for <qemu-devel@nongnu.org>;
-	Fri, 5 Apr 2019 12:39:35 +0200 (CEST)
-Date: Fri, 5 Apr 2019 12:39:28 +0200
-From: Olaf Hering <olaf@aepfle.de>
-To: <qemu-devel@nongnu.org>
-Message-ID: <20190405123928.70da87e2.olaf@aepfle.de>
-X-Mailer: Claws Mail 2019.03.13 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+	(envelope-from <philmd@redhat.com>) id 1hCMPQ-0006mh-7b
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:21 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCMPP-0006iX-6c
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:20 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p10so7446327wrq.1
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 03:49:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:cc:message-id
+	:date:user-agent:mime-version:in-reply-to;
+	bh=hjmSgqvTbccAElTNi1wSrEbUU7hIkG9dVzNVcvJ7Am0=;
+	b=Aa3fzsCLgXPwzXVAq0pgaBpT5bya/exyevSbdul9z4B607QOsG/Pl7xv20RZrA4iCz
+	45iGl7KcLWiUOpIR9VOR+qNb85MmLOukICwAGQLadSZgKXYMx6Cx+wcZNJwgTy2EQxuE
+	5u4Wh/mhXQB1tKBpJX5UeeS1+dMDUjCllY8/IHLIDymx96J7iqm5pVSLqiKKbnhBUb31
+	6ygijPT7ndooIH55CVWr0x9mQ2rZYpubEKF7A9oA115o5W6i6LG3Dvp8eLYWed//Y75H
+	A5IQVARCjpfjvDwZwjTcy9OXIwXq0QDbMepm/zbsH2aqiSdsbGrOQ5HJx7vxLBKjPZ9N
+	hVwQ==
+X-Gm-Message-State: APjAAAXzx8FNfoFh6ix5aW4VuC6Kl0LpopcGT0IDmemcs3zi+hM+oogX
+	61jYt4GlPG51aVrV69RqKj1q1A==
+X-Google-Smtp-Source: APXvYqx8Z0WSGezdvDl6pdmWK0eEjF0biAMwL1qIsd79+XixI95S5sOqNToe9LS1akyBQf0/CrEFng==
+X-Received: by 2002:a5d:6101:: with SMTP id v1mr7992339wrt.222.1554461357774; 
+	Fri, 05 Apr 2019 03:49:17 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	y125sm3818673wmc.39.2019.04.05.03.49.16
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 05 Apr 2019 03:49:16 -0700 (PDT)
+To: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org
+References: <20190405123928.70da87e2.olaf@aepfle.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+Date: Fri, 5 Apr 2019 12:49:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/AYpR9aZwhs_17BsV=fNIudv";
-	protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 2a01:238:20a:202:5300::2
-Subject: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+In-Reply-To: <20190405123928.70da87e2.olaf@aepfle.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.66
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,57 +85,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405103928.0vr_fq0Ae8Is5o4UEGL8WzyJP_8ekdWjFaDpIiOrWjw@z>
+Message-ID: <20190405104915.Jks6a-U-o2fD22RNT0hw_CW1CJE3o4QvkpO9oMJh0Ds@z>
 
---Sig_/AYpR9aZwhs_17BsV=fNIudv
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+References: <20190405123928.70da87e2.olaf@aepfle.de>
+In-Reply-To: <20190405123928.70da87e2.olaf@aepfle.de>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-It seems in qemu.git#master the edk2.git submodule is now mandatory.
-For me it fails to compile. This is not a new error. It needs to be compile=
-d with -fPIC since essentially forever.
+Hi Olaf,
 
-But I wonder, why does it fail to compile only for me?!
-Example of failure:
+On 4/5/19 12:39 PM, Olaf Hering wrote:
+> It seems in qemu.git#master the edk2.git submodule is now mandatory.
 
- $ grep -h CommonLib.o /dev/shm/*/.build.log=20
-[   85s] gcc  -c  -I .. -I ../Include/Common -I ../Include/ -I ../Include/I=
-ndustryStandard -I ../Common/ -I .. -I . -I ../Include/X64/  -MD -fshort-wc=
-har -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-st=
-ringop-truncation -Wno-restrict -Wno-unused-result -nostdlib -g -O2  Common=
-Lib.c -o CommonLib.o
-[   89s] ar crs ../libs/libCommon.a BasePeCoff.o BinderFuncs.o CommonLib.o =
-Crc32.o Decompress.o EfiCompress.o EfiUtilityMsgs.o FirmwareVolumeBuffer.o =
-FvLib.o MemoryFile.o MyAlloc.o OsPath.o ParseGuidedSectionTools.o ParseInf.=
-o PeCoffLoaderEx.o SimpleFileParsing.o StringFuncs.o TianoCompress.o PcdVal=
-ueCommon.o
-[  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-linux/b=
-in/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 against `.r=
-odata.str1.1' can not be used when making a PIE object; recompile with -fPIC
-[  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-linux/b=
-in/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 against `.r=
-odata.str1.1' can not be used when making a PIE object; recompile with -fPIC
-[  120s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-linux/b=
-in/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 against `.r=
-odata.str1.1' can not be used when making a PIE object; recompile with -fPIC
+The EDK2 submodule was added for UEFI testing, you don't need to compile
+it to build/use QEMU.
 
-What do I need to change in my setup so that -fPIC is not required?
+How did you end up compiling it?
 
-Olaf
+> For me it fails to compile. This is not a new error. It needs to be com=
+piled with -fPIC since essentially forever.
+>=20
+> But I wonder, why does it fail to compile only for me?!
+> Example of failure:
+>=20
+>  $ grep -h CommonLib.o /dev/shm/*/.build.log=20
+> [   85s] gcc  -c  -I .. -I ../Include/Common -I ../Include/ -I ../Inclu=
+de/IndustryStandard -I ../Common/ -I .. -I . -I ../Include/X64/  -MD -fsh=
+ort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations=
+ -Wno-stringop-truncation -Wno-restrict -Wno-unused-result -nostdlib -g -=
+O2  CommonLib.c -o CommonLib.o
+> [   89s] ar crs ../libs/libCommon.a BasePeCoff.o BinderFuncs.o CommonLi=
+b.o Crc32.o Decompress.o EfiCompress.o EfiUtilityMsgs.o FirmwareVolumeBuf=
+fer.o FvLib.o MemoryFile.o MyAlloc.o OsPath.o ParseGuidedSectionTools.o P=
+arseInf.o PeCoffLoaderEx.o SimpleFileParsing.o StringFuncs.o TianoCompres=
+s.o PcdValueCommon.o
+> [  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
+ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
+st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
+ith -fPIC
+> [  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
+ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
+st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
+ith -fPIC
+> [  120s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
+ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
+st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
+ith -fPIC
+>=20
+> What do I need to change in my setup so that -fPIC is not required?
 
---Sig_/AYpR9aZwhs_17BsV=fNIudv
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+Apparently your Linux distribution has transitioned to enabling PIE by
+default in GCC 7, see:
+https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+
+"This is achieved by a gcc defaults override in the "gcc-PIE" package."
+
+Regards,
+
+Phil.
+
+
+--1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKcwYAAKCRBdQqD6ppg2
-fur5AJ9MGZtoafXZUTXbNLVTny3ukV+yJgCglJTI8TeRtBuWk5Cv59y64iXjZpY=
-=++Fo
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlynMqsACgkQoqP9bt6t
+wN6rPBAAm4MM5iUy8Koceu92ju9lKju1alwJvGelswGjpYJmVofGROSSvqCCVn8L
+JNSjM7JfWpfroJ2jL+RZutkbL10mBTOhh3nUU3WaSZJGsBOHyPneygrtIoTWI4nE
+uEtUEKngmxPS78luW2XZfcKTVqccSrs05LehYg2b7o3eOVjcYHviz6bNSgnr4lcH
+kvsFCj/YKP9Uqmo8o4yS10vcWkL4QYrjNqnQS+FbMf9QNhdKc72mg/i2BVpeGggi
+VoZv5LWBd4Sic7Ga0icHSlIC9btyXofoDfp5li/sFSDiwAfrax78+E5fN/mN7yJi
+qyoHFGgOsdM3vCIZL2xC9S1ZejV7BTxz0aEkOoejLYZlKAWmPm/iCNhSwoJLouSG
+NNBEJ6TGaX1jn19iHhPetdw5S2hZ2nrtrbUd4yXbuPJBhhHH0pqWD5PG3A69TQE8
+CpICc9+EKO2MY9JpQhWLT98ixbrtXQbKlS6jB2ckpTLTAOIgrgZ3dWJqZ73buyI+
+GfhvRbLxd/JPWRFfsuk8io8wZQuPX8bdsQMH93j6M5oeoCLQV9qlAVZeYoMFV3no
+XbRHXDxn1+hjVjUWGYuaqxsGg4qj+g6qjEdxounDg4w48XAfjvsqNn8hKxJ0A6C8
+TTXb688+DQqGATMVCXbx8qSCyiCo80dzFrXAc4zdr55xxtIM/XQ=
+=qgic
 -----END PGP SIGNATURE-----
 
---Sig_/AYpR9aZwhs_17BsV=fNIudv--
+--1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq--
 
