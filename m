@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53594)
+Received: from eggs.gnu.org ([209.51.188.92]:53657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCKln-0008LQ-9z
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:04:20 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCKlp-0008QJ-31
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCKeU-00037c-VV
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:56:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41535)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCKeU-00036E-8f
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:56:46 -0400
-Date: Fri, 5 Apr 2019 09:56:29 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190405085628.GA2819@work-vm>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCKdg-0001lw-Rn
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:55:58 -0400
+Date: Fri, 5 Apr 2019 16:55:30 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190405085529.GA24071@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190313044253.31988-1-richardw.yang@linux.intel.com>
+	<20190313044253.31988-4-richardw.yang@linux.intel.com>
+	<20190313132300.3f56a5ca@redhat.com>
+	<20190313133359.h2njohyijgvkcbtv@master>
+	<20190313170943.5384f5cf@redhat.com>
+	<20190402035343.GA6527@richard>
+	<20190402081512.6194a58f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+In-Reply-To: <20190402081512.6194a58f@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] hw/acpi: Extract build_mcfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,149 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>, armbru@redhat.com
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, mst@redhat.com, mdroth@linux.vnet.ibm.com, liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com, ailan@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, Wei Yang <richard.weiyang@gmail.com>, peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, wei.w.wang@intel.com, yang.zhong@intel.com
 
-* Jens Freimann (jfreimann@redhat.com) wrote:
-> ping
+On Tue, Apr 02, 2019 at 08:15:12AM +0200, Igor Mammedov wrote:
+>On Tue, 2 Apr 2019 11:53:43 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
 > 
-> FYI: I'm also working on a few related tools to detect driver behaviour when
-> assigning a MAC to the vf device. Code is at https://github.com/jensfr/netfailover_driver_detect
+>> The migration infrastructure has several SaveStateEntry to help migrate
+>> different elements. The one with name "ram" take charge of RAMBlock. So this
+>> SaveStateEntry and its ops is the next step for me to investigate. And from
+>> this to see the effect of different size MemoryRegion during migration.
+>I don't think that you need to dig in migration mechanics so deep.
+>For our purpose of finding QEMU&machine version where migration between
+>size mismatched MemoryRegions (or RAMBlocks) is fixed is sufficient.
+>
 
-Hi Jens,
-  I've not been following this too uch, but:
+ok.
 
-> regards,
-> Jens
-> 
-> On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
-> > This is another attempt at implementing the host side of the
-> > net_failover concept
-> > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> > 
-> > The general idea is that we have a pair of devices, a vfio-pci and a
-> > emulated device. Before migration the vfio device is unplugged and data
-> > flows to the emulated device, on the target side another vfio-pci device
-> > is plugged in to take over the data-path. In the guest the net_failover
-> > module will pair net devices with the same MAC address.
-> > 
-> > * In the first patch the infrastructure for hiding the device is added
-> >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
-> >  state and it is set based on a callback to the standby device which
-> >  registers itself for handling the assessment: "should the primary device
-> >  be hidden?" by cross validating the ids of the devices.
-> > 
-> > * In the second patch the virtio-net uses the API to hide the vfio
-> >  device and unhides it when the feature is acked.
-> > 
-> > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
-> > 
-> > To summarize concerns/feedback from previous discussion:
-> > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
-> >  Migration might get stuck for unpredictable time with unclear reason.
-> >  This approach combines two tricky things, hot/unplug and migration.
-> >  -> We can surprise-remove the PCI device and in QEMU we can do all
-> >     necessary rollbacks transparent to management software. Will it be
-> >     easy, probably not.
+>Aside from trying to grasp how migration works internally, you can try
+>to simulate[1] problem and bisect it to a commit that fixed it.
+>It still not easy due to amount of combinations you'd need to try,
+>but it's probably much easier than trying to figure out issue just
+>by reading code.
+>
+>1) to stimulate you need to recreate conditions for table_mr jumping
+>from initial padded size to the next padded size after adding bridge
+>so you'd have reproducer which makes table_mr differ in size.
+>
+>If I recall correctly in that time conditions were created by large
+>amount hotpluggble CPUs (maxcpus - CLI option) and then addidng
+>PCI bridges.
+>I'd just hack QEMU to print table_mr size in acpi_build_update()
+>to find coldplug CLI where we jump to the next padded size and then
+>use it for bisection with bridge[s] hotplug on source and migrating that
+>without reboot to target where hotplugged bridges are on CLI (one has to
+>configure target so it would have all devices that source has including
+>hotplugged ones)
+>
 
-This sounds 'fun' - bonus cases are things like what happens if the
-guest gets rebooted somewhere during the process or if it's currently
-sitting in the bios/grub/etc
+Igor,
 
-> > 2. PCI devices are a precious ressource. The primary device should never
-> >  be added to QEMU if it won't be used by guest instead of hiding it in
-> >  QEMU.
-> >  -> We only hotplug the device when the standby feature bit was
-> >     negotiated. We save the device cmdline options until we need it for
-> >     qdev_device_add()
-> >     Hiding a device can be a useful concept to model. For example a
-> >     pci device in a powered-off slot could be marked as hidden until the slot is
-> >     powered on (mst).
+I got some confusion on how to re-produce this case. To be specific, how to 
+expand table_mr from initial padded size to next padded size.
 
-Are they really that precious? Personally it's not something I'd worry
-about.
+Let's see a normal hotplug case first. 
 
-> > 3. Management layer software should handle this. Open Stack already has
-> >  components/code to handle unplug/replug VFIO devices and metadata to
-> >  provide to the guest for detecting which devices should be paired.
-> >  -> An approach that includes all software from firmware to
-> >     higher-level management software wasn't tried in the last years. This is
-> >     an attempt to keep it simple and contained in QEMU as much as possible.
-> > 4. Hotplugging a device and then making it part of a failover setup is
-> >   not possible
-> >  -> addressed by extending qdev hotplug functions to check for hidden
-> >     attribute, so e.g. device_add can be used to plug a device.
-> > 
-> > There are still some open issues:
-> > 
-> > Migration: I'm looking for something like a pre-migration hook that I
-> > could use to unplug the vfio-pci device. I tried with a migration
-> > notifier but it is called to late, i.e. after migration is aborted due
-> > to vfio-pci marked unmigrateable. I worked around this by setting it
-> > to migrateable and used a migration notifier on the virtio-net device.
+    I did one test to see the how a guest with hot-plug cpu migrate to
+    destination.  It looks the migration fails if I just do hot-plug at
+    source. So I have to do hot-plug both at source and at destination. This
+    will expand the table_mr both at source and destination.
 
-Why not just let this happen at the libvirt level; then you do the
-hotunplug etc before you actually tell qemu anything about starting a
-migration?
+Then let's see the effect of hotplug more devices to exceed original padded
+size. There are two cases, before re-sizable MemoryRegion and after.
 
-> > Commandline: There is a dependency between vfio-pci and virtio-net
-> > devices. One points to the other via new parameters
-> > primar=<primary qdev id> and standby='<standby qdev id>'. This means
-> > that the primary device needs to be specified after standby device on
-> > the qemu command line. Not sure how to solve this.
-> > 
-> > Error handling: Patches don't cover all possible error scenarios yet.
-> > 
-> > I have tested this with a mlx5 NIC and was able to migrate the VM with
-> > above mentioned workarounds for open problems.
-> > 
-> > Command line example:
-> > 
-> > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
-> >        -machine q35,kernel-irqchip=split -cpu host   \
-> >        -k fr   \
-> >        -serial stdio   \
-> >        -net none \
-> >        -qmp unix:/tmp/qmp.socket,server,nowait \
-> >        -monitor telnet:127.0.0.1:5555,server,nowait \
-> >        -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
-> >        -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
-> >        -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
-> >        -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
-> >        -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,primary=hostdev0 \
-> >        -device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
+1) Before re-sizable MemoryRegion introduced
 
-Yes, that's a bit grim; it's circular dependency on the 'hostdev0' and
-'net1' id's.  cc'ing in Markus.
+    Before re-sizable MemoryRegion introduced, we just pad table_mr to 4K. And
+    this size never gets bigger, if I am right. To be accurate, the table_blob
+    would grow to next padded size if we hot-add more cpus/pci bridge, but we
+    just copy the original size of MemoryRegion. Even without migration, the
+    ACPI table is corrupted when we expand to next padded size.
+    
+    Is my understanding correct here?
 
-Dave
+2) After re-sizable MemoryRegion introduced
 
-> >        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
-> > 
-> > I'm grateful for any remarks or ideas!
-> > 
-> > Thanks!
-> > 
-> > regards,
-> > Jens
-> > 
-> > Sameeh Jubran (2):
-> >  qdev/qbus: Add hidden device support
-> >  net/virtio: add failover support
-> > 
-> > hw/core/qdev.c                 | 27 ++++++++++
-> > hw/net/virtio-net.c            | 95 ++++++++++++++++++++++++++++++++++
-> > hw/pci/pci.c                   |  1 +
-> > include/hw/pci/pci.h           |  2 +
-> > include/hw/qdev-core.h         |  8 +++
-> > include/hw/virtio/virtio-net.h |  7 +++
-> > qdev-monitor.c                 | 48 +++++++++++++++--
-> > vl.c                           |  7 ++-
-> > 8 files changed, 189 insertions(+), 6 deletions(-)
-> > 
-> > -- 
-> > 2.20.1
-> > 
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    This time both tabl_blob and MemoryRegion grows when it expand to next
+    padded size. Since we need to hot-add device at both side, ACPI table
+    grows at the same pace.
+
+    Every thing looks good, until one of it exceed the resizable
+    MemoryRegion's max size. (Not sure this is possible in reality, while
+    possible in theory). Actually, this looks like case 1) when resizable
+    MemoryRegion is not introduced. The too big ACPI table get corrupted.
+
+So if my understanding is correct, the procedure you mentioned "expand from
+initial padded size to next padded size" only applies to two different max
+size resizable MemoryRegion. For other cases, the procedure corrupt the ACPI
+table itself.
+
+Then when we look at
+
+    commit 07fb61760cdea7c3f1b9c897513986945bca8e89
+    Author: Paolo Bonzini <pbonzini@redhat.com>
+    Date:   Mon Jul 28 17:34:15 2014 +0200
+    
+        pc: hack for migration compatibility from QEMU 2.0
+    
+This fix ACPI migration issue before resizable MemoryRegion is
+introduced(introduced in 2015-01-08). This looks expand to next padded size
+always corrupt ACPI table at that time. And it make me think expand to next
+padded size is not the procedure we should do?
+
+And my colleague Wei Wang(in cc) mentioned, to make migration succeed, the
+MemoryRegion has to be the same size at both side. So I guess the problem
+doesn't lie in hotplug but in "main table" size difference.
+
+For example, we have two version of Qemu: v1 and v2. Their "main table" size
+is:
+
+    v1: 3990
+    v2: 4020
+
+At this point, their ACPI table all padded to 4k, which is the same.
+
+Then we create a machine with 1 more vcpu by these two versions. This will
+expand the table to:
+
+    v1: 4095
+    v2: 4125
+
+After padding, v1's ACPI table size is still 4k but v2's is 8k. Now the
+migration is broken.
+
+If this analysis is correct, the relationship between migration failure and
+ACPI table is "the change of ACPI table size". Any size change of any
+ACPI table would break migration. While of course, since we pad the table,
+only some combinations of tables would result in a visible real size change in
+MemoryRegion.
+
+Then the principle for future ACPI development is to keep all ACPI table size
+unchanged.
+
+Now let's back to mcfg table. As the comment mentioned, guest could
+enable/disable MCFG, so the code here reserve table no matter it is enabled or
+not. This behavior ensures ACPI table size not changed. So do we need to find
+the machine type as you suggested before?
+
+-- 
+Wei Yang
+Help you, Help me
