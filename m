@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40125)
+Received: from eggs.gnu.org ([209.51.188.92]:44915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hCRQa-00049B-AY
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:10:53 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hCRZE-0008OK-FW
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hCRQR-0001qF-Ph
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:10:51 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
-	id 1hCRPh-0000Kd-D8
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:10:40 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y7so8624416wrn.11
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 09:09:52 -0700 (PDT)
-From: Jules Irenge <jbi.octave@gmail.com>
-Date: Fri,  5 Apr 2019 17:09:35 +0100
-Message-Id: <20190405160938.27494-2-jbi.octave@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1hCRZ8-00045n-L0
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:46 -0400
+Resent-Message-Id: <E1hCRZ8-00045n-L0@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hCRYX-0003CJ-Rq
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:34 -0400
+Message-ID: <155448110124.12882.11234669806783181642@76452e4e88f2>
 In-Reply-To: <20190405160938.27494-1-jbi.octave@gmail.com>
-References: <20190405160938.27494-1-jbi.octave@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 1/4] target/mips: realign comments to fix
- checkpatch warnings
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 5 Apr 2019 09:18:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] target/mips: errors and warnings
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: amarkovic@wavecomp.com
-Cc: arikalo@wavecomp.com, qemu-devel@nongnu.org
+To: jbi.octave@gmail.com
+Cc: fam@euphon.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, qemu-devel@nongnu.org
 
-Realign comments to fix warnings issued by checkpatch.pl tool
-"WARNING: Block comments use a leading /* on a separate line"
-within "target/mips/cpu.h" file.
-
-Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
----
- target/mips/cpu.h | 34 ++++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 12 deletions(-)
-
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index a10eeb0de3..5dd71dbe21 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -37,7 +37,8 @@ union fpr_t {
- /* FPU/MSA register mapping is not tested on big-endian hosts. */
-     wr_t     wr;   /* vector data */
- };
--/* define FP_ENDIAN_IDX to access the same location
-+/*
-+ * define FP_ENDIAN_IDX to access the same location
-  * in the fpr_t union regardless of the host endianness
-  */
- #if defined(HOST_WORDS_BIGENDIAN)
-@@ -963,9 +964,11 @@ struct CPUMIPSState {
-     /* TMASK defines different execution modes */
- #define MIPS_HFLAG_TMASK  0x1F5807FF
- #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
--    /* The KSU flags must be the lowest bits in hflags. The flag order
--       must be the same as defined for CP0 Status. This allows to use
--       the bits as the value of mmu_idx. */
-+    /*
-+     * The KSU flags must be the lowest bits in hflags. The flag order
-+     * must be the same as defined for CP0 Status. This allows to use
-+     * the bits as the value of mmu_idx.
-+     */
- #define MIPS_HFLAG_KSU    0x00003 /* kernel/supervisor/user mode mask   */
- #define MIPS_HFLAG_UM     0x00002 /* user mode flag                     */
- #define MIPS_HFLAG_SM     0x00001 /* supervisor mode flag               */
-@@ -975,18 +978,22 @@ struct CPUMIPSState {
- #define MIPS_HFLAG_CP0    0x00010 /* CP0 enabled                        */
- #define MIPS_HFLAG_FPU    0x00020 /* FPU enabled                        */
- #define MIPS_HFLAG_F64    0x00040 /* 64-bit FPU enabled                 */
--    /* True if the MIPS IV COP1X instructions can be used.  This also
--       controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
--       and RSQRT.D.  */
-+    /*
-+     * True if the MIPS IV COP1X instructions can be used.  This also
-+     * controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
-+     * and RSQRT.D.
-+     */
- #define MIPS_HFLAG_COP1X  0x00080 /* COP1X instructions enabled         */
- #define MIPS_HFLAG_RE     0x00100 /* Reversed endianness                */
- #define MIPS_HFLAG_AWRAP  0x00200 /* 32-bit compatibility address wrapping */
- #define MIPS_HFLAG_M16    0x00400 /* MIPS16 mode flag                   */
- #define MIPS_HFLAG_M16_SHIFT 10
--    /* If translation is interrupted between the branch instruction and
-+    /*
-+     * If translation is interrupted between the branch instruction and
-      * the delay slot, record what type of branch it is so that we can
-      * resume translation properly.  It might be possible to reduce
--     * this from three bits to two.  */
-+     * this from three bits to two.
-+     */
- #define MIPS_HFLAG_BMASK_BASE  0x803800
- #define MIPS_HFLAG_B      0x00800 /* Unconditional branch               */
- #define MIPS_HFLAG_BC     0x01000 /* Conditional branch                 */
-@@ -1073,8 +1080,10 @@ void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf);
- extern void cpu_wrdsp(uint32_t rs, uint32_t mask_num, CPUMIPSState *env);
- extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
- 
--/* MMU modes definitions. We carefully match the indices with our
--   hflags layout. */
-+/*
-+ * MMU modes definitions. We carefully match the indices with our
-+ * hflags layout.
-+ */
- #define MMU_MODE0_SUFFIX _kernel
- #define MMU_MODE1_SUFFIX _super
- #define MMU_MODE2_SUFFIX _user
-@@ -1097,7 +1106,8 @@ static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
- 
- #include "exec/cpu-all.h"
- 
--/* Memory access type :
-+/*
-+ * Memory access type :
-  * may be needed for precise access rights control and precise exceptions.
-  */
- enum {
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwNTE2MDkzOC4yNzQ5
+NC0xLWpiaS5vY3RhdmVAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQwNTE2MDkzOC4yNzQ5NC0xLWpiaS5vY3Rh
+dmVAZ21haWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC80XSB0YXJnZXQv
+bWlwczogZXJyb3JzIGFuZCB3YXJuaW5ncyBjbGVhbnVwcwpUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MDUxNjA5
+MzguMjc0OTQtMS1qYmkub2N0YXZlQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwNDA1MTYwOTM4
+LjI3NDk0LTEtamJpLm9jdGF2ZUBnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0Jwo2OGEzM2NhMjFmIHRhcmdldC9taXBzOiByZXBsYWNlIHRhYiBjb2RlIGluZGVudCB3aXRo
+IHNwYWNlcyB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKNTIyNjgwNTUwMCB0YXJnZXQvbWlwczog
+d3JhcCBsaW5lcyB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKYzQzNWJhMGRmMiB0YXJnZXQvbWlw
+czogYWRkIG9yIHJlbW92ZSBzcGFjZSB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKZWZiNDBjZjkx
+ZiB0YXJnZXQvbWlwczogcmVhbGlnbiBjb21tZW50cyB0byBmaXggY2hlY2twYXRjaCB3YXJuaW5n
+cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS80IENoZWNraW5nIGNvbW1pdCBlZmI0MGNmOTFmNjcg
+KHRhcmdldC9taXBzOiByZWFsaWduIGNvbW1lbnRzIHRvIGZpeCBjaGVja3BhdGNoIHdhcm5pbmdz
+KQoyLzQgQ2hlY2tpbmcgY29tbWl0IGM0MzViYTBkZjIxNSAodGFyZ2V0L21pcHM6IGFkZCBvciBy
+ZW1vdmUgc3BhY2UgdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzKQpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzQyOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo3NToKKyNkZWZpbmUgU0VU
+X0ZQX0NPTkQobnVtLCBlbnYpICAgICBkbyB7ICgoZW52KS5mY3IzMSkgfD0gKChudW0pID8gKDEg
+PDwgKChudW0pICsgMjQpKSA6ICgxIDw8IDIzKSk7IH0gd2hpbGUgKDApCgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzQzOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo3NjoKKyNkZWZp
+bmUgQ0xFQVJfRlBfQ09ORChudW0sIGVudikgICBkbyB7ICgoZW52KS5mY3IzMSkgJj0gfigobnVt
+KSA/ICgxIDw8ICgobnVtKSArIDI0KSkgOiAoMSA8PCAyMykpOyB9IHdoaWxlICgwKQoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MjogRklMRTogdGFyZ2V0L21pcHMvY3B1Lmg6ODE6
+CisjZGVmaW5lIFNFVF9GUF9DQVVTRShyZWcsIHYpICAgICAgZG8geyAocmVnKSA9ICgocmVnKSAm
+IH4oMHgzZiA8PCAxMikpIHwgKCh2ICYgMHgzZikgPDwgMTIpOyB9IHdoaWxlICgwKQoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzogRklMRTogdGFyZ2V0L21pcHMvY3B1Lmg6ODI6
+CisjZGVmaW5lIFNFVF9GUF9FTkFCTEUocmVnLCB2KSAgICAgZG8geyAocmVnKSA9ICgocmVnKSAm
+IH4oMHgxZiA8PCAgNykpIHwgKCh2ICYgMHgxZikgPDwgNyk7IH0gd2hpbGUgKDApCgpFUlJPUjog
+bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU0OiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo4MzoK
+KyNkZWZpbmUgU0VUX0ZQX0ZMQUdTKHJlZywgdikgICAgICBkbyB7IChyZWcpID0gKChyZWcpICYg
+figweDFmIDw8ICAyKSkgfCAoKHYgJiAweDFmKSA8PCAyKTsgfSB3aGlsZSAoMCkKCnRvdGFsOiA1
+IGVycm9ycywgMCB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi80IGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgozLzQgQ2hlY2tpbmcgY29tbWl0IDUyMjY4MDU1MDBlYyAodGFy
+Z2V0L21pcHM6IHdyYXAgbGluZXMgdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzKQo0LzQgQ2hlY2tp
+bmcgY29tbWl0IDY4YTMzY2EyMWY2MSAodGFyZ2V0L21pcHM6IHJlcGxhY2UgdGFiIGNvZGUgaW5k
+ZW50IHdpdGggc3BhY2VzIHRvIGZpeCBjaGVja3BhdGNoIGVycm9ycykKPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MDUxNjA5MzguMjc0OTQt
+MS1qYmkub2N0YXZlQGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
