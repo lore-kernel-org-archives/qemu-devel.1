@@ -2,75 +2,83 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79EEC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B00C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:15:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B5A4206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:06:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5A4206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 39178217D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:15:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MYz++ral"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39178217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36638 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36692 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCHzj-0003W7-Kg
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:06:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52082)
+	id 1hCI7w-0005L3-1L
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:15:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCHyu-0002tz-46
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hCI75-000517-46
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCHys-0004Cj-Sn
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37464)
+	(envelope-from <peter.maydell@linaro.org>) id 1hCI74-0001TD-10
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:14:07 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hCHys-0004AQ-Kw
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:05:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hCHyq-0002iA-TF
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 06:05:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D724C2E8078
-	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 06:05:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hCI73-0001RV-C0
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:14:05 -0400
+Received: by mail-oi1-x241.google.com with SMTP id x188so3932003oia.13
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 23:14:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Sfa7A/BS0sWHpIOJHxMtKCoQbarU1kfg4Zi58fPevvQ=;
+	b=MYz++ralrDRQiLuJ89FEkBurzdbW1qg6TEu0OfAWWXH1OmiOeFnY5L5aRGISp/1z/X
+	ShbChLn6FW05JlWu5myrsUAKZMzyiemvFBXUK4WJI8vg1+TbTsVxEAj2jxFcvyQG9tFF
+	Uj6+oKU6aLsbKJoT1vaF/lYZ9vMr7E4+w9qjfsZvbPbt5hTw3mWH9mBm0DtEIFfKx+iw
+	++zYwEio/zrqUzVV+Yg4Cp7I85F3chAXLgPzgWLmqDpdeDxzBKVBrZc8QtuqggddckEL
+	eZCSxbqXvGmrC3RpvMljguzyeUQuXSL5u7hzRWuwktBE+vilez6x/AsACtjCSKm4Ra7E
+	+K+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Sfa7A/BS0sWHpIOJHxMtKCoQbarU1kfg4Zi58fPevvQ=;
+	b=t7UgsGzRadtRLy84j7rvPV15tXpaRjt+WCS3tr9YnJxHDZmeTOBMEzYPFXEzazHjHN
+	8Y1Vk+qHJNjaf72/3NU/KPV5cXXacEFqalmGd9WFlDbJj5pp7D2WQ9IEDTix4JQeldTp
+	It24uvKDK7674mI1+a3tBMVzlnUBnM8vg/vR4KJgWyRSnv5phARvkARO+F++Nww9kQPz
+	fnSX4gjacrjYq2h80EmEBux0t+F4XchHtwEyYmQuO5J6rxeQy63pMs1RlAjrMC3DFIAU
+	hiMZYm6zrK3ekxBrll7xyCnMwYeb5UUHJHX1+5IG6jAR5s6N0ngtXn9EMxLLVb3i7YvE
+	ceuw==
+X-Gm-Message-State: APjAAAWModzXxihiQJKTRTwu4iIKLWMfkjg4xbKTVXqB1nSxfkF4MHC4
+	7lqiq5zW/HOlrf3Wz4PEIsOf3LGaOAGa9+V6XD27TA==
+X-Google-Smtp-Source: APXvYqzMH6dtRrHcpdYxdpb/xdyHmV5Ne0ajQ7YlzJhkpY627+R8DFHKhga8LNSMqu1oQyI6DrMrNYIyHSaJP1B6lCo=
+X-Received: by 2002:aca:e84c:: with SMTP id f73mr5993605oih.163.1554444844230; 
+	Thu, 04 Apr 2019 23:14:04 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190405003924.1906-1-palmer@sifive.com>
+In-Reply-To: <20190405003924.1906-1-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Apr 2019 13:13:53 +0700
+Message-ID:
+ <CAFEAcA82u1SNuO-2AvCR8dx6XyyeZnrdWFbhmOvHun7hmxNFZg@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Apr 2019 05:59:09 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1823169@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fractalbob paelzer th-huth
-X-Launchpad-Bug-Reporter: Robert Uomini (fractalbob)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
-	=?utf-8?q?=29?=
-References: <155437966834.20937.13725906067731199360.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155444394987.21192.3332237882695030786.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 719f81e571c2bed7d8fd17545053eb0dd776886e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823169] Re: qemu displays message "Setup failed,
- please check external storage is available and has enough room."
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for 4.0-rc3, v2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,47 +87,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823169 <1823169@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405055909.f37PCJbvU038AB0gOiVoWxwjEs1oQCDr4wxrwuoeY0o@z>
+Message-ID: <20190405061353.r9r86r0ZKGgmfZr9Q_nXCmoFowRV5SvuTcabUuXW4E0@z>
 
-I agree to Thomas, and in that case referring to your comment #2 - qemu ver=
-sions in Ubuntu are associated with the base Ubuntu version - so Ubuntu 16.=
-04 will stick to qemu 2.5 + fixes.
-Ubuntu 19.10 released next week has qemu 3.1 btw, see [1]
+On Fri, 5 Apr 2019 at 07:39, Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> The following changes since commit 061b51e9195670e9d190cdec46fabcb3c77763fb:
+>
+>   Update version for v4.0.0-rc2 release (2019-04-02 17:01:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.0-rc3-v2
+>
+> for you to fetch changes up to 79bcac250f96ba1d4fdecfdc6e3363c9024703a4:
+>
+>   riscv: plic: Log guest errors (2019-04-04 16:36:21 -0700)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for 4.0-rc3, v2
+>
+> This patch set contains a pair of tightly coupled PLIC bug fixes:
+>
+> * We were calculating the PLIC addresses incorrectly.
+> * We were installing the wrong number of PLIC interrupts.
+>
+> The two bugs togther resulted in a mostly-working system, but they're
+> impossible to seperate because fixing one bug would result in
+> significant breakage.  As a result they're in the same patch.
+>
+> There is also a cleanup to use qemu_log_mask(LOG_GUEST_ERROR,...) for
+> error reporting.
+>
+> As far as I know these are the last outstanding RISC-V patches for 4.0.
+>
+> v2 no longer fails "make check" for me... sorry!
+Applied, thanks.
 
-And vice versa for an upstream report (which is often helpful for deep
-technical discussions) you'll want to try with the latest version anyway
-- which for just a few days is 3.1 still, then it will be 4.0 :-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-[1]: https://launchpad.net/ubuntu/+source/qemu
-[2]: https://wiki.qemu.org/Planning/4.0
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823169
-
-Title:
-  qemu displays message "Setup failed, please check external storage is
-  available and has enough room."
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I tried to launch the Android app PokerStarsFR, and after it began
-  initialization, the launch failed with the above error. I'm running
-  qemu on a Dell XPS 13 (9370) laptop running Ubuntu 16.04 LTS. The
-  standard apps launch OK, but this one does not. I had downloaded it
-  from the PokerStars site
-  https://www.pokerstars.fr/en/poker/download/android/.
-
-  I am running qemu version 2.5.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823169/+subscriptions
+-- PMM
 
