@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46223)
+Received: from eggs.gnu.org ([209.51.188.92]:47195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCMPR-0002wa-FX
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hCMTc-0004Qx-Lh
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCMPQ-0006mh-7b
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:21 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34403)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCMPP-0006iX-6c
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:49:20 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p10so7446327wrq.1
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 03:49:18 -0700 (PDT)
-References: <20190405123928.70da87e2.olaf@aepfle.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
-Date: Fri, 5 Apr 2019 12:49:15 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1hCMTZ-0005iI-FW
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCMTY-0005gm-Ml
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:37 -0400
+Date: Fri, 5 Apr 2019 11:53:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190405105326.GD2819@work-vm>
+References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190405123928.70da87e2.olaf@aepfle.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq"
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Juan Quintela <quintela@redhat.com>, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
-References: <20190405123928.70da87e2.olaf@aepfle.de>
-In-Reply-To: <20190405123928.70da87e2.olaf@aepfle.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-Hi Olaf,
-
-On 4/5/19 12:39 PM, Olaf Hering wrote:
-> It seems in qemu.git#master the edk2.git submodule is now mandatory.
-
-The EDK2 submodule was added for UEFI testing, you don't need to compile
-it to build/use QEMU.
-
-How did you end up compiling it?
-
-> For me it fails to compile. This is not a new error. It needs to be com=
-piled with -fPIC since essentially forever.
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> Hi,
 >=20
-> But I wonder, why does it fail to compile only for me?!
-> Example of failure:
+> I am trying to understand the possible values for the MAX_FD variable
+> used by the floppy controller model (hw/block/fdc.c).
 >=20
->  $ grep -h CommonLib.o /dev/shm/*/.build.log=20
-> [   85s] gcc  -c  -I .. -I ../Include/Common -I ../Include/ -I ../Inclu=
-de/IndustryStandard -I ../Common/ -I .. -I . -I ../Include/X64/  -MD -fsh=
-ort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations=
- -Wno-stringop-truncation -Wno-restrict -Wno-unused-result -nostdlib -g -=
-O2  CommonLib.c -o CommonLib.o
-> [   89s] ar crs ../libs/libCommon.a BasePeCoff.o BinderFuncs.o CommonLi=
-b.o Crc32.o Decompress.o EfiCompress.o EfiUtilityMsgs.o FirmwareVolumeBuf=
-fer.o FvLib.o MemoryFile.o MyAlloc.o OsPath.o ParseGuidedSectionTools.o P=
-arseInf.o PeCoffLoaderEx.o SimpleFileParsing.o StringFuncs.o TianoCompres=
-s.o PcdValueCommon.o
-> [  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
-ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
-st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
-ith -fPIC
-> [  106s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
-ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
-st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
-ith -fPIC
-> [  120s] /usr/lib64/gcc/x86_64-suse-linux/7/../../../../x86_64-suse-lin=
-ux/bin/ld: ../libs/libCommon.a(CommonLib.o): relocation R_X86_64_32 again=
-st `.rodata.str1.1' can not be used when making a PIE object; recompile w=
-ith -fPIC
+> Looking at git history:
 >=20
-> What do I need to change in my setup so that -fPIC is not required?
+> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
+>   FDC introduced with "#define MAX_FD 2"
+>=20
+> - 2008-04-29 78ae820cfeb0 (Herv=E9 Poussineau):
+>   Supports up to 4 floppy drives if MAX_FD is set to 4
+>   Migration stream knows about runtime value of MAX_FD
+>=20
+> - 2009-09-10 d7a6c2703577 (Juan Quintela):
+>   FDC vmstate-ified
+>   Migration stream use compile time value of MAX_FD
+>=20
+> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
+>=20
+> Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
+> migration.
+>=20
+> If I understand correctly migration, first we should change in
+> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
 
-Apparently your Linux distribution has transitioned to enabling PIE by
-default in GCC 7, see:
-https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+Right.
 
-"This is achieved by a gcc defaults override in the "gcc-PIE" package."
+> Then to be able to use >2 floppy disks I have to modify the the
+> vmstate.version_id, and
+>=20
+> 1/ add a new field in the vmstate_fdc containing the number of drives
+> and add code to check >2 and adapt
+>=20
+> or
+>=20
+> 2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
+> to older FDC with only 2 disks...
 
-Regards,
+Or, you add a subsection which is conditional on MAX_FD > 2 and which
+only stores the state of the extra FDs.
 
-Phil.
+> Another option I don't like is:
+>=20
+> 3/ get ride of MAX_FD !=3D 2 and clean the codebase...
 
+Seems sane to me.
 
---1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> $ git grep '#if MAX_FD'
+> hw/block/fdc.c:744:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:758:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:1317:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:1340:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:2041:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:2079:#if MAX_FD =3D=3D 4
+> hw/block/fdc.c:2104:#if MAX_FD =3D=3D 4
+>=20
+> Herv=E9, what board are/were you using with 4 floppy drives?
+>=20
+> BTW this link is somehow interesting :)
+> https://www.seasip.info/VintagePC/floppies.html
 
------BEGIN PGP SIGNATURE-----
+Ah interesting; I did wonder because I've never seen machines
+with more than 2 (double sided) drives.
 
-iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlynMqsACgkQoqP9bt6t
-wN6rPBAAm4MM5iUy8Koceu92ju9lKju1alwJvGelswGjpYJmVofGROSSvqCCVn8L
-JNSjM7JfWpfroJ2jL+RZutkbL10mBTOhh3nUU3WaSZJGsBOHyPneygrtIoTWI4nE
-uEtUEKngmxPS78luW2XZfcKTVqccSrs05LehYg2b7o3eOVjcYHviz6bNSgnr4lcH
-kvsFCj/YKP9Uqmo8o4yS10vcWkL4QYrjNqnQS+FbMf9QNhdKc72mg/i2BVpeGggi
-VoZv5LWBd4Sic7Ga0icHSlIC9btyXofoDfp5li/sFSDiwAfrax78+E5fN/mN7yJi
-qyoHFGgOsdM3vCIZL2xC9S1ZejV7BTxz0aEkOoejLYZlKAWmPm/iCNhSwoJLouSG
-NNBEJ6TGaX1jn19iHhPetdw5S2hZ2nrtrbUd4yXbuPJBhhHH0pqWD5PG3A69TQE8
-CpICc9+EKO2MY9JpQhWLT98ixbrtXQbKlS6jB2ckpTLTAOIgrgZ3dWJqZ73buyI+
-GfhvRbLxd/JPWRFfsuk8io8wZQuPX8bdsQMH93j6M5oeoCLQV9qlAVZeYoMFV3no
-XbRHXDxn1+hjVjUWGYuaqxsGg4qj+g6qjEdxounDg4w48XAfjvsqNn8hKxJ0A6C8
-TTXb688+DQqGATMVCXbx8qSCyiCo80dzFrXAc4zdr55xxtIM/XQ=
-=qgic
------END PGP SIGNATURE-----
+Dave
 
---1BypOdhQZ3eiZQFYGYsBy3QuyMXjAT4Fq--
+> Thanks,
+>=20
+> Phil.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
