@@ -6,89 +6,62 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A6CC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15B1C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:19:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5606A2175B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:09:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5606A2175B
+	by mail.kernel.org (Postfix) with ESMTPS id C2DFC21738
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:19:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2DFC21738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37851 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37931 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCJv0-0002ro-JK
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 04:09:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44160)
+	id 1hCK4X-0005N4-0h
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 04:19:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hCJsT-0001C2-Lp
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:07:10 -0400
+	(envelope-from <groug@kaod.org>) id 1hCK3c-00050U-R3
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:18:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hCJsS-0002Br-K7
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:07:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45570
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hCJsS-0002Aa-CM
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:07:08 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3586dEw031738
-	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 04:07:07 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rp2yygnvh-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 04:06:46 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 5 Apr 2019 09:05:24 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 5 Apr 2019 09:05:20 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
-	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3585Jml55378146
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 5 Apr 2019 08:05:20 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D1B9FA4054;
-	Fri,  5 Apr 2019 08:05:19 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A2278A4064;
-	Fri,  5 Apr 2019 08:05:19 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.20.25])
-	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2019 08:05:19 +0000 (GMT)
+	(envelope-from <groug@kaod.org>) id 1hCK3b-0002Df-Ih
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:18:40 -0400
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:34163)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hCK3b-00028T-7f
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:18:39 -0400
+Received: from player763.ha.ovh.net (unknown [10.109.146.163])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 53486EE019
+	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 10:18:36 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player763.ha.ovh.net (Postfix) with ESMTPSA id 5446F471AFBA;
+	Fri,  5 Apr 2019 08:18:27 +0000 (UTC)
+Date: Fri, 5 Apr 2019 10:18:26 +0200
 From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 05 Apr 2019 10:05:19 +0200
-User-Agent: StGit/unknown-version
+To: Alexey Kardashevskiy <aik@linux.ibm.com>
+Message-ID: <20190405101826.0255f9c5@bahia.lan>
+In-Reply-To: <cd08ddbc-d289-04a5-c9ae-d7618fc22308@linux.ibm.com>
+References: <155323635511.18748.18133954505098138975.stgit@aravinda>
+	<155323643836.18748.13006461397179281455.stgit@aravinda>
+	<20190325062256.GO29295@umbus>
+	<1fdde5df-408a-f81d-d9ac-eb9636324b54@linux.vnet.ibm.com>
+	<20190404231707.GB25513@umbus.fritz.box>
+	<cd08ddbc-d289-04a5-c9ae-d7618fc22308@linux.ibm.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19040508-0028-0000-0000-0000035D8AA2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19040508-0029-0000-0000-0000241C9C58
-Message-Id: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-05_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904050060
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 1/2] target/ppc/trace-events: Fix trivial typo
+X-Ovh-Tracer-Id: 1106759609355180472
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrtdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.109.80
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 3/6] target/ppc: Handle NMI
+ guest exit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,30 +73,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
-	Aravinda Prasad <aravinda@linux.vnet.ibm.com>,
-	qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, Aravinda Prasad <aravinda@linux.vnet.ibm.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405080519.CmuOu79oPtu7aKrWcFiOqysR_c1IPSLEPnvjezs0SfM@z>
+Message-ID: <20190405081826.vqCxwqcv1Zll9Ou1ZoCJlTtPYJdSbLzDQJ1qNGDUUKY@z>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- target/ppc/trace-events |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, 5 Apr 2019 16:04:27 +1100
+Alexey Kardashevskiy <aik@linux.ibm.com> wrote:
 
-diff --git a/target/ppc/trace-events b/target/ppc/trace-events
-index 3858f97dff54..ed4d57c6d9c1 100644
---- a/target/ppc/trace-events
-+++ b/target/ppc/trace-events
-@@ -1,5 +1,5 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
- # kvm.c
--kvm_failed_spr_set(int str, const char *msg) "Warning: Unable to set SPR %d to KVM: %s"
--kvm_failed_spr_get(int str, const char *msg) "Warning: Unable to retrieve SPR %d from KVM: %s"
-+kvm_failed_spr_set(int spr, const char *msg) "Warning: Unable to set SPR %d to KVM: %s"
-+kvm_failed_spr_get(int spr, const char *msg) "Warning: Unable to retrieve SPR %d from KVM: %s"
+> On 05/04/2019 10:17, David Gibson wrote:
+> > On Thu, Apr 04, 2019 at 02:40:45PM +0530, Aravinda Prasad wrote:  
+> >>
+> >>
+> >> On Monday 25 March 2019 11:52 AM, David Gibson wrote:  
+> >>> On Fri, Mar 22, 2019 at 12:03:58PM +0530, Aravinda Prasad wrote:  
+> >>>> Memory error such as bit flips that cannot be corrected
+> >>>> by hardware are passed on to the kernel for handling.
+> >>>> If the memory address in error belongs to guest then
+> >>>> the guest kernel is responsible for taking suitable action.
+> >>>> Patch [1] enhances KVM to exit guest with exit reason
+> >>>> set to KVM_EXIT_NMI in such cases. This patch handles
+> >>>> KVM_EXIT_NMI exit.
+> >>>>
+> >>>> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+> >>>>     (e20bbd3d and related commits)
+> >>>>
+> >>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> >>>> ---
+> >>>>  hw/ppc/spapr_events.c  |   22 ++++++++++++++++++++++
+> >>>>  include/hw/ppc/spapr.h |    1 +
+> >>>>  target/ppc/kvm.c       |   16 ++++++++++++++++
+> >>>>  target/ppc/kvm_ppc.h   |    2 ++
+> >>>>  4 files changed, 41 insertions(+)
+> >>>>  
+> >>
+> >> [...]
+> >>  
+> >>>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> >>>> index 2427c8e..a593448 100644
+> >>>> --- a/target/ppc/kvm.c
+> >>>> +++ b/target/ppc/kvm.c
+> >>>> @@ -1738,6 +1738,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> >>>>          ret = 0;
+> >>>>          break;
+> >>>>  
+> >>>> +    case KVM_EXIT_NMI:
+> >>>> +        DPRINTF("handle NMI exception\n");  
+> >>>
+> >>> tracepoints are generally preferred to new DPRINTFs.  
+> >>
+> >> I see DPRINTFs used in all other exit reasons in this function. Do you
+> >> want me to change this particular exit case to tracepoints? I think it
+> >> is better to keep this DPRINTF as of now and change all the DPRINTFs to
+> >> tracepoints in a separate patch set.  
+> > 
+> > Ah, good point.   
+> 
+> imho not. The kvm.c already knows about traces (there are two) and even
+> if every other trace in kvm_arch_handle_exit() is DPRINTF (enabled all
+> at once), having at least one which can be enabled without QEMU
+> recompile and separately from the others is a small but nice bonus
+> before someone gets rid of DPRINTF.
+> 
+
+Done.
+
+https://patchwork.ozlabs.org/project/qemu-devel/list/?series=101141
+
+> 
+> > Tracepoints are generally preferred, but since
+> > DPRINTFs are in use here, stick with that (at some point it would be
+> > good to change the whole file, but that's out of scope here).  
+> 
+> 
 
 
