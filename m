@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48596)
+Received: from eggs.gnu.org ([209.51.188.92]:50190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hCHZb-0004Xi-UG
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1hCHpO-00080t-Uj
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hCHZa-0002r4-MZ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48650)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hCHZa-0002ld-D0
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
-	<20190402132650.23095-2-armbru@redhat.com>
-	<20190403223255.GB18809@richard> <875zrt69iy.fsf@dusky.pond.sub.org>
-	<20190404231526.GA17148@richard>
-Date: Fri, 05 Apr 2019 07:39:25 +0200
-In-Reply-To: <20190404231526.GA17148@richard> (Wei Yang's message of "Fri, 5
-	Apr 2019 07:15:26 +0800")
-Message-ID: <87o95lovsi.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1hCHp0-0000cZ-PU
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:55:27 -0400
+References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+	<1554388475-18329-17-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <15d1851a-be5c-b816-56f3-cd31fb42f992@redhat.com>
+Date: Fri, 5 Apr 2019 07:55:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/4] vl: Simplify machine_parse()
+In-Reply-To: <1554388475-18329-17-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 16/16] s390-bios: Use control unit type
+ to find bootable devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,194 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Wei Yang <richardw.yang@linux.intel.com> writes:
+On 04/04/2019 16.34, Jason J. Herne wrote:
+> When the user does not specify which device to boot from then we end
+> up guessing. Instead of simply grabbing the first available device let's
+> be a little bit smarter and only choose devices that might be bootable
+> like disk, and not console devices.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/main.c | 38 ++++++++++++++++++++++++++++----------
+>  1 file changed, 28 insertions(+), 10 deletions(-)
 
-> On Thu, Apr 04, 2019 at 06:05:25PM +0200, Markus Armbruster wrote:
->>Wei Yang <richardw.yang@linux.intel.com> writes:
->>
->>> On Tue, Apr 02, 2019 at 03:26:50PM +0200, Markus Armbruster wrote:
->>>>Exploit that argument @name is nerver null.  Check is_help_option()
->>>>first, because that's what we do elsewhere.
->>>>
->>>>Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>>---
->>>> vl.c | 24 +++++++++++-------------
->>>> 1 file changed, 11 insertions(+), 13 deletions(-)
->>>>
->>>>diff --git a/vl.c b/vl.c
->>>>index 6a31e5bfac..da1af3e10d 100644
->>>>--- a/vl.c
->>>>+++ b/vl.c
->>>>@@ -2573,19 +2573,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->>>> 
->>>> static MachineClass *machine_parse(const char *name, GSList *machines)
->>>> {
->>>>-    MachineClass *mc = NULL;
->>>>+    MachineClass *mc;
->>>>     GSList *el;
->>>> 
->>>>-    if (name) {
->>>>-        mc = find_machine(name, machines);
->>>>-    }
->>>>-    if (mc) {
->>>>-        return mc;
->>>>-    }
->>>>-    if (name && !is_help_option(name)) {
->>>>-        error_report("unsupported machine type");
->>>>-        error_printf("Use -machine help to list supported machines\n");
->>>>-    } else {
->>>>+    if (is_help_option(name)) {
->>>>         printf("Supported machines are:\n");
->>>>         machines = g_slist_sort(machines, machine_class_cmp);
->>>>         for (el = machines; el; el = el->next) {
->>>>@@ -2597,9 +2588,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
->>>>                    mc->is_default ? " (default)" : "",
->>>>                    mc->deprecation_reason ? " (deprecated)" : "");
->>>>         }
->>>>+        exit(0);
->>>>     }
->>>>-
->>>>-    exit(!name || !is_help_option(name));
->>>>+        
->>>>+    mc = find_machine(name, machines);
->>>>+    if (!mc) {
->>>>+        error_report("unsupported machine type");
->>>>+        error_printf("Use -machine help to list supported machines\n");
->>>>+        exit(1);
->>>>+    }
->>>>+    return mc;
->>>
->>> This change looks changed the original behavior.
->>>
->>> In original logic, if mc is not NULL, there is no message printed. While now
->>> it rely on is_help_option(). And no it exit when !is_help_option(), while
->>> before this change it exit when is_help_option().
->>>
->>> I don't understand the reason behind this. My suggestion is you may split this
->>> patch into two:
->>>
->>>   1. remove check on name
->>>   2. refine the logic with explanations.
->>
->>Cases:
->>
->>(1) User asks for help, i.e. is_help_option(name)
->>
->>(1a) and no machine named @name exists, i.e.
->>     is_help_option(name) && !find_machine(name, machines)
->>
->>(1b) and a machine named @name exists
->>     is_help_option(name) && find_machine(name, machines)
->>
->>(2) User asks for a machine that doesn't exist, i.e.
->>    !is_help_option(name) && !find_machine(name, machines)
->>
->>(3) User asks for a machine that exists, i.e.
->>    !is_help_option(name) && find_machine(name, machines)
->>
->>Since no machines are called "help" or "?", case (1b) is not actually
->>possible.
->>
->>Old code:
->>
->>    static MachineClass *machine_parse(const char *name, GSList *machines)
->>    {
->>        MachineClass *mc = NULL;
->>        GSList *el;
->>
->>        if (name) {
->>            mc = find_machine(name, machines);
->>        }
->>        if (mc) {
->>            return mc;
->>        }
->>        if (name && !is_help_option(name)) {
->>            error_report("unsupported machine type");
->>            error_printf("Use -machine help to list supported machines\n");
->>        } else {
->>            printf("Supported machines are:\n");
->>            machines = g_slist_sort(machines, machine_class_cmp);
->>            for (el = machines; el; el = el->next) {
->>                MachineClass *mc = el->data;
->>                if (mc->alias) {
->>                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
->>                }
->>                printf("%-20s %s%s%s\n", mc->name, mc->desc,
->>                       mc->is_default ? " (default)" : "",
->>                       mc->deprecation_reason ? " (deprecated)" : "");
->>            }
->>        }
->>
->>        exit(!name || !is_help_option(name));
->>    }
->>
->>Case (1a): print help, exit(0)
->>
->>Case (1b): return find_machine()
->>
->>Case (2): report error, exit(1)
->>
->>Case (3): return find_machine()
->>
->>New code:
->>
->>    static MachineClass *machine_parse(const char *name, GSList *machines)
->>    {
->>        MachineClass *mc;
->>        GSList *el;
->>
->>        if (is_help_option(name)) {
->>            printf("Supported machines are:\n");
->>            machines = g_slist_sort(machines, machine_class_cmp);
->>            for (el = machines; el; el = el->next) {
->>                MachineClass *mc = el->data;
->>                if (mc->alias) {
->>                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
->>                }
->>                printf("%-20s %s%s%s\n", mc->name, mc->desc,
->>                       mc->is_default ? " (default)" : "",
->>                       mc->deprecation_reason ? " (deprecated)" : "");
->>            }
->>            exit(0);
->>        }
->>
->>        mc = find_machine(name, machines);
->>        if (!mc) {
->>            error_report("unsupported machine type");
->>            error_printf("Use -machine help to list supported machines\n");
->>            exit(1);
->>        }
->>        return mc;
->>    }
->>
->>Case (1a): print help, exit(0)
->>
->>Case (1b): print help, exit(0)
->>
->>Case (2): report error, exit(1)
->>
->>Case (3): return find_machine()
->>
->>The patch changes "impossible" case (1b).  That's intentional (but my
->>commit message could explain it better).
->
-> This looks better.
+Thanks for adding this patch, the problem with -device x-terminal3270 is
+fixed now, indeed.
 
-Amending my commit message to explain things better:
-
-    vl: Simplify machine_parse()
-
-    Exploit that argument @name is nerver null.  Check is_help_option()
-    first, because that's what we do elsewhere.  If we (foolishly!)
-    defined a machine named "help", -machine help would now print help
-    instead of selecting the machine named "help".
-
->                    Would you mind refine it so that I could send all these
-> patches in v2.
->
-> Or you prefer send it out by our self?
-
-Please send v2.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
