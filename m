@@ -2,61 +2,72 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1283C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 11:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE5C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:10:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2B4F206DD
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 11:56:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B4F206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90F6820449
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 12:10:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="FX1xSIBB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F6820449
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40662 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41188 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCNSU-0003e5-IR
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 07:56:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32774)
+	id 1hCNfo-0007sT-PR
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 08:10:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCNRg-0003Mq-Sp
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:55:46 -0400
+	(envelope-from <olaf@aepfle.de>) id 1hCNex-0007bZ-UD
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCNRf-0004O9-Lb
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:55:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCNRf-0004N2-3T
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:55:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D55F3164680;
-	Fri,  5 Apr 2019 11:55:41 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E2F1646D9;
-	Fri,  5 Apr 2019 11:55:33 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Olaf Hering <olaf@aepfle.de>, qemu-devel@nongnu.org,
-	Laszlo Ersek <lersek@redhat.com>
-Date: Fri,  5 Apr 2019 13:55:29 +0200
-Message-Id: <20190405115529.11590-1-philmd@redhat.com>
+	(envelope-from <olaf@aepfle.de>) id 1hCNex-0007Ma-1Q
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:27 -0400
+Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::10]:19593)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCNev-0007JZ-Qe
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 08:09:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1554466163;
+	s=strato-dkim-0002; d=aepfle.de;
+	h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
+	X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+	bh=QGbQwWcGSn1cmW0XWUkaPTABhCLJAkBVToAtmgoZsk8=;
+	b=FX1xSIBB783FSjotER/drSUNNyHf/MWl8d/Xh/rw1Xt6HkVrorZaQOPUKlag3S3B/H
+	fFL64VWwC/TES8oAwJxxTic89qbncm16pYX22g3lBtJ4n+y7do9OwuSY+J1a++BaX7+6
+	UEMRh18YQ+9gkoUAZuJajolL0IU2XQCCWLVvhx970bMlTrBnUujxS6xev19hHjfIR5JH
+	Ch2oQ9PQRhtryRpFxT3Ztd6V43BmrbQKwfiG6pVgx48on+kIilHRfWBFcZpCiZSC05gX
+	OaBxz0hJnXARygjhQwv8Unqxn6BtHxEw9kPBqa9WKn8T65B5RkCfDfGPscX0BBnfdtxV
+	npbg==
+X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4oc0Nr2ihluivsAEtyZCGP8Vn3U6NBQHRrVwM9zJHX/gJPE7W8Q"
+X-RZG-CLASS-ID: mo00
+Received: from sender by smtp.strato.de (RZmta 44.18 AUTH)
+	with ESMTPSA id 3086c5v35C9Lpgf
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1
+	with 521 ECDH bits, eq. 15360 bits RSA))
+	(Client did not present a certificate);
+	Fri, 5 Apr 2019 14:09:21 +0200 (CEST)
+Date: Fri, 5 Apr 2019 14:09:17 +0200
+From: Olaf Hering <olaf@aepfle.de>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190405140917.3af9b91d.olaf@aepfle.de>
+In-Reply-To: <20190405115529.11590-1-philmd@redhat.com>
+References: <20190405115529.11590-1-philmd@redhat.com>
+X-Mailer: Claws Mail 2019.03.13 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 05 Apr 2019 11:55:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.0] roms: Allow the EFIROM variable to be
- overridden
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf";
+	protocol="application/pgp-signature"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 2a01:238:20a:202:5301::10
+Subject: Re: [Qemu-devel] [PATCH for-4.0] roms: Allow the EFIROM variable to
+ be overridden
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,57 +79,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S .
+	Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405115529.yWVMyVbv8nZqCjyYJ73vnTeBE6L9p11ChVnSGHBbruM@z>
+Message-ID: <20190405120917.wzaIBI3SZ6wZ5PtsabKS8lnew_ca0L6YMVBWn6dOrYg@z>
 
-Since commit f590a812c210 we build the EfiRom utility
-unconditionally. This has been tested on all the Linux
-distribution providing continuous integration (namely
-Debian and Fedora). Not all distributions are able to
-build the EfiRom without specific patches (In particular
-SUSE which enforces the PIE protection, see [*]).
-Restore the possibility to other distributions to
-override the EFIROM variable.
+--Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-[*] https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+Am Fri,  5 Apr 2019 13:55:29 +0200
+schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 
-Reported-by: Olaf Hering <olaf@aepfle.de>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- roms/Makefile | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> +EFIROM ?=3D edk2/BaseTools/Source/C/bin/EfiRom
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 78d5dd18c30..0bcfa665ccf 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
- # We need that to combine multiple images (legacy bios,
- # efi ia32, efi x64) into a single rom binary.
- #
--EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-+EFIROM ?=3D edk2/BaseTools/Source/C/bin/EfiRom
-=20
- default:
- 	@echo "nothing is build by default"
-@@ -120,8 +120,11 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-=20
-+# Do not compile $(EFIROM) if the variable is overridden
-+ifeq "$(origin EFIROM)" "file"
- $(EFIROM):
- 	$(MAKE) -C edk2/BaseTools
-+endif
-=20
- slof:
- 	$(MAKE) -C SLOF CROSS=3D$(powerpc64_cross_prefix) qemu
---=20
-2.20.1
+This name is too generic and will conflict with ipxe.git if any of "bios se=
+avgabios pxerom" is used for 'make -C roms'.
 
+Olaf
+
+--Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKdFbQAKCRBdQqD6ppg2
+fkRNAJ99Ry8ACOCI8Oi3lFj0I4/1FKU9YACgxmjYmn095wUNKBxXZ1EiStfU5Dg=
+=tORK
+-----END PGP SIGNATURE-----
+
+--Sig_/Qvc=w8aZ/K4qshRZ2RdK2Nf--
 
