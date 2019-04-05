@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44915)
+Received: from eggs.gnu.org ([209.51.188.92]:45154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hCRZE-0008OK-FW
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hCRZe-000052-D1
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hCRZ8-00045n-L0
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:46 -0400
-Resent-Message-Id: <E1hCRZ8-00045n-L0@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hCRYX-0003CJ-Rq
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:19:34 -0400
-Message-ID: <155448110124.12882.11234669806783181642@76452e4e88f2>
-In-Reply-To: <20190405160938.27494-1-jbi.octave@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgilbert@redhat.com>) id 1hCRZc-0004hE-6M
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:20:14 -0400
+Date: Fri, 5 Apr 2019 17:11:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190405161158.GA3275@work-vm>
+References: <20190405114513.3141-1-armbru@redhat.com>
+	<20190405125140.GB4597@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 5 Apr 2019 09:18:22 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] target/mips: errors and warnings
- cleanups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190405125140.GB4597@linux.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH for-4.0] hmp: Fix drive_add ... format=help
+ crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jbi.octave@gmail.com
-Cc: fam@euphon.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwNTE2MDkzOC4yNzQ5
-NC0xLWpiaS5vY3RhdmVAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQwNTE2MDkzOC4yNzQ5NC0xLWpiaS5vY3Rh
-dmVAZ21haWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC80XSB0YXJnZXQv
-bWlwczogZXJyb3JzIGFuZCB3YXJuaW5ncyBjbGVhbnVwcwpUeXBlOiBzZXJpZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
-dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MDUxNjA5
-MzguMjc0OTQtMS1qYmkub2N0YXZlQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwNDA1MTYwOTM4
-LjI3NDk0LTEtamJpLm9jdGF2ZUBnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo2OGEzM2NhMjFmIHRhcmdldC9taXBzOiByZXBsYWNlIHRhYiBjb2RlIGluZGVudCB3aXRo
-IHNwYWNlcyB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKNTIyNjgwNTUwMCB0YXJnZXQvbWlwczog
-d3JhcCBsaW5lcyB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKYzQzNWJhMGRmMiB0YXJnZXQvbWlw
-czogYWRkIG9yIHJlbW92ZSBzcGFjZSB0byBmaXggY2hlY2twYXRjaCBlcnJvcnMKZWZiNDBjZjkx
-ZiB0YXJnZXQvbWlwczogcmVhbGlnbiBjb21tZW50cyB0byBmaXggY2hlY2twYXRjaCB3YXJuaW5n
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS80IENoZWNraW5nIGNvbW1pdCBlZmI0MGNmOTFmNjcg
-KHRhcmdldC9taXBzOiByZWFsaWduIGNvbW1lbnRzIHRvIGZpeCBjaGVja3BhdGNoIHdhcm5pbmdz
-KQoyLzQgQ2hlY2tpbmcgY29tbWl0IGM0MzViYTBkZjIxNSAodGFyZ2V0L21pcHM6IGFkZCBvciBy
-ZW1vdmUgc3BhY2UgdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzKQpFUlJPUjogbGluZSBvdmVyIDkw
-IGNoYXJhY3RlcnMKIzQyOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo3NToKKyNkZWZpbmUgU0VU
-X0ZQX0NPTkQobnVtLCBlbnYpICAgICBkbyB7ICgoZW52KS5mY3IzMSkgfD0gKChudW0pID8gKDEg
-PDwgKChudW0pICsgMjQpKSA6ICgxIDw8IDIzKSk7IH0gd2hpbGUgKDApCgpFUlJPUjogbGluZSBv
-dmVyIDkwIGNoYXJhY3RlcnMKIzQzOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo3NjoKKyNkZWZp
-bmUgQ0xFQVJfRlBfQ09ORChudW0sIGVudikgICBkbyB7ICgoZW52KS5mY3IzMSkgJj0gfigobnVt
-KSA/ICgxIDw8ICgobnVtKSArIDI0KSkgOiAoMSA8PCAyMykpOyB9IHdoaWxlICgwKQoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MjogRklMRTogdGFyZ2V0L21pcHMvY3B1Lmg6ODE6
-CisjZGVmaW5lIFNFVF9GUF9DQVVTRShyZWcsIHYpICAgICAgZG8geyAocmVnKSA9ICgocmVnKSAm
-IH4oMHgzZiA8PCAxMikpIHwgKCh2ICYgMHgzZikgPDwgMTIpOyB9IHdoaWxlICgwKQoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzogRklMRTogdGFyZ2V0L21pcHMvY3B1Lmg6ODI6
-CisjZGVmaW5lIFNFVF9GUF9FTkFCTEUocmVnLCB2KSAgICAgZG8geyAocmVnKSA9ICgocmVnKSAm
-IH4oMHgxZiA8PCAgNykpIHwgKCh2ICYgMHgxZikgPDwgNyk7IH0gd2hpbGUgKDApCgpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU0OiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuaDo4MzoK
-KyNkZWZpbmUgU0VUX0ZQX0ZMQUdTKHJlZywgdikgICAgICBkbyB7IChyZWcpID0gKChyZWcpICYg
-figweDFmIDw8ICAyKSkgfCAoKHYgJiAweDFmKSA8PCAyKTsgfSB3aGlsZSAoMCkKCnRvdGFsOiA1
-IGVycm9ycywgMCB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi80IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgozLzQgQ2hlY2tpbmcgY29tbWl0IDUyMjY4MDU1MDBlYyAodGFy
-Z2V0L21pcHM6IHdyYXAgbGluZXMgdG8gZml4IGNoZWNrcGF0Y2ggZXJyb3JzKQo0LzQgQ2hlY2tp
-bmcgY29tbWl0IDY4YTMzY2EyMWY2MSAodGFyZ2V0L21pcHM6IHJlcGxhY2UgdGFiIGNvZGUgaW5k
-ZW50IHdpdGggc3BhY2VzIHRvIGZpeCBjaGVja3BhdGNoIGVycm9ycykKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MDUxNjA5MzguMjc0OTQt
-MS1qYmkub2N0YXZlQGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 05.04.2019 um 13:45 hat Markus Armbruster geschrieben:
+> > drive_new() returns null without setting an error when it provided
+> > help.  add_init_drive() assumes null means failure, and crashes trying
+> > to report a null error.
+> > 
+> > Fixes: c4f26c9f37ce511e5fe629c21c180dc6eb7c5a25
+> > Cc: qemu-stable@nongnu.org
+> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> 
+> We should probably have a test case for this.
+
+Perhaps just adding:
+
+drive_add 0 format=help
+
+to the hmp_cmds list in tests/test-hmp.c  ?
+
+Dave
+
+> Kevin
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
