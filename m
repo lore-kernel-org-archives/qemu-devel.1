@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37813)
+Received: from eggs.gnu.org ([209.51.188.92]:37829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hCQ3y-0000at-V8
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:43:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hCQ4J-0000b0-RM
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hCQ0T-0000oY-0y
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:39:50 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 5 Apr 2019 14:39:43 +0000
-Message-ID: <ae484c62-04f9-5b4e-03d0-bf368ed7714a@virtuozzo.com>
-References: <20190403030526.12258-1-eblake@redhat.com>
-	<20190403030526.12258-3-eblake@redhat.com>
-In-Reply-To: <20190403030526.12258-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B984F6CDB7A1DF4F87B43CEEC859CA71@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1hCPt6-000890-Kz
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:32:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCPt6-00081t-4y
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 10:32:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 432863164680
+	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 14:32:10 +0000 (UTC)
+Date: Fri, 5 Apr 2019 15:32:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190405143203.GA20049@work-vm>
+References: <20190403114958.3705-1-quintela@redhat.com>
+	<20190403114958.3705-2-quintela@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/7] nbd/server: Trace server noncompliance
- on unaligned requests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190403114958.3705-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] migration: Fix migrate_set_parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-MDMuMDQuMjAxOSA2OjA1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBXZSd2ZSByZWNlbnRseSBhZGRl
-ZCB0cmFjZXMgZm9yIGNsaWVudHMgdG8gZmxhZyBzZXJ2ZXIgbm9uLWNvbXBsaWFuY2U7DQo+IGxl
-dCdzIGRvIHRoZSBzYW1lIGZvciBzZXJ2ZXJzIHRvIGZsYWcgY2xpZW50IG5vbi1jb21wbGlhbmNl
-LiBBY2NvcmRpbmcNCj4gdG8gdGhlIHNwZWMsIGlmIHRoZSBjbGllbnQgcmVxdWVzdHMgTkJEX0lO
-Rk9fQkxPQ0tfU0laRSwgaXQgaXMNCj4gcHJvbWlzaW5nIHRvIHNlbmQgYWxsIHJlcXVlc3RzIGFs
-aWduZWQgdG8gdGhvc2UgYm91bmRhcmllcy4gIE9mDQo+IGNvdXJzZSwgaWYgdGhlIGNsaWVudCBk
-b2VzIG5vdCByZXF1ZXN0IE5CRF9JTkZPX0JMT0NLX1NJWkUsIHRoZW4gaXQNCj4gbWFkZSBubyBw
-cm9taXNlcyBzbyB3ZSBzaG91bGRuJ3QgZmxhZyBhbnl0aGluZzsgYW5kIGJlY2F1c2Ugd2UgYXJl
-DQo+IHdpbGxpbmcgdG8gaGFuZGxlIGNsaWVudHMgdGhhdCBtYWRlIG5vIHByb21pc2VzICh0aGUg
-c3BlYyBhbGxvd3MgdXMgdG8NCj4gdXNlIE5CRF9SRVBfRVJSX0JMT0NLX1NJWkVfUkVRRCBpZiB3
-ZSBoYWQgYmVlbiB1bndpbGxpbmcpLCB3ZSBhbHJlYWR5DQo+IGhhdmUgdG8gaGFuZGxlIHVuYWxp
-Z25lZCByZXF1ZXN0cyAod2hpY2ggdGhlIGJsb2NrIGxheWVyIGFscmVhZHkgZG9lcw0KPiBvbiBv
-dXIgYmVoYWxmKS4gIFNvIGV2ZW4gdGhvdWdoIHRoZSBzcGVjIGFsbG93cyB1cyB0byByZXR1cm4g
-RUlOVkFMDQo+IGZvciBjbGllbnRzIHRoYXQgcHJvbWlzZWQgdG8gYmVoYXZlLCBpdCdzIGVhc2ll
-ciB0byBhbHdheXMgYW5zd2VyDQo+IHVuYWxpZ25lZCByZXF1ZXN0cy4gIFN0aWxsLCBmbGFnZ2lu
-ZyBub24tY29tcGxpYW5jZSBjYW4gYmUgdXNlZnVsIGluDQo+IGRlYnVnZ2luZyBhIGNsaWVudCB0
-aGF0IGlzIHRyeWluZyB0byBiZSBtYXhpbWFsbHkgcG9ydGFibGUuDQo+IA0KPiBRZW11IGFzIGNs
-aWVudCB1c2VkIHRvIGhhdmUgb25lIHNwb3Qgd2hlcmUgaXQgc2VudCBub24tY29tcGxpYW50DQo+
-IHJlcXVlc3RzOiBpZiB0aGUgc2VydmVyIHNlbmRzIGFuIHVuYWxpZ25lZCByZXBseSB0bw0KPiBO
-QkRfQ01EX0JMT0NLX1NUQVRVUywgYW5kIHRoZSBjbGllbnQgd2FzIGl0ZXJhdGluZyBvdmVyIHRo
-ZSBlbnRpcmUNCj4gZGlzaywgdGhlIG5leHQgcmVxdWVzdCB3b3VsZCBzdGFydCBhdCB0aGF0IHVu
-YWxpZ25lZCBwb2ludDsgdGhpcyB3YXMNCj4gZml4ZWQgaW4gY29tbWl0IGEzOTI4NmRkIHdoZW4g
-dGhlIGNsaWVudCB3YXMgdGF1Z2h0IHRvIHdvcmsgYXJvdW5kDQo+IHNlcnZlciBub24tY29tcGxp
-YW5jZTsgYnV0IGlzIGVxdWFsbHkgZml4ZWQgaWYgdGhlIHNlcnZlciBpcyBwYXRjaGVkDQo+IHRv
-IG5vdCBzZW5kIHVuYWxpZ25lZCByZXBsaWVzIGluIHRoZSBmaXJzdCBwbGFjZSAodGhlIG5leHQg
-ZmV3IHBhdGNoZXMNCj4gd2lsbCBhZGRyZXNzIHRoYXQpLiBGb3J0dW5hdGVseSwgSSBkaWQgbm90
-IGZpbmQgYW55IG1vcmUgc3BvdHMgd2hlcmUNCj4gcWVtdSBhcyBjbGllbnQgd2FzIG5vbi1jb21w
-bGlhbnQuIEkgd2FzIGFibGUgdG8gdGVzdCB0aGUgcGF0Y2ggYnkNCj4gdXNpbmcgdGhlIGZvbGxv
-d2luZyBoYWNrIHRvIGNvbnZpbmNlIHFlbXUtaW8gdG8gcnVuIHZhcmlvdXMgdW5hbGlnbmVkDQo+
-IGNvbW1hbmRzLCBjb3VwbGVkIHdpdGggc2VydmluZyA1MTItYnl0ZSBhbGlnbm1lbnQgYnkgaW50
-ZW50aW9uYWxseQ0KPiBvbWl0dGluZyAnLWYgcmF3JyBvbiB0aGUgc2VydmVyIHdoaWxlIHZpZXdp
-bmcgc2VydmVyIHRyYWNlcy4NCj4gDQo+IHwgZGlmZiAtLWdpdCBpL25iZC9jbGllbnQuYyB3L25i
-ZC9jbGllbnQuYw0KPiB8IGluZGV4IDQyNzk4MGJkZDIyLi4xODU4YjJhYWMzNSAxMDA2NDQNCj4g
-fCAtLS0gaS9uYmQvY2xpZW50LmMNCj4gfCArKysgdy9uYmQvY2xpZW50LmMNCj4gfCBAQCAtNDQ5
-LDYgKzQ0OSw3IEBAIHN0YXRpYyBpbnQgbmJkX29wdF9pbmZvX29yX2dvKFFJT0NoYW5uZWwgKmlv
-YywgdWludDMyX3Qgb3B0LA0KPiB8ICAgICAgICAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0
-KGlvYyk7DQo+IHwgICAgICAgICAgICAgICAgICByZXR1cm4gLTE7DQo+IHwgICAgICAgICAgICAg
-IH0NCj4gfCArICAgICAgICAgICAgaW5mby0+bWluX2Jsb2NrID0gMTsvL2hhY2sNCj4gfCAgICAg
-ICAgICAgICAgaWYgKCFpc19wb3dlcl9vZl8yKGluZm8tPm1pbl9ibG9jaykpIHsNCj4gfCAgICAg
-ICAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgInNlcnZlciBtaW5pbXVtIGJsb2NrIHNpemUg
-JSIgUFJJdTMyDQo+IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICIgaXMgbm90IGEgcG93
-ZXIgb2YgdHdvIiwgaW5mby0+bWluX2Jsb2NrKTsNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMg
-Qmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBuYmQvc2VydmVyLmMgICAgIHwg
-MTIgKysrKysrKysrKysrDQo+ICAgbmJkL3RyYWNlLWV2ZW50cyB8ICAxICsNCj4gICAyIGZpbGVz
-IGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9uYmQvc2VydmVy
-LmMgYi9uYmQvc2VydmVyLmMNCj4gaW5kZXggMWI4Yzg2MTk4OTYuLjMwNDBjZWI1NjA2IDEwMDY0
-NA0KPiAtLS0gYS9uYmQvc2VydmVyLmMNCj4gKysrIGIvbmJkL3NlcnZlci5jDQo+IEBAIC0xMjQs
-NiArMTI0LDggQEAgc3RydWN0IE5CRENsaWVudCB7DQo+ICAgICAgIGludCBuYl9yZXF1ZXN0czsN
-Cj4gICAgICAgYm9vbCBjbG9zaW5nOw0KPiANCj4gKyAgICB1aW50MzJfdCBjaGVja19hbGlnbjsg
-LyogSWYgbm9uLXplcm8sIGNoZWNrIGZvciBhbGlnbmVkIGNsaWVudCByZXF1ZXN0cyAqLw0KPiAr
-DQo+ICAgICAgIGJvb2wgc3RydWN0dXJlZF9yZXBseTsNCj4gICAgICAgTkJERXhwb3J0TWV0YUNv
-bnRleHRzIGV4cG9ydF9tZXRhOw0KPiANCj4gQEAgLTY2MCw2ICs2NjIsOCBAQCBzdGF0aWMgaW50
-IG5iZF9uZWdvdGlhdGVfaGFuZGxlX2luZm8oTkJEQ2xpZW50ICpjbGllbnQsIHVpbnQxNl90IG15
-ZmxhZ3MsDQo+IA0KPiAgICAgICBpZiAoY2xpZW50LT5vcHQgPT0gTkJEX09QVF9HTykgew0KPiAg
-ICAgICAgICAgY2xpZW50LT5leHAgPSBleHA7DQo+ICsgICAgICAgIGNsaWVudC0+Y2hlY2tfYWxp
-Z24gPSBibG9ja3NpemUgPw0KPiArICAgICAgICAgICAgYmxrX2dldF9yZXF1ZXN0X2FsaWdubWVu
-dChleHAtPmJsaykgOiAwOw0KDQpJIHRoaW5rIGJldHRlciBzZXQgaW4gc2FtZSBwbGFjZSwgd2hl
-cmUgc2l6ZXNbMF0gc2V0LCBvciB1c2Ugc2l6ZXNbMF0gaGVyZSBvciBhZGQgc2VwYXJhdGUgbG9j
-YWwNCnZhcmliYWxlIGZvciBpdCwgc28gdGhhdCwgaWYgInNpemVzWzBdID0iIGNoYW5nZXMgc29t
-ZWhvdywgd2Ugd2lsbCBub3QgZm9yZ2V0IHRvIGZpeCB0aGlzIHBsYWNlIHRvby4NCg0KPiAgICAg
-ICAgICAgUVRBSUxRX0lOU0VSVF9UQUlMKCZjbGllbnQtPmV4cC0+Y2xpZW50cywgY2xpZW50LCBu
-ZXh0KTsNCj4gICAgICAgICAgIG5iZF9leHBvcnRfZ2V0KGNsaWVudC0+ZXhwKTsNCj4gICAgICAg
-ICAgIG5iZF9jaGVja19tZXRhX2V4cG9ydChjbGllbnQpOw0KPiBAQCAtMjEyNiw2ICsyMTMwLDE0
-IEBAIHN0YXRpYyBpbnQgbmJkX2NvX3JlY2VpdmVfcmVxdWVzdChOQkRSZXF1ZXN0RGF0YSAqcmVx
-LCBOQkRSZXF1ZXN0ICpyZXF1ZXN0LA0KPiAgICAgICAgICAgcmV0dXJuIChyZXF1ZXN0LT50eXBl
-ID09IE5CRF9DTURfV1JJVEUgfHwNCj4gICAgICAgICAgICAgICAgICAgcmVxdWVzdC0+dHlwZSA9
-PSBOQkRfQ01EX1dSSVRFX1pFUk9FUykgPyAtRU5PU1BDIDogLUVJTlZBTDsNCj4gICAgICAgfQ0K
-PiArICAgIGlmIChjbGllbnQtPmNoZWNrX2FsaWduICYmICFRRU1VX0lTX0FMSUdORUQocmVxdWVz
-dC0+ZnJvbSB8IHJlcXVlc3QtPmxlbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGNsaWVudC0+Y2hlY2tfYWxpZ24pKSB7DQo+ICsgICAgICAgIC8q
-DQo+ICsgICAgICAgICAqIFRoZSBibG9jayBsYXllciBncmFjZWZ1bGx5IGhhbmRsZXMgdW5hbGln
-bmVkIHJlcXVlc3RzLCBidXQNCj4gKyAgICAgICAgICogaXQncyBzdGlsbCB3b3J0aCB0cmFjaW5n
-IGNsaWVudCBub24tY29tcGxpYW5jZQ0KPiArICAgICAgICAgKi8NCj4gKyAgICAgICAgdHJhY2Vf
-bmJkX2NvX3JlY2VpdmVfYWxpZ25fY29tcGxpYW5jZShuYmRfY21kX2xvb2t1cChyZXF1ZXN0LT50
-eXBlKSk7DQo+ICsgICAgfQ0KPiAgICAgICB2YWxpZF9mbGFncyA9IE5CRF9DTURfRkxBR19GVUE7
-DQo+ICAgICAgIGlmIChyZXF1ZXN0LT50eXBlID09IE5CRF9DTURfUkVBRCAmJiBjbGllbnQtPnN0
-cnVjdHVyZWRfcmVwbHkpIHsNCj4gICAgICAgICAgIHZhbGlkX2ZsYWdzIHw9IE5CRF9DTURfRkxB
-R19ERjsNCj4gZGlmZiAtLWdpdCBhL25iZC90cmFjZS1ldmVudHMgYi9uYmQvdHJhY2UtZXZlbnRz
-DQo+IGluZGV4IGE2Y2NhOGZkZjgzLi44N2EyYjg5NmMzNSAxMDA2NDQNCj4gLS0tIGEvbmJkL3Ry
-YWNlLWV2ZW50cw0KPiArKysgYi9uYmQvdHJhY2UtZXZlbnRzDQo+IEBAIC03MSw0ICs3MSw1IEBA
-IG5iZF9jb19zZW5kX2V4dGVudHModWludDY0X3QgaGFuZGxlLCB1bnNpZ25lZCBpbnQgZXh0ZW50
-cywgdWludDMyX3QgaWQsIHVpbnQ2NF90DQo+ICAgbmJkX2NvX3NlbmRfc3RydWN0dXJlZF9lcnJv
-cih1aW50NjRfdCBoYW5kbGUsIGludCBlcnIsIGNvbnN0IGNoYXIgKmVycm5hbWUsIGNvbnN0IGNo
-YXIgKm1zZykgIlNlbmQgc3RydWN0dXJlZCBlcnJvciByZXBseTogaGFuZGxlID0gJSIgUFJJdTY0
-ICIsIGVycm9yID0gJWQgKCVzKSwgbXNnID0gJyVzJyINCj4gICBuYmRfY29fcmVjZWl2ZV9yZXF1
-ZXN0X2RlY29kZV90eXBlKHVpbnQ2NF90IGhhbmRsZSwgdWludDE2X3QgdHlwZSwgY29uc3QgY2hh
-ciAqbmFtZSkgIkRlY29kaW5nIHR5cGU6IGhhbmRsZSA9ICUiIFBSSXU2NCAiLCB0eXBlID0gJSIg
-UFJJdTE2ICIgKCVzKSINCj4gICBuYmRfY29fcmVjZWl2ZV9yZXF1ZXN0X3BheWxvYWRfcmVjZWl2
-ZWQodWludDY0X3QgaGFuZGxlLCB1aW50MzJfdCBsZW4pICJQYXlsb2FkIHJlY2VpdmVkOiBoYW5k
-bGUgPSAlIiBQUkl1NjQgIiwgbGVuID0gJSIgUFJJdTMyDQo+ICtuYmRfY29fcmVjZWl2ZV9hbGln
-bl9jb21wbGlhbmNlKGNvbnN0IGNoYXIgKm9wKSAiY2xpZW50IHNlbnQgbm9uLWNvbXBsaWFudCB1
-bmFsaWduZWQgJXMgcmVxdWVzdCINCg0KRG9uJ3QgeW91IHdhbnQgcHJpbnQgcmVxdWVzdC0+ZnJv
-bSwgcmVxdWVzdC0+bGVuIGFuZCBjbGllbnQtPmNoZWNrX2FsaWduIGFzIHdlbGw/DQoNCj4gICBu
-YmRfdHJpcCh2b2lkKSAiUmVhZGluZyByZXF1ZXN0Ig0KPiANCg0KUGF0Y2ggc2VlbXMgY29ycmVj
-dCBhbnl3YXksIHNvIGlmIHlvdSBhcmUgaW4gYSBodXJyeSwgaXQncyBPSyBhcyBpczoNCg0KUmV2
-aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVv
-enpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+* Juan Quintela (quintela@redhat.com) wrote:
+> Otherwise we are setting err twice, what is wrong and causes an abort.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+Queued just this one.
+
+> ---
+>  hmp.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 92941142af..8eec768088 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1825,8 +1825,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>      case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
+>          p->has_xbzrle_cache_size = true;
+>          visit_type_size(v, param, &cache_size, &err);
+> -        if (err || cache_size > INT64_MAX
+> -            || (size_t)cache_size != cache_size) {
+> +        if (err) {
+> +            break;
+> +        }
+> +        if (cache_size > INT64_MAX || (size_t)cache_size != cache_size) {
+>              error_setg(&err, "Invalid size %s", valuestr);
+>              break;
+>          }
+> -- 
+> 2.20.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
