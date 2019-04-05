@@ -2,63 +2,113 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA67C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3181BC4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D01DD20663
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:54:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D01DD20663
+	by mail.kernel.org (Postfix) with ESMTPS id CC95F217D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 10:58:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC95F217D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39831 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39885 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCMUL-0004hf-0w
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 06:54:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47195)
+	id 1hCMYj-0006eo-1U
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 06:58:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCMTc-0004Qx-Lh
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1hCMXt-0006Jk-8c
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCMTZ-0005iI-FW
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34758)
+	(envelope-from <thuth@redhat.com>) id 1hCMXs-00045d-6B
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:58:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCMTY-0005gm-Ml
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:53:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hCMXr-00042L-GN; Fri, 05 Apr 2019 06:58:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F09B81E17;
-	Fri,  5 Apr 2019 10:53:35 +0000 (UTC)
-Received: from work-vm (ovpn-117-242.ams2.redhat.com [10.36.117.242])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 74986646D7;
-	Fri,  5 Apr 2019 10:53:29 +0000 (UTC)
-Date: Fri, 5 Apr 2019 11:53:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190405105326.GD2819@work-vm>
-References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 07E9A4902D;
+	Fri,  5 Apr 2019 10:58:02 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E35875D707;
+	Fri,  5 Apr 2019 10:57:54 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190404071421.4891-1-thuth@redhat.com>
+	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+	<158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
+	<3ba3c765-589f-4c0a-38dc-d9126f515e7b@redhat.com>
+	<87lg0p4tsc.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <8e8d5b15-57ad-95ff-c328-557c617d93b6@redhat.com>
+Date: Fri, 5 Apr 2019 12:57:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <87lg0p4tsc.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 05 Apr 2019 10:53:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 05 Apr 2019 10:58:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
+Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
+ not be user_creatable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,89 +120,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	=?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
-	John Snow <jsnow@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405105327.qBiLP_8WU0zpxPCmQKNIRW7VX51iE08jP1yPBMoEgCk@z>
+Message-ID: <20190405105754.9RUAEwrFrZJSGZuCM5j5br0uJsEqkT2HfRHKymSgY0o@z>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> Hi,
+On 04/04/2019 18.30, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 >=20
-> I am trying to understand the possible values for the MAX_FD variable
-> used by the floppy controller model (hw/block/fdc.c).
+>> On 04/04/2019 15.29, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 4/4/19 12:07 PM, Paolo Bonzini wrote:
+>>>> On 04/04/19 09:14, Thomas Huth wrote:
+>>>>> The i8042 PS/2 controller is part of the chipset on the motherboard=
+.
+>>>>> It is instantiated by the machine init code, and it does not make s=
+ense
+>>>>> to allow the user to plug an additional i8042 in any of the free IS=
+A slots.
+>>>>> Thus let's mark the device with user_creatable =3D false.
+>>>>>
+>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>> ---
+>>>>>  hw/input/pckbd.c | 2 ++
+>>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> user_creatable is not for devices that are not pluggable in real lif=
+e;
+>>>> it is for devices that crash QEMU (!) or always fail if plugged by t=
+he user.
+>>
+>> ... hmm, but presenting devices to the user that are clearly not
+>> intended for direct use is also not very nice, is it?
 >=20
-> Looking at git history:
+> Maybe, but hiding them should be separate from marking devices that
+> still defeat device_add.
 >=20
-> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
->   FDC introduced with "#define MAX_FD 2"
->=20
-> - 2008-04-29 78ae820cfeb0 (Herv=E9 Poussineau):
->   Supports up to 4 floppy drives if MAX_FD is set to 4
->   Migration stream knows about runtime value of MAX_FD
->=20
-> - 2009-09-10 d7a6c2703577 (Juan Quintela):
->   FDC vmstate-ified
->   Migration stream use compile time value of MAX_FD
->=20
-> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
->=20
-> Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
-> migration.
->=20
-> If I understand correctly migration, first we should change in
-> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
+> In the ideal world, we'd be able to start with an empty board, then
+> build a machine with by wiring together devices.  Say like use
+> device_add to create and plug into parent bus, qom-set link properties
+> to create additional wires.
 
-Right.
+I agree with you on the vision of creating a machine dynamically - but I
+doubt that we will ever do it with the "high level" -device option or
+device_add HMP/QMP command. You'd likely rather need to introduce a new
+interface / commands for this anyway, which then simply ignore the
+normal user_creatable flag.
 
-> Then to be able to use >2 floppy disks I have to modify the the
-> vmstate.version_id, and
+> Plenty of devices fail at the device_add stage, or require additional
+> wiring by code.  These are marked not user_creatable.
+
+Sure, I think we all agree on these kind of devices.
+
+But what about these devices which obviously don't crash QEMU, but are
+completely useless with "-device", since they can not be used in any
+meaningful way? Presenting them to the average user e.g. in the "-device
+help" output is somewhat gruesome, isn't it?
+
+>>>> So the question to ask is: would it make sense, and especially work,=
+ to
+>>>> add an i8042 to machines that do have an ISA bridge (for example the=
+ Alpha?)
 >=20
-> 1/ add a new field in the vmstate_fdc containing the number of drives
-> and add code to check >2 and adapt
->=20
-> or
->=20
-> 2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
-> to older FDC with only 2 disks...
+> Scratch the "would it make sense" part, keep the "would it work" part.
 
-Or, you add a subsection which is conditional on MAX_FD > 2 and which
-only stores the state of the extra FDs.
+I don't see a way how this could really work (in the sense of being
+usable, not in the sense of not crashing QEMU). The device is only
+expected to be there on certain chipssets, the guest does not have a
+possibility to detect this device on systems that do not feature one of
+these chipssets. So you get a device in such a case that simply does
+nothing. How is that useful for you?
 
-> Another option I don't like is:
->=20
-> 3/ get ride of MAX_FD !=3D 2 and clean the codebase...
-
-Seems sane to me.
-
-> $ git grep '#if MAX_FD'
-> hw/block/fdc.c:744:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:758:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:1317:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:1340:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:2041:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:2079:#if MAX_FD =3D=3D 4
-> hw/block/fdc.c:2104:#if MAX_FD =3D=3D 4
->=20
-> Herv=E9, what board are/were you using with 4 floppy drives?
->=20
-> BTW this link is somehow interesting :)
-> https://www.seasip.info/VintagePC/floppies.html
-
-Ah interesting; I did wonder because I've never seen machines
-with more than 2 (double sided) drives.
-
-Dave
-
-> Thanks,
->=20
-> Phil.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
 
