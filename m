@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35748)
+Received: from eggs.gnu.org ([209.51.188.92]:42680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCLTu-0003BO-L8
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:49:55 -0400
+	(envelope-from <philmd@redhat.com>) id 1hCM6Y-0004ls-A2
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCLTp-0003ju-Bf
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:49:53 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35813)
+	(envelope-from <philmd@redhat.com>) id 1hCM6V-0001OP-Mw
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:29:50 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53873)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCLTn-0003Z1-E5
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:49:49 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y197so6491751wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 02:49:44 -0700 (PDT)
-References: <20190404221238.12468-1-philmd@redhat.com>
-	<20190404221238.12468-5-philmd@redhat.com>
-	<bb4e3258-9036-e487-81b4-8bc5eff24158@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCM6R-0001DN-DT
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:29:45 -0400
+Received: by mail-wm1-f67.google.com with SMTP id q16so6090465wmj.3
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 03:29:42 -0700 (PDT)
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2ac6c0ac-7304-91f3-49d5-649e1bdda8c9@redhat.com>
-Date: Fri, 5 Apr 2019 11:49:41 +0200
+Message-ID: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+Date: Fri, 5 Apr 2019 12:29:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <bb4e3258-9036-e487-81b4-8bc5eff24158@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 4/4] hw/mips/r4k: Refactor the
- Super I/O chipset
+Subject: [Qemu-devel] How to correctly use more than 2 floppy drives?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 4/5/19 6:51 AM, Thomas Huth wrote:
-> On 05/04/2019 00.12, Philippe Mathieu-Daudé wrote:
->> ISA Super I/O are already modeled by the ISASuperIODevice abstract
->> device.
->> Since this board uses a generic ISA Super I/O chipset, refactor it
->> as the TYPE_R4K_SUPERIO device, child of ISASuperIODevice.
-> 
-> Good idea!
-> 
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/mips/mips_r4k.c | 61 ++++++++++++++++++++++++++++++++++------------
->>  1 file changed, 45 insertions(+), 16 deletions(-)
->>
->> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
->> index 93dbf76bb49..b51a9523b43 100644
->> --- a/hw/mips/mips_r4k.c
->> +++ b/hw/mips/mips_r4k.c
->> @@ -18,6 +18,7 @@
->>  #include "hw/i386/pc.h"
->>  #include "hw/char/serial.h"
->>  #include "hw/isa/isa.h"
->> +#include "hw/isa/superio.h"
->>  #include "net/net.h"
->>  #include "hw/net/ne2000-isa.h"
->>  #include "sysemu/sysemu.h"
->> @@ -29,7 +30,6 @@
->>  #include "hw/loader.h"
->>  #include "elf.h"
->>  #include "hw/timer/mc146818rtc.h"
->> -#include "hw/input/i8042.h"
->>  #include "hw/timer/i8254.h"
->>  #include "exec/address-spaces.h"
->>  #include "sysemu/qtest.h"
->> @@ -37,10 +37,6 @@
->>  
->>  #define MAX_IDE_BUS 2
->>  
->> -static const int ide_iobase[2] = { 0x1f0, 0x170 };
->> -static const int ide_iobase2[2] = { 0x3f6, 0x376 };
->> -static const int ide_irq[2] = { 14, 15 };
->> -
->>  static ISADevice *pit; /* PIT i8254 */
->>  
->>  /* i8254 PIT is attached to the IRQ0 at PIC i8259 */
->> @@ -73,6 +69,49 @@ static const MemoryRegionOps mips_qemu_ops = {
->>      .endianness = DEVICE_NATIVE_ENDIAN,
->>  };
->>  
->> +#define TYPE_R4K_SUPERIO "r4k-superio"
->> +
->> +static uint16_t get_ide_iobase(ISASuperIODevice *sio, uint8_t index)
->> +{
->> +    static const uint16_t ide_iobase[] = { 0x1f0, 0x3f6, 0x170, 0x376 };
->> +
->> +    return ide_iobase[index];
->> +}
->> +
->> +static unsigned int get_ide_irq(ISASuperIODevice *sio, uint8_t index)
->> +{
->> +    return index < MAX_IDE_DEVS ? 14 : 15;
->> +}
->> +
->> +static void r4k_superio_class_init(ObjectClass *klass, void *data)
->> +{
->> +    ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
->> +
->> +    sc->serial.count = MAX_ISA_SERIAL_PORTS;
->> +    sc->parallel.count = 0;
->> +    sc->floppy.count = 0;
->> +    sc->ide = (ISASuperIOFuncs){
->> +        .count = MAX_IDE_BUS * MAX_IDE_DEVS,
->> +        .get_iobase = get_ide_iobase,
->> +        .get_irq    = get_ide_irq,
->> +    };
->> +}
->> +
->> +static const TypeInfo r4k_superio_type_info = {
->> +    .name          = TYPE_R4K_SUPERIO,
->> +    .parent        = TYPE_ISA_SUPERIO,
->> +    .instance_size = sizeof(ISASuperIODevice),
->> +    .class_size    = sizeof(ISASuperIOClass),
->> +    .class_init    = r4k_superio_class_init,
->> +};
->> +
->> +static void r4k_superio_register_types(void)
->> +{
->> +    type_register_static(&r4k_superio_type_info);
->> +}
->> +
->> +type_init(r4k_superio_register_types)
->> +
->>  typedef struct ResetData {
->>      MIPSCPU *cpu;
->>      uint64_t vector;
->> @@ -179,10 +218,8 @@ void mips_r4k_init(MachineState *machine)
->>      MIPSCPU *cpu;
->>      CPUMIPSState *env;
->>      ResetData *reset_info;
->> -    int i;
->>      qemu_irq *i8259;
->>      ISABus *isa_bus;
->> -    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->>      DriveInfo *dinfo;
->>      int be;
->>  
->> @@ -274,20 +311,12 @@ void mips_r4k_init(MachineState *machine)
->>  
->>      pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
->>  
->> -    serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
->> -
->>      isa_vga_init(isa_bus);
->>  
->>      if (nd_table[0].used)
->>          isa_ne2000_init(isa_bus, 0x300, 9, &nd_table[0]);
->>  
->> -    ide_drive_get(hd, ARRAY_SIZE(hd));
->> -    for(i = 0; i < MAX_IDE_BUS; i++)
->> -        isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i], ide_irq[i],
->> -                     hd[MAX_IDE_DEVS * i],
->> -                     hd[MAX_IDE_DEVS * i + 1]);
->> -
->> -    isa_create_simple(isa_bus, TYPE_I8042);
->> +    isa_create_simple(isa_bus, TYPE_R4K_SUPERIO);
-> 
-> What about the ide_drive_get() and the ide_create_drive() that is done
-> by isa_ide_init() internally? As far as I can see, the superio code does
-> not do this job for you? So don't you have to do that manually here
-> after creating the R4K_SUPERIO device?
+Hi,
 
-Oops... I was scared I did the same mistake with the Floppy controller
-in 7313b1f28be but hopefully not. However you made me notice I never
-considered the case MAX_FD>2. I'll send a mail asking if this case is
-still used.
+I am trying to understand the possible values for the MAX_FD variable
+used by the floppy controller model (hw/block/fdc.c).
 
-Thanks!
+Looking at git history:
+
+- 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
+  FDC introduced with "#define MAX_FD 2"
+
+- 2008-04-29 78ae820cfeb0 (Hervé Poussineau):
+  Supports up to 4 floppy drives if MAX_FD is set to 4
+  Migration stream knows about runtime value of MAX_FD
+
+- 2009-09-10 d7a6c2703577 (Juan Quintela):
+  FDC vmstate-ified
+  Migration stream use compile time value of MAX_FD
+
+Since 7138fcfbf7dd MAX_FD has always been defined as 2.
+
+Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
+migration.
+
+If I understand correctly migration, first we should change in
+vmstate_fdc the user-definable MAX_FD by a constant 2 value.
+
+Then to be able to use >2 floppy disks I have to modify the the
+vmstate.version_id, and
+
+1/ add a new field in the vmstate_fdc containing the number of drives
+and add code to check >2 and adapt
+
+or
+
+2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
+to older FDC with only 2 disks...
+
+Another option I don't like is:
+
+3/ get ride of MAX_FD != 2 and clean the codebase...
+
+$ git grep '#if MAX_FD'
+hw/block/fdc.c:744:#if MAX_FD == 4
+hw/block/fdc.c:758:#if MAX_FD == 4
+hw/block/fdc.c:1317:#if MAX_FD == 4
+hw/block/fdc.c:1340:#if MAX_FD == 4
+hw/block/fdc.c:2041:#if MAX_FD == 4
+hw/block/fdc.c:2079:#if MAX_FD == 4
+hw/block/fdc.c:2104:#if MAX_FD == 4
+
+Hervé, what board are/were you using with 4 floppy drives?
+
+BTW this link is somehow interesting :)
+https://www.seasip.info/VintagePC/floppies.html
+
+Thanks,
 
 Phil.
