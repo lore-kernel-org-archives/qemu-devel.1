@@ -1,43 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47243)
+Received: from eggs.gnu.org ([209.51.188.92]:47646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hCOd2-0001oh-C1
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:11:33 -0400
+	(envelope-from <mopsfelder@gmail.com>) id 1hCOeN-0002WV-5r
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:12:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hCOd1-0006n1-5s
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:11:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32896
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1hCOd0-0006mf-RJ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:11:31 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x35DBNKs121338
-	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 09:11:30 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rp6sbapk4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 09:11:24 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 5 Apr 2019 14:11:05 +0100
-Reply-To: jjherne@linux.ibm.com
-References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
-	<6cd9fc3c-f5cb-e0fd-6990-d519014bead0@redhat.com>
-	<d5b711f6-2e0e-f664-70cc-8d9c906bf122@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri, 5 Apr 2019 09:11:00 -0400
+	(envelope-from <mopsfelder@gmail.com>) id 1hCOeL-00082s-5z
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:12:55 -0400
+From: "Murilo Opsfelder =?utf-8?Q?Ara=C3=BAjo?=" <mopsfelder@gmail.com>
+In-Reply-To: <155445152490.302073.17033451726459859333.stgit@bahia.lan>
+References: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
+	<155445152490.302073.17033451726459859333.stgit@bahia.lan>
+Date: Fri, 05 Apr 2019 10:12:42 -0300
+Message-ID: <87tvfc8uk5.fsf@kermit.br.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <d5b711f6-2e0e-f664-70cc-8d9c906bf122@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <5749904a-9ac3-1b68-c544-b0f0cdcc8ffa@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 00/16] s390: vfio-ccw dasd
- ipl support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/ppc/kvm: Convert DPRINTF to
+ traces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,77 +23,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Aravinda Prasad <aravinda@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 4/5/19 3:52 AM, Thomas Huth wrote:
-> On 05/04/2019 08.58, Thomas Huth wrote:
->> On 04/04/2019 16.34, Jason J. Herne wrote:
->>> This is to support booting from vfio-ccw dasd devices. We basically implement
->>> the real hardware ipl procedure. This allows for booting Linux guests on
->>> vfio-ccw devices.
->>>
->>> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
->>> channel programs dynamically modify themselves. Details on the ipl process and
->>> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
->>
->>   Hi Jason,
->>
->> while running my s390-ccw bios tests, I noticed that network booting
->> seems to be broken now. This used to work before:
->>
->> s390x-softmmu/qemu-system-s390x -nographic -accel kvm \
->>   -bios pc-bios/s390-ccw/s390-ccw.img \
->>   -global s390-ipl.netboot_fw=pc-bios/s390-ccw/s390-netboot.img \
->>   -netdev user,id=n1,tftp=/boot,bootfile=vmlinuz-4.18.0 \
->>   -device virtio-net-ccw,netdev=n1,bootindex=1
->>
->> Now it simply fails with "! No IPL device available !".
->>
->> Could you have a look at it, please?
-> 
-> FWIW: The problem seems to be in the last patch: virtio_is_supported()
-> is now not called anymore, and so virtio_get_device_type() now returns
-> the wrong type.
-> 
->   Thomas
-> 
+Hi, Greg.
 
-Good catch. Testing netboot for this iteration did slip my mind. I've now added a basic 
-netboot script to my test suite to avoid this type of regression in the future.
+Greg Kurz <groug@kaod.org> writes:
 
-Your analysis of the problem matches what I'm seeing as well. Here is what I'm proposing 
-to fix it. If you like it, let me know if you want me to re-send just the final patch, or 
-the entire series again with a v7 tag.
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  target/ppc/kvm.c        |   68 +++++++++++++++++++----------------------------
+>  target/ppc/trace-events |   25 +++++++++++++++++
+>  2 files changed, 52 insertions(+), 41 deletions(-)
+>
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 2427c8ee13ae..3a11d2e1060c 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -49,16 +49,6 @@
+>  #include "elf.h"
+>  #include "sysemu/kvm_int.h"
+>
+> -//#define DEBUG_KVM
+> -
+> -#ifdef DEBUG_KVM
+> -#define DPRINTF(fmt, ...) \
+> -    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) \
+> -    do { } while (0)
+> -#endif
+> -
+>  #define PROC_DEVTREE_CPU      "/proc/device-tree/cpus/"
+>
+>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> @@ -626,7 +616,7 @@ static int kvm_put_fp(CPUState *cs)
+>          reg.addr = (uintptr_t)&fpscr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to set FPSCR to KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_fpscr_set(strerror(errno));
+>              return ret;
+>          }
+>
+> @@ -647,8 +637,8 @@ static int kvm_put_fp(CPUState *cs)
+>
+>              ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>              if (ret < 0) {
+> -                DPRINTF("Unable to set %s%d to KVM: %s\n", vsx ? "VSR" : "FPR",
+> -                        i, strerror(errno));
+> +                trace_kvm_failed_fp_set(vsx ? "VSR" : "FPR", i,
+> +                                        strerror(errno));
+>                  return ret;
+>              }
+>          }
+> @@ -659,7 +649,7 @@ static int kvm_put_fp(CPUState *cs)
+>          reg.addr = (uintptr_t)&env->vscr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to set VSCR to KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_vscr_set(strerror(errno));
+>              return ret;
+>          }
+>
+> @@ -668,7 +658,7 @@ static int kvm_put_fp(CPUState *cs)
+>              reg.addr = (uintptr_t)cpu_avr_ptr(env, i);
+>              ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>              if (ret < 0) {
+> -                DPRINTF("Unable to set VR%d to KVM: %s\n", i, strerror(errno));
+> +                trace_kvm_failed_vr_set(i, strerror(errno));
+>                  return ret;
+>              }
+>          }
+> @@ -693,7 +683,7 @@ static int kvm_get_fp(CPUState *cs)
+>          reg.addr = (uintptr_t)&fpscr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to get FPSCR from KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_fpscr_get(strerror(errno));
+>              return ret;
+>          } else {
+>              env->fpscr = fpscr;
+> @@ -709,8 +699,8 @@ static int kvm_get_fp(CPUState *cs)
+>
+>              ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>              if (ret < 0) {
+> -                DPRINTF("Unable to get %s%d from KVM: %s\n",
+> -                        vsx ? "VSR" : "FPR", i, strerror(errno));
+> +                trace_kvm_failed_fp_get(vsx ? "VSR" : "FPR", i,
+> +                                        strerror(errno));
+>                  return ret;
+>              } else {
+>  #ifdef HOST_WORDS_BIGENDIAN
+> @@ -733,7 +723,7 @@ static int kvm_get_fp(CPUState *cs)
+>          reg.addr = (uintptr_t)&env->vscr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to get VSCR from KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_vscr_get(strerror(errno));
+>              return ret;
+>          }
+>
+> @@ -742,8 +732,7 @@ static int kvm_get_fp(CPUState *cs)
+>              reg.addr = (uintptr_t)cpu_avr_ptr(env, i);
+>              ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>              if (ret < 0) {
+> -                DPRINTF("Unable to get VR%d from KVM: %s\n",
+> -                        i, strerror(errno));
+> +                trace_kvm_failed_vr_get(i, strerror(errno));
+>                  return ret;
+>              }
+>          }
+> @@ -764,7 +753,7 @@ static int kvm_get_vpa(CPUState *cs)
+>      reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+> -        DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(errno));
+> +        trace_kvm_failed_vpa_addr_get(strerror(errno));
+>          return ret;
+>      }
+>
+> @@ -774,8 +763,7 @@ static int kvm_get_vpa(CPUState *cs)
+>      reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+> -        DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
+> -                strerror(errno));
+> +        trace_kvm_failed_slb_get(strerror(errno));
+>          return ret;
+>      }
+>
+> @@ -785,8 +773,7 @@ static int kvm_get_vpa(CPUState *cs)
+>      reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+> -        DPRINTF("Unable to get dispatch trace log state from KVM: %s\n",
+> -                strerror(errno));
+> +        trace_kvm_failed_dtl_get(strerror(errno));
+>          return ret;
+>      }
+>
+> @@ -812,7 +799,7 @@ static int kvm_put_vpa(CPUState *cs)
+>          reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_vpa_addr_set(strerror(errno));
+>              return ret;
+>          }
+>      }
+> @@ -823,7 +810,7 @@ static int kvm_put_vpa(CPUState *cs)
+>      reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+> -        DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerror(errno));
+> +        trace_kvm_failed_slb_set(strerror(errno));
+>          return ret;
+>      }
+>
+> @@ -833,8 +820,7 @@ static int kvm_put_vpa(CPUState *cs)
+>      reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+> -        DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
+> -                strerror(errno));
+> +        trace_kvm_failed_dtl_set(strerror(errno));
+>          return ret;
+>      }
+>
+> @@ -843,7 +829,7 @@ static int kvm_put_vpa(CPUState *cs)
+>          reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+> -            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
+> +            trace_kvm_failed_null_vpa_addr_set(strerror(errno));
+>              return ret;
+>          }
+>      }
+> @@ -996,7 +982,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>
+>          if (cap_papr) {
+>              if (kvm_put_vpa(cs) < 0) {
+> -                DPRINTF("Warning: Unable to set VPA information to KVM\n");
+> +                trace_kvm_failed_put_vpa();
+>              }
+>          }
+>
+> @@ -1296,7 +1282,7 @@ int kvm_arch_get_registers(CPUState *cs)
+>
+>          if (cap_papr) {
+>              if (kvm_get_vpa(cs) < 0) {
+> -                DPRINTF("Warning: Unable to get VPA information from KVM\n");
+> +                trace_kvm_failed_get_vpa();
+>              }
+>          }
+>
+> @@ -1352,7 +1338,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+>           */
+>          irq = KVM_INTERRUPT_SET;
+>
+> -        DPRINTF("injected interrupt %d\n", irq);
+> +        trace_kvm_injected_interrupt(irq);
+>          r = kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
+>          if (r < 0) {
+>              printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
+> @@ -1697,20 +1683,20 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>      switch (run->exit_reason) {
+>      case KVM_EXIT_DCR:
+>          if (run->dcr.is_write) {
+> -            DPRINTF("handle dcr write\n");
+> +            trace_kvm_handle_dcr_write();
+>              ret = kvmppc_handle_dcr_write(env, run->dcr.dcrn, run->dcr.data);
+>          } else {
+> -            DPRINTF("handle dcr read\n");
+> +            trace_kvm_handle_drc_read();
+>              ret = kvmppc_handle_dcr_read(env, run->dcr.dcrn, &run->dcr.data);
+>          }
+>          break;
+>      case KVM_EXIT_HLT:
+> -        DPRINTF("handle halt\n");
+> +        trace_kvm_handle_halt();
+>          ret = kvmppc_handle_halt(cpu);
+>          break;
+>  #if defined(TARGET_PPC64)
+>      case KVM_EXIT_PAPR_HCALL:
+> -        DPRINTF("handle PAPR hypercall\n");
+> +        trace_kvm_handle_papr_hcall();
+>          run->papr_hcall.ret = spapr_hypercall(cpu,
+>                                                run->papr_hcall.nr,
+>                                                run->papr_hcall.args);
+> @@ -1718,18 +1704,18 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>          break;
+>  #endif
+>      case KVM_EXIT_EPR:
+> -        DPRINTF("handle epr\n");
+> +        trace_kvm_handle_epr();
+>          run->epr.epr = ldl_phys(cs->as, env->mpic_iack);
+>          ret = 0;
+>          break;
+>      case KVM_EXIT_WATCHDOG:
+> -        DPRINTF("handle watchdog expiry\n");
+> +        trace_kvm_handle_watchdog_expiry();
+>          watchdog_perform_action();
+>          ret = 0;
+>          break;
+>
+>      case KVM_EXIT_DEBUG:
+> -        DPRINTF("handle debug exception\n");
+> +        trace_kvm_handle_debug_exception();
+>          if (kvm_handle_debug(cpu, run)) {
+>              ret = EXCP_DEBUG;
+>              break;
+> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+> index ed4d57c6d9c1..7b3cfe11fdfe 100644
+> --- a/target/ppc/trace-events
+> +++ b/target/ppc/trace-events
+> @@ -3,3 +3,28 @@
+>  # kvm.c
+>  kvm_failed_spr_set(int spr, const char *msg) "Warning: Unable to set SPR %d to KVM: %s"
+>  kvm_failed_spr_get(int spr, const char *msg) "Warning: Unable to retrieve SPR %d from KVM: %s"
+> +kvm_failed_fpscr_set(const char *msg) "Unable to set FPSCR to KVM: %s"
+> +kvm_failed_fp_set(const char *fpname, int fpnum, const char *msg) "Unable to set %s%d to KVM: %s"
+> +kvm_failed_vscr_set(const char *msg) "Unable to set VSCR to KVM: %s"
+> +kvm_failed_vr_set(int vr, const char *msg) "Unable to set VR%d to KVM: %s"
+> +kvm_failed_fpscr_get(const char *msg) "Unable to get FPSCR from KVM: %s"
+> +kvm_failed_fp_get(const char *fpname, int fpnum, const char *msg) "Unable to get %s%d from KVM: %s"
+> +kvm_failed_vscr_get(const char *msg) "Unable to get VSCR from KVM: %s"
+> +kvm_failed_vr_get(int vr, const char *msg) "Unable to get VR%d from KVM: %s"
+> +kvm_failed_vpa_addr_get(const char *msg) "Unable to get VPA address from KVM: %s"
+> +kvm_failed_slb_get(const char *msg) "Unable to get SLB shadow state from KVM: %s"
+> +kvm_failed_dtl_get(const char *msg) "Unable to get dispatch trace log state from KVM: %s"
+> +kvm_failed_vpa_addr_set(const char *msg) "Unable to set VPA address to KVM: %s"
+> +kvm_failed_slb_set(const char *msg) "Unable to set SLB shadow state to KVM: %s"
+> +kvm_failed_dtl_set(const char *msg) "Unable to set dispatch trace log state to KVM: %s"
+> +kvm_failed_null_vpa_addr_set(const char *msg) "Unable to set VPA address to KVM: %s"
+> +kvm_failed_put_vpa(void) "Warning: Unable to set VPA information to KVM"
+> +kvm_failed_get_vpa(void) "Warning: Unable to get VPA information from KVM"
 
+Some messages have "Warning:" and some don't.
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 03e90e3..3d1e9a4 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -67,6 +67,7 @@ static bool find_subch(int dev_no)
-  {
-      Schib schib;
-      int i, r;
-+    bool is_virtio;
+Since these traces indicate some kind of failure, do you think adding
+the warning prefix would be welcome?  Having it also facilitates when
+searching logs.
 
-      for (i = 0; i < 0x10000; i++) {
-          blk_schid.sch_no = i;
-@@ -80,12 +81,13 @@ static bool find_subch(int dev_no)
+Murilo
 
-          enable_subchannel(blk_schid);
-          cutype = cu_type(blk_schid);
-+        is_virtio = virtio_is_supported(blk_schid);
-
-          /* No specific devno given, just return 1st possibly bootable device */
-          if (dev_no < 0) {
-              switch (cutype) {
-              case CU_TYPE_VIRTIO:
--                if (virtio_is_supported(blk_schid)) {
-+                if (is_virtio) {
-                      /*
-                       * Skip net devices since no IPLB is created and therefore
-                       * no network bootloader has been loaded
-
-
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+> +kvm_injected_interrupt(int irq) "injected interrupt %d"
+> +kvm_handle_dcr_write(void) "handle dcr write"
+> +kvm_handle_drc_read(void) "handle dcr read"
+> +kvm_handle_halt(void) "handle halt"
+> +kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+> +kvm_handle_epr(void) "handle epr"
+> +kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
+> +kvm_handle_debug_exception(void) "handle debug exception"
