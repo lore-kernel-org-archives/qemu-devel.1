@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46128)
+Received: from eggs.gnu.org ([209.51.188.92]:48848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hCXsL-0007kA-Q3
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:03:59 -0400
+	(envelope-from <mst@redhat.com>) id 1hCY0p-0003Xa-5N
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hCXf3-0007Kb-8m
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:50:14 -0400
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
-Date: Fri, 5 Apr 2019 18:50:03 -0400
+	(envelope-from <mst@redhat.com>) id 1hCY0o-0003V9-7M
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:43 -0400
+Received: from mail-qt1-f170.google.com ([209.85.160.170]:34373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hCY0n-0003QV-Lg
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:12:42 -0400
+Received: by mail-qt1-f170.google.com with SMTP id k2so9398652qtm.1
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 16:12:41 -0700 (PDT)
+Date: Fri, 5 Apr 2019 19:12:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1553199229-25318-1-git-send-email-liam.merwick@oracle.com>
+References: <20190405231225.30165-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
- allocation failure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190405231225.30165-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] acpi: verify file entries in
+ bios_linker_loader_add_pointer()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Liam Merwick <liam.merwick@oracle.com>, Igor Mammedov <imammedo@redhat.com>
 
+From: Liam Merwick <liam.merwick@oracle.com>
 
+The callers to bios_linker_find_file() assert that the file entry returned
+is not NULL, except for those in bios_linker_loader_add_pointer().  Add two
+asserts in that case for completeness and to facilitate static code analysis.
 
-On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
-> On a file system used by the customer, fallocate() returns an error
-> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
-> fails. We can handle that case the same way as it is done for the
-> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
-> zeroes to an image for the unaligned chunk of the block.
-> 
-> Suggested-by: Denis V. Lunev <den@openvz.org>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  block/io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index dfc153b..0412a51 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->              assert(!bs->supported_zero_flags);
->          }
->  
-> -        if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
-> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
->              /* Fall back to bounce buffer if write zeroes is unsupported */
->              BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
->  
-> 
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Message-Id: <1553199229-25318-1-git-send-email-liam.merwick@oracle.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/acpi/bios-linker-loader.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I suppose that if fallocate fails for any reason and we're allowing
-fallback, we're either going to succeed ... or fail again very soon
-thereafter.
-
-Are there any cases where it is vital to not ignore the first fallocate
-failure? I'm a little wary of ignoring the return code from
-bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
-failure here that the following bounce writes will also fail "safely."
-
-I'm not completely confident, but I have no tangible objections:
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index d16b8bbcb1..626c04a39f 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -283,6 +283,8 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+     const BiosLinkerFileEntry *source_file =
+         bios_linker_find_file(linker, src_file);
+ 
++    assert(dst_file);
++    assert(source_file);
+     assert(dst_patched_offset < dst_file->blob->len);
+     assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
+     assert(src_offset < source_file->blob->len);
+-- 
+MST
