@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48608)
+Received: from eggs.gnu.org ([209.51.188.92]:48806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCQrJ-0005i5-Nm
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 11:34:26 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hCQrj-00060w-6v
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 11:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hCQrI-0003a0-Oa
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 11:34:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCQrD-0002kp-3L
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 11:34:21 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  5 Apr 2019 17:33:12 +0200
-Message-Id: <20190405153314.2068-1-philmd@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hCQrf-0003sr-MU
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 11:34:49 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 5 Apr 2019 15:34:32 +0000
+Message-ID: <57ff4a6d-36ed-3126-6de0-aa708828693d@virtuozzo.com>
+References: <20190403030526.12258-1-eblake@redhat.com>
+	<20190403030526.12258-4-eblake@redhat.com>
+In-Reply-To: <20190403030526.12258-4-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F2205CE0757DA54681CCE2D0A93617C3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 v2 0/2] roms: Rename the EFIROM
- variable and let it be overridable
+Subject: Re: [Qemu-devel] [PATCH 3/7] nbd/server: Don't fail NBD_OPT_INFO
+ for byte-aligned sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Olaf Hering <olaf@aepfle.de>
-Cc: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Hi,
-
-Two trivial fixes to avoid the latest EDK2 testing series to
-cause trouble to downstream distributions (in particular if
-they have PIE enforced).
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (2):
-  roms: Rename the EFIROM variable to avoid clashing with iPXE
-  roms: Allow the EDK2_EFIROM variable to be overridden
-
- roms/Makefile | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
---=20
-2.20.1
+MDMuMDQuMjAxOSA2OjA1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBJbiBjb21taXQgMGMxZDUwYmQs
+IEkgYWRkZWQgYSBjb3VwbGUgb2YgVE9ETyBjb21tZW50cyBhYm91dCB3aGV0aGVyIHdlDQo+IGNv
+bnN1bHQgYmwucmVxdWVzdF9hbGlnbm1lbnQgd2hlbiByZXNwb25kaW5nIHRvIE5CRF9PUFRfSU5G
+Ty4gQXQgdGhlDQo+IHRpbWUsIHFlbXUgYXMgc2VydmVyIHdhcyBoYXJkLWNvZGluZyBhbiBhZHZl
+cnRpc2VkIGFsaWdubWVudCBvZiA1MTIgdG8NCj4gY2xpZW50cyB0aGF0IHByb21pc2VkIHRvIG9i
+ZXkgY29uc3RyYWludHMsIGFuZCB0aGVyZSB3YXMgbm8gZnVuY3Rpb24NCj4gZm9yIGdldHRpbmcg
+YXQgYSBkZXZpY2UncyBwcmVmZXJyZWQgYWxpZ25tZW50LiBCdXQgaW4gaGluZHNpZ2h0LA0KPiBh
+ZHZlcnRpc2luZyA1MTIgd2hlbiB0aGUgYmxvY2sgZGV2aWNlIHByZWZlcnMgMSBjYXVzZWQgb3Ro
+ZXINCj4gY29tcGxpYW5jZSBwcm9ibGVtcywgYW5kIGNvbW1pdCBiMDI0NWQ2NCBjaGFuZ2VkIG9u
+ZSBvZiB0aGUgdHdvIFRPRE8NCj4gY29tbWVudHMgdG8gYWR2ZXJ0aXNlIGEgbW9yZSBhY2N1cmF0
+ZSBhbGlnbm1lbnQuIFRpbWUgdG8gZml4IHRoZSBvdGhlcg0KPiBUT0RPLiAgRG9lc24ndCByZWFs
+bHkgaW1wYWN0IHFlbXUgYXMgY2xpZW50IChvdXIgbm9ybWFsIGNsaWVudCBkb2Vzbid0DQo+IHVz
+ZSBOQkRfT1BUX0lORk8sIGFuZCBxZW11LW5iZCAtLWxpc3QgcHJvbWlzZXMgdG8gb2JleSBibG9j
+ayBzaXplcyksDQo+IGJ1dCBpdCBtaWdodCBwcm92ZSB1c2VmdWwgdG8gb3RoZXIgY2xpZW50cy4N
+Cj4gDQo+IEZpeGVzOiBiMDI0NWQ2NA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxh
+a2VAcmVkaGF0LmNvbT4NCg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2
+c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
