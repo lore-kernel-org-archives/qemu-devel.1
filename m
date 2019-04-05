@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37388)
+Received: from eggs.gnu.org ([209.51.188.92]:54193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hCVFQ-000650-EE
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:15:37 -0400
+	(envelope-from <flukshun@gmail.com>) id 1hCVaB-0005bN-2j
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hCVFO-0006pl-Pz
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:15:36 -0400
-References: <20190405191635.25740-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6ef529c2-714e-0764-d259-7bf65e8cd273@redhat.com>
-Date: Fri, 5 Apr 2019 14:38:49 -0500
+	(envelope-from <flukshun@gmail.com>) id 1hCVa4-0008Qt-0h
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:36:58 -0400
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20190405191635.25740-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="395omYHbbIFfEXpopBKmqDW2bfbacP0l7"
-Subject: Re: [Qemu-devel] [PATCH for-4.1] qemu-nbd: Look up flag names in
- array
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <ce68c2dc-857a-aff0-0fb7-a8e48e921c54@redhat.com>
+References: <20190401210011.16009-1-mdroth@linux.vnet.ibm.com>
+	<ce68c2dc-857a-aff0-0fb7-a8e48e921c54@redhat.com>
+Message-ID: <155449613359.3739.8673708328232350625@sif>
+Date: Fri, 05 Apr 2019 15:28:53 -0500
+Subject: Re: [Qemu-devel] [PATCH 00/97] Patch Round-up for stable 3.0.1,
+ freeze on 2019-04-08
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Lieven <pl@kamp.de>, Hannes Reinecke <hare@suse.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---395omYHbbIFfEXpopBKmqDW2bfbacP0l7
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6ef529c2-714e-0764-d259-7bf65e8cd273@redhat.com>
-Subject: Re: [PATCH for-4.1] qemu-nbd: Look up flag names in array
-References: <20190405191635.25740-1-mreitz@redhat.com>
-In-Reply-To: <20190405191635.25740-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Philippe Mathieu-Daud=C3=A9 (2019-04-04 17:31:31)
+> On 4/1/19 10:58 PM, Michael Roth wrote:
+> > Hi everyone,                                                           =
+                                   =
 
-On 4/5/19 2:16 PM, Max Reitz wrote:
-> The existing code to convert flag bits into strings looks a bit strange=
+> > =
 
-> now, and if we ever add more flags, it will look even stranger.  Preven=
-t
-> that from happening by making it look up the flag names in an array.
+> > The following new patches are queued for QEMU stable v3.0.1:
+> > =
 
-At one point, I even considered using a QAPI type and expressing things
-in a way where we could add an --output=3Djson and/or use our existing
-QObject-to-human-readable formatters instead of open-coding things in
-qemu-nbd.  But this patch is worthwhile in the meantime.
+> >   https://github.com/mdroth/qemu/commits/stable-3.0-staging
+> > =
 
+> > The release is planned for 2019-04-11:
+> > =
+
+> >   https://wiki.qemu.org/Planning/3.0
+...
+> =
+
+> I'm not sure about 4c257911dcc7c4189768e9651755c849ce9db4e8
+> "i386: remove the 'INTEL_PT' CPUID bit from named CPU models"
+
+AFAICT this was only enabled by default via Icelake-*, Cascadelake-Server
+models, which are only in 3.1+. I have it queued for 3.1.1 though.
+
+> =
+
+> What about 334c43e2c342e878311c66b4e62343f0a7c2c6be?
+> "qemu-img: fix error reporting for -object"
+
+Looks like this fixes a regression introduced in 3.1 with 7e1e0c11, I'll
+make sure to queue it for 3.1.1 though.
+
+> =
+
+> Also ade0075523478fa015afd5c6f6cc70681687818d:
+> "contrib/rdmacm-mux: Fix out-of-bounds risk"
+
+Fixes regression introduced in 4.0 with a5d2f6f8773
+
+> =
+
+> And 3fd2092fd11b9e4220a08eca0663cc59178a6c3f:
+> "hw/usb: fix mistaken de-initialization of CCID state"
+
+
+Fixes regression introduced in 4.0 with 7dea29e4
+
+> =
+
+> Eventually:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg00843.html
+> "megasas: fix mapped frame size"
+
+Hopefully it makes it in by rc3 next week, otherwise we'd need to delay
+3.0.1 to pick it up. Will keep it eye on it.
+
+Thanks for the suggestions!
+
+> =
+
+> Regards,
+> =
+
+> Phil.
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> Looking at the diff stat I can't claim this patch really improves
-> anything by much, but the current code just pains me so.
-> ---
->  include/block/nbd.h | 38 +++++++++++++++++++++++++------------
->  qemu-nbd.c          | 46 +++++++++++++++++----------------------------=
-
->  2 files changed, 43 insertions(+), 41 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Will apply through my NBD tree for 4.1 (no semantic change, so -rc3 is
-indeed too late for taking this into 4.0)
-
-Hmm. nbdkit uses a generated header that scrapes the definitions of
-various bit values and produces automated value-to-name lookup
-functions, rather than having to open-code the lookup functions. Perhaps
-we could consider doing similar in qemu for even less code to maintain.
-
-
-> +                [NBD_FLAG_SEND_CACHE_BIT]           =3D "cache",
-> +            };
-> +
->              printf("  size:  %" PRIu64 "\n", list[i].size);
->              printf("  flags: 0x%x (", list[i].flags);
-> -            if (list[i].flags & NBD_FLAG_READ_ONLY) {
-> -                printf(" readonly");
-> -            }
-
-I'm also wondering if I should have added another nbd_*_lookup()
-function in nbd/common.c to do this lookup (even if we still like the
-array approach over open-coding, and whether or not we like the idea of
-generating things from the .h, having all of the lookup functions in one
-place and style makes more sense than special-casing NBD_FLAG_ lookups
-to just live in qemu-nbd.c).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---395omYHbbIFfEXpopBKmqDW2bfbacP0l7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlynrskACgkQp6FrSiUn
-Q2q5Qwf8DJuVUGdyefrbTX4TnxssiYEz9M51TzaSGAuGnK+CjYnbLoncC53CPWmt
-GaA+nVEE7sJkXENuQzcRIimdZC1KOV0WT7ZOqkHXdLbmZVwitNt9IzfiYa9KNkg1
-2WjaySejpS0rI6DXZZupDP0Kame83aI3J5kVr7yD64pvB+S7Lb+xEPolof67TM/f
-/3CYAAEKhrkDvCQj7LKaYkG/p+GICxOQR5KZo9HGNZgsKHo+Xup8alwnDmoz85yu
-0psNZyi5S8F/UccKChI01smHf0lcO8xfBxY1Wo9i6XljCdEGH9kunFFyER9FSBWs
-Diw+A0AlFbaNPiVlyNB/hHqwSBEHXA==
-=YN/h
------END PGP SIGNATURE-----
-
---395omYHbbIFfEXpopBKmqDW2bfbacP0l7--
