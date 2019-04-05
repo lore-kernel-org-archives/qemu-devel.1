@@ -2,93 +2,104 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EA6C282CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 20:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6272C282CE
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 21:10:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9D020989
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 20:48:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9D020989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8787920651
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 21:10:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XRbRGaSO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8787920651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46699 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46948 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCVl5-0001g2-By
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 16:48:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35222)
+	id 1hCW6l-0000kT-NX
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 17:10:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hCVjt-0001Be-2X
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:06 -0400
+	(envelope-from <wei.d.li@oracle.com>) id 1hCW62-0000MH-1w
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hCVjr-00009c-Lo
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hCVjm-00089o-Mw
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 16:47:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6E7D81DE0;
-	Fri,  5 Apr 2019 19:30:41 +0000 (UTC)
-Received: from [10.3.116.67] (ovpn-116-67.phx2.redhat.com [10.3.116.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D7A201001DF9;
-	Fri,  5 Apr 2019 19:30:40 +0000 (UTC)
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
-	qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com,
-	pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
-References: <20190405184037.16799-1-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <b0340220-870c-c3a6-9ce8-592ae2f6e061@redhat.com>
-Date: Fri, 5 Apr 2019 14:30:39 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190405184037.16799-1-dgilbert@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 05 Apr 2019 19:30:41 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.0] test qgraph.c: Fix segs due to out
- of scope default
+	(envelope-from <wei.d.li@oracle.com>) id 1hCW5t-0005v5-4y
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:51 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:54090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hCW5l-0005LS-0Q
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:44 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x35L97I6088205; Fri, 5 Apr 2019 21:09:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : subject : from
+	: to : cc : message-id : references : in-reply-to : mime-version :
+	content-type : content-transfer-encoding; s=corp-2018-07-02;
+	bh=dsMK5oq7lohD0csr6mLSTMRSg6BXReJwJ8IUunZQa7Q=;
+	b=XRbRGaSOgC0n16apKKrEmqaQkLiBLZLpC4fUH08OV4CNyEO+Wpb/9uPLMSU+J4+fc0vf
+	+TOowomMUkRXTbLhF7WAsqjjxYHefGiXMa6bvokhFFcR2B4mAHoFtbfqQnNRiOSXHEbP
+	dnVnXSd9e3QmCtyFxaaUmhZO9sW/p6EsH1nrK7GAvrHdVTafYdLWtaEnUCGNted0uEKu
+	n+sxe5YphbTVTTQGX3A0GBIXqI1O84In6EwwuRvMUFwjcTqSLkelKll3yNgrEMh8MtP/
+	TOxCDuC2lYXcBy7TgSxW/bxWDz0MJPkvxZfBHJpONDrlvVwi45jsdU7dlIOGhMboeO0A
+	kw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by aserp2130.oracle.com with ESMTP id 2rhwydq6eu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 05 Apr 2019 21:09:07 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x35L7nml030574; Fri, 5 Apr 2019 21:09:06 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserp3020.oracle.com with ESMTP id 2rp35s318n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 05 Apr 2019 21:09:06 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x35L96xM016481;
+	Fri, 5 Apr 2019 21:09:06 GMT
+Received: from [10.74.109.160] (/10.74.109.160)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Fri, 05 Apr 2019 14:09:05 -0700
+User-Agent: Microsoft-MacOutlook/10.15.0.190115
+Date: Fri, 05 Apr 2019 14:09:04 -0700
+From: Wei Li <wei.d.li@oracle.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
+Thread-Topic: [Qemu-devel] Following up questions related to QEMU and I/O
+	Thread
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+In-Reply-To: <20190401090724.GA643@stefanha-x1.localdomain>
+Mime-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9218
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904050140
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9218
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904050140
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,73 +111,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405193039.2I7wmbw5m9vrNs5TGhknVPogt-B6OtBqT7eN7DRog7E@z>
+Message-ID: <20190405210904.xBSkzJJrQBmqvJAxQmNJg2ZfG-KqcJFRJAXsamOCjNs@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com,
- pbonzini@redhat.com, e.emanuelegiuseppe@gmail.com
-Message-ID: <b0340220-870c-c3a6-9ce8-592ae2f6e061@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0] test qgraph.c: Fix segs due to out
- of scope default
-References: <20190405184037.16799-1-dgilbert@redhat.com>
-In-Reply-To: <20190405184037.16799-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks Stefan for your quick response!
 
-On 4/5/19 1:40 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> The test uses the trick:
->    if (!opts) {
->      opts =3D &(QOSGraph...Options) { };
->    }
->=20
->   in a couple of places, however the temporary created
-> by the &() {}  goes out of scope at the bottom of the if,
-> and results in a seg or assert when opts-> fields are
-> used (on fedora 30's gcc 9).
->=20
-> Fixes: fc281c802022cb3a73a5
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tests/libqos/qgraph.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Hi Paolo,
+Could you please send us a link related to the multiqueue feature which you=
+ are working on so that we could start getting some details about the featur=
+e.
 
-Fixing it for 4.0 would be nice (we can't promise that everything in 4.0
-is clean for gcc 9, but as long as we have to do -rc3 anyways, fixing
-undefined behavior into something well-defined like this seems reasonable=
-)
+Thanks again,
+Wei=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+=EF=BB=BFOn 4/1/19, 3:54 AM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+    On Fri, Mar 29, 2019 at 08:16:36AM -0700, Wei Li wrote:
+    > Thanks Stefan for your reply and guidance!
+    >=20
+    > We spent some time on exploring the multiple I/O Threads approach per=
+ your feedback. Based on the perf measurement data, we did see some IOPS imp=
+rovement for multiple volumes, which is great. :)
+    >=20
+    > In addition, IOPS for single Volume will still be a bottleneck, it se=
+ems like multiqueue block layer feature which Paolo is working on may be abl=
+e to help improving the IOPS for single volume.
+    >=20
+    > @Paolo, @Stefan,=20
+    > Would you mind sharing the multiqueue feature code branch with us? So=
+ that we could get some rough idea about this feature and maybe start doing =
+some exploration?=20
+   =20
+    Paolo last worked on this code, so he may be able to send you a link.
+   =20
+    Stefan
+   =20
 
 
---f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlynrN8ACgkQp6FrSiUn
-Q2pYJwf7Bz9t8TrzBGBhG/XemR+x0MtuDQBcuzMiOEOP40oigL5VpTbPzikxqWck
-ECd4snSHIa4TGbL527KKYPgGzm4+cl3PLLZjjmXUbQhFRQU6ZzJLJ8PJaMpUzciN
-uBafbIPSJgHPMw0sZBrxkMhrJWDam/Auo/IFfQ4D20TvvrRVCiw5xZUvDGxSYa2v
-+hsS8jTqkjFvs0Ps14+3C8IWyJu5QeWvUWbHLrzkKtzz1metx91W5Uf6CuKdbC51
-DHG+v5qTCmO/9L1hrIrSbiTxjE8gVahfsQ9ISST9fgnBAmOQtAE2UmQeWv7xsoQ4
-fjuHIt8ruryOvKY+NOjQZclALodDfg==
-=rdjJ
------END PGP SIGNATURE-----
-
---f63j5Yw2EoHyf37xmyea0nSW1T44oVe5p--
 
