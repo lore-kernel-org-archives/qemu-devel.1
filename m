@@ -1,85 +1,93 @@
-Return-Path: <SRS0=qZCI=SG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C71BC4360F
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Apr 2019 23:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFB2C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 00:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E82DD217D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  4 Apr 2019 23:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BDAA217D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 00:27:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="IQbf9CoI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82DD217D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oC6tbW9q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BDAA217D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60965 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33150 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCBoa-0003Qc-NY
-	for qemu-devel@archiver.kernel.org; Thu, 04 Apr 2019 19:30:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39313)
+	id 1hCChk-0008UU-2R
+	for qemu-devel@archiver.kernel.org; Thu, 04 Apr 2019 20:27:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hCBnl-00031c-Pq
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 19:29:47 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hCCgS-0007jg-Ev
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 20:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hCBnj-00039u-AB
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 19:29:45 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34522)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hCCgN-0004ID-RO
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 20:26:16 -0400
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:45131)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hCBni-00038c-Ql
-	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 19:29:43 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b3so2177782pfd.1
-	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 16:29:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
-	h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
-	:content-transfer-encoding;
-	bh=vP3OA7fOnTz5jmeVu8TZ/FpmkBa0rsQI6P2v+o1nyUk=;
-	b=IQbf9CoIYBs71zMNsUy18UEQZFI6Pj2co82Zz+FnGUVKGNXmcqPI6rlk8IvmydoFxv
-	l2zPTHAnFHP2ehslin+U1BqBs6uBLlkrdpWq0M6zgSfB9WjEpoHhAV4q3oByQvZmdUUc
-	NEEPf4nZGhfQ3NtMHcR7PR1X8LYZ2XSEYD365gOOiNzy2AGjc/IAlA50v8LWsQEGuugt
-	ocVawHUJy3/9tBJv7oKDX8F84YfFN57fCoA37TTY1l0+vwwvbbEu+C5k6Z8M3/3sZv2W
-	dyF6JLDNaSfw56pKOaJOCwvLhpUvGpEdn5Q44241E/mSvaK6GXiKAc7mkJNAGPfxcM4B
-	joHQ==
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hCCgN-0004FK-Aw
+	for qemu-devel@nongnu.org; Thu, 04 Apr 2019 20:26:11 -0400
+Received: by mail-ot1-x32a.google.com with SMTP id e5so4056877otk.12
+	for <qemu-devel@nongnu.org>; Thu, 04 Apr 2019 17:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=VXCs7j6bmcvOcj08Ujk48bqH4VdlMOvYGLpcfHHD9Ok=;
+	b=oC6tbW9qB2nQ1Os6Nbt+MJxT6cLC6xiIuFVr1RMRnjGOCXg0u3FvrMzjZDGTG2iZua
+	AKcWdKghFG823hi4N8N0whAW3Nd5Hm/IwBhC/p0dx6D8kC2XEhMC4d2xkZ/wX8llJpSV
+	f4V5KUuS2pSI2dlHsKuwEWbKwEGDdPGpauzvkJJ3IkORMA8if6HkRbps4Lm43OTy+L6H
+	+7UOLFLZSYG42xGbs94VXfPVATofXtyD2U94Vj45AGxs3YAbvFjHHPVII46ef7eU9CGb
+	KnC804dEcwRsY0qgoXuKJXZr9E6fhPrm+dUr5dAVQUBlGVtJ509y8USplsLOWrargI5t
+	VSbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
-	:mime-version:content-transfer-encoding;
-	bh=vP3OA7fOnTz5jmeVu8TZ/FpmkBa0rsQI6P2v+o1nyUk=;
-	b=Oo7A7D7qbSYVB7fRU6wVSnpF2rOduL88JilXUvry9N2WaMW29BoC3VPINIKkUacCRF
-	Q0zwxdPc2nWFgHT9HCNxFG8M5p3NS/S6KT+9T4xMJtpHFBWMfSzQaV54LOTWoQBW5eth
-	4kI3wmf1GKcphXabTlPkdncB/DLd4xcyg7e0xL9F7RRNt0oF2LvVgw/irvB30BXu8Ts2
-	Cs551vkwb+rzYJDlPuoYZogLrbyF0aHUj7A2TWkObk8UlxORf/W6l1JiKCNIN9CdzUSG
-	KGQFUx3fdOYJ+LYk7HE46RRLqRIhQsDJ5Xu9BPd5s9CBkkyl1doVUsgEaCfScxwT5t6z
-	sfUw==
-X-Gm-Message-State: APjAAAUo0/bnlHXOlw3cPLEnfyaNdiA5Ry9l+tow8wMKxy+nU+I/Zci4
-	tqYhAaVr2jB+WwbCo1431LV9lA==
-X-Google-Smtp-Source: APXvYqw16mx5aNvIeNFjtmc30uqRJ+kGFTon7rYVD1H8vMKbOgo+aSomnvA/BxIJR20cid9On28IQg==
-X-Received: by 2002:a62:5582:: with SMTP id j124mr8942831pfb.53.1554420581402; 
-	Thu, 04 Apr 2019 16:29:41 -0700 (PDT)
-Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
-	i13sm24100659pgq.17.2019.04.04.16.29.40
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 04 Apr 2019 16:29:40 -0700 (PDT)
-Date: Thu, 04 Apr 2019 16:29:40 -0700 (PDT)
-X-Google-Original-Date: Thu, 04 Apr 2019 16:10:25 PDT (-0700)
-In-Reply-To: <CAKmqyKNrdJA55m1sZDM=cFXJV1-0KU-52qE40anNDH227bzEaw@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-e8730265-3522-4aa0-9197-8402b25b2361@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=VXCs7j6bmcvOcj08Ujk48bqH4VdlMOvYGLpcfHHD9Ok=;
+	b=tidb+6n+XmRZgHsxDg0G1+AFpLk06fUq8umP/+5JJnE2bXuK9bZ9ScQ/DSikGBmC/m
+	6aLyNY+50xa6Z6gp9oGQ5+lqfnO+7ZaeG5Ivko5Xf4u//9m0irQOPqQB9k3+0/3m1Oln
+	J0ZojkdWEVe8vqBAS/0/5Y1jb7ZYzcVJ6EFw4ojLXFEJ3taQEvelp3zhKfrXeS5JQgaW
+	fZgavAsSljfGkTxGJfTqwUs8avcVSjyLCMYcxxQchPLMUsH7dTszQRRB313TVX0ZewA8
+	4eyhKcAXA1yf3C9Dg04n3TAi7GOq+Bm4yfu+SW88h3sViB3nwJ6KkDypkPVxrk2kPjxX
+	Llxg==
+X-Gm-Message-State: APjAAAURYVIzEtBu1NQk7tb2Mzu6uizxBrXq4Xey7kEZ+H6K8OQtQdtW
+	nNcJqVX2Q30Dee1DF154mztj0yyAWlN/NZrIc5k=
+X-Google-Smtp-Source: APXvYqwyDHdvSfwPbbMEY5i5HYT3hnud+HBZQkIP9oqvdhwomYy0Cpaj2479OH9Hgx2i7hkHWbR/4uYV7koDDCFIaOc=
+X-Received: by 2002:a05:6830:1342:: with SMTP id
+	r2mr6779738otq.105.1554423968614; 
+	Thu, 04 Apr 2019 17:26:08 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a9d:220e:0:0:0:0:0 with HTTP;
+	Thu, 4 Apr 2019 17:26:07 -0700 (PDT)
+Received: by 2002:a9d:220e:0:0:0:0:0 with HTTP;
+	Thu, 4 Apr 2019 17:26:07 -0700 (PDT)
+In-Reply-To: <0d428692-d478-9c03-8416-ced9700f995c@redhat.com>
+References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554383690-28338-3-git-send-email-mateja.marjanovic@rt-rk.com>
+	<e0e8ff46-2fa8-e0ce-8699-2cec076695d1@redhat.com>
+	<BN6PR2201MB12518B6A27D666DE96C5E30BC6500@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<0d428692-d478-9c03-8416-ced9700f995c@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 5 Apr 2019 02:26:07 +0200
+Message-ID:
+ <CAL1e-=gJM7rk+Agz4vMFQJeGO2wD-w=donev4D0Oqs+BtRmXkQ@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for 4.0-rc3
+X-Received-From: 2607:f8b0:4864:20::32a
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] target/mips: Optimize
+ ILVEV.<B|H|W|D> MSA instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,166 +99,633 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
-	qemu-devel@nongnu.org
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Mateja Marjanovic <mateja.marjanovic@rt-rk.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	"aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190404232940.liKtmyFsoDGmWeXQxRUlk9_Od9kfjX1P3Kaw4ctYEAc@z>
+Message-ID: <20190405002607.2H9m2swEr8KMKdkXKikxm80Z9NzJhXIAghXK-cibmBk@z>
 
-On Thu, 04 Apr 2019 11:18:52 PDT (-0700), alistair23@gmail.com wrote:
-> On Thu, Apr 4, 2019 at 1:45 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> On Thu, 4 Apr 2019 at 08:00, Palmer Dabbelt <palmer@sifive.com> wrote:
->> >
->> > The following changes since commit 49fc899f8d673dd9e73f3db0d9e9ea60b77c331b:
->> >
->> >   Update version for v4.0.0-rc1 release (2019-03-26 17:02:29 +0000)
->> >
->> > are available in the Git repository at:
->> >
->> >   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.0-rc3
->> >
->> > for you to fetch changes up to b84ffcecdb7a6a3e9946d0d6d24703199c4880b3:
->> >
->> >   riscv: plic: Log guest errors (2019-03-27 20:23:03 -0700)
->> >
->> > ----------------------------------------------------------------
->> > RISC-V Patches for 4.0-rc3
->> >
->> > This patch set contains a pair of tightly coupled PLIC bug fixes:
->> >
->> > * We were calculating the PLIC addresses incorrectly.
->> > * We were installing the wrong number of PLIC interrupts.
->> >
->> > The two bugs togther resulted in a mostly-working system, but they're
->> > impossible to seperate because fixing one bug would result in
->> > significant breakage.  As a result they're in the same patch.
->> >
->> > There is also a cleanup to use qemu_log_mask(LOG_GUEST_ERROR,...) for
->> > error reporting.
->> >
->> > As far as I know these are the last outstanding RISC-V patches for 4.0.
->>
->> Hi; I'm afraid this fails 'make check':
->> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
->> QTEST_QEMU_BINARY=riscv32-softmmu/qemu-system-riscv32
->> QTEST_QEMU_IMG=qemu-img tests/qom-test -m=quick -k --tap < /dev/null |
->> ./scripts/tap-driver.pl --test-name="qom-test"
->> PASS 1 qom-test /riscv32/qom/virt
->> PASS 2 qom-test /riscv32/qom/none
->> PASS 3 qom-test /riscv32/qom/spike_v1.10
->> Broken pipe
->> /home/petmay01/linaro/qemu-for-merges/tests/libqtest.c:143:
->> kill_qemu() detected QEMU death from signal 11 (Segmentation fault)
->> (core dumped)
->> Aborted (core dumped)
->> ERROR - too few tests run (expected 6, got 3)
->> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:903:
->> recipe for target 'check-qtest-riscv32' failed
+On Apr 4, 2019 9:17 PM, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> w=
+rote:
 >
-> I managed to reproduce the problem and I have sent a v3 with the fix.
+> Hi Aleksandar,
 >
-> What is strange is that I didn't see this in my make check runs, I'll
-> check to see what I'm missing.
-
-Thanks!
-
-> What is also strange is that the SiFive U machine should only be
-> 64-bit, it seems odd to run it with 32-bit RISC-V (unless I'm missing
-> something). That's probably something we should fix for 4.1.
-
-Ya, we need to go clean this up.  It's all a bit messy right now.
-
+> On 4/4/19 8:19 PM, Aleksandar Markovic wrote:
+> >> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> Subject: Re: [PATCH v6 2/4] target/mips: Optimize ILVEV.<B|H|W|D> MSA
+instructions
+> >>
+> >> Hi Mateja,
+> >>
+> >> On 4/4/19 3:14 PM, Mateja Marjanovic wrote:
+> >>> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> >>>
+> >>> Optimize set of MSA instructions ILVEV.<B|H|W|D>, using
+> >>> directly tcg registers and performing logic on them
+> >>> instead of using helpers.
+> >>>
+> >>> In the following table, the first column is the performance
+> >>> before this patch. The second represents the performance,
+> >>> after converting from helpers to tcg, but without using
+> >>> tcg_gen_deposit function. The third one is the solution
+> >>> which is implemented in this patch.
+> >>>
+> >>> Performance measurement is done by executing the
+> >>> instructions a large number of times on a computer
+> >>> with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+> >>>
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>> || instr    ||   before    || no-deposit ||  with-deposit ||
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>> || ilvev.b  ||  126.92 ms  ||  24.52 ms  ||   24.43 ms    ||
+> >>> || ilvev.h  ||   93.67 ms  ||  23.92 ms  ||   23.86 ms    ||
+> >>
+> >> I'm quite surprised there is not a single change here since your v5,
+are
+> >> you sure you used the correct result? I was expecting a slighly
+improvement.
+> >>
+> >
+> > Hello, Philippe.
+> >
+> > First of all, thank you so much for taking your time to provide
+> > Matejan with the source code below.
+> >
+> > Speaking about your idea, Mateja told me he DID implemented it,
+> > and did measurements, and that the improvement is noticeable,
+> > but really small. I don't know why he did not include that change
+> > - perhaps he didn't have enough time to integrate it.
+> >
+> > I know he is on a long weekend now, so we will have to wait for
+> > the next week for Mateja to explain this to us. Mateja, could you
+> > perhaps add a column "with-deposit-and-mask-as-tcg-constant"?
 >
-> Alistair
+> Ah OK, no worries since this series will enter in the 4.1 dev cycle and
+> there is still 2/3 weeks to go.
+> I am simply curious to see the difference using the register approach :)
+> I recently noticed I can run those tests myself (I previously mixed
+> threads and thought Mateja was running this on a FPGA).
 >
->>
->> The sifive_u machine seems to dump core on startup:
->>
->> $ gdb --args riscv32-softmmu/qemu-system-riscv32 -M sifive_u -display none
->> [...]
->> (gdb) r
->> Starting program:
->> /home/petmay01/linaro/qemu-for-merges/build/alldbg/riscv32-softmmu/qemu-system-riscv32
->> -M sifive_u -display none
->> [Thread debugging using libthread_db enabled]
->> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
->> [New Thread 0x7fffd7dc4700 (LWP 29908)]
->> [New Thread 0x7fffd526f700 (LWP 29909)]
->>
->> Thread 1 "qemu-system-ris" received signal SIGSEGV, Segmentation fault.
->> 0x0000555555ba1df7 in object_get_canonical_path_component
->> (obj=0x5555559b3018 <qdev_get_hotplug_handler+24>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1797
->> 1797        g_hash_table_iter_init(&iter, obj->parent->properties);
->> (gdb) bt
->> #0  0x0000555555ba1df7 in object_get_canonical_path_component
->> (obj=0x5555559b3018 <qdev_get_hotplug_handler+24>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1797
->> #1  0x0000555555ba1ed6 in object_get_canonical_path
->> (obj=0x5555559b3018 <qdev_get_hotplug_handler+24>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1823
->> #2  0x0000555555ba0b72 in object_property_set_link
->> (obj=0x5555567e2e50, value=0x5555559b3018
->> <qdev_get_hotplug_handler+24>, name=0x555556919b60 "sysbus-irq[0]",
->> errp=0x5555566b6d28 <error_abort>)
->>     at /home/petmay01/linaro/qemu-for-merges/qom/object.c:1302
->> #3  0x00005555559b37f4 in qdev_connect_gpio_out_named
->> (dev=0x5555567e2e50, name=0x555555e52b62 "sysbus-irq", n=0,
->> pin=0x5555559b3018 <qdev_get_hotplug_handler+24>) at
->> /home/petmay01/linaro/qemu-for-merges/hw/core/qdev.c:460
->> #4  0x00005555559b9d7b in sysbus_connect_irq (dev=0x5555567e2e50, n=0,
->> irq=0x5555559b3018 <qdev_get_hotplug_handler+24>) at
->> /home/petmay01/linaro/qemu-for-merges/hw/core/sysbus.c:116
->> #5  0x000055555590a9e9 in riscv_sifive_u_soc_realize
->> (dev=0x5555567e2820, errp=0x7fffffffdc80) at
->> /home/petmay01/linaro/qemu-for-merges/hw/riscv/sifive_u.c:393
->> #6  0x00005555559b457e in device_set_realized (obj=0x5555567e2820,
->> value=true, errp=0x5555566b6d28 <error_abort>) at
->> /home/petmay01/linaro/qemu-for-merges/hw/core/qdev.c:834
->> #7  0x0000555555ba276a in property_set_bool (obj=0x5555567e2820,
->> v=0x5555567e9360, name=0x555555e28139 "realized",
->> opaque=0x5555567e1220, errp=0x5555566b6d28 <error_abort>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:2074
->> #8  0x0000555555ba09e6 in object_property_set (obj=0x5555567e2820,
->> v=0x5555567e9360, name=0x555555e28139 "realized", errp=0x5555566b6d28
->> <error_abort>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1266
->> #9  0x0000555555ba3aac in object_property_set_qobject
->> (obj=0x5555567e2820, value=0x5555567e9340, name=0x555555e28139
->> "realized", errp=0x5555566b6d28 <error_abort>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/qom-qobject.c:27
->> #10 0x0000555555ba0ccb in object_property_set_bool
->> (obj=0x5555567e2820, value=true, name=0x555555e28139 "realized",
->> errp=0x5555566b6d28 <error_abort>) at
->> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1332
->> #11 0x000055555590a1f3 in riscv_sifive_u_init (machine=0x55555671b8d0)
->> at /home/petmay01/linaro/qemu-for-merges/hw/riscv/sifive_u.c:270
->> #12 0x00005555559bcfa8 in machine_run_board_init
->> (machine=0x55555671b8d0) at
->> /home/petmay01/linaro/qemu-for-merges/hw/core/machine.c:1030
->> #13 0x00005555559406fd in main (argc=5, argv=0x7fffffffe1d8,
->> envp=0x7fffffffe208) at
->> /home/petmay01/linaro/qemu-for-merges/vl.c:4479
->>
->>
->> Running under valgrind shows use of uninitialised values, invalid reads, etc:
->>
->> ==29912== Conditional jump or move depends on uninitialised value(s)
->> ==29912==    at 0x5677A8: qdev_connect_gpio_out_named (qdev.c:450)
->> ==29912==    by 0x56DD7A: sysbus_connect_irq (sysbus.c:116)
->> ==29912==    by 0x4BE9E8: riscv_sifive_u_soc_realize (sifive_u.c:393)
->> ==29912==    by 0x56857D: device_set_realized (qdev.c:834)
->> ==29912==    by 0x756769: property_set_bool (object.c:2074)
->> ==29912==    by 0x7549E5: object_property_set (object.c:1266)
->> ==29912==    by 0x757AAB: object_property_set_qobject (qom-qobject.c:27)
->> ==29912==    by 0x754CCA: object_property_set_bool (object.c:1332)
->> ==29912==    by 0x4BE1F2: riscv_sifive_u_init (sifive_u.c:270)
->> ==29912==    by 0x570FA7: machine_run_board_init (machine.c:1030)
->> ==29912==    by 0x4F46FC: main (vl.c:4479)
->>
->>
->> thanks
->> -- PMM
 
+The problem with the test procedure and results that are presented here is
+that their accuracy is very small if the emulation of the instruction under
+measurement is fast. The source code is just 10,000,000 single MIPS
+instruction executions in a C for loop, and that is all nice and dendy if
+the emulation of that instruction dominates over for loop overhead, in
+terms of emulation time. But for instructions that are emulated fast, we
+are measuring more loop overhead than instruction itself.
+
+Actually, the numbers inthat area (under let=CB=8As say 25 ms) are plain
+misleading.
+
+I think we need to devise better test, and update the table in the commit
+message with the new results that will be closer to the reality - and hence
+more informative and valuable.
+
+BTW, I came to the conclusion that there is no faster emulation for special
+cases when two or three operands are the same, so those cases will not be
+singled out.
+
+Aleksandar
+
+> I try to have a quick look at your work, and I'm pleased to see how
+> Mateja improves the quality/accuracy of each series.
+>
+> Regards,
+>
+> Phil.
+>
+> > Yours,
+> > Aleksandar
+> >
+> >
+> >>> || ilvev.w  ||  117.86 ms  ||  23.83 ms  ||   22.17 ms    ||
+> >>> || ilvev.d  ||   45.49 ms  ||  19.74 ms  ||   19.71 ms    ||
+> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>
+> >>> No-deposit column and with-deposit column have the
+> >>> same statistical values in every row, except ILVEV.W,
+> >>> which is the only function which uses the deposit
+> >>> function.
+> >>>
+> >>> No-deposit version of the ILVEV.W implementation:
+> >>>
+> >>> static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> >>>                                uint32_t ws, uint32_t wt)
+> >>> {
+> >>>     TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >>>     TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >>>     uint64_t mask =3D 0x00000000ffffffffULL;
+> >>>
+> >>>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> >>>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
+> >>>     tcg_gen_shli_i64(t2, t2, 32);
+> >>>     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >>>
+> >>>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >>>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >>>     tcg_gen_shli_i64(t2, t2, 32);
+> >>>     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >>>
+> >>>     tcg_temp_free_i64(t1);
+> >>>     tcg_temp_free_i64(t2);
+> >>> }
+> >>>
+> >>> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> >>> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> >>> ---
+> >>>  target/mips/helper.h     |   1 -
+> >>>  target/mips/msa_helper.c |   9 -----
+> >>>  target/mips/translate.c  | 101
+++++++++++++++++++++++++++++++++++++++++++++++-
+> >>>  3 files changed, 100 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> >>> index 02e16c7..82f6a40 100644
+> >>> --- a/target/mips/helper.h
+> >>> +++ b/target/mips/helper.h
+> >>> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32,
+i32, i32)
+> >>>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
+> >>>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+> >>>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+> >>> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+> >>>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+> >>>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+> >>>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+> >>> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> >>> index a7ea6aa..d5c3842 100644
+> >>> --- a/target/mips/msa_helper.c
+> >>> +++ b/target/mips/msa_helper.c
+> >>> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
+> >>>      } while (0)
+> >>>  MSA_FN_DF(ilvr_df)
+> >>>  #undef MSA_DO
+> >>> -
+> >>> -#define MSA_DO(DF)                      \
+> >>> -    do {                                \
+> >>> -        pwx->DF[2*i]   =3D pwt->DF[2*i];  \
+> >>> -        pwx->DF[2*i+1] =3D pws->DF[2*i];  \
+> >>> -    } while (0)
+> >>> -MSA_FN_DF(ilvev_df)
+> >>> -#undef MSA_DO
+> >>> -
+> >>>  #undef MSA_LOOP_COND
+> >>>
+> >>>  #define MSA_LOOP_COND(DF) \
+> >>> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> >>> index df685e4..3057669 100644
+> >>> --- a/target/mips/translate.c
+> >>> +++ b/target/mips/translate.c
+> >>> @@ -28973,6 +28973,90 @@ static inline void gen_ilvod_d(CPUMIPSState
+*env, uint32_t wd,
+> >>>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+> >>>  }
+> >>>
+> >>> +/*
+> >>> + * [MSA] ILVEV.B wd, ws, wt
+> >>> + *
+> >>> + *   Vector Interleave Even (byte data elements)
+> >>> + *
+> >>> + */
+> >>> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> >>> +                               uint32_t ws, uint32_t wt)
+> >>> +{
+> >>> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >>> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >>> +    TCGv_i64 mask =3D tcg_const_i64(0x00ff00ff00ff00ffULL);
+> >>> +
+> >>> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> >>> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> >>> +    tcg_gen_shli_i64(t2, t2, 8);
+> >>> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >>> +
+> >>> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >>> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >>> +    tcg_gen_shli_i64(t2, t2, 8);
+> >>> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >>> +
+> >>> +    tcg_temp_free_i64(mask);
+> >>> +    tcg_temp_free_i64(t1);
+> >>> +    tcg_temp_free_i64(t2);
+> >>> +}
+> >>> +
+> >>> +/*
+> >>> + * [MSA] ILVEV.H wd, ws, wt
+> >>> + *
+> >>> + *   Vector Interleave Even (halfword data elements)
+> >>> + *
+> >>> + */
+> >>> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> >>> +                               uint32_t ws, uint32_t wt)
+> >>> +{
+> >>> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >>> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >>> +    TCGv_i64 mask =3D tcg_const_i64(0x0000ffff0000ffffULL);
+> >>> +
+> >>> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> >>> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> >>> +    tcg_gen_shli_i64(t2, t2, 16);
+> >>> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >>> +
+> >>> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >>> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >>> +    tcg_gen_shli_i64(t2, t2, 16);
+> >>> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >>> +
+> >>> +    tcg_temp_free_i64(mask);
+> >>> +    tcg_temp_free_i64(t1);
+> >>> +    tcg_temp_free_i64(t2);
+> >>> +}
+> >>
+> >> Apparently you missed my comment about refactoring using mask/shift as
+> >> arguments:
+> >>
+> >> static inline void gen_ilvev_hb(CPUMIPSState *env, uint32_t wd,
+> >>                                 uint32_t ws, uint32_t wt,
+> >>                                 int64_t mask, int64_t shift)
+> >> {
+> >>     TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >>     TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >>     TCGv_i64 tm =3D tcg_const_i64(mask);
+> >>
+> >>     tcg_gen_and_i64(t1, msa_wr_d[wt * 2], tm);
+> >>     tcg_gen_and_i64(t2, msa_wr_d[ws * 2], tm);
+> >>     tcg_gen_shli_i64(t2, t2, shift);
+> >>     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >>
+> >>     tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], tm);
+> >>     tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], tm);
+> >>     tcg_gen_shli_i64(t2, t2, shift);
+> >>     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >>
+> >>     tcg_temp_free_i64(tm);
+> >>     tcg_temp_free_i64(t1);
+> >>     tcg_temp_free_i64(t2);
+> >> }
+> >>
+> >> static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> >>                                uint32_t ws, uint32_t wt)
+> >> {
+> >>     gen_ilvev_hb(env, wd, ws, wt, 0x00ff00ff00ff00ffLL, 8);
+> >> }
+> >>
+> >> static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> >>                                uint32_t ws, uint32_t wt)
+> >> {
+> >>     gen_ilvev_hb(env, wd, ws, wt, 0x0000ffff0000ffffLL, 16);
+> >> }
+> >>
+> >>
+> >>> +
+> >>> +/*
+> >>> + * [MSA] ILVEV.W wd, ws, wt
+> >>> + *
+> >>> + *   Vector Interleave Even (word data elements)
+> >>> + *
+> >>> + */
+> >>> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> >>> +                               uint32_t ws, uint32_t wt)
+> >>> +{
+> >>> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2],
+> >>> +                        msa_wr_d[ws * 2], 32, 32);
+> >>> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[wt * 2 + 1],
+> >>> +                        msa_wr_d[ws * 2 + 1], 32, 32);
+> >>> +}
+> >>> +
+> >>> +/*
+> >>> + * [MSA] ILVEV.D wd, ws, wt
+> >>> + *
+> >>> + *   Vector Interleave Even (Doubleword data elements)
+> >>> + *
+> >>> + */
+> >>> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
+> >>> +                               uint32_t ws, uint32_t wt)
+> >>> +{
+> >>> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
+> >>> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
+> >>> +}
+> >>> +
+> >>>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+> >>>  {
+> >>>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+> >>> @@ -29129,7 +29213,22 @@ static void gen_msa_3r(CPUMIPSState *env,
+DisasContext *ctx)
+> >>>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+> >>>          break;
+> >>>      case OPC_ILVEV_df:
+> >>> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+> >>> +        switch (df) {
+> >>> +        case DF_BYTE:
+> >>> +            gen_ilvev_b(env, wd, ws, wt);
+> >>> +            break;
+> >>> +        case DF_HALF:
+> >>> +            gen_ilvev_h(env, wd, ws, wt);
+> >>> +            break;
+> >>> +        case DF_WORD:
+> >>> +            gen_ilvev_w(env, wd, ws, wt);
+> >>> +            break;
+> >>> +        case DF_DOUBLE:
+> >>> +            gen_ilvev_d(env, wd, ws, wt);
+> >>> +            break;
+> >>> +        default:
+> >>> +            assert(0);
+> >>> +        }
+> >>>          break;
+> >>>      case OPC_BINSR_df:
+> >>>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
+> >>>
+> >>
+> > ________________________________________
+> > From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Sent: Thursday, April 4, 2019 3:42 PM
+> > To: Mateja Marjanovic; qemu-devel@nongnu.org
+> > Cc: aurelien@aurel32.net; richard.henderson@linaro.org; Aleksandar
+Markovic; Aleksandar Rikalo
+> > Subject: Re: [PATCH v6 2/4] target/mips: Optimize ILVEV.<B|H|W|D> MSA
+instructions
+> >
+> > Hi Mateja,
+> >
+> > On 4/4/19 3:14 PM, Mateja Marjanovic wrote:
+> >> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+> >>
+> >> Optimize set of MSA instructions ILVEV.<B|H|W|D>, using
+> >> directly tcg registers and performing logic on them
+> >> instead of using helpers.
+> >>
+> >> In the following table, the first column is the performance
+> >> before this patch. The second represents the performance,
+> >> after converting from helpers to tcg, but without using
+> >> tcg_gen_deposit function. The third one is the solution
+> >> which is implemented in this patch.
+> >>
+> >> Performance measurement is done by executing the
+> >> instructions a large number of times on a computer
+> >> with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+> >>
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> || instr    ||   before    || no-deposit ||  with-deposit ||
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> || ilvev.b  ||  126.92 ms  ||  24.52 ms  ||   24.43 ms    ||
+> >> || ilvev.h  ||   93.67 ms  ||  23.92 ms  ||   23.86 ms    ||
+> >
+> > I'm quite surprised there is not a single change here since your v5, ar=
+e
+> > you sure you used the correct result? I was expecting a slighly
+improvement.
+> >
+> >> || ilvev.w  ||  117.86 ms  ||  23.83 ms  ||   22.17 ms    ||
+> >> || ilvev.d  ||   45.49 ms  ||  19.74 ms  ||   19.71 ms    ||
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> No-deposit column and with-deposit column have the
+> >> same statistical values in every row, except ILVEV.W,
+> >> which is the only function which uses the deposit
+> >> function.
+> >>
+> >> No-deposit version of the ILVEV.W implementation:
+> >>
+> >> static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> >>                                uint32_t ws, uint32_t wt)
+> >> {
+> >>     TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >>     TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >>     uint64_t mask =3D 0x00000000ffffffffULL;
+> >>
+> >>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
+> >>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
+> >>     tcg_gen_shli_i64(t2, t2, 32);
+> >>     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >>
+> >>     tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >>     tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >>     tcg_gen_shli_i64(t2, t2, 32);
+> >>     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >>
+> >>     tcg_temp_free_i64(t1);
+> >>     tcg_temp_free_i64(t2);
+> >> }
+> >>
+> >> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> >> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> >> ---
+> >>  target/mips/helper.h     |   1 -
+> >>  target/mips/msa_helper.c |   9 -----
+> >>  target/mips/translate.c  | 101
+++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  3 files changed, 100 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> >> index 02e16c7..82f6a40 100644
+> >> --- a/target/mips/helper.h
+> >> +++ b/target/mips/helper.h
+> >> @@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32,
+i32, i32)
+> >>  DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
+> >>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+> >>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+> >> -DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+> >>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+> >>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+> >>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+> >> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> >> index a7ea6aa..d5c3842 100644
+> >> --- a/target/mips/msa_helper.c
+> >> +++ b/target/mips/msa_helper.c
+> >> @@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
+> >>      } while (0)
+> >>  MSA_FN_DF(ilvr_df)
+> >>  #undef MSA_DO
+> >> -
+> >> -#define MSA_DO(DF)                      \
+> >> -    do {                                \
+> >> -        pwx->DF[2*i]   =3D pwt->DF[2*i];  \
+> >> -        pwx->DF[2*i+1] =3D pws->DF[2*i];  \
+> >> -    } while (0)
+> >> -MSA_FN_DF(ilvev_df)
+> >> -#undef MSA_DO
+> >> -
+> >>  #undef MSA_LOOP_COND
+> >>
+> >>  #define MSA_LOOP_COND(DF) \
+> >> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> >> index df685e4..3057669 100644
+> >> --- a/target/mips/translate.c
+> >> +++ b/target/mips/translate.c
+> >> @@ -28973,6 +28973,90 @@ static inline void gen_ilvod_d(CPUMIPSState
+*env, uint32_t wd,
+> >>      tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+> >>  }
+> >>
+> >> +/*
+> >> + * [MSA] ILVEV.B wd, ws, wt
+> >> + *
+> >> + *   Vector Interleave Even (byte data elements)
+> >> + *
+> >> + */
+> >> +static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> >> +                               uint32_t ws, uint32_t wt)
+> >> +{
+> >> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >> +    TCGv_i64 mask =3D tcg_const_i64(0x00ff00ff00ff00ffULL);
+> >> +
+> >> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> >> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> >> +    tcg_gen_shli_i64(t2, t2, 8);
+> >> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >> +
+> >> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >> +    tcg_gen_shli_i64(t2, t2, 8);
+> >> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >> +
+> >> +    tcg_temp_free_i64(mask);
+> >> +    tcg_temp_free_i64(t1);
+> >> +    tcg_temp_free_i64(t2);
+> >> +}
+> >> +
+> >> +/*
+> >> + * [MSA] ILVEV.H wd, ws, wt
+> >> + *
+> >> + *   Vector Interleave Even (halfword data elements)
+> >> + *
+> >> + */
+> >> +static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> >> +                               uint32_t ws, uint32_t wt)
+> >> +{
+> >> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >> +    TCGv_i64 mask =3D tcg_const_i64(0x0000ffff0000ffffULL);
+> >> +
+> >> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> >> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> >> +    tcg_gen_shli_i64(t2, t2, 16);
+> >> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >> +
+> >> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> >> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> >> +    tcg_gen_shli_i64(t2, t2, 16);
+> >> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >> +
+> >> +    tcg_temp_free_i64(mask);
+> >> +    tcg_temp_free_i64(t1);
+> >> +    tcg_temp_free_i64(t2);
+> >> +}
+> >
+> > Apparently you missed my comment about refactoring using mask/shift as
+> > arguments:
+> >
+> > static inline void gen_ilvev_hb(CPUMIPSState *env, uint32_t wd,
+> >                                 uint32_t ws, uint32_t wt,
+> >                                 int64_t mask, int64_t shift)
+> > {
+> >     TCGv_i64 t1 =3D tcg_temp_new_i64();
+> >     TCGv_i64 t2 =3D tcg_temp_new_i64();
+> >     TCGv_i64 tm =3D tcg_const_i64(mask);
+> >
+> >     tcg_gen_and_i64(t1, msa_wr_d[wt * 2], tm);
+> >     tcg_gen_and_i64(t2, msa_wr_d[ws * 2], tm);
+> >     tcg_gen_shli_i64(t2, t2, shift);
+> >     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> >
+> >     tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], tm);
+> >     tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], tm);
+> >     tcg_gen_shli_i64(t2, t2, shift);
+> >     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> >
+> >     tcg_temp_free_i64(tm);
+> >     tcg_temp_free_i64(t1);
+> >     tcg_temp_free_i64(t2);
+> > }
+> >
+> > static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
+> >                                uint32_t ws, uint32_t wt)
+> > {
+> >     gen_ilvev_hb(env, wd, ws, wt, 0x00ff00ff00ff00ffLL, 8);
+> > }
+> >
+> > static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
+> >                                uint32_t ws, uint32_t wt)
+> > {
+> >     gen_ilvev_hb(env, wd, ws, wt, 0x0000ffff0000ffffLL, 16);
+> > }
+> >
+> >
+> >> +
+> >> +/*
+> >> + * [MSA] ILVEV.W wd, ws, wt
+> >> + *
+> >> + *   Vector Interleave Even (word data elements)
+> >> + *
+> >> + */
+> >> +static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
+> >> +                               uint32_t ws, uint32_t wt)
+> >> +{
+> >> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2],
+> >> +                        msa_wr_d[ws * 2], 32, 32);
+> >> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[wt * 2 + 1],
+> >> +                        msa_wr_d[ws * 2 + 1], 32, 32);
+> >> +}
+> >> +
+> >> +/*
+> >> + * [MSA] ILVEV.D wd, ws, wt
+> >> + *
+> >> + *   Vector Interleave Even (Doubleword data elements)
+> >> + *
+> >> + */
+> >> +static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
+> >> +                               uint32_t ws, uint32_t wt)
+> >> +{
+> >> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
+> >> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
+> >> +}
+> >> +
+> >>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+> >>  {
+> >>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+> >> @@ -29129,7 +29213,22 @@ static void gen_msa_3r(CPUMIPSState *env,
+DisasContext *ctx)
+> >>          gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+> >>          break;
+> >>      case OPC_ILVEV_df:
+> >> -        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+> >> +        switch (df) {
+> >> +        case DF_BYTE:
+> >> +            gen_ilvev_b(env, wd, ws, wt);
+> >> +            break;
+> >> +        case DF_HALF:
+> >> +            gen_ilvev_h(env, wd, ws, wt);
+> >> +            break;
+> >> +        case DF_WORD:
+> >> +            gen_ilvev_w(env, wd, ws, wt);
+> >> +            break;
+> >> +        case DF_DOUBLE:
+> >> +            gen_ilvev_d(env, wd, ws, wt);
+> >> +            break;
+> >> +        default:
+> >> +            assert(0);
+> >> +        }
+> >>          break;
+> >>      case OPC_BINSR_df:
+> >>          gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
+> >>
+>
