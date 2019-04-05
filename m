@@ -2,83 +2,66 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1471EC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 09:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95A6C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 09:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE11F217D7
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 09:15:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ju+RM90K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE11F217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5C8217D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 09:16:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5C8217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38605 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38729 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCKwQ-0000Rx-QI
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 05:15:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56938)
+	id 1hCKy0-0002md-PQ
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 05:16:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hCKvJ-0008Bp-Mi
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:14:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1hCKxA-0002Ap-Ns
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hCKvI-0001Bq-TN
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:14:09 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hCKvH-0001AK-S1
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:14:08 -0400
-Received: by mail-ot1-x343.google.com with SMTP id j10so5032422otq.0
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 02:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=kIHsoSWQ7xWl/T5Zil8IhTPkpwjLYX3wXTfAMDljL20=;
-	b=Ju+RM90KFxdKrCj93g8hQgiokKCpzyjolHdbjp5kag3tofzbPbrH4AHqridFMdLhyj
-	9yWPZTZjqGk6RwRuYnkDN8BLh3ar+EmFxT27Bav4VPNhTzO0dOBGbTFS3jpUlWPm53bO
-	bFSXJ9KtIPI4D2wKqHNshBUKqYt09SsSOCLcx0UETFVr7FFMBtNU5WYGwd2U1wEgJolb
-	jShAVViM34cxusDx94Qydg9Vae29aRZ27m2kmiuZUzkNd0igJAAMRICS0YxUCB8c/fLE
-	TYvvpuQNNK2hQm+vvl1H1za7P4vMBymWx0bfXMANdHOpt4JmT21sOpfg7/v7TgIWXXNe
-	IPOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=kIHsoSWQ7xWl/T5Zil8IhTPkpwjLYX3wXTfAMDljL20=;
-	b=rtwq3qpSIWIk1p6FdN02Zv02zPKdgygxHwR7/JPFckXeAWf9t56lmRdLFtYqVWYNMo
-	yjUJ6QZn7GnoRSrDSueg/DH66DDxanJ6vMNmJ3F7HAhNj9dnrk4J0HdRN+PJNg/U1acj
-	wMAGnoxTlWEooz+Pf7c4XTaXq8PnrxsVNrMJZ5topZ8i/TXrHI9fcpzm0Gyk+ws4TaK9
-	jkom1qdX9h66CCt+yzaTDpR6ivpt19V+yRZ7PXMqE1qocbPjsvo6G/Tlzol+wRwCP0MJ
-	grZzjxBDo9CZRamMP2NAY1qy3Qksh8E6BsM2gWKgcVqd0sWlKKSCyA0d5hyz01aBKzcc
-	oJ2Q==
-X-Gm-Message-State: APjAAAVY+HT3K/BYbsDSQTtyVo9Vytk1luiJqHE7TzHCAxPOEa/9Ui96
-	+tHjNtPp68xw3HXab3ljt6Kk7XVZZ59m9cq9TY8mKA==
-X-Google-Smtp-Source: APXvYqxHQ5cWVX6FrFiYUpUW6RaGeyp+vjBk4FJXD1mpjABK08yop4O1a/b3esU0fB2wcRmCyudBlh7iOUBnFzIdYpI=
-X-Received: by 2002:a05:6830:1cb:: with SMTP id
-	r11mr3414332ota.302.1554455646451; 
-	Fri, 05 Apr 2019 02:14:06 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <berrange@redhat.com>) id 1hCKx9-00058G-7v
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hCKx7-000530-OB
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFA3D308339D;
+	Fri,  5 Apr 2019 09:16:00 +0000 (UTC)
+Received: from redhat.com (ovpn-112-43.ams2.redhat.com [10.36.112.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 848DF5D707;
+	Fri,  5 Apr 2019 09:15:56 +0000 (UTC)
+Date: Fri, 5 Apr 2019 10:15:53 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Helge Deller <deller@gmx.de>
+Message-ID: <20190405091553.GG6105@redhat.com>
 References: <20190404185730.GA22512@ls3530.dellerweb.de>
 	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
 	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
 	<20190405082613.GC6105@redhat.com>
 	<457ec791-3691-2ebb-e225-bd42a7aee627@gmx.de>
-In-Reply-To: <457ec791-3691-2ebb-e225-bd42a7aee627@gmx.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Apr 2019 16:13:55 +0700
-Message-ID:
- <CAFEAcA8uXuQMRapv5ZvvQBFzR0VV++fYnZEm=ePc8Xe1=OCbMA@mail.gmail.com>
-To: Helge Deller <deller@gmx.de>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Content-Disposition: inline
+In-Reply-To: <457ec791-3691-2ebb-e225-bd42a7aee627@gmx.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Fri, 05 Apr 2019 09:16:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
  on non-release architectures
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,21 +75,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405091355.1cLRp3OAnEpTg32qHgY6fZuT3O-mpO1PwjdApJNEsN8@z>
+Message-ID: <20190405091553.XnvexKkBnlJq4yFf1zpiPGkxqnP2wVveD4p7MeAODQg@z>
 
-On Fri, 5 Apr 2019 at 16:02, Helge Deller <deller@gmx.de> wrote:
+On Fri, Apr 05, 2019 at 11:02:52AM +0200, Helge Deller wrote:
+> On 05.04.19 10:26, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Apr 05, 2019 at 09:56:46AM +0200, Helge Deller wrote:
+> >> Hi Peter,
+> >>
+> >> On 05.04.19 03:34, Peter Maydell wrote:
+> >>> On Fri, 5 Apr 2019 at 01:59, Helge Deller <deller@gmx.de> wrote:
+> >>>> If a non-release architecture is found, and it's known that there =
+is no
+> >>>> native TCG support for that CPU, automatically fall back to the TC=
+I
+> >>>> implementation instead of requesting the user to run configure aga=
+in
+> >>>> with the --enable-tcg-interpreter option.
+> >>>>
+> >>>> This change simplifies building qemu in automatic build environmen=
+ts
+> >>>> (like in my case the debian buildds) because one does not need to
+> >>>> special case on the architectures.
+> >>>
+> >>> I don't think we should do this. TCI is unmaintained, has several
+> >>> known flaws,
+> >>
+> >> Just out of interest: Is there a list with those flaws somewhere?
+> >>
+> >>> does not provide the level of performance that
+> >>> people expect from QEMU, and we've talked about removing it
+> >>> altogether. In particular, distros should not automatically ship
+> >>> a TCI QEMU -- it's something that a user can use if they
+> >>> explicitly opt into but which I don't think we want to surprise
+> >>> anybody with.
+> >>
+> >> I won't argue against your points. They are all valid.
+> >>
+> >>> If we care about a host architecture we should support it
+> >>> with a proper TCG backend. If we don't care that much we
+> >>> shouldn't support it.
+> >>
+> >> Looking just at some of the debian "ports" (non-release) architectur=
+es:
+> >> alpha, hppa, ia64, m68k, powerpc, sh4, sparc64
+> >> Most likely nobody will ever care enough to write a TCG backend for =
+those,
+> >> and it doesn't even make sense because they are so much slower than
+> >> the currently supported TCG backend architectures. So why should one=
+ want
+> >> to emulate a fast x86 machine on slow m68k for example?
+> >>
+> >> The only reason when it *can* make sense is, when you need "basic"
+> >> emulation or availability of binaries for cross-dependecies in distr=
+os,
+> >> e.g. to build other packages or to be able to install other packages=
+.
+> >> As one example, many packages depend on libvirt (frontend tools, mon=
+itoring
+> >> stuff, ...) and libvirt again depends on some qemu binaries.
+> >> So, having qemu buildable (even if the result is slow) makes life ea=
+sier.
+> >
+> > If it is just a matter of satisfying dependencies, it is easy to buil=
+d
+> > a minimal libvirt that is essentially just the client libraries and n=
+ot
+> > the QEMU driver that would in turn allow other packages to build. Alt=
+ernatively
+> > it should be possible to build the downstream apps with their libvirt=
+ dep
+> > disabled avoiding pulling in the whole virtualization chain as a buil=
+d
+> > pre-req.
+>=20
+> libvirt was just one example, and yes, it's possible to work around in
+> multiple ways.
+>=20
+> As another example, even if I only want to build "qemu-img", I still ne=
+ed
+> to manually give the --enable-tcg-interpreter configure option.
+
+That is something I would consider a valid bug to fix. We should permit
+people to do  "./configure --disable-system --disable-user --enable-tools=
+".
+Requiring --enable-tcg-interpreter in that scenario is clearly wrong,
+as we're not even building it.
+
+> >> I know, my point above now turns into a "distro packaging" issue.
+> >> That's why I'm questioning, why should distros (or even direct end-u=
+sers)
+> >> be forced to distinguish between architectures?
+> >> Shouldn't running "./configure" find out what's available and then
+> >>  auto-configure itself to the *best* what's possible?
+> >
+> > "best" depends on the POV. You want configure to enable support on
+> > hppa by default since you have an interest in that architecture, whic=
+h
+> > is fine. The QEMU maintainers, however, have a POV that considers
+> > raising an error by default to be the "best" solution for architectur=
+es
+> > that are considered unsupported, requiring explicit arg to optin to u=
+se
+> > unsupported features.
+>=20
+> Yes, fair point.
 > Sadly such special treatment by projects makes life for me
 > as an architecture maintainer much harder :-(
 
-It's kind of inevitable for programs that aren't straightforwardly
-architecture agnostic. gcc doesn't work for architectures which
-don't have implemented backends either...
+FWIW I like to see code portability that is as broad as is practical.
+At the same time though, essentially every open source project is
+massively overloaded with work they want to accomplish vs number of
+contributors available.
 
-thanks
--- PMM
+There has to be a tradeoff in where effort is spent and usually that
+tradeoff ends up priortizing areas that are going to benefit the
+largest number of users. In recent times QEMU has been trying to
+formalize what it considers supported vs unsupported so that we have
+a better plan for where we spend our limited contributor resources.
+The intent is that this will help us improve overall project quality.
+That has meant dropping support for many older distros, and marking
+some OSes, distros & architectures as unsupported with a view to fully
+dropping ability to build on them in future.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
