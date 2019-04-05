@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54470)
+Received: from eggs.gnu.org ([209.51.188.92]:60588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hCW62-0000MH-1w
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hCWCx-0003Qx-W7
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hCW5t-0005v5-4y
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:51 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:54090)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hCW5l-0005LS-0Q
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:09:44 -0400
-Date: Fri, 05 Apr 2019 14:09:04 -0700
-From: Wei Li <wei.d.li@oracle.com>
-Message-ID: <C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-In-Reply-To: <20190401090724.GA643@stefanha-x1.localdomain>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(envelope-from <pbonzini@redhat.com>) id 1hCWCw-0006yn-UD
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:17:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hCWCv-0006rw-Kn
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 17:17:06 -0400
+References: <20190405184037.16799-1-dgilbert@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <29aaecc0-8dff-9506-6d1b-88e80d121437@redhat.com>
+Date: Fri, 5 Apr 2019 23:16:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <20190405184037.16799-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] test qgraph.c: Fix segs due to out of
+ scope default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, e.emanuelegiuseppe@gmail.com
 
-Thanks Stefan for your quick response!
+On 05/04/19 20:40, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The test uses the trick:
+>    if (!opts) {
+>      opts = &(QOSGraph...Options) { };
+>    }
+> 
+>   in a couple of places, however the temporary created
+> by the &() {}  goes out of scope at the bottom of the if,
+> and results in a seg or assert when opts-> fields are
+> used (on fedora 30's gcc 9).
+> 
+> Fixes: fc281c802022cb3a73a5
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Hi Paolo,
-Could you please send us a link related to the multiqueue feature which you=
- are working on so that we could start getting some details about the featur=
-e.
+Thomas, can you pick this up?
 
-Thanks again,
-Wei=20
+Paolo
 
-=EF=BB=BFOn 4/1/19, 3:54 AM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
-
-    On Fri, Mar 29, 2019 at 08:16:36AM -0700, Wei Li wrote:
-    > Thanks Stefan for your reply and guidance!
-    >=20
-    > We spent some time on exploring the multiple I/O Threads approach per=
- your feedback. Based on the perf measurement data, we did see some IOPS imp=
-rovement for multiple volumes, which is great. :)
-    >=20
-    > In addition, IOPS for single Volume will still be a bottleneck, it se=
-ems like multiqueue block layer feature which Paolo is working on may be abl=
-e to help improving the IOPS for single volume.
-    >=20
-    > @Paolo, @Stefan,=20
-    > Would you mind sharing the multiqueue feature code branch with us? So=
- that we could get some rough idea about this feature and maybe start doing =
-some exploration?=20
-   =20
-    Paolo last worked on this code, so he may be able to send you a link.
-   =20
-    Stefan
-   =20
+> ---
+>  tests/libqos/qgraph.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/libqos/qgraph.c b/tests/libqos/qgraph.c
+> index 122efc1b7b..b149caaaa9 100644
+> --- a/tests/libqos/qgraph.c
+> +++ b/tests/libqos/qgraph.c
+> @@ -77,6 +77,7 @@ static void add_edge(const char *source, const char *dest,
+>  {
+>      char *key;
+>      QOSGraphEdgeList *list = g_hash_table_lookup(edge_table, source);
+> +    QOSGraphEdgeOptions def_opts = { };
+>  
+>      if (!list) {
+>          list = g_new0(QOSGraphEdgeList, 1);
+> @@ -85,7 +86,7 @@ static void add_edge(const char *source, const char *dest,
+>      }
+>  
+>      if (!opts) {
+> -        opts = &(QOSGraphEdgeOptions) { };
+> +        opts = &def_opts;
+>      }
+>  
+>      QOSGraphEdge *edge = g_new0(QOSGraphEdge, 1);
+> @@ -590,9 +591,10 @@ void qos_add_test(const char *name, const char *interface,
+>  {
+>      QOSGraphNode *node;
+>      char *test_name = g_strdup_printf("%s-tests/%s", interface, name);;
+> +    QOSGraphTestOptions def_opts = { };
+>  
+>      if (!opts) {
+> -        opts = &(QOSGraphTestOptions) { };
+> +        opts = &def_opts;
+>      }
+>      node = create_node(test_name, QNODE_TEST);
+>      node->u.test.function = test_func;
+> 
