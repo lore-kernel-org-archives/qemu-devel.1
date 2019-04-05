@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27879C282CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 22:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A713C282CE
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFB07206BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 22:36:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB07206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 5725D2175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:05:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5725D2175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47721 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCXRT-0002GE-0z
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 18:36:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36550)
+	id 1hCXu7-0000Vb-3Z
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 19:05:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hCXQO-0000zc-Lw
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:35:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hCXsL-0007kA-Q3
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hCXQN-00048q-NQ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:35:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58954)
+	(envelope-from <jsnow@redhat.com>) id 1hCXf3-0007Kb-8m
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 18:50:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hCXQK-00040B-Fz; Fri, 05 Apr 2019 18:35:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hCXf0-00073K-SK; Fri, 05 Apr 2019 18:50:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1E033082B63;
-	Fri,  5 Apr 2019 22:34:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F6733066482;
+	Fri,  5 Apr 2019 22:50:09 +0000 (UTC)
 Received: from [10.18.17.206] (dhcp-17-206.bos.redhat.com [10.18.17.206])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CC64A60BFB;
-	Fri,  5 Apr 2019 22:34:56 +0000 (UTC)
-To: lichun <706701795@qq.com>, kwolf@redhat.com, mreitz@redhat.com,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <1554378405-11640-1-git-send-email-706701795@qq.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 39632648CF;
+	Fri,  5 Apr 2019 22:50:04 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,23 +120,23 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f6d784b8-3702-e8bb-a79f-6887acbef354@redhat.com>
-Date: Fri, 5 Apr 2019 18:34:56 -0400
+Message-ID: <ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+Date: Fri, 5 Apr 2019 18:50:03 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <1554378405-11640-1-git-send-email-706701795@qq.com>
+In-Reply-To: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 05 Apr 2019 22:34:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 05 Apr 2019 22:50:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] Fixed dump_buffer function
- parameter offset does not take effect
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
+ allocation failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -148,51 +148,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+	mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405223456.CyFh4_opJZHAU6CmLSZubJfIVhPZaxAxNdl94EhdWAg@z>
+Message-ID: <20190405225003.HB_8th4Tgm_LVdeEciegzkQIr5h40io4SVjCvBqS0us@z>
 
-Hi! Thank you for this patch.
 
-Some notes follow:
 
-On 4/4/19 7:46 AM, lichun wrote:
-> Signed-off-by: lichun <706701795@qq.com>
-
-You should write a commit message explaining the problem being fixed by
-this patch, even if it's very brief.
-
-In the future, try wording subject lines in terms of what the patch
-"does" instead of what it "did"; i.e.:
-
-"Fix dump_buffer function so that the offset parameter takes effect"
-is preferable to
-"Fixed dump_buffer function parameter offset does not take effect"
-
+On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
+> On a file system used by the customer, fallocate() returns an error
+> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
+> fails. We can handle that case the same way as it is done for the
+> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
+> zeroes to an image for the unaligned chunk of the block.
+> 
+> Suggested-by: Denis V. Lunev <den@openvz.org>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  qemu-io-cmds.c | 2 +-
+>  block/io.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index 09750a2..8d93dc6 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -357,7 +357,7 @@ static void dump_buffer(const void *buffer, int64_t offset, int64_t len)
->      int j;
->      const uint8_t *p;
+> diff --git a/block/io.c b/block/io.c
+> index dfc153b..0412a51 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+>              assert(!bs->supported_zero_flags);
+>          }
 >  
-> -    for (i = 0, p = buffer; i < len; i += 16) {
-> +    for (i = 0, p = buffer + offset; i < len; i += 16) {
->          const uint8_t *s = p;
+> -        if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
+> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
+>              /* Fall back to bounce buffer if write zeroes is unsupported */
+>              BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
 >  
->          printf("%08" PRIx64 ":  ", offset + i);
 > 
 
-At a glance I am not sure that this patch is correct, it looks to me as
-if callers are expecting the entire buffer to be dumped and the offset
-is the offset of *this buffer* relative to some reference point (e.g.
-the disk being read from.)
+I suppose that if fallocate fails for any reason and we're allowing
+fallback, we're either going to succeed ... or fail again very soon
+thereafter.
 
-Can you point me to examples in which this is obviously wrong?
+Are there any cases where it is vital to not ignore the first fallocate
+failure? I'm a little wary of ignoring the return code from
+bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
+failure here that the following bounce writes will also fail "safely."
+
+I'm not completely confident, but I have no tangible objections:
+Reviewed-by: John Snow <jsnow@redhat.com>
 
