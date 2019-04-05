@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:53594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCKll-0008LQ-8R
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:04:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hCKln-0008LQ-9z
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hCKhD-0007V7-Jj
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:59:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45208)
+	(envelope-from <dgilbert@redhat.com>) id 1hCKeU-00037c-VV
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:56:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41535)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCKhC-0007UJ-Ol
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:59:35 -0400
-Date: Fri, 5 Apr 2019 09:59:24 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hCKeU-00036E-8f
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:56:46 -0400
+Date: Fri, 5 Apr 2019 09:56:29 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190405085924.GB2819@work-vm>
-References: <20181210173151.16629-1-dgilbert@redhat.com>
-	<20190404152454.3c6b38ce@bahia.lan>
+Message-ID: <20190405085628.GA2819@work-vm>
+References: <20190322134447.14831-1-jfreimann@redhat.com>
+	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190404152454.3c6b38ce@bahia.lan>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
- virtual machines3
+In-Reply-To: <20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
+ assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +28,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
+To: Jens Freimann <jfreimann@redhat.com>, armbru@redhat.com
+Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, mst@redhat.com, mdroth@linux.vnet.ibm.com, liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com, ailan@redhat.com
 
-* Greg Kurz (groug@kaod.org) wrote:
-> On Mon, 10 Dec 2018 17:31:44 +0000
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+* Jens Freimann (jfreimann@redhat.com) wrote:
+> ping
 > 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Hi,
-> >   This is the first RFC for the QEMU side of 'virtio-fs';
-> > a new mechanism for mounting host directories into the guest
-> > in a fast, consistent and secure manner.  Our primary use
-> > case is kata containers, but it should be usable in other scenarios
-> > as well.
-> > 
-> > There are corresponding patches being posted to Linux kernel,
-> > libfuse and kata lists.
-> > 
-> > For a fuller design description, and benchmark numbers, please see
-> > Vivek's posting of the kernel set here:
-> > 
-> > https://marc.info/?l=linux-kernel&m=154446243024251&w=2
-> > 
-> > We've got a small website with instructions on how to use it, here:
-> > 
-> > https://virtio-fs.gitlab.io/
-> > 
-> > and all the code is available on gitlab at:
-> > 
-> > https://gitlab.com/virtio-fs
-> > 
-> 
-> Hi !
-> 
-> This looks like a very promising replacement for virtio-9p, at
-> least with better chances of reaching a production quality level.
-> 
-> Not sure I'll have enough time to step in, but please Cc me on
-> future posts. As virtio-9p maintainer, I'll be happy to help if
-> I can. Also I'll be happy to get rid of the fsdev proxy backend
-> at some point (which I already wanted to replace with a vhost
-> user based solution :-) ).
+> FYI: I'm also working on a few related tools to detect driver behaviour when
+> assigning a MAC to the vf device. Code is at https://github.com/jensfr/netfailover_driver_detect
 
-Thanks! We'll try and remember to keep you in the loop.
-If there are any gotchas that you tripped over in 9p that we should
-watch out for then please give us a prod.
+Hi Jens,
+  I've not been following this too uch, but:
+
+> regards,
+> Jens
+> 
+> On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
+> > This is another attempt at implementing the host side of the
+> > net_failover concept
+> > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+> > 
+> > The general idea is that we have a pair of devices, a vfio-pci and a
+> > emulated device. Before migration the vfio device is unplugged and data
+> > flows to the emulated device, on the target side another vfio-pci device
+> > is plugged in to take over the data-path. In the guest the net_failover
+> > module will pair net devices with the same MAC address.
+> > 
+> > * In the first patch the infrastructure for hiding the device is added
+> >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
+> >  state and it is set based on a callback to the standby device which
+> >  registers itself for handling the assessment: "should the primary device
+> >  be hidden?" by cross validating the ids of the devices.
+> > 
+> > * In the second patch the virtio-net uses the API to hide the vfio
+> >  device and unhides it when the feature is acked.
+> > 
+> > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
+> > 
+> > To summarize concerns/feedback from previous discussion:
+> > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+> >  Migration might get stuck for unpredictable time with unclear reason.
+> >  This approach combines two tricky things, hot/unplug and migration.
+> >  -> We can surprise-remove the PCI device and in QEMU we can do all
+> >     necessary rollbacks transparent to management software. Will it be
+> >     easy, probably not.
+
+This sounds 'fun' - bonus cases are things like what happens if the
+guest gets rebooted somewhere during the process or if it's currently
+sitting in the bios/grub/etc
+
+> > 2. PCI devices are a precious ressource. The primary device should never
+> >  be added to QEMU if it won't be used by guest instead of hiding it in
+> >  QEMU.
+> >  -> We only hotplug the device when the standby feature bit was
+> >     negotiated. We save the device cmdline options until we need it for
+> >     qdev_device_add()
+> >     Hiding a device can be a useful concept to model. For example a
+> >     pci device in a powered-off slot could be marked as hidden until the slot is
+> >     powered on (mst).
+
+Are they really that precious? Personally it's not something I'd worry
+about.
+
+> > 3. Management layer software should handle this. Open Stack already has
+> >  components/code to handle unplug/replug VFIO devices and metadata to
+> >  provide to the guest for detecting which devices should be paired.
+> >  -> An approach that includes all software from firmware to
+> >     higher-level management software wasn't tried in the last years. This is
+> >     an attempt to keep it simple and contained in QEMU as much as possible.
+> > 4. Hotplugging a device and then making it part of a failover setup is
+> >   not possible
+> >  -> addressed by extending qdev hotplug functions to check for hidden
+> >     attribute, so e.g. device_add can be used to plug a device.
+> > 
+> > There are still some open issues:
+> > 
+> > Migration: I'm looking for something like a pre-migration hook that I
+> > could use to unplug the vfio-pci device. I tried with a migration
+> > notifier but it is called to late, i.e. after migration is aborted due
+> > to vfio-pci marked unmigrateable. I worked around this by setting it
+> > to migrateable and used a migration notifier on the virtio-net device.
+
+Why not just let this happen at the libvirt level; then you do the
+hotunplug etc before you actually tell qemu anything about starting a
+migration?
+
+> > Commandline: There is a dependency between vfio-pci and virtio-net
+> > devices. One points to the other via new parameters
+> > primar=<primary qdev id> and standby='<standby qdev id>'. This means
+> > that the primary device needs to be specified after standby device on
+> > the qemu command line. Not sure how to solve this.
+> > 
+> > Error handling: Patches don't cover all possible error scenarios yet.
+> > 
+> > I have tested this with a mlx5 NIC and was able to migrate the VM with
+> > above mentioned workarounds for open problems.
+> > 
+> > Command line example:
+> > 
+> > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+> >        -machine q35,kernel-irqchip=split -cpu host   \
+> >        -k fr   \
+> >        -serial stdio   \
+> >        -net none \
+> >        -qmp unix:/tmp/qmp.socket,server,nowait \
+> >        -monitor telnet:127.0.0.1:5555,server,nowait \
+> >        -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
+> >        -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
+> >        -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
+> >        -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
+> >        -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,primary=hostdev0 \
+> >        -device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
+
+Yes, that's a bit grim; it's circular dependency on the 'hostdev0' and
+'net1' id's.  cc'ing in Markus.
 
 Dave
 
-
-Dave
-
-> Cheers,
-> 
-> --
-> Greg
-> 
-> > QEMU's changes
-> > --------------
+> >        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
 > > 
-> > The QEMU changes are pretty small; 
+> > I'm grateful for any remarks or ideas!
 > > 
-> > There's a new vhost-user device, which is used to carry a stream of
-> > FUSE messages to an external daemon that actually performs
-> > all the file IO.  The FUSE daemon is an external process in order to
-> > achieve better isolation for security and resource control (e.g. number
-> > of file descriptors) and also because it's cleaner than trying to
-> > integrate libfuse into QEMU.
+> > Thanks!
 > > 
-> > This device has an extra BAR that contains (up to) 3 regions:
+> > regards,
+> > Jens
 > > 
-> >  a) a DAX mapping range ('the cache') - into which QEMU mmap's
-> >     files on behalf of the external daemon; those files are
-> >     then directly mapped by the guest in a way similar to a DAX
-> >     backed file system;  one advantage of this is that multiple
-> >     guests all accessing the same files should all be sharing
-> >     those pages of host cache.
+> > Sameeh Jubran (2):
+> >  qdev/qbus: Add hidden device support
+> >  net/virtio: add failover support
 > > 
-> >  b) An experimental set of mappings for use by a metadata versioning
-> >     daemon;  this mapping is shared between multiple guests and
-> >     the daemon, but only contains a set of version counters that
-> >     allow a guest to quickly tell if its metadata is stale.
+> > hw/core/qdev.c                 | 27 ++++++++++
+> > hw/net/virtio-net.c            | 95 ++++++++++++++++++++++++++++++++++
+> > hw/pci/pci.c                   |  1 +
+> > include/hw/pci/pci.h           |  2 +
+> > include/hw/qdev-core.h         |  8 +++
+> > include/hw/virtio/virtio-net.h |  7 +++
+> > qdev-monitor.c                 | 48 +++++++++++++++--
+> > vl.c                           |  7 ++-
+> > 8 files changed, 189 insertions(+), 6 deletions(-)
 > > 
-> > TODO
-> > ----
+> > -- 
+> > 2.20.1
 > > 
-> > This is the first RFC, we know we have a bunch of things to clear up:
 > > 
-> >   a) The virtio device specificiation is still in flux and is expected
-> >      to change
-> > 
-> >   b) We'd like to find ways of reducing the map/unmap latency for DAX
-> > 
-> >   c) The metadata versioning scheme needs to settle out.
-> > 
-> >   d) mmap'ing host files has some interesting side effects; for example
-> >      if the file gets truncated by the host and then the guest accesses
-> >      the mapping, KVM can fail the guest hard.
-> > 
-> > Dr. David Alan Gilbert (6):
-> >   virtio: Add shared memory capability
-> >   virtio-fs: Add cache BAR
-> >   virtio-fs: Add vhost-user slave commands for mapping
-> >   virtio-fs: Fill in slave commands for mapping
-> >   virtio-fs: Allow mapping of meta data version table
-> >   virtio-fs: Allow mapping of journal
-> > 
-> > Stefan Hajnoczi (1):
-> >   virtio: add vhost-user-fs-pci device
-> > 
-> >  configure                                   |  10 +
-> >  contrib/libvhost-user/libvhost-user.h       |   3 +
-> >  docs/interop/vhost-user.txt                 |  35 ++
-> >  hw/virtio/Makefile.objs                     |   1 +
-> >  hw/virtio/vhost-user-fs.c                   | 517 ++++++++++++++++++++
-> >  hw/virtio/vhost-user.c                      |  16 +
-> >  hw/virtio/virtio-pci.c                      | 115 +++++
-> >  hw/virtio/virtio-pci.h                      |  19 +
-> >  include/hw/pci/pci.h                        |   1 +
-> >  include/hw/virtio/vhost-user-fs.h           |  79 +++
-> >  include/standard-headers/linux/virtio_fs.h  |  48 ++
-> >  include/standard-headers/linux/virtio_ids.h |   1 +
-> >  include/standard-headers/linux/virtio_pci.h |   9 +
-> >  13 files changed, 854 insertions(+)
-> >  create mode 100644 hw/virtio/vhost-user-fs.c
-> >  create mode 100644 include/hw/virtio/vhost-user-fs.h
-> >  create mode 100644 include/standard-headers/linux/virtio_fs.h
-> > 
-> 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
