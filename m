@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50864)
+Received: from eggs.gnu.org ([209.51.188.92]:51135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1hCRjk-0003di-Bl
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:30:41 -0400
+	(envelope-from <groug@kaod.org>) id 1hCRkO-0003sE-1c
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1hCRjf-0008Cd-15
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:30:38 -0400
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:40547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1hCRjS-0007dD-A0
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:30:29 -0400
-Received: by mail-wm1-f48.google.com with SMTP id z24so7905316wmi.5
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 09:29:54 -0700 (PDT)
-References: <20190326131822.GD15011@stefanha-x1.localdomain>
-From: Sergio Lopez <slp@redhat.com>
-In-reply-to: <20190326131822.GD15011@stefanha-x1.localdomain>
-Date: Fri, 05 Apr 2019 18:29:49 +0200
-Message-ID: <878swomn42.fsf@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1hCRkH-0000G9-8x
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:31:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hCRkB-0008Qp-BK
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 12:31:12 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x35GTEKk119564
+	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 12:30:53 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rp82hyrnw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 12:30:53 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Fri, 5 Apr 2019 17:30:51 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 05 Apr 2019 18:30:48 +0200
+In-Reply-To: <155448184292.8446.8225650773162648595.stgit@bahia.lan>
+References: <155448184292.8446.8225650773162648595.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] QEMU event loop optimizations
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <155448184841.8446.13959787238854054119.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH for-4.1 2/2] spapr: Drop duplicate code in LSI
+ mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +40,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
---=-=-=
-Content-Type: text/plain
+LSI mapping in spapr currently open-codes standard PCI swizzling. It thus
+duplicates the code of pci_swizzle_map_irq_fn().
 
+Expose the swizzling formula so that it can be used with a slot number
+when building the device tree. Simply drop pci_spapr_map_irq() and call
+pci_swizzle_map_irq_fn() instead.
 
-Stefan Hajnoczi writes:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/pci/pci.c         |    2 +-
+ hw/ppc/spapr_pci.c   |   24 ++++--------------------
+ include/hw/pci/pci.h |    4 ++++
+ 3 files changed, 9 insertions(+), 21 deletions(-)
 
-> Hi Sergio,
-> Here are the forgotten event loop optimizations I mentioned:
->
->   https://github.com/stefanha/qemu/commits/event-loop-optimizations
->
-> The goal was to eliminate or reorder syscalls so that useful work (like
-> executing BHs) occurs as soon as possible after an event is detected.
->
-> I remember that these optimizations only shave off a handful of
-> microseconds, so they aren't a huge win.  They do become attractive on
-> fast SSDs with <10us read/write latency.
->
-> These optimizations are aggressive and there is a possibility of
-> introducing regressions.
->
-> If you have time to pick up this work, try benchmarking each commit
-> individually so performance changes are attributed individually.
-> There's no need to send them together in a single patch series, the
-> changes are quite independent.
-
-It took me a while to find a way to get meaningful numbers to evaluate
-those optimizations. The problem is that here (Xeon E5-2640 v3 and EPYC
-7351P) the cost of event_notifier_set() is just ~0.4us when the code
-path is hot, and it's hard differentiating it from the noise.
-
-To do so, I've used a patched kernel with a naive io_poll implementation
-for virtio_blk [1], an also patched QEMU with poll-inflight [2] (just to
-be sure we're polling) and ran the test on semi-isolated cores
-(nohz_full + rcu_nocbs + systemd_isolation) with idle siblings. The
-storage is simulated by null_blk with "completion_nsec=0 no_sched=1
-irqmode=0".
-
-# fio --time_based --runtime=30 --rw=randread --name=randread \
- --filename=/dev/vdb --direct=1 --ioengine=pvsync2 --iodepth=1 --hipri=1
-
-| avg_lat (us) | master | qbsn* |
-|   run1       | 11.32  | 10.96 |
-|   run2       | 11.37  | 10.79 |
-|   run3       | 11.42  | 10.67 |
-|   run4       | 11.32  | 11.06 |
-|   run5       | 11.42  | 11.19 |
-|   run6       | 11.42  | 10.91 |
- * patched with aio: add optimized qemu_bh_schedule_nested() API
-
-Even though there's still some variance in the numbers, the 0.4us
-improvement can be clearly appreciated.
-
-I haven't tested the other 3 patches, as their optimizations only have
-effect when the event loop is not running in polling mode. Without
-polling, we get an additional overhead of, at least, 10us, in addition
-to a lot of noise, due to both direct costs (ppoll()...) and indirect
-ones (re-scheduling and TLB/cache pollution), so I don't think we can
-reliable benchmark them. Probably their impact won't be significant
-either, due to the costs I've just mentioned.
-
-Sergio.
-
-[1] https://github.com/slp/linux/commit/d369b37db3e298933e8bb88c6eeacff07f39bc13
-[2] https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg00447.html
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAlyngn0ACgkQ9GknjS8M
-AjX5ThAAhdU6dwvSXtqoXMYKjKLVAVCCVY13UNyuEtddfJuLwgn0ghk/KGRIlgum
-ZWJmlimkWSFzypOL9XGoA5byMmh78uI6RsYLYtArBdFxeRHk9Ie1Xmjx5hRgz049
-Now7hu7qlQv7Bv3hrC6FY0/Mx6uTdTKB0+hoXqRjGI2Sr4x8ZYCDgWdUnX5fJ3DL
-4fUJcyX8Mt9HjaMCH2Y/NUElTVKHVNAH9CL1UuA6Gfaj0B5Ly0KUqb6NMB+fZeIk
-P4JEkiMkiqM/0FV27R2Sm3C7JmqfwxplVCVZXUT1kPEtZBk4P7YK5MIpBxbLCMJ7
-T2vwDNCTrnoK8/mQGictdVPq/S1e1m63I2LIbA8BAcDPhMazWNmS4ChOZGw0H32e
-N9U6Qhp60idcjYDrG05Sg8pBohW4vw6AnN3n6shbIW1ao7DQjLD8VDNqN/ZdCSEm
-7Oanv8EmrSRiDI29Kpj0y8KbDQVP8zYTYFwlLaQYYqfbiZsGER52CUGXzY77feeZ
-kB7vsrjNz13a4hYS6mOcQkJJeku0bCChfNGXKkpQX5dMd8Ghs3NxSSCY79G1maUF
-RtPuALcHBHKr16eeMycCDQIVji24s14MLe9eJzKQQkIoHnc9ThU48oj+YZ51HxoE
-t++RwIpruCMLxJfuUi0ybXXpc9iOJFcY4LYKbnQ4nTZhj0Ctu7o=
-=h9Wc
------END PGP SIGNATURE-----
---=-=-=--
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 35451c1e9987..bb52bafd8d1c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1532,7 +1532,7 @@ void pci_device_set_intx_routing_notifier(PCIDevice *dev,
+  */
+ int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin)
+ {
+-    return (pin + PCI_SLOT(pci_dev->devfn)) % PCI_NUM_PINS;
++    return pci_swizzle(PCI_SLOT(pci_dev->devfn), pin);
+ }
+ 
+ /***********************************************************/
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index c70688a0dc23..26850d0b94f4 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -719,26 +719,10 @@ param_error_exit:
+     rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+ }
+ 
+-static int pci_spapr_swizzle(int slot, int pin)
+-{
+-    return (slot + pin) % PCI_NUM_PINS;
+-}
+-
+-static int pci_spapr_map_irq(PCIDevice *pci_dev, int irq_num)
+-{
+-    /*
+-     * Here we need to convert pci_dev + irq_num to some unique value
+-     * which is less than number of IRQs on the specific bus (4).  We
+-     * use standard PCI swizzling, that is (slot number + pin number)
+-     * % 4.
+-     */
+-    return pci_spapr_swizzle(PCI_SLOT(pci_dev->devfn), irq_num);
+-}
+-
+ static void pci_spapr_set_irq(void *opaque, int irq_num, int level)
+ {
+     /*
+-     * Here we use the number returned by pci_spapr_map_irq to find a
++     * Here we use the number returned by pci_swizzle_map_irq_fn to find a
+      * corresponding qemu_irq.
+      */
+     SpaprPhbState *phb = opaque;
+@@ -1744,7 +1728,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+                                 &sphb->iowindow);
+ 
+     bus = pci_register_root_bus(dev, NULL,
+-                                pci_spapr_set_irq, pci_spapr_map_irq, sphb,
++                                pci_spapr_set_irq, pci_swizzle_map_irq_fn, sphb,
+                                 &sphb->memspace, &sphb->iospace,
+                                 PCI_DEVFN(0, 0), PCI_NUM_PINS, TYPE_PCI_BUS);
+     phb->bus = bus;
+@@ -2236,14 +2220,14 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
+     }
+ 
+     /* Build the interrupt-map, this must matches what is done
+-     * in pci_spapr_map_irq
++     * in pci_swizzle_map_irq_fn
+      */
+     _FDT(fdt_setprop(fdt, bus_off, "interrupt-map-mask",
+                      &interrupt_map_mask, sizeof(interrupt_map_mask)));
+     for (i = 0; i < PCI_SLOT_MAX; i++) {
+         for (j = 0; j < PCI_NUM_PINS; j++) {
+             uint32_t *irqmap = interrupt_map[i*PCI_NUM_PINS + j];
+-            int lsi_num = pci_spapr_swizzle(i, j);
++            int lsi_num = pci_swizzle(i, j);
+ 
+             irqmap[0] = cpu_to_be32(b_ddddd(i)|b_fff(0));
+             irqmap[1] = 0;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index d87f5f93e9cd..033b2145d98c 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -411,6 +411,10 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+ void pci_bus_irqs_cleanup(PCIBus *bus);
+ int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
+ /* 0 <= pin <= 3 0 = INTA, 1 = INTB, 2 = INTC, 3 = INTD */
++static inline int pci_swizzle(int slot, int pin)
++{
++    return (slot + pin) % PCI_NUM_PINS;
++}
+ int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
+ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+                               pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
