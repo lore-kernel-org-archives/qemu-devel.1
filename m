@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0FBC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DB4C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:25:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 099512175B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:15:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099512175B
+	by mail.kernel.org (Postfix) with ESMTPS id 011CC2175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 04:25:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011CC2175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35723 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35799 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCGGO-0002Ly-0f
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 00:15:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35315)
+	id 1hCGPv-0004oD-5H
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 00:25:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCGFR-0001xn-FH
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1hCGOx-0004JO-QG
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCGFQ-00045b-Ig
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57062)
+	(envelope-from <thuth@redhat.com>) id 1hCGOw-0002fW-2n
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:24:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hCGFP-00040R-RH
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:14:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hCGOu-0002YU-7F
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:24:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AF4D307D91E;
-	Fri,  5 Apr 2019 04:14:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A76513A4D;
+	Fri,  5 Apr 2019 04:24:22 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B039E86811;
-	Fri,  5 Apr 2019 04:14:27 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 17B7B608E5;
+	Fri,  5 Apr 2019 04:24:15 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	qemu-devel@nongnu.org
 References: <20190404221238.12468-1-philmd@redhat.com>
-	<20190404221238.12468-2-philmd@redhat.com>
+	<20190404221238.12468-4-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +90,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <ef95f30c-38e0-d7bd-533f-d8b9831bc62a@redhat.com>
-Date: Fri, 5 Apr 2019 06:14:26 +0200
+Message-ID: <fc206966-79bf-0582-f9ab-697734771fa9@redhat.com>
+Date: Fri, 5 Apr 2019 06:24:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190404221238.12468-2-philmd@redhat.com>
+In-Reply-To: <20190404221238.12468-4-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Fri, 05 Apr 2019 04:14:34 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 05 Apr 2019 04:24:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 1/4] hw/isa/superio: Rename a
- variable
+Subject: Re: [Qemu-devel] [PATCH for-4.1 3/4] hw/isa/superio: Support
+ chipsets with no Floppy Disk controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,43 +126,39 @@ Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405041426.PPjwxonZjXwC9rDQD1ZddgHpXnNCgBRco3mX7-etxR8@z>
+Message-ID: <20190405042415.YL26I0Gl_-WLUvPdwNbHqOhEGQvDdFgZqeVUMS6W7w8@z>
 
 On 05/04/2019 00.12, Philippe Mathieu-Daud=C3=A9 wrote:
-> This patch is purely cosmetic. No functional change.
-> This will ease the next patch where we re-indent an if() statement.
+> Not all Super I/O chipsets provide a Floppy Disk Controller.
+>=20
+> Without this change, using a Super I/O with no FDC would abort QEMU wit=
+h:
+>=20
+>   Initialization of device isa-fdc failed: ISA controller does not supp=
+ort DMA
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/isa/isa-superio.c | 69 ++++++++++++++++++++++----------------------
->  1 file changed, 34 insertions(+), 35 deletions(-)
+>  hw/isa/isa-superio.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-> index d54463bf035..c6845eaf578 100644
+> index b0761ea1f96..6956f06d529 100644
 > --- a/hw/isa/isa-superio.c
 > +++ b/hw/isa/isa-superio.c
-> @@ -22,8 +22,8 @@
+> @@ -113,7 +113,8 @@ static void isa_superio_realize(DeviceState *dev, E=
+rror **errp)
+>      }
 > =20
->  static void isa_superio_realize(DeviceState *dev, Error **errp)
->  {
-> -    ISASuperIODevice *sio =3D ISA_SUPERIO(dev);
-> -    ISASuperIOClass *k =3D ISA_SUPERIO_GET_CLASS(sio);
-> +    ISASuperIODevice *s =3D ISA_SUPERIO(dev);
-> +    ISASuperIOClass *k =3D ISA_SUPERIO_GET_CLASS(s);
+>      /* Floppy disc */
+> -    if (!k->floppy.is_enabled || k->floppy.is_enabled(s, 0)) {
+> +    if (k->floppy.count
+> +            && (!k->floppy.is_enabled || k->floppy.is_enabled(s, 0))) =
+{
+>          isa =3D isa_create(bus, "isa-fdc");
+>          d =3D DEVICE(isa);
+>          if (k->floppy.get_iobase) {
 
-Sorry, but I have to say that I normally really don't like single-letter
-variable names. They are much harder to search for, and way less
-self-describing.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-If you get problems with the line length in a later patch, what about
-refactoring the related code into a separate function? So that you'd
-only have something like this in the realize function:
-
-    for (i =3D 0, j =3D 0; i < bus_count; i++, j +=3D MAX_IDE_DEVS) {
-        if (!k->ide.is_enabled || k->ide.is_enabled(s, j)) {
-            isa_superio_init_ide(...);
-        }
-    }
-
- Thomas
 
