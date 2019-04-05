@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48042)
+Received: from eggs.gnu.org ([209.51.188.92]:48524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCMXt-0006Jk-8c
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:58:06 -0400
+	(envelope-from <olaf@aepfle.de>) id 1hCMZG-00072p-HJ
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCMXs-00045d-6B
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:58:05 -0400
-References: <20190404071421.4891-1-thuth@redhat.com>
-	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
-	<158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
-	<3ba3c765-589f-4c0a-38dc-d9126f515e7b@redhat.com>
-	<87lg0p4tsc.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8e8d5b15-57ad-95ff-c328-557c617d93b6@redhat.com>
-Date: Fri, 5 Apr 2019 12:57:54 +0200
+	(envelope-from <olaf@aepfle.de>) id 1hCMZF-0006nI-Je
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:30 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::12]:10938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCMZE-0006jA-Ap
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:29 -0400
+Date: Fri, 5 Apr 2019 12:59:18 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20190405125918.462c6ae4.olaf@aepfle.de>
+In-Reply-To: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+References: <20190405123928.70da87e2.olaf@aepfle.de>
+	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87lg0p4tsc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
- not be user_creatable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/qxyv.yX5szkNIorp2b5/mpZ";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-On 04/04/2019 18.30, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+--Sig_/qxyv.yX5szkNIorp2b5/mpZ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Am Fri, 5 Apr 2019 12:49:15 +0200
+schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
+
+> The EDK2 submodule was added for UEFI testing, you don't need to compile
+> it to build/use QEMU.
 >=20
->> On 04/04/2019 15.29, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 4/4/19 12:07 PM, Paolo Bonzini wrote:
->>>> On 04/04/19 09:14, Thomas Huth wrote:
->>>>> The i8042 PS/2 controller is part of the chipset on the motherboard=
-.
->>>>> It is instantiated by the machine init code, and it does not make s=
-ense
->>>>> to allow the user to plug an additional i8042 in any of the free IS=
-A slots.
->>>>> Thus let's mark the device with user_creatable =3D false.
->>>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>  hw/input/pckbd.c | 2 ++
->>>>>  1 file changed, 2 insertions(+)
->>>>
->>>> user_creatable is not for devices that are not pluggable in real lif=
-e;
->>>> it is for devices that crash QEMU (!) or always fail if plugged by t=
-he user.
->>
->> ... hmm, but presenting devices to the user that are clearly not
->> intended for direct use is also not very nice, is it?
->=20
-> Maybe, but hiding them should be separate from marking devices that
-> still defeat device_add.
->=20
-> In the ideal world, we'd be able to start with an empty board, then
-> build a machine with by wiring together devices.  Say like use
-> device_add to create and plug into parent bus, qom-set link properties
-> to create additional wires.
+> How did you end up compiling it?
 
-I agree with you on the vision of creating a machine dynamically - but I
-doubt that we will ever do it with the "high level" -device option or
-device_add HMP/QMP command. You'd likely rather need to introduce a new
-interface / commands for this anyway, which then simply ignore the
-normal user_creatable flag.
+The qemu.spec file has this since a very long time:
+make -C roms efirom ${unrelated_settings}
 
-> Plenty of devices fail at the device_add stage, or require additional
-> wiring by code.  These are marked not user_creatable.
+This used to work still in January with c9d18c1c150c84e7a976df989ad04ddf010=
+83f46.
 
-Sure, I think we all agree on these kind of devices.
+Olaf
 
-But what about these devices which obviously don't crash QEMU, but are
-completely useless with "-device", since they can not be used in any
-meaningful way? Presenting them to the average user e.g. in the "-device
-help" output is somewhat gruesome, isn't it?
+--Sig_/qxyv.yX5szkNIorp2b5/mpZ
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
 
->>>> So the question to ask is: would it make sense, and especially work,=
- to
->>>> add an i8042 to machines that do have an ISA bridge (for example the=
- Alpha?)
->=20
-> Scratch the "would it make sense" part, keep the "would it work" part.
+-----BEGIN PGP SIGNATURE-----
 
-I don't see a way how this could really work (in the sense of being
-usable, not in the sense of not crashing QEMU). The device is only
-expected to be there on certain chipssets, the guest does not have a
-possibility to detect this device on systems that do not feature one of
-these chipssets. So you get a device in such a case that simply does
-nothing. How is that useful for you?
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKc1BwAKCRBdQqD6ppg2
+fh9/AKCQYcL7VuEatSXVQcwVI1TsBd2BfwCfdsKy0MYdn/CCqZD6biEzttKfq5o=
+=yysl
+-----END PGP SIGNATURE-----
 
- Thomas
+--Sig_/qxyv.yX5szkNIorp2b5/mpZ--
