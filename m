@@ -2,107 +2,109 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E21B8C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 581F9C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1C1520700
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:53:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C1520700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18489217D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18489217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37104 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37178 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCIiu-0001Kp-Np
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:53:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44049)
+	id 1hCIp7-000366-5V
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:59:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@linux.ibm.com>) id 1hCH8f-0007o5-32
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:11:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1hCIoC-0002hr-C7
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@linux.ibm.com>) id 1hCH1u-00016w-VE
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:04:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aik@linux.ibm.com>) id 1hCH1u-0000YB-D8
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:04:42 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x354xY7f048828
-	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 01:04:35 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rny4qk01m-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 01:04:35 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aik@linux.ibm.com>;
-	Fri, 5 Apr 2019 06:04:33 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-	by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 5 Apr 2019 06:04:30 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
-	[9.149.105.62])
-	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3554TID45220090
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 5 Apr 2019 05:04:29 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82C01AE04D;
-	Fri,  5 Apr 2019 05:04:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 389ADAE05F;
-	Fri,  5 Apr 2019 05:04:29 +0000 (GMT)
-Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
-	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2019 05:04:29 +0000 (GMT)
-Received: from [10.61.2.175] (haven.au.ibm.com [9.192.254.114])
-	(using TLSv1.2 with cipher AES128-SHA (128/128 bits))
+	(envelope-from <thuth@redhat.com>) id 1hCIoA-00071V-BL
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:58:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hCIo7-0006vo-R0; Fri, 05 Apr 2019 02:58:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by ozlabs.au.ibm.com (Postfix) with ESMTPSA id CB1F9A00D1;
-	Fri,  5 Apr 2019 16:04:27 +1100 (AEDT)
-To: David Gibson <david@gibson.dropbear.id.au>,
-	Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-References: <155323635511.18748.18133954505098138975.stgit@aravinda>
-	<155323643836.18748.13006461397179281455.stgit@aravinda>
-	<20190325062256.GO29295@umbus>
-	<1fdde5df-408a-f81d-d9ac-eb9636324b54@linux.vnet.ibm.com>
-	<20190404231707.GB25513@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@linux.ibm.com>
-Date: Fri, 5 Apr 2019 16:04:27 +1100
+	by mx1.redhat.com (Postfix) with ESMTPS id A8722307D8E3;
+	Fri,  5 Apr 2019 06:58:33 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7CB6C5D719;
+	Fri,  5 Apr 2019 06:58:31 +0000 (UTC)
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com,
+	alifm@linux.ibm.com, borntraeger@de.ibm.com
+References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <6cd9fc3c-f5cb-e0fd-6990-d519014bead0@redhat.com>
+Date: Fri, 5 Apr 2019 08:58:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190404231707.GB25513@umbus.fritz.box>
+In-Reply-To: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19040505-4275-0000-0000-000003247D55
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19040505-4276-0000-0000-000038338B8E
-Message-Id: <cd08ddbc-d289-04a5-c9ae-d7618fc22308@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-05_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904050037
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Fri, 05 Apr 2019 02:51:02 -0400
-Subject: Re: [Qemu-devel] [PATCH v7 3/6] target/ppc: Handle NMI guest exit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 05 Apr 2019 06:58:33 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 00/16] s390: vfio-ccw dasd ipl support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,79 +116,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, aik@au1.ibm.com,
-	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405050427.yPUatZVkv25QbF7XNc1HUvkSTspS8H57aFP-zv2y2iY@z>
+Message-ID: <20190405065830.1BHSJcGCJvvrDV9LmS8BkamlwvoO3GuuOCDL0TSuT9w@z>
 
+On 04/04/2019 16.34, Jason J. Herne wrote:
+> This is to support booting from vfio-ccw dasd devices. We basically imp=
+lement
+> the real hardware ipl procedure. This allows for booting Linux guests o=
+n
+> vfio-ccw devices.
+>=20
+> vfio-ccw's channel program prefetch algorithm complicates ipl because m=
+ost ipl
+> channel programs dynamically modify themselves. Details on the ipl proc=
+ess and
+> how we worked around this issue can be found in docs/devel/s390-dasd-ip=
+l.txt.
 
+ Hi Jason,
 
-On 05/04/2019 10:17, David Gibson wrote:
-> On Thu, Apr 04, 2019 at 02:40:45PM +0530, Aravinda Prasad wrote:
->>
->>
->> On Monday 25 March 2019 11:52 AM, David Gibson wrote:
->>> On Fri, Mar 22, 2019 at 12:03:58PM +0530, Aravinda Prasad wrote:
->>>> Memory error such as bit flips that cannot be corrected
->>>> by hardware are passed on to the kernel for handling.
->>>> If the memory address in error belongs to guest then
->>>> the guest kernel is responsible for taking suitable action.
->>>> Patch [1] enhances KVM to exit guest with exit reason
->>>> set to KVM_EXIT_NMI in such cases. This patch handles
->>>> KVM_EXIT_NMI exit.
->>>>
->>>> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
->>>>     (e20bbd3d and related commits)
->>>>
->>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>> ---
->>>>  hw/ppc/spapr_events.c  |   22 ++++++++++++++++++++++
->>>>  include/hw/ppc/spapr.h |    1 +
->>>>  target/ppc/kvm.c       |   16 ++++++++++++++++
->>>>  target/ppc/kvm_ppc.h   |    2 ++
->>>>  4 files changed, 41 insertions(+)
->>>>
->>
->> [...]
->>
->>>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->>>> index 2427c8e..a593448 100644
->>>> --- a/target/ppc/kvm.c
->>>> +++ b/target/ppc/kvm.c
->>>> @@ -1738,6 +1738,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>>>          ret = 0;
->>>>          break;
->>>>  
->>>> +    case KVM_EXIT_NMI:
->>>> +        DPRINTF("handle NMI exception\n");
->>>
->>> tracepoints are generally preferred to new DPRINTFs.
->>
->> I see DPRINTFs used in all other exit reasons in this function. Do you
->> want me to change this particular exit case to tracepoints? I think it
->> is better to keep this DPRINTF as of now and change all the DPRINTFs to
->> tracepoints in a separate patch set.
-> 
-> Ah, good point. 
+while running my s390-ccw bios tests, I noticed that network booting
+seems to be broken now. This used to work before:
 
-imho not. The kvm.c already knows about traces (there are two) and even
-if every other trace in kvm_arch_handle_exit() is DPRINTF (enabled all
-at once), having at least one which can be enabled without QEMU
-recompile and separately from the others is a small but nice bonus
-before someone gets rid of DPRINTF.
+s390x-softmmu/qemu-system-s390x -nographic -accel kvm \
+ -bios pc-bios/s390-ccw/s390-ccw.img \
+ -global s390-ipl.netboot_fw=3Dpc-bios/s390-ccw/s390-netboot.img \
+ -netdev user,id=3Dn1,tftp=3D/boot,bootfile=3Dvmlinuz-4.18.0 \
+ -device virtio-net-ccw,netdev=3Dn1,bootindex=3D1
 
+Now it simply fails with "! No IPL device available !".
 
-> Tracepoints are generally preferred, but since
-> DPRINTFs are in use here, stick with that (at some point it would be
-> good to change the whole file, but that's out of scope here).
+Could you have a look at it, please?
 
-
--- 
-Alexey Kardashevskiy
-IBM OzLabs, LTC Team
-
-e-mail: aik@linux.ibm.com
-
+ Thanks,
+  Thomas
 
