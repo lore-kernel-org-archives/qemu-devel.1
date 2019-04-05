@@ -2,57 +2,59 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0356EC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADD2C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FFD206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:43:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FFD206DF
+	by mail.kernel.org (Postfix) with ESMTPS id 3BAFB206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 06:43:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BAFB206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36973 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36975 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCIZk-0004Se-Uv
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:43:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58130)
+	id 1hCIZp-0004Wl-BT
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 02:43:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY3-0003cW-1q
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:41:59 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY4-0003cb-Oy
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY2-0004Nn-9L
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:41:59 -0400
-Received: from mga06.intel.com ([134.134.136.31]:33225)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hCIY3-0004PH-QV
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:42:00 -0400
+Received: from mga07.intel.com ([134.134.136.100]:40758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hCIY2-0004Lx-0H
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:41:58 -0400
+	id 1hCIY3-0004O6-Eb
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 02:41:59 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-	by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	04 Apr 2019 23:41:55 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	04 Apr 2019 23:41:57 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,310,1549958400"; d="scan'208";a="288952742"
+X-IronPort-AV: E=Sophos;i="5.60,310,1549958400"; d="scan'208";a="128814018"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga004.jf.intel.com with ESMTP; 04 Apr 2019 23:41:54 -0700
+	by orsmga007.jf.intel.com with ESMTP; 04 Apr 2019 23:41:56 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  5 Apr 2019 14:41:17 +0800
-Message-Id: <20190405064121.23662-1-richardw.yang@linux.intel.com>
+Date: Fri,  5 Apr 2019 14:41:18 +0800
+Message-Id: <20190405064121.23662-2-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190405064121.23662-1-richardw.yang@linux.intel.com>
+References: <20190405064121.23662-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.31
-Subject: [Qemu-devel] [PATCH v2 0/4] cleanup select_machine
+X-Received-From: 134.134.136.100
+Subject: [Qemu-devel] [PATCH v2 1/4] vl.c: make find_default_machine() local
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,32 +72,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190405064117.MWVU5rSyqHFKYL87rcxtU_5CedQywBOQ1s5c-cBmTug@z>
+Message-ID: <20190405064118.9eCkI3t7VsA4OvzyxvuN1Z3GHqjffUr07SoeaPLiB3E@z>
 
-Here is two simple change related to select_machine()
+Function find_default_machine() is introduced by commit 2c8cffa599b7
+"vl: make find_default_machine externally visible", and it was used
+outside of vl.c until commit a904410af5f1 "pc_sysfw: remove the rom_only
+property".
 
-[1]: make find_default_machine() local since no one outside file use it
-[2]: allocate TYPE_MACHINE list only once to select machine type
-[3]: cleanup after previous commit
-[4]: Simplify machine_parse()
+Commit a904410af5f1 "pc_sysfw: remove the rom_only property" removed the
+only user of find_default_machine() outside vl.c, but neglected to make
+it static. Do that now.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
 ---
 v2:
-  * adjust changelog in [1]
-  * Markus provides [3-4]
+  * refactor changelog as suggested by Markus
+  * move one not related change to patch 2
+---
+ include/hw/boards.h | 1 -
+ vl.c                | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-Markus Armbruster (2):
-  vl: Clean up after previous commit
-  vl: Simplify machine_parse()
-
-Wei Yang (2):
-  vl.c: make find_default_machine() local
-  vl.c: allocate TYPE_MACHINE list once during bootup
-
- include/hw/boards.h |  1 -
- vl.c                | 69 ++++++++++++++++++---------------------------
- 2 files changed, 28 insertions(+), 42 deletions(-)
-
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 21212f0859..e911d56c28 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -57,7 +57,6 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+ #define MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
+ 
+-MachineClass *find_default_machine(void);
+ extern MachineState *current_machine;
+ 
+ void machine_run_board_init(MachineState *machine);
+diff --git a/vl.c b/vl.c
+index 502857a176..8a874e81a3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1441,7 +1441,7 @@ static MachineClass *find_machine(const char *name)
+     return mc;
+ }
+ 
+-MachineClass *find_default_machine(void)
++static MachineClass *find_default_machine(void)
+ {
+     GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
+     MachineClass *mc = NULL;
 -- 
 2.19.1
 
