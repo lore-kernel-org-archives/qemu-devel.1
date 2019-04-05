@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48524)
+Received: from eggs.gnu.org ([209.51.188.92]:51872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMZG-00072p-HJ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1hCMnz-0002He-Tv
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:14:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1hCMZF-0006nI-Je
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:30 -0400
-Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::12]:10938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hCMZE-0006jA-Ap
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 06:59:29 -0400
-Date: Fri, 5 Apr 2019 12:59:18 +0200
-From: Olaf Hering <olaf@aepfle.de>
-Message-ID: <20190405125918.462c6ae4.olaf@aepfle.de>
-In-Reply-To: <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hCMnx-0003Eh-UX
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:14:43 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:44959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCMnv-00035E-Vb
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 07:14:40 -0400
+Received: by mail-wr1-f48.google.com with SMTP id y7so7458922wrn.11
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 04:14:39 -0700 (PDT)
 References: <20190405123928.70da87e2.olaf@aepfle.de>
 	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+	<20190405125918.462c6ae4.olaf@aepfle.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
+Date: Fri, 5 Apr 2019 13:14:35 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/qxyv.yX5szkNIorp2b5/mpZ";
-	protocol="application/pgp-signature"
+In-Reply-To: <20190405125918.462c6ae4.olaf@aepfle.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iwBXYSSKQw6emSL0d4WjQ4r3pfDmMQxzP"
 Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,39 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
---Sig_/qxyv.yX5szkNIorp2b5/mpZ
-Content-Type: text/plain; charset=UTF-8
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iwBXYSSKQw6emSL0d4WjQ4r3pfDmMQxzP
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <7fded1f3-7539-45b5-17c7-39fe7193dbc9@redhat.com>
+Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+References: <20190405123928.70da87e2.olaf@aepfle.de>
+ <1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+ <20190405125918.462c6ae4.olaf@aepfle.de>
+In-Reply-To: <20190405125918.462c6ae4.olaf@aepfle.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am Fri, 5 Apr 2019 12:49:15 +0200
-schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
-
-> The EDK2 submodule was added for UEFI testing, you don't need to compile
-> it to build/use QEMU.
+On 4/5/19 12:59 PM, Olaf Hering wrote:
+> Am Fri, 5 Apr 2019 12:49:15 +0200
+> schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 >=20
-> How did you end up compiling it?
+>> The EDK2 submodule was added for UEFI testing, you don't need to compi=
+le
+>> it to build/use QEMU.
+>>
+>> How did you end up compiling it?
+>=20
+> The qemu.spec file has this since a very long time:
+> make -C roms efirom ${unrelated_settings}
 
-The qemu.spec file has this since a very long time:
-make -C roms efirom ${unrelated_settings}
+I don't have any qemu.spec, is it a SUSE file?
 
-This used to work still in January with c9d18c1c150c84e7a976df989ad04ddf010=
-83f46.
+>=20
+> This used to work still in January with c9d18c1c150c84e7a976df989ad04dd=
+f01083f46.
 
-Olaf
+Before f590a812c210 the EfiRom tool was not available, now we compile it
+inconditionally.
 
---Sig_/qxyv.yX5szkNIorp2b5/mpZ
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+So I assume your distribution already provides the EfiRom tool. Can you
+point me at the package which provides it? I wonder if your distribution
+use a non-upstreamed patch that change the EDK2 BaseTools PIE/PIC flags.
+
+Thanks,
+
+Phil.
+
+
+--iwBXYSSKQw6emSL0d4WjQ4r3pfDmMQxzP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKc1BwAKCRBdQqD6ppg2
-fh9/AKCQYcL7VuEatSXVQcwVI1TsBd2BfwCfdsKy0MYdn/CCqZD6biEzttKfq5o=
-=yysl
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlynOJsACgkQoqP9bt6t
+wN429Q//Q2XrblwuyAfMK5dEBcmW+FNJEvxu82nwKxgZIbtLOymk7+NcLXa7FGtO
+wt13en6vDZiwHoN4iWvE71vfjNSgwW0QROEipZACzxZC8rZZDitJetXKbpf0CZRt
+fnWG+QKUGFUU/zznoE34zg5QETKv3h0KzrRaA0l78mJqFke+J3va5Dch62TFfwxh
+VImuWFZk0RqmfXB9YwOKettPfHPJ9H75vmurjnWyRjMwiEBW19CLAd8cNjda8mEA
+84VFHg44ycxvxhQlOM2/aa/0BkMeY0hTe6vGMa8WczcXWS8xX0tin58o/5pupNyj
+pVACMZqHdXSVk9pbkX4FPsreFOZp7ICSr4LAghMdnh++GYM8BtLD/n3E5uRyf+pr
+yAsswhURj+1VIoS2T5GYD/CSkSMyfOH3IzW6PIAdYXA7TnRNMYkI7Cj+RR/HHUQh
+bnCKZxA0ppfH3GD2SxypATIY27frLgOUKQ4Iyo7en2bMZccobCQcp0hA8OWy2yB7
+JHUisZcfyi+3XoLflLT9VQsoUALaCQYIgOIvGblFBrHOvkLiDxfDOGKNsdamxizn
+m7DTchWi/SJEVws5di/KQzMf6RYhVqirAtNRdgYMZ2GDkowHxpDbWTCqgYU0cjn+
+lzYKrn9Fp5x+2W9m3UyuEnqP0nLSZ+qsfkB/aAXwkToWfE2aOgk=
+=ZgJ5
 -----END PGP SIGNATURE-----
 
---Sig_/qxyv.yX5szkNIorp2b5/mpZ--
+--iwBXYSSKQw6emSL0d4WjQ4r3pfDmMQxzP--
