@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41005)
+Received: from eggs.gnu.org ([209.51.188.92]:48596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCGpG-0003YV-GZ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:51:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1hCHZb-0004Xi-UG
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hCGpF-0003wj-0d
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:51:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56382)
+	(envelope-from <armbru@redhat.com>) id 1hCHZa-0002r4-MZ
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hCGpE-0003qR-Lm
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 00:51:36 -0400
-References: <20190404221238.12468-1-philmd@redhat.com>
-	<20190404221238.12468-5-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bb4e3258-9036-e487-81b4-8bc5eff24158@redhat.com>
-Date: Fri, 5 Apr 2019 06:51:25 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hCHZa-0002ld-D0
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 01:39:30 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190311060823.18360-1-richardw.yang@linux.intel.com>
+	<20190402132650.23095-2-armbru@redhat.com>
+	<20190403223255.GB18809@richard> <875zrt69iy.fsf@dusky.pond.sub.org>
+	<20190404231526.GA17148@richard>
+Date: Fri, 05 Apr 2019 07:39:25 +0200
+In-Reply-To: <20190404231526.GA17148@richard> (Wei Yang's message of "Fri, 5
+	Apr 2019 07:15:26 +0800")
+Message-ID: <87o95lovsi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190404221238.12468-5-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.1 4/4] hw/mips/r4k: Refactor the
- Super I/O chipset
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/4] vl: Simplify machine_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +29,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: pbonzini@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-On 05/04/2019 00.12, Philippe Mathieu-Daud=C3=A9 wrote:
-> ISA Super I/O are already modeled by the ISASuperIODevice abstract
-> device.
-> Since this board uses a generic ISA Super I/O chipset, refactor it
-> as the TYPE_R4K_SUPERIO device, child of ISASuperIODevice.
+Wei Yang <richardw.yang@linux.intel.com> writes:
 
-Good idea!
+> On Thu, Apr 04, 2019 at 06:05:25PM +0200, Markus Armbruster wrote:
+>>Wei Yang <richardw.yang@linux.intel.com> writes:
+>>
+>>> On Tue, Apr 02, 2019 at 03:26:50PM +0200, Markus Armbruster wrote:
+>>>>Exploit that argument @name is nerver null.  Check is_help_option()
+>>>>first, because that's what we do elsewhere.
+>>>>
+>>>>Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>>---
+>>>> vl.c | 24 +++++++++++-------------
+>>>> 1 file changed, 11 insertions(+), 13 deletions(-)
+>>>>
+>>>>diff --git a/vl.c b/vl.c
+>>>>index 6a31e5bfac..da1af3e10d 100644
+>>>>--- a/vl.c
+>>>>+++ b/vl.c
+>>>>@@ -2573,19 +2573,10 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>>>> 
+>>>> static MachineClass *machine_parse(const char *name, GSList *machines)
+>>>> {
+>>>>-    MachineClass *mc = NULL;
+>>>>+    MachineClass *mc;
+>>>>     GSList *el;
+>>>> 
+>>>>-    if (name) {
+>>>>-        mc = find_machine(name, machines);
+>>>>-    }
+>>>>-    if (mc) {
+>>>>-        return mc;
+>>>>-    }
+>>>>-    if (name && !is_help_option(name)) {
+>>>>-        error_report("unsupported machine type");
+>>>>-        error_printf("Use -machine help to list supported machines\n");
+>>>>-    } else {
+>>>>+    if (is_help_option(name)) {
+>>>>         printf("Supported machines are:\n");
+>>>>         machines = g_slist_sort(machines, machine_class_cmp);
+>>>>         for (el = machines; el; el = el->next) {
+>>>>@@ -2597,9 +2588,16 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
+>>>>                    mc->is_default ? " (default)" : "",
+>>>>                    mc->deprecation_reason ? " (deprecated)" : "");
+>>>>         }
+>>>>+        exit(0);
+>>>>     }
+>>>>-
+>>>>-    exit(!name || !is_help_option(name));
+>>>>+        
+>>>>+    mc = find_machine(name, machines);
+>>>>+    if (!mc) {
+>>>>+        error_report("unsupported machine type");
+>>>>+        error_printf("Use -machine help to list supported machines\n");
+>>>>+        exit(1);
+>>>>+    }
+>>>>+    return mc;
+>>>
+>>> This change looks changed the original behavior.
+>>>
+>>> In original logic, if mc is not NULL, there is no message printed. While now
+>>> it rely on is_help_option(). And no it exit when !is_help_option(), while
+>>> before this change it exit when is_help_option().
+>>>
+>>> I don't understand the reason behind this. My suggestion is you may split this
+>>> patch into two:
+>>>
+>>>   1. remove check on name
+>>>   2. refine the logic with explanations.
+>>
+>>Cases:
+>>
+>>(1) User asks for help, i.e. is_help_option(name)
+>>
+>>(1a) and no machine named @name exists, i.e.
+>>     is_help_option(name) && !find_machine(name, machines)
+>>
+>>(1b) and a machine named @name exists
+>>     is_help_option(name) && find_machine(name, machines)
+>>
+>>(2) User asks for a machine that doesn't exist, i.e.
+>>    !is_help_option(name) && !find_machine(name, machines)
+>>
+>>(3) User asks for a machine that exists, i.e.
+>>    !is_help_option(name) && find_machine(name, machines)
+>>
+>>Since no machines are called "help" or "?", case (1b) is not actually
+>>possible.
+>>
+>>Old code:
+>>
+>>    static MachineClass *machine_parse(const char *name, GSList *machines)
+>>    {
+>>        MachineClass *mc = NULL;
+>>        GSList *el;
+>>
+>>        if (name) {
+>>            mc = find_machine(name, machines);
+>>        }
+>>        if (mc) {
+>>            return mc;
+>>        }
+>>        if (name && !is_help_option(name)) {
+>>            error_report("unsupported machine type");
+>>            error_printf("Use -machine help to list supported machines\n");
+>>        } else {
+>>            printf("Supported machines are:\n");
+>>            machines = g_slist_sort(machines, machine_class_cmp);
+>>            for (el = machines; el; el = el->next) {
+>>                MachineClass *mc = el->data;
+>>                if (mc->alias) {
+>>                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+>>                }
+>>                printf("%-20s %s%s%s\n", mc->name, mc->desc,
+>>                       mc->is_default ? " (default)" : "",
+>>                       mc->deprecation_reason ? " (deprecated)" : "");
+>>            }
+>>        }
+>>
+>>        exit(!name || !is_help_option(name));
+>>    }
+>>
+>>Case (1a): print help, exit(0)
+>>
+>>Case (1b): return find_machine()
+>>
+>>Case (2): report error, exit(1)
+>>
+>>Case (3): return find_machine()
+>>
+>>New code:
+>>
+>>    static MachineClass *machine_parse(const char *name, GSList *machines)
+>>    {
+>>        MachineClass *mc;
+>>        GSList *el;
+>>
+>>        if (is_help_option(name)) {
+>>            printf("Supported machines are:\n");
+>>            machines = g_slist_sort(machines, machine_class_cmp);
+>>            for (el = machines; el; el = el->next) {
+>>                MachineClass *mc = el->data;
+>>                if (mc->alias) {
+>>                    printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+>>                }
+>>                printf("%-20s %s%s%s\n", mc->name, mc->desc,
+>>                       mc->is_default ? " (default)" : "",
+>>                       mc->deprecation_reason ? " (deprecated)" : "");
+>>            }
+>>            exit(0);
+>>        }
+>>
+>>        mc = find_machine(name, machines);
+>>        if (!mc) {
+>>            error_report("unsupported machine type");
+>>            error_printf("Use -machine help to list supported machines\n");
+>>            exit(1);
+>>        }
+>>        return mc;
+>>    }
+>>
+>>Case (1a): print help, exit(0)
+>>
+>>Case (1b): print help, exit(0)
+>>
+>>Case (2): report error, exit(1)
+>>
+>>Case (3): return find_machine()
+>>
+>>The patch changes "impossible" case (1b).  That's intentional (but my
+>>commit message could explain it better).
+>
+> This looks better.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/mips/mips_r4k.c | 61 ++++++++++++++++++++++++++++++++++------------
->  1 file changed, 45 insertions(+), 16 deletions(-)
->=20
-> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> index 93dbf76bb49..b51a9523b43 100644
-> --- a/hw/mips/mips_r4k.c
-> +++ b/hw/mips/mips_r4k.c
-> @@ -18,6 +18,7 @@
->  #include "hw/i386/pc.h"
->  #include "hw/char/serial.h"
->  #include "hw/isa/isa.h"
-> +#include "hw/isa/superio.h"
->  #include "net/net.h"
->  #include "hw/net/ne2000-isa.h"
->  #include "sysemu/sysemu.h"
-> @@ -29,7 +30,6 @@
->  #include "hw/loader.h"
->  #include "elf.h"
->  #include "hw/timer/mc146818rtc.h"
-> -#include "hw/input/i8042.h"
->  #include "hw/timer/i8254.h"
->  #include "exec/address-spaces.h"
->  #include "sysemu/qtest.h"
-> @@ -37,10 +37,6 @@
-> =20
->  #define MAX_IDE_BUS 2
-> =20
-> -static const int ide_iobase[2] =3D { 0x1f0, 0x170 };
-> -static const int ide_iobase2[2] =3D { 0x3f6, 0x376 };
-> -static const int ide_irq[2] =3D { 14, 15 };
-> -
->  static ISADevice *pit; /* PIT i8254 */
-> =20
->  /* i8254 PIT is attached to the IRQ0 at PIC i8259 */
-> @@ -73,6 +69,49 @@ static const MemoryRegionOps mips_qemu_ops =3D {
->      .endianness =3D DEVICE_NATIVE_ENDIAN,
->  };
-> =20
-> +#define TYPE_R4K_SUPERIO "r4k-superio"
-> +
-> +static uint16_t get_ide_iobase(ISASuperIODevice *sio, uint8_t index)
-> +{
-> +    static const uint16_t ide_iobase[] =3D { 0x1f0, 0x3f6, 0x170, 0x37=
-6 };
-> +
-> +    return ide_iobase[index];
-> +}
-> +
-> +static unsigned int get_ide_irq(ISASuperIODevice *sio, uint8_t index)
-> +{
-> +    return index < MAX_IDE_DEVS ? 14 : 15;
-> +}
-> +
-> +static void r4k_superio_class_init(ObjectClass *klass, void *data)
-> +{
-> +    ISASuperIOClass *sc =3D ISA_SUPERIO_CLASS(klass);
-> +
-> +    sc->serial.count =3D MAX_ISA_SERIAL_PORTS;
-> +    sc->parallel.count =3D 0;
-> +    sc->floppy.count =3D 0;
-> +    sc->ide =3D (ISASuperIOFuncs){
-> +        .count =3D MAX_IDE_BUS * MAX_IDE_DEVS,
-> +        .get_iobase =3D get_ide_iobase,
-> +        .get_irq    =3D get_ide_irq,
-> +    };
-> +}
-> +
-> +static const TypeInfo r4k_superio_type_info =3D {
-> +    .name          =3D TYPE_R4K_SUPERIO,
-> +    .parent        =3D TYPE_ISA_SUPERIO,
-> +    .instance_size =3D sizeof(ISASuperIODevice),
-> +    .class_size    =3D sizeof(ISASuperIOClass),
-> +    .class_init    =3D r4k_superio_class_init,
-> +};
-> +
-> +static void r4k_superio_register_types(void)
-> +{
-> +    type_register_static(&r4k_superio_type_info);
-> +}
-> +
-> +type_init(r4k_superio_register_types)
-> +
->  typedef struct ResetData {
->      MIPSCPU *cpu;
->      uint64_t vector;
-> @@ -179,10 +218,8 @@ void mips_r4k_init(MachineState *machine)
->      MIPSCPU *cpu;
->      CPUMIPSState *env;
->      ResetData *reset_info;
-> -    int i;
->      qemu_irq *i8259;
->      ISABus *isa_bus;
-> -    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->      DriveInfo *dinfo;
->      int be;
-> =20
-> @@ -274,20 +311,12 @@ void mips_r4k_init(MachineState *machine)
-> =20
->      pit =3D i8254_pit_init(isa_bus, 0x40, 0, NULL);
-> =20
-> -    serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
-> -
->      isa_vga_init(isa_bus);
-> =20
->      if (nd_table[0].used)
->          isa_ne2000_init(isa_bus, 0x300, 9, &nd_table[0]);
-> =20
-> -    ide_drive_get(hd, ARRAY_SIZE(hd));
-> -    for(i =3D 0; i < MAX_IDE_BUS; i++)
-> -        isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i], ide_irq[i=
-],
-> -                     hd[MAX_IDE_DEVS * i],
-> -                     hd[MAX_IDE_DEVS * i + 1]);
-> -
-> -    isa_create_simple(isa_bus, TYPE_I8042);
-> +    isa_create_simple(isa_bus, TYPE_R4K_SUPERIO);
+Amending my commit message to explain things better:
 
-What about the ide_drive_get() and the ide_create_drive() that is done
-by isa_ide_init() internally? As far as I can see, the superio code does
-not do this job for you? So don't you have to do that manually here
-after creating the R4K_SUPERIO device?
+    vl: Simplify machine_parse()
 
- Thomas
+    Exploit that argument @name is nerver null.  Check is_help_option()
+    first, because that's what we do elsewhere.  If we (foolishly!)
+    defined a machine named "help", -machine help would now print help
+    instead of selecting the machine named "help".
+
+>                    Would you mind refine it so that I could send all these
+> patches in v2.
+>
+> Or you prefer send it out by our self?
+
+Please send v2.
