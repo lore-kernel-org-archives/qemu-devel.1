@@ -2,79 +2,113 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 301DDC4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 13:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90949C4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 13:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCCDE21738
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 13:49:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=soylent.io header.i=@soylent.io header.b="NENgaQyD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCDE21738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=soylent.io
+	by mail.kernel.org (Postfix) with ESMTPS id 511CF21850
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 13:59:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 511CF21850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42231 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42413 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCPDf-0006SP-B9
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 09:49:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53591)
+	id 1hCPNI-0002sz-1W
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 09:59:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mkhon@soylent.io>) id 1hCKln-0008LM-2z
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:04:19 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hCPLW-0001Z2-B9
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mkhon@soylent.io>) id 1hCKg6-0005EG-Ru
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:58:28 -0400
-Received: from forward105p.mail.yandex.net ([77.88.28.108]:47225)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mkhon@soylent.io>) id 1hCKg4-00053V-GZ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:58:25 -0400
-Received: from mxback21g.mail.yandex.net (mxback21g.mail.yandex.net
-	[IPv6:2a02:6b8:0:1472:2741:0:8b7:321])
-	by forward105p.mail.yandex.net (Yandex) with ESMTP id 38FB24D41942
-	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 11:58:19 +0300 (MSK)
-Received: from smtp3o.mail.yandex.net (smtp3o.mail.yandex.net
-	[2a02:6b8:0:1a2d::27])
-	by mxback21g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	Z6RVbx7vtg-wINqqRd4; Fri, 05 Apr 2019 11:58:18 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soylent.io; s=mail;
-	t=1554454699; bh=v4gKDEFC3to+4c7E968/Mh0cWH8kod1uq14a0MpQCBs=;
-	h=To:Subject:From:Message-ID:Date;
-	b=NENgaQyDpRiNi76nDtj7/Ok+s4ae6GLk2DQBgLBIa9VMM3AP6ePS/j57x/LVf+XIU
-	mL6UtUX9Tm0ZOHVBDEPbiLXbmFrnk6tWxN7jPVNIi3fW7Q+s01WNnKe5vrLF9y5aPW
-	g1abhrd7MzaZGNypwjN51n0nrMfZO9IznX9ZkwVY=
-Authentication-Results: mxback21g.mail.yandex.net;
-	dkim=pass header.i=@soylent.io
-Received: by smtp3o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
-	AyN3tGMMAm-wIJSb5mg; Fri, 05 Apr 2019 11:58:18 +0300
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(Client certificate not present)
-Received: by mail-ed1-f42.google.com with SMTP id p20so4793709eds.6
-	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 01:58:18 -0700 (PDT)
-X-Gm-Message-State: APjAAAUVSHa8TLUzWrL5XQBQorEv10uXwDihbubC8ZHmittUTSNOorE+
-	Glh8yHpO+s8qw9JWIPPhyC4nAnqyEKTsOvsSVxShrA==
-X-Google-Smtp-Source: APXvYqwZUQW4eWU4VPcBnNVIjptG1YkgFdQI87mvC4+TO+YfKQr+NHiX85HqOCwP5+qw4GxT1cuSyfGjgXjTWhSl0NQ=
-X-Received: by 2002:a17:906:f44:: with SMTP id h4mr6568481ejj.4.1554454697488; 
-	Fri, 05 Apr 2019 01:58:17 -0700 (PDT)
+	(envelope-from <jjherne@linux.ibm.com>) id 1hCP88-0002sC-EW
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:43:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48918
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1hCP86-0002qV-Ud
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 09:43:39 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x35DekMw031857
+	for <qemu-devel@nongnu.org>; Fri, 5 Apr 2019 09:43:36 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rp7mm9jvv-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 09:43:36 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Fri, 5 Apr 2019 14:43:35 +0100
+Received: from b01cxnp23033.gho.pok.ibm.com (9.57.198.28)
+	by e15.ny.us.ibm.com (146.89.104.202) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Fri, 5 Apr 2019 14:43:34 +0100
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+	[9.57.199.108])
+	by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x35DhWP317432580
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Fri, 5 Apr 2019 13:43:32 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EE16AB2064;
+	Fri,  5 Apr 2019 13:43:31 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BD2E8B2067;
+	Fri,  5 Apr 2019 13:43:31 +0000 (GMT)
+Received: from [9.60.75.198] (unknown [9.60.75.198])
+	by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2019 13:43:31 +0000 (GMT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com,
+	alifm@linux.ibm.com, borntraeger@de.ibm.com
+References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+	<6cd9fc3c-f5cb-e0fd-6990-d519014bead0@redhat.com>
+	<d5b711f6-2e0e-f664-70cc-8d9c906bf122@redhat.com>
+	<5749904a-9ac3-1b68-c544-b0f0cdcc8ffa@linux.ibm.com>
+	<ec4dd665-53c6-5731-8f36-0e0bef55e646@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Date: Fri, 5 Apr 2019 09:43:31 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.2.1
 MIME-Version: 1.0
-From: Max Khon <mkhon@soylent.io>
-Date: Fri, 5 Apr 2019 15:58:06 +0700
-X-Gmail-Original-Message-ID: <CADe0-4=CmoKk=yFTuBL7vBEh6EZfX557GTUYSYexKSfuL84-Fg@mail.gmail.com>
-Message-ID:
- <CADe0-4=CmoKk=yFTuBL7vBEh6EZfX557GTUYSYexKSfuL84-Fg@mail.gmail.com>
-To: qemu-devel@nongnu.org
-Content-Type: multipart/mixed; boundary="0000000000001070110585c4b0c3"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 77.88.28.108
-X-Mailman-Approved-At: Fri, 05 Apr 2019 09:47:48 -0400
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] hvf: fix "bad size" panic for 64-bit operands
+In-Reply-To: <ec4dd665-53c6-5731-8f36-0e0bef55e646@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19040513-0068-0000-0000-000003B1093D
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00010874; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000284; SDB=6.01184699; UDB=6.00620330;
+	IPR=6.00965441; 
+	MB=3.00026303; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-05 13:43:35
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19040513-0069-0000-0000-0000480D86BF
+Message-Id: <09cec2fc-daa3-77e9-af86-6188150b955d@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-05_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904050093
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+	mx0b-001b2d01.pphosted.com id x35DekMw031857
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v6 00/16] s390: vfio-ccw dasd
+ ipl support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,181 +120,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: jjherne@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405085806.jxVEad8pjuRooWBc0jiMv-_4RPG5KNWGwJtn0l4dOO4@z>
+Message-ID: <20190405134331.5ViGUuNrb4ei58hDRQdx_O3cKhDwEjTWJ_1f3kJAIEc@z>
 
---0000000000001070110585c4b0c3
-Content-Type: text/plain; charset="UTF-8"
+On 4/5/19 9:26 AM, Thomas Huth wrote:
+> On 05/04/2019 15.11, Jason J. Herne wrote:
+>> On 4/5/19 3:52 AM, Thomas Huth wrote:
+>>> On 05/04/2019 08.58, Thomas Huth wrote:
+> [...]
+>>>> while running my s390-ccw bios tests, I noticed that network booting
+>>>> seems to be broken now. This used to work before:
+>>>>
+>>>> s390x-softmmu/qemu-system-s390x -nographic -accel kvm \
+>>>>  =C2=A0 -bios pc-bios/s390-ccw/s390-ccw.img \
+>>>>  =C2=A0 -global s390-ipl.netboot_fw=3Dpc-bios/s390-ccw/s390-netboot.=
+img \
+>>>>  =C2=A0 -netdev user,id=3Dn1,tftp=3D/boot,bootfile=3Dvmlinuz-4.18.0 =
+\
+>>>>  =C2=A0 -device virtio-net-ccw,netdev=3Dn1,bootindex=3D1
+>>>>
+>>>> Now it simply fails with "! No IPL device available !".
+>>>>
+>>>> Could you have a look at it, please?
+>>>
+>>> FWIW: The problem seems to be in the last patch: virtio_is_supported(=
+)
+>>> is now not called anymore, and so virtio_get_device_type() now return=
+s
+>>> the wrong type.
+>>>
+>>>  =C2=A0 Thomas
+>>>
+>>
+>> Good catch. Testing netboot for this iteration did slip my mind. I've
+>> now added a basic netboot script to my test suite to avoid this type o=
+f
+>> regression in the future.
+>>
+>> Your analysis of the problem matches what I'm seeing as well. Here is
+>> what I'm proposing to fix it. If you like it, let me know if you want =
+me
+>> to re-send just the final patch, or the entire series again with a v7 =
+tag.
+>>
+>>
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 03e90e3..3d1e9a4 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -67,6 +67,7 @@ static bool find_subch(int dev_no)
+>>  =C2=A0{
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 Schib schib;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 int i, r;
+>> +=C2=A0=C2=A0=C2=A0 bool is_virtio;
+>>
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 0x10000; i++) {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_schid.sch_no =3D=
+ i;
+>> @@ -80,12 +81,13 @@ static bool find_subch(int dev_no)
+>>
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enable_subchannel(bl=
+k_schid);
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cutype =3D cu_type(b=
+lk_schid);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 is_virtio =3D virtio_is_su=
+pported(blk_schid);
+>>
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* No specific devno=
+ given, just return 1st possibly bootable
+>> device */
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dev_no < 0) {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 switch (cutype) {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 case CU_TYPE_VIRTIO:
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if (virtio_is_supported(blk_schid)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if (is_virtio) {
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Skip net devi=
+ces since no IPLB is created and
+>> therefore
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * no network bo=
+otloader has been loaded
+>>
+>>
+>=20
+> Looks fine to me. But maybe we should also add a comment before the new
+> "virtio_is_supported" line, saying something like "Note: we always have
+> to run virtio_is_supported() here to make sure that the vdev.senseid
+> data gets pre-initialized"? Otherwise, we might accidentally "revert"
+> this patch when somebody thinks that the code might be optimizable by
+> removing the is_virtio variable again...
+>=20
 
-Hello,
+I agree with your comment.
 
-Attached patch fixes "bad size" panic for 64-bit operands when "-accel hvf"
-is enabled.
+> If you like, I can squash these changes in when I pick up the patches,
+> so you don't have to resend.
+>=20
 
-Max
+I'll take you up on that offer, thanks Thomas. :)
 
---0000000000001070110585c4b0c3
-Content-Type: application/octet-stream; name="fix-64bit-hvf.patch"
-Content-Disposition: attachment; filename="fix-64bit-hvf.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju3u6j500>
-X-Attachment-Id: f_ju3u6j500
 
-Y29tbWl0IGQ1NTI2MGM0ZmY0Y2JlYTk2NThkNDU4YmYyNjIyMDBhMmViZDYxMjUKQXV0aG9yOiBN
-YXggS2hvbiA8ZmpvZUBzYW1vZGVsa2luLm5ldD4KRGF0ZTogICBGcmkgQXByIDUgMTU6NTE6MzYg
-MjAxOSArMDcwMAoKICAgIEZpeCAiYmFkIHNpemUiIHBhbmljIGZvciA2NC1iaXQgb3BlcmFuZHMu
-CgpkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvaHZmL3g4Nl9lbXUuYyBiL3RhcmdldC9pMzg2L2h2
-Zi94ODZfZW11LmMKaW5kZXggM2VhMThlZGM2OC4uMDE0YjljNmYwYyAxMDA2NDQKLS0tIGEvdGFy
-Z2V0L2kzODYvaHZmL3g4Nl9lbXUuYworKysgYi90YXJnZXQvaTM4Ni9odmYveDg2X2VtdS5jCkBA
-IC04Niw2ICs4NiwxNyBAQCB2b2lkIGh2Zl9oYW5kbGVfaW8oc3RydWN0IENQVVN0YXRlICpjcHUs
-IHVpbnQxNl90IHBvcnQsIHZvaWQgKmRhdGEsCiAgICAgICAgIEZMQUdTX0ZVTkMjIzMyKGVudiwg
-djEsIHYyLCBkaWZmKTsgICAgICAgICAgXAogICAgICAgICBicmVhazsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgY2FzZSA4OiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgICAgICB1aW50NjRfdCB2MSA9ICh1aW50NjRfdClkZWNvZGUt
-Pm9wWzBdLnZhbDsgIFwKKyAgICAgICAgdWludDY0X3QgdjIgPSAodWludDY0X3QpZGVjb2RlLT5v
-cFsxXS52YWw7ICBcCisgICAgICAgIHVpbnQ2NF90IGRpZmYgPSB2MSBjbWQgdjI7ICAgICAgICAg
-ICAgICAgICAgXAorICAgICAgICBpZiAoc2F2ZV9yZXMpIHsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBcCisgICAgICAgICAgICB3cml0ZV92YWxfZXh0KGVudiwgZGVjb2RlLT5vcFswXS5w
-dHIsIGRpZmYsIDgpOyBcCisgICAgICAgIH0gXAorICAgICAgICBGTEFHU19GVU5DIyM2NChlbnYs
-IHYxLCB2MiwgZGlmZik7ICAgICAgICAgIFwKKyAgICAgICAgYnJlYWs7ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAogICAgIGRlZmF1bHQ6ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgVk1fUEFOSUMoImJhZCBzaXplXG4iKTsgICAg
-ICAgICAgICAgICAgICAgIFwKICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXApAQCAtMzE1LDEzICszMjYsMTUgQEAgc3RhdGljIHZvaWQgZXhl
-Y194b3Ioc3RydWN0IENQVVg4NlN0YXRlICplbnYsIHN0cnVjdCB4ODZfZGVjb2RlICpkZWNvZGUp
-CiBzdGF0aWMgdm9pZCBleGVjX25lZyhzdHJ1Y3QgQ1BVWDg2U3RhdGUgKmVudiwgc3RydWN0IHg4
-Nl9kZWNvZGUgKmRlY29kZSkKIHsKICAgICAvKkVYRUNfMk9QX0ZMQUdTX0NNRChlbnYsIGRlY29k
-ZSwgLSwgU0VUX0ZMQUdTX09TWkFQQ19TVUIsIGZhbHNlKTsqLwotICAgIGludDMyX3QgdmFsOwor
-ICAgIGludDY0X3QgdmFsOwogICAgIGZldGNoX29wZXJhbmRzKGVudiwgZGVjb2RlLCAyLCB0cnVl
-LCB0cnVlLCBmYWxzZSk7CiAKICAgICB2YWwgPSAwIC0gc2lnbihkZWNvZGUtPm9wWzFdLnZhbCwg
-ZGVjb2RlLT5vcGVyYW5kX3NpemUpOwogICAgIHdyaXRlX3ZhbF9leHQoZW52LCBkZWNvZGUtPm9w
-WzFdLnB0ciwgdmFsLCBkZWNvZGUtPm9wZXJhbmRfc2l6ZSk7CiAKLSAgICBpZiAoNCA9PSBkZWNv
-ZGUtPm9wZXJhbmRfc2l6ZSkgeworICAgIGlmICg4ID09IGRlY29kZS0+b3BlcmFuZF9zaXplKSB7
-CisgICAgICAgIFNFVF9GTEFHU19PU1pBUENfU1VCNjQoZW52LCAwLCAwIC0gdmFsLCB2YWwpOwor
-ICAgIH0gZWxzZSBpZiAoNCA9PSBkZWNvZGUtPm9wZXJhbmRfc2l6ZSkgewogICAgICAgICBTRVRf
-RkxBR1NfT1NaQVBDX1NVQjMyKGVudiwgMCwgMCAtIHZhbCwgdmFsKTsKICAgICB9IGVsc2UgaWYg
-KDIgPT0gZGVjb2RlLT5vcGVyYW5kX3NpemUpIHsKICAgICAgICAgU0VUX0ZMQUdTX09TWkFQQ19T
-VUIxNihlbnYsIDAsIDAgLSB2YWwsIHZhbCk7CmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9odmYv
-eDg2X2ZsYWdzLmMgYi90YXJnZXQvaTM4Ni9odmYveDg2X2ZsYWdzLmMKaW5kZXggZWU2ZDMzZjg2
-MS4uYTdhNGU0NjAyNSAxMDA2NDQKLS0tIGEvdGFyZ2V0L2kzODYvaHZmL3g4Nl9mbGFncy5jCisr
-KyBiL3RhcmdldC9pMzg2L2h2Zi94ODZfZmxhZ3MuYwpAQCAtNjQsNyArNjQsNyBAQAogICAgIHRh
-cmdldF91bG9uZyB0ZW1wID0gKChsZl9jYXJyaWVzKSAmIChMRl9NQVNLX0FGKSkgfCBcCiAgICAg
-KCgobGZfY2FycmllcykgPj4gKHNpemUgLSAyKSkgPDwgTEZfQklUX1BPKTsgXAogICAgIGVudi0+
-aHZmX2VtdWwtPmxmbGFncy5yZXN1bHQgPSAodGFyZ2V0X3Vsb25nKShpbnQjI3NpemUjI190KShs
-Zl9yZXN1bHQpOyBcCi0gICAgaWYgKChzaXplKSA9PSAzMikgeyBcCisgICAgaWYgKChzaXplKSA9
-PSA2NCB8fCAoc2l6ZSkgPT0gMzIpIHsgXAogICAgICAgICB0ZW1wID0gKChsZl9jYXJyaWVzKSAm
-IH4oTEZfTUFTS19QREIgfCBMRl9NQVNLX1NEKSk7IFwKICAgICB9IGVsc2UgaWYgKChzaXplKSA9
-PSAxNikgeyBcCiAgICAgICAgIHRlbXAgPSAoKGxmX2NhcnJpZXMpICYgKExGX01BU0tfQUYpKSB8
-ICgobGZfY2FycmllcykgPDwgMTYpOyBcCkBAIC04Myw2ICs4Myw4IEBACiAgICAgU0VUX0ZMQUdT
-X09TWkFQQ19TSVpFKDE2LCBjYXJyaWVzLCByZXN1bHQpCiAjZGVmaW5lIFNFVF9GTEFHU19PU1pB
-UENfMzIoY2FycmllcywgcmVzdWx0KSBcCiAgICAgU0VUX0ZMQUdTX09TWkFQQ19TSVpFKDMyLCBj
-YXJyaWVzLCByZXN1bHQpCisjZGVmaW5lIFNFVF9GTEFHU19PU1pBUENfNjQoY2FycmllcywgcmVz
-dWx0KSBcCisgICAgU0VUX0ZMQUdTX09TWkFQQ19TSVpFKDY0LCBjYXJyaWVzLCByZXN1bHQpCiAK
-IC8qICoqKioqKioqKioqKioqKioqKiogKi8KIC8qIE9TWkFQICovCkBAIC05MSw3ICs5Myw3IEBA
-CiAjZGVmaW5lIFNFVF9GTEFHU19PU1pBUF9TSVpFKHNpemUsIGxmX2NhcnJpZXMsIGxmX3Jlc3Vs
-dCkgeyBcCiAgICAgdGFyZ2V0X3Vsb25nIHRlbXAgPSAoKGxmX2NhcnJpZXMpICYgKExGX01BU0tf
-QUYpKSB8IFwKICAgICAoKChsZl9jYXJyaWVzKSA+PiAoc2l6ZSAtIDIpKSA8PCBMRl9CSVRfUE8p
-OyBcCi0gICAgaWYgKChzaXplKSA9PSAzMikgeyBcCisgICAgaWYgKChzaXplKSA9PSA2NCB8fCAo
-c2l6ZSkgPT0gMzIpIHsgXAogICAgICAgICB0ZW1wID0gKChsZl9jYXJyaWVzKSAmIH4oTEZfTUFT
-S19QREIgfCBMRl9NQVNLX1NEKSk7IFwKICAgICB9IGVsc2UgaWYgKChzaXplKSA9PSAxNikgeyBc
-CiAgICAgICAgIHRlbXAgPSAoKGxmX2NhcnJpZXMpICYgKExGX01BU0tfQUYpKSB8ICgobGZfY2Fy
-cmllcykgPDwgMTYpOyBcCkBAIC0xMTMsNiArMTE1LDggQEAKICAgICBTRVRfRkxBR1NfT1NaQVBf
-U0laRSgxNiwgY2FycmllcywgcmVzdWx0KQogI2RlZmluZSBTRVRfRkxBR1NfT1NaQVBfMzIoY2Fy
-cmllcywgcmVzdWx0KSBcCiAgICAgU0VUX0ZMQUdTX09TWkFQX1NJWkUoMzIsIGNhcnJpZXMsIHJl
-c3VsdCkKKyNkZWZpbmUgU0VUX0ZMQUdTX09TWkFQXzY0KGNhcnJpZXMsIHJlc3VsdCkgXAorICAg
-IFNFVF9GTEFHU19PU1pBUF9TSVpFKDY0LCBjYXJyaWVzLCByZXN1bHQpCiAKIHZvaWQgU0VUX0ZM
-QUdTX094eHh4QyhDUFVYODZTdGF0ZSAqZW52LCB1aW50MzJfdCBuZXdfb2YsIHVpbnQzMl90IG5l
-d19jZikKIHsKQEAgLTEyMiw2ICsxMjYsMTIgQEAgdm9pZCBTRVRfRkxBR1NfT3h4eHhDKENQVVg4
-NlN0YXRlICplbnYsIHVpbnQzMl90IG5ld19vZiwgdWludDMyX3QgbmV3X2NmKQogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIChuZXdfY2YgPDwgTEZfQklUX0NGKTsKIH0KIAor
-dm9pZCBTRVRfRkxBR1NfT1NaQVBDX1NVQjY0KENQVVg4NlN0YXRlICplbnYsIHVpbnQ2NF90IHYx
-LCB1aW50NjRfdCB2MiwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBkaWZm
-KQoreworICAgIFNFVF9GTEFHU19PU1pBUENfNjQoU1VCX0NPVVRfVkVDKHYxLCB2MiwgZGlmZiks
-IGRpZmYpOworfQorCiB2b2lkIFNFVF9GTEFHU19PU1pBUENfU1VCMzIoQ1BVWDg2U3RhdGUgKmVu
-diwgdWludDMyX3QgdjEsIHVpbnQzMl90IHYyLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHVpbnQzMl90IGRpZmYpCiB7CkBAIC0xNDAsNiArMTUwLDEyIEBAIHZvaWQgU0VUX0ZMQUdTX09T
-WkFQQ19TVUI4KENQVVg4NlN0YXRlICplbnYsIHVpbnQ4X3QgdjEsIHVpbnQ4X3QgdjIsCiAgICAg
-U0VUX0ZMQUdTX09TWkFQQ184KFNVQl9DT1VUX1ZFQyh2MSwgdjIsIGRpZmYpLCBkaWZmKTsKIH0K
-IAordm9pZCBTRVRfRkxBR1NfT1NaQVBDX0FERDY0KENQVVg4NlN0YXRlICplbnYsIHVpbnQ2NF90
-IHYxLCB1aW50NjRfdCB2MiwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBk
-aWZmKQoreworICAgIFNFVF9GTEFHU19PU1pBUENfNjQoQUREX0NPVVRfVkVDKHYxLCB2MiwgZGlm
-ZiksIGRpZmYpOworfQorCiB2b2lkIFNFVF9GTEFHU19PU1pBUENfQUREMzIoQ1BVWDg2U3RhdGUg
-KmVudiwgdWludDMyX3QgdjEsIHVpbnQzMl90IHYyLAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHVpbnQzMl90IGRpZmYpCiB7CkBAIC0xNTgsNiArMTc0LDEyIEBAIHZvaWQgU0VUX0ZMQUdT
-X09TWkFQQ19BREQ4KENQVVg4NlN0YXRlICplbnYsIHVpbnQ4X3QgdjEsIHVpbnQ4X3QgdjIsCiAg
-ICAgU0VUX0ZMQUdTX09TWkFQQ184KEFERF9DT1VUX1ZFQyh2MSwgdjIsIGRpZmYpLCBkaWZmKTsK
-IH0KIAordm9pZCBTRVRfRkxBR1NfT1NaQVBfU1VCNjQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDY0
-X3QgdjEsIHVpbnQ2NF90IHYyLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90
-IGRpZmYpCit7CisgICAgU0VUX0ZMQUdTX09TWkFQXzY0KFNVQl9DT1VUX1ZFQyh2MSwgdjIsIGRp
-ZmYpLCBkaWZmKTsKK30KKwogdm9pZCBTRVRfRkxBR1NfT1NaQVBfU1VCMzIoQ1BVWDg2U3RhdGUg
-KmVudiwgdWludDMyX3QgdjEsIHVpbnQzMl90IHYyLAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHVpbnQzMl90IGRpZmYpCiB7CkBAIC0xNzYsNiArMTk4LDEyIEBAIHZvaWQgU0VUX0ZMQUdT
-X09TWkFQX1NVQjgoQ1BVWDg2U3RhdGUgKmVudiwgdWludDhfdCB2MSwgdWludDhfdCB2MiwKICAg
-ICBTRVRfRkxBR1NfT1NaQVBfOChTVUJfQ09VVF9WRUModjEsIHYyLCBkaWZmKSwgZGlmZik7CiB9
-CiAKK3ZvaWQgU0VUX0ZMQUdTX09TWkFQX0FERDY0KENQVVg4NlN0YXRlICplbnYsIHVpbnQ2NF90
-IHYxLCB1aW50NjRfdCB2MiwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBk
-aWZmKQoreworICAgIFNFVF9GTEFHU19PU1pBUF82NChBRERfQ09VVF9WRUModjEsIHYyLCBkaWZm
-KSwgZGlmZik7Cit9CisKIHZvaWQgU0VUX0ZMQUdTX09TWkFQX0FERDMyKENQVVg4NlN0YXRlICpl
-bnYsIHVpbnQzMl90IHYxLCB1aW50MzJfdCB2MiwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICB1aW50MzJfdCBkaWZmKQogewpAQCAtMTk1LDYgKzIyMywxMiBAQCB2b2lkIFNFVF9GTEFHU19P
-U1pBUF9BREQ4KENQVVg4NlN0YXRlICplbnYsIHVpbnQ4X3QgdjEsIHVpbnQ4X3QgdjIsCiB9CiAK
-IAordm9pZCBTRVRfRkxBR1NfT1NaQVBDX0xPR0lDNjQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDY0
-X3QgdjEsIHVpbnQ2NF90IHYyLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0
-X3QgZGlmZikKK3sKKyAgICBTRVRfRkxBR1NfT1NaQVBDXzY0KCh1aW50NjRfdCkgMCwgZGlmZik7
-Cit9CisKIHZvaWQgU0VUX0ZMQUdTX09TWkFQQ19MT0dJQzMyKENQVVg4NlN0YXRlICplbnYsIHVp
-bnQzMl90IHYxLCB1aW50MzJfdCB2MiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVp
-bnQzMl90IGRpZmYpCiB7CmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9odmYveDg2X2ZsYWdzLmgg
-Yi90YXJnZXQvaTM4Ni9odmYveDg2X2ZsYWdzLmgKaW5kZXggODk0Mjc0NTk4OC4uNGU0N2ZjMTlj
-MyAxMDA2NDQKLS0tIGEvdGFyZ2V0L2kzODYvaHZmL3g4Nl9mbGFncy5oCisrKyBiL3RhcmdldC9p
-Mzg2L2h2Zi94ODZfZmxhZ3MuaApAQCAtNDIsNiArNDIsOCBAQCB2b2lkIHNldF9PRihDUFVYODZT
-dGF0ZSAqZW52LCBib29sIHZhbCk7CiAKIHZvaWQgU0VUX0ZMQUdTX094eHh4QyhDUFVYODZTdGF0
-ZSAqZW52LCB1aW50MzJfdCBuZXdfb2YsIHVpbnQzMl90IG5ld19jZik7CiAKK3ZvaWQgU0VUX0ZM
-QUdTX09TWkFQQ19TVUI2NChDUFVYODZTdGF0ZSAqZW52LCB1aW50NjRfdCB2MSwgdWludDY0X3Qg
-djIsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgZGlmZik7CiB2b2lkIFNF
-VF9GTEFHU19PU1pBUENfU1VCMzIoQ1BVWDg2U3RhdGUgKmVudiwgdWludDMyX3QgdjEsIHVpbnQz
-Ml90IHYyLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IGRpZmYpOwogdm9p
-ZCBTRVRfRkxBR1NfT1NaQVBDX1NVQjE2KENQVVg4NlN0YXRlICplbnYsIHVpbnQxNl90IHYxLCB1
-aW50MTZfdCB2MiwKQEAgLTQ5LDYgKzUxLDggQEAgdm9pZCBTRVRfRkxBR1NfT1NaQVBDX1NVQjE2
-KENQVVg4NlN0YXRlICplbnYsIHVpbnQxNl90IHYxLCB1aW50MTZfdCB2MiwKIHZvaWQgU0VUX0ZM
-QUdTX09TWkFQQ19TVUI4KENQVVg4NlN0YXRlICplbnYsIHVpbnQ4X3QgdjEsIHVpbnQ4X3QgdjIs
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90IGRpZmYpOwogCit2b2lkIFNFVF9G
-TEFHU19PU1pBUENfQURENjQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDY0X3QgdjEsIHVpbnQ2NF90
-IHYyLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRpZmYpOwogdm9pZCBT
-RVRfRkxBR1NfT1NaQVBDX0FERDMyKENQVVg4NlN0YXRlICplbnYsIHVpbnQzMl90IHYxLCB1aW50
-MzJfdCB2MiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBkaWZmKTsKIHZv
-aWQgU0VUX0ZMQUdTX09TWkFQQ19BREQxNihDUFVYODZTdGF0ZSAqZW52LCB1aW50MTZfdCB2MSwg
-dWludDE2X3QgdjIsCkBAIC01Niw2ICs2MCw4IEBAIHZvaWQgU0VUX0ZMQUdTX09TWkFQQ19BREQx
-NihDUFVYODZTdGF0ZSAqZW52LCB1aW50MTZfdCB2MSwgdWludDE2X3QgdjIsCiB2b2lkIFNFVF9G
-TEFHU19PU1pBUENfQUREOChDUFVYODZTdGF0ZSAqZW52LCB1aW50OF90IHYxLCB1aW50OF90IHYy
-LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDhfdCBkaWZmKTsKIAordm9pZCBTRVRf
-RkxBR1NfT1NaQVBfU1VCNjQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDY0X3QgdjEsIHVpbnQ2NF90
-IHYyLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgZGlmZik7CiB2b2lkIFNF
-VF9GTEFHU19PU1pBUF9TVUIzMihDUFVYODZTdGF0ZSAqZW52LCB1aW50MzJfdCB2MSwgdWludDMy
-X3QgdjIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBkaWZmKTsKIHZvaWQg
-U0VUX0ZMQUdTX09TWkFQX1NVQjE2KENQVVg4NlN0YXRlICplbnYsIHVpbnQxNl90IHYxLCB1aW50
-MTZfdCB2MiwKQEAgLTYzLDYgKzY5LDggQEAgdm9pZCBTRVRfRkxBR1NfT1NaQVBfU1VCMTYoQ1BV
-WDg2U3RhdGUgKmVudiwgdWludDE2X3QgdjEsIHVpbnQxNl90IHYyLAogdm9pZCBTRVRfRkxBR1Nf
-T1NaQVBfU1VCOChDUFVYODZTdGF0ZSAqZW52LCB1aW50OF90IHYxLCB1aW50OF90IHYyLAogICAg
-ICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90IGRpZmYpOwogCit2b2lkIFNFVF9GTEFHU19P
-U1pBUF9BREQ2NChDUFVYODZTdGF0ZSAqZW52LCB1aW50NjRfdCB2MSwgdWludDY0X3QgdjIsCisg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBkaWZmKTsKIHZvaWQgU0VUX0ZMQUdT
-X09TWkFQX0FERDMyKENQVVg4NlN0YXRlICplbnYsIHVpbnQzMl90IHYxLCB1aW50MzJfdCB2MiwK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IGRpZmYpOwogdm9pZCBTRVRfRkxB
-R1NfT1NaQVBfQUREMTYoQ1BVWDg2U3RhdGUgKmVudiwgdWludDE2X3QgdjEsIHVpbnQxNl90IHYy
-LApAQCAtNzAsNiArNzgsOCBAQCB2b2lkIFNFVF9GTEFHU19PU1pBUF9BREQxNihDUFVYODZTdGF0
-ZSAqZW52LCB1aW50MTZfdCB2MSwgdWludDE2X3QgdjIsCiB2b2lkIFNFVF9GTEFHU19PU1pBUF9B
-REQ4KENQVVg4NlN0YXRlICplbnYsIHVpbnQ4X3QgdjEsIHVpbnQ4X3QgdjIsCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHVpbnQ4X3QgZGlmZik7CiAKK3ZvaWQgU0VUX0ZMQUdTX09TWkFQQ19M
-T0dJQzY0KENQVVg4NlN0YXRlICplbnYsIHVpbnQ2NF90IHYxLCB1aW50NjRfdCB2MiwKKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRpZmYpOwogdm9pZCBTRVRfRkxBR1Nf
-T1NaQVBDX0xPR0lDMzIoQ1BVWDg2U3RhdGUgKmVudiwgdWludDMyX3QgdjEsIHVpbnQzMl90IHYy
-LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgZGlmZik7CiB2b2lkIFNF
-VF9GTEFHU19PU1pBUENfTE9HSUMxNihDUFVYODZTdGF0ZSAqZW52LCB1aW50MTZfdCB2MSwgdWlu
-dDE2X3QgdjIsCg==
---0000000000001070110585c4b0c3--
+--=20
+-- Jason J. Herne (jjherne@linux.ibm.com)
+
 
