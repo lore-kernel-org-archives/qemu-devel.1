@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57446)
+Received: from eggs.gnu.org ([209.51.188.92]:57710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hCKxA-0002Ap-Ns
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:06 -0400
+	(envelope-from <philmd@redhat.com>) id 1hCKy2-0002te-Na
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hCKx9-00058G-7v
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hCKx7-000530-OB
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:02 -0400
-Date: Fri, 5 Apr 2019 10:15:53 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190405091553.GG6105@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hCKy1-0008Ht-Ks
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:58 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hCKy1-0008BG-09
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 05:16:57 -0400
+Received: by mail-wr1-f66.google.com with SMTP id y7so7050748wrn.11
+	for <qemu-devel@nongnu.org>; Fri, 05 Apr 2019 02:16:56 -0700 (PDT)
 References: <20190404185730.GA22512@ls3530.dellerweb.de>
 	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
 	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<20190405082613.GC6105@redhat.com>
-	<457ec791-3691-2ebb-e225-bd42a7aee627@gmx.de>
+	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
+	<20190405090212.GF6105@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
+Date: Fri, 5 Apr 2019 11:16:54 +0200
 MIME-Version: 1.0
+In-Reply-To: <20190405090212.GF6105@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <457ec791-3691-2ebb-e225-bd42a7aee627@gmx.de>
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
  on non-release architectures
 List-Id: <qemu-devel.nongnu.org>
@@ -33,135 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Helge Deller <deller@gmx.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>
+Cc: Helge Deller <deller@gmx.de>, Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>, Samuel Thibault <samuel.thibault@ens-lyon.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, Apr 05, 2019 at 11:02:52AM +0200, Helge Deller wrote:
-> On 05.04.19 10:26, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Apr 05, 2019 at 09:56:46AM +0200, Helge Deller wrote:
-> >> Hi Peter,
-> >>
-> >> On 05.04.19 03:34, Peter Maydell wrote:
-> >>> On Fri, 5 Apr 2019 at 01:59, Helge Deller <deller@gmx.de> wrote:
-> >>>> If a non-release architecture is found, and it's known that there =
-is no
-> >>>> native TCG support for that CPU, automatically fall back to the TC=
-I
-> >>>> implementation instead of requesting the user to run configure aga=
-in
-> >>>> with the --enable-tcg-interpreter option.
-> >>>>
-> >>>> This change simplifies building qemu in automatic build environmen=
-ts
-> >>>> (like in my case the debian buildds) because one does not need to
-> >>>> special case on the architectures.
-> >>>
-> >>> I don't think we should do this. TCI is unmaintained, has several
-> >>> known flaws,
-> >>
-> >> Just out of interest: Is there a list with those flaws somewhere?
-> >>
-> >>> does not provide the level of performance that
-> >>> people expect from QEMU, and we've talked about removing it
-> >>> altogether. In particular, distros should not automatically ship
-> >>> a TCI QEMU -- it's something that a user can use if they
-> >>> explicitly opt into but which I don't think we want to surprise
-> >>> anybody with.
-> >>
-> >> I won't argue against your points. They are all valid.
-> >>
-> >>> If we care about a host architecture we should support it
-> >>> with a proper TCG backend. If we don't care that much we
-> >>> shouldn't support it.
-> >>
-> >> Looking just at some of the debian "ports" (non-release) architectur=
-es:
-> >> alpha, hppa, ia64, m68k, powerpc, sh4, sparc64
-> >> Most likely nobody will ever care enough to write a TCG backend for =
-those,
-> >> and it doesn't even make sense because they are so much slower than
-> >> the currently supported TCG backend architectures. So why should one=
- want
-> >> to emulate a fast x86 machine on slow m68k for example?
-> >>
-> >> The only reason when it *can* make sense is, when you need "basic"
-> >> emulation or availability of binaries for cross-dependecies in distr=
-os,
-> >> e.g. to build other packages or to be able to install other packages=
-.
-> >> As one example, many packages depend on libvirt (frontend tools, mon=
-itoring
-> >> stuff, ...) and libvirt again depends on some qemu binaries.
-> >> So, having qemu buildable (even if the result is slow) makes life ea=
-sier.
-> >
-> > If it is just a matter of satisfying dependencies, it is easy to buil=
-d
-> > a minimal libvirt that is essentially just the client libraries and n=
-ot
-> > the QEMU driver that would in turn allow other packages to build. Alt=
-ernatively
-> > it should be possible to build the downstream apps with their libvirt=
- dep
-> > disabled avoiding pulling in the whole virtualization chain as a buil=
-d
-> > pre-req.
->=20
-> libvirt was just one example, and yes, it's possible to work around in
-> multiple ways.
->=20
-> As another example, even if I only want to build "qemu-img", I still ne=
-ed
-> to manually give the --enable-tcg-interpreter configure option.
+On 4/5/19 11:02 AM, Daniel P. Berrangé wrote:
+> On Fri, Apr 05, 2019 at 10:47:54AM +0200, Philippe Mathieu-Daudé wrote:
+>> Hi Helge,
+>>
+>> On 4/5/19 9:56 AM, Helge Deller wrote:
+>>> On 05.04.19 03:34, Peter Maydell wrote:
+>>>> On Fri, 5 Apr 2019 at 01:59, Helge Deller <deller@gmx.de> wrote:
+>>>>> If a non-release architecture is found, and it's known that there is no
+>>>>> native TCG support for that CPU, automatically fall back to the TCI
+>>>>> implementation instead of requesting the user to run configure again
+>>>>> with the --enable-tcg-interpreter option.
+>>>>>
+>>>>> This change simplifies building qemu in automatic build environments
+>>>>> (like in my case the debian buildds) because one does not need to
+>>>>> special case on the architectures.
+>>>>
+>>>> I don't think we should do this. TCI is unmaintained, has several
+>>>> known flaws,
+>>>
+>>> Just out of interest: Is there a list with those flaws somewhere?
+>>
+>> The last big discussion is in this thread:
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06528.html
 
-That is something I would consider a valid bug to fix. We should permit
-people to do  "./configure --disable-system --disable-user --enable-tools=
-".
-Requiring --enable-tcg-interpreter in that scenario is clearly wrong,
-as we're not even building it.
+I just noticed this link doesn't show the full thread replies list, and
+want to point out Stefan's one:
 
-> >> I know, my point above now turns into a "distro packaging" issue.
-> >> That's why I'm questioning, why should distros (or even direct end-u=
-sers)
-> >> be forced to distinguish between architectures?
-> >> Shouldn't running "./configure" find out what's available and then
-> >>  auto-configure itself to the *best* what's possible?
-> >
-> > "best" depends on the POV. You want configure to enable support on
-> > hppa by default since you have an interest in that architecture, whic=
-h
-> > is fine. The QEMU maintainers, however, have a POV that considers
-> > raising an error by default to be the "best" solution for architectur=
-es
-> > that are considered unsupported, requiring explicit arg to optin to u=
-se
-> > unsupported features.
->=20
-> Yes, fair point.
-> Sadly such special treatment by projects makes life for me
-> as an architecture maintainer much harder :-(
+https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06841.html
 
-FWIW I like to see code portability that is as broad as is practical.
-At the same time though, essentially every open source project is
-massively overloaded with work they want to accomplish vs number of
-contributors available.
+I guess remember someone (Thomas? you Daniel?) posting a link of 3 forks
+using TCI for reverse engineering but I can't find it to check if they
+are still active.
 
-There has to be a tradeoff in where effort is spent and usually that
-tradeoff ends up priortizing areas that are going to benefit the
-largest number of users. In recent times QEMU has been trying to
-formalize what it considers supported vs unsupported so that we have
-a better plan for where we spend our limited contributor resources.
-The intent is that this will help us improve overall project quality.
-That has meant dropping support for many older distros, and marking
-some OSes, distros & architectures as unsupported with a view to fully
-dropping ability to build on them in future.
+> Do the various crashes that you illustrate in that cover letter
+> still exist today ? If so, 2 years of continued brokenness with no
+> fixes would reinforce the the view that it is time to remove TCI
+> from the codebase.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Or find a maintainer and add tests...
