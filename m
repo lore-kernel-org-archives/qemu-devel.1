@@ -2,109 +2,127 @@ Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53897C4360F
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 07:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA4DC4360F
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AED4217D4
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 07:57:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="HD4xmUCB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AED4217D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	by mail.kernel.org (Postfix) with ESMTPS id 86B122175B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 08:08:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B122175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37750 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37833 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCJjZ-00071r-Bv
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 03:57:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42668)
+	id 1hCJtT-0001hL-Sv
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 04:08:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1hCJiY-0006ML-UI
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hCJs8-00011q-Ex
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1hCJiX-00085G-Ci
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:54 -0400
-Received: from mout.gmx.net ([212.227.15.19]:56341)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1hCJiX-0007xI-0L
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 03:56:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1554451007;
-	bh=rk9/oY94owm8Hj+BxxWFEF+IS4kkrm29M2edbHVteaY=;
-	h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-	b=HD4xmUCB2njzW+yZ53nGqZS7dwFq47XHmFkvXnWz7MavPIdl3zCvrAgxuW08Uul2U
-	ZKBAqk8cHO4q8jM+Bkd2HBt0nOyoj+h/3s3h3XdDy03AJCDFup2RdnCJwN8L0UFws4
-	NQP/6DkD964JTzCZDZ/mxmaYnwDYhzzKEHjhP+5g=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.131.3]) by mail.gmx.com (mrgmx002
-	[212.227.17.190]) with ESMTPSA (Nemesis) id 0MdrK9-1hZDuc14ov-00PbcC;
-	Fri, 05 Apr 2019 09:56:47 +0200
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-From: Helge Deller <deller@gmx.de>
+	(envelope-from <pbonzini@redhat.com>) id 1hCJs7-0001po-LM
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hCJs7-0001oO-Bt
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 04:06:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 593EA81DE0
+	for <qemu-devel@nongnu.org>; Fri,  5 Apr 2019 07:58:58 +0000 (UTC)
+Received: from [10.36.112.30] (ovpn-112-30.ams2.redhat.com [10.36.112.30])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EBF97614EE;
+	Fri,  5 Apr 2019 07:58:39 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>
+References: <20190404071421.4891-1-thuth@redhat.com>
+	<298ccbd7-9af5-8303-e42b-33dd1cb94b9e@redhat.com>
+	<158fe22a-5781-73e5-5955-2fe9db019236@redhat.com>
+	<3ba3c765-589f-4c0a-38dc-d9126f515e7b@redhat.com>
+	<fda6bc0b-9ea0-2770-f104-568b3f16ab90@redhat.com>
+	<265f98b8-675c-99fb-0ef8-0dcc13c14a91@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=deller@gmx.de; keydata=
-	xsBNBFDPIPYBCAC6PdtagIE06GASPWQJtfXiIzvpBaaNbAGgmd3Iv7x+3g039EV7/zJ1do/a
-	y9jNEDn29j0/jyd0A9zMzWEmNO4JRwkMd5Z0h6APvlm2D8XhI94r/8stwroXOQ8yBpBcP0yX
-	+sqRm2UXgoYWL0KEGbL4XwzpDCCapt+kmarND12oFj30M1xhTjuFe0hkhyNHkLe8g6MC0xNg
-	KW3x7B74Rk829TTAtj03KP7oA+dqsp5hPlt/hZO0Lr0kSAxf3kxtaNA7+Z0LLiBqZ1nUerBh
-	OdiCasCF82vQ4/y8rUaKotXqdhGwD76YZry9AQ9p6ccqKaYEzWis078Wsj7p0UtHoYDbABEB
-	AAHNHEhlbGdlIERlbGxlciA8ZGVsbGVyQGdteC5kZT7CwJIEEwECADwCGwMGCwkIBwMCBhUI
-	AgkKCwQWAgMBAh4BAheAFiEE9M/0wAvkPPtRU6Boh8nBUbUeOGQFAlrHzIICGQEACgkQh8nB
-	UbUeOGT1GAgAt+EeoHB4DbAx+pZoGbBYp6ZY8L6211n8fSi7wiwgM5VppucJ+C+wILoPkqiU
-	+ZHKlcWRbttER2oBUvKOt0+yDfAGcoZwHS0P+iO3HtxR81h3bosOCwek+TofDXl+TH/WSQJa
-	iaitof6iiPZLygzUmmW+aLSSeIAHBunpBetRpFiep1e5zujCglKagsW78Pq0DnzbWugGe26A
-	288JcK2W939bT1lZc22D9NhXXRHfX2QdDdrCQY7UsI6g/dAm1d2ldeFlGleqPMdaaQMcv5+E
-	vDOur20qjTlenjnR/TFm9tA1zV+K7ePh+JfwKc6BSbELK4EHv8J8WQJjfTphakYLVM7ATQRQ
-	zyD2AQgA2SJJapaLvCKdz83MHiTMbyk8yj2AHsuuXdmB30LzEQXjT3JEqj1mpvcEjXrX1B3h
-	+0nLUHPI2Q4XWRazrzsseNMGYqfVIhLsK6zT3URPkEAp7R1JxoSiLoh4qOBdJH6AJHex4CWu
-	UaSXX5HLqxKl1sq1tO8rq2+hFxY63zbWINvgT0FUEME27Uik9A5t8l9/dmF0CdxKdmrOvGMw
-	T770cTt76xUryzM3fAyjtOEVEglkFtVQNM/BN/dnq4jDE5fikLLs8eaJwsWG9k9wQUMtmLpL
-	gRXeFPRRK+IT48xuG8rK0g2NOD8aW5ThTkF4apznZe74M7OWr/VbuZbYW443QQARAQABwsBf
-	BBgBAgAJBQJQzyD2AhsMAAoJEIfJwVG1HjhkNTgH/idWz2WjLE8DvTi7LvfybzvnXyx6rWUs
-	91tXUdCzLuOtjqWVsqBtSaZynfhAjlbqRlrFZQ8i8jRyJY1IwqgvHP6PO9s+rIxKlfFQtqhl
-	kR1KUdhNGtiI90sTpi4aeXVsOyG3572KV3dKeFe47ALU6xE5ZL5U2LGhgQkbjr44I3EhPWc/
-	lJ/MgLOPkfIUgjRXt0ZcZEN6pAMPU95+u1N52hmqAOQZvyoyUOJFH1siBMAFRbhgWyv+YE2Y
-	ZkAyVDL2WxAedQgD/YCCJ+16yXlGYGNAKlvp07SimS6vBEIXk/3h5Vq4Hwgg0Z8+FRGtYZyD
-	KrhlU0uMP9QTB5WAUvxvGy8=
-Message-ID: <b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-Date: Fri, 5 Apr 2019 09:56:46 +0200
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <02729d68-9714-141b-b221-74ff31dca977@redhat.com>
+Date: Fri, 5 Apr 2019 09:58:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
+In-Reply-To: <265f98b8-675c-99fb-0ef8-0dcc13c14a91@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 05 Apr 2019 07:58:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XjA1wyQsLSrVJvt3CzqLFvAjdDmGtfIpoCl50d6QHTUHQMqzN/b
-	9LpKGVFaiQmhRo+6ffFMzOPapINGB76n4n5+tGjqT3Exd4IOUuPFg3Jh1v8dx9KiHwr9Han
-	8lq6lnASi6a136kb9BfZoyAe2uU15et5SRPlKOeLjquCbn8UEqdFnYcRMEkOkvtiVyR5GzT
-	h5VfaSj3EJGBvSxOY0lBw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6NC8rt6KXZs=:Xn97CZaAbVi4rux5iehb7B
-	eR7X5syrpK+GvwEz+HRhvdGcRTjHuW9ZzOwXCE7sIq3Qp14DAhaWiSgXRMbp4bDPmvOnsHK1I
-	nlw4o/+3YmmwAQLa5ZffL1zkb9v4Lpy3dPyLDyFvFS9WSkIMNHZXeJ4fn6IpA/A9a5LyDauRW
-	f+WG3deKWcZxW4rpgVY9EFtaoKc6MSwtLl414U9pMucVSfZlT51ZWZqL9petzw7Ouq2BoJUgN
-	jv63bvXya3NVQDqKgucKrNVz0jpNPf/xFpN0TosvMZWNSDP49iBE3A5vjixokTsxEFQKPjOWR
-	Sv/KekOlGXcmkCWY6ru0tMD04h6n2Qtt2xtIlmxNOczo4bOHkajnv+NHkAEoabwRAC/pHVi4r
-	tNfqCm7bwPRQaueGaHvyid4QVH5yfuJMH9I0LNzt7rYXZuwfngNT65W/7Yf47ksDpOacYN1DF
-	U6qJC4XW7iS0TakqlTYtvxxXM5SQQkGJTjiBsF7fqa3pRrhikfjb9YEcJUnoJDIXUjlnvJSA5
-	BL1/h/BA/qsVX2E/UUjh3Rl4+Xj0jCh8FGVyxDVCdiOXRI1bD6UQACX4fnZpznBjGF6N/2Lkx
-	61ZGr9IUGTnaLHXGc8AkGIQG7+EQRSKasCe1E8dXTfO/FWd3xbal/3wFyWTInbaq1Q398F5M1
-	KyFUgglbm4G+ZU9BPEd1tPAc5MBlrI08xeDRfwCnavWwkKHdzKMGXWe4/xSK9H5FlNUvhAVO8
-	XqPriwEXlW2qozfhdeiaG7UbIqPoJ1JU1IY15v8sZuFbmfsl8zyW48g6LU4GcI0vMcXsDL5D0
-	wxzFS7UrUMMAafC/n5c3QMW7A5ehEfSmacxcFcyKxHD4QvDHzLSzO+HOs5to2QsbMpM/JFSL5
-	NMLNXP2SO4B2nx6fwu/Eud/x6h6dYrQyj+lOdBS942hd6EtwPfaMeHFdgw0jaA
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.19
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] hw/input/pckbd: The i8042 device should
+ not be user_creatable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,76 +134,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405075646.9U1eLnpKcxhol-IG4QlfUvwQrOCjTfYcJMq2HfxNY8U@z>
+Message-ID: <20190405075821.s_75TS4W11Ge5LFGq-HtFF9XV5AvwjxK4kOOFqWwSw0@z>
 
-Hi Peter,
+On 04/04/19 22:49, Philippe Mathieu-Daud=C3=A9 wrote:
+> While I wonder if someone still use the r4k machine, I have more doubts
+> about users running with more the 2 -serial options...
 
-On 05.04.19 03:34, Peter Maydell wrote:
-> On Fri, 5 Apr 2019 at 01:59, Helge Deller <deller@gmx.de> wrote:
->> If a non-release architecture is found, and it's known that there is no
->> native TCG support for that CPU, automatically fall back to the TCI
->> implementation instead of requesting the user to run configure again
->> with the --enable-tcg-interpreter option.
->>
->> This change simplifies building qemu in automatic build environments
->> (like in my case the debian buildds) because one does not need to
->> special case on the architectures.
->
-> I don't think we should do this. TCI is unmaintained, has several
-> known flaws,
+I sort of remember ISA extension cards that had jumpers or dip switches
+to choose between COM1/COM2/COM3/COM4...
 
-Just out of interest: Is there a list with those flaws somewhere?
+Paolo
 
-> does not provide the level of performance that
-> people expect from QEMU, and we've talked about removing it
-> altogether. In particular, distros should not automatically ship
-> a TCI QEMU -- it's something that a user can use if they
-> explicitly opt into but which I don't think we want to surprise
-> anybody with.
-
-I won't argue against your points. They are all valid.
-
-> If we care about a host architecture we should support it
-> with a proper TCG backend. If we don't care that much we
-> shouldn't support it.
-
-Looking just at some of the debian "ports" (non-release) architectures:
-alpha, hppa, ia64, m68k, powerpc, sh4, sparc64
-Most likely nobody will ever care enough to write a TCG backend for those,
-and it doesn't even make sense because they are so much slower than
-the currently supported TCG backend architectures. So why should one want
-to emulate a fast x86 machine on slow m68k for example?
-
-The only reason when it *can* make sense is, when you need "basic"
-emulation or availability of binaries for cross-dependecies in distros,
-e.g. to build other packages or to be able to install other packages.
-As one example, many packages depend on libvirt (frontend tools, monitorin=
-g
-stuff, ...) and libvirt again depends on some qemu binaries.
-So, having qemu buildable (even if the result is slow) makes life easier.
-
-I know, my point above now turns into a "distro packaging" issue.
-That's why I'm questioning, why should distros (or even direct end-users)
-be forced to distinguish between architectures?
-Shouldn't running "./configure" find out what's available and then
- auto-configure itself to the *best* what's possible?
-
-And, my patch still prints the warning that that's an unsupported
-architecture, at the end of configure there is still the big warning
-about "*this architecture may go away*", and if someone complains about
-performance on such an architecture you can still happily invite him to
-write the TCG backend.
-
-Anyway, if you think Philippe's suggestion of "why not add a "hppa" case s=
-electing
-TCI in the switch?" is the better solution, then I'm happy to send such a =
-patch
-instead.
-
-Helge
 
