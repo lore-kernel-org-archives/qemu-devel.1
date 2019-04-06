@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59875)
+Received: from eggs.gnu.org ([209.51.188.92]:45239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hCYax-0006OM-AJ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:50:05 -0400
+	(envelope-from <tgfbeta@me.com>) id 1hCbd5-0004P8-Dx
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hCYYG-0003Pt-3O
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:47:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38812)
+	(envelope-from <tgfbeta@me.com>) id 1hCbd3-0000rq-TI
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:27 -0400
+Received: from pv50p00im-hyfv10021501.me.com ([17.58.6.48]:36369)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hCYYC-00030O-Es
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:47:14 -0400
-Date: Fri, 5 Apr 2019 20:46:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190405234659.GJ7238@habkost.net>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-	<20190405085628.GA2819@work-vm>
-	<20190405191850-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190405191850-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hCbd3-0000jO-HA
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:25 -0400
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+From: Chen Zhang <tgfbeta@me.com>
+In-Reply-To: <C847199D-0619-494F-9376-E8D9C382A4F0@me.com>
+Date: Sat, 6 Apr 2019 11:04:18 +0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CE17AB4A-6AF8-4130-937B-301BB974C06A@me.com>
+References: <2D646E18-7F28-4F06-9F3D-D5F8A1408FAC@me.com>
+	<CAFEAcA_cwH+LH7kzfysQ6Ka98JRX5xf3NgeJo6+0vtuyxP=2ew@mail.gmail.com>
+	<7CD2D067-C9F5-435C-97A0-2ED23CA2A20B@me.com>
+	<CAFEAcA-VgDpR+jdRFXxw00vtqdd5OZ5N_-xQBC5eFe7LX9M=dQ@mail.gmail.com>
+	<C847199D-0619-494F-9376-E8D9C382A4F0@me.com>
+Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa: Fix absolute input device
+ grabbing issues on Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jens Freimann <jfreimann@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, pkrempa@redhat.com, mdroth@linux.vnet.ibm.com, liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com, ailan@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, Apr 05, 2019 at 07:22:35PM -0400, Michael S. Tsirkin wrote:
-> On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
-> > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
-[...]
-> > > > 3. Management layer software should handle this. Open Stack already has
-> > > >  components/code to handle unplug/replug VFIO devices and metadata to
-> > > >  provide to the guest for detecting which devices should be paired.
-> > > >  -> An approach that includes all software from firmware to
-> > > >     higher-level management software wasn't tried in the last years. This is
-> > > >     an attempt to keep it simple and contained in QEMU as much as possible.
-> > > > 4. Hotplugging a device and then making it part of a failover setup is
-> > > >   not possible
-> > > >  -> addressed by extending qdev hotplug functions to check for hidden
-> > > >     attribute, so e.g. device_add can be used to plug a device.
-> > > > 
-> > > > There are still some open issues:
-> > > > 
-> > > > Migration: I'm looking for something like a pre-migration hook that I
-> > > > could use to unplug the vfio-pci device. I tried with a migration
-> > > > notifier but it is called to late, i.e. after migration is aborted due
-> > > > to vfio-pci marked unmigrateable. I worked around this by setting it
-> > > > to migrateable and used a migration notifier on the virtio-net device.
-> > 
-> > Why not just let this happen at the libvirt level; then you do the
-> > hotunplug etc before you actually tell qemu anything about starting a
-> > migration?
-> 
-> If qemu frees up resources (as it does on unplug) then libvirt
-> is not guaranteed it can roll the change back on e.g.
-> migration failure.
+ping
 
-Why should we always free up resources on unplug?
+http://patchwork.ozlabs.org/patch/1058186/
 
-Unplug of a disk device doesn't close the corresponding -blockdev.
-Unplug of a serial device doesn't close the corresponding -chardev.
-Unplug of a memory device doesn't close the corresponding memory backend.
-Unplug of a crypto device doesn't close the corresponding crypto backend.
-
-Why do we expect device_del of a passthrough PCI device to always
-release the host side PCI device?  We can provide a better API
-than that.
-
-
-> 
-> But really another issue is simply that it's a mechanism,
-> there's no policy that management needs to decide on.
-> Doing it at lowest possible level ensures all
-> upper layers benefit with minimal pain.
-
-I don't see a problem in trying to make this work with surprise
-removal too.  But if it is also possible to make this work
-without surprise removal support on the guest side, why not
-provide the mechanisms for the management layer to implement it?
-
--- 
-Eduardo
+> On Mar 28, 2019, at 10:05 AM, Chen Zhang <tgfbeta@me.com> wrote:
+>=20
+>=20
+>=20
+>> On Mar 27, 2019, at 7:37 PM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>>=20
+>> On Wed, 27 Mar 2019 at 01:09, Chen Zhang <tgfbeta@me.com> wrote:
+>>> Just double-checked on a MacMini mid 2011 with macOS 10.13.6, Xcode =
+10.1. This NSWindow API did exist, and the patch could be built without =
+error.
+>>> Searching convertPointFromScreen in Xcode.app=E2=80=99s platform SDK =
+showed that it was defined at line 440 in NSWindow.h of =
+AppKit.framework.
+>>>=20
+>>> May I ask what build environment did you use (as printed by =
+`xcode-select -p`)?
+>>=20
+>> manooth$ xcode-select -p
+>> /Applications/Xcode.app/Contents/Developer
+>>=20
+>> But that doesn't seem to be what the C compiler is actually
+>> using, because the error messages quote the filename
+>> /System/Library/Frameworks/AppKit.framework/Headers/NSWindow.h
+>> There is no convertPointFromScreen in that header; but there
+>> is one in both of
+>>=20
+>> =
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Devel=
+oper/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Versions/C=
+/Headers/NSWindow.h
+>>=20
+>> and
+>> =
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Framewo=
+rks/AppKit.framework/Versions/C/Headers/NSWindow.h
+>>=20
+>> which are the other two copies of NSWindow.h this machine has.
+>>=20
+>> thanks
+>> -- PMM
+> This was really odd.
+>=20
+> I tried to figure out what was wrong with the toolchain and run =
+`xcode-select --install` and `xcode-select --switch`. After the this, =
+clang failed like what you mentioned.
+>=20
+> I had to re-configure qemu with --extra-cflags=3D"-isysroot `xcrun =
+--show-sdk-path`=E2=80=9D, forcing clang to use the correct SDK root, =
+and then it would compile.
+>=20
+> Thanks and best regards,
