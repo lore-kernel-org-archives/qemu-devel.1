@@ -1,67 +1,75 @@
-Return-Path: <SRS0=1I+v=SH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Ux9P=SI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5619C282CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3EEC282CE
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 03:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DCD20700
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Apr 2019 23:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DCD20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C8D121738
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 03:05:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="qD+/cKoq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C8D121738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48367 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49807 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCYcW-0007TU-EO
-	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 19:51:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59875)
+	id 1hCbdw-0004gb-4b
+	for qemu-devel@archiver.kernel.org; Fri, 05 Apr 2019 23:05:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hCYax-0006OM-AJ
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:50:05 -0400
+	(envelope-from <tgfbeta@me.com>) id 1hCbd5-0004P8-Dx
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hCYYG-0003Pt-3O
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:47:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38812)
+	(envelope-from <tgfbeta@me.com>) id 1hCbd3-0000rq-TI
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:27 -0400
+Received: from pv50p00im-hyfv10021501.me.com ([17.58.6.48]:36369)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hCYYC-00030O-Es
-	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 19:47:14 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D749A3066482;
-	Fri,  5 Apr 2019 23:47:08 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CAB5419C56;
-	Fri,  5 Apr 2019 23:47:01 +0000 (UTC)
-Date: Fri, 5 Apr 2019 20:46:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190405234659.GJ7238@habkost.net>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-	<20190405085628.GA2819@work-vm>
-	<20190405191850-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hCbd3-0000jO-HA
+	for qemu-devel@nongnu.org; Fri, 05 Apr 2019 23:04:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=04042017;
+	t=1554519862; bh=B61b9hJE5wM+yryVvBxcyUr5Kk8EXSV2Cv2z3ZdCg04=;
+	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
+	b=qD+/cKoqBjZi/qmYWGykC2Q0mLk4rN7fL1oNvvZQofBvRf32IsFPUfMtf/D7Pcmo9
+	B1sGh28Wo2I6gRgLTdx4mQrMgr5HgOvzzK+J46iEFt2IBI1Fj4Enga3dv/79dXLooj
+	o9aFXpsVCmTvxb3No992EK9c+idgIL2Vh5Ixe2P7GlFwe6Ww9gmMbQOobJXfdxUjzp
+	eJQOerCT8alsDHQZ1HmG+y8GhK03EEsQxV3gqtclX48GzU6q6ETPQumROn8CSewuZ7
+	CEo9EXJLYDcPB3a5f0S4+dGAgPjccU9nUznjg1HKbxaXJM7FSDMxKM8TSeeetcoxI6
+	qZueA3gzljUsA==
+Received: from [192.168.18.7] (unknown [125.36.116.110])
+	by pv50p00im-hyfv10021501.me.com (Postfix) with ESMTPSA id A46C1B4007B; 
+	Sat,  6 Apr 2019 03:04:21 +0000 (UTC)
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190405191850-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 05 Apr 2019 23:47:08 +0000 (UTC)
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+In-Reply-To: <C847199D-0619-494F-9376-E8D9C382A4F0@me.com>
+Date: Sat, 6 Apr 2019 11:04:18 +0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CE17AB4A-6AF8-4130-937B-301BB974C06A@me.com>
+References: <2D646E18-7F28-4F06-9F3D-D5F8A1408FAC@me.com>
+	<CAFEAcA_cwH+LH7kzfysQ6Ka98JRX5xf3NgeJo6+0vtuyxP=2ew@mail.gmail.com>
+	<7CD2D067-C9F5-435C-97A0-2ED23CA2A20B@me.com>
+	<CAFEAcA-VgDpR+jdRFXxw00vtqdd5OZ5N_-xQBC5eFe7LX9M=dQ@mail.gmail.com>
+	<C847199D-0619-494F-9376-E8D9C382A4F0@me.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-Mailer: Apple Mail (2.3445.104.8)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-06_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 clxscore=1015 mlxscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1812120000 definitions=main-1904060021
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+X-Received-From: 17.58.6.48
+Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa: Fix absolute input device
+ grabbing issues on Mojave
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,71 +81,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
-	mdroth@linux.vnet.ibm.com, liran.alon@oracle.com,
-	laine@redhat.com, ogerlitz@mellanox.com,
-	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Chen Zhang via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Chen Zhang <tgfbeta@me.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190405234659.9etQ8YH_HgvWay7UUns62wlSAYn3ups6xg79ZUXvZvs@z>
+Message-ID: <20190406030418.wWDvwiHqjzE4a8LMTm3UMgFnREl_VMmNvsqonDrdV-k@z>
 
-On Fri, Apr 05, 2019 at 07:22:35PM -0400, Michael S. Tsirkin wrote:
-> On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
-> > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
-[...]
-> > > > 3. Management layer software should handle this. Open Stack already has
-> > > >  components/code to handle unplug/replug VFIO devices and metadata to
-> > > >  provide to the guest for detecting which devices should be paired.
-> > > >  -> An approach that includes all software from firmware to
-> > > >     higher-level management software wasn't tried in the last years. This is
-> > > >     an attempt to keep it simple and contained in QEMU as much as possible.
-> > > > 4. Hotplugging a device and then making it part of a failover setup is
-> > > >   not possible
-> > > >  -> addressed by extending qdev hotplug functions to check for hidden
-> > > >     attribute, so e.g. device_add can be used to plug a device.
-> > > > 
-> > > > There are still some open issues:
-> > > > 
-> > > > Migration: I'm looking for something like a pre-migration hook that I
-> > > > could use to unplug the vfio-pci device. I tried with a migration
-> > > > notifier but it is called to late, i.e. after migration is aborted due
-> > > > to vfio-pci marked unmigrateable. I worked around this by setting it
-> > > > to migrateable and used a migration notifier on the virtio-net device.
-> > 
-> > Why not just let this happen at the libvirt level; then you do the
-> > hotunplug etc before you actually tell qemu anything about starting a
-> > migration?
-> 
-> If qemu frees up resources (as it does on unplug) then libvirt
-> is not guaranteed it can roll the change back on e.g.
-> migration failure.
+ping
 
-Why should we always free up resources on unplug?
+http://patchwork.ozlabs.org/patch/1058186/
 
-Unplug of a disk device doesn't close the corresponding -blockdev.
-Unplug of a serial device doesn't close the corresponding -chardev.
-Unplug of a memory device doesn't close the corresponding memory backend.
-Unplug of a crypto device doesn't close the corresponding crypto backend.
+> On Mar 28, 2019, at 10:05 AM, Chen Zhang <tgfbeta@me.com> wrote:
+>=20
+>=20
+>=20
+>> On Mar 27, 2019, at 7:37 PM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>>=20
+>> On Wed, 27 Mar 2019 at 01:09, Chen Zhang <tgfbeta@me.com> wrote:
+>>> Just double-checked on a MacMini mid 2011 with macOS 10.13.6, Xcode =
+10.1. This NSWindow API did exist, and the patch could be built without =
+error.
+>>> Searching convertPointFromScreen in Xcode.app=E2=80=99s platform SDK =
+showed that it was defined at line 440 in NSWindow.h of =
+AppKit.framework.
+>>>=20
+>>> May I ask what build environment did you use (as printed by =
+`xcode-select -p`)?
+>>=20
+>> manooth$ xcode-select -p
+>> /Applications/Xcode.app/Contents/Developer
+>>=20
+>> But that doesn't seem to be what the C compiler is actually
+>> using, because the error messages quote the filename
+>> /System/Library/Frameworks/AppKit.framework/Headers/NSWindow.h
+>> There is no convertPointFromScreen in that header; but there
+>> is one in both of
+>>=20
+>> =
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Devel=
+oper/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Versions/C=
+/Headers/NSWindow.h
+>>=20
+>> and
+>> =
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Framewo=
+rks/AppKit.framework/Versions/C/Headers/NSWindow.h
+>>=20
+>> which are the other two copies of NSWindow.h this machine has.
+>>=20
+>> thanks
+>> -- PMM
+> This was really odd.
+>=20
+> I tried to figure out what was wrong with the toolchain and run =
+`xcode-select --install` and `xcode-select --switch`. After the this, =
+clang failed like what you mentioned.
+>=20
+> I had to re-configure qemu with --extra-cflags=3D"-isysroot `xcrun =
+--show-sdk-path`=E2=80=9D, forcing clang to use the correct SDK root, =
+and then it would compile.
+>=20
+> Thanks and best regards,
 
-Why do we expect device_del of a passthrough PCI device to always
-release the host side PCI device?  We can provide a better API
-than that.
-
-
-> 
-> But really another issue is simply that it's a mechanism,
-> there's no policy that management needs to decide on.
-> Doing it at lowest possible level ensures all
-> upper layers benefit with minimal pain.
-
-I don't see a problem in trying to make this work with surprise
-removal too.  But if it is also possible to make this work
-without surprise removal support on the guest side, why not
-provide the mechanisms for the management layer to implement it?
-
--- 
-Eduardo
 
