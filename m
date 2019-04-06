@@ -2,94 +2,121 @@ Return-Path: <SRS0=Ux9P=SI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D48C10F06
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 09:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73351C10F06
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 09:03:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A12DA21855
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 09:00:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FuUnLrO0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A12DA21855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2778F21855
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 09:03:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2778F21855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52449 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52461 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hChC1-0004WM-Mn
-	for qemu-devel@archiver.kernel.org; Sat, 06 Apr 2019 05:00:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52547)
+	id 1hChEb-0005sc-Ec
+	for qemu-devel@archiver.kernel.org; Sat, 06 Apr 2019 05:03:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hChB8-00044a-Hw
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 04:59:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hChDf-0005br-Dk
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 05:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hChB7-00072o-Jf
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 04:59:58 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hChB6-00071j-WD
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 04:59:57 -0400
-Received: by mail-pl1-x642.google.com with SMTP id d1so4344765plj.8
-	for <qemu-devel@nongnu.org>; Sat, 06 Apr 2019 01:59:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=k8fMmkRO9gjH44jPQ/D16lhgb3aDjyntu9xjH7rcW6k=;
-	b=FuUnLrO0OJTxjAc4c2jhu8YS8jxhx3Vqes0mniY5fWCgGyrls5r/wcDu1rz0yYm6mn
-	x2zh48FoP/7vv4Te84XvjPhXw7hoWsZfaeKu9ExGDlBWn4AJIj5BmeOn3tyrf1KtYBb8
-	VmQoinBxfE6dlmT7x5u0ZYPAUXB1QFS9tcOSDzP/ZeHF8mW7QAV2P3cevygIqcaM93t3
-	7SdTk4VnkQNwlT6iPLqACdg+vm8lGsZosUq86wRU0imxXvH45JB0/zonGhl40kNA7JW1
-	v/eRSFI768EVTuNjZ6KC6iJuburA5B8kFNFL+0YCi32be1mi8dnkyJxdIgCZ+iGH4Z18
-	SCEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=k8fMmkRO9gjH44jPQ/D16lhgb3aDjyntu9xjH7rcW6k=;
-	b=JqUOELqqjgRz6irA0vUs9W8p8x+6suTfBe0ju+T4EMIIUKxlG6ZKa8RCvkozfCoJxo
-	/OkfrhDtc6ve8ETsHK5ehmru168XN78TnINrCJ5fe0GdZPHUlFrNFQiX1jO0AUa3S2Qi
-	LOo65SiXygWnCQO/ER5eJlYemMn5/Ik9nIEuKeGX/YCUiW5mVNsGtosc8VF+IZpwTwLr
-	7VNPJKGz5spl6Z2Bb6gjhlQrfxnqV9kIIvzcFw54LGNKI54SwEEM2j94khp5aqGg+Vjo
-	F2j3ndEaupoV5N8KqTX7GOBTni8l1qckYKkEICtIUGfRNXSwBviyql+39bo//C6W3yv7
-	on/A==
-X-Gm-Message-State: APjAAAXILtL8HOLTZP/IMTJRBkE3vbEZnOa/IrnvL9924lLy6bIpfbZt
-	wC/8wZa8uV0A+ae1fcy9KcBHIV9Y2DGQKg==
-X-Google-Smtp-Source: APXvYqz42LJTwt8r98G2IH2bDtEAgGuX5zM/V46gIqWQiZK67dF9W5mW2AV9/gcKJ76fFTcmGfRnWw==
-X-Received: by 2002:a17:902:1003:: with SMTP id
-	b3mr17531463pla.306.1554541193886; 
-	Sat, 06 Apr 2019 01:59:53 -0700 (PDT)
-Received: from [10.59.8.239] ([61.200.20.122])
-	by smtp.gmail.com with ESMTPSA id
-	k9sm32141857pga.22.2019.04.06.01.59.50
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 06 Apr 2019 01:59:52 -0700 (PDT)
-To: Helge Deller <deller@gmx.de>, Peter Maydell <peter.maydell@linaro.org>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1hChDd-0000H6-QA
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 05:02:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hChDd-0000GB-Bg
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 05:02:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D518C057F40;
+	Sat,  6 Apr 2019 09:02:31 +0000 (UTC)
+Received: from [10.36.112.12] (unknown [10.36.112.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C0B1D5D705;
+	Sat,  6 Apr 2019 09:02:24 +0000 (UTC)
+To: qemu-devel <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>,
+	"seabios@seabios.org" <seabios@seabios.org>, libvir-list@redhat.com,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linux Virtualization <virtualization@lists.linux-foundation.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <5c330405-d3e3-f737-91f0-fe4de3edd576@linaro.org>
-Date: Sat, 6 Apr 2019 17:59:47 +0900
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <a0b5ce3d-6f0f-2674-51a1-e3a6796d496f@redhat.com>
+Date: Sat, 6 Apr 2019 11:02:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.6.0
 MIME-Version: 1.0
-In-Reply-To: <b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Sat, 06 Apr 2019 09:02:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] CFP: KVM Forum 2019
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,30 +128,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: kvm-forum-2019-pc@redhat.com
+Cc: kvm-forum-2019-pc@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190406085947.W2RsUMnzhY3VCORYmv7VvspEeuv4XbCv8W2gIIGccYk@z>
+Message-ID: <20190406090222.chSOMPQESKlASTP_Cpsa8oRY9UlD_eh4F6kYfpxU6ss@z>
 
-On 4/5/19 2:56 PM, Helge Deller wrote:
-> Looking just at some of the debian "ports" (non-release) architectures:
-> alpha, hppa, ia64, m68k, powerpc, sh4, sparc64
+================================================================
+KVM Forum 2019: Call For Participation
+October 30-November 1, 2019 - Lyon Convention Center - Lyon, France
 
-FWIW:
+(All submissions must be received before June 15, 2019 at 23:59 PST)
+=================================================================
 
-sparc64 does have a tcg backend.
-(Indeed, tcg/sparc does *not* support 32-bit cpus!)
+KVM Forum is an annual event that presents a rare opportunity
+for developers and users to meet, discuss the state of Linux
+virtualization technology, and plan for the challenges ahead. 
+We invite you to lead part of the discussion by submitting a speaking
+proposal for KVM Forum 2019.
 
-powerpc does have a tcg backend, and it has both 32 and 64-bit users.
+At this highly technical conference, developers driving innovation
+in the KVM virtualization stack (Linux, KVM, QEMU, libvirt) can
+meet users who depend on KVM as part of their offerings, or to
+power their data centers and clouds.
 
-Both hppa and ia64 used to have tcg backends, and could
-be resurrected if there was a will.
+KVM Forum will include sessions on the state of the KVM
+virtualization stack, planning for the future, and many
+opportunities for attendees to collaborate. As we celebrate ten years
+of KVM development in the Linux kernel, KVM continues to be a
+critical part of the FOSS cloud infrastructure.
 
-I have a tcg/alpha backend that I haven't bothered to
-merge, because I assumed there was little interest.
+This year, KVM Forum is joining Open Source Summit in Lyon,
+France. Selected talks from KVM Forum will be presented on
+Wednesday October 30 to the full audience of the Open Source Summit.
+Also, attendees of KVM Forum will have access to all of the talks from
+Open Source Summit on Wednesday.
+
+https://events.linuxfoundation.org/events/kvm-forum-2019/program/call-for-proposals/
+
+Suggested topics:
+* Scaling, latency optimizations, performance tuning, real-time guests
+* Hardening and security
+* New features
+* Testing
+
+KVM and the Linux kernel:
+* Nested virtualization
+* Resource management (CPU, I/O, memory) and scheduling
+* VFIO: IOMMU, SR-IOV, virtual GPU, etc.
+* Networking: Open vSwitch, XDP, etc.
+* virtio and vhost
+* Architecture ports and new processor features
+
+QEMU:
+* Management interfaces: QOM and QMP
+* New devices, new boards, new architectures
+* Graphics, desktop virtualization and virtual GPU
+* New storage features
+* High availability, live migration and fault tolerance
+* Emulation and TCG
+* Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
+
+Management and infrastructure
+* Managing KVM: Libvirt, OpenStack, oVirt, etc.
+* Storage: Ceph, Gluster, SPDK, etc.r
+* Network Function Virtualization: DPDK, OPNFV, OVN, etc.
+* Provisioning
 
 
-r~
+========================
+SUBMITTING YOUR PROPOSAL
+========================
+
+Abstracts due: June 15, 2019
+
+Please submit a short abstract (~150 words) describing your presentation
+proposal. Slots vary in length up to 45 minutes.
+
+Submit your proposal here:
+https://events.linuxfoundation.org/events/kvm-forum-2019/program/call-for-proposals/
+Please only use the categories "presentation" and "panel discussion"
+
+You will receive a notification whether or not your presentation proposal
+was accepted by August 12, 2019.
+
+Speakers will receive a complimentary pass for the event. In case
+your submission has multiple presenters, only the primary speaker for a
+proposal will receive a complimentary event pass. For panel discussions, all
+panelists will receive a complimentary event pass.
+
+
+TECHNICAL TALKS
+
+A good technical talk should not just report on what has happened over
+the last year; it should present a concrete problem and how it impacts
+the user and/or developer community. Whenever applicable, focus on
+work that needs to be done, difficulties that haven't yet been solved,
+and on decisions that other developers should be aware of. Summarizing
+recent developments is okay but it should not be more than a small
+portion of the overall talk.
+
+
+END-USER TALKS
+
+One of the big challenges as developers is to know what, where and how
+people actually use our software. We will reserve a few slots for end
+users talking about their deployment challenges and achievements.
+
+If you are using KVM in production you are encouraged submit a speaking
+proposal. Simply mark it as an end-user talk. As an end user, this is a
+unique opportunity to get your input to developers.
+
+
+HANDS-ON / BOF SESSIONS
+
+We will reserve some time for people to get together and discuss
+strategic decisions as well as other topics that are best solved within
+smaller groups.
+
+These sessions will be announced during the event. If you are interested
+in organizing such a session, please add it to the list at
+
+  http://www.linux-kvm.org/page/KVM_Forum_2019_BOF
+
+Let people you think who might be interested know about your BOF, and
+encourage them to add their names to the wiki page as well. Please add
+your ideas to the list before KVM Forum starts.
+
+
+PANEL DISCUSSIONS
+
+If you are proposing a panel discussion, please make sure that you list
+all of your potential panelists in your the abstract. We will request full
+biographies if a panel is accepted.
+
+
+==============
+HOTEL / TRAVEL
+==============
+
+This year's event will take place at the Lyon Conference Center.
+For information on hotels close to the conference, please visit
+https://events.linuxfoundation.org/events/kvm-forum-2019/attend/venue-travel/.
+Information on conference hotel blocks will be available later in
+Spring 2019.
+
+
+=================
+DATES TO REMEMBER
+=================
+
+Submission deadline: Saturday, June 15 at 23:59 PST
+Notification: Monday, August 12
+Schedule announced: Friday, August 16
+Slides due date: Wednesday, October 23
+Event dates: Wednesday, October 30 - Friday, November 1
+
+Thank you for your interest in KVM. We're looking forward to your
+submissions and seeing you at the KVM Forum 2019 in October!
+
+-your KVM Forum 2019 Program Committee
+
+Please contact us with any questions or comments at
+kvm-forum-2019-pc@redhat.com
 
