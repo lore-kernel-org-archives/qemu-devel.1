@@ -1,93 +1,64 @@
-Return-Path: <SRS0=Ux9P=SI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=0TSG=SJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAFCC10F06
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 15:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B70C282DA
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 02:00:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79A9F20B1F
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Apr 2019 15:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A9F20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 78DDD2133F
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 02:00:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DDD2133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56187 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33023 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hCnDI-0003gc-Bh
-	for qemu-devel@archiver.kernel.org; Sat, 06 Apr 2019 11:26:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59855)
+	id 1hCx6W-0001rN-Mj
+	for qemu-devel@archiver.kernel.org; Sat, 06 Apr 2019 22:00:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCnCR-0003EW-MM
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 11:25:45 -0400
+	(envelope-from <guoheyi@huawei.com>) id 1hCx5j-0001Y0-Mt
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 21:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCnCQ-0001ZR-1n
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 11:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hCnCP-0001Xa-Ol
-	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 11:25:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hCnCN-0005VM-2Z
-	for <qemu-devel@nongnu.org>; Sat, 06 Apr 2019 15:25:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F3C7A2E8079
-	for <qemu-devel@nongnu.org>; Sat,  6 Apr 2019 15:25:38 +0000 (UTC)
+	(envelope-from <guoheyi@huawei.com>) id 1hCx5h-0007g5-Ud
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 21:59:27 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2200 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1hCx5h-0007ed-77
+	for qemu-devel@nongnu.org; Sat, 06 Apr 2019 21:59:25 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+	by Forcepoint Email with ESMTP id D39792B5FFFE89113D02;
+	Sun,  7 Apr 2019 09:59:15 +0800 (CST)
+Received: from [127.0.0.1] (10.177.31.55) by DGGEMS406-HUB.china.huawei.com
+	(10.3.19.206) with Microsoft SMTP Server id 14.3.408.0; Sun, 7 Apr 2019
+	09:59:07 +0800
+To: Auger Eric <eric.auger@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <f3a469aa-4a18-a8be-3a37-8989401e2db7@huawei.com>
+	<20190403144550-mutt-send-email-mst@kernel.org>
+	<4c3d0235-f5b6-a3d7-89b9-2054f24f84f7@redhat.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <4f416cdc-4fd8-c815-b8d2-d4a1121d2981@huawei.com>
+Date: Sun, 7 Apr 2019 09:59:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+	Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 06 Apr 2019 15:16:26 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddstreet
-X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
-X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id:
- <155456378642.8739.18221766449873778787.launchpad@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 61251c7b74240bff636a81ced51b355edb447786
+In-Reply-To: <4c3d0235-f5b6-a3d7-89b9-2054f24f84f7@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.31.55]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
- vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
+X-Received-From: 45.249.212.190
+Subject: Re: [Qemu-devel] Question: can we hot plug a PCIe switch on machine
+ "virt"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,199 +67,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Cc: wanghaibin 00208455 <wanghaibin.wang@huawei.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190406151626.vX2caneNs0QJ7fqOYLA8rIgfPNYWiLZFJAqklUKBR7g@z>
+Message-ID: <20190407015906.Ub4v8TISipujc3Wpchitf3kAgVH1Y4Xxb7dCC3Mgrhs@z>
 
-** Also affects: qemu (Ubuntu Trusty)
-   Importance: Undecided
-       Status: New
+Hi Eric,
 
-** Changed in: qemu (Ubuntu Trusty)
-       Status: New =3D> In Progress
+My real interesting is about the hotplug of PCIe switch, which means we don't need to provide lots of PCIe root ports or PCIe down stream ports at the beginning, but we can extend the capacity by hot adding PCIe switches which can provide more hot-pluggable slots for endpoint devices.
 
-** Changed in: qemu (Ubuntu Trusty)
-   Importance: Undecided =3D> Medium
+The document docs/pcie.txt says "PCI Express Downstream Ports can't be hot-plugged into an existing PCI Express Upstream Port" which confuses me. Does it actually mean Downstream Ports can't be hot-plugged? For they can't be hot-plugged into an existing Upstream Port as the doc says, either they can't be hot-plugged into an non-existing Upstream Port or another place...
 
-** Changed in: qemu (Ubuntu Trusty)
-     Assignee: (unassigned) =3D> Dan Streetman (ddstreet)
+Thanks,
 
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
+Heyi
 
-** Changed in: qemu
-       Status: New =3D> In Progress
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Dan Streetman (ddstreet)
+On 2019/4/4 15:39, Auger Eric wrote:
+> Hi Heyi,
+>
+> On 4/3/19 8:50 PM, Michael S. Tsirkin wrote:
+>> On Wed, Apr 03, 2019 at 03:32:09PM +0800, Heyi Guo wrote:
+>>> Hi folks,
+>>>
+>>> In physical world, a PCIe switch including one upstream port and several downstream ports is a single physical device, however we treat each port as a device in qemu world. In qemu docs/pcie.txt, we have below statements:
+>>>
+>>> Line 230: Be aware that PCI Express Downstream Ports can't be hot-plugged into
+>>> Line 231: an existing PCI Express Upstream Port.
+>>>
+>>> To my understanding, it implies PCIe downstream ports *can* be hot-plugged into something which is not an existing upstream port. If it is true, how can we do that? AFAIK monitor command device_add can only add one device at a time.
+>>>
+>>> Please help to show the truth.
+>>>
+>>> Thanks,
+>>>
+>>> Heyi
+>>>
+>> afaik they can only be plugged into upstearm ports with or without hotplug.
+> Hotplug on upstream port does not look supported, as mentionned in the doc:
+> (QEMU) device_add driver=xio3130-downstream id=down0 bus=upstream_port1
+> {"error": {"class": "GenericError", "desc": "Bus 'upstream_port1' does
+> not support hotplugging"}}
+>
+> Looks the std way to use the downstream port is the one documented in 2.2.3:
+>
+> 2.2.3 Plugging a PCI Express device into a Switch:
+> -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]
+> -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]
+> -device
+> xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]]
+> -device <dev>,bus=downstream_port1
+>
+> For my curiosity why do you want to hotplug a downstream port in another
+> place than an upstream port?
+>
+> Thanks
+>
+> Eric
+>
+>
+> .
+>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
-
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Trusty:
-  In Progress
-Status in qemu source package in Xenial:
-  In Progress
-Status in qemu source package in Bionic:
-  In Progress
-Status in qemu source package in Cosmic:
-  In Progress
-Status in qemu source package in Disco:
-  In Progress
-
-Bug description:
-  [impact]
-
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
-
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
-
-  [test case]
-
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
-
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
-
-  [regression potential]
-
-  the change adds flags to prevent repeated calls to both
-  vhost_net_stop() and vhost_net_cleanup() (really, prevents repeated
-  calls to vhost_dev_cleanup()).  Any regression would be seen when
-  stopping and/or cleaning up a vhost net.  Regressions might include
-  failure to hot-remove a vhost net from a guest, or failure to cleanup
-  (i.e. mem leak), or crashes during cleanup or stopping a vhost net.
-
-  [other info]
-
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).  However, this appears to still apply upstream, and I am
-  sending a patch to the qemu list to patch upstream as well.
-
-  The specific race condition for this (in the qemu 2.5 code version)
-  is:
-
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
-
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
-
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
-
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
-
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
-
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
-
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
 
