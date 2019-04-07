@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35055)
+Received: from eggs.gnu.org ([209.51.188.92]:36266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hD37j-0002He-W3
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:25:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1hD3H5-0003PA-QQ
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hD37i-0001mU-8M
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:25:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59864)
+	(envelope-from <bounces@canonical.com>) id 1hD3H4-0007tT-R0
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35644)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hD37g-0001kJ-6i
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:25:54 -0400
+	id 1hD3H4-0007tG-J0
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:34 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hD37c-0002C3-AO
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 08:25:48 +0000
+	id 1hD3H3-0004MU-IM
+	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 08:35:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4AA0E2E80CC
-	for <qemu-devel@nongnu.org>; Sun,  7 Apr 2019 08:25:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5DAB62E80CB
+	for <qemu-devel@nongnu.org>; Sun,  7 Apr 2019 08:35:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 07 Apr 2019 08:17:32 -0000
+Date: Sun, 07 Apr 2019 08:23:49 -0000
 From: sles <1807073@bugs.launchpad.net>
 Reply-To: Bug 1807073 <1807073@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154406426264.32667.2616897072259419283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155462505297.21252.8956715668662426160.malone@soybean.canonical.com>
+Message-Id: <155462542989.20581.12967786214444318389.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1807073] Re: qemu-guest-agent stop work when
  fsfreeze
@@ -39,30 +39,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Just got almost the same
-Ubuntu 16.04 as guest on Centos 7 host,
-all will latest updates.
+btw,I run OEL7 VM on the same host and Ubuntu 18.04 VM,
+both have newer qemu-guest-agent:
 
-Execute of
-virsh qemu-agent-command inetgw2 '{"execute":"guest-fsfreeze-freeze"}'
+18.04: qemu-guest-age 1:2.11+dfsg-
 
-failed with agent not available ( or something like this), but fsfreeze exe=
-cuted in OS
-Apr  7 02:28:54 inetgw2 qemu-ga: info: guest-fsfreeze called
+OEL7: rpm -qi qemu-guest-agent
+Name        : qemu-guest-agent
+Epoch       : 10
+Version     : 2.12.0
+Release     : 2.el7
 
-snapshot was created =
-
-after this =
-
-virsh qemu-agent-command inetgw2 '{"execute":"guest-fsfreeze-thaw"}'
-failed too with agent not available
-
-So Ubuntu 16.04 VM stuck in  freezed i/o state.
- qemu-guest-age 1:2.5+dfsg-5
-
-Same version...
-
-Thank you!
+Never had this problem on both oh these.
 
 -- =
 
