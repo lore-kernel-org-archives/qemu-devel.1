@@ -2,93 +2,55 @@ Return-Path: <SRS0=0TSG=SJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 633F6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 08:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1576C10F0E
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 08:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17C54213F2
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 08:14:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vh/1QqrU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17C54213F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1E5F213F2
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 08:20:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E5F213F2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35887 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35934 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hD2wQ-0008Ra-4l
-	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 04:14:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33359)
+	id 1hD32C-0001X9-15
+	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 04:20:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hD2vc-00088n-PR
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:26 -0400
+	(envelope-from <guoheyi@huawei.com>) id 1hD31A-0001AS-Bk
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kamalheib1@gmail.com>) id 1hD2vb-0003CJ-70
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kamalheib1@gmail.com>)
-	id 1hD2vZ-00032d-44
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:23 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k17so12649223wrx.10
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 01:13:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=WDcVPn0rL4jXQhf5zsKQY+JMHL4DVAOK/vTKS7GEZxw=;
-	b=vh/1QqrULW0oAp5u90FyzVGLTsNr9Xi5NNp9ncfTSlerhb40lTBkmGs950fYFOXXuZ
-	HXp9yKYOGZoMlsbhy+HtKQ2MiqXrHGQJJTeXXMcDwMmEFDTojtxu9SOYf3egjN2GOTH4
-	wRoITJuvfTIrU+LDU/RK1pP2wdXfGC2RSYN5Z1i3uord4S1Lr2JGdtP1ygRhOHDL/Nya
-	OqEXNZutOlgNptbP5fwtymy2FYpE/Ahcjt1czeUCBDLeWqdm0itWdeF3gOMYwItLuqp3
-	JcL/1CVL5nCp0IKrFrlNVgV58DL/n3MVN+sX1OLdf1ifbUqtYyX1iNO04a/ku/JipQhl
-	3U0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=WDcVPn0rL4jXQhf5zsKQY+JMHL4DVAOK/vTKS7GEZxw=;
-	b=MtGi4OzesjUDo0zQN+iWCGREFKq+QGvsA11d0cYksG+xvULLLpxb0flF/mzIooVt4/
-	oEsf5dFmBd4s+U9VrwQzALiSELpK9zGtlwDpcijIXu6Nz7EPZEWrv3CBenoA63wYStO0
-	z2Fegero0uEwecma41Od4x0QDd3fKtaaqQ16bciYqvgQiS6a6urM7ul7NJV/+ZWrE3hz
-	8QZRDoDdDM4CjP5Sj+aaoBp2afAjX+Qu0PwARc849o8NaxdDGbJymDBmyCKy+sV+a09N
-	8LZi6iQ++i4dyz7UEGRZWLCx+i6XNRrFJMK7d1F44BFqlPL8/mNOI5nChJO+lwYQF/+b
-	kgwA==
-X-Gm-Message-State: APjAAAX2s1BCyqL5flZ3Cnud9y5OGtFIwvWf4W0NUxn1rO7r2kZkITaY
-	todLzxBeCFY34TEKMKXtUira7oxG
-X-Google-Smtp-Source: APXvYqy+iD8SNsnJ7Hu37Q6WNTS6NRNZ7uDYXSWz2w4An0imOwSYf1DBJxySRUohklVJIeqw/rB2nA==
-X-Received: by 2002:adf:fe41:: with SMTP id m1mr14650148wrs.220.1554624797935; 
-	Sun, 07 Apr 2019 01:13:17 -0700 (PDT)
-Received: from [192.168.1.29] ([192.116.94.220])
-	by smtp.gmail.com with ESMTPSA id
-	b10sm41331981wrt.86.2019.04.07.01.13.16
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Sun, 07 Apr 2019 01:13:17 -0700 (PDT)
-To: Yuval Shaia <yuval.shaia@oracle.com>
-References: <20190403113343.26384-1-kamalheib1@gmail.com>
-	<20190403113343.26384-2-kamalheib1@gmail.com>
-	<20190403180522.GA3446@lap1>
-From: Kamal Heib <kamalheib1@gmail.com>
-Message-ID: <7acea8a2-36a1-c9aa-1467-2be7a2f5f3f0@gmail.com>
-Date: Sun, 7 Apr 2019 11:13:15 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <guoheyi@huawei.com>) id 1hD319-000746-77
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:19:08 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2257 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+	id 1hD316-0006yN-96; Sun, 07 Apr 2019 04:19:04 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+	by Forcepoint Email with ESMTP id B4069CDBAB1A1E366A48;
+	Sun,  7 Apr 2019 16:18:58 +0800 (CST)
+Received: from linux-wjgadX.huawei.com (10.90.31.46) by
+	DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server
+	id 14.3.408.0; Sun, 7 Apr 2019 16:18:52 +0800
+From: Heyi Guo <guoheyi@huawei.com>
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
+Date: Sun, 7 Apr 2019 16:14:53 +0800
+Message-ID: <1554624893-8363-1-git-send-email-guoheyi@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <20190403180522.GA3446@lap1>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] hw/rdma: Add SRQ support to backend
- layer
+X-Originating-IP: [10.90.31.46]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.191
+Subject: [Qemu-devel] [RFC] arm/virt: add one more uart for UEFI runtime
+ debug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,275 +62,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com,
+	Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190407081315.na7s3Qqw7HyNNQ6BjZpAc6no6Uu7HyJI1TrXIptsZLM@z>
+Message-ID: <20190407081453.w3SIQeSbYszTCWW5rd-QighhIVnjN8DDzJVvXG_Ykvw@z>
 
+This patch is based on the discussion in TianoCore edk2-devel mailing
+list:
+https://lists.01.org/pipermail/edk2-devel/2019-March/037986.html
 
+The conclusion is that we need an individual UART for UEFI runtime
+services to print debug message at runtime, to avoid conflicting with
+the system UART. We cannot use the secure UART either, for we may both
+have Trusted Firmware and UEFI runtime services running on the VM, and
+it is not easy to keep synchronization between the two components.
 
-On 4/3/19 9:05 PM, Yuval Shaia wrote:
-> On Wed, Apr 03, 2019 at 02:33:40PM +0300, Kamal Heib wrote:
->> Add the required functions and definitions to support shared receive
->> queues (SRQs) in the backend layer.
->>
->> Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
->> ---
->>  hw/rdma/rdma_backend.c      | 116 +++++++++++++++++++++++++++++++++++-
->>  hw/rdma/rdma_backend.h      |  12 ++++
->>  hw/rdma/rdma_backend_defs.h |   5 ++
->>  hw/rdma/rdma_rm.c           |   2 +
->>  hw/rdma/rdma_rm_defs.h      |   1 +
->>  5 files changed, 134 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
->> index d1660b6474fa..04dfd63a573b 100644
->> --- a/hw/rdma/rdma_backend.c
->> +++ b/hw/rdma/rdma_backend.c
->> @@ -40,6 +40,7 @@ typedef struct BackendCtx {
->>      void *up_ctx;
->>      struct ibv_sge sge; /* Used to save MAD recv buffer */
->>      RdmaBackendQP *backend_qp; /* To maintain recv buffers */
->> +    RdmaBackendSRQ *backend_srq;
->>  } BackendCtx;
->>  
->>  struct backend_umad {
->> @@ -99,6 +100,7 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->>      int i, ne, total_ne = 0;
->>      BackendCtx *bctx;
->>      struct ibv_wc wc[2];
->> +    RdmaProtectedGSList *cqe_ctx_list;
->>  
->>      qemu_mutex_lock(&rdma_dev_res->lock);
->>      do {
->> @@ -116,8 +118,13 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->>  
->>              comp_handler(bctx->up_ctx, &wc[i]);
->>  
->> -            rdma_protected_gslist_remove_int32(&bctx->backend_qp->cqe_ctx_list,
->> -                                               wc[i].wr_id);
->> +            if (bctx->backend_qp) {
->> +                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
->> +            } else {
->> +                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
->> +            }
->> +
->> +            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
->>              rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
->>              g_free(bctx);
->>          }
->> @@ -662,6 +669,60 @@ err_free_bctx:
->>      g_free(bctx);
->>  }
->>  
->> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
->> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
->> +                                uint32_t num_sge, void *ctx)
->> +{
->> +    BackendCtx *bctx;
->> +    struct ibv_sge new_sge[MAX_SGE];
->> +    uint32_t bctx_id;
->> +    int rc;
->> +    struct ibv_recv_wr wr = {}, *bad_wr;
->> +
->> +    bctx = g_malloc0(sizeof(*bctx));
->> +    bctx->up_ctx = ctx;
->> +    bctx->backend_srq = srq;
->> +
->> +    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
->> +    if (unlikely(rc)) {
->> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
->> +        goto err_free_bctx;
->> +    }
->> +
->> +    rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
->> +
->> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
->> +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
->> +    if (rc) {
->> +        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
->> +        goto err_dealloc_cqe_ctx;
->> +    }
->> +
->> +    wr.num_sge = num_sge;
->> +    wr.sg_list = new_sge;
->> +    wr.wr_id = bctx_id;
->> +    rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
->> +    if (rc) {
->> +        rdma_error_report("ibv_post_srq_recv fail, srqn=0x%x, rc=%d, errno=%d",
->> +                          srq->ibsrq->handle, rc, errno);
->> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
->> +        goto err_dealloc_cqe_ctx;
->> +    }
->> +
->> +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
->> +    backend_dev->rdma_dev_res->stats.rx_bufs++;
->> +    backend_dev->rdma_dev_res->stats.rx_srq++;
-> 
-> You should update function rdma_dump_device_counters with this new
-> counter.
-> 
->> +
->> +    return;
->> +
->> +err_dealloc_cqe_ctx:
->> +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
->> +    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
->> +
->> +err_free_bctx:
->> +    g_free(bctx);
->> +}
->> +
->>  int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd)
->>  {
->>      pd->ibpd = ibv_alloc_pd(backend_dev->context);
->> @@ -938,6 +999,55 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
->>      rdma_protected_gslist_destroy(&qp->cqe_ctx_list);
->>  }
->>  
->> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
->> +                            uint32_t max_wr, uint32_t max_sge,
->> +                            uint32_t srq_limit)
->> +{
->> +    struct ibv_srq_init_attr srq_init_attr = {};
->> +
->> +    srq_init_attr.attr.max_wr = max_wr;
->> +    srq_init_attr.attr.max_sge = max_sge;
->> +    srq_init_attr.attr.srq_limit = srq_limit;
->> +
->> +    srq->ibsrq = ibv_create_srq(pd->ibpd, &srq_init_attr);
->> +    if (!srq->ibsrq) {
->> +        rdma_error_report("ibv_create_srq failed, errno=%d", errno);
->> +        return -EIO;
->> +    }
->> +
->> +    rdma_protected_gslist_init(&srq->cqe_ctx_list);
->> +
->> +    return 0;
->> +}
->> +
->> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr)
->> +{
->> +    if (!srq->ibsrq) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return ibv_query_srq(srq->ibsrq, srq_attr);
->> +}
->> +
->> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
->> +                int srq_attr_mask)
->> +{
->> +    if (!srq->ibsrq) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return ibv_modify_srq(srq->ibsrq, srq_attr, srq_attr_mask);
->> +}
->> +
->> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq, RdmaDeviceResources *dev_res)
->> +{
->> +    if (srq->ibsrq) {
->> +        ibv_destroy_srq(srq->ibsrq);
->> +    }
->> +    g_slist_foreach(srq->cqe_ctx_list.list, free_cqe_ctx, dev_res);
->> +    rdma_protected_gslist_destroy(&srq->cqe_ctx_list);
->> +}
->> +
->>  #define CHK_ATTR(req, dev, member, fmt) ({ \
->>      trace_rdma_check_dev_attr(#member, dev.member, req->member); \
->>      if (req->member > dev.member) { \
->> @@ -960,6 +1070,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
->>      }
->>  
->>      dev_attr->max_sge = MAX_SGE;
->> +    dev_attr->max_srq_sge = MAX_SGE;
->>  
->>      CHK_ATTR(dev_attr, bk_dev_attr, max_mr_size, "%" PRId64);
->>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp, "%d");
->> @@ -970,6 +1081,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
->>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_rd_atom, "%d");
->>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_init_rd_atom, "%d");
->>      CHK_ATTR(dev_attr, bk_dev_attr, max_ah, "%d");
->> +    CHK_ATTR(dev_attr, bk_dev_attr, max_srq, "%d");
->>  
->>      return 0;
->>  }
->> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
->> index 38056d97c7fc..cad7956d98e8 100644
->> --- a/hw/rdma/rdma_backend.h
->> +++ b/hw/rdma/rdma_backend.h
->> @@ -114,4 +114,16 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->>                              RdmaBackendQP *qp, uint8_t qp_type,
->>                              struct ibv_sge *sge, uint32_t num_sge, void *ctx);
->>  
->> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
->> +                            uint32_t max_wr, uint32_t max_sge,
->> +                            uint32_t srq_limit);
->> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr);
->> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
->> +                            int srq_attr_mask);
->> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq,
->> +                              RdmaDeviceResources *dev_res);
->> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
->> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
->> +                                uint32_t num_sge, void *ctx);
->> +
->>  #endif
->> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
->> index 817153dc8cf4..0b55be35038d 100644
->> --- a/hw/rdma/rdma_backend_defs.h
->> +++ b/hw/rdma/rdma_backend_defs.h
->> @@ -68,4 +68,9 @@ typedef struct RdmaBackendQP {
->>      RdmaProtectedGSList cqe_ctx_list;
->>  } RdmaBackendQP;
->>  
->> +typedef struct RdmaBackendSRQ {
->> +    struct ibv_srq *ibsrq;
->> +    RdmaProtectedGSList cqe_ctx_list;
->> +} RdmaBackendSRQ;
->> +
->>  #endif
->> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
->> index bac3b2f4a6c3..b683506b8616 100644
->> --- a/hw/rdma/rdma_rm.c
->> +++ b/hw/rdma/rdma_rm.c
->> @@ -37,6 +37,8 @@ void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res)
->>                     dev_res->stats.tx_err);
->>      monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
->>                     dev_res->stats.rx_bufs);
->> +    monitor_printf(mon, "\trx_srq           : %" PRId64 "\n",
->> +                   dev_res->stats.rx_srq);
->>      monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
->>                     dev_res->stats.rx_bufs_len);
->>      monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
->> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
->> index c200d311de37..e774af528022 100644
->> --- a/hw/rdma/rdma_rm_defs.h
->> +++ b/hw/rdma/rdma_rm_defs.h
->> @@ -106,6 +106,7 @@ typedef struct RdmaRmStats {
->>      uint64_t rx_bufs;
->>      uint64_t rx_bufs_len;
->>      uint64_t rx_bufs_err;
->> +    uint64_t rx_srq;
->>      uint64_t completions;
->>      uint64_t mad_tx;
->>      uint64_t mad_tx_err;
-> 
-> Please make a separate patch to update the function
-> rdma_dump_device_counters.
-> 
+To keep backward compatibility, UEFI UART is put behind the secure
+UART when secure world is enabled.
 
-You mean a separate patch for introducing the "rx_srq" counter & update the
-function rdma_dump_device_counters()?
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+---
+ hw/arm/virt.c         | 29 +++++++++++++++++++++++------
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 24 insertions(+), 6 deletions(-)
 
-> Besides that patch lgtm.
-> 
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> 
->> -- 
->> 2.20.1
->>
->>
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ce2664a..cbc5a66 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -131,6 +131,7 @@ static const MemMapEntry base_memmap[] = {
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
++    [VIRT_UEFI_UART] =          { 0x09070000, 0x00001000 },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -166,6 +167,7 @@ static const int a15irqmap[] = {
+     [VIRT_PCIE] = 3, /* ... to 6 */
+     [VIRT_GPIO] = 7,
+     [VIRT_SECURE_UART] = 8,
++    [VIRT_UEFI_UART] = 9,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
+     [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+@@ -713,13 +715,23 @@ static void create_uart(const VirtMachineState *vms, qemu_irq *pic, int uart,
+     if (uart == VIRT_UART) {
+         qemu_fdt_setprop_string(vms->fdt, "/chosen", "stdout-path", nodename);
+     } else {
++        const char *status_string;
++
++        if (uart == VIRT_SECURE_UART) {
++            status_string = "secure-status";
++        } else {
++            status_string = "uefi-status";
++        }
++
+         /* Mark as not usable by the normal world */
+         qemu_fdt_setprop_string(vms->fdt, nodename, "status", "disabled");
+-        qemu_fdt_setprop_string(vms->fdt, nodename, "secure-status", "okay");
++        qemu_fdt_setprop_string(vms->fdt, nodename, status_string, "okay");
+ 
+-        qemu_fdt_add_subnode(vms->fdt, "/secure-chosen");
+-        qemu_fdt_setprop_string(vms->fdt, "/secure-chosen", "stdout-path",
+-                                nodename);
++        if (uart == VIRT_SECURE_UART) {
++            qemu_fdt_add_subnode(vms->fdt, "/secure-chosen");
++            qemu_fdt_setprop_string(vms->fdt, "/secure-chosen", "stdout-path",
++                                    nodename);
++        }
+     }
+ 
+     g_free(nodename);
+@@ -1423,6 +1435,7 @@ static void machvirt_init(MachineState *machine)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+     bool aarch64 = true;
++    int uart_index = 0;
+ 
+     /*
+      * In accelerated mode, the memory map is computed earlier in kvm_type()
+@@ -1616,13 +1629,17 @@ static void machvirt_init(MachineState *machine)
+ 
+     fdt_add_pmu_nodes(vms);
+ 
+-    create_uart(vms, pic, VIRT_UART, sysmem, serial_hd(0));
++    create_uart(vms, pic, VIRT_UART, sysmem, serial_hd(uart_index++));
+ 
+     if (vms->secure) {
+         create_secure_ram(vms, secure_sysmem);
+-        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
++        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem,
++                    serial_hd(uart_index++));
+     }
+ 
++    /* Create UART for UEFI runtime services debug */
++    create_uart(vms, pic, VIRT_UEFI_UART, sysmem, serial_hd(uart_index));
++
+     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+ 
+     create_rtc(vms, pic);
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 507517c..565769f 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -77,6 +77,7 @@ enum {
+     VIRT_GPIO,
+     VIRT_SECURE_UART,
+     VIRT_SECURE_MEM,
++    VIRT_UEFI_UART,
+     VIRT_LOWMEMMAP_LAST,
+ };
+ 
+-- 
+1.8.3.1
+
 
