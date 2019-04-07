@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36266)
+Received: from eggs.gnu.org ([209.51.188.92]:41564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hD3H5-0003PA-QQ
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:37 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hD3rq-0007E1-K7
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 05:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hD3H4-0007tT-R0
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hD3H4-0007tG-J0
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hD3H3-0004MU-IM
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 08:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5DAB62E80CB
-	for <qemu-devel@nongnu.org>; Sun,  7 Apr 2019 08:35:33 +0000 (UTC)
+	(envelope-from <yuval.shaia@oracle.com>) id 1hD3rp-0006T0-4p
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 05:13:34 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:42098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hD3ro-0006Rx-OL
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 05:13:33 -0400
+Date: Sun, 7 Apr 2019 12:13:14 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190407091313.GA6737@lap1>
+References: <20190403113343.26384-1-kamalheib1@gmail.com>
+	<20190403113343.26384-2-kamalheib1@gmail.com>
+	<20190403180522.GA3446@lap1>
+	<7acea8a2-36a1-c9aa-1467-2be7a2f5f3f0@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 07 Apr 2019 08:23:49 -0000
-From: sles <1807073@bugs.launchpad.net>
-Reply-To: Bug 1807073 <1807073@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154406426264.32667.2616897072259419283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155462542989.20581.12967786214444318389.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1807073] Re: qemu-guest-agent stop work when
- fsfreeze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7acea8a2-36a1-c9aa-1467-2be7a2f5f3f0@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] hw/rdma: Add SRQ support to backend
+ layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +31,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kamal Heib <kamalheib1@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-btw,I run OEL7 VM on the same host and Ubuntu 18.04 VM,
-both have newer qemu-guest-agent:
+On Sun, Apr 07, 2019 at 11:13:15AM +0300, Kamal Heib wrote:
+> 
+> 
+> On 4/3/19 9:05 PM, Yuval Shaia wrote:
+> > On Wed, Apr 03, 2019 at 02:33:40PM +0300, Kamal Heib wrote:
+> >> Add the required functions and definitions to support shared receive
+> >> queues (SRQs) in the backend layer.
+> >>
+> >> Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
+> >> ---
+> >>  hw/rdma/rdma_backend.c      | 116 +++++++++++++++++++++++++++++++++++-
+> >>  hw/rdma/rdma_backend.h      |  12 ++++
+> >>  hw/rdma/rdma_backend_defs.h |   5 ++
+> >>  hw/rdma/rdma_rm.c           |   2 +
+> >>  hw/rdma/rdma_rm_defs.h      |   1 +
+> >>  5 files changed, 134 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> >> index d1660b6474fa..04dfd63a573b 100644
+> >> --- a/hw/rdma/rdma_backend.c
+> >> +++ b/hw/rdma/rdma_backend.c
+> >> @@ -40,6 +40,7 @@ typedef struct BackendCtx {
+> >>      void *up_ctx;
+> >>      struct ibv_sge sge; /* Used to save MAD recv buffer */
+> >>      RdmaBackendQP *backend_qp; /* To maintain recv buffers */
+> >> +    RdmaBackendSRQ *backend_srq;
+> >>  } BackendCtx;
+> >>  
+> >>  struct backend_umad {
+> >> @@ -99,6 +100,7 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+> >>      int i, ne, total_ne = 0;
+> >>      BackendCtx *bctx;
+> >>      struct ibv_wc wc[2];
+> >> +    RdmaProtectedGSList *cqe_ctx_list;
+> >>  
+> >>      qemu_mutex_lock(&rdma_dev_res->lock);
+> >>      do {
+> >> @@ -116,8 +118,13 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+> >>  
+> >>              comp_handler(bctx->up_ctx, &wc[i]);
+> >>  
+> >> -            rdma_protected_gslist_remove_int32(&bctx->backend_qp->cqe_ctx_list,
+> >> -                                               wc[i].wr_id);
+> >> +            if (bctx->backend_qp) {
+> >> +                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+> >> +            } else {
+> >> +                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+> >> +            }
+> >> +
+> >> +            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
+> >>              rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> >>              g_free(bctx);
+> >>          }
+> >> @@ -662,6 +669,60 @@ err_free_bctx:
+> >>      g_free(bctx);
+> >>  }
+> >>  
+> >> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+> >> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
+> >> +                                uint32_t num_sge, void *ctx)
+> >> +{
+> >> +    BackendCtx *bctx;
+> >> +    struct ibv_sge new_sge[MAX_SGE];
+> >> +    uint32_t bctx_id;
+> >> +    int rc;
+> >> +    struct ibv_recv_wr wr = {}, *bad_wr;
+> >> +
+> >> +    bctx = g_malloc0(sizeof(*bctx));
+> >> +    bctx->up_ctx = ctx;
+> >> +    bctx->backend_srq = srq;
+> >> +
+> >> +    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+> >> +    if (unlikely(rc)) {
+> >> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+> >> +        goto err_free_bctx;
+> >> +    }
+> >> +
+> >> +    rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
+> >> +
+> >> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
+> >> +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+> >> +    if (rc) {
+> >> +        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> >> +        goto err_dealloc_cqe_ctx;
+> >> +    }
+> >> +
+> >> +    wr.num_sge = num_sge;
+> >> +    wr.sg_list = new_sge;
+> >> +    wr.wr_id = bctx_id;
+> >> +    rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
+> >> +    if (rc) {
+> >> +        rdma_error_report("ibv_post_srq_recv fail, srqn=0x%x, rc=%d, errno=%d",
+> >> +                          srq->ibsrq->handle, rc, errno);
+> >> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> >> +        goto err_dealloc_cqe_ctx;
+> >> +    }
+> >> +
+> >> +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
+> >> +    backend_dev->rdma_dev_res->stats.rx_bufs++;
+> >> +    backend_dev->rdma_dev_res->stats.rx_srq++;
+> > 
+> > You should update function rdma_dump_device_counters with this new
+> > counter.
+> > 
+> >> +
+> >> +    return;
+> >> +
+> >> +err_dealloc_cqe_ctx:
+> >> +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
+> >> +    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
+> >> +
+> >> +err_free_bctx:
+> >> +    g_free(bctx);
+> >> +}
+> >> +
+> >>  int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd)
+> >>  {
+> >>      pd->ibpd = ibv_alloc_pd(backend_dev->context);
+> >> @@ -938,6 +999,55 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
+> >>      rdma_protected_gslist_destroy(&qp->cqe_ctx_list);
+> >>  }
+> >>  
+> >> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
+> >> +                            uint32_t max_wr, uint32_t max_sge,
+> >> +                            uint32_t srq_limit)
+> >> +{
+> >> +    struct ibv_srq_init_attr srq_init_attr = {};
+> >> +
+> >> +    srq_init_attr.attr.max_wr = max_wr;
+> >> +    srq_init_attr.attr.max_sge = max_sge;
+> >> +    srq_init_attr.attr.srq_limit = srq_limit;
+> >> +
+> >> +    srq->ibsrq = ibv_create_srq(pd->ibpd, &srq_init_attr);
+> >> +    if (!srq->ibsrq) {
+> >> +        rdma_error_report("ibv_create_srq failed, errno=%d", errno);
+> >> +        return -EIO;
+> >> +    }
+> >> +
+> >> +    rdma_protected_gslist_init(&srq->cqe_ctx_list);
+> >> +
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr)
+> >> +{
+> >> +    if (!srq->ibsrq) {
+> >> +        return -EINVAL;
+> >> +    }
+> >> +
+> >> +    return ibv_query_srq(srq->ibsrq, srq_attr);
+> >> +}
+> >> +
+> >> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
+> >> +                int srq_attr_mask)
+> >> +{
+> >> +    if (!srq->ibsrq) {
+> >> +        return -EINVAL;
+> >> +    }
+> >> +
+> >> +    return ibv_modify_srq(srq->ibsrq, srq_attr, srq_attr_mask);
+> >> +}
+> >> +
+> >> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq, RdmaDeviceResources *dev_res)
+> >> +{
+> >> +    if (srq->ibsrq) {
+> >> +        ibv_destroy_srq(srq->ibsrq);
+> >> +    }
+> >> +    g_slist_foreach(srq->cqe_ctx_list.list, free_cqe_ctx, dev_res);
+> >> +    rdma_protected_gslist_destroy(&srq->cqe_ctx_list);
+> >> +}
+> >> +
+> >>  #define CHK_ATTR(req, dev, member, fmt) ({ \
+> >>      trace_rdma_check_dev_attr(#member, dev.member, req->member); \
+> >>      if (req->member > dev.member) { \
+> >> @@ -960,6 +1070,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
+> >>      }
+> >>  
+> >>      dev_attr->max_sge = MAX_SGE;
+> >> +    dev_attr->max_srq_sge = MAX_SGE;
+> >>  
+> >>      CHK_ATTR(dev_attr, bk_dev_attr, max_mr_size, "%" PRId64);
+> >>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp, "%d");
+> >> @@ -970,6 +1081,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
+> >>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_rd_atom, "%d");
+> >>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_init_rd_atom, "%d");
+> >>      CHK_ATTR(dev_attr, bk_dev_attr, max_ah, "%d");
+> >> +    CHK_ATTR(dev_attr, bk_dev_attr, max_srq, "%d");
+> >>  
+> >>      return 0;
+> >>  }
+> >> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+> >> index 38056d97c7fc..cad7956d98e8 100644
+> >> --- a/hw/rdma/rdma_backend.h
+> >> +++ b/hw/rdma/rdma_backend.h
+> >> @@ -114,4 +114,16 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+> >>                              RdmaBackendQP *qp, uint8_t qp_type,
+> >>                              struct ibv_sge *sge, uint32_t num_sge, void *ctx);
+> >>  
+> >> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
+> >> +                            uint32_t max_wr, uint32_t max_sge,
+> >> +                            uint32_t srq_limit);
+> >> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr);
+> >> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
+> >> +                            int srq_attr_mask);
+> >> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq,
+> >> +                              RdmaDeviceResources *dev_res);
+> >> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+> >> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
+> >> +                                uint32_t num_sge, void *ctx);
+> >> +
+> >>  #endif
+> >> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
+> >> index 817153dc8cf4..0b55be35038d 100644
+> >> --- a/hw/rdma/rdma_backend_defs.h
+> >> +++ b/hw/rdma/rdma_backend_defs.h
+> >> @@ -68,4 +68,9 @@ typedef struct RdmaBackendQP {
+> >>      RdmaProtectedGSList cqe_ctx_list;
+> >>  } RdmaBackendQP;
+> >>  
+> >> +typedef struct RdmaBackendSRQ {
+> >> +    struct ibv_srq *ibsrq;
+> >> +    RdmaProtectedGSList cqe_ctx_list;
+> >> +} RdmaBackendSRQ;
+> >> +
+> >>  #endif
+> >> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> >> index bac3b2f4a6c3..b683506b8616 100644
+> >> --- a/hw/rdma/rdma_rm.c
+> >> +++ b/hw/rdma/rdma_rm.c
+> >> @@ -37,6 +37,8 @@ void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res)
+> >>                     dev_res->stats.tx_err);
+> >>      monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
+> >>                     dev_res->stats.rx_bufs);
+> >> +    monitor_printf(mon, "\trx_srq           : %" PRId64 "\n",
+> >> +                   dev_res->stats.rx_srq);
 
-18.04: qemu-guest-age 1:2.11+dfsg-
+[1]
 
-OEL7: rpm -qi qemu-guest-agent
-Name        : qemu-guest-agent
-Epoch       : 10
-Version     : 2.12.0
-Release     : 2.el7
+> >>      monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
+> >>                     dev_res->stats.rx_bufs_len);
+> >>      monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
+> >> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> >> index c200d311de37..e774af528022 100644
+> >> --- a/hw/rdma/rdma_rm_defs.h
+> >> +++ b/hw/rdma/rdma_rm_defs.h
+> >> @@ -106,6 +106,7 @@ typedef struct RdmaRmStats {
+> >>      uint64_t rx_bufs;
+> >>      uint64_t rx_bufs_len;
+> >>      uint64_t rx_bufs_err;
+> >> +    uint64_t rx_srq;
+> >>      uint64_t completions;
+> >>      uint64_t mad_tx;
+> >>      uint64_t mad_tx_err;
+> > 
+> > Please make a separate patch to update the function
+> > rdma_dump_device_counters.
+> > 
+> 
+> You mean a separate patch for introducing the "rx_srq" counter & update the
+> function rdma_dump_device_counters()?
 
-Never had this problem on both oh these.
+My bad, missed that ([1]).
+No need for a separate patch.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1807073
-
-Title:
-  qemu-guest-agent stop work when fsfreeze
-
-Status in QEMU:
-  New
-
-Bug description:
-  Create a live snapshot, we should first to fsfreeze the file system. We d=
-o have only one disk mounted to /:
-  Filesystem      Size  Used Avail Use% Mounted on
-  udev             48G     0   48G   0% /dev
-  tmpfs           9.5G  8.7M  9.5G   1% /run
-  /dev/vda1       485G  1.5G  484G   1% /
-  tmpfs            48G     0   48G   0% /dev/shm
-  tmpfs           5.0M     0  5.0M   0% /run/lock
-  tmpfs            48G     0   48G   0% /sys/fs/cgroup
-  tmpfs           9.5G     0  9.5G   0% /run/user/0
-
-  snapshot action is OK, when we restore the snapshot, the file system beca=
-me read-only, and syslog seems stop writing until we fsck /dev/vda1 and mou=
-nt -o rw,remount /:
-  Dec  5 00:39:16 systemd[1]: Started Session 180 of user root.
-  Dec  5 00:45:05 qemu-ga: info: guest-fsfreeze called
-  Dec  5 07:00:45 kernel: [  114.623823] EXT4-fs (vda1): re-mounted. Opts: =
-(null)
-
-  So after snapshoting, wo do fsthaw the file system,  maybe the qga
-  dose not respond or stop work, this action dose not execute
-  successfully and there is no log to show the status of qemu-guest-
-  agent.
-
-  Version:
-  libvirt 1.2.17
-  qemu 2.3.0
-  qemu-guest-agent 2.5
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1807073/+subscriptions
+> 
+> > Besides that patch lgtm.
+> > 
+> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > 
+> >> -- 
+> >> 2.20.1
+> >>
+> >>
+> 
