@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34356)
+Received: from eggs.gnu.org ([209.51.188.92]:33359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCzRE-0001DJ-BQ
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 00:29:49 -0400
+	(envelope-from <kamalheib1@gmail.com>) id 1hD2vc-00088n-PR
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hCzRC-0007uB-Vl
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 00:29:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47012)
+	(envelope-from <kamalheib1@gmail.com>) id 1hD2vb-0003CJ-70
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:24 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hCzRC-0007ts-Nm
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 00:29:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hCzRB-0007mr-A9
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 04:29:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 43F2E2E8076
-	for <qemu-devel@nongnu.org>; Sun,  7 Apr 2019 04:29:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kamalheib1@gmail.com>)
+	id 1hD2vZ-00032d-44
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 04:13:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id k17so12649223wrx.10
+	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 01:13:19 -0700 (PDT)
+References: <20190403113343.26384-1-kamalheib1@gmail.com>
+	<20190403113343.26384-2-kamalheib1@gmail.com>
+	<20190403180522.GA3446@lap1>
+From: Kamal Heib <kamalheib1@gmail.com>
+Message-ID: <7acea8a2-36a1-c9aa-1467-2be7a2f5f3f0@gmail.com>
+Date: Sun, 7 Apr 2019 11:13:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 07 Apr 2019 04:17:22 -0000
-From: Launchpad Bug Tracker <1547012@bugs.launchpad.net>
-Reply-To: Bug 1547012 <1547012@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160218130432.32646.62868.malonedeb@gac.canonical.com>
-Message-Id: <155461064269.28623.12411456476857682471.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1547012] Re: qemu instances crashes with certain
- spice clients
+In-Reply-To: <20190403180522.GA3446@lap1>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] hw/rdma: Add SRQ support to backend
+ layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +33,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
 
--- =
+On 4/3/19 9:05 PM, Yuval Shaia wrote:
+> On Wed, Apr 03, 2019 at 02:33:40PM +0300, Kamal Heib wrote:
+>> Add the required functions and definitions to support shared receive
+>> queues (SRQs) in the backend layer.
+>>
+>> Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
+>> ---
+>>  hw/rdma/rdma_backend.c      | 116 +++++++++++++++++++++++++++++++++++-
+>>  hw/rdma/rdma_backend.h      |  12 ++++
+>>  hw/rdma/rdma_backend_defs.h |   5 ++
+>>  hw/rdma/rdma_rm.c           |   2 +
+>>  hw/rdma/rdma_rm_defs.h      |   1 +
+>>  5 files changed, 134 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+>> index d1660b6474fa..04dfd63a573b 100644
+>> --- a/hw/rdma/rdma_backend.c
+>> +++ b/hw/rdma/rdma_backend.c
+>> @@ -40,6 +40,7 @@ typedef struct BackendCtx {
+>>      void *up_ctx;
+>>      struct ibv_sge sge; /* Used to save MAD recv buffer */
+>>      RdmaBackendQP *backend_qp; /* To maintain recv buffers */
+>> +    RdmaBackendSRQ *backend_srq;
+>>  } BackendCtx;
+>>  
+>>  struct backend_umad {
+>> @@ -99,6 +100,7 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+>>      int i, ne, total_ne = 0;
+>>      BackendCtx *bctx;
+>>      struct ibv_wc wc[2];
+>> +    RdmaProtectedGSList *cqe_ctx_list;
+>>  
+>>      qemu_mutex_lock(&rdma_dev_res->lock);
+>>      do {
+>> @@ -116,8 +118,13 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+>>  
+>>              comp_handler(bctx->up_ctx, &wc[i]);
+>>  
+>> -            rdma_protected_gslist_remove_int32(&bctx->backend_qp->cqe_ctx_list,
+>> -                                               wc[i].wr_id);
+>> +            if (bctx->backend_qp) {
+>> +                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+>> +            } else {
+>> +                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+>> +            }
+>> +
+>> +            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
+>>              rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+>>              g_free(bctx);
+>>          }
+>> @@ -662,6 +669,60 @@ err_free_bctx:
+>>      g_free(bctx);
+>>  }
+>>  
+>> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+>> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
+>> +                                uint32_t num_sge, void *ctx)
+>> +{
+>> +    BackendCtx *bctx;
+>> +    struct ibv_sge new_sge[MAX_SGE];
+>> +    uint32_t bctx_id;
+>> +    int rc;
+>> +    struct ibv_recv_wr wr = {}, *bad_wr;
+>> +
+>> +    bctx = g_malloc0(sizeof(*bctx));
+>> +    bctx->up_ctx = ctx;
+>> +    bctx->backend_srq = srq;
+>> +
+>> +    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+>> +    if (unlikely(rc)) {
+>> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+>> +        goto err_free_bctx;
+>> +    }
+>> +
+>> +    rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
+>> +
+>> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
+>> +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+>> +    if (rc) {
+>> +        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+>> +        goto err_dealloc_cqe_ctx;
+>> +    }
+>> +
+>> +    wr.num_sge = num_sge;
+>> +    wr.sg_list = new_sge;
+>> +    wr.wr_id = bctx_id;
+>> +    rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
+>> +    if (rc) {
+>> +        rdma_error_report("ibv_post_srq_recv fail, srqn=0x%x, rc=%d, errno=%d",
+>> +                          srq->ibsrq->handle, rc, errno);
+>> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+>> +        goto err_dealloc_cqe_ctx;
+>> +    }
+>> +
+>> +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
+>> +    backend_dev->rdma_dev_res->stats.rx_bufs++;
+>> +    backend_dev->rdma_dev_res->stats.rx_srq++;
+> 
+> You should update function rdma_dump_device_counters with this new
+> counter.
+> 
+>> +
+>> +    return;
+>> +
+>> +err_dealloc_cqe_ctx:
+>> +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
+>> +    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
+>> +
+>> +err_free_bctx:
+>> +    g_free(bctx);
+>> +}
+>> +
+>>  int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd)
+>>  {
+>>      pd->ibpd = ibv_alloc_pd(backend_dev->context);
+>> @@ -938,6 +999,55 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
+>>      rdma_protected_gslist_destroy(&qp->cqe_ctx_list);
+>>  }
+>>  
+>> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
+>> +                            uint32_t max_wr, uint32_t max_sge,
+>> +                            uint32_t srq_limit)
+>> +{
+>> +    struct ibv_srq_init_attr srq_init_attr = {};
+>> +
+>> +    srq_init_attr.attr.max_wr = max_wr;
+>> +    srq_init_attr.attr.max_sge = max_sge;
+>> +    srq_init_attr.attr.srq_limit = srq_limit;
+>> +
+>> +    srq->ibsrq = ibv_create_srq(pd->ibpd, &srq_init_attr);
+>> +    if (!srq->ibsrq) {
+>> +        rdma_error_report("ibv_create_srq failed, errno=%d", errno);
+>> +        return -EIO;
+>> +    }
+>> +
+>> +    rdma_protected_gslist_init(&srq->cqe_ctx_list);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr)
+>> +{
+>> +    if (!srq->ibsrq) {
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    return ibv_query_srq(srq->ibsrq, srq_attr);
+>> +}
+>> +
+>> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
+>> +                int srq_attr_mask)
+>> +{
+>> +    if (!srq->ibsrq) {
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    return ibv_modify_srq(srq->ibsrq, srq_attr, srq_attr_mask);
+>> +}
+>> +
+>> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq, RdmaDeviceResources *dev_res)
+>> +{
+>> +    if (srq->ibsrq) {
+>> +        ibv_destroy_srq(srq->ibsrq);
+>> +    }
+>> +    g_slist_foreach(srq->cqe_ctx_list.list, free_cqe_ctx, dev_res);
+>> +    rdma_protected_gslist_destroy(&srq->cqe_ctx_list);
+>> +}
+>> +
+>>  #define CHK_ATTR(req, dev, member, fmt) ({ \
+>>      trace_rdma_check_dev_attr(#member, dev.member, req->member); \
+>>      if (req->member > dev.member) { \
+>> @@ -960,6 +1070,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
+>>      }
+>>  
+>>      dev_attr->max_sge = MAX_SGE;
+>> +    dev_attr->max_srq_sge = MAX_SGE;
+>>  
+>>      CHK_ATTR(dev_attr, bk_dev_attr, max_mr_size, "%" PRId64);
+>>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp, "%d");
+>> @@ -970,6 +1081,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
+>>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_rd_atom, "%d");
+>>      CHK_ATTR(dev_attr, bk_dev_attr, max_qp_init_rd_atom, "%d");
+>>      CHK_ATTR(dev_attr, bk_dev_attr, max_ah, "%d");
+>> +    CHK_ATTR(dev_attr, bk_dev_attr, max_srq, "%d");
+>>  
+>>      return 0;
+>>  }
+>> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+>> index 38056d97c7fc..cad7956d98e8 100644
+>> --- a/hw/rdma/rdma_backend.h
+>> +++ b/hw/rdma/rdma_backend.h
+>> @@ -114,4 +114,16 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+>>                              RdmaBackendQP *qp, uint8_t qp_type,
+>>                              struct ibv_sge *sge, uint32_t num_sge, void *ctx);
+>>  
+>> +int rdma_backend_create_srq(RdmaBackendSRQ *srq, RdmaBackendPD *pd,
+>> +                            uint32_t max_wr, uint32_t max_sge,
+>> +                            uint32_t srq_limit);
+>> +int rdma_backend_query_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr);
+>> +int rdma_backend_modify_srq(RdmaBackendSRQ *srq, struct ibv_srq_attr *srq_attr,
+>> +                            int srq_attr_mask);
+>> +void rdma_backend_destroy_srq(RdmaBackendSRQ *srq,
+>> +                              RdmaDeviceResources *dev_res);
+>> +void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
+>> +                                RdmaBackendSRQ *srq, struct ibv_sge *sge,
+>> +                                uint32_t num_sge, void *ctx);
+>> +
+>>  #endif
+>> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
+>> index 817153dc8cf4..0b55be35038d 100644
+>> --- a/hw/rdma/rdma_backend_defs.h
+>> +++ b/hw/rdma/rdma_backend_defs.h
+>> @@ -68,4 +68,9 @@ typedef struct RdmaBackendQP {
+>>      RdmaProtectedGSList cqe_ctx_list;
+>>  } RdmaBackendQP;
+>>  
+>> +typedef struct RdmaBackendSRQ {
+>> +    struct ibv_srq *ibsrq;
+>> +    RdmaProtectedGSList cqe_ctx_list;
+>> +} RdmaBackendSRQ;
+>> +
+>>  #endif
+>> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+>> index bac3b2f4a6c3..b683506b8616 100644
+>> --- a/hw/rdma/rdma_rm.c
+>> +++ b/hw/rdma/rdma_rm.c
+>> @@ -37,6 +37,8 @@ void rdma_dump_device_counters(Monitor *mon, RdmaDeviceResources *dev_res)
+>>                     dev_res->stats.tx_err);
+>>      monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
+>>                     dev_res->stats.rx_bufs);
+>> +    monitor_printf(mon, "\trx_srq           : %" PRId64 "\n",
+>> +                   dev_res->stats.rx_srq);
+>>      monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
+>>                     dev_res->stats.rx_bufs_len);
+>>      monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
+>> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+>> index c200d311de37..e774af528022 100644
+>> --- a/hw/rdma/rdma_rm_defs.h
+>> +++ b/hw/rdma/rdma_rm_defs.h
+>> @@ -106,6 +106,7 @@ typedef struct RdmaRmStats {
+>>      uint64_t rx_bufs;
+>>      uint64_t rx_bufs_len;
+>>      uint64_t rx_bufs_err;
+>> +    uint64_t rx_srq;
+>>      uint64_t completions;
+>>      uint64_t mad_tx;
+>>      uint64_t mad_tx_err;
+> 
+> Please make a separate patch to update the function
+> rdma_dump_device_counters.
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1547012
+You mean a separate patch for introducing the "rx_srq" counter & update the
+function rdma_dump_device_counters()?
 
-Title:
-  qemu instances crashes with certain spice clients
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  It's possible to make qemu instances crash when using certain browsers
-  connected as spice-clients.
-
-  my environment:
-
-  - OpenStack Kilo installed from ubuntu-cloud archive (qemu-system-x86 2.2=
-+dfsg-5expubuntu9.6~cloud0)
-  - Using spice for web-console access
-
-  How to reproduce:
-
-  1. Start a VM on openstack
-  2. access the OpenStack dashboard using iceweasel 43.0.4 =
-
-  3. Open the spice-console
-  4. Leave the console open for few minutes
-  5. The VM will crash on the hypervisor
-
-  The content of qemu log-files for this particular VM:
-
-  2016-02-18 07:25:23.655+0000: starting up
-  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin=
-:/bin QEMU_AUDIO_DRV=3Dspice /usr/bin/qemu-system-x86_64 -name instance-000=
-0188f -S -machine pc-i440fx-utopic,accel=3Dkvm,usb=3Doff -cpu SandyBridge,+=
-erms,+smep,+fsgsbase,+pdpe1gb,+rdrand,+f16c,+osxsave,+dca,+pcid,+pdcm,+xtpr=
-,+tm2,+est,+smx,+vmx,+ds_cpl,+monitor,+dtes64,+pbe,+tm,+ht,+ss,+acpi,+ds,+v=
-me -m 4096 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -=
-uuid cb04ff25-056f-4f82-a2e8-1fbb762bc29e -smbios type=3D1,manufacturer=3DO=
-penStack Foundation,product=3DOpenStack Nova,version=3D2015.1.2,serial=3D00=
-000000-0000-0000-0000-0cc47a45f5e8,uuid=3Dcb04ff25-056f-4f82-a2e8-1fbb762bc=
-29e -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/va=
-r/lib/libvirt/qemu/instance-0000188f.monitor,server,nowait -mon chardev=3Dc=
-harmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=3Dslew -glo=
-bal kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -boot strict=
-=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device vi=
-rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x4 -drive file=3Drb=
-d:libvirt/cb04ff25-056f-4f82-a2e8-1fbb762bc29e_disk:id=3Dcinder:key=3DAQBYm=
-dBUCDq7IBAA/7tLevRjdF3Bo7522xkFqA=3D=3D:auth_supported=3Dcephx\;none:mon_ho=
-st=3Dxxx.xxx.xxx.xxx\:6789\;xxx.xxx.xxx.xxx\:6789\;xxx.xxx.xxx.xxx\:6789\;x=
-xx.xxx.xxx.xxx\:6789\;xxx.xxx.xxx.xxx\:6789,if=3Dnone,id=3Ddrive-virtio-dis=
-k0,format=3Draw,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=3Dp=
-ci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 =
--netdev tap,fd=3D55,id=3Dhostnet0,vhost=3Don,vhostfd=3D58 -device virtio-ne=
-t-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:a4:74:3b,bus=3Dpci.0,addr=
-=3D0x3 -chardev file,id=3Dcharserial0,path=3D/var/lib/nova/instances/cb04ff=
-25-056f-4f82-a2e8-1fbb762bc29e/console.log -device isa-serial,chardev=3Dcha=
-rserial0,id=3Dserial0 -chardev pty,id=3Dcharserial1 -device isa-serial,char=
-dev=3Dcharserial1,id=3Dserial1 -chardev pty,id=3Dcharchannel0 -device virts=
-erialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel=
-0,name=3Dcom.redhat.spice.0 -spice port=3D5929,addr=3D172.24.1.30,disable-t=
-icketing,seamless-migration=3Don -k fr-ch -device qxl-vga,id=3Dvideo0,ram_s=
-ize=3D67108864,vram_size=3D67108864,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x2 -=
-device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6 -msg timesta=
-mp=3Don
-  char device redirected to /dev/pts/64 (label charserial1)
-  char device redirected to /dev/pts/65 (label charchannel0)
-  main_channel_link: add main channel client
-  main_channel_handle_parsed: net test: latency 44.136000 ms, bitrate 15753=
-8461538 bps (150240.384615 Mbps)
-  inputs_connect: inputs channel client create
-  red_dispatcher_set_cursor_peer:
-  ((null):18188): SpiceWorker-CRITICAL **: red_worker.c:1629:common_alloc_r=
-ecv_buf: unexpected message size 214862 (max is 1024)
-  2016-02-18 07:30:47.008+0000: shutting down
-
-  It's funny because this error only occurs with certain browser
-  versions, in my case with Iceweasel 43.0.4 and 44. 0 but it works well
-  with Chrome 48.0.256482 and Firefox 44.0.2.
-
-  Marking this a potential security issue as it could maybe lead to a
-  denial-of-service if a user sends crafted packets.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1547012/+subscriptions
+> Besides that patch lgtm.
+> 
+> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> 
+>> -- 
+>> 2.20.1
+>>
+>>
