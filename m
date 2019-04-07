@@ -2,67 +2,81 @@ Return-Path: <SRS0=0TSG=SJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA8A2C10F0E
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 18:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185A8C10F0E
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 19:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A694820896
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 18:56:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A694820896
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BEA9E20879
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 19:18:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2DpoRNj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEA9E20879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42443 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDCxp-0004T6-Sw
-	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 14:56:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49345)
+	id 1hDDJH-0000ef-WE
+	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 15:18:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDCx4-00048m-UI
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 14:55:36 -0400
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDDIT-0000MO-4O
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDCx3-0007uz-LN
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 14:55:34 -0400
-Resent-Date: Sun, 07 Apr 2019 14:55:34 -0400
-Resent-Message-Id: <E1hDCx3-0007uz-LN@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDCx3-0007eh-AM
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 14:55:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1554663307; cv=none; d=zoho.com; s=zohoarc; 
-	b=YwpJe1cJ6A9J9C0T0PAf4q5GIm8LI9Q8ZIJbxEAphJG9lTVqXncDfyQkavhytZx2hxx00Lnv1r7V8ylVluf4/n1VTfiuRJuXJWK7u9r8Qt4ZW8FJjCw1+4I32ff42/E3QivbFg98ZpQFzaZoF61pandR4iEn1PTAc4/Ktf5SXLE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1554663307;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=cyk7KapgAu1i8RAx7wP3XO6epHD5WMlkM09UdFVjkwU=; 
-	b=PTUjNS0mt/MWCNFReRc9Qm71C7dZ3FQREzWJcwEWFAB6Iw7d/WG94M7TAne2K1Xx0QQ/WmobKAoKMSOGxaGFL46+L75XJJnYdhjFwiWEgClbrv12ocDgcW3s2XmahN22mAGoWr3vAaLgGq7DIdZSsUKKRtwD3HVrVXOBWftcPYU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1554663304790236.18341238256755;
-	Sun, 7 Apr 2019 11:55:04 -0700 (PDT)
-Message-ID: <155466330356.12882.14207478694719549753@76452e4e88f2>
-In-Reply-To: <20190407185042.7624-1-sohailalvi2236@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: sohailalvi2236@gmail.com
-Date: Sun, 7 Apr 2019 11:55:04 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH] set_bit() function added to the source
- code of uncategorized devices and categorizes have been assigne to them.
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDDIR-0005p6-7V
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:41 -0400
+Received: from mail-pl1-x62e.google.com ([2607:f8b0:4864:20::62e]:42626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sohailalvi2236@gmail.com>)
+	id 1hDDIP-0005nm-Bu
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:37 -0400
+Received: by mail-pl1-x62e.google.com with SMTP id cv12so6010479plb.9
+	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 12:17:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=xk0IR4py3Q73CS9m2OZw579cOOI17N0uvwH7IOVEyo4=;
+	b=N2DpoRNjvZYRAdizs1Fe61XVqGVW5KNV+0Vv4qRhQyP1o+UtnuF71jBHfglAFHMAgB
+	AFilWjO2OngrjLzLGNjhucN6rOYfALDflG96+xQtT7CtPNsms3WQKt2xS77md1Yc82Gr
+	/NoQOu64BQGe2Er/KZWC+3fCL2+lR2Hqr6zLUUs4FATu+hc8wbd1hoDWSvQMbyY478xC
+	GotC3+YgxBJ0GBH5GIGR78K40hnBfhWtLJLIJ01X5spt9f1myULKF7CK8v8NdTVegG+W
+	NaEo07yu2b85Qr38uPsmBcXWz9r/MEMGX4my8IAUCsfHoq3+kPErAovLP9O55jlqUSlF
+	hTew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=xk0IR4py3Q73CS9m2OZw579cOOI17N0uvwH7IOVEyo4=;
+	b=X6I3tV8r26Ww9GJ4tykNz5mMdHYQisM+Pw4Xk0Y0qoumuJ/ZoQ5AGJsC9wV242kBNY
+	wREaXK7H5i1nEm/+mUP3N/FPJsJ0MTWV7BMMKIsW6xF7ieny9HLyZBRHzeHdC3yK3Opi
+	qzHOsgedSd3r4TfoElvaonqFCtdfnKkICqtOdCh6G+Ulh3XvHfeXvGojsQAiXO9Tspz2
+	YbAthnlUuCTOQmMfsHFqNPjaNIZShSQiXWT1VeHBgi+/7LJPGT3upGrbVB6rU2CZ2Jh6
+	K6CSCRPV1yq/a3KZIf/uYf77G9d28Ppj7uYNYgcOSpe6XGEIxT88Ipbff0/xJGGwCmei
+	6kYw==
+X-Gm-Message-State: APjAAAVG6AcJ/F7FisBbwop4DK26shIk/40N/PcIQjjysOpLd4mZNugL
+	fbSlP7qIcf7Jx2x1Jf17Yp/FPt6eAM2NiQ==
+X-Google-Smtp-Source: APXvYqwJQkw6yHrvivw/oJ7wQOnJCiAQOeFWZDSrnCdqugJhbbeJd3t5uh1rz8T77LnUiMzWq92X/Q==
+X-Received: by 2002:a17:902:7043:: with SMTP id
+	h3mr26377107plt.228.1554664654658; 
+	Sun, 07 Apr 2019 12:17:34 -0700 (PDT)
+Received: from localhost.localdomain ([42.111.128.225])
+	by smtp.gmail.com with ESMTPSA id
+	m16sm66914461pfi.29.2019.04.07.12.17.32
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 07 Apr 2019 12:17:34 -0700 (PDT)
+From: sohailalvi2236@gmail.com
+To: qemu-devel@nongnu.org
+Date: Mon,  8 Apr 2019 00:47:28 +0530
+Message-Id: <20190407191728.8552-1-sohailalvi2236@gmail.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::62e
+Subject: [Qemu-devel] [PATCH 1/5] Device Models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,52 +88,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, sohailalvi2236@gmail.com, qemu-devel@nongnu.org
+Cc: Sohail Alvi <sohailalvi2236@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190407185504.w2uHWNR8CM0iZHukU1n4C-EYn00_AJNnxFuauLmLglE@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190407191728.JR03nWpoQDbD3bZ3Sj88c3ttfpJetZXGq2wcKEISBRg@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwNzE4NTA0Mi43NjI0
-LTEtc29oYWlsYWx2aTIyMzZAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBzZXRfYml0KCkg
-ZnVuY3Rpb24gYWRkZWQgdG8gdGhlIHNvdXJjZSBjb2RlIG9mIHVuY2F0ZWdvcml6ZWQgZGV2aWNl
-cyBhbmQgY2F0ZWdvcml6ZXMgaGF2ZSBiZWVuIGFzc2lnbmUgdG8gdGhlbS4KVHlwZTogc2VyaWVz
-Ck1lc3NhZ2UtaWQ6IDIwMTkwNDA3MTg1MDQyLjc2MjQtMS1zb2hhaWxhbHZpMjIzNkBnbWFpbC5j
-b20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBi
-YXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICAxMDU0NmUwLi45MGZiODY0ICBtYXN0ZXIg
-ICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwNDA3MTg1MDQyLjc2MjQtMS1zb2hh
-aWxhbHZpMjIzNkBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5MDQwNzE4NTA0Mi43NjI0LTEtc29o
-YWlsYWx2aTIyMzZAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTJj
-OGFlNSBzZXRfYml0KCkgZnVuY3Rpb24gYWRkZWQgdG8gdGhlIHNvdXJjZSBjb2RlIG9mIHVuY2F0
-ZWdvcml6ZWQgZGV2aWNlcyBhbmQgY2F0ZWdvcml6ZXMgaGF2ZSBiZWVuIGFzc2lnbmUgdG8gdGhl
-bS4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciBTaWdu
-ZWQtb2ZmLWJ5OgojOTogCiAgICBTaWduZWQtb2ZmLWJ5OlNvaGFpbEFsdmkgPHNvaGFpbGFsdmky
-MjM2QGdtYWlsLmNvbT4KCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMyOTogRklMRTogaHcv
-YmxvY2sveGVuLWJsb2NrLmM6NjI4OgorICAgIFhlbkJsb2NrRGV2aWNlQ2xhc3MgKmJsb2NrZGV2
-X2NsYXNzID0gWEVOX0JMT0NLX0RFVklDRV9DTEFTUyhjbGFzcyk7ICAgICQKCkVSUk9SOiB0cmFp
-bGluZyB3aGl0ZXNwYWNlCiM0NTogRklMRTogaHcvZG1hL2k4MjM3NC5jOjE0NzoKKyAgICBzZXRf
-Yml0KERFVklDRV9DQVRFR09SWV9CUklER0UsIGRjLT5jYXRlZ29yaWVzKTsgICAgJAoKRVJST1I6
-IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzE3MDogRklMRTogaHcvbWVtL252ZGltbS5jOjIwMDoKKyAg
-ICBzZXRfYml0KERFVklDRV9DQVRFR09SWV9TVE9SQUdFLCBkYy0+Y2F0ZWdvcmllcyk7ICAgICQK
-CnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMTE5IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA1
-MmM4YWU1NmUwNGQgKHNldF9iaXQoKSBmdW5jdGlvbiBhZGRlZCB0byB0aGUgc291cmNlIGNvZGUg
-b2YgdW5jYXRlZ29yaXplZCBkZXZpY2VzIGFuZCBjYXRlZ29yaXplcyBoYXZlIGJlZW4gYXNzaWdu
-ZSB0byB0aGVtLikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MDcxODUwNDIuNzYyNC0xLXNv
-aGFpbGFsdmkyMjM2QGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+From: Sohail Alvi <sohailalvi2236@gmail.com>
+
+Signed-off-by: SohailAlvi <sohailalvi2236@gmail.com>
+---
+ hw/block/xen-block.c       | 4 +++-
+ hw/dma/i82374.c            | 3 ++-
+ hw/i386/amd_iommu.c        | 9 +++++++++
+ hw/i386/intel_iommu.c      | 1 +
+ hw/i386/pc_piix.c          | 1 +
+ hw/i386/xen/xen_pvdevice.c | 1 +
+ hw/ipmi/ipmi_bmc_extern.c  | 1 +
+ hw/ipmi/ipmi_bmc_sim.c     | 1 +
+ hw/ipmi/isa_ipmi_bt.c      | 1 +
+ hw/ipmi/isa_ipmi_kcs.c     | 1 +
+ hw/mem/nvdimm.c            | 1 +
+ hw/mem/pc-dimm.c           | 1 +
+ hw/tpm/tpm_tis.c           | 1 +
+ 13 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index ef635be4c2..c5a683f5c3 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -579,6 +579,7 @@ static void xen_disk_class_init(ObjectClass *class, void *data)
+     DeviceClass *dev_class = DEVICE_CLASS(class);
+     XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
+ 
++    set_bit(DEVICE_CATEGORY_STORAGE, dev_class->categories);
+     blockdev_class->realize = xen_disk_realize;
+     blockdev_class->unrealize = xen_disk_unrealize;
+ 
+@@ -624,8 +625,9 @@ static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
+ static void xen_cdrom_class_init(ObjectClass *class, void *data)
+ {
+     DeviceClass *dev_class = DEVICE_CLASS(class);
+-    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
++    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);    
+ 
++    set_bit(DEVICE_CATEGORY_STORAGE, dev_class->categories);
+     blockdev_class->realize = xen_cdrom_realize;
+     blockdev_class->unrealize = xen_cdrom_unrealize;
+ 
+diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+index 892f655a7e..caf231422b 100644
+--- a/hw/dma/i82374.c
++++ b/hw/dma/i82374.c
+@@ -143,7 +143,8 @@ static Property i82374_properties[] = {
+ static void i82374_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    
++
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);    
+     dc->realize = i82374_realize;
+     dc->vmsd = &vmstate_i82374;
+     dc->props = i82374_properties;
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index 6eabdf9917..d4ebd599b6 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -1594,6 +1594,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     X86IOMMUClass *dc_class = X86_IOMMU_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset = amdvi_reset;
+     dc->vmsd = &vmstate_amdvi;
+     dc->hotpluggable = false;
+@@ -1611,8 +1612,16 @@ static const TypeInfo amdvi = {
+     .class_init = amdvi_class_init
+ };
+ 
++static void amdvi_pci_class_init(ObjectClass *klass, void* data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++}
++
+ static const TypeInfo amdviPCI = {
+     .name = "AMDVI-PCI",
++    .class_init = amdvi_pci_class_init,
+     .parent = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(AMDVIPCIState),
+     .interfaces = (InterfaceInfo[]) {
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 055a1e865d..89362be7fc 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3719,6 +3719,7 @@ static void vtd_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     X86IOMMUClass *x86_class = X86_IOMMU_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset = vtd_reset;
+     dc->vmsd = &vtd_vmstate;
+     dc->props = vtd_properties;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 8ad8e885c6..2db7dee42d 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -910,6 +910,7 @@ static void isa_bridge_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->desc        = "ISA bridge faked to support IGD PT";
+     k->vendor_id    = PCI_VENDOR_ID_INTEL;
+     k->class_id     = PCI_CLASS_BRIDGE_ISA;
+diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
+index a146f1883a..cb30835944 100644
+--- a/hw/i386/xen/xen_pvdevice.c
++++ b/hw/i386/xen/xen_pvdevice.c
+@@ -126,6 +126,7 @@ static void xen_pv_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     k->realize = xen_pv_realize;
+     k->class_id = PCI_CLASS_SYSTEM_OTHER;
+     dc->desc = "Xen PV Device";
+diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+index bf0b7ee0f5..73604e2be6 100644
+--- a/hw/ipmi/ipmi_bmc_extern.c
++++ b/hw/ipmi/ipmi_bmc_extern.c
+@@ -521,6 +521,7 @@ static void ipmi_bmc_extern_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     IPMIBmcClass *bk = IPMI_BMC_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     bk->handle_command = ipmi_bmc_extern_handle_command;
+     bk->handle_reset = ipmi_bmc_extern_handle_reset;
+     dc->hotpluggable = false;
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index 9b509f829b..3166232fd4 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -2012,6 +2012,7 @@ static void ipmi_sim_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     IPMIBmcClass *bk = IPMI_BMC_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->hotpluggable = false;
+     dc->realize = ipmi_sim_realize;
+     dc->props = ipmi_sim_properties;
+diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+index 8bbb1fa785..3def8d3068 100644
+--- a/hw/ipmi/isa_ipmi_bt.c
++++ b/hw/ipmi/isa_ipmi_bt.c
+@@ -539,6 +539,7 @@ static void isa_ipmi_bt_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->realize = isa_ipmi_bt_realize;
+     dc->props = ipmi_isa_properties;
+ 
+diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
+index a79431554a..a8f230224f 100644
+--- a/hw/ipmi/isa_ipmi_kcs.c
++++ b/hw/ipmi/isa_ipmi_kcs.c
+@@ -522,6 +522,7 @@ static void isa_ipmi_kcs_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->realize = ipmi_isa_realize;
+     dc->props = ipmi_isa_properties;
+ 
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index bf2adf5e16..9fbbbe22e7 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -197,6 +197,7 @@ static void nvdimm_class_init(ObjectClass *oc, void *data)
+     NVDIMMClass *nvc = NVDIMM_CLASS(oc);
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);    
+     ddc->realize = nvdimm_realize;
+     mdc->get_memory_region = nvdimm_md_get_memory_region;
+     dc->props = nvdimm_properties;
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 152400b1fc..d627f0c82f 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -255,6 +255,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
+     MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
+ 
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+     dc->realize = pc_dimm_realize;
+     dc->unrealize = pc_dimm_unrealize;
+     dc->props = pc_dimm_properties;
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index fd183e8deb..a0a27f7ce1 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -1016,6 +1016,7 @@ static void tpm_tis_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     TPMIfClass *tc = TPM_IF_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->realize = tpm_tis_realizefn;
+     dc->props = tpm_tis_properties;
+     dc->reset = tpm_tis_reset;
+-- 
+2.17.1
 
 
