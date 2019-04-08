@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37639)
+Received: from eggs.gnu.org ([209.51.188.92]:37637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hDZXh-0001kA-Vk
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1hDZXh-0001k8-Va
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hDZXe-0007HN-DL
+	(envelope-from <eblake@redhat.com>) id 1hDZXe-0007HO-DU
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:52 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  8 Apr 2019 14:02:33 -0500
-Message-Id: <20190408190233.10321-5-eblake@redhat.com>
+Date: Mon,  8 Apr 2019 14:02:32 -0500
+Message-Id: <20190408190233.10321-4-eblake@redhat.com>
 In-Reply-To: <20190408190233.10321-1-eblake@redhat.com>
 References: <20190408190233.10321-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/4] nbd/client: Fix error message for server
- with unusable sizing
+Subject: [Qemu-devel] [PULL 3/4] nbd/server: Don't fail NBD_OPT_INFO for
+ byte-aligned sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +23,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Add a missing space to the error message used when giving up on a
-server that insists on an alignment which renders the last few bytes
-of the export unreadable.
+In commit 0c1d50bd, I added a couple of TODO comments about whether we
+consult bl.request_alignment when responding to NBD_OPT_INFO. At the
+time, qemu as server was hard-coding an advertised alignment of 512 to
+clients that promised to obey constraints, and there was no function
+for getting at a device's preferred alignment. But in hindsight,
+advertising 512 when the block device prefers 1 caused other
+compliance problems, and commit b0245d64 changed one of the two TODO
+comments to advertise a more accurate alignment. Time to fix the other
+TODO.  Doesn't really impact qemu as client (our normal client doesn't
+use NBD_OPT_INFO, and qemu-nbd --list promises to obey block sizes),
+but it might prove useful to other clients.
 
-Fixes: 3add3ab78
+Fixes: b0245d64
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190404145226.32649-1-eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20190403030526.12258-4-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ nbd/server.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 427980bdd22..4de30630c73 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -428,7 +428,7 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32=
-_t opt,
-             }
-             if (info->min_block &&
-                 !QEMU_IS_ALIGNED(info->size, info->min_block)) {
--                error_setg(errp, "export size %" PRIu64 "is not multiple=
- of "
-+                error_setg(errp, "export size %" PRIu64 " is not multipl=
-e of "
-                            "minimum block size %" PRIu32, info->size,
-                            info->min_block);
-                 nbd_send_opt_abort(ioc);
+diff --git a/nbd/server.c b/nbd/server.c
+index 1c4c5474ad4..e21bd501dc6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -643,11 +643,14 @@ static int nbd_negotiate_handle_info(NBDClient *cli=
+ent, uint16_t myflags,
+         return rc;
+     }
+
+-    /* If the client is just asking for NBD_OPT_INFO, but forgot to
+-     * request block sizes, return an error.
+-     * TODO: consult blk_bs(blk)->request_align, and only error if it
+-     * is not 1? */
+-    if (client->opt =3D=3D NBD_OPT_INFO && !blocksize) {
++    /*
++     * If the client is just asking for NBD_OPT_INFO, but forgot to
++     * request block sizes in a situation that would impact
++     * performance, then return an error. But for NBD_OPT_GO, we
++     * tolerate all clients, regardless of alignments.
++     */
++    if (client->opt =3D=3D NBD_OPT_INFO && !blocksize &&
++        blk_get_request_alignment(exp->blk) > 1) {
+         return nbd_negotiate_send_rep_err(client,
+                                           NBD_REP_ERR_BLOCK_SIZE_REQD,
+                                           errp,
 --=20
 2.20.1
