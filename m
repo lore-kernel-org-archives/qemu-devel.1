@@ -4,104 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A62C10F13
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82105C10F14
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FBD02148E
+	by mail.kernel.org (Postfix) with ESMTPS id 3F58120880
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bO6KMEiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBD02148E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlEblpZ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F58120880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59541 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59539 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDcIN-0004o4-8R
+	id 1hDcIN-0004nm-Hf
 	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 17:59:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38606)
+Received: from eggs.gnu.org ([209.51.188.92]:37840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lidong.chen@oracle.com>) id 1hDcHC-0004Dl-IK
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:03 -0400
+	(envelope-from <flukshun@gmail.com>) id 1hDcGe-0003wO-JT
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lidong.chen@oracle.com>) id 1hDcHB-0008Nq-EB
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:02 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:48538)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lidong.chen@oracle.com>)
-	id 1hDcHA-0008Kx-US
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:01 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38Lj5K7106882; Mon, 8 Apr 2019 21:57:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=subject : to : cc :
-	references : from : message-id : date : mime-version : in-reply-to :
-	content-type : content-transfer-encoding; s=corp-2018-07-02;
-	bh=+aSuA7jSZSleIlfevt3SJNFrPoevbw6SdfxioxbRVNw=;
-	b=bO6KMEiIBpY+h/nSvkY3bkfRugk8H9CuBzdESZE59SqQR2T8O9OZSXvXda8/7npCkppe
-	a732dGrFxFy6FY2+UlUGXOjKm3aumr7uqUey9vXG8BhjZWPDjaEZpOyo21OKTWIvdey/
-	3RA/yLnb0ZFIwFpGYmr+myoU2r4PCDSiJkMWpRafsosD7Q7o+1nXzthVE8l+fyC6iNxD
-	ngLFLaFsCVEbM3C+IZd+jqp6jQzyZTcXke+saN/CsMZ7rfmcgeEkb3/MR7a40cZtZ402
-	mSKpQ7ISpzmZ+Wi+Ng7elaga21qHkbG8V/TQ3R0rtId/12/5mCEFuzrbo4ayw4JLwJPY
-	TQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-	by aserp2130.oracle.com with ESMTP id 2rphme9ghc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Apr 2019 21:57:58 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38Lvn0t087834; Mon, 8 Apr 2019 21:57:57 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-	by userp3020.oracle.com with ESMTP id 2rpkehxkg4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Apr 2019 21:57:57 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x38LvuQJ005863;
-	Mon, 8 Apr 2019 21:57:56 GMT
-Received: from [10.159.131.36] (/10.159.131.36)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Mon, 08 Apr 2019 14:57:56 -0700
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org
-References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
-	<d35048f6-44e7-46a0-3d70-51123896f1ef@redhat.com>
-From: Lidong Chen <lidong.chen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <e67e84dc-193a-3b28-7016-9113652e11fd@oracle.com>
-Date: Mon, 8 Apr 2019 14:57:37 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <flukshun@gmail.com>) id 1hDcGd-0007ei-DS
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:57:28 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:35870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>)
+	id 1hDcGd-0007Zs-0p; Mon, 08 Apr 2019 17:57:27 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id e76so1552643ybc.3;
+	Mon, 08 Apr 2019 14:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+	:cc:references:message-id:user-agent:subject:date;
+	bh=8Yi6QVxk9W5jky9l0J8UaUVLboC8PKdBVurccfXsSSY=;
+	b=BlEblpZ8Lbm+qIrZrZAnbW5rKie198J3Kq1J8yX5sZMxeffhoAo0rWOSoodGgP7wKu
+	5/F5r2mi/ssTsZ93jCOW1udscUa3HRvsTs+gAqoES0k8ynKWxjL5DUpk5zCzf8O56f+Q
+	Rxa330WZhy8GORSPeleO7gOU8VcP2ei9+YPzXiWrC681LOavChqfvD+xa9WPHGXZaRZA
+	VEODMM6iw8JE+av5Hd+tVPUIbwk9tbY8k9TjRT/yVKVCEx35U9geAZd6TBJrYTknSg/o
+	e3HCt8GGvXwALqZddEwDqF/IjOaMGVVeTgMCJlnbaabdiiXYj++DtOfhma5IPJVjuvHF
+	QM6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+	:from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+	bh=8Yi6QVxk9W5jky9l0J8UaUVLboC8PKdBVurccfXsSSY=;
+	b=twIsE84SmwnFpGj2h5DpUSklpdCNUqq59mJ3MND6hcrmnBsv1qoWvXirsyu0+8JH5m
+	6eF8tVmWDK0Ql+ffphL/iIF1/h07yWVJ7cICVPdCoTEKFe3vRsxsymU4XWeTnTVXWJR0
+	CL2v1Tm61RQq9ruwYyriEzDCXi2s5CGdaDRTmIiKbcsU9aUh4FxBci2gP+3GVA034g92
+	tk+dTlDgje+gJWqhm8HqgZ8qBZqP1RhkZokNAHowv1tRL6rLOt1Yh9Nh7joElIzQum2w
+	RSGdDvoDyfdCz7X/LmlA8Kcb3TIOXc2LjQgvheaxlB/57fLpGJYfrZwHqY4ngSK1uujK
+	YxBQ==
+X-Gm-Message-State: APjAAAVXtFO9UnCrWvtV/gdRT4WzIqir8Ywv4nzwBBGF38lwL1Qqsx6P
+	ZARDFhuK2kaeUnec1wgnAM0=
+X-Google-Smtp-Source: APXvYqyJnSry1mt0CziZc4jS6mJSKEiAZqc1SvUkBQ5Sq/J7mwLuLb+gYLN9WXUWdEREjB1eNm2iBw==
+X-Received: by 2002:a25:8201:: with SMTP id q1mr4289948ybk.149.1554760645311; 
+	Mon, 08 Apr 2019 14:57:25 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+	[76.251.165.188]) by smtp.gmail.com with ESMTPSA id
+	w22sm16888463yww.58.2019.04.08.14.57.23
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 08 Apr 2019 14:57:23 -0700 (PDT)
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <d35048f6-44e7-46a0-3d70-51123896f1ef@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904080159
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1904080159
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2130.oracle.com id
-	x38Lj5K7106882
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.79
-Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20190404121015.28634-1-pl@kamp.de>
+References: <20190404121015.28634-1-pl@kamp.de>
+Message-ID: <155476063977.3739.16390356140711847238@sif>
+User-Agent: alot/0.7
+Date: Mon, 08 Apr 2019 16:57:19 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b43
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] megasas: fix mapped frame
+ size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -113,66 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, f4bug@amsat.org
+Cc: fam@euphon.net, pbonzini@redhat.com, hare@suse.com,
+	Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408215737.7Vl1i7CECEm9cC6vZbgvtzzSymeZuEPxiDwvpl1PXIU@z>
+Message-ID: <20190408215719.Tt9IEZ8WIS1PUQDhFyCP57p1FnZo5JrrOp1vva2pfhQ@z>
 
-Hi Philippe,
+Quoting Peter Lieven (2019-04-04 07:10:15)
+> the current value of 1024 bytes (16 * MFI_FRAME_SIZE) we map is not enoug=
+h to hold
+> the maximum number of scatter gather elements we advertise. We actually n=
+eed a
+> maximum of 2048 bytes. This is 128 max sg elements * 16 bytes (sizeof (un=
+ion mfi_sgl)).
+> =
 
-On 4/8/2019 2:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Lidong
->
-> On 4/8/19 9:04 PM, Lidong Chen wrote:
->> Due to an off-by-one error, the assert statements allow an
->> out-of-bounds array access.
-> ... which can't happen. Thus harmless for 4.0.
->
-> I suppose this is a static analysis warning and you didn't triggered it
-> while tracing.
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
-Right, it was found by the static analysis.=C2=A0 Thank you for your revi=
-ew.
+Is there any chance of getting this in for v4.0.0-rc3 tomorrow? Also
+hoping to pull it in for v3.0.1.
 
-Regards,
+> ---
+>  hw/scsi/megasas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-Lidong
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index a56317e026..5ad762de23 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -477,7 +477,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState=
+ *s,
+>  {
+>      PCIDevice *pcid =3D PCI_DEVICE(s);
+>      MegasasCmd *cmd =3D NULL;
+> -    int frame_size =3D MFI_FRAME_SIZE * 16;
+> +    int frame_size =3D MEGASAS_MAX_SGE * sizeof(union mfi_sgl);
+>      hwaddr frame_size_p =3D frame_size;
+>      unsigned long index;
+> =
 
+> -- =
 
->
-> Thanks for cleaning this :)
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
->> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
->> ---
->>   hw/sd/sd.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index aaab15f..818f86c 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates=
- state)
->>       if (state =3D=3D sd_inactive_state) {
->>           return "inactive";
->>       }
->> -    assert(state <=3D ARRAY_SIZE(state_name));
->> +    assert(state < ARRAY_SIZE(state_name));
->>       return state_name[state];
->>   }
->>  =20
->> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t =
-rsp)
->>       if (rsp =3D=3D sd_r1b) {
->>           rsp =3D sd_r1;
->>       }
->> -    assert(rsp <=3D ARRAY_SIZE(response_name));
->> +    assert(rsp < ARRAY_SIZE(response_name));
->>       return response_name[rsp];
->>   }
->>  =20
->>
+> 2.17.1
+> =
+
+> =
+
+>=20
 
