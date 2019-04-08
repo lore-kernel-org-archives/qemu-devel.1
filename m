@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45214)
+Received: from eggs.gnu.org ([209.51.188.92]:45697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDQnL-0002pm-1D
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:42:28 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQog-0003RG-Eh
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDQnK-0006gr-11
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:42:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDQnJ-0006gZ-Mu
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:42:25 -0400
-References: <20190405123928.70da87e2.olaf@aepfle.de>
-	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
-	<20190405125918.462c6ae4.olaf@aepfle.de>
-	<9a4ea235-29ce-2a98-a723-0a61be55433f@redhat.com>
-	<20190408110911.46d3b9d0.olaf@aepfle.de>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <002dd129-cda3-77b5-ac8b-4734cdb1b902@redhat.com>
-Date: Mon, 8 Apr 2019 11:42:17 +0200
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQoe-0007QN-GX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:50 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hDQoc-0007OH-Jj
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:46 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 4so13534699wmf.1
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:43:44 -0700 (PDT)
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-11-armbru@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <eebcf43e-a4d3-d8b1-1611-23b665ebbe6e@gmail.com>
+Date: Mon, 8 Apr 2019 11:44:44 +0300
 MIME-Version: 1.0
-In-Reply-To: <20190408110911.46d3b9d0.olaf@aepfle.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+In-Reply-To: <20190408083627.7479-11-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 10/15] vl: Make -machine $TYPE,
+ help and -accel help print to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 04/08/19 11:09, Olaf Hering wrote:
-> Am Mon, 8 Apr 2019 11:04:09 +0200
-> schrieb Laszlo Ersek <lersek@redhat.com>:
+Hi Markus,
+
+On 4/8/19 11:36 AM, Markus Armbruster wrote:
+> Command line help help explicitly requested by the user should be
+> printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
+> $TYPE,help and -accel help to match: use printf() instead of
+> error_printf().
 >
->> This is not a QEMU build failure, but an issue in the downstream
->> packaging that not only tries to build QEMU, but performs a
->> maintainer build on binary artifacts.
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   vl.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> I'm sure everyone will rebuild the things from source that can be
-> rebuilt.
+> diff --git a/vl.c b/vl.c
+> index c696ad2a13..792ef36001 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
+>               continue;
+>           }
+>   
+> -        error_printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
+> -                     prop->name, prop->type);
+> +        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
+> +                    prop->name, prop->type);
 
-Define "everyone".
+Does the line above have an alignment issue?
 
-- Every direct end-user of upstream QEMU? (That is, every human user
-  that runs configure and make and make install?) Absolutely not. Those
-  users are already not rebuilding the full contents of pc-bios. Look
-  for INSTALL_BLOBS in the top-level makefile.
+Anyway,
 
-- Every *packager* / distribution that provides QEMU packages? Yes, they
-  will definitely rebuild whatever they can from source. That's only
-  prudent and ethical. That's what I called a "maintainer build".
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-> Who would ship random binary blobs from unknown origin?
+Thanks,
+Marcel
 
-I don't expect you to, and any of the patches related to the edk2
-submodule don't force you to.
-
-commit f590a812c21074e82228de3e1dfb57b75fc02b62
-Author: Laszlo Ersek <lersek@redhat.com>
-Date:   Mon Feb 4 17:03:22 2019 +0100
-
-    roms: build the EfiRom utility from the roms/edk2 submodule
-
-    Building the EfiRom utility from "roms/edk2/BaseTools" should make
-    "roms/Makefile" more self-contained. Otherwise, we'd call the system-wide
-    EfiRom for building the combined iPXE option ROMs, but call the sibling
-    utilities from "roms/edk2/BaseTools" for building "roms/edk2" content.
-
-Without this patch, if you ran "make -C roms", you'd use one instance of
-EfiRom (from who knows where) for producing the combined iPXE oproms,
-and another EfiRom, from the edk2.git submodule, for anything inside
-that same edk2.git submodule that requires EfiRom. That's *wrong*.
-
-- You are invoking "make -C roms" in QEMU, so you should use precisely
-  the same EfiRom for all purposes that need EfiRom.
-
-- And given that the EfiRom source code is available in the submodule,
-  the one EfiRom used (for whatever purpose) should be *that* EfiRom
-  (i.e., built from source).
-
-If you need to inject specific compiler/linker flags, into the building
-of EfiRom itself, you can already do that; you just need to update your
-spec file to take advantage of that edk2 BaseTools build feature.
-
-Laszlo
+>           if (prop->description) {
+> -            error_printf(" (%s)\n", prop->description);
+> +            printf(" (%s)\n", prop->description);
+>           } else {
+> -            error_printf("\n");
+> +            printf("\n");
+>           }
+>       }
+>   
+> @@ -3643,7 +3643,7 @@ int main(int argc, char **argv, char **envp)
+>                                                        optarg, true);
+>                   optarg = qemu_opt_get(accel_opts, "accel");
+>                   if (!optarg || is_help_option(optarg)) {
+> -                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+> +                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
+>                       exit(0);
+>                   }
+>                   opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
