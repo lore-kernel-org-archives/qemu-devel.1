@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47789)
+Received: from eggs.gnu.org ([209.51.188.92]:57462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKW-00042a-Er
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDbYt-0004ei-4k
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKU-0007yO-2v
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:24 -0400
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:54290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDbKT-0007vc-Mo
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:21 -0400
-Received: by mail-it1-x141.google.com with SMTP id a190so1436731ite.4
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:57:19 -0700 (PDT)
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Date: Mon,  8 Apr 2019 16:55:52 -0400
-Message-Id: <431abaf842f7e8c41f0e06aee4d084c903f454b8.1554755001.git.stephen.checkoway@oberlin.edu>
+	(envelope-from <no-reply@patchew.org>) id 1hDbYj-0003K0-90
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:12:10 -0400
+Resent-Message-Id: <E1hDbYj-0003K0-90@eggs.gnu.org>
+Message-ID: <155475788029.12882.3177437800544924153@76452e4e88f2>
 In-Reply-To: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/10] block/pflash_cfi02: Implement erase
- suspend/resume
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 8 Apr 2019 14:11:21 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
+ missing AMD pflash functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,495 +24,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: stephen.checkoway@oberlin.edu
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-During a sector erase (but not a chip erase), the embeded erase program
-can be suspended. Once suspended, the sectors not selected for erasure
-may be read and programmed. Autoselect mode is allowed during erase
-suspend mode. Presumably, CFI queries are similarly allowed so this
-commit allows them as well.
-
-Since guest firmware can use status bits DQ7, DQ6, DQ3, and DQ2 to
-determine the current state of sector erasure, these bits are properly
-implemented.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
----
- hw/block/pflash_cfi02.c   | 153 ++++++++++++++++++++++++++++++++++----
- tests/pflash-cfi02-test.c | 102 +++++++++++++++++++++++++
- 2 files changed, 241 insertions(+), 14 deletions(-)
-
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 4f773f9229..f8a7314dee 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -29,7 +29,6 @@
-  * - CFI queries
-  *
-  * It does not implement software data protection as found in many real chips
-- * It does not implement erase suspend/resume commands
-  */
- 
- #include "qemu/osdep.h"
-@@ -37,6 +36,7 @@
- #include "hw/block/block.h"
- #include "hw/block/flash.h"
- #include "qapi/error.h"
-+#include "qemu/bitmap.h"
- #include "qemu/timer.h"
- #include "sysemu/block-backend.h"
- #include "qemu/host-utils.h"
-@@ -72,6 +72,7 @@ struct PFlashCFI02 {
-     BlockBackend *blk;
-     uint32_t uniform_nb_blocs;
-     uint32_t uniform_sector_len;
-+    uint32_t total_sectors;
-     uint32_t nb_blocs[PFLASH_MAX_ERASE_REGIONS];
-     uint32_t sector_len[PFLASH_MAX_ERASE_REGIONS];
-     uint64_t total_len;
-@@ -106,6 +107,8 @@ struct PFlashCFI02 {
-     int rom_mode;
-     int read_counter; /* used for lazy switch-back to rom mode */
-     int sectors_to_erase;
-+    uint64_t erase_time_remaining;
-+    unsigned long *sector_erase_map;
-     char *name;
-     void *storage;
- };
-@@ -152,6 +155,14 @@ static inline void reset_dq3(PFlashCFI02 *pfl)
-     pfl->status &= ~(pfl->interleave_multiplier * 0x08);
- }
- 
-+/*
-+ * Toggle status bit DQ2.
-+ */
-+static inline void toggle_dq2(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^= pfl->interleave_multiplier * 0x04;
-+}
-+
- /*
-  * Set up replicated mappings of the same region.
-  */
-@@ -175,6 +186,29 @@ static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
-     pfl->rom_mode = rom_mode;
- }
- 
-+/*
-+ * Returns the time it takes to erase the number of sectors scheduled for
-+ * erasure based on CFI address 0x21 which is "Typical timeout per individual
-+ * block erase 2^N ms."
-+ */
-+static uint64_t pflash_erase_time(PFlashCFI02 *pfl)
-+{
-+    /*
-+     * If there are no sectors to erase (which can happen if all of the sectors
-+     * to be erased are protected), then erase takes 100 us. Protected sectors
-+     * aren't supported so this should never happen.
-+     */
-+    return ((1ULL << pfl->cfi_table[0x21]) * pfl->sectors_to_erase) * SCALE_US;
-+}
-+
-+/*
-+ * Returns true if the device is currently in erase suspend mode.
-+ */
-+static inline bool pflash_erase_suspend_mode(PFlashCFI02 *pfl)
-+{
-+    return pfl->erase_time_remaining > 0;
-+}
-+
- static void pflash_timer(void *opaque)
- {
-     PFlashCFI02 *pfl = opaque;
-@@ -189,12 +223,7 @@ static void pflash_timer(void *opaque)
-          */
-         if ((pfl->status & 0x08) == 0) {
-             assert_dq3(pfl);
--            /*
--             * CFI address 0x21 is "Typical timeout per individual block erase
--             * 2^N ms"
--             */
--            uint64_t timeout = ((1ULL << pfl->cfi_table[0x21]) *
--                                pfl->sectors_to_erase) * 1000000;
-+            uint64_t timeout = pflash_erase_time(pfl);
-             timer_mod(&pfl->timer,
-                       qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + timeout);
-             DPRINTF("%s: erase timeout fired; erasing %d sectors\n",
-@@ -202,6 +231,7 @@ static void pflash_timer(void *opaque)
-             return;
-         }
-         DPRINTF("%s: sector erase complete\n", __func__);
-+        bitmap_zero(pfl->sector_erase_map, pfl->total_sectors);
-         pfl->sectors_to_erase = 0;
-         reset_dq3(pfl);
-     }
-@@ -240,25 +270,45 @@ static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
-     return ret;
- }
- 
-+typedef struct {
-+    uint32_t len;
-+    uint32_t num;
-+} SectorInfo;
-+
- /*
-  * offset should be a byte offset of the QEMU device and _not_ a device
-  * offset.
-  */
--static uint32_t pflash_sector_len(PFlashCFI02 *pfl, hwaddr offset)
-+static SectorInfo pflash_sector_info(PFlashCFI02 *pfl, hwaddr offset)
- {
-     assert(offset < pfl->total_len);
-     int nb_regions = pfl->cfi_table[0x2C];
-     hwaddr addr = 0;
-+    uint32_t sector_num = 0;
-     for (int i = 0; i < nb_regions; ++i) {
-         uint64_t region_size = (uint64_t)pfl->nb_blocs[i] * pfl->sector_len[i];
-         if (addr <= offset && offset < addr + region_size) {
--            return pfl->sector_len[i];
-+            return (SectorInfo) {
-+                .len = pfl->sector_len[i],
-+                .num = sector_num + (offset - addr) / pfl->sector_len[i],
-+            };
-         }
-+        sector_num += pfl->nb_blocs[i];
-         addr += region_size;
-     }
-     abort();
- }
- 
-+/*
-+ * Returns true if the offset refers to a flash sector that is currently being
-+ * erased.
-+ */
-+static bool pflash_sector_is_erasing(PFlashCFI02 *pfl, hwaddr offset)
-+{
-+    long sector_num = pflash_sector_info(pfl, offset).num;
-+    return test_bit(sector_num, pfl->sector_erase_map);
-+}
-+
- static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
- {
-     PFlashCFI02 *pfl = opaque;
-@@ -285,6 +335,15 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-     case 0x80:
-         /* We accept reads during second unlock sequence... */
-     case 0x00:
-+        if (pflash_erase_suspend_mode(pfl) &&
-+            pflash_sector_is_erasing(pfl, offset)) {
-+            /* Toggle bit 2, but not 6. */
-+            toggle_dq2(pfl);
-+            /* Status register read */
-+            ret = pfl->status;
-+            DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-+            break;
-+        }
-         /* Flash area read */
-         return pflash_data_read(pfl, offset, width);
-     case 0x90:
-@@ -313,14 +372,16 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-         DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n",
-                 __func__, device_addr & 0xFF, ret);
-         break;
--    case 0xA0:
-     case 0x10:
-     case 0x30:
-+        /* Toggle bit 2 during erase, but not program. */
-+        toggle_dq2(pfl);
-+    case 0xA0:
-+        /* Toggle bit 6 */
-+        toggle_dq6(pfl);
-         /* Status register read */
-         ret = pfl->status;
-         DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
--        /* Toggle bit 6 */
--        toggle_dq6(pfl);
-         break;
-     case 0x98:
-         /* CFI query mode */
-@@ -351,7 +412,8 @@ static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
- 
- static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
- {
--    uint64_t sector_len = pflash_sector_len(pfl, offset);
-+    SectorInfo sector_info = pflash_sector_info(pfl, offset);
-+    uint64_t sector_len = sector_info.len;
-     offset &= ~(sector_len - 1);
-     DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
-             __func__, pfl->bank_width * 2, offset,
-@@ -363,6 +425,7 @@ static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
-     }
-     set_dq7(pfl, 0x00);
-     ++pfl->sectors_to_erase;
-+    set_bit(sector_info.num, pfl->sector_erase_map);
-     /* Set (or reset) the 50 us timer for additional erase commands.  */
-     timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 50000);
- }
-@@ -426,6 +489,25 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             pfl->cmd = 0x98;
-             return;
-         }
-+        /* Handle erase resume in erase suspend mode, otherwise reset. */
-+        if (cmd == 0x30) {
-+            if (pflash_erase_suspend_mode(pfl)) {
-+                /* Resume the erase. */
-+                timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+                          pfl->erase_time_remaining);
-+                pfl->erase_time_remaining = 0;
-+                pfl->wcycle = 6;
-+                pfl->cmd = 0x30;
-+                set_dq7(pfl, 0x00);
-+                assert_dq3(pfl);
-+                return;
-+            }
-+            goto reset_flash;
-+        }
-+        /* Ignore erase suspend. */
-+        if (cmd == 0xB0) {
-+            return;
-+        }
-         if (masked_addr != pfl->unlock_addr0 || cmd != 0xAA) {
-             DPRINTF("%s: unlock0 failed %04x %02x %04x\n",
-                     __func__, masked_addr, cmd, pfl->unlock_addr0);
-@@ -471,6 +553,14 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             /* We need another unlock sequence */
-             goto check_unlock0;
-         case 0xA0:
-+            if (pflash_erase_suspend_mode(pfl) &&
-+                pflash_sector_is_erasing(pfl, offset)) {
-+                /* Ignore writes to erasing sectors. */
-+                if (pfl->bypass) {
-+                    goto do_bypass;
-+                }
-+                goto reset_flash;
-+            }
-             trace_pflash_data_write(offset, value, width, 0);
-             if (!pfl->ro) {
-                 p = (uint8_t *)pfl->storage + offset;
-@@ -529,6 +619,10 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-         }
-         break;
-     case 5:
-+        if (pflash_erase_suspend_mode(pfl)) {
-+            /* Erasing is not supported in erase suspend mode. */
-+            goto reset_flash;
-+        }
-         switch (cmd) {
-         case 0x10:
-             if (masked_addr != pfl->unlock_addr0) {
-@@ -563,6 +657,30 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             /* Ignore writes during chip erase */
-             return;
-         case 0x30:
-+            if (cmd == 0xB0) {
-+                /*
-+                 * If erase suspend happens during the erase timeout (so DQ3 is
-+                 * 0), then the device suspends erasing immediately. Set the
-+                 * remaining time to be the total time to erase. Otherwise,
-+                 * there is a maximum amount of time it can take to enter
-+                 * suspend mode. Let's ignore that and suspend immediately and
-+                 * set the remaining time to the actual time remaining on the
-+                 * timer.
-+                 */
-+                if ((pfl->status & 0x08) == 0) {
-+                    pfl->erase_time_remaining = pflash_erase_time(pfl);
-+                } else {
-+                    int64_t delta = timer_expire_time_ns(&pfl->timer) -
-+                        qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+                    /* Make sure we have a positive time remaining. */
-+                    pfl->erase_time_remaining = delta <= 0 ? 1 : delta;
-+                }
-+                reset_dq3(pfl);
-+                timer_del(&pfl->timer);
-+                pfl->wcycle = 0;
-+                pfl->cmd = 0;
-+                return;
-+            }
-             /*
-              * If DQ3 is 0, additional sector erase commands can be
-              * written and anything else (other than an erase suspend) resets
-@@ -727,10 +845,12 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-     int num_devices = pfl->bank_width / pfl->device_width;
-     int nb_regions;
-     pfl->total_len = 0;
-+    pfl->total_sectors = 0;
-     for (nb_regions = 0; nb_regions < PFLASH_MAX_ERASE_REGIONS; ++nb_regions) {
-         if (pfl->nb_blocs[nb_regions] == 0) {
-             break;
-         }
-+        pfl->total_sectors += pfl->nb_blocs[nb_regions];
-         uint64_t sector_len_per_device = pfl->sector_len[nb_regions] /
-                                          num_devices;
- 
-@@ -765,6 +885,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-         pfl->nb_blocs[0] = pfl->uniform_nb_blocs;
-         pfl->sector_len[0] = pfl->uniform_sector_len;
-         pfl->total_len = uniform_len;
-+        pfl->total_sectors = pfl->uniform_nb_blocs;
-     } else if (uniform_len != 0 && uniform_len != pfl->total_len) {
-         error_setg(errp, "\"num-blocks\"*\"sector-length\" "
-                    "different from \"num-blocks0\"*\'sector-length0\" + ... + "
-@@ -789,6 +910,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-     pfl->unlock_addr0 &= 0x7FF;
-     pfl->unlock_addr1 &= 0x7FF;
- 
-+    /* Allocate memory for a bitmap for sectors being erased. */
-+    pfl->sector_erase_map = bitmap_new(pfl->total_sectors);
-+
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -896,7 +1020,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-     pfl->cfi_table[0x44] = '0';
- 
-     pfl->cfi_table[0x45] = 0x00; /* Address sensitive unlock required. */
--    pfl->cfi_table[0x46] = 0x00; /* Erase suspend not supported. */
-+    pfl->cfi_table[0x46] = 0x02; /* Erase suspend to read/write. */
-     pfl->cfi_table[0x47] = 0x00; /* Sector protect not supported. */
-     pfl->cfi_table[0x48] = 0x00; /* Temporary sector unprotect not supported. */
- 
-@@ -938,6 +1062,7 @@ static void pflash_cfi02_unrealize(DeviceState *dev, Error **errp)
- {
-     PFlashCFI02 *pfl = PFLASH_CFI02(dev);
-     timer_del(&pfl->timer);
-+    g_free(pfl->sector_erase_map);
- }
- 
- static void pflash_cfi02_class_init(ObjectClass *klass, void *data)
-diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-index dad16aaf52..67a639d888 100644
---- a/tests/pflash-cfi02-test.c
-+++ b/tests/pflash-cfi02-test.c
-@@ -45,6 +45,8 @@ typedef struct {
- #define CHIP_ERASE_CMD 0x10
- #define UNLOCK_BYPASS_CMD 0x20
- #define UNLOCK_BYPASS_RESET_CMD 0x00
-+#define ERASE_SUSPEND_CMD 0xB0
-+#define ERASE_RESUME_CMD SECTOR_ERASE_CMD
- 
- typedef struct {
-     /* Interleave configuration. */
-@@ -267,6 +269,16 @@ static void chip_erase(const FlashConfig *c)
-     flash_cmd(c, UNLOCK0_ADDR, CHIP_ERASE_CMD);
- }
- 
-+static void erase_suspend(const FlashConfig *c)
-+{
-+    flash_cmd(c, FLASH_ADDR(0), ERASE_SUSPEND_CMD);
-+}
-+
-+static void erase_resume(const FlashConfig *c)
-+{
-+    flash_cmd(c, FLASH_ADDR(0), ERASE_RESUME_CMD);
-+}
-+
- /*
-  * Test flash commands with a variety of device geometry.
-  */
-@@ -345,6 +357,7 @@ static void test_geometry(const void *opaque)
-     const uint64_t dq7 = replicate(c, 0x80);
-     const uint64_t dq6 = replicate(c, 0x40);
-     const uint64_t dq3 = replicate(c, 0x08);
-+    const uint64_t dq2 = replicate(c, 0x04);
- 
-     uint64_t byte_addr = 0;
-     for (int region = 0; region < nb_erase_regions; ++region) {
-@@ -485,6 +498,95 @@ static void test_geometry(const void *opaque)
-         }
-     }
- 
-+    /* Test erase suspend/resume during erase timeout. */
-+    sector_erase(c, 0);
-+    /*
-+     * Check that DQ 3 is 0 and DQ6 and DQ2 are toggling in the sector being
-+     * erased as well as in a sector not being erased.
-+     */
-+    byte_addr = c->sector_len[0];
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq3, ==, 0);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    status0 = flash_read(c, byte_addr);
-+    status1 = flash_read(c, byte_addr);
-+    g_assert_cmpint(status0 & dq3, ==, 0);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+
-+    /*
-+     * Check that after suspending, DQ6 does not toggle but DQ2 does toggle in
-+     * an erase suspended sector but that neither toggle (we should be
-+     * getting data) in a sector not being erased.
-+     */
-+    erase_suspend(c);
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq6, ==, status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    g_assert_cmpint(flash_read(c, byte_addr), ==, flash_read(c, byte_addr));
-+
-+    /* Check that after resuming, DQ3 is 1 and DQ6 and DQ2 toggle. */
-+    erase_resume(c);
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    status0 = flash_read(c, byte_addr);
-+    status1 = flash_read(c, byte_addr);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    wait_for_completion(c, 0);
-+
-+    /* Repeat this process but this time suspend after the timeout. */
-+    sector_erase(c, 0);
-+    clock_step_next();
-+    /*
-+     * Check that DQ 3 is 1 and DQ6 and DQ2 are toggling in the sector being
-+     * erased as well as in a sector not being erased.
-+     */
-+    byte_addr = c->sector_len[0];
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    status0 = flash_read(c, byte_addr);
-+    status1 = flash_read(c, byte_addr);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+
-+    /*
-+     * Check that after suspending, DQ6 does not toggle but DQ2 does toggle in
-+     * an erase suspended sector but that neither toggle (we should be
-+     * getting data) in a sector not being erased.
-+     */
-+    erase_suspend(c);
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq6, ==, status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    g_assert_cmpint(flash_read(c, byte_addr), ==, flash_read(c, byte_addr));
-+
-+    /* Check that after resuming, DQ3 is 1 and DQ6 and DQ2 toggle. */
-+    erase_resume(c);
-+    status0 = flash_read(c, 0);
-+    status1 = flash_read(c, 0);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    status0 = flash_read(c, byte_addr);
-+    status1 = flash_read(c, byte_addr);
-+    g_assert_cmpint(status0 & dq3, ==, dq3);
-+    g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+    g_assert_cmpint(status0 & dq2, ==, ~status1 & dq2);
-+    wait_for_completion(c, 0);
-+
-     qtest_quit(global_qtest);
- }
- 
--- 
-2.20.1 (Apple Git-117)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTU0NzU1MDAxLmdp
+dC5zdGVwaGVuLmNoZWNrb3dheUBvYmVybGluLmVkdS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogY292ZXIuMTU1NDc1NTAwMS5naXQuc3Rl
+cGhlbi5jaGVja293YXlAb2Jlcmxpbi5lZHUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAw
+MC8xMF0gYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgbWlzc2luZyBBTUQgcGZsYXNoIGZ1
+bmN0aW9uYWxpdHkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3L2NvdmVyLjE1NTQ3NTUwMDEuZ2l0LnN0ZXBoZW4uY2hlY2tv
+d2F5QG9iZXJsaW4uZWR1IC0+IHBhdGNoZXcvY292ZXIuMTU1NDc1NTAwMS5naXQuc3RlcGhlbi5j
+aGVja293YXlAb2Jlcmxpbi5lZHUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMDU1
+MmQ2ZDRiIGJsb2NrL3BmbGFzaF9jZmkwMjogVXNlIHRoZSBjaGlwIGVyYXNlIHRpbWUgc3BlY2lm
+aWVkIGluIHRoZSBDRkkgdGFibGUKZThjNWNiODI4NSBibG9jay9wZmxhc2hfY2ZpMDI6IEltcGxl
+bWVudCBlcmFzZSBzdXNwZW5kL3Jlc3VtZQowNmVhODI3MzkzIGJsb2NrL3BmbGFzaF9jZmkwMjog
+SW1wbGVtZW50IG11bHRpLXNlY3RvciBlcmFzZQo2Y2ZkNmY0MTEyIGJsb2NrL3BmbGFzaF9jZmkw
+MjogRml4IHJlc2V0IGNvbW1hbmQgbm90IGlnbm9yZWQgZHVyaW5nIGVyYXNlCmEyZGQxNzZjYTIg
+YmxvY2svcGZsYXNoX2NmaTAyOiBGaXggQ0ZJIGluIGF1dG9zZWxlY3QgbW9kZQpkNmFhYzI2NDk3
+IGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG5vbnVuaWZvcm0gc2VjdG9yIHNpemVzCjc4
+MjM4MjVhNDUgYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgaW50ZXJlbGVhdmVkIGZsYXNo
+IGRldmljZXMKMGU4MzIwZTU3OCBibG9jay9wZmxhc2hfY2ZpMDI6IEZpeCBjb21tYW5kIGFkZHJl
+c3MgY29tcGFyaXNvbgoyZDg2ZGJlOWE1IGJsb2NrL3BmbGFzaF9jZmkwMjogUmVmYWN0b3IsIE5G
+QyBpbnRlbmRlZAplZjViYzk0MjE5IGJsb2NrL3BmbGFzaF9jZmkwMjogQWRkIHRlc3QgZm9yIHN1
+cHBvcnRlZCBjb21tYW5kcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
+aXQgZWY1YmM5NDIxOTY0IChibG9jay9wZmxhc2hfY2ZpMDI6IEFkZCB0ZXN0IGZvciBzdXBwb3J0
+ZWQgY29tbWFuZHMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjc6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjE6CisjZGVmaW5lIE1QX0ZMQVNIX1NJWkVf
+TUFYICgzMioxMDI0KjEwMjQpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjc6IEZJTEU6IHRl
+c3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjE6CisjZGVmaW5lIE1QX0ZMQVNIX1NJWkVfTUFYICgz
+MioxMDI0KjEwMjQpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM2ODogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoyMjoKKyNkZWZpbmUgQkFTRV9BRERSICgweDEwMDAwMDAw
+MFVMTC1NUF9GTEFTSF9TSVpFX01BWCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNzE6
+IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjU6CisjZGVmaW5lIENGSV9BRERSIChG
+TEFTSF9XSURUSCoweDU1KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzcyOiBGSUxFOiB0ZXN0
+cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjI2OgorI2RlZmluZSBVTkxPQ0swX0FERFIgKEZMQVNIX1dJ
+RFRIKjB4NTU1NSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNzM6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6Mjc6CisjZGVmaW5lIFVOTE9DSzFfQUREUiAoRkxBU0hfV0lE
+VEgqMHgyQUFBKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNjI6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MTE2OgorICAgIGdfYXNzZXJ0X2NtcGludChmbGFzaF9yZWFk
+KEZMQVNIX1dJRFRIKjB4MDAwMCksID09LCAweDAwQkYpOwogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnKicgKGN0eDpWeFYpCiMxNjM6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTE3
+OgorICAgIGdfYXNzZXJ0X2NtcGludChmbGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MDAwMSksID09
+LCAweDIzNkQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNjg6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTIyOgorICAgIGdfYXNzZXJ0X2NtcGludChm
+bGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MTApLCA9PSwgJ1EnKTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJyonIChjdHg6VnhWKQojMTY5OiBGSUxFOiB0ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5j
+OjEyMzoKKyAgICBnX2Fzc2VydF9jbXBpbnQoZmxhc2hfcmVhZChGTEFTSF9XSURUSCoweDExKSwg
+PT0sICdSJyk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzE3MDogRklM
+RTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjQ6CisgICAgZ19hc3NlcnRfY21waW50KGZs
+YXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgxMiksID09LCAnWScpOwogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzE3MTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjU6CisgICAgZ19hc3Nl
+cnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyQyksID49LCAxKTsgLyogTnVtIGVy
+YXNlIHJlZ2lvbnMuICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAo
+Y3R4OlZ4VikKIzE3MTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjU6CisgICAg
+Z19hc3NlcnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyQyksID49LCAxKTsgLyog
+TnVtIGVyYXNlIHJlZ2lvbnMuICovCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4
+VikKIzE3MjogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjY6CisgICAgdWludDMy
+X3QgbmJfc2VjdG9ycyA9IGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyRCkgKwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
+ZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNzM6IEZJTEU6IHRlc3RzL3BmbGFz
+aC1jZmkwMi10ZXN0LmM6MTI3OgorICAgICAgICAgICAgICAgICAgICAgICAgICAoZmxhc2hfcmVh
+ZChGTEFTSF9XSURUSCoweDJFKSA8PCA4KSArIDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
+dGhhdCAnKicgKGN0eDpWeFYpCiMxNzQ6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6
+MTI4OgorICAgIHVpbnQzMl90IHNlY3Rvcl9sZW4gPSAoZmxhc2hfcmVhZChGTEFTSF9XSURUSCow
+eDJGKSA8PCA4KSArCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYp
+CiMxNzU6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTI5OgorICAgICAgICAgICAg
+ICAgICAgICAgICAgICAoZmxhc2hfcmVhZChGTEFTSF9XSURUSCoweDMwKSA8PCAxNik7CiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMyNTQ6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MjA4OgorICAgIGlmIChmdHJ1bmNhdGUoZmQsIDgqMTAyNCox
+MDI0KSA8IDApIHsKICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMyNTQ6IEZJTEU6IHRlc3RzL3BmbGFzaC1j
+ZmkwMi10ZXN0LmM6MjA4OgorICAgIGlmIChmdHJ1bmNhdGUoZmQsIDgqMTAyNCoxMDI0KSA8IDAp
+IHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMTggZXJyb3JzLCAyIHdh
+cm5pbmdzLCAyMzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKMi8xMCBDaGVja2luZyBjb21taXQgMmQ4NmRiZTlhNTZmIChibG9jay9wZmxhc2hf
+Y2ZpMDI6IFJlZmFjdG9yLCBORkMgaW50ZW5kZWQpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
+dW5kIHRoYXQgJz8nIChjdHg6VnhXKQojMTAxOiBGSUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIu
+YzoxNzI6CisgICAgdWludDY0X3QgcmV0ID0gcGZsLT5iZT8gbGRuX2JlX3AocCwgd2lkdGgpIDog
+bGRuX2xlX3AocCwgd2lkdGgpOwogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDM0MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzEwIENoZWNraW5nIGNvbW1pdCAwZTgzMjBlNTc4YjEg
+KGJsb2NrL3BmbGFzaF9jZmkwMjogRml4IGNvbW1hbmQgYWRkcmVzcyBjb21wYXJpc29uKQpFUlJP
+Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzU1OiBGSUxFOiB0
+ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjI2OgorI2RlZmluZSBVTkxPQ0swX0FERFIgKEZMQVNI
+X1dJRFRIKjB4NTU1KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM1NjogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoyNzoKKyNkZWZpbmUgVU5MT0NLMV9BRERSIChGTEFTSF9X
+SURUSCoweDJBQSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjU6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MTk1OgorICAgIGZsYXNoX3dyaXRlKEZMQVNIX1dJRFRIKjB4
+NTU1NSwgVU5MT0NLMF9DTUQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM2NjogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxOTY6CisgICAgZmxhc2hfd3JpdGUoRkxBU0hfV0lEVEgq
+MHgyQUFBLCBVTkxPQ0sxX0NNRCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzY3OiBGSUxFOiB0
+ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjE5NzoKKyAgICBmbGFzaF93cml0ZShGTEFTSF9XSURU
+SCoweDU1NTUsIEFVVE9TRUxFQ1RfQ01EKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjg6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTk4OgorICAgIGdfYXNzZXJ0X2NtcGludChm
+bGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MDAwMCksID09LCAweDAwQkYpOwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM2OTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRl
+c3QuYzoxOTk6CisgICAgZ19hc3NlcnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgw
+MDAxKSwgPT0sIDB4MjM2RCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgp0b3RhbDogNyBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTAgQ2hlY2tpbmcgY29tbWl0
+IDc4MjM4MjVhNDVjYyAoYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgaW50ZXJlbGVhdmVk
+IGZsYXNoIGRldmljZXMpCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVkdW5kYW50IGNvbnNpZGVy
+IHJlbW92aW5nIGl0CiMyMTQ6IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjMwMDoKKyNp
+ZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDk5NSBsaW5lcyBjaGVja2VkCgpQYXRj
+aCA0LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzEwIENoZWNraW5nIGNvbW1pdCBk
+NmFhYzI2NDk3M2QgKGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG5vbnVuaWZvcm0gc2Vj
+dG9yIHNpemVzKQo2LzEwIENoZWNraW5nIGNvbW1pdCBhMmRkMTc2Y2EyYjYgKGJsb2NrL3BmbGFz
+aF9jZmkwMjogRml4IENGSSBpbiBhdXRvc2VsZWN0IG1vZGUpCjcvMTAgQ2hlY2tpbmcgY29tbWl0
+IDZjZmQ2ZjQxMTJkYiAoYmxvY2svcGZsYXNoX2NmaTAyOiBGaXggcmVzZXQgY29tbWFuZCBub3Qg
+aWdub3JlZCBkdXJpbmcgZXJhc2UpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUo
+cykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3
+LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzEwIENoZWNraW5nIGNvbW1pdCAwNmVh
+ODI3MzkzMzAgKGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG11bHRpLXNlY3RvciBlcmFz
+ZSkKOS8xMCBDaGVja2luZyBjb21taXQgZThjNWNiODI4NWI0IChibG9jay9wZmxhc2hfY2ZpMDI6
+IEltcGxlbWVudCBlcmFzZSBzdXNwZW5kL3Jlc3VtZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGIw
+NTUyZDZkNGJmMiAoYmxvY2svcGZsYXNoX2NmaTAyOiBVc2UgdGhlIGNoaXAgZXJhc2UgdGltZSBz
+cGVjaWZpZWQgaW4gdGhlIENGSSB0YWJsZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU1NDc1NTAwMS5naXQuc3RlcGhlbi5jaGVja293
+YXlAb2Jlcmxpbi5lZHUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
