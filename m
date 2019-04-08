@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35929)
+Received: from eggs.gnu.org ([209.51.188.92]:36406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDS1X-0005zC-1W
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:01:12 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDS30-0006xr-O9
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDS1W-0004cF-0C
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:01:10 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45566)
+	(envelope-from <philmd@redhat.com>) id 1hDS2z-0005ZT-M5
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:02:42 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDS1V-0004bu-Ok
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:01:09 -0400
-Received: by mail-wr1-f66.google.com with SMTP id s15so15769493wra.12
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 04:01:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDS2z-0005YS-D9
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:02:41 -0400
+Received: by mail-wr1-f65.google.com with SMTP id y7so219627wrn.11
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 04:02:41 -0700 (PDT)
 References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-14-armbru@redhat.com>
+	<20190408083627.7479-15-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3fd43de9-8dd8-67c9-0525-0d4f44dd7422@redhat.com>
-Date: Mon, 8 Apr 2019 13:01:07 +0200
+Message-ID: <606bbd80-1981-55d3-d42e-6a0c8f8a32e8@redhat.com>
+Date: Mon, 8 Apr 2019 13:02:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190408083627.7479-14-armbru@redhat.com>
+In-Reply-To: <20190408083627.7479-15-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/15] blockdev: Make -drive format=help
- print to stdout
+Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
+ stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +32,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 On 4/8/19 10:36 AM, Markus Armbruster wrote:
 > Command line help explicitly requested by the user should be printed
-> to stdout, not stderr.  We do elsewhere.  Adjust -drive to match: use
-> qemu_printf() instead of error_printf().  Plain printf() would be
-> wrong because we need to print to the current monitor for "drive_add
-> ... format=help".
+> to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
+> use qemu_printf() instead of error_printf().  Plain printf() would be
+> wrong because we need to print to the current monitor for chardev-add
+> help".
 > 
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
+> Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  blockdev.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  chardev/char.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/blockdev.c b/blockdev.c
-> index 4775a07d93..79fbac8450 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -40,6 +40,7 @@
->  #include "monitor/monitor.h"
->  #include "qemu/error-report.h"
->  #include "qemu/option.h"
-> +#include "qemu/qemu-print.h"
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 514cd6b0c3..54724a56b1 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -28,6 +28,7 @@
+>  #include "sysemu/sysemu.h"
 >  #include "qemu/config-file.h"
->  #include "qapi/qapi-commands-block.h"
->  #include "qapi/qapi-commands-transaction.h"
-> @@ -301,7 +302,7 @@ DriveInfo *drive_get_next(BlockInterfaceType type)
+>  #include "qemu/error-report.h"
+> +#include "qemu/qemu-print.h"
+>  #include "chardev/char.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-char.h"
+> @@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMainContext *context,
 >  
->  static void bdrv_format_print(void *opaque, const char *name)
->  {
-> -    error_printf(" %s", name);
-> +    qemu_printf(" %s", name);
->  }
+>          chardev_name_foreach(help_string_append, str);
 >  
->  typedef struct {
-> @@ -530,11 +531,11 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
->  
->      if ((buf = qemu_opt_get(opts, "format")) != NULL) {
->          if (is_help_option(buf)) {
-> -            error_printf("Supported formats:");
-> +            qemu_printf("Supported formats:");
->              bdrv_iterate_format(bdrv_format_print, NULL, false);
-> -            error_printf("\nSupported formats (read-only):");
-> +            qemu_printf("\nSupported formats (read-only):");
->              bdrv_iterate_format(bdrv_format_print, NULL, true);
-> -            error_printf("\n");
-> +            qemu_printf("\n");
->              goto early_err;
->          }
->  
+> -        error_printf("Available chardev backend types: %s\n", str->str);
+> +        qemu_printf("Available chardev backend types: %s\n", str->str);
+>          g_string_free(str, true);
+>          return NULL;
+>      }
 > 
