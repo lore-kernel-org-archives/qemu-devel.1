@@ -1,68 +1,82 @@
-Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9E3C04AAB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6BDC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:14:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D95E20830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:56:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D95E20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B25E2148E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:14:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tD+QnaiA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B25E2148E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53079 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54603 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNZQA-0006kh-KF
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:56:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59282)
+	id 1hDVyz-0001A8-Lm
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:14:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hNZPH-000634-Tn
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:55:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDVuT-0006gH-Tb
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hNZPG-0002FD-IY
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:55:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hNZPC-000284-Gd; Mon, 06 May 2019 04:55:27 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25AA730917AF;
-	Mon,  6 May 2019 08:55:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A3CB319C4F;
-	Mon,  6 May 2019 08:55:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 0D0981132B35; Mon,  6 May 2019 10:55:20 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-References: <20190505230140.5661-1-philmd@redhat.com>
-Date: Mon, 06 May 2019 10:55:20 +0200
-In-Reply-To: <20190505230140.5661-1-philmd@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 6 May 2019 01:01:40
-	+0200")
-Message-ID: <87sgtsrmh3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <peter.maydell@linaro.org>) id 1hDVuS-0001r2-GR
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:09 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDVuR-0001p8-3k
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:07 -0400
+Received: by mail-oi1-x244.google.com with SMTP id a6so10840290oie.5
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 08:10:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=cUkeSrQAHzjGcNApECfcnTh5/SQ40V50xV20vC7imXQ=;
+	b=tD+QnaiAro/cLno4JqeNSCJX2NXZe2u5EDmoNd6/9HBeL4eppfDnT+Mo7jE+nIoIf6
+	ewH1/UuCEInPRCjm8TKtU6BZ6T0mJUxOKXKcM/O7jq9DJCEDl4bI5XFnhxoeJ2dERrof
+	I+oS1dwRSrhLxwGA1DwvJDRZUGHz+gqh+VWF9wky6RYZDgbTCM0yEda/h0U5Bb1OMTpJ
+	B2Q0a/n63lOXgy/YRT7fDBSpXCOKd2SW33dL4hX38JcPSsoRfFk02Ge5aMXfvs61ePIx
+	qPtXpcGvjzrgXZj06zDU62hB0yi9KfQINjD4D31GAp+3T9FFoBVbWJVTNUpUKYPwpcIR
+	7IBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=cUkeSrQAHzjGcNApECfcnTh5/SQ40V50xV20vC7imXQ=;
+	b=tCY20pMq4xTKeCZdUxSJuWmgb96wY+XfKijf5jQOConpC3hYGvlYxhpMcwXIZvXBxJ
+	em8+vq+69GXREnMSFhuGpk2bWLKoh/zq2CHTwqwUa91/WfR81J0nZL+wOpRX0pDD8UUf
+	J6ojTQV6X9w9PMVxM5Sx6SiPh//EuWHLf8xDsjp6anbzowEonfpkeNEwYTRbDWno9McV
+	enNtYZQUa29VeKFeFpPMVjOvAEevr2yhmoFSE4+1NMmXji4oOTir41+TXM/USMw97Kmm
+	svoZcq7JvG4u9iZF5rvi/FsjQaxypju2VkUsSBemqh1yihSlo9gmE3Kq/8E6nYIJuMIT
+	h86w==
+X-Gm-Message-State: APjAAAXhstkvb80DQW4QoSq6IUFk0ZFVojEvcd+ox/PFp1G93DDKQLbq
+	VFtomVRa0mb2b+UEzjKdz00LP5nELLjeU4m0FUk+AhU8
+X-Google-Smtp-Source: APXvYqxYdzu56MA5cjDE4KSuuFWAc3uXYcGXoPJB9rXHfC4+mZxo3v3N20lpROLmFRk5WL9CZWjo8j8Vbw4ytdBI23c=
+X-Received: by 2002:aca:b3c2:: with SMTP id c185mr16979223oif.98.1554736204809;
+	Mon, 08 Apr 2019 08:10:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Mon, 06 May 2019 08:55:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hw/sd/sdcard: Use the available enums
+References: <20190408145721.15881-1-sohailalvi2236@gmail.com>
+In-Reply-To: <20190408145721.15881-1-sohailalvi2236@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Apr 2019 16:09:53 +0100
+Message-ID:
+ <CAFEAcA-D0MK_eEs+tvPsdp+2s9YuC=qS=uyhzNtqy3DW9-=rNQ@mail.gmail.com>
+To: sohailalvi2236@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH] qemu_system_reset_request() in hw/
+ corresponding to watchdog that has triggered replaced by
+ watchdog_perform_action().
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,61 +88,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Juan Quintela <quintela@redhat.com>,
-	qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>,
-	Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190408150953.MfETo-sSnX-LD00hbFFXfLa1D73mErSFVxoF7PKmJkg@z>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> We already define SDCardModes/SDCardStates as enums. Declare
-> the mode/state as enums too, this make gdb debugging sessions
-> friendlier: instead of numbers, the mode/state name is displayed.
+On Mon, 8 Apr 2019 at 15:59, <sohailalvi2236@gmail.com> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> From: Sohail Alvi <sohailalvi2236@gmail.com>
+>
 > ---
->  hw/sd/sd.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/arm/musicpal.c        | 3 ++-
+>  hw/ppc/ppc.c             | 3 ++-
+>  hw/s390x/ipl.c           | 3 ++-
+>  hw/timer/etraxfs_timer.c | 3 ++-
+>  hw/timer/m48t59.c        | 3 ++-
+>  hw/timer/pxa2xx_timer.c  | 3 ++-
+>  6 files changed, 12 insertions(+), 6 deletions(-)
+
+Hi; thanks for this patch. Unfortunately I think you've
+misunderstood the suggestion from the bitesize tasks page.
+(This is our fault, because the bitesize tasks list
+has accumulated a lot of tasks that really require
+some understanding of exactly what is being done, but
+don't make it clear in their description.)
+
+In this case the key phrase is "corresponding to a
+watchdog that has triggered". Not all calls to
+qemu_system_reset_request() are calls made by
+watchdog devices when their timer has triggered.
+If the call is not a watchdog timer timeout then
+it doesn't need changing. Some of the places you've
+changed here are watchdog timeouts, but some are not.
+
+I would also suggest that you have one patch per
+device you're changing -- all of these devices
+are parts of different machines which have different
+guest CPU architectures. That means that the people
+who can review and test the change are different
+for each device. Also if we have a patch per device
+it means that if there turns out to be a problem
+with the change for one of the devices it's easy
+to back that change out without affecting the others.
+
+I would also suggest that your commit message should
+have just a short description in the Subject line,
+and a more detailed description in the main body
+of the commit message. You can look at some of
+the commit messages in our git history to get an
+idea of our preferred style.
+
+> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+> index 93ec3c5698..84593e61cc 100644
+> --- a/hw/arm/musicpal.c
+> +++ b/hw/arm/musicpal.c
+> @@ -28,6 +28,7 @@
+>  #include "sysemu/block-backend.h"
+>  #include "exec/address-spaces.h"
+>  #include "ui/pixel_ops.h"
+> +#include "sysemu/watchdog.h"
 >
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index aaab15f3868..a66b3d5b45e 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -96,8 +96,8 @@ struct SDState {
->      BlockBackend *blk;
->      bool spi;
->=20=20
-> -    uint32_t mode;    /* current card mode, one of SDCardModes */
-> -    int32_t state;    /* current card state, one of SDCardStates */
-> +    enum SDCardModes mode;
-> +    enum SDCardStates state;
->      uint32_t vhs;
->      bool wp_switch;
->      unsigned long *wp_groups;
-> @@ -1640,7 +1640,7 @@ static int cmd_valid_while_locked(SDState *sd, SDRe=
-quest *req)
->=20=20
->  int sd_do_command(SDState *sd, SDRequest *req,
->                    uint8_t *response) {
-> -    int last_state;
-> +    enum SDCardStates last_state;
->      sd_rsp_type_t rtype;
->      int rsplen;
+>  #define MP_MISC_BASE            0x80002000
+>  #define MP_MISC_SIZE            0x00001000
+> @@ -898,7 +899,7 @@ static void mv88w8618_pit_write(void *opaque, hwaddr offset,
+>
+>      case MP_BOARD_RESET:
+>          if (value == MP_BOARD_RESET_MAGIC) {
+> -            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +            watchdog_perform_action();
+>          }
 
-These guys are part of the migration state:
+This isn't a watchdog timeout -- it's just a device
+register that allows the guest to request a board
+reset.
 
-   static const VMStateDescription sd_vmstate =3D {
-       .name =3D "sd-card",
-       .version_id =3D 1,
-       .minimum_version_id =3D 1,
-       .pre_load =3D sd_vmstate_pre_load,
-       .fields =3D (VMStateField[]) {
-           VMSTATE_UINT32(mode, SDState),
-           VMSTATE_INT32(state, SDState),
-   [...]
+>          break;
+>      }
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index ad20584f26..636d2046f8 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "kvm_ppc.h"
+>  #include "trace.h"
+> +#include "sysemu/watchdog.h"
+>
+>  //#define PPC_DEBUG_IRQ
+>  //#define PPC_DEBUG_TB
+> @@ -380,7 +381,7 @@ void ppc40x_chip_reset(PowerPCCPU *cpu)
+>  void ppc40x_system_reset(PowerPCCPU *cpu)
+>  {
+>      qemu_log_mask(CPU_LOG_RESET, "Reset PowerPC system\n");
+> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +    watchdog_perform_action();
+>  }
 
-Juan, David, are VMSTATE_UINT32() and VMSTATE_INT32() safe to use with
-enums?
+This isn't a watchdog either.
+
+>
+>  void store_40x_dbcr0(CPUPPCState *env, uint32_t val)
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 51b272e190..4783b41c57 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/option.h"
+>  #include "exec/exec-all.h"
+> +#include "sysemu/watchdog.h"
+>
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define LINUX_MAGIC_ADDR                0x010008UL
+> @@ -547,7 +548,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+>          /* ignore -no-reboot, send no event  */
+>          qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
+>      } else {
+> -        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +        watchdog_perform_action();
+
+Nor is this.
+
+>      }
+>      /* as this is triggered by a CPU, make sure to exit the loop */
+>      if (tcg_enabled()) {
+> diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
+> index 2280914b1d..9561113d0e 100644
+> --- a/hw/timer/etraxfs_timer.c
+> +++ b/hw/timer/etraxfs_timer.c
+> @@ -26,6 +26,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/timer.h"
+>  #include "hw/ptimer.h"
+> +#include "sysemu/watchdog.h"
+>
+>  #define D(x)
+>
+> @@ -207,7 +208,7 @@ static void watchdog_hit(void *opaque)
+>          qemu_irq_raise(t->nmi);
+>      }
+>      else
+> -        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +        watchdog_perform_action();
+
+This one really is a watchdog timeout, so this change
+is OK. (If you run your patch through scripts/checkpatch.pl
+you'll find that checkpatch advises adding some braces to
+this if statement, though.)
+
+
+>      t->wd_hits++;
+>  }
+> diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+> index ca3ed445de..ebe58e8dc7 100644
+> --- a/hw/timer/m48t59.c
+> +++ b/hw/timer/m48t59.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/sysbus.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/bcd.h"
+> +#include "sysemu/watchdog.h"
+>
+>  #include "m48t59-internal.h"
+>
+> @@ -158,7 +159,7 @@ static void watchdog_cb (void *opaque)
+>         NVRAM->buffer[0x1FF7] = 0x00;
+>         NVRAM->buffer[0x1FFC] &= ~0x40;
+>          /* May it be a hw CPU Reset instead ? */
+> -        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +        watchdog_perform_action();
+>      } else {
+>         qemu_set_irq(NVRAM->IRQ, 1);
+>         qemu_set_irq(NVRAM->IRQ, 0);
+
+Yes, this is a watchdog.
+
+> diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
+> index a489bf5159..2be680b5df 100644
+> --- a/hw/timer/pxa2xx_timer.c
+> +++ b/hw/timer/pxa2xx_timer.c
+> @@ -14,6 +14,7 @@
+>  #include "hw/arm/pxa.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/log.h"
+> +#include "sysemu/watchdog.h"
+>
+>  #define OSMR0  0x00
+>  #define OSMR1  0x04
+> @@ -414,7 +415,7 @@ static void pxa2xx_timer_tick(void *opaque)
+>      if (t->num == 3)
+>          if (i->reset3 & 1) {
+>              i->reset3 = 0;
+> -            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +            watchdog_perform_action();
+>          }
+
+This is a watchdog too.
+
+>  }
+>
+> --
+> 2.17.1
+
+thanks
+-- PMM
 
