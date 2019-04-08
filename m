@@ -2,48 +2,51 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF041C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C43F9C10F14
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B378020883
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B378020883
+	by mail.kernel.org (Postfix) with ESMTPS id 8605920883
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8605920883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50889 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50940 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDRkC-0001Fg-Ti
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:43:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60164)
+	id 1hDRoX-0002D8-Q2
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:47:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hDRjO-0000va-Ff
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:42:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hDRnX-0001tf-Vx
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hDRjN-0002pe-Ki
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:42:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43036)
+	(envelope-from <pbonzini@redhat.com>) id 1hDRnW-0004XB-Vw
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hDRjN-0002pC-As
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:42:25 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hDRnW-0004VS-Ev
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:42 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CF9C3092661
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 10:42:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C78A307CDC7;
+	Mon,  8 Apr 2019 10:46:41 +0000 (UTC)
 Received: from [10.36.112.69] (ovpn-112-69.ams2.redhat.com [10.36.112.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C43205D71B;
-	Mon,  8 Apr 2019 10:42:03 +0000 (UTC)
-To: Sergio Lopez <slp@redhat.com>
-References: <20190326131822.GD15011@stefanha-x1.localdomain>
-	<55751c00-0854-ea4d-75b5-ab82b4eeb70d@redhat.com>
-	<877ec8mmy9.fsf@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B33395D71B;
+	Mon,  8 Apr 2019 10:46:35 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>,
+	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	Wei Yang <richardw.yang@linux.intel.com>
+References: <20190407092314.11066-1-thuth@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -101,22 +104,23 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
 	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
 	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
 	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <14b7dab8-5c4b-a8e4-c3c3-8e931171747a@redhat.com>
-Date: Mon, 8 Apr 2019 12:42:00 +0200
+Message-ID: <5c1d5f0b-3845-dce3-a50a-d28f2560397e@redhat.com>
+Date: Mon, 8 Apr 2019 12:46:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <877ec8mmy9.fsf@redhat.com>
+In-Reply-To: <20190407092314.11066-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 08 Apr 2019 10:42:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 08 Apr 2019 10:46:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] QEMU event loop optimizations
+Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
+ hot-plugging nvdimm on older machine types
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -128,28 +132,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408104200.FgyStCkoV24cyXGxC3ZFOeTRDcfpcMfGX5W7mv2ohOI@z>
+Message-ID: <20190408104633.ncYMX9vsY-o8N2utUh-_nS4tzfhC50BsHXFbxQhYMj8@z>
 
-On 05/04/19 18:33, Sergio Lopez wrote:
->> - qemu_bh_schedule_nested should not be necessary since we have=20
->> ctx->notify_me to also avoid the event_notifier_set call.  However, it=
-=20
->> is possible to avoid the smp_mb at the beginning of aio_notify, since =
-=20
->> atomic_xchg already implies it.  Maybe add a "static void=20
->> aio_notify__after_smp_mb"?
-> try_poll_mode() is called with ctx->notify_me !=3D 0, so we get at leas=
-t
-> one event_notifier_set() call while working in polling mode.
+On 07/04/19 11:23, Thomas Huth wrote:
+> QEMU currently crashes when you try to hot-plug an "nvdimm" device
+> on older machine types:
+> 
+> $ qemu-system-x86_64 -monitor stdio -M pc-1.1
+> QEMU 3.1.92 monitor - type 'help' for more information
+> (qemu) device_add nvdimm,id=nvdimmn1
+> qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
+>  Assertion `*errp == ((void *)0)' failed.
+> Aborted (core dumped)
+> 
+> The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
+> added recently before the check whether nvdimm is enabled. It should
+> be done after the check. And while we're at it, also check the errp
+> after the hotplug_handler_pre_plug(), otherwise errors are silently
+> ignored here.
+> 
+> Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/i386/pc.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 6077d27361..f2c15bf1f2 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      const MachineState *ms = MACHINE(hotplug_dev);
+>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>      const uint64_t legacy_align = TARGET_PAGE_SIZE;
+> +    Error *local_err = NULL;
+>  
+>      /*
+>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> @@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> -    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
+> -
+>      if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
+>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>          return;
+>      }
+>  
+> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+>      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
+>                       pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
+>  }
+> 
 
-Right, though then there is the idea of making ctx->notify_me and
-ctx->notified bitmasks, where bit 0 is "BH ready" and bit 1 is "poll()
-parameters changed".  try_poll_mode() cares about the latter, but does
-not need event_notifier_set() for BH ready.
+Queued, thanks.
 
 Paolo
 
