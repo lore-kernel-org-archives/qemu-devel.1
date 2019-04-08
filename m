@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56979)
+Received: from eggs.gnu.org ([209.51.188.92]:53345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hDape-000550-TC
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:25:31 -0400
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDaiH-0003PP-M3
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hDapd-0003xn-RD
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:25:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58118
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1hDapd-0003rE-EF
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:25:29 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38KEPjZ126921
-	for <qemu-devel@nongnu.org>; Mon, 8 Apr 2019 16:25:17 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rrd3freuw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 16:25:16 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Mon, 8 Apr 2019 21:25:16 +0100
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-2-cohuck@redhat.com>
-	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
-	<20190408190747.12e3618b.cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Mon, 8 Apr 2019 16:25:11 -0400
-MIME-Version: 1.0
-In-Reply-To: <20190408190747.12e3618b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <3f64d56f-e27a-3f95-6c44-2602dc00ea0f@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
- channel programs
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDaiG-0005yK-Np
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:53 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sohailalvi2236@gmail.com>)
+	id 1hDaiF-0005w5-S2
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:52 -0400
+Received: by mail-pg1-x543.google.com with SMTP id k3so7929140pga.6
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:17:48 -0700 (PDT)
+From: sohailalvi2236@gmail.com
+Date: Tue,  9 Apr 2019 01:47:41 +0530
+Message-Id: <20190408201741.8042-1-sohailalvi2236@gmail.com>
+In-Reply-To: <CAFEAcA-D0MK_eEs+tvPsdp+2s9YuC=qS=uyhzNtqy3DW9-=rNQ@mail.gmail.com>
+References: <CAFEAcA-D0MK_eEs+tvPsdp+2s9YuC=qS=uyhzNtqy3DW9-=rNQ@mail.gmail.com>
+Subject: [Qemu-devel] [PATCH 02/5] hw/timer: qemu_system_reset() replaced by
+ watchdog_perform_action()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,47 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Sohail Alvi <sohailalvi2236@gmail.com>
 
+From: Sohail Alvi <sohailalvi2236@gmail.com>
 
+Signed-off-by: SohailAlvi <sohailalvi2236@gmail.com>
 
-On 4/8/19 1:07 PM, Cornelia Huck wrote:
-> On Mon, 8 Apr 2019 13:02:12 -0400
-> Farhan Ali <alifm@linux.ibm.com> wrote:
-> 
->> On 03/01/2019 04:38 AM, Cornelia Huck wrote:
->>> When we get a solicited interrupt, the start function may have
->>> been cleared by a csch, but we still have a channel program
->>> structure allocated. Make it safe to call the cp accessors in
->>> any case, so we can call them unconditionally.
->>>
->>> While at it, also make sure that functions called from other parts
->>> of the code return gracefully if the channel program structure
->>> has not been initialized (even though that is a bug in the caller).
->>>
->>> Reviewed-by: Eric Farman<farman@linux.ibm.com>
->>> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
->>> ---
->>
->> Hi Connie,
->>
->> My series of fixes for vfio-ccw depends on this patch as I would like to
->> call cp_free unconditionally :) (I had developed my code on top of your
->> patches).
->>
->> Could we pick this patch up as well when/if you pick up my patch series?
->> I am in the process of sending out a v2.
->>
->> Regarding this patch we could merge it as a stand alone patch, separate
->> from this series. And also the patch LGTM
->>
->> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> 
-> Actually, I wanted to ask how people felt about merging this whole
-> series for the next release :) It would be one thing less on my plate...
-> 
+The watchdog_perform_action() function has been added in place of qemu_system_reset where watchdog was triggered.
+Changes have been made according to the previous suggestions given by Peter
+Maydell.
 
-I'm not opposed to it.  Every time I try to review patches 4 and 6 I get 
-an asynchronous interrupt of my own.  :)  I'll at least get you an ack 
-in the next day or two.
+The patch was tested with scripts/checkpatch.pl and no style errors were
+found.
+---
+ hw/timer/etraxfs_timer.c | 3 ++-
+ hw/timer/m48t59.c        | 3 ++-
+ hw/timer/pxa2xx_timer.c  | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
+index 2280914b1d..9561113d0e 100644
+--- a/hw/timer/etraxfs_timer.c
++++ b/hw/timer/etraxfs_timer.c
+@@ -26,6 +26,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/timer.h"
+ #include "hw/ptimer.h"
++#include "sysemu/watchdog.h"
+ 
+ #define D(x)
+ 
+@@ -207,7 +208,7 @@ static void watchdog_hit(void *opaque)
+         qemu_irq_raise(t->nmi);
+     }
+     else
+-        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        watchdog_perform_action();
+ 
+     t->wd_hits++;
+ }
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index ca3ed445de..ebe58e8dc7 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -30,6 +30,7 @@
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/bcd.h"
++#include "sysemu/watchdog.h"
+ 
+ #include "m48t59-internal.h"
+ 
+@@ -158,7 +159,7 @@ static void watchdog_cb (void *opaque)
+ 	NVRAM->buffer[0x1FF7] = 0x00;
+ 	NVRAM->buffer[0x1FFC] &= ~0x40;
+         /* May it be a hw CPU Reset instead ? */
+-        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        watchdog_perform_action();
+     } else {
+ 	qemu_set_irq(NVRAM->IRQ, 1);
+ 	qemu_set_irq(NVRAM->IRQ, 0);
+diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
+index a489bf5159..2be680b5df 100644
+--- a/hw/timer/pxa2xx_timer.c
++++ b/hw/timer/pxa2xx_timer.c
+@@ -14,6 +14,7 @@
+ #include "hw/arm/pxa.h"
+ #include "hw/sysbus.h"
+ #include "qemu/log.h"
++#include "sysemu/watchdog.h"
+ 
+ #define OSMR0	0x00
+ #define OSMR1	0x04
+@@ -414,7 +415,7 @@ static void pxa2xx_timer_tick(void *opaque)
+     if (t->num == 3)
+         if (i->reset3 & 1) {
+             i->reset3 = 0;
+-            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++            watchdog_perform_action();
+         }
+ }
+ 
+-- 
+2.17.1
