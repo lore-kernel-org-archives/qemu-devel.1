@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33620)
+Received: from eggs.gnu.org ([209.51.188.92]:36121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hDQ8a-00067X-Jh
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:00:25 -0400
+	(envelope-from <olaf@aepfle.de>) id 1hDQHN-0007pX-Ts
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hDQ8Z-0002lq-Hc
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:00:20 -0400
-Date: Mon, 8 Apr 2019 10:00:13 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190408090013.GJ15001@stefanha-x1.localdomain>
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	(envelope-from <olaf@aepfle.de>) id 1hDQHN-0006Yn-27
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:09:25 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::6]:33412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hDQHL-0006Vg-Le
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:09:24 -0400
+Date: Mon, 8 Apr 2019 11:09:10 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20190408110911.46d3b9d0.olaf@aepfle.de>
+In-Reply-To: <9a4ea235-29ce-2a98-a723-0a61be55433f@redhat.com>
+References: <20190405123928.70da87e2.olaf@aepfle.de>
+	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
+	<20190405125918.462c6ae4.olaf@aepfle.de>
+	<9a4ea235-29ce-2a98-a723-0a61be55433f@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="nywXBoy70X0GaB8B"
-Content-Disposition: inline
-In-Reply-To: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
+	boundary="Sig_/WTSsj_EH+VdbA4pv_K6_Yh5";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-
---nywXBoy70X0GaB8B
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/WTSsj_EH+VdbA4pv_K6_Yh5
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2019 at 05:24:04PM +0300, Andrey Shinkevich wrote:
-> On a file system used by the customer, fallocate() returns an error
-> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
-> fails. We can handle that case the same way as it is done for the
-> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
-> zeroes to an image for the unaligned chunk of the block.
->=20
-> Suggested-by: Denis V. Lunev <den@openvz.org>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  block/io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Am Mon, 8 Apr 2019 11:04:09 +0200
+schrieb Laszlo Ersek <lersek@redhat.com>:
 
-Thanks, applied to my block-next tree for QEMU 4.1:
-https://github.com/stefanha/qemu/commits/block-next
+> This is not a QEMU build failure, but an issue in the downstream
+> packaging that not only tries to build QEMU, but performs a maintainer
+> build on binary artifacts.
 
-Stefan
+I'm sure everyone will rebuild the things from source that can be rebuilt.
+Who would ship random binary blobs from unknown origin?
 
---nywXBoy70X0GaB8B
-Content-Type: application/pgp-signature; name="signature.asc"
+Olaf
+
+--Sig_/WTSsj_EH+VdbA4pv_K6_Yh5
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcqw2dAAoJEJykq7OBq3PIfVQH/RDkGhJfcMi4ewcbpIreJvHg
-N7MwBnaAMhGaQfIVmTfxsOAvbfe3X+j/biQDRp38g5E2YV15yKT8T4qgOzVeUemg
-bVm6i4pZS+m2z/V53FERIS1FOPYyMMFHQF5ttC8uicKJmpkk4tMhOmZtVj9PyLb/
-Q7d9yWXFrXxERmpJ+SY3vuCX5f48Nt48hYqCLIENypFa1jFg24S8z/w8Qq22zFzk
-DlafQoTLQENSVoBuLjriLQRWVjmuq+kpVxARGYxf9++iBScG2kET46swNbVIfU8y
-aijI1NdxKhBR2f748po7JPiOennTWefHbo010PwdJ7kPbpeBBaqwkDkJ/0H5Euw=
-=nhUx
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKsPtwAKCRBdQqD6ppg2
+fiTYAJ9OX04ljC0Fic+3uuNr9LuPN+WEXgCdH8RKe5cS8hmWCwUZmbsvLyMs4vg=
+=nu3x
 -----END PGP SIGNATURE-----
 
---nywXBoy70X0GaB8B--
+--Sig_/WTSsj_EH+VdbA4pv_K6_Yh5--
