@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44270)
+Received: from eggs.gnu.org ([209.51.188.92]:44291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDa5B-00024s-3i
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hDa5E-00025w-2W
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDa5A-00076O-94
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:29 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:39001)
+	(envelope-from <laurent@vivier.eu>) id 1hDa5D-000781-7D
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:32 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:57897)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hDa59-00075h-To
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:28 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hDa5C-00077Y-RL
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:31 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  8 Apr 2019 21:37:09 +0200
-Message-Id: <20190408193711.32680-1-laurent@vivier.eu>
+Date: Mon,  8 Apr 2019 21:37:10 +0200
+Message-Id: <20190408193711.32680-2-laurent@vivier.eu>
+In-Reply-To: <20190408193711.32680-1-laurent@vivier.eu>
+References: <20190408193711.32680-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/2] Linux user for 4.0 patches
+Subject: [Qemu-devel] [PULL 1/2] linux-user: assume __NR_gettid always exists
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +27,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-The following changes since commit f55a585d1037e5de6088f25e75443c2776786e29:
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-04-07 14:54:55 +0100)
+The gettid syscall was introduced in Linux 2.4.11. This is old enough
+that we can assume it always exists and thus not bother with the
+conditional backcompat logic.
 
-are available in the Git repository at:
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20190320161842.13908-2-berrange@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-4.0-pull-request
-
-for you to fetch changes up to 71ba74f67eaca21b0cc9d96f534ad3b9a7161400:
-
-  linux-user: rename gettid() to sys_gettid() to avoid clash with glibc (2019-04-08 17:27:13 +0200)
-
-----------------------------------------------------------------
-fix gettid() clash with new glibc
-
-----------------------------------------------------------------
-
-Daniel P. Berrangé (2):
-  linux-user: assume __NR_gettid always exists
-  linux-user: rename gettid() to sys_gettid() to avoid clash with glibc
-
- linux-user/syscall.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 208fd1813d6a..11729f382cf4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -249,15 +249,7 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
+ #define TARGET_NR__llseek TARGET_NR_llseek
+ #endif
+ 
+-#ifdef __NR_gettid
+ _syscall0(int, gettid)
+-#else
+-/* This is a replacement for the host gettid() and must return a host
+-   errno. */
+-static int gettid(void) {
+-    return -ENOSYS;
+-}
+-#endif
+ 
+ /* For the 64-bit guest on 32-bit host case we must emulate
+  * getdents using getdents64, because otherwise the host
 -- 
 2.20.1
