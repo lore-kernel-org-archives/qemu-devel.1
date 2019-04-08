@@ -2,65 +2,93 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C31C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0CEC282DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:41:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 519A220880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:34:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519A220880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 335AB20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:41:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQVKtTI5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 335AB20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50078 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50187 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDQfg-0008NY-JS
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 05:34:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41323)
+	id 1hDQm4-0002JA-5l
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 05:41:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDQbb-0005YK-Qy
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:30:20 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQl9-0001t4-5P
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDQba-00018P-K2
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:30:19 -0400
-Resent-Date: Mon, 08 Apr 2019 05:30:19 -0400
-Resent-Message-Id: <E1hDQba-00018P-K2@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDQba-0000vF-95; Mon, 08 Apr 2019 05:30:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1554715793; cv=none; d=zoho.com; s=zohoarc; 
-	b=dCY4QQsSpZBe60pgbidm+xomPdCpvjAhoOzIhbQT9ImKOB9FK7ourfEDN+bZ627LYzqXq0yDyfxAonB/gag71bYt8f3cwV/4IRFz3TADENqRhkLHfZ761pDvhTQTuIdJvS0pNIVDpSlDUbL9VaISkpxt4sZjB7E9kFLZb6UleG0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1554715793;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=15+wKlQV5KK2KfIAUoPIQqtBMTcScfQ6o71ad25O53c=; 
-	b=PjjY7Osrl8n42NG407KTSKEJDaGflX2qy0ZrQZyXlNpxnT1Ggz/YVTzyHLqyA2FP3qk9xVv2fPexoeHUvCj2KSjzO+m6aiuoyZb3Z+wIAuuRgTYAbmeoUc+u1wFFEuue8RoBO+O/LfNt0W1AHcJHSnBfZVLjGKEtIim/sazIjdk=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1554715790876892.5429034653301;
-	Mon, 8 Apr 2019 02:29:50 -0700 (PDT)
-Message-ID: <155471578957.12882.15898285010752314117@76452e4e88f2>
-In-Reply-To: <20190408084056.26212-1-ghorges@xiyoulinux.org>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQl8-0005lU-AB
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:40:11 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hDQl6-0005kK-RR
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:40:10 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y7so15473686wrn.11
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=r5BMkOuVnSJRjRnzpUDwtGjzp8Irr7hpDVQ+2U2Dvbg=;
+	b=YQVKtTI5iG3RcNjrrufnr5ZgephJLI5w1wSiEJn61P39EPpigQug8bKFAnOb2NEbZx
+	0IYDBtgzpkfM/srCEuXvN9cFFYOx94ww3PoFxC990udz3Sx6jfIBfpiF0buMn2e5CwoD
+	gVrZoSTULwAFSzH1wdv+tUf/vtIk0NZBpSn5zeB1pTUn/9hohQAHn/vVhjV5zX2lds/Y
+	xBrPOXycxL/GWf2dClQSqh9OyPPwDmfvTgEaTO3/Ch/UCnbrE5dJBU3GhPZnmk4ySxNy
+	cAqExT66fyRwQtrKM9RLNP4GsVM5XwSLjQOjpSy21EFucrPj5vktRL444NRozQCxzwxt
+	loRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=r5BMkOuVnSJRjRnzpUDwtGjzp8Irr7hpDVQ+2U2Dvbg=;
+	b=ijfy0eGM/GUrL/a+2X2yGO3CstuQ+rl9fay+7YKz90lzN+6JPHjQeZEi3F20Nx91GF
+	Q/cQEdkCXdbqxLapij3XNGle8mxv3ezavE2RcJqJVfdTNmfYaaB6WYEwXtbOD+pOzla+
+	zgoAigIcCaQrNIP5xWP8urcG3/uQrLNVD+pvUIpTiF5apEaWZZJ8zwD/9nFYj2wSNw/W
+	hr27rsEpOnFwWN0gPG/DbNUROf7SGuKyNUiofV8aOCJhpfqRDrwK5dJn/7ywQQZG8CBj
+	szueQDBNYy8wJ9Y9ER/BZMJ/7vKnMVuxtMZeWrUqCb3A7TXT7q2TTssHo8TZxtEZK8gv
+	M6OQ==
+X-Gm-Message-State: APjAAAVezKtv+jZ+R3WPBZQhFFBlYRgRLyXIbcbMC6ZCzx01Bcqlzmlh
+	fi0uCOvBuq0kaes1danjlQI=
+X-Google-Smtp-Source: APXvYqzBwoAarP8g5I80gwCglPANLdHxZlCG4fXVv+0ruMGtDmlRwNzX4ymGcPFkmQN9FViUw8QRcg==
+X-Received: by 2002:a05:6000:1286:: with SMTP id
+	f6mr12543738wrx.93.1554716406889; 
+	Mon, 08 Apr 2019 02:40:06 -0700 (PDT)
+Received: from localhost.localdomain ([37.142.144.27])
+	by smtp.gmail.com with ESMTPSA id
+	r30sm94266294wrr.46.2019.04.08.02.40.05
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 02:40:06 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-7-armbru@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <0e6fed9f-a8c6-6dad-b27f-4eb62db8dd7e@gmail.com>
+Date: Mon, 8 Apr 2019 11:41:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ghorges@xiyoulinux.org
-Date: Mon, 8 Apr 2019 02:29:50 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c
+In-Reply-To: <20190408083627.7479-7-armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH 06/15] pci: Report fatal errors with
+ error_report(), not error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,45 +100,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-block@nongnu.org,
-	ghorges@xiyoulinux.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408092950.DuFdPy-Qn6bS9MUNPGptOBPptfeOC7NXG1oi1HuMZEM@z>
+Message-ID: <20190408084107.XzPiK0DfSLZP7MMxr3rC3VXB592abZHYuqD2LZ__7LU@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwODA4NDA1Ni4yNjIx
-Mi0xLWdob3JnZXNAeGl5b3VsaW51eC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdl
-c0B4aXlvdWxpbnV4Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gV3NoYWRvdyBpbiBxZW11L2xp
-bnV4LXVzZXIvc3lzY2FsbC5jClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3Rh
-ZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQwNTA2NDEyMS4yMzY2Mi0xLXJpY2hh
-cmR3LnlhbmdAbGludXguaW50ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MDUwNjQxMjEuMjM2NjIt
-MS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzIwMTkwNDA1MTUzMzE0LjIwNjgtMS1waGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTkwNDA1MTUzMzE0LjIwNjgtMS1waGlsbWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10g
-ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlv
-dWxpbnV4Lm9yZyAtPiBwYXRjaGV3LzIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlv
-dWxpbnV4Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM3NmFmMTQyY2QgV3No
-YWRvdyBpbiBxZW11L2xpbnV4LXVzZXIvc3lzY2FsbC5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQpF
-UlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDE2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgYzc2YWYxNDJjZDAyIChXc2hhZG93
-IGluIHFlbXUvbGludXgtdXNlci9zeXNjYWxsLmMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-NDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlvdWxpbnV4Lm9yZy90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
+
+On 4/8/19 11:36 AM, Markus Armbruster wrote:
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   hw/pci/pci.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 35451c1e99..a74995b596 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -927,7 +927,7 @@ static uint16_t pci_req_id_cache_extract(PCIReqIDCache *cache)
+>           result = PCI_BUILD_BDF(bus_n, 0);
+>           break;
+>       default:
+> -        error_printf("Invalid PCI requester ID cache type: %d\n",
+> +        error_report("Invalid PCI requester ID cache type: %d",
+>                        cache->type);
+>           exit(1);
+>           break;
+
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+
+Thanks,
+Marcel
 
