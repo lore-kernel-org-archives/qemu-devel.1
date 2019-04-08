@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53835)
+Received: from eggs.gnu.org ([209.51.188.92]:54061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDTSK-0000Yq-Vk
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:32:57 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDTSo-0000we-NT
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDTSJ-0003ES-R6
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:32:56 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-10-armbru@redhat.com>
-	<9223e19f-878f-636e-2c48-6d9e47485a65@redhat.com>
-	<20190408110448.4ac62234.cohuck@redhat.com>
-Date: Mon, 08 Apr 2019 14:32:53 +0200
-In-Reply-To: <20190408110448.4ac62234.cohuck@redhat.com> (Cornelia Huck's
-	message of "Mon, 8 Apr 2019 11:04:48 +0200")
-Message-ID: <877ec4r822.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1hDTSm-0003Zc-N8
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:26 -0400
+Resent-Message-Id: <E1hDTSm-0003Zc-N8@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hDTSj-0003Ux-DJ
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:22 -0400
+Message-ID: <155472676351.12882.17823375506809746100@76452e4e88f2>
+In-Reply-To: <20190408122816.595-1-ghorges@xiyoulinux.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 09/15] s390x/kvm: Report warnings with
- warn_report(), not error_printf()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 8 Apr 2019 05:32:44 -0700 (PDT)
+Subject: Re: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c:Changed some
+ variable names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: ghorges@xiyoulinux.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-Cornelia Huck <cohuck@redhat.com> writes:
-
-> On Mon, 8 Apr 2019 10:39:40 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
->
->> On 08/04/2019 10.36, Markus Armbruster wrote:
->> > kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
->> > -ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
->> > ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
->> > failures.
->> > 
->> > kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
->> > in the latter failure mode.  Since this is obviously a warning, use
->> > warn_report().
->> > 
->> > Perhaps the reporting should be left to the caller.  It could warn on
->> > failure other than -ENOSYS.
->> > 
->> > Cc: Thomas Huth <thuth@redhat.com>
->> > Cc: qemu-s390x@nongnu.org
->> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> > ---
->> >  target/s390x/kvm.c | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> > 
->> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> > index 19530fb94e..2c6e35b5aa 100644
->> > --- a/target/s390x/kvm.c
->> > +++ b/target/s390x/kvm.c
->> > @@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
->> >  
->> >      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
->> >      if (ret < 0) {
->> > -        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
->> > +        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
->> >      }
->> >      return ret;
->> >  }
->> >   
->> 
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->
-> (Markus, I think you wanted to take this?)
-
-I intend to take the complete series through my tree if nobody objects.
-
-Thanks!
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwODEyMjgxNi41OTUt
+MS1naG9yZ2VzQHhpeW91bGludXgub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQwODEyMjgxNi41OTUtMS1naG9yZ2VzQHhp
+eW91bGludXgub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBXc2hhZG93IGluIHFlbXUvbGludXgt
+dXNlci9zeXNjYWxsLmM6Q2hhbmdlZCBzb21lIHZhcmlhYmxlIG5hbWVzClR5cGU6IHNlcmllcwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2Ug
+PiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5
+MDQwODEyMjgxNi41OTUtMS1naG9yZ2VzQHhpeW91bGludXgub3JnIC0+IHBhdGNoZXcvMjAxOTA0
+MDgxMjI4MTYuNTk1LTEtZ2hvcmdlc0B4aXlvdWxpbnV4Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCmM1OWVkOWNjN2IgV3NoYWRvdyBpbiBxZW11L2xpbnV4LXVzZXIvc3lzY2Fs
+bC5jOkNoYW5nZWQgc29tZSB2YXJpYWJsZSBuYW1lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJS
+T1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxNjAgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGM1OWVkOWNjN2JhMyAoV3NoYWRvdyBp
+biBxZW11L2xpbnV4LXVzZXIvc3lzY2FsbC5jOkNoYW5nZWQgc29tZSB2YXJpYWJsZSBuYW1lcykg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MDgxMjI4MTYuNTk1LTEtZ2hvcmdlc0B4aXlvdWxp
+bnV4Lm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
