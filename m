@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41365)
+Received: from eggs.gnu.org ([209.51.188.92]:45519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hDXvg-0007MY-PD
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:34 -0400
+	(envelope-from <rjones@redhat.com>) id 1hDY4c-0000k9-OP
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003U1-Mb
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46298
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003Tj-EM
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:30 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38H4AF0185103
-	for <qemu-devel@nongnu.org>; Mon, 8 Apr 2019 13:19:29 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rr96vm62k-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:19:28 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Mon, 8 Apr 2019 18:19:28 +0100
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-2-cohuck@redhat.com>
-	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
-	<20190408190747.12e3618b.cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 8 Apr 2019 13:19:23 -0400
+	(envelope-from <rjones@redhat.com>) id 1hDY4a-0002PT-3g
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:28:46 -0400
+Date: Mon, 8 Apr 2019 18:22:11 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20190408172202.GH3926@redhat.com>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-3-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190408190747.12e3618b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b0ff9cf2-f311-2056-a8b1-415c61a419fc@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
- channel programs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190408083627.7479-3-armbru@redhat.com>
+Subject: [Qemu-devel] Whither qemu's ssh driver? (was: Re: [PATCH 02/15]
+ block/ssh: Do not report read/write/flush errors to the user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,52 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, ptoscano@redhat.com, berrange@redhat.com
 
+I don't know much about this patch which looks like internal qemu
+rearrangements so I guess fine.  However I do have a few things to say
+about the ssh driver ...
 
+As you know I wrote this a few years ago, and it uses libssh2.
+libssh2 has not evolved as quickly as we'd like and it may be better
+to use libssh instead -- despite the names, these are two separate and
+unrelated libraries.  libssh supports a wider range of SSH encryption
+and has more features.  It's generally more likely to work against a
+random SSH server.  It has also been through the FIPS process.  Indeed
+Red Hat made the decision to switch exclusively to libssh in RHEL 8,
+if that carries any weight.
 
-On 04/08/2019 01:07 PM, Cornelia Huck wrote:
-> On Mon, 8 Apr 2019 13:02:12 -0400
-> Farhan Ali <alifm@linux.ibm.com> wrote:
-> 
->> On 03/01/2019 04:38 AM, Cornelia Huck wrote:
->>> When we get a solicited interrupt, the start function may have
->>> been cleared by a csch, but we still have a channel program
->>> structure allocated. Make it safe to call the cp accessors in
->>> any case, so we can call them unconditionally.
->>>
->>> While at it, also make sure that functions called from other parts
->>> of the code return gracefully if the channel program structure
->>> has not been initialized (even though that is a bug in the caller).
->>>
->>> Reviewed-by: Eric Farman<farman@linux.ibm.com>
->>> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
->>> ---
->>
->> Hi Connie,
->>
->> My series of fixes for vfio-ccw depends on this patch as I would like to
->> call cp_free unconditionally :) (I had developed my code on top of your
->> patches).
->>
->> Could we pick this patch up as well when/if you pick up my patch series?
->> I am in the process of sending out a v2.
->>
->> Regarding this patch we could merge it as a stand alone patch, separate
->> from this series. And also the patch LGTM
->>
->> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> 
-> Actually, I wanted to ask how people felt about merging this whole
-> series for the next release :) It would be one thing less on my plate...
-> 
-> 
+Pino posted a libssh2 -> libssh conversion patch a while back, but it
+has been somewhat stuck in review.  If I recall the latest concern was
+whether it performs as well as the libssh2 version.
 
-I have been testing with your patches for a while now and I haven't hit 
-any problems due to the patches.
+  https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07267.html
 
-IMHO I think we can merge the patches for the next release.
+In the meantime I added libssh support to nbdkit.  nbdkit can be used
+as a complete replacement for qemu's ssh driver.
 
-Thanks
-Farhan
+  nbdkit ssh host=foo.example.com disk.img -U tmpdirXXXXXX/sock
+  qemu -hda nbd:unix:tmpdirXXXXXX/sock
+
+In fact it's somewhat superior (IMHO) because all of the tricky code
+handling libssh runs outside qemu in a separate process, improving
+isolation and potentially allowing separate, restrictive security
+policies to be applied.  For example it would no longer be necessary
+to give qemu permission to connect to remote SSH servers.
+
+Could we make this really smooth somehow?  nbdkit has a concept
+[https://www.mankier.com/1/nbdkit-captive] where we make it easy to
+manage external commands owned by nbdkit.  Is there an equivalent
+feature of qemu where:
+
+  qemu -object exec,id=nbd1,cmd='nbdkit -f -U $sock ssh ...' \
+       -drive file.driver=nbd,file.socket=nbd1
+
+would run the command but also allocate a socket and kill the
+subcommand on exit (of qemu)?
+
+Basically I'm trying to think about how to make this a reality:
+
+  https://rwmj.files.wordpress.com/2018/10/drawing2-svg.png
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
