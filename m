@@ -4,76 +4,107 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E52FEC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A708C10F14
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9086C2070D
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:37:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33C0B21473
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:56:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="vCqMeEZF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9086C2070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Bz1sCFuD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33C0B21473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51481 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51650 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDSai-0000SQ-O2
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 07:37:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43364)
+	id 1hDStP-0002Us-D5
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 07:56:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hDSZq-0008T0-E1
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:36:40 -0400
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDSsV-0002C8-HY
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hDSZo-0000lK-IO
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:36:38 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:39530)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hDSZo-0000kJ-24
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:36:36 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::162])
-	by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id B99822E1500;
-	Mon,  8 Apr 2019 14:36:34 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	HL8qK4DzXq-aY3q1Lf1; Mon, 08 Apr 2019 14:36:34 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1554723394; bh=BmUxItcpz2lEhDCVWG0+M6xL2WVW6GrEO2MtmYYu0Og=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=vCqMeEZF8KsT/KsRAWMxfRqbe0lnFHIaOjYj8t4Hn2SH3cOZpv5aDcQUgm7EzBEh7
-	ZKitvfxcbfusC6pRaY0xk7wNLm0N0q4Ro+WJBXNw7YRzs5BW/AsAI5/F8iZ959r5Lv
-	4mHctVx9lXXXKMArktGZtHH924D9qZspnfhIzmvM=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1g.mail.yandex.net ([::1])
-	by mxbackcorp1g.mail.yandex.net with LMTP id 3k1H9nkz
-	for <yury-kotov@yandex-team.ru>; Mon, 8 Apr 2019 14:36:29 +0300
-Received: by iva6-8a76e93b6298.qloud-c.yandex.net with HTTP;
-	Mon, 08 Apr 2019 14:36:29 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Dr. David Alan Gilbert <dgilbert@redhat.com>
-In-Reply-To: <20190405090706.GC2819@work-vm>
-References: <20190403083841.830-1-yury-kotov@yandex-team.ru>
-	<20190403190503.GI2790@work-vm>
-	<48831554365540@vla1-9d3c37294942.qloud-c.yandex.net>
-	<20190405090706.GC2819@work-vm>
-MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 08 Apr 2019 14:36:34 +0300
-Message-Id: <309001554723389@iva6-8a76e93b6298.qloud-c.yandex.net>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDSsQ-0003pJ-Vw
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:55:52 -0400
+Received: from mail-eopbgr20126.outbound.protection.outlook.com
+	([40.107.2.126]:31822
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+	id 1hDSsK-0003jb-VC; Mon, 08 Apr 2019 07:55:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=6nmegihZHrXw4C7MC+ZwUSBvDr/s2J0up4MK8msEdmc=;
+	b=Bz1sCFuD7fWvT+JnWQF61QtJ5vkiQOHx328606bs7BEMX4R9VM/ZrNjaIfgvWcwmiHLpQ2SQpTnxpvvAC+STYJ0QZlXrklnn0VLffw2ZP/QydCG8sxQd5uls8ymL4rN3MDuOrdO6ii00flOSz13q+xFjzyigX3cvhM9upnz4wiI=
+Received: from AM6PR08MB4421.eurprd08.prod.outlook.com (20.179.18.23) by
+	AM6PR08MB3797.eurprd08.prod.outlook.com (20.178.89.150) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.13; Mon, 8 Apr 2019 11:55:37 +0000
+Received: from AM6PR08MB4421.eurprd08.prod.outlook.com
+	([fe80::d15a:3eaa:44bc:2644]) by
+	AM6PR08MB4421.eurprd08.prod.outlook.com
+	([fe80::d15a:3eaa:44bc:2644%4]) with mapi id 15.20.1771.019;
+	Mon, 8 Apr 2019 11:55:37 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Thread-Topic: [Qemu-block] [PATCH] block/io.c: fix for the allocation failure
+Thread-Index: AQHU67tCeBQBY4L5bEGNNolBmRLa5KYuLFmAgAQNt4D//9NxAIAAHvoA
+Date: Mon, 8 Apr 2019 11:55:37 +0000
+Message-ID: <009d858c-40e5-6397-44b0-d395fa9d0cf9@virtuozzo.com>
+References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+	<468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
+	<20190408100442.GA11997@linux.fritz.box>
+In-Reply-To: <20190408100442.GA11997@linux.fritz.box>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0502CA0012.eurprd05.prod.outlook.com
+	(2603:10a6:3:e3::22) To AM6PR08MB4421.eurprd08.prod.outlook.com
+	(2603:10a6:20b:71::23)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f323f271-5fc2-4fdd-4760-08d6bc191d79
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:AM6PR08MB3797; 
+x-ms-traffictypediagnostic: AM6PR08MB3797:
+x-microsoft-antispam-prvs: <AM6PR08MB3797B505C38D9649E4E5CEF3F42C0@AM6PR08MB3797.eurprd08.prod.outlook.com>
+x-forefront-prvs: 0001227049
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(376002)(346002)(396003)(136003)(366004)(39840400004)(199004)(189003)(66066001)(6486002)(53936002)(31686004)(105586002)(107886003)(446003)(476003)(106356001)(11346002)(4326008)(76176011)(186003)(486006)(6512007)(316002)(305945005)(54906003)(2616005)(229853002)(44832011)(25786009)(36756003)(31696002)(7736002)(2906002)(14454004)(86362001)(6116002)(386003)(53546011)(81166006)(26005)(81156014)(68736007)(99286004)(8936002)(14444005)(256004)(8676002)(6506007)(52116002)(478600001)(6246003)(3846002)(5660300002)(102836004)(71190400001)(6436002)(71200400001)(97736004)(6916009)(93886005);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3797;
+	H:AM6PR08MB4421.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: kJtrNU8nhTEIBBNWXMF+gIYJ9Z/gU+D16XThj9fJK25PgJ+tXV+hnRpRb9+bjvQGKKvxz9HJlC9fxIjDlnnII7FSm2IcXktI4G5szFi57ooSRQrxYntPrq6HZ/4i5h6DwZGLUmAmHtAsKEWUoD+Y4sant+ojH75Jk6JPmwKcXTegzgQisd/fx9O/c/9KQZopGVB9mw9yOGoor100LRiqJtl+MW1BhDRYN+wBc6esv1so7/Tq/bQb86srZeP2yMMdWTG2/cXgC8coKGRMvJ/Me/xlyVfayzU3LNGOGTBAiH4Ug8g85ib/3LQtFPj0zb1lUqgxHObhpLZnZVmxQp2cKrfMAV4fDx6ALfgX1a1W8/VFcnWp7rV/xltgtK27glGdRZoqJoWCdIVKKS4o9zcSm9iKgGwMZXEpDGUYyKz8Ojg=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 5.45.199.163
-Subject: Re: [Qemu-devel] [PATCH] migration: fix migration shutdown
+Content-ID: <AE3DC5E2154FBA4FA757FD6D7D4DE823@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f323f271-5fc2-4fdd-4760-08d6bc191d79
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2019 11:55:37.6747 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3797
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.2.126
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
+ allocation failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,379 +116,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+Cc: "fam@euphon.net" <fam@euphon.net>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	Denis Lunev <den@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Evgeny Yakovlev <wrfsh@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
+	"mreitz@redhat.com" <mreitz@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408113634.mlF4F8e3uHQHQmQZIJlqQaVDpxupEt2r1fQxKImoOxI@z>
+Message-ID: <20190408115537.t1A9TXqzg-F1oEbksUukWqq5_TKdYZ5Y5sXmrhkztbo@z>
 
-Hi,
-
-I've sent another patch to fix this UAF:
-"migration: Fix use-after-free during process exit"
-
-It's more simple and fixes only the regression.
-
-Regards,
-Yury
-
-05.04.2019, 12:07, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
-> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->> =C2=A003.04.2019, 22:06, "Dr. David Alan Gilbert" <dgilbert@redhat.com=
->:
->> =C2=A0> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->> =C2=A0>> =C2=A0It fixes heap-use-after-free which was found by clang's=
- ASAN.
->> =C2=A0>>
->> =C2=A0>> =C2=A0Control flow of this use-after-free:
->> =C2=A0>> =C2=A0main_thread:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* Got SIGTERM and completes mai=
-n loop
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* Calls migration_shutdown
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- migrate_fd_cancel=
- (so, migration_thread begins to complete)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- object_unref(OBJE=
-CT(current_migration));
->> =C2=A0>>
->> =C2=A0>> =C2=A0migration_thread:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* migration_iteration_finish ->=
- schedule cleanup bh
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* object_unref(OBJECT(s)); (Now=
-, current_migration is freed)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* exits
->> =C2=A0>>
->> =C2=A0>> =C2=A0main_thread:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* Calls vm_shutdown -> drain bd=
-rvs -> main loop
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-> cleanup_bh -> us=
-e after free
->> =C2=A0>>
->> =C2=A0>> =C2=A0If you want to reproduce, these couple of sleeps will h=
-elp:
->> =C2=A0>> =C2=A0vl.c:4613:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0migration_shutdown();
->> =C2=A0>> =C2=A0+ sleep(2);
->> =C2=A0>> =C2=A0migration.c:3269:
->> =C2=A0>> =C2=A0+ sleep(1);
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0trace_migration_thread_af=
-ter_loop();
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0migration_iteration_finis=
-h(s);
->> =C2=A0>
->> =C2=A0> Fun; I hadn't realised you could get more main loop after exit=
-ing
->> =C2=A0> the main loop.
->> =C2=A0>
->> =C2=A0> Is this fallout from my 892ae715b6b or is this just another ca=
-se it
->> =C2=A0> didn't catch?
->> =C2=A0> I guess it moved the shutdown early, so it probably is fallout=
-, and
->> =C2=A0> so probably does need to go to 4.0 ?
->> =C2=A0>
->> =C2=A0I think this is closer to another case than fallout. Because wit=
-hout
->> =C2=A0892ae715b6b, reproducing of UAF at exit was much easier.
->> =C2=A0Another way to fix it - remove unref from migration_shutdown
->> =C2=A0(but keep migrate_fd_cancel) and restore migration_object_finali=
-ze.
->
-> OK, so in that case I'd rather leave this to 4.1 rather than rush it in
-> 4.0rc's - I'd rather only take regressions at this point.
->
-> Dave
->
->> =C2=A0>> =C2=A0Original output:
->> =C2=A0>> =C2=A0qemu-system-x86_64: terminating on signal 15 from pid 3=
-1980 (<unknown process>)
->> =C2=A0>> =C2=A0=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> =C2=A0>> =C2=A0=3D=3D31958=3D=3DERROR: AddressSanitizer: heap-use-afte=
-r-free on address 0x61900001d210
->> =C2=A0>> =C2=A0=C2=A0=C2=A0at pc 0x555558a535ca bp 0x7fffffffb190 sp 0=
-x7fffffffb188
->> =C2=A0>> =C2=A0READ of size 8 at 0x61900001d210 thread T0 (qemu-vm-0)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#0 0x555558a535c9 in migrate_fd=
-_cleanup migration/migration.c:1502:23
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#1 0x5555594fde0a in aio_bh_cal=
-l util/async.c:90:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#2 0x5555594fe522 in aio_bh_pol=
-l util/async.c:118:13
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#3 0x555559524783 in aio_poll u=
-til/aio-posix.c:725:17
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#4 0x555559504fb3 in aio_wait_b=
-h_oneshot util/aio-wait.c:71:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#5 0x5555573bddf6 in virtio_blk=
-_data_plane_stop
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hw/block/dataplane/=
-virtio-blk.c:282:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#6 0x5555589d5c09 in virtio_bus=
-_stop_ioeventfd hw/virtio/virtio-bus.c:246:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#7 0x5555589e9917 in virtio_pci=
-_stop_ioeventfd hw/virtio/virtio-pci.c:287:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#8 0x5555589e22bf in virtio_pci=
-_vmstate_change hw/virtio/virtio-pci.c:1072:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#9 0x555557628931 in virtio_vms=
-tate_change hw/virtio/virtio.c:2257:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#10 0x555557c36713 in vm_state_=
-notify vl.c:1605:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#11 0x55555716ef53 in do_vm_sto=
-p cpus.c:1074:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#12 0x55555716eeff in vm_shutdo=
-wn cpus.c:1092:12
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#13 0x555557c4283e in main vl.c=
-:4617:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#14 0x7fffdfdb482f in __libc_st=
-art_main
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(/lib/x86_64-linux-=
-gnu/libc.so.6+0x2082f)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#15 0x555556ecb118 in _start (x=
-86_64-softmmu/qemu-system-x86_64+0x1977118)
->> =C2=A0>>
->> =C2=A0>> =C2=A00x61900001d210 is located 144 bytes inside of 952-byte =
-region
->> =C2=A0>> =C2=A0=C2=A0=C2=A0[0x61900001d180,0x61900001d538)
->> =C2=A0>> =C2=A0freed by thread T6 (live_migration) here:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#0 0x555556f76782 in __intercep=
-tor_free
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/tmp/final/llvm.src=
-/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:124:3
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#1 0x555558d5fa94 in object_fin=
-alize qom/object.c:618:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#2 0x555558d57651 in object_unr=
-ef qom/object.c:1068:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#3 0x555558a55588 in migration_=
-thread migration/migration.c:3272:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#4 0x5555595393f2 in qemu_threa=
-d_start util/qemu-thread-posix.c:502:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#5 0x7fffe057f6b9 in start_thre=
-ad (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
->> =C2=A0>>
->> =C2=A0>> =C2=A0previously allocated by thread T0 (qemu-vm-0) here:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#0 0x555556f76b03 in __intercep=
-tor_malloc
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/tmp/final/llvm.src=
-/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:146:3
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#1 0x7ffff6ee37b8 in g_malloc (=
-/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4f7b8)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#2 0x555558d58031 in object_new=
- qom/object.c:640:12
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#3 0x555558a31f21 in migration_=
-object_init migration/migration.c:139:25
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#4 0x555557c41398 in main vl.c:=
-4320:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#5 0x7fffdfdb482f in __libc_sta=
-rt_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
->> =C2=A0>>
->> =C2=A0>> =C2=A0Thread T6 (live_migration) created by T0 (qemu-vm-0) he=
-re:
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#0 0x555556f5f0dd in pthread_cr=
-eate
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/tmp/final/llvm.src=
-/projects/compiler-rt/lib/asan/asan_interceptors.cc:210:3
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#1 0x555559538cf9 in qemu_threa=
-d_create util/qemu-thread-posix.c:539:11
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#2 0x555558a53304 in migrate_fd=
-_connect migration/migration.c:3332:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#3 0x555558a72bd8 in migration_=
-channel_connect migration/channel.c:92:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#4 0x555558a6ef87 in exec_start=
-_outgoing_migration migration/exec.c:42:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#5 0x555558a4f3c2 in qmp_migrat=
-e migration/migration.c:1922:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#6 0x555558bb4f6a in qmp_marsha=
-l_migrate qapi/qapi-commands-migration.c:607:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#7 0x555559363738 in do_qmp_dis=
-patch qapi/qmp-dispatch.c:131:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#8 0x555559362a15 in qmp_dispat=
-ch qapi/qmp-dispatch.c:174:11
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#9 0x5555571bac15 in monitor_qm=
-p_dispatch monitor.c:4124:11
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#10 0x55555719a22d in monitor_q=
-mp_bh_dispatcher monitor.c:4207:9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#11 0x5555594fde0a in aio_bh_ca=
-ll util/async.c:90:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#12 0x5555594fe522 in aio_bh_po=
-ll util/async.c:118:13
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#13 0x5555595201e0 in aio_dispa=
-tch util/aio-posix.c:460:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#14 0x555559503553 in aio_ctx_d=
-ispatch util/async.c:261:5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0#15 0x7ffff6ede196 in g_main_co=
-ntext_dispatch
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4a196)
->> =C2=A0>>
->> =C2=A0>> =C2=A0SUMMARY: AddressSanitizer: heap-use-after-free migratio=
-n/migration.c:1502:23
->> =C2=A0>> =C2=A0=C2=A0=C2=A0in migrate_fd_cleanup
->> =C2=A0>> =C2=A0Shadow bytes around the buggy address:
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffb9f0: fa fa fa fa fa fa fa fa fa =
-fa fa fa fa fa fa fa
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba00: fa fa fa fa fa fa fa fa fa =
-fa fa fa fa fa fa fa
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba10: fa fa fa fa fa fa fa fa fa =
-fa fa fa fa fa fa fa
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba20: fa fa fa fa fa fa fa fa fa =
-fa fa fa fa fa fa fa
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba30: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0=3D>0x0c327fffba40: fd fd[fd]fd fd fd fd fd fd fd fd fd=
- fd fd fd fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba50: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba60: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba70: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba80: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A00x0c327fffba90: fd fd fd fd fd fd fd fd fd =
-fd fd fd fd fd fd fd
->> =C2=A0>> =C2=A0Shadow byte legend (one shadow byte represents 8 applic=
-ation bytes):
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Addressable: 00
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Partially addressable: 01 02 03 04 05 06 07
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Heap left redzone: fa
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Freed heap region: fd
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Stack left redzone: f1
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Stack mid redzone: f2
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Stack right redzone: f3
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Stack after return: f5
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Stack use after scope: f8
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Global redzone: f9
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Global init order: f6
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Poisoned by user: f7
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Container overflow: fc
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Array cookie: ac
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Intra object redzone: bb
->> =C2=A0>> =C2=A0=C2=A0=C2=A0ASan internal: fe
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Left alloca redzone: ca
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Right alloca redzone: cb
->> =C2=A0>> =C2=A0=C2=A0=C2=A0Shadow gap: cc
->> =C2=A0>> =C2=A0=3D=3D31958=3D=3DABORTING
->> =C2=A0>>
->> =C2=A0>> =C2=A0Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
->> =C2=A0>> =C2=A0---
->> =C2=A0>> =C2=A0=C2=A0migration/migration.c | 30 ++++++++++++++++++++++=
-++------
->> =C2=A0>> =C2=A0=C2=A01 file changed, 24 insertions(+), 6 deletions(-)
->> =C2=A0>>
->> =C2=A0>> =C2=A0diff --git a/migration/migration.c b/migration/migratio=
-n.c
->> =C2=A0>> =C2=A0index 609e0df5d0..54d82bb88b 100644
->> =C2=A0>> =C2=A0--- a/migration/migration.c
->> =C2=A0>> =C2=A0+++ b/migration/migration.c
->> =C2=A0>> =C2=A0@@ -128,6 +128,8 @@ static int migration_maybe_pause(Mi=
-grationState *s,
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-nt *current_active_state,
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-nt new_state);
->> =C2=A0>> =C2=A0=C2=A0static void migrate_fd_cancel(MigrationState *s);
->> =C2=A0>> =C2=A0+static void migrate_join_thread(MigrationState *s);
->> =C2=A0>> =C2=A0+static void migrate_fd_cleanup(void *opaque);
->> =C2=A0>>
->> =C2=A0>> =C2=A0=C2=A0void migration_object_init(void)
->> =C2=A0>> =C2=A0=C2=A0{
->> =C2=A0>> =C2=A0@@ -176,6 +178,17 @@ void migration_shutdown(void)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* stop the migratio=
-n using this structure
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0migrate_fd_cancel(current=
-_migration);
->> =C2=A0>> =C2=A0+ /*
->> =C2=A0>> =C2=A0+ * migration_thread schedules cleanup_bh, but migratio=
-n_shutdown is called
->> =C2=A0>> =C2=A0+ * from the end of main, so cleanu_up may not be calle=
-d because main-loop is
->> =C2=A0>> =C2=A0+ * complete. So, wait for the complition of migration_=
-thread, cancel bh and
->> =C2=A0>> =C2=A0+ * call cleanup ourselves.
->> =C2=A0>> =C2=A0+ */
->> =C2=A0>
->> =C2=A0> (Some typos)
->> =C2=A0>
->> =C2=A0Ok :)
->>
->> =C2=A0>> =C2=A0+ migrate_join_thread(current_migration);
->> =C2=A0>
->> =C2=A0> I'll admit to being a bit nervous that something in here could=
- be
->> =C2=A0> hanging and thus we could hang here rather than die as SIGTERM=
- is
->> =C2=A0> expecting us to.
->> =C2=A0>
->> =C2=A0I think it's only way to be sure we havn't other races with migr=
-ation_thread.
->> =C2=A0And this joining is cheaper than vm_shutdown IMHO.
->>
->> =C2=A0>> =C2=A0+ if (current_migration->cleanup_bh) {
->> =C2=A0>> =C2=A0+ qemu_bh_cancel(current_migration->cleanup_bh);
->> =C2=A0>
->> =C2=A0> Is that needed? Doesn't migrate_fd_cleanup start with a qemu_b=
-h_delete?
->> =C2=A0>
->> =C2=A0Agree, it's odd.
->>
->> =C2=A0>> =C2=A0+ migrate_fd_cleanup(current_migration);
->> =C2=A0>> =C2=A0+ }
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0object_unref(OBJECT(curre=
-nt_migration));
->> =C2=A0>> =C2=A0=C2=A0}
->> =C2=A0>>
->> =C2=A0>> =C2=A0@@ -1495,6 +1508,16 @@ static void block_cleanup_parame=
-ters(MigrationState *s)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->> =C2=A0>> =C2=A0=C2=A0}
->> =C2=A0>>
->> =C2=A0>> =C2=A0+static void migrate_join_thread(MigrationState *s)
->> =C2=A0>> =C2=A0+{
->> =C2=A0>> =C2=A0+ qemu_mutex_unlock_iothread();
->> =C2=A0>> =C2=A0+ if (s->migration_thread_running) {
->> =C2=A0>> =C2=A0+ qemu_thread_join(&s->thread);
->> =C2=A0>> =C2=A0+ s->migration_thread_running =3D false;
->> =C2=A0>> =C2=A0+ }
->> =C2=A0>> =C2=A0+ qemu_mutex_lock_iothread();
->> =C2=A0>> =C2=A0+}
->> =C2=A0>> =C2=A0+
->> =C2=A0>> =C2=A0=C2=A0static void migrate_fd_cleanup(void *opaque)
->> =C2=A0>> =C2=A0=C2=A0{
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MigrationState *s =3D opa=
-que;
->> =C2=A0>> =C2=A0@@ -1508,12 +1531,7 @@ static void migrate_fd_cleanup(v=
-oid *opaque)
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Q=
-EMUFile *tmp;
->> =C2=A0>>
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-race_migrate_fd_cleanup();
->> =C2=A0>> =C2=A0- qemu_mutex_unlock_iothread();
->> =C2=A0>> =C2=A0- if (s->migration_thread_running) {
->> =C2=A0>> =C2=A0- qemu_thread_join(&s->thread);
->> =C2=A0>> =C2=A0- s->migration_thread_running =3D false;
->> =C2=A0>> =C2=A0- }
->> =C2=A0>> =C2=A0- qemu_mutex_lock_iothread();
->> =C2=A0>> =C2=A0+ migrate_join_thread(s);
->> =C2=A0>>
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0m=
-ultifd_save_cleanup();
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0q=
-emu_mutex_lock(&s->qemu_file_lock);
->> =C2=A0>
->> =C2=A0> Dave
->> =C2=A0>
->> =C2=A0>> =C2=A0--
->> =C2=A0>> =C2=A02.21.0
->> =C2=A0> --
->> =C2=A0> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+DQoNCk9uIDA4LzA0LzIwMTkgMTM6MDQsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDA4LjA0LjIw
+MTkgdW0gMTE6NDQgaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4NCj4+DQo+
+PiBPbiAwNi8wNC8yMDE5IDAxOjUwLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4NCj4+Pg0KPj4+IE9u
+IDQvNS8xOSAxMDoyNCBBTSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+Pj4+IE9uIGEgZmls
+ZSBzeXN0ZW0gdXNlZCBieSB0aGUgY3VzdG9tZXIsIGZhbGxvY2F0ZSgpIHJldHVybnMgYW4gZXJy
+b3INCj4+Pj4gaWYgdGhlIGJsb2NrIGlzIG5vdCBwcm9wZXJseSBhbGlnbmVkLiBTbywgYmRydl9j
+b19wd3JpdGVfemVyb2VzKCkNCj4+Pj4gZmFpbHMuIFdlIGNhbiBoYW5kbGUgdGhhdCBjYXNlIHRo
+ZSBzYW1lIHdheSBhcyBpdCBpcyBkb25lIGZvciB0aGUNCj4+Pj4gdW5zdXBwb3J0ZWQgY2FzZXMs
+IG5hbWVseSwgY2FsbCB0byBiZHJ2X2RyaXZlcl9wd3JpdGV2KCkgdGhhdCB3cml0ZXMNCj4+Pj4g
+emVyb2VzIHRvIGFuIGltYWdlIGZvciB0aGUgdW5hbGlnbmVkIGNodW5rIG9mIHRoZSBibG9jay4N
+Cj4+Pj4NCj4+Pj4gU3VnZ2VzdGVkLWJ5OiBEZW5pcyBWLiBMdW5ldiA8ZGVuQG9wZW52ei5vcmc+
+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmlj
+aEB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgYmxvY2svaW8uYyB8IDIgKy0NCj4+
+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+Pj4+
+DQo+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9pby5jIGIvYmxvY2svaW8uYw0KPj4+PiBpbmRleCBk
+ZmMxNTNiLi4wNDEyYTUxIDEwMDY0NA0KPj4+PiAtLS0gYS9ibG9jay9pby5jDQo+Pj4+ICsrKyBi
+L2Jsb2NrL2lvLmMNCj4+Pj4gQEAgLTE1MTYsNyArMTUxNiw3IEBAIHN0YXRpYyBpbnQgY29yb3V0
+aW5lX2ZuIGJkcnZfY29fZG9fcHdyaXRlX3plcm9lcyhCbG9ja0RyaXZlclN0YXRlICpicywNCj4+
+Pj4gICAgICAgICAgICAgICAgYXNzZXJ0KCFicy0+c3VwcG9ydGVkX3plcm9fZmxhZ3MpOw0KPj4+
+PiAgICAgICAgICAgIH0NCj4+Pj4gICAgDQo+Pj4+IC0gICAgICAgIGlmIChyZXQgPT0gLUVOT1RT
+VVAgJiYgIShmbGFncyAmIEJEUlZfUkVRX05PX0ZBTExCQUNLKSkgew0KPj4+PiArICAgICAgICBp
+ZiAocmV0IDwgMCAmJiAhKGZsYWdzICYgQkRSVl9SRVFfTk9fRkFMTEJBQ0spKSB7DQo+Pj4+ICAg
+ICAgICAgICAgICAgIC8qIEZhbGwgYmFjayB0byBib3VuY2UgYnVmZmVyIGlmIHdyaXRlIHplcm9l
+cyBpcyB1bnN1cHBvcnRlZCAqLw0KPj4+PiAgICAgICAgICAgICAgICBCZHJ2UmVxdWVzdEZsYWdz
+IHdyaXRlX2ZsYWdzID0gZmxhZ3MgJiB+QkRSVl9SRVFfWkVST19XUklURTsNCj4+Pj4gICAgDQo+
+Pj4+DQo+Pj4NCj4+PiBJIHN1cHBvc2UgdGhhdCBpZiBmYWxsb2NhdGUgZmFpbHMgZm9yIGFueSBy
+ZWFzb24gYW5kIHdlJ3JlIGFsbG93aW5nDQo+Pj4gZmFsbGJhY2ssIHdlJ3JlIGVpdGhlciBnb2lu
+ZyB0byBzdWNjZWVkIC4uLiBvciBmYWlsIGFnYWluIHZlcnkgc29vbg0KPj4+IHRoZXJlYWZ0ZXIu
+DQo+Pj4NCj4+PiBBcmUgdGhlcmUgYW55IGNhc2VzIHdoZXJlIGl0IGlzIHZpdGFsIHRvIG5vdCBp
+Z25vcmUgdGhlIGZpcnN0IGZhbGxvY2F0ZQ0KPj4+IGZhaWx1cmU/IEknbSBhIGxpdHRsZSB3YXJ5
+IG9mIGlnbm9yaW5nIHRoZSByZXR1cm4gY29kZSBmcm9tDQo+Pj4gYmRydl9jb19wd3JpdGVfemVy
+b2VzLCBidXQgSSBhbSBhc3N1bWluZyB0aGF0IGlmIHRoZXJlIGlzIGEgInJlYWwiDQo+Pj4gZmFp
+bHVyZSBoZXJlIHRoYXQgdGhlIGZvbGxvd2luZyBib3VuY2Ugd3JpdGVzIHdpbGwgYWxzbyBmYWls
+ICJzYWZlbHkuIg0KPj4+DQo+Pj4gSSdtIG5vdCBjb21wbGV0ZWx5IGNvbmZpZGVudCwgYnV0IEkg
+aGF2ZSBubyB0YW5naWJsZSBvYmplY3Rpb25zOg0KPj4+IFJldmlld2VkLWJ5OiBKb2huIFNub3cg
+PGpzbm93QHJlZGhhdC5jb20+DQo+Pj4NCj4+DQo+PiBUaGFuayB5b3UgZm9yIHlvdXIgcmV2aWV3
+LCBKb2huIQ0KPj4NCj4+IExldCBtZSBjbGFyaWZ5IHRoZSBjaXJjdW1zdGFuY2VzIGFuZCBxdW90
+ZSB0aGUgYnVnIHJlcG9ydDoNCj4+ICJDdXN0b21lciBoYWQgV2luLTIwMTIgVk0gd2l0aCA1MEdC
+IHN5c3RlbSBkaXNrIHdoaWNoIHdhcyBsYXRlciByZXNpemVkDQo+PiB0byAyNTZHQiB3aXRob3V0
+IHJlc2l6aW5nIHRoZSBwYXJ0aXRpb24gaW5zaWRlIFZNLg0KPj4gTm93LCB3aGlsZSB0cnlpbmcg
+dG8gcmVzaXplIHRvIDUwRywgdGhlIGZvbGxvd2luZyBlcnJvciB3aWxsIGFwcGVhcg0KPj4gJ0Zh
+aWxlZCB0byByZWR1Y2UgdGhlIG51bWJlciBvZiBMMiB0YWJsZXM6IEludmFsaWQgYXJndW1lbnQn
+DQo+PiBJdCB3YXMgZm91bmQgdGhhdCBpdCBpcyBwb3NzaWJsZSB0byBzaHJpbmsgdGhlIGRpc2sg
+dG8gMTI4RyBhbmQgYW55IHNpemUNCj4+IGFib3ZlIHRoYXQgbnVtYmVyLCBidXQgc2l6ZSBiZWxv
+dyAxMjhHIHdpbGwgYnJpbmcgdGhlIG1lbnRpb25lZCBlcnJvci4iDQo+Pg0KPj4gVGhlIGZhbGxv
+Y2F0ZSgpIHJldHVybnMgbm8gZXJyb3Igb24gdGhhdCBmaWxlIHN5c3RlbSBpZiB0aGUgb2Zmc2V0
+IGFuZA0KPj4gdGhlIChvZmZzZXQgKyBieXRlcykgcGFyYW1ldGVycyBvZiB0aGUgYmRydl9jb19k
+b19wd3JpdGVfemVyb2VzKCkgYm90aA0KPj4gYXJlIGFsaWduZWQgdG8gNEsuDQo+IA0KPiBXaGF0
+IGlzIHRoZSByZXR1cm4gdmFsdWUgeW91IGdldCBmcm9tIHRoaXMgZmlsZSBzeXN0ZW0/DQo+IA0K
+PiBNYXliZSB0dXJuaW5nIHRoYXQgaW50byBFTk9UU1VQIGluIGZpbGUtcG9zaXggd291bGQgYmUg
+bGVzcyBpbnZhc2l2ZS4NCj4gSnVzdCBmYWxsaW5nIGJhY2sgZm9yIGFueSBlcnJvciBnaXZlcyBt
+ZSB0aGUgdmFndWUgZmVlbGluZyB0aGF0IGl0IGNvdWxkDQo+IGNhdXNlIHByb2JsZW1zIHNvb25l
+ciBvciBsYXRlci4NCj4gDQo+IEtldmluDQo+IA0KDQpUaGUgcmV0dXJuIHZhbHVlIGZvciB0aGF0
+IGN1c3RvbSBkaXN0cmlidXRlZCBmaWxlIHN5c3RlbSBpcw0KIkludmFsaWQgYXJndW1lbnQiLCB0
+aGF0J3MNCiJFSU5WQUw6IG1vZGUgaXMgRkFMTE9DX0ZMX1pFUk9fUkFOR0UsIGJ1dCB0aGUgZmls
+ZSByZWZlcnJlZCB0bw0KYnkgZmQgaXMgbm90IGEgcmVndWxhciBmaWxlIi4NCg0KV2hlbiBJIHJl
+cHJvZHVjZWQgdGhlIGJ1ZywgSSBzYXcgdGhhdCB0aGUgYWxpZ25tZW50IGluIHRoZQ0KYmRydl9j
+b19kb19wd3JpdGVfemVyb2VzKCkgd2FzIHNldCB0byAnMScgaW4gdGhhdCBjYXNlOg0KDQpNQVgo
+YnMtPmJsLnB3cml0ZV96ZXJvZXNfYWxpZ25tZW50IC89MC8pLA0KICAgICBicy0+YmwucmVxdWVz
+dF9hbGlnbm1lbnQgLz0xLyk7DQoNCldpdGggbXkgZmlyc3QgcGF0Y2ggSSBoYWQgbm90IHNlbnQg
+YmVmb3JlLCBhIG5ldyBtZW1iZXIgb2YgdGhlIHN0cnVjdHVyZQ0KQmxvY2tMaW1pdHMsIHNheSBw
+d3JpdGVfemVyb2VzX2FsaWdubWVudF9taW4sIHdhcyBzZXQgdG8gNEsgZm9yIGEgcmF3DQpmaWxl
+IGFuZCB0aGUgYWxpZ25tZW50IHdhcyBtYWRlIGZvciB0aGUgYmxvY2suIFRoZW4gemVyb2VzIHdl
+cmUgd3JpdHRlbg0KdG8gdGhlIGltYWdlIGZvciB0aGUgdW5hbGlnbmVkIGhlYWQgYW5kIHRhaWwg
+YnkgaW52b2tpbmcgdGhlDQpiZHJ2X2RyaXZlcl9wd3JpdGV2KCkuIFRoYXQgYXBwcm9hY2ggaGFz
+IGNvbnMgYWxzbzogd2Ugd291bGQgd3JpdGUgdG8NCnRoZSBkaXNrIGFsd2F5cy4NCg0KVGhlIGZp
+bGUgc3lzdGVtIG1haW50YWluZXJzIHNheSB0aGF0IHRoZSBidWcgaXMgYSBwYXJ0aWN1bGFyIGNh
+c2UgYW5kDQp0aGV5IG1heSBub3QgcmV0dXJuIHRoZSBnZW5lcmFsIGVycm9yIHN1Y2ggYXMgJ3Vu
+c3VwcG9ydGVkJy4NCi0tIA0KQW5kcmV5DQo=
 
