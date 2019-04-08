@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34419)
+Received: from eggs.gnu.org ([209.51.188.92]:35890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDRuv-0004WZ-PT
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:22 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDS1L-0005rO-94
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDRut-0000cn-OW
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDRuq-0000Rc-1W
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:17 -0400
-References: <20190405153314.2068-1-philmd@redhat.com>
-	<20190405153314.2068-2-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <38bea80e-fe2a-78d6-bd2e-f997ea9e4df2@redhat.com>
-Date: Mon, 8 Apr 2019 12:54:04 +0200
+	(envelope-from <philmd@redhat.com>) id 1hDS1K-0004VR-4d
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:00:59 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:47022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDS1J-0004Uw-Sn
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:00:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id t17so15772866wrw.13
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 04:00:57 -0700 (PDT)
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-13-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <73204a97-3391-141f-e636-3dd2ec5e1fa1@redhat.com>
+Date: Mon, 8 Apr 2019 13:00:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190405153314.2068-2-philmd@redhat.com>
+In-Reply-To: <20190408083627.7479-13-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 1/2] roms: Rename the EFIROM
- variable to avoid clashing with iPXE
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 12/15] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +31,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
-Cc: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 04/05/19 17:33, Philippe Mathieu-Daud=C3=A9 wrote:
-> The iPXE project already uses the EFIROM for a tool named 'efirom'
-> which is not the Intel EfiRom used by the EDK2 project. To make
-> the difference obvious, rename the variable.
->=20
-> This fixes a long standing issue which is now masked since commit
-> f590a812c21 "roms: build the EfiRom utility from the roms/edk2
-> submodule" (but would reappear in the next commit):
-
-[*]
-
->=20
->   $ git checkout f590a812c21~
->   $ make -C roms clean EFIROM=3D$(type -P EfiRom)
->   make: Entering directory '/source/qemu/roms'
->   [...]
->   make -C ipxe/src veryclean
->   make[1]: Entering directory '/source/qemu/roms/ipxe/src'
->   rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.* b=
-in{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin ./util/el=
-f2efi32 ./util/elf2efi64 /usr/bin/EfiRom ./util/efifatbin ./util/iccfix .=
-/util/einfo TAGS bin{,-*}/symtab
->   rm: cannot remove '/usr/bin/EfiRom': Permission denied
->   make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
->   make[1]: Leaving directory '/source/qemu/roms/ipxe/src'
->   make: *** [Makefile:152: clean] Error 2
->   make: Leaving directory '/source/qemu/roms'
->=20
-> Reported-by: Olaf Hering <olaf@aepfle.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 4/8/19 10:36 AM, Markus Armbruster wrote:
+> We commonly want to print to the current monitor if we have one, else
+> to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+> we have is monitor_vfprintf(), which is rather unwieldy.  We often
+> print to stderr just because error_printf() is easier.
+> 
+> New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+> next commits will put them to use.
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  roms/Makefile | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/roms/Makefile b/roms/Makefile
-> index 78d5dd18c30..d28252dafdf 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
->  # We need that to combine multiple images (legacy bios,
->  # efi ia32, efi x64) into a single rom binary.
->  #
-> -EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> +EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> =20
->  default:
->  	@echo "nothing is build by default"
-> @@ -102,8 +102,8 @@ pxe-rom-%: build-pxe-roms
-> =20
->  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-> =20
-> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
-> -	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
-> +efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-> +	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
->  		-b ipxe/src/bin/$(VID)$(DID).rom \
->  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
->  		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
-> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
->  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-> =20
-> -$(EFIROM):
-> +$(EDK2_EFIROM):
->  	$(MAKE) -C edk2/BaseTools
-> =20
->  slof:
->=20
+>  MAINTAINERS               |  2 ++
+>  include/qemu/qemu-print.h | 19 ++++++++++++++++++
+>  stubs/monitor.c           |  5 +++++
+>  util/Makefile.objs        |  1 +
+>  util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 69 insertions(+)
+>  create mode 100644 include/qemu/qemu-print.h
+>  create mode 100644 util/qemu-print.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac8ab..1aa19dc4ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1895,6 +1895,8 @@ F: hmp.[ch]
+>  F: hmp-commands*.hx
+>  F: include/monitor/hmp-target.h
+>  F: tests/test-hmp.c
+> +F: include/qemu/qemu-print.h
+> +F: util/qemu-print.c
+>  
+>  Network device backends
+>  M: Jason Wang <jasowang@redhat.com>
+> diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+> new file mode 100644
+> index 0000000000..8fed32bf42
+> --- /dev/null
+> +++ b/include/qemu/qemu-print.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_PRINT_H
+> +#define QEMU_PRINT_H
+> +
+> +int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 
-Upon reading your and Olaf's comments in the v1 thread:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-  [PATCH for-4.0] roms: Allow the EFIROM variable to be overridden
-
-I've changed my mind on this series.
-
-Please insert a paragraph at [*] in the commit message:
-
-"iPXE's 'veryclean' recipe removes $(EFIROM) even if the EFIROM macro
-originates from elsewhere."
-
-With that:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-(I'll comment under patch#2 separately.)
-
-Thank you for picking this up.
-Laszlo
+> +
+> +#endif
+> diff --git a/stubs/monitor.c b/stubs/monitor.c
+> index b57fe6c32f..b2ea975e40 100644
+> --- a/stubs/monitor.c
+> +++ b/stubs/monitor.c
+> @@ -6,6 +6,11 @@
+>  
+>  __thread Monitor *cur_mon;
+>  
+> +int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+> +{
+> +    abort();
+> +}
+> +
+>  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+>  {
+>      error_setg(errp, "only QEMU supports file descriptor passing");
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 835fcd69e2..9206878dec 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -23,6 +23,7 @@ util-obj-y += bitmap.o bitops.o hbitmap.o
+>  util-obj-y += fifo8.o
+>  util-obj-y += cacheinfo.o
+>  util-obj-y += error.o qemu-error.o
+> +util-obj-y += qemu-print.o
+>  util-obj-y += id.o
+>  util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+>  util-obj-y += qemu-option.o qemu-progress.o
+> diff --git a/util/qemu-print.c b/util/qemu-print.c
+> new file mode 100644
+> index 0000000000..86f9417af8
+> --- /dev/null
+> +++ b/util/qemu-print.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "monitor/monitor.h"
+> +#include "qemu/qemu-print.h"
+> +
+> +/*
+> + * Print like vprintf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_vprintf(const char *fmt, va_list ap)
+> +{
+> +    if (cur_mon) {
+> +        return monitor_vprintf(cur_mon, fmt, ap);
+> +    }
+> +    return vprintf(fmt, ap);
+> +}
+> +
+> +/*
+> + * Print like printf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_printf(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    int ret;
+> +
+> +    va_start(ap, fmt);
+> +    ret = qemu_vprintf(fmt, ap);
+> +    va_end(ap);
+> +    return ret;
+> +}
+> 
