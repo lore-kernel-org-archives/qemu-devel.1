@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50010)
+Received: from eggs.gnu.org ([209.51.188.92]:52796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDR1O-00086w-QD
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:56:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hDRFt-0002sV-9G
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDR1L-0005VP-VZ
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:56:58 -0400
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon, 8 Apr 2019 09:56:37 +0000
-Message-ID: <d4593259-c3a8-8e84-cbbb-8caf02d6b9a7@virtuozzo.com>
-References: <1551346019-293202-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<28859adc-27c2-e2ed-3f24-ba620236970f@redhat.com>
-In-Reply-To: <28859adc-27c2-e2ed-3f24-ba620236970f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <989E22637DC47246A2E806680027669E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1hDRFr-0005LD-Tv
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:11:57 -0400
+Date: Mon, 8 Apr 2019 12:04:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190408100442.GA11997@linux.fritz.box>
+References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+	<468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qcow2: discard bitmap when
- removed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
+ allocation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-UElOR0lORw0KDQpJIGtpbmRseSByZW1pbmQgeW91IGFib3V0IHRoaXMgc21hbGwgcGF0Y2ggZm9y
-IFFFTVUgNC4xLg0KSSBhbSBnb2luZyB0byBiZSBhd2F5IGZvciB2YWNhdGlvbiBmcm9tIEFwcmls
-LCAxMHRoIHRvIE1heSwgMTV0aC4NCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5
-IFNoaW5rZXZpY2gNCg0KDQpPbiAxOS8wMy8yMDE5IDAxOjE4LCBKb2huIFNub3cgd3JvdGU6DQo+
-IA0KPiANCj4gT24gMi8yOC8xOSA0OjI2IEFNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+
-IFdoZW4gYSBiaXRtYXAgaXMgcmVtb3ZlZCwgd2UgY2FuIGNsZWFuIHNvbWUgc3BhY2Ugb24gdGhl
-IGRpc2suIFRoZSBzaXplDQo+PiBvZiBhIGNsdXN0ZXIgbWF5IGJlIGxhcmdlciwgc28gaXMgdGhl
-IHNpemUgb2YgdGhlIGJpdG1hcCB0aGF0IGluY2x1ZGVzDQo+PiBtYW55IGNsdXN0ZXJzLiBTb21l
-IGJpdG1hcHMgY2FuIGJlIGFzIGxhcmdlIGFzIHRlbnMgb2YgbWVnYWJ5dGVzLg0KPj4gVGhlIGZs
-YWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMgYWxsb3dzIGEgY2FsbCB0byB0aGUgcmF3X2NvX3BkaXNj
-YXJkKCkNCj4+IHRoYXQgZG9lcyB0aGUgYWN0dWFsIGNsZWFuaW5nIG9mIHRoZSBpbWFnZSBvbiBk
-aXNrLCB3aGlsZSB3aXRoIHRoZSBmbGFnDQo+PiBRQ09XMl9ESVNDQVJEX09USEVSLCBhIHJlZmVy
-ZW5jZSBjb3VudCBvZiB0aGUgY2x1c3RlciBpcyB1cGRhdGVkIG9ubHkuDQo+Pg0KPj4gU2lnbmVk
-LW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5j
-b20+DQo+PiAtLS0NCj4+IHYxOiBEaXNjYXJkIG9sZCBiaXRtYXAgZGlyZWN0b3JpZXMgaW4gUUNP
-VzIgaW1hZ2UNCj4+DQo+PiBJbiB0aGUgZmlyc3QgdmVyc2lvbiBvZiB0aGUgcGF0Y2gsIGFueSBj
-YWxsIHRvIHFjb3cyX2ZyZWVfY2x1c3RlcnMoKSBpbg0KPj4gYmxvY2svcWNvdzItYml0bWFwLmMg
-d2FzIHdpdGggdGhlIGZsYWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMsIGV2ZW4gaW4gdGhlDQo+PiBj
-YXNlcyB3aGVuIHRoZSBjbGVhbmVkIHNwYWNlIGlzIGluc2lnbmlmaWNhbnQsIHBhcnRpY3VsYXJs
-eSwgaW4gY2FzZSBvZg0KPj4gYml0bWFwIGRpcmVjdG9yaWVzLg0KPj4gRGlzY3Vzc2VkIGluIHRo
-ZSBlbWFpbCB0aHJlYWQgd2l0aCB0aGUgbWVzc2FnZSBJRA0KPj4gPDE1NDk5NzQ5NTEtNzMxMjg1
-LTEtZ2l0LXNlbmQtZW1haWwtYW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4+DQo+
-PiAgIGJsb2NrL3Fjb3cyLWJpdG1hcC5jIHwgMiArLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMSBp
-bnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNv
-dzItYml0bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KPj4gaW5kZXggM2VlNTI0ZC4uMTYy
-NzQ0ZSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jDQo+PiArKysgYi9ibG9j
-ay9xY293Mi1iaXRtYXAuYw0KPj4gQEAgLTIwMiw3ICsyMDIsNyBAQCBzdGF0aWMgdm9pZCBjbGVh
-cl9iaXRtYXBfdGFibGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90ICpiaXRtYXBfdGFi
-bGUsDQo+PiAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gICAgICAgICAgIH0NCj4+ICAgDQo+
-PiAtICAgICAgICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBhZGRyLCBzLT5jbHVzdGVyX3NpemUs
-IFFDT1cyX0RJU0NBUkRfT1RIRVIpOw0KPj4gKyAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhi
-cywgYWRkciwgcy0+Y2x1c3Rlcl9zaXplLCBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7DQo+PiAgICAg
-ICAgICAgYml0bWFwX3RhYmxlW2ldID0gMDsNCj4+ICAgICAgIH0NCj4+ICAgfQ0KPj4NCj4gTG9v
-a3MgbGlrZSA0LjEgbWF0ZXJpYWwgbm93LiBLZXZpbiBtYXkgaGF2ZSBiZWVuIGV4cGVjdGluZyBt
-ZSB0byBlbmdhZ2UNCj4gd2l0aCB0aGlzLCBldmVuIHRob3VnaCBJIGRvIG5vdCBtYWludGFpbiB0
-aGUgcWNvdzItYml0bWFwLmMgZmlsZS4gKEFuZA0KPiBJJ20gdmVyeSBiZWhpbmQgb24gcmVhZGlu
-ZyBtYWlsIHRoYXQgd2FzIG5vdCBkaXJlY3RseSBhZGRyZXNzZWQgdG8gbWUsDQo+IHNvcnJ5Li4u
-ISkNCj4gDQo+IFBsZWFzZSByZXNlbmQgd2hlbiB0aGUgNC4xIHdpbmRvdyBvcGVucyBhbmQgd2Un
-bGwgYWRkcmVzcyB0aGlzIHRoZW4uDQo+IA0KPiAtLWpzDQo+IA0KDQo=
+Am 08.04.2019 um 11:44 hat Andrey Shinkevich geschrieben:
+> 
+> 
+> On 06/04/2019 01:50, John Snow wrote:
+> > 
+> > 
+> > On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
+> >> On a file system used by the customer, fallocate() returns an error
+> >> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
+> >> fails. We can handle that case the same way as it is done for the
+> >> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
+> >> zeroes to an image for the unaligned chunk of the block.
+> >>
+> >> Suggested-by: Denis V. Lunev <den@openvz.org>
+> >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> >> ---
+> >>   block/io.c | 2 +-
+> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/block/io.c b/block/io.c
+> >> index dfc153b..0412a51 100644
+> >> --- a/block/io.c
+> >> +++ b/block/io.c
+> >> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+> >>               assert(!bs->supported_zero_flags);
+> >>           }
+> >>   
+> >> -        if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
+> >> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
+> >>               /* Fall back to bounce buffer if write zeroes is unsupported */
+> >>               BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
+> >>   
+> >>
+> > 
+> > I suppose that if fallocate fails for any reason and we're allowing
+> > fallback, we're either going to succeed ... or fail again very soon
+> > thereafter.
+> > 
+> > Are there any cases where it is vital to not ignore the first fallocate
+> > failure? I'm a little wary of ignoring the return code from
+> > bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
+> > failure here that the following bounce writes will also fail "safely."
+> > 
+> > I'm not completely confident, but I have no tangible objections:
+> > Reviewed-by: John Snow <jsnow@redhat.com>
+> > 
+> 
+> Thank you for your review, John!
+> 
+> Let me clarify the circumstances and quote the bug report:
+> "Customer had Win-2012 VM with 50GB system disk which was later resized 
+> to 256GB without resizing the partition inside VM.
+> Now, while trying to resize to 50G, the following error will appear
+> 'Failed to reduce the number of L2 tables: Invalid argument'
+> It was found that it is possible to shrink the disk to 128G and any size 
+> above that number, but size below 128G will bring the mentioned error."
+> 
+> The fallocate() returns no error on that file system if the offset and
+> the (offset + bytes) parameters of the bdrv_co_do_pwrite_zeroes() both
+> are aligned to 4K.
+
+What is the return value you get from this file system?
+
+Maybe turning that into ENOTSUP in file-posix would be less invasive.
+Just falling back for any error gives me the vague feeling that it could
+cause problems sooner or later.
+
+Kevin
