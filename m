@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38403)
+Received: from eggs.gnu.org ([209.51.188.92]:46327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDJyU-0000jW-Lu
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1hDKuu-0006Xm-5o
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 23:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDJyT-0005Hf-Db
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:30 -0400
-Resent-Message-Id: <E1hDJyT-0005Hf-Db@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21563)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDJyT-0005HP-3R
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:29 -0400
-Message-ID: <155469029685.12882.6842154497172555422@76452e4e88f2>
-In-Reply-To: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peterx@redhat.com>) id 1hDKut-00013A-8G
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 23:25:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hDKut-00012R-1O
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 23:25:51 -0400
+Date: Mon, 8 Apr 2019 11:25:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190408032543.GE23212@xz-x1>
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 7 Apr 2019 19:24:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] ui/cocoa: Fix absolute and relative
- input issues on Mojave
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, kraxel@redhat.com
+To: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9CNzg2RjAwRC01NTE4LTQwNUIt
-QjBBQy1DNUJGMkQ3MjgzRjVAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiBCNzg2RjAwRC01NTE4LTQwNUItQjBBQy1DNUJGMkQ3
-MjgzRjVAbWUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXSB1aS9jb2NvYTog
-Rml4IGFic29sdXRlIGFuZCByZWxhdGl2ZSBpbnB1dCBpc3N1ZXMgb24gTW9qYXZlClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy9CNzg2RjAwRC01NTE4LTQwNUItQjBBQy1DNUJGMkQ3MjgzRjVAbWUuY29tIC0+IHBhdGNoZXcv
-Qjc4NkYwMEQtNTUxOC00MDVCLUIwQUMtQzVCRjJENzI4M0Y1QG1lLmNvbQpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjljNWM3ZjA0N2QgdWkvY29jb2E6IEZpeCBtb3VzZSBncmFiYmlu
-ZyBpbiBmdWxsc2NyZWVuIG1vZGUgZm9yIHJlbGF0aXZlIGlucHV0IGRldmljZQpmZmU3NmJhZmMx
-IHVpL2NvY29hOiBGaXggYWJzb2x1dGUgaW5wdXQgZGV2aWNlIGdyYWJiaW5nIGlzc3VlIG9uCgo9
-PT0gT1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGZmZTc2YmFmYzFiYiAodWkv
-Y29jb2E6IEZpeCBhYnNvbHV0ZSBpbnB1dCBkZXZpY2UgZ3JhYmJpbmcgaXNzdWUgb24pCkVSUk9S
-OiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6
-IApBdXRob3I6IENoZW4gWmhhbmcgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
-Zz4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjEgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-MS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDljNWM3
-ZjA0N2RhOCAodWkvY29jb2E6IEZpeCBtb3VzZSBncmFiYmluZyBpbiBmdWxsc2NyZWVuIG1vZGUg
-Zm9yIHJlbGF0aXZlIGlucHV0IGRldmljZSkKRVJST1I6IEF1dGhvciBlbWFpbCBhZGRyZXNzIGlz
-IG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1dGhvcjogQ2hlbiBaaGFuZyB2aWEg
-UWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAxMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-L0I3ODZGMDBELTU1MTgtNDA1Qi1CMEFDLUM1QkYyRDcyODNGNUBtZS5jb20vdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Sun, Apr 07, 2019 at 10:19:05PM -0400, Catherine Ho wrote:
+> Currently it is not forbidden to use "-object memory-backend-file,share=on"
+> and together with "-incoming". But after incoming migration is finished,
+> the memory-backend-file will be definitely written if share=on. So the
+> memory-backend-file can only be used once, but failed in the 2nd time
+> incoming.
+> 
+> Thus it gives a warning and the users can run the qemu if they really
+> want to do it.
+> 
+> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> ---
+>  backends/hostmem-file.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 37ac6445d2..59429ee0b4 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/hostmem.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qom/object_interfaces.h"
+> +#include "migration/migration.h"
+>  
+>  /* hostmem-file.c */
+>  /**
+> @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>          }
+>      }
+>  
+> +    /*
+> +     * In ignore shared case, if share=on for host memory backend file,
+> +     * the ram might be written after incoming process is finished. Thus
+> +     * the memory backend can't be reused for 2nd/3rd... incoming
+> +     */
+> +    if (backend->share && migrate_ignore_shared()
+> +                       && runstate_check(RUN_STATE_INMIGRATE))
+> +        warn_report("share=on for memory backend file might be "
+> +                        "conflicted with incoming in ignore shared case");
+
+I feel like this message wasn't really clear to me...  you want to
+warn people these data might not match with each other, right?  How
+about simply state it:
+
+  NOTE: Please make sure the data on the shared memory backend file
+  and the data from the incoming migration stream contains matching
+  contents, otherwise...
+
+Regards,
+
+-- 
+Peter Xu
