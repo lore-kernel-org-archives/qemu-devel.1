@@ -2,63 +2,68 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDF5C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 12:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3BFC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D05C21473
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 12:55:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D05C21473
+	by mail.kernel.org (Postfix) with ESMTPS id EACF7213F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:02:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EACF7213F2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52686 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52833 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDTo7-0007Ss-Kc
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 08:55:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34096)
+	id 1hDTug-0000zk-1b
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 09:02:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDTnG-00079F-F0
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:54:35 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1hDTtl-0000iV-PI
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDTnF-0000ls-26
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:54:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52436)
+	(envelope-from <jfreimann@redhat.com>) id 1hDTtg-0005PF-GG
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hDTnE-0000jT-IQ; Mon, 08 Apr 2019 08:54:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1hDTtc-0005Df-LN
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E780130BC660;
-	Mon,  8 Apr 2019 12:54:30 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3F7162B9E0;
-	Mon,  8 Apr 2019 12:54:29 +0000 (UTC)
-Date: Mon, 8 Apr 2019 14:54:24 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190408145424.45af3db8@redhat.com>
-In-Reply-To: <1553849325-44201-4-git-send-email-like.xu@linux.intel.com>
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<1553849325-44201-4-git-send-email-like.xu@linux.intel.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 3988B2D7FB;
+	Mon,  8 Apr 2019 13:00:55 +0000 (UTC)
+Received: from localhost (dhcp-192-206.str.redhat.com [10.33.192.206])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 59B6B5DA2A;
+	Mon,  8 Apr 2019 13:00:51 +0000 (UTC)
+Date: Mon, 8 Apr 2019 15:00:50 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190408130050.66zn2725wky3aoqd@jenstp.localdomain>
+References: <20190322134447.14831-1-jfreimann@redhat.com>
+	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
+	<20190405085628.GA2819@work-vm>
+	<20190405191850-mutt-send-email-mst@kernel.org>
+	<20190408091649.GD2687@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Disposition: inline
+In-Reply-To: <20190408091649.GD2687@work-vm>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Mon, 08 Apr 2019 12:54:31 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Mon, 08 Apr 2019 13:00:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/9] cpu/topology: add uncommon arch
- support for smp machine properties
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
+ assigned network devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,209 +75,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, like.xu@intel.com,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: pkrempa@redhat.com, ehabkost@redhat.com,
+	"Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
+	qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com,
+	liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com,
+	ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408125424.tn1nHBg_I4EKKyB8b60XeHD6HTXoitXQUgNfhoDKIgY@z>
+Message-ID: <20190408130050.DZYDLi6nVMAnAWytaXhBWh8bHP6oGRlmPv2wYAVfHao@z>
 
-On Fri, 29 Mar 2019 16:48:39 +0800
-Like Xu <like.xu@linux.intel.com> wrote:
+On Mon, Apr 08, 2019 at 10:16:50AM +0100, Dr. David Alan Gilbert wrote:
+>* Michael S. Tsirkin (mst@redhat.com) wrote:
+>> On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
+>> > * Jens Freimann (jfreimann@redhat.com) wrote:
+>> > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
+>> > > > This is another attempt at implementing the host side of the
+>> > > > net_failover concept
+>> > > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+>> > > >
+>> > > > The general idea is that we have a pair of devices, a vfio-pci and a
+>> > > > emulated device. Before migration the vfio device is unplugged and data
+>> > > > flows to the emulated device, on the target side another vfio-pci device
+>> > > > is plugged in to take over the data-path. In the guest the net_failover
+>> > > > module will pair net devices with the same MAC address.
+>> > > >
+>> > > > * In the first patch the infrastructure for hiding the device is added
+>> > > >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
+>> > > >  state and it is set based on a callback to the standby device which
+>> > > >  registers itself for handling the assessment: "should the primary device
+>> > > >  be hidden?" by cross validating the ids of the devices.
+>> > > >
+>> > > > * In the second patch the virtio-net uses the API to hide the vfio
+>> > > >  device and unhides it when the feature is acked.
+>> > > >
+>> > > > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
+>> > > >
+>> > > > To summarize concerns/feedback from previous discussion:
+>> > > > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+>> > > >  Migration might get stuck for unpredictable time with unclear reason.
+>> > > >  This approach combines two tricky things, hot/unplug and migration.
+>> > > >  -> We can surprise-remove the PCI device and in QEMU we can do all
+>> > > >     necessary rollbacks transparent to management software. Will it be
+>> > > >     easy, probably not.
+>> >
+>> > This sounds 'fun' - bonus cases are things like what happens if the
+>> > guest gets rebooted somewhere during the process or if it's currently
+>> > sitting in the bios/grub/etc
+>>
+>> Um, during which process? Guests are gradually fixed to support
+>> surprise removal well. Part of it is thunderbolt which makes
+>> it incredibly easy. Yes - bios/grub will need to learn to
+>> handle this well.
+>
+>Ignoring the actual mechanism of the unplug itself; there are probably
+>loads of cases; e.g.
+>
+>      running with both cards
+>      hot unplug real card
+>      start migration
+>      guest reboots
+>        Kernel sees only the virtio card
+>      migration completes
+>      hotadd the real card back
+>
+>so the guest has to know to pair the real card even though it booted
+>with only the virtio card.
 
-here should be a commit message explaining what patch does
-in more detail.
+Maybe I misunderstand, but, when the 'real card' is added back after
+migration the net_failover driver in the guest will know to pair it
+with the virtio card because they have the same MAC address. Did you
+mean something else?
 
+>I'm sure there are loads of other corners.
 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Probably yes.
 
-Generic note, try not call qdev_get_machine() every time
-you replace smp_cpus or other variables. It's often possible
-to pass MachineState via call chain with trivial fixups.
-
-> ---
->  hw/alpha/dp264.c     | 1 +
->  hw/hppa/machine.c    | 4 ++++
->  hw/mips/boston.c     | 1 +
->  hw/mips/mips_malta.c | 9 +++++++++
->  hw/sparc/sun4m.c     | 2 ++
->  hw/sparc64/sun4u.c   | 2 ++
->  hw/xtensa/sim.c      | 1 +
->  hw/xtensa/xtfpga.c   | 1 +
->  8 files changed, 21 insertions(+)
-> 
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index 0347eb8..ee5d432 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
->      char *palcode_filename;
->      uint64_t palcode_entry, palcode_low, palcode_high;
->      uint64_t kernel_entry, kernel_low, kernel_high;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->  
->      /* Create up to 4 cpus.  */
->      memset(cpus, 0, sizeof(cpus));
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index d1b1d3c..f652891 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -16,6 +16,7 @@
->  #include "hw/ide.h"
->  #include "hw/timer/i8254.h"
->  #include "hw/char/serial.h"
-> +#include "hw/boards.h"
->  #include "hppa_sys.h"
->  #include "qemu/units.h"
->  #include "qapi/error.h"
-> @@ -72,6 +73,7 @@ static void machine_hppa_init(MachineState *machine)
->      MemoryRegion *ram_region;
->      MemoryRegion *cpu_region;
->      long i;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
-I'd prefer to replace smp_cpus with machine->topo.smp_cpus
-directly at places it's used, as it makes affected sites
-more visible in the patch.
-And use local smp_cpus only in places where using machine->topo.smp_cpus
-makes core less readable.
-(but it's just personal preference so I don't insist on it)
-
->  
->      ram_size = machine->ram_size;
->  
-> @@ -242,7 +244,9 @@ static void machine_hppa_init(MachineState *machine)
->  
->  static void hppa_machine_reset(void)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
->      int i;
-> +    unsigned int smp_cpus = ms->topo.smp_cpus;
-
-***)
-It would be better to pass MachineState as argument to
-hppa_machine_reset(), a patch to so should go before this one.
-
-Quick look shows only 3 overrides (hppa, pc, pnv) and one caller,
-so I'd rather fix it than calling qdev_get_machine() unnecessarily 
-
->  
->      qemu_devices_reset();
->  
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index e5bab3c..7752c10 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -434,6 +434,7 @@ static void boston_mach_init(MachineState *machine)
->      DriveInfo *hd[6];
->      Chardev *chr;
->      int fw_size, fit_err;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->      bool is_64b;
->  
->      if ((machine->ram_size % GiB) ||
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 439665a..d595375 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
->  
->  static void malta_mips_config(MIPSCPU *cpu)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->      CPUMIPSState *env = &cpu->env;
->      CPUState *cs = CPU(cpu);
-this one also called from reset, so the same [***] applies here too.
-
->  
-> @@ -1127,9 +1129,11 @@ static void main_cpu_reset(void *opaque)
->  static void create_cpu_without_cps(const char *cpu_type,
->                                     qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-caller has an access to MachineState so pass it down call chain all the way
-
->      CPUMIPSState *env;
->      MIPSCPU *cpu;
->      int i;
-> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->  
->      for (i = 0; i < smp_cpus; i++) {
->          cpu = MIPS_CPU(cpu_create(cpu_type));
-> @@ -1149,7 +1153,9 @@ static void create_cpu_without_cps(const char *cpu_type,
->  static void create_cps(MaltaState *s, const char *cpu_type,
->                         qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-ditto
-
->      Error *err = NULL;
-> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->  
->      s->cps = MIPS_CPS(object_new(TYPE_MIPS_CPS));
->      qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
-> @@ -1171,6 +1177,9 @@ static void create_cps(MaltaState *s, const char *cpu_type,
->  static void mips_create_cpu(MaltaState *s, const char *cpu_type,
->                              qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-ditto
-
-> +    unsigned int smp_cpus = ms->topo.smp_cpus;
-> +
->      if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
->          create_cps(s, cpu_type, cbus_irq, i8259_irq);
->      } else {
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index ca1e382..2321cfb 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -853,6 +853,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->      unsigned int num_vsimms;
->      DeviceState *dev;
->      SysBusDevice *s;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
-> +    unsigned int max_cpus = machine->topo.max_cpus;
->  
->      /* init CPUs */
->      for(i = 0; i < smp_cpus; i++) {
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 399f2d7..d089c4d 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -546,6 +546,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      NICInfo *nd;
->      MACAddr macaddr;
->      bool onboard_nic;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
-> +    unsigned int max_cpus = machine->topo.max_cpus;
->  
->      /* init CPUs */
->      cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
-> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> index 12c7437..cc0396b 100644
-> --- a/hw/xtensa/sim.c
-> +++ b/hw/xtensa/sim.c
-> @@ -59,6 +59,7 @@ static void xtensa_sim_init(MachineState *machine)
->      ram_addr_t ram_size = machine->ram_size;
->      const char *kernel_filename = machine->kernel_filename;
->      int n;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->  
->      for (n = 0; n < smp_cpus; n++) {
->          cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index e05ef75..f71a15e 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->      const unsigned system_io_size = 224 * MiB;
->      uint32_t freq = 10000000;
->      int n;
-> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->  
->      if (smp_cpus > 1) {
->          mx_pic = xtensa_mx_pic_init(31);
-
+regards,
+Jens 
 
