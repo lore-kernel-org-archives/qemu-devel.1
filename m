@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45860)
+Received: from eggs.gnu.org ([209.51.188.92]:46931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDWIz-0002rw-2g
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:35:29 -0400
+	(envelope-from <berto@igalia.com>) id 1hDWNS-0003xq-ES
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:40:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDWIy-0006hC-4F
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:35:29 -0400
-Date: Mon, 8 Apr 2019 16:35:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190408153520.GG2687@work-vm>
-References: <20190408153003.20596-1-armbru@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1hDWNO-00024X-3t
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:40:06 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1554483379-682051-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1554483379-682051-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1554483379-682051-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Mon, 08 Apr 2019 17:39:54 +0200
+Message-ID: <w511s2cy08l.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190408153003.20596-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hmp: Fix drive_add ... format=help crash
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] block/stream: introduce a bottom
+ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> drive_new() returns null without setting an error when it provided
-> help.  add_init_drive() assumes null means failure, and crashes trying
-> to report a null error.
-> 
-> Fixes: c4f26c9f37ce511e5fe629c21c180dc6eb7c5a25
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> v2: Make tests/test-hmp.c cover the bug
-> 
->  device-hotplug.c | 2 +-
->  tests/test-hmp.c | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/device-hotplug.c b/device-hotplug.c
-> index 6090d5f1e9..6153259d71 100644
-> --- a/device-hotplug.c
-> +++ b/device-hotplug.c
-> @@ -48,7 +48,7 @@ static DriveInfo *add_init_drive(const char *optstr)
+On Fri 05 Apr 2019 06:56:19 PM CEST, Andrey Shinkevich wrote:
+> @@ -232,8 +232,13 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+>      StreamBlockJob *s;
+>      BlockDriverState *iter;
+>      bool bs_read_only;
+> +    BlockDriverState *bottom = NULL;
+> +    int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
+> +
+> +    /* Find the bottom node that has the base as its backing image */
+> +    bottom = bdrv_find_overlay(bs, base);
+
+What happens if bs == base here ??
+
+> +    /*
+> +     * Block all intermediate nodes between bs and bottom (inclusive), because
+> +     * they will disappear from the chain after this operation. The streaming
+> +     * job reads every block only once, assuming that it doesn't change, so
+> +     * forbid writes and resizes.
+> +     */
+> +    for (iter = bs; iter != bottom; iter = backing_bs(iter)) {
+> +        block_job_add_bdrv(&s->common, "intermediate node", backing_bs(iter),
+> +                           0, basic_flags, &error_abort);
+>      }
+
+This stops when iter == bottom, so bottom is not actually blocked.
+
+> diff --git a/block/trace-events b/block/trace-events
+> index 7335a42..5366d45 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -20,7 +20,7 @@ bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_of
 >  
->      mc = MACHINE_GET_CLASS(current_machine);
->      dinfo = drive_new(opts, mc->block_default_type, &err);
-> -    if (!dinfo) {
-> +    if (err) {
->          error_report_err(err);
->          qemu_opts_del(opts);
->          return NULL;
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 8c49d2fdf1..54a01824dc 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -31,6 +31,7 @@ static const char *hmp_cmds[] = {
->      "cpu 0",
->      "device_add ?",
->      "device_add usb-mouse,id=mouse1",
-> +    "drive_add ignored format=help",
+>  # stream.c
+>  stream_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
+> -stream_start(void *bs, void *base, void *s) "bs %p base %p s %p"
+> +stream_start(void *bs, void *bottom, void *s) "bs %p bottom %p s %p"
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Is this change still correct? We don't pass bottom anymore.
 
->      "mouse_button 7",
->      "mouse_move 10 10",
->      "mouse_button 0",
-> -- 
-> 2.17.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Berto
