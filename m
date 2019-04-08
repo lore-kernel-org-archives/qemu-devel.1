@@ -2,114 +2,110 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2722C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842BAC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B66FC213F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B66FC213F2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3E326213F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:52:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZvbBAt42"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E326213F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53422 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDUcf-0005da-2S
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 09:47:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45958)
+	id 1hDUhi-0006z3-Ev
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 09:52:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDUbD-0004rL-Ir
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDUgn-0006aP-6t
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDUbC-0003uF-9H
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:36897)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hDUbB-0003rj-TF
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:10 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1N3bfB-1gmNKx04Fn-010Z55; Mon, 08 Apr 2019 15:45:48 +0200
-To: ghorges <ghorges@xiyoulinux.org>, qemu-devel@nongnu.org
-References: <20190408133854.25737-1-ghorges@xiyoulinux.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <3bbe2125-8542-cdc9-621c-830a0f3c0e8a@vivier.eu>
-Date: Mon, 8 Apr 2019 15:45:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190408133854.25737-1-ghorges@xiyoulinux.org>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDUgl-0007kQ-US
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:51:57 -0400
+Received: from mail-eopbgr80115.outbound.protection.outlook.com
+	([40.107.8.115]:20715
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hDUgi-0007hv-ER; Mon, 08 Apr 2019 09:51:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=82EMThwMRLzRUhe9P7RYhT8GoZa9hcuGu9FvSjT1fMA=;
+	b=ZvbBAt42G0T1TzCJ4b+sRHNKt/158+3GQy5WxqGhaepmkPqfZoo445+JFoxeq8y++xqQDcdcsfGampOU8M7E1dwjQ1JYgtNOWJsI5vKBeIkSZjMscUhMtpeu21L9Nd//SRxiwuIP+v4M0wjHY4CLfHBnBrkIqak8pmHflivmc5k=
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
+	DB7PR08MB3289.eurprd08.prod.outlook.com (52.134.111.27) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.19; Mon, 8 Apr 2019 13:51:47 +0000
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949]) by
+	DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1771.021;
+	Mon, 8 Apr 2019 13:51:47 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+Thread-Topic: [PATCH 4/7] iotests: Update 241 to expose backing layer
+	fragmentation
+Thread-Index: AQHU6codgi5M7m/JxEicxYLuupn+3qYyUNIA
+Date: Mon, 8 Apr 2019 13:51:46 +0000
+Message-ID: <7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
+References: <20190403030526.12258-1-eblake@redhat.com>
+	<20190403030526.12258-5-eblake@redhat.com>
+In-Reply-To: <20190403030526.12258-5-eblake@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:H3iAa+vxPEsmjV6dYFyOHVwQsh+R7F01Km3+tMAgAIwtAr46J6x
-	wpRITSF63vLb/GOwrBlA2Q/SiovakfBlW/RjuKfbxCQGBEp38SmU8TiSaveJgYs4kVRXdYJ
-	ur4bbOrc/OLIDyN4fJpperny/ESlgMibuJ5JJjR/G8CPjhoXP837HH2W0vBjgsZEHMIm1ek
-	pV47mXtgxaj/lHBoseZgQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uUlOAU5rRJE=:tJK4Izns8vlTl/u1xL2tiK
-	aXQ+2otewNYquazJuG9Mj0g1NszSLFogKiFEE7L+BjvS3l+8mWYDOlgSFAjcUZXDcSK1XxOy3
-	xJERsMwojAILicPI3j4n+qSzew3CTXzBUM8DTaVTbzIPgFwVxW7uLO5ACY9PSlExGT1f1V11b
-	siJId+FhGQqqWteew59wuCsV3/Rk8NusYWu+/UpK8RkgwNA3NdaEKkUgKWIYx+0P4K50zkqYi
-	nSCKYCwCx8cvbXXWXwcuHiK9abuAi5pgNnRD6P3uu9uty+MiwtMQPAZkYDYQzPfh8QJe4EGvk
-	fSL/2KPFg/eQy+2/MX1Q4aj8qnZGLuMgkThY4Mf60KqYc4oy4rRTW0HSFggEgbEUAOrRy5oem
-	2AClDpDKabGECVeJbn8CMtIMsjMxXF78sIAk2J7oDQy6OcaNUeN4sKlVDVketGj1r1CcEZJ/A
-	29DWjr9bv6kFV+2uf2skaXxPr9Q2rTc0NNLUKsPFqUHH+5DoC7b/r0jzZGr7ndDRu2g+41VeQ
-	qq+UHHLw3CEQu6CKQXg/oxZR1CjWWK8bIVQ3poCV4oqTpL45M63bu5YkrTgo+wuA4s6lgmS9D
-	m5rrqgmKMzrU5vrut+mACWRdJ84PgqtRQvYLsaJiHi691QwdDl8KDowIIoPa/1tBEgxnNRYdD
-	N4NXTNCKGk0yt3fjozHxDrP0YteZKI0SYwgQXY/VWOEQ5HlOI0sxBvni8ZVz2h4+8xSyOxce7
-	s2fiN5WtNEoRYeBmC4UojU3+mKcKBR63gYbCFmU0gokeznTnPgR93GxNpmM=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [PATCH] Wshadow in
- qemu/linux-user/syscall.c:Changed some variable names
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0210.eurprd05.prod.outlook.com
+	(2603:10a6:3:f9::34) To DB7PR08MB3851.eurprd08.prod.outlook.com
+	(2603:10a6:10:7b::30)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190408165144442
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 23b631bb-2b96-42ff-975c-08d6bc29575c
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3289; 
+x-ms-traffictypediagnostic: DB7PR08MB3289:
+x-microsoft-antispam-prvs: <DB7PR08MB32896D467625FBCC332D030FC12C0@DB7PR08MB3289.eurprd08.prod.outlook.com>
+x-forefront-prvs: 0001227049
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(136003)(376002)(366004)(396003)(346002)(39840400004)(199004)(189003)(8676002)(14444005)(6506007)(386003)(68736007)(97736004)(4326008)(2501003)(256004)(26005)(99286004)(186003)(36756003)(6436002)(2616005)(31686004)(25786009)(305945005)(7736002)(11346002)(476003)(446003)(102836004)(5660300002)(52116002)(81156014)(81166006)(478600001)(8936002)(14454004)(76176011)(486006)(229853002)(6246003)(86362001)(316002)(31696002)(6512007)(71200400001)(3846002)(6116002)(110136005)(54906003)(2906002)(71190400001)(66066001)(53936002)(105586002)(6486002)(106356001);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3289;
+	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: sfxlWaQmitgO921PjWGjQNh3iNdkkEE+9fJ/ebPyoHREYfnV3iUsdXnhZ37Kv8izcRuF7o2ehJPIunUs3Ejg2DbFBIUBrWqQNw7bgylV8Yqi2Ho7iyyUBS4Zr7Ft0rMH4hGoipgEhgns4F+ASAQxrYrGAg12auzo4skOzbEAEECr2dIpdXt3zgAUyA357s66qtPEEAlCBTetP8wbZMGYLaL28nL1B4FVRA2ycow/1wej+KMhaSSsG1SM5rv/2cQ4+iLWSWLUwelRPSZ6sGeu9gv6lz5ZzvW32aeSTirTFxeJaEtACLS38J3sCUucE/QhYAgxAGNWMqf45S6xOPSj5WP1Ok4tBdWuAL7HpTJiSTaCtbFMvWrZvy/JTId1oBU8wk1MwWOzzAP6xUFqdrFKmvia7mopDFpLMIwjzJH5MMM=
+Content-Type: text/plain; charset="UTF-8"
+Content-ID: <A1D0882FADB5A74194D6064C3DEEF36E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23b631bb-2b96-42ff-975c-08d6bc29575c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2019 13:51:47.1415 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3289
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.115
+Subject: Re: [Qemu-devel] [PATCH 4/7] iotests: Update 241 to expose backing
+ layer fragmentation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,203 +117,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ghorges <1298394633@qq.com>, riku.voipio@iki.fi
+Cc: Kevin Wolf <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408134546.8ycrOCU3TzH4aCUffPjk9RcZHqTI-3SD4w1iMDIsxb8@z>
+Message-ID: <20190408135146.RnnrQJIa8rndNIBh_ikQd6VDHXv89Dc6jbFKNuw_O2k@z>
 
-Hi,
-
-Le 08/04/2019 à 15:38, ghorges a écrit :
-> From: ghorges <1298394633@qq.com>
-
-Very weird. Perhaps you can update the author with "git commit --amend
---author='ghorges <ghorges@xiyoulinux.org>'" to have the same email address?
-
-> Signed-off-by: ghorges <ghorges@xiyoulinux.org>
-
-we need a description here with at least the problem you are trying to
-fix (the error message from the compiler, for instance).
-
-Thanks,
-Laurent
-
-> ---
->  linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
->  1 file changed, 33 insertions(+), 33 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 208fd1813d..985095e4d5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->                  size_t size;
->              } sig, *sig_ptr;
->  
-> -            abi_ulong arg_sigset, arg_sigsize, *arg7;
-> +            abi_ulong arg_sigset, arg_sigsize, *arg7s;
->              target_sigset_t *target_sigset;
->  
->              n = arg1;
-> @@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->                  sig_ptr = &sig;
->                  sig.size = SIGSET_T_SIZE;
->  
-> -                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
-> -                if (!arg7) {
-> +                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
-> +                if (!arg7s) {
->                      return -TARGET_EFAULT;
->                  }
-> -                arg_sigset = tswapal(arg7[0]);
-> -                arg_sigsize = tswapal(arg7[1]);
-> -                unlock_user(arg7, arg6, 0);
-> +                arg_sigset = tswapal(arg7s[0]);
-> +                arg_sigsize = tswapal(arg7s[1]);
-> +                unlock_user(arg7s, arg6, 0);
->  
->                  if (arg_sigset) {
->                      sig.set = &set;
-> @@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->      case TARGET_NR_getcpu:
->          {
-> -            unsigned cpu, node;
-> -            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-> +            unsigned cpus, node;
-> +            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
->                                         arg2 ? &node : NULL,
->                                         NULL));
->              if (is_error(ret)) {
->                  return ret;
->              }
-> -            if (arg1 && put_user_u32(cpu, arg1)) {
-> +            if (arg1 && put_user_u32(cpus, arg1)) {
->                  return -TARGET_EFAULT;
->              }
->              if (arg2 && put_user_u32(node, arg2)) {
-> @@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_listxattr:
->      case TARGET_NR_llistxattr:
->      {
-> -        void *p, *b = 0;
-> +        void *q, *b = 0;
->          if (arg2) {
->              b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
->              if (!b) {
->                  return -TARGET_EFAULT;
->              }
->          }
-> -        p = lock_user_string(arg1);
-> -        if (p) {
-> +        q = lock_user_string(arg1);
-> +        if (q) {
->              if (num == TARGET_NR_listxattr) {
-> -                ret = get_errno(listxattr(p, b, arg3));
-> +                ret = get_errno(listxattr(q, b, arg3));
->              } else {
-> -                ret = get_errno(llistxattr(p, b, arg3));
-> +                ret = get_errno(llistxattr(q, b, arg3));
->              }
->          } else {
->              ret = -TARGET_EFAULT;
->          }
-> -        unlock_user(p, arg1, 0);
-> +        unlock_user(q, arg1, 0);
->          unlock_user(b, arg2, arg3);
->          return ret;
->      }
-> @@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_setxattr:
->      case TARGET_NR_lsetxattr:
->          {
-> -            void *p, *n, *v = 0;
-> +            void *q, *n, *v = 0;
->              if (arg3) {
->                  v = lock_user(VERIFY_READ, arg3, arg4, 1);
->                  if (!v) {
->                      return -TARGET_EFAULT;
->                  }
->              }
-> -            p = lock_user_string(arg1);
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_setxattr) {
-> -                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
-> +                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
->                  } else {
-> -                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
-> +                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->              unlock_user(v, arg3, 0);
->          }
-> @@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_getxattr:
->      case TARGET_NR_lgetxattr:
->          {
-> -            void *p, *n, *v = 0;
-> +            void *q, *n, *v = 0;
->              if (arg3) {
->                  v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
->                  if (!v) {
->                      return -TARGET_EFAULT;
->                  }
->              }
-> -            p = lock_user_string(arg1);
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_getxattr) {
-> -                    ret = get_errno(getxattr(p, n, v, arg4));
-> +                    ret = get_errno(getxattr(q, n, v, arg4));
->                  } else {
-> -                    ret = get_errno(lgetxattr(p, n, v, arg4));
-> +                    ret = get_errno(lgetxattr(q, n, v, arg4));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->              unlock_user(v, arg3, arg4);
->          }
-> @@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_removexattr:
->      case TARGET_NR_lremovexattr:
->          {
-> -            void *p, *n;
-> -            p = lock_user_string(arg1);
-> +            void *q, *n;
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_removexattr) {
-> -                    ret = get_errno(removexattr(p, n));
-> +                    ret = get_errno(removexattr(q, n));
->                  } else {
-> -                    ret = get_errno(lremovexattr(p, n));
-> +                    ret = get_errno(lremovexattr(q, n));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->          }
->          return ret;
-> 
-
+MDMuMDQuMjAxOSA2OjA1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBQcmV2aW91cyBjb21taXRzIGhh
+dmUgbWVudGlvbmVkIHRoYXQgb3VyIE5CRCBzZXJ2ZXIgc3RpbGwgc2VuZHMNCj4gdW5hbGlnbmVk
+IGZyYWdtZW50cyB3aGVuIGFuIGFjdGl2ZSBsYXllciB3aXRoIGxhcmdlIGFkdmVydGlzZWQgbWlu
+aW11bQ0KPiBibG9jayBzaXplIGlzIGJhY2tlZCBieSBhbm90aGVyIGxheWVyIHdpdGggYSBzbWFs
+bGVyIGJsb2NrDQo+IHNpemUuIEV4cGFuZCB0aGUgdGVzdCB0byBhY3R1YWxseSBjb3ZlciB0aGlz
+IHNjZW5hcmlvLCBieSB1c2luZyBxY293Mg0KPiBlbmNyeXB0aW9uICh3aGljaCBmb3JjZXMgNTEy
+LWJ5dGUgYWxpZ25tZW50KSB3aXRoIGFuIHVuYWxpZ25lZCByYXcNCj4gYmFja2luZyBmaWxlLg0K
+PiANCj4gVGhlIHRlc3QgcGFzc2VzLCBidXQgb25seSBiZWNhdXNlIHRoZSBjbGllbnQgc2lkZSB3
+b3JrcyBhcm91bmQgdGhlDQo+IHNlcnZlcidzIG5vbi1jb21wbGlhbmNlOyBpZiB5b3UgcmVwZWF0
+IHRoZSB0ZXN0IG1hbnVhbGx5IHdpdGggdHJhY2luZw0KPiB0dXJuZWQgb24sIHlvdSB3aWxsIHNl
+ZSB0aGUgc2VydmVyIHNlbmRpbmcgYSBzdGF0dXMgZm9yIDEwMDAgYnl0ZXMNCj4gZGF0YSB0aGVu
+IDEwNDggYnl0ZXMgaG9sZSwgd2hpY2ggaXMgbm90IGFsaWduZWQuIEJ1dCByZXZlcnRpbmcgY29t
+bWl0DQo+IDczN2QzZjUyNDQgc2hvd3MgdGhhdCBpdCBpcyBpbmRlZWQgdGhlIGNsaWVudCB3b3Jr
+aW5nIGFyb3VuZCB0aGUgYnVnDQo+IGluIHRoZSBzZXJ2ZXIuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5
+OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCg0KT29wcywgMjQxIGZhaWxzIGZvciBt
+ZToNCg0KLVdBUk5JTkc6IEltYWdlIGZvcm1hdCB3YXMgbm90IHNwZWNpZmllZCBmb3IgJy9ob21l
+L2VibGFrZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy9zY3JhdGNoL3QucmF3JyBhbmQgcHJvYmlu
+ZyBndWVzc2VkIHJhdy4NCitXQVJOSU5HOiBJbWFnZSBmb3JtYXQgd2FzIG5vdCBzcGVjaWZpZWQg
+Zm9yICcvd29yay9zcmMvcWVtdS9lcmljL3Rlc3RzL3FlbXUtaW90ZXN0cy9zY3JhdGNoL3QucmF3
+JyBhbmQgcHJvYmluZyBndWVzc2VkIHJhdy4NCg0KV2UgZm9yZ2V0IHRvIGZpbHRlciBvdXRwdXQg
+OigNCg0KVGVzdGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MSAgICAg
+fCAyMCArKysrKysrKysrKysrKysrKysrLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNDEub3V0
+IHwgIDkgKysrKysrKysrDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAx
+IGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MSBi
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDENCj4gaW5kZXggNGIxOTY4NTczODcuLmMxZmE2OTgwZGM4
+IDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjQxDQo+ICsrKyBiL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy8yNDENCj4gQEAgLTI4LDYgKzI4LDcgQEAgbmJkX3VuaXhfc29ja2V0PSRURVNU
+X0RJUi90ZXN0X3FlbXVfbmJkX3NvY2tldA0KPiAgIF9jbGVhbnVwKCkNCj4gICB7DQo+ICAgICAg
+IF9jbGVhbnVwX3Rlc3RfaW1nDQo+ICsgICAgcm0gLWYgIiRURVNUX0lNQUdFX0ZJTEUucWNvdzIi
+DQoNCnlvdSBtZWFuIF9JTUdfLCBub3QgX0lNQUdFXy4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWly
+IFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAgICAg
+ICBuYmRfc2VydmVyX3N0b3ANCj4gICB9DQo+ICAgdHJhcCAiX2NsZWFudXA7IGV4aXQgXCRzdGF0
+dXMiIDAgMSAyIDMgMTUNCj4gQEAgLTM3LDcgKzM4LDcgQEAgdHJhcCAiX2NsZWFudXA7IGV4aXQg
+XCRzdGF0dXMiIDAgMSAyIDMgMTUNCj4gICAuIC4vY29tbW9uLmZpbHRlcg0KPiAgIC4gLi9jb21t
+b24ubmJkDQo+IA0KPiAtX3N1cHBvcnRlZF9mbXQgcmF3DQo+ICtfc3VwcG9ydGVkX2ZtdCByYXcg
+IyBhbHRob3VnaCB0aGUgdGVzdCBhbHNvIHJlcXVpcmVzIHVzZSBvZiBxY293Mg0KPiAgIF9zdXBw
+b3J0ZWRfcHJvdG8gbmJkDQo+ICAgX3N1cHBvcnRlZF9vcyBMaW51eA0KPiAgIF9yZXF1aXJlX2Nv
+bW1hbmQgUUVNVV9OQkQNCj4gQEAgLTg4LDYgKzg5LDIzIEBAICRRRU1VX0lNRyBtYXAgLS1vdXRw
+dXQ9anNvbiAiJFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9pbWdfbWFwDQo+ICAgJFFFTVVfSU8g
+LWMgbWFwICIkVEVTVF9JTUciDQo+ICAgbmJkX3NlcnZlcl9zdG9wDQo+IA0KPiArZWNobw0KPiAr
+ZWNobyAiPT09IEVuY3J5cHRlZCBxY293MiBmaWxlIGJhY2tlZCBieSB1bmFsaWduZWQgcmF3IGlt
+YWdlICA9PT0iDQo+ICtlY2hvDQo+ICsNCj4gKyMgRW5hYmxpbmcgZW5jcnlwdGlvbiBpbiBxY293
+MiBmb3JjZXMgNTEyLWFsaWdubWVudA0KPiArU0VDUkVUPXNlY3JldCxpZD1zZWMwLGRhdGE9MTIz
+NDUNCj4gKyRRRU1VX0lNRyBjcmVhdGUgLWYgcWNvdzIgLWIgIiRURVNUX0lNR19GSUxFIiAtRiBy
+YXcgLS1vYmplY3QgIiRTRUNSRVQiIFwNCj4gKyAgLW8gZW5jcnlwdC5mb3JtYXQ9bHVrcyxlbmNy
+eXB0LmtleS1zZWNyZXQ9c2VjMCxlbmNyeXB0Lml0ZXItdGltZT0xMCBcDQo+ICsgICIkVEVTVF9J
+TUdfRklMRS5xY293MiIgMmsgfCBfZmlsdGVyX2ltZ19jcmVhdGUNCj4gK25iZF9zZXJ2ZXJfc3Rh
+cnRfdW5peF9zb2NrZXQgLS1vYmplY3QgIiRTRUNSRVQiIC0taW1hZ2Utb3B0cyBcDQo+ICsgIGRy
+aXZlcj1xY293MixmaWxlLmZpbGVuYW1lPSIkVEVTVF9JTUdfRklMRS5xY293MiIsZW5jcnlwdC5r
+ZXktc2VjcmV0PXNlYzANCj4gKw0KPiArJFFFTVVfTkJEX1BST0cgLS1saXN0IC1rICRuYmRfdW5p
+eF9zb2NrZXQgfCBncmVwICdcKHNpemVcfG1pblwpJw0KPiArJFFFTVVfSU1HIG1hcCAtLW91dHB1
+dD1qc29uICIkVEVTVF9JTUciIHwgX2ZpbHRlcl9xZW11X2ltZ19tYXANCj4gKyRRRU1VX0lPIC1j
+IG1hcCAiJFRFU1RfSU1HIg0KPiArbmJkX3NlcnZlcl9zdG9wDQo+ICsNCj4gICAjIE5vdCB0ZXN0
+ZWQgeWV0OiB3ZSBhbHNvIHdhbnQgdG8gZW5zdXJlIHRoYXQgcWVtdSBhcyBOQkQgY2xpZW50IGRv
+ZXMNCj4gICAjIG5vdCBhY2Nlc3MgYmV5b25kIHRoZSBlbmQgb2YgYSBzZXJ2ZXIncyBhZHZlcnRp
+c2VkIHVuYWxpZ25lZCBzaXplOg0KPiAgICMgIG5iZGtpdCAtVSAtIG1lbW9yeSBzaXplPTUxMyAt
+LXJ1biAncWVtdS1pbyAtZiByYXcgLWMgInIgNTEyIDUxMiIgJG5iZCcNCj4gZGlmZiAtLWdpdCBh
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDEub3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MS5vdXQN
+Cj4gaW5kZXggZjQ4MTA3NGEwMmUuLmVmN2RlMTIwNWQyIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9x
+ZW11LWlvdGVzdHMvMjQxLm91dA0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQxLm91dA0K
+PiBAQCAtMjUsNCArMjUsMTMgQEAgV0FSTklORzogSW1hZ2UgZm9ybWF0IHdhcyBub3Qgc3BlY2lm
+aWVkIGZvciAnL2hvbWUvZWJsYWtlL3FlbXUvdGVzdHMvcWVtdS1pb3Rlc3QNCj4gICBbeyAic3Rh
+cnQiOiAwLCAibGVuZ3RoIjogMTAwMCwgImRlcHRoIjogMCwgInplcm8iOiBmYWxzZSwgImRhdGEi
+OiB0cnVlLCAib2Zmc2V0IjogT0ZGU0VUfSwNCj4gICB7ICJzdGFydCI6IDEwMDAsICJsZW5ndGgi
+OiAyNCwgImRlcHRoIjogMCwgInplcm8iOiB0cnVlLCAiZGF0YSI6IHRydWUsICJvZmZzZXQiOiBP
+RkZTRVR9XQ0KPiAgIDEgS2lCICgweDQwMCkgYnl0ZXMgICAgIGFsbG9jYXRlZCBhdCBvZmZzZXQg
+MCBieXRlcyAoMHgwKQ0KPiArDQo+ICs9PT0gRW5jcnlwdGVkIHFjb3cyIGZpbGUgYmFja2VkIGJ5
+IHVuYWxpZ25lZCByYXcgaW1hZ2UgID09PQ0KPiArDQo+ICtGb3JtYXR0aW5nICdURVNUX0RJUi90
+LklNR0ZNVC5xY293MicsIGZtdD1xY293MiBzaXplPTIwNDggYmFja2luZ19maWxlPVRFU1RfRElS
+L3QuSU1HRk1UIGJhY2tpbmdfZm10PUlNR0ZNVCBlbmNyeXB0LmZvcm1hdD1sdWtzIGVuY3J5cHQu
+a2V5LXNlY3JldD1zZWMwIGVuY3J5cHQuaXRlci10aW1lPTEwDQo+ICsgIHNpemU6ICAyMDQ4DQo+
+ICsgIG1pbiBibG9jazogNTEyDQo+ICtbeyAic3RhcnQiOiAwLCAibGVuZ3RoIjogMTAyNCwgImRl
+cHRoIjogMCwgInplcm8iOiBmYWxzZSwgImRhdGEiOiB0cnVlLCAib2Zmc2V0IjogT0ZGU0VUfSwN
+Cj4gK3sgInN0YXJ0IjogMTAyNCwgImxlbmd0aCI6IDEwMjQsICJkZXB0aCI6IDAsICJ6ZXJvIjog
+dHJ1ZSwgImRhdGEiOiBmYWxzZSwgIm9mZnNldCI6IE9GRlNFVH1dDQo+ICsyIEtpQiAoMHg4MDAp
+IGJ5dGVzICAgICBhbGxvY2F0ZWQgYXQgb2Zmc2V0IDAgYnl0ZXMgKDB4MCkNCj4gICAqKiogZG9u
+ZQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
