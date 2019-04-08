@@ -2,89 +2,106 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 301C6C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A62C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA94120857
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FBD02148E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qJd08ocG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA94120857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bO6KMEiI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBD02148E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59262 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59541 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDbqD-0008DU-16
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 17:30:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39391)
+	id 1hDcIN-0004o4-8R
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 17:59:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hDbpO-0007tv-QP
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:29:20 -0400
+	(envelope-from <lidong.chen@oracle.com>) id 1hDcHC-0004Dl-IK
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hDbpN-00007s-Aq
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:29:18 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:34188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hDbpM-0008Ve-Mm
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:29:17 -0400
-Received: by mail-ed1-x544.google.com with SMTP id x14so13063178eds.1
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 14:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=5OujmZ1FZlnF7ecMrNyhSpVvC0WI69uVcZoEBGtISNA=;
-	b=qJd08ocGRqkbZR9U1WUNQ6NK4Q2jZirrK0A85RLKl5W/vcH6CAz7kjhLsFNf3MaywT
-	fodKsXorWRpJeduPMQHf7yMNudH09wv3mO4AxG0dt079ApznBLQAnY1UXKkGdF9jfWVy
-	ozdksnPSrwQHqLowQ1U/2UqAASi6nX/9zXT8XeATyEJyBzDZAuiYYc6avIqKjLHdbW7f
-	+FJy/UFbsYlfJmEvloX6rxSjs4gl9yd+YQk3w7gDLPcpl0OfH8ouEGfHm3ejB2ssaVw6
-	9atEOpAX5FAgsun4MwfdI0I1zf/C1tXRIvEmJjw19nzG/rCHrLZMJJvlkoQkbUG3jC5k
-	2G2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
-	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=5OujmZ1FZlnF7ecMrNyhSpVvC0WI69uVcZoEBGtISNA=;
-	b=ifYyZ4IUSoujOshQiM8ZwZ3kUXOiybvhVdNth7t5MXe/dbiZ/jDq7IC2pzH1DOEg0B
-	WRpKbXq8ERoUrt6MTY1a2J9f6qA04M6Vnofa94/vPvpynQ+aW2mQT+pz1RwdDF2EJ10h
-	zx8VDy1s5xPy0tzTw/L510n+egjLsAJhBvk2TvP4S/WY8UBH2QgBNC590MyQ+yuH2ONd
-	GxHs+c0dt77W6P+2Swx5NdzN6AElwnnwsLcw1XtKed3zO1c5RGzelLkHGHVNPUwQVQjS
-	vpJJEaxBlgECCNSApQhOrjTacfEng3cs7VFvKGWEdPIbAN08PH0Xa/7Hpj9zSz7QYdXx
-	5RWA==
-X-Gm-Message-State: APjAAAU+81eAttOukmfSGaSF7MJQ4vyQd/lGkagQv3VfG89iQDuSqSKg
-	E8TY1hJup8Y6fAdyS8E3aps=
-X-Google-Smtp-Source: APXvYqxvO4Uhl009wc+oOrYnqKCBtTuBQnwMZdkUhTScpJ3tWa7Fn8Pq7VWnLRGvy+Ai5aYdm8qy/A==
-X-Received: by 2002:a50:84ac:: with SMTP id 41mr20788973edq.170.1554758953268; 
-	Mon, 08 Apr 2019 14:29:13 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
-	by smtp.gmail.com with ESMTPSA id k15sm1928325ejr.5.2019.04.08.14.29.12
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 08 Apr 2019 14:29:12 -0700 (PDT)
-Date: Mon, 8 Apr 2019 21:29:11 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190408212911.jiqdva62ddebndut@master>
-References: <20190407092314.11066-1-thuth@redhat.com>
-	<20190408134517.GA9047@richard>
-	<14147807-8723-adac-dffb-31b7bbd0fc3b@redhat.com>
+	(envelope-from <lidong.chen@oracle.com>) id 1hDcHB-0008Nq-EB
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:02 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:48538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lidong.chen@oracle.com>)
+	id 1hDcHA-0008Kx-US
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:58:01 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x38Lj5K7106882; Mon, 8 Apr 2019 21:57:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=subject : to : cc :
+	references : from : message-id : date : mime-version : in-reply-to :
+	content-type : content-transfer-encoding; s=corp-2018-07-02;
+	bh=+aSuA7jSZSleIlfevt3SJNFrPoevbw6SdfxioxbRVNw=;
+	b=bO6KMEiIBpY+h/nSvkY3bkfRugk8H9CuBzdESZE59SqQR2T8O9OZSXvXda8/7npCkppe
+	a732dGrFxFy6FY2+UlUGXOjKm3aumr7uqUey9vXG8BhjZWPDjaEZpOyo21OKTWIvdey/
+	3RA/yLnb0ZFIwFpGYmr+myoU2r4PCDSiJkMWpRafsosD7Q7o+1nXzthVE8l+fyC6iNxD
+	ngLFLaFsCVEbM3C+IZd+jqp6jQzyZTcXke+saN/CsMZ7rfmcgeEkb3/MR7a40cZtZ402
+	mSKpQ7ISpzmZ+Wi+Ng7elaga21qHkbG8V/TQ3R0rtId/12/5mCEFuzrbo4ayw4JLwJPY
+	TQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+	by aserp2130.oracle.com with ESMTP id 2rphme9ghc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Apr 2019 21:57:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x38Lvn0t087834; Mon, 8 Apr 2019 21:57:57 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+	by userp3020.oracle.com with ESMTP id 2rpkehxkg4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Apr 2019 21:57:57 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x38LvuQJ005863;
+	Mon, 8 Apr 2019 21:57:56 GMT
+Received: from [10.159.131.36] (/10.159.131.36)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Mon, 08 Apr 2019 14:57:56 -0700
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
+	<d35048f6-44e7-46a0-3d70-51123896f1ef@redhat.com>
+From: Lidong Chen <lidong.chen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <e67e84dc-193a-3b28-7016-9113652e11fd@oracle.com>
+Date: Mon, 8 Apr 2019 14:57:37 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <14147807-8723-adac-dffb-31b7bbd0fc3b@redhat.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
- hot-plugging nvdimm on older machine types
+In-Reply-To: <d35048f6-44e7-46a0-3d70-51123896f1ef@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904080159
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904080159
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2130.oracle.com id
+	x38Lj5K7106882
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,133 +113,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: darren.kenny@oracle.com, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408212911.ePyLXE9TGQn5siL9_VV2zb_UhwYdxfRLILCVxdwUoUA@z>
+Message-ID: <20190408215737.7Vl1i7CECEm9cC6vZbgvtzzSymeZuEPxiDwvpl1PXIU@z>
 
-On Mon, Apr 08, 2019 at 05:06:49PM +0200, Thomas Huth wrote:
->On 08/04/2019 15.45, Wei Yang wrote:
->> On Sun, Apr 07, 2019 at 11:23:14AM +0200, Thomas Huth wrote:
->>> QEMU currently crashes when you try to hot-plug an "nvdimm" device
->>> on older machine types:
->>>
->>> $ qemu-system-x86_64 -monitor stdio -M pc-1.1
->>> QEMU 3.1.92 monitor - type 'help' for more information
->>> (qemu) device_add nvdimm,id=nvdimmn1
->>> qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
->>> Assertion `*errp == ((void *)0)' failed.
->>> Aborted (core dumped)
->>>
->>> The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
->>> added recently before the check whether nvdimm is enabled. It should
->>> be done after the check. And while we're at it, also check the errp
->>> after the hotplug_handler_pre_plug(), otherwise errors are silently
->>> ignored here.
->> 
->> Thomas,
->> 
->> Thanks for pointing this out, while I have some different idea on how to fix
->> this.
->> 
->> The reason of the core dump is errp already been set in
->> hotplug_handler_pre_plug(), and this function check acpi hotplug capability.
->> The order of this check is correct, while we should  return when errp is set
->> in hotplug_handler_pre_plug().
->> 
->> I got a fix like this, which I have tested and looks good to me.
->> 
->> 
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 6077d27361..b11f3b15c1 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -2091,6 +2091,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>      }
->>  
->>      hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
->> +    if (*errp) {
->> +        return;
->> +    }
->
->Not sure, but I think you can not rely on the fact that the caller set
->*errp = NULL already... that's why it is more common to use a local_err
->variable and error_propagate() for such cases (which is what I did in my
->patch).
->
+Hi Philippe,
 
-Ok, that's fine for me.
-
->Also, why don't you want the "nvdimm is not enabled: missing 'nvdimm' in
->'-M'" check to be done first?
+On 4/8/2019 2:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Lidong
 >
-
-Because this function pc_memory_pre_plug() will be called not only when
-nvdimm is hot-plugged but also dimm is hot-plugged. And
-hotplug_handler_pre_plug() here is to check the acpi(if it has) hot-plug
-capability.
-
-So the check in pc_memory_pre_plug() is from generic to specific: 
-    1. Do we have capability to hot-plug?
-    2. If the device is nvdimm, do we enabled nvdimm?
-
-> Thomas
+> On 4/8/19 9:04 PM, Lidong Chen wrote:
+>> Due to an off-by-one error, the assert statements allow an
+>> out-of-bounds array access.
+> ... which can't happen. Thus harmless for 4.0.
 >
->
->
->>      if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->> 
->>>
->>> Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>> hw/i386/pc.c | 9 +++++++--
->>> 1 file changed, 7 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>> index 6077d27361..f2c15bf1f2 100644
->>> --- a/hw/i386/pc.c
->>> +++ b/hw/i386/pc.c
->>> @@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>     const MachineState *ms = MACHINE(hotplug_dev);
->>>     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>>     const uint64_t legacy_align = TARGET_PAGE_SIZE;
->>> +    Error *local_err = NULL;
->>>
->>>     /*
->>>      * When -no-acpi is used with Q35 machine type, no ACPI is built,
->>> @@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>         return;
->>>     }
->>>
->>> -    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
->>> -
->>>     if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->>>         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->>>         return;
->>>     }
->>>
->>> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
->>> +    if (local_err) {
->>> +        error_propagate(errp, local_err);
->>> +        return;
->>> +    }
->>> +
->>>     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
->>>                      pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
->>> }
->>> -- 
->>> 2.21.0
->> 
->
+> I suppose this is a static analysis warning and you didn't triggered it
+> while tracing.
 
--- 
-Wei Yang
-Help you, Help me
+Right, it was found by the static analysis.=C2=A0 Thank you for your revi=
+ew.
+
+Regards,
+
+Lidong
+
+
+>
+> Thanks for cleaning this :)
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+>> ---
+>>   hw/sd/sd.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>> index aaab15f..818f86c 100644
+>> --- a/hw/sd/sd.c
+>> +++ b/hw/sd/sd.c
+>> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates=
+ state)
+>>       if (state =3D=3D sd_inactive_state) {
+>>           return "inactive";
+>>       }
+>> -    assert(state <=3D ARRAY_SIZE(state_name));
+>> +    assert(state < ARRAY_SIZE(state_name));
+>>       return state_name[state];
+>>   }
+>>  =20
+>> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t =
+rsp)
+>>       if (rsp =3D=3D sd_r1b) {
+>>           rsp =3D sd_r1;
+>>       }
+>> -    assert(rsp <=3D ARRAY_SIZE(response_name));
+>> +    assert(rsp < ARRAY_SIZE(response_name));
+>>       return response_name[rsp];
+>>   }
+>>  =20
+>>
 
