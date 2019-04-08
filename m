@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40481)
+Received: from eggs.gnu.org ([209.51.188.92]:41365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDXrF-0006CJ-US
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:59 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1hDXvg-0007MY-PD
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDXrC-00017G-81
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:57 -0400
-Resent-Message-Id: <E1hDXrC-00017G-81@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21538)
+	(envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003U1-Mb
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46298
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDXrB-00016X-Tv
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:54 -0400
-Message-ID: <155474277106.12882.8346453217758632698@76452e4e88f2>
-In-Reply-To: <20190408145721.15881-1-sohailalvi2236@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003Tj-EM
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:30 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x38H4AF0185103
+	for <qemu-devel@nongnu.org>; Mon, 8 Apr 2019 13:19:29 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rr96vm62k-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:19:28 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Mon, 8 Apr 2019 18:19:28 +0100
+References: <20190301093902.27799-1-cohuck@redhat.com>
+	<20190301093902.27799-2-cohuck@redhat.com>
+	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
+	<20190408190747.12e3618b.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Mon, 8 Apr 2019 13:19:23 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 8 Apr 2019 09:59:32 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] qemu_system_reset_request() in hw/
- corresponding to watchdog that has triggered replaced by
- watchdog_perform_action().
+In-Reply-To: <20190408190747.12e3618b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <b0ff9cf2-f311-2056-a8b1-415c61a419fc@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +45,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sohailalvi2236@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwODE0NTcyMS4xNTg4
-MS0xLXNvaGFpbGFsdmkyMjM2QGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDgxNDU3MjEuMTU4ODEtMS1zb2hh
-aWxhbHZpMjIzNkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gcWVtdV9z
-eXN0ZW1fcmVzZXRfcmVxdWVzdCgpIGluIGh3LyBjb3JyZXNwb25kaW5nIHRvIHdhdGNoZG9nIHRo
-YXQgaGFzIHRyaWdnZXJlZCByZXBsYWNlZCBieSB3YXRjaGRvZ19wZXJmb3JtX2FjdGlvbigpLgpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIGY1NWE1ODVkMTAuLjJjNTczMTA2Mjcg
-IG1hc3RlciAgICAgLT4gbWFzdGVyCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
-MjAxOTA0MDgxNDU3MjEuMTU4ODEtMS1zb2hhaWxhbHZpMjIzNkBnbWFpbC5jb20gLT4gcGF0Y2hl
-dy8yMDE5MDQwODE0NTcyMS4xNTg4MS0xLXNvaGFpbGFsdmkyMjM2QGdtYWlsLmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA1Njg2ZjliOTEgcWVtdV9zeXN0ZW1fcmVzZXRfcmVx
-dWVzdCgpIGluIGh3LyBjb3JyZXNwb25kaW5nIHRvIHdhdGNoZG9nIHRoYXQgaGFzIHRyaWdnZXJl
-ZCByZXBsYWNlZCBieSB3YXRjaGRvZ19wZXJmb3JtX2FjdGlvbigpLgoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCA5MCBsaW5lcyBjaGVja2VkCgpDb21taXQgMDU2ODZmOWI5MTBkIChx
-ZW11X3N5c3RlbV9yZXNldF9yZXF1ZXN0KCkgaW4gaHcvIGNvcnJlc3BvbmRpbmcgdG8gd2F0Y2hk
-b2cgdGhhdCBoYXMgdHJpZ2dlcmVkIHJlcGxhY2VkIGJ5IHdhdGNoZG9nX3BlcmZvcm1fYWN0aW9u
-KCkuKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwODE0NTcyMS4xNTg4MS0xLXNvaGFpbGFs
-dmkyMjM2QGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+
+
+On 04/08/2019 01:07 PM, Cornelia Huck wrote:
+> On Mon, 8 Apr 2019 13:02:12 -0400
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> On 03/01/2019 04:38 AM, Cornelia Huck wrote:
+>>> When we get a solicited interrupt, the start function may have
+>>> been cleared by a csch, but we still have a channel program
+>>> structure allocated. Make it safe to call the cp accessors in
+>>> any case, so we can call them unconditionally.
+>>>
+>>> While at it, also make sure that functions called from other parts
+>>> of the code return gracefully if the channel program structure
+>>> has not been initialized (even though that is a bug in the caller).
+>>>
+>>> Reviewed-by: Eric Farman<farman@linux.ibm.com>
+>>> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
+>>> ---
+>>
+>> Hi Connie,
+>>
+>> My series of fixes for vfio-ccw depends on this patch as I would like to
+>> call cp_free unconditionally :) (I had developed my code on top of your
+>> patches).
+>>
+>> Could we pick this patch up as well when/if you pick up my patch series?
+>> I am in the process of sending out a v2.
+>>
+>> Regarding this patch we could merge it as a stand alone patch, separate
+>> from this series. And also the patch LGTM
+>>
+>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> 
+> Actually, I wanted to ask how people felt about merging this whole
+> series for the next release :) It would be one thing less on my plate...
+> 
+> 
+
+I have been testing with your patches for a while now and I haven't hit 
+any problems due to the patches.
+
+IMHO I think we can merge the patches for the next release.
+
+Thanks
+Farhan
