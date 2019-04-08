@@ -2,65 +2,75 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B01C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 07:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9572EC282CE
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:12:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1BBE20880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 07:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1BBE20880
+	by mail.kernel.org (Postfix) with ESMTPS id 6780F20870
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:12:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6780F20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48506 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49114 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDOMB-0005vq-Us
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 03:06:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56498)
+	id 1hDPOc-0004iv-Co
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:12:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hDOKw-00057C-Ma
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 03:04:59 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hDPNr-0004QF-5r
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:12:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hDOKs-0008Ig-Vw
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 03:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60048)
+	(envelope-from <imammedo@redhat.com>) id 1hDPNl-0008Q6-E7
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:11:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hDOKp-0008DI-9Y
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 03:04:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
+	id 1hDPNX-0008LM-OE; Mon, 08 Apr 2019 04:11:44 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 139A08123F;
-	Mon,  8 Apr 2019 07:04:45 +0000 (UTC)
-Received: from xz-x1 (dhcp-14-116.nay.redhat.com [10.66.14.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 779115D9C6;
-	Mon,  8 Apr 2019 07:04:41 +0000 (UTC)
-Date: Mon, 8 Apr 2019 15:04:39 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Message-ID: <20190408070439.GC4340@xz-x1>
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-	<20190408032543.GE23212@xz-x1>
-	<CAEn6zmE3tjtZrusqZptkgqi2CFaNndsVHekr9=uxS=YptcbQzQ@mail.gmail.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 14A09308FE95;
+	Mon,  8 Apr 2019 08:11:41 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 454931018A0E;
+	Mon,  8 Apr 2019 08:11:36 +0000 (UTC)
+Date: Mon, 8 Apr 2019 10:11:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Message-ID: <20190408101132.5d849d1f@redhat.com>
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA8393564E2@lhreml524-mbs.china.huawei.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
+	<20190403114901.6e4ea653@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
+	<ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8393564E2@lhreml524-mbs.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CAEn6zmE3tjtZrusqZptkgqi2CFaNndsVHekr9=uxS=YptcbQzQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Mon, 08 Apr 2019 07:04:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 08 Apr 2019 08:11:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,95 +82,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"sameo@linux.intel.com" <sameo@linux.intel.com>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Linuxarm <linuxarm@huawei.com>, Auger Eric <eric.auger@redhat.com>,
+	"shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	"xuwei \(O\)" <xuwei5@huawei.com>,
+	"sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+	Laszlo Ersek <lersek@redhat.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408070439.gPk7AbH7q9DKFyhAgthiAoKZyvAMGTVl_7WYQUkpEhs@z>
+Message-ID: <20190408081132.km0dO_OnuD4a0WpdDZbVE4u1Ezu-ifQ8o1TbcRKckAU@z>
 
-On Mon, Apr 08, 2019 at 02:15:36PM +0800, Catherine Ho wrote:
-> Hi Peter Xu
-> 
-> On Mon, 8 Apr 2019 at 11:25, Peter Xu <peterx@redhat.com> wrote:
-> 
-> > On Sun, Apr 07, 2019 at 10:19:05PM -0400, Catherine Ho wrote:
-> > > Currently it is not forbidden to use "-object
-> > memory-backend-file,share=on"
-> > > and together with "-incoming". But after incoming migration is finished,
-> > > the memory-backend-file will be definitely written if share=on. So the
-> > > memory-backend-file can only be used once, but failed in the 2nd time
-> > > incoming.
-> > >
-> > > Thus it gives a warning and the users can run the qemu if they really
-> > > want to do it.
-> > >
-> > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > > ---
-> > >  backends/hostmem-file.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > >
-> > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > > index 37ac6445d2..59429ee0b4 100644
-> > > --- a/backends/hostmem-file.c
-> > > +++ b/backends/hostmem-file.c
-> > > @@ -16,6 +16,7 @@
-> > >  #include "sysemu/hostmem.h"
-> > >  #include "sysemu/sysemu.h"
-> > >  #include "qom/object_interfaces.h"
-> > > +#include "migration/migration.h"
-> > >
-> > >  /* hostmem-file.c */
-> > >  /**
-> > > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
-> > Error **errp)
-> > >          }
-> > >      }
-> > >
-> > > +    /*
-> > > +     * In ignore shared case, if share=on for host memory backend file,
-> > > +     * the ram might be written after incoming process is finished. Thus
-> > > +     * the memory backend can't be reused for 2nd/3rd... incoming
-> > > +     */
-> > > +    if (backend->share && migrate_ignore_shared()
-> > > +                       && runstate_check(RUN_STATE_INMIGRATE))
-> > > +        warn_report("share=on for memory backend file might be "
-> > > +                        "conflicted with incoming in ignore shared
-> > case");
-> >
-> > I feel like this message wasn't really clear to me...  you want to
-> > warn people these data might not match with each other, right?  How
-> > about simply state it:
-> >
-> >   NOTE: Please make sure the data on the shared memory backend file
-> >   and the data from the incoming migration stream contains matching
-> >   contents, otherwise...
-> >
-> 
-> Sorry for my vague expression.
-> The background is [1]
-> I happened to use "-object memory-backend-file,share=on" and together with
-> "-incoming".
-> It worked fine in 1st incoming migration but failed in 2nd, 3rd incoming
-> migration.
-> Because qemu uses qemu_ram_mmap(..., MAP_SHARED,...) when share=on, the
-> memory-backend-file will be written after 1st incoming migration.
-> Finally I realized that this was caused by "share=on" flag, and after I
-> removed it,
-> the memory-backend-file will not be changed any more.
-> 
-> So do you think it will be better that qemu gives the user a clear warning
-> that
-> incoming migration will change the data in  memory-backend-file  with
-> "share=on" ?
+On Wed, 3 Apr 2019 16:25:49 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Hmm... "a shared memory backend file" would already be clear to me
-that it will be modified, but it might be subjective.
+> Hi Laszlo,
+> 
+> > -----Original Message-----
+> > From: Laszlo Ersek [mailto:lersek@redhat.com]
+> > Sent: 03 April 2019 14:29
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> > Igor Mammedov <imammedo@redhat.com>
+> > Cc: Auger Eric <eric.auger@redhat.com>; Ard Biesheuvel
+> > <ard.biesheuvel@linaro.org>; peter.maydell@linaro.org;
+> > sameo@linux.intel.com; qemu-devel@nongnu.org; Linuxarm
+> > <linuxarm@huawei.com>; shannon.zhaosl@gmail.com;
+> > qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
+> > sebastien.boeuf@intel.com; Leif Lindholm <Leif.Lindholm@arm.com>
+> > Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+> > feature "fdt"
+> > 
+> > On 04/03/19 14:10, Shameerali Kolothum Thodi wrote:
+> >   
+> > >>>>> So, the condition for hiding the hotpluggable memory nodes in question
+> > >>>>> from the DT is:  
+> > >>>>  
+> > >>>>>
+> > >>>>>   (aarch64 && firmware_loaded && acpi_enabled)  
+> >   
+> > >>> While UEFI has bindings for both 32-bit and 64-bit ARM, ACPI has a
+> > >>> 64-bit-only binding for ARM. (And you can have UEFI without ACPI, but
+> > >>> not the reverse, on ARM.) So if you run the 32-bit build of the
+> > >>> ArmVirtQemu firmware, you get no ACPI at all; all you can rely on with
+> > >>> the OS is the DT.  
+> > >
+> > > Just to confirm, does that mean with 32-bit build of the UEFI, the OS cannot
+> > > boot with ACPI and uses DT only.  
+> > 
+> > Indeed.
+> >   
+> > > So,
+> > >
+> > > If ((aarch64 && firmware_loaded && acpi_enabled) {
+> > >    Hide_hotpluggable_memory_nodes()
+> > > } else {
+> > >    Add_ hotpluggable_memory_nodes()
+> > > }
+> > >
+> > > should work for all cases?  
+> > 
+> > Yes.
+> > 
+> > Here's what happens when any one of the subconditions evaluates to false:
+> > 
+> > - ARM32 has no ACPI bindings, so the guest kernel can only use DT.
+> > 
+> > - On AARCH64, if you don't "load the firmware" (= don't use UEFI), then
+> >   there won't be an ACPI entry point for the OS to locate (the RSD PTR
+> >   is defined by the ACPI spec in UEFI terms, for AARCH64). So the guest
+> >   kernel can only use DT.
+> > 
+> > - When on AARCH64 and using UEFI, but asking QEMU not to generate ACPI
+> >   content, the firmware will not install any ACPI tables, so the guest
+> >   kernel can only use DT.
+> >   
+> 
+> Thanks. That makes it very clear. Much appreciated.
+> 
+> > >>> This "bitness distinction" is implemented in the firmware already. If
+> > >>> you hid the memory nodes from the DT under the condition
+> > >>>
+> > >>>   (!aarch64 && firmware_loaded && acpi_enabled)
+> > >>>
+> > >>> then the nodes would not be seen by the OS at all (because
+> > >>> "acpi_enabled" is irrelevant for the 32-bit build of ArmVirtQemu, and
+> > >>> all the OS can ever get is DT).  
+> > >>
+> > >> It's getting tricky and I don't like a bit that we are trying to carter
+> > >> 64 bit only UEFI build (or any other build) on QEMU side. Also Peter has
+> > >> a valid about guessing on QEMU side (that's usually a source of problem
+> > >> in the future).  
+> > >
+> > > If the above is correct(with 32-bit variant of UEFI, OS cannot have ACPI boot),
+> > > then do we really have the issue of memory becoming non  
+> > hot-un-unpluggable?  
+> > > May be I am missing something.  
+> > 
+> > I think Igor and Peter dislike adding complex logic to QEMU that
+> > reflects the behavior of a specific firmware. AIUI their objection isn't
+> > that it wouldn't work, but that it's not the right thing to do, from a
+> > design perspective.  
+> 
+> Understood. Hope we can converge on something soon.
+Lets try adding a parameter to memory descriptors in DT that would mark
+them as hotpluggable.
 
-Regards,
+ 
+> Cheers,
+> Shameer
 
--- 
-Peter Xu
 
