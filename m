@@ -2,90 +2,66 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153A2C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208E6C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE76520879
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:08:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="1J6kjY1g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE76520879
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	by mail.kernel.org (Postfix) with ESMTPS id CB67620879
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 21:13:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB67620879
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59034 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59110 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDbUt-0003IV-2q
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 17:08:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47729)
+	id 1hDbZv-0005CA-Qq
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 17:13:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKT-0003zK-Lc
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDbYt-0004ei-4k
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKQ-0007u9-0U
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:21 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:40276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDbKP-0007so-Ja
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:17 -0400
-Received: by mail-it1-x143.google.com with SMTP id k64so1428867itb.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:57:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=3THaHSWEylYySKmgh3f4xH1bdO8Ha+TvgLUYvmPOH8s=;
-	b=1J6kjY1gH2AnePN085FjjZQhbr0cETiGbl+8/QXY2ptg31K2395/ibSCp+HItuyZuJ
-	bZ0Dez/lIfHEMf2qlW1sNUBuTjZ1navGCi2lsispjeVT3MDd7zqPjpMCKGMjMtAw3Vuk
-	oPEAlT5Jz53BvPnzi9T+/gz6grQp6WFK9GEnEwwTkVU/CwRv6AsFhKoDX5xX0P7Z9XYf
-	GofwXVtxk7jTyeYkvi0VVnoOzpa5TVyTnQtBvDpRRdmSWTgRcICBczRzZrnSieTP2GYQ
-	9VIppdd0hOfWNJ8ybJVkSqxxo0SZ0Lg14ahtKEBJZTTFxOgYap28+o2Ql+aq2BTZ7wFx
-	IVUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=3THaHSWEylYySKmgh3f4xH1bdO8Ha+TvgLUYvmPOH8s=;
-	b=QVzZ3JoJYktqGi8YErHO5p+rPu5yTiS3QFXSGs1t97XRWtLA+burr/b0MMUiByqDYp
-	9NBguGoi5YN0oQb4Qr3AaiQE/Mb0XM98yGEabx7EfljH6JIPsJQTCarEBGer8ch2wqjY
-	/uL51Xw6U6eCIUVrpFPc+7ATnIkkzDDXGe2CjQrgdCqKr6ySjYK4HAjnbkZ3fB6CnUsv
-	DT1U+bIP9q8qt7lfZp2sFGZpbYRXL/bxV+WZ+H6aTKUmk1MAaU8LCcd3hstE+QKetc6p
-	bGNIh3AngD3FfWySlen22eBH370FW+bH2ueYl3tcGTw2jACJUZvHbiNQPWF3L5QIdgWa
-	Zg8Q==
-X-Gm-Message-State: APjAAAVE7G4qxtlA0dwGHk48WamGQzVdVl6yVjZAh0o6lnTn34OlB0qW
-	X/IPDgY6Qftzcnjv2uYxe3yhi+jXaPYbYA==
-X-Google-Smtp-Source: APXvYqwf4phytjMCBCXK2Z+KtAvxA3VcLu7FhimCuX/8IIMbLRWBR4KYnQInZLlV06N0g5SZye9v7A==
-X-Received: by 2002:a05:660c:40d:: with SMTP id
-	c13mr22029572itk.115.1554757035992; 
-	Mon, 08 Apr 2019 13:57:15 -0700 (PDT)
-Received: from worksec.wireless.oberlin.edu (ip-70-93.wireless.oberlin.edu.
-	[132.162.70.93]) by smtp.gmail.com with ESMTPSA id
-	h133sm5969313itb.34.2019.04.08.13.57.15
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 08 Apr 2019 13:57:15 -0700 (PDT)
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 16:55:51 -0400
-Message-Id:
- <9a10d7067dee911b144d253b0b5bf69b980285f7.1554755001.git.stephen.checkoway@oberlin.edu>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
+	(envelope-from <no-reply@patchew.org>) id 1hDbYj-0003K0-90
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 17:12:10 -0400
+Resent-Date: Mon, 08 Apr 2019 17:12:07 -0400
+Resent-Message-Id: <E1hDbYj-0003K0-90@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hDbYh-0003FS-E5; Mon, 08 Apr 2019 17:12:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1554757882; cv=none; d=zoho.com; s=zohoarc; 
+	b=a/TmwAc5EMlO8YJzM6obslVApiMurP9iEAqFnpASqGn4JgBXCgU8AZp8gqCT1MMnLC3/rp0iBJJnjgJTOSo2UK6xnMZmC7KFoIA5aJzv97eYAPO0/WG1Q2Nt5dRXk7GOHHg0WreMxpgIPHgsxROUAR8MR91uDoSL5ZH4tDHztrU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1554757882;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=QXRoVBt2z7/s5iYS6tPdI6r3Ehye1FMc+BDnl057FnM=; 
+	b=a7rVT0AjV8LAbqvMjV/lfBaLB8rnr4HgT20QJok8TgiHqtLEyB8tmiuDoM9IeSnMHbfcWoBNULrZWK1PJt7TjjAHIMuCgjZkhfTbjYHfGtFZ1Tk/coyQ8pMbmCzUNaEzicT/E4IxfOcCMtDs/os4FwnKTZY8O2Bw90cL8Me3K50=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1554757881771236.54903660206105;
+	Mon, 8 Apr 2019 14:11:21 -0700 (PDT)
+Message-ID: <155475788029.12882.3177437800544924153@76452e4e88f2>
 In-Reply-To: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::143
-Subject: [Qemu-devel] [PATCH 08/10] block/pflash_cfi02: Implement
- multi-sector erase
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stephen.checkoway@oberlin.edu
+Date: Mon, 8 Apr 2019 14:11:21 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
+ missing AMD pflash functionality
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,302 +73,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, stephen.checkoway@oberlin.edu,
+	qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408205551.Qqunt0OVhYBHd_DGu4rVtYo8Vxa4g8T-zSFnsbLCQwI@z>
+Message-ID: <20190408211121.amhvKBPhh25JR4G0g-ngF8nBMzdBLc5iMZBNbN1RrJI@z>
 
-After two unlock cycles and a sector erase command, the AMD flash chips
-start a 50 us erase time out. Any additional sector erase commands add a
-sector to be erased and restart the 50 us timeout. During the timeout,
-status bit DQ3 is cleared. After the time out, DQ3 is asserted during
-erasure.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
----
- hw/block/pflash_cfi02.c   | 94 +++++++++++++++++++++++++++++++--------
- tests/pflash-cfi02-test.c | 59 ++++++++++++++++++++++--
- 2 files changed, 131 insertions(+), 22 deletions(-)
-
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index fa6929b9b6..4f773f9229 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -30,7 +30,6 @@
-  *
-  * It does not implement software data protection as found in many real chips
-  * It does not implement erase suspend/resume commands
-- * It does not implement multiple sectors erase
-  */
- 
- #include "qemu/osdep.h"
-@@ -106,6 +105,7 @@ struct PFlashCFI02 {
-     MemoryRegion orig_mem;
-     int rom_mode;
-     int read_counter; /* used for lazy switch-back to rom mode */
-+    int sectors_to_erase;
-     char *name;
-     void *storage;
- };
-@@ -136,6 +136,22 @@ static inline void toggle_dq6(PFlashCFI02 *pfl)
-     pfl->status ^= pfl->interleave_multiplier * 0x40;
- }
- 
-+/*
-+ * Turn on DQ3.
-+ */
-+static inline void assert_dq3(PFlashCFI02 *pfl)
-+{
-+    pfl->status |= pfl->interleave_multiplier * 0x08;
-+}
-+
-+/*
-+ * Turn off DQ3.
-+ */
-+static inline void reset_dq3(PFlashCFI02 *pfl)
-+{
-+    pfl->status &= ~(pfl->interleave_multiplier * 0x08);
-+}
-+
- /*
-  * Set up replicated mappings of the same region.
-  */
-@@ -159,11 +175,37 @@ static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
-     pfl->rom_mode = rom_mode;
- }
- 
--static void pflash_timer (void *opaque)
-+static void pflash_timer(void *opaque)
- {
-     PFlashCFI02 *pfl = opaque;
- 
-     trace_pflash_timer_expired(pfl->cmd);
-+    if (pfl->cmd == 0x30) {
-+        /*
-+         * Sector erase. If DQ3 is 0 when the timer expires, then the 50
-+         * us erase timeout has expired so we need to start the timer for the
-+         * sector erase algorithm. Otherwise, the erase completed and we should
-+         * go back to read array mode.
-+         */
-+        if ((pfl->status & 0x08) == 0) {
-+            assert_dq3(pfl);
-+            /*
-+             * CFI address 0x21 is "Typical timeout per individual block erase
-+             * 2^N ms"
-+             */
-+            uint64_t timeout = ((1ULL << pfl->cfi_table[0x21]) *
-+                                pfl->sectors_to_erase) * 1000000;
-+            timer_mod(&pfl->timer,
-+                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + timeout);
-+            DPRINTF("%s: erase timeout fired; erasing %d sectors\n",
-+                    __func__, pfl->sectors_to_erase);
-+            return;
-+        }
-+        DPRINTF("%s: sector erase complete\n", __func__);
-+        pfl->sectors_to_erase = 0;
-+        reset_dq3(pfl);
-+    }
-+
-     /* Reset flash */
-     toggle_dq7(pfl);
-     if (pfl->bypass) {
-@@ -307,13 +349,30 @@ static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
-     }
- }
- 
-+static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
-+{
-+    uint64_t sector_len = pflash_sector_len(pfl, offset);
-+    offset &= ~(sector_len - 1);
-+    DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
-+            __func__, pfl->bank_width * 2, offset,
-+            pfl->bank_width * 2, offset + sector_len - 1);
-+    if (!pfl->ro) {
-+        uint8_t *p = pfl->storage;
-+        memset(p + offset, 0xFF, sector_len);
-+        pflash_update(pfl, offset, sector_len);
-+    }
-+    set_dq7(pfl, 0x00);
-+    ++pfl->sectors_to_erase;
-+    /* Set (or reset) the 50 us timer for additional erase commands.  */
-+    timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 50000);
-+}
-+
- static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-                          unsigned int width)
- {
-     PFlashCFI02 *pfl = opaque;
-     uint8_t *p;
-     uint8_t cmd;
--    uint32_t sector_len;
- 
-     cmd = value;
-     if (pfl->cmd != 0xA0) {
-@@ -490,20 +549,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             break;
-         case 0x30:
-             /* Sector erase */
--            p = pfl->storage;
--            sector_len = pflash_sector_len(pfl, offset);
--            offset &= ~(sector_len - 1);
--            DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
--                    __func__, pfl->bank_width * 2, offset,
--                    pfl->bank_width * 2, offset + sector_len - 1);
--            if (!pfl->ro) {
--                memset(p + offset, 0xFF, sector_len);
--                pflash_update(pfl, offset, sector_len);
--            }
--            set_dq7(pfl, 0x00);
--            /* Let's wait 1/2 second before sector erase is done */
--            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                      (NANOSECONDS_PER_SECOND / 2));
-+            pflash_sector_erase(pfl, offset);
-             break;
-         default:
-             DPRINTF("%s: invalid command %02x (wc 5)\n", __func__, cmd);
-@@ -517,7 +563,19 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-             /* Ignore writes during chip erase */
-             return;
-         case 0x30:
--            /* Ignore writes during sector erase */
-+            /*
-+             * If DQ3 is 0, additional sector erase commands can be
-+             * written and anything else (other than an erase suspend) resets
-+             * the device.
-+             */
-+            if ((pfl->status & 0x08) == 0) {
-+                if (cmd == 0x30) {
-+                    pflash_sector_erase(pfl, offset);
-+                } else {
-+                    goto reset_flash;
-+                }
-+            }
-+            /* Ignore writes during the actual erase. */
-             return;
-         default:
-             /* Should never happen */
-diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-index c984295167..dad16aaf52 100644
---- a/tests/pflash-cfi02-test.c
-+++ b/tests/pflash-cfi02-test.c
-@@ -37,6 +37,7 @@ typedef struct {
- #define CFI_CMD 0x98
- #define UNLOCK0_CMD 0xAA
- #define UNLOCK1_CMD 0x55
-+#define SECOND_UNLOCK_CMD 0x80
- #define AUTOSELECT_CMD 0x90
- #define RESET_CMD 0xF0
- #define PROGRAM_CMD 0xA0
-@@ -222,7 +223,7 @@ static void reset(const FlashConfig *c)
- static void sector_erase(const FlashConfig *c, uint64_t byte_addr)
- {
-     unlock(c);
--    flash_cmd(c, UNLOCK0_ADDR, 0x80);
-+    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
-     unlock(c);
-     flash_write(c, byte_addr, replicate(c, SECTOR_ERASE_CMD));
- }
-@@ -261,7 +262,7 @@ static void program(const FlashConfig *c, uint64_t byte_addr, uint16_t data)
- static void chip_erase(const FlashConfig *c)
- {
-     unlock(c);
--    flash_cmd(c, UNLOCK0_ADDR, 0x80);
-+    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
-     unlock(c);
-     flash_cmd(c, UNLOCK0_ADDR, CHIP_ERASE_CMD);
- }
-@@ -343,6 +344,7 @@ static void test_geometry(const void *opaque)
-     reset(c);
-     const uint64_t dq7 = replicate(c, 0x80);
-     const uint64_t dq6 = replicate(c, 0x40);
-+    const uint64_t dq3 = replicate(c, 0x08);
- 
-     uint64_t byte_addr = 0;
-     for (int region = 0; region < nb_erase_regions; ++region) {
-@@ -360,18 +362,29 @@ static void test_geometry(const void *opaque)
-         /* Erase and program sector. */
-         for (uint32_t i = 0; i < nb_sectors; ++i) {
-             sector_erase(c, byte_addr);
--            /* Read toggle. */
-+
-+            /* Check that DQ3 is 0. */
-+            g_assert_cmpint(flash_read(c, byte_addr) & dq3, ==, 0);
-+            clock_step_next(); /* Step over the 50 us timeout. */
-+
-+            /* Check that DQ3 is 1. */
-             uint64_t status0 = flash_read(c, byte_addr);
-+            g_assert_cmpint(status0 & dq3, ==, dq3);
-+
-             /* DQ7 is 0 during an erase. */
-             g_assert_cmpint(status0 & dq7, ==, 0);
-             uint64_t status1 = flash_read(c, byte_addr);
-+
-             /* DQ6 toggles during an erase. */
-             g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
-+
-             /* Wait for erase to complete. */
--            clock_step_next();
-+            wait_for_completion(c, byte_addr);
-+
-             /* Ensure DQ6 has stopped toggling. */
-             g_assert_cmpint(flash_read(c, byte_addr), ==,
-                             flash_read(c, byte_addr));
-+
-             /* Now the data should be valid. */
-             g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
- 
-@@ -434,6 +447,44 @@ static void test_geometry(const void *opaque)
-     g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
-     reset(c);
- 
-+    /*
-+     * Program a word on each sector, erase one or two sectors per region, and
-+     * verify that all of those, and only those, are erased.
-+     */
-+    byte_addr = 0;
-+    for (int region = 0; region < nb_erase_regions; ++region) {
-+        for (int i = 0; i < config->nb_blocs[region]; ++i) {
-+            program(c, byte_addr, 0);
-+            byte_addr += config->sector_len[region];
-+        }
-+    }
-+    unlock(c);
-+    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
-+    unlock(c);
-+    byte_addr = 0;
-+    const uint64_t erase_cmd = replicate(c, SECTOR_ERASE_CMD);
-+    for (int region = 0; region < nb_erase_regions; ++region) {
-+        flash_write(c, byte_addr, erase_cmd);
-+        if (c->nb_blocs[region] > 1) {
-+            flash_write(c, byte_addr + c->sector_len[region], erase_cmd);
-+        }
-+        byte_addr += c->sector_len[region] * c->nb_blocs[region];
-+    }
-+
-+    clock_step_next(); /* Step over the 50 us timeout. */
-+    wait_for_completion(c, 0);
-+    byte_addr = 0;
-+    for (int region = 0; region < nb_erase_regions; ++region) {
-+        for (int i = 0; i < config->nb_blocs[region]; ++i) {
-+            if (i < 2) {
-+                g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
-+            } else {
-+                g_assert_cmpint(flash_read(c, byte_addr), ==, 0);
-+            }
-+            byte_addr += config->sector_len[region];
-+        }
-+    }
-+
-     qtest_quit(global_qtest);
- }
- 
--- 
-2.20.1 (Apple Git-117)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTU0NzU1MDAxLmdp
+dC5zdGVwaGVuLmNoZWNrb3dheUBvYmVybGluLmVkdS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogY292ZXIuMTU1NDc1NTAwMS5naXQuc3Rl
+cGhlbi5jaGVja293YXlAb2Jlcmxpbi5lZHUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAw
+MC8xMF0gYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgbWlzc2luZyBBTUQgcGZsYXNoIGZ1
+bmN0aW9uYWxpdHkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3L2NvdmVyLjE1NTQ3NTUwMDEuZ2l0LnN0ZXBoZW4uY2hlY2tv
+d2F5QG9iZXJsaW4uZWR1IC0+IHBhdGNoZXcvY292ZXIuMTU1NDc1NTAwMS5naXQuc3RlcGhlbi5j
+aGVja293YXlAb2Jlcmxpbi5lZHUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMDU1
+MmQ2ZDRiIGJsb2NrL3BmbGFzaF9jZmkwMjogVXNlIHRoZSBjaGlwIGVyYXNlIHRpbWUgc3BlY2lm
+aWVkIGluIHRoZSBDRkkgdGFibGUKZThjNWNiODI4NSBibG9jay9wZmxhc2hfY2ZpMDI6IEltcGxl
+bWVudCBlcmFzZSBzdXNwZW5kL3Jlc3VtZQowNmVhODI3MzkzIGJsb2NrL3BmbGFzaF9jZmkwMjog
+SW1wbGVtZW50IG11bHRpLXNlY3RvciBlcmFzZQo2Y2ZkNmY0MTEyIGJsb2NrL3BmbGFzaF9jZmkw
+MjogRml4IHJlc2V0IGNvbW1hbmQgbm90IGlnbm9yZWQgZHVyaW5nIGVyYXNlCmEyZGQxNzZjYTIg
+YmxvY2svcGZsYXNoX2NmaTAyOiBGaXggQ0ZJIGluIGF1dG9zZWxlY3QgbW9kZQpkNmFhYzI2NDk3
+IGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG5vbnVuaWZvcm0gc2VjdG9yIHNpemVzCjc4
+MjM4MjVhNDUgYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgaW50ZXJlbGVhdmVkIGZsYXNo
+IGRldmljZXMKMGU4MzIwZTU3OCBibG9jay9wZmxhc2hfY2ZpMDI6IEZpeCBjb21tYW5kIGFkZHJl
+c3MgY29tcGFyaXNvbgoyZDg2ZGJlOWE1IGJsb2NrL3BmbGFzaF9jZmkwMjogUmVmYWN0b3IsIE5G
+QyBpbnRlbmRlZAplZjViYzk0MjE5IGJsb2NrL3BmbGFzaF9jZmkwMjogQWRkIHRlc3QgZm9yIHN1
+cHBvcnRlZCBjb21tYW5kcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
+aXQgZWY1YmM5NDIxOTY0IChibG9jay9wZmxhc2hfY2ZpMDI6IEFkZCB0ZXN0IGZvciBzdXBwb3J0
+ZWQgY29tbWFuZHMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjc6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjE6CisjZGVmaW5lIE1QX0ZMQVNIX1NJWkVf
+TUFYICgzMioxMDI0KjEwMjQpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjc6IEZJTEU6IHRl
+c3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjE6CisjZGVmaW5lIE1QX0ZMQVNIX1NJWkVfTUFYICgz
+MioxMDI0KjEwMjQpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM2ODogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoyMjoKKyNkZWZpbmUgQkFTRV9BRERSICgweDEwMDAwMDAw
+MFVMTC1NUF9GTEFTSF9TSVpFX01BWCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNzE6
+IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MjU6CisjZGVmaW5lIENGSV9BRERSIChG
+TEFTSF9XSURUSCoweDU1KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzcyOiBGSUxFOiB0ZXN0
+cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjI2OgorI2RlZmluZSBVTkxPQ0swX0FERFIgKEZMQVNIX1dJ
+RFRIKjB4NTU1NSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNzM6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6Mjc6CisjZGVmaW5lIFVOTE9DSzFfQUREUiAoRkxBU0hfV0lE
+VEgqMHgyQUFBKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNjI6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MTE2OgorICAgIGdfYXNzZXJ0X2NtcGludChmbGFzaF9yZWFk
+KEZMQVNIX1dJRFRIKjB4MDAwMCksID09LCAweDAwQkYpOwogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnKicgKGN0eDpWeFYpCiMxNjM6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTE3
+OgorICAgIGdfYXNzZXJ0X2NtcGludChmbGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MDAwMSksID09
+LCAweDIzNkQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNjg6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTIyOgorICAgIGdfYXNzZXJ0X2NtcGludChm
+bGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MTApLCA9PSwgJ1EnKTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJyonIChjdHg6VnhWKQojMTY5OiBGSUxFOiB0ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5j
+OjEyMzoKKyAgICBnX2Fzc2VydF9jbXBpbnQoZmxhc2hfcmVhZChGTEFTSF9XSURUSCoweDExKSwg
+PT0sICdSJyk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzE3MDogRklM
+RTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjQ6CisgICAgZ19hc3NlcnRfY21waW50KGZs
+YXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgxMiksID09LCAnWScpOwogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzE3MTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjU6CisgICAgZ19hc3Nl
+cnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyQyksID49LCAxKTsgLyogTnVtIGVy
+YXNlIHJlZ2lvbnMuICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAo
+Y3R4OlZ4VikKIzE3MTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjU6CisgICAg
+Z19hc3NlcnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyQyksID49LCAxKTsgLyog
+TnVtIGVyYXNlIHJlZ2lvbnMuICovCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4
+VikKIzE3MjogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxMjY6CisgICAgdWludDMy
+X3QgbmJfc2VjdG9ycyA9IGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgyRCkgKwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
+ZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNzM6IEZJTEU6IHRlc3RzL3BmbGFz
+aC1jZmkwMi10ZXN0LmM6MTI3OgorICAgICAgICAgICAgICAgICAgICAgICAgICAoZmxhc2hfcmVh
+ZChGTEFTSF9XSURUSCoweDJFKSA8PCA4KSArIDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
+dGhhdCAnKicgKGN0eDpWeFYpCiMxNzQ6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6
+MTI4OgorICAgIHVpbnQzMl90IHNlY3Rvcl9sZW4gPSAoZmxhc2hfcmVhZChGTEFTSF9XSURUSCow
+eDJGKSA8PCA4KSArCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYp
+CiMxNzU6IEZJTEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTI5OgorICAgICAgICAgICAg
+ICAgICAgICAgICAgICAoZmxhc2hfcmVhZChGTEFTSF9XSURUSCoweDMwKSA8PCAxNik7CiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMyNTQ6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MjA4OgorICAgIGlmIChmdHJ1bmNhdGUoZmQsIDgqMTAyNCox
+MDI0KSA8IDApIHsKICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMyNTQ6IEZJTEU6IHRlc3RzL3BmbGFzaC1j
+ZmkwMi10ZXN0LmM6MjA4OgorICAgIGlmIChmdHJ1bmNhdGUoZmQsIDgqMTAyNCoxMDI0KSA8IDAp
+IHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMTggZXJyb3JzLCAyIHdh
+cm5pbmdzLCAyMzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKMi8xMCBDaGVja2luZyBjb21taXQgMmQ4NmRiZTlhNTZmIChibG9jay9wZmxhc2hf
+Y2ZpMDI6IFJlZmFjdG9yLCBORkMgaW50ZW5kZWQpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
+dW5kIHRoYXQgJz8nIChjdHg6VnhXKQojMTAxOiBGSUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIu
+YzoxNzI6CisgICAgdWludDY0X3QgcmV0ID0gcGZsLT5iZT8gbGRuX2JlX3AocCwgd2lkdGgpIDog
+bGRuX2xlX3AocCwgd2lkdGgpOwogICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDM0MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzEwIENoZWNraW5nIGNvbW1pdCAwZTgzMjBlNTc4YjEg
+KGJsb2NrL3BmbGFzaF9jZmkwMjogRml4IGNvbW1hbmQgYWRkcmVzcyBjb21wYXJpc29uKQpFUlJP
+Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzU1OiBGSUxFOiB0
+ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjI2OgorI2RlZmluZSBVTkxPQ0swX0FERFIgKEZMQVNI
+X1dJRFRIKjB4NTU1KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM1NjogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoyNzoKKyNkZWZpbmUgVU5MT0NLMV9BRERSIChGTEFTSF9X
+SURUSCoweDJBQSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjU6IEZJTEU6IHRlc3Rz
+L3BmbGFzaC1jZmkwMi10ZXN0LmM6MTk1OgorICAgIGZsYXNoX3dyaXRlKEZMQVNIX1dJRFRIKjB4
+NTU1NSwgVU5MT0NLMF9DTUQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM2NjogRklMRTogdGVz
+dHMvcGZsYXNoLWNmaTAyLXRlc3QuYzoxOTY6CisgICAgZmxhc2hfd3JpdGUoRkxBU0hfV0lEVEgq
+MHgyQUFBLCBVTkxPQ0sxX0NNRCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzY3OiBGSUxFOiB0
+ZXN0cy9wZmxhc2gtY2ZpMDItdGVzdC5jOjE5NzoKKyAgICBmbGFzaF93cml0ZShGTEFTSF9XSURU
+SCoweDU1NTUsIEFVVE9TRUxFQ1RfQ01EKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojNjg6IEZJ
+TEU6IHRlc3RzL3BmbGFzaC1jZmkwMi10ZXN0LmM6MTk4OgorICAgIGdfYXNzZXJ0X2NtcGludChm
+bGFzaF9yZWFkKEZMQVNIX1dJRFRIKjB4MDAwMCksID09LCAweDAwQkYpOwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM2OTogRklMRTogdGVzdHMvcGZsYXNoLWNmaTAyLXRl
+c3QuYzoxOTk6CisgICAgZ19hc3NlcnRfY21waW50KGZsYXNoX3JlYWQoRkxBU0hfV0lEVEgqMHgw
+MDAxKSwgPT0sIDB4MjM2RCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgp0b3RhbDogNyBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTAgQ2hlY2tpbmcgY29tbWl0
+IDc4MjM4MjVhNDVjYyAoYmxvY2svcGZsYXNoX2NmaTAyOiBJbXBsZW1lbnQgaW50ZXJlbGVhdmVk
+IGZsYXNoIGRldmljZXMpCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVkdW5kYW50IGNvbnNpZGVy
+IHJlbW92aW5nIGl0CiMyMTQ6IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjMwMDoKKyNp
+ZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDk5NSBsaW5lcyBjaGVja2VkCgpQYXRj
+aCA0LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzEwIENoZWNraW5nIGNvbW1pdCBk
+NmFhYzI2NDk3M2QgKGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG5vbnVuaWZvcm0gc2Vj
+dG9yIHNpemVzKQo2LzEwIENoZWNraW5nIGNvbW1pdCBhMmRkMTc2Y2EyYjYgKGJsb2NrL3BmbGFz
+aF9jZmkwMjogRml4IENGSSBpbiBhdXRvc2VsZWN0IG1vZGUpCjcvMTAgQ2hlY2tpbmcgY29tbWl0
+IDZjZmQ2ZjQxMTJkYiAoYmxvY2svcGZsYXNoX2NmaTAyOiBGaXggcmVzZXQgY29tbWFuZCBub3Qg
+aWdub3JlZCBkdXJpbmcgZXJhc2UpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUo
+cykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3
+LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzEwIENoZWNraW5nIGNvbW1pdCAwNmVh
+ODI3MzkzMzAgKGJsb2NrL3BmbGFzaF9jZmkwMjogSW1wbGVtZW50IG11bHRpLXNlY3RvciBlcmFz
+ZSkKOS8xMCBDaGVja2luZyBjb21taXQgZThjNWNiODI4NWI0IChibG9jay9wZmxhc2hfY2ZpMDI6
+IEltcGxlbWVudCBlcmFzZSBzdXNwZW5kL3Jlc3VtZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGIw
+NTUyZDZkNGJmMiAoYmxvY2svcGZsYXNoX2NmaTAyOiBVc2UgdGhlIGNoaXAgZXJhc2UgdGltZSBz
+cGVjaWZpZWQgaW4gdGhlIENGSSB0YWJsZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU1NDc1NTAwMS5naXQuc3RlcGhlbi5jaGVja293
+YXlAb2Jlcmxpbi5lZHUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
