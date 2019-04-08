@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55417)
+Received: from eggs.gnu.org ([209.51.188.92]:56385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDVO1-0007Kn-1C
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:39 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hDVRE-0001C5-AI
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDVNx-0000Sn-FP
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:35 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  8 Apr 2019 16:35:40 +0200
-Message-Id: <20190408143543.3982-2-kwolf@redhat.com>
-In-Reply-To: <20190408143543.3982-1-kwolf@redhat.com>
-References: <20190408143543.3982-1-kwolf@redhat.com>
+	(envelope-from <like.xu@linux.intel.com>) id 1hDVRD-0002YG-60
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:39:56 -0400
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<20190329112152.0c7ad147@redhat.com>
+	<7b902f2b-64b9-9c73-eeb0-1be33f1f2b07@linux.intel.com>
+	<20190408152614.0bdf3cfd@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
+Message-ID: <3b8f97c1-5ffe-1fea-5f4b-0f8d0dc6fe0c@linux.intel.com>
+Date: Mon, 8 Apr 2019 22:38:43 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] qapi: Support features for structs
+In-Reply-To: <20190408152614.0bdf3cfd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/9] refactor cpu topo into machine
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,390 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-trivial@nongnu.org, like.xu@intel.com, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Sometimes, the behaviour of QEMU changes compatibly, but without a
-change in the QMP syntax (usually by allowing values or operations that
-previously resulted in an error). QMP clients may still need to know
-whether the extension is available.
+On 2019/4/8 21:26, Igor Mammedov wrote:
+> On Thu, 4 Apr 2019 11:26:09 +0800
+> Like Xu <like.xu@linux.intel.com> wrote:
+> 
+>> On 2019/3/29 18:21, Igor Mammedov wrote:
+>>> On Fri, 29 Mar 2019 16:48:36 +0800
+>>> Like Xu <like.xu@linux.intel.com> wrote:
+>>>    
+>>>> This patch series make existing cores/threads/sockets into machine
+>>>> properties and get rid of global variables they use currently.
+>>> Thanks for looking into it!
+>>> Its long overdue and rather desired conversion (albeit naive one,
+>>> but this series is a good starting point). I'll go over your patches
+>>> next week with comments and concrete suggestions how to implement
+>>> particular things.
+>>
+>> Hi Igor, any comments and suggestions on smp machine properties
+>> in this patch considering we may add die topology for PCMachine as an
+>> extension?
+> 
+> I've looked at several patches and that it for this series.
+> The most comments apply to the patches I've not reviewed as well.
 
-This allows to add a list of features to struct definitions that will be
-made visible to QMP clients through schema introspection.
+Hi Igor, thanks for your comments, time and patience.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/introspect.json                   |  8 ++++-
- docs/devel/qapi-code-gen.txt           | 38 ++++++++++++++++++++
- scripts/qapi/common.py                 | 49 ++++++++++++++++++++------
- scripts/qapi/doc.py                    |  3 +-
- scripts/qapi/introspect.py             |  6 +++-
- scripts/qapi/types.py                  |  3 +-
- scripts/qapi/visit.py                  |  3 +-
- tests/qapi-schema/double-type.err      |  2 +-
- tests/qapi-schema/test-qapi.py         |  3 +-
- tests/qapi-schema/unknown-expr-key.err |  2 +-
- 10 files changed, 99 insertions(+), 18 deletions(-)
+I'll try to fix them in next version ASAP.
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 3d22166b2b..3cb6c1aca4 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -174,6 +174,11 @@
- #            and may even differ from the order of the values of the
- #            enum type of the @tag.
- #
-+# @features: names of features that are supported by this version and bu=
-ild and
-+#            aren't othervise visible through schema introspection (e.g.=
- change
-+#            of behaviour related to an object type that didn't come wit=
-h a
-+#            syntactic change in the schema of the object type) (since: =
-4.1)
-+#
- # Values of this type are JSON object on the wire.
- #
- # Since: 2.5
-@@ -181,7 +186,8 @@
- { 'struct': 'SchemaInfoObject',
-   'data': { 'members': [ 'SchemaInfoObjectMember' ],
-             '*tag': 'str',
--            '*variants': [ 'SchemaInfoObjectVariant' ] } }
-+            '*variants': [ 'SchemaInfoObjectVariant' ],
-+            '*features': [ 'str' ] } }
-=20
- ##
- # @SchemaInfoObjectMember:
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index b517b0cfbf..e8ec8ac1de 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -719,6 +719,34 @@ any non-empty complex type (struct, union, or altern=
-ate), and a
- pointer to that QAPI type is passed as a single argument.
-=20
-=20
-+=3D=3D=3D Features =3D=3D=3D
-+
-+Sometimes, the behaviour of QEMU changes compatibly, but without a
-+change in the QMP syntax (usually by allowing values or operations that
-+previously resulted in an error). QMP clients may still need to know
-+whether the extension is available.
-+
-+For this purpose, a list of features can be specified for a struct type.
-+This is exposed to the client as a list of string, where each string
-+signals that this build of QEMU shows a certain behaviour.
-+
-+In the schema, features can be specified as simple strings, for example:
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ 'allow-negative-numbers' ] }
-+
-+Another option is to specify features as dictionaries, where the key
-+'name' specifies the feature string to be exposed to clients:
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ { 'name': 'allow-negative-numbers' } ] }
-+
-+This expanded form is necessary if you want to make the feature
-+conditional (see below in "Configuring the schema").
-+
-+
- =3D=3D=3D Downstream extensions =3D=3D=3D
-=20
- QAPI schema names that are externally visible, say in the Client JSON
-@@ -771,6 +799,16 @@ Example: a conditional 'bar' enum member.
-   [ 'foo',
-     { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
-=20
-+Similarly, features can be specified as a dictionary with a 'name' and
-+an 'if' key.
-+
-+Example: a conditional 'allow-negative-numbers' feature
-+
-+{ 'struct': 'TestType',
-+  'data': { 'number': 'int' },
-+  'features': [ { 'name': 'allow-negative-numbers',
-+                  'if' 'defined(IFCOND)' } ] }
-+
- Please note that you are responsible to ensure that the C code will
- compile with an arbitrary combination of conditions, since the
- generators are unable to check it at this point.
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f07869ec73..692d787f04 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -886,12 +886,29 @@ def check_enum(expr, info):
- def check_struct(expr, info):
-     name =3D expr['struct']
-     members =3D expr['data']
-+    features =3D expr.get('features')
-=20
-     check_type(info, "'data' for struct '%s'" % name, members,
-                allow_dict=3DTrue, allow_optional=3DTrue)
-     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
-                allow_metas=3D['struct'])
-=20
-+    if features:
-+        if not isinstance(features, list):
-+            raise QAPISemError(info,
-+                               "Struct '%s' requires an array for 'featu=
-res'" %
-+                               name)
-+        for f in features:
-+            assert isinstance(f, dict)
-+            check_known_keys(info, "feature of struct %s" % (name), f,
-+                             ['name'], ['if'])
-+
-+            check_if(f, info)
-+            f['if'] =3D listify_cond(f.get('if'))
-+
-+            if not isinstance(f['name'], str):
-+                raise QAPISemError(info, "Feature names for struct '%s' =
-must "
-+                                         "be strings" % name)
-=20
- def check_known_keys(info, source, keys, required, optional):
-=20
-@@ -947,6 +964,10 @@ def normalize_members(members):
-                 continue
-             members[key] =3D {'type': arg}
-=20
-+def normalize_features(features):
-+    if isinstance(features, list):
-+        features[:] =3D [f if isinstance(f, dict) else {'name': f}
-+                       for f in features]
-=20
- def check_exprs(exprs):
-     global all_names
-@@ -986,8 +1007,10 @@ def check_exprs(exprs):
-             normalize_members(expr['data'])
-         elif 'struct' in expr:
-             meta =3D 'struct'
--            check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
-+            check_keys(expr_elem, 'struct', ['data'],
-+                       ['base', 'if', 'features'])
-             normalize_members(expr['data'])
-+            normalize_features(expr.get('features'))
-             struct_types[expr[meta]] =3D expr
-         elif 'command' in expr:
-             meta =3D 'command'
-@@ -1126,10 +1149,12 @@ class QAPISchemaVisitor(object):
-     def visit_array_type(self, name, info, ifcond, element_type):
-         pass
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         pass
-=20
--    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts,
-+                               features):
-         pass
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-@@ -1290,7 +1315,7 @@ class QAPISchemaArrayType(QAPISchemaType):
-=20
- class QAPISchemaObjectType(QAPISchemaType):
-     def __init__(self, name, info, doc, ifcond,
--                 base, local_members, variants):
-+                 base, local_members, variants, features):
-         # struct has local_members, optional base, and no variants
-         # flat union has base, variants, and no local_members
-         # simple union has local_members, variants, and no base
-@@ -1307,6 +1332,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-         self.local_members =3D local_members
-         self.variants =3D variants
-         self.members =3D None
-+        self.features =3D features
-=20
-     def check(self, schema):
-         QAPISchemaType.check(self, schema)
-@@ -1368,9 +1394,11 @@ class QAPISchemaObjectType(QAPISchemaType):
-=20
-     def visit(self, visitor):
-         visitor.visit_object_type(self.name, self.info, self.ifcond,
--                                  self.base, self.local_members, self.va=
-riants)
-+                                  self.base, self.local_members, self.va=
-riants,
-+                                  self.features)
-         visitor.visit_object_type_flat(self.name, self.info, self.ifcond=
-,
--                                       self.members, self.variants)
-+                                       self.members, self.variants,
-+                                       self.features)
-=20
-=20
- class QAPISchemaMember(object):
-@@ -1675,7 +1703,7 @@ class QAPISchema(object):
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type =3D QAPISchemaObjectType(
--            'q_empty', None, None, None, None, [], None)
-+            'q_empty', None, None, None, None, [], None, [])
-         self._def_entity(self.the_empty_object_type)
-=20
-         qtypes =3D ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist'=
-,
-@@ -1721,7 +1749,7 @@ class QAPISchema(object):
-             assert ifcond =3D=3D typ._ifcond # pylint: disable=3Dprotect=
-ed-access
-         else:
-             self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
-d,
--                                                  None, members, None))
-+                                                  None, members, None, [=
-]))
-         return name
-=20
-     def _def_enum_type(self, expr, info, doc):
-@@ -1752,9 +1780,10 @@ class QAPISchema(object):
-         base =3D expr.get('base')
-         data =3D expr['data']
-         ifcond =3D expr.get('if')
-+        features =3D expr.get('features')
-         self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond, b=
-ase,
-                                               self._make_members(data, i=
-nfo),
--                                              None))
-+                                              None, features))
-=20
-     def _make_variant(self, case, typ, ifcond):
-         return QAPISchemaObjectTypeVariant(case, typ, ifcond)
-@@ -1795,7 +1824,7 @@ class QAPISchema(object):
-             QAPISchemaObjectType(name, info, doc, ifcond, base, members,
-                                  QAPISchemaObjectTypeVariants(tag_name,
-                                                               tag_member=
-,
--                                                              variants))=
-)
-+                                                              variants),=
- []))
-=20
-     def _def_alternate_type(self, expr, info, doc):
-         name =3D expr['alternate']
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 5c8c136899..433e9fcbfb 100755
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -220,7 +220,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-                                body=3Dtexi_entity(doc, 'Values', ifcond,
-                                                 member_func=3Dtexi_enum_=
-value)))
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         doc =3D self.cur_doc
-         if base and base.is_implicit():
-             base =3D None
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index f7f2ca07e4..8909cecde4 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -188,11 +188,15 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-         self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement},
-                        ifcond)
-=20
--    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
-+    def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts,
-+                               features):
-         obj =3D {'members': [self._gen_member(m) for m in members]}
-         if variants:
-             obj.update(self._gen_variants(variants.tag_member.name,
-                                           variants.variants))
-+        if features:
-+            obj['features'] =3D [ (f['name'], f) for f in features ]
-+
-         self._gen_qlit(name, 'object', obj, ifcond)
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 2bd6fcd44f..3edd9374aa 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -227,7 +227,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
-tor):
-             self._genh.add(gen_array(name, element_type))
-             self._gen_type_cleanup(name)
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 826b8066e1..c1cd675c95 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -326,7 +326,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
-itor):
-             self._genh.add(gen_visit_decl(name))
-             self._genc.add(gen_visit_list(name, element_type))
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
-diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
--type.err
-index 799193dba1..69457173a7 100644
---- a/tests/qapi-schema/double-type.err
-+++ b/tests/qapi-schema/double-type.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
-ar'
--Valid keys are 'base', 'data', 'if', 'struct'.
-+Valid keys are 'base', 'data', 'features', 'if', 'struct'.
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index d21fca01fc..f2d6815c86 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -38,7 +38,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         print('array %s %s' % (name, element_type.name))
-         self._print_if(ifcond)
-=20
--    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-+    def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts,
-+                          features):
-         print('object %s' % name)
-         if base:
-             print('    base %s' % base.name)
-diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
-nknown-expr-key.err
-index 6ff8bb99c5..4340eaf894 100644
---- a/tests/qapi-schema/unknown-expr-key.err
-+++ b/tests/qapi-schema/unknown-expr-key.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'phony'=
- in struct 'bar'
--Valid keys are 'base', 'data', 'if', 'struct'.
-+Valid keys are 'base', 'data', 'features', 'if', 'struct'.
---=20
-2.20.1
+> 
+>>>    
+>>>> Like Xu (9):
+>>>>     cpu/topology: add struct CpuTopology to MachineState
+>>>>     cpu/topology: add general support for machine properties
+>>>>     cpu/topology: add uncommon arch support for smp machine properties
+>>>>     cpu/topology: add ARM support for smp machine properties
+>>>>     cpu/topology: add i386 support for smp machine properties
+>>>>     cpu/topology: add PPC support for smp machine properties
+>>>>     cpu/topology: add riscv support for smp machine properties
+>>>>     cpu/topology: add s390x support for smp machine properties
+>>>>     cpu/topology: replace smp global variables with machine propertie
+>>>>
+>>>>    accel/kvm/kvm-all.c          |  3 +++
+>>>>    backends/hostmem.c           |  4 ++++
+>>>>    cpus.c                       |  4 ++++
+>>>>    exec.c                       |  2 ++
+>>>>    gdbstub.c                    |  7 ++++++-
+>>>>    hw/alpha/dp264.c             |  1 +
+>>>>    hw/arm/fsl-imx6.c            |  5 +++++
+>>>>    hw/arm/fsl-imx6ul.c          |  5 +++++
+>>>>    hw/arm/fsl-imx7.c            |  5 +++++
+>>>>    hw/arm/highbank.c            |  1 +
+>>>>    hw/arm/mcimx6ul-evk.c        |  1 +
+>>>>    hw/arm/mcimx7d-sabre.c       |  3 +++
+>>>>    hw/arm/raspi.c               |  2 ++
+>>>>    hw/arm/realview.c            |  1 +
+>>>>    hw/arm/sabrelite.c           |  1 +
+>>>>    hw/arm/vexpress.c            |  3 +++
+>>>>    hw/arm/virt.c                |  7 +++++++
+>>>>    hw/arm/xlnx-zynqmp.c         |  7 +++++++
+>>>>    hw/cpu/core.c                |  3 +++
+>>>>    hw/hppa/machine.c            |  4 ++++
+>>>>    hw/i386/acpi-build.c         |  3 +++
+>>>>    hw/i386/kvmvapic.c           |  5 +++++
+>>>>    hw/i386/pc.c                 | 12 +++++++++++
+>>>>    hw/mips/boston.c             |  1 +
+>>>>    hw/mips/mips_malta.c         |  9 +++++++++
+>>>>    hw/openrisc/openrisc_sim.c   |  1 +
+>>>>    hw/ppc/e500.c                |  3 +++
+>>>>    hw/ppc/mac_newworld.c        |  2 ++
+>>>>    hw/ppc/mac_oldworld.c        |  2 ++
+>>>>    hw/ppc/pnv.c                 |  3 +++
+>>>>    hw/ppc/prep.c                |  2 ++
+>>>>    hw/ppc/spapr.c               | 29 ++++++++++++++++++++++++++
+>>>>    hw/ppc/spapr_rtas.c          |  3 +++
+>>>>    hw/riscv/sifive_e.c          |  4 ++++
+>>>>    hw/riscv/sifive_plic.c       |  3 +++
+>>>>    hw/riscv/sifive_u.c          |  4 ++++
+>>>>    hw/riscv/spike.c             |  2 ++
+>>>>    hw/riscv/virt.c              |  1 +
+>>>>    hw/s390x/s390-virtio-ccw.c   |  2 ++
+>>>>    hw/s390x/sclp.c              |  1 +
+>>>>    hw/smbios/smbios.c           | 11 ++++++++++
+>>>>    hw/sparc/sun4m.c             |  2 ++
+>>>>    hw/sparc64/sun4u.c           |  2 ++
+>>>>    hw/xtensa/sim.c              |  1 +
+>>>>    hw/xtensa/xtfpga.c           |  1 +
+>>>>    include/hw/arm/virt.h        |  2 +-
+>>>>    include/hw/boards.h          |  8 ++++++++
+>>>>    include/sysemu/sysemu.h      |  2 +-
+>>>>    migration/postcopy-ram.c     |  7 +++++++
+>>>>    numa.c                       |  1 +
+>>>>    target/arm/cpu.c             |  7 +++++++
+>>>>    target/i386/cpu.c            |  4 ++++
+>>>>    target/openrisc/sys_helper.c |  5 +++++
+>>>>    target/s390x/cpu.c           |  3 +++
+>>>>    target/s390x/excp_helper.c   |  6 ++++++
+>>>>    tcg/tcg.c                    | 15 ++++++++++++++
+>>>>    vl.c                         | 48 ++++++++++++++++++++++++--------------------
+>>>>    57 files changed, 261 insertions(+), 25 deletions(-)
+>>>>   
+>>>
+>>>
+>>>    
+>>
+>>
+> 
+> 
