@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58360)
+Received: from eggs.gnu.org ([209.51.188.92]:58389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0M-0007Zw-Gk
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:27 -0400
+	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0O-0007bf-Dl
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0L-0007Co-Dv
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:26 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41957)
+	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0N-0007Dy-Ei
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:28 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hDZ0L-0007Bq-66
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:25 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 64so13099362otb.8
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 11:28:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hDZ0N-0007Di-8Y
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:27 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e80so13118371ote.5
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 11:28:27 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
-Date: Mon,  8 Apr 2019 14:27:46 -0400
-Message-Id: <20190408182748.1238-4-jan.bobek@gmail.com>
+Date: Mon,  8 Apr 2019 14:27:48 -0400
+Message-Id: <20190408182748.1238-6-jan.bobek@gmail.com>
 In-Reply-To: <20190408182748.1238-1-jan.bobek@gmail.com>
 References: <20190408182748.1238-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH 3/5] risu_reginfo_i386: implement
- arch-specific reginfo interface
+Subject: [Qemu-devel] [RISU PATCH 5/5] risu_i386: remove old unused code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +30,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jan Bobek <jan.bobek@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-CPU-specific code in risu_reginfo_* is expected to define and export
-the following symbols:
-
-- arch_long_opts, arch_extra_help, process_arch_opt
-- reginfo_size
-- reginfo_init
-- reginfo_is_eq
-- reginfo_dump, reginfo_dump_mismatch
-
-Make risu_reginfo_i386.c implement this interface.
+The code being removed is a remnant of the past implementation; it has
+since been replaced by its more powerful, architecture-independent
+counterpart in reginfo.c.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- risu_reginfo_i386.c | 48 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
+ risu_i386.c | 58 -----------------------------------------------------
+ 1 file changed, 58 deletions(-)
 
-diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-index e8d671f..3882261 100644
---- a/risu_reginfo_i386.c
-+++ b/risu_reginfo_i386.c
-@@ -10,12 +10,28 @@
-  ******************************************************************************/
- 
- #include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
- #include <ucontext.h>
- 
+diff --git a/risu_i386.c b/risu_i386.c
+index eb4dff4..14b0db3 100644
+--- a/risu_i386.c
++++ b/risu_i386.c
+@@ -16,13 +16,6 @@
  #include "risu.h"
  #include "risu_reginfo_i386.h"
  
--static void fill_reginfo(struct reginfo *ri, ucontext_t * uc)
-+const struct option * const arch_long_opts;
-+const char * const arch_extra_help;
-+
-+void process_arch_opt(int opt, const char *arg)
-+{
-+    abort();
-+}
-+
-+const int reginfo_size(void)
-+{
-+    return sizeof(struct reginfo);
-+}
-+
-+/* reginfo_init: initialize with a ucontext */
-+void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+-struct reginfo master_ri, apprentice_ri;
+-
+-static int insn_is_ud2(uint32_t insn)
+-{
+-    return ((insn & 0xffff) == 0x0b0f);
+-}
+-
+ void advance_pc(void *vuc)
  {
-     int i;
-     for (i = 0; i < NGREG; i++) {
-@@ -51,18 +67,38 @@ static void fill_reginfo(struct reginfo *ri, ucontext_t * uc)
-     ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.gregs[REG_EIP]);
- }
- 
--static char *regname[] = {
-+/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
-+int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
-+{
-+    return 0 == memcmp(m, a, sizeof(*m));
-+}
-+
-+static const char *const regname[NGREG] = {
-     "GS", "FS", "ES", "DS", "EDI", "ESI", "EBP", "ESP",
-     "EBX", "EDX", "ECX", "EAX", "TRAPNO", "ERR", "EIP",
--    "CS", "EFL", "UESP", "SS", 0
-+    "CS", "EFL", "UESP", "SS"
- };
- 
--static void dump_reginfo(struct reginfo *ri)
-+/* reginfo_dump: print state to a stream, returns nonzero on success */
-+int reginfo_dump(struct reginfo *ri, FILE *f)
+     ucontext_t *uc = (ucontext_t *) vuc;
+@@ -61,54 +54,3 @@ uintptr_t get_pc(struct reginfo *ri)
  {
-     int i;
--    fprintf(stderr, "  faulting insn %x\n", ri->faulting_insn);
-+    fprintf(f, "  faulting insn %x\n", ri->faulting_insn);
-     for (i = 0; i < NGREG; i++) {
--        fprintf(stderr, "  %s: %x\n", regname[i] ? regname[i] : "???",
-+        fprintf(f, "  %s: %x\n", regname[i] ? regname[i] : "???",
-                 ri->gregs[i]);
-     }
-+    return !ferror(f);
-+}
-+
-+int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-+{
-+    int i;
-+    for (i = 0; i < NGREG; i++) {
-+        if (m->gregs[i] != a->gregs[i]) {
-+            fprintf(f, "Mismatch: Register %s\n", regname[i] ? regname[i] : "???");
-+            fprintf(f, "m: [%x] != a: [%x]\n", m->gregs[i], a->gregs[i]);
-+        }
-+    }
-+    return !ferror(f);
+     return ri->gregs[REG_EIP];
  }
+-
+-int send_register_info(int sock, void *uc)
+-{
+-    struct reginfo ri;
+-    fill_reginfo(&ri, uc);
+-    return send_data_pkt(sock, &ri, sizeof(ri));
+-}
+-
+-/* Read register info from the socket and compare it with that from the
+- * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
+- * NB: called from a signal handler.
+- */
+-int recv_and_compare_register_info(int sock, void *uc)
+-{
+-    int resp;
+-    fill_reginfo(&master_ri, uc);
+-    recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri));
+-    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) != 0) {
+-        /* mismatch */
+-        resp = 2;
+-    } else if (insn_is_ud2(master_ri.faulting_insn)) {
+-        /* end of test */
+-        resp = 1;
+-    } else {
+-        /* either successful match or expected undef */
+-        resp = 0;
+-    }
+-    send_response_byte(sock, resp);
+-    return resp;
+-}
+-
+-/* Print a useful report on the status of the last comparison
+- * done in recv_and_compare_register_info(). This is called on
+- * exit, so need not restrict itself to signal-safe functions.
+- * Should return 0 if it was a good match (ie end of test)
+- * and 1 for a mismatch.
+- */
+-int report_match_status(void)
+-{
+-    fprintf(stderr, "match status...\n");
+-    fprintf(stderr, "master reginfo:\n");
+-    dump_reginfo(&master_ri);
+-    fprintf(stderr, "apprentice reginfo:\n");
+-    dump_reginfo(&apprentice_ri);
+-    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) == 0) {
+-        fprintf(stderr, "match!\n");
+-        return 0;
+-    }
+-    fprintf(stderr, "mismatch!\n");
+-    return 1;
+-}
 -- 
 2.20.1
