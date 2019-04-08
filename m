@@ -2,86 +2,95 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD41FC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EABEC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A954920855
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:35:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xp4EM/1c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A954920855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAE2020855
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:35:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE2020855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57175 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDZ6m-000372-He
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 14:35:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58389)
+	id 1hDZ72-0003Gr-1c
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 14:35:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0O-0007bf-Dl
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hDZ5S-0002UD-RX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hDZ0N-0007Dy-Ei
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:28 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38591)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hDZ0N-0007Di-8Y
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:28:27 -0400
-Received: by mail-ot1-x344.google.com with SMTP id e80so13118371ote.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 11:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=ixDla5yG69dYcjSXMRxEhIxmDIvMKdt+9KxqZIdYFH4=;
-	b=Xp4EM/1caaJyewiCheEs/t0w9jLBDYYz1KpnwuUi7COJoSo6d5vhNfyktZ+vyf2Os8
-	txfqcUuLTnXfIlabXWdTZHzqPKfmnaEVVFRp8hMb3OFV8AXZtNgRGivhvPGq7gPOo8ZA
-	9Pk0IBNf1MoaBymu8S909cePYlv6Mkjme+K4YQfIt9cJX7f8dBFi43WPl3XCLUIUV3ZH
-	QI5YDjE62XgBm1i6razzZzZhuKLFScrhDElpkOb9PAKrItVx6jw6lu5+a4RJDz7O1cgp
-	jArjcfd4lPSqIe356woYgGjk4qdkbXKDXAwEju11JDEqY+5XNTzoeVPad4EO2vvfkdZH
-	FK+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=ixDla5yG69dYcjSXMRxEhIxmDIvMKdt+9KxqZIdYFH4=;
-	b=J2eV6XUblhvt85bOaxIeQgC3iJHO4sW5WDpjC0duisXr+3o4CeByPavc5vencoVLUB
-	OxzqPMZYgpwGBmt1GAzWRulqKDNhqK1abaOIy6KQWXsZPC8axLrvIBK704tm2WQXpVQp
-	7r+DO9unyChBAgQQ2uGaethWng6doIT1SWBkJ23Gy3KZtdsZiLYm2jqFl7quJCNrPry3
-	9D++J/e+5lJ3EyIKdhVXRBHQsYvndCT83Z0c08ZM1Gls2DwTDvItBEkHgHCqL4tSfZB1
-	kuEI1FKcsseIcUKMUXHCa8oT73MX1vK+BtsXdkgz0btAeep67BbaK6++RGAQRgimlOZ9
-	JT4w==
-X-Gm-Message-State: APjAAAWEbauaVvfUBIwmz1mKfOLMIQIxfOJa89YjEfCxgkKaE+98gOj0
-	b/fHJgPtPcOHVaAB/4ccCAuy9qDPASw=
-X-Google-Smtp-Source: APXvYqxVht55Rh2lEdhJEJ2cR6PvuYxq23w9Fzb7t2xra9A9EET335ygASoTEi1Z3JOURmCXKWWPGw==
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr20107963otn.239.1554748106416; 
-	Mon, 08 Apr 2019 11:28:26 -0700 (PDT)
-Received: from dionysus.attlocal.net
-	(69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
-	by smtp.gmail.com with ESMTPSA id
-	r133sm9940295oib.21.2019.04.08.11.28.25
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 08 Apr 2019 11:28:25 -0700 (PDT)
-From: Jan Bobek <jan.bobek@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 14:27:48 -0400
-Message-Id: <20190408182748.1238-6-jan.bobek@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190408182748.1238-1-jan.bobek@gmail.com>
-References: <20190408182748.1238-1-jan.bobek@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1hDZ5R-0002az-Gq
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:33:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hDZ5M-0002PM-Iu; Mon, 08 Apr 2019 14:33:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59C2D821F3;
+	Mon,  8 Apr 2019 18:33:26 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-100.brq.redhat.com
+	[10.40.204.100])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B23119C5B;
+	Mon,  8 Apr 2019 18:33:24 +0000 (UTC)
+To: "Richard W.M. Jones" <rjones@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-3-armbru@redhat.com>
+	<20190408172202.GH3926@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d40c9fd6-6ae2-95f3-2f63-151ee1f13d0f@redhat.com>
+Date: Mon, 8 Apr 2019 20:33:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: [Qemu-devel] [RISU PATCH 5/5] risu_i386: remove old unused code
+In-Reply-To: <20190408172202.GH3926@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="adjrWjB2gRXjuQItw1jypAmoqGzeJzUYB"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Mon, 08 Apr 2019 18:33:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] Whither qemu's ssh driver? (was: Re: [PATCH 02/15]
+ block/ssh: Do not report read/write/flush errors to the user)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,99 +102,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Jan Bobek <jan.bobek@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	ptoscano@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408182748.4bsXA5U94vU5M5l66f_09xA_eaOzkWlVOE8Gq4CyGuA@z>
+Message-ID: <20190408183322._pmw_5Mns2Izwv3ESxCS6pL4d3POz9LLzzQbmlHNDMc@z>
 
-The code being removed is a remnant of the past implementation; it has
-since been replaced by its more powerful, architecture-independent
-counterpart in reginfo.c.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--adjrWjB2gRXjuQItw1jypAmoqGzeJzUYB
+From: Max Reitz <mreitz@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, ptoscano@redhat.com, berrange@redhat.com
+Message-ID: <d40c9fd6-6ae2-95f3-2f63-151ee1f13d0f@redhat.com>
+Subject: Re: Whither qemu's ssh driver? (was: Re: [PATCH 02/15] block/ssh: Do
+ not report read/write/flush errors to the user)
+References: <20190408083627.7479-1-armbru@redhat.com>
+ <20190408083627.7479-3-armbru@redhat.com> <20190408172202.GH3926@redhat.com>
+In-Reply-To: <20190408172202.GH3926@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
----
- risu_i386.c | 58 -----------------------------------------------------
- 1 file changed, 58 deletions(-)
+On 08.04.19 19:22, Richard W.M. Jones wrote:
+> I don't know much about this patch which looks like internal qemu
+> rearrangements so I guess fine.  However I do have a few things to say
+> about the ssh driver ...
+>=20
+> As you know I wrote this a few years ago, and it uses libssh2.
+> libssh2 has not evolved as quickly as we'd like and it may be better
+> to use libssh instead -- despite the names, these are two separate and
+> unrelated libraries.  libssh supports a wider range of SSH encryption
+> and has more features.  It's generally more likely to work against a
+> random SSH server.  It has also been through the FIPS process.  Indeed
+> Red Hat made the decision to switch exclusively to libssh in RHEL 8,
+> if that carries any weight.
+>=20
+> Pino posted a libssh2 -> libssh conversion patch a while back, but it
+> has been somewhat stuck in review.  If I recall the latest concern was
+> whether it performs as well as the libssh2 version.
+>=20
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07267.html
+>=20
+> In the meantime I added libssh support to nbdkit.  nbdkit can be used
+> as a complete replacement for qemu's ssh driver.
+>=20
+>   nbdkit ssh host=3Dfoo.example.com disk.img -U tmpdirXXXXXX/sock
+>   qemu -hda nbd:unix:tmpdirXXXXXX/sock
+>=20
+> In fact it's somewhat superior (IMHO) because all of the tricky code
+> handling libssh runs outside qemu in a separate process, improving
+> isolation and potentially allowing separate, restrictive security
+> policies to be applied.  For example it would no longer be necessary
+> to give qemu permission to connect to remote SSH servers.
+>=20
+> Could we make this really smooth somehow?  nbdkit has a concept
+> [https://www.mankier.com/1/nbdkit-captive] where we make it easy to
+> manage external commands owned by nbdkit.  Is there an equivalent
+> feature of qemu where:
+>=20
+>   qemu -object exec,id=3Dnbd1,cmd=3D'nbdkit -f -U $sock ssh ...' \
+>        -drive file.driver=3Dnbd,file.socket=3Dnbd1
+>=20
+> would run the command but also allocate a socket and kill the
+> subcommand on exit (of qemu)?
+>=20
+> Basically I'm trying to think about how to make this a reality:
+>=20
+>   https://rwmj.files.wordpress.com/2018/10/drawing2-svg.png
+>=20
+> Rich.
 
-diff --git a/risu_i386.c b/risu_i386.c
-index eb4dff4..14b0db3 100644
---- a/risu_i386.c
-+++ b/risu_i386.c
-@@ -16,13 +16,6 @@
- #include "risu.h"
- #include "risu_reginfo_i386.h"
- 
--struct reginfo master_ri, apprentice_ri;
--
--static int insn_is_ud2(uint32_t insn)
--{
--    return ((insn & 0xffff) == 0x0b0f);
--}
--
- void advance_pc(void *vuc)
- {
-     ucontext_t *uc = (ucontext_t *) vuc;
-@@ -61,54 +54,3 @@ uintptr_t get_pc(struct reginfo *ri)
- {
-     return ri->gregs[REG_EIP];
- }
--
--int send_register_info(int sock, void *uc)
--{
--    struct reginfo ri;
--    fill_reginfo(&ri, uc);
--    return send_data_pkt(sock, &ri, sizeof(ri));
--}
--
--/* Read register info from the socket and compare it with that from the
-- * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
-- * NB: called from a signal handler.
-- */
--int recv_and_compare_register_info(int sock, void *uc)
--{
--    int resp;
--    fill_reginfo(&master_ri, uc);
--    recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri));
--    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) != 0) {
--        /* mismatch */
--        resp = 2;
--    } else if (insn_is_ud2(master_ri.faulting_insn)) {
--        /* end of test */
--        resp = 1;
--    } else {
--        /* either successful match or expected undef */
--        resp = 0;
--    }
--    send_response_byte(sock, resp);
--    return resp;
--}
--
--/* Print a useful report on the status of the last comparison
-- * done in recv_and_compare_register_info(). This is called on
-- * exit, so need not restrict itself to signal-safe functions.
-- * Should return 0 if it was a good match (ie end of test)
-- * and 1 for a mismatch.
-- */
--int report_match_status(void)
--{
--    fprintf(stderr, "match status...\n");
--    fprintf(stderr, "master reginfo:\n");
--    dump_reginfo(&master_ri);
--    fprintf(stderr, "apprentice reginfo:\n");
--    dump_reginfo(&apprentice_ri);
--    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) == 0) {
--        fprintf(stderr, "match!\n");
--        return 0;
--    }
--    fprintf(stderr, "mismatch!\n");
--    return 1;
--}
--- 
-2.20.1
+I don=E2=80=99t disagree with anything you say.  I would prefer to move t=
+he less
+well maintained drivers (for which there is no strict performance
+requirement) into a separate process.  nbdkit is perfectly suited for
+that, and the drivers are there, as you say (ssh, curl, vvfat).
 
+Having a nicer interface in qemu would make the transition simple,
+because we could tell users exactly how to change their command line so
+their use case continues to work.  I=E2=80=99m not sure whether it really=
+ works,
+though, because I don=E2=80=99t think there is such a simple replacement =
+for
+being able to simply pass "ssh://host/path" to qemu and have it work.
+
+But I think it=E2=80=99s still worth it.
+
+Max
+
+
+--adjrWjB2gRXjuQItw1jypAmoqGzeJzUYB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyrk/IACgkQ9AfbAGHV
+z0AFRAf7BoU58cNYAaKkUiTPDMvaMPUpWqWn3TYyJA7cyaOoiARh/nvhrx4iXJSg
+yoesVHmnWnAsjcK6lseLyoGQxeuqrZX8hWIrcmy2tTLJNX4OS7ffmQqrkJ347DK8
+GQAJpEwWdBxtCfv956JS2jM6f3yiKh5vQpX9auteJA2WZ4eVRROtcHEIZ+283r+O
+gZWbMkUvMOIXk7+BfSganz3SeEZRdER+tf/usR6i4mtgD7ZbqOvVdeUXZO5qDqqo
+yicDkq2DtYt/k1wxbl4X3W/ISGNXr7voDmohta5M2wfD37PpWtrqDzIeLLBE/zuL
+L8hyQH7sRhAezikt8yFG68eXD9yXGA==
+=SNfH
+-----END PGP SIGNATURE-----
+
+--adjrWjB2gRXjuQItw1jypAmoqGzeJzUYB--
 
