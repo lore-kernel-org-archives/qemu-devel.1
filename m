@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47521)
+Received: from eggs.gnu.org ([209.51.188.92]:47663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKK-0003nF-4v
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:13 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKP-0003t0-Md
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKI-0007iD-5h
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:12 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:50199)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKN-0007re-67
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:17 -0400
+Received: from mail-it1-x133.google.com ([2607:f8b0:4864:20::133]:39530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDbKH-0007h3-R6
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:10 -0400
-Received: by mail-it1-x142.google.com with SMTP id q14so1480166itk.0
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:57:09 -0700 (PDT)
+	id 1hDbKM-0007qo-W7
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:15 -0400
+Received: by mail-it1-x133.google.com with SMTP id 139so1441664ita.4
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:57:14 -0700 (PDT)
 From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Date: Mon,  8 Apr 2019 16:55:45 -0400
-Message-Id: <f76b0245ccc8625f901e4caeb04446d757d3d19e.1554755001.git.stephen.checkoway@oberlin.edu>
+Date: Mon,  8 Apr 2019 16:55:49 -0400
+Message-Id: <32151d01f48ada4e0099f3adfd88229c5e5648c0.1554755001.git.stephen.checkoway@oberlin.edu>
 In-Reply-To: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
 References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 02/10] block/pflash_cfi02: Refactor,
- NFC intended
+Subject: [Qemu-devel] [PATCH 06/10] block/pflash_cfi02: Fix CFI in
+ autoselect mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,381 +30,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stephen Checkoway <s@pahtak.org>, Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Stephen Checkoway <s@pahtak.org>
-
-Simplify and refactor for upcoming commits. In particular, pull out all
-of the code to modify the status into simple helper functions. Status
-handling becomes more complex once multiple chips are interleaved to
-produce a single device.
-
-No change in functionality is intended with this commit.
+After a flash device enters CFI mode from autoselect mode, the reset
+command returns the device to autoselect mode. An additional reset
+command is necessary to return to read array mode.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 ---
- hw/block/pflash_cfi02.c | 221 +++++++++++++++++-----------------------
- 1 file changed, 95 insertions(+), 126 deletions(-)
+ hw/block/pflash_cfi02.c   | 21 +++++++++++++++++----
+ tests/pflash-cfi02-test.c | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index f2c6201f81..53db3fd09f 100644
+index 7c94c3adef..32aba9a771 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -46,18 +46,19 @@
- #include "hw/sysbus.h"
- #include "trace.h"
+@@ -61,8 +61,9 @@ do {                                                       \
+  */
+ #define PFLASH_MAX_ERASE_REGIONS 4
  
--//#define PFLASH_DEBUG
--#ifdef PFLASH_DEBUG
-+#define PFLASH_DEBUG false
- #define DPRINTF(fmt, ...)                                  \
- do {                                                       \
--    fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
-+    if (PFLASH_DEBUG) {                                    \
-+        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
-+    }                                                      \
- } while (0)
--#else
--#define DPRINTF(fmt, ...) do { } while (0)
--#endif
+-/* Special write cycle for CFI queries. */
++/* Special write cycles for CFI queries. */
+ #define WCYCLE_CFI 7
++#define WCYCLE_AUTOSELECT_CFI 8
  
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
- 
-+/* Special write cycle for CFI queries. */
-+#define WCYCLE_CFI 7
-+
  struct PFlashCFI02 {
      /*< private >*/
-     SysBusDevice parent_obj;
-@@ -97,6 +98,31 @@ struct PFlashCFI02 {
-     void *storage;
- };
- 
-+/*
-+ * Toggle status bit DQ7.
-+ */
-+static inline void toggle_dq7(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^= 0x80;
-+}
-+
-+/*
-+ * Set status bit DQ7 to bit 7 of value.
-+ */
-+static inline void set_dq7(PFlashCFI02 *pfl, uint8_t value)
-+{
-+    pfl->status &= 0x7F;
-+    pfl->status |= value & 0x80;
-+}
-+
-+/*
-+ * Toggle status bit DQ6.
-+ */
-+static inline void toggle_dq6(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^= 0x40;
-+}
-+
- /*
-  * Set up replicated mappings of the same region.
-  */
-@@ -126,7 +152,7 @@ static void pflash_timer (void *opaque)
- 
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
--    pfl->status ^= 0x80;
-+    toggle_dq7(pfl);
-     if (pfl->bypass) {
-         pfl->wcycle = 2;
-     } else {
-@@ -136,12 +162,34 @@ static void pflash_timer (void *opaque)
-     pfl->cmd = 0;
- }
- 
--static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
--                            int width, int be)
-+/*
-+ * Read data from flash.
-+ */
-+static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
-+                                 unsigned int width)
- {
-+    uint8_t *p = (uint8_t *)pfl->storage + offset;
-+    uint64_t ret = pfl->be? ldn_be_p(p, width) : ldn_le_p(p, width);
-+    /* XXX: Need a trace_pflash_data_read(offset, ret, width) */
-+    switch (width) {
-+    case 1:
-+        trace_pflash_data_read8(offset, ret);
-+        break;
-+    case 2:
-+        trace_pflash_data_read16(offset, ret);
-+        break;
-+    case 4:
-+        trace_pflash_data_read32(offset, ret);
-+        break;
-+    }
-+    return ret;
-+}
-+
-+static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-+{
-+    PFlashCFI02 *pfl = opaque;
-     hwaddr boff;
--    uint32_t ret;
--    uint8_t *p;
-+    uint64_t ret;
- 
-     ret = -1;
-     trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-@@ -166,39 +214,8 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-     case 0x80:
-         /* We accept reads during second unlock sequence... */
-     case 0x00:
--    flash_read:
-         /* Flash area read */
--        p = pfl->storage;
--        switch (width) {
--        case 1:
--            ret = p[offset];
--            trace_pflash_data_read8(offset, ret);
--            break;
--        case 2:
--            if (be) {
--                ret = p[offset] << 8;
--                ret |= p[offset + 1];
--            } else {
--                ret = p[offset];
--                ret |= p[offset + 1] << 8;
--            }
--            trace_pflash_data_read16(offset, ret);
--            break;
--        case 4:
--            if (be) {
--                ret = p[offset] << 24;
--                ret |= p[offset + 1] << 16;
--                ret |= p[offset + 2] << 8;
--                ret |= p[offset + 3];
--            } else {
--                ret = p[offset];
--                ret |= p[offset + 1] << 8;
--                ret |= p[offset + 2] << 16;
--                ret |= p[offset + 3] << 24;
--            }
--            trace_pflash_data_read32(offset, ret);
--            break;
--        }
-+        ret = pflash_data_read(pfl, offset, width);
-         break;
-     case 0x90:
-         /* flash ID read */
-@@ -213,23 +230,23 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-         case 0x0E:
-         case 0x0F:
-             ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
--            if (ret == (uint8_t)-1) {
--                goto flash_read;
-+            if (ret != (uint8_t)-1) {
-+                break;
-             }
--            break;
-+            /* Fall through to data read. */
-         default:
--            goto flash_read;
-+            ret = pflash_data_read(pfl, offset, width);
-         }
--        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
-+        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
-         break;
-     case 0xA0:
-     case 0x10:
-     case 0x30:
-         /* Status register read */
-         ret = pfl->status;
--        DPRINTF("%s: status %x\n", __func__, ret);
-+        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-         /* Toggle bit 6 */
--        pfl->status ^= 0x40;
-+        toggle_dq6(pfl);
-         break;
-     case 0x98:
-         /* CFI query mode */
-@@ -245,8 +262,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
- }
- 
- /* update flash content on disk */
--static void pflash_update(PFlashCFI02 *pfl, int offset,
--                          int size)
-+static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
- {
-     int offset_end;
-     if (pfl->blk) {
-@@ -259,9 +275,10 @@ static void pflash_update(PFlashCFI02 *pfl, int offset,
-     }
- }
- 
--static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
--                         uint32_t value, int width, int be)
-+static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-+                         unsigned int width)
- {
-+    PFlashCFI02 *pfl = opaque;
-     hwaddr boff;
-     uint8_t *p;
-     uint8_t cmd;
-@@ -277,7 +294,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-     trace_pflash_write(offset, value, width, pfl->wcycle);
-     offset &= pfl->chip_len - 1;
- 
--    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
-+    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n", __func__,
-             offset, value, width);
-     boff = offset & (pfl->sector_len - 1);
-     if (pfl->width == 2)
-@@ -295,7 +312,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-         if (boff == 0x55 && cmd == 0x98) {
-         enter_CFI_mode:
-             /* Enter CFI query mode */
--            pfl->wcycle = 7;
-+            pfl->wcycle = WCYCLE_CFI;
-             pfl->cmd = 0x98;
-             return;
-         }
-@@ -345,40 +362,22 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-             goto check_unlock0;
-         case 0xA0:
-             trace_pflash_data_write(offset, value, width, 0);
--            p = pfl->storage;
-             if (!pfl->ro) {
--                switch (width) {
--                case 1:
--                    p[offset] &= value;
--                    pflash_update(pfl, offset, 1);
--                    break;
--                case 2:
--                    if (be) {
--                        p[offset] &= value >> 8;
--                        p[offset + 1] &= value;
--                    } else {
--                        p[offset] &= value;
--                        p[offset + 1] &= value >> 8;
--                    }
--                    pflash_update(pfl, offset, 2);
--                    break;
--                case 4:
--                    if (be) {
--                        p[offset] &= value >> 24;
--                        p[offset + 1] &= value >> 16;
--                        p[offset + 2] &= value >> 8;
--                        p[offset + 3] &= value;
--                    } else {
--                        p[offset] &= value;
--                        p[offset + 1] &= value >> 8;
--                        p[offset + 2] &= value >> 16;
--                        p[offset + 3] &= value >> 24;
--                    }
--                    pflash_update(pfl, offset, 4);
--                    break;
-+                p = (uint8_t *)pfl->storage + offset;
-+                if (pfl->be) {
-+                    uint64_t current = ldn_be_p(p, width);
-+                    stn_be_p(p, width, current & value);
-+                } else {
-+                    uint64_t current = ldn_le_p(p, width);
-+                    stn_le_p(p, width, current & value);
-                 }
-+                pflash_update(pfl, offset, width);
-             }
--            pfl->status = 0x00 | ~(value & 0x80);
-+            /*
-+             * While programming, status bit DQ7 should hold the opposite
-+             * value from how it was programmed.
-+             */
-+            set_dq7(pfl, ~value);
-             /* Let's pretend write is immediate */
-             if (pfl->bypass)
-                 goto do_bypass;
-@@ -426,7 +425,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-                 memset(pfl->storage, 0xFF, pfl->chip_len);
-                 pflash_update(pfl, 0, pfl->chip_len);
-             }
--            pfl->status = 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 5 seconds before chip erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND * 5));
-@@ -441,7 +440,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-                 memset(p + offset, 0xFF, pfl->sector_len);
-                 pflash_update(pfl, offset, pfl->sector_len);
-             }
--            pfl->status = 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 1/2 second before sector erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND / 2));
-@@ -467,7 +466,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+@@ -329,6 +330,12 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+             DPRINTF("%s: flash reset asked (%02x %02x)\n",
+                     __func__, pfl->cmd, cmd);
+ #endif
++            if (pfl->wcycle == WCYCLE_AUTOSELECT_CFI) {
++                /* Return to autoselect mode. */
++                pfl->wcycle = 3;
++                pfl->cmd = 0x90;
++                return;
++            }
              goto reset_flash;
          }
+     }
+@@ -354,7 +361,6 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+         /* We're in read mode */
+     check_unlock0:
+         if (masked_addr == 0x55 && cmd == 0x98) {
+-        enter_CFI_mode:
+             /* Enter CFI query mode */
+             pfl->wcycle = WCYCLE_CFI;
+             pfl->cmd = 0x98;
+@@ -431,9 +437,15 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+                 /* Unlock bypass reset */
+                 goto reset_flash;
+             }
+-            /* We can enter CFI query mode from autoselect mode */
++            /*
++             * We can enter CFI query mode from autoselect mode, but we must
++             * return to autoselect mode after a reset.
++             */
+             if (masked_addr == 0x55 && cmd == 0x98) {
+-                goto enter_CFI_mode;
++                /* Enter autoselect CFI query mode */
++                pfl->wcycle = WCYCLE_AUTOSELECT_CFI;
++                pfl->cmd = 0x98;
++                return;
+             }
+             /* No break here */
+         default:
+@@ -514,6 +526,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+         }
          break;
--    case 7: /* Special value for CFI queries */
-+    case WCYCLE_CFI: /* Special value for CFI queries */
+     case WCYCLE_CFI: /* Special value for CFI queries */
++    case WCYCLE_AUTOSELECT_CFI:
          DPRINTF("%s: invalid write in CFI query mode\n", __func__);
          goto reset_flash;
      default:
-@@ -492,39 +491,9 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-     pfl->cmd = 0;
+diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
+index c16118e38b..c984295167 100644
+--- a/tests/pflash-cfi02-test.c
++++ b/tests/pflash-cfi02-test.c
+@@ -437,6 +437,39 @@ static void test_geometry(const void *opaque)
+     qtest_quit(global_qtest);
  }
  
--static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned size)
--{
--    return pflash_read(opaque, addr, size, 1);
--}
--
--static void pflash_be_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 1);
--}
--
--static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned size)
--{
--    return pflash_read(opaque, addr, size, 0);
--}
--
--static void pflash_le_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 0);
--}
--
--static const MemoryRegionOps pflash_cfi02_ops_be = {
--    .read = pflash_be_readfn,
--    .write = pflash_be_writefn,
--    .valid.min_access_size = 1,
--    .valid.max_access_size = 4,
--    .endianness = DEVICE_NATIVE_ENDIAN,
--};
--
--static const MemoryRegionOps pflash_cfi02_ops_le = {
--    .read = pflash_le_readfn,
--    .write = pflash_le_writefn,
-+static const MemoryRegionOps pflash_cfi02_ops = {
-+    .read = pflash_read,
-+    .write = pflash_write,
-     .valid.min_access_size = 1,
-     .valid.max_access_size = 4,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-@@ -552,9 +521,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- 
-     chip_len = pfl->sector_len * pfl->nb_blocs;
- 
--    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
--                                  &pflash_cfi02_ops_be : &pflash_cfi02_ops_le,
--                                  pfl, pfl->name, chip_len, &local_err);
-+    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-+                                  &pflash_cfi02_ops, pfl, pfl->name,
-+                                  chip_len, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
++/*
++ * Test that
++ * 1. enter autoselect mode;
++ * 2. enter CFI mode; and then
++ * 3. exit CFI mode
++ * leaves the flash device in autoselect mode.
++ */
++static void test_cfi_in_autoselect(const void *opaque)
++{
++    const FlashConfig *c = opaque;
++    global_qtest = qtest_initf("-M musicpal,accel=qtest"
++                               " -drive if=pflash,file=%s,format=raw,"
++                               "copy-on-read",
++                               image_path);
++
++    /* 1. Enter autoselect. */
++    unlock(c);
++    flash_cmd(c, UNLOCK0_ADDR, AUTOSELECT_CMD);
++    g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
++
++    /* 2. Enter CFI. */
++    flash_cmd(c, CFI_ADDR, CFI_CMD);
++    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x10)), ==, replicate(c, 'Q'));
++    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x11)), ==, replicate(c, 'R'));
++    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x12)), ==, replicate(c, 'Y'));
++
++    /* 3. Exit CFI. */
++    reset(c);
++    g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
++
++    qtest_quit(global_qtest);
++}
++
+ static void cleanup(void *opaque)
+ {
+     unlink(image_path);
+@@ -560,6 +593,9 @@ int main(int argc, char **argv)
+         qtest_add_data_func(path, config, test_geometry);
+         g_free(path);
+     }
++
++    qtest_add_data_func("pflash-cfi02/cfi-in-autoselect", &configuration[0],
++                        test_cfi_in_autoselect);
+     int result = g_test_run();
+     cleanup(NULL);
+     return result;
 -- 
 2.20.1 (Apple Git-117)
