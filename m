@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52207)
+Received: from eggs.gnu.org ([209.51.188.92]:53754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDPtU-0006eb-Tu
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:44:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1hDPvh-0008Hd-Ix
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDPtT-0000OT-TX
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:44:44 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:34604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hDPtR-0000KS-MK
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:44:42 -0400
-Received: by mail-qt1-x842.google.com with SMTP id k2so14481914qtm.1
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 01:44:39 -0700 (PDT)
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Mon,  8 Apr 2019 04:43:00 -0400
-Message-Id: <1554712980-18714-1-git-send-email-catherine.hecx@gmail.com>
-In-Reply-To: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] hostmem-file: warn when memory-backend-file,
- share=on and in incoming migration
+	(envelope-from <thuth@redhat.com>) id 1hDPvf-0001v0-EP
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:47:01 -0400
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-10-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9223e19f-878f-636e-2c48-6d9e47485a65@redhat.com>
+Date: Mon, 8 Apr 2019 10:39:40 +0200
+MIME-Version: 1.0
+In-Reply-To: <20190408083627.7479-10-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/15] s390x/kvm: Report warnings with
+ warn_report(), not error_printf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Catherine Ho <catherine.hecx@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Currently it is not forbidden to use "-object memory-backend-file,share=on"
-and together with "-incoming". But after incoming migration is finished,
-the memory-backend-file will be definitely written if share=on. So the
-memory-backend-file can only be used once, but failed in the 2nd time
-incoming.
+On 08/04/2019 10.36, Markus Armbruster wrote:
+> kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
+> -ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
+> ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
+> failures.
+> 
+> kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
+> in the latter failure mode.  Since this is obviously a warning, use
+> warn_report().
+> 
+> Perhaps the reporting should be left to the caller.  It could warn on
+> failure other than -ENOSYS.
+> 
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  target/s390x/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 19530fb94e..2c6e35b5aa 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+>  
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
+>      if (ret < 0) {
+> -        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
+> +        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
+>      }
+>      return ret;
+>  }
+> 
 
-Thus it gives a warning and the users can run the qemu if they really
-want to do it.
-
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
----
- backends/hostmem-file.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 37ac6445d2..ce03dc0a18 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -16,6 +16,7 @@
- #include "sysemu/hostmem.h"
- #include "sysemu/sysemu.h"
- #include "qom/object_interfaces.h"
-+#include "migration/migration.h"
- 
- /* hostmem-file.c */
- /**
-@@ -79,6 +80,17 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         }
-     }
- 
-+    /*
-+     * In ignore shared incoming migration, if share=on for host memory
-+     * backend file, the ram might be modified after incoming process.
-+     * The user should know this potential risk.
-+     */
-+    if (backend->share && migrate_ignore_shared()
-+                       && runstate_check(RUN_STATE_INMIGRATE))
-+        warn_report("NOTE: Please make sure the data on the shared memory "
-+                    "backend file and the data from the incoming migration"
-+                    " stream contains matching contents, otherwise...");
-+
-     backend->force_prealloc = mem_prealloc;
-     name = host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--- 
-2.17.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
