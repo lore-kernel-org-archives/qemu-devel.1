@@ -6,121 +6,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C43F9C10F14
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA9CC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8605920883
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8605920883
+	by mail.kernel.org (Postfix) with ESMTPS id D308920883
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:50:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D308920883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50940 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50950 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDRoX-0002D8-Q2
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:47:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60942)
+	id 1hDRqi-0002rT-3v
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:50:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hDRnX-0001tf-Vx
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDRps-0002af-If
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hDRnW-0004XB-Vw
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hDRnW-0004VS-Ev
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:46:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5C78A307CDC7;
-	Mon,  8 Apr 2019 10:46:41 +0000 (UTC)
-Received: from [10.36.112.69] (ovpn-112-69.ams2.redhat.com [10.36.112.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B33395D71B;
-	Mon,  8 Apr 2019 10:46:35 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>
-References: <20190407092314.11066-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <5c1d5f0b-3845-dce3-a50a-d28f2560397e@redhat.com>
-Date: Mon, 8 Apr 2019 12:46:33 +0200
+	(envelope-from <philmd@redhat.com>) id 1hDRpr-0005jp-0c
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:49:08 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDRpq-0005iD-LX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:49:06 -0400
+Received: by mail-wr1-f67.google.com with SMTP id y13so15788082wrd.3
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 03:49:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=cMO8fgG8oUKdpAQ6b/BB5inP8x37fRYiU2uodUnk0XQ=;
+	b=W1e1hJU5anIpuFMTXaUZ7zwCEnvpK9NMwj2pe1EOfUNNIzwG3Z0HLlu6j1mz7l/ZQu
+	yO1IZ5U5e/ALq2Ib1Q/pNY2gHger4tVOcNIKXNamgBKR3B4W+eUxmj0txmx4bWlaAG6Q
+	4WQ3hAcmaeBiZMSOe3npSwH39Q78LdttO0M+Jq/28JUjMRvlizsyBNyO2ZGl+/sXBBMv
+	t5MggZh3E65+tdYkIUGdVS6QAVeAm822c7ACemHbOXzu0g813g6mfygZoW5P5bx3bs4c
+	xAmPvr06yoKl2SivHFkd7jHxhDNnMIiqQ0EoNz0Lljz5TsjSD+I6tGPADZnX415RCMmi
+	g2fQ==
+X-Gm-Message-State: APjAAAU9tKTsx8N3dPW5iPwtZIk/inpLz1y+VUU87Ln+vRX8YiNfOglS
+	rwadT7L3uSAT2A02A1W/yGrRaA==
+X-Google-Smtp-Source: APXvYqyNaFJn2UIE6/g8jsZ3OFvCH8Fpg557iKAV40aUqVkRI9YB1RWEcaqlFQVrZ9boUS68KPM5IQ==
+X-Received: by 2002:a5d:634c:: with SMTP id b12mr18600193wrw.203.1554720545578;
+	Mon, 08 Apr 2019 03:49:05 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	m13sm9270686wmg.42.2019.04.08.03.49.04
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 03:49:04 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-5-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <bac30071-64ea-3dff-976b-9c8d8b1f16a3@redhat.com>
+Date: Mon, 8 Apr 2019 12:49:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190407092314.11066-1-thuth@redhat.com>
+In-Reply-To: <20190408083627.7479-5-armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 08 Apr 2019 10:46:41 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
- hot-plugging nvdimm on older machine types
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 04/15] loader-fit: Wean off error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -132,70 +86,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Paul Burton <pburton@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408104633.ncYMX9vsY-o8N2utUh-_nS4tzfhC50BsHXFbxQhYMj8@z>
+Message-ID: <20190408104903.IXUbhSdoShnzqdksFavOxEYQtBgo-kUYgchlvnAwT0Q@z>
 
-On 07/04/19 11:23, Thomas Huth wrote:
-> QEMU currently crashes when you try to hot-plug an "nvdimm" device
-> on older machine types:
+On 4/8/19 10:36 AM, Markus Armbruster wrote:
+> load_fit() reports errors with error_printf() instead of
+> error_report().  Worse, it even reports errors it actually recovers
+> from, in fit_cfg_compatible() and fit_load_fdt().  Messed up in
+> initial commit 51b58561c1d.
 > 
-> $ qemu-system-x86_64 -monitor stdio -M pc-1.1
-> QEMU 3.1.92 monitor - type 'help' for more information
-> (qemu) device_add nvdimm,id=nvdimmn1
-> qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
->  Assertion `*errp == ((void *)0)' failed.
-> Aborted (core dumped)
+> Convert the helper functions for load_fit() to Error.  Make sure each
+> failure path sets an error.
 > 
-> The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
-> added recently before the check whether nvdimm is enabled. It should
-> be done after the check. And while we're at it, also check the errp
-> after the hotplug_handler_pre_plug(), otherwise errors are silently
-> ignored here.
+> Fix fit_cfg_compatible() and fit_load_fdt() not to report errors they
+> actually recover from.
 > 
-> Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Convert load_fit() to error_report().
+> 
+> Cc: Paul Burton <pburton@wavecomp.com>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  hw/i386/pc.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  hw/core/loader-fit.c | 62 +++++++++++++++++++++++++-------------------
+>  1 file changed, 36 insertions(+), 26 deletions(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 6077d27361..f2c15bf1f2 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      const MachineState *ms = MACHINE(hotplug_dev);
->      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->      const uint64_t legacy_align = TARGET_PAGE_SIZE;
-> +    Error *local_err = NULL;
+> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+> index 447f60857d..f27b6af942 100644
+> --- a/hw/core/loader-fit.c
+> +++ b/hw/core/loader-fit.c
+> @@ -18,6 +18,7 @@
+>   */
 >  
->      /*
->       * When -no-acpi is used with Q35 machine type, no ACPI is built,
-> @@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->          return;
+>  #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>  #include "qemu/units.h"
+>  #include "exec/memory.h"
+>  #include "hw/loader.h"
+> @@ -33,7 +34,7 @@
+>  #define FIT_LOADER_MAX_PATH (128)
+>  
+>  static const void *fit_load_image_alloc(const void *itb, const char *name,
+> -                                        int *poff, size_t *psz)
+> +                                        int *poff, size_t *psz, Error **errp)
+>  {
+>      const void *data;
+>      const char *comp;
+> @@ -46,6 +47,7 @@ static const void *fit_load_image_alloc(const void *itb, const char *name,
+>  
+>      off = fdt_path_offset(itb, path);
+>      if (off < 0) {
+> +        error_setg(errp, "can't find node %s", path);
+>          return NULL;
+>      }
+>      if (poff) {
+> @@ -54,6 +56,7 @@ static const void *fit_load_image_alloc(const void *itb, const char *name,
+>  
+>      data = fdt_getprop(itb, off, "data", &sz);
+>      if (!data) {
+> +        error_setg(errp, "can't get %s/data", path);
+>          return NULL;
 >      }
 >  
-> -    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
-> -
->      if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->          return;
+> @@ -73,7 +76,7 @@ static const void *fit_load_image_alloc(const void *itb, const char *name,
+>  
+>          uncomp_len = gunzip(uncomp_data, uncomp_len, (void *) data, sz);
+>          if (uncomp_len < 0) {
+> -            error_printf("unable to decompress %s image\n", name);
+> +            error_setg(errp, "unable to decompress %s image", name);
+>              g_free(uncomp_data);
+>              return NULL;
+>          }
+> @@ -85,18 +88,19 @@ static const void *fit_load_image_alloc(const void *itb, const char *name,
+>          return data;
 >      }
 >  
-> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
->      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
->                       pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
+> -    error_printf("unknown compression '%s'\n", comp);
+> +    error_setg(errp, "unknown compression '%s'", comp);
+>      return NULL;
 >  }
-> 
+>  
+>  static int fit_image_addr(const void *itb, int img, const char *name,
+> -                          hwaddr *addr)
+> +                          hwaddr *addr, Error **errp)
+>  {
+>      const void *prop;
+>      int len;
+>  
+>      prop = fdt_getprop(itb, img, name, &len);
+>      if (!prop) {
+> +        error_setg(errp, "can't find %s address", name);
+>          return -ENOENT;
+>      }
+>  
+> @@ -108,13 +112,14 @@ static int fit_image_addr(const void *itb, int img, const char *name,
+>          *addr = fdt64_to_cpu(*(fdt64_t *)prop);
+>          return 0;
+>      default:
+> -        error_printf("invalid %s address length %d\n", name, len);
+> +        error_setg(errp, "invalid %s address length %d", name, len);
+>          return -EINVAL;
+>      }
+>  }
+>  
+>  static int fit_load_kernel(const struct fit_loader *ldr, const void *itb,
+> -                           int cfg, void *opaque, hwaddr *pend)
+> +                           int cfg, void *opaque, hwaddr *pend,
+> +                           Error **errp)
+>  {
+>      const char *name;
+>      const void *data;
+> @@ -126,26 +131,26 @@ static int fit_load_kernel(const struct fit_loader *ldr, const void *itb,
+>  
+>      name = fdt_getprop(itb, cfg, "kernel", NULL);
+>      if (!name) {
+> -        error_printf("no kernel specified by FIT configuration\n");
+> +        error_setg(errp, "no kernel specified by FIT configuration");
+>          return -EINVAL;
+>      }
+>  
+> -    load_data = data = fit_load_image_alloc(itb, name, &img_off, &sz);
+> +    load_data = data = fit_load_image_alloc(itb, name, &img_off, &sz, errp);
+>      if (!data) {
+> -        error_printf("unable to load kernel image from FIT\n");
+> +        error_prepend(errp, "unable to load kernel image from FIT: ");
+>          return -EINVAL;
+>      }
+>  
+> -    err = fit_image_addr(itb, img_off, "load", &load_addr);
+> +    err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
+>      if (err) {
+> -        error_printf("unable to read kernel load address from FIT\n");
+> +        error_prepend(errp, "unable to read kernel load address from FIT: ");
+>          ret = err;
+>          goto out;
+>      }
+>  
+> -    err = fit_image_addr(itb, img_off, "entry", &entry_addr);
+> +    err = fit_image_addr(itb, img_off, "entry", &entry_addr, errp);
+>      if (err) {
+> -        error_printf("unable to read kernel entry address from FIT\n");
+> +        error_prepend(errp, "unable to read kernel entry address from FIT: ");
+>          ret = err;
+>          goto out;
+>      }
+> @@ -172,7 +177,7 @@ out:
+>  
+>  static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+>                          int cfg, void *opaque, const void *match_data,
+> -                        hwaddr kernel_end)
+> +                        hwaddr kernel_end, Error **errp)
+>  {
+>      const char *name;
+>      const void *data;
+> @@ -187,16 +192,18 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+>          return 0;
+>      }
+>  
+> -    load_data = data = fit_load_image_alloc(itb, name, &img_off, &sz);
+> +    load_data = data = fit_load_image_alloc(itb, name, &img_off, &sz, errp);
+>      if (!data) {
+> -        error_printf("unable to load FDT image from FIT\n");
+> +        error_prepend(errp, "unable to load FDT image from FIT: ");
+>          return -EINVAL;
+>      }
+>  
+> -    err = fit_image_addr(itb, img_off, "load", &load_addr);
+> +    err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
+>      if (err == -ENOENT) {
+>          load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
+> +        error_free(*errp);
+>      } else if (err) {
+> +        error_prepend(errp, "unable to read FDT load address from FIT: ");
+>          ret = err;
+>          goto out;
+>      }
+> @@ -229,7 +236,7 @@ static bool fit_cfg_compatible(const void *itb, int cfg, const char *compat)
+>          return false;
+>      }
+>  
+> -    fdt = fit_load_image_alloc(itb, fdt_name, NULL, NULL);
+> +    fdt = fit_load_image_alloc(itb, fdt_name, NULL, NULL, NULL);
+>      if (!fdt) {
+>          return false;
+>      }
+> @@ -252,11 +259,12 @@ out:
+>  
+>  int load_fit(const struct fit_loader *ldr, const char *filename, void *opaque)
+>  {
+> +    Error *err = NULL;
+>      const struct fit_loader_match *match;
+>      const void *itb, *match_data = NULL;
+>      const char *def_cfg_name;
+>      char path[FIT_LOADER_MAX_PATH];
+> -    int itb_size, configs, cfg_off, off, err;
+> +    int itb_size, configs, cfg_off, off;
+>      hwaddr kernel_end;
+>      int ret;
+>  
+> @@ -267,6 +275,7 @@ int load_fit(const struct fit_loader *ldr, const char *filename, void *opaque)
+>  
+>      configs = fdt_path_offset(itb, "/configurations");
+>      if (configs < 0) {
+> +        error_report("can't find node /configurations");
+>          ret = configs;
+>          goto out;
+>      }
+> @@ -301,20 +310,21 @@ int load_fit(const struct fit_loader *ldr, const char *filename, void *opaque)
+>      }
+>  
+>      if (cfg_off < 0) {
+> -        /* couldn't find a configuration to use */
+> +        error_report("can't find configuration");
+>          ret = cfg_off;
+>          goto out;
+>      }
+>  
+> -    err = fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end);
+> -    if (err) {
+> -        ret = err;
+> +    ret = fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end, &err);
+> +    if (ret) {
+> +        error_report_err(err);
+>          goto out;
+>      }
+>  
+> -    err = fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_end);
+> -    if (err) {
+> -        ret = err;
+> +    ret = fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_end,
+> +                       &err);
+> +    if (ret) {
+> +        error_report_err(err);
+>          goto out;
+>      }
 
-Queued, thanks.
+Very nice cleanup, thanks!
 
-Paolo
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 
