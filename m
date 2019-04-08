@@ -2,59 +2,80 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D737DC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBEDC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 998C0214C6
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:12:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 998C0214C6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xiyoulinux.org
+	by mail.kernel.org (Postfix) with ESMTPS id E22842148E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:13:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DmonOzZo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22842148E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54570 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54572 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDVwV-000819-U7
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:12:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38169)
+	id 1hDVxJ-00006X-5o
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:13:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDVue-0006uF-1W
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:21 -0400
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDVr4-0004Nd-AS
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDVuc-00025B-5n
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:20 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:55800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghorges@xiyoulinux.org>)
-	id 1hDVua-0001yg-6H
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:16 -0400
-X-QQ-mid: bizesmtp20t1554736202tkh3ha73
-Received: from localhost.localdomain (unknown [117.32.216.84])
-	by esmtp6.qq.com (ESMTP) with 
-	id ; Mon, 08 Apr 2019 23:10:01 +0800 (CST)
-X-QQ-SSF: 01100000002000609670000A0000000
-X-QQ-FEAT: wPXoeRw+iZbBfI/kw3DPwOhZ0J0ogo4dkfdSB3eKdBSbO//2nml4taFYD/LYJ
-	lcSgJVmS17DT+wCQN7Wb8X0inIfwa+/259Pcyq8ariCscp8lLq8RlTkp55mUMjLmYzpESa/
-	JUPEVOX3qeq3E7oy20dsixGJkuEvGk+n0R+b0uJZJ36kwC0nRcsxrDpYER2wIIdh5J/xkDt
-	PVq+VVdKkGigqF2NIhIZex5zlXGBxxwRNyBPZWRUCcSmFkCJRDdONHFr+vYmu2mXg1SdARr
-	vYJ/vRQNKZ5QSJSR+aE5363oI=
-X-QQ-GoodBg: 0
-From: ghorges <ghorges@xiyoulinux.org>
+	(envelope-from <sohailalvi2236@gmail.com>) id 1hDVr3-0006du-7I
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:38 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sohailalvi2236@gmail.com>)
+	id 1hDVr1-0006aR-CZ
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:37 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 85so7492533pgc.3
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 08:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=t3MMun1BLhqIl8wkTU3nOq12qX+bujfqL3LT4yJBdfY=;
+	b=DmonOzZoiMo62R53unBX3bk5Y2hl8mQAOjsKODdMXMVHjLnchijgOoFMw14UAeqz3c
+	qoiJvXOHUePtcL9LYl5AXdKjDF/KmANZO+idG8KJslF7TXrTmDW/TJxYkCupS6bIs8yT
+	isIa0+ccTscJKpYcH9OgWPnuoQKRqAxW8KWxJ3f+Z+tqNsunyeBuxEFAoUt98CALHhHt
+	25GEA+Nb4FBIRjWPmAC9choA/OniQdKfnKOMCuNmiWw3c/tqTiWI+EGWMAUwjm+abLtE
+	OmX6m4G874c+immlwiE6mFWvgqzUKA8oBuiMl+ds6OgFTjxXwAjBklEjUqWHMyr6+Gpa
+	3X2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=t3MMun1BLhqIl8wkTU3nOq12qX+bujfqL3LT4yJBdfY=;
+	b=UADY8jdxuZhrljt/6pjTIpirmWu9oLwkdJl8KQjfo03r9Q9mBCG1pribp1MRxspL7m
+	gYKtT0WPAc72KqLHCKZ5qUbV7XJyqp+NkJsc6ecVGFWmo6EGLY6IdVMrnEM36nrKMNNQ
+	W4iPw5uHxe4PURwLgVgayqAZgoGDoL057i9b4KEVAh98jdHJX5No9OhcT1KDZ17hv2e6
+	fXEz6NhFFvbFREwGDBLsfuy86V3DVpEbCfqQjxso0TX2lzcnMqE7QcpZ8AQ88xF8ZK/3
+	JlrndcnE/c2mrEE4KVD4YuYqN8RS4TgjA/sq+PLhPe7OL2c71+4Fn0cbqtJuGSMebnGS
+	f+1g==
+X-Gm-Message-State: APjAAAWmWanGLy3hk254Jjuox3ScNdtUEWLHX/G0ZIamJ3yzXqWhplfU
+	+2SmaMSxO/SKx9xR44Q3EnQe2kk8EptlRA==
+X-Google-Smtp-Source: APXvYqw1Fhj89Cvr39d3LXrDmoEyRlmXfAoywIn0GM/l6K+yEg76qpDWRAc261UV0VlZVnz6ggLXOw==
+X-Received: by 2002:a65:5383:: with SMTP id x3mr11472824pgq.60.1554735993174; 
+	Mon, 08 Apr 2019 08:06:33 -0700 (PDT)
+Received: from localhost.localdomain ([157.50.37.23])
+	by smtp.gmail.com with ESMTPSA id
+	v1sm46676901pff.81.2019.04.08.08.06.30
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 08:06:32 -0700 (PDT)
+From: sohailalvi2236@gmail.com
 To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 23:09:53 +0800
-Message-Id: <20190408150953.22949-1-ghorges@xiyoulinux.org>
-X-Mailer: git-send-email 2.17.0
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:xiyoulinux.org:qybgforeign:qybgforeign4
-X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.4.x
-X-Received-From: 184.105.206.84
-Subject: [Qemu-devel] [PATCH] Wshadow:Modify some variable names
+Date: Mon,  8 Apr 2019 20:36:25 +0530
+Message-Id: <20190408150625.16280-1-sohailalvi2236@gmail.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [Resend  PATCH 2/5] Device models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,198 +87,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, Yicheng Ma <ghorges@xiyoulinux.org>
+Cc: Sohail Alvi <sohailalvi2236@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408150953.k6vPIwQfDyntbuY0WX6PoiBcgk2wU1bye_wZgftzIfY@z>
+Message-ID: <20190408150625.l2hE93Uc8tij7sXlrWjdf1Jw8qHKQksskA0B1ZAspuQ@z>
 
-From: Yicheng Ma <ghorges@xiyoulinux.org>
+From: Sohail Alvi <sohailalvi2236@gmail.com>
 
-Content-Type: text/plain; charset=utf-8
+Signed-off-by: SohailAlvi <sohailalvi2236@gmail.com>
 
-Change the name of some variables so that the code can be compiled with -Wshadow
+ qemu_system_reset_request() in hw/ corresponding to watchdog
+ that has triggered replaced by watchdog_perform_action().
 
-Signed-off-by: Yicheng Ma <ghorges@xiyoulinux.org>
 ---
- linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+ hw/arm/musicpal.c        | 3 ++-
+ hw/ppc/ppc.c             | 3 ++-
+ hw/s390x/ipl.c           | 3 ++-
+ hw/timer/etraxfs_timer.c | 3 ++-
+ hw/timer/m48t59.c        | 3 ++-
+ hw/timer/pxa2xx_timer.c  | 3 ++-
+ 6 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 208fd1813d..985095e4d5 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 size_t size;
-             } sig, *sig_ptr;
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index 93ec3c5698..84593e61cc 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -28,6 +28,7 @@
+ #include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "ui/pixel_ops.h"
++#include "sysemu/watchdog.h"
  
--            abi_ulong arg_sigset, arg_sigsize, *arg7;
-+            abi_ulong arg_sigset, arg_sigsize, *arg7s;
-             target_sigset_t *target_sigset;
+ #define MP_MISC_BASE            0x80002000
+ #define MP_MISC_SIZE            0x00001000
+@@ -898,7 +899,7 @@ static void mv88w8618_pit_write(void *opaque, hwaddr offset,
  
-             n = arg1;
-@@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 sig_ptr = &sig;
-                 sig.size = SIGSET_T_SIZE;
- 
--                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
--                if (!arg7) {
-+                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
-+                if (!arg7s) {
-                     return -TARGET_EFAULT;
-                 }
--                arg_sigset = tswapal(arg7[0]);
--                arg_sigsize = tswapal(arg7[1]);
--                unlock_user(arg7, arg6, 0);
-+                arg_sigset = tswapal(arg7s[0]);
-+                arg_sigsize = tswapal(arg7s[1]);
-+                unlock_user(arg7s, arg6, 0);
- 
-                 if (arg_sigset) {
-                     sig.set = &set;
-@@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case MP_BOARD_RESET:
+         if (value == MP_BOARD_RESET_MAGIC) {
+-            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++            watchdog_perform_action();
          }
-     case TARGET_NR_getcpu:
-         {
--            unsigned cpu, node;
--            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-+            unsigned cpus, node;
-+            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
-                                        arg2 ? &node : NULL,
-                                        NULL));
-             if (is_error(ret)) {
-                 return ret;
-             }
--            if (arg1 && put_user_u32(cpu, arg1)) {
-+            if (arg1 && put_user_u32(cpus, arg1)) {
-                 return -TARGET_EFAULT;
-             }
-             if (arg2 && put_user_u32(node, arg2)) {
-@@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_listxattr:
-     case TARGET_NR_llistxattr:
-     {
--        void *p, *b = 0;
-+        void *q, *b = 0;
-         if (arg2) {
-             b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
-             if (!b) {
-                 return -TARGET_EFAULT;
-             }
-         }
--        p = lock_user_string(arg1);
--        if (p) {
-+        q = lock_user_string(arg1);
-+        if (q) {
-             if (num == TARGET_NR_listxattr) {
--                ret = get_errno(listxattr(p, b, arg3));
-+                ret = get_errno(listxattr(q, b, arg3));
-             } else {
--                ret = get_errno(llistxattr(p, b, arg3));
-+                ret = get_errno(llistxattr(q, b, arg3));
-             }
-         } else {
-             ret = -TARGET_EFAULT;
-         }
--        unlock_user(p, arg1, 0);
-+        unlock_user(q, arg1, 0);
-         unlock_user(b, arg2, arg3);
-         return ret;
+         break;
      }
-@@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_setxattr:
-     case TARGET_NR_lsetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_READ, arg3, arg4, 1);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_setxattr) {
--                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
-                 } else {
--                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, 0);
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index ad20584f26..636d2046f8 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "trace.h"
++#include "sysemu/watchdog.h"
+ 
+ //#define PPC_DEBUG_IRQ
+ //#define PPC_DEBUG_TB
+@@ -380,7 +381,7 @@ void ppc40x_chip_reset(PowerPCCPU *cpu)
+ void ppc40x_system_reset(PowerPCCPU *cpu)
+ {
+     qemu_log_mask(CPU_LOG_RESET, "Reset PowerPC system\n");
+-    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    watchdog_perform_action();
+ }
+ 
+ void store_40x_dbcr0(CPUPPCState *env, uint32_t val)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 51b272e190..4783b41c57 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -27,6 +27,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
+ #include "exec/exec-all.h"
++#include "sysemu/watchdog.h"
+ 
+ #define KERN_IMAGE_START                0x010000UL
+ #define LINUX_MAGIC_ADDR                0x010008UL
+@@ -547,7 +548,7 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+         /* ignore -no-reboot, send no event  */
+         qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
+     } else {
+-        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        watchdog_perform_action();
+     }
+     /* as this is triggered by a CPU, make sure to exit the loop */
+     if (tcg_enabled()) {
+diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
+index 2280914b1d..9561113d0e 100644
+--- a/hw/timer/etraxfs_timer.c
++++ b/hw/timer/etraxfs_timer.c
+@@ -26,6 +26,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/timer.h"
+ #include "hw/ptimer.h"
++#include "sysemu/watchdog.h"
+ 
+ #define D(x)
+ 
+@@ -207,7 +208,7 @@ static void watchdog_hit(void *opaque)
+         qemu_irq_raise(t->nmi);
+     }
+     else
+-        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        watchdog_perform_action();
+ 
+     t->wd_hits++;
+ }
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index ca3ed445de..ebe58e8dc7 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -30,6 +30,7 @@
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/bcd.h"
++#include "sysemu/watchdog.h"
+ 
+ #include "m48t59-internal.h"
+ 
+@@ -158,7 +159,7 @@ static void watchdog_cb (void *opaque)
+ 	NVRAM->buffer[0x1FF7] = 0x00;
+ 	NVRAM->buffer[0x1FFC] &= ~0x40;
+         /* May it be a hw CPU Reset instead ? */
+-        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        watchdog_perform_action();
+     } else {
+ 	qemu_set_irq(NVRAM->IRQ, 1);
+ 	qemu_set_irq(NVRAM->IRQ, 0);
+diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
+index a489bf5159..2be680b5df 100644
+--- a/hw/timer/pxa2xx_timer.c
++++ b/hw/timer/pxa2xx_timer.c
+@@ -14,6 +14,7 @@
+ #include "hw/arm/pxa.h"
+ #include "hw/sysbus.h"
+ #include "qemu/log.h"
++#include "sysemu/watchdog.h"
+ 
+ #define OSMR0	0x00
+ #define OSMR1	0x04
+@@ -414,7 +415,7 @@ static void pxa2xx_timer_tick(void *opaque)
+     if (t->num == 3)
+         if (i->reset3 & 1) {
+             i->reset3 = 0;
+-            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++            watchdog_perform_action();
          }
-@@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_getxattr:
-     case TARGET_NR_lgetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_getxattr) {
--                    ret = get_errno(getxattr(p, n, v, arg4));
-+                    ret = get_errno(getxattr(q, n, v, arg4));
-                 } else {
--                    ret = get_errno(lgetxattr(p, n, v, arg4));
-+                    ret = get_errno(lgetxattr(q, n, v, arg4));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, arg4);
-         }
-@@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_removexattr:
-     case TARGET_NR_lremovexattr:
-         {
--            void *p, *n;
--            p = lock_user_string(arg1);
-+            void *q, *n;
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_removexattr) {
--                    ret = get_errno(removexattr(p, n));
-+                    ret = get_errno(removexattr(q, n));
-                 } else {
--                    ret = get_errno(lremovexattr(p, n));
-+                    ret = get_errno(lremovexattr(q, n));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-         }
-         return ret;
+ }
+ 
 -- 
-2.17.0
-
-
+2.17.1
 
 
