@@ -2,62 +2,85 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03269C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D44CC282DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7C9520880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C9520880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 544FF20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQy4Lkk8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544FF20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49479 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDPuB-0006wo-R0
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:45:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48984)
+	id 1hDPuE-0006yn-IO
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:45:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDPlc-0008Ay-6f
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:37 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDPsi-0005xO-Pa
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDPlb-0003fk-0Q
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hDPlX-0003cC-IX; Mon, 08 Apr 2019 04:36:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB8AE307E04F;
-	Mon,  8 Apr 2019 08:36:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F984600D4;
-	Mon,  8 Apr 2019 08:36:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id CFFAB1132BD3; Mon,  8 Apr 2019 10:36:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 10:36:14 +0200
-Message-Id: <20190408083627.7479-3-armbru@redhat.com>
-In-Reply-To: <20190408083627.7479-1-armbru@redhat.com>
-References: <20190408083627.7479-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 08 Apr 2019 08:36:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 02/15] block/ssh: Do not report
- read/write/flush errors to the user
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDPsh-0008Mv-96
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:56 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:39952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hDPsg-0008Jk-1K
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:55 -0400
+Received: by mail-qt1-x843.google.com with SMTP id x12so14424554qts.7
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 01:43:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=mluOeCvZqHaE1UNzjY+qDA6Y1LJdXS+eO+yepQydSIg=;
+	b=dQy4Lkk8cZpXRqzijj4ZgMQK3sWos5iH7VX06x92Mhn+InqG+ne29KIU1/xkyKgY+S
+	s20a1zY+5nQ3DVqzOgPCYKKfN1KNB1E6TB0559aH9qU0+chcnIDVkFeOHDvGV2HOYsYA
+	E0G1Rqn1ny824l1FfwJqRDAZwid/Y/5WzeRxBcDlp1DC3jWCazKIYoFa48KxpPIKEfh6
+	/vlrgVGEV2LHCZ6PwJ+PBjqVuIogRXKA30fvzg8AkBHYo+h9sWWxXaYdBFG182mbtZQa
+	2mBGYmpD5MF3/Y27zD+hXlTyNh4CAAzMHAycNfNUSqpgXgGypjHLcXsCYEXTNKKGrX7K
+	K+/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=mluOeCvZqHaE1UNzjY+qDA6Y1LJdXS+eO+yepQydSIg=;
+	b=Qsd7BAwXsqQwHEoK0FFohzEMwYk/YjR3yo4WX+b6Z4d58FF9AEkNc9yE4hbjXb2dk3
+	Ybzz7nydPnDl+Y6FRlXO8xxefIDYFJHL9eOcL+i1RXOZb58RBJE4EWhjAnj9PaDxoDZU
+	okNCpOTjxOTEHIYOkot6TZUR7NjoS8gdoSSEIPdCiJlVJOhzI+CQXNN4aT9JkOCBWxCQ
+	8DToK58iAeTX1AYXkTVhq9EjiI2DcNS+csx1VVUhT+snCSmDt88EIkhVUc4h967epQvw
+	VkV5UBIkpxXvqjaRTQhHbTUi3M4uXKLDYhS8CZERRoR554GQPhvYD/DaVPoDeXm4aE+U
+	zREg==
+X-Gm-Message-State: APjAAAXRfiMHDeoInBsrk3rRYezd1mgqtxqcj1SfhiEx8AH6xBKH3bg3
+	Gg/LmUzObYe0DMjfO9M8xSM=
+X-Google-Smtp-Source: APXvYqwBwOYxS1ATkC0/LKaDIMiY6xypKPYOXj0/KSTLUBb4DDap5zWf836/efsdzRu+zvnUzx/wPg==
+X-Received: by 2002:ac8:2acc:: with SMTP id c12mr22132566qta.108.1554713033308;
+	Mon, 08 Apr 2019 01:43:53 -0700 (PDT)
+Received: from localhost.localdomain (104.129.187.94.16clouds.com.
+	[104.129.187.94]) by smtp.gmail.com with ESMTPSA id
+	d75sm17603259qkb.74.2019.04.08.01.43.52
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 01:43:52 -0700 (PDT)
+From: Catherine Ho <catherine.hecx@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Date: Mon,  8 Apr 2019 04:42:13 -0400
+Message-Id: <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
+References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
+ incoming migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,116 +92,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408083614.TGTYjuiT32uUlgnKXaXf4MPXV-sQ5kMsGpnQNjv1cks@z>
+Message-ID: <20190408084213.ma8v5yjnCeYEL4Q5P9XBcdUeG1v86CMdM9KaaCCc8bs@z>
 
-Callbacks ssh_co_readv(), ssh_co_writev(), ssh_co_flush() report
-errors to the user with error_printf().  They shouldn't, it's their
-caller's job.  Replace by a suitable trace point.
+Commit 18269069c310 ("migration: Introduce ignore-shared capability")
+addes ignore-shared capability to bypass the shared ramblock (e,g,
+membackend + numa node). It does good to live migration.
 
-Perhaps we should convert this part of the block driver interface to
-Error, so block drivers can pass more detail to their callers.  Not
-today.
+As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
+until VM starts, but it does on aarch64 qemu:
+Backtrace:
+1  0x000055f4a296dd84 in address_space_write_rom_internal () at
+exec.c:3458
+2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
+3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
+4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
+5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
+6  0x000055f4a2c9851d in main () at vl.c:4552
 
-Cc: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
+druing rom_reset. In ignore-shared incoming case, this rom filling
+is not required since all the data has been stored in memory backend
+file.
+
+Further more, as suggested by Peter Xu, if we do rom_reset() now with
+these ROMs then the RAM data should be re-filled again too with the
+migration stream coming in.
+
+Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
+capability")
+Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Suggested-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
 ---
- block/ssh.c        | 36 ++++++++++++------------------------
- block/trace-events |  3 +++
- 2 files changed, 15 insertions(+), 24 deletions(-)
+ hw/core/loader.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index 190ef95300..382fc04fbf 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -159,31 +159,19 @@ sftp_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
-     g_free(msg);
- }
- 
--static void GCC_FMT_ATTR(2, 3)
--sftp_error_report(BDRVSSHState *s, const char *fs, ...)
-+static void sftp_error_trace(BDRVSSHState *s, const char *op)
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index fe5cb24122..040109464b 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -1087,6 +1087,15 @@ static void rom_reset(void *unused)
  {
--    va_list args;
-+    char *ssh_err;
-+    int ssh_err_code;
-+    unsigned long sftp_err_code;
+     Rom *rom;
  
--    va_start(args, fs);
--    error_vprintf(fs, args);
--
--    if ((s)->sftp) {
--        char *ssh_err;
--        int ssh_err_code;
--        unsigned long sftp_err_code;
--
--        /* This is not an errno.  See <libssh2.h>. */
--        ssh_err_code = libssh2_session_last_error(s->session,
-+    /* This is not an errno.  See <libssh2.h>. */
-+    ssh_err_code = libssh2_session_last_error(s->session,
-                                                   &ssh_err, NULL, 0);
--        /* See <libssh2_sftp.h>. */
--        sftp_err_code = libssh2_sftp_last_error((s)->sftp);
-+    /* See <libssh2_sftp.h>. */
-+    sftp_err_code = libssh2_sftp_last_error((s)->sftp);
- 
--        error_printf(": %s (libssh2 error code: %d, sftp error code: %lu)",
--                     ssh_err, ssh_err_code, sftp_err_code);
--    }
--
--    va_end(args);
--    error_printf("\n");
-+    trace_sftp_error(op, ssh_err, ssh_err_code, sftp_err_code);
- }
- 
- static int parse_uri(const char *filename, QDict *options, Error **errp)
-@@ -1035,7 +1023,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
-             goto again;
-         }
-         if (r < 0) {
--            sftp_error_report(s, "read failed");
-+            sftp_error_trace(s, "read");
-             s->offset = -1;
-             return -EIO;
-         }
-@@ -1105,7 +1093,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
-             goto again;
-         }
-         if (r < 0) {
--            sftp_error_report(s, "write failed");
-+            sftp_error_trace(s, "write");
-             s->offset = -1;
-             return -EIO;
-         }
-@@ -1188,7 +1176,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
-         return 0;
-     }
-     if (r < 0) {
--        sftp_error_report(s, "fsync failed");
-+        sftp_error_trace(s, "fsync");
-         return -EIO;
-     }
- 
-diff --git a/block/trace-events b/block/trace-events
-index 7335a42540..79ccd8d824 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -208,3 +208,6 @@ sheepdog_co_rw_vector_new(uint64_t oid) "new oid 0x%" PRIx64
- sheepdog_snapshot_create_info(const char *sn_name, const char *id, const char *name, int64_t size, int is_snapshot) "sn_info: name %s id_str %s s: name %s vm_state_size %" PRId64 " " "is_snapshot %d"
- sheepdog_snapshot_create(const char *sn_name, const char *id) "%s %s"
- sheepdog_snapshot_create_inode(const char *name, uint32_t snap, uint32_t vdi) "s->inode: name %s snap_id 0x%" PRIx32 " vdi 0x%" PRIx32
++    /*
++     * We don't need to fill in the RAM with ROM data because we'll fill
++     * the data in during the next incoming migration in all cases.  Note
++     * that some of those RAMs can actually be modified by the guest on ARM
++     * so this is probably the only right thing to do here.
++     */
++    if (runstate_check(RUN_STATE_INMIGRATE))
++        return;
 +
-+# ssh.c
-+sftp_error(const char *op, const char *ssh_err, int ssh_err_code, unsigned long sftp_err_code) "%s failed: %s (libssh2 error code: %d, sftp error code: %lu)"
+     QTAILQ_FOREACH(rom, &roms, next) {
+         if (rom->fw_file) {
+             continue;
 -- 
-2.17.2
+2.17.1
 
 
