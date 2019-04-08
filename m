@@ -2,92 +2,83 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD60C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B121C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:45:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D991920870
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10BB020870
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:45:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXltvVWh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D991920870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b13J3YEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10BB020870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50208 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50210 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDQpn-00040X-4Z
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 05:44:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45697)
+	id 1hDQps-00044G-8Q
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 05:45:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQog-0003RG-Eh
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDQoj-0003Ru-Tl
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDQoe-0007QN-GX
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:50 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51954)
+	(envelope-from <peter.maydell@linaro.org>) id 1hDQoh-0007Rc-5o
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:53 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hDQoc-0007OH-Jj
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:46 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 4so13534699wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:references:from:message-id:date:user-agent:mime-version
-	:in-reply-to:content-transfer-encoding:content-language;
-	bh=Lt8k8WxRvSHoHjbTl3/IIDl61m8cZBJdFBnAke5/crE=;
-	b=FXltvVWhdhpLYo69FVDdMomNmflLHa7ZeNevyite/1KEzsZQadnQQoyWhSZqgLhSf1
-	oLK/+Bd6biUdam/ijYvB7a9br0yYRkhmKiFxeuVy9K+JQuzCXiKL2RkrsdHkeVg+CgRF
-	+skZ8AkqTzC5xNm5nkD487snxqwzoKbgng9fCvvXCkRlJUN+465cLMOsVzv6Qkqucn/j
-	Ykhwh+1YpdXQ+4vfJGnbJj1MDCBa8ZHUNGf2P0B0LumwObPvXoZbPzcvdun5SK0P65+t
-	AWQuLcTGwkeOMpvbpsyeTC/6KB9TV9WLXnisNyNpdKboHGT8k+/ufLk/9On+LASzoJjR
-	CdRw==
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDQog-0007Qi-PX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:51 -0400
+Received: by mail-ot1-x342.google.com with SMTP id t8so11393258otp.7
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:43:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=PEsWYR7q7GCRV0rDY4IjVdUNENI8piFrJ3/uOWByDZw=;
+	b=b13J3YEY0pTBgbvWZeKn31y+72rnXbEtx2WzXncQooN7ixv8CBjuyZJW1tf+LIXD+Q
+	YjFhDtF1KFy0tD6wIDkg3cFVBtLnWI/oFOE4QlpOjAHU3ybgxuWd/VtkdqmOnrtob+J3
+	bgx659bkPqX+Y6Qrc2IKCvMlEpKCD+XBXES5Tg26UJcskdd0Oeom8RKTXrYcggbAs2yz
+	pkkMssw8vOHZyjqbkn05Ie0KxYhLEG3JBJwxSvbNJSdvk2YIukptTcmJx4wHwTudHblz
+	2QtuvNmOQ9MQMS8SKrBHmlHjQQn9ANheWs3wE9gmoS1TCuuqKE9rdJ4+XT/WeWRHXPO0
+	dQDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=Lt8k8WxRvSHoHjbTl3/IIDl61m8cZBJdFBnAke5/crE=;
-	b=ElgOYighIPyEQDH5uCcko5tXLJdUbe+7RDTyJQUt5SGHf5Foq2U2hvIRmE+N8+xQUa
-	IEsCytChEWNextVRNlZbDcb2/Qn9vBejL7LAAnqB7zMyFTgxrCWDA/BEvf9QSW0GDaVE
-	RYEWlcYGSYX2iHjpkblKyWcu4vT9LCCb2TJ92QGcdRyi8GYTO0WY1vEtsV4IO3K6YmCy
-	OWzgLLbjOM4anpQSQG2ZSgge2JaAfGbGhn+g7vOVHc5FNr53RKlSf6w4zU3edKd4eFfL
-	zBiNGiw4PA67B6SVEKAeIbOJf19t5SuaGohzk8cFuaebwajGMYg5VDacd+gGR/D2+nWy
-	hPaA==
-X-Gm-Message-State: APjAAAVKaOIrPzssvO0eNVrsml0oQ8Q8863JTbp3PSI42ZBAd+HM20sF
-	IZye6MfB4K2dgug0BIBtd9Sipgdk
-X-Google-Smtp-Source: APXvYqwKWV+9YzLxxlvvPII5W0hTVxbKntDIHeLKaJhMoZ2JjL3tUZ3pOcxb7WHpZvUfLGazdvo0GQ==
-X-Received: by 2002:a7b:c147:: with SMTP id z7mr16549295wmi.67.1554716623035; 
-	Mon, 08 Apr 2019 02:43:43 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
-	by smtp.gmail.com with ESMTPSA id
-	q4sm41767891wrx.25.2019.04.08.02.43.42
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 08 Apr 2019 02:43:42 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-11-armbru@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <eebcf43e-a4d3-d8b1-1611-23b665ebbe6e@gmail.com>
-Date: Mon, 8 Apr 2019 11:44:44 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.4.0
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=PEsWYR7q7GCRV0rDY4IjVdUNENI8piFrJ3/uOWByDZw=;
+	b=oI7RD7dTYK2BrJVbGblCFejEtXqLJumf3usvzp7sWZj7Dbs5ZVu+nv2wsu4ryPWnLv
+	dMon+qXR5uBsZXpxaRHnRstX51dWyIsC8fKsgOwJB2QeBAqGMcqC289xsTGyCYTkkRZ2
+	qdc55kZ5KZx/thn8MrZSRt6pR/2BnJqKfZdyIfOvMCsLIc4glpx4vtz184OB63XaDRav
+	96RNb9saPz7F2xb+/tu/1QEfZiXiAocJbEthMsOkDVYNpbAeBvSYuTGwIBVCIBI1+qSE
+	56RXuF4nRPw5S9RXUVc+cQadS5gtefF5YwtLuhZf0v14xjAwjjjCJ8jvHfRAneuKos3J
+	pvaw==
+X-Gm-Message-State: APjAAAVjUXhUsDPrqC/8cGxmug4npqxBkPn8pQDg13bKWXG8wPSmE+SN
+	peeH1KqnUOKShRySrdzlY6HxWLeICrnDLK6adDwXRA==
+X-Google-Smtp-Source: APXvYqyXbeFJg7VLK2cJouyxHrmqM6mFRB1fQQ7kVL0psCrBUizzUkeR4KZcjUjAdR9JqYyLpb9/cZhU4XVqvTUbmRI=
+X-Received: by 2002:a05:6830:164a:: with SMTP id
+	h10mr19313412otr.323.1554716628848; 
+	Mon, 08 Apr 2019 02:43:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190408083627.7479-11-armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <1554624893-8363-1-git-send-email-guoheyi@huawei.com>
+	<CAFEAcA-N=y3k41oexvYaQ+tKj1d2tCZh8MhPvdq8Uz7dh-eWWA@mail.gmail.com>
+	<cb3534ef-2bd0-0518-c6ca-01c1f6511199@huawei.com>
+In-Reply-To: <cb3534ef-2bd0-0518-c6ca-01c1f6511199@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Apr 2019 10:43:37 +0100
+Message-ID:
+ <CAFEAcA_7GVwQfiyJi-dRkCaoyGrGJQtCd6DdF1dgJcGPcCDTRw@mail.gmail.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH 10/15] vl: Make -machine $TYPE,
- help and -accel help print to stdout
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [RFC] arm/virt: add one more uart for UEFI runtime
+ debug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,64 +90,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: wanghaibin.wang@huawei.com, qemu-arm <qemu-arm@nongnu.org>,
+	Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408084444.knA8e9yjdMdOOsOBpZMcQBugwwQ5Ekpsmarf75QRZkg@z>
+Message-ID: <20190408094337.mFJmA6GhbsSwYX68awqo2-272Xzcia3MclkC7N4k6hM@z>
 
-Hi Markus,
+On Mon, 8 Apr 2019 at 02:45, Heyi Guo <guoheyi@huawei.com> wrote:
+> On 2019/4/7 21:16, Peter Maydell wrote:
+> > I don't think it makes much sense to keep adding UARTs for every
+> > bit of the system software stack. We don't have an infinite
+> > supply of UARTs on real hardware either -- how is this handled
+> > there ?
+> As you were in the edk2 mail thread, I supposed you also agreed to add one more UART. What did you mean by "I do still have a todo list item to add a 2nd UART"? How shall we do that?
 
-On 4/8/19 11:36 AM, Markus Armbruster wrote:
-> Command line help help explicitly requested by the user should be
-> printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
-> $TYPE,help and -accel help to match: use printf() instead of
-> error_printf().
->
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   vl.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index c696ad2a13..792ef36001 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
->               continue;
->           }
->   
-> -        error_printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
-> -                     prop->name, prop->type);
-> +        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
-> +                    prop->name, prop->type);
+That would be a simple second UART available to both secure
+and non-secure and advertised in the device tree. It would
+only be created if the user specifically asked for it on
+the QEMU command line. I still need to investigate exactly
+how that ought to work, though.
 
-Does the line above have an alignment issue?
-
-Anyway,
-
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
-
->           if (prop->description) {
-> -            error_printf(" (%s)\n", prop->description);
-> +            printf(" (%s)\n", prop->description);
->           } else {
-> -            error_printf("\n");
-> +            printf("\n");
->           }
->       }
->   
-> @@ -3643,7 +3643,7 @@ int main(int argc, char **argv, char **envp)
->                                                        optarg, true);
->                   optarg = qemu_opt_get(accel_opts, "accel");
->                   if (!optarg || is_help_option(optarg)) {
-> -                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
-> +                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
->                       exit(0);
->                   }
->                   opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
-
+thanks
+-- PMM
 
