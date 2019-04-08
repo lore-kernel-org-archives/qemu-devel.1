@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55180)
+Received: from eggs.gnu.org ([209.51.188.92]:55179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuP-0004QY-Us
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuP-0004QX-Un
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuO-0007al-0B
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuO-0007b0-1u
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:25 -0400
-Date: Mon, 8 Apr 2019 13:45:53 +1000
+Date: Mon, 8 Apr 2019 13:40:54 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190408034553.GD16627@umbus.fritz.box>
-References: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
-	<155445152490.302073.17033451726459859333.stgit@bahia.lan>
+Message-ID: <20190408034054.GB16627@umbus.fritz.box>
+References: <155448184292.8446.8225650773162648595.stgit@bahia.lan>
+	<155448184841.8446.13959787238854054119.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AbQceqfdZEv+FvjW"
+	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
 Content-Disposition: inline
-In-Reply-To: <155445152490.302073.17033451726459859333.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/ppc/kvm: Convert DPRINTF to
- traces
+In-Reply-To: <155448184841.8446.13959787238854054119.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] spapr: Drop duplicate code in
+ LSI mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,328 +26,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---AbQceqfdZEv+FvjW
+--p4qYPpj5QlsIQJ0K
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2019 at 10:05:24AM +0200, Greg Kurz wrote:
+On Fri, Apr 05, 2019 at 06:30:48PM +0200, Greg Kurz wrote:
+> LSI mapping in spapr currently open-codes standard PCI swizzling. It thus
+> duplicates the code of pci_swizzle_map_irq_fn().
+>=20
+> Expose the swizzling formula so that it can be used with a slot number
+> when building the device tree. Simply drop pci_spapr_map_irq() and call
+> pci_swizzle_map_irq_fn() instead.
+>=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
 Applied to ppc-for-4.1, thanks.
 
-I did have to fix up a small conflict because I've now merged my style
-fixups for target/ppc into ppc-for-4.1.
-
 > ---
->  target/ppc/kvm.c        |   68 +++++++++++++++++++----------------------=
-------
->  target/ppc/trace-events |   25 +++++++++++++++++
->  2 files changed, 52 insertions(+), 41 deletions(-)
+>  hw/pci/pci.c         |    2 +-
+>  hw/ppc/spapr_pci.c   |   24 ++++--------------------
+>  include/hw/pci/pci.h |    4 ++++
+>  3 files changed, 9 insertions(+), 21 deletions(-)
 >=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 2427c8ee13ae..3a11d2e1060c 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -49,16 +49,6 @@
->  #include "elf.h"
->  #include "sysemu/kvm_int.h"
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 35451c1e9987..bb52bafd8d1c 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1532,7 +1532,7 @@ void pci_device_set_intx_routing_notifier(PCIDevice=
+ *dev,
+>   */
+>  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin)
+>  {
+> -    return (pin + PCI_SLOT(pci_dev->devfn)) % PCI_NUM_PINS;
+> +    return pci_swizzle(PCI_SLOT(pci_dev->devfn), pin);
+>  }
 > =20
-> -//#define DEBUG_KVM
+>  /***********************************************************/
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index c70688a0dc23..26850d0b94f4 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -719,26 +719,10 @@ param_error_exit:
+>      rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>  }
+> =20
+> -static int pci_spapr_swizzle(int slot, int pin)
+> -{
+> -    return (slot + pin) % PCI_NUM_PINS;
+> -}
 > -
-> -#ifdef DEBUG_KVM
-> -#define DPRINTF(fmt, ...) \
-> -    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) \
-> -    do { } while (0)
-> -#endif
+> -static int pci_spapr_map_irq(PCIDevice *pci_dev, int irq_num)
+> -{
+> -    /*
+> -     * Here we need to convert pci_dev + irq_num to some unique value
+> -     * which is less than number of IRQs on the specific bus (4).  We
+> -     * use standard PCI swizzling, that is (slot number + pin number)
+> -     * % 4.
+> -     */
+> -    return pci_spapr_swizzle(PCI_SLOT(pci_dev->devfn), irq_num);
+> -}
 > -
->  #define PROC_DEVTREE_CPU      "/proc/device-tree/cpus/"
+>  static void pci_spapr_set_irq(void *opaque, int irq_num, int level)
+>  {
+>      /*
+> -     * Here we use the number returned by pci_spapr_map_irq to find a
+> +     * Here we use the number returned by pci_swizzle_map_irq_fn to find=
+ a
+>       * corresponding qemu_irq.
+>       */
+>      SpaprPhbState *phb =3D opaque;
+> @@ -1744,7 +1728,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+>                                  &sphb->iowindow);
 > =20
->  const KVMCapabilityInfo kvm_arch_required_capabilities[] =3D {
-> @@ -626,7 +616,7 @@ static int kvm_put_fp(CPUState *cs)
->          reg.addr =3D (uintptr_t)&fpscr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to set FPSCR to KVM: %s\n", strerror(errno));
-> +            trace_kvm_failed_fpscr_set(strerror(errno));
->              return ret;
->          }
-> =20
-> @@ -647,8 +637,8 @@ static int kvm_put_fp(CPUState *cs)
-> =20
->              ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->              if (ret < 0) {
-> -                DPRINTF("Unable to set %s%d to KVM: %s\n", vsx ? "VSR" :=
- "FPR",
-> -                        i, strerror(errno));
-> +                trace_kvm_failed_fp_set(vsx ? "VSR" : "FPR", i,
-> +                                        strerror(errno));
->                  return ret;
->              }
->          }
-> @@ -659,7 +649,7 @@ static int kvm_put_fp(CPUState *cs)
->          reg.addr =3D (uintptr_t)&env->vscr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to set VSCR to KVM: %s\n", strerror(errno));
-> +            trace_kvm_failed_vscr_set(strerror(errno));
->              return ret;
->          }
-> =20
-> @@ -668,7 +658,7 @@ static int kvm_put_fp(CPUState *cs)
->              reg.addr =3D (uintptr_t)cpu_avr_ptr(env, i);
->              ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->              if (ret < 0) {
-> -                DPRINTF("Unable to set VR%d to KVM: %s\n", i, strerror(e=
-rrno));
-> +                trace_kvm_failed_vr_set(i, strerror(errno));
->                  return ret;
->              }
->          }
-> @@ -693,7 +683,7 @@ static int kvm_get_fp(CPUState *cs)
->          reg.addr =3D (uintptr_t)&fpscr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to get FPSCR from KVM: %s\n", strerror(errno=
-));
-> +            trace_kvm_failed_fpscr_get(strerror(errno));
->              return ret;
->          } else {
->              env->fpscr =3D fpscr;
-> @@ -709,8 +699,8 @@ static int kvm_get_fp(CPUState *cs)
-> =20
->              ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->              if (ret < 0) {
-> -                DPRINTF("Unable to get %s%d from KVM: %s\n",
-> -                        vsx ? "VSR" : "FPR", i, strerror(errno));
-> +                trace_kvm_failed_fp_get(vsx ? "VSR" : "FPR", i,
-> +                                        strerror(errno));
->                  return ret;
->              } else {
->  #ifdef HOST_WORDS_BIGENDIAN
-> @@ -733,7 +723,7 @@ static int kvm_get_fp(CPUState *cs)
->          reg.addr =3D (uintptr_t)&env->vscr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to get VSCR from KVM: %s\n", strerror(errno)=
-);
-> +            trace_kvm_failed_vscr_get(strerror(errno));
->              return ret;
->          }
-> =20
-> @@ -742,8 +732,7 @@ static int kvm_get_fp(CPUState *cs)
->              reg.addr =3D (uintptr_t)cpu_avr_ptr(env, i);
->              ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->              if (ret < 0) {
-> -                DPRINTF("Unable to get VR%d from KVM: %s\n",
-> -                        i, strerror(errno));
-> +                trace_kvm_failed_vr_get(i, strerror(errno));
->                  return ret;
->              }
->          }
-> @@ -764,7 +753,7 @@ static int kvm_get_vpa(CPUState *cs)
->      reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
->      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->      if (ret < 0) {
-> -        DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(err=
-no));
-> +        trace_kvm_failed_vpa_addr_get(strerror(errno));
->          return ret;
+>      bus =3D pci_register_root_bus(dev, NULL,
+> -                                pci_spapr_set_irq, pci_spapr_map_irq, sp=
+hb,
+> +                                pci_spapr_set_irq, pci_swizzle_map_irq_f=
+n, sphb,
+>                                  &sphb->memspace, &sphb->iospace,
+>                                  PCI_DEVFN(0, 0), PCI_NUM_PINS, TYPE_PCI_=
+BUS);
+>      phb->bus =3D bus;
+> @@ -2236,14 +2220,14 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uin=
+t32_t intc_phandle, void *fdt,
 >      }
 > =20
-> @@ -774,8 +763,7 @@ static int kvm_get_vpa(CPUState *cs)
->      reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
->      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->      if (ret < 0) {
-> -        DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
-> -                strerror(errno));
-> +        trace_kvm_failed_slb_get(strerror(errno));
->          return ret;
->      }
+>      /* Build the interrupt-map, this must matches what is done
+> -     * in pci_spapr_map_irq
+> +     * in pci_swizzle_map_irq_fn
+>       */
+>      _FDT(fdt_setprop(fdt, bus_off, "interrupt-map-mask",
+>                       &interrupt_map_mask, sizeof(interrupt_map_mask)));
+>      for (i =3D 0; i < PCI_SLOT_MAX; i++) {
+>          for (j =3D 0; j < PCI_NUM_PINS; j++) {
+>              uint32_t *irqmap =3D interrupt_map[i*PCI_NUM_PINS + j];
+> -            int lsi_num =3D pci_spapr_swizzle(i, j);
+> +            int lsi_num =3D pci_swizzle(i, j);
 > =20
-> @@ -785,8 +773,7 @@ static int kvm_get_vpa(CPUState *cs)
->      reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
->      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->      if (ret < 0) {
-> -        DPRINTF("Unable to get dispatch trace log state from KVM: %s\n",
-> -                strerror(errno));
-> +        trace_kvm_failed_dtl_get(strerror(errno));
->          return ret;
->      }
-> =20
-> @@ -812,7 +799,7 @@ static int kvm_put_vpa(CPUState *cs)
->          reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(e=
-rrno));
-> +            trace_kvm_failed_vpa_addr_set(strerror(errno));
->              return ret;
->          }
->      }
-> @@ -823,7 +810,7 @@ static int kvm_put_vpa(CPUState *cs)
->      reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
->      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->      if (ret < 0) {
-> -        DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerror(=
-errno));
-> +        trace_kvm_failed_slb_set(strerror(errno));
->          return ret;
->      }
-> =20
-> @@ -833,8 +820,7 @@ static int kvm_put_vpa(CPUState *cs)
->      reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
->      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->      if (ret < 0) {
-> -        DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
-> -                strerror(errno));
-> +        trace_kvm_failed_dtl_set(strerror(errno));
->          return ret;
->      }
-> =20
-> @@ -843,7 +829,7 @@ static int kvm_put_vpa(CPUState *cs)
->          reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
->          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
->          if (ret < 0) {
-> -            DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(e=
-rrno));
-> +            trace_kvm_failed_null_vpa_addr_set(strerror(errno));
->              return ret;
->          }
->      }
-> @@ -996,7 +982,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-> =20
->          if (cap_papr) {
->              if (kvm_put_vpa(cs) < 0) {
-> -                DPRINTF("Warning: Unable to set VPA information to KVM\n=
-");
-> +                trace_kvm_failed_put_vpa();
->              }
->          }
-> =20
-> @@ -1296,7 +1282,7 @@ int kvm_arch_get_registers(CPUState *cs)
-> =20
->          if (cap_papr) {
->              if (kvm_get_vpa(cs) < 0) {
-> -                DPRINTF("Warning: Unable to get VPA information from KVM=
-\n");
-> +                trace_kvm_failed_get_vpa();
->              }
->          }
-> =20
-> @@ -1352,7 +1338,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run =
-*run)
->           */
->          irq =3D KVM_INTERRUPT_SET;
-> =20
-> -        DPRINTF("injected interrupt %d\n", irq);
-> +        trace_kvm_injected_interrupt(irq);
->          r =3D kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
->          if (r < 0) {
->              printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
-> @@ -1697,20 +1683,20 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm=
-_run *run)
->      switch (run->exit_reason) {
->      case KVM_EXIT_DCR:
->          if (run->dcr.is_write) {
-> -            DPRINTF("handle dcr write\n");
-> +            trace_kvm_handle_dcr_write();
->              ret =3D kvmppc_handle_dcr_write(env, run->dcr.dcrn, run->dcr=
-=2Edata);
->          } else {
-> -            DPRINTF("handle dcr read\n");
-> +            trace_kvm_handle_drc_read();
->              ret =3D kvmppc_handle_dcr_read(env, run->dcr.dcrn, &run->dcr=
-=2Edata);
->          }
->          break;
->      case KVM_EXIT_HLT:
-> -        DPRINTF("handle halt\n");
-> +        trace_kvm_handle_halt();
->          ret =3D kvmppc_handle_halt(cpu);
->          break;
->  #if defined(TARGET_PPC64)
->      case KVM_EXIT_PAPR_HCALL:
-> -        DPRINTF("handle PAPR hypercall\n");
-> +        trace_kvm_handle_papr_hcall();
->          run->papr_hcall.ret =3D spapr_hypercall(cpu,
->                                                run->papr_hcall.nr,
->                                                run->papr_hcall.args);
-> @@ -1718,18 +1704,18 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm=
-_run *run)
->          break;
->  #endif
->      case KVM_EXIT_EPR:
-> -        DPRINTF("handle epr\n");
-> +        trace_kvm_handle_epr();
->          run->epr.epr =3D ldl_phys(cs->as, env->mpic_iack);
->          ret =3D 0;
->          break;
->      case KVM_EXIT_WATCHDOG:
-> -        DPRINTF("handle watchdog expiry\n");
-> +        trace_kvm_handle_watchdog_expiry();
->          watchdog_perform_action();
->          ret =3D 0;
->          break;
-> =20
->      case KVM_EXIT_DEBUG:
-> -        DPRINTF("handle debug exception\n");
-> +        trace_kvm_handle_debug_exception();
->          if (kvm_handle_debug(cpu, run)) {
->              ret =3D EXCP_DEBUG;
->              break;
-> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
-> index ed4d57c6d9c1..7b3cfe11fdfe 100644
-> --- a/target/ppc/trace-events
-> +++ b/target/ppc/trace-events
-> @@ -3,3 +3,28 @@
->  # kvm.c
->  kvm_failed_spr_set(int spr, const char *msg) "Warning: Unable to set SPR=
- %d to KVM: %s"
->  kvm_failed_spr_get(int spr, const char *msg) "Warning: Unable to retriev=
-e SPR %d from KVM: %s"
-> +kvm_failed_fpscr_set(const char *msg) "Unable to set FPSCR to KVM: %s"
-> +kvm_failed_fp_set(const char *fpname, int fpnum, const char *msg) "Unabl=
-e to set %s%d to KVM: %s"
-> +kvm_failed_vscr_set(const char *msg) "Unable to set VSCR to KVM: %s"
-> +kvm_failed_vr_set(int vr, const char *msg) "Unable to set VR%d to KVM: %=
-s"
-> +kvm_failed_fpscr_get(const char *msg) "Unable to get FPSCR from KVM: %s"
-> +kvm_failed_fp_get(const char *fpname, int fpnum, const char *msg) "Unabl=
-e to get %s%d from KVM: %s"
-> +kvm_failed_vscr_get(const char *msg) "Unable to get VSCR from KVM: %s"
-> +kvm_failed_vr_get(int vr, const char *msg) "Unable to get VR%d from KVM:=
- %s"
-> +kvm_failed_vpa_addr_get(const char *msg) "Unable to get VPA address from=
- KVM: %s"
-> +kvm_failed_slb_get(const char *msg) "Unable to get SLB shadow state from=
- KVM: %s"
-> +kvm_failed_dtl_get(const char *msg) "Unable to get dispatch trace log st=
-ate from KVM: %s"
-> +kvm_failed_vpa_addr_set(const char *msg) "Unable to set VPA address to K=
-VM: %s"
-> +kvm_failed_slb_set(const char *msg) "Unable to set SLB shadow state to K=
-VM: %s"
-> +kvm_failed_dtl_set(const char *msg) "Unable to set dispatch trace log st=
-ate to KVM: %s"
-> +kvm_failed_null_vpa_addr_set(const char *msg) "Unable to set VPA address=
- to KVM: %s"
-> +kvm_failed_put_vpa(void) "Warning: Unable to set VPA information to KVM"
-> +kvm_failed_get_vpa(void) "Warning: Unable to get VPA information from KV=
-M"
-> +kvm_injected_interrupt(int irq) "injected interrupt %d"
-> +kvm_handle_dcr_write(void) "handle dcr write"
-> +kvm_handle_drc_read(void) "handle dcr read"
-> +kvm_handle_halt(void) "handle halt"
-> +kvm_handle_papr_hcall(void) "handle PAPR hypercall"
-> +kvm_handle_epr(void) "handle epr"
-> +kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
-> +kvm_handle_debug_exception(void) "handle debug exception"
+>              irqmap[0] =3D cpu_to_be32(b_ddddd(i)|b_fff(0));
+>              irqmap[1] =3D 0;
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index d87f5f93e9cd..033b2145d98c 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -411,6 +411,10 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_ir=
+q, pci_map_irq_fn map_irq,
+>  void pci_bus_irqs_cleanup(PCIBus *bus);
+>  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
+>  /* 0 <=3D pin <=3D 3 0 =3D INTA, 1 =3D INTB, 2 =3D INTC, 3 =3D INTD */
+> +static inline int pci_swizzle(int slot, int pin)
+> +{
+> +    return (slot + pin) % PCI_NUM_PINS;
+> +}
+>  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
+>  PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+>                                pci_set_irq_fn set_irq, pci_map_irq_fn map=
+_irq,
 >=20
 
 --=20
@@ -356,24 +155,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AbQceqfdZEv+FvjW
+--p4qYPpj5QlsIQJ0K
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqw/EACgkQbDjKyiDZ
-s5KhxA//VILqgIgcF1lPfHsVlIGOaGCCdEOdfwi2FnwIdJJDP6qfe7WyhIwEeNYE
-5w0wyjlsBTnbgKcY+GS2hyQRted7JtvQozxcyTYMw2as6lUrjsQtqTdYTjHU7quy
-0NukwPRftxAozyKdZawzW/gD+MFGnjuEy/6YkTdlK4Z8Uc4WWeufQPvfDEGTFuKb
-VARCdbxn7CFJAuho7Eg36GK1jNfmjgMGJgteG+zXwf5+qJk/1ds5P8S6X1nDfn/U
-NDquCLrKcNsqFVC8SKmJMBVMFthBFnnReJLjPwX0G2iwzWFuFZ0MsOirYgoir2rq
-hJFwXdo9OwvhZ/ydpBJgKEpg/3vG31zCMArlO8bPcH3PQfayjtRh0UL35llfSYwi
-/7Nepq2ISCF4twYmmFOAt9RKIVa+dQZC8v/+E7XShdEHaQyMugBGSO6thMmvXUW+
-IYjLWZXg5BqolrXKrFUkmWu3etPPrI17HfQ48dL02aTvpEtfGGOvDvR+aBu9W2Cd
-j7I82nQSjzm4sFtUHCg/SwaSTxYK4AAkrygUe5uzWKPPs0mtaAVuEJ6i0634n/JL
-JyFL0OEQj4A2nPwUdaG7iZasWiJC639/ZH+3Qyabos29ygkDn6zJh35kWk/slcLu
-/T867KPLbj8GZzrjQPnkdwXqpg5l+/+dcGc/F2MfTF2RNQzcYSQ=
-=wMX7
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqwsYACgkQbDjKyiDZ
+s5IwpxAAppz+IzdjeSeESxLQxOTaahy8VUZMgnB4shRIIm/stPiP8k5CIwiSVr8L
+p+ZXAlBNTPkg2V1m0Wpo4/lX3Qu9AwM57mG8dfH6xNDKhPFfzeXvSb2v+E28f8kV
+l/Q8tmiFymGtFzTs1ivi894h+/MosrfNm8fxLNewNPyGji2rQEDFBo8x3DOvUHEK
+n5OEN2bXvqRkHevVzTlWeXj43EBi8OYIU2vMsW/s9lJdZJB6Ln8kWGyoAuskbf65
+8YAqQR5G+1jg3i3Kl4OsRdHNCy1ineYoA2OuiH4w3WqQsxBNuT+ccMQTc5HaICmq
+snGjti7z4jcPi8RbWNU2M76JCg3ZZjaAfTalLrWBBTlHP7kazcl33aDvEMC+WO0y
+BDHlKyrmjn6KBghlwuxQ0zI65OwARLZSNo9vKKZE9YveADwt5Exi4N6OnNGOGbhX
+eFYZHfLLpnMKI2kPJYzMaHJBzqc7BM29CUQqtkGuUrb4LIP9GZZF10gnoiZpzHsa
+5+H6YeaqWpb0o6xw5YkieCtU9RnDgb4ItEyfLThYKedGq2/njVTBBGP051EmNLE+
+jtr2QDiJ6cGKQvu7niJZKR5bQ4HwBcO8XYIMb0ZOlAkGCO49lIa29Z6lf3AR0wCG
+KDkqipLlsDudZhfY971EbK2tZiNZ6Rvtxmo1EErs/Z7MbuKciNU=
+=JQO/
 -----END PGP SIGNATURE-----
 
---AbQceqfdZEv+FvjW--
+--p4qYPpj5QlsIQJ0K--
