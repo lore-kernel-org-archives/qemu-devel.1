@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38077)
+Received: from eggs.gnu.org ([209.51.188.92]:39722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hDZZ6-0002fU-Mw
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:04:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDZes-0006W4-IZ
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:10:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hDZZ5-00084l-9T
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:04:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42398)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hDZZ4-00082y-IN
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:04:18 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE0B0307EAA0
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 19:04:17 +0000 (UTC)
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-15-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53312567-fb1e-0f9d-f2d1-1adbf584ef21@redhat.com>
-Date: Mon, 8 Apr 2019 14:04:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1hDZeq-0002Gr-QX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:10:18 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDZep-0002Fo-D5
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:10:16 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y84so11385101oia.12
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 12:10:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190408083627.7479-15-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uvecyl1cSTheA3j6bGWfY2wEGNl45w3GH"
-Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
- stdout
+References: <20190408163439.18818-1-kwolf@redhat.com>
+In-Reply-To: <20190408163439.18818-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Apr 2019 20:10:02 +0100
+Message-ID: <CAFEAcA_MXn6LXD_P3iMka_1RvXctt+CmB=bZJPnf+-Pe1Dk_zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uvecyl1cSTheA3j6bGWfY2wEGNl45w3GH
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <53312567-fb1e-0f9d-f2d1-1adbf584ef21@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
- stdout
-References: <20190408083627.7479-1-armbru@redhat.com>
- <20190408083627.7479-15-armbru@redhat.com>
-In-Reply-To: <20190408083627.7479-15-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 8 Apr 2019 at 17:35, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit f55a585d1037e5de6088f25e75443c2776786e29:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-04-07 14:54:55 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to ab63817119b03b95f7dce6fae036e6d063ad63fb:
+>
+>   hmp: Fix drive_add ... format=help crash (2019-04-08 17:42:06 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - hmp: Fix drive_add ... format=help crash
+> - block: Forward 'discard' to temporary overlay
+>
+> ----------------------------------------------------------------
 
-On 4/8/19 3:36 AM, Markus Armbruster wrote:
-> Command line help explicitly requested by the user should be printed
-> to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
-> use qemu_printf() instead of error_printf().  Plain printf() would be
-> wrong because we need to print to the current monitor for chardev-add
-> help".
+Applied, thanks.
 
-Mismatched "
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---uvecyl1cSTheA3j6bGWfY2wEGNl45w3GH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyrmy0ACgkQp6FrSiUn
-Q2rfIQgAhu6Fo/MBkJRy+UumHl8qaiaAUwBoW7w22ntwp9R222xOrQZgCHAbKaoC
-/8FZzicW+PYLdHAn+AwjAhb67g6dU80gUaxCeoBjlmuUCaTYfanUN/iVI3ewbEFL
-2F40oxN2IgPEhTUP4zisuOfggNxt0LbtvPzZz83QB4n20Z6zlZ7nTJBahu7WR+ko
-aFbKqe8i2vgHFqs4wSJPBBTaSXsIOJ+ZmJ5E333yne8nkdTFeePeJTq3QvmKuniX
-Pb8ywe7XxEWyEgY6hRvWENv0BqEVRdu6Pe7XPgc2OraNolk28bzyat4Poz0cbUtE
-y0R0OZlPCm0HYSuqWoCYwWeYiYj+qg==
-=UZxR
------END PGP SIGNATURE-----
-
---uvecyl1cSTheA3j6bGWfY2wEGNl45w3GH--
+-- PMM
