@@ -2,108 +2,65 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C322C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB93C10F14
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4817220883
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 09:58:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YC06Xtws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4817220883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 716342148D
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:12:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716342148D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50379 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50539 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDR2N-00009a-IK
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 05:57:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50010)
+	id 1hDRGj-0003DX-Hl
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:12:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDR1O-00086w-QD
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:56:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hDRFt-0002sV-9G
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDR1L-0005VP-VZ
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:56:58 -0400
-Received: from mail-eopbgr10098.outbound.protection.outlook.com
-	([40.107.1.98]:54585
-	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDR18-0005Nn-1m; Mon, 08 Apr 2019 05:56:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=Tce3ePH6M0qNB42WGBaLUhndh5qpCcb2kG6Iz7261o8=;
-	b=YC06XtwsgEiDQVF121z9cBwqPsYyh2D66FeH9mj6qGb4n2ApKT+kR3N8vlfVpwUn/NsDq+k8xiqW7ZIFQy7YBbyzMJbmqYOLoZFeLF6ph1QDUfTYD2WuuTAj899SYFBqMVt9YvXXa3RlhDIdl08UiCh2WoLdsEt9KGJpLHw88GM=
-Received: from AM6PR08MB4421.eurprd08.prod.outlook.com (20.179.18.23) by
-	AM6PR08MB4087.eurprd08.prod.outlook.com (20.179.2.202) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1771.16; Mon, 8 Apr 2019 09:56:37 +0000
-Received: from AM6PR08MB4421.eurprd08.prod.outlook.com
-	([fe80::d15a:3eaa:44bc:2644]) by
-	AM6PR08MB4421.eurprd08.prod.outlook.com
-	([fe80::d15a:3eaa:44bc:2644%4]) with mapi id 15.20.1771.019;
-	Mon, 8 Apr 2019 09:56:37 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-block] [PATCH v2] qcow2: discard bitmap when removed
-Thread-Index: AQHUz0fFuPhc95BDyUWuCjMQWLZPB6YSEmuAgCAxuYA=
-Date: Mon, 8 Apr 2019 09:56:37 +0000
-Message-ID: <d4593259-c3a8-8e84-cbbb-8caf02d6b9a7@virtuozzo.com>
-References: <1551346019-293202-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<28859adc-27c2-e2ed-3f24-ba620236970f@redhat.com>
-In-Reply-To: <28859adc-27c2-e2ed-3f24-ba620236970f@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0057.eurprd01.prod.exchangelabs.com
-	(2603:10a6:7:7d::34) To AM6PR08MB4421.eurprd08.prod.outlook.com
-	(2603:10a6:20b:71::23)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d4723372-eaba-4fd9-de0e-08d6bc087da6
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:AM6PR08MB4087; 
-x-ms-traffictypediagnostic: AM6PR08MB4087:
-x-microsoft-antispam-prvs: <AM6PR08MB408797BB03EFE6F5A60889BCF42C0@AM6PR08MB4087.eurprd08.prod.outlook.com>
-x-forefront-prvs: 0001227049
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(39840400004)(136003)(376002)(346002)(396003)(366004)(199004)(189003)(2906002)(478600001)(5660300002)(4326008)(486006)(7736002)(14454004)(81156014)(81166006)(8676002)(8936002)(97736004)(25786009)(36756003)(68736007)(102836004)(66066001)(186003)(11346002)(446003)(26005)(305945005)(2616005)(31686004)(476003)(76176011)(386003)(6436002)(54906003)(6486002)(6512007)(53546011)(6506007)(106356001)(229853002)(110136005)(105586002)(6246003)(256004)(31696002)(53936002)(2201001)(52116002)(14444005)(86362001)(99286004)(2501003)(316002)(71190400001)(71200400001)(6116002)(3846002)(44832011);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4087;
-	H:AM6PR08MB4421.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: kIugw7DcHe0ReQbI89i3Wn3qQfsaOP7fmCY5oyFv+pG9fpaLHXnMW7hGiek5tIOGznwKs1P8IEBYT8NtrG4eCbeZ5XRl4nqpfgjRKzWMY7MWTu5aUDHsq1kEhKWkjsZ9UUpPGA1IZaQBvqUz5+kbdpV7D9udkH1zh5HfXU5Mm/C0JjOrq3hqhm4m2lKTFPnbgq6v6mGJAcZmocQg0gTW+/YfuoRJIx0yldzzW3509ds7NrrPjPf2aeOxA3HJsFXN7Bjnlaex12co2GWlNobkAwPvSGcwCi6UIVmMGLu7BFOpojk2DKL0AOWFqBib4qjhAbOACV55sr7H0ebmDl9uoy8lU1vGocYdKxna2bo8zEfuVdWotozPMfSAaQuEp02+7qZqp2aJY8NJI6TvOyD1Tf72W18PTzJm60qnNrlHCbk=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <989E22637DC47246A2E806680027669E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1hDRFr-0005LD-Tv
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:11:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hDRFn-0005Hk-RU; Mon, 08 Apr 2019 06:11:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B54081243;
+	Mon,  8 Apr 2019 10:04:48 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-165.ams2.redhat.com [10.36.117.165])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ACE75D719;
+	Mon,  8 Apr 2019 10:04:43 +0000 (UTC)
+Date: Mon, 8 Apr 2019 12:04:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <20190408100442.GA11997@linux.fritz.box>
+References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+	<468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4723372-eaba-4fd9-de0e-08d6bc087da6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2019 09:56:37.5953 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4087
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.98
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qcow2: discard bitmap when
- removed
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Mon, 08 Apr 2019 10:04:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
+ allocation failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,51 +72,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+Cc: "fam@euphon.net" <fam@euphon.net>,
 	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+	Denis Lunev <den@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"mreitz@redhat.com" <mreitz@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408095637.8RM6UIAoXtMv0n5k-SST4jQABcZp0kFZffEdoBWSUoU@z>
+Message-ID: <20190408100442.rzSKMqL3bcpumUB2fTe9iYXyekiC_5ncHq4U3YjiDcI@z>
 
-UElOR0lORw0KDQpJIGtpbmRseSByZW1pbmQgeW91IGFib3V0IHRoaXMgc21hbGwgcGF0Y2ggZm9y
-IFFFTVUgNC4xLg0KSSBhbSBnb2luZyB0byBiZSBhd2F5IGZvciB2YWNhdGlvbiBmcm9tIEFwcmls
-LCAxMHRoIHRvIE1heSwgMTV0aC4NCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5
-IFNoaW5rZXZpY2gNCg0KDQpPbiAxOS8wMy8yMDE5IDAxOjE4LCBKb2huIFNub3cgd3JvdGU6DQo+
-IA0KPiANCj4gT24gMi8yOC8xOSA0OjI2IEFNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+
-IFdoZW4gYSBiaXRtYXAgaXMgcmVtb3ZlZCwgd2UgY2FuIGNsZWFuIHNvbWUgc3BhY2Ugb24gdGhl
-IGRpc2suIFRoZSBzaXplDQo+PiBvZiBhIGNsdXN0ZXIgbWF5IGJlIGxhcmdlciwgc28gaXMgdGhl
-IHNpemUgb2YgdGhlIGJpdG1hcCB0aGF0IGluY2x1ZGVzDQo+PiBtYW55IGNsdXN0ZXJzLiBTb21l
-IGJpdG1hcHMgY2FuIGJlIGFzIGxhcmdlIGFzIHRlbnMgb2YgbWVnYWJ5dGVzLg0KPj4gVGhlIGZs
-YWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMgYWxsb3dzIGEgY2FsbCB0byB0aGUgcmF3X2NvX3BkaXNj
-YXJkKCkNCj4+IHRoYXQgZG9lcyB0aGUgYWN0dWFsIGNsZWFuaW5nIG9mIHRoZSBpbWFnZSBvbiBk
-aXNrLCB3aGlsZSB3aXRoIHRoZSBmbGFnDQo+PiBRQ09XMl9ESVNDQVJEX09USEVSLCBhIHJlZmVy
-ZW5jZSBjb3VudCBvZiB0aGUgY2x1c3RlciBpcyB1cGRhdGVkIG9ubHkuDQo+Pg0KPj4gU2lnbmVk
-LW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5j
-b20+DQo+PiAtLS0NCj4+IHYxOiBEaXNjYXJkIG9sZCBiaXRtYXAgZGlyZWN0b3JpZXMgaW4gUUNP
-VzIgaW1hZ2UNCj4+DQo+PiBJbiB0aGUgZmlyc3QgdmVyc2lvbiBvZiB0aGUgcGF0Y2gsIGFueSBj
-YWxsIHRvIHFjb3cyX2ZyZWVfY2x1c3RlcnMoKSBpbg0KPj4gYmxvY2svcWNvdzItYml0bWFwLmMg
-d2FzIHdpdGggdGhlIGZsYWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMsIGV2ZW4gaW4gdGhlDQo+PiBj
-YXNlcyB3aGVuIHRoZSBjbGVhbmVkIHNwYWNlIGlzIGluc2lnbmlmaWNhbnQsIHBhcnRpY3VsYXJs
-eSwgaW4gY2FzZSBvZg0KPj4gYml0bWFwIGRpcmVjdG9yaWVzLg0KPj4gRGlzY3Vzc2VkIGluIHRo
-ZSBlbWFpbCB0aHJlYWQgd2l0aCB0aGUgbWVzc2FnZSBJRA0KPj4gPDE1NDk5NzQ5NTEtNzMxMjg1
-LTEtZ2l0LXNlbmQtZW1haWwtYW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4+DQo+
-PiAgIGJsb2NrL3Fjb3cyLWJpdG1hcC5jIHwgMiArLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMSBp
-bnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNv
-dzItYml0bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KPj4gaW5kZXggM2VlNTI0ZC4uMTYy
-NzQ0ZSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jDQo+PiArKysgYi9ibG9j
-ay9xY293Mi1iaXRtYXAuYw0KPj4gQEAgLTIwMiw3ICsyMDIsNyBAQCBzdGF0aWMgdm9pZCBjbGVh
-cl9iaXRtYXBfdGFibGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90ICpiaXRtYXBfdGFi
-bGUsDQo+PiAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gICAgICAgICAgIH0NCj4+ICAgDQo+
-PiAtICAgICAgICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBhZGRyLCBzLT5jbHVzdGVyX3NpemUs
-IFFDT1cyX0RJU0NBUkRfT1RIRVIpOw0KPj4gKyAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhi
-cywgYWRkciwgcy0+Y2x1c3Rlcl9zaXplLCBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7DQo+PiAgICAg
-ICAgICAgYml0bWFwX3RhYmxlW2ldID0gMDsNCj4+ICAgICAgIH0NCj4+ICAgfQ0KPj4NCj4gTG9v
-a3MgbGlrZSA0LjEgbWF0ZXJpYWwgbm93LiBLZXZpbiBtYXkgaGF2ZSBiZWVuIGV4cGVjdGluZyBt
-ZSB0byBlbmdhZ2UNCj4gd2l0aCB0aGlzLCBldmVuIHRob3VnaCBJIGRvIG5vdCBtYWludGFpbiB0
-aGUgcWNvdzItYml0bWFwLmMgZmlsZS4gKEFuZA0KPiBJJ20gdmVyeSBiZWhpbmQgb24gcmVhZGlu
-ZyBtYWlsIHRoYXQgd2FzIG5vdCBkaXJlY3RseSBhZGRyZXNzZWQgdG8gbWUsDQo+IHNvcnJ5Li4u
-ISkNCj4gDQo+IFBsZWFzZSByZXNlbmQgd2hlbiB0aGUgNC4xIHdpbmRvdyBvcGVucyBhbmQgd2Un
-bGwgYWRkcmVzcyB0aGlzIHRoZW4uDQo+IA0KPiAtLWpzDQo+IA0KDQo=
+Am 08.04.2019 um 11:44 hat Andrey Shinkevich geschrieben:
+> 
+> 
+> On 06/04/2019 01:50, John Snow wrote:
+> > 
+> > 
+> > On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
+> >> On a file system used by the customer, fallocate() returns an error
+> >> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
+> >> fails. We can handle that case the same way as it is done for the
+> >> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
+> >> zeroes to an image for the unaligned chunk of the block.
+> >>
+> >> Suggested-by: Denis V. Lunev <den@openvz.org>
+> >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> >> ---
+> >>   block/io.c | 2 +-
+> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/block/io.c b/block/io.c
+> >> index dfc153b..0412a51 100644
+> >> --- a/block/io.c
+> >> +++ b/block/io.c
+> >> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+> >>               assert(!bs->supported_zero_flags);
+> >>           }
+> >>   
+> >> -        if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
+> >> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
+> >>               /* Fall back to bounce buffer if write zeroes is unsupported */
+> >>               BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
+> >>   
+> >>
+> > 
+> > I suppose that if fallocate fails for any reason and we're allowing
+> > fallback, we're either going to succeed ... or fail again very soon
+> > thereafter.
+> > 
+> > Are there any cases where it is vital to not ignore the first fallocate
+> > failure? I'm a little wary of ignoring the return code from
+> > bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
+> > failure here that the following bounce writes will also fail "safely."
+> > 
+> > I'm not completely confident, but I have no tangible objections:
+> > Reviewed-by: John Snow <jsnow@redhat.com>
+> > 
+> 
+> Thank you for your review, John!
+> 
+> Let me clarify the circumstances and quote the bug report:
+> "Customer had Win-2012 VM with 50GB system disk which was later resized 
+> to 256GB without resizing the partition inside VM.
+> Now, while trying to resize to 50G, the following error will appear
+> 'Failed to reduce the number of L2 tables: Invalid argument'
+> It was found that it is possible to shrink the disk to 128G and any size 
+> above that number, but size below 128G will bring the mentioned error."
+> 
+> The fallocate() returns no error on that file system if the offset and
+> the (offset + bytes) parameters of the bdrv_co_do_pwrite_zeroes() both
+> are aligned to 4K.
+
+What is the return value you get from this file system?
+
+Maybe turning that into ENOTSUP in file-posix would be less invasive.
+Just falling back for any error gives me the vague feeling that it could
+cause problems sooner or later.
+
+Kevin
 
