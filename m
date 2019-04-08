@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45958)
+Received: from eggs.gnu.org ([209.51.188.92]:47375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDUbD-0004rL-Ir
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDUgn-0006aP-6t
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDUbC-0003uF-9H
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:36897)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hDUbB-0003rj-TF
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:46:10 -0400
-References: <20190408133854.25737-1-ghorges@xiyoulinux.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3bbe2125-8542-cdc9-621c-830a0f3c0e8a@vivier.eu>
-Date: Mon, 8 Apr 2019 15:45:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190408133854.25737-1-ghorges@xiyoulinux.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDUgl-0007kQ-US
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:51:57 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Apr 2019 13:51:46 +0000
+Message-ID: <7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
+References: <20190403030526.12258-1-eblake@redhat.com>
+	<20190403030526.12258-5-eblake@redhat.com>
+In-Reply-To: <20190403030526.12258-5-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Wshadow in
- qemu/linux-user/syscall.c:Changed some variable names
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A1D0882FADB5A74194D6064C3DEEF36E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 4/7] iotests: Update 241 to expose backing
+ layer fragmentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,198 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ghorges <ghorges@xiyoulinux.org>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, ghorges <1298394633@qq.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi,
-
-Le 08/04/2019 à 15:38, ghorges a écrit :
-> From: ghorges <1298394633@qq.com>
-
-Very weird. Perhaps you can update the author with "git commit --amend
---author='ghorges <ghorges@xiyoulinux.org>'" to have the same email address?
-
-> Signed-off-by: ghorges <ghorges@xiyoulinux.org>
-
-we need a description here with at least the problem you are trying to
-fix (the error message from the compiler, for instance).
-
-Thanks,
-Laurent
-
-> ---
->  linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
->  1 file changed, 33 insertions(+), 33 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 208fd1813d..985095e4d5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->                  size_t size;
->              } sig, *sig_ptr;
->  
-> -            abi_ulong arg_sigset, arg_sigsize, *arg7;
-> +            abi_ulong arg_sigset, arg_sigsize, *arg7s;
->              target_sigset_t *target_sigset;
->  
->              n = arg1;
-> @@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->                  sig_ptr = &sig;
->                  sig.size = SIGSET_T_SIZE;
->  
-> -                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
-> -                if (!arg7) {
-> +                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
-> +                if (!arg7s) {
->                      return -TARGET_EFAULT;
->                  }
-> -                arg_sigset = tswapal(arg7[0]);
-> -                arg_sigsize = tswapal(arg7[1]);
-> -                unlock_user(arg7, arg6, 0);
-> +                arg_sigset = tswapal(arg7s[0]);
-> +                arg_sigsize = tswapal(arg7s[1]);
-> +                unlock_user(arg7s, arg6, 0);
->  
->                  if (arg_sigset) {
->                      sig.set = &set;
-> @@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->      case TARGET_NR_getcpu:
->          {
-> -            unsigned cpu, node;
-> -            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-> +            unsigned cpus, node;
-> +            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
->                                         arg2 ? &node : NULL,
->                                         NULL));
->              if (is_error(ret)) {
->                  return ret;
->              }
-> -            if (arg1 && put_user_u32(cpu, arg1)) {
-> +            if (arg1 && put_user_u32(cpus, arg1)) {
->                  return -TARGET_EFAULT;
->              }
->              if (arg2 && put_user_u32(node, arg2)) {
-> @@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_listxattr:
->      case TARGET_NR_llistxattr:
->      {
-> -        void *p, *b = 0;
-> +        void *q, *b = 0;
->          if (arg2) {
->              b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
->              if (!b) {
->                  return -TARGET_EFAULT;
->              }
->          }
-> -        p = lock_user_string(arg1);
-> -        if (p) {
-> +        q = lock_user_string(arg1);
-> +        if (q) {
->              if (num == TARGET_NR_listxattr) {
-> -                ret = get_errno(listxattr(p, b, arg3));
-> +                ret = get_errno(listxattr(q, b, arg3));
->              } else {
-> -                ret = get_errno(llistxattr(p, b, arg3));
-> +                ret = get_errno(llistxattr(q, b, arg3));
->              }
->          } else {
->              ret = -TARGET_EFAULT;
->          }
-> -        unlock_user(p, arg1, 0);
-> +        unlock_user(q, arg1, 0);
->          unlock_user(b, arg2, arg3);
->          return ret;
->      }
-> @@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_setxattr:
->      case TARGET_NR_lsetxattr:
->          {
-> -            void *p, *n, *v = 0;
-> +            void *q, *n, *v = 0;
->              if (arg3) {
->                  v = lock_user(VERIFY_READ, arg3, arg4, 1);
->                  if (!v) {
->                      return -TARGET_EFAULT;
->                  }
->              }
-> -            p = lock_user_string(arg1);
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_setxattr) {
-> -                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
-> +                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
->                  } else {
-> -                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
-> +                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->              unlock_user(v, arg3, 0);
->          }
-> @@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_getxattr:
->      case TARGET_NR_lgetxattr:
->          {
-> -            void *p, *n, *v = 0;
-> +            void *q, *n, *v = 0;
->              if (arg3) {
->                  v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
->                  if (!v) {
->                      return -TARGET_EFAULT;
->                  }
->              }
-> -            p = lock_user_string(arg1);
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_getxattr) {
-> -                    ret = get_errno(getxattr(p, n, v, arg4));
-> +                    ret = get_errno(getxattr(q, n, v, arg4));
->                  } else {
-> -                    ret = get_errno(lgetxattr(p, n, v, arg4));
-> +                    ret = get_errno(lgetxattr(q, n, v, arg4));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->              unlock_user(v, arg3, arg4);
->          }
-> @@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_removexattr:
->      case TARGET_NR_lremovexattr:
->          {
-> -            void *p, *n;
-> -            p = lock_user_string(arg1);
-> +            void *q, *n;
-> +            q = lock_user_string(arg1);
->              n = lock_user_string(arg2);
-> -            if (p && n) {
-> +            if (q && n) {
->                  if (num == TARGET_NR_removexattr) {
-> -                    ret = get_errno(removexattr(p, n));
-> +                    ret = get_errno(removexattr(q, n));
->                  } else {
-> -                    ret = get_errno(lremovexattr(p, n));
-> +                    ret = get_errno(lremovexattr(q, n));
->                  }
->              } else {
->                  ret = -TARGET_EFAULT;
->              }
-> -            unlock_user(p, arg1, 0);
-> +            unlock_user(q, arg1, 0);
->              unlock_user(n, arg2, 0);
->          }
->          return ret;
-> 
+MDMuMDQuMjAxOSA2OjA1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBQcmV2aW91cyBjb21taXRzIGhh
+dmUgbWVudGlvbmVkIHRoYXQgb3VyIE5CRCBzZXJ2ZXIgc3RpbGwgc2VuZHMNCj4gdW5hbGlnbmVk
+IGZyYWdtZW50cyB3aGVuIGFuIGFjdGl2ZSBsYXllciB3aXRoIGxhcmdlIGFkdmVydGlzZWQgbWlu
+aW11bQ0KPiBibG9jayBzaXplIGlzIGJhY2tlZCBieSBhbm90aGVyIGxheWVyIHdpdGggYSBzbWFs
+bGVyIGJsb2NrDQo+IHNpemUuIEV4cGFuZCB0aGUgdGVzdCB0byBhY3R1YWxseSBjb3ZlciB0aGlz
+IHNjZW5hcmlvLCBieSB1c2luZyBxY293Mg0KPiBlbmNyeXB0aW9uICh3aGljaCBmb3JjZXMgNTEy
+LWJ5dGUgYWxpZ25tZW50KSB3aXRoIGFuIHVuYWxpZ25lZCByYXcNCj4gYmFja2luZyBmaWxlLg0K
+PiANCj4gVGhlIHRlc3QgcGFzc2VzLCBidXQgb25seSBiZWNhdXNlIHRoZSBjbGllbnQgc2lkZSB3
+b3JrcyBhcm91bmQgdGhlDQo+IHNlcnZlcidzIG5vbi1jb21wbGlhbmNlOyBpZiB5b3UgcmVwZWF0
+IHRoZSB0ZXN0IG1hbnVhbGx5IHdpdGggdHJhY2luZw0KPiB0dXJuZWQgb24sIHlvdSB3aWxsIHNl
+ZSB0aGUgc2VydmVyIHNlbmRpbmcgYSBzdGF0dXMgZm9yIDEwMDAgYnl0ZXMNCj4gZGF0YSB0aGVu
+IDEwNDggYnl0ZXMgaG9sZSwgd2hpY2ggaXMgbm90IGFsaWduZWQuIEJ1dCByZXZlcnRpbmcgY29t
+bWl0DQo+IDczN2QzZjUyNDQgc2hvd3MgdGhhdCBpdCBpcyBpbmRlZWQgdGhlIGNsaWVudCB3b3Jr
+aW5nIGFyb3VuZCB0aGUgYnVnDQo+IGluIHRoZSBzZXJ2ZXIuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5
+OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCg0KT29wcywgMjQxIGZhaWxzIGZvciBt
+ZToNCg0KLVdBUk5JTkc6IEltYWdlIGZvcm1hdCB3YXMgbm90IHNwZWNpZmllZCBmb3IgJy9ob21l
+L2VibGFrZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy9zY3JhdGNoL3QucmF3JyBhbmQgcHJvYmlu
+ZyBndWVzc2VkIHJhdy4NCitXQVJOSU5HOiBJbWFnZSBmb3JtYXQgd2FzIG5vdCBzcGVjaWZpZWQg
+Zm9yICcvd29yay9zcmMvcWVtdS9lcmljL3Rlc3RzL3FlbXUtaW90ZXN0cy9zY3JhdGNoL3QucmF3
+JyBhbmQgcHJvYmluZyBndWVzc2VkIHJhdy4NCg0KV2UgZm9yZ2V0IHRvIGZpbHRlciBvdXRwdXQg
+OigNCg0KVGVzdGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MSAgICAg
+fCAyMCArKysrKysrKysrKysrKysrKysrLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNDEub3V0
+IHwgIDkgKysrKysrKysrDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAx
+IGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MSBi
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDENCj4gaW5kZXggNGIxOTY4NTczODcuLmMxZmE2OTgwZGM4
+IDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjQxDQo+ICsrKyBiL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy8yNDENCj4gQEAgLTI4LDYgKzI4LDcgQEAgbmJkX3VuaXhfc29ja2V0PSRURVNU
+X0RJUi90ZXN0X3FlbXVfbmJkX3NvY2tldA0KPiAgIF9jbGVhbnVwKCkNCj4gICB7DQo+ICAgICAg
+IF9jbGVhbnVwX3Rlc3RfaW1nDQo+ICsgICAgcm0gLWYgIiRURVNUX0lNQUdFX0ZJTEUucWNvdzIi
+DQoNCnlvdSBtZWFuIF9JTUdfLCBub3QgX0lNQUdFXy4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWly
+IFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAgICAg
+ICBuYmRfc2VydmVyX3N0b3ANCj4gICB9DQo+ICAgdHJhcCAiX2NsZWFudXA7IGV4aXQgXCRzdGF0
+dXMiIDAgMSAyIDMgMTUNCj4gQEAgLTM3LDcgKzM4LDcgQEAgdHJhcCAiX2NsZWFudXA7IGV4aXQg
+XCRzdGF0dXMiIDAgMSAyIDMgMTUNCj4gICAuIC4vY29tbW9uLmZpbHRlcg0KPiAgIC4gLi9jb21t
+b24ubmJkDQo+IA0KPiAtX3N1cHBvcnRlZF9mbXQgcmF3DQo+ICtfc3VwcG9ydGVkX2ZtdCByYXcg
+IyBhbHRob3VnaCB0aGUgdGVzdCBhbHNvIHJlcXVpcmVzIHVzZSBvZiBxY293Mg0KPiAgIF9zdXBw
+b3J0ZWRfcHJvdG8gbmJkDQo+ICAgX3N1cHBvcnRlZF9vcyBMaW51eA0KPiAgIF9yZXF1aXJlX2Nv
+bW1hbmQgUUVNVV9OQkQNCj4gQEAgLTg4LDYgKzg5LDIzIEBAICRRRU1VX0lNRyBtYXAgLS1vdXRw
+dXQ9anNvbiAiJFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9pbWdfbWFwDQo+ICAgJFFFTVVfSU8g
+LWMgbWFwICIkVEVTVF9JTUciDQo+ICAgbmJkX3NlcnZlcl9zdG9wDQo+IA0KPiArZWNobw0KPiAr
+ZWNobyAiPT09IEVuY3J5cHRlZCBxY293MiBmaWxlIGJhY2tlZCBieSB1bmFsaWduZWQgcmF3IGlt
+YWdlICA9PT0iDQo+ICtlY2hvDQo+ICsNCj4gKyMgRW5hYmxpbmcgZW5jcnlwdGlvbiBpbiBxY293
+MiBmb3JjZXMgNTEyLWFsaWdubWVudA0KPiArU0VDUkVUPXNlY3JldCxpZD1zZWMwLGRhdGE9MTIz
+NDUNCj4gKyRRRU1VX0lNRyBjcmVhdGUgLWYgcWNvdzIgLWIgIiRURVNUX0lNR19GSUxFIiAtRiBy
+YXcgLS1vYmplY3QgIiRTRUNSRVQiIFwNCj4gKyAgLW8gZW5jcnlwdC5mb3JtYXQ9bHVrcyxlbmNy
+eXB0LmtleS1zZWNyZXQ9c2VjMCxlbmNyeXB0Lml0ZXItdGltZT0xMCBcDQo+ICsgICIkVEVTVF9J
+TUdfRklMRS5xY293MiIgMmsgfCBfZmlsdGVyX2ltZ19jcmVhdGUNCj4gK25iZF9zZXJ2ZXJfc3Rh
+cnRfdW5peF9zb2NrZXQgLS1vYmplY3QgIiRTRUNSRVQiIC0taW1hZ2Utb3B0cyBcDQo+ICsgIGRy
+aXZlcj1xY293MixmaWxlLmZpbGVuYW1lPSIkVEVTVF9JTUdfRklMRS5xY293MiIsZW5jcnlwdC5r
+ZXktc2VjcmV0PXNlYzANCj4gKw0KPiArJFFFTVVfTkJEX1BST0cgLS1saXN0IC1rICRuYmRfdW5p
+eF9zb2NrZXQgfCBncmVwICdcKHNpemVcfG1pblwpJw0KPiArJFFFTVVfSU1HIG1hcCAtLW91dHB1
+dD1qc29uICIkVEVTVF9JTUciIHwgX2ZpbHRlcl9xZW11X2ltZ19tYXANCj4gKyRRRU1VX0lPIC1j
+IG1hcCAiJFRFU1RfSU1HIg0KPiArbmJkX3NlcnZlcl9zdG9wDQo+ICsNCj4gICAjIE5vdCB0ZXN0
+ZWQgeWV0OiB3ZSBhbHNvIHdhbnQgdG8gZW5zdXJlIHRoYXQgcWVtdSBhcyBOQkQgY2xpZW50IGRv
+ZXMNCj4gICAjIG5vdCBhY2Nlc3MgYmV5b25kIHRoZSBlbmQgb2YgYSBzZXJ2ZXIncyBhZHZlcnRp
+c2VkIHVuYWxpZ25lZCBzaXplOg0KPiAgICMgIG5iZGtpdCAtVSAtIG1lbW9yeSBzaXplPTUxMyAt
+LXJ1biAncWVtdS1pbyAtZiByYXcgLWMgInIgNTEyIDUxMiIgJG5iZCcNCj4gZGlmZiAtLWdpdCBh
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDEub3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MS5vdXQN
+Cj4gaW5kZXggZjQ4MTA3NGEwMmUuLmVmN2RlMTIwNWQyIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9x
+ZW11LWlvdGVzdHMvMjQxLm91dA0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQxLm91dA0K
+PiBAQCAtMjUsNCArMjUsMTMgQEAgV0FSTklORzogSW1hZ2UgZm9ybWF0IHdhcyBub3Qgc3BlY2lm
+aWVkIGZvciAnL2hvbWUvZWJsYWtlL3FlbXUvdGVzdHMvcWVtdS1pb3Rlc3QNCj4gICBbeyAic3Rh
+cnQiOiAwLCAibGVuZ3RoIjogMTAwMCwgImRlcHRoIjogMCwgInplcm8iOiBmYWxzZSwgImRhdGEi
+OiB0cnVlLCAib2Zmc2V0IjogT0ZGU0VUfSwNCj4gICB7ICJzdGFydCI6IDEwMDAsICJsZW5ndGgi
+OiAyNCwgImRlcHRoIjogMCwgInplcm8iOiB0cnVlLCAiZGF0YSI6IHRydWUsICJvZmZzZXQiOiBP
+RkZTRVR9XQ0KPiAgIDEgS2lCICgweDQwMCkgYnl0ZXMgICAgIGFsbG9jYXRlZCBhdCBvZmZzZXQg
+MCBieXRlcyAoMHgwKQ0KPiArDQo+ICs9PT0gRW5jcnlwdGVkIHFjb3cyIGZpbGUgYmFja2VkIGJ5
+IHVuYWxpZ25lZCByYXcgaW1hZ2UgID09PQ0KPiArDQo+ICtGb3JtYXR0aW5nICdURVNUX0RJUi90
+LklNR0ZNVC5xY293MicsIGZtdD1xY293MiBzaXplPTIwNDggYmFja2luZ19maWxlPVRFU1RfRElS
+L3QuSU1HRk1UIGJhY2tpbmdfZm10PUlNR0ZNVCBlbmNyeXB0LmZvcm1hdD1sdWtzIGVuY3J5cHQu
+a2V5LXNlY3JldD1zZWMwIGVuY3J5cHQuaXRlci10aW1lPTEwDQo+ICsgIHNpemU6ICAyMDQ4DQo+
+ICsgIG1pbiBibG9jazogNTEyDQo+ICtbeyAic3RhcnQiOiAwLCAibGVuZ3RoIjogMTAyNCwgImRl
+cHRoIjogMCwgInplcm8iOiBmYWxzZSwgImRhdGEiOiB0cnVlLCAib2Zmc2V0IjogT0ZGU0VUfSwN
+Cj4gK3sgInN0YXJ0IjogMTAyNCwgImxlbmd0aCI6IDEwMjQsICJkZXB0aCI6IDAsICJ6ZXJvIjog
+dHJ1ZSwgImRhdGEiOiBmYWxzZSwgIm9mZnNldCI6IE9GRlNFVH1dDQo+ICsyIEtpQiAoMHg4MDAp
+IGJ5dGVzICAgICBhbGxvY2F0ZWQgYXQgb2Zmc2V0IDAgYnl0ZXMgKDB4MCkNCj4gICAqKiogZG9u
+ZQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
