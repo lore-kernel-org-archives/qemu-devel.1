@@ -2,52 +2,66 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23503C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCCEC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:33:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0B5D20879
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:29:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B5D20879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 36DBF2147A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:33:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36DBF2147A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55910 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55982 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDX94-0002oB-4e
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:29:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59019)
+	id 1hDXD5-00048p-FP
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:33:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6I-00015g-Pl
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:28 -0400
+	(envelope-from <groug@kaod.org>) id 1hDXBy-0003o1-KA
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6G-0006M6-5T
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:26 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50308)
+	(envelope-from <groug@kaod.org>) id 1hDXBv-0003Vk-JO
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:32:18 -0400
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:39718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hDX6D-0006ES-4J; Mon, 08 Apr 2019 12:26:23 -0400
-Received: from [10.28.8.145] (helo=kvm.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hDX69-0001tt-N0; Mon, 08 Apr 2019 19:26:17 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Mon,  8 Apr 2019 19:26:17 +0300
-Message-Id: <20190408162617.258535-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190408162617.258535-1-vsementsov@virtuozzo.com>
-References: <20190408162617.258535-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2 2/2] block: avoid recursive block_status
- call if possible
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hDXBt-0003Hq-Li
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:32:15 -0400
+Received: from player739.ha.ovh.net (unknown [10.109.143.189])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B4F41124FD7
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 18:32:03 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player739.ha.ovh.net (Postfix) with ESMTPSA id 28BFF4AA8890;
+	Mon,  8 Apr 2019 16:31:57 +0000 (UTC)
+Date: Mon, 8 Apr 2019 18:31:56 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190408183156.1f71c21d@bahia.lan>
+In-Reply-To: <20190408042149.GH16627@umbus.fritz.box>
+References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
+	<20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190328183923.lcd3p6fpy4qvvxoo@maxibm>
+	<20190329132951.451d4ef0@bahia.lan>
+	<20190408042149.GH16627@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/hS/cLmIl4Mdm32v_ElMfPXG";
+	protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 8611726915692829158
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefgddutdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.43.140
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,262 +73,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
-	mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	"Maxiwell S. Garcia" <maxiwell@linux.ibm.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408162617.w_6nku17DQDfhcXUpuKgdlh6DzKAYyHolliap6aiMy4@z>
+Message-ID: <20190408163156.3oJi2KBnLU2e0RIn06gWmCapp6_tdIwsXLv12JZqrOo@z>
 
-drv_co_block_status digs bs->file for additional, more accurate search
-for hole inside region, reported as DATA by bs since 5daa74a6ebc.
+--Sig_/hS/cLmIl4Mdm32v_ElMfPXG
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-knows, where are holes and where is data. But every block_status
-request calls lseek additionally. Assume a big disk, full of
-data, in any iterative copying block job (or img convert) we'll call
-lseek(HOLE) on every iteration, and each of these lseeks will have to
-iterate through all metadata up to the end of file. It's obviously
-ineffective behavior. And for many scenarios we don't need this lseek
-at all.
+On Mon, 8 Apr 2019 14:21:50 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-However, lseek is needed when we have metadata-preallocated image.
+> On Fri, Mar 29, 2019 at 01:29:51PM +0100, Greg Kurz wrote:
+> > On Thu, 28 Mar 2019 15:39:45 -0300
+> > "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
+> >  =20
+> > > Hi,
+> > >=20
+> > > On Thu, Mar 28, 2019 at 02:21:51PM +0100, Greg Kurz wrote: =20
+> > > > On Wed, 27 Mar 2019 17:41:00 -0300
+> > > > "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
+> > > >    =20
+> > > > > Here are two patches to add a handler for ibm,get-vpd RTAS calls.
+> > > > > This RTAS exposes host information in case of set QEMU options
+> > > > > 'host-serial' and 'host-model' as 'passthrough'.
+> > > > >=20
+> > > > > The patch 1 creates helper functions to get valid 'host-serial'
+> > > > > and 'host-model' parameters, guided by QEMU command line. These
+> > > > > parameters are useful to build the guest device tree and to return
+> > > > > get-vpd RTAS calls. The patch 2 adds the ibm,get-vpd itself.
+> > > > >=20
+> > > > > Update v7:
+> > > > > * rtas_get_vpd_fields as a static array in spapr machine state
+> > > > >=20
+> > > > > Maxiwell S. Garcia (2):
+> > > > >   spapr: helper functions to get valid host fields
+> > > > >   spapr-rtas: add ibm,get-vpd RTAS interface
+> > > > >=20
+> > > > >  hw/ppc/spapr.c         | 48 +++++++++++----------
+> > > > >  hw/ppc/spapr_rtas.c    | 96 ++++++++++++++++++++++++++++++++++++=
+++++++
+> > > > >  include/hw/ppc/spapr.h | 14 +++++-
+> > > > >  3 files changed, 135 insertions(+), 23 deletions(-)
+> > > > >    =20
+> > > >=20
+> > > > Hi Maxiwell,
+> > > >=20
+> > > > David sent a patch to rework how the host data is exposed to the gu=
+est.
+> > > > Especially, the special casing of the "none" and "passthrough" stri=
+ngs
+> > > > is no more... I'm afraid you'll have to rework your patches accordi=
+ngly:
+> > > > code+changelog in patch 1 and at least changelog in patch 2.
+> > > >=20
+> > > > Cheers,   =20
+> > >=20
+> > > IIUC, the 'ibm,get-vpd' RTAS should return information about the
+> > > platform/cabinet. Thus, it's not necessary to add new nodes in the gu=
+est
+> > > device tree to export information like that. =20
+> >=20
+> > I agree that these "host-model" and "host-serial" props, which aren't
+> > described anywhere and not used by either the linux kernel or the
+> > powerpc-utils, look like a QEMU-specific poor man's version of VPD.
+> >=20
+> > Not quite sure why they were even created since this is the purpose
+> > of "system-id" and "model" as explained in PAPR, and supposedly
+> > exposed in /proc/ppc64/lparcfg according to the LPARCFG(5) manual
+> > page: =20
+>=20
+> Yeah, I'm not sure why they were created either.  I rather suspect
+> nothing much is using them, and I'd kind of like to just kill them.
+> But Daniel Berrange (and maybe others) are paranoid about this
+> breaking things.
+>=20
 
-So, let's detect metadata-preallocation case and don't dig qcow2's
-protocol file in other cases.
+Speaking of that. The "host-model"/"host-serial" fix is associated to a
+CVE which affects QEMU versions currently shipped by downstream vendors.
+Isn't a good enough reason to break things in existing unsecure setups ?
+Should we add this patch to Mike's patch round-up for stable 3.0.1 (and
+therefore break something that used to _work_ with 3.0.0) ?
 
-The idea is to compare allocation size in POV of filesystem with
-allocations size in POV of Qcow2 (by refcounts). If allocation in fs is
-significantly lower, consider it as metadata-preallocation case.
+> >=20
+> >        serial_number
+> >        The serial number of the physical system in which the partition =
+resides
+> >=20
+> >        system_type
+> >        The  machine,type-model  of  the physical system in which the pa=
+rtition
+> >        resides
+> >=20
+> > This is indeed what we get in a PowerVM LPAR running on a tuleta system:
+> >=20
+> > [root@furax1 ~]# head -3 /proc/ppc64/lparcfg=20
+> > lparcfg 1.9
+> > serial_number=3DIBM,032116A9A
+> > system_type=3DIBM,8247-22L
+> >=20
+> > [root@furax1 ~]# echo $(cat /proc/device-tree/system-id)
+> > IBM,032116A9A
+> > [root@furax1 ~]# echo $(cat /proc/device-tree/model)
+> > IBM,8247-22L
+> >=20
+> > But QEMU generates a hard coded "IBM pSeries (emulated by qemu)" model,
+> > which is clearly not PAPR compliant according to this requirement:
+> >=20
+> > 	R1=E2=80=9312.2=E2=80=9313. There must be a property, =E2=80=9Cmodel=
+=E2=80=9D, under the root node
+> > 	in the format, =E2=80=9C<vendor>,xxxx-yyy=E2=80=9D, where <vendor> is =
+replaced by
+> > 	one to five letters representing the stock symbol of the company
+> > 	(for example, for IBM: =E2=80=9CIBM,xxxx-yyy=E2=80=9D), and where xxxx=
+-yyy is
+> > 	derived from the VPD TM field (see Table 160=E2=80=9A =E2=80=9CLoPAPR =
+VPD Fields=E2=80=9A=E2=80=9D
+> > 	on page 343) of the first or =E2=80=98marked=E2=80=99 processor enclos=
+ure.
+> >=20
+> > And worse, it mixes "vm,uuid" which is QEMU specific concept to uniquely
+> > identify guests, with "system-id" which is about the host :-\ =20
+>=20
+> Ugh, right.  So, it's been this way for years, so it's clearly not
+> breaking things in practice.  Given that, it might be best to leave
+> it, even though it violates PAPR technically.
+>=20
+> Frankly, providing information about the *guest* virtual model and
+> "serial number" =3D~=3D UUID makes more sense than providing information
+> about the host that might be security sensitive.
+>=20
 
-102 iotest changed, as our detector can't detect shrinked file as
-metadata-preallocation, which don't seem to be wrong, as with metadata
-preallocation we always have valid file length.
+IIUC, the rationale of exposing to the guest something that uniquely
+identifies the host is needed by some inventory or license validation
+softwares [1]. So I'd say we need both a guest UUID, that doesn't change
+during the VM lifetime, and host UUID that changes when migrating to
+another host.
 
-Other two iotests tiny changed QMP output sequence, which should be
-exactly because skipped lseek at mirror beginning.
+The fact that "system-id" =3D=3D "vm,uuid" in the current code didn't
+break anything would rather indicate that there are no inventory
+or license validation softwares users yet in the KVM+PAPR+linux
+ecosystem...
 
-Suggested-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2.h              |  4 ++++
- include/block/block.h      |  8 +++++++-
- block/io.c                 |  9 ++++++++-
- block/qcow2-refcount.c     | 32 ++++++++++++++++++++++++++++++++
- block/qcow2.c              | 11 +++++++++++
- tests/qemu-iotests/102     |  2 +-
- tests/qemu-iotests/102.out |  3 ++-
- tests/qemu-iotests/141.out |  2 +-
- tests/qemu-iotests/144.out |  2 +-
- 9 files changed, 67 insertions(+), 6 deletions(-)
+[1] https://bugs.launchpad.net/nova/+bug/1337349/comments/6
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fdee297f33..b6135d8271 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -350,6 +350,9 @@ typedef struct BDRVQcow2State {
-     int nb_compress_threads;
- 
-     BdrvChild *data_file;
-+
-+    bool metadata_preallocation_checked;
-+    bool metadata_preallocation;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-@@ -643,6 +646,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 void *cb_opaque, Error **errp);
- int qcow2_shrink_reftable(BlockDriverState *bs);
- int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
-+int qcow2_detect_metadata_preallocation(BlockDriverState *bs);
- 
- /* qcow2-cluster.c functions */
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-diff --git a/include/block/block.h b/include/block/block.h
-index c7a26199aa..1f2f08e4ee 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -156,10 +156,15 @@ typedef struct HDGeometry {
-  * BDRV_BLOCK_EOF: the returned pnum covers through end of file for this
-  *                 layer, set by block layer
-  *
-- * Internal flag:
-+ * Internal flags:
-  * BDRV_BLOCK_RAW: for use by passthrough drivers, such as raw, to request
-  *                 that the block layer recompute the answer from the returned
-  *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
-+ * BDRV_BLOCK_RECURSE: request that the block layer will recursively search for
-+ *                     zeroes in file child of current block node inside
-+ *                     returned region. Only valid together with both
-+ *                     BDRV_BLOCK_DATA and BDRV_BLOCK_OFFSET_VALID. Should not
-+ *                     appear with BDRV_BLOCK_ZERO.
-  *
-  * If BDRV_BLOCK_OFFSET_VALID is set, the map parameter represents the
-  * host offset within the returned BDS that is allocated for the
-@@ -184,6 +189,7 @@ typedef struct HDGeometry {
- #define BDRV_BLOCK_RAW          0x08
- #define BDRV_BLOCK_ALLOCATED    0x10
- #define BDRV_BLOCK_EOF          0x20
-+#define BDRV_BLOCK_RECURSE      0x40
- #define BDRV_BLOCK_OFFSET_MASK  BDRV_SECTOR_MASK
- 
- typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopenQueue;
-diff --git a/block/io.c b/block/io.c
-index dfc153b8d8..8595d4b504 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2121,6 +2121,12 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-      */
-     assert(*pnum && QEMU_IS_ALIGNED(*pnum, align) &&
-            align > offset - aligned_offset);
-+    if (ret & BDRV_BLOCK_RECURSE) {
-+        assert(ret & BDRV_BLOCK_DATA);
-+        assert(ret & BDRV_BLOCK_OFFSET_VALID);
-+        assert(!(ret & BDRV_BLOCK_ZERO));
-+    }
-+
-     *pnum -= offset - aligned_offset;
-     if (*pnum > bytes) {
-         *pnum = bytes;
-@@ -2151,7 +2157,8 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         }
-     }
- 
--    if (want_zero && local_file && local_file != bs &&
-+    if (want_zero && ret & BDRV_BLOCK_RECURSE &&
-+        local_file && local_file != bs &&
-         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
-         (ret & BDRV_BLOCK_OFFSET_VALID)) {
-         int64_t file_pnum;
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index e0fe322500..5786ba93e0 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -3422,3 +3422,35 @@ int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
-                             "There are no references in the refcount table.");
-     return -EIO;
- }
-+
-+int qcow2_detect_metadata_preallocation(BlockDriverState *bs)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int64_t i, end_cluster, cluster_count = 0, threshold;
-+    int64_t file_length, real_allocation, real_clusters;
-+
-+    file_length = bdrv_getlength(bs->file->bs);
-+    if (file_length < 0) {
-+        return file_length;
-+    }
-+
-+    real_allocation = bdrv_get_allocated_file_size(bs->file->bs);
-+    if (real_allocation < 0) {
-+        return real_allocation;
-+    }
-+
-+    real_clusters = real_allocation / s->cluster_size;
-+    threshold = MAX(real_clusters * 10 / 9, real_clusters + 2);
-+
-+    end_cluster = size_to_clusters(s, file_length);
-+    for (i = 0; i < end_cluster && cluster_count < threshold; i++) {
-+        uint64_t refcount;
-+        int ret = qcow2_get_refcount(bs, i, &refcount);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        cluster_count += !!refcount;
-+    }
-+
-+    return cluster_count >= threshold;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index d507ee0686..e89e1c4fb1 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1900,6 +1900,12 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
-     unsigned int bytes;
-     int status = 0;
- 
-+    if (!s->metadata_preallocation_checked) {
-+        ret = qcow2_detect_metadata_preallocation(bs);
-+        s->metadata_preallocation = (ret == 1);
-+        s->metadata_preallocation_checked = true;
-+    }
-+
-     bytes = MIN(INT_MAX, count);
-     qemu_co_mutex_lock(&s->lock);
-     ret = qcow2_get_cluster_offset(bs, offset, &bytes, &cluster_offset);
-@@ -1922,6 +1928,11 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
-     } else if (ret != QCOW2_CLUSTER_UNALLOCATED) {
-         status |= BDRV_BLOCK_DATA;
-     }
-+    if (s->metadata_preallocation && (status & BDRV_BLOCK_DATA) &&
-+        (status & BDRV_BLOCK_OFFSET_VALID))
-+    {
-+        status |= BDRV_BLOCK_RECURSE;
-+    }
-     return status;
- }
- 
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index cedd2b25dc..125402db2b 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -56,7 +56,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
- $QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
- 
- $QEMU_IO -c map "$TEST_IMG"
--$QEMU_IMG map "$TEST_IMG"
-+$QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
- 
- echo
- echo '=== Testing map on an image file truncated outside of qemu ==='
-diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
-index 4401b08fee..cd2fdc7f96 100644
---- a/tests/qemu-iotests/102.out
-+++ b/tests/qemu-iotests/102.out
-@@ -7,7 +7,8 @@ wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image resized.
- 64 KiB (0x10000) bytes     allocated at offset 0 bytes (0x0)
--Offset          Length          Mapped to       File
-+Offset          Length          File
-+0               0x10000         TEST_DIR/t.IMGFMT
- 
- === Testing map on an image file truncated outside of qemu ===
- 
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index 41c7291258..4d71d9dcae 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -42,9 +42,9 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
-+{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
--{"return": {}}
- {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block device is in use by block job: commit"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
-diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
-index 55299201e4..a9a8216bea 100644
---- a/tests/qemu-iotests/144.out
-+++ b/tests/qemu-iotests/144.out
-@@ -14,10 +14,10 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/
- 
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "virtio0"}}
-+{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "virtio0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
- {"return": {}}
--{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "virtio0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
--- 
-2.18.0
+> > All of this is very confusing and need to be sorted out before building
+> > anything on top of it. Especially since "model" and "system-id" are
+> > supposed to derive from VPD IIUC.
+> >=20
+> > I guess that we should first decide what we really want to expose
+> > in "system-id" and "model": what we have now ? the same as in
+> > "host-serial" and "host-model", ie. user configurable ? Must we
+> > stay compatible with existing setups ? In any case, I'm afraid that
+> > we have to diverge from PAPR somehow, since it obviously doesn't
+> > care about the security concerns that motivated recent changes
+> > for "host-serial" and "host-model"... =20
+>=20
+> We absolutely should not expose the real host information without the
+> user explicitly requesting it.
+>=20
 
+I agree, but it seems that we may need something in between: an ID that
+uniquely identifies a given system but that doesn't reveal security
+sensitive information.
+
+Looking again at PAPR, nothing much is said on the format of "system-id"
+or VPD SN. Only "model" is expected to follow some formatting rules:
+<vendor>,xxxx-yyy.
+
+For "system-id", this could be addressed pretty much like in OpenStack
+with systemd's /etc/machine-id. For "model", I'm not sure...
+
+> > > Since it's a POWER specific
+> > > functionality, may 'ibm,get-vpd' export host information if the
+> > > guest instance allows it? Or is it better return only the 'host-seria=
+l'
+> > > and 'host-model' content, like in the patch "spapr: Simplify handling
+> > > of host-serial and host-model values"?
+> > >  =20
+> >=20
+> > I've spent some time reading PAPR on this topic and I'm not sure that
+> > "ibm,get-vpd" is the way to go for what you were trying to achieve
+> > initially (ie, obtain up-to-date host model and serial after migration).
+> >=20
+> > Have you looked at RTAS "ibm,update-properties" ?
+> >=20
+> > 	7.4.8 ibm,update-properties RTAS Call
+> >=20
+> > 	This RTAS call is used to report updates to the properties changed
+> > 	due to a massive platform reconfiguration such as when the partition
+> > 	is migrated between machines. =20
+>=20
+> Yeah.. the thing here is that partition migration kind of means
+> something different in PAPR than it does in the qemu world.  It uses a
+> guest-aware model of migration (which frankly I think is broken
+> verging on unworkable).  qemu and uses a guest-(mostly)-unaware
+> migration model.
+>=20
+
+Yeah...
+
+> > This explicitly covers updates to "system-id" and "model". Maybe it is
+> > time to do as Ben was suggesting a long time ago when "host-serial"
+> > and "host-model" were introduced [1]:
+> >=20
+> > 	On Tue, 2014-07-08 at 12:49 +0200, Alexander Graf wrote: =20
+> > 	> Please be aware that all of the above is bogus when you start
+> > 	> thinking=20
+> > 	> about live migration. =20
+> >=20
+> > 	What's probably where we need to start thinking about implementing
+> > 	migration according to PAPR :-)
+> >=20
+> > 	IE. With pre and post-migration notifications to the guest including
+> > 	device-tree updates.
+> >=20
+> >=20
+> > [1] https://patchwork.ozlabs.org/patch/367792/#813547
+> >  =20
+>=20
+
+
+--Sig_/hS/cLmIl4Mdm32v_ElMfPXG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlyrd3wACgkQcdTV5YIv
+c9ZeMg//TfWJ2alO1xg0YOrCnTzWYdsoBIksRlQGO2Ijaaxf+EYYsRvU2/tSq8/F
+iEb8TVMDpaVroTWwfkurg2Y+n3Ht/DTQVpDd/c6b+1LewGd5pFoTJx5I9B3xqWW7
+8bJDHPRMUJN1opshB0cj5tq+M+h7d1Y13W1cSe3+aF6FFVCCoz2lrw0AB+mAOsWp
+EzY6sxFKZMpzGSLJuVUVjBCz1Y+1d+J5zMMs+N2D6DnTPbYlxBVWtIxgUYNUmDCq
+UmXBw9I4qqLtYroVS6p2gNxr7jVWShDkEnJ89vzL4yLTiAXCgHzHQatU/463yIsc
+ll9p9DJfLKyF5f5EQAMslCWFBRKyPtul/sbU+kQlktxEn2uF2y13937+AKZ2uSj6
+enoMJBQyzpskuD3CU0i5nTMsnN7+UB1ZqvEA8gid/1V3IJ3iD7kju+C0fZaI5qDT
+ztt+mZejqfBKvqB8+R4eL5JPDNXVTTnXOHSea7YNm8FuyDsQ/07DyjIxiOA7NI/x
+6pz6TTfqrWRrxV4nAxLIaRTOgBWoj576CVIzM5XF8FD7mjdZHMzVmf1toCHI7L6/
+oIaBnk0JxJJVkrNqrBTquwABvAIx+MyqAbsg2iZxAJrLf6dvxV6H2mQ2ymlqdwQU
+/DpovmHn8Ne0wiRXp6IRDIF4xTpMcDp9XO6wH291OWi74GrcRzw=
+=EExp
+-----END PGP SIGNATURE-----
+
+--Sig_/hS/cLmIl4Mdm32v_ElMfPXG--
 
