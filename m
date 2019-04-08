@@ -1,82 +1,96 @@
-Return-Path: <SRS0=0TSG=SJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 185A8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 19:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 639E0C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 00:33:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEA9E20879
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Apr 2019 19:18:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2DpoRNj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEA9E20879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1BF0F20857
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 00:33:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF0F20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42634 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45285 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDDJH-0000ef-WE
-	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 15:18:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53272)
+	id 1hDIDt-00035I-0M
+	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 20:33:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sohailalvi2236@gmail.com>) id 1hDDIT-0000MO-4O
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:42 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1hDID4-0002mQ-80
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 20:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sohailalvi2236@gmail.com>) id 1hDDIR-0005p6-7V
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:41 -0400
-Received: from mail-pl1-x62e.google.com ([2607:f8b0:4864:20::62e]:42626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sohailalvi2236@gmail.com>)
-	id 1hDDIP-0005nm-Bu
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 15:17:37 -0400
-Received: by mail-pl1-x62e.google.com with SMTP id cv12so6010479plb.9
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 12:17:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id;
-	bh=xk0IR4py3Q73CS9m2OZw579cOOI17N0uvwH7IOVEyo4=;
-	b=N2DpoRNjvZYRAdizs1Fe61XVqGVW5KNV+0Vv4qRhQyP1o+UtnuF71jBHfglAFHMAgB
-	AFilWjO2OngrjLzLGNjhucN6rOYfALDflG96+xQtT7CtPNsms3WQKt2xS77md1Yc82Gr
-	/NoQOu64BQGe2Er/KZWC+3fCL2+lR2Hqr6zLUUs4FATu+hc8wbd1hoDWSvQMbyY478xC
-	GotC3+YgxBJ0GBH5GIGR78K40hnBfhWtLJLIJ01X5spt9f1myULKF7CK8v8NdTVegG+W
-	NaEo07yu2b85Qr38uPsmBcXWz9r/MEMGX4my8IAUCsfHoq3+kPErAovLP9O55jlqUSlF
-	hTew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=xk0IR4py3Q73CS9m2OZw579cOOI17N0uvwH7IOVEyo4=;
-	b=X6I3tV8r26Ww9GJ4tykNz5mMdHYQisM+Pw4Xk0Y0qoumuJ/ZoQ5AGJsC9wV242kBNY
-	wREaXK7H5i1nEm/+mUP3N/FPJsJ0MTWV7BMMKIsW6xF7ieny9HLyZBRHzeHdC3yK3Opi
-	qzHOsgedSd3r4TfoElvaonqFCtdfnKkICqtOdCh6G+Ulh3XvHfeXvGojsQAiXO9Tspz2
-	YbAthnlUuCTOQmMfsHFqNPjaNIZShSQiXWT1VeHBgi+/7LJPGT3upGrbVB6rU2CZ2Jh6
-	K6CSCRPV1yq/a3KZIf/uYf77G9d28Ppj7uYNYgcOSpe6XGEIxT88Ipbff0/xJGGwCmei
-	6kYw==
-X-Gm-Message-State: APjAAAVG6AcJ/F7FisBbwop4DK26shIk/40N/PcIQjjysOpLd4mZNugL
-	fbSlP7qIcf7Jx2x1Jf17Yp/FPt6eAM2NiQ==
-X-Google-Smtp-Source: APXvYqwJQkw6yHrvivw/oJ7wQOnJCiAQOeFWZDSrnCdqugJhbbeJd3t5uh1rz8T77LnUiMzWq92X/Q==
-X-Received: by 2002:a17:902:7043:: with SMTP id
-	h3mr26377107plt.228.1554664654658; 
-	Sun, 07 Apr 2019 12:17:34 -0700 (PDT)
-Received: from localhost.localdomain ([42.111.128.225])
-	by smtp.gmail.com with ESMTPSA id
-	m16sm66914461pfi.29.2019.04.07.12.17.32
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 07 Apr 2019 12:17:34 -0700 (PDT)
-From: sohailalvi2236@gmail.com
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 00:47:28 +0530
-Message-Id: <20190407191728.8552-1-sohailalvi2236@gmail.com>
-X-Mailer: git-send-email 2.17.1
+	(envelope-from <kevin.tian@intel.com>) id 1hDID2-00084E-OT
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 20:32:26 -0400
+Received: from mga02.intel.com ([134.134.136.20]:35204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1hDID2-0007pU-B1
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 20:32:24 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	07 Apr 2019 17:32:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,323,1549958400"; d="scan'208";a="221406587"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+	by orsmga001.jf.intel.com with ESMTP; 07 Apr 2019 17:32:15 -0700
+Received: from fmsmsx156.amr.corp.intel.com (10.18.116.74) by
+	fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server
+	(TLS) id 14.3.408.0; Sun, 7 Apr 2019 17:32:15 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+	fmsmsx156.amr.corp.intel.com (10.18.116.74) with Microsoft SMTP Server
+	(TLS) id 14.3.408.0; Sun, 7 Apr 2019 17:32:15 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.92]) by
+	SHSMSX106.ccr.corp.intel.com ([169.254.10.21]) with mapi id
+	14.03.0415.000; Mon, 8 Apr 2019 08:32:13 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Elijah Shakkour <elijahsh@mellanox.com>, Peter Xu <peterx@redhat.com>
+Thread-Topic: QEMU and vIOMMU support for emulated VF passthrough to nested
+	(L2) VM
+Thread-Index: AQHU6rQUf10CGYezxEGbJ2w753/2CaYrmjwQgASbDICAATnhUA==
+Date: Mon, 8 Apr 2019 00:32:12 +0000
+Message-ID:
+ <AADFC41AFE54684AB9EE6CBC0274A5D19C9D1F97@SHSMSX104.ccr.corp.intel.com>
+References: <AM6PR05MB6616E9FDE038EA2B0665DD9CBD540@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401024710.GB8853@xz-x1>
+	<AM6PR05MB6616E9F5EE3B3B531266B73DBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190401102515.GD8853@xz-x1>
+	<AM6PR05MB6616E41924ADEC1CFC6053BFBD550@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<c89218b50e3b015edc4d7f9490138929a97b8268.camel@oracle.com>
+	<AM6PR05MB6616081C90DBA9C552B847BEBD560@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190403024018.GK11008@xz-x1>
+	<AM6PR05MB6616802C8D185F294565E74CBD570@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<AM6PR05MB66164C0598CFA23FFEEC6C4BBD570@AM6PR05MB6616.eurprd05.prod.outlook.com>
+	<20190404065948.GB23212@xz-x1>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19C9CE809@SHSMSX104.ccr.corp.intel.com>
+	<AM6PR05MB6616FF1FD229194F40882133BD530@AM6PR05MB6616.eurprd05.prod.outlook.com>
+In-Reply-To: <AM6PR05MB6616FF1FD229194F40882133BD530@AM6PR05MB6616.eurprd05.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmE5YzhlMmQtZTFjNS00N2Y4LTg2NTItYmRkY2ZjMTQ3ZWJmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoic1pUYWdvODhDcjRUMUpXTDBOSGVrNUEwRWdFQmlWY3FYVnV4SmNQbXNWcitXWDZkZG5EcmtqSVVpeFwvdVJBdUMifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::62e
-Subject: [Qemu-devel] [PATCH 1/5] Device Models
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] QEMU and vIOMMU support for emulated VF
+ passthrough to nested (L2) VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,219 +102,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sohail Alvi <sohailalvi2236@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+	Knut Omang <knut.omang@oracle.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190407191728.JR03nWpoQDbD3bZ3Sj88c3ttfpJetZXGq2wcKEISBRg@z>
+Message-ID: <20190408003212.TaPzSMshWZwtRgbtczVAi82hKxYb9_aZ-vYoGzCgCbg@z>
 
-From: Sohail Alvi <sohailalvi2236@gmail.com>
-
-Signed-off-by: SohailAlvi <sohailalvi2236@gmail.com>
----
- hw/block/xen-block.c       | 4 +++-
- hw/dma/i82374.c            | 3 ++-
- hw/i386/amd_iommu.c        | 9 +++++++++
- hw/i386/intel_iommu.c      | 1 +
- hw/i386/pc_piix.c          | 1 +
- hw/i386/xen/xen_pvdevice.c | 1 +
- hw/ipmi/ipmi_bmc_extern.c  | 1 +
- hw/ipmi/ipmi_bmc_sim.c     | 1 +
- hw/ipmi/isa_ipmi_bt.c      | 1 +
- hw/ipmi/isa_ipmi_kcs.c     | 1 +
- hw/mem/nvdimm.c            | 1 +
- hw/mem/pc-dimm.c           | 1 +
- hw/tpm/tpm_tis.c           | 1 +
- 13 files changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index ef635be4c2..c5a683f5c3 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -579,6 +579,7 @@ static void xen_disk_class_init(ObjectClass *class, void *data)
-     DeviceClass *dev_class = DEVICE_CLASS(class);
-     XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
- 
-+    set_bit(DEVICE_CATEGORY_STORAGE, dev_class->categories);
-     blockdev_class->realize = xen_disk_realize;
-     blockdev_class->unrealize = xen_disk_unrealize;
- 
-@@ -624,8 +625,9 @@ static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
- static void xen_cdrom_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dev_class = DEVICE_CLASS(class);
--    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
-+    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);    
- 
-+    set_bit(DEVICE_CATEGORY_STORAGE, dev_class->categories);
-     blockdev_class->realize = xen_cdrom_realize;
-     blockdev_class->unrealize = xen_cdrom_unrealize;
- 
-diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-index 892f655a7e..caf231422b 100644
---- a/hw/dma/i82374.c
-+++ b/hw/dma/i82374.c
-@@ -143,7 +143,8 @@ static Property i82374_properties[] = {
- static void i82374_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);    
-     dc->realize = i82374_realize;
-     dc->vmsd = &vmstate_i82374;
-     dc->props = i82374_properties;
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 6eabdf9917..d4ebd599b6 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1594,6 +1594,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     X86IOMMUClass *dc_class = X86_IOMMU_CLASS(klass);
- 
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset = amdvi_reset;
-     dc->vmsd = &vmstate_amdvi;
-     dc->hotpluggable = false;
-@@ -1611,8 +1612,16 @@ static const TypeInfo amdvi = {
-     .class_init = amdvi_class_init
- };
- 
-+static void amdvi_pci_class_init(ObjectClass *klass, void* data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+}
-+
- static const TypeInfo amdviPCI = {
-     .name = "AMDVI-PCI",
-+    .class_init = amdvi_pci_class_init,
-     .parent = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(AMDVIPCIState),
-     .interfaces = (InterfaceInfo[]) {
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 055a1e865d..89362be7fc 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3719,6 +3719,7 @@ static void vtd_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     X86IOMMUClass *x86_class = X86_IOMMU_CLASS(klass);
- 
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset = vtd_reset;
-     dc->vmsd = &vtd_vmstate;
-     dc->props = vtd_properties;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 8ad8e885c6..2db7dee42d 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -910,6 +910,7 @@ static void isa_bridge_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->desc        = "ISA bridge faked to support IGD PT";
-     k->vendor_id    = PCI_VENDOR_ID_INTEL;
-     k->class_id     = PCI_CLASS_BRIDGE_ISA;
-diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
-index a146f1883a..cb30835944 100644
---- a/hw/i386/xen/xen_pvdevice.c
-+++ b/hw/i386/xen/xen_pvdevice.c
-@@ -126,6 +126,7 @@ static void xen_pv_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     k->realize = xen_pv_realize;
-     k->class_id = PCI_CLASS_SYSTEM_OTHER;
-     dc->desc = "Xen PV Device";
-diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-index bf0b7ee0f5..73604e2be6 100644
---- a/hw/ipmi/ipmi_bmc_extern.c
-+++ b/hw/ipmi/ipmi_bmc_extern.c
-@@ -521,6 +521,7 @@ static void ipmi_bmc_extern_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     IPMIBmcClass *bk = IPMI_BMC_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     bk->handle_command = ipmi_bmc_extern_handle_command;
-     bk->handle_reset = ipmi_bmc_extern_handle_reset;
-     dc->hotpluggable = false;
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 9b509f829b..3166232fd4 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -2012,6 +2012,7 @@ static void ipmi_sim_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     IPMIBmcClass *bk = IPMI_BMC_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->hotpluggable = false;
-     dc->realize = ipmi_sim_realize;
-     dc->props = ipmi_sim_properties;
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index 8bbb1fa785..3def8d3068 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -539,6 +539,7 @@ static void isa_ipmi_bt_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->realize = isa_ipmi_bt_realize;
-     dc->props = ipmi_isa_properties;
- 
-diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-index a79431554a..a8f230224f 100644
---- a/hw/ipmi/isa_ipmi_kcs.c
-+++ b/hw/ipmi/isa_ipmi_kcs.c
-@@ -522,6 +522,7 @@ static void isa_ipmi_kcs_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->realize = ipmi_isa_realize;
-     dc->props = ipmi_isa_properties;
- 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index bf2adf5e16..9fbbbe22e7 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -197,6 +197,7 @@ static void nvdimm_class_init(ObjectClass *oc, void *data)
-     NVDIMMClass *nvc = NVDIMM_CLASS(oc);
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);    
-     ddc->realize = nvdimm_realize;
-     mdc->get_memory_region = nvdimm_md_get_memory_region;
-     dc->props = nvdimm_properties;
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 152400b1fc..d627f0c82f 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -255,6 +255,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
-     MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
- 
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-     dc->realize = pc_dimm_realize;
-     dc->unrealize = pc_dimm_unrealize;
-     dc->props = pc_dimm_properties;
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index fd183e8deb..a0a27f7ce1 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -1016,6 +1016,7 @@ static void tpm_tis_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     TPMIfClass *tc = TPM_IF_CLASS(klass);
- 
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->realize = tpm_tis_realizefn;
-     dc->props = tpm_tis_properties;
-     dc->reset = tpm_tis_reset;
--- 
-2.17.1
-
+PiBGcm9tOiBFbGlqYWggU2hha2tvdXIgW21haWx0bzplbGlqYWhzaEBtZWxsYW5veC5jb21dDQo+
+IFNlbnQ6IFN1bmRheSwgQXByaWwgNywgMjAxOSA5OjQ3IFBNDQo+IA0KPiANCj4gPiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGlu
+dGVsLmNvbT4NCj4gPiBTZW50OiBUaHVyc2RheSwgQXByaWwgNCwgMjAxOSAxMDo1OCBBTQ0KPiA+
+IFRvOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+OyBFbGlqYWggU2hha2tvdXINCj4gPiA8
+ZWxpamFoc2hAbWVsbGFub3guY29tPg0KPiA+IENjOiBLbnV0IE9tYW5nIDxrbnV0Lm9tYW5nQG9y
+YWNsZS5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPiA8bXN0QHJlZGhhdC5jb20+OyBBbGV4
+IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsNCj4gPiBNYXJjZWwgQXBm
+ZWxiYXVtIDxtYXJjZWwuYXBmZWxiYXVtQGdtYWlsLmNvbT47IFN0ZWZhbiBIYWpub2N6aQ0KPiA+
+IDxzdGVmYW5oYUBnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiBTdWJqZWN0
+OiBSRTogUUVNVSBhbmQgdklPTU1VIHN1cHBvcnQgZm9yIGVtdWxhdGVkIFZGIHBhc3N0aHJvdWdo
+IHRvDQo+ID4gbmVzdGVkIChMMikgVk0NCj4gPg0KPiA+ID4gRnJvbTogUGV0ZXIgWHUgW21haWx0
+bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gPiA+IFNlbnQ6IFRodXJzZGF5LCBBcHJpbCA0LCAyMDE5
+IDM6MDAgUE0NCj4gPiA+DQo+ID4gPiBPbiBXZWQsIEFwciAwMywgMjAxOSBhdCAxMDoxMDozNVBN
+ICswMDAwLCBFbGlqYWggU2hha2tvdXIgd3JvdGU6DQo+ID4gPg0KPiA+ID4gWy4uLl0NCj4gPiA+
+DQo+ID4gPiA+ID4gPiA+ID4gPiA+IFlvdSBjYW4gYWxzbyB0cnkgdG8gZW5hYmxlIFZULWQgZGV2
+aWNlIGxvZyBieSBhcHBlbmRpbmc6DQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+
+ID4gPiA+ICAgLXRyYWNlIGVuYWJsZT0idnRkXyoiDQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4g
+PiA+ID4gPiA+ID4gPiA+IEluIGNhc2UgaXQgZHVtcHMgYW55dGhpbmcgdXNlZnVsIGZvciB5b3Uu
+DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IEhlcmUgaXMgdGhlIHJlbGV2YW50IGR1bXAg
+KGRldiAwMTowMC4wMSBpcyBteSBWRik6DQo+ID4gPiA+ID4gPiA+ICINCj4gPiA+ID4gPiA+ID4g
+dnRkX2ludl9kZXNjX2NjX2RldmljZSBjb250ZXh0IGludmFsaWRhdGUgZGV2aWNlIDAxOjAwLjAx
+DQo+ID4gPiA+ID4gPiA+IHZ0ZF9jZV9ub3RfcHJlc2VudCBDb250ZXh0IGVudHJ5IGJ1cyAxIGRl
+dmZuIDEgbm90IHByZXNlbnQNCj4gPiA+ID4gPiA+ID4gdnRkX3N3aXRjaF9hZGRyZXNzX3NwYWNl
+IERldmljZSAwMTowMC4xIHN3aXRjaGluZyBhZGRyZXNzDQo+ID4gPiA+ID4gPiA+IHNwYWNlIChp
+b21tdQ0KPiA+ID4gPiA+ID4gPiBlbmFibGVkPTEpIHZ0ZF9jZV9ub3RfcHJlc2VudCBDb250ZXh0
+IGVudHJ5IGJ1cyAxIGRldmZuIDEgbm90DQo+ID4gPiA+ID4gPiA+IHByZXNlbnQgdnRkX2VyciBE
+ZXRlY3RlZCBpbnZhbGlkIGNvbnRleHQgZW50cnkgd2hlbiB0cnlpbmcgdG8NCj4gPiA+ID4gPiA+
+ID4gc3luYyBzaGFkb3cgcGFnZSB0YWJsZQ0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IFRoZXNl
+IGxpbmVzIG1lYW4gdGhhdCB0aGUgZ3Vlc3Qgc2VudCBhIGRldmljZSBpbnZhbGlkYXRpb24gdG8N
+Cj4gPiA+ID4gPiA+IHlvdXIgVkYgYnV0IHRoZSBJT01NVSBmb3VuZCB0aGF0IHRoZSBkZXZpY2Ug
+Y29udGV4dCBlbnRyeSBpcw0KPiA+IG1pc3NpbmcuDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4g
+PiB2dGRfaW90bGJfY2NfdXBkYXRlIElPVExCIGNvbnRleHQgdXBkYXRlIGJ1cyAweDEgZGV2Zm4g
+MHgxDQo+ID4gPiA+ID4gPiA+IGhpZ2gNCj4gPiA+ID4gPiA+ID4gMHgxMDIgbG93IDB4MmQwMDcw
+MDMgZ2VuIDAgLT4gZ2VuIDINCj4gPiA+ID4gPiA+ID4gdnRkX2Vycl9kbWFyX3NscHRlX3Jlc3Zf
+ZXJyb3IgaW92YQ0KPiA+ID4gPiA+ID4gPiAweGYwOGU3MDAwIGxldmVsIDIgc2xwdGUgMHgyYTU0
+MDA4ZjcNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBUaGlzIGxpbmUgc2hvdWxkIG5vdCBleGlz
+dCBpbiBsYXRlc3QgUUVNVS4gIEFyZSB5b3Ugc3VyZSB5b3UncmUNCj4gPiA+ID4gPiA+IHVzaW5n
+IHRoZSBsYXRlc3QgUUVNVT8NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IEkgbW92ZWQgbm93IHRvIFFF
+TVUgNC4wIFJDMi4NCj4gPiA+ID4gPiBUaGlzIGlzIHRoZSB3aGF0IEkgZ2V0IG5vdzoNCj4gPiA+
+ID4gPiB2dGRfaW90bGJfY2NfdXBkYXRlIElPVExCIGNvbnRleHQgdXBkYXRlIGJ1cyAweDEgZGV2
+Zm4gMHgxIGhpZ2gNCj4gPiA+ID4gPiAweDEwMg0KPiA+ID4gbG93DQo+ID4gPiA+ID4gMHgyZjAw
+NzAwMyBnZW4gMCAtPiBnZW4gMQ0KPiA+ID4gPiA+IHFlbXUtc3lzdGVtLXg4Nl82NDogdnRkX2lv
+dmFfdG9fc2xwdGU6IGRldGVjdGVkIHNwbHRlIHJlc2VydmUNCj4gPiA+ID4gPiBub24temVybyBp
+b3ZhPTB4ZjBkMjkwMDAsIGxldmVsPTB4MnNscHRlPTB4MjlmNjAwOGY3KQ0KPiA+ID4gPiA+IHZ0
+ZF9mYXVsdF9kaXNhYmxlZCBGYXVsdCBwcm9jZXNzaW5nIGRpc2FibGVkIGZvciBjb250ZXh0IGVu
+dHJ5DQo+ID4gPiA+ID4gcWVtdS1zeXN0ZW0teDg2XzY0OiB2dGRfaW9tbXVfdHJhbnNsYXRlOiBk
+ZXRlY3RlZCB0cmFuc2xhdGlvbg0KPiA+ID4gPiA+IGZhaWx1cmUgKGRldj0wMTowMDowMSwgaW92
+YT0weGYwZDI5MDAwKSBVbmFzc2lnbmVkIG1lbSByZWFkDQo+ID4gPiAwMDAwMDAwMGYwZDI5MDAw
+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBJJ20gbm90IGZhbWlsaWFyIHdpdGggdklPTU1VIHJlZ2lz
+dGVycywgYnV0IEkgbm90aWNlZCB0aGF0IEkgbXVzdA0KPiA+ID4gPiA+IHJlcG9ydCBzbm9vcCBj
+b250cm9sIHN1cHBvcnQgdG8gSHlwZXItViAoaS5lLiBiaXQgNyBpbiBleHRlbmRlZA0KPiA+ID4g
+PiA+IGNhcGFiaWxpdHkgcmVnaXN0ZXINCj4gPiA+IG9mDQo+ID4gPiA+ID4gdklPTU1VKSBpbi1v
+cmRlciB0byBzYXRpc2Z5IElPTU1VIHN1cHBvcnQgZm9yIFNSSU9WLg0KPiA+ID4gPiA+IHZJT01N
+VS5lY2FwIGJlZm9yZSAgICAweGYwMGY1ZQ0KPiA+ID4gPiA+IHZJT01NVS5lY2FwIGFmdGVyICAg
+ICAgIDB4ZjAwZmRlDQo+ID4gPiA+ID4gQnV0IEkgc2VlIHRoYXQgdklPTU1VIGRvZXNuJ3QgcmVh
+bGx5IHN1cHBvcnQgc25vb3AgY29udHJvbC4NCj4gPiA+ID4gPiBDb3VsZCB0aGlzIGJlIHRoZSBw
+cm9ibGVtIHRoYXQgZmFpbHMgSU9WQSByYW5nZSBjaGVjayBpbiB0aGlzDQo+ID4gPiA+ID4gZnVu
+Y3Rpb24gdnRkX2lvdmFfcmFuZ2VfY2hlY2soKT8NCj4gPiA+ID4NCj4gPiA+ID4gU29ycnksIEkg
+bWVhbnQgdGhlIFNMUFRFIHJlc2VydmVkIG5vbi16ZXJvIGNoZWNrIGZhaWx1cmUgaW4NCj4gPiA+
+IHZ0ZF9zbHB0ZV9ub256ZXJvX3JzdmQoKQ0KPiA+ID4gPiBBbmQgTk9UIElPVkEgcmFuZ2UgY2hl
+Y2sgZmFpbHVyZSAoc2luY2UgcmFuZ2UgY2hlY2sgZGlkbid0IGZhaWwpDQo+ID4gPg0KPiA+ID4g
+UHJvYmFibHkuICBDdXJyZW50bHkgVlQtZCBlbXVsYXRpb24gZG9lcyBub3Qgc3VwcG9ydCBzbm9v
+cGluZyBjb250cm9sLA0KPiA+ID4gYW5kIGlmIHlvdSBtb2RpZnkgdGhhdCBlY2FwIG9ubHkgeW91
+IHByb2JhYmx5IHdpbGwgZW5jb3VudGVyIHRoaXMNCj4gPiA+IHByb2JsZW0gYmVjYXVzZSB0aGVu
+IHRoZSBndWVzdCBrZXJuZWwgd2lsbCBzZXR1cCB0aGUgU05QIGJpdCBpbiB0aGUNCj4gPiA+IElP
+TU1VIHBhZ2UgdGFibGUgZW50cmllcyB3aGljaCB3aWxsIHZpb2xhdGUgdGhlIHJlc2VydmVkIGJp
+dHMgaW4gdGhlDQo+ID4gPiBlbXVsYXRpb24gY29kZSB0aGVuIHlvdSBjYW4gc2VlIHRoZXNlIGVy
+cm9ycy4NCj4gPiA+DQo+ID4gPiBOb3cgdGFsa2luZyBhYm91dCBpbXBsZW1lbnRpbmcgdGhlIFNu
+b29wIENvbnRyb2wgZm9yIEludGVsIElPTU1VIGZvcg0KPiA+ID4gcmVhbCAod2hpY2ggY29ycmVz
+cG9uZHMgdG8gdnQtZCBlY2FwIGJpdCA3KSAtIEknZCBjb25mZXNzIEknbSBub3QgMTAwJQ0KPiA+
+ID4gY2xlYXIgb24gd2hhdCBkb2VzIHRoZSAic25vb3BpbmciIG1lYW4gYW5kIHdoYXQgd2UgbmVl
+ZCB0byBkbyBhcyBhbg0KPiA+ID4gZW11bGF0b3IuIEknbSBxdW90dGluZyBmcm9tIHNwZWM6DQo+
+ID4gPg0KPiA+ID4gICAiU25vb3AgYmVoYXZpb3IgZm9yIGEgbWVtb3J5IGFjY2VzcyAodG8gYSB0
+cmFuc2xhdGlvbiBzdHJ1Y3R1cmUNCj4gPiA+ICAgZW50cnkgb3IgYWNjZXNzIHRvIHRoZSBtYXBw
+ZWQgcGFnZSkgc3BlY2lmaWVzIGlmIHRoZSBhY2Nlc3MgaXMNCj4gPiA+ICAgY29oZXJlbnQgKHNu
+b29wcyB0aGUgcHJvY2Vzc29yIGNhY2hlcykgb3Igbm90LiINCj4gPiA+DQo+ID4gPiBJZiBpdCBp
+cyBvbmx5IGEgY2FwYWJpbGl0eSBzaG93aW5nIHRoYXQgd2hldGhlciB0aGUgaGFyZHdhcmUgaXMN
+Cj4gPiA+IGNhcGFibGUgb2Ygc25vb3BpbmcgcHJvY2Vzc29yIGNhY2hlcywgdGhlbiBJIGRvbid0
+IHRoaW5rIHdlIG5lZWQgdG8gZG8NCj4gPiA+IG11Y2ggaGVyZSBhcyBhbiBlbXVsYXRvciBvZiBW
+VC1kIHNpbXBseSBiZWNhdXNlIHdoZW4gd2UgYWNjZXNzIHRoZQ0KPiA+ID4gZGF0YSB3ZSdyZSBz
+dGlsbCBmcm9tIHRoZSBwcm9jZXNzb3IncyBzaWRlIChiZWNhdXNlIHdlJ3JlIGVtdWxhdGluZw0K
+PiA+ID4gdGhlIElPTU1VIGJlaGF2aW9yIG9ubHkpIHNvIHRoZSBjYWNoZSBzaG91bGQgYWx3YXlz
+IGJlZW4gY29oZXJlbnQNCj4gZnJvbQ0KPiA+ID4gdGhlIFBPViBvZiBndWVzdCB2Q1BVcywganVz
+dCBsaWtlIGhvdyB0aGUgcHJvY2Vzc29ycyBwcm92aWRlIGNhY2hlDQo+ID4gPiBjb2hlcmVuY2Ug
+YmV0d2VlbiB0d28gY29yZXMgKHNvIElNSE8gaGVyZSB0aGUgVlQtZCBlbXVsYXRpb24gY29kZQ0K
+PiBjYW4NCj4gPiA+IGJlIHJ1biBvbiBvbmUgY29yZS90aHJlYWQsIGFuZCB0aGUgdmNwdSB3aGlj
+aCBydW5zIHRoZSBndWVzdCBpb21tdQ0KPiA+ID4gZHJpdmVyIGNhbiBiZSBydW4gb24gYW5vdGhl
+ciBjb3JlL3RocmVhZCkuICBJZiBzbywgbWF5YmUgd2UgY2FuIHNpbXBseQ0KPiA+ID4gZGVjbGFy
+ZSBzdXBwb3J0IG9mIHRoYXQgYnV0IHdlIGF0IGxlYXN0IGFsc28gbmVlZCB0byByZW1vdmUgdGhl
+IFNOUA0KPiA+ID4gYml0IGZyb20gdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkW10gYXJyYXkg
+dG8gcmVmbGVjdCB0aGF0IHdlDQo+ID4gPiB1bmRlcnN0YW5kIHRoYXQgYml0Lg0KPiA+ID4NCj4g
+PiA+IENDaW5nIEFsZXggYW5kIEtldmluIHRvIHNlZSB3aGV0aGVyIEknbSBtaXN1bmRlcnN0YW5k
+aW5nIG9yIGluIGNhc2Ugb2YNCj4gPiA+IGFueSBmdXJ0aGVyIGlucHV0IG9uIHRoZSBzbm9vcGlu
+ZyBzdXBwb3J0Lg0KPiA+ID4NCj4gPg0KPiA+IGZvciBzb2Z0d2FyZSBETUEgeWVzIHNub29wIGlz
+IGd1YXJhbnRlZWQgc2luY2UgaXQncyBqdXN0IENQVSBhY2Nlc3MuDQo+ID4NCj4gPiBIb3dldmVy
+IGZvciBWRklPIGRldmljZSBpLmUuIGhhcmR3YXJlIERNQSwgc25vb3Agc2hvdWxkIGJlIHJlcG9y
+dGVkDQo+ID4gYmFzZWQgb24gcGh5c2ljYWwgSU9NTVUgY2FwYWJpbGl0eS4gSXQncyBmaW5lIHRv
+IHJlcG9ydCBubyBzbm9vcCBjb250cm9sIG9uDQo+ID4gdklPTU1VIChjdXJyZW50IHN0YXRlKSBl
+dmVuIHdoZW4gaXQncyBwaHlzaWNhbGx5IHN1cHBvcnRlZC4gSXQganVzdCByZXN1bHRzDQo+ID4g
+dGhhdCBMMSBWTU0gbXVzdCBmYXZvciBndWVzdCBjYWNoZSBhdHRyaWJ1dGVzIGluc3RlYWQgb2Yg
+Zm9yY2luZyBXQiBpbiBMMQ0KPiA+IEVQVCB3aGVuIGRvaW5nIG5lc3RlZCBwYXNzdGhyb3VnaC4g
+SG93ZXZlciBpdCdzIGluY29ycmVjdCB0byByZXBvcnQgc25vb3ANCj4gPiBjb250cm9sIG9uIHZJ
+T01NVSB3aGVuIHBoeXNpY2FsbHkgaXQncyBub3Qgc3VwcG9ydGVkLCBvdGhlcndpc2UgTDEgVk1N
+DQo+ID4gbWF5IGZvcmNlIFdCIGluIEwxIEVQVCBhbmQgZW5hYmxlIHNub29wIGZpZWxkIGluIHZJ
+T01NVSAybmQgbGV2ZWwgUFRFDQo+IHdpdGgNCj4gPiBhc3N1bXB0aW9uIHRoYXQgaGFyZHdhcmUg
+c25vb3AgaXMgZ3VhcmFudGVlZCAoaG93ZXZlciBpdCBpc24ndCkuIFRoZW4gaXQNCj4gPiBiZWNv
+bWVzIGEgY29ycmVjdG5lc3MgaXNzdWUuDQo+ID4NCj4gDQo+IElmIG15IGRldmljZSBpcyBmdWxs
+eSBlbXVsYXRlZCwgY2FuIEkgaWdub3JlIHRoZSBTTlAgYml0IGluIHRoZSBTTFBURT8gV2hhdCBp
+cw0KPiB0aGUgY29zdCBvZiBpZ25vcmluZyBpdCBpbiBzdWNoIGEgY2FzZT8gV2hhdCBjb3VsZCBn
+byB3cm9uZz8NCj4gKEkgdHJpZWQgdG8gaWdub3JlIGl0IGFuZCBpdCBzZWVtcyB0aGF0IHRyYW5z
+bGF0aW9ucyB3b3JrIGZvciBtZSBub3cpLg0KPiANCg0KSSdtIG5vdCBzdXJlIHdoYXQgeW91IG1l
+YW50IGJ5ICdpZ25vcmUnIGhlcmUuIEJ1dCBhcyBlYXJsaWVyIHBvaW50ZWQNCm91dCBieSBQZXRl
+ciwgZm9yIGVtdWxhdGVkIGRldmljZXMgeW91IGRvbid0IG5lZWQgZG8gYW55dGhpbmcgc3BlY2lh
+bA0KaGVyZS4gWW91IGNhbiBqdXN0IHJlcG9ydCBzbm9vcCBjYXBhYmlsaXR5IGFuZCB0aGVuIHJl
+bW92ZSBpdCBmcm9tDQpyZXNlcnZlZCBiaXQgY2hlY2sgaW4gU0xQVEUuDQoNClRoYW5rcw0KS2V2
+aW4NCg==
 
