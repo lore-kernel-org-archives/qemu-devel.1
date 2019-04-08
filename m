@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36586)
+Received: from eggs.gnu.org ([209.51.188.92]:37551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDZTW-0008N7-DS
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:58:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1hDZXa-0001dO-Pe
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDZTU-0002hf-CS
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:58:34 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hDZTO-0002e8-Mn
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:58:30 -0400
-Received: by mail-pg1-x543.google.com with SMTP id g8so7831659pgf.2
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 11:58:22 -0700 (PDT)
-References: <20190323222412.9825-1-slyfox@gentoo.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bbceff60-323c-a94e-f236-f0f55751d8cf@linaro.org>
-Date: Mon, 8 Apr 2019 08:58:15 -1000
+	(envelope-from <eblake@redhat.com>) id 1hDZXU-0007DD-0T
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hDZXT-0007BQ-NT
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:02:39 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A73803082E3F
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 19:02:35 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-117-110.phx2.redhat.com [10.3.117.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6873760C70
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 19:02:35 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  8 Apr 2019 14:02:29 -0500
+Message-Id: <20190408190233.10321-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190323222412.9825-1-slyfox@gentoo.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] powerpc: fix denorm float->double
- conversion
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] NBD patches for 4.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergei Trofimovich <slyfox@gentoo.org>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 3/23/19 12:24 PM, Sergei Trofimovich wrote:
-> Here denormalization conversion has a few bugs:
-> - significand (abs_arg) has 32-bit unsigned wraparound in
->     ret |= abs_arg << (shift + 29);
-> - significand does not drop explicit leading '1' in denorm
->   'float' when converting to normalized 'double'
-> - significand had an off-by-one shift
+The following changes since commit 2c573106279495795449b0d0373464b597dfe3=
+16:
 
-Correct on all points.  Thanks for the test case and analysis.
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-201=
+9-04-08' into staging (2019-04-08 15:21:11 +0100)
 
+are available in the Git repository at:
 
-> +        /*
-> +         * Conversion mechanics:
-> +         * float denorm (2^(-126) - biased):
-> +         *    [ sign (1 bit) | exp32 (8 bits)  | sign32 (23 bits) ]
-> +         *                 s                0    0001abc...def
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-04-08
 
-FWIW, the overlap between "sign" and "significand" is why I prefer the term
-"fraction", even though the term itself is less precise.
+for you to fetch changes up to e53f88df77e70350b0eda92a2e5e39f67792008f:
 
+  nbd/client: Fix error message for server with unusable sizing (2019-04-=
+08 13:51:25 -0500)
 
->          if (unlikely(abs_arg != 0)) {
->              /* Denormalized operand.  */
-> -            int shift = clz32(abs_arg) - 9;
-> -            int exp = -126 - shift + 1023;
-> -            ret |= (uint64_t)exp << 52;
-> -            ret |= abs_arg << (shift + 29);
-> +            int lz = clz32(abs_arg);
-> +            abs_arg &= ~(1 << (31 - lz)); /* [2a.] */
-> +
-> +            /* shift within sign32 includeing leading '1' */
-> +            int shift = lz + 1 - (32 - 23);
-> +            int exp = -126 + 1023 - shift; /* [2b]. */
-> +            ret |= (uint64_t)exp << 52; /* [3.] */
-> +            ret |= (uint64_t)abs_arg << (52 - 23 + shift); /* [4.] */
+----------------------------------------------------------------
+nbd patches for 2019-04-08
 
-I think perhaps using deposit makes things clearer, since we don't have to
-explicitly remove the msb in that case:
+- Fix minor issues in recent alignment patches
 
-E.g.
+----------------------------------------------------------------
+Eric Blake (4):
+      nbd/server: Fix blockstatus trace
+      nbd/server: Trace client noncompliance on unaligned requests
+      nbd/server: Don't fail NBD_OPT_INFO for byte-aligned sources
+      nbd/client: Fix error message for server with unusable sizing
 
-@@ -67,10 +67,10 @@ uint64_t helper_todouble(uint32_t arg)
-         ret = (uint64_t)extract32(arg, 31, 1) << 63;
-         if (unlikely(abs_arg != 0)) {
-             /* Denormalized operand.  */
--            int shift = clz32(abs_arg) - 9;
--            int exp = -126 - shift + 1023;
--            ret |= (uint64_t)exp << 52;
--            ret |= abs_arg << (shift + 29);
-+            int msbm1 = 31 - clz32(abs_arg);
-+            int exp = 1023 - 126 - (23 - msbm1);
-+            ret = deposit64(ret, 52, 11, exp);
-+            ret = deposit64(ret, 52 - msbm1, msbm1, abs_arg);
+ nbd/client.c     |  2 +-
+ nbd/server.c     | 39 +++++++++++++++++++++++++++------------
+ nbd/trace-events |  1 +
+ 3 files changed, 29 insertions(+), 13 deletions(-)
 
-
-Thoughts?
-
-
-r~
+--=20
+2.20.1
