@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46022)
+Received: from eggs.gnu.org ([209.51.188.92]:46327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQpQ-0003vd-PE
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:44:37 -0400
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQqD-0004aB-MB
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:45:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQpP-0007uU-Nf
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:44:36 -0400
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQqC-0008Nv-Lu
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:45:25 -0400
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon, 8 Apr 2019 09:44:14 +0000
-Message-ID: <468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
+Date: Mon, 8 Apr 2019 09:45:17 +0000
+Message-ID: <3bd0a942-f89b-5302-631a-1b7af3dc8702@virtuozzo.com>
 References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
-In-Reply-To: <ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+	<20190408090013.GJ15001@stefanha-x1.localdomain>
+In-Reply-To: <20190408090013.GJ15001@stefanha-x1.localdomain>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0352ABD972FE7F47B395379B8413D1F2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <7502647989D87A45A286282D2EFCDB75@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
- allocation failure
+Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-DQoNCk9uIDA2LzA0LzIwMTkgMDE6NTAsIEpvaG4gU25vdyB3cm90ZToNCj4gDQo+IA0KPiBPbiA0
-LzUvMTkgMTA6MjQgQU0sIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4gT24gYSBmaWxlIHN5
-c3RlbSB1c2VkIGJ5IHRoZSBjdXN0b21lciwgZmFsbG9jYXRlKCkgcmV0dXJucyBhbiBlcnJvcg0K
-Pj4gaWYgdGhlIGJsb2NrIGlzIG5vdCBwcm9wZXJseSBhbGlnbmVkLiBTbywgYmRydl9jb19wd3Jp
-dGVfemVyb2VzKCkNCj4+IGZhaWxzLiBXZSBjYW4gaGFuZGxlIHRoYXQgY2FzZSB0aGUgc2FtZSB3
-YXkgYXMgaXQgaXMgZG9uZSBmb3IgdGhlDQo+PiB1bnN1cHBvcnRlZCBjYXNlcywgbmFtZWx5LCBj
-YWxsIHRvIGJkcnZfZHJpdmVyX3B3cml0ZXYoKSB0aGF0IHdyaXRlcw0KPj4gemVyb2VzIHRvIGFu
-IGltYWdlIGZvciB0aGUgdW5hbGlnbmVkIGNodW5rIG9mIHRoZSBibG9jay4NCj4+DQo+PiBTdWdn
-ZXN0ZWQtYnk6IERlbmlzIFYuIEx1bmV2IDxkZW5Ab3BlbnZ6Lm9yZz4NCj4+IFNpZ25lZC1vZmYt
-Ynk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0K
-Pj4gLS0tDQo+PiAgIGJsb2NrL2lvLmMgfCAyICstDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
-c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ibG9jay9pby5j
-IGIvYmxvY2svaW8uYw0KPj4gaW5kZXggZGZjMTUzYi4uMDQxMmE1MSAxMDA2NDQNCj4+IC0tLSBh
-L2Jsb2NrL2lvLmMNCj4+ICsrKyBiL2Jsb2NrL2lvLmMNCj4+IEBAIC0xNTE2LDcgKzE1MTYsNyBA
-QCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX2RvX3B3cml0ZV96ZXJvZXMoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsDQo+PiAgICAgICAgICAgICAgIGFzc2VydCghYnMtPnN1cHBvcnRlZF96
-ZXJvX2ZsYWdzKTsNCj4+ICAgICAgICAgICB9DQo+PiAgIA0KPj4gLSAgICAgICAgaWYgKHJldCA9
-PSAtRU5PVFNVUCAmJiAhKGZsYWdzICYgQkRSVl9SRVFfTk9fRkFMTEJBQ0spKSB7DQo+PiArICAg
-ICAgICBpZiAocmV0IDwgMCAmJiAhKGZsYWdzICYgQkRSVl9SRVFfTk9fRkFMTEJBQ0spKSB7DQo+
-PiAgICAgICAgICAgICAgIC8qIEZhbGwgYmFjayB0byBib3VuY2UgYnVmZmVyIGlmIHdyaXRlIHpl
-cm9lcyBpcyB1bnN1cHBvcnRlZCAqLw0KPj4gICAgICAgICAgICAgICBCZHJ2UmVxdWVzdEZsYWdz
-IHdyaXRlX2ZsYWdzID0gZmxhZ3MgJiB+QkRSVl9SRVFfWkVST19XUklURTsNCj4+ICAgDQo+Pg0K
-PiANCj4gSSBzdXBwb3NlIHRoYXQgaWYgZmFsbG9jYXRlIGZhaWxzIGZvciBhbnkgcmVhc29uIGFu
-ZCB3ZSdyZSBhbGxvd2luZw0KPiBmYWxsYmFjaywgd2UncmUgZWl0aGVyIGdvaW5nIHRvIHN1Y2Nl
-ZWQgLi4uIG9yIGZhaWwgYWdhaW4gdmVyeSBzb29uDQo+IHRoZXJlYWZ0ZXIuDQo+IA0KPiBBcmUg
-dGhlcmUgYW55IGNhc2VzIHdoZXJlIGl0IGlzIHZpdGFsIHRvIG5vdCBpZ25vcmUgdGhlIGZpcnN0
-IGZhbGxvY2F0ZQ0KPiBmYWlsdXJlPyBJJ20gYSBsaXR0bGUgd2FyeSBvZiBpZ25vcmluZyB0aGUg
-cmV0dXJuIGNvZGUgZnJvbQ0KPiBiZHJ2X2NvX3B3cml0ZV96ZXJvZXMsIGJ1dCBJIGFtIGFzc3Vt
-aW5nIHRoYXQgaWYgdGhlcmUgaXMgYSAicmVhbCINCj4gZmFpbHVyZSBoZXJlIHRoYXQgdGhlIGZv
-bGxvd2luZyBib3VuY2Ugd3JpdGVzIHdpbGwgYWxzbyBmYWlsICJzYWZlbHkuIg0KPiANCj4gSSdt
-IG5vdCBjb21wbGV0ZWx5IGNvbmZpZGVudCwgYnV0IEkgaGF2ZSBubyB0YW5naWJsZSBvYmplY3Rp
-b25zOg0KPiBSZXZpZXdlZC1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiANCg0K
-VGhhbmsgeW91IGZvciB5b3VyIHJldmlldywgSm9obiENCg0KTGV0IG1lIGNsYXJpZnkgdGhlIGNp
-cmN1bXN0YW5jZXMgYW5kIHF1b3RlIHRoZSBidWcgcmVwb3J0Og0KIkN1c3RvbWVyIGhhZCBXaW4t
-MjAxMiBWTSB3aXRoIDUwR0Igc3lzdGVtIGRpc2sgd2hpY2ggd2FzIGxhdGVyIHJlc2l6ZWQgDQp0
-byAyNTZHQiB3aXRob3V0IHJlc2l6aW5nIHRoZSBwYXJ0aXRpb24gaW5zaWRlIFZNLg0KTm93LCB3
-aGlsZSB0cnlpbmcgdG8gcmVzaXplIHRvIDUwRywgdGhlIGZvbGxvd2luZyBlcnJvciB3aWxsIGFw
-cGVhcg0KJ0ZhaWxlZCB0byByZWR1Y2UgdGhlIG51bWJlciBvZiBMMiB0YWJsZXM6IEludmFsaWQg
-YXJndW1lbnQnDQpJdCB3YXMgZm91bmQgdGhhdCBpdCBpcyBwb3NzaWJsZSB0byBzaHJpbmsgdGhl
-IGRpc2sgdG8gMTI4RyBhbmQgYW55IHNpemUgDQphYm92ZSB0aGF0IG51bWJlciwgYnV0IHNpemUg
-YmVsb3cgMTI4RyB3aWxsIGJyaW5nIHRoZSBtZW50aW9uZWQgZXJyb3IuIg0KDQpUaGUgZmFsbG9j
-YXRlKCkgcmV0dXJucyBubyBlcnJvciBvbiB0aGF0IGZpbGUgc3lzdGVtIGlmIHRoZSBvZmZzZXQg
-YW5kDQp0aGUgKG9mZnNldCArIGJ5dGVzKSBwYXJhbWV0ZXJzIG9mIHRoZSBiZHJ2X2NvX2RvX3B3
-cml0ZV96ZXJvZXMoKSBib3RoDQphcmUgYWxpZ25lZCB0byA0Sy4NCi0tIA0KV2l0aCB0aGUgYmVz
-dCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
+
+
+On 08/04/2019 12:00, Stefan Hajnoczi wrote:
+> On Fri, Apr 05, 2019 at 05:24:04PM +0300, Andrey Shinkevich wrote:
+>> On a file system used by the customer, fallocate() returns an error
+>> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
+>> fails. We can handle that case the same way as it is done for the
+>> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
+>> zeroes to an image for the unaligned chunk of the block.
+>>
+>> Suggested-by: Denis V. Lunev <den@openvz.org>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>   block/io.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> Thanks, applied to my block-next tree for QEMU 4.1:
+> https://github.com/stefanha/qemu/commits/block-next
+>=20
+> Stefan
+>=20
+
+Thank you all!
+--=20
+With the best regards,
+Andrey Shinkevich
