@@ -2,82 +2,67 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 080AFC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 02:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D691C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 02:26:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1AF820880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 02:23:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oaoOe4X/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1AF820880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01C3F20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 02:26:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C3F20880
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46158 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46203 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDJwT-0000FW-M9
-	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 22:23:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37359)
+	id 1hDJzH-00013q-AV
+	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 22:26:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDJtv-0007Dn-3r
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDJyU-0000jW-Lu
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDJtu-0003Vb-3q
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:47 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:32960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hDJtt-0003VF-RV
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:46 -0400
-Received: by mail-qt1-x843.google.com with SMTP id k14so13743158qtb.0
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 19:20:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id;
-	bh=1vHiXAg79l9IJh/5FNvQ5ujKHABrFFpNaP9piWBe8tQ=;
-	b=oaoOe4X/UNWoaDlDAR+vVa22fOxrQIog0Za3y9MwkeAnyj8CXE/cof8ZPrvF9Wq6PJ
-	NWRuy1iLRhg8tjoToThwwskURvR/m8nfoJ8CDD+cglHIrWbmNECgfNqXW2c8iAiTaNx7
-	Hf1sxrA71jO2iiASLONT23oLtrsGE/5V5jod3RexITl1DF69lEVCZ+cZaP/Lk9IvdCFR
-	bsHjnblfk0Nx1JNOtdd7hH8+ZBzMvhTnwxFeZlT3/ANaka0Brugg+Fx9CNKwLOQmUa45
-	VfKQ87OUEwi7WrgG8shyaMU5f+RHeeL6c203as2Epw8KVw18fS81U1jQoJdLGVtuPh8l
-	iH2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=1vHiXAg79l9IJh/5FNvQ5ujKHABrFFpNaP9piWBe8tQ=;
-	b=QmcSIr+euRWr3r72++ml57oeFtCzN0qmfovfNw+evQ/AGKfkm69Ig5U4nBa7kapc4q
-	cSGFBId+zXcau/2Fere0xPjZsRt1qhGVbYTHDRrxurpfMivwCiBm9m8mFZ4VCGANNhvJ
-	Cpn5HI7XJ37/TWB5PpGIixdf8YWPvyCtWu3BwdSnktDrSO6DAPXKuyA398XkJdIEHbkm
-	mqrMMQozlYGIBMwISthRKrs2g49Ifh8zl4ZfHTMEUVMswvMtZ/sV3ZASocMzAdMW2Fk4
-	ja5svNCrracSKxU5BP/MpHNo98KIpSr7sUv4y9xS/0FqUWxVZmeMK8Xv0uicBOIktgor
-	PIVA==
-X-Gm-Message-State: APjAAAVfrgTyEkCz4WMuhtrSZhjjIFhfesMAQkhmBkPlBoi0f70Bbbmz
-	kn9KPZRLhVNf9l4SSX8zrQM=
-X-Google-Smtp-Source: APXvYqyXXZgc83JFOOopLjTmkmycz9wmRT6YL3u/XHxCzFJaPDRMEUXLdd+nG6RxOzA/sV3v4YiDjQ==
-X-Received: by 2002:ac8:950:: with SMTP id z16mr21962675qth.16.1554690045211; 
-	Sun, 07 Apr 2019 19:20:45 -0700 (PDT)
-Received: from localhost.localdomain (104.129.187.94.16clouds.com.
-	[104.129.187.94]) by smtp.gmail.com with ESMTPSA id
-	v6sm16201450qkd.46.2019.04.07.19.20.44
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 07 Apr 2019 19:20:44 -0700 (PDT)
-From: Catherine Ho <catherine.hecx@gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date: Sun,  7 Apr 2019 22:19:05 -0400
-Message-Id: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-X-Mailer: git-send-email 1.7.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Subject: [Qemu-devel] [PATCH] hostmem-file: warn when memory-backend-file,
- share=on and in incoming migration
+	(envelope-from <no-reply@patchew.org>) id 1hDJyT-0005Hf-Db
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:30 -0400
+Resent-Date: Sun, 07 Apr 2019 22:25:30 -0400
+Resent-Message-Id: <E1hDJyT-0005Hf-Db@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21563)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hDJyT-0005HP-3R
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:25:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1554690298; cv=none; d=zoho.com; s=zohoarc; 
+	b=n4o5JPIhCMZA7p7GmGdgLvp3MBF/fauYTkK17CkrVecJbmvI+6qiSTfn2xKNRs0i3eVGaq4vbNoJzOswgxs70eSwfigvmA2qINn29LHyJoUCv1bKfbXlaFPK2IyALP/ObLafRaSnskK2y9tjhDjt6CFnHD/UCm5eftUAqbLDN/4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1554690298;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=SSNblKIs7ik4lUpcJAxxQvjheDwG85q7gXCaYDbEtaI=; 
+	b=a9WaLMjL3kx7fMThiaZPVAFKfoHAjX/l7FFSObAKm5TJaFcmeoUEdeawALpnkO5OyL4lq/y7RN1FGmAlL9sqVAfZwKEEMJ+5kzNEr5MrYn2OkPjm8jgxo04nM/hCjJg/LJNRm9h0AgOq+Mq43ulLMrxxdSBYG1vyIloW2GfYvzE=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1554690298210443.99578873396683;
+	Sun, 7 Apr 2019 19:24:58 -0700 (PDT)
+Message-ID: <155469029685.12882.6842154497172555422@76452e4e88f2>
+In-Reply-To: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Sun, 7 Apr 2019 19:24:58 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH 0/2] ui/cocoa: Fix absolute and relative
+ input issues on Mojave
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,59 +74,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>,
-	Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Juan Quintela <quintela@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+	kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408021905.8YMTkOdnR_cXu3VUewKyxmgZXdv5maiQXLMmf-zdfzY@z>
+Message-ID: <20190408022458.v0OrBw_jWkfOZz1pug2SGkhE84aWMRCSV2YM-X3D-P0@z>
 
-Currently it is not forbidden to use "-object memory-backend-file,share=on"
-and together with "-incoming". But after incoming migration is finished,
-the memory-backend-file will be definitely written if share=on. So the
-memory-backend-file can only be used once, but failed in the 2nd time
-incoming.
-
-Thus it gives a warning and the users can run the qemu if they really
-want to do it.
-
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
----
- backends/hostmem-file.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 37ac6445d2..59429ee0b4 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -16,6 +16,7 @@
- #include "sysemu/hostmem.h"
- #include "sysemu/sysemu.h"
- #include "qom/object_interfaces.h"
-+#include "migration/migration.h"
- 
- /* hostmem-file.c */
- /**
-@@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         }
-     }
- 
-+    /*
-+     * In ignore shared case, if share=on for host memory backend file,
-+     * the ram might be written after incoming process is finished. Thus
-+     * the memory backend can't be reused for 2nd/3rd... incoming
-+     */
-+    if (backend->share && migrate_ignore_shared()
-+                       && runstate_check(RUN_STATE_INMIGRATE))
-+        warn_report("share=on for memory backend file might be "
-+                        "conflicted with incoming in ignore shared case");
-+
-     backend->force_prealloc = mem_prealloc;
-     name = host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9CNzg2RjAwRC01NTE4LTQwNUIt
+QjBBQy1DNUJGMkQ3MjgzRjVAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiBCNzg2RjAwRC01NTE4LTQwNUItQjBBQy1DNUJGMkQ3
+MjgzRjVAbWUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXSB1aS9jb2NvYTog
+Rml4IGFic29sdXRlIGFuZCByZWxhdGl2ZSBpbnB1dCBpc3N1ZXMgb24gTW9qYXZlClR5cGU6IHNl
+cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
+IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
+dy9CNzg2RjAwRC01NTE4LTQwNUItQjBBQy1DNUJGMkQ3MjgzRjVAbWUuY29tIC0+IHBhdGNoZXcv
+Qjc4NkYwMEQtNTUxOC00MDVCLUIwQUMtQzVCRjJENzI4M0Y1QG1lLmNvbQpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCjljNWM3ZjA0N2QgdWkvY29jb2E6IEZpeCBtb3VzZSBncmFiYmlu
+ZyBpbiBmdWxsc2NyZWVuIG1vZGUgZm9yIHJlbGF0aXZlIGlucHV0IGRldmljZQpmZmU3NmJhZmMx
+IHVpL2NvY29hOiBGaXggYWJzb2x1dGUgaW5wdXQgZGV2aWNlIGdyYWJiaW5nIGlzc3VlIG9uCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGZmZTc2YmFmYzFiYiAodWkv
+Y29jb2E6IEZpeCBhYnNvbHV0ZSBpbnB1dCBkZXZpY2UgZ3JhYmJpbmcgaXNzdWUgb24pCkVSUk9S
+OiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6
+IApBdXRob3I6IENoZW4gWmhhbmcgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
+Zz4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjEgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDljNWM3
+ZjA0N2RhOCAodWkvY29jb2E6IEZpeCBtb3VzZSBncmFiYmluZyBpbiBmdWxsc2NyZWVuIG1vZGUg
+Zm9yIHJlbGF0aXZlIGlucHV0IGRldmljZSkKRVJST1I6IEF1dGhvciBlbWFpbCBhZGRyZXNzIGlz
+IG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1dGhvcjogQ2hlbiBaaGFuZyB2aWEg
+UWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
+L0I3ODZGMDBELTU1MTgtNDA1Qi1CMEFDLUM1QkYyRDcyODNGNUBtZS5jb20vdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
