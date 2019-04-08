@@ -2,76 +2,65 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6E1C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141B7C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DAF21473
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:15:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DAF21473
+	by mail.kernel.org (Postfix) with ESMTPS id CAF5221473
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:24:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF5221473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55760 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55842 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDWvV-0006oU-3l
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:15:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56862)
+	id 1hDX49-0000RC-Mw
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:24:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDWud-0006Td-P1
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:14:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hDX3O-00006o-4V
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDWuc-0005wQ-JA
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:10066)
+	(envelope-from <dgilbert@redhat.com>) id 1hDX3N-0003iA-7K
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14999)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>)
-	id 1hDWuZ-0005uF-Kj; Mon, 08 Apr 2019 12:14:19 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDX3M-0003hQ-Su
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:25 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D551316891D;
-	Mon,  8 Apr 2019 16:14:18 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-29.rdu2.redhat.com
-	[10.10.121.29])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 95B991001DDA;
-	Mon,  8 Apr 2019 16:14:16 +0000 (UTC)
-To: Xiang Zheng <zhengxiang9@huawei.com>, Markus Armbruster <armbru@redhat.com>
-References: <20190325125142.11628-1-zhengxiang9@huawei.com>
-	<CAFEAcA-O5+A0Q=14k2vrBg3KNM7MmqbcyhBoZZOe=AsyE-UDbw@mail.gmail.com>
-	<19929558-9f2d-148a-4357-d48b46f8b62b@huawei.com>
-	<87va06kvm6.fsf@dusky.pond.sub.org>
-	<59f100b4-f6e9-973d-532b-58fb172a7009@redhat.com>
-	<87imw5fv45.fsf@dusky.pond.sub.org>
-	<abe1d9cd-85bb-2ef8-630f-af28cae6378c@redhat.com>
-	<8736n9eb4s.fsf@dusky.pond.sub.org>
-	<bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
-	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
-	<b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a8144a1f-364e-cea5-b0a7-05342bdab936@redhat.com>
-Date: Mon, 8 Apr 2019 18:14:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	by mx1.redhat.com (Postfix) with ESMTPS id E61983082B66
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 16:23:23 +0000 (UTC)
+Received: from work-vm (ovpn-117-240.ams2.redhat.com [10.36.117.240])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F72A1001E7D;
+	Mon,  8 Apr 2019 16:23:22 +0000 (UTC)
+Date: Mon, 8 Apr 2019 17:23:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190408162320.GH2687@work-vm>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-12-armbru@redhat.com>
+	<87pnpwpre1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <87pnpwpre1.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Mon, 08 Apr 2019 16:14:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 08 Apr 2019 16:23:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
- flash device to save memory
+Subject: Re: [Qemu-devel] [PATCH 11/15] monitor error: Make printf()-like
+ functions return a value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,133 +72,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	qemu-arm <qemu-arm@nongnu.org>, Heyi Guo <guoheyi@huawei.com>,
-	wanghaibin.wang@huawei.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408161415.j9P0SZTygdrlUrbvHniTkxk13hkVVmLE_Ty8q9z5KJ4@z>
+Message-ID: <20190408162320.BzxXQXLhFqMYd26vdbykzjcl3jB9PhDX5THIifcl4oM@z>
 
-On 04/08/19 15:43, Xiang Zheng wrote:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
 > 
-> On 2019/4/3 23:35, Laszlo Ersek wrote:
->>> I thought about your comments and wrote the following patch (just for test)
->>> which uses a file mapping to replace the anonymous mapping. UEFI seems to work
->>> fine. So why not use a file mapping to read or write a pflash device?
->> Honestly I can't answer "why not do this". Maybe we should.
->>
->> Regarding "why not do this *exactly as shown below*" -- probably because
->> then we'd have updates to the same underlying regular file via both
->> mmap() and write(), and the interactions between those are really tricky
->> (= best avoided).
->>
->> One of my favorite questions over the years used to be posting a matrix
->> of possible mmap() and file descriptor r/w/sync interactions, with the
->> outcomes as they were "implied" by POSIX, and then asking at the bottom,
->> "is my understanding correct?" I've never ever received an answer to
->> that. :)
+> > printf() & friends return the number of characters written on success,
+> > negative value on error.
+> >
+> > monitor_printf(), monitor_vfprintf(), monitor_vprintf(),
+> > error_printf(), error_printf_unless_qmp(), error_vprintf(), and
+> > error_vprintf_unless_qmp() return void.  Some of them carry a TODO
+> > comment asking for int instead.
+> >
+> > Improve them to return int like printf() does.
+> >
+> > This makes our use of monitor_printf() as fprintf_function slightly
+> > less dirty: the function cast no longer adds a return value that isn't
+> > there.  It still changes a parameter's pointer type.  That will be
+> > addressed in a future commit.
+> >
+> > monitor_vfprintf() always returns zero.  Improve it to return the
+> > proper value.
+> >
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> > ---
+> [...]
+> > diff --git a/stubs/error-printf.c b/stubs/error-printf.c
+> > index 99c6406668..537298209d 100644
+> > --- a/stubs/error-printf.c
+> > +++ b/stubs/error-printf.c
+> > @@ -2,19 +2,19 @@
+> >  #include "qemu-common.h"
+> >  #include "qemu/error-report.h"
+> >  
+> > -void error_vprintf(const char *fmt, va_list ap)
+> > +int error_vprintf(const char *fmt, va_list ap)
+> >  {
+> >      if (g_test_initialized() && !g_test_subprocess() &&
+> >          getenv("QTEST_SILENT_ERRORS")) {
+> >          char *msg = g_strdup_vprintf(fmt, ap);
+> >          g_test_message("%s", msg);
+> >          g_free(msg);
+> > -    } else {
+> > -        vfprintf(stderr, fmt, ap);
+> > +        return strlen(msg);
 > 
-> In my opinion, it's feasible to r/w/sync the memory devices which use a block
-> backend via mmap() and write().
-
-Maybe. I think that would be a first in QEMU, and you'd likely have to
-describe and follow a semi-formal model between fd actions and mmap()
-actions.
-
-Here's the (unconfirmed) table I referred to earlier.
-
-+-------------+-----------------------------------------------------+
-| change made | change visible via                                  |
-| through     +-----------------+-------------+---------------------+
-|             | MAP_SHARED      | MAP_PRIVATE | read()              |
-+-------------+-----------------+-------------+---------------------+
-| MAP_SHARED  | yes             | unspecified | depends on MS_SYNC, |
-|             |                 |             | MS_ASYNC, or normal |
-|             |                 |             | system activity     |
-+-------------+-----------------+-------------+---------------------+
-| MAP_PRIVATE | no              | no          | no                  |
-+-------------+-----------------+-------------+---------------------+
-| write()     | depends on      | unspecified | yes                 |
-|             | MS_INVALIDATE,  |             |                     |
-|             | or the system's |             |                     |
-|             | read/write      |             |                     |
-|             | consistency     |             |                     |
-+-------------+-----------------+-------------+---------------------+
-
-Presumably:
-
-- a write() to some offset range of a regular file should be visible in
-a MAP_SHARED mapping of that range after a matching msync(...,
-MS_INVALIDATE) call;
-
-- changes through a MAP_SHARED mapping to a regular file should be
-visible via read() after a matching msync(..., MS_SYNC) call returns.
-
-I sent this table first in 2010 to the Austin Group mailing list, and
-received no comments. Then another person (on the same list) asked
-basically the same questions in 2013, to which I responded with the
-above assumptions / interpretations -- and received no comments from
-third parties again.
-
-But, I'm really out of my depth here -- we're not even discussing
-generic read()/write()/mmap()/munmap()/msync() interactions, but how
-they would fit into the qemu block layer. And I have no idea.
-
+> Use after free.  Obvious fixup appended.
 > 
->>
->> Also... although we don't really use them in practice, some QCOW2
->> features for pflash block backends are -- or would be -- nice. (Not the
->> internal snapshots or the live RAM dumps, of course.)
+> >      }
+> > +    return vfprintf(stderr, fmt, ap);
+> >  }
+> >  
+> > -void error_vprintf_unless_qmp(const char *fmt, va_list ap)
+> > +int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+> >  {
+> > -    error_vprintf(fmt, ap);
+> > +    return error_vprintf(fmt, ap);
+> >  }
+> [...]
 > 
-> Regarding sparse files, can we read actual backend size data for the read-only
-> pflash memory as the following steps shown?
-> 
-> 1) Create a sparse file -- QEMU_EFI-test.raw:
->    dd if=/dev/zero of=QEMU_EFI-test.raw bs=1M seek=64 count=0
-> 
-> 2) Read from QEMU_EFI.fd and write to QEMU_EFI-test.raw:
->    dd of="QEMU_EFI-test.raw" if="QEMU_EFI.fd" conv=notrunc
-> 
-> 3) Use QEMU_EFI-test.raw as the read-only pflash and start qemu with the below
-> patch applied:
-> 
-> ---8>---
-> 
-> diff --git a/hw/block/block.c b/hw/block/block.c
-> index bf56c76..ad18d5e 100644
-> --- a/hw/block/block.c
-> +++ b/hw/block/block.c
-> @@ -30,7 +30,7 @@
->  bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
->                                   Error **errp)
+> diff --git a/stubs/error-printf.c b/stubs/error-printf.c
+> index 537298209d..1f9d3b3714 100644
+> --- a/stubs/error-printf.c
+> +++ b/stubs/error-printf.c
+> @@ -4,12 +4,15 @@
+>  
+>  int error_vprintf(const char *fmt, va_list ap)
 >  {
-> -    int64_t blk_len;
-> +    int64_t blk_len, actual_len;
->      int ret;
-> 
->      blk_len = blk_getlength(blk);
-> @@ -53,7 +53,9 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
->       * block device and read only on demand.
->       */
->      assert(size <= BDRV_REQUEST_MAX_BYTES);
-> -    ret = blk_pread(blk, 0, buf, size);
-> +    actual_len = bdrv_get_allocated_file_size(blk_bs(blk));
-> +    ret = blk_pread(blk, 0, buf,
-> +            (!blk_is_read_only(blk) || actual_len < 0) ? size : actual_len);
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "can't read block backend");
->          return false;
-> 
+> +    int ret;
+> +
+>      if (g_test_initialized() && !g_test_subprocess() &&
+>          getenv("QTEST_SILENT_ERRORS")) {
+>          char *msg = g_strdup_vprintf(fmt, ap);
+>          g_test_message("%s", msg);
+> +        ret = strlen(msg);
+>          g_free(msg);
+> -        return strlen(msg);
+> +        return ret;
+>      }
+>      return vfprintf(stderr, fmt, ap);
+>  }
 
-This hunk looks dubious for a general helper function. It seems to
-assume that the holes are punched at the end of the file.
+Yeh, with the fixup:
 
-Sorry, this discussion is making me uncomfortable. I don't want to
-ignore your questions, but I have no idea about the right answers. This
-really needs the attention of the block people.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Laszlo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
