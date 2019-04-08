@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56385)
+Received: from eggs.gnu.org ([209.51.188.92]:57082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hDVRE-0001C5-AI
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:39:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDVTn-0002kx-4u
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hDVRD-0002YG-60
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:39:56 -0400
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<20190329112152.0c7ad147@redhat.com>
-	<7b902f2b-64b9-9c73-eeb0-1be33f1f2b07@linux.intel.com>
-	<20190408152614.0bdf3cfd@redhat.com>
-From: Like Xu <like.xu@linux.intel.com>
-Message-ID: <3b8f97c1-5ffe-1fea-5f4b-0f8d0dc6fe0c@linux.intel.com>
-Date: Mon, 8 Apr 2019 22:38:43 +0800
+	(envelope-from <armbru@redhat.com>) id 1hDVTi-0003yn-0p
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:42:31 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190204231815.29661-1-philmd@redhat.com>
+	<20190204231815.29661-3-philmd@redhat.com>
+Date: Mon, 08 Apr 2019 16:42:12 +0200
+In-Reply-To: <20190204231815.29661-3-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Feb 2019 00:18:06
+	+0100")
+Message-ID: <87k1g4o8xn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190408152614.0bdf3cfd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] refactor cpu topo into machine
- properties
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 02/11] hw: Remove unused 'hw/devices.h'
+ include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +25,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-trivial@nongnu.org, like.xu@intel.com, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 2019/4/8 21:26, Igor Mammedov wrote:
-> On Thu, 4 Apr 2019 11:26:09 +0800
-> Like Xu <like.xu@linux.intel.com> wrote:
-> 
->> On 2019/3/29 18:21, Igor Mammedov wrote:
->>> On Fri, 29 Mar 2019 16:48:36 +0800
->>> Like Xu <like.xu@linux.intel.com> wrote:
->>>    
->>>> This patch series make existing cores/threads/sockets into machine
->>>> properties and get rid of global variables they use currently.
->>> Thanks for looking into it!
->>> Its long overdue and rather desired conversion (albeit naive one,
->>> but this series is a good starting point). I'll go over your patches
->>> next week with comments and concrete suggestions how to implement
->>> particular things.
->>
->> Hi Igor, any comments and suggestions on smp machine properties
->> in this patch considering we may add die topology for PCMachine as an
->> extension?
-> 
-> I've looked at several patches and that it for this series.
-> The most comments apply to the patches I've not reviewed as well.
-
-Hi Igor, thanks for your comments, time and patience.
-
-I'll try to fix them in next version ASAP.
-
-> 
->>>    
->>>> Like Xu (9):
->>>>     cpu/topology: add struct CpuTopology to MachineState
->>>>     cpu/topology: add general support for machine properties
->>>>     cpu/topology: add uncommon arch support for smp machine properties
->>>>     cpu/topology: add ARM support for smp machine properties
->>>>     cpu/topology: add i386 support for smp machine properties
->>>>     cpu/topology: add PPC support for smp machine properties
->>>>     cpu/topology: add riscv support for smp machine properties
->>>>     cpu/topology: add s390x support for smp machine properties
->>>>     cpu/topology: replace smp global variables with machine propertie
->>>>
->>>>    accel/kvm/kvm-all.c          |  3 +++
->>>>    backends/hostmem.c           |  4 ++++
->>>>    cpus.c                       |  4 ++++
->>>>    exec.c                       |  2 ++
->>>>    gdbstub.c                    |  7 ++++++-
->>>>    hw/alpha/dp264.c             |  1 +
->>>>    hw/arm/fsl-imx6.c            |  5 +++++
->>>>    hw/arm/fsl-imx6ul.c          |  5 +++++
->>>>    hw/arm/fsl-imx7.c            |  5 +++++
->>>>    hw/arm/highbank.c            |  1 +
->>>>    hw/arm/mcimx6ul-evk.c        |  1 +
->>>>    hw/arm/mcimx7d-sabre.c       |  3 +++
->>>>    hw/arm/raspi.c               |  2 ++
->>>>    hw/arm/realview.c            |  1 +
->>>>    hw/arm/sabrelite.c           |  1 +
->>>>    hw/arm/vexpress.c            |  3 +++
->>>>    hw/arm/virt.c                |  7 +++++++
->>>>    hw/arm/xlnx-zynqmp.c         |  7 +++++++
->>>>    hw/cpu/core.c                |  3 +++
->>>>    hw/hppa/machine.c            |  4 ++++
->>>>    hw/i386/acpi-build.c         |  3 +++
->>>>    hw/i386/kvmvapic.c           |  5 +++++
->>>>    hw/i386/pc.c                 | 12 +++++++++++
->>>>    hw/mips/boston.c             |  1 +
->>>>    hw/mips/mips_malta.c         |  9 +++++++++
->>>>    hw/openrisc/openrisc_sim.c   |  1 +
->>>>    hw/ppc/e500.c                |  3 +++
->>>>    hw/ppc/mac_newworld.c        |  2 ++
->>>>    hw/ppc/mac_oldworld.c        |  2 ++
->>>>    hw/ppc/pnv.c                 |  3 +++
->>>>    hw/ppc/prep.c                |  2 ++
->>>>    hw/ppc/spapr.c               | 29 ++++++++++++++++++++++++++
->>>>    hw/ppc/spapr_rtas.c          |  3 +++
->>>>    hw/riscv/sifive_e.c          |  4 ++++
->>>>    hw/riscv/sifive_plic.c       |  3 +++
->>>>    hw/riscv/sifive_u.c          |  4 ++++
->>>>    hw/riscv/spike.c             |  2 ++
->>>>    hw/riscv/virt.c              |  1 +
->>>>    hw/s390x/s390-virtio-ccw.c   |  2 ++
->>>>    hw/s390x/sclp.c              |  1 +
->>>>    hw/smbios/smbios.c           | 11 ++++++++++
->>>>    hw/sparc/sun4m.c             |  2 ++
->>>>    hw/sparc64/sun4u.c           |  2 ++
->>>>    hw/xtensa/sim.c              |  1 +
->>>>    hw/xtensa/xtfpga.c           |  1 +
->>>>    include/hw/arm/virt.h        |  2 +-
->>>>    include/hw/boards.h          |  8 ++++++++
->>>>    include/sysemu/sysemu.h      |  2 +-
->>>>    migration/postcopy-ram.c     |  7 +++++++
->>>>    numa.c                       |  1 +
->>>>    target/arm/cpu.c             |  7 +++++++
->>>>    target/i386/cpu.c            |  4 ++++
->>>>    target/openrisc/sys_helper.c |  5 +++++
->>>>    target/s390x/cpu.c           |  3 +++
->>>>    target/s390x/excp_helper.c   |  6 ++++++
->>>>    tcg/tcg.c                    | 15 ++++++++++++++
->>>>    vl.c                         | 48 ++++++++++++++++++++++++--------------------
->>>>    57 files changed, 261 insertions(+), 25 deletions(-)
->>>>   
->>>
->>>
->>>    
->>
->>
-> 
-> 
+Suggest to say "hw: Remove unused 'hw/devices.h' inclusions" or 'hw:
+Remove unused #include "hw/devices.h"'.
