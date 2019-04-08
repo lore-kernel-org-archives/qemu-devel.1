@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53517)
+Received: from eggs.gnu.org ([209.51.188.92]:57954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDRIs-0003rG-IF
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:15:03 -0400
+	(envelope-from <thuth@redhat.com>) id 1hDRaE-0006S8-Er
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDRIr-000842-9d
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:15:02 -0400
-Date: Mon, 8 Apr 2019 12:14:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190408101449.GB11997@linux.fritz.box>
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
-	<468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
-	<20190408100442.GA11997@linux.fritz.box>
+	(envelope-from <thuth@redhat.com>) id 1hDRaD-0007Xl-01
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:32:58 -0400
+References: <20190408084056.26212-1-ghorges@xiyoulinux.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <351ee1e0-578e-3c7f-b0c1-a5617a1ef4a6@redhat.com>
+Date: Mon, 8 Apr 2019 12:32:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190408100442.GA11997@linux.fritz.box>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
- allocation failure
+In-Reply-To: <20190408084056.26212-1-ghorges@xiyoulinux.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +23,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: ghorges <ghorges@xiyoulinux.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
 
-Am 08.04.2019 um 12:04 hat Kevin Wolf geschrieben:
-> Am 08.04.2019 um 11:44 hat Andrey Shinkevich geschrieben:
-> > 
-> > 
-> > On 06/04/2019 01:50, John Snow wrote:
-> > > 
-> > > 
-> > > On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
-> > >> On a file system used by the customer, fallocate() returns an error
-> > >> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
-> > >> fails. We can handle that case the same way as it is done for the
-> > >> unsupported cases, namely, call to bdrv_driver_pwritev() that writes
-> > >> zeroes to an image for the unaligned chunk of the block.
-> > >>
-> > >> Suggested-by: Denis V. Lunev <den@openvz.org>
-> > >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > >> ---
-> > >>   block/io.c | 2 +-
-> > >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/block/io.c b/block/io.c
-> > >> index dfc153b..0412a51 100644
-> > >> --- a/block/io.c
-> > >> +++ b/block/io.c
-> > >> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-> > >>               assert(!bs->supported_zero_flags);
-> > >>           }
-> > >>   
-> > >> -        if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
-> > >> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
-> > >>               /* Fall back to bounce buffer if write zeroes is unsupported */
-> > >>               BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
-> > >>   
-> > >>
-> > > 
-> > > I suppose that if fallocate fails for any reason and we're allowing
-> > > fallback, we're either going to succeed ... or fail again very soon
-> > > thereafter.
-> > > 
-> > > Are there any cases where it is vital to not ignore the first fallocate
-> > > failure? I'm a little wary of ignoring the return code from
-> > > bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
-> > > failure here that the following bounce writes will also fail "safely."
-> > > 
-> > > I'm not completely confident, but I have no tangible objections:
-> > > Reviewed-by: John Snow <jsnow@redhat.com>
-> > > 
-> > 
-> > Thank you for your review, John!
-> > 
-> > Let me clarify the circumstances and quote the bug report:
-> > "Customer had Win-2012 VM with 50GB system disk which was later resized 
-> > to 256GB without resizing the partition inside VM.
-> > Now, while trying to resize to 50G, the following error will appear
-> > 'Failed to reduce the number of L2 tables: Invalid argument'
-> > It was found that it is possible to shrink the disk to 128G and any size 
-> > above that number, but size below 128G will bring the mentioned error."
-> > 
-> > The fallocate() returns no error on that file system if the offset and
-> > the (offset + bytes) parameters of the bdrv_co_do_pwrite_zeroes() both
-> > are aligned to 4K.
-> 
-> What is the return value you get from this file system?
-> 
-> Maybe turning that into ENOTSUP in file-posix would be less invasive.
-> Just falling back for any error gives me the vague feeling that it could
-> cause problems sooner or later.
 
-Also, which file system is this? This seems to be a file system bug.
-fallocate() isn't documented to possibly have alignment restrictions for
-FALLOC_FL_ZERO_RANGE (if this is the operation you're talking about).
-FALLOC_FL_PUNCH_HOLE even explicitly mentions the behaviour for partial
-blocks, so there is no doubt that operations for partial blocks are
-considered valid. Operations that may impose restrictions are explicitly
-documented as such.
+ Hi,
 
-So in any case, this would only be a workaround for a buggy file system.
-The real bug needs to be fixed there.
+thanks for your patch! But please add a short patch description (beside
+the subject), e.g. "Change the name of some variables so that the code
+can be compiled with -Wshadow, too".
 
-Kevin
+And you've got to put a "Signed-off-by" line at the end of the patch
+description, too. See this URL for details:
+
+https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a=
+_Signed-off-by:_line
+
+For future patches to files in the linux-user directory, please also CC:
+the maintainers of this subsystem (i.e. Ruku Voipio and Laurent Vivier,
+see MAINTAINERS file).
+
+ Thanks,
+  Thomas
+
+
+On 08/04/2019 10.40, ghorges wrote:
+> ---
+>  linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
+>  1 file changed, 33 insertions(+), 33 deletions(-)
+>=20
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 208fd1813d..985095e4d5 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int nu=
+m, abi_long arg1,
+>                  size_t size;
+>              } sig, *sig_ptr;
+> =20
+> -            abi_ulong arg_sigset, arg_sigsize, *arg7;
+> +            abi_ulong arg_sigset, arg_sigsize, *arg7s;
+>              target_sigset_t *target_sigset;
+> =20
+>              n =3D arg1;
+> @@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int =
+num, abi_long arg1,
+>                  sig_ptr =3D &sig;
+>                  sig.size =3D SIGSET_T_SIZE;
+> =20
+> -                arg7 =3D lock_user(VERIFY_READ, arg6, sizeof(*arg7) * =
+2, 1);
+> -                if (!arg7) {
+> +                arg7s =3D lock_user(VERIFY_READ, arg6, sizeof(*arg7s) =
+* 2, 1);
+> +                if (!arg7s) {
+>                      return -TARGET_EFAULT;
+>                  }
+> -                arg_sigset =3D tswapal(arg7[0]);
+> -                arg_sigsize =3D tswapal(arg7[1]);
+> -                unlock_user(arg7, arg6, 0);
+> +                arg_sigset =3D tswapal(arg7s[0]);
+> +                arg_sigsize =3D tswapal(arg7s[1]);
+> +                unlock_user(arg7s, arg6, 0);
+> =20
+>                  if (arg_sigset) {
+>                      sig.set =3D &set;
+> @@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int =
+num, abi_long arg1,
+>          }
+>      case TARGET_NR_getcpu:
+>          {
+> -            unsigned cpu, node;
+> -            ret =3D get_errno(sys_getcpu(arg1 ? &cpu : NULL,
+> +            unsigned cpus, node;
+> +            ret =3D get_errno(sys_getcpu(arg1 ? &cpus : NULL,
+>                                         arg2 ? &node : NULL,
+>                                         NULL));
+>              if (is_error(ret)) {
+>                  return ret;
+>              }
+> -            if (arg1 && put_user_u32(cpu, arg1)) {
+> +            if (arg1 && put_user_u32(cpus, arg1)) {
+>                  return -TARGET_EFAULT;
+>              }
+>              if (arg2 && put_user_u32(node, arg2)) {
+> @@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,
+>      case TARGET_NR_listxattr:
+>      case TARGET_NR_llistxattr:
+>      {
+> -        void *p, *b =3D 0;
+> +        void *q, *b =3D 0;
+>          if (arg2) {
+>              b =3D lock_user(VERIFY_WRITE, arg2, arg3, 0);
+>              if (!b) {
+>                  return -TARGET_EFAULT;
+>              }
+>          }
+> -        p =3D lock_user_string(arg1);
+> -        if (p) {
+> +        q =3D lock_user_string(arg1);
+> +        if (q) {
+>              if (num =3D=3D TARGET_NR_listxattr) {
+> -                ret =3D get_errno(listxattr(p, b, arg3));
+> +                ret =3D get_errno(listxattr(q, b, arg3));
+>              } else {
+> -                ret =3D get_errno(llistxattr(p, b, arg3));
+> +                ret =3D get_errno(llistxattr(q, b, arg3));
+>              }
+>          } else {
+>              ret =3D -TARGET_EFAULT;
+>          }
+> -        unlock_user(p, arg1, 0);
+> +        unlock_user(q, arg1, 0);
+>          unlock_user(b, arg2, arg3);
+>          return ret;
+>      }
+> @@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,
+>      case TARGET_NR_setxattr:
+>      case TARGET_NR_lsetxattr:
+>          {
+> -            void *p, *n, *v =3D 0;
+> +            void *q, *n, *v =3D 0;
+>              if (arg3) {
+>                  v =3D lock_user(VERIFY_READ, arg3, arg4, 1);
+>                  if (!v) {
+>                      return -TARGET_EFAULT;
+>                  }
+>              }
+> -            p =3D lock_user_string(arg1);
+> +            q =3D lock_user_string(arg1);
+>              n =3D lock_user_string(arg2);
+> -            if (p && n) {
+> +            if (q && n) {
+>                  if (num =3D=3D TARGET_NR_setxattr) {
+> -                    ret =3D get_errno(setxattr(p, n, v, arg4, arg5));
+> +                    ret =3D get_errno(setxattr(q, n, v, arg4, arg5));
+>                  } else {
+> -                    ret =3D get_errno(lsetxattr(p, n, v, arg4, arg5));
+> +                    ret =3D get_errno(lsetxattr(q, n, v, arg4, arg5));
+>                  }
+>              } else {
+>                  ret =3D -TARGET_EFAULT;
+>              }
+> -            unlock_user(p, arg1, 0);
+> +            unlock_user(q, arg1, 0);
+>              unlock_user(n, arg2, 0);
+>              unlock_user(v, arg3, 0);
+>          }
+> @@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,
+>      case TARGET_NR_getxattr:
+>      case TARGET_NR_lgetxattr:
+>          {
+> -            void *p, *n, *v =3D 0;
+> +            void *q, *n, *v =3D 0;
+>              if (arg3) {
+>                  v =3D lock_user(VERIFY_WRITE, arg3, arg4, 0);
+>                  if (!v) {
+>                      return -TARGET_EFAULT;
+>                  }
+>              }
+> -            p =3D lock_user_string(arg1);
+> +            q =3D lock_user_string(arg1);
+>              n =3D lock_user_string(arg2);
+> -            if (p && n) {
+> +            if (q && n) {
+>                  if (num =3D=3D TARGET_NR_getxattr) {
+> -                    ret =3D get_errno(getxattr(p, n, v, arg4));
+> +                    ret =3D get_errno(getxattr(q, n, v, arg4));
+>                  } else {
+> -                    ret =3D get_errno(lgetxattr(p, n, v, arg4));
+> +                    ret =3D get_errno(lgetxattr(q, n, v, arg4));
+>                  }
+>              } else {
+>                  ret =3D -TARGET_EFAULT;
+>              }
+> -            unlock_user(p, arg1, 0);
+> +            unlock_user(q, arg1, 0);
+>              unlock_user(n, arg2, 0);
+>              unlock_user(v, arg3, arg4);
+>          }
+> @@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,
+>      case TARGET_NR_removexattr:
+>      case TARGET_NR_lremovexattr:
+>          {
+> -            void *p, *n;
+> -            p =3D lock_user_string(arg1);
+> +            void *q, *n;
+> +            q =3D lock_user_string(arg1);
+>              n =3D lock_user_string(arg2);
+> -            if (p && n) {
+> +            if (q && n) {
+>                  if (num =3D=3D TARGET_NR_removexattr) {
+> -                    ret =3D get_errno(removexattr(p, n));
+> +                    ret =3D get_errno(removexattr(q, n));
+>                  } else {
+> -                    ret =3D get_errno(lremovexattr(p, n));
+> +                    ret =3D get_errno(lremovexattr(q, n));
+>                  }
+>              } else {
+>                  ret =3D -TARGET_EFAULT;
+>              }
+> -            unlock_user(p, arg1, 0);
+> +            unlock_user(q, arg1, 0);
+>              unlock_user(n, arg2, 0);
+>          }
+>          return ret;
+>=20
