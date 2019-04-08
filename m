@@ -3,72 +3,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1A0C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 05:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59C7C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 05:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180A120870
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 05:38:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180A120870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=certusnet.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id A5C5820870
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 05:39:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C5820870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47737 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47747 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDMyr-00019n-BE
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 01:38:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38492)
+	id 1hDN0V-0001qy-W1
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 01:39:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDMwi-0007sR-QK
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:35:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDMzg-0001ZO-3R
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDMmx-0006N2-9a
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:25:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hDMmx-0006MN-1n
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:25:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hDMmu-0004Iz-Bn
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 05:25:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 574B32E80C7
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 05:25:44 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1hDMze-0004dm-9b
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:38:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDMzb-0004Zp-Hm
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 01:38:53 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D75FF74A7;
+	Mon,  8 Apr 2019 05:38:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B50185DA2A;
+	Mon,  8 Apr 2019 05:38:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 173401138648; Mon,  8 Apr 2019 07:38:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>
+References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+	<ef6ca1d8-50ac-5239-34eb-be05fad7af69@reactos.org>
+Date: Mon, 08 Apr 2019 07:38:37 +0200
+In-Reply-To: <ef6ca1d8-50ac-5239-34eb-be05fad7af69@reactos.org>
+	(=?utf-8?Q?=22Herv=C3=A9?=
+	Poussineau"'s message of "Fri, 5 Apr 2019 18:35:41 +0200")
+Message-ID: <87o95hjbtu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Apr 2019 05:16:10 -0000
-From: Hongquan Zhu <zhuhq@certusnet.com.cn>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: slesru zhuhq
-X-Launchpad-Bug-Reporter: Hongquan Zhu (zhuhq)
-X-Launchpad-Bug-Modifier: Hongquan Zhu (zhuhq)
-References: <154406426264.32667.2616897072259419283.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155470057010.14046.11694721989992472746.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2150c799a60e14e5394a2d6640c157e4f3f67707
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 08 Apr 2019 05:38:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1807073] Re: qemu-guest-agent stop work when
- fsfreeze
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,60 +74,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1807073 <1807073@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408051610.cX0m4Lc2koJ1EWUuBSsjt0m1b-02IkRQbjvhd6yz8Ko@z>
+Message-ID: <20190408053837.-vUx9eb2Mxf7FQBWA0CKJMueHGLPcsBlpG89m_2HRoE@z>
 
-But it happens in some times=EF=BC=8C this problem dose not occur 100 perce=
-nt=E3=80=82I
-can not reproduce when I want to find WHY=E3=80=82So it=E2=80=98s dangerous=
- in my
-production environment=E3=80=82
+Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
 
--- =
+> Le 05/04/2019 =C3=A0 12:29, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
+=A0:
+>> Hi,
+>>
+>> I am trying to understand the possible values for the MAX_FD variable
+>> used by the floppy controller model (hw/block/fdc.c).
+>>
+>> Looking at git history:
+>>
+>> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
+>>    FDC introduced with "#define MAX_FD 2"
+>>
+>> - 2008-04-29 78ae820cfeb0 (Herv=C3=A9 Poussineau):
+>>    Supports up to 4 floppy drives if MAX_FD is set to 4
+>>    Migration stream knows about runtime value of MAX_FD
+>>
+>> - 2009-09-10 d7a6c2703577 (Juan Quintela):
+>>    FDC vmstate-ified
+>>    Migration stream use compile time value of MAX_FD
+>>
+>> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
+>>
+>> Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
+>> migration.
+>>
+>> If I understand correctly migration, first we should change in
+>> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
+>>
+>> Then to be able to use >2 floppy disks I have to modify the the
+>> vmstate.version_id, and
+>>
+>> 1/ add a new field in the vmstate_fdc containing the number of drives
+>> and add code to check >2 and adapt
+>>
+>> or
+>>
+>> 2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
+>> to older FDC with only 2 disks...
+>>
+>> Another option I don't like is:
+>>
+>> 3/ get ride of MAX_FD !=3D 2 and clean the codebase...
+>>
+>> $ git grep '#if MAX_FD'
+>> hw/block/fdc.c:744:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:758:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:1317:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:1340:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:2041:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:2079:#if MAX_FD =3D=3D 4
+>> hw/block/fdc.c:2104:#if MAX_FD =3D=3D 4
+>>
+>> Herv=C3=A9, what board are/were you using with 4 floppy drives?
+>
+> That was only an attempt to support 4 drives in code, as controller was a=
+ble to do it.
+> However, no emulated board took advantage of it, so that's why it kind-of=
+ regressed.
+>
+> Feel free to choose the solution you prefer.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1807073
-
-Title:
-  qemu-guest-agent stop work when fsfreeze
-
-Status in QEMU:
-  New
-
-Bug description:
-  Create a live snapshot, we should first to fsfreeze the file system. We d=
-o have only one disk mounted to /:
-  Filesystem      Size  Used Avail Use% Mounted on
-  udev             48G     0   48G   0% /dev
-  tmpfs           9.5G  8.7M  9.5G   1% /run
-  /dev/vda1       485G  1.5G  484G   1% /
-  tmpfs            48G     0   48G   0% /dev/shm
-  tmpfs           5.0M     0  5.0M   0% /run/lock
-  tmpfs            48G     0   48G   0% /sys/fs/cgroup
-  tmpfs           9.5G     0  9.5G   0% /run/user/0
-
-  snapshot action is OK, when we restore the snapshot, the file system beca=
-me read-only, and syslog seems stop writing until we fsck /dev/vda1 and mou=
-nt -o rw,remount /:
-  Dec  5 00:39:16 systemd[1]: Started Session 180 of user root.
-  Dec  5 00:45:05 qemu-ga: info: guest-fsfreeze called
-  Dec  5 07:00:45 kernel: [  114.623823] EXT4-fs (vda1): re-mounted. Opts: =
-(null)
-
-  So after snapshoting, wo do fsthaw the file system,  maybe the qga
-  dose not respond or stop work, this action dose not execute
-  successfully and there is no log to show the status of qemu-guest-
-  agent.
-
-  Version:
-  libvirt 1.2.17
-  qemu 2.3.0
-  qemu-guest-agent 2.5
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1807073/+subscriptions
+Since no user has appeared since 2008, it feels safe enough to assume
+that none will appear going forward.  I lean towards your "3/ get ride
+of MAX_FD !=3D 2 and clean the codebase..."  Explain in a comment that we
+emulate only a 2-drive floppy controller, not the genuine IBM PC 4-drive
+floppy controller.
 
