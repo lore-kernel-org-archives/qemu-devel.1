@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58761)
+Received: from eggs.gnu.org ([209.51.188.92]:59510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDRd2-0007Vm-Ai
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:35:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hDRgn-0008MI-C1
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDRd1-0000Ry-AK
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:35:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hDRd0-0000RW-UI
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:35:51 -0400
-Date: Mon, 8 Apr 2019 12:35:42 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190408123542.1a4de426@redhat.com>
-In-Reply-To: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1hDRgm-0001kj-KC
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:39:45 -0400
+Date: Mon, 8 Apr 2019 12:39:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190408103939.GC11997@linux.fritz.box>
+References: <20190408084056.26212-1-ghorges@xiyoulinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190408084056.26212-1-ghorges@xiyoulinux.org>
+Subject: Re: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +22,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: ghorges <ghorges@xiyoulinux.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Sun,  7 Apr 2019 22:19:05 -0400
-Catherine Ho <catherine.hecx@gmail.com> wrote:
-
-> Currently it is not forbidden to use "-object memory-backend-file,share=on"
-> and together with "-incoming". But after incoming migration is finished,
-> the memory-backend-file will be definitely written if share=on. So the
-> memory-backend-file can only be used once, but failed in the 2nd time
-> incoming.
-> 
-> Thus it gives a warning and the users can run the qemu if they really
-> want to do it.
-
-Shouldn't we add a migration blocker in such a case instead of warning
-and letting qemu run wild?
-
-
-> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+Am 08.04.2019 um 10:40 hat ghorges geschrieben:
 > ---
->  backends/hostmem-file.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index 37ac6445d2..59429ee0b4 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/hostmem.h"
->  #include "sysemu/sysemu.h"
->  #include "qom/object_interfaces.h"
-> +#include "migration/migration.h"
->  
->  /* hostmem-file.c */
->  /**
-> @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->          }
->      }
->  
-> +    /*
-> +     * In ignore shared case, if share=on for host memory backend file,
-> +     * the ram might be written after incoming process is finished. Thus
-> +     * the memory backend can't be reused for 2nd/3rd... incoming
-> +     */
-> +    if (backend->share && migrate_ignore_shared()
-> +                       && runstate_check(RUN_STATE_INMIGRATE))
-> +        warn_report("share=on for memory backend file might be "
-> +                        "conflicted with incoming in ignore shared case");
-> +
->      backend->force_prealloc = mem_prealloc;
->      name = host_memory_backend_get_name(backend);
->      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>  linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
+>  1 file changed, 33 insertions(+), 33 deletions(-)
+
+Thomas already gave you some hints what to improve. I'd just like to add
+that you shouldn't send the email to the qemu-block mailing list if the
+patch is not about the block layer at all.
+
+Kevin
