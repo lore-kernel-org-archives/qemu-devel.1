@@ -6,76 +6,64 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E959C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 258BFC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:55:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BB2320663
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:54:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB2320663
+	by mail.kernel.org (Postfix) with ESMTPS id E991020663
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:55:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E991020663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50994 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51031 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDRud-0004Gc-Kz
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:54:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34072)
+	id 1hDRvw-00053a-7w
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:55:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDRtt-0003zT-7V
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:53:18 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDRuv-0004WZ-PT
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDRts-00087B-6A
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:53:17 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35987)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDRtr-00086e-TJ
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:53:16 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y13so15802694wrd.3
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 03:53:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=c4LLaF4aIrjPRRohp1SnH9OyoeWwemgrvvLMSakSvOA=;
-	b=oEh+N7mrNcWbemvsQWMqz6mHZoJgrc0YL8X0p75keKHC6A0Vc/NCzMZK8ERhOVE+l3
-	FUznVuZ0ZAqIn/KFi0LdbmSAaItOAqRWNASHdI3wF0FOS42W/AnkoS4O2I6Cef96HJUX
-	aijCNyNsirVpBKJGqM2YEnp5IrvLyayj+oITh7WcNlUpd7wT/0hOQvioDpHtm9HmVYzS
-	1XK3OhXiCrn7Q8KhWN/ufgCJlsYkWL/gLMzFm3UZyMKozFyTXl72Ut4ffcMLgIsU88Xz
-	o3zX+P761MDp+hojguNn4AXz5x4+PiWH6B8PP/WWmkT3y0hV+tDN5aUiv7pvnpfonZWP
-	SgpA==
-X-Gm-Message-State: APjAAAXqr2J8yeEf634OMZ+luqC3mUkkfZCFPMB7e8hB0l3ydgsK5jlc
-	JLxwDHO1714OxQN9DQPNBhhpug==
-X-Google-Smtp-Source: APXvYqwhm/kuIH9mmxdfJfOcLKKmo9PqwMIMAulnMaYvE42o8wLeaIXwurnKpHsBgrjadSY1yJb38A==
-X-Received: by 2002:adf:f7c2:: with SMTP id a2mr17413296wrq.242.1554720795040; 
-	Mon, 08 Apr 2019 03:53:15 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	s10sm13705543wmh.0.2019.04.08.03.53.14
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 08 Apr 2019 03:53:14 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-6-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8adaa89a-9e0d-a5ab-36c9-ea60d056885e@redhat.com>
-Date: Mon, 8 Apr 2019 12:53:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <lersek@redhat.com>) id 1hDRut-0000cn-OW
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDRuq-0000Rc-1W
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C68BB3087944;
+	Mon,  8 Apr 2019 10:54:13 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-29.rdu2.redhat.com
+	[10.10.121.29])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A818160851;
+	Mon,  8 Apr 2019 10:54:05 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
+References: <20190405153314.2068-1-philmd@redhat.com>
+	<20190405153314.2068-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <38bea80e-fe2a-78d6-bd2e-f997ea9e4df2@redhat.com>
+Date: Mon, 8 Apr 2019 12:54:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190408083627.7479-6-armbru@redhat.com>
+In-Reply-To: <20190405153314.2068-2-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 08 Apr 2019 10:54:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 05/15] mips/boston: Report errors with
- error_report(), not error_printf()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 1/2] roms: Rename the EFIROM
+ variable to avoid clashing with iPXE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,55 +75,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Paul Burton <pburton@wavecomp.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408105313.mhjkZR3R4PYPRWa5atSD7VBExUFTvtkOv_1WRm0-86E@z>
+Message-ID: <20190408105404.ZBAyCza9v-8-GZqD2D9NoPCueoqpKacvSQhG_g1YhUw@z>
 
-On 4/8/19 10:36 AM, Markus Armbruster wrote:
-> Cc: Paul Burton <pburton@wavecomp.com>
-> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 04/05/19 17:33, Philippe Mathieu-Daud=C3=A9 wrote:
+> The iPXE project already uses the EFIROM for a tool named 'efirom'
+> which is not the Intel EfiRom used by the EDK2 project. To make
+> the difference obvious, rename the variable.
+>=20
+> This fixes a long standing issue which is now masked since commit
+> f590a812c21 "roms: build the EfiRom utility from the roms/edk2
+> submodule" (but would reappear in the next commit):
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+[*]
 
+>=20
+>   $ git checkout f590a812c21~
+>   $ make -C roms clean EFIROM=3D$(type -P EfiRom)
+>   make: Entering directory '/source/qemu/roms'
+>   [...]
+>   make -C ipxe/src veryclean
+>   make[1]: Entering directory '/source/qemu/roms/ipxe/src'
+>   rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.* b=
+in{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin ./util/el=
+f2efi32 ./util/elf2efi64 /usr/bin/EfiRom ./util/efifatbin ./util/iccfix .=
+/util/einfo TAGS bin{,-*}/symtab
+>   rm: cannot remove '/usr/bin/EfiRom': Permission denied
+>   make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
+>   make[1]: Leaving directory '/source/qemu/roms/ipxe/src'
+>   make: *** [Makefile:152: clean] Error 2
+>   make: Leaving directory '/source/qemu/roms'
+>=20
+> Reported-by: Olaf Hering <olaf@aepfle.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/mips/boston.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index e5bab3cadc..a8b29f62f5 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -528,21 +528,21 @@ static void boston_mach_init(MachineState *machine)
->          fw_size = load_image_targphys(machine->firmware,
->                                        0x1fc00000, 4 * MiB);
->          if (fw_size == -1) {
-> -            error_printf("unable to load firmware image '%s'\n",
-> +            error_report("unable to load firmware image '%s'",
->                            machine->firmware);
->              exit(1);
->          }
->      } else if (machine->kernel_filename) {
->          fit_err = load_fit(&boston_fit_loader, machine->kernel_filename, s);
->          if (fit_err) {
-> -            error_printf("unable to load FIT image\n");
-> +            error_report("unable to load FIT image");
->              exit(1);
->          }
->  
->          gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
->                       s->kernel_entry, s->fdt_base, is_64b);
->      } else if (!qtest_enabled()) {
-> -        error_printf("Please provide either a -kernel or -bios argument\n");
-> +        error_report("Please provide either a -kernel or -bios argument");
->          exit(1);
->      }
->  }
-> 
+>  roms/Makefile | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/roms/Makefile b/roms/Makefile
+> index 78d5dd18c30..d28252dafdf 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
+>  # We need that to combine multiple images (legacy bios,
+>  # efi ia32, efi x64) into a single rom binary.
+>  #
+> -EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
+> +EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
+> =20
+>  default:
+>  	@echo "nothing is build by default"
+> @@ -102,8 +102,8 @@ pxe-rom-%: build-pxe-roms
+> =20
+>  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+> =20
+> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
+> -	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+> +efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
+> +	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+>  		-b ipxe/src/bin/$(VID)$(DID).rom \
+>  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
+>  		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
+> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
+>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+> =20
+> -$(EFIROM):
+> +$(EDK2_EFIROM):
+>  	$(MAKE) -C edk2/BaseTools
+> =20
+>  slof:
+>=20
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Upon reading your and Olaf's comments in the v1 thread:
+
+  [PATCH for-4.0] roms: Allow the EFIROM variable to be overridden
+
+I've changed my mind on this series.
+
+Please insert a paragraph at [*] in the commit message:
+
+"iPXE's 'veryclean' recipe removes $(EFIROM) even if the EFIROM macro
+originates from elsewhere."
+
+With that:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+(I'll comment under patch#2 separately.)
+
+Thank you for picking this up.
+Laszlo
 
