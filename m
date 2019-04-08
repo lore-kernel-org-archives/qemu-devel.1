@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54497)
+Received: from eggs.gnu.org ([209.51.188.92]:54618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1hDTTI-0001It-9s
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDTTR-0001P8-JH
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1hDTTG-0003vT-Gb
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:55 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:38310)
+	(envelope-from <armbru@redhat.com>) id 1hDTTO-00041E-II
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:34:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1hDTTA-0003ov-PN
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:33:50 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20190408123342euoutp025f3a148c3785953af3b756f3c24f2ffb~Tf87afdpS0613506135euoutp02D
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 12:33:42 +0000 (GMT)
-From: Ilya Maximets <i.maximets@samsung.com>
-Message-ID: <c138abfe-61fd-6e04-8900-2ba2a24073de@samsung.com>
-Date: Mon, 8 Apr 2019 15:33:39 +0300
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDTTM-0003y9-6a
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 08:34:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-11-armbru@redhat.com>
+	<eebcf43e-a4d3-d8b1-1611-23b665ebbe6e@gmail.com>
+Date: Mon, 08 Apr 2019 14:33:57 +0200
+In-Reply-To: <eebcf43e-a4d3-d8b1-1611-23b665ebbe6e@gmail.com> (Marcel
+	Apfelbaum's message of "Mon, 8 Apr 2019 11:44:44 +0300")
+Message-ID: <8736msr80a.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-References: <CGME20190408123341eucas1p2add7886160b2b66912413defd4544d1f@eucas1p2.samsung.com>
-Subject: [Qemu-devel]  [PATCH 00/97] Patch Round-up for stable 3.0.1,
- freeze on 2019-04-08
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 10/15] vl: Make -machine $TYPE,
+ help and -accel help print to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-stable@nongnu.org, dgilbert@redhat.com
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-> Hi everyone,                                                                    
->                           
-> 
-> The following new patches are queued for QEMU stable v3.0.1:
-> 
->   https://github.com/mdroth/qemu/commits/stable-3.0-staging
-> 
-> The release is planned for 2019-04-11:
-> 
->   https://wiki.qemu.org/Planning/3.0
-> 
-> Please respond here or CC address@hidden on any patches you
-> think should be included in the release.
-> 
-> Note that this update falls outside the normal stable release support
-> window (~1 development cycle), but is being release now since it was
-> delayed from its intended release date.
-> 
-> Thanks!
-> 
+Marcel Apfelbaum <marcel.apfelbaum@gmail.com> writes:
 
-[...]
+> Hi Markus,
+>
+> On 4/8/19 11:36 AM, Markus Armbruster wrote:
+>> Command line help help explicitly requested by the user should be
+>> printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
+>> $TYPE,help and -accel help to match: use printf() instead of
+>> error_printf().
+>>
+>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   vl.c | 10 +++++-----
+>>   1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/vl.c b/vl.c
+>> index c696ad2a13..792ef36001 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
+>>               continue;
+>>           }
+>>   -        error_printf("%s.%s=%s",
+>> MACHINE_GET_CLASS(machine)->name,
+>> -                     prop->name, prop->type);
+>> +        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
+>> +                    prop->name, prop->type);
+>
+> Does the line above have an alignment issue?
 
-> 
-> Ilya Maximets (1):
->       migration: Stop postcopy fault thread before notifying
+Oops!  Will fix.
 
-Hi.
+> Anyway,
+>
+> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Sorry for late response, but what about following two patches:
-
-  c4f753859ae6 ("vhost-user: Fix userfaultfd leak")
-  5ce43896e167 ("vhost-user: Don't ask for reply on postcopy mem table set")
-
-?
-
-Best regards, Ilya Maximets.
+Thank you!
