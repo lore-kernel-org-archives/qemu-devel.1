@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47033)
+Received: from eggs.gnu.org ([209.51.188.92]:48328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDNZT-00074j-Hb
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:15:57 -0400
+	(envelope-from <olaf@aepfle.de>) id 1hDNf6-00089A-48
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDNZR-0000Gj-GW
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:15:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hDNZN-0000EY-Hd
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:15:51 -0400
-Received: by mail-ot1-x344.google.com with SMTP id m10so10954081otp.2
-	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 23:15:48 -0700 (PDT)
+	(envelope-from <olaf@aepfle.de>) id 1hDNf5-0003Uz-2d
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:21:44 -0400
+Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::10]:15443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1hDNf4-0003Ot-6U
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 02:21:42 -0400
+Date: Mon, 8 Apr 2019 08:21:29 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20190408082129.5103140f.olaf@aepfle.de>
+In-Reply-To: <20190405191703-mutt-send-email-mst@kernel.org>
+References: <20190405115529.11590-1-philmd@redhat.com>
+	<20190405140917.3af9b91d.olaf@aepfle.de>
+	<6bdd3c91-1e65-db2d-8ff2-fa667a819a1f@redhat.com>
+	<20190405150438.48c1cc84.olaf@aepfle.de>
+	<3c212c03-80a3-a8bb-fbe0-0071ebfb6936@redhat.com>
+	<20190405191703-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-	<20190408032543.GE23212@xz-x1>
-In-Reply-To: <20190408032543.GE23212@xz-x1>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Mon, 8 Apr 2019 14:15:36 +0800
-Message-ID: <CAEn6zmE3tjtZrusqZptkgqi2CFaNndsVHekr9=uxS=YptcbQzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/B1aWM0eKGCXgd7+BkdNzIVu";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH for-4.0] roms: Allow the EFIROM variable to
+ be overridden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, ipxe-devel@lists.ipxe.org
 
-Hi Peter Xu
+--Sig_/B1aWM0eKGCXgd7+BkdNzIVu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 8 Apr 2019 at 11:25, Peter Xu <peterx@redhat.com> wrote:
+Am Fri, 5 Apr 2019 19:17:35 -0400
+schrieb "Michael S. Tsirkin" <mst@redhat.com>:
 
-> On Sun, Apr 07, 2019 at 10:19:05PM -0400, Catherine Ho wrote:
-> > Currently it is not forbidden to use "-object
-> memory-backend-file,share=on"
-> > and together with "-incoming". But after incoming migration is finished,
-> > the memory-backend-file will be definitely written if share=on. So the
-> > memory-backend-file can only be used once, but failed in the 2nd time
-> > incoming.
-> >
-> > Thus it gives a warning and the users can run the qemu if they really
-> > want to do it.
-> >
-> > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > ---
-> >  backends/hostmem-file.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >
-> > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > index 37ac6445d2..59429ee0b4 100644
-> > --- a/backends/hostmem-file.c
-> > +++ b/backends/hostmem-file.c
-> > @@ -16,6 +16,7 @@
-> >  #include "sysemu/hostmem.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qom/object_interfaces.h"
-> > +#include "migration/migration.h"
-> >
-> >  /* hostmem-file.c */
-> >  /**
-> > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
-> Error **errp)
-> >          }
-> >      }
-> >
-> > +    /*
-> > +     * In ignore shared case, if share=on for host memory backend file,
-> > +     * the ram might be written after incoming process is finished. Thus
-> > +     * the memory backend can't be reused for 2nd/3rd... incoming
-> > +     */
-> > +    if (backend->share && migrate_ignore_shared()
-> > +                       && runstate_check(RUN_STATE_INMIGRATE))
-> > +        warn_report("share=on for memory backend file might be "
-> > +                        "conflicted with incoming in ignore shared
-> case");
->
-> I feel like this message wasn't really clear to me...  you want to
-> warn people these data might not match with each other, right?  How
-> about simply state it:
->
->   NOTE: Please make sure the data on the shared memory backend file
->   and the data from the incoming migration stream contains matching
->   contents, otherwise...
->
+> Let's keep it simple: set a config variable, then check it here.
 
-Sorry for my vague expression.
-The background is [1]
-I happened to use "-object memory-backend-file,share=on" and together with
-"-incoming".
-It worked fine in 1st incoming migration but failed in 2nd, 3rd incoming
-migration.
-Because qemu uses qemu_ram_mmap(..., MAP_SHARED,...) when share=on, the
-memory-backend-file will be written after 1st incoming migration.
-Finally I realized that this was caused by "share=on" flag, and after I
-removed it,
-the memory-backend-file will not be changed any more.
+Better revert f590a812c21074e82228de3e1dfb57b75fc02b62 and 23858f4092fc9ebf=
+9e7a5e5110e44abef6fc6643 for the time being. It looks like a no-op right no=
+w. How did people get away without the system-wide EfiRom until now? It is =
+certainly only a very small inconvenience to build a private EfiRom for tho=
+se who can not possibly receive it from the vendor.
 
-So do you think it will be better that qemu gives the user a clear warning
-that
-incoming migration will change the data in  memory-backend-file  with
-"share=on" ?
+Also roms/ seems to be unable to receive configure options.
 
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg00350.html
+Olaf
 
+--Sig_/B1aWM0eKGCXgd7+BkdNzIVu
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
 
-> Regards,
->
-> --
-> Peter Xu
->
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXKroaQAKCRBdQqD6ppg2
+fkguAKDk/IxJfhbTevVlX2jyQ3ZhrbEZKwCglcUFMXN07n3n7iJus66+8x77w4M=
+=gzcx
+-----END PGP SIGNATURE-----
+
+--Sig_/B1aWM0eKGCXgd7+BkdNzIVu--
