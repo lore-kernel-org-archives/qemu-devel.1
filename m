@@ -2,63 +2,63 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB58CC282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 04:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 638A5C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 04:31:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A27D620880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 04:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E3F120880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 04:31:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OhAwfq21"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A27D620880
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MpY2zgsh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3F120880
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47144 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47147 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDLwG-0005gG-Jt
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 00:31:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55144)
+	id 1hDLwO-0005jm-9k
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 00:31:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuO-0004QQ-1u
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuP-0004QZ-Uz
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuM-0007a8-Al
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:23 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40931 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuO-0007ba-6d
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:25 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:57085 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hDLuK-0007WO-9d; Mon, 08 Apr 2019 00:29:21 -0400
+	id 1hDLuM-0007WR-51; Mon, 08 Apr 2019 00:29:24 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44cy9g0J6Tz9sRV; Mon,  8 Apr 2019 14:29:10 +1000 (AEST)
+	id 44cy9f6ZwBz9sRR; Mon,  8 Apr 2019 14:29:10 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1554697751;
-	bh=am+KzcEyhedUh5lf+YMEEUWp0ljbRhVp/UtknfXOo+k=;
+	d=gibson.dropbear.id.au; s=201602; t=1554697750;
+	bh=GpwQvXQB+37gRuoDux03zeLmnZfsr2/3n0UrJHoqvGU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OhAwfq21SY9w69NxQ44zVrnom9SYvwwevaCmnk4P4C3jayhvWApwU+aYb8gRE9ZAD
-	YTdftg/u8J+CO7lBCnhkN8SnnJfBmK5fXUcMGlA5sJD+GpzkmgQHCrxh4C680pUJ+P
-	R7jUCCtS5FAumHvcvmnh/vLMrpfwGlxVWi/3yh88=
-Date: Mon, 8 Apr 2019 13:50:11 +1000
+	b=MpY2zgshiTqgkxacGhsLTC6WEajLzKtk0fv016tzGmJZtPzfgtYwqbaeY4hg115q8
+	9FxFjRzZVUJflqNVun2+1CDU6AhbdOaLaNTUM3edJBLGbVrOGkm+CojM5BlkHrIyIc
+	Mjiqpp12hwLshnaR7bbDr/ssRuTT3ZhD0/KfmTuo=
+Date: Mon, 8 Apr 2019 13:41:57 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190408035010.GE16627@umbus.fritz.box>
-References: <155414129703.574858.5054152366329409898.stgit@bahia.lan>
-	<20190401225214.GA9231@umbus.fritz.box>
+Message-ID: <20190408034157.GC16627@umbus.fritz.box>
+References: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="PGNNI9BzQDUtgA2J"
+	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
 Content-Disposition: inline
-In-Reply-To: <20190401225214.GA9231@umbus.fritz.box>
+In-Reply-To: <155445151931.302073.18436485925081597460.stgit@bahia.lan>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-4.0 0/2] spapr: Fix extended
- config space accesses
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/ppc/trace-events: Fix trivial
+ typo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,63 +70,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcel Apfelbaum <marcel@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+	Aravinda Prasad <aravinda@linux.vnet.ibm.com>,
+	qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408035011.ZwG1WYnKf9DXGsbKBvB5e0VYbr3cSlsZHNAZbf6YNu8@z>
+Message-ID: <20190408034157.ATimeLxjB3Fp8mF3LcrqqwxZlevIANBu1s1fbNbqgYU@z>
 
 
---PGNNI9BzQDUtgA2J
+--B4IIlcmfBL/1gGOG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 02, 2019 at 09:52:14AM +1100, David Gibson wrote:
-> On Mon, Apr 01, 2019 at 07:54:57PM +0200, Greg Kurz wrote:
-> > Recent commit c2077e2ca0da7 added stricter checks that now prevent
-> > a guest to access the extended config space of a PCIe device connected
-> > attached to a PHB on a pseries machine.
-> >=20
-> > PAPR compatible PHBs act like legacy PCI busses, but they do allow acce=
-ss
-> > to the full 4k config space of PCIe devices. As discussed several times=
- on
-> > the list ([1] and [2]), we cannot really change PAPR PHB to have a true
-> > PCIe root bus since it would call for massive and unwanted changes in
-> > libvirt.
-> >=20
-> > This series tries to address the issue with a new PCI bus class method
-> > that tells if the PCI bus supports extended config space accesses,
-> > instead of relying on pci_bus_is_express() which wants a PCIe root bus.
-> > A new legacy PCI bus type is added to implement the PAPR behaviour.
-> >=20
-> > Note that this fixes a potential 4.0 regression, hence the for-4.0 tag.
-> >=20
-> > [1] https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07377.html
-> >     https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02839.html
-> >=20
-> > [2] https://lists.gnu.org/archive/html/qemu-ppc/2017-01/msg00034.html
->=20
-> So, I actually had some patches I'd been working on that address both
-> the c2077e2ca0da7 issue and the PAPR fixup in what I think is a
-> cleaner manner.  Can't remember now if I posted and they got lost, or
-> I didn't get around to posting.
->=20
-> Nonetheless, at this point we're fixing a real regression on PAPR.
-> I'll look at cleaning this up post 4.0.
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbe
->=20
-> I can take this through my tree if people are ok with that.
+On Fri, Apr 05, 2019 at 10:05:19AM +0200, Greg Kurz wrote:
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Never got a reply on this, but I see these have not yet been merged
-via another path.  These fix a real regression for the pseries machine
-so I've put them into my tree with the intention to send a pull
-request tomorrow, even though they do largely touch generic code.
+Applied to ppc-for-4.1, thanks.
+
+> ---
+>  target/ppc/trace-events |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+> index 3858f97dff54..ed4d57c6d9c1 100644
+> --- a/target/ppc/trace-events
+> +++ b/target/ppc/trace-events
+> @@ -1,5 +1,5 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+> =20
+>  # kvm.c
+> -kvm_failed_spr_set(int str, const char *msg) "Warning: Unable to set SPR=
+ %d to KVM: %s"
+> -kvm_failed_spr_get(int str, const char *msg) "Warning: Unable to retriev=
+e SPR %d from KVM: %s"
+> +kvm_failed_spr_set(int spr, const char *msg) "Warning: Unable to set SPR=
+ %d to KVM: %s"
+> +kvm_failed_spr_get(int spr, const char *msg) "Warning: Unable to retriev=
+e SPR %d from KVM: %s"
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -134,25 +117,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---PGNNI9BzQDUtgA2J
+--B4IIlcmfBL/1gGOG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqxPIACgkQbDjKyiDZ
-s5IIOw//RNJVZpE8LB/YnFINQtk+mhy05pfKoIB/yIzKheQBXeVbEfu7HRDbWuTm
-2CkNulhzISWvC+bY7eM/c2WwCOIFdhGmr4i5HlBJ98XkbsTjsVPOLJUqry52Fg0I
-175nk5iS8BpxUIco6Bqopo5tOoJ0dlV8YLYdvehuUrAch/0CsEClpIYAml0CiMaY
-cuhVVHbdart4hxdDeGUpwq4lBRD3WpSGtBQhVGu5iXzG4GNl562WIzyucd59b9Sv
-F9zlC9EuPB5rewSXvUCrl4YFFODq7OvWue4Qk/HEHqYNDD3NN1YyzmjodDIDeEyq
-mCy1wZGgD8xGoGii0wPVzIrzczZOxFRuowGPk2oLdbzyHKbyh0Mt9QNfOpY9O+0G
-BzD6teQJhlMREV6ZE7Ua7JvNYN+vZYp6z1TXcMxFrAdkvhA5yNhvdGABvFXCQuX9
-W1wly4wbu/gD+x67vTr81WpopZE9BmmRet5BFtqNoCxwCXUcgRg4zuXbM/V+NzbP
-2E0HTk0qSoNKAwhakc6bKzP41aYNJoadAsqQgS9Kr0GTTxicvDtiXH8HLlbDzwzl
-gNsrRciQ02Jdf+ldemeMz1ohe+b7rx7ofOGuZmNwDjnIUQ8ybfV0LwY0nOootb2Y
-bOhf3r4qBfpzEiTLYnyJuJOndulbpwGcu55FSvpF8GpeqDp+IBw=
-=5NRs
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqwwUACgkQbDjKyiDZ
+s5KSPBAAqDPTwUuW/jbSkTOnjfi9vv579K81ZssBflAx/v8SrffdaBSeI7Dm4A3G
+C24MzGsJN1fqcqYcfTKkas5diKK2DRivPelFacKE9Uby8dgfjifuzW2ESWJJjMve
+Hm8SpVI2xV6DMhkw3bMqBAP93zsCH49c6Ig1AMYKF28fCNJnEgwe4Tid1Pv45Oz3
+IpHATTJOzoK3qBOg04Ubjmgxk/ZvpxeLbbx7IU8sjbu43lauskTyTSkx6qPnCWKc
+eIi2V5vwP84QWBbXpX+Y8YTenugXcwV7q1BRi+U3iWiKOweN5IpAQ54Hpjp3h/+y
+JbjnrwPPKxy3oaSXwoGk/uXHKx3lyOd7x1qbcj6v9GTeyEmpjtTWWr+uwe6TNxV6
+pSVWIAqWgHeLtOQvspNeEVMnMmBYS2GkmRWV6g3O3a5H1C+xtkUckOi+EecNz4Qe
+iosSpGo8h0RxIUxAli/L/+1TTGyJvJOkANBXCHaX90RookjkiH1WJZPU+EyP7asb
+sxWfN7KBmq67icNkBC7ckKg0HTpEQstAZ663cZ2YtmJcWZftT+tu1+irTEljWw4w
+kDv2JKH9DlC/ME5krzqMuxnhJ97TjQHJlFFPP5e2LGa89krvZEfDn1L9urNt/qMw
+PQXnDXm42iXhd6TMZbubqb6kUYvS5CYZGowqh8hys8vrRADUL14=
+=CdCR
 -----END PGP SIGNATURE-----
 
---PGNNI9BzQDUtgA2J--
+--B4IIlcmfBL/1gGOG--
 
