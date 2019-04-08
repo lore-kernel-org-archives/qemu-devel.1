@@ -2,65 +2,49 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 141B7C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 503C2C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:27:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAF5221473
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:24:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF5221473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20AF620879
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 16:27:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20AF620879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55842 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55890 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDX49-0000RC-Mw
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:24:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58458)
+	id 1hDX7W-0001mV-AE
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 12:27:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDX3O-00006o-4V
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6I-00015f-P4
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDX3N-0003iA-7K
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14999)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6G-0006Lv-56
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:26 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDX3M-0003hQ-Su
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:23:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E61983082B66
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 16:23:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-240.ams2.redhat.com [10.36.117.240])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F72A1001E7D;
-	Mon,  8 Apr 2019 16:23:22 +0000 (UTC)
-Date: Mon, 8 Apr 2019 17:23:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190408162320.GH2687@work-vm>
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-12-armbru@redhat.com>
-	<87pnpwpre1.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <87pnpwpre1.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 08 Apr 2019 16:23:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 11/15] monitor error: Make printf()-like
- functions return a value
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hDX6D-0006EV-4G; Mon, 08 Apr 2019 12:26:23 -0400
+Received: from [10.28.8.145] (helo=kvm.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hDX69-0001tt-Ar; Mon, 08 Apr 2019 19:26:17 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Mon,  8 Apr 2019 19:26:15 +0300
+Message-Id: <20190408162617.258535-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2 for 4.1 0/2] avoid lseek on block_status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,97 +56,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+	mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408162320.BzxXQXLhFqMYd26vdbykzjcl3jB9PhDX5THIifcl4oM@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190408162615.SC5K6grkjFPXdj8_ogyd08dr1qan4b2dgED7-fCwc0Y@z>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> > printf() & friends return the number of characters written on success,
-> > negative value on error.
-> >
-> > monitor_printf(), monitor_vfprintf(), monitor_vprintf(),
-> > error_printf(), error_printf_unless_qmp(), error_vprintf(), and
-> > error_vprintf_unless_qmp() return void.  Some of them carry a TODO
-> > comment asking for int instead.
-> >
-> > Improve them to return int like printf() does.
-> >
-> > This makes our use of monitor_printf() as fprintf_function slightly
-> > less dirty: the function cast no longer adds a return value that isn't
-> > there.  It still changes a parameter's pointer type.  That will be
-> > addressed in a future commit.
-> >
-> > monitor_vfprintf() always returns zero.  Improve it to return the
-> > proper value.
-> >
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> > ---
-> [...]
-> > diff --git a/stubs/error-printf.c b/stubs/error-printf.c
-> > index 99c6406668..537298209d 100644
-> > --- a/stubs/error-printf.c
-> > +++ b/stubs/error-printf.c
-> > @@ -2,19 +2,19 @@
-> >  #include "qemu-common.h"
-> >  #include "qemu/error-report.h"
-> >  
-> > -void error_vprintf(const char *fmt, va_list ap)
-> > +int error_vprintf(const char *fmt, va_list ap)
-> >  {
-> >      if (g_test_initialized() && !g_test_subprocess() &&
-> >          getenv("QTEST_SILENT_ERRORS")) {
-> >          char *msg = g_strdup_vprintf(fmt, ap);
-> >          g_test_message("%s", msg);
-> >          g_free(msg);
-> > -    } else {
-> > -        vfprintf(stderr, fmt, ap);
-> > +        return strlen(msg);
-> 
-> Use after free.  Obvious fixup appended.
-> 
-> >      }
-> > +    return vfprintf(stderr, fmt, ap);
-> >  }
-> >  
-> > -void error_vprintf_unless_qmp(const char *fmt, va_list ap)
-> > +int error_vprintf_unless_qmp(const char *fmt, va_list ap)
-> >  {
-> > -    error_vprintf(fmt, ap);
-> > +    return error_vprintf(fmt, ap);
-> >  }
-> [...]
-> 
-> diff --git a/stubs/error-printf.c b/stubs/error-printf.c
-> index 537298209d..1f9d3b3714 100644
-> --- a/stubs/error-printf.c
-> +++ b/stubs/error-printf.c
-> @@ -4,12 +4,15 @@
->  
->  int error_vprintf(const char *fmt, va_list ap)
->  {
-> +    int ret;
-> +
->      if (g_test_initialized() && !g_test_subprocess() &&
->          getenv("QTEST_SILENT_ERRORS")) {
->          char *msg = g_strdup_vprintf(fmt, ap);
->          g_test_message("%s", msg);
-> +        ret = strlen(msg);
->          g_free(msg);
-> -        return strlen(msg);
-> +        return ret;
->      }
->      return vfprintf(stderr, fmt, ap);
->  }
+Hi!
 
-Yeh, with the fixup:
+It's a continuation for
+"[PATCH] qcow2: avoid lseek on block_status if possible"
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06598.html
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+performance results for block-status on tmpfs [tests originally by Kevin,
+now they are in 01]:
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+./tests/perf/block/qcow2/convert-blockstatus /ramdisk/x
+
+after 01:
+
+plain: 81.77
+forward: 82.61
+prealloc: 0.01
+
+after 02:
+
+plain: 0.12
+forward: 0.12
+prealloc: 0.01
+
+v2:
+ 01: new
+ 02: [mostly by Kevin's comments]
+     - rewritten to go through new flag BDRV_BLOCK_RECURSE
+     - never retry detection if failed for first time
+     - rewrite detection to do less iterations and to be more simple
+
+     iotests 102 behavior changed [and not sure about other two ones
+     in comparison with v1, but it seems it doesn't matter]
+
+     also, patch subject changed, as now it's a generic change for
+     block layer
+
+
+Vladimir Sementsov-Ogievskiy (2):
+  tests/perf: Test lseek influence on qcow2 block-status
+  block: avoid recursive block_status call if possible
+
+ block/qcow2.h                              |  4 ++
+ include/block/block.h                      |  8 ++-
+ block/io.c                                 |  9 ++-
+ block/qcow2-refcount.c                     | 32 ++++++++++
+ block/qcow2.c                              | 11 ++++
+ tests/perf/block/qcow2/convert-blockstatus | 71 ++++++++++++++++++++++
+ tests/qemu-iotests/102                     |  2 +-
+ tests/qemu-iotests/102.out                 |  3 +-
+ tests/qemu-iotests/141.out                 |  2 +-
+ tests/qemu-iotests/144.out                 |  2 +-
+ 10 files changed, 138 insertions(+), 6 deletions(-)
+ create mode 100755 tests/perf/block/qcow2/convert-blockstatus
+
+-- 
+2.18.0
+
 
