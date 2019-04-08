@@ -2,68 +2,61 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3BFC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B60C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:06:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EACF7213F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EACF7213F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 221B5213F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 13:06:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221B5213F2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xiyoulinux.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52833 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52882 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDTug-0000zk-1b
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 09:02:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35681)
+	id 1hDTzB-0002F3-2R
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 09:06:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hDTtl-0000iV-PI
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:19 -0400
+	(envelope-from <ghorges@xiyoulinux.org>) id 1hDTxt-0001aw-1J
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hDTtg-0005PF-GG
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57712)
+	(envelope-from <ghorges@xiyoulinux.org>) id 1hDTxq-0007WY-KX
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:05:32 -0400
+Received: from smtpbgau1.qq.com ([54.206.16.166]:41247)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1hDTtc-0005Df-LN
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:01:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3988B2D7FB;
-	Mon,  8 Apr 2019 13:00:55 +0000 (UTC)
-Received: from localhost (dhcp-192-206.str.redhat.com [10.33.192.206])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 59B6B5DA2A;
-	Mon,  8 Apr 2019 13:00:51 +0000 (UTC)
-Date: Mon, 8 Apr 2019 15:00:50 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190408130050.66zn2725wky3aoqd@jenstp.localdomain>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-	<20190405085628.GA2819@work-vm>
-	<20190405191850-mutt-send-email-mst@kernel.org>
-	<20190408091649.GD2687@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Disposition: inline
-In-Reply-To: <20190408091649.GD2687@work-vm>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 08 Apr 2019 13:00:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+	(Exim 4.71) (envelope-from <ghorges@xiyoulinux.org>)
+	id 1hDTxp-0007Qs-Ms
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:05:30 -0400
+X-QQ-mid: bizesmtp20t1554728700tlrevuij
+Received: from localhost.localdomain (unknown [117.32.216.84])
+	by esmtp6.qq.com (ESMTP) with 
+	id ; Mon, 08 Apr 2019 21:04:59 +0800 (CST)
+X-QQ-SSF: 01100000002000508440000A0000000
+X-QQ-FEAT: 0ESs8nxzjD8CIH5xPgW0GK8FLNqVxmQ5JIWnBWDQLc5sz5J/bkjxaa88/cPvy
+	tVhm06Q00skKRfqYID78RP3rcdk0I+Su1UX9zP41irisVcVneNnwVRUsMnB63G1yWEua+xv
+	PMIyoSdWApWjKSWmsvNRNRqZk51281UAWaxfLl/8W3qKssGNMFrqGdKjEQmw3xMgamYd7BX
+	rYr3WACOsGc1ma61JjvgWbOKJ0VKBV2HSLJpwEURnoleErmugHyHtvHgIizN6eqEpURx0k2
+	5iCI7HzkQ5LC0iz7GPDFqtpgo=
+X-QQ-GoodBg: 0
+From: ghorges <ghorges@xiyoulinux.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  8 Apr 2019 21:04:50 +0800
+Message-Id: <20190408130450.12233-1-ghorges@xiyoulinux.org>
+X-Mailer: git-send-email 2.17.0
+Signed-off-by: ghorges <ghorges@xiyoulinux.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:xiyoulinux.org:qybgforeign:qybgforeign4
+X-QQ-Bgrelay: 1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 54.206.16.166
+Subject: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c:Changed some
+ variable names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,82 +68,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, ehabkost@redhat.com,
-	"Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
-	qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com,
-	liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com,
-	ailan@redhat.com
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, ghorges <ghorges@xiyoulinux.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408130050.DZYDLi6nVMAnAWytaXhBWh8bHP6oGRlmPv2wYAVfHao@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190408130450.H1JFZB87M43Gg4n_NavYLei5dqNJTgMoAa3UMCHNm0M@z>
 
-On Mon, Apr 08, 2019 at 10:16:50AM +0100, Dr. David Alan Gilbert wrote:
->* Michael S. Tsirkin (mst@redhat.com) wrote:
->> On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
->> > * Jens Freimann (jfreimann@redhat.com) wrote:
->> > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
->> > > > This is another attempt at implementing the host side of the
->> > > > net_failover concept
->> > > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
->> > > >
->> > > > The general idea is that we have a pair of devices, a vfio-pci and a
->> > > > emulated device. Before migration the vfio device is unplugged and data
->> > > > flows to the emulated device, on the target side another vfio-pci device
->> > > > is plugged in to take over the data-path. In the guest the net_failover
->> > > > module will pair net devices with the same MAC address.
->> > > >
->> > > > * In the first patch the infrastructure for hiding the device is added
->> > > >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
->> > > >  state and it is set based on a callback to the standby device which
->> > > >  registers itself for handling the assessment: "should the primary device
->> > > >  be hidden?" by cross validating the ids of the devices.
->> > > >
->> > > > * In the second patch the virtio-net uses the API to hide the vfio
->> > > >  device and unhides it when the feature is acked.
->> > > >
->> > > > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
->> > > >
->> > > > To summarize concerns/feedback from previous discussion:
->> > > > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
->> > > >  Migration might get stuck for unpredictable time with unclear reason.
->> > > >  This approach combines two tricky things, hot/unplug and migration.
->> > > >  -> We can surprise-remove the PCI device and in QEMU we can do all
->> > > >     necessary rollbacks transparent to management software. Will it be
->> > > >     easy, probably not.
->> >
->> > This sounds 'fun' - bonus cases are things like what happens if the
->> > guest gets rebooted somewhere during the process or if it's currently
->> > sitting in the bios/grub/etc
->>
->> Um, during which process? Guests are gradually fixed to support
->> surprise removal well. Part of it is thunderbolt which makes
->> it incredibly easy. Yes - bios/grub will need to learn to
->> handle this well.
->
->Ignoring the actual mechanism of the unplug itself; there are probably
->loads of cases; e.g.
->
->      running with both cards
->      hot unplug real card
->      start migration
->      guest reboots
->        Kernel sees only the virtio card
->      migration completes
->      hotadd the real card back
->
->so the guest has to know to pair the real card even though it booted
->with only the virtio card.
+---
+ linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
 
-Maybe I misunderstand, but, when the 'real card' is added back after
-migration the net_failover driver in the guest will know to pair it
-with the virtio card because they have the same MAC address. Did you
-mean something else?
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 208fd1813d..985095e4d5 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                 size_t size;
+             } sig, *sig_ptr;
+ 
+-            abi_ulong arg_sigset, arg_sigsize, *arg7;
++            abi_ulong arg_sigset, arg_sigsize, *arg7s;
+             target_sigset_t *target_sigset;
+ 
+             n = arg1;
+@@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                 sig_ptr = &sig;
+                 sig.size = SIGSET_T_SIZE;
+ 
+-                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
+-                if (!arg7) {
++                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
++                if (!arg7s) {
+                     return -TARGET_EFAULT;
+                 }
+-                arg_sigset = tswapal(arg7[0]);
+-                arg_sigsize = tswapal(arg7[1]);
+-                unlock_user(arg7, arg6, 0);
++                arg_sigset = tswapal(arg7s[0]);
++                arg_sigsize = tswapal(arg7s[1]);
++                unlock_user(arg7s, arg6, 0);
+ 
+                 if (arg_sigset) {
+                     sig.set = &set;
+@@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         }
+     case TARGET_NR_getcpu:
+         {
+-            unsigned cpu, node;
+-            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
++            unsigned cpus, node;
++            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
+                                        arg2 ? &node : NULL,
+                                        NULL));
+             if (is_error(ret)) {
+                 return ret;
+             }
+-            if (arg1 && put_user_u32(cpu, arg1)) {
++            if (arg1 && put_user_u32(cpus, arg1)) {
+                 return -TARGET_EFAULT;
+             }
+             if (arg2 && put_user_u32(node, arg2)) {
+@@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_listxattr:
+     case TARGET_NR_llistxattr:
+     {
+-        void *p, *b = 0;
++        void *q, *b = 0;
+         if (arg2) {
+             b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+             if (!b) {
+                 return -TARGET_EFAULT;
+             }
+         }
+-        p = lock_user_string(arg1);
+-        if (p) {
++        q = lock_user_string(arg1);
++        if (q) {
+             if (num == TARGET_NR_listxattr) {
+-                ret = get_errno(listxattr(p, b, arg3));
++                ret = get_errno(listxattr(q, b, arg3));
+             } else {
+-                ret = get_errno(llistxattr(p, b, arg3));
++                ret = get_errno(llistxattr(q, b, arg3));
+             }
+         } else {
+             ret = -TARGET_EFAULT;
+         }
+-        unlock_user(p, arg1, 0);
++        unlock_user(q, arg1, 0);
+         unlock_user(b, arg2, arg3);
+         return ret;
+     }
+@@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_setxattr:
+     case TARGET_NR_lsetxattr:
+         {
+-            void *p, *n, *v = 0;
++            void *q, *n, *v = 0;
+             if (arg3) {
+                 v = lock_user(VERIFY_READ, arg3, arg4, 1);
+                 if (!v) {
+                     return -TARGET_EFAULT;
+                 }
+             }
+-            p = lock_user_string(arg1);
++            q = lock_user_string(arg1);
+             n = lock_user_string(arg2);
+-            if (p && n) {
++            if (q && n) {
+                 if (num == TARGET_NR_setxattr) {
+-                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
++                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
+                 } else {
+-                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
++                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
+                 }
+             } else {
+                 ret = -TARGET_EFAULT;
+             }
+-            unlock_user(p, arg1, 0);
++            unlock_user(q, arg1, 0);
+             unlock_user(n, arg2, 0);
+             unlock_user(v, arg3, 0);
+         }
+@@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_getxattr:
+     case TARGET_NR_lgetxattr:
+         {
+-            void *p, *n, *v = 0;
++            void *q, *n, *v = 0;
+             if (arg3) {
+                 v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
+                 if (!v) {
+                     return -TARGET_EFAULT;
+                 }
+             }
+-            p = lock_user_string(arg1);
++            q = lock_user_string(arg1);
+             n = lock_user_string(arg2);
+-            if (p && n) {
++            if (q && n) {
+                 if (num == TARGET_NR_getxattr) {
+-                    ret = get_errno(getxattr(p, n, v, arg4));
++                    ret = get_errno(getxattr(q, n, v, arg4));
+                 } else {
+-                    ret = get_errno(lgetxattr(p, n, v, arg4));
++                    ret = get_errno(lgetxattr(q, n, v, arg4));
+                 }
+             } else {
+                 ret = -TARGET_EFAULT;
+             }
+-            unlock_user(p, arg1, 0);
++            unlock_user(q, arg1, 0);
+             unlock_user(n, arg2, 0);
+             unlock_user(v, arg3, arg4);
+         }
+@@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_removexattr:
+     case TARGET_NR_lremovexattr:
+         {
+-            void *p, *n;
+-            p = lock_user_string(arg1);
++            void *q, *n;
++            q = lock_user_string(arg1);
+             n = lock_user_string(arg2);
+-            if (p && n) {
++            if (q && n) {
+                 if (num == TARGET_NR_removexattr) {
+-                    ret = get_errno(removexattr(p, n));
++                    ret = get_errno(removexattr(q, n));
+                 } else {
+-                    ret = get_errno(lremovexattr(p, n));
++                    ret = get_errno(lremovexattr(q, n));
+                 }
+             } else {
+                 ret = -TARGET_EFAULT;
+             }
+-            unlock_user(p, arg1, 0);
++            unlock_user(q, arg1, 0);
+             unlock_user(n, arg2, 0);
+         }
+         return ret;
+-- 
+2.17.0
+Signed-off-by: ghorges <ghorges@xiyoulinux.org>
 
->I'm sure there are loads of other corners.
 
-Probably yes.
-
-regards,
-Jens 
 
