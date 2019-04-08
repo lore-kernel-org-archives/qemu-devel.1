@@ -2,70 +2,141 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 790EBC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 19:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 672BBC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 19:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EE3E20863
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 19:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE3E20863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA6F20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 19:41:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA6F20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57997 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58009 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDa8N-0003fT-Ls
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 15:40:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44339)
+	id 1hDa9T-0004Og-La
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 15:41:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDa5K-000284-Fh
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:39 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hDa72-00030f-32
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hDa5J-0007BW-CR
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:38 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:58135)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hDa5J-0007Ap-0O
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:37:37 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
-	(Nemesis)
-	id 1MelWf-1gf4jz1smL-00ake9; Mon, 08 Apr 2019 21:37:18 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 21:37:11 +0200
-Message-Id: <20190408193711.32680-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190408193711.32680-1-laurent@vivier.eu>
-References: <20190408193711.32680-1-laurent@vivier.eu>
+	(envelope-from <jsnow@redhat.com>) id 1hDa70-00082v-Ub
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:39:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hDa70-00082m-Id
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 15:39:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F16B03082AED;
+	Mon,  8 Apr 2019 19:30:51 +0000 (UTC)
+Received: from [10.10.125.81] (ovpn-125-81.rdu2.redhat.com [10.10.125.81])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 60D10108BF0D;
+	Mon,  8 Apr 2019 19:30:47 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>,
+	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+	<ef6ca1d8-50ac-5239-34eb-be05fad7af69@reactos.org>
+	<87o95hjbtu.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <cca2f2c2-6916-8db9-ef4c-72cd2a79c9ef@redhat.com>
+Date: Mon, 8 Apr 2019 15:30:46 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <87o95hjbtu.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/NmBRfLQlj6w7+pKeyyiXk1wBAY6dGCphEkiKEWySpOkeFAvUf7
-	I2lAIHF4FQz2sqzN3I03tB4kVnEqZGbFyrOmOhbJAHM49k8Ln6ZDPqnHcXtsXTfZ9Omlm7w
-	oUXKpY5m5wtlsYjj9GqmGS9F8L3KPPBQcXmN1PyqQLNu7bn6ulO5m5W6I94Zu7z3Izh85PB
-	+N4KXSeMaQglaWsEUS0xA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tMCD/o/Tj3Y=:ARUcA7nERBCaME/xP5+7DQ
-	3Mr/QdyI0BxBnhosFqzr3MWsZLRIySfLauh+fg6wuVybz9XgEg7JxCu5xWyIrP4GoDOL4HU7r
-	ppbRNE6Cc0IhATtbz+0qSA/j2Dx066x82MIWc8XeIOl+GdnSjS1/CoqBON0YJQ9jC8H0ZrRQQ
-	ejnho8xHCUKezdhk70va+wNx/qtbKjpO+CodNoHkuVaM40lLsmPLMxD1fHDJJR0YlIxj48Z8c
-	7o0D6WOqnjG3KJLqRNXFsrh+bn3MXIi2KA+HlyF/LdThmQNOX3cd9RObgrkEFlYXAan8NjNlo
-	2edRY6slRPgZEASahFNhJ6q34bp1U+/s5+vnhvF2oEuSR/aBbAYUrERoqZ5+y7kBk6jFAtItb
-	u+RARR1UT2Fq4TMrZFIf2KjZ6+2/7nbnQdd9EjZuKw2OM1sE1Zurss3cgCZfVRQhMZMtk1CAH
-	GHOw4VxteOp/swa2QuKqakmPCyMVrfPerplmXol0jYNOX86j06arHG29SSwVA4acpntWL8FlP
-	ZUAumW4MBNHTqMfrLjeSHrVKg+EdxNOZTzcrMJ7k2i53gfb5ft7eiB+tvrk3nmcPVdkfE+ATy
-	yRU9f+AkcihSTAyTrjoenZ7hfQKDLvegVi3kHjeL4WUrxRuscVrpQexcYEdbA8IdXlktXduVl
-	1dWDPgJORvcymFh5fOWqLHgdZvM3w/zoE49NuFMbUTf72NFOiJwWRpwq/feZUdiJWdWht/xTO
-	jEodFjdLlkyaHH+rXLFKkdhxqtffQW5cdkb0BCIiHeZUhfHJ05Ry7LDUGxU=
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 08 Apr 2019 19:30:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PULL 2/2] linux-user: rename gettid() to sys_gettid()
- to avoid clash with glibc
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,95 +148,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Juan Quintela <quintela@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408193711.G7vWIg8A-YkWSg3WzWcX73C8D9-a4HREiFHCgVroA6g@z>
+Message-ID: <20190408193046.uFH60oqnbH37s2PUeu2pvaHJhKq4ow4Ek75kQrU31vU@z>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
 
-The glibc-2.29.9000-6.fc31.x86_64 package finally includes the gettid()
-function as part of unistd.h when __USE_GNU is defined. This clashes
-with linux-user code which unconditionally defines this function name
-itself.
 
-/home/berrange/src/virt/qemu/linux-user/syscall.c:253:16: error: static declaration of ‘gettid’ follows non-static declaration
-  253 | _syscall0(int, gettid)
-      |                ^~~~~~
-/home/berrange/src/virt/qemu/linux-user/syscall.c:184:13: note: in definition of macro ‘_syscall0’
-  184 | static type name (void)   \
-      |             ^~~~
-In file included from /usr/include/unistd.h:1170,
-                 from /home/berrange/src/virt/qemu/include/qemu/osdep.h:107,
-                 from /home/berrange/src/virt/qemu/linux-user/syscall.c:20:
-/usr/include/bits/unistd_ext.h:34:16: note: previous declaration of ‘gettid’ was here
-   34 | extern __pid_t gettid (void) __THROW;
-      |                ^~~~~~
-  CC      aarch64-linux-user/linux-user/signal.o
-make[1]: *** [/home/berrange/src/virt/qemu/rules.mak:69: linux-user/syscall.o] Error 1
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:449: subdir-aarch64-linux-user] Error 2
+On 4/8/19 1:38 AM, Markus Armbruster wrote:
+> Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
+>=20
+>> Le 05/04/2019 =C3=A0 12:29, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
+=A0:
+>>> Hi,
+>>>
+>>> I am trying to understand the possible values for the MAX_FD variable
+>>> used by the floppy controller model (hw/block/fdc.c).
+>>>
+>>> Looking at git history:
+>>>
+>>> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
+>>>    FDC introduced with "#define MAX_FD 2"
+>>>
+>>> - 2008-04-29 78ae820cfeb0 (Herv=C3=A9 Poussineau):
+>>>    Supports up to 4 floppy drives if MAX_FD is set to 4
+>>>    Migration stream knows about runtime value of MAX_FD
+>>>
+>>> - 2009-09-10 d7a6c2703577 (Juan Quintela):
+>>>    FDC vmstate-ified
+>>>    Migration stream use compile time value of MAX_FD
+>>>
+>>> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
+>>>
+>>> Since d7a6c2703577 MAX_FD can not be different than 2 without breakin=
+g
+>>> migration.
+>>>
+>>> If I understand correctly migration, first we should change in
+>>> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
+>>>
+>>> Then to be able to use >2 floppy disks I have to modify the the
+>>> vmstate.version_id, and
+>>>
+>>> 1/ add a new field in the vmstate_fdc containing the number of drives
+>>> and add code to check >2 and adapt
+>>>
+>>> or
+>>>
+>>> 2/ change MAX_FD to 4 for all the codebase, adding some code to migra=
+te
+>>> to older FDC with only 2 disks...
+>>>
+>>> Another option I don't like is:
+>>>
+>>> 3/ get ride of MAX_FD !=3D 2 and clean the codebase...
+>>>
+>>> $ git grep '#if MAX_FD'
+>>> hw/block/fdc.c:744:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:758:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:1317:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:1340:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:2041:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:2079:#if MAX_FD =3D=3D 4
+>>> hw/block/fdc.c:2104:#if MAX_FD =3D=3D 4
+>>>
+>>> Herv=C3=A9, what board are/were you using with 4 floppy drives?
+>>
+>> That was only an attempt to support 4 drives in code, as controller wa=
+s able to do it.
+>> However, no emulated board took advantage of it, so that's why it kind=
+-of regressed.
+>>
+>> Feel free to choose the solution you prefer.
+>=20
+> Since no user has appeared since 2008, it feels safe enough to assume
+> that none will appear going forward.  I lean towards your "3/ get ride
+> of MAX_FD !=3D 2 and clean the codebase..."  Explain in a comment that =
+we
+> emulate only a 2-drive floppy controller, not the genuine IBM PC 4-driv=
+e
+> floppy controller.
+>=20
 
-While we could make our definition conditional and rely on glibc's impl,
-this patch simply renames our definition to sys_gettid() which is a
-common pattern in this file.
+I think I'd rather have MAX_FD set to 2 and a cleaner codebase than a
+half-working implementation for 4.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190320161842.13908-3-berrange@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Or, does it actually work with four? I think if Herv=C3=A9 wants to prese=
+rve
+this feature it should be formalized as a device property and made to
+work with migration ... or I am content to remove it.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 11729f382cf4..96cd4bf86dd3 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -249,7 +249,8 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
- #define TARGET_NR__llseek TARGET_NR_llseek
- #endif
- 
--_syscall0(int, gettid)
-+#define __NR_sys_gettid __NR_gettid
-+_syscall0(int, sys_gettid)
- 
- /* For the 64-bit guest on 32-bit host case we must emulate
-  * getdents using getdents64, because otherwise the host
-@@ -5434,7 +5435,7 @@ static void *clone_func(void *arg)
-     cpu = ENV_GET_CPU(env);
-     thread_cpu = cpu;
-     ts = (TaskState *)cpu->opaque;
--    info->tid = gettid();
-+    info->tid = sys_gettid();
-     task_settid(ts);
-     if (info->child_tidptr)
-         put_user_u32(info->tid, info->child_tidptr);
-@@ -5579,9 +5580,9 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-                mapping.  We can't repeat the spinlock hack used above because
-                the child process gets its own copy of the lock.  */
-             if (flags & CLONE_CHILD_SETTID)
--                put_user_u32(gettid(), child_tidptr);
-+                put_user_u32(sys_gettid(), child_tidptr);
-             if (flags & CLONE_PARENT_SETTID)
--                put_user_u32(gettid(), parent_tidptr);
-+                put_user_u32(sys_gettid(), parent_tidptr);
-             ts = (TaskState *)cpu->opaque;
-             if (flags & CLONE_SETTLS)
-                 cpu_set_tls (env, newtls);
-@@ -10621,7 +10622,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return TARGET_PAGE_SIZE;
- #endif
-     case TARGET_NR_gettid:
--        return get_errno(gettid());
-+        return get_errno(sys_gettid());
- #ifdef TARGET_NR_readahead
-     case TARGET_NR_readahead:
- #if TARGET_ABI_BITS == 32
--- 
-2.20.1
-
+--js
 
