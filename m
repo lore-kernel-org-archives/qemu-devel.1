@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39595)
+Received: from eggs.gnu.org ([209.51.188.92]:39999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDQXi-0001o4-J1
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:26:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDQXq-0002BR-Ta
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:26:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDQOk-0001Ag-Mv
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:17:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51250)
+	(envelope-from <armbru@redhat.com>) id 1hDQNX-0000dE-KL
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:15:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDQOk-00019x-BX
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:17:02 -0400
-Date: Mon, 8 Apr 2019 10:16:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190408091649.GD2687@work-vm>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-	<20190405085628.GA2819@work-vm>
-	<20190405191850-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDQNX-0000cr-9n
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:15:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4110030BC679
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 09:15:46 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190403114958.3705-1-quintela@redhat.com>
+	<20190403114958.3705-7-quintela@redhat.com>
+Date: Mon, 08 Apr 2019 11:15:44 +0200
+In-Reply-To: <20190403114958.3705-7-quintela@redhat.com> (Juan Quintela's
+	message of "Wed, 3 Apr 2019 13:49:56 +0200")
+Message-ID: <87tvf8svr3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190405191850-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: Add multifd-compress
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,192 +34,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jens Freimann <jfreimann@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com, ailan@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
-> > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > ping
-> > > 
-> > > FYI: I'm also working on a few related tools to detect driver behaviour when
-> > > assigning a MAC to the vf device. Code is at https://github.com/jensfr/netfailover_driver_detect
-> > 
-> > Hi Jens,
-> >   I've not been following this too uch, but:
-> > 
-> > > regards,
-> > > Jens
-> > > 
-> > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
-> > > > This is another attempt at implementing the host side of the
-> > > > net_failover concept
-> > > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> > > > 
-> > > > The general idea is that we have a pair of devices, a vfio-pci and a
-> > > > emulated device. Before migration the vfio device is unplugged and data
-> > > > flows to the emulated device, on the target side another vfio-pci device
-> > > > is plugged in to take over the data-path. In the guest the net_failover
-> > > > module will pair net devices with the same MAC address.
-> > > > 
-> > > > * In the first patch the infrastructure for hiding the device is added
-> > > >  for the qbus and qdev APIs. A "hidden" boolean is added to the device
-> > > >  state and it is set based on a callback to the standby device which
-> > > >  registers itself for handling the assessment: "should the primary device
-> > > >  be hidden?" by cross validating the ids of the devices.
-> > > > 
-> > > > * In the second patch the virtio-net uses the API to hide the vfio
-> > > >  device and unhides it when the feature is acked.
-> > > > 
-> > > > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
-> > > > 
-> > > > To summarize concerns/feedback from previous discussion:
-> > > > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
-> > > >  Migration might get stuck for unpredictable time with unclear reason.
-> > > >  This approach combines two tricky things, hot/unplug and migration.
-> > > >  -> We can surprise-remove the PCI device and in QEMU we can do all
-> > > >     necessary rollbacks transparent to management software. Will it be
-> > > >     easy, probably not.
-> > 
-> > This sounds 'fun' - bonus cases are things like what happens if the
-> > guest gets rebooted somewhere during the process or if it's currently
-> > sitting in the bios/grub/etc
-> 
-> Um, during which process? Guests are gradually fixed to support
-> surprise removal well. Part of it is thunderbolt which makes
-> it incredibly easy. Yes - bios/grub will need to learn to
-> handle this well.
+Juan Quintela <quintela@redhat.com> writes:
 
-Ignoring the actual mechanism of the unplug itself; there are probably
-loads of cases; e.g.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+> ---
+> Rename it to NONE
+> ---
+>  hmp.c                        | 17 +++++++++++++++++
+>  hw/core/qdev-properties.c    | 11 +++++++++++
+>  include/hw/qdev-properties.h |  1 +
+>  migration/migration.c        | 16 ++++++++++++++++
+>  qapi/common.json             | 13 +++++++++++++
+>  qapi/migration.json          | 19 +++++++++++++++----
+>  tests/migration-test.c       | 13 ++++++++++---
+>  7 files changed, 83 insertions(+), 7 deletions(-)
+>
+> diff --git a/hmp.c b/hmp.c
+> index 8eec768088..02fbe27757 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -435,6 +435,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_CHANNELS),
+>              params->multifd_channels);
+> +        monitor_printf(mon, "%s: %s\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_COMPRESS),
+> +            MultifdCompress_str(params->multifd_compress));
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+> @@ -1737,6 +1740,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>      MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
+>      uint64_t valuebw = 0;
+>      uint64_t cache_size;
+> +    int compress_type;
+>      Error *err = NULL;
+>      int val, ret;
+>  
+> @@ -1822,6 +1826,19 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          p->has_multifd_channels = true;
+>          visit_type_int(v, param, &p->multifd_channels, &err);
+>          break;
+> +    case MIGRATION_PARAMETER_MULTIFD_COMPRESS:
+> +        p->has_multifd_compress = true;
+> +        visit_type_enum(v, param, &compress_type,
+> +                        &MultifdCompress_lookup, &err);
 
-      running with both cards
-      hot unplug real card
-      start migration
-      guest reboots
-        Kernel sees only the virtio card
-      migration completes
-      hotadd the real card back
+visit_type_MultifdCompress(), please.
 
-so the guest has to know to pair the real card even though it booted
-with only the virtio card.
+> +        if (err) {
+> +            break;
+> +        }
+> +        if (compress_type < 0 || compress_type > MULTIFD_COMPRESS__MAX) {
+> +            error_setg(&err, "Invalid multifd_compress option %s", valuestr);
+> +            break;
+> +        }
+> +        p->multifd_compress = compress_type;
+> +        break;
+>      case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
+>          p->has_xbzrle_cache_size = true;
+>          visit_type_size(v, param, &cache_size, &err);
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 5da1439a8b..7c8e71532f 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -645,6 +645,17 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
+>      .set_default_value = set_default_value_enum,
+>  };
+>  
+> +/* --- MultifdCompress --- */
+> +
+> +const PropertyInfo qdev_prop_multifd_compress = {
+> +    .name = "MultifdCompress",
+> +    .description = "multifd_compress values",
 
-I'm sure there are loads of other corners.
+Similar property declarations list the valid values in .description.
 
-> > > > 2. PCI devices are a precious ressource. The primary device should never
-> > > >  be added to QEMU if it won't be used by guest instead of hiding it in
-> > > >  QEMU.
-> > > >  -> We only hotplug the device when the standby feature bit was
-> > > >     negotiated. We save the device cmdline options until we need it for
-> > > >     qdev_device_add()
-> > > >     Hiding a device can be a useful concept to model. For example a
-> > > >     pci device in a powered-off slot could be marked as hidden until the slot is
-> > > >     powered on (mst).
-> > 
-> > Are they really that precious? Personally it's not something I'd worry
-> > about.
-> > 
-> > > > 3. Management layer software should handle this. Open Stack already has
-> > > >  components/code to handle unplug/replug VFIO devices and metadata to
-> > > >  provide to the guest for detecting which devices should be paired.
-> > > >  -> An approach that includes all software from firmware to
-> > > >     higher-level management software wasn't tried in the last years. This is
-> > > >     an attempt to keep it simple and contained in QEMU as much as possible.
-> > > > 4. Hotplugging a device and then making it part of a failover setup is
-> > > >   not possible
-> > > >  -> addressed by extending qdev hotplug functions to check for hidden
-> > > >     attribute, so e.g. device_add can be used to plug a device.
-> > > > 
-> > > > There are still some open issues:
-> > > > 
-> > > > Migration: I'm looking for something like a pre-migration hook that I
-> > > > could use to unplug the vfio-pci device. I tried with a migration
-> > > > notifier but it is called to late, i.e. after migration is aborted due
-> > > > to vfio-pci marked unmigrateable. I worked around this by setting it
-> > > > to migrateable and used a migration notifier on the virtio-net device.
-> > 
-> > Why not just let this happen at the libvirt level; then you do the
-> > hotunplug etc before you actually tell qemu anything about starting a
-> > migration?
-> 
-> If qemu frees up resources (as it does on unplug) then libvirt
-> is not guaranteed it can roll the change back on e.g.
-> migration failure.
+> +    .enum_table = &MultifdCompress_lookup,
+> +    .get = get_enum,
+> +    .set = set_enum,
+> +    .set_default_value = set_default_value_enum,
+> +};
+> +
+>  /* --- pci address --- */
+>  
+>  /*
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index b6758c852e..ac452d8f2c 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -23,6 +23,7 @@ extern const PropertyInfo qdev_prop_tpm;
+>  extern const PropertyInfo qdev_prop_ptr;
+>  extern const PropertyInfo qdev_prop_macaddr;
+>  extern const PropertyInfo qdev_prop_on_off_auto;
+> +extern const PropertyInfo qdev_prop_multifd_compress;
+>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>  extern const PropertyInfo qdev_prop_blockdev_on_error;
+>  extern const PropertyInfo qdev_prop_bios_chs_trans;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 609e0df5d0..d6f8ef342a 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -82,6 +82,7 @@
+>  /* The delay time (in ms) between two COLO checkpoints */
+>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+> +#define DEFAULT_MIGRATE_MULTIFD_COMPRESS MULTIFD_COMPRESS_NONE
+>  
+>  /* Background transfer rate for postcopy, 0 means unlimited, note
+>   * that page requests can still exceed this limit.
+> @@ -769,6 +770,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->block_incremental = s->parameters.block_incremental;
+>      params->has_multifd_channels = true;
+>      params->multifd_channels = s->parameters.multifd_channels;
+> +    params->has_multifd_compress = true;
+> +    params->multifd_compress = s->parameters.multifd_compress;
+>      params->has_xbzrle_cache_size = true;
+>      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+>      params->has_max_postcopy_bandwidth = true;
+> @@ -1268,6 +1271,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_multifd_channels) {
+>          dest->multifd_channels = params->multifd_channels;
+>      }
+> +    if (params->has_multifd_compress) {
+> +        dest->multifd_compress = params->multifd_compress;
+> +    }
+>      if (params->has_xbzrle_cache_size) {
+>          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+>      }
+> @@ -1364,6 +1370,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>      if (params->has_multifd_channels) {
+>          s->parameters.multifd_channels = params->multifd_channels;
+>      }
+> +    if (params->has_multifd_compress) {
+> +        s->parameters.multifd_compress = params->multifd_compress;
+> +    }
+>      if (params->has_xbzrle_cache_size) {
+>          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+>          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+> @@ -3353,6 +3362,9 @@ void migration_global_dump(Monitor *mon)
+>  #define DEFINE_PROP_MIG_CAP(name, x)             \
+>      DEFINE_PROP_BOOL(name, MigrationState, enabled_capabilities[x], false)
+>  
+> +#define DEFINE_PROP_MULTIFD_COMPRESS(_n, _s, _f, _d) \
+> +    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_multifd_compress, MultifdCompress)
+> +
 
-Can you explain this in a bit more detail please; do you mean if it
-frees the netdev?
+As long as qdev_prop_multifd_compress is exposed in qdev-properties.h,
+hiding the macro using it doesn't make sense to me.
 
-> But really another issue is simply that it's a mechanism,
-> there's no policy that management needs to decide on.
-> Doing it at lowest possible level ensures all
-> upper layers benefit with minimal pain.
+>  static Property migration_properties[] = {
+>      DEFINE_PROP_BOOL("store-global-state", MigrationState,
+>                       store_global_state, true),
+> @@ -3392,6 +3404,9 @@ static Property migration_properties[] = {
+>      DEFINE_PROP_UINT8("multifd-channels", MigrationState,
+>                        parameters.multifd_channels,
+>                        DEFAULT_MIGRATE_MULTIFD_CHANNELS),
+> +    DEFINE_PROP_MULTIFD_COMPRESS("multifd-compress", MigrationState,
+> +                      parameters.multifd_compress,
+> +                      DEFAULT_MIGRATE_MULTIFD_COMPRESS),
+>      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+>                        parameters.xbzrle_cache_size,
+>                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+> @@ -3481,6 +3496,7 @@ static void migration_instance_init(Object *obj)
+>      params->has_x_checkpoint_delay = true;
+>      params->has_block_incremental = true;
+>      params->has_multifd_channels = true;
+> +    params->has_multifd_compress = true;
+>      params->has_xbzrle_cache_size = true;
+>      params->has_max_postcopy_bandwidth = true;
+>      params->has_max_cpu_throttle = true;
+> diff --git a/qapi/common.json b/qapi/common.json
+> index 99d313ef3b..7248172792 100644
+> --- a/qapi/common.json
+> +++ b/qapi/common.json
+> @@ -193,3 +193,16 @@
+>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+>               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+>               'x86_64', 'xtensa', 'xtensaeb' ] }
+> +
+> +##
+> +# @MultifdCompress:
+> +#
+> +# An enumeration of multifd compression.
+> +#
+> +# @none: no compression.
+> +#
+> +# Since: 4.1
+> +#
+> +##
+> +{ 'enum': 'MultifdCompress',
+> +  'data': [ 'none' ] }
 
-Network setups in things like OpenStack can be really complex and
-involve interacting with switches etc - something somewhere might
-have to reconfigure a switch when you pull the real card.
+Any particular reason for putting this in common.json?  As is, it looks
+rather migration-specific to me...
 
-Dave
-
-> > > > Commandline: There is a dependency between vfio-pci and virtio-net
-> > > > devices. One points to the other via new parameters
-> > > > primar=<primary qdev id> and standby='<standby qdev id>'. This means
-> > > > that the primary device needs to be specified after standby device on
-> > > > the qemu command line. Not sure how to solve this.
-> > > > 
-> > > > Error handling: Patches don't cover all possible error scenarios yet.
-> > > > 
-> > > > I have tested this with a mlx5 NIC and was able to migrate the VM with
-> > > > above mentioned workarounds for open problems.
-> > > > 
-> > > > Command line example:
-> > > > 
-> > > > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
-> > > >        -machine q35,kernel-irqchip=split -cpu host   \
-> > > >        -k fr   \
-> > > >        -serial stdio   \
-> > > >        -net none \
-> > > >        -qmp unix:/tmp/qmp.socket,server,nowait \
-> > > >        -monitor telnet:127.0.0.1:5555,server,nowait \
-> > > >        -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
-> > > >        -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
-> > > >        -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
-> > > >        -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
-> > > >        -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,primary=hostdev0 \
-> > > >        -device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
-> > 
-> > Yes, that's a bit grim; it's circular dependency on the 'hostdev0' and
-> > 'net1' id's.  cc'ing in Markus.
-> > 
-> > Dave
-> > 
-> > > >        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
-> > > > 
-> > > > I'm grateful for any remarks or ideas!
-> > > > 
-> > > > Thanks!
-> > > > 
-> > > > regards,
-> > > > Jens
-> > > > 
-> > > > Sameeh Jubran (2):
-> > > >  qdev/qbus: Add hidden device support
-> > > >  net/virtio: add failover support
-> > > > 
-> > > > hw/core/qdev.c                 | 27 ++++++++++
-> > > > hw/net/virtio-net.c            | 95 ++++++++++++++++++++++++++++++++++
-> > > > hw/pci/pci.c                   |  1 +
-> > > > include/hw/pci/pci.h           |  2 +
-> > > > include/hw/qdev-core.h         |  8 +++
-> > > > include/hw/virtio/virtio-net.h |  7 +++
-> > > > qdev-monitor.c                 | 48 +++++++++++++++--
-> > > > vl.c                           |  7 ++-
-> > > > 8 files changed, 189 insertions(+), 6 deletions(-)
-> > > > 
-> > > > -- 
-> > > > 2.20.1
-> > > > 
-> > > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 9cfbaf8c6c..629795fd30 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -580,6 +580,9 @@
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>  #                    Defaults to 99. (Since 3.1)
+>  #
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.1)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -592,7 +595,7 @@
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'multifd-channels',
+>             'xbzrle-cache-size', 'max-postcopy-bandwidth',
+> -           'max-cpu-throttle' ] }
+> +           'max-cpu-throttle', 'multifd-compress' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -680,7 +683,10 @@
+>  #                     (Since 3.0)
+>  #
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+> -#                    The default value is 99. (Since 3.1)
+> +#                    The default value is 99. (Since 4.0)
+> +#
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.1)
+>  #
+>  # Since: 2.4
+>  ##
+> @@ -707,7 +713,8 @@
+>              '*multifd-channels': 'int',
+>              '*xbzrle-cache-size': 'size',
+>              '*max-postcopy-bandwidth': 'size',
+> -	    '*max-cpu-throttle': 'int' } }
+> +	    '*max-cpu-throttle': 'int',
+> +            '*multifd-compress': 'MultifdCompress' } }
+>  
+>  ##
+>  # @migrate-set-parameters:
+> @@ -817,6 +824,9 @@
+>  #                    Defaults to 99.
+>  #                     (Since 3.1)
+>  #
+> +# @multifd-compress: What compression method to use.
+> +#                    Defaults to none. (Since 4.1)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -840,7 +850,8 @@
+>              '*multifd-channels': 'uint8',
+>              '*xbzrle-cache-size': 'size',
+>  	    '*max-postcopy-bandwidth': 'size',
+> -            '*max-cpu-throttle':'uint8'} }
+> +            '*max-cpu-throttle': 'uint8',
+> +            '*multifd-compress': 'MultifdCompress' } }
+>  
+>  ##
+>  # @query-migrate-parameters:
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 65d5e256a7..8a1ccc2516 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -449,7 +449,6 @@ static void migrate_check_parameter_str(QTestState *who, const char *parameter,
+>      g_free(result);
+>  }
+>  
+> -__attribute__((unused))
+>  static void migrate_set_parameter_str(QTestState *who, const char *parameter,
+>                                        const char *value)
+>  {
+> @@ -1065,7 +1064,7 @@ static void test_precopy_tcp(void)
+>      g_free(uri);
+>  }
+>  
+> -static void test_multifd_tcp(void)
+> +static void test_multifd_tcp(const char *method)
+>  {
+>      char *uri;
+>      QTestState *from, *to;
+> @@ -1087,6 +1086,9 @@ static void test_multifd_tcp(void)
+>      migrate_set_parameter_int(from, "multifd-channels", 2);
+>      migrate_set_parameter_int(to, "multifd-channels", 2);
+>  
+> +    migrate_set_parameter_str(from, "multifd-compress", method);
+> +    migrate_set_parameter_str(to, "multifd-compress", method);
+> +
+>      migrate_set_capability(from, "multifd", "true");
+>      migrate_set_capability(to, "multifd", "true");
+>      /* Wait for the first serial output from the source */
+> @@ -1112,6 +1114,11 @@ static void test_multifd_tcp(void)
+>      test_migrate_end(from, to, true);
+>  }
+>  
+> +static void test_multifd_tcp_none(void)
+> +{
+> +    test_multifd_tcp("none");
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      char template[] = "/tmp/migration-test-XXXXXX";
+> @@ -1166,7 +1173,7 @@ int main(int argc, char **argv)
+>      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+>      /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
+>      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+> -    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
+> +    qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none);
+>  
+>      ret = g_test_run();
