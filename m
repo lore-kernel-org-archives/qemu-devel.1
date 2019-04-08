@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7A4C282CE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03269C282CE
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15B2C20880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B2C20880
+	by mail.kernel.org (Postfix) with ESMTPS id C7C9520880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C9520880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49483 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDPuC-0006xQ-Af
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:45:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48999)
+	id 1hDPuB-0006wo-R0
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:45:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDPlc-0008BP-Hq
+	(envelope-from <armbru@redhat.com>) id 1hDPlc-0008Ay-6f
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDPlb-0003gn-KH
+	(envelope-from <armbru@redhat.com>) id 1hDPlb-0003fk-0Q
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33692)
+Received: from mx1.redhat.com ([209.132.183.28]:48950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDPlb-0003fV-7t
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:35 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hDPlX-0003cC-IX; Mon, 08 Apr 2019 04:36:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8255B308FEFF
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 08:36:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DB8AE307E04F;
+	Mon,  8 Apr 2019 08:36:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 029FF1091EEC;
-	Mon,  8 Apr 2019 08:36:32 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F984600D4;
+	Mon,  8 Apr 2019 08:36:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id EB1791132A03; Mon,  8 Apr 2019 10:36:27 +0200 (CEST)
+	id CFFAB1132BD3; Mon,  8 Apr 2019 10:36:27 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 10:36:19 +0200
-Message-Id: <20190408083627.7479-8-armbru@redhat.com>
+Date: Mon,  8 Apr 2019 10:36:14 +0200
+Message-Id: <20190408083627.7479-3-armbru@redhat.com>
 In-Reply-To: <20190408083627.7479-1-armbru@redhat.com>
 References: <20190408083627.7479-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 08 Apr 2019 08:36:34 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Mon, 08 Apr 2019 08:36:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 07/15] hpet: Report warnings with warn_report(),
- not error_printf()
+Subject: [Qemu-devel] [PATCH 02/15] block/ssh: Do not report
+ read/write/flush errors to the user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,33 +69,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408083619.EzRLX8gNdkBhffxR3y0e3G5M8ukMBjGBdov-fkWd6z4@z>
+Message-ID: <20190408083614.TGTYjuiT32uUlgnKXaXf4MPXV-sQ5kMsGpnQNjv1cks@z>
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Callbacks ssh_co_readv(), ssh_co_writev(), ssh_co_flush() report
+errors to the user with error_printf().  They shouldn't, it's their
+caller's job.  Replace by a suitable trace point.
+
+Perhaps we should convert this part of the block driver interface to
+Error, so block drivers can pass more detail to their callers.  Not
+today.
+
+Cc: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/timer/hpet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/ssh.c        | 36 ++++++++++++------------------------
+ block/trace-events |  3 +++
+ 2 files changed, 15 insertions(+), 24 deletions(-)
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index d97436bc7b..41024f39fb 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -744,7 +744,7 @@ static void hpet_realize(DeviceState *dev, Error **errp)
-     HPETTimer *timer;
+diff --git a/block/ssh.c b/block/ssh.c
+index 190ef95300..382fc04fbf 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -159,31 +159,19 @@ sftp_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
+     g_free(msg);
+ }
  
-     if (!s->intcap) {
--        error_printf("Hpet's intcap not initialized.\n");
-+        warn_report("Hpet's intcap not initialized");
+-static void GCC_FMT_ATTR(2, 3)
+-sftp_error_report(BDRVSSHState *s, const char *fs, ...)
++static void sftp_error_trace(BDRVSSHState *s, const char *op)
+ {
+-    va_list args;
++    char *ssh_err;
++    int ssh_err_code;
++    unsigned long sftp_err_code;
+ 
+-    va_start(args, fs);
+-    error_vprintf(fs, args);
+-
+-    if ((s)->sftp) {
+-        char *ssh_err;
+-        int ssh_err_code;
+-        unsigned long sftp_err_code;
+-
+-        /* This is not an errno.  See <libssh2.h>. */
+-        ssh_err_code = libssh2_session_last_error(s->session,
++    /* This is not an errno.  See <libssh2.h>. */
++    ssh_err_code = libssh2_session_last_error(s->session,
+                                                   &ssh_err, NULL, 0);
+-        /* See <libssh2_sftp.h>. */
+-        sftp_err_code = libssh2_sftp_last_error((s)->sftp);
++    /* See <libssh2_sftp.h>. */
++    sftp_err_code = libssh2_sftp_last_error((s)->sftp);
+ 
+-        error_printf(": %s (libssh2 error code: %d, sftp error code: %lu)",
+-                     ssh_err, ssh_err_code, sftp_err_code);
+-    }
+-
+-    va_end(args);
+-    error_printf("\n");
++    trace_sftp_error(op, ssh_err, ssh_err_code, sftp_err_code);
+ }
+ 
+ static int parse_uri(const char *filename, QDict *options, Error **errp)
+@@ -1035,7 +1023,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
+             goto again;
+         }
+         if (r < 0) {
+-            sftp_error_report(s, "read failed");
++            sftp_error_trace(s, "read");
+             s->offset = -1;
+             return -EIO;
+         }
+@@ -1105,7 +1093,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+             goto again;
+         }
+         if (r < 0) {
+-            sftp_error_report(s, "write failed");
++            sftp_error_trace(s, "write");
+             s->offset = -1;
+             return -EIO;
+         }
+@@ -1188,7 +1176,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
+         return 0;
      }
-     if (hpet_cfg.count == UINT8_MAX) {
-         /* first instance */
+     if (r < 0) {
+-        sftp_error_report(s, "fsync failed");
++        sftp_error_trace(s, "fsync");
+         return -EIO;
+     }
+ 
+diff --git a/block/trace-events b/block/trace-events
+index 7335a42540..79ccd8d824 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -208,3 +208,6 @@ sheepdog_co_rw_vector_new(uint64_t oid) "new oid 0x%" PRIx64
+ sheepdog_snapshot_create_info(const char *sn_name, const char *id, const char *name, int64_t size, int is_snapshot) "sn_info: name %s id_str %s s: name %s vm_state_size %" PRId64 " " "is_snapshot %d"
+ sheepdog_snapshot_create(const char *sn_name, const char *id) "%s %s"
+ sheepdog_snapshot_create_inode(const char *name, uint32_t snap, uint32_t vdi) "s->inode: name %s snap_id 0x%" PRIx32 " vdi 0x%" PRIx32
++
++# ssh.c
++sftp_error(const char *op, const char *ssh_err, int ssh_err_code, unsigned long sftp_err_code) "%s failed: %s (libssh2 error code: %d, sftp error code: %lu)"
 -- 
 2.17.2
 
