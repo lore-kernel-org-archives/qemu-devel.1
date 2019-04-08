@@ -2,60 +2,83 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A072C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 01:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E868C282DD
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 01:59:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB7A520833
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 01:46:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7A520833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47C4120879
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 01:59:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCJew8/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C4120879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45858 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45953 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDJMz-00032z-4Q
-	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 21:46:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60777)
+	id 1hDJZG-0004Zl-9P
+	for qemu-devel@archiver.kernel.org; Sun, 07 Apr 2019 21:59:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1hDJM9-0002ib-LA
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 21:45:54 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDJYR-0004FZ-Dr
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 21:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1hDJM8-0005aJ-GB
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 21:45:53 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59174 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <guoheyi@huawei.com>)
-	id 1hDJM5-0005VI-NU; Sun, 07 Apr 2019 21:45:50 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-	by Forcepoint Email with ESMTP id EB38DE45BE85DA402998;
-	Mon,  8 Apr 2019 09:45:43 +0800 (CST)
-Received: from [127.0.0.1] (10.177.31.55) by DGGEMS409-HUB.china.huawei.com
-	(10.3.19.209) with Microsoft SMTP Server id 14.3.408.0; Mon, 8 Apr 2019
-	09:45:33 +0800
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1554624893-8363-1-git-send-email-guoheyi@huawei.com>
-	<CAFEAcA-N=y3k41oexvYaQ+tKj1d2tCZh8MhPvdq8Uz7dh-eWWA@mail.gmail.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <cb3534ef-2bd0-0518-c6ca-01c1f6511199@huawei.com>
-Date: Mon, 8 Apr 2019 09:45:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
-	Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-N=y3k41oexvYaQ+tKj1d2tCZh8MhPvdq8Uz7dh-eWWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.31.55]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.32
-Subject: Re: [Qemu-devel] [RFC] arm/virt: add one more uart for UEFI runtime
- debug
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDJYP-0001kQ-TP
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 21:58:35 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:43609)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hDJYP-0001jY-Jh
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 21:58:33 -0400
+Received: by mail-qt1-x842.google.com with SMTP id v32so13617111qtc.10
+	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 18:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=UJ3xa018bb6QorxLPMflAByB25j56KTQmZ9gqnHPprM=;
+	b=kCJew8/6s4lhtAl5liMq4jkTSTagH3ub9OnaQGW9Ix6QwAMZ2pF1WRKFRBYV8Y77hg
+	QW+mkzGgsr2wvkvVEFiYvD2r4xc9zXD7LtRYPAUYeDbVxgLPxuupWRJFVlxnfBJgt8rE
+	3nsxPwejHA2IAkUeS12v7LcYvee9IWsLOdE1swh6cMOtkcaI6/gTzsL/OmXtddKjvlwh
+	qGfXMmvkbyJ1ocPyMUn9AjWxAyGbSSOhVomTUwTYQ6Co3Q+mVR54Zk2khrKHSb8I2+AR
+	TNOdZBbgX9p37KePuM8wFrRHvLu7O3DU9k0KAI63f/ZoscSdeSC7x69KRZ5ypbqHOdq+
+	0HIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=UJ3xa018bb6QorxLPMflAByB25j56KTQmZ9gqnHPprM=;
+	b=VU4/t/uivFQAwOAwuz7rb6rPV/gtNa0jjEbovZcZ8cQiEBb6qxPD7Z5ZYdf2anL+gN
+	cf9ZfICYFDlIqNc5MvWTuf4dS3R56ch0bBSX1vaF/G65IfUPBl9Zt6akwikNNV4U+76R
+	hLxs0bSldoZjqCpNp7wU+VDkruyUqFuCV+kdYOLEik7an/3MdhTmTLYRC0uWf6GPJhyO
+	KhKKdN3/GpH8UE8H4pWGrD7iH7pKdysF/6yJjZZRQf73YxFSLZ0newuZhk0cucGLqcrD
+	RxgY13z/ki0acvwozCg7cwI27Z5F0/MYRvO1n4I+ygogiAeg5jQ5TmG0d1sj9EESlHeY
+	FZew==
+X-Gm-Message-State: APjAAAWsDgSKNwv4sceJl34nPG4bwithTc8RRpIGXiJr8Vrk0BR3EV7N
+	WRWYfzdhk/mTBvBADCbtaEY=
+X-Google-Smtp-Source: APXvYqxxcwRxAXl+XkPwLOALAdnFrYt3xaTBrQvMOtTbDRTr4ACidbT/kvLTemKxObDlaayQ4P7JIQ==
+X-Received: by 2002:ac8:3216:: with SMTP id x22mr22512777qta.114.1554688712233;
+	Sun, 07 Apr 2019 18:58:32 -0700 (PDT)
+Received: from localhost.localdomain (104.129.187.94.16clouds.com.
+	[104.129.187.94]) by smtp.gmail.com with ESMTPSA id
+	m41sm18055059qtb.58.2019.04.07.18.58.31
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 07 Apr 2019 18:58:31 -0700 (PDT)
+From: Catherine Ho <catherine.hecx@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Date: Sun,  7 Apr 2019 21:56:56 -0400
+Message-Id: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::842
+Subject: [Qemu-devel] [PATCH v3] migration: do not rom_reset() during
+ incoming migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,64 +90,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, qemu-arm <qemu-arm@nongnu.org>,
-	Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408014532.pYo0pCEQvZT7ocx6rUBPZWZWBnnM-qE3oOpJD-qZx3c@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190408015656.SjMbI6AL5jMdtzP7RP8a2C-JlVLeYnGKdMIBVkT8bNw@z>
 
+Commit 18269069c310 ("migration: Introduce ignore-shared capability")
+addes ignore-shared capability to bypass the shared ramblock (e,g,
+membackend + numa node). It does good to live migration.
 
+As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
+until VM starts, but it does on aarch64 qemu:
+Backtrace:
+1  0x000055f4a296dd84 in address_space_write_rom_internal () at
+exec.c:3458
+2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
+3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
+4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
+5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
+6  0x000055f4a2c9851d in main () at vl.c:4552
 
-On 2019/4/7 21:16, Peter Maydell wrote:
-> On Sun, 7 Apr 2019 at 09:19, Heyi Guo <guoheyi@huawei.com> wrote:
->> This patch is based on the discussion in TianoCore edk2-devel mailing
->> list:
->> https://lists.01.org/pipermail/edk2-devel/2019-March/037986.html
->>
->> The conclusion is that we need an individual UART for UEFI runtime
->> services to print debug message at runtime, to avoid conflicting with
->> the system UART. We cannot use the secure UART either, for we may both
->> have Trusted Firmware and UEFI runtime services running on the VM, and
->> it is not easy to keep synchronization between the two components.
-> I don't think it makes much sense to keep adding UARTs for every
-> bit of the system software stack. We don't have an infinite
-> supply of UARTs on real hardware either -- how is this handled
-> there ?
-As you were in the edk2 mail thread, I supposed you also agreed to add one more UART. What did you mean by "I do still have a todo list item to add a 2nd UART"? How shall we do that?
+Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
+druing rom_reset. In ignore-shared incoming case, this rom filling
+is not required since all the data has been stored in memory backend
+file.
 
-On our real hardware platforms, we don't have a separate serial port for UEFI runtime services; that's the reason for why I had wanted to have an adaptable approach for platform without one more serial port...
+Further more, as suggested by Peter Xu, if we do rom_reset() now with
+these ROMs then the RAM data should be re-filled again too with the
+migration stream coming in.
 
->
-> Also adding new UARTs to this board is awkward because of
-> the weird choices various bits of software have made in
-> reading the dtb and picking a UART if there's more than one
-> listed.
->
->> @@ -713,13 +715,23 @@ static void create_uart(const VirtMachineState *vms, qemu_irq *pic, int uart,
->>       if (uart == VIRT_UART) {
->>           qemu_fdt_setprop_string(vms->fdt, "/chosen", "stdout-path", nodename);
->>       } else {
->> +        const char *status_string;
->> +
->> +        if (uart == VIRT_SECURE_UART) {
->> +            status_string = "secure-status";
->> +        } else {
->> +            status_string = "uefi-status";
-> Where does this status string come from? The "secure-status" one
-> is documented in the device tree spec and has a well defined
-> meaning.
-Sorry this came from my imagination, so I sent it as a "RFC" :)
+Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
+capability")
+Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Suggested-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+---
+ hw/core/loader.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thanks,
-Heyi
-
->
-> thanks
-> -- PMM
->
-> .
->
-
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index fe5cb24122..946bb8ff00 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -1087,6 +1087,13 @@ static void rom_reset(void *unused)
+ {
+     Rom *rom;
+ 
++    /*
++     * If we do rom_reset() now with these ROMs then the RAM data should be
++     * re-filled again too with the migration stream coming in.
++     */
++    if (runstate_check(RUN_STATE_INMIGRATE))
++        return;
++
+     QTAILQ_FOREACH(rom, &roms, next) {
+         if (rom->fw_file) {
+             continue;
+-- 
+2.17.1
 
 
