@@ -3,67 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 258BFC10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D8DAC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:02:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E991020663
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 10:55:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E991020663
+	by mail.kernel.org (Postfix) with ESMTPS id 2E0E120857
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 11:02:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E0E120857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51031 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51099 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDRvw-00053a-7w
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 06:55:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34419)
+	id 1hDS2c-0006VK-Ag
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 07:02:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDRuv-0004WZ-PT
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:22 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDS1L-0005rO-94
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDRut-0000cn-OW
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDRuq-0000Rc-1W
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 06:54:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C68BB3087944;
-	Mon,  8 Apr 2019 10:54:13 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-29.rdu2.redhat.com
-	[10.10.121.29])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A818160851;
-	Mon,  8 Apr 2019 10:54:05 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
-References: <20190405153314.2068-1-philmd@redhat.com>
-	<20190405153314.2068-2-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <38bea80e-fe2a-78d6-bd2e-f997ea9e4df2@redhat.com>
-Date: Mon, 8 Apr 2019 12:54:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	(envelope-from <philmd@redhat.com>) id 1hDS1K-0004VR-4d
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:00:59 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:47022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDS1J-0004Uw-Sn
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 07:00:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id t17so15772866wrw.13
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 04:00:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=mbonHmMlo2iVkQqwG5E8BJk/0dXPRqWa0plBAoUOL5U=;
+	b=c3+Bsw6GWy9rY1FYLS42Xk+OKG0Bhba+fZn5rtgHaVj30BCzymFgHzU8AUebe0HSNt
+	RXuXUiMCZuE2nRCyAl/AGh69m+IGr4v/Wvxnl9qmMnKCLv+zI+IghUxOjXH9iQLMHHoN
+	5jQVh9s7zi14pX/y+m/RbonpKZfnqO+GefBccjKSh/z2V1zs368LEJPJuaxLZnYvy8JH
+	oePyndoaC7aKdabSMNjoizArYlYRpBkblyGIQ0dSC+RohQYS1rNcyt38hxuZzfhtBR4U
+	aylSs6yEdQXlkb64X71wx3FRrUsTgGWEKO3t0EUQBjXtKTjBXfutbR+ZtNQAgIeB8w9D
+	f1Ow==
+X-Gm-Message-State: APjAAAVeCh60CaEu6p76x0aXihy4O94/xictdUumlZ97Cn/gJ+5LRI0F
+	TXMUtd8aDM4swrfa86ZuChwcig==
+X-Google-Smtp-Source: APXvYqzLuSwBnljRrEB0oTyTDRiRXsw+MPpMZFab8IZKOP19DgEs4us/n0SGWI+rvPglrb8WX1D2zA==
+X-Received: by 2002:adf:f10c:: with SMTP id r12mr43843wro.216.1554721256828;
+	Mon, 08 Apr 2019 04:00:56 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	s189sm23279417wmf.45.2019.04.08.04.00.55
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 04:00:56 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-13-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <73204a97-3391-141f-e636-3dd2ec5e1fa1@redhat.com>
+Date: Mon, 8 Apr 2019 13:00:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190405153314.2068-2-philmd@redhat.com>
+In-Reply-To: <20190408083627.7479-13-armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 08 Apr 2019 10:54:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 1/2] roms: Rename the EFIROM
- variable to avoid clashing with iPXE
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 12/15] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,99 +87,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408105404.ZBAyCza9v-8-GZqD2D9NoPCueoqpKacvSQhG_g1YhUw@z>
+Message-ID: <20190408110055.BbjiqqX_YwPeJ1FCx-Vuh3tTPJSA2t6uweL1jBe0olo@z>
 
-On 04/05/19 17:33, Philippe Mathieu-Daud=C3=A9 wrote:
-> The iPXE project already uses the EFIROM for a tool named 'efirom'
-> which is not the Intel EfiRom used by the EDK2 project. To make
-> the difference obvious, rename the variable.
->=20
-> This fixes a long standing issue which is now masked since commit
-> f590a812c21 "roms: build the EfiRom utility from the roms/edk2
-> submodule" (but would reappear in the next commit):
-
-[*]
-
->=20
->   $ git checkout f590a812c21~
->   $ make -C roms clean EFIROM=3D$(type -P EfiRom)
->   make: Entering directory '/source/qemu/roms'
->   [...]
->   make -C ipxe/src veryclean
->   make[1]: Entering directory '/source/qemu/roms/ipxe/src'
->   rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.* b=
-in{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin ./util/el=
-f2efi32 ./util/elf2efi64 /usr/bin/EfiRom ./util/efifatbin ./util/iccfix .=
-/util/einfo TAGS bin{,-*}/symtab
->   rm: cannot remove '/usr/bin/EfiRom': Permission denied
->   make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
->   make[1]: Leaving directory '/source/qemu/roms/ipxe/src'
->   make: *** [Makefile:152: clean] Error 2
->   make: Leaving directory '/source/qemu/roms'
->=20
-> Reported-by: Olaf Hering <olaf@aepfle.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 4/8/19 10:36 AM, Markus Armbruster wrote:
+> We commonly want to print to the current monitor if we have one, else
+> to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+> we have is monitor_vfprintf(), which is rather unwieldy.  We often
+> print to stderr just because error_printf() is easier.
+> 
+> New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+> next commits will put them to use.
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  roms/Makefile | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/roms/Makefile b/roms/Makefile
-> index 78d5dd18c30..d28252dafdf 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
->  # We need that to combine multiple images (legacy bios,
->  # efi ia32, efi x64) into a single rom binary.
->  #
-> -EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> +EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> =20
->  default:
->  	@echo "nothing is build by default"
-> @@ -102,8 +102,8 @@ pxe-rom-%: build-pxe-roms
-> =20
->  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-> =20
-> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
-> -	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
-> +efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-> +	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
->  		-b ipxe/src/bin/$(VID)$(DID).rom \
->  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
->  		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
-> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
->  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-> =20
-> -$(EFIROM):
-> +$(EDK2_EFIROM):
->  	$(MAKE) -C edk2/BaseTools
-> =20
->  slof:
->=20
+>  MAINTAINERS               |  2 ++
+>  include/qemu/qemu-print.h | 19 ++++++++++++++++++
+>  stubs/monitor.c           |  5 +++++
+>  util/Makefile.objs        |  1 +
+>  util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 69 insertions(+)
+>  create mode 100644 include/qemu/qemu-print.h
+>  create mode 100644 util/qemu-print.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac8ab..1aa19dc4ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1895,6 +1895,8 @@ F: hmp.[ch]
+>  F: hmp-commands*.hx
+>  F: include/monitor/hmp-target.h
+>  F: tests/test-hmp.c
+> +F: include/qemu/qemu-print.h
+> +F: util/qemu-print.c
+>  
+>  Network device backends
+>  M: Jason Wang <jasowang@redhat.com>
+> diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+> new file mode 100644
+> index 0000000000..8fed32bf42
+> --- /dev/null
+> +++ b/include/qemu/qemu-print.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_PRINT_H
+> +#define QEMU_PRINT_H
+> +
+> +int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 
-Upon reading your and Olaf's comments in the v1 thread:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-  [PATCH for-4.0] roms: Allow the EFIROM variable to be overridden
-
-I've changed my mind on this series.
-
-Please insert a paragraph at [*] in the commit message:
-
-"iPXE's 'veryclean' recipe removes $(EFIROM) even if the EFIROM macro
-originates from elsewhere."
-
-With that:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-(I'll comment under patch#2 separately.)
-
-Thank you for picking this up.
-Laszlo
+> +
+> +#endif
+> diff --git a/stubs/monitor.c b/stubs/monitor.c
+> index b57fe6c32f..b2ea975e40 100644
+> --- a/stubs/monitor.c
+> +++ b/stubs/monitor.c
+> @@ -6,6 +6,11 @@
+>  
+>  __thread Monitor *cur_mon;
+>  
+> +int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+> +{
+> +    abort();
+> +}
+> +
+>  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+>  {
+>      error_setg(errp, "only QEMU supports file descriptor passing");
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 835fcd69e2..9206878dec 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -23,6 +23,7 @@ util-obj-y += bitmap.o bitops.o hbitmap.o
+>  util-obj-y += fifo8.o
+>  util-obj-y += cacheinfo.o
+>  util-obj-y += error.o qemu-error.o
+> +util-obj-y += qemu-print.o
+>  util-obj-y += id.o
+>  util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+>  util-obj-y += qemu-option.o qemu-progress.o
+> diff --git a/util/qemu-print.c b/util/qemu-print.c
+> new file mode 100644
+> index 0000000000..86f9417af8
+> --- /dev/null
+> +++ b/util/qemu-print.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "monitor/monitor.h"
+> +#include "qemu/qemu-print.h"
+> +
+> +/*
+> + * Print like vprintf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_vprintf(const char *fmt, va_list ap)
+> +{
+> +    if (cur_mon) {
+> +        return monitor_vprintf(cur_mon, fmt, ap);
+> +    }
+> +    return vprintf(fmt, ap);
+> +}
+> +
+> +/*
+> + * Print like printf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_printf(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    int ret;
+> +
+> +    va_start(ap, fmt);
+> +    ret = qemu_vprintf(fmt, ap);
+> +    va_end(ap);
+> +    return ret;
+> +}
+> 
 
