@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45731)
+Received: from eggs.gnu.org ([209.51.188.92]:46022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDQoj-0003Ru-Tl
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:54 -0400
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQpQ-0003vd-PE
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDQoh-0007Rc-5o
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:53 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40777)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDQog-0007Qi-PX
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:43:51 -0400
-Received: by mail-ot1-x342.google.com with SMTP id t8so11393258otp.7
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:43:49 -0700 (PDT)
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDQpP-0007uU-Nf
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:44:36 -0400
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Mon, 8 Apr 2019 09:44:14 +0000
+Message-ID: <468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
+References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+In-Reply-To: <ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0352ABD972FE7F47B395379B8413D1F2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1554624893-8363-1-git-send-email-guoheyi@huawei.com>
-	<CAFEAcA-N=y3k41oexvYaQ+tKj1d2tCZh8MhPvdq8Uz7dh-eWWA@mail.gmail.com>
-	<cb3534ef-2bd0-0518-c6ca-01c1f6511199@huawei.com>
-In-Reply-To: <cb3534ef-2bd0-0518-c6ca-01c1f6511199@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Apr 2019 10:43:37 +0100
-Message-ID: <CAFEAcA_7GVwQfiyJi-dRkCaoyGrGJQtCd6DdF1dgJcGPcCDTRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC] arm/virt: add one more uart for UEFI runtime
- debug
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
+ allocation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Laszlo Ersek <lersek@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Mon, 8 Apr 2019 at 02:45, Heyi Guo <guoheyi@huawei.com> wrote:
-> On 2019/4/7 21:16, Peter Maydell wrote:
-> > I don't think it makes much sense to keep adding UARTs for every
-> > bit of the system software stack. We don't have an infinite
-> > supply of UARTs on real hardware either -- how is this handled
-> > there ?
-> As you were in the edk2 mail thread, I supposed you also agreed to add one more UART. What did you mean by "I do still have a todo list item to add a 2nd UART"? How shall we do that?
-
-That would be a simple second UART available to both secure
-and non-secure and advertised in the device tree. It would
-only be created if the user specifically asked for it on
-the QEMU command line. I still need to investigate exactly
-how that ought to work, though.
-
-thanks
--- PMM
+DQoNCk9uIDA2LzA0LzIwMTkgMDE6NTAsIEpvaG4gU25vdyB3cm90ZToNCj4gDQo+IA0KPiBPbiA0
+LzUvMTkgMTA6MjQgQU0sIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4gT24gYSBmaWxlIHN5
+c3RlbSB1c2VkIGJ5IHRoZSBjdXN0b21lciwgZmFsbG9jYXRlKCkgcmV0dXJucyBhbiBlcnJvcg0K
+Pj4gaWYgdGhlIGJsb2NrIGlzIG5vdCBwcm9wZXJseSBhbGlnbmVkLiBTbywgYmRydl9jb19wd3Jp
+dGVfemVyb2VzKCkNCj4+IGZhaWxzLiBXZSBjYW4gaGFuZGxlIHRoYXQgY2FzZSB0aGUgc2FtZSB3
+YXkgYXMgaXQgaXMgZG9uZSBmb3IgdGhlDQo+PiB1bnN1cHBvcnRlZCBjYXNlcywgbmFtZWx5LCBj
+YWxsIHRvIGJkcnZfZHJpdmVyX3B3cml0ZXYoKSB0aGF0IHdyaXRlcw0KPj4gemVyb2VzIHRvIGFu
+IGltYWdlIGZvciB0aGUgdW5hbGlnbmVkIGNodW5rIG9mIHRoZSBibG9jay4NCj4+DQo+PiBTdWdn
+ZXN0ZWQtYnk6IERlbmlzIFYuIEx1bmV2IDxkZW5Ab3BlbnZ6Lm9yZz4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0K
+Pj4gLS0tDQo+PiAgIGJsb2NrL2lvLmMgfCAyICstDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ibG9jay9pby5j
+IGIvYmxvY2svaW8uYw0KPj4gaW5kZXggZGZjMTUzYi4uMDQxMmE1MSAxMDA2NDQNCj4+IC0tLSBh
+L2Jsb2NrL2lvLmMNCj4+ICsrKyBiL2Jsb2NrL2lvLmMNCj4+IEBAIC0xNTE2LDcgKzE1MTYsNyBA
+QCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX2RvX3B3cml0ZV96ZXJvZXMoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsDQo+PiAgICAgICAgICAgICAgIGFzc2VydCghYnMtPnN1cHBvcnRlZF96
+ZXJvX2ZsYWdzKTsNCj4+ICAgICAgICAgICB9DQo+PiAgIA0KPj4gLSAgICAgICAgaWYgKHJldCA9
+PSAtRU5PVFNVUCAmJiAhKGZsYWdzICYgQkRSVl9SRVFfTk9fRkFMTEJBQ0spKSB7DQo+PiArICAg
+ICAgICBpZiAocmV0IDwgMCAmJiAhKGZsYWdzICYgQkRSVl9SRVFfTk9fRkFMTEJBQ0spKSB7DQo+
+PiAgICAgICAgICAgICAgIC8qIEZhbGwgYmFjayB0byBib3VuY2UgYnVmZmVyIGlmIHdyaXRlIHpl
+cm9lcyBpcyB1bnN1cHBvcnRlZCAqLw0KPj4gICAgICAgICAgICAgICBCZHJ2UmVxdWVzdEZsYWdz
+IHdyaXRlX2ZsYWdzID0gZmxhZ3MgJiB+QkRSVl9SRVFfWkVST19XUklURTsNCj4+ICAgDQo+Pg0K
+PiANCj4gSSBzdXBwb3NlIHRoYXQgaWYgZmFsbG9jYXRlIGZhaWxzIGZvciBhbnkgcmVhc29uIGFu
+ZCB3ZSdyZSBhbGxvd2luZw0KPiBmYWxsYmFjaywgd2UncmUgZWl0aGVyIGdvaW5nIHRvIHN1Y2Nl
+ZWQgLi4uIG9yIGZhaWwgYWdhaW4gdmVyeSBzb29uDQo+IHRoZXJlYWZ0ZXIuDQo+IA0KPiBBcmUg
+dGhlcmUgYW55IGNhc2VzIHdoZXJlIGl0IGlzIHZpdGFsIHRvIG5vdCBpZ25vcmUgdGhlIGZpcnN0
+IGZhbGxvY2F0ZQ0KPiBmYWlsdXJlPyBJJ20gYSBsaXR0bGUgd2FyeSBvZiBpZ25vcmluZyB0aGUg
+cmV0dXJuIGNvZGUgZnJvbQ0KPiBiZHJ2X2NvX3B3cml0ZV96ZXJvZXMsIGJ1dCBJIGFtIGFzc3Vt
+aW5nIHRoYXQgaWYgdGhlcmUgaXMgYSAicmVhbCINCj4gZmFpbHVyZSBoZXJlIHRoYXQgdGhlIGZv
+bGxvd2luZyBib3VuY2Ugd3JpdGVzIHdpbGwgYWxzbyBmYWlsICJzYWZlbHkuIg0KPiANCj4gSSdt
+IG5vdCBjb21wbGV0ZWx5IGNvbmZpZGVudCwgYnV0IEkgaGF2ZSBubyB0YW5naWJsZSBvYmplY3Rp
+b25zOg0KPiBSZXZpZXdlZC1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiANCg0K
+VGhhbmsgeW91IGZvciB5b3VyIHJldmlldywgSm9obiENCg0KTGV0IG1lIGNsYXJpZnkgdGhlIGNp
+cmN1bXN0YW5jZXMgYW5kIHF1b3RlIHRoZSBidWcgcmVwb3J0Og0KIkN1c3RvbWVyIGhhZCBXaW4t
+MjAxMiBWTSB3aXRoIDUwR0Igc3lzdGVtIGRpc2sgd2hpY2ggd2FzIGxhdGVyIHJlc2l6ZWQgDQp0
+byAyNTZHQiB3aXRob3V0IHJlc2l6aW5nIHRoZSBwYXJ0aXRpb24gaW5zaWRlIFZNLg0KTm93LCB3
+aGlsZSB0cnlpbmcgdG8gcmVzaXplIHRvIDUwRywgdGhlIGZvbGxvd2luZyBlcnJvciB3aWxsIGFw
+cGVhcg0KJ0ZhaWxlZCB0byByZWR1Y2UgdGhlIG51bWJlciBvZiBMMiB0YWJsZXM6IEludmFsaWQg
+YXJndW1lbnQnDQpJdCB3YXMgZm91bmQgdGhhdCBpdCBpcyBwb3NzaWJsZSB0byBzaHJpbmsgdGhl
+IGRpc2sgdG8gMTI4RyBhbmQgYW55IHNpemUgDQphYm92ZSB0aGF0IG51bWJlciwgYnV0IHNpemUg
+YmVsb3cgMTI4RyB3aWxsIGJyaW5nIHRoZSBtZW50aW9uZWQgZXJyb3IuIg0KDQpUaGUgZmFsbG9j
+YXRlKCkgcmV0dXJucyBubyBlcnJvciBvbiB0aGF0IGZpbGUgc3lzdGVtIGlmIHRoZSBvZmZzZXQg
+YW5kDQp0aGUgKG9mZnNldCArIGJ5dGVzKSBwYXJhbWV0ZXJzIG9mIHRoZSBiZHJ2X2NvX2RvX3B3
+cml0ZV96ZXJvZXMoKSBib3RoDQphcmUgYWxpZ25lZCB0byA0Sy4NCi0tIA0KV2l0aCB0aGUgYmVz
+dCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
