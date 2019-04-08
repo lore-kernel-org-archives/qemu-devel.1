@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55313)
+Received: from eggs.gnu.org ([209.51.188.92]:55421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDVNo-0007E0-Lz
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hDVO1-0007Kp-1B
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDVNn-0000LL-JJ
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hDVNy-0000To-N7
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 10:36:35 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  8 Apr 2019 16:35:39 +0200
-Message-Id: <20190408143543.3982-1-kwolf@redhat.com>
+Date: Mon,  8 Apr 2019 16:35:41 +0200
+Message-Id: <20190408143543.3982-3-kwolf@redhat.com>
+In-Reply-To: <20190408143543.3982-1-kwolf@redhat.com>
+References: <20190408143543.3982-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/4] file-posix: Add dynamic-auto-read-only
- QAPI feature
+Subject: [Qemu-devel] [PATCH 2/4] tests/qapi-schema: Test for good feature
+ lists in structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +25,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-This series adds optional feature lists to struct definitions in the
-QAPI schema and makes use of them to advertise the new behaviour of
-auto-read-only=3Don in file-posix.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qapi-schema/qapi-schema-test.json | 27 +++++++++++++++++++++++++
+ tests/qapi-schema/qapi-schema-test.out  | 26 ++++++++++++++++++++++++
+ tests/qapi-schema/test-qapi.py          |  4 ++++
+ 3 files changed, 57 insertions(+)
 
-Kevin Wolf (4):
-  qapi: Support features for structs
-  tests/qapi-schema: Test for good feature lists in structs
-  tests/qapi-schema: Error case tests for features in structs
-  file-posix: Add dynamic-auto-read-only QAPI feature
-
- qapi/block-core.json                          | 11 ++++-
- qapi/introspect.json                          |  8 ++-
- tests/qapi-schema/features-bad-type.json      |  3 ++
- tests/qapi-schema/features-missing-name.json  |  3 ++
- tests/qapi-schema/features-name-bad-type.json |  3 ++
- tests/qapi-schema/features-no-list.json       |  3 ++
- tests/qapi-schema/features-unknown-key.json   |  3 ++
- tests/qapi-schema/qapi-schema-test.json       | 27 ++++++++++
- docs/devel/qapi-code-gen.txt                  | 38 ++++++++++++++
- scripts/qapi/common.py                        | 49 +++++++++++++++----
- scripts/qapi/doc.py                           |  3 +-
- scripts/qapi/introspect.py                    |  6 ++-
- scripts/qapi/types.py                         |  3 +-
- scripts/qapi/visit.py                         |  3 +-
- tests/Makefile.include                        |  5 ++
- tests/qapi-schema/double-type.err             |  2 +-
- tests/qapi-schema/features-bad-type.err       |  1 +
- tests/qapi-schema/features-bad-type.exit      |  1 +
- tests/qapi-schema/features-bad-type.out       |  0
- tests/qapi-schema/features-missing-name.err   |  1 +
- tests/qapi-schema/features-missing-name.exit  |  1 +
- tests/qapi-schema/features-missing-name.out   |  0
- tests/qapi-schema/features-name-bad-type.err  |  1 +
- tests/qapi-schema/features-name-bad-type.exit |  1 +
- tests/qapi-schema/features-name-bad-type.out  |  0
- tests/qapi-schema/features-no-list.err        |  1 +
- tests/qapi-schema/features-no-list.exit       |  1 +
- tests/qapi-schema/features-no-list.out        |  0
- tests/qapi-schema/features-unknown-key.err    |  2 +
- tests/qapi-schema/features-unknown-key.exit   |  1 +
- tests/qapi-schema/features-unknown-key.out    |  0
- tests/qapi-schema/qapi-schema-test.out        | 26 ++++++++++
- tests/qapi-schema/test-qapi.py                |  7 ++-
- tests/qapi-schema/unknown-expr-key.err        |  2 +-
- 34 files changed, 197 insertions(+), 19 deletions(-)
- create mode 100644 tests/qapi-schema/features-bad-type.json
- create mode 100644 tests/qapi-schema/features-missing-name.json
- create mode 100644 tests/qapi-schema/features-name-bad-type.json
- create mode 100644 tests/qapi-schema/features-no-list.json
- create mode 100644 tests/qapi-schema/features-unknown-key.json
- create mode 100644 tests/qapi-schema/features-bad-type.err
- create mode 100644 tests/qapi-schema/features-bad-type.exit
- create mode 100644 tests/qapi-schema/features-bad-type.out
- create mode 100644 tests/qapi-schema/features-missing-name.err
- create mode 100644 tests/qapi-schema/features-missing-name.exit
- create mode 100644 tests/qapi-schema/features-missing-name.out
- create mode 100644 tests/qapi-schema/features-name-bad-type.err
- create mode 100644 tests/qapi-schema/features-name-bad-type.exit
- create mode 100644 tests/qapi-schema/features-name-bad-type.out
- create mode 100644 tests/qapi-schema/features-no-list.err
- create mode 100644 tests/qapi-schema/features-no-list.exit
- create mode 100644 tests/qapi-schema/features-no-list.out
- create mode 100644 tests/qapi-schema/features-unknown-key.err
- create mode 100644 tests/qapi-schema/features-unknown-key.exit
- create mode 100644 tests/qapi-schema/features-unknown-key.out
-
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 0952c68734..263514b448 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -242,3 +242,30 @@
+   { 'foo': 'TestIfStruct',
+     'bar': { 'type': ['TestIfEnum'], 'if': 'defined(TEST_IF_EVT_BAR)' } =
+},
+   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
++
++# test 'features' for structs
++
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [] }
++{ 'struct': 'FeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1' ] }
++{ 'struct': 'FeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1' } ] }
++{ 'struct': 'FeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1', 'feature2' ] }
++
++{ 'struct': 'CondFeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+} ] }
++{ 'struct': 'CondFeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+},
++                { 'name': 'feature2', 'if': 'defined(TEST_IF_FEATURE_2)'=
+} ] }
++{ 'struct': 'CondFeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
++                                              'defined(TEST_IF_COND_2)']=
+ } ] }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 77fb1e1aa9..490e202f65 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -354,3 +354,29 @@ object q_obj_TestIfEvent-arg
+ event TestIfEvent q_obj_TestIfEvent-arg
+    boxed=3DFalse
+     if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
++object FeatureStruct0
++    member foo: int optional=3DFalse
++object FeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++    feature feature2
++object CondFeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++object CondFeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++    feature feature2
++        if ['defined(TEST_IF_FEATURE_2)']
++object CondFeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index f2d6815c86..08e29c23a6 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -49,6 +49,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             self._print_if(m.ifcond, 8)
+         self._print_variants(variants)
+         self._print_if(ifcond)
++        if features:
++            for f in features:
++                print('    feature %s' % f['name'])
++                self._print_if(f.get('if'), 8)
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         print('alternate %s' % name)
 --=20
 2.20.1
