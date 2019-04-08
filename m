@@ -2,93 +2,69 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EE8C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B505C10F14
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1D3221473
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D3221473
+	by mail.kernel.org (Postfix) with ESMTPS id 4DB7221473
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DB7221473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54512 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54514 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDVuN-0006P9-29
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:10:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37413)
+	id 1hDVue-0006Y3-Cj
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:10:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hDVsp-0005Wq-8Q
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:08:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDVqL-0003xh-99
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hDVsn-0000Ft-9D
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:08:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48626)
+	(envelope-from <armbru@redhat.com>) id 1hDVqI-0005k4-U2
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:05:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hDVsd-0008Pf-AK; Mon, 08 Apr 2019 11:08:17 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hDVq5-00058S-Vu; Mon, 08 Apr 2019 11:05:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77FCE306D355;
-	Mon,  8 Apr 2019 15:08:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-100.brq.redhat.com
-	[10.40.204.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4156A5D964;
-	Mon,  8 Apr 2019 15:08:08 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Qemu-block <qemu-block@nongnu.org>
-References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
-	<471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <19944be5-e9db-3428-5744-79e8301a265f@redhat.com>
-Date: Mon, 8 Apr 2019 17:08:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 52254883B8;
+	Mon,  8 Apr 2019 15:05:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DDB9868D61;
+	Mon,  8 Apr 2019 15:04:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 654671138648; Mon,  8 Apr 2019 17:04:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190204231815.29661-1-philmd@redhat.com>
+	<20190204231815.29661-7-philmd@redhat.com>
+Date: Mon, 08 Apr 2019 17:04:45 +0200
+In-Reply-To: <20190204231815.29661-7-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Feb 2019 00:18:10
+	+0100")
+Message-ID: <87y34kmtbm.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 08 Apr 2019 15:08:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Mon, 08 Apr 2019 15:05:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Aborts in iotest 169
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] hw/devices: Move Gamepad
+ declarations into a new header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,75 +76,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Luiz Capitulino <lcapitulino@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Rob Herring <robh@kernel.org>, qemu-trivial@nongnu.org,
+	Magnus Damm <magnus.damm@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Richard Henderson <rth@twiddle.net>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+	Jan Kiszka <jan.kiszka@web.de>,
+	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <f4bug@amsat.org>,
+	Andrew Jeffery <andrew@aj.id.au>,
+	Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408150807.Q7FwAtMyxoBkWm31P_CvvX7K6a8jiIfTxdjkiEP2bRk@z>
+Message-ID: <20190408150445.BnYZw5BsEuAwGmI5K7J8Ljo9CXAubdSVtELMjTXo8TY@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Luiz Capitulino <lcapitulino@redhat.com>
-Message-ID: <19944be5-e9db-3428-5744-79e8301a265f@redhat.com>
-Subject: Re: Aborts in iotest 169
-References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
- <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
-In-Reply-To: <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On 08.04.19 16:57, Vladimir Sementsov-Ogievskiy wrote:
-> 23.01.2019 18:48, Max Reitz wrote:
->> Hi,
->>
->> When running 169 in parallel (e.g. like so:
->>
->> $ while TEST_DIR=3D/tmp/t0 ./check -T -qcow2 169; do; done
->> $ while TEST_DIR=3D/tmp/t1 ./check -T -qcow2 169; do; done
->> $ while TEST_DIR=3D/tmp/t2 ./check -T -qcow2 169; do; done
->> $ while TEST_DIR=3D/tmp/t3 ./check -T -qcow2 169; do; done
->>
->> in four different shells), I get aborts:
->>
->> (Often I get segfaults, but that's because of
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html =
---
->> feel free to apply the attached patch to make them go away)
->=20
-> Hi,
->=20
-> Didn't you send it in separate? iotests still fails sometimes with segf=
-ault
-> in chardev code...
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS                |  1 +
+>  hw/arm/stellaris.c         |  2 +-
+>  hw/input/stellaris_input.c |  2 +-
+>  include/hw/devices.h       |  3 ---
+>  include/hw/input/gamepad.h | 21 +++++++++++++++++++++
+>  5 files changed, 24 insertions(+), 5 deletions(-)
+>  create mode 100644 include/hw/input/gamepad.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index daae4a3beb..a38086f767 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -729,6 +729,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/*/stellaris*
+> +F: include/hw/input/gamepad.h
+>=20=20
+>  Versatile Express
+>  M: Peter Maydell <peter.maydell@linaro.org>
+> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+> index 442529cc65..24c20bf612 100644
+> --- a/hw/arm/stellaris.c
+> +++ b/hw/arm/stellaris.c
+> @@ -12,7 +12,6 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/ssi/ssi.h"
+>  #include "hw/arm/arm.h"
+> -#include "hw/devices.h"
+>  #include "qemu/timer.h"
+>  #include "hw/i2c/i2c.h"
+>  #include "net/net.h"
+> @@ -22,6 +21,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/arm/armv7m.h"
+>  #include "hw/char/pl011.h"
+> +#include "hw/input/gamepad.h"
+>  #include "hw/misc/unimp.h"
+>  #include "cpu.h"
+>=20=20
+> diff --git a/hw/input/stellaris_input.c b/hw/input/stellaris_input.c
+> index 99168bfeef..20c87d86f4 100644
+> --- a/hw/input/stellaris_input.c
+> +++ b/hw/input/stellaris_input.c
+> @@ -8,7 +8,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+> -#include "hw/devices.h"
+> +#include "hw/input/gamepad.h"
+>  #include "ui/console.h"
+>=20=20
+>  typedef struct {
+> diff --git a/include/hw/devices.h b/include/hw/devices.h
+> index e400f9eac0..7a630da47f 100644
+> --- a/include/hw/devices.h
+> +++ b/include/hw/devices.h
+> @@ -26,7 +26,4 @@ void *tsc2005_init(qemu_irq pintdav);
+>  uint32_t tsc2005_txrx(void *opaque, uint32_t value, int len);
+>  void tsc2005_set_transform(void *opaque, MouseTransformInfo *info);
+>=20=20
+> -/* stellaris_input.c */
+> -void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
+> -
+>  #endif
+> diff --git a/include/hw/input/gamepad.h b/include/hw/input/gamepad.h
+> new file mode 100644
+> index 0000000000..112bad5e4c
+> --- /dev/null
+> +++ b/include/hw/input/gamepad.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * Gamepad style buttons connected to IRQ/GPIO lines
+> + *
+> + * Copyright (c) 2007 CodeSourcery.
+> + * Written by Paul Brook
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef HW_INPUT_GAMEPAD_H
+> +#define HW_INPUT_GAMEPAD_H
+> +
+> +/* Gamepad devices that have nowhere better to go.  */
 
-I didn=E2=80=99t, because I don=E2=80=99t believe that patch is entirely =
-correct.
-That=E2=80=99s why its commit title starts with =E2=80=9CHack=E2=80=9D.
+Are there any gamepad devices that have a better place to go?  git-grep
+gamepad suggests no.  Drop the comment?
 
-Max
-
-
---h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyrY9cACgkQ9AfbAGHV
-z0BJqAf/VefmNCznndrHt97Th6yDgQekVyVPOP83tJzuBQxqElhrR3ghn7ubejJP
-X/QP/uFlUaBYq5/fM9w+bFXOSOEuS22JtCSuLgiD9eGGJWuw+eLEgZU/tGE+zuBe
-HuCJ4Jaotk0xcfts7KRB0JbpIuHYc/aC9CvI/+9qJaqV+QYtktlkvQMBkAcPVxpe
-TmhTOsfHwkcWhX+lX86W0VzG1frDZIVzd5QwR9GOrhZkQgtL9LO/dlnnVkgF13CE
-dX1n9bd3EtQXDsxucXFFkxZ3D0HqPckd9ypXu0zJ14yvPSh0yxrW/3FTomp3vJfy
-QlSxfVyKza0GRLnDk+9gU7EkSRsoaQ==
-=pOLE
------END PGP SIGNATURE-----
-
---h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l--
+> +
+> +#include "hw/irq.h"
+> +
+> +/* stellaris_input.c */
+> +void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
+> +
+> +#endif
 
