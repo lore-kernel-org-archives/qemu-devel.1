@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40941)
+Received: from eggs.gnu.org ([209.51.188.92]:42457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hDW2H-0003cX-8Q
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:14 -0400
+	(envelope-from <berto@igalia.com>) id 1hDW6y-0006bK-0k
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hDW2G-0003w7-CH
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:13 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:58448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1hDW2F-0003sB-Vr
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:12 -0400
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <99f9b621-7e23-0ada-ca49-605cabf2abbd@oracle.com>
-Date: Mon, 8 Apr 2019 18:17:47 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4283A075-04C3-4DE3-AEA1-298E400EC7CA@oracle.com>
-References: <20190321075545.14929-1-nir.weiner@oracle.com>
-	<99f9b621-7e23-0ada-ca49-605cabf2abbd@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-scsi: Support live migration
+	(envelope-from <berto@igalia.com>) id 1hDW6w-0000he-S6
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:03 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <3e489e51-79c7-54ec-7018-e7424d2c6f40@virtuozzo.com>
+References: <1554483379-682051-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1554483379-682051-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w517ec4y1wv.fsf@maestria.local.igalia.com>
+	<3e489e51-79c7-54ec-7018-e7424d2c6f40@virtuozzo.com>
+Date: Mon, 08 Apr 2019 17:22:58 +0200
+Message-ID: <w514l78y10t.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] block: include base when checking
+ image chain for block allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Weiner <nir.weiner@oracle.com>
-Cc: qemu-devel@nongnu.org, Bijan Mottahedeh <bijan.mottahedeh@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Second ping.
-This series has been sent almost 2 weeks ago. We would appreciate some =
-feedback/review.
+On Mon 08 Apr 2019 05:16:22 PM CEST, Andrey Shinkevich wrote:
+> On 08/04/2019 18:03, Alberto Garcia wrote:
+>> On Fri 05 Apr 2019 06:56:17 PM CEST, Andrey Shinkevich wrote:
+>>> +int bdrv_is_allocated_above(BlockDriverState *top,
+>>> +                            BlockDriverState *base,
+>>> +                            int64_t offset, int64_t bytes, int64_t *pnum)
+>>> +{
+>>> +    return bdrv_do_is_allocated_above(top, base, false, offset, bytes, pnum);
+>>> +}
+>>> +
+>>> +int bdrv_is_allocated_above_inclusive(BlockDriverState *top,
+>>> +                                      BlockDriverState *base,
+>>> +                                      int64_t offset, int64_t bytes,
+>>> +                                      int64_t *pnum)
+>>> +{
+>>> +    return bdrv_do_is_allocated_above(top, base, true, offset, bytes, pnum);
+>>> +}
+>> 
+>> Instead of having these two, isn't it simpler to add an 'include_base'
+>> parameter to the original function?
+>> 
+>> Another alternative (I haven't checked this one so it could be more
+>> cumbersome): change the semantics of the function to always include the
+>> base and modify the callers.
+>
+> The idea behind those two functions was to keep the rest of the code
+> unmodified. Currently, we have the issue with the block-stream
+> parallel jobs. What if we manage this case first and then, when proved
+> to be robust, take care of the rest?
 
-Thanks,
--Liran
+Sure, that makes sense if you need to do significant changes to the
+other callers, but if you just need to pass an extra 'false'
+parameter...
 
-> On 27 Mar 2019, at 12:40, Nir Weiner <nir.weiner@oracle.com> wrote:
->=20
-> On 3/21/19 9:55 AM, Nir Weiner wrote:
->=20
->> Originally migration was not possible with vhost-scsi because
->> as part of migration, the source host target SCSI device state
->> needs to be saved and loaded into the destination host target SCSI
->> device. This cannot be done by QEMU.
->>=20
->> As this can be handled either by external orchestrator or by having
->> shared-storage (i.e. iSCSI), there is no reason to limit the
->> orchestrator from being able to explictly specify it wish to enable
->> migration even when VM have a vhost-scsi device.
->>=20
->> Liran Alon (1):
->>   vhost-scsi: Allow user to enable migration
->>=20
->> Nir Weiner (2):
->>   vhost-scsi: The vhost device should be stopped when the VM is not
->>     running
->>   vhost-scsi: Add vmstate descriptor
->>=20
->>  hw/scsi/vhost-scsi.c                  | 57 =
-++++++++++++++++++++++-----
->>  include/hw/virtio/vhost-scsi-common.h |  1 +
->>  2 files changed, 48 insertions(+), 10 deletions(-)
->>=20
-> ping + CC to relevant maintainers
+It's not a big deal, I just think you'd have a simpler patch.
+
+Berto
