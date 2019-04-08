@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47464)
+Received: from eggs.gnu.org ([209.51.188.92]:48900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hDPfJ-00070H-EL
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:30:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDPlZ-000890-L0
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hDPfI-0008H6-6J
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:30:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50010)
+	(envelope-from <armbru@redhat.com>) id 1hDPlY-0003dT-OO
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48963)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hDPfH-0008FS-N4
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:30:04 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDPlY-0003ce-EN
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE5F2C05001C
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 08:30:01 +0000 (UTC)
-Date: Mon, 8 Apr 2019 09:29:58 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190408082958.GF15001@stefanha-x1.localdomain>
-References: <20190326131822.GD15011@stefanha-x1.localdomain>
-	<878swomn42.fsf@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A1EBB3086229
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 08:36:31 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon,  8 Apr 2019 10:36:15 +0200
+Message-Id: <20190408083627.7479-4-armbru@redhat.com>
+In-Reply-To: <20190408083627.7479-1-armbru@redhat.com>
+References: <20190408083627.7479-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
-Content-Disposition: inline
-In-Reply-To: <878swomn42.fsf@redhat.com>
-Subject: Re: [Qemu-devel] QEMU event loop optimizations
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 03/15] char-pty: Drop "char device redirected
+ to" message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+char_pty_open() prints a "char device redirected to PTY_NAME (label
+LABEL)" message to the current monitor or else to stderr.  No other
+ChardevClass::open() prints anything on success.  Drop the message.
 
---gdTfX7fkYsEEjebm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ chardev/char-pty.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-On Fri, Apr 05, 2019 at 06:29:49PM +0200, Sergio Lopez wrote:
->=20
-> Stefan Hajnoczi writes:
->=20
-> > Hi Sergio,
-> > Here are the forgotten event loop optimizations I mentioned:
-> >
-> >   https://github.com/stefanha/qemu/commits/event-loop-optimizations
-> >
-> > The goal was to eliminate or reorder syscalls so that useful work (like
-> > executing BHs) occurs as soon as possible after an event is detected.
-> >
-> > I remember that these optimizations only shave off a handful of
-> > microseconds, so they aren't a huge win.  They do become attractive on
-> > fast SSDs with <10us read/write latency.
-> >
-> > These optimizations are aggressive and there is a possibility of
-> > introducing regressions.
-> >
-> > If you have time to pick up this work, try benchmarking each commit
-> > individually so performance changes are attributed individually.
-> > There's no need to send them together in a single patch series, the
-> > changes are quite independent.
->=20
-> It took me a while to find a way to get meaningful numbers to evaluate
-> those optimizations. The problem is that here (Xeon E5-2640 v3 and EPYC
-> 7351P) the cost of event_notifier_set() is just ~0.4us when the code
-> path is hot, and it's hard differentiating it from the noise.
->=20
-> To do so, I've used a patched kernel with a naive io_poll implementation
-> for virtio_blk [1], an also patched QEMU with poll-inflight [2] (just to
-> be sure we're polling) and ran the test on semi-isolated cores
-> (nohz_full + rcu_nocbs + systemd_isolation) with idle siblings. The
-> storage is simulated by null_blk with "completion_nsec=3D0 no_sched=3D1
-> irqmode=3D0".
->=20
-> # fio --time_based --runtime=3D30 --rw=3Drandread --name=3Drandread \
->  --filename=3D/dev/vdb --direct=3D1 --ioengine=3Dpvsync2 --iodepth=3D1 --=
-hipri=3D1
->=20
-> | avg_lat (us) | master | qbsn* |
-> |   run1       | 11.32  | 10.96 |
-> |   run2       | 11.37  | 10.79 |
-> |   run3       | 11.42  | 10.67 |
-> |   run4       | 11.32  | 11.06 |
-> |   run5       | 11.42  | 11.19 |
-> |   run6       | 11.42  | 10.91 |
->  * patched with aio: add optimized qemu_bh_schedule_nested() API
->=20
-> Even though there's still some variance in the numbers, the 0.4us
-> improvement can be clearly appreciated.
->=20
-> I haven't tested the other 3 patches, as their optimizations only have
-> effect when the event loop is not running in polling mode. Without
-> polling, we get an additional overhead of, at least, 10us, in addition
-> to a lot of noise, due to both direct costs (ppoll()...) and indirect
-> ones (re-scheduling and TLB/cache pollution), so I don't think we can
-> reliable benchmark them. Probably their impact won't be significant
-> either, due to the costs I've just mentioned.
-
-Thanks for benchmarking them.  We can leave them for now, since there is
-a risk of introducing bugs and they don't make a great difference.
-
-Stefan
-
-> Sergio.
->=20
-> [1] https://github.com/slp/linux/commit/d369b37db3e298933e8bb88c6eeacff07=
-f39bc13
-> [2] https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg00447.html
-
-
-
---gdTfX7fkYsEEjebm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcqwaGAAoJEJykq7OBq3PIH/8H/0jzP5E2RiPvSGgo3pYLhRyw
-CZDNEHuV/hybIBFx4h9mQhBzN9ZYGi9sZhMJ7xOCrl87DJ7+gEOLWbvi3m5WBG08
-MNNRUNf8EeVCU83Durw4grKNJNnR1r+9YllzqQpoVp3H2h4pdSU/I/MrZ+5jBHVi
-xT+KtZin4eiCuaijxYiDyQxQDJ9bWawEHeVVVhg2UFXh/SnJpMMlGyX3FOVa068/
-Zoh3M9XQpOl5lWG7qtzjp7OjoF2OOOwpasQF70ZcHrPq9Ase4bUa0c1r/tlGRiTI
-nMG/n20ax0g39Y0JkUjbiYhZfetLTMm1crRORFUxVOTCWrQcP5FL4NXKGbH+NGA=
-=4yAG
------END PGP SIGNATURE-----
-
---gdTfX7fkYsEEjebm--
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index b034332edd..a48d3e5d20 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
+     qemu_set_nonblock(master_fd);
+=20
+     chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+-    error_printf("char device redirected to %s (label %s)\n",
+-                 pty_name, chr->label);
+=20
+     s =3D PTY_CHARDEV(chr);
+     s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+--=20
+2.17.2
