@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59017)
+Received: from eggs.gnu.org ([209.51.188.92]:59020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6I-00015f-P4
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6I-00015h-Pu
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6G-0006Lv-56
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hDX6G-0006Ly-55
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 12:26:26 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  8 Apr 2019 19:26:15 +0300
-Message-Id: <20190408162617.258535-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 for 4.1 0/2] avoid lseek on block_status
+Date: Mon,  8 Apr 2019 19:26:16 +0300
+Message-Id: <20190408162617.258535-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190408162617.258535-1-vsementsov@virtuozzo.com>
+References: <20190408162617.258535-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] tests/perf: Test lseek influence on
+ qcow2 block-status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,59 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net, stefanha@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Hi!
+Block layer may recursively check block_status in file child of qcow2,
+if qcow2 driver returned DATA. There are several test cases to check
+influence of lseek on block_status performance. To see real difference
+run on tmpfs.
 
-It's a continuation for
-"[PATCH] qcow2: avoid lseek on block_status if possible"
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06598.html
+Tests originally created by Kevin, I just refactored and put them
+together into one executable file with simple output.
 
-performance results for block-status on tmpfs [tests originally by Kevin,
-now they are in 01]:
-
-./tests/perf/block/qcow2/convert-blockstatus /ramdisk/x
-
-after 01:
-
-plain: 81.77
-forward: 82.61
-prealloc: 0.01
-
-after 02:
-
-plain: 0.12
-forward: 0.12
-prealloc: 0.01
-
-v2:
- 01: new
- 02: [mostly by Kevin's comments]
-     - rewritten to go through new flag BDRV_BLOCK_RECURSE
-     - never retry detection if failed for first time
-     - rewrite detection to do less iterations and to be more simple
-
-     iotests 102 behavior changed [and not sure about other two ones
-     in comparison with v1, but it seems it doesn't matter]
-
-     also, patch subject changed, as now it's a generic change for
-     block layer
-
-
-Vladimir Sementsov-Ogievskiy (2):
-  tests/perf: Test lseek influence on qcow2 block-status
-  block: avoid recursive block_status call if possible
-
- block/qcow2.h                              |  4 ++
- include/block/block.h                      |  8 ++-
- block/io.c                                 |  9 ++-
- block/qcow2-refcount.c                     | 32 ++++++++++
- block/qcow2.c                              | 11 ++++
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
  tests/perf/block/qcow2/convert-blockstatus | 71 ++++++++++++++++++++++
- tests/qemu-iotests/102                     |  2 +-
- tests/qemu-iotests/102.out                 |  3 +-
- tests/qemu-iotests/141.out                 |  2 +-
- tests/qemu-iotests/144.out                 |  2 +-
- 10 files changed, 138 insertions(+), 6 deletions(-)
+ 1 file changed, 71 insertions(+)
  create mode 100755 tests/perf/block/qcow2/convert-blockstatus
 
+diff --git a/tests/perf/block/qcow2/convert-blockstatus b/tests/perf/block/qcow2/convert-blockstatus
+new file mode 100755
+index 0000000000..a1a3c1ef43
+--- /dev/null
++++ b/tests/perf/block/qcow2/convert-blockstatus
+@@ -0,0 +1,71 @@
++#!/bin/bash
++#
++# Test lseek influence on qcow2 block-status
++#
++# Block layer may recursively check block_status in file child of qcow2, if
++# qcow2 driver returned DATA. There are several test cases to check influence
++# of lseek on block_status performance. To see real difference run on tmpfs.
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# Tests originally written by Kevin Wolf
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++if [ "$#" -lt 1 ]; then
++    echo "Usage: $0 SOURCE_FILE"
++    exit 1
++fi
++
++ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../.." >/dev/null 2>&1 && pwd )"
++QEMU_IMG="$ROOT_DIR/qemu-img"
++QEMU_IO="$ROOT_DIR/qemu-io"
++
++size=1G
++src="$1"
++
++# test-case plain
++
++(
++$QEMU_IMG create -f qcow2 "$src" $size
++for i in $(seq 16384 -1 0); do
++    echo "write $((i * 65536)) 64k"
++done | $QEMU_IO "$src"
++) > /dev/null
++
++echo -n "plain: "
++/usr/bin/time -f %e $QEMU_IMG convert -n "$src" null-co://
++
++# test-case forward
++
++(
++$QEMU_IMG create -f qcow2 "$src" $size
++for i in $(seq 0 2 16384); do
++    echo "write $((i * 65536)) 64k"
++done | $QEMU_IO "$src"
++for i in $(seq 1 2 16384); do
++    echo "write $((i * 65536)) 64k"
++done | $QEMU_IO "$src"
++) > /dev/null
++
++echo -n "forward: "
++/usr/bin/time -f %e $QEMU_IMG convert -n "$src" null-co://
++
++# test-case prealloc
++
++$QEMU_IMG create -f qcow2 -o preallocation=metadata "$src" $size > /dev/null
++
++echo -n "prealloc: "
++/usr/bin/time -f %e $QEMU_IMG convert -n "$src" null-co://
 -- 
 2.18.0
