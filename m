@@ -2,110 +2,93 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18786C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EE8C10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCD0721473
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:08:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD0721473
+	by mail.kernel.org (Postfix) with ESMTPS id F1D3221473
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D3221473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54496 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54512 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDVsn-0005Hs-0U
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:08:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36975)
+	id 1hDVuN-0006P9-29
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:10:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hDVrN-0004aO-CI
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hDVsp-0005Wq-8Q
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hDVrM-0006vF-8X
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48762)
+	(envelope-from <mreitz@redhat.com>) id 1hDVsn-0000Ft-9D
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:08:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hDVrL-0006uJ-T1
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:06:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hDVsd-0008Pf-AK; Mon, 08 Apr 2019 11:08:17 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 417308AE66;
-	Mon,  8 Apr 2019 15:06:54 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-50.ams2.redhat.com [10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A18FD60472;
-	Mon,  8 Apr 2019 15:06:50 +0000 (UTC)
-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190407092314.11066-1-thuth@redhat.com>
-	<20190408134517.GA9047@richard>
-From: Thomas Huth <thuth@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 77FCE306D355;
+	Mon,  8 Apr 2019 15:08:12 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-100.brq.redhat.com
+	[10.40.204.100])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4156A5D964;
+	Mon,  8 Apr 2019 15:08:08 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	Qemu-block <qemu-block@nongnu.org>
+References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
+	<471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <14147807-8723-adac-dffb-31b7bbd0fc3b@redhat.com>
-Date: Mon, 8 Apr 2019 17:06:49 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <19944be5-e9db-3428-5744-79e8301a265f@redhat.com>
+Date: Mon, 8 Apr 2019 17:08:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190408134517.GA9047@richard>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Mon, 08 Apr 2019 15:06:54 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Mon, 08 Apr 2019 15:08:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
- hot-plugging nvdimm on older machine types
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] Aborts in iotest 169
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,114 +100,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Luiz Capitulino <lcapitulino@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408150649._Q_UU7PJMmQNjGBHyEeF8c2K6kasantyHHKngatXp7A@z>
+Message-ID: <20190408150807.Q7FwAtMyxoBkWm31P_CvvX7K6a8jiIfTxdjkiEP2bRk@z>
 
-On 08/04/2019 15.45, Wei Yang wrote:
-> On Sun, Apr 07, 2019 at 11:23:14AM +0200, Thomas Huth wrote:
->> QEMU currently crashes when you try to hot-plug an "nvdimm" device
->> on older machine types:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <19944be5-e9db-3428-5744-79e8301a265f@redhat.com>
+Subject: Re: Aborts in iotest 169
+References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
+ <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
+In-Reply-To: <471e5ea1-cafb-c9b6-129e-07e9007122d6@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08.04.19 16:57, Vladimir Sementsov-Ogievskiy wrote:
+> 23.01.2019 18:48, Max Reitz wrote:
+>> Hi,
 >>
->> $ qemu-system-x86_64 -monitor stdio -M pc-1.1
->> QEMU 3.1.92 monitor - type 'help' for more information
->> (qemu) device_add nvdimm,id=nvdimmn1
->> qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
->> Assertion `*errp == ((void *)0)' failed.
->> Aborted (core dumped)
+>> When running 169 in parallel (e.g. like so:
 >>
->> The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
->> added recently before the check whether nvdimm is enabled. It should
->> be done after the check. And while we're at it, also check the errp
->> after the hotplug_handler_pre_plug(), otherwise errors are silently
->> ignored here.
-> 
-> Thomas,
-> 
-> Thanks for pointing this out, while I have some different idea on how to fix
-> this.
-> 
-> The reason of the core dump is errp already been set in
-> hotplug_handler_pre_plug(), and this function check acpi hotplug capability.
-> The order of this check is correct, while we should  return when errp is set
-> in hotplug_handler_pre_plug().
-> 
-> I got a fix like this, which I have tested and looks good to me.
-> 
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 6077d27361..b11f3b15c1 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -2091,6 +2091,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      }
->  
->      hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
-> +    if (*errp) {
-> +        return;
-> +    }
-
-Not sure, but I think you can not rely on the fact that the caller set
-*errp = NULL already... that's why it is more common to use a local_err
-variable and error_propagate() for such cases (which is what I did in my
-patch).
-
-Also, why don't you want the "nvdimm is not enabled: missing 'nvdimm' in
-'-M'" check to be done first?
-
- Thomas
-
-
-
->      if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-> 
+>> $ while TEST_DIR=3D/tmp/t0 ./check -T -qcow2 169; do; done
+>> $ while TEST_DIR=3D/tmp/t1 ./check -T -qcow2 169; do; done
+>> $ while TEST_DIR=3D/tmp/t2 ./check -T -qcow2 169; do; done
+>> $ while TEST_DIR=3D/tmp/t3 ./check -T -qcow2 169; do; done
 >>
->> Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->> hw/i386/pc.c | 9 +++++++--
->> 1 file changed, 7 insertions(+), 2 deletions(-)
+>> in four different shells), I get aborts:
 >>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 6077d27361..f2c15bf1f2 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>     const MachineState *ms = MACHINE(hotplug_dev);
->>     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>     const uint64_t legacy_align = TARGET_PAGE_SIZE;
->> +    Error *local_err = NULL;
->>
->>     /*
->>      * When -no-acpi is used with Q35 machine type, no ACPI is built,
->> @@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>         return;
->>     }
->>
->> -    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
->> -
->>     if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->>         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->>         return;
->>     }
->>
->> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->>     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
->>                      pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
->> }
->> -- 
->> 2.21.0
-> 
+>> (Often I get segfaults, but that's because of
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html =
+--
+>> feel free to apply the attached patch to make them go away)
+>=20
+> Hi,
+>=20
+> Didn't you send it in separate? iotests still fails sometimes with segf=
+ault
+> in chardev code...
 
+I didn=E2=80=99t, because I don=E2=80=99t believe that patch is entirely =
+correct.
+That=E2=80=99s why its commit title starts with =E2=80=9CHack=E2=80=9D.
+
+Max
+
+
+--h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyrY9cACgkQ9AfbAGHV
+z0BJqAf/VefmNCznndrHt97Th6yDgQekVyVPOP83tJzuBQxqElhrR3ghn7ubejJP
+X/QP/uFlUaBYq5/fM9w+bFXOSOEuS22JtCSuLgiD9eGGJWuw+eLEgZU/tGE+zuBe
+HuCJ4Jaotk0xcfts7KRB0JbpIuHYc/aC9CvI/+9qJaqV+QYtktlkvQMBkAcPVxpe
+TmhTOsfHwkcWhX+lX86W0VzG1frDZIVzd5QwR9GOrhZkQgtL9LO/dlnnVkgF13CE
+dX1n9bd3EtQXDsxucXFFkxZ3D0HqPckd9ypXu0zJ14yvPSh0yxrW/3FTomp3vJfy
+QlSxfVyKza0GRLnDk+9gU7EkSRsoaQ==
+=pOLE
+-----END PGP SIGNATURE-----
+
+--h2YikPECzZM9p9XUv3bXuNRhtiLpqOo9l--
 
