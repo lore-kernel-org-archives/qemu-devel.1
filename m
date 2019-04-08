@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39999)
+Received: from eggs.gnu.org ([209.51.188.92]:41323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hDQXz-0002BR-R1
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:26:36 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDQbb-0005YK-Qy
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hDQJ5-000790-9b
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:13 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:45946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hDQJ3-00078G-6Q
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:09 -0400
-Received: by mail-qt1-f195.google.com with SMTP id v20so14450795qtv.12
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:11:06 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1hDQba-00018P-K2
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:30:19 -0400
+Resent-Message-Id: <E1hDQba-00018P-K2@eggs.gnu.org>
+Message-ID: <155471578957.12882.15898285010752314117@76452e4e88f2>
+In-Reply-To: <20190408084056.26212-1-ghorges@xiyoulinux.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-15-armbru@redhat.com>
-In-Reply-To: <20190408083627.7479-15-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 8 Apr 2019 11:10:55 +0200
-Message-ID: <CAMxuvaz9R37C1c=vY1xtqMYBW7j1t0pTKW=_ViSq_0yx4DHWuQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
- stdout
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 8 Apr 2019 02:29:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] Wshadow in qemu/linux-user/syscall.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: ghorges@xiyoulinux.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, Apr 8, 2019 at 10:36 AM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Command line help explicitly requested by the user should be printed
-> to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
-> use qemu_printf() instead of error_printf().  Plain printf() would be
-> wrong because we need to print to the current monitor for chardev-add
-> help".
->
-> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  chardev/char.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 514cd6b0c3..54724a56b1 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -28,6 +28,7 @@
->  #include "sysemu/sysemu.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/qemu-print.h"
->  #include "chardev/char.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-char.h"
-> @@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMain=
-Context *context,
->
->          chardev_name_foreach(help_string_append, str);
->
-> -        error_printf("Available chardev backend types: %s\n", str->str);
-> +        qemu_printf("Available chardev backend types: %s\n", str->str);
->          g_string_free(str, true);
->          return NULL;
->      }
-> --
-> 2.17.2
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwODA4NDA1Ni4yNjIx
+Mi0xLWdob3JnZXNAeGl5b3VsaW51eC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdl
+c0B4aXlvdWxpbnV4Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gV3NoYWRvdyBpbiBxZW11L2xp
+bnV4LXVzZXIvc3lzY2FsbC5jClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
+YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3Rh
+ZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQwNTA2NDEyMS4yMzY2Mi0xLXJpY2hh
+cmR3LnlhbmdAbGludXguaW50ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MDUwNjQxMjEuMjM2NjIt
+MS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
+ICBwYXRjaGV3LzIwMTkwNDA1MTUzMzE0LjIwNjgtMS1waGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRj
+aGV3LzIwMTkwNDA1MTUzMzE0LjIwNjgtMS1waGlsbWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlv
+dWxpbnV4Lm9yZyAtPiBwYXRjaGV3LzIwMTkwNDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlv
+dWxpbnV4Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM3NmFmMTQyY2QgV3No
+YWRvdyBpbiBxZW11L2xpbnV4LXVzZXIvc3lzY2FsbC5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQpF
+UlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAg
+d2FybmluZ3MsIDE2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgYzc2YWYxNDJjZDAyIChXc2hhZG93
+IGluIHFlbXUvbGludXgtdXNlci9zeXNjYWxsLmMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+NDA4MDg0MDU2LjI2MjEyLTEtZ2hvcmdlc0B4aXlvdWxpbnV4Lm9yZy90ZXN0aW5nLmNoZWNrcGF0
+Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
