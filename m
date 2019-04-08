@@ -2,68 +2,106 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7856C10F13
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 17:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504CAC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 17:20:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B71320883
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 17:16:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B71320883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 24E6D20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 17:20:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E6D20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56432 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDXsT-0006en-O8
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 13:16:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40481)
+	id 1hDXwa-0007lW-9f
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 13:20:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDXrF-0006CJ-US
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:59 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1hDXvg-0007MY-PD
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDXrC-00017G-81
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:57 -0400
-Resent-Date: Mon, 08 Apr 2019 13:14:57 -0400
-Resent-Message-Id: <E1hDXrC-00017G-81@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21538)
+	(envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003U1-Mb
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46298
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDXrB-00016X-Tv
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:14:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1554742774; cv=none; d=zoho.com; s=zohoarc; 
-	b=B6E/VSRRh+nXyC1M9gfetYZaAIFwJK5MF/7D9v8nE2mYmX38cHrtwdKzrhKCbBjiIIKPIUu6rN57yp3tpBr7QbXau5QVLdpSv3dlIOBWS3RnVVOjZABOtosXXBBAaV+fjFCUynJuzvXW1aI15ZeThRIHMeCnDZrIjOP+KtAlAMg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1554742774;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=spfDvz7bWDHfJpJudHtaTDC7hs/QTyucaPnf5wbMDTk=; 
-	b=GXmVSAyg1Lgh6jOd6mKgOzlDgb4AoWQbuUSsDi8qhIMCAbKtc77wfjkOEu4Nr/MWBWyJERkaePvdAw9ZFDHDZdfvjiPXIRR1F7QQZ2YtxopphqpP3kylB9VL6lbOpUjj+L+rresNt6KhMmr4dTT1fBpCk55m2VuzbllcTz9wfn0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1554742772343791.7466667457867;
-	Mon, 8 Apr 2019 09:59:32 -0700 (PDT)
-Message-ID: <155474277106.12882.8346453217758632698@76452e4e88f2>
-In-Reply-To: <20190408145721.15881-1-sohailalvi2236@gmail.com>
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hDXve-0003Tj-EM
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 13:19:30 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x38H4AF0185103
+	for <qemu-devel@nongnu.org>; Mon, 8 Apr 2019 13:19:29 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rr96vm62k-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:19:28 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Mon, 8 Apr 2019 18:19:28 +0100
+Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
+	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 8 Apr 2019 18:19:24 +0100
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+	[9.57.199.107])
+	by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x38HJNSj30736638
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 8 Apr 2019 17:19:23 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8C9D6124058;
+	Mon,  8 Apr 2019 17:19:23 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CDE8124055;
+	Mon,  8 Apr 2019 17:19:23 +0000 (GMT)
+Received: from [9.56.58.129] (unknown [9.56.58.129])
+	by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Apr 2019 17:19:23 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20190301093902.27799-1-cohuck@redhat.com>
+	<20190301093902.27799-2-cohuck@redhat.com>
+	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
+	<20190408190747.12e3618b.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Mon, 8 Apr 2019 13:19:23 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: sohailalvi2236@gmail.com
-Date: Mon, 8 Apr 2019 09:59:32 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH] qemu_system_reset_request() in hw/
- corresponding to watchdog that has triggered replaced by
- watchdog_perform_action().
+In-Reply-To: <20190408190747.12e3618b.cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19040817-0040-0000-0000-000004DE16AF
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00010890; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000284; SDB=6.01186196; UDB=6.00621238;
+	IPR=6.00966953; 
+	MB=3.00026346; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-08 17:19:26
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19040817-0041-0000-0000-000008E91BD9
+Message-Id: <b0ff9cf2-f311-2056-a8b1-415c61a419fc@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-08_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=688 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904080138
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
+ channel programs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,45 +113,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, sohailalvi2236@gmail.com, qemu-devel@nongnu.org
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org,
+	qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+	qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408165932.s-17MXo-r_9a9IRDJEcXZ2N8_gRzOaz8phqY0W6rsLM@z>
+Message-ID: <20190408171923.u4fFsuqhJwuTH0DSY4WFoMptFPi4pSBVQFuEkQFf84E@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwODE0NTcyMS4xNTg4
-MS0xLXNvaGFpbGFsdmkyMjM2QGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MDgxNDU3MjEuMTU4ODEtMS1zb2hh
-aWxhbHZpMjIzNkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gcWVtdV9z
-eXN0ZW1fcmVzZXRfcmVxdWVzdCgpIGluIGh3LyBjb3JyZXNwb25kaW5nIHRvIHdhdGNoZG9nIHRo
-YXQgaGFzIHRyaWdnZXJlZCByZXBsYWNlZCBieSB3YXRjaGRvZ19wZXJmb3JtX2FjdGlvbigpLgpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIGY1NWE1ODVkMTAuLjJjNTczMTA2Mjcg
-IG1hc3RlciAgICAgLT4gbWFzdGVyCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
-MjAxOTA0MDgxNDU3MjEuMTU4ODEtMS1zb2hhaWxhbHZpMjIzNkBnbWFpbC5jb20gLT4gcGF0Y2hl
-dy8yMDE5MDQwODE0NTcyMS4xNTg4MS0xLXNvaGFpbGFsdmkyMjM2QGdtYWlsLmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA1Njg2ZjliOTEgcWVtdV9zeXN0ZW1fcmVzZXRfcmVx
-dWVzdCgpIGluIGh3LyBjb3JyZXNwb25kaW5nIHRvIHdhdGNoZG9nIHRoYXQgaGFzIHRyaWdnZXJl
-ZCByZXBsYWNlZCBieSB3YXRjaGRvZ19wZXJmb3JtX2FjdGlvbigpLgoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCA5MCBsaW5lcyBjaGVja2VkCgpDb21taXQgMDU2ODZmOWI5MTBkIChx
-ZW11X3N5c3RlbV9yZXNldF9yZXF1ZXN0KCkgaW4gaHcvIGNvcnJlc3BvbmRpbmcgdG8gd2F0Y2hk
-b2cgdGhhdCBoYXMgdHJpZ2dlcmVkIHJlcGxhY2VkIGJ5IHdhdGNoZG9nX3BlcmZvcm1fYWN0aW9u
-KCkuKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQwODE0NTcyMS4xNTg4MS0xLXNvaGFpbGFs
-dmkyMjM2QGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+
+
+On 04/08/2019 01:07 PM, Cornelia Huck wrote:
+> On Mon, 8 Apr 2019 13:02:12 -0400
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> On 03/01/2019 04:38 AM, Cornelia Huck wrote:
+>>> When we get a solicited interrupt, the start function may have
+>>> been cleared by a csch, but we still have a channel program
+>>> structure allocated. Make it safe to call the cp accessors in
+>>> any case, so we can call them unconditionally.
+>>>
+>>> While at it, also make sure that functions called from other parts
+>>> of the code return gracefully if the channel program structure
+>>> has not been initialized (even though that is a bug in the caller).
+>>>
+>>> Reviewed-by: Eric Farman<farman@linux.ibm.com>
+>>> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
+>>> ---
+>>
+>> Hi Connie,
+>>
+>> My series of fixes for vfio-ccw depends on this patch as I would like to
+>> call cp_free unconditionally :) (I had developed my code on top of your
+>> patches).
+>>
+>> Could we pick this patch up as well when/if you pick up my patch series?
+>> I am in the process of sending out a v2.
+>>
+>> Regarding this patch we could merge it as a stand alone patch, separate
+>> from this series. And also the patch LGTM
+>>
+>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> 
+> Actually, I wanted to ask how people felt about merging this whole
+> series for the next release :) It would be one thing less on my plate...
+> 
+> 
+
+I have been testing with your patches for a while now and I haven't hit 
+any problems due to the patches.
+
+IMHO I think we can merge the patches for the next release.
+
+Thanks
+Farhan
 
 
