@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38169)
+Received: from eggs.gnu.org ([209.51.188.92]:38344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDVue-0006uF-1W
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDVv9-0007Eg-IT
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDVuc-00025B-5n
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:20 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:55800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghorges@xiyoulinux.org>)
-	id 1hDVua-0001yg-6H
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:16 -0400
-From: ghorges <ghorges@xiyoulinux.org>
-Date: Mon,  8 Apr 2019 23:09:53 +0800
-Message-Id: <20190408150953.22949-1-ghorges@xiyoulinux.org>
-Subject: [Qemu-devel] [PATCH] Wshadow:Modify some variable names
+	(envelope-from <armbru@redhat.com>) id 1hDVv8-0002T1-4h
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:10:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190204231815.29661-1-philmd@redhat.com>
+	<20190204231815.29661-8-philmd@redhat.com>
+Date: Mon, 08 Apr 2019 17:10:39 +0200
+In-Reply-To: <20190204231815.29661-8-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Feb 2019 00:18:11
+	+0100")
+Message-ID: <87tvf8mt1s.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] hw/devices: Move TI touchscreen
+ declarations into a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,190 +26,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, Yicheng Ma <ghorges@xiyoulinux.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <f4bug@amsat.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-From: Yicheng Ma <ghorges@xiyoulinux.org>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Content-Type: text/plain; charset=utf-8
+> Since uWireSlave is only used in this new header, there is no
+> need to expose it via "qemu/typedefs.h".
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS                |  2 ++
+>  hw/arm/nseries.c           |  2 +-
+>  hw/arm/palm.c              |  2 +-
+>  hw/input/tsc2005.c         |  2 +-
+>  hw/input/tsc210x.c         |  4 ++--
+>  include/hw/arm/omap.h      |  6 +-----
+>  include/hw/devices.h       | 15 ---------------
+>  include/hw/input/tsc2xxx.h | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/qemu/typedefs.h    |  1 -
+>  9 files changed, 46 insertions(+), 26 deletions(-)
+>  create mode 100644 include/hw/input/tsc2xxx.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a38086f767..6b0b5ccb41 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -654,6 +654,7 @@ F: hw/input/tsc2005.c
+>  F: hw/misc/cbus.c
+>  F: hw/timer/twl92230.c
+>  F: include/hw/display/blizzard.h
+> +F: include/hw/input/tsc2xxx.h
+>  F: include/hw/misc/cbus.h
+>=20=20
+>  Palm
+> @@ -663,6 +664,7 @@ L: qemu-arm@nongnu.org
+>  S: Odd Fixes
+>  F: hw/arm/palm.c
+>  F: hw/input/tsc210x.c
+> +F: include/hw/input/tsc2xxx.h
+>=20=20
+>  Raspberry Pi
+>  M: Peter Maydell <peter.maydell@linaro.org>
+> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+> index ac876b5878..5ac2ca0877 100644
+> --- a/hw/arm/nseries.c
+> +++ b/hw/arm/nseries.c
+> @@ -30,8 +30,8 @@
+>  #include "ui/console.h"
+>  #include "hw/boards.h"
+>  #include "hw/i2c/i2c.h"
+> -#include "hw/devices.h"
+>  #include "hw/display/blizzard.h"
+> +#include "hw/input/tsc2xxx.h"
+>  #include "hw/misc/cbus.h"
+>  #include "hw/block/flash.h"
+>  #include "hw/hw.h"
+> diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+> index 285f43709d..139d27d1cc 100644
+> --- a/hw/arm/palm.c
+> +++ b/hw/arm/palm.c
+> @@ -26,7 +26,7 @@
+>  #include "hw/arm/omap.h"
+>  #include "hw/boards.h"
+>  #include "hw/arm/arm.h"
+> -#include "hw/devices.h"
+> +#include "hw/input/tsc2xxx.h"
+>  #include "hw/loader.h"
+>  #include "exec/address-spaces.h"
+>  #include "cpu.h"
+> diff --git a/hw/input/tsc2005.c b/hw/input/tsc2005.c
+> index 2b9108a193..f82771e7a7 100644
+> --- a/hw/input/tsc2005.c
+> +++ b/hw/input/tsc2005.c
+> @@ -23,7 +23,7 @@
+>  #include "hw/hw.h"
+>  #include "qemu/timer.h"
+>  #include "ui/console.h"
+> -#include "hw/devices.h"
+> +#include "hw/input/tsc2xxx.h"
+>  #include "trace.h"
+>=20=20
+>  #define TSC_CUT_RESOLUTION(value, p)	((value) >> (16 - (p ? 12 : 10)))
+> diff --git a/hw/input/tsc210x.c b/hw/input/tsc210x.c
+> index ded0db9351..542a9188be 100644
+> --- a/hw/input/tsc210x.c
+> +++ b/hw/input/tsc210x.c
+> @@ -24,8 +24,8 @@
+>  #include "audio/audio.h"
+>  #include "qemu/timer.h"
+>  #include "ui/console.h"
+> -#include "hw/arm/omap.h"	/* For I2SCodec and uWireSlave */
+> -#include "hw/devices.h"
+> +#include "hw/arm/omap.h"            /* For I2SCodec */
+> +#include "hw/input/tsc2xxx.h"
+>=20=20
+>  #define TSC_DATA_REGISTERS_PAGE		0x0
+>  #define TSC_CONTROL_REGISTERS_PAGE	0x1
+> diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+> index e7fbd340f3..9de867daa4 100644
+> --- a/include/hw/arm/omap.h
+> +++ b/include/hw/arm/omap.h
+> @@ -20,6 +20,7 @@
+>  #include "exec/memory.h"
+>  # define hw_omap_h		"omap.h"
+>  #include "hw/irq.h"
+> +#include "hw/input/tsc2xxx.h"
+>  #include "target/arm/cpu-qom.h"
+>  #include "qemu/log.h"
+>=20=20
+> @@ -679,11 +680,6 @@ qemu_irq *omap_mpuio_in_get(struct omap_mpuio_s *s);
+>  void omap_mpuio_out_set(struct omap_mpuio_s *s, int line, qemu_irq handl=
+er);
+>  void omap_mpuio_key(struct omap_mpuio_s *s, int row, int col, int down);
+>=20=20
+> -struct uWireSlave {
+> -    uint16_t (*receive)(void *opaque);
+> -    void (*send)(void *opaque, uint16_t data);
+> -    void *opaque;
+> -};
+>  struct omap_uwire_s;
+>  void omap_uwire_attach(struct omap_uwire_s *s,
+>                  uWireSlave *slave, int chipselect);
+> diff --git a/include/hw/devices.h b/include/hw/devices.h
+> index 7a630da47f..ba9034050b 100644
+> --- a/include/hw/devices.h
+> +++ b/include/hw/devices.h
+> @@ -4,7 +4,6 @@
+>  /* Devices that have nowhere better to go.  */
+>=20=20
+>  #include "hw/hw.h"
+> -#include "ui/console.h"
+>=20=20
+>  /* smc91c111.c */
+>  void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
+> @@ -12,18 +11,4 @@ void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
+>  /* lan9118.c */
+>  void lan9118_init(NICInfo *, uint32_t, qemu_irq);
+>=20=20
+> -/* tsc210x.c */
+> -uWireSlave *tsc2102_init(qemu_irq pint);
+> -uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav);
+> -I2SCodec *tsc210x_codec(uWireSlave *chip);
+> -uint32_t tsc210x_txrx(void *opaque, uint32_t value, int len);
+> -void tsc210x_set_transform(uWireSlave *chip,
+> -                MouseTransformInfo *info);
+> -void tsc210x_key_event(uWireSlave *chip, int key, int down);
+> -
+> -/* tsc2005.c */
+> -void *tsc2005_init(qemu_irq pintdav);
+> -uint32_t tsc2005_txrx(void *opaque, uint32_t value, int len);
+> -void tsc2005_set_transform(void *opaque, MouseTransformInfo *info);
+> -
+>  #endif
+> diff --git a/include/hw/input/tsc2xxx.h b/include/hw/input/tsc2xxx.h
+> new file mode 100644
+> index 0000000000..f23f00cde9
+> --- /dev/null
+> +++ b/include/hw/input/tsc2xxx.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * TI touchscreen controller
+> + *
+> + * Copyright (c) 2006 Andrzej Zaborowski
+> + * Copyright (C) 2008 Nokia Corporation
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef HW_INPUT_TSC2XXX_H
+> +#define HW_INPUT_TSC2XXX_H
+> +
+> +/* TI 4/8-wire resistive touch screen converters */
 
-Change the name of some variables so that the code can be compiled with -Wshadow
+This sounds like a more specific phrasing of "TI touchscreen controller"
+above.  Do we need both, or could this one be merged into the one above?
 
-Signed-off-by: Yicheng Ma <ghorges@xiyoulinux.org>
----
- linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 208fd1813d..985095e4d5 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 size_t size;
-             } sig, *sig_ptr;
- 
--            abi_ulong arg_sigset, arg_sigsize, *arg7;
-+            abi_ulong arg_sigset, arg_sigsize, *arg7s;
-             target_sigset_t *target_sigset;
- 
-             n = arg1;
-@@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 sig_ptr = &sig;
-                 sig.size = SIGSET_T_SIZE;
- 
--                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
--                if (!arg7) {
-+                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
-+                if (!arg7s) {
-                     return -TARGET_EFAULT;
-                 }
--                arg_sigset = tswapal(arg7[0]);
--                arg_sigsize = tswapal(arg7[1]);
--                unlock_user(arg7, arg6, 0);
-+                arg_sigset = tswapal(arg7s[0]);
-+                arg_sigsize = tswapal(arg7s[1]);
-+                unlock_user(arg7s, arg6, 0);
- 
-                 if (arg_sigset) {
-                     sig.set = &set;
-@@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-     case TARGET_NR_getcpu:
-         {
--            unsigned cpu, node;
--            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-+            unsigned cpus, node;
-+            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
-                                        arg2 ? &node : NULL,
-                                        NULL));
-             if (is_error(ret)) {
-                 return ret;
-             }
--            if (arg1 && put_user_u32(cpu, arg1)) {
-+            if (arg1 && put_user_u32(cpus, arg1)) {
-                 return -TARGET_EFAULT;
-             }
-             if (arg2 && put_user_u32(node, arg2)) {
-@@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_listxattr:
-     case TARGET_NR_llistxattr:
-     {
--        void *p, *b = 0;
-+        void *q, *b = 0;
-         if (arg2) {
-             b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
-             if (!b) {
-                 return -TARGET_EFAULT;
-             }
-         }
--        p = lock_user_string(arg1);
--        if (p) {
-+        q = lock_user_string(arg1);
-+        if (q) {
-             if (num == TARGET_NR_listxattr) {
--                ret = get_errno(listxattr(p, b, arg3));
-+                ret = get_errno(listxattr(q, b, arg3));
-             } else {
--                ret = get_errno(llistxattr(p, b, arg3));
-+                ret = get_errno(llistxattr(q, b, arg3));
-             }
-         } else {
-             ret = -TARGET_EFAULT;
-         }
--        unlock_user(p, arg1, 0);
-+        unlock_user(q, arg1, 0);
-         unlock_user(b, arg2, arg3);
-         return ret;
-     }
-@@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_setxattr:
-     case TARGET_NR_lsetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_READ, arg3, arg4, 1);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_setxattr) {
--                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
-                 } else {
--                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, 0);
-         }
-@@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_getxattr:
-     case TARGET_NR_lgetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_getxattr) {
--                    ret = get_errno(getxattr(p, n, v, arg4));
-+                    ret = get_errno(getxattr(q, n, v, arg4));
-                 } else {
--                    ret = get_errno(lgetxattr(p, n, v, arg4));
-+                    ret = get_errno(lgetxattr(q, n, v, arg4));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, arg4);
-         }
-@@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_removexattr:
-     case TARGET_NR_lremovexattr:
-         {
--            void *p, *n;
--            p = lock_user_string(arg1);
-+            void *q, *n;
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_removexattr) {
--                    ret = get_errno(removexattr(p, n));
-+                    ret = get_errno(removexattr(q, n));
-                 } else {
--                    ret = get_errno(lremovexattr(p, n));
-+                    ret = get_errno(lremovexattr(q, n));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-         }
-         return ret;
--- 
-2.17.0
+> +
+> +#include "hw/irq.h"
+> +#include "ui/console.h"
+> +
+> +typedef struct uWireSlave {
+> +    uint16_t (*receive)(void *opaque);
+> +    void (*send)(void *opaque, uint16_t data);
+> +    void *opaque;
+> +} uWireSlave;
+> +
+> +/* tsc210x.c */
+> +uWireSlave *tsc2102_init(qemu_irq pint);
+> +uWireSlave *tsc2301_init(qemu_irq penirq, qemu_irq kbirq, qemu_irq dav);
+> +I2SCodec *tsc210x_codec(uWireSlave *chip);
+> +uint32_t tsc210x_txrx(void *opaque, uint32_t value, int len);
+> +void tsc210x_set_transform(uWireSlave *chip, MouseTransformInfo *info);
+> +void tsc210x_key_event(uWireSlave *chip, int key, int down);
+> +
+> +/* tsc2005.c */
+> +void *tsc2005_init(qemu_irq pintdav);
+> +uint32_t tsc2005_txrx(void *opaque, uint32_t value, int len);
+> +void tsc2005_set_transform(void *opaque, MouseTransformInfo *info);
+> +
+> +#endif
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 5d1a2d8329..4d2e3cfb86 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -98,7 +98,6 @@ typedef struct RAMBlock RAMBlock;
+>  typedef struct Range Range;
+>  typedef struct SHPCDevice SHPCDevice;
+>  typedef struct SSIBus SSIBus;
+> -typedef struct uWireSlave uWireSlave;
+>  typedef struct VirtIODevice VirtIODevice;
+>  typedef struct Visitor Visitor;
+>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
