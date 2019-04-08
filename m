@@ -2,85 +2,62 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D44CC282DD
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C59C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 544FF20880
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:45:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQy4Lkk8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544FF20880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57B2F20880
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 08:47:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B2F20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49488 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49513 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDPuE-0006yn-IO
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:45:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52002)
+	id 1hDPwL-0008Ss-LE
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 04:47:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDPsi-0005xO-Pa
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDPlc-0008BF-CL
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hDPsh-0008Mv-96
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:56 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:39952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hDPsg-0008Jk-1K
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:43:55 -0400
-Received: by mail-qt1-x843.google.com with SMTP id x12so14424554qts.7
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 01:43:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=mluOeCvZqHaE1UNzjY+qDA6Y1LJdXS+eO+yepQydSIg=;
-	b=dQy4Lkk8cZpXRqzijj4ZgMQK3sWos5iH7VX06x92Mhn+InqG+ne29KIU1/xkyKgY+S
-	s20a1zY+5nQ3DVqzOgPCYKKfN1KNB1E6TB0559aH9qU0+chcnIDVkFeOHDvGV2HOYsYA
-	E0G1Rqn1ny824l1FfwJqRDAZwid/Y/5WzeRxBcDlp1DC3jWCazKIYoFa48KxpPIKEfh6
-	/vlrgVGEV2LHCZ6PwJ+PBjqVuIogRXKA30fvzg8AkBHYo+h9sWWxXaYdBFG182mbtZQa
-	2mBGYmpD5MF3/Y27zD+hXlTyNh4CAAzMHAycNfNUSqpgXgGypjHLcXsCYEXTNKKGrX7K
-	K+/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=mluOeCvZqHaE1UNzjY+qDA6Y1LJdXS+eO+yepQydSIg=;
-	b=Qsd7BAwXsqQwHEoK0FFohzEMwYk/YjR3yo4WX+b6Z4d58FF9AEkNc9yE4hbjXb2dk3
-	Ybzz7nydPnDl+Y6FRlXO8xxefIDYFJHL9eOcL+i1RXOZb58RBJE4EWhjAnj9PaDxoDZU
-	okNCpOTjxOTEHIYOkot6TZUR7NjoS8gdoSSEIPdCiJlVJOhzI+CQXNN4aT9JkOCBWxCQ
-	8DToK58iAeTX1AYXkTVhq9EjiI2DcNS+csx1VVUhT+snCSmDt88EIkhVUc4h967epQvw
-	VkV5UBIkpxXvqjaRTQhHbTUi3M4uXKLDYhS8CZERRoR554GQPhvYD/DaVPoDeXm4aE+U
-	zREg==
-X-Gm-Message-State: APjAAAXRfiMHDeoInBsrk3rRYezd1mgqtxqcj1SfhiEx8AH6xBKH3bg3
-	Gg/LmUzObYe0DMjfO9M8xSM=
-X-Google-Smtp-Source: APXvYqwBwOYxS1ATkC0/LKaDIMiY6xypKPYOXj0/KSTLUBb4DDap5zWf836/efsdzRu+zvnUzx/wPg==
-X-Received: by 2002:ac8:2acc:: with SMTP id c12mr22132566qta.108.1554713033308;
-	Mon, 08 Apr 2019 01:43:53 -0700 (PDT)
-Received: from localhost.localdomain (104.129.187.94.16clouds.com.
-	[104.129.187.94]) by smtp.gmail.com with ESMTPSA id
-	d75sm17603259qkb.74.2019.04.08.01.43.52
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 08 Apr 2019 01:43:52 -0700 (PDT)
-From: Catherine Ho <catherine.hecx@gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date: Mon,  8 Apr 2019 04:42:13 -0400
-Message-Id: <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
-References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Subject: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
- incoming migration
+	(envelope-from <armbru@redhat.com>) id 1hDPlb-0003fu-1q
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDPla-0003eq-Hd
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 04:36:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D54B6F74AE
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 08:36:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 78BC46013D;
+	Mon,  8 Apr 2019 08:36:33 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 1D6931132783; Mon,  8 Apr 2019 10:36:28 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  8 Apr 2019 10:36:27 +0200
+Message-Id: <20190408083627.7479-16-armbru@redhat.com>
+In-Reply-To: <20190408083627.7479-1-armbru@redhat.com>
+References: <20190408083627.7479-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 08 Apr 2019 08:36:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 15/15] monitor: Simplify how -device/device_add
+ print help
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,69 +69,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>,
-	Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Juan Quintela <quintela@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408084213.ma8v5yjnCeYEL4Q5P9XBcdUeG1v86CMdM9KaaCCc8bs@z>
+Message-ID: <20190408083627.Wii-C8yiWQLDiTDEAuPyAk8S--QXDqJbPGw-sLNbcNw@z>
 
-Commit 18269069c310 ("migration: Introduce ignore-shared capability")
-addes ignore-shared capability to bypass the shared ramblock (e,g,
-membackend + numa node). It does good to live migration.
+Commit a95db58f210 added monitor_vfprintf() as an error_printf()
+generalized from stderr to arbitrary streams, then used it wrapped in
+helper out_printf() to print -device/device_add help to stdout.  Use
+qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
 
-As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
-until VM starts, but it does on aarch64 qemu:
-Backtrace:
-1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-exec.c:3458
-2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
-3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
-5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-6  0x000055f4a2c9851d in main () at vl.c:4552
-
-Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
-druing rom_reset. In ignore-shared incoming case, this rom filling
-is not required since all the data has been stored in memory backend
-file.
-
-Further more, as suggested by Peter Xu, if we do rom_reset() now with
-these ROMs then the RAM data should be re-filled again too with the
-migration stream coming in.
-
-Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-capability")
-Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Suggested-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/core/loader.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/monitor/monitor.h |  3 ---
+ monitor.c                 | 16 ++++------------
+ qdev-monitor.c            | 36 ++++++++++++++----------------------
+ 3 files changed, 18 insertions(+), 37 deletions(-)
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index fe5cb24122..040109464b 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1087,6 +1087,15 @@ static void rom_reset(void *unused)
- {
-     Rom *rom;
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index e4c3717454..316a168c41 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int monitor_fdset_dup_fd_find(int dup_fd);
  
-+    /*
-+     * We don't need to fill in the RAM with ROM data because we'll fill
-+     * the data in during the next incoming migration in all cases.  Note
-+     * that some of those RAMs can actually be modified by the guest on ARM
-+     * so this is probably the only right thing to do here.
-+     */
-+    if (runstate_check(RUN_STATE_INMIGRATE))
-+        return;
-+
-     QTAILQ_FOREACH(rom, &roms, next) {
-         if (rom->fw_file) {
-             continue;
+-int monitor_vfprintf(FILE *stream,
+-                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+-
+ #endif /* MONITOR_H */
+diff --git a/monitor.c b/monitor.c
+index 7b4a78d798..10be8bdb86 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
+     monitor_flush(opaque);
+ }
+ 
+-/*
+- * Print to current monitor if we have one, else to stream.
+- */
+-int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+-{
+-    if (cur_mon && !monitor_cur_is_qmp()) {
+-        return monitor_vprintf(cur_mon, fmt, ap);
+-    }
+-    return vfprintf(stream, fmt, ap);
+-}
+-
+ /*
+  * Print to current monitor if we have one, else to stderr.
+  */
+ int error_vprintf(const char *fmt, va_list ap)
+ {
+-    return monitor_vfprintf(stderr, fmt, ap);
++    if (cur_mon && !monitor_cur_is_qmp()) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vfprintf(stderr, fmt, ap);
+ }
+ 
+ int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index d4320986a2..373b9ad445 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -31,6 +31,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "qemu/option.h"
++#include "qemu/qemu-print.h"
+ #include "sysemu/block-backend.h"
+ #include "migration/misc.h"
+ 
+@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
+     return (qdev_class_get_alias(dc) != NULL);
+ }
+ 
+-static void out_printf(const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    monitor_vfprintf(stdout, fmt, ap);
+-    va_end(ap);
+-}
+-
+ static void qdev_print_devinfo(DeviceClass *dc)
+ {
+-    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
++    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
+     if (dc->bus_type) {
+-        out_printf(", bus %s", dc->bus_type);
++        qemu_printf(", bus %s", dc->bus_type);
+     }
+     if (qdev_class_has_alias(dc)) {
+-        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
++        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
+     }
+     if (dc->desc) {
+-        out_printf(", desc \"%s\"", dc->desc);
++        qemu_printf(", desc \"%s\"", dc->desc);
+     }
+     if (!dc->user_creatable) {
+-        out_printf(", no-user");
++        qemu_printf(", no-user");
+     }
+-    out_printf("\n");
++    qemu_printf("\n");
+ }
+ 
+ static void qdev_print_devinfos(bool show_no_user)
+@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
+                 continue;
+             }
+             if (!cat_printed) {
+-                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
++                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
+                 cat_printed = true;
+             }
+             qdev_print_devinfo(dc);
+@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
+     }
+ 
+     if (prop_list) {
+-        out_printf("%s options:\n", driver);
++        qemu_printf("%s options:\n", driver);
+     } else {
+-        out_printf("There are no options for %s.\n", driver);
++        qemu_printf("There are no options for %s.\n", driver);
+     }
+     for (prop = prop_list; prop; prop = prop->next) {
+         int len;
+-        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
++        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
+         if (prop->value->has_description) {
+             if (len < 24) {
+-                out_printf("%*s", 24 - len, "");
++                qemu_printf("%*s", 24 - len, "");
+             }
+-            out_printf(" - %s\n", prop->value->description);
++            qemu_printf(" - %s\n", prop->value->description);
+         } else {
+-            out_printf("\n");
++            qemu_printf("\n");
+         }
+     }
+ 
 -- 
-2.17.1
+2.17.2
 
 
