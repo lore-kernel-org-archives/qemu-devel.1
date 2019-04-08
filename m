@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53345)
+Received: from eggs.gnu.org ([209.51.188.92]:37465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sohailalvi2236@gmail.com>) id 1hDaiH-0003PP-M3
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1hDb4S-0000bv-3O
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sohailalvi2236@gmail.com>) id 1hDaiG-0005yK-Np
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:53 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39260)
+	(envelope-from <bounces@canonical.com>) id 1hDb4Q-0002J2-3m
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59292)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sohailalvi2236@gmail.com>)
-	id 1hDaiF-0005w5-S2
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:17:52 -0400
-Received: by mail-pg1-x543.google.com with SMTP id k3so7929140pga.6
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:17:48 -0700 (PDT)
-From: sohailalvi2236@gmail.com
-Date: Tue,  9 Apr 2019 01:47:41 +0530
-Message-Id: <20190408201741.8042-1-sohailalvi2236@gmail.com>
-In-Reply-To: <CAFEAcA-D0MK_eEs+tvPsdp+2s9YuC=qS=uyhzNtqy3DW9-=rNQ@mail.gmail.com>
-References: <CAFEAcA-D0MK_eEs+tvPsdp+2s9YuC=qS=uyhzNtqy3DW9-=rNQ@mail.gmail.com>
-Subject: [Qemu-devel] [PATCH 02/5] hw/timer: qemu_system_reset() replaced by
- watchdog_perform_action()
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hDb4M-0002Hp-A8
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hDb4K-0000BZ-TI
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 20:40:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D51822E80C9
+	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 20:40:40 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Apr 2019 20:34:54 -0000
+From: =?utf-8?q?Matthias_L=C3=BCscher?= <1823790@bugs.launchpad.net>
+Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1823790] [NEW] QEMU forces systemd into tight loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +35,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Sohail Alvi <sohailalvi2236@gmail.com>
+To: qemu-devel@nongnu.org
 
-From: Sohail Alvi <sohailalvi2236@gmail.com>
+Public bug reported:
 
-Signed-off-by: SohailAlvi <sohailalvi2236@gmail.com>
+While building Debian images for embedded ARM target systems I detected
+that QEMU seems to force newer systemd daemons into a tight loop.
 
-The watchdog_perform_action() function has been added in place of qemu_system_reset where watchdog was triggered.
-Changes have been made according to the previous suggestions given by Peter
-Maydell.
+My setup is the following:
 
-The patch was tested with scripts/checkpatch.pl and no style errors were
-found.
----
- hw/timer/etraxfs_timer.c | 3 ++-
- hw/timer/m48t59.c        | 3 ++-
- hw/timer/pxa2xx_timer.c  | 3 ++-
- 3 files changed, 6 insertions(+), 3 deletions(-)
+Host machine: Ubuntu 18.04, amd64
+LXD container: Debian Buster, arm64, systemd 241
+QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3.1=
++dfsg-7)
 
-diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
-index 2280914b1d..9561113d0e 100644
---- a/hw/timer/etraxfs_timer.c
-+++ b/hw/timer/etraxfs_timer.c
-@@ -26,6 +26,7 @@
- #include "sysemu/sysemu.h"
- #include "qemu/timer.h"
- #include "hw/ptimer.h"
-+#include "sysemu/watchdog.h"
- 
- #define D(x)
- 
-@@ -207,7 +208,7 @@ static void watchdog_hit(void *opaque)
-         qemu_irq_raise(t->nmi);
-     }
-     else
--        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+        watchdog_perform_action();
- 
-     t->wd_hits++;
- }
-diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
-index ca3ed445de..ebe58e8dc7 100644
---- a/hw/timer/m48t59.c
-+++ b/hw/timer/m48t59.c
-@@ -30,6 +30,7 @@
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
- #include "qemu/bcd.h"
-+#include "sysemu/watchdog.h"
- 
- #include "m48t59-internal.h"
- 
-@@ -158,7 +159,7 @@ static void watchdog_cb (void *opaque)
- 	NVRAM->buffer[0x1FF7] = 0x00;
- 	NVRAM->buffer[0x1FFC] &= ~0x40;
-         /* May it be a hw CPU Reset instead ? */
--        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+        watchdog_perform_action();
-     } else {
- 	qemu_set_irq(NVRAM->IRQ, 1);
- 	qemu_set_irq(NVRAM->IRQ, 0);
-diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
-index a489bf5159..2be680b5df 100644
---- a/hw/timer/pxa2xx_timer.c
-+++ b/hw/timer/pxa2xx_timer.c
-@@ -14,6 +14,7 @@
- #include "hw/arm/pxa.h"
- #include "hw/sysbus.h"
- #include "qemu/log.h"
-+#include "sysemu/watchdog.h"
- 
- #define OSMR0	0x00
- #define OSMR1	0x04
-@@ -414,7 +415,7 @@ static void pxa2xx_timer_tick(void *opaque)
-     if (t->num == 3)
-         if (i->reset3 & 1) {
-             i->reset3 = 0;
--            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+            watchdog_perform_action();
-         }
- }
- 
--- 
-2.17.1
+To easily reproduce the issue I have created the following repository:
+https://github.com/lueschem/edi-qemu
+
+The call where systemd gets looping is the following:
+2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 errno=
+=3D34 (Numerical result out of range)
+
+Furthermore I also verified that the issue is not related to LXD.
+The same behavior can be reproduced using systemd-nspawn.
+
+This issue reported against systemd seems to be related:
+https://github.com/systemd/systemd/issues/11557
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823790
+
+Title:
+  QEMU forces systemd into tight loop
+
+Status in QEMU:
+  New
+
+Bug description:
+  While building Debian images for embedded ARM target systems I
+  detected that QEMU seems to force newer systemd daemons into a tight
+  loop.
+
+  My setup is the following:
+
+  Host machine: Ubuntu 18.04, amd64
+  LXD container: Debian Buster, arm64, systemd 241
+  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
+.1+dfsg-7)
+
+  To easily reproduce the issue I have created the following repository:
+  https://github.com/lueschem/edi-qemu
+
+  The call where systemd gets looping is the following:
+  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
+no=3D34 (Numerical result out of range)
+
+  Furthermore I also verified that the issue is not related to LXD.
+  The same behavior can be reproduced using systemd-nspawn.
+
+  This issue reported against systemd seems to be related:
+  https://github.com/systemd/systemd/issues/11557
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
