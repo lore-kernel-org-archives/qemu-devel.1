@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42457)
+Received: from eggs.gnu.org ([209.51.188.92]:42547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDW6y-0006bK-0k
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDW76-0006hC-W5
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDW6w-0000he-S6
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:03 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <3e489e51-79c7-54ec-7018-e7424d2c6f40@virtuozzo.com>
-References: <1554483379-682051-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554483379-682051-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w517ec4y1wv.fsf@maestria.local.igalia.com>
-	<3e489e51-79c7-54ec-7018-e7424d2c6f40@virtuozzo.com>
-Date: Mon, 08 Apr 2019 17:22:58 +0200
-Message-ID: <w514l78y10t.fsf@maestria.local.igalia.com>
+	(envelope-from <armbru@redhat.com>) id 1hDW76-0000x8-1W
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:12 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190204231815.29661-1-philmd@redhat.com>
+Date: Mon, 08 Apr 2019 17:22:54 +0200
+In-Reply-To: <20190204231815.29661-1-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Feb 2019 00:18:04
+	+0100")
+Message-ID: <87d0lwmshd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] block: include base when checking
- image chain for block allocation
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] hw: Remove "hw/devices.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +24,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <f4bug@amsat.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org, Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon 08 Apr 2019 05:16:22 PM CEST, Andrey Shinkevich wrote:
-> On 08/04/2019 18:03, Alberto Garcia wrote:
->> On Fri 05 Apr 2019 06:56:17 PM CEST, Andrey Shinkevich wrote:
->>> +int bdrv_is_allocated_above(BlockDriverState *top,
->>> +                            BlockDriverState *base,
->>> +                            int64_t offset, int64_t bytes, int64_t *pnum)
->>> +{
->>> +    return bdrv_do_is_allocated_above(top, base, false, offset, bytes, pnum);
->>> +}
->>> +
->>> +int bdrv_is_allocated_above_inclusive(BlockDriverState *top,
->>> +                                      BlockDriverState *base,
->>> +                                      int64_t offset, int64_t bytes,
->>> +                                      int64_t *pnum)
->>> +{
->>> +    return bdrv_do_is_allocated_above(top, base, true, offset, bytes, pnum);
->>> +}
->> 
->> Instead of having these two, isn't it simpler to add an 'include_base'
->> parameter to the original function?
->> 
->> Another alternative (I haven't checked this one so it could be more
->> cumbersome): change the semantics of the function to always include the
->> base and modify the callers.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Hi,
 >
-> The idea behind those two functions was to keep the rest of the code
-> unmodified. Currently, we have the issue with the block-stream
-> parallel jobs. What if we manage this case first and then, when proved
-> to be robust, take care of the rest?
+> As his first comment describes itself, the "hw/devices.h" contains
+> declarations for "Devices that have nowhere better to go."
+> This series remove it, creating new headers for devices covered there.
+> MAINTAINERS is updated.
+> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
+> and "hw/net/ne2000-isa.h" header guard.
 
-Sure, that makes sense if you need to do significant changes to the
-other callers, but if you just need to pass an extra 'false'
-parameter...
-
-It's not a big deal, I just think you'd have a simpler patch.
-
-Berto
+Needs a rebase now.  Apart from that, series
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
