@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40638)
+Received: from eggs.gnu.org ([209.51.188.92]:40640)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9940f4835=Paul.Durrant@citrix.com>)
-	id 1hDW1L-0002wV-1P
+	id 1hDW1L-0002wX-5K
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9940f4835=Paul.Durrant@citrix.com>)
-	id 1hDW1J-00024M-Sm
+	id 1hDW1J-00024D-Rn
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:17:15 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 8 Apr 2019 16:16:16 +0100
-Message-ID: <20190408151617.13025-3-paul.durrant@citrix.com>
+Date: Mon, 8 Apr 2019 16:16:17 +0100
+Message-ID: <20190408151617.13025-4-paul.durrant@citrix.com>
 In-Reply-To: <20190408151617.13025-1-paul.durrant@citrix.com>
 References: <20190408151617.13025-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/3] xen-bus: allow AioContext to be specified
- for each event channel
+Subject: [Qemu-devel] [PATCH 3/3] xen-bus / xen-block: add support for event
+ channel polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +26,145 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This patch adds an AioContext parameter to xen_device_bind_event_channel()
-and then uses aio_set_fd_handler() to set the callback rather than
-qemu_set_fd_handler().
+This patch introduces a poll callback for event channel fd-s and uses
+this to invoke the channel callback function.
+
+To properly support polling, it is necessary for the event channel callback
+function to return a boolean saying whether it has done any useful work or
+not. Thus xen_block_dataplane_event() is modified to directly invoke
+xen_block_handle_requests() and the latter only returns true if it actually
+processes any requests. This also means that the call to qemu_bh_schedule()
+is moved into xen_block_complete_aio(), which is more intuitive since the
+only reason for doing a deferred poll of the shared ring should be because
+there were previously insufficient resources to fully complete a previous
+poll.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 ---
- hw/block/dataplane/xen-block.c |  2 +-
- hw/xen/xen-bus.c               | 10 +++++++---
- include/hw/xen/xen-bus.h       |  1 +
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ hw/block/dataplane/xen-block.c | 17 +++++++++--------
+ hw/xen/xen-bus.c               | 11 +++++++++--
+ include/hw/xen/xen-bus.h       |  2 +-
+ 3 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index bb8f1186e4..1046f965c4 100644
+index 1046f965c4..908bd27bbd 100644
 --- a/hw/block/dataplane/xen-block.c
 +++ b/hw/block/dataplane/xen-block.c
-@@ -802,7 +802,7 @@ void xen_block_dataplane_start(XenBlockDataPlane *dataplane,
+@@ -317,7 +317,9 @@ static void xen_block_complete_aio(void *opaque, int ret)
+     }
+     xen_block_release_request(request);
+ 
+-    qemu_bh_schedule(dataplane->bh);
++    if (dataplane->more_work) {
++        qemu_bh_schedule(dataplane->bh);
++    }
+ 
+ done:
+     aio_context_release(dataplane->ctx);
+@@ -514,12 +516,13 @@ static int xen_block_get_request(XenBlockDataPlane *dataplane,
+  */
+ #define IO_PLUG_THRESHOLD 1
+ 
+-static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
++static bool xen_block_handle_requests(XenBlockDataPlane *dataplane)
+ {
+     RING_IDX rc, rp;
+     XenBlockRequest *request;
+     int inflight_atstart = dataplane->requests_inflight;
+     int batched = 0;
++    bool done_something = false;
+ 
+     dataplane->more_work = 0;
+ 
+@@ -551,6 +554,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
+         }
+         xen_block_get_request(dataplane, request, rc);
+         dataplane->rings.common.req_cons = ++rc;
++        done_something = true;
+ 
+         /* parse them */
+         if (xen_block_parse_request(request) != 0) {
+@@ -602,10 +606,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
+         blk_io_unplug(dataplane->blk);
      }
  
-     dataplane->event_channel =
--        xen_device_bind_event_channel(xendev, event_channel,
-+        xen_device_bind_event_channel(xendev, dataplane->ctx, event_channel,
-                                       xen_block_dataplane_event, dataplane,
-                                       &local_err);
-     if (local_err) {
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 9e391492ac..4f634d1291 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -924,6 +924,7 @@ done:
- 
- struct XenEventChannel {
-     QLIST_ENTRY(XenEventChannel) list;
-+    AioContext *ctx;
-     xenevtchn_handle *xeh;
-     evtchn_port_t local_port;
-     XenEventHandler handler;
-@@ -943,6 +944,7 @@ static void xen_device_event(void *opaque)
+-    if (dataplane->more_work &&
+-        dataplane->requests_inflight < dataplane->max_requests) {
+-        qemu_bh_schedule(dataplane->bh);
+-    }
++    return done_something;
  }
  
- XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
-+                                               AioContext *ctx,
-                                                unsigned int port,
-                                                XenEventHandler handler,
-                                                void *opaque, Error **errp)
-@@ -968,8 +970,9 @@ XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
-     channel->handler = handler;
-     channel->opaque = opaque;
+ static void xen_block_dataplane_bh(void *opaque)
+@@ -617,11 +618,11 @@ static void xen_block_dataplane_bh(void *opaque)
+     aio_context_release(dataplane->ctx);
+ }
  
--    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), xen_device_event, NULL,
--                        channel);
-+    channel->ctx = ctx;
-+    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false,
-+                       xen_device_event, NULL, NULL, channel);
+-static void xen_block_dataplane_event(void *opaque)
++static bool xen_block_dataplane_event(void *opaque)
+ {
+     XenBlockDataPlane *dataplane = opaque;
+ 
+-    qemu_bh_schedule(dataplane->bh);
++    return xen_block_handle_requests(dataplane);
+ }
+ 
+ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 4f634d1291..c90fc62a8d 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -931,13 +931,20 @@ struct XenEventChannel {
+     void *opaque;
+ };
+ 
++static bool xen_device_poll(void *opaque)
++{
++    XenEventChannel *channel = opaque;
++
++    return channel->handler(channel->opaque);
++}
++
+ static void xen_device_event(void *opaque)
+ {
+     XenEventChannel *channel = opaque;
+     unsigned long port = xenevtchn_pending(channel->xeh);
+ 
+     if (port == channel->local_port) {
+-        channel->handler(channel->opaque);
++        xen_device_poll(channel);
+ 
+         xenevtchn_unmask(channel->xeh, port);
+     }
+@@ -972,7 +979,7 @@ XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+ 
+     channel->ctx = ctx;
+     aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false,
+-                       xen_device_event, NULL, NULL, channel);
++                       xen_device_event, NULL, xen_device_poll, channel);
  
      QLIST_INSERT_HEAD(&xendev->event_channels, channel, list);
  
-@@ -1010,7 +1013,8 @@ void xen_device_unbind_event_channel(XenDevice *xendev,
- 
-     QLIST_REMOVE(channel, list);
- 
--    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), NULL, NULL, NULL);
-+    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false,
-+                       NULL, NULL, NULL, NULL);
- 
-     if (xenevtchn_unbind(channel->xeh, channel->local_port) < 0) {
-         error_setg_errno(errp, errno, "xenevtchn_unbind failed");
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 3315f0de20..8183b98c7d 100644
+index 8183b98c7d..1c2d9dfdb8 100644
 --- a/include/hw/xen/xen-bus.h
 +++ b/include/hw/xen/xen-bus.h
-@@ -122,6 +122,7 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
- typedef void (*XenEventHandler)(void *opaque);
+@@ -119,7 +119,7 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+                                 XenDeviceGrantCopySegment segs[],
+                                 unsigned int nr_segs, Error **errp);
+ 
+-typedef void (*XenEventHandler)(void *opaque);
++typedef bool (*XenEventHandler)(void *opaque);
  
  XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
-+                                               AioContext *ctx,
-                                                unsigned int port,
-                                                XenEventHandler handler,
-                                                void *opaque, Error **errp);
+                                                AioContext *ctx,
 -- 
 2.20.1.2.gb21ebb6
