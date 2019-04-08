@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37263)
+Received: from eggs.gnu.org ([209.51.188.92]:37359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hDJtq-0007Ag-Gn
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:43 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDJtv-0007Dn-3r
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hDJjK-0007mE-7r
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:09:51 -0400
-Received: from pv50p00im-ztdg10011301.me.com ([17.58.6.40]:50197)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hDJjI-0007eD-46
-	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:09:48 -0400
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Chen Zhang <tgfbeta@me.com>
-In-Reply-To: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
-Date: Mon, 8 Apr 2019 10:09:42 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <91053E16-BF23-405F-971F-8042EEA50408@me.com>
-References: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
-Subject: [Qemu-devel] [PATCH 2/2] ui/cocoa: Fix mouse grabbing in fullscreen
- mode for relative input device
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDJtu-0003Vb-3q
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:47 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:32960)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hDJtt-0003VF-RV
+	for qemu-devel@nongnu.org; Sun, 07 Apr 2019 22:20:46 -0400
+Received: by mail-qt1-x843.google.com with SMTP id k14so13743158qtb.0
+	for <qemu-devel@nongnu.org>; Sun, 07 Apr 2019 19:20:45 -0700 (PDT)
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Sun,  7 Apr 2019 22:19:05 -0400
+Message-Id: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+Subject: [Qemu-devel] [PATCH] hostmem-file: warn when memory-backend-file,
+ share=on and in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Catherine Ho <catherine.hecx@gmail.com>
 
-In fullscreen mode, the window property of cocoaView may not be the key
-window, and the current implementation would not grab mouse in =
-fullscreen
-mode after user ungrabs cursor in fullscreen mode with hot-key, and left
-clicks the relative input devices to re-grab it.
+Currently it is not forbidden to use "-object memory-backend-file,share=on"
+and together with "-incoming". But after incoming migration is finished,
+the memory-backend-file will be definitely written if share=on. So the
+memory-backend-file can only be used once, but failed in the 2nd time
+incoming.
 
-This patch used value of isFullscreen as a short-cirtuit condition for
-relative input device grabbing.
+Thus it gives a warning and the users can run the qemu if they really
+want to do it.
 
-Signed-off-by: Chen Zhang <tgfbeta@me.com>
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
 ---
- ui/cocoa.m | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ backends/hostmem-file.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 474d44cb9f..aa7cf07368 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -901,7 +901,12 @@ QemuCocoaView *cocoaView;
-         case NSEventTypeLeftMouseUp:
-             mouse_event =3D true;
-             if (!isMouseGrabbed && [self screenContainsPoint:p]) {
--                if([[self window] isKeyWindow]) {
-+                /*
-+                 * In fullscreen mode, the window of cocoaView may not =
-be the
-+                 * key window, therefore the position relative to the =
-virtual
-+                 * screen alone will be sufficient.
-+                 */
-+                if(isFullscreen || [[self window] isKeyWindow]) {
-                     [self grabMouse];
-                 }
-             }
---=20
-2.19.2
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 37ac6445d2..59429ee0b4 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -16,6 +16,7 @@
+ #include "sysemu/hostmem.h"
+ #include "sysemu/sysemu.h"
+ #include "qom/object_interfaces.h"
++#include "migration/migration.h"
+ 
+ /* hostmem-file.c */
+ /**
+@@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         }
+     }
+ 
++    /*
++     * In ignore shared case, if share=on for host memory backend file,
++     * the ram might be written after incoming process is finished. Thus
++     * the memory backend can't be reused for 2nd/3rd... incoming
++     */
++    if (backend->share && migrate_ignore_shared()
++                       && runstate_check(RUN_STATE_INMIGRATE))
++        warn_report("share=on for memory backend file might be "
++                        "conflicted with incoming in ignore shared case");
++
+     backend->force_prealloc = mem_prealloc;
+     name = host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+-- 
+2.17.1
