@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37465)
+Received: from eggs.gnu.org ([209.51.188.92]:47351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDb4S-0000bv-3O
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:49 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKF-0003jm-26
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDb4Q-0002J2-3m
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59292)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDbKD-0007Xk-45
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:06 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:39369)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hDb4M-0002Hp-A8
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:40:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hDb4K-0000BZ-TI
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 20:40:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D51822E80C9
-	for <qemu-devel@nongnu.org>; Mon,  8 Apr 2019 20:40:40 +0000 (UTC)
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hDbKA-0007RW-6b
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 16:57:03 -0400
+Received: by mail-it1-x143.google.com with SMTP id 139so1440509ita.4
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 13:56:59 -0700 (PDT)
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Date: Mon,  8 Apr 2019 16:55:43 -0400
+Message-Id: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Apr 2019 20:34:54 -0000
-From: =?utf-8?q?Matthias_L=C3=BCscher?= <1823790@bugs.launchpad.net>
-Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823790] [NEW] QEMU forces systemd into tight loop
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement missing
+ AMD pflash functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +28,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
 
-Public bug reported:
+The goal of this patch series implement the following AMD command-set parallel
+flash functionality:
+- flash interleaving;
+- nonuniform sector sizes;
+- erase suspend/resume commands; and
+- multi-sector erase.
 
-While building Debian images for embedded ARM target systems I detected
-that QEMU seems to force newer systemd daemons into a tight loop.
+During refactoring and implementation, I discovered several bugs that are
+fixed here as well:
+- flash commands use only 11-bits of the address in most cases, but the
+  current code uses all of them [1];
+- entering CFI mode from autoselect mode and then exiting CFI mode should
+  return the chip to autoselect mode, but the current code returns to read
+  array mode; and
+- reset command should be ignored during sector/chip erase, but the current
+  code performs the reset.
 
-My setup is the following:
+The first patch in the series adds a test for the existing behavior. Tests for
+additional behavior/bug fixes are added in the relevant patch.
 
-Host machine: Ubuntu 18.04, amd64
-LXD container: Debian Buster, arm64, systemd 241
-QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3.1=
-+dfsg-7)
+1. I found firmware in the wild that relies on the 11-bit address behavior,
+   probably due to a bug in the firmware itself.
 
-To easily reproduce the issue I have created the following repository:
-https://github.com/lueschem/edi-qemu
+Stephen Checkoway (10):
+  block/pflash_cfi02: Add test for supported commands
+  block/pflash_cfi02: Refactor, NFC intended
+  block/pflash_cfi02: Fix command address comparison
+  block/pflash_cfi02: Implement intereleaved flash devices
+  block/pflash_cfi02: Implement nonuniform sector sizes
+  block/pflash_cfi02: Fix CFI in autoselect mode
+  block/pflash_cfi02: Fix reset command not ignored during erase
+  block/pflash_cfi02: Implement multi-sector erase
+  block/pflash_cfi02: Implement erase suspend/resume
+  block/pflash_cfi02: Use the chip erase time specified in the CFI table
 
-The call where systemd gets looping is the following:
-2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 errno=
-=3D34 (Numerical result out of range)
+ hw/block/pflash_cfi02.c   | 843 +++++++++++++++++++++++++++-----------
+ tests/Makefile.include    |   2 +
+ tests/pflash-cfi02-test.c | 757 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 1367 insertions(+), 235 deletions(-)
+ create mode 100644 tests/pflash-cfi02-test.c
 
-Furthermore I also verified that the issue is not related to LXD.
-The same behavior can be reproduced using systemd-nspawn.
-
-This issue reported against systemd seems to be related:
-https://github.com/systemd/systemd/issues/11557
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823790
-
-Title:
-  QEMU forces systemd into tight loop
-
-Status in QEMU:
-  New
-
-Bug description:
-  While building Debian images for embedded ARM target systems I
-  detected that QEMU seems to force newer systemd daemons into a tight
-  loop.
-
-  My setup is the following:
-
-  Host machine: Ubuntu 18.04, amd64
-  LXD container: Debian Buster, arm64, systemd 241
-  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
-.1+dfsg-7)
-
-  To easily reproduce the issue I have created the following repository:
-  https://github.com/lueschem/edi-qemu
-
-  The call where systemd gets looping is the following:
-  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
-no=3D34 (Numerical result out of range)
-
-  Furthermore I also verified that the issue is not related to LXD.
-  The same behavior can be reproduced using systemd-nspawn.
-
-  This issue reported against systemd seems to be related:
-  https://github.com/systemd/systemd/issues/11557
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
+-- 
+2.20.1 (Apple Git-117)
