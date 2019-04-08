@@ -2,98 +2,66 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7714EC10F14
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEDDC10F13
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E28E2148E
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:24:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="amzqxnvI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E28E2148E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40A132148E
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 15:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40A132148E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54815 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54872 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDW8F-0007Li-Gq
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:24:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40941)
+	id 1hDW9y-0000Hl-I4
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 11:26:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hDW2H-0003cX-8Q
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1hDW76-0006hC-W5
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hDW2G-0003w7-CH
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:13 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:58448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1hDW2F-0003sB-Vr
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:18:12 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38FGZEo147347; Mon, 8 Apr 2019 15:17:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=content-type :
-	mime-version : subject : from : in-reply-to : date : cc :
-	content-transfer-encoding : message-id : references : to;
-	s=corp-2018-07-02; bh=U7DO9gvD0XwHethQ/7Hdcxf9zGjH8Lr5NRYiCdwWS4s=;
-	b=amzqxnvIMS6SxwrxE2kBnZ84cH0JJyvNjaqnCT9dj2CmRcwncL+/QW5Qznsm6O6GBts3
-	F7K2270z0zRsnnFgO4WofseHBvV1RfEHoKXXvRtrRr1JPq3ro7ZUBd/6oF2rIqJx8cIw
-	8qF6z0PAHPfO3Q8d4GVFQFIyqkkRXCAXjzsqbVLDrirfyhI0YPqhWvsQzXj5oyQmlSqR
-	x9Aq+kQwvT0AeOZsPR36XHcyLzOqahip6aXDgQWSOn8NmfXI6/7Ma8LkL0tQkhs2peOK
-	tvS7FstIQq7v3StK/JCG5eeslnBtqVpCXbyS0t9Utg0txOdMAHA2f/MbCd8UQYJroYSY
-	VA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-	by userp2130.oracle.com with ESMTP id 2rpkhsq6ng-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Apr 2019 15:17:54 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x38FHVTH166270; Mon, 8 Apr 2019 15:17:53 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-	by aserp3030.oracle.com with ESMTP id 2rpj5a1tcm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Apr 2019 15:17:53 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x38FHpni009051;
-	Mon, 8 Apr 2019 15:17:51 GMT
-Received: from [10.0.5.57] (/213.57.127.10)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Mon, 08 Apr 2019 08:17:50 -0700
+	(envelope-from <armbru@redhat.com>) id 1hDW76-0000x8-1W
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 11:23:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hDW72-0000nb-Tg; Mon, 08 Apr 2019 11:23:09 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9A14C05E767;
+	Mon,  8 Apr 2019 15:23:02 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B9265D722;
+	Mon,  8 Apr 2019 15:22:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id B4D381138648; Mon,  8 Apr 2019 17:22:54 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190204231815.29661-1-philmd@redhat.com>
+Date: Mon, 08 Apr 2019 17:22:54 +0200
+In-Reply-To: <20190204231815.29661-1-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 5 Feb 2019 00:18:04
+	+0100")
+Message-ID: <87d0lwmshd.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <99f9b621-7e23-0ada-ca49-605cabf2abbd@oracle.com>
-Date: Mon, 8 Apr 2019 18:17:47 +0300
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <4283A075-04C3-4DE3-AEA1-298E400EC7CA@oracle.com>
-References: <20190321075545.14929-1-nir.weiner@oracle.com>
-	<99f9b621-7e23-0ada-ca49-605cabf2abbd@oracle.com>
-To: Nir Weiner <nir.weiner@oracle.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9220
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904080124
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9221
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904080124
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-scsi: Support live migration
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 08 Apr 2019 15:23:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] hw: Remove "hw/devices.h"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,49 +73,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Bijan Mottahedeh <bijan.mottahedeh@oracle.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Rob Herring <robh@kernel.org>, qemu-trivial@nongnu.org,
+	Magnus Damm <magnus.damm@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Richard Henderson <rth@twiddle.net>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+	Jan Kiszka <jan.kiszka@web.de>,
+	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <f4bug@amsat.org>,
+	Andrew Jeffery <andrew@aj.id.au>,
+	Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190408151747.BERTsCVDeQOcFlOq9Z9oHjCZwSIHigJiUAYp_2zmhE4@z>
+Message-ID: <20190408152254.7uJaqUDAER6OFqSFz96F5jBYG4AoXFUswpgvR93PsHo@z>
 
-Second ping.
-This series has been sent almost 2 weeks ago. We would appreciate some =
-feedback/review.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Thanks,
--Liran
+> Hi,
+>
+> As his first comment describes itself, the "hw/devices.h" contains
+> declarations for "Devices that have nowhere better to go."
+> This series remove it, creating new headers for devices covered there.
+> MAINTAINERS is updated.
+> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
+> and "hw/net/ne2000-isa.h" header guard.
 
-> On 27 Mar 2019, at 12:40, Nir Weiner <nir.weiner@oracle.com> wrote:
->=20
-> On 3/21/19 9:55 AM, Nir Weiner wrote:
->=20
->> Originally migration was not possible with vhost-scsi because
->> as part of migration, the source host target SCSI device state
->> needs to be saved and loaded into the destination host target SCSI
->> device. This cannot be done by QEMU.
->>=20
->> As this can be handled either by external orchestrator or by having
->> shared-storage (i.e. iSCSI), there is no reason to limit the
->> orchestrator from being able to explictly specify it wish to enable
->> migration even when VM have a vhost-scsi device.
->>=20
->> Liran Alon (1):
->>   vhost-scsi: Allow user to enable migration
->>=20
->> Nir Weiner (2):
->>   vhost-scsi: The vhost device should be stopped when the VM is not
->>     running
->>   vhost-scsi: Add vmstate descriptor
->>=20
->>  hw/scsi/vhost-scsi.c                  | 57 =
-++++++++++++++++++++++-----
->>  include/hw/virtio/vhost-scsi-common.h |  1 +
->>  2 files changed, 48 insertions(+), 10 deletions(-)
->>=20
-> ping + CC to relevant maintainers
-
+Needs a rebase now.  Apart from that, series
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
