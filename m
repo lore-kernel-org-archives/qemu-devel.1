@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44115)
+Received: from eggs.gnu.org ([209.51.188.92]:45384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDUUm-0002SC-UO
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:39:34 -0400
+	(envelope-from <zhengxiang9@huawei.com>) id 1hDUZs-0003sz-FG
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghorges@xiyoulinux.org>) id 1hDUUe-0000AV-UF
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:39:29 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:51187)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghorges@xiyoulinux.org>)
-	id 1hDUUb-00005D-IP
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:39:22 -0400
-From: ghorges <ghorges@xiyoulinux.org>
-Date: Mon,  8 Apr 2019 21:38:54 +0800
-Message-Id: <20190408133854.25737-1-ghorges@xiyoulinux.org>
-Subject: [Qemu-devel] [PATCH] Wshadow in qemu/linux-user/syscall.c:Changed
- some variable names
+	(envelope-from <zhengxiang9@huawei.com>) id 1hDUZr-00037t-I8
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 09:44:48 -0400
+References: <20190325125142.11628-1-zhengxiang9@huawei.com>
+	<CAFEAcA-O5+A0Q=14k2vrBg3KNM7MmqbcyhBoZZOe=AsyE-UDbw@mail.gmail.com>
+	<19929558-9f2d-148a-4357-d48b46f8b62b@huawei.com>
+	<87va06kvm6.fsf@dusky.pond.sub.org>
+	<59f100b4-f6e9-973d-532b-58fb172a7009@redhat.com>
+	<87imw5fv45.fsf@dusky.pond.sub.org>
+	<abe1d9cd-85bb-2ef8-630f-af28cae6378c@redhat.com>
+	<8736n9eb4s.fsf@dusky.pond.sub.org>
+	<bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
+	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
+Date: Mon, 8 Apr 2019 21:43:46 +0800
+MIME-Version: 1.0
+In-Reply-To: <c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
+ flash device to save memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,186 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, ghorges <1298394633@qq.com>, ghorges <ghorges@xiyoulinux.org>
+To: Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com
 
-From: ghorges <1298394633@qq.com>
 
-Signed-off-by: ghorges <ghorges@xiyoulinux.org>
----
- linux-user/syscall.c | 66 ++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+On 2019/4/3 23:35, Laszlo Ersek wrote:
+>> I thought about your comments and wrote the following patch (just for test)
+>> which uses a file mapping to replace the anonymous mapping. UEFI seems to work
+>> fine. So why not use a file mapping to read or write a pflash device?
+> Honestly I can't answer "why not do this". Maybe we should.
+> 
+> Regarding "why not do this *exactly as shown below*" -- probably because
+> then we'd have updates to the same underlying regular file via both
+> mmap() and write(), and the interactions between those are really tricky
+> (= best avoided).
+> 
+> One of my favorite questions over the years used to be posting a matrix
+> of possible mmap() and file descriptor r/w/sync interactions, with the
+> outcomes as they were "implied" by POSIX, and then asking at the bottom,
+> "is my understanding correct?" I've never ever received an answer to
+> that. :)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 208fd1813d..985095e4d5 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8240,7 +8240,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 size_t size;
-             } sig, *sig_ptr;
- 
--            abi_ulong arg_sigset, arg_sigsize, *arg7;
-+            abi_ulong arg_sigset, arg_sigsize, *arg7s;
-             target_sigset_t *target_sigset;
- 
-             n = arg1;
-@@ -8280,13 +8280,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 sig_ptr = &sig;
-                 sig.size = SIGSET_T_SIZE;
- 
--                arg7 = lock_user(VERIFY_READ, arg6, sizeof(*arg7) * 2, 1);
--                if (!arg7) {
-+                arg7s = lock_user(VERIFY_READ, arg6, sizeof(*arg7s) * 2, 1);
-+                if (!arg7s) {
-                     return -TARGET_EFAULT;
-                 }
--                arg_sigset = tswapal(arg7[0]);
--                arg_sigsize = tswapal(arg7[1]);
--                unlock_user(arg7, arg6, 0);
-+                arg_sigset = tswapal(arg7s[0]);
-+                arg_sigsize = tswapal(arg7s[1]);
-+                unlock_user(arg7s, arg6, 0);
- 
-                 if (arg_sigset) {
-                     sig.set = &set;
-@@ -9479,14 +9479,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-     case TARGET_NR_getcpu:
-         {
--            unsigned cpu, node;
--            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-+            unsigned cpus, node;
-+            ret = get_errno(sys_getcpu(arg1 ? &cpus : NULL,
-                                        arg2 ? &node : NULL,
-                                        NULL));
-             if (is_error(ret)) {
-                 return ret;
-             }
--            if (arg1 && put_user_u32(cpu, arg1)) {
-+            if (arg1 && put_user_u32(cpus, arg1)) {
-                 return -TARGET_EFAULT;
-             }
-             if (arg2 && put_user_u32(node, arg2)) {
-@@ -10649,24 +10649,24 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_listxattr:
-     case TARGET_NR_llistxattr:
-     {
--        void *p, *b = 0;
-+        void *q, *b = 0;
-         if (arg2) {
-             b = lock_user(VERIFY_WRITE, arg2, arg3, 0);
-             if (!b) {
-                 return -TARGET_EFAULT;
-             }
-         }
--        p = lock_user_string(arg1);
--        if (p) {
-+        q = lock_user_string(arg1);
-+        if (q) {
-             if (num == TARGET_NR_listxattr) {
--                ret = get_errno(listxattr(p, b, arg3));
-+                ret = get_errno(listxattr(q, b, arg3));
-             } else {
--                ret = get_errno(llistxattr(p, b, arg3));
-+                ret = get_errno(llistxattr(q, b, arg3));
-             }
-         } else {
-             ret = -TARGET_EFAULT;
-         }
--        unlock_user(p, arg1, 0);
-+        unlock_user(q, arg1, 0);
-         unlock_user(b, arg2, arg3);
-         return ret;
-     }
-@@ -10686,25 +10686,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_setxattr:
-     case TARGET_NR_lsetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_READ, arg3, arg4, 1);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_setxattr) {
--                    ret = get_errno(setxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(setxattr(q, n, v, arg4, arg5));
-                 } else {
--                    ret = get_errno(lsetxattr(p, n, v, arg4, arg5));
-+                    ret = get_errno(lsetxattr(q, n, v, arg4, arg5));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, 0);
-         }
-@@ -10731,25 +10731,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_getxattr:
-     case TARGET_NR_lgetxattr:
-         {
--            void *p, *n, *v = 0;
-+            void *q, *n, *v = 0;
-             if (arg3) {
-                 v = lock_user(VERIFY_WRITE, arg3, arg4, 0);
-                 if (!v) {
-                     return -TARGET_EFAULT;
-                 }
-             }
--            p = lock_user_string(arg1);
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_getxattr) {
--                    ret = get_errno(getxattr(p, n, v, arg4));
-+                    ret = get_errno(getxattr(q, n, v, arg4));
-                 } else {
--                    ret = get_errno(lgetxattr(p, n, v, arg4));
-+                    ret = get_errno(lgetxattr(q, n, v, arg4));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-             unlock_user(v, arg3, arg4);
-         }
-@@ -10776,19 +10776,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_removexattr:
-     case TARGET_NR_lremovexattr:
-         {
--            void *p, *n;
--            p = lock_user_string(arg1);
-+            void *q, *n;
-+            q = lock_user_string(arg1);
-             n = lock_user_string(arg2);
--            if (p && n) {
-+            if (q && n) {
-                 if (num == TARGET_NR_removexattr) {
--                    ret = get_errno(removexattr(p, n));
-+                    ret = get_errno(removexattr(q, n));
-                 } else {
--                    ret = get_errno(lremovexattr(p, n));
-+                    ret = get_errno(lremovexattr(q, n));
-                 }
-             } else {
-                 ret = -TARGET_EFAULT;
-             }
--            unlock_user(p, arg1, 0);
-+            unlock_user(q, arg1, 0);
-             unlock_user(n, arg2, 0);
-         }
-         return ret;
+In my opinion, it's feasible to r/w/sync the memory devices which use a block
+backend via mmap() and write().
+
+> 
+> Also... although we don't really use them in practice, some QCOW2
+> features for pflash block backends are -- or would be -- nice. (Not the
+> internal snapshots or the live RAM dumps, of course.)
+
+Regarding sparse files, can we read actual backend size data for the read-only
+pflash memory as the following steps shown?
+
+1) Create a sparse file -- QEMU_EFI-test.raw:
+   dd if=/dev/zero of=QEMU_EFI-test.raw bs=1M seek=64 count=0
+
+2) Read from QEMU_EFI.fd and write to QEMU_EFI-test.raw:
+   dd of="QEMU_EFI-test.raw" if="QEMU_EFI.fd" conv=notrunc
+
+3) Use QEMU_EFI-test.raw as the read-only pflash and start qemu with the below
+patch applied:
+
+---8>---
+
+diff --git a/hw/block/block.c b/hw/block/block.c
+index bf56c76..ad18d5e 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -30,7 +30,7 @@
+ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
+                                  Error **errp)
+ {
+-    int64_t blk_len;
++    int64_t blk_len, actual_len;
+     int ret;
+
+     blk_len = blk_getlength(blk);
+@@ -53,7 +53,9 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
+      * block device and read only on demand.
+      */
+     assert(size <= BDRV_REQUEST_MAX_BYTES);
+-    ret = blk_pread(blk, 0, buf, size);
++    actual_len = bdrv_get_allocated_file_size(blk_bs(blk));
++    ret = blk_pread(blk, 0, buf,
++            (!blk_is_read_only(blk) || actual_len < 0) ? size : actual_len);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "can't read block backend");
+         return false;
 -- 
-2.17.0
+1.8.3.1
+
+
+-- 
+
+Thanks,
+Xiang
