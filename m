@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40021)
+Received: from eggs.gnu.org ([209.51.188.92]:39999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDQXx-0002C5-0m
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:26:34 -0400
+	(envelope-from <mlureau@redhat.com>) id 1hDQXz-0002BR-R1
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDQJj-0007Ow-UR
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDQJj-0007OZ-LX
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:51 -0400
-References: <20190405123928.70da87e2.olaf@aepfle.de>
-	<1cec1873-9962-f258-a052-167efec620e9@redhat.com>
-	<20190405125918.462c6ae4.olaf@aepfle.de>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9a4ea235-29ce-2a98-a723-0a61be55433f@redhat.com>
-Date: Mon, 8 Apr 2019 11:04:09 +0200
+	(envelope-from <mlureau@redhat.com>) id 1hDQJ5-000790-9b
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:13 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:45946)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hDQJ3-00078G-6Q
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 05:11:09 -0400
+Received: by mail-qt1-f195.google.com with SMTP id v20so14450795qtv.12
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 02:11:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190405125918.462c6ae4.olaf@aepfle.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-15-armbru@redhat.com>
+In-Reply-To: <20190408083627.7479-15-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 8 Apr 2019 11:10:55 +0200
+Message-ID: <CAMxuvaz9R37C1c=vY1xtqMYBW7j1t0pTKW=_ViSq_0yx4DHWuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] edk2 fails to compile in v4.0.0-rc2
+Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
+ stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/05/19 12:59, Olaf Hering wrote:
-> Am Fri, 5 Apr 2019 12:49:15 +0200
-> schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
->=20
->> The EDK2 submodule was added for UEFI testing, you don't need to compi=
-le
->> it to build/use QEMU.
->>
->> How did you end up compiling it?
->=20
-> The qemu.spec file has this since a very long time:
-> make -C roms efirom ${unrelated_settings}
->=20
-> This used to work still in January with c9d18c1c150c84e7a976df989ad04dd=
-f01083f46.
+On Mon, Apr 8, 2019 at 10:36 AM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Command line help explicitly requested by the user should be printed
+> to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
+> use qemu_printf() instead of error_printf().  Plain printf() would be
+> wrong because we need to print to the current monitor for chardev-add
+> help".
+>
+> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-This is not a QEMU build failure, but an issue in the downstream
-packaging that not only tries to build QEMU, but performs a maintainer
-build on binary artifacts.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-I responded in more detail under Phil's thread
-
-[PATCH for-4.0 v2 0/2] roms: Rename the EFIROM variable and let it be
-overridable
-
-Thanks
-Laszlo
+> ---
+>  chardev/char.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 514cd6b0c3..54724a56b1 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -28,6 +28,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/qemu-print.h"
+>  #include "chardev/char.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-char.h"
+> @@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMain=
+Context *context,
+>
+>          chardev_name_foreach(help_string_append, str);
+>
+> -        error_printf("Available chardev backend types: %s\n", str->str);
+> +        qemu_printf("Available chardev backend types: %s\n", str->str);
+>          g_string_free(str, true);
+>          return NULL;
+>      }
+> --
+> 2.17.2
+>
