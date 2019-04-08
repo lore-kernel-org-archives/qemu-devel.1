@@ -2,53 +2,50 @@ Return-Path: <SRS0=gAfu=SK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24444C10F13
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27360C282CE
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FB5920830
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB9120857
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Apr 2019 18:24:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB5920830
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB9120857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57024 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57026 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDYwU-0004Pa-L9
+	id 1hDYwU-0004QE-Ir
 	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 14:24:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56819)
+Received: from eggs.gnu.org ([209.51.188.92]:56820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDYue-0003Gm-01
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDYud-0003Gn-WE
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDYub-0003wf-DS
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDYub-0003wO-BE
 	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 14:22:31 -0400
-Received: from relay.sw.ru ([185.231.240.75]:53850)
+Received: from relay.sw.ru ([185.231.240.75]:53846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDYuZ-0003tM-Gm; Mon, 08 Apr 2019 14:22:29 -0400
+	id 1hDYuZ-0003tK-Hb; Mon, 08 Apr 2019 14:22:29 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDYuU-0002Da-DI; Mon, 08 Apr 2019 21:22:22 +0300
+	id 1hDYuT-0002Da-RQ; Mon, 08 Apr 2019 21:22:22 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon,  8 Apr 2019 21:22:20 +0300
+Date: Mon,  8 Apr 2019 21:22:18 +0300
 Message-Id:
- <1554747741-918964-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 2/3] block/stream: refactor stream_run: drop
- goto
+Subject: [Qemu-devel] [PATCH v4 0/3] block/stream: get rid of the base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,58 +64,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190408182220._eTqawJuqKyyUfYsfHV9A46T2oTko3QTgkd1yrOAEP4@z>
+Message-ID: <20190408182218.3omaYbGYJKVESHZxPgwKJkIOXC2ZVhU5bpR_ESAOPJg@z>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This series introduces a bottom intermediate node that eliminates the
+dependency on the base that may change while stream job is running.
+It happens when stream/commit parallel jobs are running on the same
+backing chain. The base node of the stream job may be a top node of
+the parallel commit job and can change before the stream job is
+completed. We avoid that dependency by introducing the bottom node.
 
-The goto is unnecessary in the stream_run() since the common exit
-code was removed in the commit eb23654dbe43b549ea2a9ebff9d8e:
-"jobs: utilize job_exit shim".
+v4:
+trace_stream_start reverted to the base.
+bdrv_is_allocated_above_inclusive() deleted and the new parameter
+'bool include_base' was added to the bdrv_is_allocated_above().
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/stream.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+v3:
+bottom = bdrv_find_overlay() moved into the stream_start()
 
-diff --git a/block/stream.c b/block/stream.c
-index 0920092..e73a320 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -122,13 +122,12 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-     void *buf;
- 
-     if (!bs->backing) {
--        goto out;
-+        return 0;
-     }
- 
-     len = bdrv_getlength(bs);
-     if (len < 0) {
--        ret = len;
--        goto out;
-+        return len;
-     }
-     job_progress_set_remaining(&s->common.job, len);
- 
-@@ -205,14 +204,10 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         bdrv_disable_copy_on_read(bs);
-     }
- 
--    /* Do not remove the backing file if an error was there but ignored.  */
--    ret = error;
--
-     qemu_vfree(buf);
- 
--out:
--    /* Modify backing chain and close BDSes in main loop */
--    return ret;
-+    /* Do not remove the backing file if an error was there but ignored. */
-+    return error;
- }
- 
- static const BlockJobDriver stream_job_driver = {
+v2:
+The function bdrv_find_overlay() with the same functionality has been
+used in the qmp_block_stream() to find a bottom node.
+The algorithm in the bdrv_do_is_allocated_above() was simplified.
+The commit messages were modified.
+
+Discussed in the e-mail threads with the message IDs
+<1553866154-257311-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+<1550762799-830661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+<1554120365-39119-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+<1554483379-682051-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+
+Andrey Shinkevich (2):
+  block: include base when checking image chain for block allocation
+  block/stream: introduce a bottom node
+
+Vladimir Sementsov-Ogievskiy (1):
+  block/stream: refactor stream_run: drop goto
+
+ block/commit.c         |  2 +-
+ block/io.c             | 14 +++++++++---
+ block/mirror.c         |  2 +-
+ block/replication.c    |  2 +-
+ block/stream.c         | 62 +++++++++++++++++++++++---------------------------
+ include/block/block.h  |  3 ++-
+ tests/qemu-iotests/245 |  4 ++--
+ 7 files changed, 47 insertions(+), 42 deletions(-)
+
 -- 
 1.8.3.1
 
