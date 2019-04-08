@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55178)
+Received: from eggs.gnu.org ([209.51.188.92]:55288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuP-0004QW-UQ
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuT-0004T8-Vt
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hDLuO-0007bg-7a
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:25 -0400
-Date: Mon, 8 Apr 2019 13:38:07 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1hDLuR-0007eg-Ts
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 00:29:29 -0400
+Date: Mon, 8 Apr 2019 14:21:50 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190408033807.GA16627@umbus.fritz.box>
-References: <155448184292.8446.8225650773162648595.stgit@bahia.lan>
+Message-ID: <20190408042149.GH16627@umbus.fritz.box>
+References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
+	<20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190328183923.lcd3p6fpy4qvvxoo@maxibm>
+	<20190329132951.451d4ef0@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
+	protocol="application/pgp-signature"; boundary="1EKig6ypoSyM7jaD"
 Content-Disposition: inline
-In-Reply-To: <155448184292.8446.8225650773162648595.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-4.1 1/2] spapr_pci: Get rid of
- duplicate code for node name creation
+In-Reply-To: <20190329132951.451d4ef0@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +28,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
+--1EKig6ypoSyM7jaD
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2019 at 06:30:43PM +0200, Greg Kurz wrote:
-> According to the changelog of 298a971024534, SpaprPhbState::dtbusname was
-> introduced to "make it easier to relate the guest and qemu views of memory
-> to each other", hence its name.
+On Fri, Mar 29, 2019 at 01:29:51PM +0100, Greg Kurz wrote:
+> On Thu, 28 Mar 2019 15:39:45 -0300
+> "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
 >=20
-> Use it when creating the PHB node to avoid code duplication.
+> > Hi,
+> >=20
+> > On Thu, Mar 28, 2019 at 02:21:51PM +0100, Greg Kurz wrote:
+> > > On Wed, 27 Mar 2019 17:41:00 -0300
+> > > "Maxiwell S. Garcia" <maxiwell@linux.ibm.com> wrote:
+> > >  =20
+> > > > Here are two patches to add a handler for ibm,get-vpd RTAS calls.
+> > > > This RTAS exposes host information in case of set QEMU options
+> > > > 'host-serial' and 'host-model' as 'passthrough'.
+> > > >=20
+> > > > The patch 1 creates helper functions to get valid 'host-serial'
+> > > > and 'host-model' parameters, guided by QEMU command line. These
+> > > > parameters are useful to build the guest device tree and to return
+> > > > get-vpd RTAS calls. The patch 2 adds the ibm,get-vpd itself.
+> > > >=20
+> > > > Update v7:
+> > > > * rtas_get_vpd_fields as a static array in spapr machine state
+> > > >=20
+> > > > Maxiwell S. Garcia (2):
+> > > >   spapr: helper functions to get valid host fields
+> > > >   spapr-rtas: add ibm,get-vpd RTAS interface
+> > > >=20
+> > > >  hw/ppc/spapr.c         | 48 +++++++++++----------
+> > > >  hw/ppc/spapr_rtas.c    | 96 ++++++++++++++++++++++++++++++++++++++=
+++++
+> > > >  include/hw/ppc/spapr.h | 14 +++++-
+> > > >  3 files changed, 135 insertions(+), 23 deletions(-)
+> > > >  =20
+> > >=20
+> > > Hi Maxiwell,
+> > >=20
+> > > David sent a patch to rework how the host data is exposed to the gues=
+t.
+> > > Especially, the special casing of the "none" and "passthrough" strings
+> > > is no more... I'm afraid you'll have to rework your patches according=
+ly:
+> > > code+changelog in patch 1 and at least changelog in patch 2.
+> > >=20
+> > > Cheers, =20
+> >=20
+> > IIUC, the 'ibm,get-vpd' RTAS should return information about the
+> > platform/cabinet. Thus, it's not necessary to add new nodes in the guest
+> > device tree to export information like that.
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> I agree that these "host-model" and "host-serial" props, which aren't
+> described anywhere and not used by either the linux kernel or the
+> powerpc-utils, look like a QEMU-specific poor man's version of VPD.
+>=20
+> Not quite sure why they were even created since this is the purpose
+> of "system-id" and "model" as explained in PAPR, and supposedly
+> exposed in /proc/ppc64/lparcfg according to the LPARCFG(5) manual
+> page:
 
-Applied, thanks.
+Yeah, I'm not sure why they were created either.  I rather suspect
+nothing much is using them, and I'd kind of like to just kill them.
+But Daniel Berrange (and maybe others) are paranoid about this
+breaking things.
 
-> ---
->  hw/ppc/spapr_pci.c |    5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index bba3a86dda6c..c70688a0dc23 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -2153,7 +2153,6 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uint3=
-2_t intc_phandle, void *fdt,
->                            uint32_t nr_msis, int *node_offset)
->  {
->      int bus_off, i, j, ret;
-> -    gchar *nodename;
->      uint32_t bus_range[] =3D { cpu_to_be32(0), cpu_to_be32(0xff) };
->      struct {
->          uint32_t hi;
-> @@ -2204,9 +2203,7 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uint3=
-2_t intc_phandle, void *fdt,
->      Error *errp =3D NULL;
-> =20
->      /* Start populating the FDT */
-> -    nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
-> -    _FDT(bus_off =3D fdt_add_subnode(fdt, 0, nodename));
-> -    g_free(nodename);
-> +    _FDT(bus_off =3D fdt_add_subnode(fdt, 0, phb->dtbusname));
->      if (node_offset) {
->          *node_offset =3D bus_off;
->      }
+>        serial_number
+>        The serial number of the physical system in which the partition re=
+sides
+>=20
+>        system_type
+>        The  machine,type-model  of  the physical system in which the part=
+ition
+>        resides
+>=20
+> This is indeed what we get in a PowerVM LPAR running on a tuleta system:
+>=20
+> [root@furax1 ~]# head -3 /proc/ppc64/lparcfg=20
+> lparcfg 1.9
+> serial_number=3DIBM,032116A9A
+> system_type=3DIBM,8247-22L
+>=20
+> [root@furax1 ~]# echo $(cat /proc/device-tree/system-id)
+> IBM,032116A9A
+> [root@furax1 ~]# echo $(cat /proc/device-tree/model)
+> IBM,8247-22L
+>=20
+> But QEMU generates a hard coded "IBM pSeries (emulated by qemu)" model,
+> which is clearly not PAPR compliant according to this requirement:
+>=20
+> 	R1=E2=80=9312.2=E2=80=9313. There must be a property, =E2=80=9Cmodel=E2=
+=80=9D, under the root node
+> 	in the format, =E2=80=9C<vendor>,xxxx-yyy=E2=80=9D, where <vendor> is re=
+placed by
+> 	one to five letters representing the stock symbol of the company
+> 	(for example, for IBM: =E2=80=9CIBM,xxxx-yyy=E2=80=9D), and where xxxx-y=
+yy is
+> 	derived from the VPD TM field (see Table 160=E2=80=9A =E2=80=9CLoPAPR VP=
+D Fields=E2=80=9A=E2=80=9D
+> 	on page 343) of the first or =E2=80=98marked=E2=80=99 processor enclosur=
+e.
+>=20
+> And worse, it mixes "vm,uuid" which is QEMU specific concept to uniquely
+> identify guests, with "system-id" which is about the host :-\
+
+Ugh, right.  So, it's been this way for years, so it's clearly not
+breaking things in practice.  Given that, it might be best to leave
+it, even though it violates PAPR technically.
+
+Frankly, providing information about the *guest* virtual model and
+"serial number" =3D~=3D UUID makes more sense than providing information
+about the host that might be security sensitive.
+
+> All of this is very confusing and need to be sorted out before building
+> anything on top of it. Especially since "model" and "system-id" are
+> supposed to derive from VPD IIUC.
+>=20
+> I guess that we should first decide what we really want to expose
+> in "system-id" and "model": what we have now ? the same as in
+> "host-serial" and "host-model", ie. user configurable ? Must we
+> stay compatible with existing setups ? In any case, I'm afraid that
+> we have to diverge from PAPR somehow, since it obviously doesn't
+> care about the security concerns that motivated recent changes
+> for "host-serial" and "host-model"...
+
+We absolutely should not expose the real host information without the
+user explicitly requesting it.
+
+> > Since it's a POWER specific
+> > functionality, may 'ibm,get-vpd' export host information if the
+> > guest instance allows it? Or is it better return only the 'host-serial'
+> > and 'host-model' content, like in the patch "spapr: Simplify handling
+> > of host-serial and host-model values"?
+> >=20
+>=20
+> I've spent some time reading PAPR on this topic and I'm not sure that
+> "ibm,get-vpd" is the way to go for what you were trying to achieve
+> initially (ie, obtain up-to-date host model and serial after migration).
+>=20
+> Have you looked at RTAS "ibm,update-properties" ?
+>=20
+> 	7.4.8 ibm,update-properties RTAS Call
+>=20
+> 	This RTAS call is used to report updates to the properties changed
+> 	due to a massive platform reconfiguration such as when the partition
+> 	is migrated between machines.
+
+Yeah.. the thing here is that partition migration kind of means
+something different in PAPR than it does in the qemu world.  It uses a
+guest-aware model of migration (which frankly I think is broken
+verging on unworkable).  qemu and uses a guest-(mostly)-unaware
+migration model.
+
+> This explicitly covers updates to "system-id" and "model". Maybe it is
+> time to do as Ben was suggesting a long time ago when "host-serial"
+> and "host-model" were introduced [1]:
+>=20
+> 	On Tue, 2014-07-08 at 12:49 +0200, Alexander Graf wrote:
+> 	> Please be aware that all of the above is bogus when you start
+> 	> thinking=20
+> 	> about live migration.
+>=20
+> 	What's probably where we need to start thinking about implementing
+> 	migration according to PAPR :-)
+>=20
+> 	IE. With pre and post-migration notifications to the guest including
+> 	device-tree updates.
+>=20
+>=20
+> [1] https://patchwork.ozlabs.org/patch/367792/#813547
 >=20
 
 --=20
@@ -81,24 +211,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---zYM0uCDKw75PZbzx
+--1EKig6ypoSyM7jaD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqwh8ACgkQbDjKyiDZ
-s5KN9BAAs2JgwksKr6qPTrjmOSg1wlaRXEkCsDjpGDI4hLG9Zq02+wEqd1yMGREj
-klItwF16q0ACko85Tk5UNyvT2+MEtvnQGQ+fh80sEIieeT3JJwDzRNMaU+Q7c6c+
-D9Tj7h2KXguKW3TSdJaSCZXps278aQHM3RBZi3/L2cpqIv56LBO76FpGtFbCG5ye
-aJ+ti2XU0Nn9NlWZ3Msm44Dje8AhboUqCUPQ5b87prJ6e4ymkorGAI45o7wrRHPm
-hVmwg7JGwEzz4S8W2LUdcKJDQl2zsd7wF1JvQhdsBD6oyLrdsuY37MW2uEkIKITs
-xJLAAyFQZ3+YKZOSVS5zUh512fc51DQK0Wvpj7QmagndVbu8W4ge1hg0sXI/MbVA
-jPsd8ck+T7N7TSBJe/lbV/m/jF+00dtXzathq3l1Ow02Dxz+ZT+o/BilDg0aqPa7
-JX9zle6XAf0t6CeGQtbptu2eczwt5IXKobDEr3FPXo5HhTg4AH+xHPhRFAQ8iJZL
-F5uq2IA65J7c+1ftOU06meyE7n64QSCvppjYXE2M9Ngq8gCHuDnqGmYku3wu4SRY
-BN4Kocx/fN/OjFYbC+J4QMJg4s5OYn0caMUAz8/pyP+ipucGE1QxTBiVJjSfUdfj
-WNbPBTjNEdA6+K/G08p931lcQg+H3NNurqBwf7KkE+Vcku0otwU=
-=jfao
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyqzFsACgkQbDjKyiDZ
+s5JvkBAAlDMtfmKRKO/YNYnBxHbItPVD0bXd7W50pKiCHOQ086qX06alqGvuW4Pc
+zzQhBLLR71TQkWq6t9+91RFyjappuQWNBWI6cW3z9pFgBliKU5UmtqL2ctiH2z4Y
+BTtpYSg4cuFV7zrdW5CBPKCRTJDzG6A8nTEbbZSuh3/+clo0F9QUyN4hqWMMiQkF
+CkwwSLkSmf7Df8YyNd6i/wOIA6Knb0++MrTXQx6bJUWv0atrCEm3HF+rSxGImAPo
+5hXHi8BtXIcqtuQxFUSccyR8FeoaZ3T5/gTG9fDbBFjuS74zx2FMU1FvCqEm8f/T
+NxJV970e1y5sB7hb0LCrff1MUu5kpNuICPPCNez1PtixuKtYE/xW1yXNeuseH61o
+qUNoJGbH3gXCshc2+c5ZTOiLA4HN/lmt0D8tKhzN241SOPOLtMXRfnBibQmmUPNF
+Fiz+BfEQg4b6HlZz3YMhuDXGY2lqXbhCSVOyoryn/1HCDZEZx7wFdvRGMPO7tj95
+3WBxB35BVcVSSUsVNW3Trp3o/eAqBFvNDT+N25iej60Kdb0aRz3USf8ZRFeKSrM0
+hGGDTRwf3mNb454YDRYRIV1zaw9dOyaLQRZgrKdpZOnYaknP+NpsppUqskm7fPIC
+P2makN8d7Uiw+V029MHBtPyvs7lCLNgtuYwwa+bJp4kBk+1WCW8=
+=DRUO
 -----END PGP SIGNATURE-----
 
---zYM0uCDKw75PZbzx--
+--1EKig6ypoSyM7jaD--
