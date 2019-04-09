@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56903)
+Received: from eggs.gnu.org ([209.51.188.92]:59225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDtPG-0006eE-W6
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:32 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWg-0004Uz-TI
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDtPF-0007YO-Kr
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:30 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34922)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWf-0003Qx-P3
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:10 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:35194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDtPF-0007WX-BH
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:29 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w1so21708556wrp.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:15:29 -0700 (PDT)
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
-	<5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
-Date: Tue, 9 Apr 2019 18:15:26 +0200
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1hDtWf-0003QN-Ap
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:09 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id w1so21739597wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:09 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	e1sm59579736wrw.66.2019.04.09.09.23.07 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 09:23:07 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 18:23:01 +0200
+Message-Id: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
- missing AMD pflash functionality
+Subject: [Qemu-devel] [PULL v2 0/5] Misc patches for QEMU 4.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 4/9/19 5:55 PM, Stephen Checkoway wrote:
-> Hi Phil,
-> 
->> On Apr 9, 2019, at 06:34, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> Hi Stephen,
->>
->> [Cc'ing Markus and Laszlo, we have similar interest in pflash01 testing]
->>
->> On 4/8/19 10:55 PM, Stephen Checkoway wrote:
->>> The goal of this patch series implement the following AMD command-set parallel
->>> flash functionality:
->>> - flash interleaving;
->>> - nonuniform sector sizes;
->>> - erase suspend/resume commands; and
->>> - multi-sector erase.
->>
->> I am very glad you addressed these long overdue issues and very pleased
->> by your patches :)
->> I'll thoroughly review it during next week (this won't get merge for the
->> current 4.0 cycle anyway).
-> 
-> Great!
-> 
->> I started a similar cleanup (mostly pflash01 focused) and converted
->> DPRINTF to trace events, added few constants. I'll see if I can rebase
->> your work on top of mine. So far only your patch 2 (refactor) would be
->> modified, simplified as the "pull out all of the code to modify the
->> status into simple helper functions" part (which else I'd ask you to
->> move in a separate patch).
->>
->> We should think of more intereleaved tests, I'll prepare a table of
->> current QEMU models using this device and how is their intereleave
->> mapping. Hopefully it would be enough to simply add the existing
->> machines to your current musicpal qtest.
->>
->> Also I'd like to see some Top/Bottom block configuration qtests, your
->> patch #5 doesn't seem tested.
-> 
-> I included four tests <https://patchew.org/QEMU/cover.1554774454.git.stephen.checkoway@oberlin.edu/bbe417c354dfa908d5e1bc8f8ad7121ec9451682.1554774454.git.stephen.checkoway@oberlin.edu/>.
-> 
-> Patchew makes it hard to link to particular lines. Here's the same patch on Github <https://github.com/qemu/qemu/commit/a851d21347121a91ba9a39c133a8fbee6e84e557#diff-d2ed797ca8898de80768bdfb390781dfR498>.
-> 
-> Are those sufficient or would you like more tests?
+The following changes since commit 248987f92cfda8305d6d44ced23e173e62a8bc0e:
 
-Ah you don't mention the tests in the patch description, that's why I
-missed them :) Sometimes I prefer to keep the test addition in a
-separate patch, it eases rebases, however in your series it seems fine.
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-04-09 10:02:30 +0100)
 
-Since you did changes in the CFI table, I think we should add a tests
-verifying the table is correctly generated for all you FlashConfig entries.
+are available in the git repository at:
 
->>> During refactoring and implementation, I discovered several bugs that are
->>> fixed here as well:
->>> - flash commands use only 11-bits of the address in most cases, but the
->>>  current code uses all of them [1];
->>> - entering CFI mode from autoselect mode and then exiting CFI mode should
->>>  return the chip to autoselect mode, but the current code returns to read
->>>  array mode; and
->>> - reset command should be ignored during sector/chip erase, but the current
->>>  code performs the reset.
->>>
->>> The first patch in the series adds a test for the existing behavior. Tests for
->>> additional behavior/bug fixes are added in the relevant patch.
->>>
->>> 1. I found firmware in the wild that relies on the 11-bit address behavior,
->>>   probably due to a bug in the firmware itself.
->>
->> Is it a musicpal firmware? Are you able to compare with real hardware?
-> 
-> No, it's not musicpal. I'm not even sure what musicpal is, it was just the most convenient choice for testing.  The real hardware is an embedded system using an old AMD processor (Am486) with three different AMD command set flash chips. The unlock addresses the firmware uses don't actually match the part sheets (in most cases). It took quite a while to realize that the flash hardware only uses 11 bits of address. (It's clearly spelled out in the various part sheets, but I guess I missed it on the first 15 or so readings.)
 
-I suppose you can not share the firmware binary. Can you share these
-unlock addresses? Maybe once I reviewed carefully your series I might
-ask you the (pflash) trace event output.
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
->> I vaguely remember some issue regarding address bus width when trying to
->> implement the TopBlock small sectors, but I wasn't using the musicpal.
->> I'll see if I can find my old notes and test with your series.
-> 
-> The one boot chip I'm using is the AM29F080B-90SI with top boot blocks. It has an 8-bit address bus.
+for you to fetch changes up to 73a2f20946d387e971f2e18fe9503f4ea3a3c201:
+
+  tests: Make check-block a phony target (2019-04-09 18:21:59 +0200)
+
+----------------------------------------------------------------
+* fixes for Alpine and SuSE
+* fix crash when hot-plugging nvdimm on older machine types
+
+----------------------------------------------------------------
+Markus Armbruster (1):
+      tests: Make check-block a phony target
+
+Peter Maydell (1):
+      include/qemu/bswap.h: Use __builtin_memcpy() in accessor functions
+
+Philippe Mathieu-Daudé (2):
+      roms: Rename the EFIROM variable to avoid clashing with iPXE
+      roms: Allow passing configure options to the EDK2 build tools
+
+Thomas Huth (1):
+      hw/i386/pc: Fix crash when hot-plugging nvdimm on older machine types
+
+ hw/i386/pc.c           |  9 +++++++--
+ include/qemu/bswap.h   | 26 ++++++++++++++++----------
+ roms/Makefile          | 23 ++++++++++++++++++-----
+ tests/Makefile.include |  2 +-
+ 4 files changed, 42 insertions(+), 18 deletions(-)
+-- 
+1.8.3.1
