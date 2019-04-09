@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53025)
+Received: from eggs.gnu.org ([209.51.188.92]:44039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hDeTk-0003kg-J0
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 20:19:09 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg5S-000256-Jo
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hDeTj-0003se-Ko
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 20:19:08 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34949)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg5R-0004uE-D0
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:02:10 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:40033)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hDeTj-0003rj-AC
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 20:19:07 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j132so12078042oib.2
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 17:19:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hDg5J-0004mb-M9
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:02:05 -0400
+Received: by mail-io1-xd42.google.com with SMTP id d201so12862252iof.7
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 19:01:54 -0700 (PDT)
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Date: Mon,  8 Apr 2019 22:01:21 -0400
+Message-Id: <cover.1554774454.git.stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
-References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
-In-Reply-To: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 9 Apr 2019 08:18:29 +0800
-Message-ID: <CAKXe6SLnou3TMsdorK0Ck-c+D6ECzWg10rBdQ_v3kLPb4FY7-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/10] block/pflash_cfi02: Implement missing
+ AMD pflash functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <lidong.chen@oracle.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Darren Kenny <darren.kenny@oracle.com>, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
 
-Lidong Chen <lidong.chen@oracle.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=889=E6=
-=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=883:51=E5=86=99=E9=81=93=EF=BC=9A
+The goal of this patch series implement the following AMD command-set parallel
+flash functionality:
+- flash interleaving;
+- nonuniform sector sizes;
+- erase suspend/resume commands; and
+- multi-sector erase.
 
-> Due to an off-by-one error, the assert statements allow an
-> out-of-bounds array access.
->
-> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
->
+During refactoring and implementation, I discovered several bugs that are
+fixed here as well:
+- flash commands use only 11-bits of the address in most cases, but the
+  current code uses all of them [1];
+- entering CFI mode from autoselect mode and then exiting CFI mode should
+  return the chip to autoselect mode, but the current code returns to read
+  array mode; and
+- reset command should be ignored during sector/chip erase, but the current
+  code performs the reset.
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+The first patch in the series adds a test for the existing behavior. Tests for
+additional behavior/bug fixes are added in the relevant patch.
 
+1. I found firmware in the wild that relies on the 11-bit address behavior,
+   probably due to a bug in the firmware itself.
 
-> ---
->  hw/sd/sd.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index aaab15f..818f86c 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates
-> state)
->      if (state =3D=3D sd_inactive_state) {
->          return "inactive";
->      }
-> -    assert(state <=3D ARRAY_SIZE(state_name));
-> +    assert(state < ARRAY_SIZE(state_name));
->      return state_name[state];
->  }
->
-> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp=
-)
->      if (rsp =3D=3D sd_r1b) {
->          rsp =3D sd_r1;
->      }
-> -    assert(rsp <=3D ARRAY_SIZE(response_name));
-> +    assert(rsp < ARRAY_SIZE(response_name));
->      return response_name[rsp];
->  }
->
-> --
-> 1.8.3.1
->
->
->
+Changes from v1:
+- Fix missing spaces around *, -, and ?.
+- Fix missing Signed-off-by line on patch 7
+- Replace use of errc with g_printerr and exit
+
+Stephen Checkoway (10):
+  block/pflash_cfi02: Add test for supported commands
+  block/pflash_cfi02: Refactor, NFC intended
+  block/pflash_cfi02: Fix command address comparison
+  block/pflash_cfi02: Implement intereleaved flash devices
+  block/pflash_cfi02: Implement nonuniform sector sizes
+  block/pflash_cfi02: Fix CFI in autoselect mode
+  block/pflash_cfi02: Fix reset command not ignored during erase
+  block/pflash_cfi02: Implement multi-sector erase
+  block/pflash_cfi02: Implement erase suspend/resume
+  block/pflash_cfi02: Use the chip erase time specified in the CFI table
+
+ hw/block/pflash_cfi02.c   | 843 +++++++++++++++++++++++++++-----------
+ tests/Makefile.include    |   2 +
+ tests/pflash-cfi02-test.c | 759 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 1367 insertions(+), 237 deletions(-)
+ create mode 100644 tests/pflash-cfi02-test.c
+
+-- 
+2.20.1 (Apple Git-117)
