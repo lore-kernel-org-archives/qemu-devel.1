@@ -2,69 +2,82 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2A4C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 13:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6864CC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 13:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1257B2084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 13:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E2292084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 13:11:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="oqyhrlZ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1257B2084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lKqvrw+D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2292084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41549 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41605 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDqTb-0003sX-8s
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 09:07:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56775)
+	id 1hDqX3-0005NG-G0
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 09:11:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDqSb-0003Wo-Qo
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:06:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDqWJ-0004tS-CJ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDqSZ-00081w-TH
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:06:45 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:43527)
+	(envelope-from <peter.maydell@linaro.org>) id 1hDqWI-0002om-7N
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:10:35 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33924)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hDqSV-0007mU-Pd; Tue, 09 Apr 2019 09:06:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=LecTQRwcqWvzAddp+w0lT8aP2aDAr9cOnwmSuYv9pp0=; 
-	b=oqyhrlZ3pbd02xiJ5Sq5dg9655V8a/zgH1IIxf9Gvt0ava4peDFndHRJUPU1k9V8RV4QP3LZyn+huviIIX2/IGkCz2yHRuAwBrVprIf7jzdRxHNamcVBiQB/TjxJ3nJcebpOUMWae0EKM6r6emUILtPFGqoQF9fPrwFqXXh0QdcIDu/M51Ds0qLo9F9Z4jI5JLBLmas9leN4VJpMBz2f4EKD5ibfLcV2d3rAzLkHcvIYYWXBSAcgACNLjNkIo8MeO0i7x4bW/d3VwDjEtGzCWaV/2z0DE0vpgEm6R16ee9pCkyMof4/jSV5LnAWkh+uh6eC8qzEeQB0Od+D0MLK2PA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hDqS9-0007k5-TG; Tue, 09 Apr 2019 15:06:17 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hDqS9-0006j8-Q0; Tue, 09 Apr 2019 15:06:17 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"qemu-devel\@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-block\@nongnu.org" <qemu-block@nongnu.org>
-In-Reply-To: <15f8499f-812d-1bf9-ad22-21971687826a@virtuozzo.com>
-References: <1554483379-682051-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554483379-682051-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w511s2cy08l.fsf@maestria.local.igalia.com>
-	<15f8499f-812d-1bf9-ad22-21971687826a@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Tue, 09 Apr 2019 15:06:17 +0200
-Message-ID: <w51ef6b49bq.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDqWI-0002nI-0w
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:10:34 -0400
+Received: by mail-ot1-x343.google.com with SMTP id k21so15496274otf.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 06:10:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=CBWNFXKaaW24Be/ZegpPnpVAvQooQLs4io1cMLpyjOo=;
+	b=lKqvrw+D6FhIIop6JHLEU6Tx+gWx7/igOVnS4M5SpvZjTzO737ekwmJsccIPmHjZVO
+	L3GuF1NQHSxGFHk4h19WLl+3bx22QnIzBFNj7JgkcEUSbzWcvUDERuS7rRgC8qvG5O74
+	X+m01QxYAy7WuiJuChZvhX+UsycRKoZCEuxxM/EUIhVoYxG9lY0CcYGVZkYO7zW55wtS
+	4Pa48s/ZRXd8lBaNGsahlnPNSz+TrrzgQjEW7R++tHHHtDARjy1RtfM+3AEHPp8Eqz+2
+	/xHDEMa6bEvtDQIlQK4ri/aj9I3udnYxpXSsczOFEPzAN215teKIDNXWPNG2k1uhTOh5
+	U8Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=CBWNFXKaaW24Be/ZegpPnpVAvQooQLs4io1cMLpyjOo=;
+	b=T+56gUz26uPJ5mv+HbiDdgIgIaOMRfQ/kfgUdIYlfcPoXXcFa/x4Apq4d9t8hGuEzK
+	Msh3QdpWWrGLvmnFvNBPoFp04Iv7JS1A7bM04dxvsjD4IocrwyCefAatXl24YukR+9pT
+	cXN7RwFPaxS61hTQ9jbgguRRWLdVkMmhVbU4a71Ih6wKIWxYsfTtwbmQPgqS2MZkvJXp
+	fx+AHb5GCUZBFmU0QKVnuIqtUaE1b5aDNx8dXS1Q3fCnZuL1EZZpRN33LXshKysLwf7g
+	8pQVWPBmMFY66OlFCwaMDdrpt/HO5dsh+TvvM7VeygexlJiSGm3rVHZW1eTyxpNW/O3E
+	+O7g==
+X-Gm-Message-State: APjAAAXMwnhOtqvXuF9kJGWkbVsZgktlca/meyYctzxQY7uWpdSosxfc
+	735koAyOf7JJ74ieC2z/Rbp3AphvgOEuk5wX5E6BVg==
+X-Google-Smtp-Source: APXvYqyqzI18zqm532RCIHWPcamsbV3L7fnbgzpjX5fSpylofwDbr4ZMrTTKwmYlUySzGtStIYFO11pt/J2nWBTuvx8=
+X-Received: by 2002:a05:6830:1497:: with SMTP id
+	s23mr20152145otq.236.1554815432867; 
+	Tue, 09 Apr 2019 06:10:32 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190328104750.25046-1-peter.maydell@linaro.org>
+	<9d4def49-7caa-c44b-7818-e81986442f18@redhat.com>
+In-Reply-To: <9d4def49-7caa-c44b-7818-e81986442f18@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Apr 2019 14:10:21 +0100
+Message-ID:
+ <CAFEAcA_NwBsRz5KAVrkje3jqnbaTMqEPTNCds3ViLCKb_gcNWA@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] block/stream: introduce a bottom
- node
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH for-4.0] target/i386: Generate #UD for LOCK
+ on a register increment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,30 +89,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	"patches@linaro.org" <patches@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409130617.3TRLIas2sOKGavJ07vLcAF4N-vfNgpT92X_BDFUZYfs@z>
+Message-ID: <20190409131021.0EycKyL8A-KZQDzZIVafsnOmYghlM59-Dgn2P7e5oGo@z>
 
-On Mon 08 Apr 2019 08:17:37 PM CEST, Andrey Shinkevich wrote:
->>> +    for (iter = bs; iter != bottom; iter = backing_bs(iter)) {
->>> +        block_job_add_bdrv(&s->common, "intermediate node", backing_bs(iter),
->>> +                           0, basic_flags, &error_abort);
->>>       }
->> 
->> This stops when iter == bottom, so bottom is not actually blocked.
+On Thu, 28 Mar 2019 at 11:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> The bottom is actually blocked because backing_bs(iter) == bottom is
-> passed to the block_job_add_bdrv() with the last iteration of the
-> loop.
+> On 28/03/19 11:47, Peter Maydell wrote:
+> > Fix a TCG crash due to attempting an atomic increment
+> > operation without having set up the address first.
+> > This is a similar case to that dealt with in commit
+> > e84fcd7f662a0d8198703, and we fix it in the same way.
+> >
+> > Fixes: https://bugs.launchpad.net/qemu/+bug/1807675
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> >  target/i386/translate.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/target/i386/translate.c b/target/i386/translate.c
+> > index 49cd298374b..b725bec37cd 100644
+> > --- a/target/i386/translate.c
+> > +++ b/target/i386/translate.c
+> > @@ -1398,6 +1398,11 @@ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d)
+> >  static void gen_inc(DisasContext *s1, TCGMemOp ot, int d, int c)
+> >  {
+> >      if (s1->prefix & PREFIX_LOCK) {
+> > +        if (d != OR_TMP0) {
+> > +            /* Lock prefix when destination is not memory */
+> > +            gen_illegal_opcode(s1);
+> > +            return;
+> > +        }
+> >          tcg_gen_movi_tl(s1->T0, c > 0 ? 1 : -1);
+> >          tcg_gen_atomic_add_fetch_tl(s1->T0, s1->A0, s1->T0,
+> >                                      s1->mem_index, ot | MO_LE);
+> >
+>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Feel free to apply it yourself.
 
-Right, I hadn't noticed that you are passing backing_bs(iter) to
-block_job_add_bdrv() now.
+Applied to master, thanks.
 
-Berto
+-- PMM
 
