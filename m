@@ -2,69 +2,59 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CC7C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 05:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A192C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 05:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1D920883
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 05:58:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1D920883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1809D20883
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 05:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1809D20883
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35741 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35747 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDjmD-0002jK-Lc
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 01:58:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39351)
+	id 1hDjnG-0003Md-9D
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 01:59:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDjlS-0002N8-2o
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 01:57:46 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1hDjlo-0002Yr-S9
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 01:58:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDjlR-0003hm-4O
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 01:57:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDjlQ-0003hV-S8
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 01:57:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB1E430833B5;
-	Tue,  9 Apr 2019 05:57:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 45A1F5D9C9;
-	Tue,  9 Apr 2019 05:57:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id BFCD71138648; Tue,  9 Apr 2019 07:57:39 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190407092314.11066-1-thuth@redhat.com>
-	<20190408134517.GA9047@richard>
-	<14147807-8723-adac-dffb-31b7bbd0fc3b@redhat.com>
-	<20190408222601.GR7238@habkost.net>
-Date: Tue, 09 Apr 2019 07:57:39 +0200
-In-Reply-To: <20190408222601.GR7238@habkost.net> (Eduardo Habkost's message of
-	"Mon, 8 Apr 2019 19:26:01 -0300")
-Message-ID: <87imvniuuk.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 09 Apr 2019 05:57:44 +0000 (UTC)
+	(envelope-from <stefan@weilnetz.de>) id 1hDjlm-0003tG-S3
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 01:58:08 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:43272
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <stefan@weilnetz.de>)
+	id 1hDjlk-0003sR-45; Tue, 09 Apr 2019 01:58:04 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id 8D2F1DB6049;
+	Tue,  9 Apr 2019 07:49:05 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024)
+	with ESMTP id 9HxXChr5P8uJ; Tue,  9 Apr 2019 07:49:04 +0200 (CEST)
+Received: from qemu.weilnetz.de (qemu.weilnetz.de [188.68.58.204])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id B169DDB6046;
+	Tue,  9 Apr 2019 07:49:04 +0200 (CEST)
+Received: by qemu.weilnetz.de (Postfix, from userid 1000)
+	id A90C946000F; Tue,  9 Apr 2019 07:49:04 +0200 (CEST)
+From: Stefan Weil <sw@weilnetz.de>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  9 Apr 2019 07:48:52 +0200
+Message-Id: <20190409054852.22547-1-sw@weilnetz.de>
+X-Mailer: git-send-email 2.11.0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
- hot-plugging nvdimm on older machine types
+X-Received-From: 37.120.169.71
+Subject: [Qemu-devel] [PATCH v2] Fix type of cluster_index
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,71 +66,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409055739.PMhD0UiPYUo9T1FqHREM24XaJYbTiE8qLG2m1fwAgk0@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409054852.LJj99_s01MKC_0_3_SxYmz4YEu4eyH06mf1FVCV4Nqo@z>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+The type should be the same as the type of cluster_id.
 
-> On Mon, Apr 08, 2019 at 05:06:49PM +0200, Thomas Huth wrote:
->> On 08/04/2019 15.45, Wei Yang wrote:
-> [...]
->> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> > index 6077d27361..b11f3b15c1 100644
->> > --- a/hw/i386/pc.c
->> > +++ b/hw/i386/pc.c
->> > @@ -2091,6 +2091,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> >      }
->> >  
->> >      hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
->> > +    if (*errp) {
->> > +        return;
->> > +    }
->> 
->> Not sure, but I think you can not rely on the fact that the caller set
->> *errp = NULL already... that's why it is more common to use a local_err
->> variable and error_propagate() for such cases (which is what I did in my
->> patch).
->
-> *errp can't be non-NULL (otherwise functions calling error_setg()
-> would crash).  errp can be NULL, though, and that's why you need
-> a local_err variable.
+This fixed a runtime error reported by sanitizers:
 
-Correct.  The big comment in error.h advises:
+    /qemu/include/exec/tb-lookup.h:33:35: runtime error: left shift of negative value -1
+    /qemu/accel/tcg/translate-all.c:1692:34: runtime error: left shift of negative value -1
 
- * Receive an error and pass it on to the caller:
- *     Error *err = NULL;
- *     foo(arg, &err);
- *     if (err) {
- *         handle the error...
- *         error_propagate(errp, err);
- *     }
- * where Error **errp is a parameter, by convention the last one.
- *
- * Do *not* "optimize" this to
- *     foo(arg, errp);
- *     if (*errp) { // WRONG!
- *         handle the error...
- *     }
- * because errp may be NULL!
- *
- * But when all you do with the error is pass it on, please use
- *     foo(arg, errp);
- * for readability.
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
 
-> I'd love to eliminate NULL errp from our codebase, but I couldn't
-> find a way to do it that is safe and simple (i.e. not letting us
-> pass NULL errp by mistake and not requiring a macro wrapping
-> every `&local_err` expression).
+v2: Fixed my e-mail address.
 
-Also, I'd prefer not not deviate even more from GError.
+ include/qom/cpu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Apropos NULL, we often pass NULL where we really ought to pass
-&error_abort.
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1d6099e5d4..6a753caed7 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -422,7 +422,7 @@ struct CPUState {
+ 
+     /* TODO Move common fields from CPUArchState here. */
+     int cpu_index;
+-    int cluster_index;
++    uint32_t cluster_index;
+     uint32_t halted;
+     uint32_t can_do_io;
+     int32_t exception_index;
+@@ -1129,6 +1129,6 @@ extern const struct VMStateDescription vmstate_cpu_common;
+ #endif /* NEED_CPU_H */
+ 
+ #define UNASSIGNED_CPU_INDEX -1
+-#define UNASSIGNED_CLUSTER_INDEX -1
++#define UNASSIGNED_CLUSTER_INDEX UINT32_MAX
+ 
+ #endif
+-- 
+2.11.0
+
 
