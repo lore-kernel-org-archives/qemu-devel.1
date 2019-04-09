@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43699)
+Received: from eggs.gnu.org ([209.51.188.92]:43918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDpqV-00021O-Kw
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:24 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDprU-0002ZX-6P
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDpqU-0004nX-GW
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:23 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDpqU-0004nG-9o
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:22 -0400
-Received: by mail-oi1-x243.google.com with SMTP id v84so13360623oif.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 05:27:22 -0700 (PDT)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDprT-00056Q-6F
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:28:24 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 14:28:23 +0200
+Message-Id: <20190409122823.12416-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20190409070830.22430-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190409070830.22430-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Apr 2019 13:27:10 +0100
-Message-ID: <CAFEAcA-NnK6gm6H9bNKxopjFHbigebr9XRCFR+4=OOEgGLkjfg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] ppc-for-4.0 queue 20190409
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 for-4.0?] aio-posix: ensure poll mode is
+ left when aio_notify is called
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +21,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, spopovyc@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, clg@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Sergio Lopez <slp@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On Tue, 9 Apr 2019 at 08:08, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 5263724b78f89cdea2354c8e92c53bac1b4641a3:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-04-08 17:53:18 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190409
->
-> for you to fetch changes up to 5cf0d326a0fec9ebac2d47c42b5f08e6bc2f686c:
->
->   spapr_pci: Fix extended config space accesses (2019-04-09 15:03:10 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2019-04-09
->
-> This is a small, hard freeze, pull request which fixes a regression on
-> the pseries machine handling of PCI-E extended config space accesses.
->
-> ----------------------------------------------------------------
+With aio=thread, adaptive polling makes latency worse rather than
+better, because it delays the execution of the ThreadPool's
+completion bottom half.
 
-Applied, thanks.
+event_notifier_poll() does run while polling, detecting that
+a bottom half was scheduled by a worker thread, but because
+ctx->notifier is explicitly ignored in run_poll_handlers_once(),
+scheduling the BH does not count as making progress and
+run_poll_handlers() keeps running.  Fix this by recomputing
+the deadline after *timeout could have changed.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+With this change, ThreadPool still cannot participate in polling
+but at least it does not suffer from extra latency.
 
--- PMM
+Reported-by: Sergio Lopez <slp@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1553692145-86728-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+        v1->v2: use qemu_soonest_timeout to handle timeout == -1
+ util/aio-posix.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 6fbfa7924f..db11021287 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -519,6 +519,10 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
+         if (!node->deleted && node->io_poll &&
+             aio_node_check(ctx, node->is_external) &&
+             node->io_poll(node->opaque)) {
++            /*
++             * Polling was successful, exit try_poll_mode immediately
++             * to adjust the next polling time.
++             */
+             *timeout = 0;
+             if (node->opaque != &ctx->notifier) {
+                 progress = true;
+@@ -558,8 +562,9 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
+     do {
+         progress = run_poll_handlers_once(ctx, timeout);
+         elapsed_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time;
+-    } while (!progress && elapsed_time < max_ns
+-             && !atomic_read(&ctx->poll_disable_cnt));
++        max_ns = qemu_soonest_timeout(*timeout, max_ns);
++        assert(!(max_ns && progress));
++    } while (elapsed_time < max_ns && !atomic_read(&ctx->poll_disable_cnt));
+ 
+     /* If time has passed with no successful polling, adjust *timeout to
+      * keep the same ending time.
+@@ -585,8 +590,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
+  */
+ static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
+ {
+-    /* See qemu_soonest_timeout() uint64_t hack */
+-    int64_t max_ns = MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
++    int64_t max_ns = qemu_soonest_timeout(*timeout, ctx->poll_ns);
+ 
+     if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
+         poll_set_started(ctx, true);
+-- 
+2.21.0
