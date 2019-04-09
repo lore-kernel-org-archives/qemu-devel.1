@@ -2,85 +2,68 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B72C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFB8C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:20:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E19402084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:20:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ceLFGLTZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E19402084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4F90E2084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:20:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F90E2084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43206 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43252 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDsXa-0004G2-Oa
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:20:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34256)
+	id 1hDsYU-0004wZ-Iz
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:20:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsWQ-0003kU-Cj
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:18:51 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDsXQ-0004IW-AJ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsWE-00029E-SR
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:18:46 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDsWE-00021x-0A
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:18:38 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z24so3808238wmi.5
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=gfY+dbclmdhipPDWOY/oT9Jrli1jXNhGCiG17GGu0/k=;
-	b=ceLFGLTZ9LgUlV/M/7/l4HQDFn7IShrpXxJ2SNO4dMX350IngKaX6ijna34yAkMZQk
-	rLTMrIXQkYzXkJWx5eTUkg7jYjEiEO8lnT+pXQFUrTXYRxFSg5xzgqH7jjWFGzwsL7WV
-	7vq02g4Fh6Fq6GLajb1kwHYIR2U9aP2sQzLIPlnB6v+eRxd4f+v0e+InfllWgZy4sqOG
-	/Y0a48NUZ/vhvX+QPf/+rgFWtHbTtE/AAvoj1KHITFgv2p+gMdO6WTLM6SZk+AO4wTeF
-	K+kicrIcfBvdSg6YDUhRQyCJ4nWrWMjsZfGZsMzvt8zqFoLzmbooKnQbQcXIFOKtFOUh
-	VuIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=gfY+dbclmdhipPDWOY/oT9Jrli1jXNhGCiG17GGu0/k=;
-	b=eTcO/RXUSXH4Z3rq5+SXB/FlySf893hkJvuc5cbV9//zygdKPGb+5DcDHdhsLFub5F
-	mv3YRsZqsp6lSzzX+PmzsY6sYriKimFHSlSAL/VS5KGF/wm+EhbHYGoqfggYWOEw0awn
-	OlMLXMKdOk3rxKBvHp16L9oJwJiee4PatIVVk7XOudjXzYKtgJ+AYV1Hsw0aHVB9HcEG
-	I4T0rG1kJHH91I/nW6l8gT1yhjxVDnyqaJMUo1lTfdMLgilyLZwGJaTwtS4V7edk4ze4
-	JObJnwKaGw0oYaE5fqapnNck0GLDgr8rgifxthLoGF4ngQ3We7gKyrnwbCly89TXN3W4
-	ezHw==
-X-Gm-Message-State: APjAAAULyapDTuykK7QyP+QVvOz/3AWU3Z7D91J4z+1lxcyRKojVQl+Y
-	jAixTpZOzHaYs9kGATM742AsF/v3mO0=
-X-Google-Smtp-Source: APXvYqx9qBEmrUU3EC6USfD8Sb5UErgy0hqOmWn148jx32D1U9vKiTIXeOU88KxtmfzIg4Qf7icRTA==
-X-Received: by 2002:a1c:acc8:: with SMTP id v191mr23331531wme.72.1554823112702;
-	Tue, 09 Apr 2019 08:18:32 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id
-	h10sm57912517wrs.27.2019.04.09.08.18.31
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 08:18:31 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 16:18:30 +0100
-Message-Id: <20190409151830.6024-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <lersek@redhat.com>) id 1hDsXP-0003N7-4o
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:19:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDsXO-0003Mb-QU
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:19:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F799307B963;
+	Tue,  9 Apr 2019 15:19:48 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-114.rdu2.redhat.com
+	[10.10.120.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9A1B15D9C9;
+	Tue,  9 Apr 2019 15:19:36 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
+References: <20190409134536.15548-1-philmd@redhat.com>
+	<20190409134536.15548-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <243a3b52-4b9e-dac2-366b-90843a03667b@redhat.com>
+Date: Tue, 9 Apr 2019 17:19:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH for-4.0] migration/ram.c: Fix use-after-free in
- multifd_recv_unfill_packet()
+In-Reply-To: <20190409134536.15548-2-philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 09 Apr 2019 15:19:49 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 1/2] roms: Rename the EFIROM
+ variable to avoid clashing with iPXE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,55 +75,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Juan Quintela <quintela@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409151830.WtP5tBvvwG_Lu3OOcOuWMrd6rbwm3Ln6bH6H9_ByYDk@z>
+Message-ID: <20190409151935.E8-doPmKVkUtClDEMmzUVmAPEjQ6HlOQDnAW2WQwnR8@z>
 
-Coverity points out (CID 1400442) that in this code:
+On 04/09/19 15:45, Philippe Mathieu-Daud=C3=A9 wrote:
+> The iPXE's 'veryclean' recipe removes $(EFIROM) even if the EFIROM
+> macro originates from elsewhere:
+>=20
+>   $ git checkout f590a812c21~
+>   $ make -C roms clean EFIROM=3D$(type -P EfiRom)
+>   make: Entering directory '/source/qemu/roms'
+>   [...]
+>   make -C ipxe/src veryclean
+>   make[1]: Entering directory '/source/qemu/roms/ipxe/src'
+>   rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.* b=
+in{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin ./util/el=
+f2efi32 ./util/elf2efi64 /usr/bin/EfiRom ./util/efifatbin ./util/iccfix .=
+/util/einfo TAGS bin{,-*}/symtab
+>   rm: cannot remove '/usr/bin/EfiRom': Permission denied
+>   make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
+>   make[1]: Leaving directory '/source/qemu/roms/ipxe/src'
+>   make: *** [Makefile:152: clean] Error 2
+>   make: Leaving directory '/source/qemu/roms'
+>=20
+> Before f590a812c21 this variable could be overridden or unset,
+> and the 'veryclean' Makefile rule would not complain.
+>=20
+> Commit f590a812c21 enforces this variable to the Intel EfiRom
+> tool provided by the EDK2 project.
+>=20
+> To avoid the name clash and make the difference between the
+> projects obvious, rename the variable used by the EDK2 project
+> as EDK2_EFIROM.
+>=20
+> Fixes: f590a812c21074e82228de3e1dfb57b75fc02b62
+> Reported-by: Olaf Hering <olaf@aepfle.de>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  roms/Makefile | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/roms/Makefile b/roms/Makefile
+> index 78d5dd18c30..d28252dafdf 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
+>  # We need that to combine multiple images (legacy bios,
+>  # efi ia32, efi x64) into a single rom binary.
+>  #
+> -EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
+> +EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
+> =20
+>  default:
+>  	@echo "nothing is build by default"
+> @@ -102,8 +102,8 @@ pxe-rom-%: build-pxe-roms
+> =20
+>  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+> =20
+> -efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
+> -	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+> +efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
+> +	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+>  		-b ipxe/src/bin/$(VID)$(DID).rom \
+>  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
+>  		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
+> @@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
+>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+> =20
+> -$(EFIROM):
+> +$(EDK2_EFIROM):
+>  	$(MAKE) -C edk2/BaseTools
+> =20
+>  slof:
+>=20
 
-    if (packet->pages_alloc > p->pages->allocated) {
-        multifd_pages_clear(p->pages);
-        multifd_pages_init(packet->pages_alloc);
-    }
+looks good, thank you; my R-b stands.
 
-we free p->pages in multifd_pages_clear() but continue to
-use it in the following code. We also leak memory, because
-multifd_pages_init() returns the pointer to a new MultiFDPages_t
-struct but we are ignoring its return value.
-
-Fix both of these bugs by adding the missing assignment of
-the newly created struct to p->pages.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I don't know anything about the multifd code, but this seems like
-the obvious fix based on looking at what the clear and init
-functions are doing. I have only run 'make check' on this,
-so review and testing definitely in order. I think we should
-really put this into 4.0, which means ideally I'd like to
-commit it to master today or tomorrow, though...
----
- migration/ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index f68beeeeffc..1ca9ba77b6a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -851,7 +851,7 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
-      */
-     if (packet->pages_alloc > p->pages->allocated) {
-         multifd_pages_clear(p->pages);
--        multifd_pages_init(packet->pages_alloc);
-+        p->pages = multifd_pages_init(packet->pages_alloc);
-     }
- 
-     p->pages->used = be32_to_cpu(packet->pages_used);
--- 
-2.20.1
-
+Laszlo
 
