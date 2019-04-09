@@ -2,52 +2,80 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URI_NOVOWEL,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 792B2C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20270C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7BE2084F
+	by mail.kernel.org (Postfix) with ESMTPS id DE0962084F
 	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:42:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7BE2084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W9GHlwGf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0962084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46281 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46283 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtov-0001Hn-2m
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:42:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35979)
+	id 1hDtow-0001J5-5D
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:42:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9951a354b=Paul.Durrant@citrix.com>)
-	id 1hDtnj-0000a0-E1
+	(envelope-from <peter.maydell@linaro.org>) id 1hDtnk-0000aP-RX
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9951a354b=Paul.Durrant@citrix.com>)
-	id 1hDtnh-0007O3-JE
+	(envelope-from <peter.maydell@linaro.org>) id 1hDtnj-0007Ox-Gk
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:40:48 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36920)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDtnj-0007OP-4k
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:40:47 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:31090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=9951a354b=Paul.Durrant@citrix.com>)
-	id 1hDtnh-0007N9-8N; Tue, 09 Apr 2019 12:40:45 -0400
-X-IronPort-AV: E=Sophos;i="5.60,329,1549929600"; d="scan'208";a="83137005"
-From: Paul Durrant <paul.durrant@citrix.com>
-To: <qemu-devel@nongnu.org>, <xen-devel@lists.xenproject.org>,
-	<qemu-block@nongnu.org>
-Date: Tue, 9 Apr 2019 17:40:38 +0100
-Message-ID: <20190409164038.25484-1-paul.durrant@citrix.com>
-X-Mailer: git-send-email 2.20.1.2.gb21ebb6
+Received: by mail-ot1-x341.google.com with SMTP id c16so16187210otn.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=qQqr++AOy+120H9HH8kxlyPTR8+nwK5yeB6Z7PI2KIY=;
+	b=W9GHlwGfWfxwArJoLtzicQ+mMG7NDSy2Lv8yQA2w3e2JUusKSRs/KJiRcfhFOKxaCF
+	v6DlIdXGDPeIYWwBWxdrSSaylrvqvCQQHMpsQk0w2JsboViEgG7guTVpIwJkc+fX+LVC
+	PbM4XCYvbieprJMgJo7jcEaKWd6fDx5ySyl9YGkHCuEE0oIaP+TMKqAt7n6bdwLQubn8
+	HQWIiTVbVytQlxxqn5S4YQU4PG2lhSNp2e3j7jwVEO3P1ZD9k/eEd9OKwYBmc+3qcCnk
+	q8zu0CrFWetydVXDNsL1Rd+2VtCGnGOLA52oSzPIZGuLjcgj76OMEMCgHTZq2GL78NA/
+	8sWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=qQqr++AOy+120H9HH8kxlyPTR8+nwK5yeB6Z7PI2KIY=;
+	b=kh9aEqHbHSg5JpghKg3gOtMYLlT6q6/4aqoC8zvsdJlaalxTQFzjBgngS6446yhe3g
+	I0XVqPf++E5RZVru3cJHUYqJewn9Uvi7sNmQn/33FHjWdPKA7X4Nbs1PJsDfFdDrPOTo
+	VQgK4gqhspKFc0NwjM5WHq40lrfgOuqO/EJBWhyp3EZ/Tfg2FnBiNFt/QIGMHJ7mM61J
+	LBFbrhaHn7bpLfSW1NaXYLe92WdGPhv911VUQ+2MzJn7zO1hLarqjhn8Wb/zo9cZKHWQ
+	mY63T7/fB9kgNXufjuX4ftCN8omcF3kquDLxrrze4oyg/r2FUzuE9uXVFistOkMtDqoK
+	MxYg==
+X-Gm-Message-State: APjAAAUazMKVHCJhNaWJOAjYBRuNiY7gpWreKB22+yiz1717lxJx/AI1
+	//sugsJS0LNmc7MR+Wqq2wqqeAtHveMeQCrIAYJ+7A==
+X-Google-Smtp-Source: APXvYqy86AKcb6Rcka4mGmd3b17IGnIx2uuakfcXs0uGNW4DKjsXl2DUEtSaBj371VCKO9MpSZR46OY+k+Zdqt8eb5o=
+X-Received: by 2002:a05:6830:1497:: with SMTP id
+	s23mr21067618otq.236.1554828045825; 
+	Tue, 09 Apr 2019 09:40:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+In-Reply-To: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Apr 2019 17:40:34 +0100
+Message-ID:
+ <CAFEAcA-k0KEsjb0VvbhhkpvTN7nFBDNtqKwx-Lai5uYbCkztJA@mail.gmail.com>
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 162.221.156.55
-Subject: [Qemu-devel] [PATCH] xen-block: support feature-large-sector-size
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 0/4] Header cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,257 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
-	Max Reitz <mreitz@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Anthony Perard <anthony.perard@citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+	qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409164038.14Ki4eSvQ59wvX037QK8Y8-XBdbAzbiNnHmlggRqwyQ@z>
+Message-ID: <20190409164034.BKiajpApau8hXaB04H3Mt8lrbvNrdWSY5wrU-gYcGb8@z>
 
-A recent Xen commit [1] clarified the semantics of sector based quantities
-used in the blkif protocol such that it is now safe to create a xen-block
-device with a logical_block_size != 512, as long as the device only
-connects to a frontend advertizing 'feature-large-block-size'.
+On Tue, 9 Apr 2019 at 16:58, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
+>
+> Removed unwanted includes from cpu-common.h
+> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+>
+> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+>
+> ---
+>  include/exec/cpu-common.h | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index cef8b88a2a..a3594f3f50 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -7,8 +7,6 @@
+>  #include "exec/hwaddr.h"
+>  #endif
+>
+> -#include "qemu/bswap.h"
+> -#include "qemu/queue.h"
+>  #include "qemu/fprintf-fn.h"
+>
 
-This patch modifies xen-block accordingly. It also uses a stack variable
-for the BlockBackend in xen_block_realize() to avoid repeated dereferencing
-of the BlockConf pointer, and changes the parameters of
-xen_block_dataplane_create() so that the BlockBackend pointer and sector
-size are passed expicitly rather than implicitly via the BlockConf.
+I was surprised that no .c files are implicitly relying
+on these includes, but apparently none are, so we can
+safely remove them.
 
-These modifications have been tested against a recent Windows PV XENVBD
-driver [2] using a xen-disk device with a 4kB logical block size.
+A couple of notes:
+ * this doesn't need to go to qemu-stable as it's just a
+   code cleanup
+ * did something go wrong with your sending of this patch?
+   Its subject is "PATCH 0/4" which would usually indicate
+   a cover letter for a four-patch series, but this seems
+   to be a stand-alone patch.
 
-[1] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=67e1c050e36b2c9900cca83618e56189effbad98
-[2] https://winpvdrvbuild.xenproject.org:8080/job/XENVBD-master/126
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
----
- hw/block/dataplane/xen-block.c | 25 ++++++++++++----------
- hw/block/dataplane/xen-block.h |  3 ++-
- hw/block/xen-block.c           | 38 +++++++++++++++++++++-------------
- 3 files changed, 40 insertions(+), 26 deletions(-)
-
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index 908bd27bbd..50094a886b 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -58,6 +58,7 @@ struct XenBlockDataPlane {
-     int requests_inflight;
-     unsigned int max_requests;
-     BlockBackend *blk;
-+    unsigned int sector_size;
-     QEMUBH *bh;
-     IOThread *iothread;
-     AioContext *ctx;
-@@ -167,7 +168,7 @@ static int xen_block_parse_request(XenBlockRequest *request)
-         goto err;
-     }
- 
--    request->start = request->req.sector_number * XEN_BLKIF_SECTOR_SIZE;
-+    request->start = request->req.sector_number * dataplane->sector_size;
-     for (i = 0; i < request->req.nr_segments; i++) {
-         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
-             error_report("error: nr_segments too big");
-@@ -177,14 +178,14 @@ static int xen_block_parse_request(XenBlockRequest *request)
-             error_report("error: first > last sector");
-             goto err;
-         }
--        if (request->req.seg[i].last_sect * XEN_BLKIF_SECTOR_SIZE >=
-+        if (request->req.seg[i].last_sect * dataplane->sector_size >=
-             XC_PAGE_SIZE) {
-             error_report("error: page crossing");
-             goto err;
-         }
- 
-         len = (request->req.seg[i].last_sect -
--               request->req.seg[i].first_sect + 1) * XEN_BLKIF_SECTOR_SIZE;
-+               request->req.seg[i].first_sect + 1) * dataplane->sector_size;
-         request->size += len;
-     }
-     if (request->start + request->size > blk_getlength(dataplane->blk)) {
-@@ -218,17 +219,17 @@ static int xen_block_copy_request(XenBlockRequest *request)
-         if (to_domain) {
-             segs[i].dest.foreign.ref = request->req.seg[i].gref;
-             segs[i].dest.foreign.offset = request->req.seg[i].first_sect *
--                XEN_BLKIF_SECTOR_SIZE;
-+                dataplane->sector_size;
-             segs[i].source.virt = virt;
-         } else {
-             segs[i].source.foreign.ref = request->req.seg[i].gref;
-             segs[i].source.foreign.offset = request->req.seg[i].first_sect *
--                XEN_BLKIF_SECTOR_SIZE;
-+                dataplane->sector_size;
-             segs[i].dest.virt = virt;
-         }
-         segs[i].len = (request->req.seg[i].last_sect -
-                        request->req.seg[i].first_sect + 1) *
--                      XEN_BLKIF_SECTOR_SIZE;
-+                      dataplane->sector_size;
-         virt += segs[i].len;
-     }
- 
-@@ -338,12 +339,12 @@ static bool xen_block_split_discard(XenBlockRequest *request,
- 
-     /* Wrap around, or overflowing byte limit? */
-     if (sec_start + sec_count < sec_count ||
--        sec_start + sec_count > INT64_MAX / XEN_BLKIF_SECTOR_SIZE) {
-+        sec_start + sec_count > INT64_MAX / dataplane->sector_size) {
-         return false;
-     }
- 
--    byte_offset = sec_start * XEN_BLKIF_SECTOR_SIZE;
--    byte_remaining = sec_count * XEN_BLKIF_SECTOR_SIZE;
-+    byte_offset = sec_start * dataplane->sector_size;
-+    byte_remaining = sec_count * dataplane->sector_size;
- 
-     do {
-         byte_chunk = byte_remaining > BDRV_REQUEST_MAX_BYTES ?
-@@ -626,13 +627,15 @@ static bool xen_block_dataplane_event(void *opaque)
- }
- 
- XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
--                                              BlockConf *conf,
-+                                              BlockBackend *blk,
-+                                              unsigned int sector_size,
-                                               IOThread *iothread)
- {
-     XenBlockDataPlane *dataplane = g_new0(XenBlockDataPlane, 1);
- 
-     dataplane->xendev = xendev;
--    dataplane->blk = conf->blk;
-+    dataplane->blk = blk;
-+    dataplane->sector_size = sector_size;
- 
-     QLIST_INIT(&dataplane->inflight);
-     QLIST_INIT(&dataplane->freelist);
-diff --git a/hw/block/dataplane/xen-block.h b/hw/block/dataplane/xen-block.h
-index d6fa6d26dd..76dcd51c3d 100644
---- a/hw/block/dataplane/xen-block.h
-+++ b/hw/block/dataplane/xen-block.h
-@@ -15,7 +15,8 @@
- typedef struct XenBlockDataPlane XenBlockDataPlane;
- 
- XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
--                                              BlockConf *conf,
-+                                              BlockBackend *blk,
-+                                              unsigned int sector_size,
-                                               IOThread *iothread);
- void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane);
- void xen_block_dataplane_start(XenBlockDataPlane *dataplane,
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index ef635be4c2..05e890ad78 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -51,11 +51,25 @@ static void xen_block_connect(XenDevice *xendev, Error **errp)
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-+    BlockConf *conf = &blockdev->props.conf;
-+    unsigned int feature_large_sector_size;
-     unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
-     char *str;
- 
-     trace_xen_block_connect(type, vdev->disk, vdev->partition);
- 
-+    if (xen_device_frontend_scanf(xendev, "feature-large-sector-size", "%u",
-+                                  &feature_large_sector_size) != 1) {
-+        feature_large_sector_size = 0;
-+    }
-+
-+    if (feature_large_sector_size != 1 &&
-+        conf->logical_block_size != XEN_BLKIF_SECTOR_SIZE) {
-+        error_setg(errp, "logical_block_size != %u not supported",
-+                   XEN_BLKIF_SECTOR_SIZE);
-+        return;
-+    }
-+
-     if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
-                                   &order) != 1) {
-         nr_ring_ref = 1;
-@@ -149,7 +163,7 @@ static void xen_block_set_size(XenBlockDevice *blockdev)
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-     BlockConf *conf = &blockdev->props.conf;
--    int64_t sectors = blk_getlength(conf->blk) / XEN_BLKIF_SECTOR_SIZE;
-+    int64_t sectors = blk_getlength(conf->blk) / conf->logical_block_size;
-     XenDevice *xendev = XEN_DEVICE(blockdev);
- 
-     trace_xen_block_size(type, vdev->disk, vdev->partition, sectors);
-@@ -184,6 +198,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-     BlockConf *conf = &blockdev->props.conf;
-+    BlockBackend *blk = conf->blk;
-     Error *local_err = NULL;
- 
-     if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-@@ -205,8 +220,8 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-      * The blkif protocol does not deal with removable media, so it must
-      * always be present, even for CDRom devices.
-      */
--    assert(conf->blk);
--    if (!blk_is_inserted(conf->blk)) {
-+    assert(blk);
-+    if (!blk_is_inserted(blk)) {
-         error_setg(errp, "device needs media, but drive is empty");
-         return;
-     }
-@@ -223,26 +238,20 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
- 
-     blkconf_blocksizes(conf);
- 
--    if (conf->logical_block_size != XEN_BLKIF_SECTOR_SIZE) {
--        error_setg(errp, "logical_block_size != %u not supported",
--                   XEN_BLKIF_SECTOR_SIZE);
--        return;
--    }
--
-     if (conf->logical_block_size > conf->physical_block_size) {
-         error_setg(
-             errp, "logical_block_size > physical_block_size not supported");
-         return;
-     }
- 
--    blk_set_dev_ops(conf->blk, &xen_block_dev_ops, blockdev);
--    blk_set_guest_block_size(conf->blk, conf->logical_block_size);
-+    blk_set_dev_ops(blk, &xen_block_dev_ops, blockdev);
-+    blk_set_guest_block_size(blk, conf->logical_block_size);
- 
-     if (conf->discard_granularity == -1) {
-         conf->discard_granularity = conf->physical_block_size;
-     }
- 
--    if (blk_get_flags(conf->blk) & BDRV_O_UNMAP) {
-+    if (blk_get_flags(blk) & BDRV_O_UNMAP) {
-         xen_device_backend_printf(xendev, "feature-discard", "%u", 1);
-         xen_device_backend_printf(xendev, "discard-granularity", "%u",
-                                   conf->discard_granularity);
-@@ -259,12 +268,13 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-                                blockdev->device_type);
- 
-     xen_device_backend_printf(xendev, "sector-size", "%u",
--                              XEN_BLKIF_SECTOR_SIZE);
-+                              conf->logical_block_size);
- 
-     xen_block_set_size(blockdev);
- 
-     blockdev->dataplane =
--        xen_block_dataplane_create(xendev, conf, blockdev->props.iothread);
-+        xen_block_dataplane_create(xendev, blk, conf->logical_block_size,
-+                                   blockdev->props.iothread);
- }
- 
- static void xen_block_frontend_changed(XenDevice *xendev,
--- 
-2.20.1.2.gb21ebb6
-
+thanks
+-- PMM
 
