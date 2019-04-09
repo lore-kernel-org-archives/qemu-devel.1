@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41970)
+Received: from eggs.gnu.org ([209.51.188.92]:42132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDrOQ-0003Tz-Pa
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:06:31 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hDrOv-0003gd-OW
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDrON-0004YA-Px
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:06:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54734)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hDrOu-0004pC-M8
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:07:01 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:54344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hDrOK-0004SF-8y
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:06:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hDrOG-0008LO-NN
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 14:06:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFC152E8058
-	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 14:06:20 +0000 (UTC)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hDrOs-0004la-7p
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:06:59 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id c1so2283232wml.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 07:06:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
+	<20180326150916.9602-36-marcandre.lureau@redhat.com>
+	<20180412144814.GH2704@work-vm>
+In-Reply-To: <20180412144814.GH2704@work-vm>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Apr 2019 16:06:42 +0200
+Message-ID: <CAJ+F1CLQ=UBWHQnHSZPu2Gtjbbd66DHsF+D-T5rn1dhT0+TCHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Apr 2019 13:51:42 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
-Message-Id: <155481790266.8592.9119116041656314996.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq not
- an integer
+Subject: Re: [Qemu-devel] [PATCH v3 35/38] console: make screendump
+ asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Your suggested fix looks good -- did you want to send it to qemu-devel
-with a suitable Signed-off-by: line ?
+Hi
+
+On Thu, Apr 12, 2018 at 4:49 PM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > Make screendump asynchronous to provide correct screendumps.
+> >
+> > HMP doesn't have async support, so it has to remain synchronous and
+> > potentially incorrect to avoid potential races.
+> >
+> > Fixes:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Hi,
+>   Looking at this and the previous pair of patches, I think we'd be
+> better if we defined that async commands took a callback function
+> pointer and data that they call.
+>
+>   Here we've got 'graphic_hw_update_done' that explicitly walks qmp
+> lists; but I think it's better just to pass graphic_hw_update() the
+> completion data together with a callback function and it calls that when
+> it's done.
+
+The calling context is in QmpReturn: it will handle further dispatch
+on the associated session (it has the associated cb+data, if you
+will).
+
+gfx_update_async() doesn't have cb+data to associate the call with a
+finish handler. Further down, spice doesn't keep the request "context"
+either. All it does is call graphic_hw_update_done() when update is
+finished, that's why we walk the list of pending screendumps here.
+
+We could move the pending list of async screendumps down to spice (and
+other console renderers), but that would make the code more
+complicated & duplicated for no strong reason.
+
+>
+> (Also isn't it a little bit of a race, calling graphic_hw_update() and
+> *then* adding the entry to the list? Can't it end up calling the _done()
+> before we've added it to the list).
+
+Yes, in theory it could. In practice that won't happen today, but we
+may change things later and not realize we "broke" screendump. So I
+will rearrange the code to add it to the pending list before calling
+graphic_hw_update().
 
 
-** Tags added: linux-user
+>
+> Also, do we need a list of outstanding screendumps, or should we just
+> have a list of async commands.
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+We have both, mostly for simplicity and flexibility reasons. If we
+removed the outstanding screendump list, we would have to query it
+from the session.
 
--- =
+Thanks for the review, I'll send an update revision.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1814352
 
-Title:
-  SIOCGIFNAME takes a struct ifreq not an integer
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
-  integer.  This leads to if_indextoname() not correctly returning
-  interface names (well, not if they're longer than 4 characters
-  including the trailing NULL ;-).
-
-  This is observed on v3.1.0.
-
-  The following one-line patch will be sent to the qemu-devel mailing
-  list:
-
-  """
-  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-  index ae8951625f..37501f575c 100644
-  --- a/linux-user/ioctls.h
-  +++ b/linux-user/ioctls.h
-  @@ -178,7 +178,7 @@
-   #endif /* CONFIG_USBFS */
-   =
-
-     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
-  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
-  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
-)))
-     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
-eq)))
-  """
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
+--
+Marc-Andr=C3=A9 Lureau
