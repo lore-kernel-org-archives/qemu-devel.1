@@ -2,88 +2,84 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F81C282E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F448C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:22:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 308E021473
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:11:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D864F213F2
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="jm48Fmkw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308E021473
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4qQPz+J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D864F213F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33855 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33931 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDgEo-0001Fq-ET
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 22:11:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45661)
+	id 1hDgPR-0003Bv-1w
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 22:22:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg7G-0003Qc-Ee
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:04:03 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDgOa-0002qz-Tk
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg7C-0006pJ-Er
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:04:00 -0400
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:38912)
+	(envelope-from <catherine.hecx@gmail.com>) id 1hDgOX-00059f-GM
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:21:55 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDg78-0006nA-FW
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:56 -0400
-Received: by mail-it1-x141.google.com with SMTP id 139so2437678ita.4
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 19:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=/jtNWxB61SZw8gmWc4QLGq2l28K8nb8bWXBa9rEihZY=;
-	b=jm48FmkwX+8OHmydGsK4/S4S/4R4b0DwL0g8XIYV3OJLRib5TKg7cwOIQUKie2t5E4
-	BQNweuL84ufQ8+02PCd6HpUhgYoX31q5qGOPevKqoQ214TbX0Lnpx4c7O7vjoB/0Dxs7
-	I5Hh2HSRztXUMECyk/iO1hkTjtGVUoMFhwCgI9edvhkZwCETvCfA5ILQRO/ZxV1a6cBe
-	FYa1QB0Cac1oaWonBU5YQb+DyM85pXq/X29nJye/X1RHds5Zi17qfwl0KKOCdT5SYs1r
-	Fmy9EbhLIx/T+rS/xAscqnarnlENk+iaO6kygdc07GwXUTI1xqOyPiuj9fyB4m11VGw2
-	FrWQ==
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hDgOT-000562-L3
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:21:51 -0400
+Received: by mail-oi1-x244.google.com with SMTP id i21so12218574oib.11
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 19:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=lzy1CCdZCja4m90v9OXoUDYkW5iqWI3vHaEjs2PpHls=;
+	b=c4qQPz+JKsoeOLgM3AafrvyoOcS9/sDEb+BqcBdp/Y26l6RKNgGCzs+OrUVV58Hn9f
+	flIYQflDyV8z52+ujjmyC22wWHJJ3D2HpyRCVKIkF5ZPW2EXn1owYgpeWwMbocvpsijl
+	ZlHQobnS5s/Rq15JPgvL8omrtVjkiEmDDEdYJaJ5giUxEJ75suCuP+6hvSaSKn2DxmTT
+	gPhokmEyJ3VyVkGJMhw0lUjZcL9JFVLG8O/HnfDWIA89P6Vl+8QVhWmGXh+cbq6KxYKE
+	ustcLwVHl6e8PRY1OfcegBQQg52ke2qIGkaVQRzjV6uRF38/XxiHoMv+3zoXR5HUbuZW
+	C8ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=/jtNWxB61SZw8gmWc4QLGq2l28K8nb8bWXBa9rEihZY=;
-	b=ePPMnpca7e95MRBdkNNQo4BoB0KrJ0FMbvKq5nCsWkuHcOw8xqyC6j4tYc0AumcXiy
-	6lzOOu5hBL5nT0l+ugSBmojQANGQPURCJDzeuIjzFgydjNpp5crFvlfTW40hbhfG/A1A
-	ih3mVkCO+Vw8G5iGNJne1Nqyc+6tGceIDUrcsCnhzRKdw3YlRcGlLz6FFI+yWdtWiBjf
-	Uetf0LOupRx7WZ3ZxPaqFsZiFfPP3QHb68w8OwuKY00k8bAchw4r6OdP1Yax6GRdNXSX
-	MK+VMyBdOgjafXt1UAXY0nGdyrsYVdYRvhYRorQyvpLlFVFgfkcW5M8ftzOHyqpfbJsg
-	C6yA==
-X-Gm-Message-State: APjAAAW8Dw01vvfJOhuCV++kSXuLpYK/3BtxIIPqCOs00OmULMUmAeTV
-	ZKHKNI5/ZtQ+PypE/mmt7gBlD3/IukhJLw==
-X-Google-Smtp-Source: APXvYqwt1c6Ea6ZLC+wq8NFn0aDTYencM92nxTmhLtauLGM6v+b74OijT1hsW+1bdx/HWX/xSx5+mQ==
-X-Received: by 2002:a02:ab90:: with SMTP id t16mr24348111jan.119.1554775432722;
-	Mon, 08 Apr 2019 19:03:52 -0700 (PDT)
-Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
-	by smtp.gmail.com with ESMTPSA id
-	y203sm5969838itb.22.2019.04.08.19.03.51
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 08 Apr 2019 19:03:52 -0700 (PDT)
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 22:01:34 -0400
-Message-Id:
- <8f3c98364902035431d788f058b342b286cc924c.1554774454.git.stephen.checkoway@oberlin.edu>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
-In-Reply-To: <cover.1554774454.git.stephen.checkoway@oberlin.edu>
-References: <cover.1554774454.git.stephen.checkoway@oberlin.edu>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=lzy1CCdZCja4m90v9OXoUDYkW5iqWI3vHaEjs2PpHls=;
+	b=n0vweJS5L/Zj/Ch9CdMguAHdkgqX0Ux7VC8S8EbQ9D3+M1xq5dkf4ukhQRbi0pKOp8
+	QWuknIjEeVG+FlgJh2jz/bVAd5Vw7RjmRXhcMHqb/yyhszXRgmWxE8xhqoJMgwikkT4m
+	qdFkxCQu6RS5pWQHd44XZR9CsJGkMPZ1QBuAyHBdV0dkdCONEnCT5NA5n5myPJbH49FL
+	5NYZ0f+oX7Jm0eVcXakUXNwO436I21jjBMrMiw67J5jIkGGGTzgGImTSKTEhtl+5oG1y
+	vtZPKxezi1Dnpej8s+OomjPUp+loSbm5Sp6zYxPJzmS6t7ezh724d7disvlrRHeOcljv
+	iqBg==
+X-Gm-Message-State: APjAAAXw3A7WRoWS+C5qRaVHwppbHYFfyFHVEo2UMriVwY/xooGnFRSm
+	fvfv9pJ4CFvh1TIQhsnU6S6N3Z/IeuSETzxL95A=
+X-Google-Smtp-Source: APXvYqwjplsliTu4oNKttMloA4fKulkojhEMlsv4cfYh60v4q6f17oR2hxZy9sSWbAQBWSxsg4OzpXt5SJxbgNRN5Qg=
+X-Received: by 2002:aca:3f84:: with SMTP id
+	m126mr17039876oia.164.1554776507986; 
+	Mon, 08 Apr 2019 19:21:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	<20190408123542.1a4de426@redhat.com>
+In-Reply-To: <20190408123542.1a4de426@redhat.com>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Tue, 9 Apr 2019 10:21:36 +0800
+Message-ID:
+ <CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::141
-Subject: [Qemu-devel] [PATCH v2 10/10] block/pflash_cfi02: Use the chip
- erase time specified in the CFI table
+X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,43 +91,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409020134.AqJJFH1Ni0vtlsYI96E-w0-j-AH_0OIH4LS_gIgX3x0@z>
+Message-ID: <20190409022136.rBsCxHa3rkjR0nFJKucGpO7NSVJ5yoR2yWKnN2TP2lU@z>
 
-When erasing the chip, use the typical time specified in the CFI table
-rather than arbitrarily selecting 5 seconds.
-
-Since the currently unconfigurable value set in the table is 12, this
-means a chip erase takes 4096 ms so this isn't a big change in behavior.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
----
- hw/block/pflash_cfi02.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index d9087cafff..76c8af4365 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -633,9 +633,9 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-                 pflash_update(pfl, 0, pfl->total_len);
-             }
-             set_dq7(pfl, 0x00);
--            /* Let's wait 5 seconds before chip erase is done */
-+            /* Wait the time specified at CFI address 0x22. */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                      (NANOSECONDS_PER_SECOND * 5));
-+                      (1ULL << pfl->cfi_table[0x22]) * SCALE_MS);
-             break;
-         case 0x30:
-             /* Sector erase */
--- 
-2.20.1 (Apple Git-117)
+Hi Igor
 
 
+On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Sun,  7 Apr 2019 22:19:05 -0400
+> Catherine Ho <catherine.hecx@gmail.com> wrote:
+>
+> > Currently it is not forbidden to use "-object
+> memory-backend-file,share=on"
+> > and together with "-incoming". But after incoming migration is finished,
+> > the memory-backend-file will be definitely written if share=on. So the
+> > memory-backend-file can only be used once, but failed in the 2nd time
+> > incoming.
+> >
+> > Thus it gives a warning and the users can run the qemu if they really
+> > want to do it.
+>
+> Shouldn't we add a migration blocker in such a case instead of warning
+> and letting qemu run wild?
+>
+
+IMO, it doesn't need to block this. With share=on and -incoming, the user
+can
+still save the device memory state into memory-backend file again if
+ignore-shared
+capability is on.
+
+If we block this, the user can't use the ignore-shared capability in
+incoming
+migration.
+
+B.R.
+Catherine
+
+>
+>
+> > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> > ---
+> >  backends/hostmem-file.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >
+> > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > index 37ac6445d2..59429ee0b4 100644
+> > --- a/backends/hostmem-file.c
+> > +++ b/backends/hostmem-file.c
+> > @@ -16,6 +16,7 @@
+> >  #include "sysemu/hostmem.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "qom/object_interfaces.h"
+> > +#include "migration/migration.h"
+> >
+> >  /* hostmem-file.c */
+> >  /**
+> > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
+> Error **errp)
+> >          }
+> >      }
+> >
+> > +    /*
+> > +     * In ignore shared case, if share=on for host memory backend file,
+> > +     * the ram might be written after incoming process is finished. Thus
+> > +     * the memory backend can't be reused for 2nd/3rd... incoming
+> > +     */
+> > +    if (backend->share && migrate_ignore_shared()
+> > +                       && runstate_check(RUN_STATE_INMIGRATE))
+> > +        warn_report("share=on for memory backend file might be "
+> > +                        "conflicted with incoming in ignore shared
+> case");
+> > +
+> >      backend->force_prealloc = mem_prealloc;
+> >      name = host_memory_backend_get_name(backend);
+> >      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>
+>
