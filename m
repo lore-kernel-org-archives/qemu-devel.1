@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59294)
+Received: from eggs.gnu.org ([209.51.188.92]:59286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWm-0004ab-LB
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWm-0004a9-4s
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWl-0003W8-Nm
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWk-0003VE-V7
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:16 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41959)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37291)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hDtWl-0003V7-Hm
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:15 -0400
-Received: by mail-wr1-x434.google.com with SMTP id r4so21688793wrq.8
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:15 -0700 (PDT)
+	id 1hDtWk-0003UF-Kr
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:14 -0400
+Received: by mail-wr1-x444.google.com with SMTP id w10so21725274wrm.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:14 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  9 Apr 2019 18:23:05 +0200
-Message-Id: <1554826986-37164-5-git-send-email-pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 18:23:04 +0200
+Message-Id: <1554826986-37164-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 References: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] hw/i386/pc: Fix crash when hot-plugging
- nvdimm on older machine types
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 3/5] include/qemu/bswap.h: Use
+ __builtin_memcpy() in accessor functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +32,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-QEMU currently crashes when you try to hot-plug an "nvdimm" device
-on older machine types:
+In the accessor functions ld*_he_p() and st*_he_p() we use memcpy()
+to perform a load or store to a pointer which might not be aligned
+for the size of the type. We rely on the compiler to optimize this
+memcpy() into an efficient load or store instruction where possible.
+This is required for good performance, but at the moment it is also
+required for correct operation, because some users of these functions
+require that the access is atomic if the pointer is aligned, which
+will only be the case if the compiler has optimized out the memcpy().
+(The particular example where we discovered this is the virtio
+vring_avail_idx() which calls virtio_lduw_phys_cached() which
+eventually ends up calling lduw_he_p().)
 
-$ qemu-system-x86_64 -monitor stdio -M pc-1.1
-QEMU 3.1.92 monitor - type 'help' for more information
-(qemu) device_add nvdimm,id=nvdimmn1
-qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
- Assertion `*errp == ((void *)0)' failed.
-Aborted (core dumped)
+Unfortunately some compile environments, such as the fortify-source
+setup used in Alpine Linux, define memcpy() to a wrapper function
+in a way that inhibits this compiler optimization.
 
-The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
-added recently before the check whether nvdimm is enabled. It should
-be done after the check. And while we're at it, also check the errp
-after the hotplug_handler_pre_plug(), otherwise errors are silently
-ignored here.
+The correct long-term fix here is to add a set of functions for
+doing atomic accesses into AddressSpaces (and to other relevant
+families of accessor functions like the virtio_*_phys_cached()
+ones), and make sure that callsites which want atomic behaviour
+use the correct functions.
 
-Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190407092314.11066-1-thuth@redhat.com>
+In the meantime, switch to using __builtin_memcpy() in the
+bswap.h accessor functions. This will make us robust against things
+like this fortify library in the short term. In the longer term
+it will mean that we don't end up with these functions being really
+badly-performing even if the semantics of the out-of-line memcpy()
+are correct.
+
+Reported-by: Fernando Casas Schössow <casasfernando@outlook.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190318112938.8298-1-peter.maydell@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ include/qemu/bswap.h | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 6077d27..f2c15bf 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     const MachineState *ms = MACHINE(hotplug_dev);
-     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-     const uint64_t legacy_align = TARGET_PAGE_SIZE;
-+    Error *local_err = NULL;
- 
-     /*
-      * When -no-acpi is used with Q35 machine type, no ACPI is built,
-@@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
--
-     if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
-         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-         return;
-     }
- 
-+    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
-                      pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 5a70f78..2a9f3fe 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -316,51 +316,57 @@ static inline void stb_p(void *ptr, uint8_t v)
+     *(uint8_t *)ptr = v;
  }
+ 
+-/* Any compiler worth its salt will turn these memcpy into native unaligned
+-   operations.  Thus we don't need to play games with packed attributes, or
+-   inline byte-by-byte stores.  */
++/*
++ * Any compiler worth its salt will turn these memcpy into native unaligned
++ * operations.  Thus we don't need to play games with packed attributes, or
++ * inline byte-by-byte stores.
++ * Some compilation environments (eg some fortify-source implementations)
++ * may intercept memcpy() in a way that defeats the compiler optimization,
++ * though, so we use __builtin_memcpy() to give ourselves the best chance
++ * of good performance.
++ */
+ 
+ static inline int lduw_he_p(const void *ptr)
+ {
+     uint16_t r;
+-    memcpy(&r, ptr, sizeof(r));
++    __builtin_memcpy(&r, ptr, sizeof(r));
+     return r;
+ }
+ 
+ static inline int ldsw_he_p(const void *ptr)
+ {
+     int16_t r;
+-    memcpy(&r, ptr, sizeof(r));
++    __builtin_memcpy(&r, ptr, sizeof(r));
+     return r;
+ }
+ 
+ static inline void stw_he_p(void *ptr, uint16_t v)
+ {
+-    memcpy(ptr, &v, sizeof(v));
++    __builtin_memcpy(ptr, &v, sizeof(v));
+ }
+ 
+ static inline int ldl_he_p(const void *ptr)
+ {
+     int32_t r;
+-    memcpy(&r, ptr, sizeof(r));
++    __builtin_memcpy(&r, ptr, sizeof(r));
+     return r;
+ }
+ 
+ static inline void stl_he_p(void *ptr, uint32_t v)
+ {
+-    memcpy(ptr, &v, sizeof(v));
++    __builtin_memcpy(ptr, &v, sizeof(v));
+ }
+ 
+ static inline uint64_t ldq_he_p(const void *ptr)
+ {
+     uint64_t r;
+-    memcpy(&r, ptr, sizeof(r));
++    __builtin_memcpy(&r, ptr, sizeof(r));
+     return r;
+ }
+ 
+ static inline void stq_he_p(void *ptr, uint64_t v)
+ {
+-    memcpy(ptr, &v, sizeof(v));
++    __builtin_memcpy(ptr, &v, sizeof(v));
+ }
+ 
+ static inline int lduw_le_p(const void *ptr)
 -- 
 1.8.3.1
