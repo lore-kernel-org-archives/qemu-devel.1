@@ -2,79 +2,108 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4244EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71173C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07FFA20883
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:00:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FFA20883
+	by mail.kernel.org (Postfix) with ESMTPS id 3B7AD20883
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7AD20883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47806 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47827 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDvzC-0000E4-Uv
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:00:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35512)
+	id 1hDw1l-0001mx-D4
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:03:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDvyR-0008HK-LZ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:00:00 -0400
+	(envelope-from <david@redhat.com>) id 1hDw0P-000158-OP
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDvyQ-0001sU-NJ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:59:59 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDvyQ-0001sG-E7
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:59:58 -0400
-Received: by mail-wm1-f66.google.com with SMTP id r186so3035357wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 11:59:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=v8Z5Atrm3PvY0PAkr9OFzq3JY2sbuJ9EB3V5/Vfi83s=;
-	b=kInBZ36+IbQ24GPSQvu4frVNWQn/Sw9fLnpvdWEiO7njYQS38ezqBdGv+KQlqyEVbC
-	pnz7YFGZ8gTxddVqemWhPUfl9CmkjxsTF82Cwo//BQv8hgnv9Ov1LZ8otB8FjOwSLd4K
-	hjyKdfYpPbJykxBFte5zTwOMMid4bpPARU6aDq5x+SCSm67K52EMpvwZltBiDniNwnA+
-	ggH91i2exFbHTnxetwg/FpoCAnmCOq2AmgS7w4SLjjJeDaT7vaikmE40CJ7aPJ+UeKbD
-	g9Elia4CEgkGjpfVT8ropRhYLQyMDLKcIgAw8PVgWlFduMc34Hl20gw4SiW7SwimHZOV
-	LCQQ==
-X-Gm-Message-State: APjAAAXDBZR/jgsPzmyuLIfT6MN1wgY4iBDxidyhnA5OTEkCpmLotdCv
-	O2/57bT0Vn2LjU3K/H5XTr5LJQ==
-X-Google-Smtp-Source: APXvYqyea+EalMErLpzPQceJ3hm6sbNNQXaKMQ75koV4IxTgx3nkhBhflNpTIut5brNovMaFygjRNA==
-X-Received: by 2002:a1c:495:: with SMTP id 143mr21258405wme.78.1554836397491; 
-	Tue, 09 Apr 2019 11:59:57 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	h10sm58913060wrs.27.2019.04.09.11.59.56
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 11:59:56 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190409174018.25798-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f018f4d8-7fb2-9037-3b5a-b34f1c5d876d@redhat.com>
-Date: Tue, 9 Apr 2019 20:59:55 +0200
+	(envelope-from <david@redhat.com>) id 1hDw0O-0002hB-Qq
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hDw0O-0002e7-Ck
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E169318DF7C;
+	Tue,  9 Apr 2019 18:53:17 +0000 (UTC)
+Received: from [10.36.116.56] (ovpn-116-56.ams2.redhat.com [10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 358E54DA7B;
+	Tue,  9 Apr 2019 18:53:17 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190307144126.31847-1-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <be62e92e-de46-b3a5-9945-a410049d25d5@redhat.com>
+Date: Tue, 9 Apr 2019 20:53:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190409174018.25798-1-armbru@redhat.com>
+In-Reply-To: <20190307144126.31847-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Tue, 09 Apr 2019 18:53:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
- overflowing in load_device_tree()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,51 +115,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alistair.francis@wdc.com, slp@redhat.com,
-	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409185955.cwglbkISkZa_exo3Z1cVvvwZaEIKibLm6l0X8Mr7oPM@z>
+Message-ID: <20190409185316.I0RP1ieNiNryqgIW-qu0oh1SJuPnUYIPIqUSGYwZ1ww@z>
 
-On 4/9/19 7:40 PM, Markus Armbruster wrote:
-> If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
-> computation of @dt_size overflows to a negative number, which then
-> gets converted to a very large size_t for g_malloc0() and
-> load_image_size().  In the (fortunately improbable) case g_malloc0()
-> succeeds and load_image_size() survives, we'd assign the negative
-> number to *sizep.  What that would do to the callers I can't say, but
-> it's unlikely to be good.
-> 
-> Fix by rejecting images whose size would overflow.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  device_tree.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/device_tree.c b/device_tree.c
-> index 296278e12a..f8b46b3c73 100644
-> --- a/device_tree.c
-> +++ b/device_tree.c
-> @@ -84,6 +84,10 @@ void *load_device_tree(const char *filename_path, int *sizep)
->                       filename_path);
->          goto fail;
->      }
-> +    if (dt_size > INT_MAX / 2 - 10000) {
+On 07.03.19 15:41, Richard Henderson wrote:
+> The primary motivator here is usage within s390x,
+> but (as with any good primitive) the opcode has
+> applications outside that.
 
-We should avoid magic number duplication.
-That said, this patch looks safe.
+I am planning to send the next big part of vector instruction support
+(Vector Integer Instructions) soon, that would make use of these patches.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- 
 
-BTW how did you figure that out?
+Thanks,
 
-> +        error_report("Device tree file '%s' is too large", filename_path);
-> +        goto fail;
-> +    }
->  
->      /* Expand to 2x size to give enough room for manipulation.  */
->      dt_size += 10000;
-> 
+David / dhildenb
 
