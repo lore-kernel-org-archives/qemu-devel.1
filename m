@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59333)
+Received: from eggs.gnu.org ([209.51.188.92]:60635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDvgC-0002gm-7r
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:41:09 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDvli-0003le-Sc
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDvgB-00021d-3p
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:41:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDvgA-00020O-Ow
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:41:07 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3786C3078AB5
-	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 18:41:05 +0000 (UTC)
-Date: Tue, 9 Apr 2019 19:41:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190409184101.GF2964@work-vm>
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-16-armbru@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hDvlh-0004dX-E6
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:46:50 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDvlg-0004dR-Vu
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:46:49 -0400
+Received: by mail-wm1-f67.google.com with SMTP id z24so4546664wmi.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 11:46:48 -0700 (PDT)
+References: <1554827719-10184-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8fs_H-gwk251mCq1V2tOBF=Mr96e4FY0aePyCre-D9NA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0c2b0c36-26ce-b272-c304-89120c2de489@redhat.com>
+Date: Tue, 9 Apr 2019 20:46:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190408083627.7479-16-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 15/15] monitor: Simplify how
- -device/device_add print help
+In-Reply-To: <CAFEAcA8fs_H-gwk251mCq1V2tOBF=Mr96e4FY0aePyCre-D9NA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v3 0/5] Misc patches for QEMU 5.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,160 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Commit a95db58f210 added monitor_vfprintf() as an error_printf()
-> generalized from stderr to arbitrary streams, then used it wrapped in
-> helper out_printf() to print -device/device_add help to stdout.  Use
-> qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
+On 4/9/19 7:25 PM, Peter Maydell wrote:
+> On Tue, 9 Apr 2019 at 17:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit 248987f92cfda8305d6d44ced23e173e62a8bc0e:
+>>
+>>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-04-09 10:02:30 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to 3e20c81ed87cb15cd04f929b075e244e0758641a:
+>>
+>>   tests: Make check-block a phony target (2019-04-09 18:34:21 +0200)
+>>
+>> ----------------------------------------------------------------
+>> * fixes for Alpine and SuSE
+>> * fix crash when hot-plugging nvdimm on older machine types
+>>
 > 
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-(the 'monitor_vprintf vs monitor_vfprintf took a minute to notice)
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  include/monitor/monitor.h |  3 ---
->  monitor.c                 | 16 ++++------------
->  qdev-monitor.c            | 36 ++++++++++++++----------------------
->  3 files changed, 18 insertions(+), 37 deletions(-)
+> Applied, thanks.
 > 
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index e4c3717454..316a168c41 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
->  void monitor_fdset_dup_fd_remove(int dup_fd);
->  int monitor_fdset_dup_fd_find(int dup_fd);
->  
-> -int monitor_vfprintf(FILE *stream,
-> -                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-> -
->  #endif /* MONITOR_H */
-> diff --git a/monitor.c b/monitor.c
-> index 7b4a78d798..10be8bdb86 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
->      monitor_flush(opaque);
->  }
->  
-> -/*
-> - * Print to current monitor if we have one, else to stream.
-> - */
-> -int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
-> -{
-> -    if (cur_mon && !monitor_cur_is_qmp()) {
-> -        return monitor_vprintf(cur_mon, fmt, ap);
-> -    }
-> -    return vfprintf(stream, fmt, ap);
-> -}
-> -
->  /*
->   * Print to current monitor if we have one, else to stderr.
->   */
->  int error_vprintf(const char *fmt, va_list ap)
->  {
-> -    return monitor_vfprintf(stderr, fmt, ap);
-> +    if (cur_mon && !monitor_cur_is_qmp()) {
-> +        return monitor_vprintf(cur_mon, fmt, ap);
-> +    }
-> +    return vfprintf(stderr, fmt, ap);
->  }
->  
->  int error_vprintf_unless_qmp(const char *fmt, va_list ap)
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index d4320986a2..373b9ad445 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -31,6 +31,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "qemu/option.h"
-> +#include "qemu/qemu-print.h"
->  #include "sysemu/block-backend.h"
->  #include "migration/misc.h"
->  
-> @@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
->      return (qdev_class_get_alias(dc) != NULL);
->  }
->  
-> -static void out_printf(const char *fmt, ...)
-> -{
-> -    va_list ap;
-> -
-> -    va_start(ap, fmt);
-> -    monitor_vfprintf(stdout, fmt, ap);
-> -    va_end(ap);
-> -}
-> -
->  static void qdev_print_devinfo(DeviceClass *dc)
->  {
-> -    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-> +    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
->      if (dc->bus_type) {
-> -        out_printf(", bus %s", dc->bus_type);
-> +        qemu_printf(", bus %s", dc->bus_type);
->      }
->      if (qdev_class_has_alias(dc)) {
-> -        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-> +        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
->      }
->      if (dc->desc) {
-> -        out_printf(", desc \"%s\"", dc->desc);
-> +        qemu_printf(", desc \"%s\"", dc->desc);
->      }
->      if (!dc->user_creatable) {
-> -        out_printf(", no-user");
-> +        qemu_printf(", no-user");
->      }
-> -    out_printf("\n");
-> +    qemu_printf("\n");
->  }
->  
->  static void qdev_print_devinfos(bool show_no_user)
-> @@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
->                  continue;
->              }
->              if (!cat_printed) {
-> -                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-> +                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
->                  cat_printed = true;
->              }
->              qdev_print_devinfo(dc);
-> @@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
->      }
->  
->      if (prop_list) {
-> -        out_printf("%s options:\n", driver);
-> +        qemu_printf("%s options:\n", driver);
->      } else {
-> -        out_printf("There are no options for %s.\n", driver);
-> +        qemu_printf("There are no options for %s.\n", driver);
->      }
->      for (prop = prop_list; prop; prop = prop->next) {
->          int len;
-> -        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-> +        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
->          if (prop->value->has_description) {
->              if (len < 24) {
-> -                out_printf("%*s", 24 - len, "");
-> +                qemu_printf("%*s", 24 - len, "");
->              }
-> -            out_printf(" - %s\n", prop->value->description);
-> +            qemu_printf(" - %s\n", prop->value->description);
->          } else {
-> -            out_printf("\n");
-> +            qemu_printf("\n");
->          }
->      }
->  
-> -- 
-> 2.17.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> for any user-visible changes.
+
+The subject says 5.0 <:O) Hopefully Peter applied it for 4.0 :)
+
+Thanks both for this PR,
+
+Phil.
