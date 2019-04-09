@@ -2,85 +2,109 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8788DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E6EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:04:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 482F42084C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:52:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cse.mrt.ac.lk header.i=@cse.mrt.ac.lk header.b="XCQH+Zi7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 482F42084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cse.mrt.ac.lk
+	by mail.kernel.org (Postfix) with ESMTPS id 8BDDE20850
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:04:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BDDE20850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46453 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46559 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtz1-0005Vi-KO
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:52:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39264)
+	id 1hDuAI-0000hn-NH
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 13:04:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDtyD-0005CY-1U
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:51:38 -0400
+	(envelope-from <sw@weilnetz.de>) id 1hDu9K-0000IV-6A
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDtyB-0005Z1-Fa
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:51:37 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hDtyB-0005YL-5P
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:51:35 -0400
-Received: by mail-wm1-x342.google.com with SMTP id h18so4158265wml.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:51:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=cse.mrt.ac.lk; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=utSakDnHBza1vNblMwJKHIgfAMO7KSjE6Rsldr6W6FI=;
-	b=XCQH+Zi754WhJRYYXAbgDQ0AHwP+Vp2W2MzUyQwj83UzDaoLfJ7y0MlYgMqQT2DmZw
-	kbYF1OHAqIaoUVlZeu/qbJBopbGO/sOnmNGZofV/tUXOUaSgQL8oVlUII4sgLFxQVHUb
-	6gPUOud9yOHy//FUqrl44cVG3GjBMNofJBfSDHKZn9LbD6lJw3FWMAjOEZYDa3zsT/Wj
-	ZvBpx6slExRsr5bvsMObOiEywslZLNwX+my70pFqg+cltsWaXGGxHenIYPrhFmH4TT54
-	8f90v3C052/tPrR6o//D/F83M1bPUop6UX03b/O9lGiLjWIwDBL1L4wzKn1p0BS6Tik8
-	wNXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=utSakDnHBza1vNblMwJKHIgfAMO7KSjE6Rsldr6W6FI=;
-	b=YXiohvDSCsp8NXcutACjfk6QimJh0r2VyHlAYl0J/v4A2B0DfHzGW88wCpO0GyDc+V
-	gvMrZ+oR3ZlFZhbvflgLLhUUEwzBoRT0zGISgl0p9Uepj8jPzifiYP2C+ncPnSDO+IHS
-	DLn25KkIlVqiHYMLb916eWJFLmSrj+6DS00JzRKUSqmX9Zga3L6fXNLo33PBI85OjKtm
-	XDM4C11FBy9d0rxfymigdAgaXzvdkmP3MiNHB+xapuoUFuHqVLBQ4wRBxbiLms4VAkND
-	C+sAhT8M/IMvvjFtkAPRmUXiH4QkkFbTalsEdlm4uniz8/9/0oll1IxNsPg6JkUGu30R
-	+nMw==
-X-Gm-Message-State: APjAAAU5Y5VIfx8fa1g2H3VCDZ6B2k14Z6wFQTTQ7Qr8a/gBxP1e+wGJ
-	3sEHrzwPBQ4hx5JNuzR3lnkWa4gfkgN4ASuy5jCL8w==
-X-Google-Smtp-Source: APXvYqwzXqLHGXFHthBSyJrvCMa71/7f0S52R8kCUVtkD9+DJBBlRDLy9fM9ilx6Zfmgv5cVCMamf84PiNrDhjOSWrY=
-X-Received: by 2002:a7b:c14c:: with SMTP id z12mr21551844wmi.138.1554828693167;
-	Tue, 09 Apr 2019 09:51:33 -0700 (PDT)
+	(envelope-from <sw@weilnetz.de>) id 1hDu9J-0003lx-9b
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:03:06 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:33178
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <sw@weilnetz.de>)
+	id 1hDu9I-0003lP-Ru; Tue, 09 Apr 2019 13:03:05 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id 154ADDB604C;
+	Tue,  9 Apr 2019 18:53:16 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024)
+	with ESMTP id U4nFqNI43RFm; Tue,  9 Apr 2019 18:53:15 +0200 (CEST)
+Received: from [192.168.178.24] (p57B42B4A.dip0.t-ipconnect.de [87.180.43.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128
+	bits)) (No client certificate requested)
+	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 4BC0CDAB19E; 
+	Tue,  9 Apr 2019 18:53:15 +0200 (CEST)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+	qemu-trivial@nongnu.org
+References: <20190409060435.22801-1-sw@weilnetz.de>
+	<4a16a810-9806-3a76-7d17-1b6282296502@linaro.org>
+From: Stefan Weil <sw@weilnetz.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <69be6fec-e9b5-d72b-d626-cf3d4b9f3720@weilnetz.de>
+Date: Tue, 9 Apr 2019 18:53:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
-	<CAFEAcA-k0KEsjb0VvbhhkpvTN7nFBDNtqKwx-Lai5uYbCkztJA@mail.gmail.com>
-	<CAH95U0j6rHGdZj4B8DK-Ty-SqZHMb3Kmg16w+j3jx5bdkeijLQ@mail.gmail.com>
-	<CAFEAcA9DSaZE-dsKV4321meT2hBEJRLmWBLF0U5o0jG=mzcmRA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9DSaZE-dsKV4321meT2hBEJRLmWBLF0U5o0jG=mzcmRA@mail.gmail.com>
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Tue, 9 Apr 2019 22:21:21 +0530
-Message-ID:
- <CAH95U0jVP2SXr9+t+NQ4xoWODMJgMxpSgdMM4RiTSKcEX9v6ZQ@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <4a16a810-9806-3a76-7d17-1b6282296502@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/4] Header cleanups
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 37.120.169.71
+Subject: Re: [Qemu-devel] [PATCH] tci: Fix some unaligned memory accesses
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,82 +116,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409165121.n61dFKDXeoJAnEdfGfgOeZ4SVwJowywSm5RL0hMjd14@z>
+Message-ID: <20190409165315.qAwoQNaykJ1XxZpFoPX-wwwhukpJU6JXColfLl6Yiws@z>
 
-Ok, thanks
+On 09.04.19 08:58, Richard Henderson wrote:
+> On 4/8/19 8:04 PM, Stefan Weil wrote:
+>>  static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
+>>  {
+>> -    tcg_target_ulong value =3D *(tcg_target_ulong *)(*tb_ptr);
+>> +    tcg_target_ulong value;
+>=20
+> Ideally these would use the helpers from "qemu/bswap.h", ldl_he_p(), et=
+c.
+>=20
+> r~
 
-On Tue, Apr 9, 2019 at 10:20 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
 
-> On Tue, 9 Apr 2019 at 17:42, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> wrote:
-> >
-> > Yeah this is a stand alone patch.
->
-> OK, thanks -- just wanted to check there wasn't a missing
-> bit. I think this could go in via the qemu-trivial tree
-> so I have cc'd them.
->
-> We're in the middle of a release at the moment, but we
-> should reopen for development in a couple of weeks. If
-> this patch still hasn't gone anywhere by a week or so after
-> that then please follow up with a 'ping' to check it hasn't
-> been forgotten by accident.
->
-> > On Tue, Apr 9, 2019 at 10:10 PM, Peter Maydell <peter.maydell@linaro.or=
-g>
-> wrote:
-> >> On Tue, 9 Apr 2019 at 16:58, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> wrote:
-> >> >
-> >> > Removed unwanted includes from cpu-common.h
-> >> > This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
-> >> >
-> >> > Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> >> >
-> >> > ---
-> >> >  include/exec/cpu-common.h | 2 --
-> >> >  1 file changed, 2 deletions(-)
-> >> >
-> >> > diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> >> > index cef8b88a2a..a3594f3f50 100644
-> >> > --- a/include/exec/cpu-common.h
-> >> > +++ b/include/exec/cpu-common.h
-> >> > @@ -7,8 +7,6 @@
-> >> >  #include "exec/hwaddr.h"
-> >> >  #endif
-> >> >
-> >> > -#include "qemu/bswap.h"
-> >> > -#include "qemu/queue.h"
-> >> >  #include "qemu/fprintf-fn.h"
-> >> >
-> >>
-> >> I was surprised that no .c files are implicitly relying
-> >> on these includes, but apparently none are, so we can
-> >> safely remove them.
-> >>
-> >> A couple of notes:
-> >>  * this doesn't need to go to qemu-stable as it's just a
-> >>    code cleanup
-> >>  * did something go wrong with your sending of this patch?
-> >>    Its subject is "PATCH 0/4" which would usually indicate
-> >>    a cover letter for a four-patch series, but this seems
-> >>    to be a stand-alone patch.
-> >>
-> >> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->
-> thanks
-> -- PMM
->
---=20
-*Aruna* Jayasena
-Embedded Systems and Computer Science Engineering Undergraduate
-University of Moratuwa
-*=E2=9C=86 **+94719872152 *
-=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-<https://www.linkedin.com/in/arunajayasena/>
+
+That would require adding a helper for tcg_target_ulong to qemu/bswap.h.
+Or tci.c would need conditional code for reading a tcg_target_ulong.
+
+Those helpers in qemu/bswap.h are also a little bit strange:
+
+- Why does lduw_he_p return an int instead of an uint16_t?
+- Why does ldsw_he_p return an int instead of an int16_t?
+- Why does ldl_he_p return an int instead of an int32_t?
+- Should ldl_he_p be renamed into ldsl_he_p?
+  And why is ldul_he_p missing?
+- Should ldq_he_p be renamed into lduq_he_p?
+  And why is ldsq_he_p missing?
+
+Using the helpers might require nasty type casts to avoid compiler
+warnings because of signed / unsigned and size mismatches.
+
+Aren't the few memcpy statements in the TCI helpers much more direct and
+understandable?
+
+Regards
+Stefan
+
