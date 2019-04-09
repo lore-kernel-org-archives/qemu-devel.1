@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69556C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466C3C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:08:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 236AE213F2
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2903213F2
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 02:08:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="PLz7imhM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 236AE213F2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="eMBnnSDy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2903213F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33781 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33789 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDgAc-0006CB-C4
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 22:07:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45001)
+	id 1hDgBZ-0006wz-6j
+	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 22:08:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg6M-0002eT-8c
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:08 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg7C-0003MJ-HG
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:04:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg6K-00064p-DB
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:06 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:54154)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDg78-0006nU-Ba
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:58 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:37204)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDg6K-00062G-1r
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:04 -0400
-Received: by mail-it1-x143.google.com with SMTP id y204so2414174itf.3
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 19:03:02 -0700 (PDT)
+	id 1hDg71-0006lZ-0H
+	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 22:03:50 -0400
+Received: by mail-it1-x143.google.com with SMTP id u65so2453461itc.2
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 19:03:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=Jv0E8JtBAEhamTwvz2jAbN/sxL4NNiW4E2UIqBfaHx8=;
-	b=PLz7imhMWO43YkSNeB152fRVhExWJz1SlhztB/WYH9sLehfcTDiWDtdevDr9nCkm+E
-	/4gKXAMX9h0OxAe2GWLeHKsRMUj5u87ixwuB6XgyceKa9LFrXzbl35bbzQ3MfFIl+UyQ
-	JDw0b7dsoCrSd5ZOeznBdpM6sC2pryfhs0OOW4fg4HyYhuM/iQ0eWuy7/1NDMY2PMASv
-	XM+zAPFgrNbc3uf9uRFBQoqZtN+UCbxG/rfVN8fdFYQLuRpeA7OaeZRReQkbdVSZVaLi
-	mLw4vfV3RWcMm0FfpKqOmGvGa63R23Ti3V65k0sBd16EEFq90N9JWsoCLk+7KHfpNTCT
-	0DAQ==
+	bh=lIiXW4UXH6WJ+mTbFcqutdCLrvr7P5sHBkgFjvabVo8=;
+	b=eMBnnSDyuHkbpMtJCzOJtgxmja+Qb08x8QshZ5WYRuhdRiHMntAOzSdYI14Cr7vDNZ
+	yZ2A7l87jD6Mf7ITIHFNFgQBQ0F3EZRLI0LHCtujbMdqTG40vJklEHx+D1lruLadlq9U
+	D50+yr22W70JrYaThuHRkF6/JFYOMWCWDldRGSxETX7cwtogVRxQrvWoEXmUtlvb7dow
+	aQc64zATN5Tbdsuma4VcL0EVRFD0lYls+iXhideWnsIdxoSuuTQs+5SsP8laoyzJJvkL
+	+NP8PJ1U6OTOFQYmSR/jEHcAOkPTKjJjZ7qZ3LALUhB1eTL+d79lTQVEWUDvMXGM9fvy
+	F1mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Jv0E8JtBAEhamTwvz2jAbN/sxL4NNiW4E2UIqBfaHx8=;
-	b=gKwDo9wlIZPfnvTZVQyaUsx69CWAyRjCjOl2MYMt0Ek13KUoBxrJm7/iXzuawsuoch
-	dNCeT/sCI+SfG6e6fm0mUf0snXBxhf4V+08J5P3ym96pYSdwcwa/Pu208652P5ke10A3
-	PU+B5/moUDRG2NYA5CheCs8fWVIkoIaVYrzBklTQ+w92dgegLtxc3aDSSM06ZvOCtwkv
-	z3S06xaukajATl/z8thpMcRR7D7ny1tOUA4V+zeg+gBPZWohVnllS1JNM1wJawWEul5P
-	Vlb9cKNST1C5YH4x/pi0PrYyI97+BDnGqp2QyO5QAK3mQJCl7GlZ2xY+AQkiqr3nTBjX
-	DiAA==
-X-Gm-Message-State: APjAAAVFFjoQiRPUXCMcag59wD0hN/ffFsFdctgozhqo8hiZsUtGPRqN
-	a4r60d+oywn5hti1huZWo7wqAwbzHx3QXg==
-X-Google-Smtp-Source: APXvYqwsK+JwIFOuHEbPH/VrnVfuoJ9Z1ViqXCipHg5KZHLoESl7diSmAZpAqYKNkQft+o8T90e4dw==
-X-Received: by 2002:a24:13c7:: with SMTP id 190mr24680006itz.9.1554775381273; 
-	Mon, 08 Apr 2019 19:03:01 -0700 (PDT)
+	bh=lIiXW4UXH6WJ+mTbFcqutdCLrvr7P5sHBkgFjvabVo8=;
+	b=jt/132tW8uP7gQnjFZGgEDg2Vq1uwx2cdKBgaK0TSYAYD1aDX0kN6rCnlZKd3eZgGH
+	n+GQFtjRDOwo3G9jve+OzfajOd7jRr/emRSYkO0yuVU/my9DO2J9ieWCYQLts6PT19+x
+	k7JxEKm3E258meEP+jLT0juwCNgXSfO8OKOHBAyfctPYwyQx8JAvxfz+LHPzhLz44ezo
+	ZZEMgphDkSms23RHA5froQClYGRlUL39zH6aMmB57TDZu/ipD41Ukq+K+MkmhdkSLjG7
+	6rElb8Pea3PGm9/vsEj1XPFT65g4Du2/T4sIZ24iEtryDdXt20xteswQwthlNkxXM4mA
+	pMJg==
+X-Gm-Message-State: APjAAAVkHbWVYCmO0+/k1GmGVYra3MgqfkprGT/hf77TC9t92ixTk80I
+	kkEc4/30FX6kcMV1c2FXtuzkas3QZGoIuA==
+X-Google-Smtp-Source: APXvYqwApX96EXJqGgtDNCJfQanO96ZDLoI2Pkx0L0FaESek9loUVVBeTkKeFfXcBaY6lftQwGAESg==
+X-Received: by 2002:a24:6fc7:: with SMTP id x190mr20450257itb.46.1554775425641;
+	Mon, 08 Apr 2019 19:03:45 -0700 (PDT)
 Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
 	by smtp.gmail.com with ESMTPSA id
-	y203sm5969838itb.22.2019.04.08.19.03.00
+	y203sm5969838itb.22.2019.04.08.19.03.44
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 08 Apr 2019 19:03:00 -0700 (PDT)
+	Mon, 08 Apr 2019 19:03:45 -0700 (PDT)
 From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 To: qemu-devel@nongnu.org
-Date: Mon,  8 Apr 2019 22:01:25 -0400
+Date: Mon,  8 Apr 2019 22:01:32 -0400
 Message-Id:
- <78f69544e043ef8895319d24f73ac966af9451c3.1554774454.git.stephen.checkoway@oberlin.edu>
+ <9e06ebcf01f74d93218880bf0d1fae9bf824716d.1554774454.git.stephen.checkoway@oberlin.edu>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <cover.1554774454.git.stephen.checkoway@oberlin.edu>
 References: <cover.1554774454.git.stephen.checkoway@oberlin.edu>
@@ -82,8 +83,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::143
-Subject: [Qemu-devel] [PATCH v2 02/10] block/pflash_cfi02: Refactor,
- NFC intended
+Subject: [Qemu-devel] [PATCH v2 08/10] block/pflash_cfi02: Implement
+ multi-sector erase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,387 +96,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
 	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409020125.94KfQe_vip8LnMyPlT9PLZ3srbIRNLiX0AUEpjIY-VY@z>
+Message-ID: <20190409020132.z9XXiz2gkiYJpBpZIh9Yx8ZRb-7YWaHOID23e3XS-Ss@z>
 
-Simplify and refactor for upcoming commits. In particular, pull out all
-of the code to modify the status into simple helper functions. Status
-handling becomes more complex once multiple chips are interleaved to
-produce a single device.
-
-No change in functionality is intended with this commit.
+After two unlock cycles and a sector erase command, the AMD flash chips
+start a 50 us erase time out. Any additional sector erase commands add a
+sector to be erased and restart the 50 us timeout. During the timeout,
+status bit DQ3 is cleared. After the time out, DQ3 is asserted during
+erasure.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 ---
- hw/block/pflash_cfi02.c | 221 +++++++++++++++++-----------------------
- 1 file changed, 95 insertions(+), 126 deletions(-)
+ hw/block/pflash_cfi02.c   | 94 +++++++++++++++++++++++++++++++--------
+ tests/pflash-cfi02-test.c | 59 ++++++++++++++++++++++--
+ 2 files changed, 131 insertions(+), 22 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index f2c6201f81..4b7af71806 100644
+index cb1160eb35..21ceb0823b 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -46,18 +46,19 @@
- #include "hw/sysbus.h"
- #include "trace.h"
+@@ -30,7 +30,6 @@
+  *
+  * It does not implement software data protection as found in many real chips
+  * It does not implement erase suspend/resume commands
+- * It does not implement multiple sectors erase
+  */
  
--//#define PFLASH_DEBUG
--#ifdef PFLASH_DEBUG
-+#define PFLASH_DEBUG false
- #define DPRINTF(fmt, ...)                                  \
- do {                                                       \
--    fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
-+    if (PFLASH_DEBUG) {                                    \
-+        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
-+    }                                                      \
- } while (0)
--#else
--#define DPRINTF(fmt, ...) do { } while (0)
--#endif
- 
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
- 
-+/* Special write cycle for CFI queries. */
-+#define WCYCLE_CFI 7
-+
- struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -97,6 +98,31 @@ struct PFlashCFI02 {
+ #include "qemu/osdep.h"
+@@ -106,6 +105,7 @@ struct PFlashCFI02 {
+     MemoryRegion orig_mem;
+     int rom_mode;
+     int read_counter; /* used for lazy switch-back to rom mode */
++    int sectors_to_erase;
+     char *name;
      void *storage;
  };
+@@ -136,6 +136,22 @@ static inline void toggle_dq6(PFlashCFI02 *pfl)
+     pfl->status ^= pfl->interleave_multiplier * 0x40;
+ }
  
 +/*
-+ * Toggle status bit DQ7.
++ * Turn on DQ3.
 + */
-+static inline void toggle_dq7(PFlashCFI02 *pfl)
++static inline void assert_dq3(PFlashCFI02 *pfl)
 +{
-+    pfl->status ^= 0x80;
++    pfl->status |= pfl->interleave_multiplier * 0x08;
 +}
 +
 +/*
-+ * Set status bit DQ7 to bit 7 of value.
++ * Turn off DQ3.
 + */
-+static inline void set_dq7(PFlashCFI02 *pfl, uint8_t value)
++static inline void reset_dq3(PFlashCFI02 *pfl)
 +{
-+    pfl->status &= 0x7F;
-+    pfl->status |= value & 0x80;
-+}
-+
-+/*
-+ * Toggle status bit DQ6.
-+ */
-+static inline void toggle_dq6(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^= 0x40;
++    pfl->status &= ~(pfl->interleave_multiplier * 0x08);
 +}
 +
  /*
   * Set up replicated mappings of the same region.
   */
-@@ -126,7 +152,7 @@ static void pflash_timer (void *opaque)
+@@ -159,11 +175,37 @@ static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
+     pfl->rom_mode = rom_mode;
+ }
+ 
+-static void pflash_timer (void *opaque)
++static void pflash_timer(void *opaque)
+ {
+     PFlashCFI02 *pfl = opaque;
  
      trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
--    pfl->status ^= 0x80;
-+    toggle_dq7(pfl);
-     if (pfl->bypass) {
-         pfl->wcycle = 2;
-     } else {
-@@ -136,12 +162,34 @@ static void pflash_timer (void *opaque)
-     pfl->cmd = 0;
- }
- 
--static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
--                            int width, int be)
-+/*
-+ * Read data from flash.
-+ */
-+static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
-+                                 unsigned int width)
- {
-+    uint8_t *p = (uint8_t *)pfl->storage + offset;
-+    uint64_t ret = pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
-+    /* XXX: Need a trace_pflash_data_read(offset, ret, width) */
-+    switch (width) {
-+    case 1:
-+        trace_pflash_data_read8(offset, ret);
-+        break;
-+    case 2:
-+        trace_pflash_data_read16(offset, ret);
-+        break;
-+    case 4:
-+        trace_pflash_data_read32(offset, ret);
-+        break;
++    if (pfl->cmd == 0x30) {
++        /*
++         * Sector erase. If DQ3 is 0 when the timer expires, then the 50
++         * us erase timeout has expired so we need to start the timer for the
++         * sector erase algorithm. Otherwise, the erase completed and we should
++         * go back to read array mode.
++         */
++        if ((pfl->status & 0x08) == 0) {
++            assert_dq3(pfl);
++            /*
++             * CFI address 0x21 is "Typical timeout per individual block erase
++             * 2^N ms"
++             */
++            uint64_t timeout = ((1ULL << pfl->cfi_table[0x21]) *
++                                pfl->sectors_to_erase) * 1000000;
++            timer_mod(&pfl->timer,
++                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + timeout);
++            DPRINTF("%s: erase timeout fired; erasing %d sectors\n",
++                    __func__, pfl->sectors_to_erase);
++            return;
++        }
++        DPRINTF("%s: sector erase complete\n", __func__);
++        pfl->sectors_to_erase = 0;
++        reset_dq3(pfl);
 +    }
-+    return ret;
-+}
 +
-+static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-+{
-+    PFlashCFI02 *pfl = opaque;
-     hwaddr boff;
--    uint32_t ret;
--    uint8_t *p;
-+    uint64_t ret;
- 
-     ret = -1;
-     trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-@@ -166,39 +214,8 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-     case 0x80:
-         /* We accept reads during second unlock sequence... */
-     case 0x00:
--    flash_read:
-         /* Flash area read */
--        p = pfl->storage;
--        switch (width) {
--        case 1:
--            ret = p[offset];
--            trace_pflash_data_read8(offset, ret);
--            break;
--        case 2:
--            if (be) {
--                ret = p[offset] << 8;
--                ret |= p[offset + 1];
--            } else {
--                ret = p[offset];
--                ret |= p[offset + 1] << 8;
--            }
--            trace_pflash_data_read16(offset, ret);
--            break;
--        case 4:
--            if (be) {
--                ret = p[offset] << 24;
--                ret |= p[offset + 1] << 16;
--                ret |= p[offset + 2] << 8;
--                ret |= p[offset + 3];
--            } else {
--                ret = p[offset];
--                ret |= p[offset + 1] << 8;
--                ret |= p[offset + 2] << 16;
--                ret |= p[offset + 3] << 24;
--            }
--            trace_pflash_data_read32(offset, ret);
--            break;
--        }
-+        ret = pflash_data_read(pfl, offset, width);
-         break;
-     case 0x90:
-         /* flash ID read */
-@@ -213,23 +230,23 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-         case 0x0E:
-         case 0x0F:
-             ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
--            if (ret == (uint8_t)-1) {
--                goto flash_read;
-+            if (ret != (uint8_t)-1) {
-+                break;
-             }
--            break;
-+            /* Fall through to data read. */
-         default:
--            goto flash_read;
-+            ret = pflash_data_read(pfl, offset, width);
-         }
--        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
-+        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
-         break;
-     case 0xA0:
-     case 0x10:
-     case 0x30:
-         /* Status register read */
-         ret = pfl->status;
--        DPRINTF("%s: status %x\n", __func__, ret);
-+        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-         /* Toggle bit 6 */
--        pfl->status ^= 0x40;
-+        toggle_dq6(pfl);
-         break;
-     case 0x98:
-         /* CFI query mode */
-@@ -245,8 +262,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
- }
- 
- /* update flash content on disk */
--static void pflash_update(PFlashCFI02 *pfl, int offset,
--                          int size)
-+static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
- {
-     int offset_end;
-     if (pfl->blk) {
-@@ -259,9 +275,10 @@ static void pflash_update(PFlashCFI02 *pfl, int offset,
+     /* Reset flash */
+     toggle_dq7(pfl);
+     if (pfl->bypass) {
+@@ -307,13 +349,30 @@ static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
      }
  }
  
--static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
--                         uint32_t value, int width, int be)
-+static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-+                         unsigned int width)
++static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
++{
++    uint64_t sector_len = pflash_sector_len(pfl, offset);
++    offset &= ~(sector_len - 1);
++    DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
++            __func__, pfl->bank_width * 2, offset,
++            pfl->bank_width * 2, offset + sector_len - 1);
++    if (!pfl->ro) {
++        uint8_t *p = pfl->storage;
++        memset(p + offset, 0xFF, sector_len);
++        pflash_update(pfl, offset, sector_len);
++    }
++    set_dq7(pfl, 0x00);
++    ++pfl->sectors_to_erase;
++    /* Set (or reset) the 50 us timer for additional erase commands.  */
++    timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 50000);
++}
++
+ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+                          unsigned int width)
  {
-+    PFlashCFI02 *pfl = opaque;
-     hwaddr boff;
+     PFlashCFI02 *pfl = opaque;
      uint8_t *p;
      uint8_t cmd;
-@@ -277,7 +294,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-     trace_pflash_write(offset, value, width, pfl->wcycle);
-     offset &= pfl->chip_len - 1;
+-    uint32_t sector_len;
  
--    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
-+    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n", __func__,
-             offset, value, width);
-     boff = offset & (pfl->sector_len - 1);
-     if (pfl->width == 2)
-@@ -295,7 +312,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-         if (boff == 0x55 && cmd == 0x98) {
-         enter_CFI_mode:
-             /* Enter CFI query mode */
--            pfl->wcycle = 7;
-+            pfl->wcycle = WCYCLE_CFI;
-             pfl->cmd = 0x98;
-             return;
-         }
-@@ -345,40 +362,22 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-             goto check_unlock0;
-         case 0xA0:
-             trace_pflash_data_write(offset, value, width, 0);
+     cmd = value;
+     if (pfl->cmd != 0xA0) {
+@@ -486,20 +545,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+             break;
+         case 0x30:
+             /* Sector erase */
 -            p = pfl->storage;
-             if (!pfl->ro) {
--                switch (width) {
--                case 1:
--                    p[offset] &= value;
--                    pflash_update(pfl, offset, 1);
--                    break;
--                case 2:
--                    if (be) {
--                        p[offset] &= value >> 8;
--                        p[offset + 1] &= value;
--                    } else {
--                        p[offset] &= value;
--                        p[offset + 1] &= value >> 8;
--                    }
--                    pflash_update(pfl, offset, 2);
--                    break;
--                case 4:
--                    if (be) {
--                        p[offset] &= value >> 24;
--                        p[offset + 1] &= value >> 16;
--                        p[offset + 2] &= value >> 8;
--                        p[offset + 3] &= value;
--                    } else {
--                        p[offset] &= value;
--                        p[offset + 1] &= value >> 8;
--                        p[offset + 2] &= value >> 16;
--                        p[offset + 3] &= value >> 24;
--                    }
--                    pflash_update(pfl, offset, 4);
--                    break;
-+                p = (uint8_t *)pfl->storage + offset;
-+                if (pfl->be) {
-+                    uint64_t current = ldn_be_p(p, width);
-+                    stn_be_p(p, width, current & value);
-+                } else {
-+                    uint64_t current = ldn_le_p(p, width);
-+                    stn_le_p(p, width, current & value);
-                 }
-+                pflash_update(pfl, offset, width);
-             }
--            pfl->status = 0x00 | ~(value & 0x80);
+-            sector_len = pflash_sector_len(pfl, offset);
+-            offset &= ~(sector_len - 1);
+-            DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
+-                    __func__, pfl->bank_width * 2, offset,
+-                    pfl->bank_width * 2, offset + sector_len - 1);
+-            if (!pfl->ro) {
+-                memset(p + offset, 0xFF, sector_len);
+-                pflash_update(pfl, offset, sector_len);
+-            }
+-            set_dq7(pfl, 0x00);
+-            /* Let's wait 1/2 second before sector erase is done */
+-            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-                      (NANOSECONDS_PER_SECOND / 2));
++            pflash_sector_erase(pfl, offset);
+             break;
+         default:
+             DPRINTF("%s: invalid command %02x (wc 5)\n", __func__, cmd);
+@@ -513,7 +559,19 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+             /* Ignore writes during chip erase */
+             return;
+         case 0x30:
+-            /* Ignore writes during sector erase */
 +            /*
-+             * While programming, status bit DQ7 should hold the opposite
-+             * value from how it was programmed.
++             * If DQ3 is 0, additional sector erase commands can be
++             * written and anything else (other than an erase suspend) resets
++             * the device.
 +             */
-+            set_dq7(pfl, ~value);
-             /* Let's pretend write is immediate */
-             if (pfl->bypass)
-                 goto do_bypass;
-@@ -426,7 +425,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-                 memset(pfl->storage, 0xFF, pfl->chip_len);
-                 pflash_update(pfl, 0, pfl->chip_len);
-             }
--            pfl->status = 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 5 seconds before chip erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND * 5));
-@@ -441,7 +440,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-                 memset(p + offset, 0xFF, pfl->sector_len);
-                 pflash_update(pfl, offset, pfl->sector_len);
-             }
--            pfl->status = 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 1/2 second before sector erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                       (NANOSECONDS_PER_SECOND / 2));
-@@ -467,7 +466,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-             goto reset_flash;
-         }
-         break;
--    case 7: /* Special value for CFI queries */
-+    case WCYCLE_CFI: /* Special value for CFI queries */
-         DPRINTF("%s: invalid write in CFI query mode\n", __func__);
-         goto reset_flash;
-     default:
-@@ -492,39 +491,9 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-     pfl->cmd = 0;
++            if ((pfl->status & 0x08) == 0) {
++                if (cmd == 0x30) {
++                    pflash_sector_erase(pfl, offset);
++                } else {
++                    goto reset_flash;
++                }
++            }
++            /* Ignore writes during the actual erase. */
+             return;
+         default:
+             /* Should never happen */
+diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
+index ae1cd4e54b..1cd9807c1b 100644
+--- a/tests/pflash-cfi02-test.c
++++ b/tests/pflash-cfi02-test.c
+@@ -37,6 +37,7 @@ typedef struct {
+ #define CFI_CMD 0x98
+ #define UNLOCK0_CMD 0xAA
+ #define UNLOCK1_CMD 0x55
++#define SECOND_UNLOCK_CMD 0x80
+ #define AUTOSELECT_CMD 0x90
+ #define RESET_CMD 0xF0
+ #define PROGRAM_CMD 0xA0
+@@ -222,7 +223,7 @@ static void reset(const FlashConfig *c)
+ static void sector_erase(const FlashConfig *c, uint64_t byte_addr)
+ {
+     unlock(c);
+-    flash_cmd(c, UNLOCK0_ADDR, 0x80);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
+     unlock(c);
+     flash_write(c, byte_addr, replicate(c, SECTOR_ERASE_CMD));
+ }
+@@ -261,7 +262,7 @@ static void program(const FlashConfig *c, uint64_t byte_addr, uint16_t data)
+ static void chip_erase(const FlashConfig *c)
+ {
+     unlock(c);
+-    flash_cmd(c, UNLOCK0_ADDR, 0x80);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
+     unlock(c);
+     flash_cmd(c, UNLOCK0_ADDR, CHIP_ERASE_CMD);
+ }
+@@ -343,6 +344,7 @@ static void test_geometry(const void *opaque)
+     reset(c);
+     const uint64_t dq7 = replicate(c, 0x80);
+     const uint64_t dq6 = replicate(c, 0x40);
++    const uint64_t dq3 = replicate(c, 0x08);
+ 
+     uint64_t byte_addr = 0;
+     for (int region = 0; region < nb_erase_regions; ++region) {
+@@ -360,18 +362,29 @@ static void test_geometry(const void *opaque)
+         /* Erase and program sector. */
+         for (uint32_t i = 0; i < nb_sectors; ++i) {
+             sector_erase(c, byte_addr);
+-            /* Read toggle. */
++
++            /* Check that DQ3 is 0. */
++            g_assert_cmpint(flash_read(c, byte_addr) & dq3, ==, 0);
++            clock_step_next(); /* Step over the 50 us timeout. */
++
++            /* Check that DQ3 is 1. */
+             uint64_t status0 = flash_read(c, byte_addr);
++            g_assert_cmpint(status0 & dq3, ==, dq3);
++
+             /* DQ7 is 0 during an erase. */
+             g_assert_cmpint(status0 & dq7, ==, 0);
+             uint64_t status1 = flash_read(c, byte_addr);
++
+             /* DQ6 toggles during an erase. */
+             g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
++
+             /* Wait for erase to complete. */
+-            clock_step_next();
++            wait_for_completion(c, byte_addr);
++
+             /* Ensure DQ6 has stopped toggling. */
+             g_assert_cmpint(flash_read(c, byte_addr), ==,
+                             flash_read(c, byte_addr));
++
+             /* Now the data should be valid. */
+             g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
+ 
+@@ -434,6 +447,44 @@ static void test_geometry(const void *opaque)
+     g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
+     reset(c);
+ 
++    /*
++     * Program a word on each sector, erase one or two sectors per region, and
++     * verify that all of those, and only those, are erased.
++     */
++    byte_addr = 0;
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        for (int i = 0; i < config->nb_blocs[region]; ++i) {
++            program(c, byte_addr, 0);
++            byte_addr += config->sector_len[region];
++        }
++    }
++    unlock(c);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
++    unlock(c);
++    byte_addr = 0;
++    const uint64_t erase_cmd = replicate(c, SECTOR_ERASE_CMD);
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        flash_write(c, byte_addr, erase_cmd);
++        if (c->nb_blocs[region] > 1) {
++            flash_write(c, byte_addr + c->sector_len[region], erase_cmd);
++        }
++        byte_addr += c->sector_len[region] * c->nb_blocs[region];
++    }
++
++    clock_step_next(); /* Step over the 50 us timeout. */
++    wait_for_completion(c, 0);
++    byte_addr = 0;
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        for (int i = 0; i < config->nb_blocs[region]; ++i) {
++            if (i < 2) {
++                g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
++            } else {
++                g_assert_cmpint(flash_read(c, byte_addr), ==, 0);
++            }
++            byte_addr += config->sector_len[region];
++        }
++    }
++
+     qtest_quit(global_qtest);
  }
  
--static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned size)
--{
--    return pflash_read(opaque, addr, size, 1);
--}
--
--static void pflash_be_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 1);
--}
--
--static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned size)
--{
--    return pflash_read(opaque, addr, size, 0);
--}
--
--static void pflash_le_writefn(void *opaque, hwaddr addr,
--                              uint64_t value, unsigned size)
--{
--    pflash_write(opaque, addr, value, size, 0);
--}
--
--static const MemoryRegionOps pflash_cfi02_ops_be = {
--    .read = pflash_be_readfn,
--    .write = pflash_be_writefn,
--    .valid.min_access_size = 1,
--    .valid.max_access_size = 4,
--    .endianness = DEVICE_NATIVE_ENDIAN,
--};
--
--static const MemoryRegionOps pflash_cfi02_ops_le = {
--    .read = pflash_le_readfn,
--    .write = pflash_le_writefn,
-+static const MemoryRegionOps pflash_cfi02_ops = {
-+    .read = pflash_read,
-+    .write = pflash_write,
-     .valid.min_access_size = 1,
-     .valid.max_access_size = 4,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-@@ -552,9 +521,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- 
-     chip_len = pfl->sector_len * pfl->nb_blocs;
- 
--    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
--                                  &pflash_cfi02_ops_be : &pflash_cfi02_ops_le,
--                                  pfl, pfl->name, chip_len, &local_err);
-+    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-+                                  &pflash_cfi02_ops, pfl, pfl->name,
-+                                  chip_len, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
 -- 
 2.20.1 (Apple Git-117)
 
