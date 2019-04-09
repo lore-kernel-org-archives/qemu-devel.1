@@ -2,62 +2,81 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B151AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74155C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65CA220833
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:21:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65CA220833
+	by mail.kernel.org (Postfix) with ESMTPS id 353BE20833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353BE20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45787 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45790 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtV1-0002ee-JH
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:21:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55721)
+	id 1hDtVF-0002pr-Dz
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:21:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLV-000371-M3
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:39 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDtPG-0006eE-W6
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLS-000512-9Q
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtLR-0004zW-SJ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 34851C130709;
-	Tue,  9 Apr 2019 16:11:32 +0000 (UTC)
-Received: from localhost (ovpn-112-27.ams2.redhat.com [10.36.112.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 728C45D722;
-	Tue,  9 Apr 2019 16:11:31 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 18:10:02 +0200
-Message-Id: <20190409161009.6322-14-marcandre.lureau@redhat.com>
-In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
-References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hDtPF-0007YO-Kr
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:30 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDtPF-0007WX-BH
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:15:29 -0400
+Received: by mail-wr1-f68.google.com with SMTP id w1so21708556wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:15:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=xlZMRGsGCBiJaem3ywtrdSpesXz/5PWyQhhy3vQ2QSk=;
+	b=GXRg84U4inHTihkghvqX7s1t20NC8r9KbnHlENGdOL6RY+M4+/v0WgMjQyIL8xvDzO
+	k5NvncWCC1ay8Ah6VQfNDDSetk5buayCSrHs7kFv8X2mC9Zi0EJ6u1o68MpQ7sTyW3Fp
+	I52vAwj7KssaHKuceGPrn56MSykZMWUIGIVPWP2YHJqNT8RqdXdBMsLdCaZ4gEditj/I
+	SeYlmA1ZPmCHoSBOHlKyEZlLn2lJNywCmhPQC4Eky2t8D4uY2uwEA4Yp7iEdnLgZBRlG
+	G6gbGL3616dHa2JMfHkKNY8/tzVXLvdhiczs34GYtVKhV00sKiYWLra22hu15QZ39yU8
+	dxWA==
+X-Gm-Message-State: APjAAAVFs/GGqMbFCZFncJTZIUShQ0jTDUizCS15do9gbZ4TLUQGwmPh
+	IeD3vAHcggTlJhMhC7WdeXSaeQ==
+X-Google-Smtp-Source: APXvYqyKa2m7zZ/PDZefOtXYlztnTMLCmTmTrvrF/tY0iYg04yk0D6f6aXecYS9tGq5EfQBfYMMfTQ==
+X-Received: by 2002:adf:fa47:: with SMTP id y7mr3785020wrr.27.1554826528351;
+	Tue, 09 Apr 2019 09:15:28 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	o10sm50270383wru.54.2019.04.09.09.15.27
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 09:15:27 -0700 (PDT)
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
+	<5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
+Date: Tue, 9 Apr 2019 18:15:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 09 Apr 2019 16:11:32 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 13/20] scripts: learn 'async' qapi commands
+	[fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
+ missing AMD pflash functionality
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,637 +88,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
-	Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409161002.gtLhbceGU4m_tpqIXh3ghTjcuxzg4zlAdEO-9PrhULI@z>
+Message-ID: <20190409161526.N0nsHd52Y6xp4nJoI0IiOp5vZfVxyhXXPS5Xn7WjzIU@z>
 
-Commands with the 'async' key will be registered as async type (see
-related commit), and will allow a synchronous (in scope callback) or
-asynchronous return (out-of-scope when ready, in idle etc) by keeping
-the given QmpReturn and calling qmp_return function later.
+On 4/9/19 5:55 PM, Stephen Checkoway wrote:
+> Hi Phil,
+> 
+>> On Apr 9, 2019, at 06:34, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> Hi Stephen,
+>>
+>> [Cc'ing Markus and Laszlo, we have similar interest in pflash01 testing]
+>>
+>> On 4/8/19 10:55 PM, Stephen Checkoway wrote:
+>>> The goal of this patch series implement the following AMD command-set parallel
+>>> flash functionality:
+>>> - flash interleaving;
+>>> - nonuniform sector sizes;
+>>> - erase suspend/resume commands; and
+>>> - multi-sector erase.
+>>
+>> I am very glad you addressed these long overdue issues and very pleased
+>> by your patches :)
+>> I'll thoroughly review it during next week (this won't get merge for the
+>> current 4.0 cycle anyway).
+> 
+> Great!
+> 
+>> I started a similar cleanup (mostly pflash01 focused) and converted
+>> DPRINTF to trace events, added few constants. I'll see if I can rebase
+>> your work on top of mine. So far only your patch 2 (refactor) would be
+>> modified, simplified as the "pull out all of the code to modify the
+>> status into simple helper functions" part (which else I'd ask you to
+>> move in a separate patch).
+>>
+>> We should think of more intereleaved tests, I'll prepare a table of
+>> current QEMU models using this device and how is their intereleave
+>> mapping. Hopefully it would be enough to simply add the existing
+>> machines to your current musicpal qtest.
+>>
+>> Also I'd like to see some Top/Bottom block configuration qtests, your
+>> patch #5 doesn't seem tested.
+> 
+> I included four tests <https://patchew.org/QEMU/cover.1554774454.git.stephen.checkoway@oberlin.edu/bbe417c354dfa908d5e1bc8f8ad7121ec9451682.1554774454.git.stephen.checkoway@oberlin.edu/>.
+> 
+> Patchew makes it hard to link to particular lines. Here's the same patch on Github <https://github.com/qemu/qemu/commit/a851d21347121a91ba9a39c133a8fbee6e84e557#diff-d2ed797ca8898de80768bdfb390781dfR498>.
+> 
+> Are those sufficient or would you like more tests?
 
-Ex:
-  { 'command': 'foo-async,
-    'data': {'arg': 'str'},
-    'returns': 'Foo',
-    'async': true }
+Ah you don't mention the tests in the patch description, that's why I
+missed them :) Sometimes I prefer to keep the test addition in a
+separate patch, it eases rebases, however in your series it seems fine.
 
-generates the following marshaller:
+Since you did changes in the CFI table, I think we should add a tests
+verifying the table is correctly generated for all you FlashConfig entries.
 
-void qmp_marshal_foo_async(QDict *args, QmpReturn *qret)
-{
-    Error *err =3D NULL;
-    Visitor *v;
-    q_obj_foo_async_arg arg =3D {0};
+>>> During refactoring and implementation, I discovered several bugs that are
+>>> fixed here as well:
+>>> - flash commands use only 11-bits of the address in most cases, but the
+>>>  current code uses all of them [1];
+>>> - entering CFI mode from autoselect mode and then exiting CFI mode should
+>>>  return the chip to autoselect mode, but the current code returns to read
+>>>  array mode; and
+>>> - reset command should be ignored during sector/chip erase, but the current
+>>>  code performs the reset.
+>>>
+>>> The first patch in the series adds a test for the existing behavior. Tests for
+>>> additional behavior/bug fixes are added in the relevant patch.
+>>>
+>>> 1. I found firmware in the wild that relies on the 11-bit address behavior,
+>>>   probably due to a bug in the firmware itself.
+>>
+>> Is it a musicpal firmware? Are you able to compare with real hardware?
+> 
+> No, it's not musicpal. I'm not even sure what musicpal is, it was just the most convenient choice for testing.  The real hardware is an embedded system using an old AMD processor (Am486) with three different AMD command set flash chips. The unlock addresses the firmware uses don't actually match the part sheets (in most cases). It took quite a while to realize that the flash hardware only uses 11 bits of address. (It's clearly spelled out in the various part sheets, but I guess I missed it on the first 15 or so readings.)
 
-    v =3D qmp_input_visitor_new(QOBJECT(args), true);
-    visit_start_struct(v, NULL, NULL, 0, &err);
-    if (err) {
-        goto out;
-    }
-    visit_type_q_obj_foo_async_arg_members(v, &arg, &err);
-    if (!err) {
-        visit_check_struct(v, &err);
-    }
-    visit_end_struct(v, NULL);
-    if (err) {
-        goto out;
-    }
+I suppose you can not share the firmware binary. Can you share these
+unlock addresses? Maybe once I reviewed carefully your series I might
+ask you the (pflash) trace event output.
 
-    qmp_foo_async(arg.arg, qret);
-
-out:
-    if (err) {
-        qmp_return_error(qret, err);
-    }
-    visit_free(v);
-    v =3D qapi_dealloc_visitor_new();
-    visit_start_struct(v, NULL, NULL, 0, NULL);
-    visit_type_q_obj_foo_async_arg_members(v, &arg, NULL);
-    visit_end_struct(v, NULL);
-    visit_free(v);
-}
-
-and a return helper:
-
-void qmp_foo_async_return(QmpReturn *qret, Foo *ret_in)
-{
-    Error *err =3D NULL;
-    QObject *ret_out =3D NULL;
-
-    qmp_marshal_output_Foo(ret_in, &ret_out, &err);
-
-    if (err) {
-        qmp_return_error(qret, err);
-    } else {
-        qmp_return(qret, ret_out);
-    }
-}
-
-The dispatched function may call the return helper within the calling
-scope or delay the return. To return an error, it can call
-qmp_return_error() directly instead.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- scripts/qapi/commands.py                | 151 ++++++++++++++++++++----
- scripts/qapi/common.py                  |  15 ++-
- scripts/qapi/doc.py                     |   3 +-
- scripts/qapi/introspect.py              |   3 +-
- tests/test-qmp-cmds.c                   |  60 ++++++++++
- tests/qapi-schema/qapi-schema-test.json |   5 +
- tests/qapi-schema/qapi-schema-test.out  |   8 ++
- tests/qapi-schema/test-qapi.py          |   8 +-
- 8 files changed, 218 insertions(+), 35 deletions(-)
-
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 6d66bf6aa3..74a7ec112c 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -16,18 +16,36 @@ See the COPYING file in the top-level directory.
- from qapi.common import *
-=20
-=20
--def gen_command_decl(name, arg_type, boxed, ret_type):
--    return mcgen('''
--%(c_type)s qmp_%(c_name)s(%(params)s);
-+def gen_command_decl(name, arg_type, boxed, ret_type, success_response, =
-async):
-+    if async:
-+        extra =3D "QmpReturn *qret"
-+    else:
-+        extra =3D 'Error **errp'
-+
-+    if async:
-+        ret =3D mcgen('''
-+void qmp_%(name)s(%(params)s);
- ''',
--                 c_type=3D(ret_type and ret_type.c_type()) or 'void',
--                 c_name=3Dc_name(name),
--                 params=3Dbuild_params(arg_type, boxed, 'Error **errp'))
-+                     name=3Dc_name(name),
-+                     params=3Dbuild_params(arg_type, boxed, extra))
-+        if success_response:
-+            ret +=3D mcgen('''
-+void qmp_%(name)s_return(QmpReturn *qret%(c_type)s);
-+''',
-+                        c_type=3D(", " + ret_type.c_type() if ret_type e=
-lse ""),
-+                        name=3Dc_name(name))
-=20
-+        return ret
-+    else:
-+        return mcgen('''
-+%(c_type)s qmp_%(c_name)s(%(params)s);
-+''',
-+                     c_type=3D(ret_type and ret_type.c_type()) or 'void'=
-,
-+                     c_name=3Dc_name(name),
-+                     params=3Dbuild_params(arg_type, boxed, extra))
-=20
--def gen_call(name, arg_type, boxed, ret_type):
--    ret =3D ''
-=20
-+def gen_argstr(arg_type, boxed):
-     argstr =3D ''
-     if boxed:
-         assert arg_type and not arg_type.is_empty()
-@@ -39,6 +57,13 @@ def gen_call(name, arg_type, boxed, ret_type):
-                 argstr +=3D 'arg.has_%s, ' % c_name(memb.name)
-             argstr +=3D 'arg.%s, ' % c_name(memb.name)
-=20
-+    return argstr
-+
-+
-+def gen_call(name, arg_type, boxed, ret_type):
-+    ret =3D ''
-+
-+    argstr =3D gen_argstr(arg_type, boxed)
-     lhs =3D ''
-     if ret_type:
-         lhs =3D 'retval =3D '
-@@ -60,6 +85,50 @@ def gen_call(name, arg_type, boxed, ret_type):
-     return ret
-=20
-=20
-+def gen_async_call(name, arg_type, boxed):
-+    argstr =3D gen_argstr(arg_type, boxed)
-+
-+    push_indent()
-+    ret =3D mcgen('''
-+
-+qmp_%(c_name)s(%(args)sqret);
-+''',
-+                c_name=3Dc_name(name), args=3Dargstr)
-+
-+    pop_indent()
-+    return ret
-+
-+
-+def gen_async_return(name, ret_type):
-+    if ret_type:
-+        return mcgen('''
-+
-+void qmp_%(c_name)s_return(QmpReturn *qret, %(ret_type)s ret_in)
-+{
-+    Error *err =3D NULL;
-+    QObject *ret_out =3D NULL;
-+
-+    qmp_marshal_output_%(ret_c_name)s(ret_in, &ret_out, &err);
-+
-+    if (err) {
-+        qmp_return_error(qret, err);
-+    } else {
-+        qmp_return(qret, ret_out);
-+    }
-+}
-+''',
-+                     c_name=3Dc_name(name),
-+                     ret_type=3Dret_type.c_type(), ret_c_name=3Dret_type=
-.c_name())
-+    else:
-+        return mcgen('''
-+
-+void qmp_%(c_name)s_return(QmpReturn *qret)
-+{
-+    qmp_return(qret, QOBJECT(qdict_new()));
-+}
-+''',
-+                     c_name=3Dc_name(name))
-+
- def gen_marshal_output(ret_type):
-     return mcgen('''
-=20
-@@ -83,19 +152,22 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s=
- ret_in, QObject **ret_out,
-                  c_type=3Dret_type.c_type(), c_name=3Dret_type.c_name())
-=20
-=20
--def build_marshal_proto(name):
--    return ('void qmp_marshal_%s(QDict *args, QObject **ret, Error **err=
-p)'
--            % c_name(name))
-+def build_marshal_proto(name, async):
-+    if async:
-+        tmpl =3D 'void qmp_marshal_%s(QDict *args, QmpReturn *qret)'
-+    else:
-+        tmpl =3D 'void qmp_marshal_%s(QDict *args, QObject **ret, Error =
-**errp)'
-+    return tmpl % c_name(name)
-=20
-=20
--def gen_marshal_decl(name):
-+def gen_marshal_decl(name, async):
-     return mcgen('''
- %(proto)s;
- ''',
--                 proto=3Dbuild_marshal_proto(name))
-+                 proto=3Dbuild_marshal_proto(name, async))
-=20
-=20
--def gen_marshal(name, arg_type, boxed, ret_type):
-+def gen_marshal(name, arg_type, boxed, ret_type, async):
-     have_args =3D arg_type and not arg_type.is_empty()
-=20
-     ret =3D mcgen('''
-@@ -104,9 +176,9 @@ def gen_marshal(name, arg_type, boxed, ret_type):
- {
-     Error *err =3D NULL;
- ''',
--                proto=3Dbuild_marshal_proto(name))
-+                proto=3Dbuild_marshal_proto(name, async))
-=20
--    if ret_type:
-+    if ret_type and not async:
-         ret +=3D mcgen('''
-     %(c_type)s retval;
- ''',
-@@ -153,12 +225,28 @@ def gen_marshal(name, arg_type, boxed, ret_type):
-     }
- ''')
-=20
--    ret +=3D gen_call(name, arg_type, boxed, ret_type)
-+    if async:
-+        ret +=3D gen_async_call(name, arg_type, boxed)
-+    else:
-+        ret +=3D gen_call(name, arg_type, boxed, ret_type)
-=20
-     ret +=3D mcgen('''
-=20
- out:
-+''')
-+
-+    if async:
-+         ret +=3D mcgen('''
-+    if (err) {
-+        qmp_return_error(qret, err);
-+    }
-+''')
-+    else:
-+        ret +=3D mcgen('''
-     error_propagate(errp, err);
-+''')
-+
-+    ret +=3D mcgen('''
-     visit_free(v);
- ''')
-=20
-@@ -193,7 +281,8 @@ out:
-     return ret
-=20
-=20
--def gen_register_command(name, success_response, allow_oob, allow_precon=
-fig):
-+def gen_register_command(name, success_response, allow_oob, allow_precon=
-fig,
-+                         async):
-     options =3D []
-=20
-     if not success_response:
-@@ -202,17 +291,24 @@ def gen_register_command(name, success_response, al=
-low_oob, allow_preconfig):
-         options +=3D ['QCO_ALLOW_OOB']
-     if allow_preconfig:
-         options +=3D ['QCO_ALLOW_PRECONFIG']
-+    if async:
-+        options +=3D ['QCO_ASYNC']
-=20
-     if not options:
-         options =3D ['QCO_NO_OPTIONS']
-=20
-     options =3D " | ".join(options)
-=20
-+    if async:
-+        regfn =3D 'qmp_register_async_command'
-+    else:
-+        regfn =3D 'qmp_register_command'
-+
-     ret =3D mcgen('''
--    qmp_register_command(cmds, "%(name)s",
-+    %(regfn)s(cmds, "%(name)s",
-                          qmp_marshal_%(c_name)s, %(opts)s);
- ''',
--                name=3Dname, c_name=3Dc_name(name),
-+                regfn=3Dregfn, name=3Dname, c_name=3Dc_name(name),
-                 opts=3Doptions)
-     return ret
-=20
-@@ -278,7 +374,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
-s);
-         genc.add(gen_registry(self._regy.get_content(), self._prefix))
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      async):
-         if not gen:
-             return
-         # FIXME: If T is a user-defined type, the user is responsible
-@@ -292,11 +389,15 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *c=
-mds);
-                            self._genh, self._genc, self._regy):
-                 self._genc.add(gen_marshal_output(ret_type))
-         with ifcontext(ifcond, self._genh, self._genc, self._regy):
--            self._genh.add(gen_command_decl(name, arg_type, boxed, ret_t=
-ype))
--            self._genh.add(gen_marshal_decl(name))
--            self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
-+            self._genh.add(gen_command_decl(name, arg_type, boxed, ret_t=
-ype,
-+                                            success_response, async))
-+            self._genh.add(gen_marshal_decl(name, async))
-+            self._genc.add(gen_marshal(name, arg_type, boxed, ret_type, =
-async))
-+            if async and success_response:
-+                self._genc.add(gen_async_return(name, ret_type))
-             self._regy.add(gen_register_command(name, success_response,
--                                                allow_oob, allow_preconf=
-ig))
-+                                                allow_oob, allow_preconf=
-ig,
-+                                                async))
-=20
-=20
- def gen_commands(schema, output_dir, prefix):
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f07869ec73..1bca5fc150 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -993,7 +993,7 @@ def check_exprs(exprs):
-             meta =3D 'command'
-             check_keys(expr_elem, 'command', [],
-                        ['data', 'returns', 'gen', 'success-response',
--                        'boxed', 'allow-oob', 'allow-preconfig', 'if'])
-+                        'boxed', 'allow-oob', 'allow-preconfig', 'if', '=
-async'])
-             normalize_members(expr.get('data'))
-         elif 'event' in expr:
-             meta =3D 'event'
-@@ -1136,7 +1136,8 @@ class QAPISchemaVisitor(object):
-         pass
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      async):
-         pass
-=20
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-@@ -1533,7 +1534,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
-=20
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
--                 gen, success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                 gen, success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                 async):
-         QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -1546,6 +1548,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed =3D boxed
-         self.allow_oob =3D allow_oob
-         self.allow_preconfig =3D allow_preconfig
-+        self.async =3D async
-=20
-     def check(self, schema):
-         QAPISchemaEntity.check(self, schema)
-@@ -1572,7 +1575,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-                               self.boxed, self.allow_oob,
--                              self.allow_preconfig)
-+                              self.allow_preconfig, self.async)
-=20
-=20
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -1820,6 +1823,7 @@ class QAPISchema(object):
-         allow_oob =3D expr.get('allow-oob', False)
-         allow_preconfig =3D expr.get('allow-preconfig', False)
-         ifcond =3D expr.get('if')
-+        async =3D expr.get('async', False)
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
-                 name, info, doc, ifcond, 'arg', self._make_members(data,=
- info))
-@@ -1828,7 +1832,8 @@ class QAPISchema(object):
-             rets =3D self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data=
-, rets,
-                                            gen, success_response,
--                                           boxed, allow_oob, allow_preco=
-nfig))
-+                                           boxed, allow_oob, allow_preco=
-nfig,
-+                                           async))
-=20
-     def _def_event(self, expr, info, doc):
-         name =3D expr['event']
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 5c8c136899..0f51a7bff3 100755
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -236,7 +236,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-                                body=3Dtexi_entity(doc, 'Members', ifcond=
-)))
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      async):
-         doc =3D self.cur_doc
-         if boxed:
-             body =3D texi_body(doc)
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index f7f2ca07e4..7f3ea88c72 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -202,7 +202,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                            for m in variants.variants]}, ifcond)
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      async):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
-         obj =3D {'arg-type': self._use_type(arg_type),
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index c4593552e3..58cd09ab08 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -36,6 +36,28 @@ void qmp_cmd_success_response(Error **errp)
- {
- }
-=20
-+static gboolean cmd_async_idle(gpointer user_data)
-+{
-+    QmpReturn *qret =3D user_data;
-+
-+    qmp_cmd_async_return(qret, g_new0(Empty2, 1));
-+
-+    return G_SOURCE_REMOVE;
-+}
-+
-+void qmp_cmd_async(const char *filename, QmpReturn *qret)
-+{
-+    g_idle_add(cmd_async_idle, qret);
-+}
-+
-+void qmp_cmd_success_response_async(const char *filename, QmpReturn *qre=
-t)
-+{
-+    Error *err =3D NULL;
-+
-+    error_setg(&err, "no response, but error ok");
-+    qmp_return_error(qret, err);
-+}
-+
- Empty2 *qmp_user_def_cmd0(Error **errp)
- {
-     return g_new0(Empty2, 1);
-@@ -360,6 +382,43 @@ static void test_qmp_return_orderly(void)
-     qobject_unref(dict);
- }
-=20
-+typedef struct QmpReturnAsync {
-+    QmpSession session;
-+    GMainLoop *loop;
-+} QmpReturnAsync;
-+
-+static void dispatch_return_async(QmpSession *session, QDict *resp)
-+{
-+    QmpReturnAsync *a =3D container_of(session, QmpReturnAsync, session)=
-;
-+
-+    g_main_loop_quit(a->loop);
-+    g_main_loop_unref(a->loop);
-+    a->loop =3D NULL;
-+}
-+
-+static void test_qmp_return_async(void)
-+{
-+    QmpReturnAsync a =3D { 0, };
-+    QDict *args =3D qdict_new();
-+    QDict *req =3D qdict_new();
-+
-+    a.loop =3D g_main_loop_new(NULL, TRUE);
-+    qmp_session_init(&a.session, &qmp_commands,
-+                    NULL, dispatch_return_async);
-+
-+    qdict_put_str(args, "filename", "test-filename");
-+    qdict_put_str(req, "execute", "cmd-async");
-+    qdict_put(req, "arguments", args);
-+    qmp_dispatch(&a.session, QOBJECT(req), false);
-+    g_assert(a.loop);
-+
-+    g_main_loop_run(a.loop);
-+    g_assert(!a.loop);
-+
-+    qmp_session_destroy(&a.session);
-+    qobject_unref(req);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -373,6 +432,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
-     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
-     g_test_add_func("/qmp/return_orderly", test_qmp_return_orderly);
-+    g_test_add_func("/qmp/return_async", test_qmp_return_async);
-=20
-     test_qmp_init_marshal(&qmp_commands);
-     g_test_run();
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 0952c68734..d10ce39215 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -143,6 +143,11 @@
-=20
- { 'command': 'cmd-success-response', 'data': {}, 'success-response': fal=
-se }
-=20
-+{ 'command': 'cmd-async', 'data': {'filename': 'str'},
-+  'returns': 'Empty2', 'async': true }
-+{ 'command': 'cmd-success-response-async', 'data': {'filename': 'str'},
-+  'async': true, 'success-response': false}
-+
- # Returning a non-dictionary requires a name from the whitelist
- { 'command': 'guest-get-time', 'data': {'a': 'int', '*b': 'int' },
-   'returns': 'int' }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 77fb1e1aa9..d652ebf75d 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -208,6 +208,14 @@ command user_def_cmd2 q_obj_user_def_cmd2-arg -> Use=
-rDefTwo
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
- command cmd-success-response None -> None
-    gen=3DTrue success_response=3DFalse boxed=3DFalse oob=3DFalse preconf=
-ig=3DFalse
-+object q_obj_cmd-async-arg
-+    member filename: str optional=3DFalse
-+command cmd-async q_obj_cmd-async-arg -> Empty2
-+   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse async=3DTrue
-+object q_obj_cmd-success-response-async-arg
-+    member filename: str optional=3DFalse
-+command cmd-success-response-async q_obj_cmd-success-response-async-arg =
--> None
-+   gen=3DTrue success_response=3DFalse boxed=3DFalse oob=3DFalse preconf=
-ig=3DFalse async=3DTrue
- object q_obj_guest-get-time-arg
-     member a: int optional=3DFalse
-     member b: int optional=3DTrue
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index d21fca01fc..0d0cef479c 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -55,12 +55,14 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_if(ifcond)
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      async):
-         print('command %s %s -> %s'
-               % (name, arg_type and arg_type.name,
-                  ret_type and ret_type.name))
--        print('   gen=3D%s success_response=3D%s boxed=3D%s oob=3D%s pre=
-config=3D%s'
--              % (gen, success_response, boxed, allow_oob, allow_preconfi=
-g))
-+        print('   gen=3D%s success_response=3D%s boxed=3D%s oob=3D%s pre=
-config=3D%s%s'
-+              % (gen, success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                 ' async=3DTrue' if async else ''))
-         self._print_if(ifcond)
-=20
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
---=20
-2.21.0.196.g041f5ea1cf
-
+>> I vaguely remember some issue regarding address bus width when trying to
+>> implement the TopBlock small sectors, but I wasn't using the musicpal.
+>> I'll see if I can find my old notes and test with your series.
+> 
+> The one boot chip I'm using is the AM29F080B-90SI with top boot blocks. It has an 8-bit address bus.
 
