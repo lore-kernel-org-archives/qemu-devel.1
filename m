@@ -6,54 +6,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BD3C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E92A3C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB3C020833
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3C020833
+	by mail.kernel.org (Postfix) with ESMTPS id AD57820833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:05:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD57820833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42946 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43013 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDsGn-0005l8-13
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:02:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54406)
+	id 1hDsJY-00078B-Sa
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:05:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDsEm-0004a8-CT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:00:37 -0400
+	(envelope-from <mst@redhat.com>) id 1hDsIc-0006mN-DP
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hDsEl-0000Dq-82
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:00:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hDsEk-0000D3-VT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:00:35 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6AAEA3008CCD;
-	Tue,  9 Apr 2019 15:00:25 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 009F2600CC;
-	Tue,  9 Apr 2019 15:00:18 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 17:00:37 +0200
-Message-Id: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 09 Apr 2019 15:00:30 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1hDsIa-000280-MM
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:34 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:35974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hDsIa-00027X-Au
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:32 -0400
+Received: by mail-qt1-f195.google.com with SMTP id s15so11796968qtn.3
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:04:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=sxjSnVokzPr2vYwKeVpxbmOjQmUxCI+7TeYIDHrIkYM=;
+	b=t7X+NPEE9pRZqNbInIr7N6szlFnRq31UM9e0hJ+Vp8Iy3Na8djT2kVszrSruV8ZeV9
+	CJOw+GkAh+i5tk4t/J6RU7BE3LEI0/hKrNeSdOwutUyQKrehBLLgTbaXoYwrdlhriLD8
+	Vd6xtSLGo2/GLoywKNrpXAb6XQlzEI6Hv7SDMgDIUdsY2PnA11D6PqeAWJFhJ4V1Slky
+	4A1Im4FdREWMEcKlcntrNkGKwLXppnRe/nZUgJZVIuTUoUcarzTA91tKI+74BQojbzEV
+	ISHXHx1O8h95l7mXQLzpJXSVZLX7FofasQ1An2gv4y6ENjqYpLqoqvsZN8scCBBH8+y4
+	DHRw==
+X-Gm-Message-State: APjAAAVC0RICMLH3Ky7tORCyjdReJ6lySgW5xAHNywMimfGaJnpJi6BE
+	jfeU31WK1I+Jef261Ul/ELlbBA==
+X-Google-Smtp-Source: APXvYqzlBkwjloGxXm9zgEbhOkYPbvzM4Ro3B3C7TsBFYVW7y68nd5MSsa73TxPHVKoFnzl5jv6FDA==
+X-Received: by 2002:a0c:87d9:: with SMTP id 25mr29416737qvk.219.1554822270375; 
+	Tue, 09 Apr 2019 08:04:30 -0700 (PDT)
+Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
+	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
+	d17sm14495110qko.93.2019.04.09.08.04.28
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 09 Apr 2019 08:04:29 -0700 (PDT)
+Date: Tue, 9 Apr 2019 11:04:27 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Message-ID: <20190409110149-mutt-send-email-mst@kernel.org>
+References: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy MCFG
- table
+	[fuzzy]
+X-Received-From: 209.85.160.195
+Subject: Re: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at
+ the passthrough of NVMe SSD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,73 +80,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richardw.yang@linux.intel.com, ehabkost@redhat.com, mst@redhat.com
+Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409150037.CR5pubbIXuxVCsPgxSbkiDL49T0umnRmTTOAV4Z39DM@z>
+Message-ID: <20190409150427.Fticmh46tAJwv2Vg0ZGVwVNT-JdpntN5X6Tzi7JM3CA@z>
 
-Dummy table (with signature "QEMU") creation came from original SeaBIOS
-codebase. And QEMU would have to keep it around if there were Q35 machine
-that depended on keeping ACPI tables blob constant size. Luckily there
-were no versioned Q35 machine types before commit:
-  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
-which obsoleted need to keep ACPI tables blob the same size on source/destination.
+On Tue, Apr 09, 2019 at 02:14:56PM +0000, Zhuangyanying wrote:
+> From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> 
+> Recently I tested the performance of NVMe SSD passthrough and found that interrupts
+> were aggregated on vcpu0(or the first vcpu of each numa) by /proc/interrupts,when
+> GuestOS was upgraded to sles12sp3 (or redhat7.6). But /proc/irq/X/smp_affinity_list
+> shows that the interrupt is spread out, such as 0-10, 11-21,.... and so on.
+> This problem cannot be resolved by "echo X > /proc/irq/X/smp_affinity_list", because
+> the NVMe SSD interrupt is requested by the API pci_alloc_irq_vectors(), so the
+> interrupt has the IRQD_AFFINITY_MANAGED flag.
+> 
+> GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X capable devices",
+> but the implementation of __setup_irq has no corresponding modification. It is still
+> irq_startup(), then setup_affinity(), that is sending an affinity message when the
+> interrupt is unmasked.
 
-Considering the 1st versioned machine is pc-q35-2.4, the dummy table
-is not really necessary and it's safe to drop it without breaking
-cross version migration in both directions unconditionally.
+So does latest upstream still change data/address of an
+unmasked vector?
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/acpi-build.c | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+> The bare metal configuration is successful, but qemu will
+> not trigger the msix update, and the affinity configuration fails.
+> The affinity is configured by /proc/irq/X/smp_affinity_list, implemented at
+> apic_ack_edge(), the bitmap is stored in pending_mask,
+> mask->__pci_write_msi_msg()->unmask,
+> and the timing is guaranteed, and the configuration takes effect.
+> 
+> The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce affinity
+> setting on startup of managed irqs" to ensure that the affinity is first issued
+> and then __irq_startup(), for the managerred interrupt. So configuration is
+> successful.
+> 
+> It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
+> (3.10.0-957.10.1) does not have backport the patch yet.
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 416da31..8671e25 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2401,7 +2401,6 @@ static void
- build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
-     AcpiTableMcfg *mcfg;
--    const char *sig;
-     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
-@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-     mcfg->allocation[0].start_bus_number = 0;
-     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
- 
--    /* MCFG is used for ECAM which can be enabled or disabled by guest.
--     * To avoid table size changes (which create migration issues),
--     * always create the table even if there are no allocations,
--     * but set the signature to a reserved value in this case.
--     * ACPI spec requires OSPMs to ignore such tables.
--     */
--    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
--        /* Reserved signature: ignored by OSPM */
--        sig = "QEMU";
--    } else {
--        sig = "MCFG";
--    }
--    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
- }
- 
- /*
-@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
-     }
-     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
-     qobject_unref(o);
-+    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
-+        return false;
-+    }
- 
-     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
-     assert(o);
--- 
-2.7.4
+Sorry - which patch?
 
+> "if (is_masked == was_masked) return;" can it be removed at qemu?
+> What is the reason for this check?
+> 
+> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> ---
+>  hw/pci/msix.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index 4e33641..e1ff533 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
+>  {
+>      bool is_masked = msix_is_masked(dev, vector);
+>  
+> -    if (is_masked == was_masked) {
+> -        return;
+> -    }
+> -
+>      msix_fire_vector_notifier(dev, vector, is_masked);
+>  
+>      if (!is_masked && msix_is_pending(dev, vector)) {
+
+
+To add to that, notifiers generally assume that updates
+come in pairs, unmask followed by mask.
+
+
+
+> -- 
+> 1.8.3.1
+> 
 
