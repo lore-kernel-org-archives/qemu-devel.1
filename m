@@ -2,80 +2,102 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5A8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79032C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:41:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5A0D2084C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5A0D2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DF852084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:41:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="MaebiGC3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DF852084F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38125 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDnDR-00027D-Uy
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 05:38:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59038)
+	id 1hDnGB-0003Zo-Gg
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 05:41:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDnCR-0001eq-5m
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:37:52 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hDnEw-0002lT-TN
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDnCP-0005Hg-L1
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:37:51 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDnCP-0005G1-92
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:37:49 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h4so19955034wre.7
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 02:37:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=qvADDrWX5bZugPG44iMbzSoIiAOjPAdyGGl39TnlEXg=;
-	b=Dm6CzOZxs9uCWjOgsBU/54/LLIAww7xGVTz+uUNb7Fr9w4vnCPxrGD73Ow2pGRHShG
-	C21v+bfFzlCRr78A6RiBQexeV6m69auOiuoBj4pYixqVuSgs7o9XAMwZPriUTvQAcym4
-	XaHbjAH9Lqoaxg8lsFw8VhrjvC8zNTr3BidwFYKWXBQQldUYzS4+RX4SXROeP+PHUpA1
-	11zYxB1T5NeUoqmK8uUEjPsJALeZ4Z/+dnIVp1e6UvyqXyP6c5R5oyie+KNaluzLv1YS
-	97lBcMzuvLD6trZ+ZoIo3D7Q2BPx9+gQtzXWkYMTrR92l9ed0OuJmp2BBDBZVn1tX455
-	e4PQ==
-X-Gm-Message-State: APjAAAV4ryoczZYDPYMRwB3lVBJ6hyoQhHqgEpEy6IMyjQY8y3FZQQOE
-	nI3n83sOzUqgUSZwyuC9aB/ExA==
-X-Google-Smtp-Source: APXvYqxCxz9nGMbTRYYPGfTUOra6sw7/al6n5QUbg8mnWwXGGezoM67+CBFd/nkTe47spPJf+TqPpA==
-X-Received: by 2002:a5d:6947:: with SMTP id r7mr2167527wrw.167.1554802667013; 
-	Tue, 09 Apr 2019 02:37:47 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	x14sm16034905wmj.3.2019.04.09.02.37.45
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 02:37:46 -0700 (PDT)
-To: Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Markus Armbruster <armbru@redhat.com>, Lidong Chen <lidong.chen@oracle.com>
-References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hDnEv-0007nr-MV
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:26 -0400
+Received: from mail-eopbgr780109.outbound.protection.outlook.com
+	([40.107.78.109]:15296
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hDnEu-0007i1-Oj
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=wavesemi.onmicrosoft.com; s=selector1-wavecomp-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=2evM5Mgjau4sxfZa1i6nTfZTsdBN0Vw+Hoj4x3yDTJA=;
+	b=MaebiGC322WH8sLe6g9WWgIqBeiQLikMwD95zxX8t5+WBES9ecoMrDJJwiobkXMtgzz6V7+yPZnD/PPdcxLWnjEhTGGXENPu4kozZsMycr4Wqetelcyb5cC+/ZEXkB4uLD3H6flvVaMvef+NThPrD2XJg3QA0GBz0ielWvQjpJ0=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+	BN6PR2201MB1298.namprd22.prod.outlook.com (10.174.80.144) with
+	Microsoft SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.13; Tue, 9 Apr 2019 09:40:19 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81]) by
+	BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81%2]) with mapi id 15.20.1792.009;
+	Tue, 9 Apr 2019 09:40:19 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Markus Armbruster <armbru@redhat.com>, Lidong Chen <lidong.chen@oracle.com>
+Thread-Topic: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+Thread-Index: AQHU7phafzj+YhuaTEG+PttwAAXDgKYzkHxA
+Date: Tue, 9 Apr 2019 09:40:18 +0000
+Message-ID:
+ <BN6PR2201MB1251E6696D83A98F4A1334F6C62D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>,
 	<87mukziv48.fsf@dusky.pond.sub.org>
-	<BN6PR2201MB125156A5AB0000731B85E76BC62D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cd833acf-4643-0d3c-78f5-7677d224954e@redhat.com>
-Date: Tue, 9 Apr 2019 11:37:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB125156A5AB0000731B85E76BC62D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87mukziv48.fsf@dusky.pond.sub.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ad720bfc-423d-466b-55ff-08d6bccf6102
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:BN6PR2201MB1298; 
+x-ms-traffictypediagnostic: BN6PR2201MB1298:
+x-microsoft-antispam-prvs: <BN6PR2201MB1298200B4BB82CEF24B465F5C62D0@BN6PR2201MB1298.namprd22.prod.outlook.com>
+x-forefront-prvs: 000227DA0C
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(39840400004)(136003)(396003)(366004)(346002)(376002)(189003)(199004)(4326008)(25786009)(229853002)(478600001)(446003)(81156014)(486006)(55016002)(6246003)(305945005)(74316002)(11346002)(8676002)(14454004)(6436002)(7736002)(476003)(33656002)(81166006)(6506007)(53936002)(3846002)(186003)(76176011)(71200400001)(55236004)(7696005)(9686003)(110136005)(71190400001)(26005)(97736004)(102836004)(54906003)(2906002)(86362001)(316002)(7416002)(5660300002)(106356001)(105586002)(68736007)(52536014)(66066001)(256004)(6116002)(99286004)(8936002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1298;
+	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 6dQKdvbSSP7B/MnIdDJq0UhTLx4IDHAv1Z/+h8QTXM5ULEQcdP/bHXPQWaL9HgWhtzqoAUeq1UnBEZQWvkQvO7q38yV81xm8LepzwsoPCDGU8fYVpX3flUCqJ5iuWcdnPssUrVo9sclXGiSISa3CdVcszXItHvTmH6lA2J3Gi821NyRbI9i+eDEOi1+ueQxi41MvdZUaklKyogpmhXnCBSbFhZCS+UWAY6vQsZTE65p2JzPRPRtJCzvf1m86au4x/hM4r/8L4Ug1v9r+rtAfFDI1oAG414MHDdKLnWC+48Q/qyvcqPx/InkEM7rqaw9LqIeavgT0+yfp3BKVBLzqNCJ34q8Zs/OQnPL0lrwc5zoAcsVocGaN9bw7/lDNetM89nDopjB9lUcbfS8LlIOcGHslU8YqmwQ+TKR1LW4oA7s=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad720bfc-423d-466b-55ff-08d6bccf6102
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 09:40:18.9997 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1298
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.78.109
 Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -89,185 +111,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"laurent@vivier.eu" <laurent@vivier.eu>,
 	Aleksandar Rikalo <arikalo@wavecomp.com>, Jason Wang <jasowang@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
 	"f4bug@amsat.org" <f4bug@amsat.org>,
 	"darren.kenny@oracle.com" <darren.kenny@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+	"alistair.francis@wdc.com" <alistair.francis@wdc.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409093744.XFepMXHxskgbr3LlDPQulCPeEH9QLp_aCJ_-7FCDPa4@z>
+Message-ID: <20190409094018.z48B9ARkIpTGQC_K8nK70rWMdqK2gCDyDd7zrmqLi-U@z>
 
-On 4/9/19 10:59 AM, Aleksandar Markovic wrote:
->>
->> Lidong Chen <lidong.chen@oracle.com> writes:
->>
->>> Due to an off-by-one error, the assert statements allow an
->>> out-of-bounds array access.
->>>
->>> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
->>> ---
->>>  hw/sd/sd.c | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->>> index aaab15f..818f86c 100644
->>> --- a/hw/sd/sd.c
->>> +++ b/hw/sd/sd.c
->>> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates state)
->>>      if (state == sd_inactive_state) {
->>>          return "inactive";
->>>      }
->>> -    assert(state <= ARRAY_SIZE(state_name));
->>> +    assert(state < ARRAY_SIZE(state_name));
->>>      return state_name[state];
->>>  }
->>>
->>> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp)
->>>      if (rsp == sd_r1b) {
->>>          rsp = sd_r1;
->>>      }
->>> -    assert(rsp <= ARRAY_SIZE(response_name));
->>> +    assert(rsp < ARRAY_SIZE(response_name));
->>>      return response_name[rsp];
->>>  }
->>
->> This is the second fix for this bug pattern in a fortnight.  Where's
->> one, there are more:
->>
->> $ git-grep '<= ARRAY_SIZE'
->> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <= ARRAY_SIZE(cs->ich_apr[0]));
->> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <= ARRAY_SIZE(cs->ich_apr[0]));
->> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <= ARRAY_SIZE(s->tx_fifo)) {
->> hw/sd/pxa2xx_mmci.c:        && s->tx_len <= ARRAY_SIZE(s->tx_fifo)
->> hw/sd/pxa2xx_mmci.c:        && s->rx_len <= ARRAY_SIZE(s->rx_fifo)
->> hw/sd/pxa2xx_mmci.c:        && s->resp_len <= ARRAY_SIZE(s->resp_fifo);
->> hw/sd/sd.c:    assert(state <= ARRAY_SIZE(state_name));
->> hw/sd/sd.c:    assert(rsp <= ARRAY_SIZE(response_name));
->> hw/usb/hcd-xhci.c:    assert(n <= ARRAY_SIZE(tmp));
-> 
->> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
->> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
->> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
->> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
-> 
-> The last four items are OK as they are. The variable multiple_regs is, in fact,
-> an array of 9 int constants:
-> 
-> static const int multiple_regs[] = { 16, 17, 18, 19, 20, 21, 22, 23, 30 };
-> 
-> ARRAY_SIZE (multiple_regs) will always be equal to 9.
-> 
-> The variable base_reglist (that is checked to be > 0 and <=9) is used
-> in succeeding lines like this:
-> 
->         for (i = 0; i < base_reglist; i++) {
->             do_sw(env, addr, env->active_tc.gpr[multiple_regs[i]], mem_idx,
->                   GETPC());
->             addr += 4;
->         }
-> 
-> Therefore, the array multiple_regs will always be accessed within its bounds.
-> 
->> target/ppc/kvm.c:           <= ARRAY_SIZE(hw_debug_points));
->> target/ppc/kvm.c:           <= ARRAY_SIZE(hw_debug_points));
->> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <= ARRAY_SIZE(dbg->arch.bp));
->> tcg/tcg.c:    tcg_debug_assert(pi <= ARRAY_SIZE(op->args));
->> util/main-loop.c:    g_assert(n_poll_fds <= ARRAY_SIZE(poll_fds));
->> util/module.c:    assert(n_dirs <= ARRAY_SIZE(dirs));
->>
->> Lidong Chen, would you like to have a look at these?
->>
->> Cc'ing maintainers to help with further investigation.
->>
-> 
-> Thank you for bringing this to our attention, Markus. And thanks to Lidong too.
-> 
-> Aleksandar
-> 
-> P. S. Shouldn't perhaps our macro ARRAY_SIZE() be renamed to
-> NUMBER_OF_ELEMENTS()?
+Markus wrote:
 
-I remember this post from Daniel where he suggests sticking to GLib
-G_N_ELEMENTS() (which looks similar to your suggestion):
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02676.html
-
-$ git grep G_N_ELEMENTS|wc -l
-125
-$ git grep ARRAY_SIZE|wc -l
-939
-
-Now it is not obvious to me to understand which GLib API we are
-encouraged to use and which ones we shouldn't.
-
-> ________________________________________
-> From: Markus Armbruster <armbru@redhat.com>
-> Sent: Tuesday, April 9, 2019 7:51:51 AM
-> To: Lidong Chen
-> Cc: qemu-devel@nongnu.org; darren.kenny@oracle.com; f4bug@amsat.org; Peter Maydell; Jason Wang; Andrzej Zaborowski; Gerd Hoffmann; Aurelien Jarno; Aleksandar Markovic; Aleksandar Rikalo; David Gibson; Richard Henderson; Paolo Bonzini
-> Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
-> 
-> Lidong Chen <lidong.chen@oracle.com> writes:
-> 
->> Due to an off-by-one error, the assert statements allow an
->> out-of-bounds array access.
->>
->> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
->> ---
->>  hw/sd/sd.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index aaab15f..818f86c 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates state)
->>      if (state == sd_inactive_state) {
->>          return "inactive";
->>      }
->> -    assert(state <= ARRAY_SIZE(state_name));
->> +    assert(state < ARRAY_SIZE(state_name));
->>      return state_name[state];
->>  }
->>
->> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp)
->>      if (rsp == sd_r1b) {
->>          rsp = sd_r1;
->>      }
->> -    assert(rsp <= ARRAY_SIZE(response_name));
->> +    assert(rsp < ARRAY_SIZE(response_name));
->>      return response_name[rsp];
->>  }
-> 
 > This is the second fix for this bug pattern in a fortnight.  Where's
 > one, there are more:
-> 
-> $ git-grep '<= ARRAY_SIZE'
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <= ARRAY_SIZE(cs->ich_apr[0]));
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <= ARRAY_SIZE(cs->ich_apr[0]));
-> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <= ARRAY_SIZE(s->tx_fifo)) {
-> hw/sd/pxa2xx_mmci.c:        && s->tx_len <= ARRAY_SIZE(s->tx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->rx_len <= ARRAY_SIZE(s->rx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->resp_len <= ARRAY_SIZE(s->resp_fifo);
-> hw/sd/sd.c:    assert(state <= ARRAY_SIZE(state_name));
-> hw/sd/sd.c:    assert(rsp <= ARRAY_SIZE(response_name));
-> hw/usb/hcd-xhci.c:    assert(n <= ARRAY_SIZE(tmp));
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <= ARRAY_SIZE (multiple_regs)) {
-> target/ppc/kvm.c:           <= ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:           <= ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <= ARRAY_SIZE(dbg->arch.bp));
-> tcg/tcg.c:    tcg_debug_assert(pi <= ARRAY_SIZE(op->args));
-> util/main-loop.c:    g_assert(n_poll_fds <= ARRAY_SIZE(poll_fds));
-> util/module.c:    assert(n_dirs <= ARRAY_SIZE(dirs));
-> 
-> Lidong Chen, would you like to have a look at these?
-> 
-> Cc'ing maintainers to help with further investigation.
-> 
+>=20
+> $ git-grep '<=3D ARRAY_SIZE'
+> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
+]));
+> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
+]));
+> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <=3D ARRAY_SIZE(s-=
+>tx_fifo)) {
+> hw/sd/pxa2xx_mmci.c:        && s->tx_len <=3D ARRAY_SIZE(s->tx_fifo)
+> hw/sd/pxa2xx_mmci.c:        && s->rx_len <=3D ARRAY_SIZE(s->rx_fifo)
+> hw/sd/pxa2xx_mmci.c:        && s->resp_len <=3D ARRAY_SIZE(s->resp_fifo);
+> hw/sd/sd.c:    assert(state <=3D ARRAY_SIZE(state_name));
+> hw/sd/sd.c:    assert(rsp <=3D ARRAY_SIZE(response_name));
+> hw/usb/hcd-xhci.c:    assert(n <=3D ARRAY_SIZE(tmp));
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <=3D AR=
+RAY_SIZE(dbg->arch.bp));
+> tcg/tcg.c:    tcg_debug_assert(pi <=3D ARRAY_SIZE(op->args));
+> util/main-loop.c:    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
+> util/module.c:    assert(n_dirs <=3D ARRAY_SIZE(dirs));
+
+There could be even more:
+
+$ git grep '> ARRAY_SIZE'
+hw/display/ssd0323.c:    if (s->cmd_len > ARRAY_SIZE(s->cmd_data)) {
+hw/display/vmware_vga.c:                || SVGA_BITMAP_SIZE(x, y) > ARRAY_S=
+IZE(cursor.mask)
+hw/display/vmware_vga.c:                    > ARRAY_SIZE(cursor.image)) {
+hw/dma/xlnx-zdma.c:        len =3D src_size > ARRAY_SIZE(s->buf) ? ARRAY_SI=
+ZE(s->buf) : src_size;
+hw/net/stellaris_enet.c:    if (s->np > ARRAY_SIZE(s->rx)) {
+hw/net/stellaris_enet.c:        if (s->rx[i].len > ARRAY_SIZE(s->rx[i].data=
+)) {
+hw/net/stellaris_enet.c:    if (s->rx_fifo_offset > ARRAY_SIZE(s->rx[0].dat=
+a) - 4) {
+hw/net/stellaris_enet.c:    if (s->tx_fifo_len > ARRAY_SIZE(s->tx_fifo)) {
+hw/scsi/mptsas.c:    ((s)->name##_head > ARRAY_SIZE((s)->name) ||         \
+hw/scsi/mptsas.c:     (s)->name##_tail > ARRAY_SIZE((s)->name))
+hw/scsi/mptsas.c:        s->doorbell_cnt > ARRAY_SIZE(s->doorbell_msg) ||
+hw/scsi/mptsas.c:        s->doorbell_reply_size > ARRAY_SIZE(s->doorbell_re=
+ply) ||
+hw/sd/ssi-sd.c:        (!s->stopping && s->arglen > ARRAY_SIZE(s->response)=
+))) {
+hw/usb/dev-mtp.c:            if (cmd.argc > ARRAY_SIZE(cmd.argv)) {
+linux-user/syscall.c:    if (nargs[num] > ARRAY_SIZE(a)) {
+target/sh4/translate.c:    if (max_insns > ARRAY_SIZE(insns)) {
+
+CC-ing additional maintainers.
+
+Aleksandar=
 
