@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47975)
+Received: from eggs.gnu.org ([209.51.188.92]:48648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDo2H-0006Nl-W8
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:26 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDo54-0008S3-By
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDo2G-0007S6-Ub
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:25 -0400
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Date: Tue, 9 Apr 2019 11:29:35 +0100
-Message-ID: <20190409102935.28292-9-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
-References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+	(envelope-from <philmd@redhat.com>) id 1hDo53-00006y-6o
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:34:18 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDo52-0008WN-OY
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:34:17 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h18so2723755wml.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 03:34:15 -0700 (PDT)
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
+Date: Tue, 9 Apr 2019 12:34:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 8/8] hw/arm/boot: Expose the PC-DIMM nodes
- in the DT
+In-Reply-To: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="efSY6aaqISsFx5nfisEO9E76Kh9g8Nyr6"
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
+ missing AMD pflash functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, imammedo@redhat.com
-Cc: peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, xuwei5@hisilicon.com, lersek@redhat.com, ard.biesheuvel@linaro.org, linuxarm@huawei.com
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-This patch adds memory nodes corresponding to PC-DIMM regions.
-This will enable support for cold plugged device memory for Guests
-with DT boot.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--efSY6aaqISsFx5nfisEO9E76Kh9g8Nyr6
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement missing
+ AMD pflash functionality
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+In-Reply-To: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+Hi Stephen,
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 8c840ba..150e1ed 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -19,6 +19,7 @@
- #include "sysemu/numa.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
-+#include "hw/mem/memory-device.h"
- #include "elf.h"
- #include "sysemu/device_tree.h"
- #include "qemu/config-file.h"
-@@ -538,6 +539,41 @@ static void fdt_add_psci_node(void *fdt)
-     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
- }
- 
-+static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-+                                             uint32_t acells, uint32_t scells) {
-+    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
-+    MemoryDeviceInfo *mi;
-+    int ret = 0;
-+
-+    for (info = info_list; info != NULL; info = info->next) {
-+        mi = info->value;
-+        switch (mi->type) {
-+        case MEMORY_DEVICE_INFO_KIND_DIMM:
-+        {
-+            PCDIMMDeviceInfo *di = mi->u.dimm.data;
-+
-+            ret = fdt_add_memory_node(fdt, acells, di->addr, scells,
-+                                      di->size, di->node, true);
-+            if (ret) {
-+                fprintf(stderr,
-+                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
-+                        di->addr);
-+                goto out;
-+            }
-+            break;
-+        }
-+        default:
-+            fprintf(stderr, "%s memory nodes are not yet supported\n",
-+                    MemoryDeviceInfoKind_str(mi->type));
-+            ret = -ENOENT;
-+            goto out;
-+        }
-+    }
-+out:
-+    qapi_free_MemoryDeviceInfoList(info_list);
-+    return ret;
-+}
-+
- int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-                  hwaddr addr_limit, AddressSpace *as)
- {
-@@ -637,6 +673,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-         }
-     }
- 
-+    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
-+    if (rc < 0) {
-+        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
-+        goto fail;
-+    }
-+
-     rc = fdt_path_offset(fdt, "/chosen");
-     if (rc < 0) {
-         qemu_fdt_add_subnode(fdt, "/chosen");
--- 
-2.7.4
+[Cc'ing Markus and Laszlo, we have similar interest in pflash01 testing]
+
+On 4/8/19 10:55 PM, Stephen Checkoway wrote:
+> The goal of this patch series implement the following AMD command-set p=
+arallel
+> flash functionality:
+> - flash interleaving;
+> - nonuniform sector sizes;
+> - erase suspend/resume commands; and
+> - multi-sector erase.
+
+I am very glad you addressed these long overdue issues and very pleased
+by your patches :)
+I'll thoroughly review it during next week (this won't get merge for the
+current 4.0 cycle anyway).
+
+I started a similar cleanup (mostly pflash01 focused) and converted
+DPRINTF to trace events, added few constants. I'll see if I can rebase
+your work on top of mine. So far only your patch 2 (refactor) would be
+modified, simplified as the "pull out all of the code to modify the
+status into simple helper functions" part (which else I'd ask you to
+move in a separate patch).
+
+We should think of more intereleaved tests, I'll prepare a table of
+current QEMU models using this device and how is their intereleave
+mapping. Hopefully it would be enough to simply add the existing
+machines to your current musicpal qtest.
+
+Also I'd like to see some Top/Bottom block configuration qtests, your
+patch #5 doesn't seem tested.
+
+> During refactoring and implementation, I discovered several bugs that a=
+re
+> fixed here as well:
+> - flash commands use only 11-bits of the address in most cases, but the=
+
+>   current code uses all of them [1];
+> - entering CFI mode from autoselect mode and then exiting CFI mode shou=
+ld
+>   return the chip to autoselect mode, but the current code returns to r=
+ead
+>   array mode; and
+> - reset command should be ignored during sector/chip erase, but the cur=
+rent
+>   code performs the reset.
+>=20
+> The first patch in the series adds a test for the existing behavior. Te=
+sts for
+> additional behavior/bug fixes are added in the relevant patch.
+>=20
+> 1. I found firmware in the wild that relies on the 11-bit address behav=
+ior,
+>    probably due to a bug in the firmware itself.
+
+Is it a musicpal firmware? Are you able to compare with real hardware?
+
+I vaguely remember some issue regarding address bus width when trying to
+implement the TopBlock small sectors, but I wasn't using the musicpal.
+I'll see if I can find my old notes and test with your series.
+
+Regards,
+
+Phil.
+
+> Stephen Checkoway (10):
+>   block/pflash_cfi02: Add test for supported commands
+>   block/pflash_cfi02: Refactor, NFC intended
+>   block/pflash_cfi02: Fix command address comparison
+>   block/pflash_cfi02: Implement intereleaved flash devices
+>   block/pflash_cfi02: Implement nonuniform sector sizes
+>   block/pflash_cfi02: Fix CFI in autoselect mode
+>   block/pflash_cfi02: Fix reset command not ignored during erase
+>   block/pflash_cfi02: Implement multi-sector erase
+>   block/pflash_cfi02: Implement erase suspend/resume
+>   block/pflash_cfi02: Use the chip erase time specified in the CFI tabl=
+e
+>=20
+>  hw/block/pflash_cfi02.c   | 843 +++++++++++++++++++++++++++-----------=
+
+>  tests/Makefile.include    |   2 +
+>  tests/pflash-cfi02-test.c | 757 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 1367 insertions(+), 235 deletions(-)
+>  create mode 100644 tests/pflash-cfi02-test.c
+>=20
+
+
+--efSY6aaqISsFx5nfisEO9E76Kh9g8Nyr6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlysdSMACgkQoqP9bt6t
+wN75DxAAjACVm9G747DpLK3VeyG8iNQZA9LpKlsBOxA9EN7j/yVx6IBKuQ9O8j90
+1PbYvxPIu1RRQip9zqW4r73CKCFmWRU2d8mqIy/38f1FWZ7LgoVlMHGp89GspsCL
+to0ntYMlFZxwI5wdvZyjml9B21FNK9/Xcwg2/sthp9Lzuza3vQFG+KvlKL4WBvb2
+v37+mKyHYm69/csYQpgUOQ0kvjnwH26yFZ6U9y8Zrnugzw0nX+T6WB0q/t3m51uF
+K4Giqqv9LM835MPbPfxUzjzqMRGQYT05lwGUWze6RIcqqqzZx9nbVsBzT4qvhBOG
+YhHDWC31ZwzrFrQkAcd/1LIdNzMJv7Ab9HgAI0UwgdwfP/+mPnk7wx+QC94HvwDb
++uQ9TdoThacGRS6CqjGzwFlykL/2dMYA5E5M9injZp64RLUK17D1RVun0CPXXDz4
+H8Mb1JAOwD6+3hBQSrW4q1q5tpej9XA3Jbl9mPfYXGfHBa4LNYWQ1tKRzcytANUI
+e/85lh5zwLvxuwmQLWfCRb6BuG+VmQPufDXKFI2cD6rY/W1cZ+5LxcCxQJ3XGuE1
+6RDp3dilmnslsnRyOYG8i9TbB8GTsn70sdWNFAVYjmE8WSECo98cmR3GYrhdp8jX
+VXoMZE3qnjiZiaNyi4sbecxl8xM0Q3sCygXmA3Bl4EveGS7K7NU=
+=3uqe
+-----END PGP SIGNATURE-----
+
+--efSY6aaqISsFx5nfisEO9E76Kh9g8Nyr6--
