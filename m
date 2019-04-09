@@ -2,107 +2,82 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0420C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B8F8C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8440820850
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:07:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8440820850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7635320850
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 17:08:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cse.mrt.ac.lk header.i=@cse.mrt.ac.lk header.b="ZJBEUzcW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7635320850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cse.mrt.ac.lk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46613 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46627 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDuDn-0001hb-Mw
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 13:07:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42058)
+	id 1hDuEd-0002IF-F9
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 13:08:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hDuCj-0001Iw-8E
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:06:38 -0400
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDuDS-0001gP-Bh
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hDuCi-000659-6x
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:06:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hDuCh-00060Y-OH; Tue, 09 Apr 2019 13:06:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 34DFF3076C60;
-	Tue,  9 Apr 2019 17:06:33 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9F8EE17996;
-	Tue,  9 Apr 2019 17:06:31 +0000 (UTC)
-To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>, qemu-devel@nongnu.org
-References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <fbe81e69-01f1-4755-49a8-e25df108a196@redhat.com>
-Date: Tue, 9 Apr 2019 19:06:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDuDQ-0006Z1-O1
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:07:22 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
+	id 1hDuDP-0006VO-D1
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:07:20 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p10so21914325wrq.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 10:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cse.mrt.ac.lk; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=jNiYLfvh/vDXwbCeYLQ6mL+AjMUsPn7+gBjqEeZiEow=;
+	b=ZJBEUzcWut46WTDQpNtv/o3s7651330PXgGGSZuDeuoVZeKv1ETUZyKMQEZY2cp9NK
+	zyOn9GsOPvjQv4zBFlBmABLxhAB99pkSs5bc0u+yXzXRK8dU3zW4YKE7Pvfl0wk/315W
+	7JEtQSFml90DPA6wnIJyv+VYbpY5VzmfoZHbgHMWeOlsnL8BWXv7B4ZUMUKty/FEUdVT
+	nit4IutsSR+JeM+bf2omI11c1WDPaOGniq2XXj0GMDcykpp/rH9JJGoKGKWP4dVtGH/Y
+	m96m7v5IkFO/3Ix77e0y7bmrTiO/8/FRfjjSdCIM9syukqpfvQf2ye4NdDzOhYvGEzBX
+	jwDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=jNiYLfvh/vDXwbCeYLQ6mL+AjMUsPn7+gBjqEeZiEow=;
+	b=jR5CPFj1qIHFEpKQf/ikTNauh4i6pe6rMsbv6GaMnL8+m3ID6Yp+89KV9EHXHSpiXc
+	9TKE9Z5/NkkqMGiRVdhdcXedQZYs327ntaqKdD1aiOTZ6s1x97EqS9UwDez4uk65MNnh
+	IgtEFkzE/kWi9A89mFB7xIkS4JNpvY1TEZqLOlsxYPM5AyByvEDIoJevnMkWEjgW70IE
+	4he9a5+q6ZCLB/tpcf3x93HF3muKXZ99VtVqsYw5yUqN/VPwK46g5FXSwtSTWiZqjsng
+	mHw9kbzMwjzdCpAzp5eKJV5QpnPGCPoOaqNU/RldgcxGA4vs4jRvlmX4XpavnVErt8O9
+	5hVg==
+X-Gm-Message-State: APjAAAVmznO2tBFiguF0zArXWGplCVj2f4NJ7tU0Z7UDZCOsSp/35/Os
+	hJGggdJoG0Zdw194TwzafMXkIqzCMHOXOyUfzSGxWQ==
+X-Google-Smtp-Source: APXvYqzPcYCydhidtkXzb0FbvW4tZq1Jcw2H30QHfLb9f30mcLckKHpY+MRfj8ew+qopfLakezPg6Z/m+IxKW2ZvqYE=
+X-Received: by 2002:adf:f68d:: with SMTP id v13mr23248844wrp.6.1554829637112; 
+	Tue, 09 Apr 2019 10:07:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+	<fbe81e69-01f1-4755-49a8-e25df108a196@redhat.com>
+In-Reply-To: <fbe81e69-01f1-4755-49a8-e25df108a196@redhat.com>
+From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Date: Tue, 9 Apr 2019 22:37:05 +0530
+Message-ID:
+ <CAH95U0j5Ph_OZS+ZY2juM6UxvESGO=dv+cYV6uLiNAOpHVS7mw@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 09 Apr 2019 17:06:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
 Subject: Re: [Qemu-devel] [PATCH 0/4] Header cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -115,36 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409170630.EOt8s5A8Bpq6z-z1rZMoQEy9l6pDJlmQaIXM4jV3z50@z>
+Message-ID: <20190409170705.UQ-n5vBZA2jwonHoeM4jv6L-VFzKtKtOBppN68PbcVo@z>
 
-On 09/04/2019 17.56, Aruna Jayasena wrote:
-> Removed unwanted includes from cpu-common.h
-> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
-> 
-> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> 
-> ---
->  include/exec/cpu-common.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index cef8b88a2a..a3594f3f50 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -7,8 +7,6 @@
->  #include "exec/hwaddr.h"
->  #endif
->  
-> -#include "qemu/bswap.h"
-> -#include "qemu/queue.h"
->  #include "qemu/fprintf-fn.h"
->  
->  /**
-> 
+Thanks!
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On Tue, Apr 9, 2019 at 10:36 PM, Thomas Huth <thuth@redhat.com> wrote:
 
+> On 09/04/2019 17.56, Aruna Jayasena wrote:
+> > Removed unwanted includes from cpu-common.h
+> > This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+> >
+> > Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+> >
+> > ---
+> >  include/exec/cpu-common.h | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> > index cef8b88a2a..a3594f3f50 100644
+> > --- a/include/exec/cpu-common.h
+> > +++ b/include/exec/cpu-common.h
+> > @@ -7,8 +7,6 @@
+> >  #include "exec/hwaddr.h"
+> >  #endif
+> >
+> > -#include "qemu/bswap.h"
+> > -#include "qemu/queue.h"
+> >  #include "qemu/fprintf-fn.h"
+> >
+> >  /**
+> >
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>
+--=20
+*Aruna* Jayasena
+Embedded Systems and Computer Science Engineering Undergraduate
+University of Moratuwa
+*=E2=9C=86 **+94719872152 *
+=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
+<https://www.linkedin.com/in/arunajayasena/>
