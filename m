@@ -2,53 +2,63 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE3DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CEDC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:00:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 495B820833
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495B820833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D100120833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:00:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D100120833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42870 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42924 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDsDa-0003bP-If
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 10:59:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53330)
+	id 1hDsF4-0004aE-4q
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:00:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAw-0001ut-2u
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:56:39 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hDsDD-0003Vi-7G
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAu-0006mS-NZ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:56:38 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39720)
+	(envelope-from <imammedo@redhat.com>) id 1hDsDC-0007j2-1D
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:58:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDsAu-0006lL-CW; Tue, 09 Apr 2019 10:56:36 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDsAr-0007rL-8A; Tue, 09 Apr 2019 17:56:33 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue,  9 Apr 2019 17:56:32 +0300
-Message-Id:
- <1554821792-968307-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 2/2] iotests: new test 253 check qemu-img
- convert force read
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hDsDB-0007h3-P5
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:58:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82A043005FEF;
+	Tue,  9 Apr 2019 14:58:55 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EAE3A1001DD7;
+	Tue,  9 Apr 2019 14:58:46 +0000 (UTC)
+Date: Tue, 9 Apr 2019 16:58:45 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190409165845.48abd4ec@redhat.com>
+In-Reply-To: <20190409134536.15548-3-philmd@redhat.com>
+References: <20190409134536.15548-1-philmd@redhat.com>
+	<20190409134536.15548-3-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 09 Apr 2019 14:58:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 2/2] roms: Allow passing
+ configure options to the EDK2 build tools
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -60,120 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
-	andrey.shinkevich@virtuozzo.com, mreitz@redhat.com
+Cc: Olaf Hering <olaf@aepfle.de>, "Michael S . Tsirkin" <mst@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409145632.ZYOg41X3cDDtixnMQ0IOoO7128iP2SdUk3lMLNAIGs4@z>
+Message-ID: <20190409145845.dYu8pehNCPRWIiS1fCPNDJ99g2qr1dLg-5QauYMHdaw@z>
 
-A new test for the patch 'qemu-img convert: ignore read errors'
+On Tue,  9 Apr 2019 15:45:36 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/253     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/253.out |  4 +++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 74 insertions(+)
- create mode 100755 tests/qemu-iotests/253
- create mode 100644 tests/qemu-iotests/253.out
+> Since commit f590a812c210 we build the EDK2 EfiRom utility
+> unconditionally.
+>=20
+> Some distributions require to use extra compiler/linker flags,
+> i.e. SUSE which enforces the PIE protection (see [*]).
+>=20
+> EDK2 build tools already provide a set of variables for that,
+> use them to allow the caller to easily inject compiler/linker
+> options..
+>=20
+> Now build scripts can pass extra options, example:
+>=20
+>   $ make -C roms \
+>       EDK2_BASETOOLS_OPTFLAGS=3D'-fPIE' \
+>       efirom
+>=20
+> [*] https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+>=20
+> Reported-by: Olaf Hering <olaf@aepfle.de>
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
-new file mode 100755
-index 0000000..671a3c4
---- /dev/null
-+++ b/tests/qemu-iotests/253
-@@ -0,0 +1,69 @@
-+#!/usr/bin/env python
-+#
-+# Test of the 'qemu-img convert' for a damaged image.
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+import os
-+from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
-+    file_path, log
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+disk = file_path('disk')
-+chunk = 256 * 1024
-+bad_sector = 768
-+blkdebug_file = os.path.join(iotests.test_dir, 'blkdebug.conf')
-+
-+
-+def create_blkdebug_file():
-+    file = open(blkdebug_file, 'w')
-+    file.write('''
-+[inject-error]
-+event = "read_aio"
-+errno = "5"
-+once ="off"
-+sector = "%d"
-+''' % (bad_sector))
-+    file.close()
-+
-+
-+def write_to_disk(offset, size):
-+    write = 'write -P 7 {} {}'.format(offset, size)
-+    qemu_io('-c', write, disk)
-+
-+
-+qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-+
-+for num in range(1, 4):
-+    write_to_disk((num-1) * chunk, chunk)
-+
-+create_blkdebug_file()
-+disk_converted = disk + '_converted'
-+log(qemu_img_pipe('convert', '-O', iotests.imgfmt, 'blkdebug:%s:%s'
-+                  % (blkdebug_file, disk), disk_converted))
-+log(qemu_img_pipe('convert', '-O', iotests.imgfmt, '-R', 'blkdebug:%s:%s'
-+                  % (blkdebug_file, disk), disk_converted))
-+
-+# TODO: with a class, self.assertNotEqual(
-+#       qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', disk),
-+#       qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', disk_converted),
-+#               'image file map matches the copied file after conversion')
-+
-+os.remove(disk_converted)
-+os.remove(blkdebug_file)
-diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
-new file mode 100644
-index 0000000..b972541
---- /dev/null
-+++ b/tests/qemu-iotests/253.out
-@@ -0,0 +1,4 @@
-+qemu-img: error while reading sector 0: Input/output error
-+
-+qemu-img: failed to read 786432 bytes at offset 0: Input/output error
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index bae7718..4cd2fe8 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -248,3 +248,4 @@
- 246 rw auto quick
- 247 rw auto quick
- 248 rw auto quick
-+253 rw auto quick
--- 
-1.8.3.1
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  roms/Makefile | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/roms/Makefile b/roms/Makefile
+> index d28252dafdf..1ff78b63bb3 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -120,8 +120,21 @@ build-efi-roms: build-pxe-roms
+>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+> =20
+> +# Build scripts can pass compiler/linker flags to the EDK2 build tools
+> +# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
+> +# EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
+> +#
+> +# Example:
+> +#
+> +#  make -C roms \
+> +#    EDK2_BASETOOLS_OPTFLAGS=3D'...' \
+> +#    EDK2_BASETOOLS_LDFLAGS=3D'...' \
+> +#    efirom
+> +#
+>  $(EDK2_EFIROM):
+> -	$(MAKE) -C edk2/BaseTools
+> +	$(MAKE) -C edk2/BaseTools \
+> +		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
+> +		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+> =20
+>  slof:
+>  	$(MAKE) -C SLOF CROSS=3D$(powerpc64_cross_prefix) qemu
 
 
