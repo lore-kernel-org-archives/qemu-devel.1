@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43502)
+Received: from eggs.gnu.org ([209.51.188.92]:44467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDwiq-0003lg-RB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:57 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hDwnN-0004tp-JV
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDwip-0007UF-VI
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:56 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDwip-0007Tb-Nr
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:55 -0400
-Received: by mail-ot1-x343.google.com with SMTP id m10so16757160otp.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 12:47:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190409151830.6024-1-peter.maydell@linaro.org>
-	<87ef6byye5.fsf@trasno.org>
-In-Reply-To: <87ef6byye5.fsf@trasno.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Apr 2019 02:47:45 +0700
-Message-ID: <CAFEAcA87-z9Su8qYOJoG9nVXnAYShwKBrDEpP+55WK5SVrnq=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0] migration/ram.c: Fix
- use-after-free in multifd_recv_unfill_packet()
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hDwnM-0002FP-8i
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:37 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59639 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hDwnL-0001h6-VD
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:36 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue,  9 Apr 2019 21:51:26 +0200
+Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH] linux-user: Support the SIOCSIFPFLAGS and
+ SIOCGIFPFLAGS ioctls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, nchen@wavecomp.com, ysu@wavecomp.com, arikalo@wavecomp.com, amarkovic@wavecomp.com
 
-On Tue, 9 Apr 2019 at 22:42, Juan Quintela <quintela@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Coverity points out (CID 1400442) that in this code:
-> >
-> >     if (packet->pages_alloc > p->pages->allocated) {
-> >         multifd_pages_clear(p->pages);
-> >         multifd_pages_init(packet->pages_alloc);
-> >     }
-> >
-> > we free p->pages in multifd_pages_clear() but continue to
-> > use it in the following code. We also leak memory, because
-> > multifd_pages_init() returns the pointer to a new MultiFDPages_t
-> > struct but we are ignoring its return value.
-> >
-> > Fix both of these bugs by adding the missing assignment of
-> > the newly created struct to p->pages.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
->
-> ouch,
->
-> good catch.
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+From: Neng Chen <nchen@wavecomp.com>
 
-Thanks for the quick review. Applied to master for rc3.
+Add support for setting and getting extended (private) flags
+of a network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
 
--- PMM
+The ioctl numeric values are platform-independent and determined
+by the file include/uapi/linux/sockios.h in Linux kernel source
+code.
+
+The ioctls set and get field ifr_flags of type short in the
+structure ifreq. Such functionality in QEMU is achieved using
+MK_STRUCT() and MK_PTR() macros with an appropriate argument.
+
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index ae89516..11829a1 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,8 @@
+   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
++  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 12c8407..060b854 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -777,6 +777,8 @@ struct target_pollfd {
+ #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
+ #define TARGET_SIOCDELMULTI    0x8932
+ #define TARGET_SIOCGIFINDEX    0x8933
++#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
++#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+ 
+ /* Bridging control calls */
+ #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
+-- 
+2.7.4
