@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42663)
+Received: from eggs.gnu.org ([209.51.188.92]:43259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDjxR-0000Ch-J8
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:10:10 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1hDk0H-0001cG-J3
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hDjxQ-0003cj-Ri
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:10:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36334)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hDjxQ-0003bW-JJ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:10:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DAFC889C45
-	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 06:10:07 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-15-armbru@redhat.com>
-	<53312567-fb1e-0f9d-f2d1-1adbf584ef21@redhat.com>
-Date: Tue, 09 Apr 2019 08:10:03 +0200
-In-Reply-To: <53312567-fb1e-0f9d-f2d1-1adbf584ef21@redhat.com> (Eric Blake's
-	message of "Mon, 8 Apr 2019 14:04:13 -0500")
-Message-ID: <87y34jhfpg.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 14/15] char: Make -chardev help print to
- stdout
+	(envelope-from <stefan@weilnetz.de>) id 1hDk0G-0005Mz-M9
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:13:05 -0400
+From: Stefan Weil <sw@weilnetz.de>
+Date: Tue,  9 Apr 2019 08:04:35 +0200
+Message-Id: <20190409060435.22801-1-sw@weilnetz.de>
+Subject: [Qemu-devel] [PATCH] tci: Fix some unaligned memory accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,18 +17,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>
 
-Eric Blake <eblake@redhat.com> writes:
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ tcg/tci.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-> On 4/8/19 3:36 AM, Markus Armbruster wrote:
->> Command line help explicitly requested by the user should be printed
->> to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
->> use qemu_printf() instead of error_printf().  Plain printf() would be
->> wrong because we need to print to the current monitor for chardev-add
->> help".
->
-> Mismatched "
-
-Eagle eyes.  Will fix, thanks!
+diff --git a/tcg/tci.c b/tcg/tci.c
+index 33edca1903..20b0715b6e 100644
+--- a/tcg/tci.c
++++ b/tcg/tci.c
+@@ -1,7 +1,7 @@
+ /*
+  * Tiny Code Interpreter for QEMU
+  *
+- * Copyright (c) 2009, 2011, 2016 Stefan Weil
++ * Copyright (c) 2009, 2011, 2016, 2019 Stefan Weil
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -159,7 +159,8 @@ static uint64_t tci_uint64(uint32_t high, uint32_t low)
+ /* Read constant (native size) from bytecode. */
+ static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
+ {
+-    tcg_target_ulong value = *(tcg_target_ulong *)(*tb_ptr);
++    tcg_target_ulong value;
++    memcpy(&value, *tb_ptr, sizeof(value));
+     *tb_ptr += sizeof(value);
+     return value;
+ }
+@@ -167,7 +168,8 @@ static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
+ /* Read unsigned constant (32 bit) from bytecode. */
+ static uint32_t tci_read_i32(uint8_t **tb_ptr)
+ {
+-    uint32_t value = *(uint32_t *)(*tb_ptr);
++    uint32_t value;
++    memcpy(&value, *tb_ptr, sizeof(value));
+     *tb_ptr += sizeof(value);
+     return value;
+ }
+@@ -175,7 +177,8 @@ static uint32_t tci_read_i32(uint8_t **tb_ptr)
+ /* Read signed constant (32 bit) from bytecode. */
+ static int32_t tci_read_s32(uint8_t **tb_ptr)
+ {
+-    int32_t value = *(int32_t *)(*tb_ptr);
++    int32_t value;
++    memcpy(&value, *tb_ptr, sizeof(value));
+     *tb_ptr += sizeof(value);
+     return value;
+ }
+@@ -184,7 +187,8 @@ static int32_t tci_read_s32(uint8_t **tb_ptr)
+ /* Read constant (64 bit) from bytecode. */
+ static uint64_t tci_read_i64(uint8_t **tb_ptr)
+ {
+-    uint64_t value = *(uint64_t *)(*tb_ptr);
++    uint64_t value;
++    memcpy(&value, *tb_ptr, sizeof(value));
+     *tb_ptr += sizeof(value);
+     return value;
+ }
+@@ -474,7 +478,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+     tcg_target_ulong regs[TCG_TARGET_NB_REGS];
+     long tcg_temps[CPU_TEMP_BUF_NLONGS];
+     uintptr_t sp_value = (uintptr_t)(tcg_temps + CPU_TEMP_BUF_NLONGS);
+-    uintptr_t ret = 0;
++    uint64_t ret = 0;
+ 
+     regs[TCG_AREG0] = (tcg_target_ulong)env;
+     regs[TCG_REG_CALL_STACK] = sp_value;
+@@ -1094,7 +1098,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+             /* QEMU specific operations. */
+ 
+         case INDEX_op_exit_tb:
+-            ret = *(uint64_t *)tb_ptr;
++            memcpy(&ret, tb_ptr, sizeof(uint64_t));
+             goto exit;
+             break;
+         case INDEX_op_goto_tb:
+-- 
+2.11.0
