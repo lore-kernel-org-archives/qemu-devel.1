@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46577)
+Received: from eggs.gnu.org ([209.51.188.92]:48983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoN-0003DT-Jn
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:24 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDsvX-0005lj-2T
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:44:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoL-00006a-Sf
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:23 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDsoK-0008TB-2Q
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:21 -0400
-Received: by mail-io1-xd42.google.com with SMTP id v4so14682909ioj.5
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:37:13 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
-Date: Tue, 9 Apr 2019 11:37:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDsvV-00041Y-Ue
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:44:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hDsvV-00040r-MM
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:44:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 25B3430B96D0
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 15:44:40 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 17:44:35 +0200
+Message-Id: <20190409154435.28807-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <98B3F0C7-6554-4455-B441-86605DA5D6C1@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-	<c03b48badb28e3c98bcbaed092b5c40e7284db08.1554755001.git.stephen.checkoway@oberlin.edu>
-	<9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/10] block/pflash_cfi02: Add test for
- supported commands
+Subject: [Qemu-devel] [PATCH] docs: replace min-glib with fedora
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
+min-glib.docker was removed in commit
+e7b3af81597db1a6b55f2c15d030d703c6b2c6ac ("glib: bump min required
+glib library version to 2.40").
 
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ docs/devel/testing.rst | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On Apr 9, 2019, at 02:13, Thomas Huth <thuth@redhat.com> wrote:
-
-> We'd like to get rid of global_qtest in the long run (since it is
-> causing trouble for tests that run multiple instances of QEMU in
-> parallel, e.g. migration tests)... so if it is feasible, please don't
-> use it in new code anymore. Try to use a local variable in the =
-function
-> that call qtest_initf() and pass the test state around via a parameter
-> to the functions that need it.
-
-One of the patches introduces a FlashConfig structure which gets passed =
-around to all the functions. I could stuff the local qtest in there. The =
-earlier patches would still use global_qtest. Would that be acceptable =
-or would you prefer that global_qtest not appear in any of the patches?
-
-Or rather than putting it in the FlashConfig struct, I could just pass a =
-separate parameter around. Whatever you prefer.
-
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 60f897d915..cec7d56c57 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -317,17 +317,17 @@ the container, with parameters defined by the make =
+target):
+=20
+ .. code::
+=20
+-  make docker-test-build@min-glib
++  make docker-test-build@fedora
+=20
+-This will create a container instance using the ``min-glib`` image (the =
+image
++This will create a container instance using the ``fedora`` image (the im=
+age
+ is downloaded and initialized automatically), in which the ``test-build`=
+` job
+ is executed.
+=20
+ Images
+ ------
+=20
+-Along with many other images, the ``min-glib`` image is defined in a Doc=
+kerfile
+-in ``tests/docker/dockefiles/``, called ``min-glib.docker``. ``make dock=
+er``
++Along with many other images, the ``fedora`` image is defined in a Docke=
+rfile
++in ``tests/docker/dockefiles/``, called ``fedora.docker``. ``make docker=
+``
+ command will list all the available images.
+=20
+ To add a new image, simply create a new ``.docker`` file under the
 --=20
-Stephen Checkoway
+2.21.0.196.g041f5ea1cf
