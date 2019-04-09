@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52419)
+Received: from eggs.gnu.org ([209.51.188.92]:55010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDki2-0003J9-3T
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:58:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hDksA-0005gV-Ln
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 03:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDki1-0008Fx-6O
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:58:18 -0400
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:42424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hDki0-0008FZ-My
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 02:58:17 -0400
-Received: by mail-pf1-x434.google.com with SMTP id w25so7677209pfi.9
-	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 23:58:16 -0700 (PDT)
-References: <20190409060435.22801-1-sw@weilnetz.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4a16a810-9806-3a76-7d17-1b6282296502@linaro.org>
-Date: Mon, 8 Apr 2019 20:58:10 -1000
+	(envelope-from <dgibson@ozlabs.org>) id 1hDks9-0005BB-RI
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 03:08:46 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue,  9 Apr 2019 17:08:28 +1000
+Message-Id: <20190409070830.22430-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20190409060435.22801-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tci: Fix some unaligned memory accesses
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] ppc-for-4.0 queue 20190409
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +19,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, mst@redhat.com, marcel@redhat.com, alex.williamson@redhat.com, clg@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-On 4/8/19 8:04 PM, Stefan Weil wrote:
->  static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
->  {
-> -    tcg_target_ulong value = *(tcg_target_ulong *)(*tb_ptr);
-> +    tcg_target_ulong value;
+The following changes since commit 5263724b78f89cdea2354c8e92c53bac1b4641=
+a3:
 
-Ideally these would use the helpers from "qemu/bswap.h", ldl_he_p(), etc.
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2019-04-08 17:53:18 +0100)
 
+are available in the Git repository at:
 
-r~
+  git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190409
+
+for you to fetch changes up to 5cf0d326a0fec9ebac2d47c42b5f08e6bc2f686c:
+
+  spapr_pci: Fix extended config space accesses (2019-04-09 15:03:10 +100=
+0)
+
+----------------------------------------------------------------
+ppc patch queue 2019-04-09
+
+This is a small, hard freeze, pull request which fixes a regression on
+the pseries machine handling of PCI-E extended config space accesses.
+
+----------------------------------------------------------------
+Greg Kurz (2):
+      pci: Allow PCI bus subtypes to support extended config space access=
+es
+      spapr_pci: Fix extended config space accesses
+
+ hw/pci/pci.c             | 24 ++++++++++++++++++++++++
+ hw/pci/pci_host.c        |  2 +-
+ hw/ppc/spapr_pci.c       | 28 ++++++++++++++++++++++++++--
+ include/hw/pci/pci.h     |  2 ++
+ include/hw/pci/pci_bus.h |  1 +
+ 5 files changed, 54 insertions(+), 3 deletions(-)
