@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51545)
+Received: from eggs.gnu.org ([209.51.188.92]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDxMV-0007OC-Ft
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1hDxOH-0008KH-Az
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDxMU-0003lq-Dz
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:55 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33858)
+	(envelope-from <bounces@canonical.com>) id 1hDxOG-0004iB-0Q
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45378)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDxMU-0003lZ-3H
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:54 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k21so16881568otf.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 13:28:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hDxOF-0004gq-Nt
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hDxOE-00064H-FO
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 20:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 50F822E80CB
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 20:30:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190409174018.25798-1-armbru@redhat.com>
-	<CAFEAcA8xg7wc+fX9Rn_F+L2jS0OzEwRcfjt==R5-YR6iphV=NA@mail.gmail.com>
-	<CAKmqyKNAT6a+a6MyhSh7RErUOyCPnEv-RKM4S-j12GS9dUMTYw@mail.gmail.com>
-In-Reply-To: <CAKmqyKNAT6a+a6MyhSh7RErUOyCPnEv-RKM4S-j12GS9dUMTYw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Apr 2019 21:28:41 +0100
-Message-ID: <CAFEAcA9S0H=tX4wZOxwbar-UpxH3D+JUc0_6VRStz_doRKmB+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
- overflowing in load_device_tree()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Apr 2019 20:24:09 -0000
+From: john <johnandersenpdx@gmail.com>
+Reply-To: Bug 1815252 <1815252@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154966719970.21699.16286451963680929757.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155484144917.14327.2914254769567120464.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815252] Re: virtio-9p-pci passthrough fsync hang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +36,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Prasad J Pandit <pjp@fedoraproject.org>
+To: qemu-devel@nongnu.org
 
-On Tue, 9 Apr 2019 at 21:15, Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Tue, Apr 9, 2019 at 1:08 PM Peter Maydell <peter.maydell@linaro.org> wrote:
-> >
-> > On Wed, 10 Apr 2019 at 00:40, Markus Armbruster <armbru@redhat.com> wrote:
-> > >
-> > > If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
-> > > computation of @dt_size overflows to a negative number, which then
-> > > gets converted to a very large size_t for g_malloc0() and
-> > > load_image_size().  In the (fortunately improbable) case g_malloc0()
-> > > succeeds and load_image_size() survives, we'd assign the negative
-> > > number to *sizep.  What that would do to the callers I can't say, but
-> > > it's unlikely to be good.
-> > >
-> > > Fix by rejecting images whose size would overflow.
-> > >
-> > > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >
-> > I think this patch is missing some attributions for the
-> > security researchers who found the issue initially.
-> > PJP's patch for this from a couple of weeks back has a
-> > reported-by credit:
-> > https://patchew.org/QEMU/20190322073555.20889-1-ppandit@redhat.com/
->
-> It seems like from that discussion that this patch is the correct approach.
->
-> I can add the attributions and send a PR for 4.0. I'll send it by EOD
-> unless anyone has any objections.
+Damn, I just ran into this bug again! Then realized I'd already reported
+it.... :(
 
-Thanks. I think given it's 21:30 here I'm going to postpone
-tagging rc3 til tomorrow (mid-afternoon UK time). I'm still
-hoping we can avoid an rc4...
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815252
+
+Title:
+  virtio-9p-pci passthrough fsync hang
+
+Status in QEMU:
+  New
+
+Bug description:
+  Tested against QEMU: e47f81b617684c4546af286d307b69014a83538a
+
+  and $qemu-system-x86_64 --version
+  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.9)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  + exec sudo qemu-system-x86_64 -enable-kvm -bios /usr/share/ovmf/OVMF.fd =
+-cpu host -smp sockets=3D1,cpus=3D4,cores=3D2 -m 2048 -vga none -nographic =
+-chardev socket,id=3Dchrtpm0,path=3D/tmp/clrwifi/swtpm2/tpm-sock -tpmdev em=
+ulator,id=3Dtpm0,chardev=3Dchrtpm0 -device tpm-tis,tpmdev=3Dtpm0 -device vi=
+rtio-rng-pci -netdev user,id=3Dmynet0,hostfwd=3Dtcp::10022-:22 -device virt=
+io-net-pci,netdev=3Dmynet0 -kernel /home/.../Documents/c/iwd/tools/bzImage =
+-append 'console=3DttyS0,115200n8 quiet kvm-intel.nested=3D1 init=3D/usr/bi=
+n/bash initcall_debug tsc=3Dreliable no_timer_check noreplace-smp cryptomgr=
+.notests rootfstype=3D9p root=3D/dev/root rootflags=3Dtrans=3Dvirtio,versio=
+n=3D9p2000.u rw' -fsdev local,id=3Dfsdev-root,path=3Dmnt,security_model=3Dp=
+assthrough -device virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root
+  [    0.000000] Linux version 4.19.0-rc2 (...) (gcc version 7.3.0 (Ubuntu =
+7.3.0-27ubuntu1~18.04)) #10 SMP Fri Feb 8 13:55:20 PST 2019
+  [    0.000000] Command line: console=3DttyS0,115200n8 quiet kvm-intel.nes=
+ted=3D1 init=3D/usr/bin/bash initcall_debug tsc=3Dreliable no_timer_check n=
+oreplace-smp cryptomgr.notests rootfstype=3D9p root=3D/dev/root rootflags=
+=3Dtrans=3Dvirtio,version=3D9p2000.u rw
+  [    0.000000] KERNEL supported cpus:
+  [    0.000000]   Intel GenuineIntel
+  [    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating poi=
+nt registers'
+  [    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+  [    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+  [    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+  [    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 =
+bytes, using 'standard' format.
+  [    0.000000] BIOS-provided physical RAM map:
+  [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080ffff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x0000000000810000-0x00000000008fffff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x0000000000900000-0x000000007e87efff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x000000007e87f000-0x000000007e888fff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x000000007e889000-0x000000007e889fff] ACP=
+I data
+  [    0.000000] BIOS-e820: [mem 0x000000007e88a000-0x000000007e88bfff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x000000007e88c000-0x000000007e88ffff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x000000007e890000-0x000000007e8a9fff] res=
+erved
+  [    0.000000] BIOS-e820: [mem 0x000000007e8aa000-0x000000007e8b9fff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x000000007e8ba000-0x000000007e8bafff] res=
+erved
+  [    0.000000] BIOS-e820: [mem 0x000000007e8bb000-0x000000007e9e5fff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x000000007e9e6000-0x000000007e9edfff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x000000007e9ee000-0x000000007eb1afff] res=
+erved
+  [    0.000000] BIOS-e820: [mem 0x000000007eb1b000-0x000000007fb9afff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x000000007fb9b000-0x000000007fbf2fff] res=
+erved
+  [    0.000000] BIOS-e820: [mem 0x000000007fbf3000-0x000000007fbfafff] ACP=
+I data
+  [    0.000000] BIOS-e820: [mem 0x000000007fbfb000-0x000000007fbfefff] ACP=
+I NVS
+  [    0.000000] BIOS-e820: [mem 0x000000007fbff000-0x000000007ff3ffff] usa=
+ble
+  [    0.000000] BIOS-e820: [mem 0x000000007ff40000-0x000000007ff5ffff] res=
+erved
+  [    0.000000] BIOS-e820: [mem 0x000000007ff60000-0x000000007fffffff] ACP=
+I NVS
+  [    0.352469] acpiphp_ibm: ibm_acpiphp_init: acpi_walk_namespace failed
+  Started bpfilter
+  bash: cannot set terminal process group (-1): Inappropriate ioctl for dev=
+ice
+  bash: no job control in this shell
+  grep: /proc/cpuinfo: No such file or directory
+  grep: /proc/cpuinfo: No such file or directory
+  root@clr / # passwd
+  ...
+  openat(AT_FDCWD, "/etc/nshadow", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 4
+  umask(077)                              =3D 077
+  openat(AT_FDCWD, "/etc/shadow", O_RDONLY|O_CREAT|O_CLOEXEC, 000) =3D 5
+  fcntl(5, F_GETFL)                       =3D 0x8000 (flags O_RDONLY|O_LARG=
+EFILE)
+  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
+  fchown(4, 0, 0)                         =3D 0
+  fchmod(4, 0100644)                      =3D 0
+  lseek(5, 0, SEEK_CUR)                   =3D 0
+  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
+  read(5, "", 8192)                       =3D 0
+  close(5)                                =3D 0
+  fstat(4, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
+  write(4, "root:$6$jihvB1NonG88C5Yt$kvDCqF7"..., 124) =3D 124
+  fsync(4 <- hung here
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815252/+subscriptions
