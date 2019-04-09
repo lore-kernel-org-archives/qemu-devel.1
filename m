@@ -2,72 +2,60 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 844B4C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BCCC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4747F20857
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:02:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4747F20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55F9120883
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:32:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F9120883
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38443 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38726 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDnai-0002VP-Dh
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 06:02:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37813)
+	id 1hDo3a-00076v-7P
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 06:32:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDnZk-00028y-NY
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:01:58 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo1t-00062Y-V8
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hDnZj-0001za-7q
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:01:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48896)
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo1s-0007HT-OX
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:01 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2259 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hDnZf-0001xp-PF; Tue, 09 Apr 2019 06:01:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C5A8308403F;
-	Tue,  9 Apr 2019 10:01:50 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-202.ams2.redhat.com
-	[10.36.116.202])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B895B1001F52;
-	Tue,  9 Apr 2019 10:01:43 +0000 (UTC)
-Date: Tue, 9 Apr 2019 12:01:42 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <20190409100142.GC6610@localhost.localdomain>
-References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
-	<20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-	<20190313160412.GF5167@linux.fritz.box>
-	<101bbf98-0456-5022-e117-fd6f693a8786@virtuozzo.com>
+	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo1o-0007D0-GR; Tue, 09 Apr 2019 06:30:56 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+	by Forcepoint Email with ESMTP id 6D9CC4AD5344516400E9;
+	Tue,  9 Apr 2019 18:30:52 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+	DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server
+	id 14.3.408.0; Tue, 9 Apr 2019 18:30:44 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+	<imammedo@redhat.com>
+Date: Tue, 9 Apr 2019 11:29:28 +0100
+Message-ID: <20190409102935.28292-2-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <101bbf98-0456-5022-e117-fd6f693a8786@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 09 Apr 2019 10:01:50 +0000 (UTC)
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+X-Received-From: 45.249.212.191
+Subject: [Qemu-devel] [PATCH v4 1/8] hw/acpi: Make ACPI IO address space
+ configurable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,199 +67,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Denis Lunev <den@virtuozzo.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"mreitz@redhat.com" <mreitz@redhat.com>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+	linuxarm@huawei.com, xuwei5@hisilicon.com,
+	shannon.zhaosl@gmail.com, sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409100142.mqKZt5v6Rha0dDQdpXKr8YhEYvJrDOFCb7D7NI4cpvw@z>
+Message-ID: <20190409102928.rTs7gOYCO0BgQp-Iyb_fk7cAK7MjRljViuIJUBCcPqM@z>
 
-Am 02.04.2019 um 10:35 hat Denis Plotnikov geschrieben:
-> 
-> 
-> On 13.03.2019 19:04, Kevin Wolf wrote:
-> > Am 14.12.2018 um 12:54 hat Denis Plotnikov geschrieben:
-> >> On 13.12.2018 15:20, Kevin Wolf wrote:
-> >>> Am 13.12.2018 um 12:07 hat Denis Plotnikov geschrieben:
-> >>>> Sounds it should be so, but it doesn't work that way and that's why:
-> >>>> when doing mirror we may resume postponed coroutines too early when the
-> >>>> underlying bs is protected from writing at and thus we encounter the
-> >>>> assert on a write request execution at bdrv_co_write_req_prepare when
-> >>>> resuming the postponed coroutines.
-> >>>>
-> >>>> The thing is that the bs is protected for writing before execution of
-> >>>> bdrv_replace_node at mirror_exit_common and bdrv_replace_node calls
-> >>>> bdrv_replace_child_noperm which, in turn, calls child->role->drained_end
-> >>>> where one of the callbacks is blk_root_drained_end which check
-> >>>> if(--blk->quiesce_counter == 0) and runs the postponed requests
-> >>>> (coroutines) if the coundition is true.
-> >>>
-> >>> Hm, so something is messed up with the drain sections in the mirror
-> >>> driver. We have:
-> >>>
-> >>>       bdrv_drained_begin(target_bs);
-> >>>       bdrv_replace_node(to_replace, target_bs, &local_err);
-> >>>       bdrv_drained_end(target_bs);
-> >>>
-> >>> Obviously, the intention was to keep the BlockBackend drained during
-> >>> bdrv_replace_node(). So how could blk->quiesce_counter ever get to 0
-> >>> inside bdrv_replace_node() when target_bs is drained?
-> >>>
-> >>> Looking at bdrv_replace_child_noperm(), it seems that the function has
-> >>> a bug: Even if old_bs and new_bs are both drained, the quiesce_counter
-> >>> for the parent reaches 0 for a moment because we call .drained_end for
-> >>> the old child first and .drained_begin for the new one later.
-> >>>
-> >>> So it seems the fix would be to reverse the order and first call
-> >>> .drained_begin for the new child and then .drained_end for the old
-> >>> child. Sounds like a good new testcase for tests/test-bdrv-drain.c, too.
-> >> Yes, it's true, but it's not enough...
-> > 
-> > Did you ever implement the changes suggested so far, so that we could
-> > continue from there? Or should I try and come up with something myself?
-> 
-> Sorry for the late reply...
-> Yes, I did ...
+This is in preparation for adding support for ARM64 platforms
+where it doesn't use port mapped IO for ACPI IO space.
 
-If there are more question or problems, can you post the patches in
-their current shape (as an RFC) or a git URL so I can play with it a
-bit? If you could include a failing test case, too, that would be ideal.
+Also move few MEMORY_* definitions to header so that other memory
+hotplug event signalling mechanisms (eg. Generic Event Device on
+HW-reduced acpi platforms) can use the same from their respective
+event handler code.
 
-> >> In mirror_exit_common() we actively manipulate with block driver states.
-> >> When we replaced a node in the snippet you showed we can't allow the
-> >> postponed coroutines to run because the block tree isn't ready to
-> >> receive the requests yet.
-> >> To be ready, we need to insert a proper block driver state to the block
-> >> backend which is done here
-> >>
-> >>       blk_remove_bs(bjob->blk);
-> >>       blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
-> >>       blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort); << << << <<
-> >>
-> >>       bs_opaque->job = NULL;
-> >>
-> >>       bdrv_drained_end(src);
-> > 
-> > Did you actually encounter a bug here or is this just theory? bjob->blk
-> > is the BlockBackend of the job and isn't in use at this point any more.
-> > We only insert the old node in it again because block_job_free() must
-> > set bs->job = NULL, and it gets bs with blk_bs(bjob->blk).
-> > 
-> > So if there is an actual bug here, I don't understand it yet.
-> And did encounter the bug that I described above.
-> When a postponed coroutine resumes it fails on assert:
-> 
-> bdrv_co_write_req_prepare: Assertion `child->perm & BLK_PERM_WRITE' failed
-> 
-> That's why it happens: we have the mirror filter bds in blk root which 
-> receives all the requests. On mirror completion we call 
-> mirror_exit_common to finish mirroring. To finish mirroring we need to 
-> remove the mirror filter from the graph and set mirror file blk root.
-> We call block_job_complete. Assume the ide request has came after the 
-> completion calling and has been postponed because blk->quiesce_counter 
-> is not 0.
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/acpi/memory_hotplug.c         | 25 ++++++++++++++-----------
+ hw/i386/acpi-build.c             |  3 ++-
+ include/hw/acpi/memory_hotplug.h |  9 +++++++--
+ 3 files changed, 23 insertions(+), 14 deletions(-)
 
-Just to avoid confusion, there are two BlockBackends here. Lets call the
-one attached to the IDE device the ide_blk, and the one owned by the
-block job job_blk.
-
-> block_job_complete does mirror_exit_common which drops the permissions.
-> 
->      /* We don't access the source any more. Dropping any WRITE/RESIZE is
->       * required before it could become a backing file of target_bs. */
->      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
->                              &error_abort);
-
-Hm... This permission change is questionable (it temporarily drops the
-file locks of the backing chain), but as long as we don't get new
-requests to mirror_top_bs, it should be okay. As the attached parents
-are drained, no requests should be made to mirror_top_bs until it is
-removed from the graph.
-
-> then, it replaces the source with the target
-> 
->          /* The mirror job has no requests in flight any more, but we 
-> need to
->           * drain potential other users of the BDS before changing the 
-> graph. */
-> 
->          // here, target_bs has no parents and doesn't begin to draing
-> 
->          bdrv_drained_begin(target_bs);
-> 
->          // after execution of the function below
->          // target bs has mirror_top_bs->backing as a parent
-> 
->          bdrv_replace_node(to_replace, target_bs, &local_err);
-
-Right, and both ide_blk and job_blk point to the subtree with target_bs
-in it. They are both still drained because target_bs is drained.
-
-src is also still drained, but it doesn't have parents any more. It is
-only kept alive because of the explicit bdrv_ref() at the start of the
-function.
-
->          // now target_bs has source's blk as a parent
->          // the following call sets blk->quiesce_counter to 0
->          // and executes the postponed coroutine on blk with
->          // mirror filter set which eventually does writing
->          // on mirror_top_bs->backing child which has no writing
->          // (and reading) permissions
-> 
->          bdrv_drained_end(target_bs);
-> 
-> 
-> Does it make thing more clear?
-
-Yes, I see the problem now. So we accidentally end the drained section
-before mirror_top_bs is actually removed from the chain.
-
-How about the following then? It should make sure that requests can't
-run before the whole graph change is completed.
-
-Kevin
-
-diff --git a/block/mirror.c b/block/mirror.c
-index ff15cfb197..8e197779ec 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -643,6 +643,11 @@ static int mirror_exit_common(Job *job)
-     bdrv_ref(mirror_top_bs);
-     bdrv_ref(target_bs);
-
-+    /* The mirror job has no requests in flight any more, but we need to
-+     * drain potential other users of the BDS before changing the graph. */
-+    assert(s->in_drain);
-+    bdrv_drained_begin(target_bs);
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index 297812d..c724f5f 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -29,12 +29,9 @@
+ #define MEMORY_SLOT_PROXIMITY_METHOD "MPXM"
+ #define MEMORY_SLOT_EJECT_METHOD     "MEJ0"
+ #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
+-#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
+ #define MEMORY_HOTPLUG_DEVICE        "MHPD"
+-#define MEMORY_HOTPLUG_IO_LEN         24
+-#define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
+ 
+-static uint16_t memhp_io_base;
++static hwaddr memhp_io_base;
+ 
+ static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
+ {
+@@ -209,7 +206,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+ };
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base)
++                              MemHotplugState *state, hwaddr io_base)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+ 
+@@ -342,7 +339,8 @@ const VMStateDescription vmstate_memory_hotplug = {
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method)
++                              const char *event_handler_method,
++                              AmlRegionSpace rs)
+ {
+     int i;
+     Aml *ifctx;
+@@ -365,14 +363,19 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_name_decl("_UID", aml_string("Memory hotplug resources")));
+ 
+         crs = aml_resource_template();
+-        aml_append(crs,
+-            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+-                   MEMORY_HOTPLUG_IO_LEN)
+-        );
++        if (rs == AML_SYSTEM_IO) {
++            aml_append(crs,
++                aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
++                       MEMORY_HOTPLUG_IO_LEN)
++            );
++        } else {
++            aml_append(crs, aml_memory32_fixed(memhp_io_base,
++                            MEMORY_HOTPLUG_IO_LEN, AML_READ_WRITE));
++        }
+         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+ 
+         aml_append(mem_ctrl_dev, aml_operation_region(
+-            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
++            MEMORY_HOTPLUG_IO_REGION, rs,
+             aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+         );
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 416da31..6d6de44 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1852,7 +1852,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+                        "\\_SB.PCI0", "\\_GPE._E02");
+     }
+-    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
++    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
++                             "\\_GPE._E03", AML_SYSTEM_IO);
+ 
+     scope =  aml_scope("_GPE");
+     {
+diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
+index 77c6576..e3a4b89 100644
+--- a/include/hw/acpi/memory_hotplug.h
++++ b/include/hw/acpi/memory_hotplug.h
+@@ -5,6 +5,10 @@
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/aml-build.h"
+ 
++#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
++#define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
++#define MEMORY_HOTPLUG_IO_LEN         24
 +
-     /* Remove target parent that still uses BLK_PERM_WRITE/RESIZE before
-      * inserting target_bs at s->to_replace, where we might not be able to get
-      * these permissions.
-@@ -682,12 +687,7 @@ static int mirror_exit_common(Job *job)
-             bdrv_reopen_set_read_only(target_bs, ro, NULL);
-         }
+ /**
+  * MemStatus:
+  * @is_removing: the memory device in slot has been requested to be ejected.
+@@ -29,7 +33,7 @@ typedef struct MemHotplugState {
+ } MemHotplugState;
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base);
++                              MemHotplugState *state, hwaddr io_base);
+ 
+ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+                          DeviceState *dev, Error **errp);
+@@ -48,5 +52,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method);
++                              const char *event_handler_method,
++                              AmlRegionSpace rs);
+ #endif
+-- 
+2.7.4
 
--        /* The mirror job has no requests in flight any more, but we need to
--         * drain potential other users of the BDS before changing the graph. */
--        assert(s->in_drain);
--        bdrv_drained_begin(target_bs);
-         bdrv_replace_node(to_replace, target_bs, &local_err);
--        bdrv_drained_end(target_bs);
-         if (local_err) {
-             error_report_err(local_err);
-             ret = -EPERM;
-@@ -722,6 +722,7 @@ static int mirror_exit_common(Job *job)
 
-     bs_opaque->job = NULL;
-
-+    bdrv_drained_end(target_bs);
-     bdrv_drained_end(src);
-     s->in_drain = false;
-     bdrv_unref(mirror_top_bs);
 
