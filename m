@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50330)
+Received: from eggs.gnu.org ([209.51.188.92]:50825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1hDoBE-0005cp-JB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:40:41 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDoE4-0006yH-Qo
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1hDoBD-0003Mj-Gg
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:40:40 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1hDoB9-0003IW-OY
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:40:37 -0400
-References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>
-	<87mukziv48.fsf@dusky.pond.sub.org>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <ea798b5f-d48a-c05f-a8cb-d2eb1f6a5a23@oracle.com>
-Date: Tue, 9 Apr 2019 11:39:45 +0100
-MIME-Version: 1.0
-In-Reply-To: <87mukziv48.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDoE3-0004oL-T0
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:43:36 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 9 Apr 2019 10:43:25 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83935C5D0@lhreml524-mbs.china.huawei.com>
+References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
+	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
+	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
+	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
+	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
+	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
+	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
+	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
+	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
+	<20190403114901.6e4ea653@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
+	<ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8393564E2@lhreml524-mbs.china.huawei.com>
+	<20190408101132.5d849d1f@redhat.com>
+In-Reply-To: <20190408101132.5d849d1f@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+ feature "fdt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +40,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Lidong Chen <lidong.chen@oracle.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org, darren.kenny@oracle.com, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>, liam.merwick@oracle.comDarren Kenny <darren.kenny@oracle.com>
-
-On 09/04/2019 06:51, Markus Armbruster wrote:
-> Lidong Chen <lidong.chen@oracle.com> writes:
->
->> Due to an off-by-one error, the assert statements allow an
->> out-of-bounds array access.
->>
->> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
 
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: 08 April 2019 09:12
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>; Auger Eric <eric.auger@redhat.com>;
+> Ard Biesheuvel <ard.biesheuvel@linaro.org>; peter.maydell@linaro.org;
+> sameo@linux.intel.com; qemu-devel@nongnu.org; Linuxarm
+> <linuxarm@huawei.com>; shannon.zhaosl@gmail.com;
+> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
+> sebastien.boeuf@intel.com; Leif Lindholm <Leif.Lindholm@arm.com>
+> Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
+> feature "fdt"
 
->> ---
->>   hw/sd/sd.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index aaab15f..818f86c 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates=
- state)
->>       if (state =3D=3D sd_inactive_state) {
->>           return "inactive";
->>       }
->> -    assert(state <=3D ARRAY_SIZE(state_name));
->> +    assert(state < ARRAY_SIZE(state_name));
->>       return state_name[state];
->>   }
->>  =20
->> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t =
-rsp)
->>       if (rsp =3D=3D sd_r1b) {
->>           rsp =3D sd_r1;
->>       }
->> -    assert(rsp <=3D ARRAY_SIZE(response_name));
->> +    assert(rsp < ARRAY_SIZE(response_name));
->>       return response_name[rsp];
->>   }
-> This is the second fix for this bug pattern in a fortnight.  Where's
-> one, there are more:
+[...]
+=20
+> > > > If the above is correct(with 32-bit variant of UEFI, OS cannot have=
+ ACPI
+> boot),
+> > > > then do we really have the issue of memory becoming non
+> > > hot-un-unpluggable?
+> > > > May be I am missing something.
+> > >
+> > > I think Igor and Peter dislike adding complex logic to QEMU that
+> > > reflects the behavior of a specific firmware. AIUI their objection is=
+n't
+> > > that it wouldn't work, but that it's not the right thing to do, from =
+a
+> > > design perspective.
+> >
+> > Understood. Hope we can converge on something soon.
+> Lets try adding a parameter to memory descriptors in DT that would mark
+> them as hotpluggable.
 
+Just send out v4 incorporating this. Please take a look and let me know.
 
-As Lidong mentioned, an internal static analysis tool (Parfait) was used=20
-to catch these. Not every arch/board is compiled but I had eyeballed the=20
-code of most interest to me and they seemed fine (e.g. for array=20
-accesses, the subsequent loops used a less-than check)
-
-However, this WIN32 code in util/main-loop.c seems wrong.
-
-425=C2=A0=C2=A0=C2=A0=C2=A0 g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds)=
-);
-426
-427=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < w->num; i++) {
-428=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 poll_fds[n_poll_fds +=
- i].fd =3D (DWORD_PTR)w->events[i];
-429=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 poll_fds[n_poll_fds +=
- i].events =3D G_IO_IN;
-430=C2=A0=C2=A0=C2=A0=C2=A0 }
-
-Seems like this should be:
-
-g_assert(n_poll_fds + w->num <=3D ARRAY_SIZE(poll_fds));
-
-Otherwise, the rest seem fine.
-
-Regards,
-
-Liam
-
-
->
-> $ git-grep '<=3D ARRAY_SIZE'
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr=
-[0]));
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr=
-[0]));
-> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <=3D ARRAY_SIZE(=
-s->tx_fifo)) {
-> hw/sd/pxa2xx_mmci.c:        && s->tx_len <=3D ARRAY_SIZE(s->tx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->rx_len <=3D ARRAY_SIZE(s->rx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->resp_len <=3D ARRAY_SIZE(s->resp_fifo=
-);
-> hw/sd/sd.c:    assert(state <=3D ARRAY_SIZE(state_name));
-> hw/sd/sd.c:    assert(rsp <=3D ARRAY_SIZE(response_name));
-> hw/usb/hcd-xhci.c:    assert(n <=3D ARRAY_SIZE(tmp));
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D A=
-RRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D A=
-RRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D A=
-RRAY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D A=
-RRAY_SIZE (multiple_regs)) {
-> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <=3D =
-ARRAY_SIZE(dbg->arch.bp));
-> tcg/tcg.c:    tcg_debug_assert(pi <=3D ARRAY_SIZE(op->args));
-> util/main-loop.c:    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
-> util/module.c:    assert(n_dirs <=3D ARRAY_SIZE(dirs));
->
-> Lidong Chen, would you like to have a look at these?
->
-> Cc'ing maintainers to help with further investigation.
->
+Thanks,
+Shameer
+=20
