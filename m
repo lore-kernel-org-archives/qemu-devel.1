@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59592)
+Received: from eggs.gnu.org ([209.51.188.92]:60170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hDnEw-0002lT-TN
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1hDnHO-0004W3-LS
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hDnEv-0007nr-MV
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:26 -0400
-Received: from mail-eopbgr780109.outbound.protection.outlook.com
-	([40.107.78.109]:15296
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hDnEu-0007i1-Oj
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:40:25 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 9 Apr 2019 09:40:18 +0000
-Message-ID: <BN6PR2201MB1251E6696D83A98F4A1334F6C62D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>,
-	<87mukziv48.fsf@dusky.pond.sub.org>
-In-Reply-To: <87mukziv48.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1hDnHN-0000zy-Cd
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:42:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hDnHN-0000zZ-2S
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:42:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E62B610C6F
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 09:42:55 +0000 (UTC)
+References: <20190318171521.8524-1-pbonzini@redhat.com>
+	<20190318171521.8524-4-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6792361a-9a55-c97e-51e4-888ec87aeb7b@redhat.com>
+Date: Tue, 9 Apr 2019 11:42:53 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+In-Reply-To: <20190318171521.8524-4-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/13] libqos: move common i2c code to
+ libqos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +35,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Lidong Chen <lidong.chen@oracle.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "darren.kenny@oracle.com" <darren.kenny@oracle.com>, "f4bug@amsat.org" <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, "alistair.francis@wdc.com" <alistair.francis@wdc.com>"f4bug@amsat.org" <f4bug@amsat.org>, "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>Andrzej Zaborowski <balrogg@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Markus wrote:
-
-> This is the second fix for this bug pattern in a fortnight.  Where's
-> one, there are more:
+On 18/03/2019 18.15, Paolo Bonzini wrote:
+> The functions to read/write 8-bit or 16-bit registers are the same
+> in tmp105 and pca9552 tests, and in fact they are a special case of
+> "read block"/"write block" functionality; read block in turn is used
+> in ds1338-test.
 >=20
-> $ git-grep '<=3D ARRAY_SIZE'
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
-]));
-> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
-]));
-> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <=3D ARRAY_SIZE(s-=
->tx_fifo)) {
-> hw/sd/pxa2xx_mmci.c:        && s->tx_len <=3D ARRAY_SIZE(s->tx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->rx_len <=3D ARRAY_SIZE(s->rx_fifo)
-> hw/sd/pxa2xx_mmci.c:        && s->resp_len <=3D ARRAY_SIZE(s->resp_fifo);
-> hw/sd/sd.c:    assert(state <=3D ARRAY_SIZE(state_name));
-> hw/sd/sd.c:    assert(rsp <=3D ARRAY_SIZE(response_name));
-> hw/usb/hcd-xhci.c:    assert(n <=3D ARRAY_SIZE(tmp));
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
-AY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
-AY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
-AY_SIZE (multiple_regs)) {
-> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
-AY_SIZE (multiple_regs)) {
-> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
-> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <=3D AR=
-RAY_SIZE(dbg->arch.bp));
-> tcg/tcg.c:    tcg_debug_assert(pi <=3D ARRAY_SIZE(op->args));
-> util/main-loop.c:    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
-> util/module.c:    assert(n_dirs <=3D ARRAY_SIZE(dirs));
+> Move everything inside libqos-test, removing the duplication.  Account
+> for the small differences by adding to tmp105-test.c the "read register
+> after writing" behavior that is specific to it.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/ds1338-test.c  |  8 +----
+>  tests/libqos/i2c.c   | 47 ++++++++++++++++++++++++++
+>  tests/libqos/i2c.h   | 11 ++++++
+>  tests/pca9552-test.c | 37 +++++---------------
+>  tests/tmp105-test.c  | 80 ++++++++++++--------------------------------
+>  5 files changed, 88 insertions(+), 95 deletions(-)
+>=20
+> diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
+> index 742dad9113..88f829f241 100644
+> --- a/tests/ds1338-test.c
+> +++ b/tests/ds1338-test.c
+> @@ -35,17 +35,11 @@ static inline uint8_t bcd2bin(uint8_t x)
+> =20
+>  static void send_and_receive(void)
+>  {
+> -    uint8_t cmd[1];
+>      uint8_t resp[7];
+>      time_t now =3D time(NULL);
+>      struct tm *tm_ptr =3D gmtime(&now);
+> =20
+> -    /* reset the index in the RTC memory */
+> -    cmd[0] =3D 0;
+> -    i2c_send(i2c, addr, cmd, 1);
+> -
+> -    /* retrieve the date */
+> -    i2c_recv(i2c, addr, resp, 7);
+> +    i2c_read_block(i2c, addr, 0, resp, sizeof(resp));
+> =20
+>      /* check retrieved time againt local time */
+>      g_assert_cmpuint(bcd2bin(resp[4]), =3D=3D , tm_ptr->tm_mday);
+> diff --git a/tests/libqos/i2c.c b/tests/libqos/i2c.c
+> index 23bc2a3eb2..daf9a96617 100644
+> --- a/tests/libqos/i2c.c
+> +++ b/tests/libqos/i2c.c
+> @@ -21,3 +21,50 @@ void i2c_recv(I2CAdapter *i2c, uint8_t addr,
+>  {
+>      i2c->recv(i2c, addr, buf, len);
+>  }
+> +
+> +void i2c_read_block(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> +                       uint8_t *buf, uint16_t len)
+> +{
+> +    i2c_send(i2c, addr, &reg, 1);
+> +    i2c_recv(i2c, addr, buf, len);
+> +}
+> +
+> +void i2c_write_block(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> +                     const uint8_t *buf, uint16_t len)
+> +{
+> +    uint8_t *cmd =3D g_malloc(len + 1);
+> +    cmd[0] =3D reg;
+> +    memcpy(&cmd[1], buf, len);
+> +    i2c_send(i2c, addr, cmd, len + 1);
+> +    g_free(cmd);
+> +}
 
-There could be even more:
+So the i2c_write_block function only uses i2c_send() ...
 
-$ git grep '> ARRAY_SIZE'
-hw/display/ssd0323.c:    if (s->cmd_len > ARRAY_SIZE(s->cmd_data)) {
-hw/display/vmware_vga.c:                || SVGA_BITMAP_SIZE(x, y) > ARRAY_S=
-IZE(cursor.mask)
-hw/display/vmware_vga.c:                    > ARRAY_SIZE(cursor.image)) {
-hw/dma/xlnx-zdma.c:        len =3D src_size > ARRAY_SIZE(s->buf) ? ARRAY_SI=
-ZE(s->buf) : src_size;
-hw/net/stellaris_enet.c:    if (s->np > ARRAY_SIZE(s->rx)) {
-hw/net/stellaris_enet.c:        if (s->rx[i].len > ARRAY_SIZE(s->rx[i].data=
-)) {
-hw/net/stellaris_enet.c:    if (s->rx_fifo_offset > ARRAY_SIZE(s->rx[0].dat=
-a) - 4) {
-hw/net/stellaris_enet.c:    if (s->tx_fifo_len > ARRAY_SIZE(s->tx_fifo)) {
-hw/scsi/mptsas.c:    ((s)->name##_head > ARRAY_SIZE((s)->name) ||         \
-hw/scsi/mptsas.c:     (s)->name##_tail > ARRAY_SIZE((s)->name))
-hw/scsi/mptsas.c:        s->doorbell_cnt > ARRAY_SIZE(s->doorbell_msg) ||
-hw/scsi/mptsas.c:        s->doorbell_reply_size > ARRAY_SIZE(s->doorbell_re=
-ply) ||
-hw/sd/ssi-sd.c:        (!s->stopping && s->arglen > ARRAY_SIZE(s->response)=
-))) {
-hw/usb/dev-mtp.c:            if (cmd.argc > ARRAY_SIZE(cmd.argv)) {
-linux-user/syscall.c:    if (nargs[num] > ARRAY_SIZE(a)) {
-target/sh4/translate.c:    if (max_insns > ARRAY_SIZE(insns)) {
+> +uint8_t i2c_get8(I2CAdapter *i2c, uint8_t addr, uint8_t reg)
+> +{
+> +    uint8_t resp[1];
+> +    i2c_read_block(i2c, addr, reg, resp, sizeof(resp));
+> +    return resp[0];
+> +}
+> +
+> +uint16_t i2c_get16(I2CAdapter *i2c, uint8_t addr, uint8_t reg)
+> +{
+> +    uint8_t resp[2];
+> +    i2c_read_block(i2c, addr, reg, resp, sizeof(resp));
+> +    return (resp[0] << 8) | resp[1];
+> +}
+> +
+> +void i2c_set8(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> +              uint8_t value)
+> +{
+> +    i2c_write_block(i2c, addr, reg, &value, 1);
+> +}
+> +
+> +void i2c_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> +               uint16_t value)
+> +{
+> +    uint8_t data[2];
+> +
+> +    data[0] =3D value >> 8;
+> +    data[1] =3D value & 255;
+> +    i2c_write_block(i2c, addr, reg, data, sizeof(data));
+> +}
 
-CC-ing additional maintainers.
+... i.e. the i2c_set8/16() functions also only use i2c_send()...
 
-Aleksandar=
+> -static void tmp105_set8(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> -                        uint8_t value)
+> -{
+> -    uint8_t cmd[2];
+> -    uint8_t resp[1];
+> -
+> -    cmd[0] =3D reg;
+> -    cmd[1] =3D value;
+> -    i2c_send(i2c, addr, cmd, 2);
+> -    i2c_recv(i2c, addr, resp, 1);
+> -    g_assert_cmphex(resp[0], =3D=3D, cmd[1]);
+> -}
+> -
+> -static void tmp105_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+> -                         uint16_t value)
+> -{
+> -    uint8_t cmd[3];
+> -    uint8_t resp[2];
+> -
+> -    cmd[0] =3D reg;
+> -    cmd[1] =3D value >> 8;
+> -    cmd[2] =3D value & 255;
+> -    i2c_send(i2c, addr, cmd, 3);
+> -    i2c_recv(i2c, addr, resp, 2);
+> -    g_assert_cmphex(resp[0], =3D=3D, cmd[1]);
+> -    g_assert_cmphex(resp[1], =3D=3D, cmd[2]);
+> -}
+
+... but the old set8/16 functions also used i2c_recv() and
+g_assert_cmphex() ... shouldn't this be added to the new functions, too?
+
+ Thomas
