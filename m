@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44261)
+Received: from eggs.gnu.org ([209.51.188.92]:46254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hDuNz-00050c-8V
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:18:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDuVi-0008L1-Gs
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hDuNy-0007Jy-5Q
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:18:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDuVh-0003JW-H8
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:26:14 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:45672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDuVf-0003DJ-H5
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:26:11 -0400
+Received: by mail-oi1-x236.google.com with SMTP id y84so14216645oia.12
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 10:26:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1553899050.git.alistair.francis@wdc.com>
-	<99590ce3f3572a2b02216a5d99cec03ccc3f35a8.1553899050.git.alistair.francis@wdc.com>
-	<6b9005b62d51d3a1f44da142936e3d2b4b4dead5.camel@hellion.org.uk>
-In-Reply-To: <6b9005b62d51d3a1f44da142936e3d2b4b4dead5.camel@hellion.org.uk>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Apr 2019 10:16:39 -0700
-Message-ID: <CAKmqyKOcgsmU5s5gta9v8rX9=2XxzPd0+dpa_c38jzVYb7T4Ag@mail.gmail.com>
+References: <1554827719-10184-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1554827719-10184-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Apr 2019 18:25:48 +0100
+Message-ID: <CAFEAcA8fs_H-gwk251mCq1V2tOBF=Mr96e4FY0aePyCre-D9NA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v2 2/6] target/riscv: Fall back to
- generating a RISC-V CPU
+Subject: Re: [Qemu-devel] [PULL v3 0/5] Misc patches for QEMU 5.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Campbell <ijc@hellion.org.uk>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Apr 4, 2019 at 5:35 AM Ian Campbell <ijc@hellion.org.uk> wrote:
+On Tue, 9 Apr 2019 at 17:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On Fri, 2019-03-29 at 22:39 +0000, Alistair Francis wrote:
-> > +    for (i = 0; i < strlen(riscv_cpu); i++) {
-> > +        if (i == 0 && riscv_cpu[i] == 'r' &&
-> > +            riscv_cpu[i + 1] == 'v') {
+> The following changes since commit 248987f92cfda8305d6d44ced23e173e62a8bc0e:
 >
-> Dpes something somewhere else enforce a minimum length or can
-> `riscv_cpu[i + 1]` be past the end of the string?
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-04-09 10:02:30 +0100)
 >
-> Similarly some more times below and also for the `i += 2` bits.
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 3e20c81ed87cb15cd04f929b075e244e0758641a:
+>
+>   tests: Make check-block a phony target (2019-04-09 18:34:21 +0200)
+>
+> ----------------------------------------------------------------
+> * fixes for Alpine and SuSE
+> * fix crash when hot-plugging nvdimm on older machine types
+>
 
-Good point, a valid string must be at least 5 characters so I have
-added a check before we start the parsing.
+Applied, thanks.
 
-Alistair
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
->
-> > +            /* Starts with "rv" */
-> > +            i += 2;
-> > +            if (riscv_cpu[i] == '3' && riscv_cpu[i + 1] == '2') {
-> > +                i += 2;
-> > +                valid = true;
-> > +                rvxlen = RV32;
-> > +            }
-> > +            if (riscv_cpu[i] == '6' && riscv_cpu[i + 1] == '4') {
-> > +                i += 2;
-> > +                valid = true;
-> > +                rvxlen = RV64;
-> > +            }
-> > +        }
->
-> Ian.
->
+-- PMM
