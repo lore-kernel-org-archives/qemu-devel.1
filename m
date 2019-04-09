@@ -2,67 +2,66 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DRUGS_ERECTILE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECB4C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD76C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B1DA20830
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:06:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1DA20830
+	by mail.kernel.org (Postfix) with ESMTPS id 0834020830
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:07:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0834020830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50274 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50281 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDzpJ-0001Ty-4V
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 19:06:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47777)
+	id 1hDzqL-0002OK-87
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 19:07:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzjk-0005bB-Tm
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:09 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDzju-0005kN-HC
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzje-0001M4-Vs
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37108)
+	(envelope-from <lersek@redhat.com>) id 1hDzjs-0001Xm-Q4
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjd-0001Jq-4h
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:58 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjs-0001X8-Cn
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:12 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B8B330642A7;
-	Tue,  9 Apr 2019 23:00:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A63D9356F6;
+	Tue,  9 Apr 2019 23:01:11 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-114.rdu2.redhat.com
 	[10.10.120.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 440211001DC0;
-	Tue,  9 Apr 2019 23:00:53 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4AB8F1048130;
+	Tue,  9 Apr 2019 23:01:02 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
 	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
 	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-Date: Wed, 10 Apr 2019 01:00:14 +0200
-Message-Id: <20190409230022.6462-5-lersek@redhat.com>
+Date: Wed, 10 Apr 2019 01:00:17 +0200
+Message-Id: <20190409230022.6462-8-lersek@redhat.com>
 In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
 References: <20190409230022.6462-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 09 Apr 2019 23:00:56 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Tue, 09 Apr 2019 23:01:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1 v4 04/12] roms/edk2: advance to tag
- edk2-stable201903
+Subject: [Qemu-devel] [PATCH for-4.1 v4 07/12] roms: build edk2 firmware
+ binaries and variable store templates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,883 +76,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409230014.inQ4s_Pfvuuo1u55Uun3DFcYNZzARhmoDEvj4uNsmd8@z>
+Message-ID: <20190409230017.gncvDD18r4LPrzCIXqRXZjYJ-42VKdmBGobyGm84myM@z>
 
-Update the roms/edk2 submodule hash from edk2-stable201811 to
-edk2-stable201903. The release notes are available at
-<https://github.com/tianocore/edk2/releases/tag/edk2-stable201903>.
+Add the "efi" target to "Makefile".
 
-$ git shortlog edk2-stable201811..edk2-stable201903
+Introduce "Makefile.edk2" for building and cleaning the firmware images
+and varstore templates.
 
-Achin Gupta (9):
-      ArmPkg: Add PCDs needed for MM communication driver.
-      ArmPkg/Drivers: Add EFI_MM_COMMUNICATION_PROTOCOL DXE driver.
-      ArmPkg/Include: Add MM interface SVC return codes.
-      ArmPkg/ArmMmuLib: Add MMU Library suitable for use in S-EL0.
-      StandaloneMmPkg: Add missing dependency on PL011UartClockLib
-      StandaloneMmPkg: Enforce alignment check for AArch64
-      StandaloneMmPkg: Zero data structure explicitly
-      StandaloneMmPkg: Replace dependency on ArmMmuLib
-      StandaloneMmPkg: Update dependency on PeCoffExtraActionLib
-
-Albecki, Mateusz (1):
-      MdeModulePkg/SdMmcPciHcDxe Fix eMMC HS400 switch sequence
-
-Alex James (2):
-      StdLib/sys/termios: Define cc_t as unsigned
-      StdLib/Environs: Avoid infinite recursion in _Exit
-
-Antoine Coeur (5):
-      ArmVirtPkg: Fix various typos
-      CryptoPkg: Fix various typos
-      CorebootPayloadPkg: Fix various typos
-      CorebootModulePkg: Fix various typos
-      BaseTools: Various typo
-
-Ard Biesheuvel (116):
-      MdePkg/BaseIoLibIntrinsicArmVirt ARM: avoid double word loads and s=
-tores
-      ArmPkg/ArmGicDxe ARM: fix encoding for GICv3 interrupt acknowledge
-      ArmPlatformPkg: clear frame pointer in startup code
-      ArmVirtPkg/PrePi: clear frame pointer in startup code
-      ArmPkg/ArmSmcPsciResetSystemLib: add missing call to ExitBootServic=
-es()
-      ArmPkg: remove now unused BsdLib.h
-      ArmPlatformPkg/NorFlashDxe: prepare for devicepath format change
-      ArmPlatformPkg/NorFlashDxe: use one GUID plus index to identify fla=
-sh banks
-      ArmVirtPkg/FdtClientDxe: take DT node 'status' properties into acco=
-unt
-      ArmVirtPkg/NorFlashQemuLib: discover NOR flash banks dynamically
-      ArmPlatformPkg/NorFlashPlatformLib: remove unused Guid member from =
-struct
-      ArmPkg/ArmPkg.dsc: move ArmMmuStandaloneMmLib.inf to AARCH64 sectio=
-n
-      EmbeddedPkg/TemplateSec: remove unused module
-      EmbeddedPkg/PrePiHobLib: drop CreateHobList() from library
-      ArmVirtPkg/FdtPciHostBridgeLib: map ECAM and I/O spaces in GCD memo=
-ry map
-      ArmVirtPkg/QemuVirtMemInfoLib: remove 1:1 mapping of top of PA rang=
-e
-      MdePkg/ProcessorBind.h AARCH64: limit MAX_ADDRESS to 48 bits
-      ArmPkg/ArmLib: add support for reading the max physical address spa=
-ce size
-      ArmVirtPkg/XenVirtMemInfoLib: refactor reading of the PA space size
-      ArmPkg/ArmMmuLib: take the CPU supported maximum PA space into acco=
-unt
-      ArmPkg/CpuPei: base GCD memory space size on CPU's PA range
-      ArmPlatformPkg/PrePi: base GCD memory space size on CPU's PA range
-      ArmVirtPkg/PrePi: base GCD memory space size on CPU's PA range
-      BeagleBoardPkg/PrePi: base GCD memory space size on CPU's PA range
-      ArmPlatformPkg/PlatformPei: drop unused PCD references
-      EmbeddedPkg/PrePiLib: drop unused PCD reference
-      ArmVirtPkg: drop PcdPrePiCpuMemorySize assignments from all platfor=
-ms
-      EmbeddedPkg/EmbeddedPkg.dec: drop PcdPrePiCpuMemorySize declaration=
-s
-      ArmPkg/ArmMmuLib ARM: handle unmapped section in GetMemoryRegion()
-      ArmPkg/ArmMmuLib ARM: handle unmapped sections when updating permis=
-sions
-      ArmVirtPkg/NorFlashQemuLib: disregard our primary FV
-      ArmVirtPkg/QemuVirtMemInfoLib: trim the MMIO region mapping
-      BaseTools/CommonLib: avoid using 'native' word size in IP address h=
-andling
-      BaseTools/CommonLib: use explicit 64-bit type in Strtoi()
-      BaseTools/DevicePath: use explicit 64-bit number parsing routines
-      BaseTools/CommonLib: add definition of MAX_UINT32
-      BaseTools/DevicePath: use MAX_UINT32 as default device path max siz=
-e
-      BaseTools/CommonLib: get rid of 'native' type string parsing routin=
-es
-      BaseTools/CommonLib: drop definition of MAX_UINTN
-      BaseTools/CommonLib: drop the use of MAX_ADDRESS
-      Revert "MdePkg/ProcessorBind.h AARCH64: limit MAX_ADDRESS to 48 bit=
-s"
-      MdeModulePkg/FileExplorerLib: avoid packed struct for program data
-      BaseTools/tools_def AARCH64 RELEASE: move GCC49/GGC5 to 4 KB alignm=
-ent
-      ArmVirtPkg/ArmVirtQemuKernel ARM: make some PCD settings apply to A=
-RM
-      ArmVirtPkg/PrePiUniCoreRelocatable CLANG38: work around build issue=
-s
-      BaseTools/GenFw ARM: don't permit R_ARM_GOT_PREL relocations
-      MdePkg/BaseMemoryLibOptDxe ARM: add missing function annotations
-      BaseTools/tools_def ARM CLANG35: work around -mno-movt option name =
-change
-      ArmVirtPkg/PrePi ARM CLANG35: drop incompatible command line option
-      ArmVirtPkg/ArmVirt.dsc.inc: define TcpIoLib resolution unconditiona=
-lly
-      ArmPkg: remove redundant _ARM_PLATFORM_FLAGS overrides
-      EmbeddedPkg: remove GdbDebugAgent library
-      BaseTools/tools_def ARM: emit PIC veneers
-      ArmPkg/DefaultExceptionHandlerLib ARM: avoid endless loop in RELEAS=
-E builds
-      MdePkg/Base: introduce MAX_ALLOC_ADDRESS
-      MdeModulePkg/Dxe/Gcd: disregard memory above MAX_ALLOC_ADDRESS
-      MdeModulePkg/Dxe/Page: take MAX_ALLOC_ADDRESS into account
-      ArmPkg/ArmMmuLib: take MAX_ALLOC_ADDRESS into account
-      ArmPlatformPkg/MemoryInitPeim: take MAX_ALLOC_ADDRESS into account
-      ArmVirtPkg/MemoryInitPeiLib: split memory HOB based on MAX_ALLOC_AD=
-DRESS
-      MdePkg/Arm/ProcessorBind.h: fix copy/paste error
-      ArmPlatformPkg/SP805WatchdogDxe: cosmetic cleanup
-      ArmPlatformPkg/SP805WatchdogDxe: switch to interrupt mode
-      ArmPkg/GenericWatchdogDxe: clean up the code
-      ArmPkg/GenericWatchdogDxe: implement RegisterHandler() method
-      ArmPlatformPkg/PL011SerialPortLib: use untyped PCD for register bas=
-e
-      BaseTools/tools_def ARM: use softfloat target for CLANG3x
-      BaseTools/GenFds: permit stripped MM_CORE_STANDALONE binaries
-      BaseTools/Conf/tools_def.template: drop ARM/AARCH support from GCC4=
-6/GCC47
-      ArmPkg/ArmMmuLib ARM: add missing support for non-shareable cached =
-mappings
-      ArmPkg/ArmMmuLib ARM: fix thinko in second level page table handlin=
-g
-      MdePkg: implement MmServicesTableLib based on traditional SMM
-      BaseTools/tools_def GCC5: disable LTO for ASLC invocations
-      ArmPkg/ArmMmuLib ARM: disregard high memory when setting permission=
-s
-      ArmPkg/ArmMmuLib AARCH64: fix out of bounds access
-      MdeModulePkg/MdeModulePkg.dsc: add MmServicesTableLib resolution
-      OvmfPkg: add MmServicesTableLib resolution
-      QuarkPlatformPkg: add MmServicesTableLib resolution
-      Vlv2TbltDevicePkg: add MmServicesTableLib resolution
-      MdeModulePkg/FaultTolerantWriteDxe: factor out boot service accesse=
-s
-      MdeModulePkg/FaultTolerantWriteDxe: implement standalone MM version
-      MdeModulePkg/VariableRuntimeDxe: factor out boot service accesses
-      MdeModulePkg/VariableRuntimeDxe: implement standalone MM version
-      MdePkg: introduce standalone MM entry point library class
-      MdePkg: introduce standalone MM entry point library implementation
-      MdePkg: add MM_STANDALONE implementation of MmServicesTableLib
-      MdeModulePkg: implement NULL instance of HobLib library class
-      MdeModulePkg: implement NULL instance of MemoryAllocationLib librar=
-y class
-      MdeModulePkg/MdeModulePkg/dsc: move DxeDebugSupportDxe to x86 only =
-section
-      MdeModulePkg/AuthVariableLibNull: add MM_STANDALONE support
-      MdeModulePkg/VarCheckLib: add MM_STANDALONE support
-      MdeModulePkg/MdeModulePkg.dsc: add MM_STANDALONE FTW and variable m=
-odules
-      ArmPkg/DebugAgentSymbolsBaseLib: remove exception handling
-      ArmPkg/DefaultExceptionHandlerLib: declare the permitted usage cont=
-ext
-      ArmVirtPkg: drop reference to ArmPkg/DefaultExceptionHandlerLibBase
-      ArmPkg/DefaultExceptionHandlerLib: drop BASE variant
-      ArmPkg/DefaultExceptionHandlerLib: use console if available
-      EmbeddedPkg/NorFlashInfoLib: convert to BASE library
-      ArmPkg/DefaultExceptionHandlerLib: add missing UefiLib include
-      CryptoPkg/SmmCryptLib: permit use by MM_STANDALONE modules
-      SecurityPkg/PlatformSecureLibNull: permit use by MM_STANDALONE modu=
-les
-      MdeModulePkg/VarCheckUefiLib: permit use by MM_STANDALONE modules
-      MdePkg/UefiDevicePathLib: permit use by MM_STANDALONE modules
-      StandaloneMmPkg: add HobLib implementation for MM_STANDALONE module=
-s
-      StandaloneMmPkg: add MM_STANDALONE MemoryAllocationLib implementati=
-on
-      StandaloneMmPkg/StandaloneMmCoreHobLib: restrict to MM_CORE_STANDAL=
-ONE
-      StandaloneMmPkg/StandaloneMmCpu: fix typo Standlone -> Standalone
-      StandaloneMmPkg/StandaloneMmCoreEntryPoint: use %a modifier for ASC=
-II strings
-      StandaloneMmPkg/StandaloneMmCoreEntryPoint: remove bogus ASSERT_EFI=
-_ERROR()s
-      StandaloneMmPkg/StandaloneMmPeCoffExtraActionLib: ignore runtime at=
-tribute
-      StandaloneMmPkg/Core/Dispatcher: don't copy dispatched image twice
-      StandaloneMmPkg/StandaloneMmCoreEntryPoint: permit the use of TE im=
-ages
-      MdeModulePkg/MdeModulePkg.dsc: ignore standalone MM modules for EBC=
- or XCODE5
-      ArmPkg/ArmMmuLib ARM: trim high memory regions instead of rejecting=
- them
-      ArmPkg/ArmMmuLib AARCH64: get rid of needless TLB invalidation
-      MdePkg/BaseLib: implement SpeculationBarrier() for ARM and AArch64
-
-Ashish Singhal (6):
-      MdeModulePkg/SdMmcPciHcDxe: Add SDMMC HC v4 and above Support.
-      MdePkg/UefiLib: Abstract driver model protocol uninstallation
-      NetworkPkg/IScsiDxe: Use UEFILib APIs to uninstall protocols.
-      NetworkPkg: Protocol Uninstallation Cleanup
-      DynamicTablesPkg/DynamicTableManagerDxe: Update DEPEX
-      DynamicTablesPkg/AcpiSpcrLibArm: Support 16550 UART.
-
-Bret Barkelew (4):
-      MdePkg/IndustryStandard: Introduce a correctly spelled macro
-      SecurityPkg/Tcg: Fix typos in TcgDxe.c and Tcg2Dxe.c
-      MdePkg/IndustryStandard: Remove an incorrectly spelled macro
-      MdePkg/UefiLib: Add a new API GetVariable3
-
-Chasel, Chiu (16):
-      IntelFsp2WrapperPkg: Support FSP Dispatch mode
-      IntelFsp2WrapperPkg: Revert 90c5bc08
-      IntelFsp2WrapperPkg: Support FSP Dispatch mode
-      IntelFsp2WrapperPkg: Fix line ending format issue
-      IntelFsp2WrapperPkg: Fix constant if statements issue
-      Maintainers.txt: Change package maintainer of IntelFsp*Pkg
-      BaseTools/GenFv: Support SecCore and PeiCore in different FV
-      IntelFsp2Pkg: Add FspmArchConfigPpi to support Dispatch mode
-      IntelFsp2Pkg: Remove unused keyword in new PPI header
-      IntelFsp2Pkg: Add function to get bootloader stack pointer
-      IntelFsp2Pkg: FSP can utilize bootloader stack
-      MdePkg: Support EFI_PEI_CORE_FV_LOCATION_PPI
-      MdeModulePkg/PeiMain: Support EFI_PEI_CORE_FV_LOCATION_PPI
-      UefiCpuPkg/SecCore: Support EFI_PEI_CORE_FV_LOCATION_PPI
-      UefiCpuPkg/SecCore: Support EFI_PEI_CORE_FV_LOCATION_PPI
-      UefiCpuPkg/SecCore: Wrong Debug Information for SecCore
-
-Chen A Chen (18):
-      SecurityPkg: Remove dead code and inf redundant definitions.
-      SecurityPkg: Remove code under UserIdentification folder.
-      FatPkg: Break down Part.c file.
-      MdePkg/UefiGpt.h: Add new definition for enable GPT support
-      FatPkg: Add GPT check in FatPei to support Capsule-on-Disk feature.
-      MdePkg/UefiSpec.h: Add definition to support Capsule-on-Disk featur=
-e
-      MdeModulePkg/CapsuleApp: Add a function used to get next DevicePath
-      MdeModulePkg/CapsuleApp: Add functions to support Capsule-on-Disk
-      MdeModulePkg/CapsuleApp: Enhance CapsuleApp to support Capsule-on-D=
-isk
-      FatPkg/FatPei/Gpt.c: Fix uninitialized variable issue
-      MdeModulePkg/CapsuleApp: Fix potential NULL pointer dereference iss=
-ue
-      MdeModulePkg/CapsuleApp: Fix potential NULL pointer dereference iss=
-ue
-      MdeModulePkg/CapsuleApp: Fix memory leak issue.
-      UefiCpuPkg/Microcode: Fix incorrect checksum issue for extended tab=
-le
-      IntelSiliconPkg/MicrocodeUpdate: Fix incorrect checksum issue
-      MdeModulePkg: Rename confusion function name
-      UefiCpuPkg/Microcode: Fix InComplete CheckSum32 issue
-      UefiCpuPkg/Microcode.c: Add verification before calculate CheckSum3=
-2
-
-Chu, Maggie (2):
-      SecurityPkg: Incorrect warning message for Opal admin revert action
-      SecurityPkg: Add a PCD to skip Opal password prompt
-
-Dandan Bi (12):
-      MdeModulePkg/DisplayEngine: Remove useless NULL ptr check for NewPo=
-s
-      MdePkg: check Length para before use in DevPathToTextUsbWWID
-      MdePkg: Check input Ptrs in GetSectionFromAnyFvByFileType
-      BaseTools/VfrCompile: report error for Integer overflow
-      MdeModulePkg/NonDiscoverablePciDevice: Remove the redundant check
-      MdePkg/BasePeCoffLib: Add more check for relocation data
-      MdePkg/BasePeCoffLib: Correct the address of RelocBaseEnd
-      ShellPkg/UefiShellAcpiViewCommandLib: Fix VS tool chain build failu=
-re
-      MdeModulePkg: Fix coding style issues
-      MdePkg: Fix coding style issues
-      MdePkg/StatusCodeDataTypeId.h: Add new definition per PI1.7 Spec
-      MdeModulePkg/BmBoot: Report status when fail to load/start boot opt=
-ion
-
-Derek Lin (1):
-      BaseTools: Fix GenFds error doesn't break build.
-
-Edgar Handal (1):
-      MdeModulePkg/SdMmcPciHcDxe: Use 16/32-bit IO widths
-
-Eric Dong (9):
-      UefiCpuPkg/Cpuid.h: Sync CPUID definition to latest SDM.
-      UefiCpuPkg/Cpuid: Add code to support new definition.
-      UefiCpuPkg/RegisterCpuFeaturesLib: Enhance debug message.
-      UefiCpuPkg/RegisterCpuFeaturesLib: Avoid AP calls PeiService.
-      UefiCpuPkg/S3Resume2Pei: check 64BIT_WAKE_F in FACS.OSPMFlags.
-      MdeModulePkg/BootScriptExecuteorDxe: check 64BIT_WAKE_F in FACS.OSP=
-MFlags
-      UefiCpuPkg/RegisterCpuFeaturesLib: Replace AcquireSpinLock.
-      SecurityPkg/OpalPassword: Update strings on Opal Setup page
-      SecurityPkg/OpalPassword: Add NULL pointer check before using it
-
-Felix Polyudov (1):
-      BaseTools: Fix incorrect formatting of GenFds command dictionary
-
-Feng, Bob C (52):
-      BaseTools: Fix the problem using FILE_GUID override in .dsc
-      BaseTools: Enable Pcd Array support.
-      BaseTool: Filter out unused structure pcds
-      BaseTools: Replace the sqlite database with list
-      BaseTools: Optimize string concatenation
-      BaseTools: Customize deepcopy function.
-      BaseTools: Correct CCFLAG for PcdValueInit
-      BaseTools: Fix PcdNvStoreDefaultValueBuffer Value.
-      BaseTools: Fixed bugs in CopyDict function
-      BaseTools: Fixed the build fail issue for cases
-      BaseTools: Fix PcdArray issue
-      BaseTools: Fixed metafile parser issues
-      BaseTools: Reset FdsGlobalVariable
-      BaseTools: Fixed build report issue.
-      BaseTools: Correct PcdArray value assigment statement
-      BaseTools: Report Error if use SET in Dsc
-      BaseTools: Remove unused logic for EDKI
-      BaseTools: Remove unused logic for IPF
-      BaseTools: Remove unused logic from C tools
-      BaseTools: Enable component override functionality
-      BaseTools: Remove unused logic for EDKI
-      BaseTools: Remove EDK_SOURCE keyword from ECC Tool
-      BaseTools: Remove EDK_SOURCE keyword from GenFds tool.
-      BaseTools: Remove EDK_SOURCE keyword from Inf Parser.
-      BaseTools: Allow empty value for HiiPcd in Dsc
-      BaseTools: Fix build report issue.
-      BaseTools: use OrderedDict instead of sdict
-      BaseTools: Make sure AllPcdList valid.
-      BaseTools:File open failed for VPD MapFile
-      BaseTools:Fixed Rsa issue and a set define issue.
-      BaseTools:ord() don't match in py2 and py3
-      BaseTools: the list and iterator translation
-      BaseTools: Handle the bytes and str difference
-      BaseTools: ECC tool Python3 adaption
-      BaseTools: Eot tool Python3 adaption
-      BaseTools: Enable CODE format in DEC file
-      BaseTools: Fixed incorrect line number in PcdValueInit.c
-      BaseTools: Correct the error message for UPT
-      BaseTools: Fixed a build report issue.
-      BaseTools: Fix the build report issue about Structure PCD
-      BaseTools: Fixed an issue about StructurePcd
-      BaseTools: Add MaxSizeUserSet to Pcd deepcopy function
-      BaseTools: Fix a ParseDevPathValue function issue.
-      BaseTools: Fixed a bug in Vpd handling
-      BaseTools: Fixed a code bug for Pcd Array.
-      BaseTools: replace Sdict with OrderedDict in UPT
-      BaseTool: Fixed incremental rebuild issue.
-      BaseTools: Fix a bug about Structure PCD
-      BaseTools: Add parameter check for the AsciiStringToUint64
-      BaseTools: Eot failed when enable python3
-      BaseTools: Fix a Eot issue.
-      BaseTools: Add python3-distutils Ubuntu package checking
-
-Gary Lin (2):
-      MdePkg ACPI: fix the typos in Acpi61.h and Acpi62.h
-      MdeModulePkg/UefiBootManagerLib: Match the nested partitions
-
-Gonzalez Del Cueto, Rodrigo (1):
-      SecurityPkg/TcgConfigDxe: Allow enabling TPM 1.2 device from disabl=
-ed state.
-
-Hao Wu (25):
-      MdePkg/BaseLib: Introduce new SpeculationBarrier API
-      MdeModulePkg/FaultTolerantWrite: Update to consume SpeculationBarri=
-er
-      MdeModulePkg/SmmLockBox: Update to consume SpeculationBarrier
-      MdeModulePkg/Variable: Update to consume SpeculationBarrier
-      UefiCpuPkg/PiSmmCpuDxeSmm: Update to consume SpeculationBarrier
-      UefiCpuPkg: Merge StuffRsb.inc files into one in UefiCpuPkg/Include
-      MdeModulePkg/SdMmcPciHcDxe: Fix VS2015 IA32 NOOPT build failure
-      MdeModulePkg/SdMmcPciHcDxe: Update comment for spec compliance stat=
-us
-      MdeModulePkg: Add definitions for ATA AHCI host controller PPI
-      MdeModulePkg: Add definitions for EDKII PEI ATA PassThru PPI
-      MdeModulePkg: Add definitions for Storage Security Command PPI
-      MdeModulePkg: Add GUID for LockBox to save storage dev to init in S=
-3
-      MdeModulePkg/NvmExpressPei: Avoid updating the module-level variabl=
-e
-      MdeModulePkg/NvmExpressPei: Add logic to produce SSC PPI
-      MdeModulePkg/NvmExpressPei: Consume S3StorageDeviceInitList LockBox
-      MdeModulePkg/AhciPei: Add AHCI mode ATA device support in PEI
-      MdeModulePkg/SmmLockBoxLib: Use 'DEBUG_' prefix instead of 'EFI_D_'
-      MdeModulePkg/SmmLockBox(PEI): Remove an ASSERT in RestoreLockBox()
-      MdeModulePkg/SmmLockBoxLib: Support LockBox enlarge in UpdateLockBo=
-x()
-      OvmfPkg/LockBoxLib: Update the comments for API UpdateLockBox()
-      SecurityPkg/OpalPassword: Remove HW init codes and consume SSC PPI
-      SecurityPkg/HddPassword: Add Security feature set support for ATA d=
-ev
-      MdeModulePkg/UfsBlockIoPei: Correct use of 'DeviceIndex' in BlkIO P=
-PI
-      MdeModulePkg/PartitionDxe: Ensure blocksize holds MBR (CVE-2018-121=
-80)
-      MdeModulePkg/RamDiskDxe: Restrict on RAM disk size (CVE-2018-12180)
-
-Hess Chen (1):
-      BaseTools/ECC: Add a new type of exception
-
-Hsueh, Hong-chihX (1):
-      MdePkg/BasePeCoffLib: skip runtime relocation if reloc info is inva=
-lid
-
-Jaben Carsey (14):
-      BaseTools: Move Identification file to Eot
-      BaseTools: cleanup LongFilePathSupport usage
-      BaseTools: create and use a standard shared variable for '*'
-      BaseTools: fix imports
-      MdeModulePkg: fix comments in BaseSortLib
-      BaseTools/build/build: refactor and move functions
-      BaseTools/Workspace/InfBuildData: move functions
-      BaseTools/DscBuildData: move function
-      BaseTools/AutoGen: move functions
-      BaseTools/GenFds/Capsule: move function logic
-      BaseTools/Common/Misc: move private functions
-      BaseTools/Common/Misc: remove uncalled code
-      BaseTools/Common/Misc: Cleanup the imports
-      BaseTools/build/build: delete variable
-
-Jagadeesh Ujja (2):
-      SecurityPkg/AuthVariableLib: allow MM_STANDALONE drivers to use thi=
-s library
-      MdePkg/Include: add MmServicesTableLib header file
-
-Jeff Brasen (5):
-      MdeModulePkg/SdDxe: Fix potential NULL pointer access
-      EmbeddedPkg/PrePiMemoryAllocationLib: Added AllocateZeroPool()
-      MdeModulePkg/BaseSortLib: Enable for all module types
-      ArmPkg/ArmScmiDxe: Add clock enable function
-      EmbeddedPkg/PrePiLib: Correct function name
-
-Jian J Wang (7):
-      CryptoPkg/IntrinsicLib: add missing BaseLib declaration
-      Upgrade OpenSSL to 1.1.0j
-      CryptoPkg/BaseCryptLib: split CryptPkcs7Verify.c on behalf of runti=
-me
-      MdePkg/UefiDevicePathLib: Add sanity check for FilePath device path
-      MdePkg/UefiDevicePathLibDevicePathProtocol: Add sanity check for Fi=
-lePath device path
-      UefiCpuPkg: restore strict page attributes via #DB in nonstop mode =
-only
-      Maintainers.txt: remove unexpected unicode BOM
-
-Jiaxin Wu (7):
-      MdeModulePkg/Dhcp4Dxe: Remove unnecessary NULL pointer check.
-      NetworkPkg/IScsiDxe: Remove unnecessary NULL pointer check.
-      NetworkPkg/DnsDxe: Remove unnecessary NULL pointer check.
-      MdeModulePkg/Ip4Dxe: Uninstall protocols when error happen in Drive=
-r Binding Start.
-      NetworkPkg/Ip6Dxe: Uninstall protocols when error happen in Driver =
-Binding Start.
-      NetworkPkg/Ip6Dxe: Clean the invalid IPv6 configuration during driv=
-er start.
-      NetworkPkg/DnsDxe: [CVE-2018-12178] Check the received packet size =
-before parsing the message.
-
-Jiewen Yao (6):
-      MdeModulePkg/LockboxNullLib: clean up INF file.
-      BaseTool/GenC: Fix build error when type is BASE or USER_DEFINED.
-      MdePkg/Include: Add Nasm.inc
-      MdePkg/BaseLib: Add Shadow Stack Support for X86.
-      UefiCpuPkg/ExceptionLib: Add CET support.
-      UefiCpuPkg/PiSmmCpu: Add Shadow Stack Support for X86 SMM.
-
-Jordan Justen (1):
-      OvmfPkg/build.sh: Enable flash for qemu 3 or later
-
-Julien Grall (1):
-      Maintainers.txt: Update e-mail address for Julien Grall
-
-Krzysztof Koch (1):
-      ShellPkg/UefiShellAcpiViewCommandLib: Add support for PPTT
-
-Laszlo Ersek (47):
-      EmulatorPkg: require GCC48 or later
-      OvmfPkg: require GCC48 or later
-      Vlv2TbltDevicePkg: assume GCC48 or later
-      BaseTools/tools_def.template: fix up LF-only line terminator
-      BaseTools/tools_def.template: strip trailing whitespace
-      BaseTools/tools_def.template: remove GCC48_IA32_X64_DLINK_COMMON de=
-ad-end
-      BaseTools/tools_def.template: remove GCC47 leaf definitions
-      BaseTools/tools_def.template: propagate loss of GCC47 references
-      BaseTools/tools_def.template: remove GCC47 documentation
-      BaseTools/tools_def.template: remove GCC46 leaf definitions
-      BaseTools/tools_def.template: propagate loss of GCC46 references
-      BaseTools/tools_def.template: remove GCC46 documentation
-      BaseTools/tools_def.template: remove GCC45 leaf definitions
-      BaseTools/tools_def.template: propagate loss of GCC45 references
-      BaseTools/tools_def.template: remove GCC45 documentation
-      BaseTools/tools_def.template: remove GCC44 leaf definitions
-      BaseTools/tools_def.template: propagate loss of GCC44 references
-      BaseTools/tools_def.template: rename GCC44_ALL_CC_FLAGS to GCC48_AL=
-L_CC_FLAGS
-      BaseTools/tools_def.template: eliminate GCC44_IA32_X64_DLINK_FLAGS
-      BaseTools/tools_def.template: rename GCC44_IA32_X64_DLINK_COMMON to=
- GCC48_IA32_X64_DLINK_COMMON
-      BaseTools/tools_def.template: remove comment about GCC44 + LzmaF86C=
-ompress
-      BaseTools/tools_def.template: remove GCC44 documentation
-      ArmPkg/ArmSoftFloatLib: drop build flags specific to GCC46/GCC47
-      CryptoPkg/BaseCryptLib: drop build flags specific to GCC44
-      Revert "MdePkg: avoid __builtin_unreachable() on GCC v4.4"
-      BaseTools/BuildReport: fix report for platforms/arches without stru=
-ct PCDs
-      ArmVirtPkg/ArmVirtQemuKernel: don't set PcdCPUCoresStackBase
-      ArmVirtPkg: don't set PcdRelocateVectorTable
-      ArmVirtPkg/{ArmVirtQemu,ArmVirtQemuKernel}: don't set PcdTrustzoneS=
-upport
-      ArmVirtPkg: don't set PcdPostCodePropertyMask
-      ArmVirtPkg: clean up PcdSetNxForStack setting (applies to ArmVirtQe=
-mu only)
-      ArmVirtPkg/PrePi: drop wrong PcdCoreCount dependency
-      ArmVirtPkg: don't set PcdCoreCount
-      ArmVirtPkg: don't set PcdDebugClearMemoryValue
-      ArmVirtPkg: don't set PcdDebugPrintErrorLevel in RELEASE builds
-      ArmVirtPkg/ArmVirtXen: don't set PcdPL031RtcBase
-      ArmVirtPkg/ArmVirtXen: don't set PcdTerminalTypeGuidBuffer
-      ArmVirtPkg/ArmVirtXen: don't set PcdShellFile
-      ArmVirtPkg/ArmVirtXen: don't set PcdTurnOffUsbLegacySupport
-      ArmVirtPkg/ArmVirtXen: don't set Pcd*ImageVerificationPolicy
-      Maintainers: add TPM2 reviewers for OvmfPkg
-      Maintainers: specify the scope for OvmfPkg/ArmVirtPkg Xen module re=
-viewers
-      MdeModulePkg/UefiBootManagerLib: fix LoadImage/StartImage status co=
-de rep.
-      OvmfPkg: add library to track boot option loading/starting on the c=
-onsole
-      OvmfPkg/PlatformBootManagerLib: display boot option loading/startin=
-g
-      ArmVirtPkg/ArmVirtQemu*: enable minimal Status Code Routing in DXE
-      ArmVirtPkg/PlatformBootManagerLib: display boot option loading/star=
-ting
-
-Leif Lindholm (8):
-      ArmPkg: fix StandaloneMmMmuLib subdirectory case
-      ArmPkg: drop ArmBds remnant Pcds from .dec
-      ArmPkg: delete unused ArmTrustZoneSmc.h
-      AppPkg: fix webserver build for !Ia32/X64
-      IntelFrameworkModulePkg: fix build for AARCH64/ARM
-      IntelFrameworkPkg: fix build for AARCH64/ARM
-      SecurityPkg: fix package build on ARM
-      SignedCapsulePkg: enable package build for AARCH64/ARM
-
-Liming Gao (12):
-      OvmfPkg: Don't include TftpDynamicCommand in XCODE5 tool chain
-      MdeModulePkg PCD: Add DynamicEx PcdVpdBaseAddress64 for non SPI pla=
-tform
-      Maintainers.txt: Add the rule to hand over the package maintain rol=
-e
-      BaseTools Script: Update ConvertFceToStructurePcd to report warning=
- messages
-      MdeModulePkg: Correct PCD name in MdeModulePkg.uni
-      Readme.md: Add edk2 release tag and edk2 release plan
-      BaseTools GenFw: Fix XCODE5 build issue
-      BaseTools VolInfo: Fix XCODE5 build issue
-      BaseTools: Update PYTHON env to PYTHON_COMMAND
-      MdeModulePkg DxeCapsuleLibFmp: Update SupportCapsuleImage() for Fak=
-e Capsule
-      BaseTools: Remove unused txt files
-      Revert "BaseTools:BaseTools supports to the driver combination."
-
-Liu Yu (1):
-      EmulatorPkg/build.sh: Fix 'run' path to simulator host executable
-
-Marcin Wojtas (2):
-      MdeModulePkg/SdMmcPciHcDxe: Add an optional parameter in NotifyPhas=
-e
-      MdeModulePkg/SdMmcPciHcDxe: Allow overriding base clock frequency
-
-Max Knutsen (1):
-      MdeModulePkg/ReportStatusCodeLib: Avoid using AllocatePool if possi=
-ble
-
-Meenakshi Aggarwal (1):
-      EmbeddedPkg: Fix Command Argument for SD/eMMC R/W operation.
-
-Mike Maslenkin (1):
-      UefiCpuPkg/CpuExceptionHandlerLib: Fix spelling issue
-
-Mike Turner (4):
-      MdePkg/BaseLib: Introduce CharToUpper and AsciiCharToUpper publicly
-      MdePkg/UefiDevicePathLib: Add a checking step
-      BaseTools/DevicePath: Add a checking step
-      MdePkg/BaseLib: Add Base64Encode() and Base64Decode()
-
-Pete Batard (2):
-      EmbeddedPkg/Library: Add VirtualRealTimeClockLib
-      EmbeddedPkg/VirtualRealTimeClockLib: Fix correctness issues
-
-Philippe Mathieu-Daude (1):
-      BaseTools: Fix build failure when specifying multiple BUILDTARGET
-
-Ray Ni (10):
-      MdeModulePkg/PciBus: Shadow option ROM after BARs are programmed
-      MdeModulePkg/PciBus: Fix system hang when no PCI Option ROM exists
-      Maintainers.txt: Update mail address
-      MdeModulePkg/PciBus: Change PCI_IO_DEVICE.RomSize to UINT32 type
-      MdeModulePkg/PciBus: Correct typos
-      MdeModulePkg/PciBus: Fix a bug PPB MEM32 BAR isn't restored sometim=
-es
-      UefiCpuPkg/MtrrLib: Fix a bug that may wrongly set memory <1MB to U=
-C
-      ShellBinPkg: Ia32/X64 Shell binary update.
-      MdeModulePkg/HiiDatabase: Fix potential integer overflow (CVE-2018-=
-12181)
-      MdeModulePkg/HiiImage: Fix stack overflow when corrupted BMP is par=
-sed (CVE-2018-12181)
-
-Sami Mujawar (36):
-      Maintainers.txt: Change DynamicTablesPkg maintainer
-      DynamicTablesPkg: Dynamic Tables Framework
-      DynamicTablesPkg: Table Generator definition
-      DynamicTablesPkg: Acpi Table Generator
-      DynamicTablesPkg: SMBIOS Table Generator
-      DynamicTablesPkg: DT Table Generator
-      DynamicTablesPkg: Standard NameSpace Objects
-      DynamicTablesPkg: Arm NameSpace Objects
-      DynamicTablesPkg: Configuration Manager Objects
-      DynamicTablesPkg: Configuration Manager Protocol
-      DynamicTablesPkg: Configuration Manager Helper
-      DynamicTablesPkg: Table Helper Library
-      DynamicTablesPkg: Dynamic Table Factory Protocol
-      DynamicTablesPkg: Dynamic Table Factory Dxe
-      DynamicTablesPkg: Dynamic Table Manager Dxe
-      DynamicTablesPkg: Arm Raw/DSDT/SSDT Generator
-      DynamicTablesPkg: Arm ACPI FADT Generator
-      DynamicTablesPkg: Arm ACPI MADT Generator
-      DynamicTablesPkg: Arm ACPI GTDT Generator
-      DynamicTablesPkg: Arm SPCR Table Generator
-      DynamicTablesPkg: Arm DBG2 Table Generator
-      DynamicTablesPkg: Arm PCI MCFG Table Generator
-      DynamicTablesPkg: Arm IORT Table Generator
-      DynamicTablesPkg: Fix protocol section
-      DynamicTablesPkg: Rename enum used for ID Mapping
-      DynamicTablesPkg: Add OEM Info
-      DynamicTablesPkg: DGB2: Update DBG2_DEBUG_PORT_DDI
-      DynamicTablesPkg: Remove GIC Distributor Id field
-      DynamicTablesPkg: Minor updates and fix typos
-      ArmPkg: Fix writes to GICv3 GICD_IROUTER<n> reg
-      Revert "DynamicTablesPkg: Minor updates and fix typos"
-      Revert "DynamicTablesPkg: Remove GIC Distributor Id field"
-      Revert "DynamicTablesPkg: DGB2: Update DBG2_DEBUG_PORT_DDI"
-      Revert "DynamicTablesPkg: Add OEM Info"
-      Revert "DynamicTablesPkg: Rename enum used for ID Mapping"
-      Revert "DynamicTablesPkg: Fix protocol section"
-
-Sean Brogan (1):
-      MdeModulePkg/NvmExpressDxe: Report StatusCode for device init failu=
-re
-
-Shenglei Zhang (37):
-      EmulatorPkg: Remove EdkShellBinPkg in FDF and DEC
-      Nt32Pkg: Remove EdkShellBinPkg in FDF and DEC
-      OvmfPkg: Remove EdkShellBinPkg in FDF
-      Vlv2TbltDevicePkg: Remove EdkShellBinPkg with ShellPkg
-      EdkShellBinPkg: Remove EdkShellBinPkg
-      EdkShellPkg: Remove EdkShellPkg
-      Maintainers.txt: Remove EdkShellPkg and EkdShellBinPkg
-      UnixPkg: Remove UnixPkg and update Maintainers.txt
-      MdeModulePkg: Remove PcdIdentifyMappingPageTablePtr
-      ShellPkg: Remove ShellPkg wrapper header files
-      BaseTools: Remove GenVtf
-      DuetPkg: Remove DuetPkg
-      BaseTools: Remove tools only used by DuetPkg
-      Maintainers.txt: Remove DuetPkg
-      ShellPkg/UefiShellDebug1CommandsLib: Remove the unused function Cha=
-rToUpper
-      MdeModulePkg/EbcDebugger: Change function names
-      MdePkg/BaseLib: Remove definitions of two functions
-      MdeModulePkg/EbcDebugger: Use AsciiCharToUpper and CharToUpper
-      MdeModulePkg/DxeHttpLib: Use BaseLib api AsciiCharToUpper
-      ShellPkg/Shell: Use BaseLib api CharToUpper
-      ShellPkg/UefiShellLib: Use BaseLib api CharToUpper
-      MdePkg: Change function parameter type
-      MdeModulePkg/S3SaveStateDxe: Change function parameter types
-      MdeModulePkg/SmmS3SaveStateDxe: Change function parameter types
-      BaseTools/tools_def.template: Remove CYGGCC
-      OptionRomPkg/ReadMe.txt: Remove CYGGCC
-      BaseTools: Update MYTOOLS
-      BaseTools/tools_def.template: Remove VS2003 and VS2005
-      OptionRomPkg/ReadMe.txt: Remove VS2005
-      BaseTools/tools_def.template: Remove UNIXGCC
-      OvmfPkg/README: Remove UNIXGCC
-      BaseTools/tools_def.template: Remove ELFGCC
-      BaseTools/tools_def.template: Remove DDK3790
-      BaseTools/build_rule.template: Remove GCCLD
-      MdePkg/BaseLib: Change a variable type in a bitwise operation
-      MdeModulePkg/PropertiesTableAttributesDxe: Remove this driver
-      IntelSiliconPkg/MicrocodeUpdateDxe: Error message enhancement
-
-Siyuan Fu (8):
-      ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF=
-.
-      ArmVirtPkg: Remove redundant library instances in ArmVirtQemuKernel=
-.dsc
-      MdeModulePkg: Delete Tcp4Dxe in MdeModulePkg.
-      NetworkPkg: Remove some clarification from TcpDxe.inf
-      MdeModulePkg: Delete IScsiDxe in MdeModulePkg.
-      NetworkPkg: Remove some clarification from IScsiDxe.inf
-      MdeModulePkg: Delete UefiPxeBcDxe in MdeModulePkg.
-      NetworkPkg: Remove some clarification from UefiPxeBcDxe.inf
-
-Solanki, Digant H (1):
-      IntelSiliconPkg\Include\IndustryStandard: Update IGD_OPREGION_MBOX3=
- Structure
-
-Songpeng Li (3):
-      ShellPkg/TftpDynamicCommand: Change file writing method in tftp
-      NetworkPkg/IScsiDxe: Remove unused global variables.
-      NetworkPkg/Dhcp6Dxe: Remove an unused global variable.
-
-Star Zeng (30):
-      Maintainers.txt: Update FmpDevicePkg maintainer
-      Maintainers.txt: Update MdeModulePkg maintainers
-      MdeModulePkg PeiCore: Remove the using of PcdPeiCoreMaxPeimPerFv
-      SecurityPkg Tcg(2)Pei: Remove the using of PcdPeiCoreMaxFvSupported
-      MdeModulePkg PeiCore: Remove the using of PcdPeiCoreMaxFvSupported
-      MdeModulePkg PeiCore: Remove the using of PcdPeiCoreMaxPpiSupported
-      OvmfPkg: Remove PcdPeiCoreMaxXXX PCDs' statement
-      Vlv2TbltDevicePkg: Remove PcdPeiCoreMaxXXX PCDs' statement
-      MdeModulePkg: Remove PcdPeiCoreMaxXXX PCDs
-      MdeModulePkg Variable: Add some missing changes for 9b18845
-      MdeModulePkg Variable: Abstract InitRealNonVolatileVariableStore
-      MdeModulePkg Variable: Move "extern XXX" to Variable.h
-      MdeModulePkg Variable: Not get NV PCD in VariableWriteServiceInitia=
-lize
-      MdeModulePkg Variable: Abstract VariableWriteServiceInitializeDxe/S=
-mm
-      MdeModulePkg Variable: Remove CacheOffset in UpdateVariable()
-      MdeModulePkg Variable: type case VolatileBase to UINTN directly
-      MdeModulePkg: Add PcdEmuVariableNvModeEnable in dec
-      MdeModulePkg: Refine description a little for PcdEmuVariableNvStore=
-Reserved
-      MdeModulePkg Variable: Add emulated variable NV mode support
-      MdeModulePkg VariablePei: Don't check BOOT_IN_RECOVERY_MODE
-      ArmVirtXen: Use merged variable driver for emulated NV mode
-      ArmVirtXen: Link VarCheckUefiLib NULL class library instance
-      BeagleBoardPkg: Use merged variable driver for emulated NV mode
-      QuarkMin: Use merged variable driver for emulated NV mode
-      CorebootPayloadPkg: Use merged variable driver for emulated NV mode
-      MdeModulePkg VariableStandaloneMm: Add PcdEmuVariableNvModeEnable i=
-n inf
-      MdeModulePkg: Remove EmuVariableRuntimeDxe
-      MdeModulePkg/PeiCore: Ensure FfsFileHeader 8 bytes aligned
-      MdeModulePkg/DxeCore: Ensure FfsFileHeader 8 bytes aligned
-      IntelFrameworkModulePkg/FwVolDxe: Ensure FfsFileHeader 8 bytes alig=
-ned
-
-Stefan Berger (1):
-      OvmfPkg: Add TCG2 Configuration menu to the Device Manager menu
-
-Sughosh Ganu (3):
-      ArmPkg/Include: Fix the SPM version SVC ID
-      StandaloneMM: Include the newly added library class for MMU functio=
-ns
-      StandaloneMM: Update permissions for Standalone MM drivers memory a=
-rea
-
-Sumit Garg (2):
-      ArmPkg/OpteeLib: Add dummy RPC handler
-      ArmPkg/OpteeLib: Add OPTEE_SUCCESS return code
-
-Sun, Zailiang (1):
-      Maintainers.txt: update Vlv2*Pkg maintainers.
-
-Tomasz Michalec (2):
-      MdeModulePkg/SdMmcPciHcDxe: Add UhsSignaling to SdMmcOverride proto=
-col
-      MdeModulePkg/SdMmcPciHcDxe: Add SwitchClockFreqPost to SdMmcOverrid=
-e
-
-Vijayenthiran Subramaniam (2):
-      MdeModulePkg/Variable: add debug logs in VariableServiceSetVariable
-      NetworkPkg/IScsiDxe: add debug logs for failed SetVariable attempts
-
-Vladimir Olovyannikov (1):
-      MdeModulePkg/NonDiscoverablePciDeviceDxe: add missing validation
-
-Vladimir Olovyannikov via edk2-devel (1):
-      ShellPkg/TftpDynamicCommand: Return proper status
-
-Wang Fan (2):
-      NetworkPkg: Add WiFi Connection Manager to NetworkPkg
-      NetworkPkg: Fix Duplicate FreePool Error in WCM
-
-Ye Ting (1):
-      Maintainers.txt: Change package maintainer and reviewer of CryptoPk=
-g.
-
-Yonghong Zhu (1):
-      Maintainers.txt: Update BaseTools maintainers
-
-Yunhua Feng (3):
-      BaseTools: nametuple not have verbose parameter in python3
-      BaseTools: Remove unnecessary super function
-      BaseTools: replace long by int
-
-Zhang, Chao B (6):
-      SecurityPkg: TCG Add more Event type
-      SecurityPkg: Update TCG PFP spec revision.
-      SecurityPkg/Tcg: Fix Warnings and Remarks reported by IASL
-      SecurityPkg/TCG: Upgrade UEFI supporting TCG spec info
-      MdeModulePkg:Tpm2Acpi.h: Upgrade UEFI supporting TCG spec info
-      Maintainers.txt: Change package maintainer and reviewer of Security=
-Pkg.
-
-Zhao, ZhiqiangX (1):
-      BaseTools: AutoGen and GenFds share the parser data.
-
-Zhichao Gao (8):
-      ShellPkg: add array index check for shell delay option
-      MdeModulePkg: change the function name ResetSystem
-      MdeModulePkg: Add the new API ResetSystem in the head file
-      MdeModulePkg: Add a new API ResetSystem for DXE ResetSystemLib
-      MdeModulePkg: Add a new API ResetSystem for Null version
-      MdeModulePkg: Add a new API ResetSystem for PEI ResetSystemLib
-      MdeModulePkg: Add a runtime library instance of ResetSystemLib
-      MdeModulePkg: Add the runtime ResetSystemLib in MdeModulePkg.dsc
-
-Zhijux Fan (38):
-      BaseTools: Update nasm file build rule to support $(INC)
-      BaseTools: Add $(INC)-like support when compiling .nasm files
-      BaseTools:Build fail when PCD use in the [DEPEX] section of INF fil=
-es
-      BaseTools:build break if the Path contains SingleFile.Ext
-      BaseTools:The BuildOptionPcd value is wrong
-      BaseTools: Fix Pcd Array changes build report issue.
-      BaseTools:Define Macro in Inf file, the pcdvalue Can't convert
-      BaseTool:Rename xrange() to range()
-      BaseTools:use iterate list to replace the itertools
-      BaseTools: Rename iteritems to items
-      BaseTools: replace get_bytes_le() to bytes_le
-      BaseTools:Solve the data sorting problem use python3
-      BaseTools: Update argparse arguments since it not have version now
-      BaseTools:Similar to octal data rectification
-      BaseTools/UPT:merge UPT Tool use Python2 and Python3
-      BaseTools: update Test scripts support python3
-      BaseTools/Scripts: Porting PackageDocumentTools code to use Python3
-      Basetools: It went wrong when use os.linesep
-      BaseTools:Fv BaseAddress must set If it not set
-      BaseTools:TestTools character encoding issue
-      BaseTools:Double carriage return inserted from Trim.py on Python3
-      BaseTools: change the Division Operator
-      BaseTools:There is extra blank line in datalog
-      BaseTools: Similar to octal data rectification
-      BaseTools: Update windows and linux run scripts file to use Python3
-      BaseTools:Update build tool to print python version information
-      BaseTools:Linux Python highest version check.
-      BaseTools: PCD value incorrect in structure pcd sku case.
-      BaseTools:StructurePCD value display incorrect in "Not used" sectio=
-n.
-      BaseTools:Fix a ECC issue
-      BaseTools:BaseTools supports to the driver combination.
-      BaseTools:Fixed build failure when specifying multiple BUILDTARGET
-      BaseTools:PCD value error in structure pcd sku case.
-      BaseTools:Build fail if define [DEPEX] in library inf
-      BaseTools:Some build generated files content are not ordered on lin=
-ux
-      BaseTools:PackageDocumentTools import lib error occurs.
-      BaseTools:The BOM character is processed when python reads a file
-      BaseTools:Run packagedoc_cli.py to generate doc failed
-
-yuchenlin (5):
-      Revert "OvmfPkg/QemuVideoDxe: list "UnalignedIoInternal.h" in the I=
-NF file"
-      Revert "OvmfPkg/QemuVideoDxe: VMWare SVGA device support"
-      Revert "OvmfPkg/QemuVideoDxe: Helper functions for unaligned port I=
-/O."
-      Revert "OvmfPkg: VMWare SVGA display device register definitions"
-      OvmfPkg: simply use the Bochs interface for vmsvga
-
-zwei4 (1):
-      Vlv2TbltDevicePkg:Fix build and boot failure of Minnowboard Max pla=
-tform.
+Collect the common bits from the recipes in the helper script
+"edk2-build.sh".
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
 ---
 
 Notes:
@@ -963,24 +99,313 @@ Notes:
    =20
     v3:
    =20
-    - pick up Igor's T-b
-   =20
-    v2:
+    - pick up Michal's R-b
    =20
     - pick up Phil's R-b
    =20
-    - pick up Michal's and Michael's R-b's
+    - pick up Michael's R-b
+   =20
+    - compress FD files with bzip2 rather than xz, so that decompression =
+at
+      "make install" time succeed on older build OSes too [Peter]
+   =20
+    - do not pick up Phil's T-b, consequently
+   =20
+    - do not pick up Igor's T-b for the same reason
+   =20
+    v2:
+   =20
+    - drop comma after copyright year, in both new files [Eric]
+   =20
+    - define the SHELL macro as /bin/bash near the top of "Makefile.edk2"=
+,
+      so that various bashisms (e.g. the "source" built-in, and the =3D=3D
+      operator of "[") work even if /bin/sh isn't bash [Phil, Eric]
+   =20
+    - rework "Makefile.edk2" to produce xz-compressed flash device files
+      [Dan, Michael, Phil]:
+   =20
+      - add implicit rule for compression,
+   =20
+      - mark uncompressed FD files as intermediate,
+   =20
+      - factor out the "flashdevs" macro for sharing between the "all" an=
+d
+        ".INTERMEDIATE" targets
+   =20
+    - due to said rework above, do not pick up Phil's R-b / T-b, and
+      Michal's and Michael's R-b's
 
- roms/edk2 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ roms/Makefile      |   5 +
+ roms/Makefile.edk2 | 148 ++++++++++++++++++++
+ roms/edk2-build.sh |  55 ++++++++
+ 3 files changed, 208 insertions(+)
 
-diff --git a/roms/edk2 b/roms/edk2
-index 85588389222a..89910a39dcfd 160000
---- a/roms/edk2
-+++ b/roms/edk2
-@@ -1 +1 @@
--Subproject commit 85588389222a3636baf0f9ed8227f2434af4c3f9
-+Subproject commit 89910a39dcfd788057caa5d88b7e76e112d187b5
+diff --git a/roms/Makefile b/roms/Makefile
+index 93c3d467be14..0ce84a45ad57 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -61,6 +61,7 @@ default:
+ 	@echo "  skiboot        -- update skiboot.lid"
+ 	@echo "  u-boot.e500    -- update u-boot.e500"
+ 	@echo "  u-boot.sam460  -- update u-boot.sam460"
++	@echo "  efi            -- update UEFI (edk2) platform firmware"
+=20
+ bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256=
+k
+ 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+@@ -156,6 +157,9 @@ skiboot:
+ 	$(MAKE) -C skiboot CROSS=3D$(powerpc64_cross_prefix)
+ 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
+=20
++efi: edk2-basetools
++	$(MAKE) -f Makefile.edk2
++
+ clean:
+ 	rm -rf seabios/.config seabios/out seabios/builds
+ 	$(MAKE) -C sgabios clean
+@@ -166,3 +170,4 @@ clean:
+ 	rm -rf u-boot/build.e500
+ 	$(MAKE) -C u-boot-sam460ex distclean
+ 	$(MAKE) -C skiboot clean
++	$(MAKE) -f Makefile.edk2 clean
+diff --git a/roms/Makefile.edk2 b/roms/Makefile.edk2
+new file mode 100644
+index 000000000000..822c547fec64
+--- /dev/null
++++ b/roms/Makefile.edk2
+@@ -0,0 +1,148 @@
++# Makefile for building firmware binaries and variable store templates f=
+or a
++# number of virtual platforms in edk2.
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program and the accompanying materials are licensed and made avai=
+lable
++# under the terms and conditions of the BSD License that accompanies thi=
+s
++# distribution. The full text of the license may be found at
++# <http://opensource.org/licenses/bsd-license.php>.
++#
++# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
+WITHOUT
++# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++SHELL =3D /bin/bash
++
++toolchain =3D $(shell source ./edk2-funcs.sh && qemu_edk2_get_toolchain =
+$(1))
++
++licenses :=3D \
++	edk2/License.txt \
++	edk2/OvmfPkg/License.txt \
++	edk2/CryptoPkg/Library/OpensslLib/openssl/LICENSE
++
++# The "edk2-arm-vars.fd" varstore template is suitable for aarch64 as we=
+ll.
++# Similarly, the "edk2-i386-vars.fd" varstore template is suitable for x=
+86_64
++# as well, independently of "secure" too.
++flashdevs :=3D \
++	aarch64-code \
++	arm-code \
++	i386-code \
++	i386-secure-code \
++	x86_64-code \
++	x86_64-secure-code \
++	\
++	arm-vars \
++	i386-vars
++
++all: $(foreach flashdev,$(flashdevs),../pc-bios/edk2-$(flashdev).fd.bz2)=
+ \
++	../pc-bios/edk2-licenses.txt
++
++../pc-bios/edk2-%.fd.bz2: ../pc-bios/edk2-%.fd
++	bzip2 -9 -c $< > $@
++
++# When the build completes, we need not keep the uncompressed flash devi=
+ce
++# files.
++.INTERMEDIATE: $(foreach flashdev,$(flashdevs),../pc-bios/edk2-$(flashde=
+v).fd)
++
++submodules:
++	cd edk2 && git submodule update --init --force
++
++# See notes on the ".NOTPARALLEL" target and the "+" indicator in
++# "tests/uefi-test-tools/Makefile".
++.NOTPARALLEL:
++
++../pc-bios/edk2-aarch64-code.fd: submodules
++	+./edk2-build.sh \
++		aarch64 \
++		--arch=3DAARCH64 \
++		--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE
++	cp edk2/Build/ArmVirtQemu-AARCH64/DEBUG_$(call toolchain,aarch64)/FV/QE=
+MU_EFI.fd \
++		$@
++	truncate --size=3D64M $@
++
++../pc-bios/edk2-arm-code.fd: submodules
++	+./edk2-build.sh \
++		arm \
++		--arch=3DARM \
++		--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE
++	cp edk2/Build/ArmVirtQemu-ARM/DEBUG_$(call toolchain,arm)/FV/QEMU_EFI.f=
+d \
++		$@
++	truncate --size=3D64M $@
++
++../pc-bios/edk2-i386-code.fd: submodules
++	+./edk2-build.sh \
++		i386 \
++		--arch=3DIA32 \
++		--platform=3DOvmfPkg/OvmfPkgIa32.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE \
++		-D TLS_ENABLE \
++		-D TPM2_ENABLE \
++		-D TPM2_CONFIG_ENABLE
++	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_CODE.fd $@
++
++../pc-bios/edk2-i386-secure-code.fd: submodules
++	+./edk2-build.sh \
++		i386 \
++		--arch=3DIA32 \
++		--platform=3DOvmfPkg/OvmfPkgIa32.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE \
++		-D TLS_ENABLE \
++		-D TPM2_ENABLE \
++		-D TPM2_CONFIG_ENABLE \
++		-D SECURE_BOOT_ENABLE \
++		-D SMM_REQUIRE
++	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_CODE.fd $@
++
++../pc-bios/edk2-x86_64-code.fd: submodules
++	+./edk2-build.sh \
++		x86_64 \
++		--arch=3DX64 \
++		--platform=3DOvmfPkg/OvmfPkgX64.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE \
++		-D TLS_ENABLE \
++		-D TPM2_ENABLE \
++		-D TPM2_CONFIG_ENABLE
++	cp edk2/Build/OvmfX64/DEBUG_$(call toolchain,x86_64)/FV/OVMF_CODE.fd $@
++
++../pc-bios/edk2-x86_64-secure-code.fd: submodules
++	+./edk2-build.sh \
++		x86_64 \
++		--arch=3DIA32 \
++		--arch=3DX64 \
++		--platform=3DOvmfPkg/OvmfPkgIa32X64.dsc \
++		-D NETWORK_IP6_ENABLE \
++		-D HTTP_BOOT_ENABLE \
++		-D TLS_ENABLE \
++		-D TPM2_ENABLE \
++		-D TPM2_CONFIG_ENABLE \
++		-D SECURE_BOOT_ENABLE \
++		-D SMM_REQUIRE
++	cp edk2/Build/Ovmf3264/DEBUG_$(call toolchain,x86_64)/FV/OVMF_CODE.fd $=
+@
++
++../pc-bios/edk2-arm-vars.fd: ../pc-bios/edk2-arm-code.fd
++	cp edk2/Build/ArmVirtQemu-ARM/DEBUG_$(call toolchain,arm)/FV/QEMU_VARS.=
+fd \
++		$@
++	truncate --size=3D64M $@
++
++../pc-bios/edk2-i386-vars.fd: ../pc-bios/edk2-i386-code.fd
++	cp edk2/Build/OvmfIa32/DEBUG_$(call toolchain,i386)/FV/OVMF_VARS.fd $@
++
++# The license file accumulates several individual licenses from under ed=
+k2,
++# prefixing each individual license with a header (generated by "tail") =
+that
++# states its pathname.
++../pc-bios/edk2-licenses.txt: submodules
++	tail -n $(shell cat $(licenses) | wc -l) $(licenses) > $@
++	dos2unix $@
++
++clean:
++	rm -rf edk2/Build
++	cd edk2/Conf && \
++		rm -rf .cache BuildEnv.sh build_rule.txt target.txt \
++			tools_def.txt
+diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
+new file mode 100755
+index 000000000000..4f46f8a6a217
+--- /dev/null
++++ b/roms/edk2-build.sh
+@@ -0,0 +1,55 @@
++#!/bin/bash
++
++# Wrapper shell script for building a  virtual platform firmware in edk2=
+.
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program and the accompanying materials are licensed and made avai=
+lable
++# under the terms and conditions of the BSD License that accompanies thi=
+s
++# distribution. The full text of the license may be found at
++# <http://opensource.org/licenses/bsd-license.php>.
++#
++# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
+WITHOUT
++# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
++
++set -e -u -C
++
++# Save the command line arguments. We need to reset $# to 0 before sourc=
+ing
++# "edksetup.sh", as it will inherit $@.
++emulation_target=3D$1
++shift
++num_args=3D0
++args=3D()
++for arg in "$@"; do
++  args[num_args++]=3D"$arg"
++done
++shift $num_args
++
++cd edk2
++
++# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
++export PYTHON_COMMAND=3Dpython2
++
++# Source "edksetup.sh" carefully.
++set +e +u +C
++source ./edksetup.sh
++ret=3D$?
++set -e -u -C
++if [ $ret -ne 0 ]; then
++  exit $ret
++fi
++
++# Fetch some option arguments, and set the cross-compilation environment=
+ (if
++# any), for the edk2 "build" utility.
++source ../edk2-funcs.sh
++edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
++edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
++qemu_edk2_set_cross_env "$emulation_target"
++
++# Build the platform firmware.
++build \
++  --cmd-len=3D65536 \
++  -n "$edk2_thread_count" \
++  --buildtarget=3DDEBUG \
++  --tagname=3D"$edk2_toolchain" \
++  "${args[@]}"
 --=20
 2.19.1.3.g30247aa5d201
 
