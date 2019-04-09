@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52340)
+Received: from eggs.gnu.org ([209.51.188.92]:52362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDv2r-0001qI-UY
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hDv2x-0001wP-0X
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDv2q-0000sG-RT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:29 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDv2q-0000qq-EC
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:28 -0400
-Received: by mail-io1-xd41.google.com with SMTP id x3so15087304iol.10
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 11:00:28 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
-Date: Tue, 9 Apr 2019 14:00:24 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <625D0D17-9BBA-444F-8204-A182B04238EC@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
-	<5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
-	<0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
- missing AMD pflash functionality
+	(envelope-from <dgilbert@redhat.com>) id 1hDv2v-0000wI-Nf
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDv2v-0000vk-AM
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8361FC0586D8
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 18:00:32 +0000 (UTC)
+Date: Tue, 9 Apr 2019 19:00:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190409180028.GE2964@work-vm>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-13-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190408083627.7479-13-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 12/15] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +34,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+* Markus Armbruster (armbru@redhat.com) wrote:
+> We commonly want to print to the current monitor if we have one, else
+> to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+> we have is monitor_vfprintf(), which is rather unwieldy.  We often
+> print to stderr just because error_printf() is easier.
+> 
+> New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+> next commits will put them to use.
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
+OK, it seems a little odd not to have the fprintf as well, but OK.
 
-On Apr 9, 2019, at 12:15, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Since you did changes in the CFI table, I think we should add a tests
-> verifying the table is correctly generated for all you FlashConfig =
-entries.
-
-That's a good idea. Some of the values are essentially arbitrary (e.g., =
-how long an erase typically takes) but the CFI values that indicate =
-support for erase/suspend and erase regions at least should be tested. =
-I'll take a closer look at what all I changed (it has been a few months =
-since I wrote the code). Are there any in particular you think I should =
-be sure to test? Do you want me to add those tests to the appropriate =
-patches in the series or would you like an additional patch that adds =
-those tests? (The later is easier to do as modifying the earlier patches =
-in the series are likely to cause conflicts with later patches that I'd =
-need to resolve, but I can do either.)
-
-> I suppose you can not share the firmware binary. Can you share these
-> unlock addresses? Maybe once I reviewed carefully your series I might
-> ask you the (pflash) trace event output.
-
-I probably cannot share the binary but the unlock addresses are 0x1554 =
-and 0x2AA8. This is for two interleaved x8/x16 chips in x16 mode so =
-shifting right by 2 (1 for the interleaving and 1 because it's an x16 =
-chip) gives 0x555 and 0xAAA. The appropriate (word) unlock addresses for =
-the chips are 0x555 and 0x2AA which is what you get if you restrict to =
-11 bits.
-
-My guess is that the firmware authors took the byte unlock addresses =
-(0xAAA and 0x555), shifted left by 2, discovered that this didn't work, =
-tried the unlock addresses in the opposite order, and found that that =
-worked due to the chips only looking at 11 bits.
-
-Looking at hw/arm/musicpal.c, I see that it is using unlock addresses =
-0x5555 and 0x2AAA. My guess is this reflects a bug in some firmware and =
-it should be using 0x555 and 0x2AA. I haven't seen any AMD pflash chips =
-that used other unlock addresses, but I've only looked at about a dozen =
-part sheets and I'm not sure what chips the musicpal is actually using.
-
-
---=20
-Stephen Checkoway
+> ---
+>  MAINTAINERS               |  2 ++
+>  include/qemu/qemu-print.h | 19 ++++++++++++++++++
+>  stubs/monitor.c           |  5 +++++
+>  util/Makefile.objs        |  1 +
+>  util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 69 insertions(+)
+>  create mode 100644 include/qemu/qemu-print.h
+>  create mode 100644 util/qemu-print.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac8ab..1aa19dc4ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1895,6 +1895,8 @@ F: hmp.[ch]
+>  F: hmp-commands*.hx
+>  F: include/monitor/hmp-target.h
+>  F: tests/test-hmp.c
+> +F: include/qemu/qemu-print.h
+> +F: util/qemu-print.c
+>  
+>  Network device backends
+>  M: Jason Wang <jasowang@redhat.com>
+> diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+> new file mode 100644
+> index 0000000000..8fed32bf42
+> --- /dev/null
+> +++ b/include/qemu/qemu-print.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_PRINT_H
+> +#define QEMU_PRINT_H
+> +
+> +int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> +
+> +#endif
+> diff --git a/stubs/monitor.c b/stubs/monitor.c
+> index b57fe6c32f..b2ea975e40 100644
+> --- a/stubs/monitor.c
+> +++ b/stubs/monitor.c
+> @@ -6,6 +6,11 @@
+>  
+>  __thread Monitor *cur_mon;
+>  
+> +int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+> +{
+> +    abort();
+> +}
+> +
+>  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+>  {
+>      error_setg(errp, "only QEMU supports file descriptor passing");
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 835fcd69e2..9206878dec 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -23,6 +23,7 @@ util-obj-y += bitmap.o bitops.o hbitmap.o
+>  util-obj-y += fifo8.o
+>  util-obj-y += cacheinfo.o
+>  util-obj-y += error.o qemu-error.o
+> +util-obj-y += qemu-print.o
+>  util-obj-y += id.o
+>  util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+>  util-obj-y += qemu-option.o qemu-progress.o
+> diff --git a/util/qemu-print.c b/util/qemu-print.c
+> new file mode 100644
+> index 0000000000..86f9417af8
+> --- /dev/null
+> +++ b/util/qemu-print.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "monitor/monitor.h"
+> +#include "qemu/qemu-print.h"
+> +
+> +/*
+> + * Print like vprintf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_vprintf(const char *fmt, va_list ap)
+> +{
+> +    if (cur_mon) {
+> +        return monitor_vprintf(cur_mon, fmt, ap);
+> +    }
+> +    return vprintf(fmt, ap);
+> +}
+> +
+> +/*
+> + * Print like printf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_printf(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    int ret;
+> +
+> +    va_start(ap, fmt);
+> +    ret = qemu_vprintf(fmt, ap);
+> +    va_end(ap);
+> +    return ret;
+> +}
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
