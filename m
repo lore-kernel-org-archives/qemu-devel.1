@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47792)
+Received: from eggs.gnu.org ([209.51.188.92]:47848)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDo24-0006DR-DB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:13 -0400
+	id 1hDo28-0006H9-LE
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDo23-0007Ky-9N
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:12 -0400
+	id 1hDo27-0007Mq-2A
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:16 -0400
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Date: Tue, 9 Apr 2019 11:29:31 +0100
-Message-ID: <20190409102935.28292-5-shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 9 Apr 2019 11:29:32 +0100
+Message-ID: <20190409102935.28292-6-shameerali.kolothum.thodi@huawei.com>
 In-Reply-To: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 4/8] hw/arm/virt: Add memory hotplug
- framework
+Subject: [Qemu-devel] [PATCH v4 5/8] hw/arm/virt: Enable device memory
+ cold/hot plug with ACPI boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +27,241 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, imammedo@redhat.com
 Cc: peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, xuwei5@hisilicon.com, lersek@redhat.com, ard.biesheuvel@linaro.org, linuxarm@huawei.com
 
-From: Eric Auger <eric.auger@redhat.com>
+This initializes the GED device with base memory and irq, configures
+ged memory hotplug event and builds the corresponding aml code. GED
+irq routing to Guest is also enabled. With this, both hot and cold
+plug of device memory is enabled now for Guest with ACPI boot.
 
-This patch adds the memory hot-plug/hot-unplug infrastructure
-in machvirt. The device memory is not yet exposed to the Guest
-either though DT or ACPI and hence both cold/hot plug of memory
-is explicitly disabled for now.
+Memory cold plug support with Guest DT boot is not yet supported.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- default-configs/arm-softmmu.mak |  3 +++
- hw/arm/virt.c                   | 45 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 47 insertions(+), 1 deletion(-)
+ default-configs/arm-softmmu.mak |  2 ++
+ hw/arm/virt-acpi-build.c        |  9 ++++++
+ hw/arm/virt.c                   | 61 +++++++++++++++++++++++++++++++++++++++--
+ include/hw/arm/virt.h           |  4 +++
+ 4 files changed, 73 insertions(+), 3 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 613d19a..9f4b803 100644
+index 9f4b803..c9a9b34 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -160,3 +160,6 @@ CONFIG_MUSICPAL=y
+@@ -163,3 +163,5 @@ CONFIG_LSI_SCSI_PCI=y
  
- # for realview and versatilepb
- CONFIG_LSI_SCSI_PCI=y
+ CONFIG_MEM_DEVICE=y
+ CONFIG_DIMM=y
++CONFIG_ACPI_MEMORY_HOTPLUG=y
++CONFIG_ACPI_HW_REDUCED=y
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index bf9c0bc..1ad394b 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -40,6 +40,8 @@
+ #include "hw/loader.h"
+ #include "hw/hw.h"
+ #include "hw/acpi/aml-build.h"
++#include "hw/acpi/memory_hotplug.h"
++#include "hw/acpi/generic_event_device.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
+ #include "hw/arm/virt.h"
+@@ -727,6 +729,7 @@ static void
+ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ {
+     Aml *scope, *dsdt;
++    MachineState *ms = MACHINE(vms);
+     const MemMapEntry *memmap = vms->memmap;
+     const int *irqmap = vms->irqmap;
+ 
+@@ -753,6 +756,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                        (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+     acpi_dsdt_add_power_button(scope);
+ 
++    build_ged_aml(scope, "\\_SB."GED_DEVICE, HOTPLUG_HANDLER(vms->acpi_dev),
++                  irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE, AML_SYSTEM_MEMORY);
 +
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
++    build_memory_hotplug_aml(scope, ms->ram_slots, "\\_SB", NULL,
++                             AML_SYSTEM_MEMORY);
++
+     aml_append(dsdt, scope);
+ 
+     /* copy AML table into ACPI tables blob and patch header there */
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index ce2664a..da516b3 100644
+index da516b3..8179b3e 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -61,6 +61,8 @@
- #include "hw/arm/smmuv3.h"
- #include "hw/acpi/acpi.h"
+@@ -63,6 +63,7 @@
  #include "target/arm/internals.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/mem/nvdimm.h"
++#include "hw/acpi/generic_event_device.h"
  
  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1806,6 +1808,34 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
+@@ -133,6 +134,8 @@ static const MemMapEntry base_memmap[] = {
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
++    [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
++    [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_REG_LEN },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -168,6 +171,7 @@ static const int a15irqmap[] = {
+     [VIRT_PCIE] = 3, /* ... to 6 */
+     [VIRT_GPIO] = 7,
+     [VIRT_SECURE_UART] = 8,
++    [VIRT_ACPI_GED] = 9,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
+     [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+@@ -183,6 +187,13 @@ static const char *valid_cpus[] = {
+     ARM_CPU_TYPE_NAME("max"),
+ };
+ 
++static GedEvent ged_events[] = {
++    {
++        .selector = ACPI_GED_IRQ_SEL_MEM,
++        .event    = GED_MEMORY_HOTPLUG,
++    },
++};
++
+ static bool cpu_type_valid(const char *cpu)
+ {
+     int i;
+@@ -516,6 +527,26 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+     }
  }
  
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                 Error **errp)
++static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
 +{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        error_setg(errp, "memory cold/hot plug is not yet supported");
++    DeviceState *dev;
++
++    dev = DEVICE(object_new(TYPE_ACPI_GED));
++    qdev_prop_set_uint64(dev, "memhp-base",
++                         vms->memmap[VIRT_PCDIMM_ACPI].base);
++    qdev_prop_set_ptr(dev, "gsi", vms->gsi);
++    qdev_prop_set_uint64(dev, "ged-base", vms->memmap[VIRT_ACPI_GED].base);
++    qdev_prop_set_uint32(dev, "ged-irq", vms->irqmap[VIRT_ACPI_GED]);
++    qdev_prop_set_ptr(dev, "ged-events", ged_events);
++    qdev_prop_set_uint32(dev, "ged-events-size", ARRAY_SIZE(ged_events));
++
++    object_property_add_child(qdev_get_machine(), "acpi-ged",
++                              OBJECT(dev), NULL);
++    qdev_init_nofail(dev);
++
++    return dev;
++}
++
+ static void create_its(VirtMachineState *vms, DeviceState *gicdev)
+ {
+     const char *itsclass = its_class_name();
+@@ -555,6 +586,12 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
+     fdt_add_v2m_gic_node(vms);
+ }
+ 
++static void virt_gsi_handler(void *opaque, int n, int level)
++{
++    qemu_irq *gic_irq = opaque;
++    qemu_set_irq(gic_irq[n], level);
++}
++
+ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+ {
+     /* We create a standalone GIC */
+@@ -670,6 +707,8 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+         pic[i] = qdev_get_gpio_in(gicdev, i);
+     }
+ 
++    vms->gsi = qemu_allocate_irqs(virt_gsi_handler, pic, NUM_IRQS);
++
+     fdt_add_gic_node(vms);
+ 
+     if (type == 3 && vms->its) {
+@@ -1418,7 +1457,7 @@ static void machvirt_init(MachineState *machine)
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const CPUArchIdList *possible_cpus;
+-    qemu_irq pic[NUM_IRQS];
++    qemu_irq *pic;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *secure_sysmem = NULL;
+     int n, virt_max_cpus;
+@@ -1614,6 +1653,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+ 
++    pic = g_new0(qemu_irq, NUM_IRQS);
+     create_gic(vms, pic);
+ 
+     fdt_add_pmu_nodes(vms);
+@@ -1644,6 +1684,8 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_platform_bus(vms, pic);
+ 
++    vms->acpi_dev = create_acpi_ged(vms);
++
+     vms->bootinfo.ram_size = machine->ram_size;
+     vms->bootinfo.kernel_filename = machine->kernel_filename;
+     vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+@@ -1811,21 +1853,34 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                  Error **errp)
+ {
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        error_setg(errp, "memory cold/hot plug is not yet supported");
++    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
++    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
++
++    if (is_nvdimm) {
++        error_setg(errp, "nvdimm is not yet supported");
+         return;
+     }
+ 
++    if (!vms->acpi_dev) {
++        error_setg(errp, "memory hotplug is not enabled: missing acpi device");
 +        return;
 +    }
 +
-+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-+}
++    hotplug_handler_pre_plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, errp);
 +
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+
-+    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
-+
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-@@ -1817,12 +1847,23 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
-         }
-     }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
-+static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+    error_setg(errp, "device unplug request for unsupported device"
-+               " type: %s", object_get_typename(OBJECT(dev)));
+     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
  }
  
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
+ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+                              DeviceState *dev, Error **errp)
  {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
++    HotplugHandlerClass *hhc;
+     VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
  
-@@ -1886,7 +1927,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    hc->pre_plug = virt_machine_device_pre_plug_cb;
-     hc->plug = virt_machine_device_plug_cb;
-+    hc->unplug_request = virt_machine_device_unplug_request_cb;
+     pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
+ 
++    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
++    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, NULL);
  }
  
- static void virt_instance_init(Object *obj)
+ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 507517c..9c6b0b1 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -77,6 +77,8 @@ enum {
+     VIRT_GPIO,
+     VIRT_SECURE_UART,
+     VIRT_SECURE_MEM,
++    VIRT_PCDIMM_ACPI,
++    VIRT_ACPI_GED,
+     VIRT_LOWMEMMAP_LAST,
+ };
+ 
+@@ -132,6 +134,8 @@ typedef struct {
+     uint32_t iommu_phandle;
+     int psci_conduit;
+     hwaddr highest_gpa;
++    DeviceState *acpi_dev;
++    qemu_irq *gsi;
+ } VirtMachineState;
+ 
+ #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
 -- 
 2.7.4
