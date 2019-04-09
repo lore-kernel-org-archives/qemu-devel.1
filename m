@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50825)
+Received: from eggs.gnu.org ([209.51.188.92]:56286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDoE4-0006yH-Qo
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:43:37 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1hDoba-0004wy-1M
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hDoE3-0004oL-T0
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:43:36 -0400
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Tue, 9 Apr 2019 10:43:25 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83935C5D0@lhreml524-mbs.china.huawei.com>
-References: <20190321104745.28068-1-shameerali.kolothum.thodi@huawei.com>
-	<20190321104745.28068-8-shameerali.kolothum.thodi@huawei.com>
-	<98c7f0fd-8446-8897-0808-e7615af29670@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA83933836A@lhreml524-mbs.china.huawei.com>
-	<0dcd3f3c-15c4-318f-28bd-4b6706708c0d@redhat.com>
-	<CAKv+Gu_-nRqeCT0s6ZwW+q3=sbGmtazFJ9R=19U5SJ=gSUmJLw@mail.gmail.com>
-	<a2c37d40-e2ee-e7aa-3f34-ab39a9a6449d@redhat.com>
-	<459862f9-18f7-0a37-dfb9-b8ca9aa6a2d2@redhat.com>
-	<3de6adf3-30c7-5908-e153-2195bc6879c5@redhat.com>
-	<9e939ea4-4be2-a165-dce4-47d8196020b0@redhat.com>
-	<20190403114901.6e4ea653@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA839353082@lhreml524-mbs.china.huawei.com>
-	<ebf745ce-f5bc-be0c-c0ce-3ce25bd7afa9@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA8393564E2@lhreml524-mbs.china.huawei.com>
-	<20190408101132.5d849d1f@redhat.com>
-In-Reply-To: <20190408101132.5d849d1f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <balaton@eik.bme.hu>) id 1hDobZ-00078w-4s
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:54 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28595)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hDobY-00071L-Q0
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:53 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Tue, 09 Apr 2019 12:56:18 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
- feature "fdt"
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190409110732.5C5FF7465DB@zero.eik.bme.hu>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] ati-vga: Fix check for blt outside vram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,46 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Leif Lindholm <Leif.Lindholm@arm.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Andrew Randrianasulu <randrianasulu@gmail.com>
 
+Fix the check preventing calling pixman functions that would access
+memory outside allocated vram. The r128 X driver sometimes seem to try
+blits that span outside vram, this check prevents crashing QEMU in
+that case. (The r128 X driver may have problems even on real hardware
+so I'm not sure if it's a client bug or emulation problem but at least
+QEMU should survive.)
 
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+---
+ hw/display/ati_2d.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: 08 April 2019 09:12
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>; Auger Eric <eric.auger@redhat.com>;
-> Ard Biesheuvel <ard.biesheuvel@linaro.org>; peter.maydell@linaro.org;
-> sameo@linux.intel.com; qemu-devel@nongnu.org; Linuxarm
-> <linuxarm@huawei.com>; shannon.zhaosl@gmail.com;
-> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
-> sebastien.boeuf@intel.com; Leif Lindholm <Leif.Lindholm@arm.com>
-> Subject: Re: [Qemu-devel] [PATCH v3 07/10] hw/arm/virt: Introduce opt-in
-> feature "fdt"
-
-[...]
-=20
-> > > > If the above is correct(with 32-bit variant of UEFI, OS cannot have=
- ACPI
-> boot),
-> > > > then do we really have the issue of memory becoming non
-> > > hot-un-unpluggable?
-> > > > May be I am missing something.
-> > >
-> > > I think Igor and Peter dislike adding complex logic to QEMU that
-> > > reflects the behavior of a specific firmware. AIUI their objection is=
-n't
-> > > that it wouldn't work, but that it's not the right thing to do, from =
-a
-> > > design perspective.
-> >
-> > Understood. Hope we can converge on something soon.
-> Lets try adding a parameter to memory descriptors in DT that would mark
-> them as hotpluggable.
-
-Just send out v4 incorporating this. Please take a look and let me know.
-
-Thanks,
-Shameer
-=20
+diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
+index bc98ba6eeb..fe3ae14864 100644
+--- a/hw/display/ati_2d.c
++++ b/hw/display/ati_2d.c
+@@ -79,10 +79,10 @@ void ati_2d_blt(ATIVGAState *s)
+                 s->regs.dst_width, s->regs.dst_height);
+         end =3D s->vga.vram_ptr + s->vga.vram_size;
+         if (src_bits >=3D end || dst_bits >=3D end ||
+-            src_bits + (s->regs.src_y + s->regs.dst_height) * src_stride=
+ +
+-            s->regs.src_x >=3D end ||
+-            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_stride=
+ +
+-            s->regs.dst_x >=3D end) {
++            src_bits + s->regs.src_x + (s->regs.src_y + s->regs.dst_heig=
+ht) *
++            src_stride * sizeof(uint32_t) >=3D end ||
++            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_heig=
+ht) *
++            dst_stride * sizeof(uint32_t) >=3D end) {
+             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n=
+");
+             return;
+         }
+@@ -140,8 +140,8 @@ void ati_2d_blt(ATIVGAState *s)
+                 filler);
+         end =3D s->vga.vram_ptr + s->vga.vram_size;
+         if (dst_bits >=3D end ||
+-            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_stride=
+ +
+-            s->regs.dst_x >=3D end) {
++            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_heig=
+ht) *
++            dst_stride * sizeof(uint32_t) >=3D end) {
+             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n=
+");
+             return;
+         }
+--=20
+2.13.7
