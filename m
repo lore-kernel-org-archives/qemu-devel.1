@@ -2,88 +2,87 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B495C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B94C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B83720880
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:24:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 692F920880
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="is2G9vWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B83720880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmywDLys"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692F920880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39337 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39377 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDorM-0007N5-Om
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 07:24:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59536)
+	id 1hDotv-0008Pd-HX
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 07:26:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hDoqY-00075w-Ou
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:23:23 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hDot6-00086w-36
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hDoqT-0000cO-LI
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:23:22 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37490)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hDot3-0001oR-LX
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:26:00 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
-	id 1hDoqT-0000bl-8J; Tue, 09 Apr 2019 07:23:17 -0400
-Received: by mail-wm1-x343.google.com with SMTP id v14so2879099wmf.2;
-	Tue, 09 Apr 2019 04:23:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hDot3-0001o1-3t
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:25:57 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g3so20359018wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 04:25:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=bdcCYNR1q2XGqS33UR+SiMQo2z+e5Ieufy7g/wv0qgI=;
-	b=is2G9vWPel8G/PG+pKA2u/KElYGMrCSYaqZ3C0EoXVIJ/IFvn8A67rLfq6eBkt1rKZ
-	6RItTsQ2nNvrN3u4uVTmwqfrFQZJGL+RGE7pMYgpzNBgBhVS0nEGuC0lpRtOE2nwZk9B
-	yggQCVYcpRe+Yhvavwnt0Q2eTIR/I+MySuH+MEPvVUjzUHgxbLe98+NkGlKj8gjkQtGP
-	hCSq/MzAogfQSyhyKCG+se1T1t5qUw8Ch4lrjIilPvV2z3TABGOl92LHWuGLaAN5xzbA
-	4z2ne6GScaM6Pog5kDPQSQMOLICFYAdlnVCv2FKToTmzaceMpexNN5GUrq2sEySu0x39
-	EvQg==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=xk/X+u3iWw04cO5PirjGmDBeEvRBdL6krFI1zPTIcms=;
+	b=NmywDLysnfeEs6lt8mcnjL4p0nccdYhGyl7CGAhhuGBF0i4DDZvd7Uc1AP7ECTm0f0
+	9lLg1w6WsdrMJEqBOX0dNeH1Gj/1hdLL83hlbOXCLZRHnU6szgY0XG6LxNbTTgcpIeQt
+	qR3dNaaMC8oi8NHzVHlsgIZM8LeuMU/vVixJO33Tpi/8+VMuY6hyzVIDJlYoejX9/S/s
+	WAJhtcNjsOTeI+akAvAXZrTDBn/S1P90rWssEd5frCR/oyAf0gavy8Xm9yPA5xfT+cwN
+	iVrVHXd2XF0T1RbXOCAyKch5HiNwzRyDwZDB2Pm6PP2cFXikDh5wGHuQKySNueSnHzYe
+	ErCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=bdcCYNR1q2XGqS33UR+SiMQo2z+e5Ieufy7g/wv0qgI=;
-	b=eQq6Aix04RuyQKI+GHbJKbwscqHkorMD9hTLIXAdKxWjWmIIWFA7knS6ms/h2eC7yU
-	B1abtFR2WOsoa1uid8j/jNmln8PXtfxo4WgUdHSYunna5xr+YJca9hbNDc0/FU6qIqbv
-	Dn6rRH8QWpvJC0ZX5S9vmIUe+NbRyqs0e60PUsLFoWTD0qf4nmldLbG2zFbB9D8Rijiu
-	gXqO4owqxFtbfHYnhJwNIl+5OyqEyWZbImNSvpDNbD1ar1IEIcjRafBJ64qZdoFhzPvV
-	CIdO2QXoeRQp7o6nbZZI/lcnxmYnDPj+KVqWKUf/uFWdBtwxhLu0gIgKPxkYMg7TlyAD
-	RFVQ==
-X-Gm-Message-State: APjAAAVbJbRbatizd/ho7nRc86QcnAX4/2/tvGmvnRcpfDIyoEO6OQIw
-	gUjRKdTZtiIdsPsFrh006cU=
-X-Google-Smtp-Source: APXvYqyQ9moDITvMBK1BsD6mvn494PDwb94WvsBIY/hSwnpKPyjV2gWVXC0PpCUzs3v4+Axlfxx6uQ==
-X-Received: by 2002:a05:600c:2293:: with SMTP id
-	19mr21365938wmf.77.1554808995669; 
-	Tue, 09 Apr 2019 04:23:15 -0700 (PDT)
-Received: from localhost ([46.233.112.222]) by smtp.gmail.com with ESMTPSA id
-	y197sm18812042wmd.34.2019.04.09.04.23.14
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 09 Apr 2019 04:23:14 -0700 (PDT)
-Date: Tue, 9 Apr 2019 12:18:52 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Message-ID: <20190409111852.GC16944@stefanha-x1.localdomain>
-References: <20190406040422.5276-1-aruna.15@cse.mrt.ac.lk>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=xk/X+u3iWw04cO5PirjGmDBeEvRBdL6krFI1zPTIcms=;
+	b=ViFh/cGmMPOWqHqJxrQNlZfwQ0c07ajmKB5w5+awScmCWFxCo1nRkLOt4KPzWfFsXe
+	Iysf4H/yMni3R+GyPnQhI4Q1DiB/sGO5JTZ4x/bpYBF0uLJufDBqq6OjFxlbqNZjGN1W
+	PYIQrxQL5Ukf6MxKe6Jwq39N3X0DeH2YsLvaNHlSX7AfzMlEtd6C7x6GrrpAIUo590I5
+	AkyjY8ipqlHN41EJ4sranRZaeMmiCnI6mOTUhJ/FNDafxf9TEZ6cSqRCs3SFsL5icUSH
+	XoNPwKU9J6nzG4WnkVlybdriY+hO6nIEwbZTVlSDNR3cSeZtvoIBSoqsqDH4c73gFaUU
+	+l4w==
+X-Gm-Message-State: APjAAAUrww2objzVuUynU5DcqEyHjNqzyV/67wIDsNX6ciVwEEkV6hA1
+	KR7pW8Y1ZMzrSrz49aRgVUika8v83HWV2WsSOR4=
+X-Google-Smtp-Source: APXvYqzcvZMLPykur7yJcYR4/XKG0m1xy8hZ+qME5ZPaAU+0yqc0aGB59oszyYF/YvnjE5SzZ5zh2HSnsclkc77leB0=
+X-Received: by 2002:adf:ed8f:: with SMTP id c15mr23595126wro.144.1554809155585;
+	Tue, 09 Apr 2019 04:25:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="iFRdW5/EC4oqxDHL"
-Content-Disposition: inline
-In-Reply-To: <20190406040422.5276-1-aruna.15@cse.mrt.ac.lk>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-4-armbru@redhat.com>
+	<CAMxuvayc+RnpmFpUVFaLW2Uh8y6bZo2N4o6wu6YVyE1XRHtdWg@mail.gmail.com>
+	<87bm1gr83k.fsf@dusky.pond.sub.org>
+	<1f1ab942-49e9-0714-c6bc-65c7a0c4fa27@redhat.com>
+In-Reply-To: <1f1ab942-49e9-0714-c6bc-65c7a0c4fa27@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Apr 2019 13:25:43 +0200
+Message-ID:
+ <CAJ+F1C+7gBUPFY5hJ8aCg4_KWJHiNMNx_6CjAQExOVKqmG7FOA@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 4/4] Header cleanups: Removed unwanted
- includes from cpu-common.h
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH 03/15] char-pty: Drop "char device
+ redirected to" message
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,83 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409111852.EnkY3uUgElLLzIJHaZtKJYeJaLIffmGAeMlWffJBtSY@z>
+Message-ID: <20190409112543.OmhqUEiI0hyeJXQqJCCUXm_rtXzqGkbE1jshLuK1QDQ@z>
+
+Hi
+
+On Tue, Apr 9, 2019 at 12:40 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 4/8/19 2:31 PM, Markus Armbruster wrote:
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> >
+> >> Hi
+> >>
+> >> On Mon, Apr 8, 2019 at 10:36 AM Markus Armbruster <armbru@redhat.com> =
+wrote:
+> >>>
+> >>> char_pty_open() prints a "char device redirected to PTY_NAME (label
+> >>> LABEL)" message to the current monitor or else to stderr.  No other
+> >>> ChardevClass::open() prints anything on success.  Drop the message.
+> >>>
+> >>> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> >>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>> ---
+> >>>  chardev/char-pty.c | 2 --
+> >>>  1 file changed, 2 deletions(-)
+> >>>
+> >>
+> >> I guess that was printed for convenience.
+> >>
+> >> Allocated pty can be read from "info chardev", so I suppose we can
+> >> make qemu more silent. Fine with me:
+> >>
+> >> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > Thanks!
+> >
+> > If we should decide the message is still useful enough to be worth
+> > keeping, I could direct it to stdout instead of dropping it.
+>
+> I prefer this, if Marc-Andr=C3=A9 is still OK.
+
+I don't mind, but I wonder if we really have users that care. Power
+users can easily get the associated pty from a monitor query.
 
 
---iFRdW5/EC4oqxDHL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Apr 06, 2019 at 09:34:22AM +0530, Aruna Jayasena wrote:
-> Removed unwanted includes from cpu-common.h
-> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
->=20
-> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-> ---
->  include/exec/cpu-common.h | 2 --
->  1 file changed, 2 deletions(-)
-
-Hi Aruna,
-I'd like to review and apply your patches.  It's a little difficult
-to understand the structure since there are several email threads with
-subject lines ("PATCH 4/4") that imply a relationship, but they were
-sent on different dates.
-
-The usual structure of the first patch submission is:
-
-  [PATCH 0/4] qemu-common.h: clean up qemu-common.h
-  +--- [PATCH 1/4] qemu-common.h: drop unused includes in util/
-  +--- [PATCH 2/4] ...
-  +--- [PATCH 3/4] ...
-  +--- [PATCH 4/4] ...
-
-Here PATCH 0 is a cover letter that describes the purpose of this patch
-series.  The actual patches (1, 2, 3, and 4) are part of the email
-thread started by the cover letter.  This relationship allows tools to
-treat the emails as a single patch series and it makes it easier for
-human reviewers to review your patches in their inbox.
-
-If you send a new revision of the patch series to address code review
-feedback:
-
-  [PATCH v2 0/4] qemu-common.h: clean up qemu-common.h
-  +--- [PATCH v2 1/4] qemu-common.h: drop unused includes in util/
-  +--- [PATCH v2 2/4] ...
-  +--- [PATCH v2 3/4] ...
-  +--- [PATCH v2 4/4] ...
-
-The "v2" revision number indicates that this series obsoletes the first
-patch submission.
-
-Please resend your patches and follow this structure.  You can use
-git-send-email --thread --no-chain-reply-to master.. to send the patch
-series.  Normally --thread and --no-chain-reply-to are defaults and you
-don't have to specify them explicitly.
-
-If you need help, feel free to ping me on IRC.  You may find it useful
-to send the email to yourself as a test first before sending to
-qemu-devel@nongnu.org.
-
-Stefan
-
---iFRdW5/EC4oqxDHL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcrH+cAAoJEJykq7OBq3PIdXYH/0Ry2IGRPtOjpvHkAJoS4VyR
-ycCZ8cGS6rR7qOCKP/9BKOBdx71qAyAcp2EFtd1HYYAm28J3XXVaSnpcaDZ3q3ir
-dBo/JH/z/WhsGLM8guNtlwiE//we2zCyAJWJgC6dGFZ5EuvsIBsWmiqJkopM+SZG
-LIrT+DjgCNKSKJBJI31vwDL+OkqDsHtAYDc0cjQ/nKpkE95D6teAo9jyYye3QU9j
-jsJicjSWbsfvk52SUCMIDtNjz96zJvYaMn/1vyhL6xiOm9lXRwYUEjI5WAFm4mRl
-uLxMiYY9SMrEEMmkrKJbPvW7BnTkAYKFnsKiP11Rwns/zO2i/p8MdOBnW2YPXSA=
-=n19E
------END PGP SIGNATURE-----
-
---iFRdW5/EC4oqxDHL--
+--=20
+Marc-Andr=C3=A9 Lureau
 
