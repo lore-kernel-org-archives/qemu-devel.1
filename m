@@ -2,89 +2,59 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB7BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F177C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 086632133D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:05:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="uDPhRueM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086632133D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 0959E2084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:07:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0959E2084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45442 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45500 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtFg-0006w9-4s
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:05:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51473)
+	id 1hDtH3-0007ur-3W
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:07:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDt5v-00086y-BF
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:32 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hDtCq-0005Gg-RC
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDt5t-0004i2-MT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:31 -0400
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:39007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDt5t-0004fw-2n
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:29 -0400
-Received: by mail-it1-x144.google.com with SMTP id 139so5733265ita.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:55:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=0gqBrNUBN17mN32Poegd2PM0Plcs43VygO+lKXAYAhM=;
-	b=uDPhRueMIbQytScEK4U1AaxIwH/ms+6MnG0Ymr5d6l0pXKV7SucMSMLZpKd6V6KEIQ
-	AhImCnscpfv5FYelmKhMqprlhSDnDGj8m8Bkp2l8uBoIKoL92WuRc0t7jac05+tUbUZC
-	yYWzke15Mg4/anhfDkk8qilnbQVbZ05JepkpZvwwra/GN968yrU3kVyMh+TL6/KuuSWu
-	FVJicvo3JKdVtfh6bDnbFPSg1IytRX/Jr9ZGFwnDjoCGxbGwQunDachLwo/AnYGdG/ME
-	0zUzc1TD9P4fhxAssCZb/Cm25mKryd1wkzRqLpZrUk0/RGlGiMgY2rZjndhgk+nIO/Un
-	oBMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=0gqBrNUBN17mN32Poegd2PM0Plcs43VygO+lKXAYAhM=;
-	b=RRjvxhFvzQOI8hDvYfcZEMHeWOxI/D3mjTChoX+6OcTV7qMA+ceEWfBddpSUd1yVnm
-	tpLE5z/iWuaR0VFh43kEq2BfRQmiiHRS1Lj+LiiK5vE0Bo4sftSjBTsWEL2yWl6gjDH3
-	lVvCrzoNvMJbJhdzCwD0Qby9mgafgpLSdA6uJj4bmMloiIpGAtuWPv5llGmVdBxxlk+9
-	uZNbsi0r3Behqe+f50woCXFLlXJiUb9+aLeKO+t5H5EEWOAEjl445S1KsobEN+FgYaQp
-	c4iR13z21+aQlsXbsVBm+yA/NlcGeuFzosAVwTeaakv3Qmt3sraV8lEcvIewPWQXNXV3
-	HzTg==
-X-Gm-Message-State: APjAAAWQZqDSpCmgfqEgZHYEbIXtSZt8i7Zxef09pOXoAnlzt4PeecFz
-	YCiob+Aj8dAkxi0nwHVZlt643w==
-X-Google-Smtp-Source: APXvYqwz2mbVMd8B8tnWgybVOc5/2SWBYuIM01zTWI/+Tfg6Kz6npZ8+dH4lMSxOUNNCymgn1GmOaA==
-X-Received: by 2002:a24:254c:: with SMTP id g73mr25203396itg.77.1554825327554; 
-	Tue, 09 Apr 2019 08:55:27 -0700 (PDT)
-Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
-	by smtp.gmail.com with ESMTPSA id
-	u26sm12798396iob.78.2019.04.09.08.55.26
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 08:55:27 -0700 (PDT)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
-Date: Tue, 9 Apr 2019 11:55:25 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hDtCp-0008NK-Ny
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:02:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1hDtCi-0008Jv-Us; Tue, 09 Apr 2019 12:02:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7CE65C0AD1DF;
+	Tue,  9 Apr 2019 16:02:30 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B1A1817CE2;
+	Tue,  9 Apr 2019 16:02:24 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, peter.maydell@linaro.org
+Date: Tue,  9 Apr 2019 18:02:19 +0200
+Message-Id: <20190409160219.19026-1-eric.auger@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 09 Apr 2019 16:02:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-X-Mailer: Apple Mail (2.3445.102.3)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
- missing AMD pflash functionality
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH for-4.1] hw/arm/smmuv3: Remove SMMUNotifierNode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,117 +66,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409155525._nz6pWhsSPEko0p0JzOiuUx_Fg7CzRS24kRKnEzlHtQ@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409160219.-ni2BdUnV2pusCpAWNApGKcDUQt_ysKmeWoIthlda_0@z>
 
-Hi Phil,
+The SMMUNotifierNode struct is not necessary and brings extra
+complexity so let's remove it. We now directly track the SMMUDevices
+which have registered IOMMU MR notifiers.
 
-> On Apr 9, 2019, at 06:34, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
->=20
-> Hi Stephen,
->=20
-> [Cc'ing Markus and Laszlo, we have similar interest in pflash01 =
-testing]
->=20
-> On 4/8/19 10:55 PM, Stephen Checkoway wrote:
->> The goal of this patch series implement the following AMD command-set =
-parallel
->> flash functionality:
->> - flash interleaving;
->> - nonuniform sector sizes;
->> - erase suspend/resume commands; and
->> - multi-sector erase.
->=20
-> I am very glad you addressed these long overdue issues and very =
-pleased
-> by your patches :)
-> I'll thoroughly review it during next week (this won't get merge for =
-the
-> current 4.0 cycle anyway).
+This is inspired from the same transformation on intel-iommu
+done in commit b4a4ba0d68f50f218ee3957b6638dbee32a5eeef
+("intel-iommu: remove IntelIOMMUNotifierNode")
 
-Great!
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/arm/smmu-common.c         |  6 +++---
+ hw/arm/smmuv3.c              | 28 +++++++---------------------
+ include/hw/arm/smmu-common.h |  8 ++------
+ 3 files changed, 12 insertions(+), 30 deletions(-)
 
-> I started a similar cleanup (mostly pflash01 focused) and converted
-> DPRINTF to trace events, added few constants. I'll see if I can rebase
-> your work on top of mine. So far only your patch 2 (refactor) would be
-> modified, simplified as the "pull out all of the code to modify the
-> status into simple helper functions" part (which else I'd ask you to
-> move in a separate patch).
->=20
-> We should think of more intereleaved tests, I'll prepare a table of
-> current QEMU models using this device and how is their intereleave
-> mapping. Hopefully it would be enough to simply add the existing
-> machines to your current musicpal qtest.
->=20
-> Also I'd like to see some Top/Bottom block configuration qtests, your
-> patch #5 doesn't seem tested.
-
-I included four tests =
-<https://patchew.org/QEMU/cover.1554774454.git.stephen.checkoway@oberlin.e=
-du/bbe417c354dfa908d5e1bc8f8ad7121ec9451682.1554774454.git.stephen.checkow=
-ay@oberlin.edu/>.
-
-Patchew makes it hard to link to particular lines. Here's the same patch =
-on Github =
-<https://github.com/qemu/qemu/commit/a851d21347121a91ba9a39c133a8fbee6e84e=
-557#diff-d2ed797ca8898de80768bdfb390781dfR498>.
-
-Are those sufficient or would you like more tests?
-
->=20
->> During refactoring and implementation, I discovered several bugs that =
-are
->> fixed here as well:
->> - flash commands use only 11-bits of the address in most cases, but =
-the
->>  current code uses all of them [1];
->> - entering CFI mode from autoselect mode and then exiting CFI mode =
-should
->>  return the chip to autoselect mode, but the current code returns to =
-read
->>  array mode; and
->> - reset command should be ignored during sector/chip erase, but the =
-current
->>  code performs the reset.
->>=20
->> The first patch in the series adds a test for the existing behavior. =
-Tests for
->> additional behavior/bug fixes are added in the relevant patch.
->>=20
->> 1. I found firmware in the wild that relies on the 11-bit address =
-behavior,
->>   probably due to a bug in the firmware itself.
->=20
-> Is it a musicpal firmware? Are you able to compare with real hardware?
-
-No, it's not musicpal. I'm not even sure what musicpal is, it was just =
-the most convenient choice for testing.  The real hardware is an =
-embedded system using an old AMD processor (Am486) with three different =
-AMD command set flash chips. The unlock addresses the firmware uses =
-don't actually match the part sheets (in most cases). It took quite a =
-while to realize that the flash hardware only uses 11 bits of address. =
-(It's clearly spelled out in the various part sheets, but I guess I =
-missed it on the first 15 or so readings.)
-
-> I vaguely remember some issue regarding address bus width when trying =
-to
-> implement the TopBlock small sectors, but I wasn't using the musicpal.
-> I'll see if I can find my old notes and test with your series.
-
-The one boot chip I'm using is the AM29F080B-90SI with top boot blocks. =
-It has an 8-bit address bus.
-
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index bbf4b8721a..e94be6db6c 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -412,10 +412,10 @@ inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion=
+ *mr)
+ /* Unmap all notifiers of all mr's */
+ void smmu_inv_notifiers_all(SMMUState *s)
+ {
+-    SMMUNotifierNode *node;
++    SMMUDevice *sdev;
+=20
+-    QLIST_FOREACH(node, &s->notifiers_list, next) {
+-        smmu_inv_notifiers_mr(&node->sdev->iommu);
++    QLIST_FOREACH(sdev, &s->devices_with_notifiers, next) {
++        smmu_inv_notifiers_mr(&sdev->iommu);
+     }
+ }
+=20
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 8c4e99fecc..fd8ec7860e 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -828,10 +828,10 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *m=
+r,
+ /* invalidate an asid/iova tuple in all mr's */
+ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t=
+ iova)
+ {
+-    SMMUNotifierNode *node;
++    SMMUDevice *sdev;
+=20
+-    QLIST_FOREACH(node, &s->notifiers_list, next) {
+-        IOMMUMemoryRegion *mr =3D &node->sdev->iommu;
++    QLIST_FOREACH(sdev, &s->devices_with_notifiers, next) {
++        IOMMUMemoryRegion *mr =3D &sdev->iommu;
+         IOMMUNotifier *n;
+=20
+         trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova)=
+;
+@@ -1472,8 +1472,6 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryR=
+egion *iommu,
+     SMMUDevice *sdev =3D container_of(iommu, SMMUDevice, iommu);
+     SMMUv3State *s3 =3D sdev->smmu;
+     SMMUState *s =3D &(s3->smmu_state);
+-    SMMUNotifierNode *node =3D NULL;
+-    SMMUNotifierNode *next_node =3D NULL;
+=20
+     if (new & IOMMU_NOTIFIER_MAP) {
+         int bus_num =3D pci_bus_num(sdev->bus);
+@@ -1485,22 +1483,10 @@ static void smmuv3_notify_flag_changed(IOMMUMemor=
+yRegion *iommu,
+=20
+     if (old =3D=3D IOMMU_NOTIFIER_NONE) {
+         trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
+-        node =3D g_malloc0(sizeof(*node));
+-        node->sdev =3D sdev;
+-        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+-        return;
+-    }
+-
+-    /* update notifier node with new flags */
+-    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+-        if (node->sdev =3D=3D sdev) {
+-            if (new =3D=3D IOMMU_NOTIFIER_NONE) {
+-                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
+-                QLIST_REMOVE(node, next);
+-                g_free(node);
+-            }
+-            return;
+-        }
++        QLIST_INSERT_HEAD(&s->devices_with_notifiers, sdev, next);
++    } else if (new =3D=3D IOMMU_NOTIFIER_NONE) {
++        trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
++        QLIST_REMOVE(sdev, next);
+     }
+ }
+=20
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index b07cadd0ef..2c7fbf4202 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -80,13 +80,9 @@ typedef struct SMMUDevice {
+     AddressSpace       as;
+     uint32_t           cfg_cache_hits;
+     uint32_t           cfg_cache_misses;
++    QLIST_ENTRY(SMMUDevice) next;
+ } SMMUDevice;
+=20
+-typedef struct SMMUNotifierNode {
+-    SMMUDevice *sdev;
+-    QLIST_ENTRY(SMMUNotifierNode) next;
+-} SMMUNotifierNode;
+-
+ typedef struct SMMUPciBus {
+     PCIBus       *bus;
+     SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically al=
+loc */
+@@ -108,7 +104,7 @@ typedef struct SMMUState {
+     GHashTable *iotlb;
+     SMMUPciBus *smmu_pcibus_by_bus_num[SMMU_PCI_BUS_MAX];
+     PCIBus *pci_bus;
+-    QLIST_HEAD(, SMMUNotifierNode) notifiers_list;
++    QLIST_HEAD(, SMMUDevice) devices_with_notifiers;
+     uint8_t bus_num;
+     PCIBus *primary_bus;
+ } SMMUState;
 --=20
-Stephen Checkoway
-
-
-
-
+2.20.1
 
 
