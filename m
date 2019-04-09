@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41290)
+Received: from eggs.gnu.org ([209.51.188.92]:42058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hDu9K-0000IV-6A
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:03:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hDuCj-0001Iw-8E
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hDu9J-0003lx-9b
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:03:06 -0400
-References: <20190409060435.22801-1-sw@weilnetz.de>
-	<4a16a810-9806-3a76-7d17-1b6282296502@linaro.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <69be6fec-e9b5-d72b-d626-cf3d4b9f3720@weilnetz.de>
-Date: Tue, 9 Apr 2019 18:53:15 +0200
+	(envelope-from <thuth@redhat.com>) id 1hDuCi-000659-6x
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 13:06:37 -0400
+References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fbe81e69-01f1-4755-49a8-e25df108a196@redhat.com>
+Date: Tue, 9 Apr 2019 19:06:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <4a16a810-9806-3a76-7d17-1b6282296502@linaro.org>
+In-Reply-To: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tci: Fix some unaligned memory accesses
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] Header cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On 09.04.19 08:58, Richard Henderson wrote:
-> On 4/8/19 8:04 PM, Stefan Weil wrote:
->>  static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
->>  {
->> -    tcg_target_ulong value =3D *(tcg_target_ulong *)(*tb_ptr);
->> +    tcg_target_ulong value;
->=20
-> Ideally these would use the helpers from "qemu/bswap.h", ldl_he_p(), et=
-c.
->=20
-> r~
+On 09/04/2019 17.56, Aruna Jayasena wrote:
+> Removed unwanted includes from cpu-common.h
+> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+> 
+> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+> 
+> ---
+>  include/exec/cpu-common.h | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index cef8b88a2a..a3594f3f50 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -7,8 +7,6 @@
+>  #include "exec/hwaddr.h"
+>  #endif
+>  
+> -#include "qemu/bswap.h"
+> -#include "qemu/queue.h"
+>  #include "qemu/fprintf-fn.h"
+>  
+>  /**
+> 
 
-
-
-That would require adding a helper for tcg_target_ulong to qemu/bswap.h.
-Or tci.c would need conditional code for reading a tcg_target_ulong.
-
-Those helpers in qemu/bswap.h are also a little bit strange:
-
-- Why does lduw_he_p return an int instead of an uint16_t?
-- Why does ldsw_he_p return an int instead of an int16_t?
-- Why does ldl_he_p return an int instead of an int32_t?
-- Should ldl_he_p be renamed into ldsl_he_p?
-  And why is ldul_he_p missing?
-- Should ldq_he_p be renamed into lduq_he_p?
-  And why is ldsq_he_p missing?
-
-Using the helpers might require nasty type casts to avoid compiler
-warnings because of signed / unsigned and size mismatches.
-
-Aren't the few memcpy statements in the TCI helpers much more direct and
-understandable?
-
-Regards
-Stefan
+Reviewed-by: Thomas Huth <thuth@redhat.com>
