@@ -2,82 +2,54 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAA9C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B39C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:53:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1191E2077C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:48:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AZHpecAc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1191E2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 42ECB20833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:53:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42ECB20833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48270 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48316 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDwjh-00045U-Lf
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:48:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43502)
+	id 1hDwoR-0005I5-GE
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:53:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDwiq-0003lg-RB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:57 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hDwnN-0004tp-JV
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDwip-0007UF-VI
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:56 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDwip-0007Tb-Nr
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:47:55 -0400
-Received: by mail-ot1-x343.google.com with SMTP id m10so16757160otp.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 12:47:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=/TFJ0+xV+CjbGjKcryNef6q8cMOWLagVruxOKTPM7y4=;
-	b=AZHpecAcnNPM/tuQEDQJ3p7Uq5R2frfm7Kz4Yv2Z2uz33aQHxHP+IooRFK7o5NwDPW
-	IwTCUWPATAgZTvLIWIex2vjG9NPaQi40DC76GXp4zUtjzFknrTdNERucxynUhHQfwhwb
-	BAWFiJzV0Etb1a0isRl6LoqcbAdRiov/qx/NEgveehHwX/GgqgJmq/zmj+YwGfCS7Yav
-	aKMNvcMHpkPAtty0W8g4MQ8diP0fLKH2rwTWms/8hlS8J/SsUBA8q/l3bae9Y64h8Mdw
-	H7XRFGsYq3OS4TJkvmPO5GjDVzKikImNWg5Z/X62gbjHrC3MKNvJuRjaSKwRpraMadeY
-	CcqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=/TFJ0+xV+CjbGjKcryNef6q8cMOWLagVruxOKTPM7y4=;
-	b=lk260bQb8DJBmCgaZ3+DCQkxUrfq448tuPOPuCSyVfpfhitDysD8zaONi26QN6k0mI
-	PLlWLEKjWhz1dkbojFQjJfwXv1lxaCV+KzpRaP03MtAi2VhxCavFm4D/SgcgGgqpCTPx
-	iURvjgDmcLexyCRF/Rz2fggOidsTEvZdA8q6ORGxzyzz6OM5V7LwAmdJJOhxQHM45B0Y
-	EbXOBrWhg0PsspgFUcw2L8lhQuHrzrfXyZsfsw1OfJFW5miSYhp3rzQkaSxMVZ6lFUcH
-	nxTSB8vSM19+pf7kMSo7q6WQ3zcVZgTwo8xFXUye8Js0ubzzETDvPMa08+HxFrQcNiIA
-	QbCg==
-X-Gm-Message-State: APjAAAUrpCsMB2qtn/PigtbiKYBuNNBAmjDnOJbWaArP0a2T86OQtqA/
-	7OMMbe+53WwULonoFDx+Ft+j3DfvH3CAt8mps9hz9A==
-X-Google-Smtp-Source: APXvYqy9vNRmcFrekxHqmiQGU0wyPDZ/FkRVX6tiF1N5MAbBYTjjT215UoLs4S+KYTaGDc4ouvZO0e1QrJOdCUFutWY=
-X-Received: by 2002:a05:6830:1044:: with SMTP id
-	b4mr26262796otp.274.1554839274335; 
-	Tue, 09 Apr 2019 12:47:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190409151830.6024-1-peter.maydell@linaro.org>
-	<87ef6byye5.fsf@trasno.org>
-In-Reply-To: <87ef6byye5.fsf@trasno.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Apr 2019 02:47:45 +0700
-Message-ID:
- <CAFEAcA87-z9Su8qYOJoG9nVXnAYShwKBrDEpP+55WK5SVrnq=g@mail.gmail.com>
-To: Juan Quintela <quintela@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH for-4.0] migration/ram.c: Fix
- use-after-free in multifd_recv_unfill_packet()
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hDwnM-0002FP-8i
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:37 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59639 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hDwnL-0001h6-VD
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:52:36 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 692B31A22C4;
+	Tue,  9 Apr 2019 21:51:32 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 2208C1A2117;
+	Tue,  9 Apr 2019 21:51:32 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Apr 2019 21:51:26 +0200
+Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH] linux-user: Support the SIOCSIFPFLAGS and
+ SIOCGIFPFLAGS ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,41 +61,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: arikalo@wavecomp.com, riku.voipio@iki.fi, ysu@wavecomp.com,
+	laurent@vivier.eu, amarkovic@wavecomp.com, nchen@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409194745.p4KGvkzMLMVbIMyTnBckQYUKRgnbwj-EUE4r6FWy6tg@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409195126.gV6qMKcOt8NsDdLuro3_q0orVhxsCWp-tlyZXueNXSw@z>
 
-On Tue, 9 Apr 2019 at 22:42, Juan Quintela <quintela@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Coverity points out (CID 1400442) that in this code:
-> >
-> >     if (packet->pages_alloc > p->pages->allocated) {
-> >         multifd_pages_clear(p->pages);
-> >         multifd_pages_init(packet->pages_alloc);
-> >     }
-> >
-> > we free p->pages in multifd_pages_clear() but continue to
-> > use it in the following code. We also leak memory, because
-> > multifd_pages_init() returns the pointer to a new MultiFDPages_t
-> > struct but we are ignoring its return value.
-> >
-> > Fix both of these bugs by adding the missing assignment of
-> > the newly created struct to p->pages.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
->
-> ouch,
->
-> good catch.
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+From: Neng Chen <nchen@wavecomp.com>
 
-Thanks for the quick review. Applied to master for rc3.
+Add support for setting and getting extended (private) flags
+of a network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
 
--- PMM
+The ioctl numeric values are platform-independent and determined
+by the file include/uapi/linux/sockios.h in Linux kernel source
+code.
+
+The ioctls set and get field ifr_flags of type short in the
+structure ifreq. Such functionality in QEMU is achieved using
+MK_STRUCT() and MK_PTR() macros with an appropriate argument.
+
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index ae89516..11829a1 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,8 @@
+   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
++  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 12c8407..060b854 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -777,6 +777,8 @@ struct target_pollfd {
+ #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
+ #define TARGET_SIOCDELMULTI    0x8932
+ #define TARGET_SIOCGIFINDEX    0x8933
++#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
++#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+ 
+ /* Bridging control calls */
+ #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
+-- 
+2.7.4
+
 
