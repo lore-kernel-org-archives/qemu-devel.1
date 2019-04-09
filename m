@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FA3C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30154C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5713220883
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:24:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5713220883
+	by mail.kernel.org (Postfix) with ESMTPS id 01B4720883
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01B4720883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45819 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45821 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtXf-00051f-EZ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:24:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55778)
+	id 1hDtXi-00055g-5F
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:24:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLf-0003Gl-Tp
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:48 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLb-0003CM-5w
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLe-00058X-Dx
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43656)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLZ-00054R-Nd
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtLd-00057I-D1
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:46 -0400
+	id 1hDtLZ-000541-CS
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:41 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D73630B96D1;
-	Tue,  9 Apr 2019 16:11:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F208330278;
+	Tue,  9 Apr 2019 16:11:40 +0000 (UTC)
 Received: from localhost (ovpn-112-27.ams2.redhat.com [10.36.112.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1DCFA5D960;
-	Tue,  9 Apr 2019 16:11:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 05E2F5D961;
+	Tue,  9 Apr 2019 16:11:33 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 18:10:05 +0200
-Message-Id: <20190409161009.6322-17-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:10:03 +0200
+Message-Id: <20190409161009.6322-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 09 Apr 2019 16:11:44 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Tue, 09 Apr 2019 16:11:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 16/20] console: add graphic_hw_update_done()
+Subject: [Qemu-devel] [PATCH v4 14/20] qmp: add qmp_return_is_cancelled()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,120 +76,135 @@ Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409161005.dIc2w_Nr4M8F1D02gv4ZYFlm_YfLzSnF1NWL13ypk9I@z>
+Message-ID: <20190409161003.cMSSlM1zVmZlL-0lP6YAAcV_zo0Tc0THxcSQf_dq0mY@z>
 
-Add a function to be called when a graphic update is done.
-
-Declare the QXL renderer as async: render_update_cookie_num counts the
-number of outstanding updates, and graphic_hw_update_done() is called
-when it reaches none.
+If the client is gone, and the session finished, no need to
+return. The async handler can use this information to avoid
+unnecessary work and exit earlier.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/ui/console.h    | 2 ++
- hw/display/qxl-render.c | 9 +++++++--
- hw/display/qxl.c        | 1 +
- ui/console.c            | 9 +++++++++
- 4 files changed, 19 insertions(+), 2 deletions(-)
+ include/qapi/qmp/dispatch.h |  8 ++++++++
+ qapi/qmp-dispatch.c         | 10 ++++++++++
+ tests/test-qmp-cmds.c       | 39 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index fef900db76..9415adadfe 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -364,6 +364,7 @@ static inline void console_write_ch(console_ch_t *des=
-t, uint32_t ch)
- typedef struct GraphicHwOps {
-     void (*invalidate)(void *opaque);
-     void (*gfx_update)(void *opaque);
-+    bool gfx_update_async; /* if true, calls graphic_hw_update_done() */
-     void (*text_update)(void *opaque, console_ch_t *text);
-     void (*update_interval)(void *opaque, uint64_t interval);
-     int (*ui_info)(void *opaque, uint32_t head, QemuUIInfo *info);
-@@ -379,6 +380,7 @@ void graphic_console_set_hwops(QemuConsole *con,
- void graphic_console_close(QemuConsole *con);
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 6aef0abc70..6673902e95 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -91,6 +91,14 @@ void qmp_return_free(QmpReturn *qret);
+ void qmp_return(QmpReturn *qret, QObject *rsp);
+ void qmp_return_error(QmpReturn *qret, Error *err);
 =20
- void graphic_hw_update(QemuConsole *con);
-+void graphic_hw_update_done(QemuConsole *con);
- void graphic_hw_invalidate(QemuConsole *con);
- void graphic_hw_text_update(QemuConsole *con, console_ch_t *chardata);
- void graphic_hw_gl_block(QemuConsole *con, bool block);
-diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
-index 14ad2b352d..102fa0b7e9 100644
---- a/hw/display/qxl-render.c
-+++ b/hw/display/qxl-render.c
-@@ -108,7 +108,7 @@ static void qxl_render_update_area_unlocked(PCIQXLDev=
-ice *qxl)
-                                                 qxl->guest_primary.surfa=
-ce.mem,
-                                                 MEMSLOT_GROUP_GUEST);
-         if (!qxl->guest_primary.data) {
--            return;
-+            goto end;
-         }
-         qxl_set_rect_to_surface(qxl, &qxl->dirty[0]);
-         qxl->num_dirty_rects =3D 1;
-@@ -136,7 +136,7 @@ static void qxl_render_update_area_unlocked(PCIQXLDev=
-ice *qxl)
-     }
-=20
-     if (!qxl->guest_primary.data) {
--        return;
-+        goto end;
-     }
-     for (i =3D 0; i < qxl->num_dirty_rects; i++) {
-         if (qemu_spice_rect_is_empty(qxl->dirty+i)) {
-@@ -157,6 +157,11 @@ static void qxl_render_update_area_unlocked(PCIQXLDe=
-vice *qxl)
-                        qxl->dirty[i].bottom - qxl->dirty[i].top);
-     }
-     qxl->num_dirty_rects =3D 0;
++/*
++ * @qmp_return_is_cancelled:
++ *
++ * Return true if the QmpReturn is cancelled, and free the QmpReturn
++ * in this case.
++ */
++bool qmp_return_is_cancelled(QmpReturn *qret);
 +
-+end:
-+    if (qxl->render_update_cookie_num =3D=3D 0) {
-+        graphic_hw_update_done(qxl->ssd.dcl.con);
-+    }
+ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options)=
+;
+ void qmp_register_async_command(QmpCommandList *cmds, const char *name,
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 1f493af67a..8653c17901 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -64,6 +64,16 @@ void qmp_return_free(QmpReturn *qret)
+     }
  }
 =20
- /*
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index c8ce5781e0..884e24766c 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -1182,6 +1182,7 @@ static const QXLInterface qxl_interface =3D {
-=20
- static const GraphicHwOps qxl_ops =3D {
-     .gfx_update  =3D qxl_hw_update,
-+    .gfx_update_async =3D true,
- };
-=20
- static void qxl_enter_vga_mode(PCIQXLDevice *d)
-diff --git a/ui/console.c b/ui/console.c
-index 6d2282d3e9..3a7f71021f 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -258,13 +258,22 @@ static void gui_setup_refresh(DisplayState *ds)
-     ds->have_text =3D have_text;
- }
-=20
-+void graphic_hw_update_done(QemuConsole *con)
++bool qmp_return_is_cancelled(QmpReturn *qret)
 +{
++    if (!qret->session) {
++        qmp_return_free(qret);
++        return true;
++    }
++
++    return false;
 +}
 +
- void graphic_hw_update(QemuConsole *con)
+ static void qmp_return_orderly(QmpReturn *qret)
  {
-+    bool async =3D false;
-     if (!con) {
-         con =3D active_console;
-     }
-     if (con && con->hw_ops->gfx_update) {
-         con->hw_ops->gfx_update(con->hw);
-+        async =3D con->hw_ops->gfx_update_async;
-+    }
-+    if (!async) {
-+        graphic_hw_update_done(con);
-     }
+     QmpSession *session =3D qret->session;
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 58cd09ab08..97958a9d78 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -36,17 +36,29 @@ void qmp_cmd_success_response(Error **errp)
+ {
  }
 =20
++static GMainLoop *loop;
++
+ static gboolean cmd_async_idle(gpointer user_data)
+ {
+     QmpReturn *qret =3D user_data;
+=20
+-    qmp_cmd_async_return(qret, g_new0(Empty2, 1));
++    if (!qret->session) {
++        g_assert(qmp_return_is_cancelled(qret));
++        g_main_loop_quit(loop);
++        g_main_loop_unref(loop);
++        loop =3D NULL;
++    } else {
++        qmp_cmd_async_return(qret, g_new0(Empty2, 1));
++    }
+=20
+     return G_SOURCE_REMOVE;
+ }
+=20
+ void qmp_cmd_async(const char *filename, QmpReturn *qret)
+ {
++    if (g_str_equal(filename, "cancel")) {
++        qmp_session_destroy(qret->session);
++    }
+     g_idle_add(cmd_async_idle, qret);
+ }
+=20
+@@ -419,6 +431,30 @@ static void test_qmp_return_async(void)
+     qobject_unref(req);
+ }
+=20
++static void test_qmp_return_async_cancel(void)
++{
++    QmpReturnAsync a =3D { 0, };
++    QDict *args =3D qdict_new();
++    QDict *req =3D qdict_new();
++
++    a.loop =3D g_main_loop_new(NULL, TRUE);
++    qmp_session_init(&a.session, &qmp_commands,
++                     NULL, dispatch_return_async);
++
++    qdict_put_str(args, "filename", "cancel");
++    qdict_put_str(req, "execute", "cmd-async");
++    qdict_put(req, "arguments", args);
++    qmp_dispatch(&a.session, QOBJECT(req), false);
++    g_assert(a.loop);
++
++    loop =3D a.loop;
++    g_main_loop_run(loop);
++    g_assert(!loop);
++
++    qmp_session_destroy(&a.session);
++    qobject_unref(req);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -433,6 +469,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
+     g_test_add_func("/qmp/return_orderly", test_qmp_return_orderly);
+     g_test_add_func("/qmp/return_async", test_qmp_return_async);
++    g_test_add_func("/qmp/return_async_cancel", test_qmp_return_async_ca=
+ncel);
+=20
+     test_qmp_init_marshal(&qmp_commands);
+     g_test_run();
 --=20
 2.21.0.196.g041f5ea1cf
 
