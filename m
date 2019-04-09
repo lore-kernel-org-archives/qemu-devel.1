@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55821)
+Received: from eggs.gnu.org ([209.51.188.92]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hDsIc-0006mN-DP
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:35 -0400
+	(envelope-from <mst@redhat.com>) id 1hDsJY-0007FW-Gr
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:05:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hDsIa-000280-MM
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:34 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:35974)
+	(envelope-from <mst@redhat.com>) id 1hDsJS-0002UU-OG
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:05:32 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:46392)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hDsIa-00027X-Au
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:04:32 -0400
-Received: by mail-qt1-f195.google.com with SMTP id s15so11796968qtn.3
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:04:30 -0700 (PDT)
-Date: Tue, 9 Apr 2019 11:04:27 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hDsJQ-0002T0-Ui
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:05:25 -0400
+Received: by mail-qk1-f195.google.com with SMTP id s81so10399532qke.13
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:05:23 -0700 (PDT)
+Date: Tue, 9 Apr 2019 11:05:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190409110149-mutt-send-email-mst@kernel.org>
-References: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+Message-ID: <20190409110456-mutt-send-email-mst@kernel.org>
+References: <20190409134536.15548-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at
- the passthrough of NVMe SSD
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190409134536.15548-1-philmd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 0/2] roms: Avoid iPXE/EDK2
+ EFIROM variable clash, pass CFLAGS to EDK2 build tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Cc: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Tue, Apr 09, 2019 at 02:14:56PM +0000, Zhuangyanying wrote:
-> From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+On Tue, Apr 09, 2019 at 03:45:34PM +0200, Philippe Mathieu-Daudé wrote:
+> Hi,
 > 
-> Recently I tested the performance of NVMe SSD passthrough and found that interrupts
-> were aggregated on vcpu0(or the first vcpu of each numa) by /proc/interrupts,when
-> GuestOS was upgraded to sles12sp3 (or redhat7.6). But /proc/irq/X/smp_affinity_list
-> shows that the interrupt is spread out, such as 0-10, 11-21,.... and so on.
-> This problem cannot be resolved by "echo X > /proc/irq/X/smp_affinity_list", because
-> the NVMe SSD interrupt is requested by the API pci_alloc_irq_vectors(), so the
-> interrupt has the IRQD_AFFINITY_MANAGED flag.
+> Two trivial fixes to avoid the latest EDK2 testing series to
+> cause trouble to downstream distributions (in particular if
+> they have PIE enforced).
 > 
-> GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X capable devices",
-> but the implementation of __setup_irq has no corresponding modification. It is still
-> irq_startup(), then setup_affinity(), that is sending an affinity message when the
-> interrupt is unmasked.
-
-So does latest upstream still change data/address of an
-unmasked vector?
-
-> The bare metal configuration is successful, but qemu will
-> not trigger the msix update, and the affinity configuration fails.
-> The affinity is configured by /proc/irq/X/smp_affinity_list, implemented at
-> apic_ack_edge(), the bitmap is stored in pending_mask,
-> mask->__pci_write_msi_msg()->unmask,
-> and the timing is guaranteed, and the configuration takes effect.
+> Since v2:
+> - addressed Laszlo's suggestion
+> - reworded patch description
 > 
-> The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce affinity
-> setting on startup of managed irqs" to ensure that the affinity is first issued
-> and then __irq_startup(), for the managerred interrupt. So configuration is
-> successful.
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01033.html
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01006.html
+> error report: https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg00992.html
 > 
-> It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
-> (3.10.0-957.10.1) does not have backport the patch yet.
-
-Sorry - which patch?
-
-> "if (is_masked == was_masked) return;" can it be removed at qemu?
-> What is the reason for this check?
+> Regards,
 > 
-> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
-> ---
->  hw/pci/msix.c | 4 ----
->  1 file changed, 4 deletions(-)
+> Phil.
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+Peter do you want to merge this directly?
+
+> Philippe Mathieu-Daudé (2):
+>   roms: Rename the EFIROM variable to avoid clashing with iPXE
+>   roms: Allow passing configure options to the EDK2 build tools
 > 
-> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> index 4e33641..e1ff533 100644
-> --- a/hw/pci/msix.c
-> +++ b/hw/pci/msix.c
-> @@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
->  {
->      bool is_masked = msix_is_masked(dev, vector);
->  
-> -    if (is_masked == was_masked) {
-> -        return;
-> -    }
-> -
->      msix_fire_vector_notifier(dev, vector, is_masked);
->  
->      if (!is_masked && msix_is_pending(dev, vector)) {
-
-
-To add to that, notifiers generally assume that updates
-come in pairs, unmask followed by mask.
-
-
-
+>  roms/Makefile | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+> 
 > -- 
-> 1.8.3.1
-> 
+> 2.20.1
