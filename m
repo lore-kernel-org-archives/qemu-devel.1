@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47900)
+Received: from eggs.gnu.org ([209.51.188.92]:47935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzk4-0005tM-Vl
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:25 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDzkG-00064A-9o
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzk3-0001gR-Ub
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40808)
+	(envelope-from <lersek@redhat.com>) id 1hDzkE-0001p1-MT
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzk3-0001ed-Kh
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:23 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzkD-0001oL-SX
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:34 -0400
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Wed, 10 Apr 2019 01:00:20 +0200
-Message-Id: <20190409230022.6462-11-lersek@redhat.com>
+Date: Wed, 10 Apr 2019 01:00:21 +0200
+Message-Id: <20190409230022.6462-12-lersek@redhat.com>
 In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
 References: <20190409230022.6462-1-lersek@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.1 v4 10/12] tests: add missing dependency
- to build QTEST_QEMU_BINARY, round 2
+Subject: [Qemu-devel] [PATCH for-4.1 v4 11/12] Makefile: install the edk2
+ firmware images and their descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +29,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-In commit b94b330e2333 ("tests: add missing dependency to build
-QTEST_QEMU_BINARY", 2017-07-31), Phil fixed the dependency list of make
-target "check-qtest-%". Namely, the recipe would set QTEST_QEMU_BINARY to
-the softmmu emulator for the emulation target, but the prerequisites
-didn't include the emulator.
+Decompress and install the edk2 firmware blobs as part of "make install",
+unless blob installation was disabled with configure's "--disable-blobs"
+option.
 
-The same issue affects the "check-report-qtest-%.tap" make target, which
-is the other make target whose recipe sets QTEST_QEMU_BINARY:
-
-> $ make -j4 check-report-qtest-aarch64.tap
->   TAP     check-report-qtest-aarch64.tap
-> sh: /.../aarch64-softmmu/qemu-system-aarch64: No such file or directory
-
-Apply Phil's fix to this make target too.
+Additionally, decompress the blobs as a pre-requisite for building softmm=
+u
+binaries -- this is helpful for both "make check" and other ad-hoc tests
+one might want to run in the build directory.
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
 
@@ -58,31 +53,143 @@ Notes:
    =20
     - pick up Michal's R-b
    =20
-    - pick up Igor's T-b
+    - pick up Phil's R-b
    =20
     - pick up Michael's R-b
    =20
+    - Decompress fd.bz2 files with bzip2 rather than fd.xz files with xz,=
+ so
+      that decompression at "make install" time succeed on older build OS=
+es
+      too [Peter]. Note that "BUNZIP2" matches the name of the actual
+      command "bunzip2" (i.e. it is sensible), and that it consists of 7
+      characters, satisfying the quiet-command limit.
+   =20
+    - do not pick up Phil's T-b, consequently
+   =20
+    - do not pick up Igor's T-b for the same reason
+   =20
     v2:
    =20
-    - new patch, relied upon by the next patch
+    - adapt to tracking the edk2 flash device files in compressed form [D=
+an,
+      Michael, Phil]
+   =20
+    - do not pick up Michal's and Michael's R-b's due to the above change
 
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure  |  1 +
+ Makefile   | 29 +++++++++++++++++++-
+ .gitignore |  1 +
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 36fc73fef55a..e2432d5e7712 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -912,7 +912,7 @@ check-speed: $(check-speed-y)
+diff --git a/configure b/configure
+index 1c563a70276a..e1ad87b697e0 100755
+--- a/configure
++++ b/configure
+@@ -7892,6 +7892,7 @@ for bios_file in \
+     $source_path/pc-bios/*.img \
+     $source_path/pc-bios/openbios-* \
+     $source_path/pc-bios/u-boot.* \
++    $source_path/pc-bios/edk2-*.fd.bz2 \
+     $source_path/pc-bios/palcode-*
+ do
+     LINKS=3D"$LINKS pc-bios/$(basename $bios_file)"
+diff --git a/Makefile b/Makefile
+index 04a0d4505085..626a04d305cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -296,6 +296,10 @@ ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_=
+CSV) $(SRC_PATH)/ui/Makefile
+ $(KEYCODEMAP_GEN): .git-submodule-status
+ $(KEYCODEMAP_CSV): .git-submodule-status
 =20
- # gtester tests with TAP output
++edk2-decompressed =3D $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
++pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
++	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
++
+ # Don't try to regenerate Makefile or configure
+ # We don't generate any of them
+ Makefile: ;
+@@ -445,6 +449,7 @@ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
++$(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
 =20
--$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: $(check-qtest-y)
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: subdir-%-softmmu $(check-qtest-y)
- 	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
- 	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- 	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+ subdir-%:
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TARGE=
+T_DIR=3D"$*/" all,)
+@@ -633,6 +638,7 @@ clean:
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+ 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+ 		-exec rm {} +
++	rm -f $(edk2-decompressed)
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *=
+.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f qemu-img-cmds.h
+@@ -723,9 +729,14 @@ spapr-rtas.bin slof.bin skiboot.lid \
+ palcode-clipper \
+ u-boot.e500 u-boot-sam460-20100605.bin \
+ qemu_vga.ndrv \
++edk2-licenses.txt \
+ hppa-firmware.img
++
++DESCS=3D50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
++60-edk2-aarch64.json 60-edk2-arm.json 60-edk2-i386.json 60-edk2-x86_64.j=
+son
+ else
+ BLOBS=3D
++DESCS=3D
+ endif
+=20
+ # Note that we manually filter-out the non-Sphinx documentation which
+@@ -786,7 +797,8 @@ endif
+=20
+ ICON_SIZES=3D16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
+=20
+-install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-loc=
+alstatedir
++install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-loc=
+alstatedir \
++	$(if $(INSTALL_BLOBS),$(edk2-decompressed))
+ ifneq ($(TOOLS),)
+ 	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DESTDI=
+R)$(bindir))
+ endif
+@@ -808,6 +820,21 @@ ifneq ($(BLOBS),)
+ 	set -e; for x in $(BLOBS); do \
+ 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
+ 	done
++endif
++ifdef INSTALL_BLOBS
++	set -e; for x in $(edk2-decompressed); do \
++		$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)"; \
++	done
++endif
++ifneq ($(DESCS),)
++	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
++	set -e; tmpf=3D$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
++	for x in $(DESCS); do \
++		sed -e 's,@DATADIR@,$(DESTDIR)$(qemu_datadir),' \
++			"$(SRC_PATH)/pc-bios/descriptors/$$x" > "$$tmpf"; \
++		$(INSTALL_DATA) "$$tmpf" \
++			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
++	done
+ endif
+ 	for s in $(ICON_SIZES); do \
+ 		mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps"; \
+diff --git a/.gitignore b/.gitignore
+index 8f782218044e..fd6e6c38c7b9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -97,6 +97,7 @@
+ *.gcno
+ *.gcov
+ /pc-bios/bios-pq/status
++/pc-bios/edk2-*.fd
+ /pc-bios/vgabios-pq/status
+ /pc-bios/optionrom/linuxboot.asm
+ /pc-bios/optionrom/linuxboot.bin
 --=20
 2.19.1.3.g30247aa5d201
