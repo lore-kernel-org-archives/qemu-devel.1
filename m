@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51431)
+Received: from eggs.gnu.org ([209.51.188.92]:52361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDs2y-0007K3-36
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:48:24 -0400
+	(envelope-from <mst@redhat.com>) id 1hDs6b-00007J-DC
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDs2x-0002e6-9O
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:48:24 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <e27a15f8-c299-7a08-3594-680aa1342b2b@virtuozzo.com>
-References: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554747741-918964-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w517ec345zb.fsf@maestria.local.igalia.com>
-	<e27a15f8-c299-7a08-3594-680aa1342b2b@virtuozzo.com>
-Date: Tue, 09 Apr 2019 16:48:18 +0200
-Message-ID: <w514l7744lp.fsf@maestria.local.igalia.com>
+	(envelope-from <mst@redhat.com>) id 1hDs6a-0004mH-9b
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:09 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:38209)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hDs6a-0004k4-38
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:08 -0400
+Received: by mail-qk1-f196.google.com with SMTP id g1so10419064qki.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 07:52:04 -0700 (PDT)
+Date: Tue, 9 Apr 2019 10:52:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190409102526-mutt-send-email-mst@kernel.org>
+References: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] block: include base when checking
- image chain for block allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at
+ the passthrough of NVMe SSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Cc: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com
 
-On Tue 09 Apr 2019 04:43:12 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>> -    while (intermediate && intermediate != base) {
->>> +    while (include_base || intermediate != base) {
->>>           int64_t pnum_inter;
->>>           int64_t size_inter;
->>>   
->>> @@ -2360,6 +2364,10 @@ int bdrv_is_allocated_above(BlockDriverState *top,
->>>               n = pnum_inter;
->>>           }
->>>   
->>> +        if (intermediate == base) {
->>> +            break;
->>> +        }
->>> +
->>>           intermediate = backing_bs(intermediate);
->> 
->> I find that the new condition + the break make things a bit less
->> readable. I think it would be simpler with something like this:
->> 
->>     BlockDriverState *stop_at = include_base ? backing_bs(base) : base;
->> 
->>     while (intermediate != stop_at) {
->>        ...
->>     }
->> 
->
-> But in this way you return back dependence on base, which we don't
-> freeze and which may disappear on some iteration. We should not touch
-> backing_bs(base) in any way.
+On Tue, Apr 09, 2019 at 02:14:56PM +0000, Zhuangyanying wrote:
+> From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> 
+> Recently I tested the performance of NVMe SSD passthrough and found that interrupts
+> were aggregated on vcpu0(or the first vcpu of each numa) by /proc/interrupts,when
+> GuestOS was upgraded to sles12sp3 (or redhat7.6). But /proc/irq/X/smp_affinity_list
+> shows that the interrupt is spread out, such as 0-10, 11-21,.... and so on.
+> This problem cannot be resolved by "echo X > /proc/irq/X/smp_affinity_list", because
+> the NVMe SSD interrupt is requested by the API pci_alloc_irq_vectors(), so the
+> interrupt has the IRQD_AFFINITY_MANAGED flag.
+> 
+> GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X capable devices",
+> but the implementation of __setup_irq has no corresponding modification. It is still
+> irq_startup(), then setup_affinity(), that is sending an affinity message when the
+> interrupt is unmasked. The bare metal configuration is successful, but qemu will
+> not trigger the msix update, and the affinity configuration fails.
+> The affinity is configured by /proc/irq/X/smp_affinity_list, implemented at
+> apic_ack_edge(), the bitmap is stored in pending_mask,
+> mask->__pci_write_msi_msg()->unmask,
+> and the timing is guaranteed, and the configuration takes effect.
+> 
+> The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce affinity
+> setting on startup of managed irqs" to ensure that the affinity is first issued
+> and then __irq_startup(), for the managerred interrupt. So configuration is
+> successful.
+> 
+> It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
+> (3.10.0-957.10.1) does not have backport the patch yet.
+> "if (is_masked == was_masked) return;" can it be removed at qemu?
+> What is the reason for this check?
 
-Ok, I see.
+The reason is simple:
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+The PCI spec says:
 
-(feel free to edit the comment with my suggestion, or leave it as it is
-if you prefer)
+Software must not modify the Address or Data fields of an entry while it is unmasked.
 
-Berto
+It's a guest bug then?
+
+> 
+> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> ---
+>  hw/pci/msix.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index 4e33641..e1ff533 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
+>  {
+>      bool is_masked = msix_is_masked(dev, vector);
+>  
+> -    if (is_masked == was_masked) {
+> -        return;
+> -    }
+> -
+>      msix_fire_vector_notifier(dev, vector, is_masked);
+>  
+>      if (!is_masked && msix_is_pending(dev, vector)) {
+> -- 
+> 1.8.3.1
+> 
