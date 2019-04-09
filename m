@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36118)
+Received: from eggs.gnu.org ([209.51.188.92]:36880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDw0u-0001Pk-Rl
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:33 -0400
+	(envelope-from <david@redhat.com>) id 1hDw4F-0003H1-7C
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hDw0t-00030n-TX
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:32 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37140)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hDw0t-00030F-Dq
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:02:31 -0400
-Received: by mail-pg1-x544.google.com with SMTP id e6so9846764pgc.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 12:02:30 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1hDw4E-0004cL-Cc
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:05:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hDw4E-0004bf-1O
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:05:58 -0400
 References: <20190307144126.31847-1-richard.henderson@linaro.org>
 	<be62e92e-de46-b3a5-9945-a410049d25d5@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d4fc4ba0-bbad-b64a-ad5d-1d964717b749@linaro.org>
-Date: Tue, 9 Apr 2019 09:02:24 -1000
+	<d4fc4ba0-bbad-b64a-ad5d-1d964717b749@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <371b33cf-469f-245c-d18f-0847340e841a@redhat.com>
+Date: Tue, 9 Apr 2019 21:05:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <be62e92e-de46-b3a5-9945-a410049d25d5@redhat.com>
+In-Reply-To: <d4fc4ba0-bbad-b64a-ad5d-1d964717b749@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -31,18 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On 4/9/19 8:53 AM, David Hildenbrand wrote:
-> On 07.03.19 15:41, Richard Henderson wrote:
->> The primary motivator here is usage within s390x,
->> but (as with any good primitive) the opcode has
->> applications outside that.
+On 09.04.19 21:02, Richard Henderson wrote:
+> On 4/9/19 8:53 AM, David Hildenbrand wrote:
+>> On 07.03.19 15:41, Richard Henderson wrote:
+>>> The primary motivator here is usage within s390x,
+>>> but (as with any good primitive) the opcode has
+>>> applications outside that.
+>>
+>> I am planning to send the next big part of vector instruction support
+>> (Vector Integer Instructions) soon, that would make use of these patches.
 > 
-> I am planning to send the next big part of vector instruction support
-> (Vector Integer Instructions) soon, that would make use of these patches.
+> I'll be sure to get them into the first pull after 4.1 opens.
+> 
 
-I'll be sure to get them into the first pull after 4.1 opens.
+Nice, I'll be posting the next series, referencing this series (might
+take some days as the amount of instructions is getting out of hand).
+Thanks!
 
 
-r~
+-- 
+
+Thanks,
+
+David / dhildenb
