@@ -2,87 +2,81 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EFFC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37126C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6883D20857
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:31:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fs7LfkUk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6883D20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0677920857
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 11:39:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0677920857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39417 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39459 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDoyk-0001Af-MA
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 07:31:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33238)
+	id 1hDp6D-0002ZC-VU
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 07:39:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hDoxa-0000eL-Rc
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:30:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hDp5S-0002I9-3I
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hDoxZ-0003mt-P8
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:30:38 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36124)
+	(envelope-from <philmd@redhat.com>) id 1hDp5K-0000XG-VO
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:38:40 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
-	id 1hDoxX-0003kI-52; Tue, 09 Apr 2019 07:30:35 -0400
-Received: by mail-wm1-x341.google.com with SMTP id h18so2919278wml.1;
-	Tue, 09 Apr 2019 04:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=ZjUCggDY8+jbUlcI6k3awUO7/Jl+popLE+V1+SB0yF0=;
-	b=Fs7LfkUkc8dxqewUZQubH5d9cfOc38bcoTWgJ+gb+3kY7S3RdtG1c41oZwuOFMFD4c
-	XuMpYhiyEffBZ4VQxTgrycFjBLxNP9NkD2MIbZjcSRRZQey0KKAqkCk+DSwHOFO3uKmU
-	x3/ZILybqDzSlarFbSaOFdyUXTchLMiEkZMBPM9WShk3u9x7RUg7Z2qB/LY/as4v9o+6
-	OMHvsfercIjLhkYidyiUledMXi30qobgDMuvBEArZzROekX2c6Y/eK6GDIzzbHtCEBvj
-	oHhYIoAeHBfXB/E/mUgTQLCA7j5OB4vMijHAtmV6F30DFI6Rg1sp8FdLzZWW/l3zCwBx
-	Q4bg==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDp5F-0000Tz-VJ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:38:34 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 4so3104504wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 04:38:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=ZjUCggDY8+jbUlcI6k3awUO7/Jl+popLE+V1+SB0yF0=;
-	b=DnsOzU+xw1LXIuyqgPcstV4rsh0BssnDHRvq6eOTOqi7C7ZvEd5oaNFlrqw9xcP7fh
-	J2Z/KRKbXR4uvqjrcuhVHo4oujLv1RVWZyWMCjZHLcov3dh+7tDYeOTh8BWWw8Y9kUXn
-	981+/brj+WiNkBB00M2Wa9HVdxFicEYVnPfJ/Y/kC8OsuATlvMgDhAtS+0YZL4UtnWSD
-	YdTMK965IzjsysXCwuScX6MD+iS5Mn9JzjacNleAc3McxyLxVHdVD0QHWOPMNRQjNVSU
-	oRMXJFABKiUmbvOePgl+IIYjR1uvt5IU8ebmXBHLs+sZFxEjHSK26IS1Q5ivRYBp7XQz
-	MvsA==
-X-Gm-Message-State: APjAAAUv+XzTQlw6ZaiJNb82RinrKuNf6qd+FopI5ZmH6Dev6Y4m0xsG
-	H5pfy6Z2cpkR9MDixJaqDRA=
-X-Google-Smtp-Source: APXvYqx+WNT0Pt6ozvK0+IpgrdGooqG096pgJqvY1VS160LnX8em7Y8JRrUVluX363ARnebXPeyCvQ==
-X-Received: by 2002:a7b:cb16:: with SMTP id u22mr21172981wmj.60.1554809433961; 
-	Tue, 09 Apr 2019 04:30:33 -0700 (PDT)
-Received: from localhost ([46.233.112.222]) by smtp.gmail.com with ESMTPSA id
-	q4sm46113612wrx.25.2019.04.09.04.30.32
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 09 Apr 2019 04:30:33 -0700 (PDT)
-Date: Tue, 9 Apr 2019 12:26:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190409112608.GD16944@stefanha-x1.localdomain>
-References: <20190402121908.44081-1-slp@redhat.com>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=iI+4TPuCt+X87IpY5J/Ito7fDOLnJvWGYSzCINK2BHU=;
+	b=R2pzkaRA6Nv0DazCE6dEbB+2X/vUy5pO+NWmGb+D/mF1bWzOAMxAbQvp79uQRtChrL
+	J1o+wEy/0vMJU+VrtHrTNbuDRiEKFuTt7Hyzr7ytmd6opcrohmSwE2eTBZXC6nc6Puyf
+	G6RHkR1+FSuIx05zT/QtMHixyb8uWCsDX6rTMkULYArVSmIDHFEM4vBASggOhmYR3vYY
+	i6Y3HTv0f2rKXuhIeTIgsJQHnODJAsGEFTQ2fRCI6lhadR22FxzY0gaN//k162quYaqa
+	9t0+anyPUpTaw9XKzQFReNkLTh8LHMpKAKxx0+rYULCwTBKO3OzcXd63B0Mj0uRjGTyf
+	QvxQ==
+X-Gm-Message-State: APjAAAUpS6Mg27zwQSmwkbZH8iDjTV+WViK0LJ7LUxPBjsTwcYdKMHb3
+	2aK+UQYY55vr+7bL3qEf5UqQHsKTN70=
+X-Google-Smtp-Source: APXvYqwbHV/z3njPAIvn3Q25Eg8HXd8ZLg6P3CLweibDgtjnD6uhrbzX4XINe80if02OIwGhoAOeJA==
+X-Received: by 2002:a1c:7dd7:: with SMTP id y206mr21149125wmc.81.1554809912175;
+	Tue, 09 Apr 2019 04:38:32 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	y125sm25985402wmc.39.2019.04.09.04.38.30
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 04:38:31 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+References: <e5fb5172-983a-c8a0-1d86-8406fe8ff99c@redhat.com>
+	<ef6ca1d8-50ac-5239-34eb-be05fad7af69@reactos.org>
+	<87o95hjbtu.fsf@dusky.pond.sub.org>
+	<cca2f2c2-6916-8db9-ef4c-72cd2a79c9ef@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <68660807-deb6-f08a-f714-7fa1782c70bf@redhat.com>
+Date: Tue, 9 Apr 2019 13:38:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hoZxPH4CaxYzWscb"
-Content-Disposition: inline
-In-Reply-To: <20190402121908.44081-1-slp@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] aio: Add a knob to always
- poll if there are in-flight requests
+In-Reply-To: <cca2f2c2-6916-8db9-ef4c-72cd2a79c9ef@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] How to correctly use more than 2 floppy drives?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,80 +88,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
-	pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Juan Quintela <quintela@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409112608.12wnll9S9LjQQC5yUIyXBxRKQz77n3bEY0nmeyBI8oE@z>
+Message-ID: <20190409113830.Wm6mbh3Vol7ECvBnmxmBDZ53IJ0c8z3kiITioWhUayQ@z>
 
+On 4/8/19 9:30 PM, John Snow wrote:
+> On 4/8/19 1:38 AM, Markus Armbruster wrote:
+>> Hervé Poussineau <hpoussin@reactos.org> writes:
+>>
+>>> Le 05/04/2019 à 12:29, Philippe Mathieu-Daudé a écrit :
+>>>> Hi,
+>>>>
+>>>> I am trying to understand the possible values for the MAX_FD variable
+>>>> used by the floppy controller model (hw/block/fdc.c).
 
---hoZxPH4CaxYzWscb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Out of curiosity, why?
 
-On Tue, Apr 02, 2019 at 02:19:08PM +0200, Sergio Lopez wrote:
-> The polling mode in aio_poll is able to trim down ~20us on the average
-> request latency, but it needs manual fine tuning to adjust it to the
-> characteristics of the storage.
->=20
-> Here we add a new knob to the IOThread object, "poll-inflight". When
-> this knob is enabled, aio_poll will always use polling if there are
-> in-flight requests, ignoring the rest of poll-* parameters. If there
-> aren't any in-flight requests, the usual polling rules apply, which is
-> useful given that the default poll-max-ns value of 32us is usually
-> enough to catch a new request in the VQ when the Guest is putting
-> pressure on us.
->=20
-> To keep track of the number of in-flight requests, AioContext has a
-> new counter which is increased/decreased by thread-pool.c and
-> linux-aio.c on request submission/completion.
->=20
-> With poll-inflight, users willing to spend more Host CPU resources in
-> exchange for a lower latency just need to enable a single knob.
->=20
-> This is just an initial version of this feature and I'm just sharing
-> it to get some early feedback. As such, managing this property through
-> QAPI is not yet implemented.
->=20
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  block/linux-aio.c         |  7 +++++++
->  include/block/aio.h       |  9 ++++++++-
->  include/sysemu/iothread.h |  1 +
->  iothread.c                | 33 +++++++++++++++++++++++++++++++++
->  util/aio-posix.c          | 32 +++++++++++++++++++++++++++++++-
->  util/thread-pool.c        |  3 +++
->  6 files changed, 83 insertions(+), 2 deletions(-)
+Cleaning Super I/O chipset I figured some code uses arrays of 2 elements
+while other use MAX_FD. If we want to have a build-configurable MAX_FD
+we can't simply replace "2" -> "MAX_FD" to clean the codebase, we need
+to correct various places, and fix migration.
+If we agree that MAX_FD is strictly 2, then we can clean the codebase
+and remove the MAX_FD != 2 cases (point 3/ below).
 
-Hi Sergio,
-More polling modes are useful for benchmarking and performance analysis.
-=46rom this perspective I think poll-inflight is worthwhile.
+>>>> Looking at git history:
+>>>>
+>>>> - 2004-01-05 7138fcfbf7dd + 8977f3c107ef (Jocelyn Mayer):
+>>>>    FDC introduced with "#define MAX_FD 2"
+>>>>
+>>>> - 2008-04-29 78ae820cfeb0 (Hervé Poussineau):
+>>>>    Supports up to 4 floppy drives if MAX_FD is set to 4
+>>>>    Migration stream knows about runtime value of MAX_FD
+>>>>
+>>>> - 2009-09-10 d7a6c2703577 (Juan Quintela):
+>>>>    FDC vmstate-ified
+>>>>    Migration stream use compile time value of MAX_FD
+>>>>
+>>>> Since 7138fcfbf7dd MAX_FD has always been defined as 2.
+>>>>
+>>>> Since d7a6c2703577 MAX_FD can not be different than 2 without breaking
+>>>> migration.
+>>>>
+>>>> If I understand correctly migration, first we should change in
+>>>> vmstate_fdc the user-definable MAX_FD by a constant 2 value.
+>>>>
+>>>> Then to be able to use >2 floppy disks I have to modify the the
+>>>> vmstate.version_id, and
+>>>>
+>>>> 1/ add a new field in the vmstate_fdc containing the number of drives
+>>>> and add code to check >2 and adapt
+>>>>
+>>>> or
+>>>>
+>>>> 2/ change MAX_FD to 4 for all the codebase, adding some code to migrate
+>>>> to older FDC with only 2 disks...
+>>>>
+>>>> Another option I don't like is:
+>>>>
+>>>> 3/ get ride of MAX_FD != 2 and clean the codebase...
+>>>>
+>>>> $ git grep '#if MAX_FD'
+>>>> hw/block/fdc.c:744:#if MAX_FD == 4
+>>>> hw/block/fdc.c:758:#if MAX_FD == 4
+>>>> hw/block/fdc.c:1317:#if MAX_FD == 4
+>>>> hw/block/fdc.c:1340:#if MAX_FD == 4
+>>>> hw/block/fdc.c:2041:#if MAX_FD == 4
+>>>> hw/block/fdc.c:2079:#if MAX_FD == 4
+>>>> hw/block/fdc.c:2104:#if MAX_FD == 4
+>>>>
+>>>> Hervé, what board are/were you using with 4 floppy drives?
+>>>
+>>> That was only an attempt to support 4 drives in code, as controller was able to do it.
+>>> However, no emulated board took advantage of it, so that's why it kind-of regressed.
+>>>
+>>> Feel free to choose the solution you prefer.
+>>
+>> Since no user has appeared since 2008, it feels safe enough to assume
+>> that none will appear going forward.  I lean towards your "3/ get ride
+>> of MAX_FD != 2 and clean the codebase..."  Explain in a comment that we
+>> emulate only a 2-drive floppy controller, not the genuine IBM PC 4-drive
+>> floppy controller.
+>>
+> 
+> I think I'd rather have MAX_FD set to 2 and a cleaner codebase than a
+> half-working implementation for 4.
+> 
+> Or, does it actually work with four? I think if Hervé wants to preserve
+> this feature it should be formalized as a device property and made to
+> work with migration ... or I am content to remove it.
 
-Like most performance optimizations, the effectiveness of this new
-polling mode depends on the workload.  It could waste CPU, especially on
-a queue depth 1 workload with a slow disk.
+I understand Hervé doesn't want to preserve his attempt ("no emulated
+board took advantage of it"), and the work is safe in the git history if
+someone want to restore it (in a way that doesn't break migration).
 
-Do you think better self-tuning is possible?  Then users don't need to
-set tunables like this one.
+Since we all seems to agree, I prepared a series to remove it and will
+send it soon (although there is no rush).
 
-Stefan
+Thanks,
 
---hoZxPH4CaxYzWscb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcrIFQAAoJEJykq7OBq3PI8qEH/iryfV2vz33+lmOKyk29N+b+
-qk05411mD/cl8TAmQm05SIKmr9A0CNgdI0zCb8vLPtEadtV/yQA9wwFubTxcGKGS
-fZwQljUFVApmcARAIBRgZRQVXmGVGZ1+n5NbsPN1m4bchjpS1JslVLRFJrybSJ3z
-Xva4M4oQf/IL4OqDmhrJKQpFwPG/zBalvQEkQHPlsXdyR/ijpNl/hxA0uNW6ZCkp
-a4g7s8by5i43v5xCuK8Eb41hmGa3vpnpTatU7hm6WlguvVZKFpFGgQEBFVM7kh7O
-8kV5pJWbVKUACaf/C8mTeU12GIPiua6dXeijTya9x6kgmncJipeFMhtlx9T6N94=
-=L82Y
------END PGP SIGNATURE-----
-
---hoZxPH4CaxYzWscb--
+Phil.
 
