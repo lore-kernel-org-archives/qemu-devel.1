@@ -2,80 +2,83 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 863EDC282DA
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 12:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 332F8C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 12:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EE2F2084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 12:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9B302084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 12:29:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i1qh11DR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE2F2084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gbDEBq8i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B302084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40312 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40320 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDprK-0002Mn-I5
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 08:28:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43699)
+	id 1hDpsV-00032r-2y
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 08:29:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDpqV-00021O-Kw
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:24 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDprU-0002ZX-6P
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDpqU-0004nX-GW
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:23 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36985)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDprT-00056Q-6F
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:28:24 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:33348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDpqU-0004nG-9o
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 08:27:22 -0400
-Received: by mail-oi1-x243.google.com with SMTP id v84so13360623oif.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 05:27:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=dwE79ye8uVtJGMHzH+nv0bGwNiTE3Kh0W2+dE1aZQJM=;
-	b=i1qh11DRI5jj37iRzlRykULxKhNabIuvkVQi7EgVy+JWFaU3rOudk17L8prWyRyINw
-	ywykP66Bg16AHedEbcvnbnO76aJjC0rAMo0wKT4MVSgN5UyKF1bUzju70GpRMocKbKnV
-	TgpjjrQN/SCh+BUsI2uNr/8hEbRantM8ZXn7fFH2Fq5eqoYS/9kHES1TWOMpJESLRazj
-	88nxjCcNDey9ZvA3kl3igUZYH5eKsflxJOBwDIWza9pp5f2LyQ0qbAAcVAOwo7fDLIVe
-	ia+VjMBHZe/yNGxOJzYYdRPYT8mrIXZSyBRYT+kSLMtkASSlxEVJbYOlfJZ+suuLqzIy
-	IJ6g==
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1hDprS-000562-Tv; Tue, 09 Apr 2019 08:28:23 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id q1so20682261wrp.0;
+	Tue, 09 Apr 2019 05:28:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=VwkzIm+GdP9ilB0XCdR4w1omZCih5X4z6ryAVHSZ/Wc=;
+	b=gbDEBq8iHZktipbhTJfnx8NCrvWpNTAfwvoqhGoOdR4cSfz4z6Lebk0jOTl2o5K6s+
+	qcdxPe7RmWbMNfO8IXwm+gFWukEBAKuY3hSV4xmT4AWTC1fHUu1hjllyZ8LAN9g/UWs0
+	jQ868GYThnf7dJ3p/7UTaQmsNR7AWPHGLQT8D3FsgYbRzpZKs1yQaZBJWrKv0O8GhBIl
+	DSUDyUKUdaGc+FktGTTLZyJWXgqwEWTCOP+SK3AzBgLC1N5hyRKn97wnircYU7Y/UqK9
+	kWTb9tSGfiFRlGO9FCIgJfBG7B74xeoU4B/knCLdHqzvXJ8IvoOHafJG/NzQe54KfNj4
+	/GXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=dwE79ye8uVtJGMHzH+nv0bGwNiTE3Kh0W2+dE1aZQJM=;
-	b=G4dzYjduBPo/QbF7y/dRSH2psQjouNU3Q9J3UZ2TO+PLV4KD3xqU8GbMDS0ZE+rCFh
-	RED6jEUtcwiorE6arm0vact+iXUAosSFJiJvx9RGDFOrswnS4sI2VEo5kdoGMvD9SBx6
-	WE4Hzl5fjq0rQSxRwTn6Jkqxy19ghqG7k37L3D46U372Sn0eIGHryEyKLmiyKYbfmcmy
-	N3AWoIYgf605sIc1TzUmtDNXPB+ImWWyohph9StWwo4eFCz1W6OgUZ/KYOleJugsYegr
-	TKCjtolmDkvxAn5FLWfN8uYjF/mL0eShO3VSa8ANVLl022IOiyPTg4uDJbwYawWntQar
-	A/0g==
-X-Gm-Message-State: APjAAAUlA7FEZNeIVt+SOqsIVS2/9uAYZiqx2tt3IId/wiwHg96YH2L+
-	yIi5vu0ZLQ3lryOJ7Da3qb1ZgF6tAZMpARNVvXJzUw==
-X-Google-Smtp-Source: APXvYqyGaAsOiQ8qMW6sNbH73DnZRpG54N1pQptqptLpf2SnPvnVtSI7peXSqA+YJj5fa/6gQiPN9kyUrRY/AKn2P8U=
-X-Received: by 2002:aca:e84c:: with SMTP id f73mr19466968oih.163.1554812841469;
-	Tue, 09 Apr 2019 05:27:21 -0700 (PDT)
+	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=VwkzIm+GdP9ilB0XCdR4w1omZCih5X4z6ryAVHSZ/Wc=;
+	b=p7Vc/p7T1JZVx8yw2SzKlEHSKtA29cmLfJpV1UA+H5xXC24POKsAXKeVhLLZfTKbtT
+	F+aTqY2wz7a2iGix6Ee1PUEBr+IfIVX3VHU4c3HBXmcSuuUDYTUjk8E6Lf87FJMK/OuR
+	TRxgT46nDFJmNBMtBL6Ue2O8VS+308M5RIgN8XKOU4lFISVKymNMZfK8Neeq70tqIgsD
+	0Alg9El9uGT96WpGpkDxbM/Wk8z6Trl0Gb3EnnU60nqCp+f21GN3bDXK9c7nPiijnCRI
+	WJcI6JoAB5LfahlwvX9Gsr08JCO0amjpGpoKtsHLRRGJR6h1ArFlHocxDp74/WxK/EQG
+	kBTg==
+X-Gm-Message-State: APjAAAW4ttbRjGt66gLRe7LwZ1SBsP3T6joYE9LPzp89aq6W7oCW3nUn
+	GbIAEtUNvkGtxXjBQgfRUt01h/HY
+X-Google-Smtp-Source: APXvYqxmih+EN4wwtJseVJp4WPvddOGYlQE/jtJac9qwhqQx0zM6hCC6iKelAAJjdpSp3Flc6WdrFA==
+X-Received: by 2002:adf:f286:: with SMTP id k6mr19632230wro.137.1554812900848; 
+	Tue, 09 Apr 2019 05:28:20 -0700 (PDT)
+Received: from donizetti.lan ([2001:b07:6468:f312:1015:663:c7e9:4214])
+	by smtp.gmail.com with ESMTPSA id
+	84sm22940820wme.43.2019.04.09.05.28.19
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 09 Apr 2019 05:28:20 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Apr 2019 14:28:23 +0200
+Message-Id: <20190409122823.12416-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190409070830.22430-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190409070830.22430-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Apr 2019 13:27:10 +0100
-Message-ID:
- <CAFEAcA-NnK6gm6H9bNKxopjFHbigebr9XRCFR+4=OOEgGLkjfg@mail.gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PULL 0/2] ppc-for-4.0 queue 20190409
+X-Received-From: 2a00:1450:4864:20::42f
+Subject: [Qemu-devel] [PATCH v2 for-4.0?] aio-posix: ensure poll mode is
+ left when aio_notify is called
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,42 +90,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	clg@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
-	Greg Kurz <groug@kaod.org>, Alex Williamson <alex.williamson@redhat.com>,
-	spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>,
-	Marcel Apfelbaum <marcel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+	qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409122710.UMKh12vid86XZlPls2fqWfLzJ6pvs3OXF0mAZkxGzs0@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409122823.rLKzILyQYwHkLKxNu4cJR_dHCf6gX9KavCBoSOB6K34@z>
 
-On Tue, 9 Apr 2019 at 08:08, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 5263724b78f89cdea2354c8e92c53bac1b4641a3:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-04-08 17:53:18 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190409
->
-> for you to fetch changes up to 5cf0d326a0fec9ebac2d47c42b5f08e6bc2f686c:
->
->   spapr_pci: Fix extended config space accesses (2019-04-09 15:03:10 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2019-04-09
->
-> This is a small, hard freeze, pull request which fixes a regression on
-> the pseries machine handling of PCI-E extended config space accesses.
->
-> ----------------------------------------------------------------
+With aio=thread, adaptive polling makes latency worse rather than
+better, because it delays the execution of the ThreadPool's
+completion bottom half.
 
-Applied, thanks.
+event_notifier_poll() does run while polling, detecting that
+a bottom half was scheduled by a worker thread, but because
+ctx->notifier is explicitly ignored in run_poll_handlers_once(),
+scheduling the BH does not count as making progress and
+run_poll_handlers() keeps running.  Fix this by recomputing
+the deadline after *timeout could have changed.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+With this change, ThreadPool still cannot participate in polling
+but at least it does not suffer from extra latency.
 
--- PMM
+Reported-by: Sergio Lopez <slp@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1553692145-86728-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+        v1->v2: use qemu_soonest_timeout to handle timeout == -1
+ util/aio-posix.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 6fbfa7924f..db11021287 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -519,6 +519,10 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
+         if (!node->deleted && node->io_poll &&
+             aio_node_check(ctx, node->is_external) &&
+             node->io_poll(node->opaque)) {
++            /*
++             * Polling was successful, exit try_poll_mode immediately
++             * to adjust the next polling time.
++             */
+             *timeout = 0;
+             if (node->opaque != &ctx->notifier) {
+                 progress = true;
+@@ -558,8 +562,9 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
+     do {
+         progress = run_poll_handlers_once(ctx, timeout);
+         elapsed_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time;
+-    } while (!progress && elapsed_time < max_ns
+-             && !atomic_read(&ctx->poll_disable_cnt));
++        max_ns = qemu_soonest_timeout(*timeout, max_ns);
++        assert(!(max_ns && progress));
++    } while (elapsed_time < max_ns && !atomic_read(&ctx->poll_disable_cnt));
+ 
+     /* If time has passed with no successful polling, adjust *timeout to
+      * keep the same ending time.
+@@ -585,8 +590,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
+  */
+ static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
+ {
+-    /* See qemu_soonest_timeout() uint64_t hack */
+-    int64_t max_ns = MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
++    int64_t max_ns = qemu_soonest_timeout(*timeout, ctx->poll_ns);
+ 
+     if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
+         poll_set_started(ctx, true);
+-- 
+2.21.0
+
 
