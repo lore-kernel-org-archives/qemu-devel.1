@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA04C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE3DC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74326208C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:57:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74326208C0
+	by mail.kernel.org (Postfix) with ESMTPS id 495B820833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495B820833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42851 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42870 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDsC6-0002aZ-Pf
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 10:57:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53327)
+	id 1hDsDa-0003bP-If
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 10:59:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAv-0001us-Tg
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAw-0001ut-2u
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAu-0006mN-NM
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:56:37 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39716)
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hDsAu-0006mS-NZ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:56:38 -0400
+Received: from relay.sw.ru ([185.231.240.75]:39720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDsAu-0006lJ-BP; Tue, 09 Apr 2019 10:56:36 -0400
+	id 1hDsAu-0006lL-CW; Tue, 09 Apr 2019 10:56:36 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hDsAr-0007rL-4N; Tue, 09 Apr 2019 17:56:33 +0300
+	id 1hDsAr-0007rL-8A; Tue, 09 Apr 2019 17:56:33 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Tue,  9 Apr 2019 17:56:31 +0300
+Date: Tue,  9 Apr 2019 17:56:32 +0300
 Message-Id:
- <1554821792-968307-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1554821792-968307-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 1/2] qemu-img convert: ignore read errors
+Subject: [Qemu-devel] [PATCH 2/2] iotests: new test 253 check qemu-img
+ convert force read
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,115 +66,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409145631.-RMOjEJni4-53d4YoLPcd9OWLA6V2wULpKy8ygfcsKw@z>
+Message-ID: <20190409145632.ZYOg41X3cDDtixnMQ0IOoO7128iP2SdUk3lMLNAIGs4@z>
 
-The 'qemu-img convert' new command option 'force read' with the key '-R'
-allows converting a damaged image to get all the available information
-in case of the read errors. The program reports read errors and continue
-the image conversion. The users should keep in their minds that the
-resulting image is inconsistent.
+A new test for the patch 'qemu-img convert: ignore read errors'
 
-Suggested-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- qemu-img-cmds.hx |  4 ++--
- qemu-img.c       | 18 ++++++++++++++++--
- qemu-img.texi    |  2 +-
- 3 files changed, 19 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/253     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/253.out |  4 +++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 74 insertions(+)
+ create mode 100755 tests/qemu-iotests/253
+ create mode 100644 tests/qemu-iotests/253.out
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 1526f32..09af9cb 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -44,9 +44,9 @@ STEXI
- ETEXI
- 
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-R] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-R] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
- 
- DEF("create", img_create,
-diff --git a/qemu-img.c b/qemu-img.c
-index aa6f81f..494e880 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -175,6 +175,7 @@ static void QEMU_NORETURN help(void)
-            "Parameters to convert subcommand:\n"
-            "  '-m' specifies how many coroutines work in parallel during the convert\n"
-            "       process (defaults to 8)\n"
-+           "  '-R' continue the image conversion in case of the sector read error\n"
-            "  '-W' allow to write to the target out of order rather than sequential\n"
-            "\n"
-            "Parameters to snapshot subcommand:\n"
-@@ -1579,6 +1580,7 @@ typedef struct ImgConvertState {
-     int64_t wait_sector_num[MAX_COROUTINES];
-     CoMutex lock;
-     int ret;
-+    bool force_read;
- } ImgConvertState;
- 
- static void convert_select_part(ImgConvertState *s, int64_t sector_num,
-@@ -1693,7 +1695,15 @@ static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sector_num,
-                 blk, (sector_num - src_cur_offset) << BDRV_SECTOR_BITS,
-                 n << BDRV_SECTOR_BITS, &qiov, 0);
-         if (ret < 0) {
--            return ret;
-+            if (!s->force_read) {
-+                return ret;
-+            }
-+            int64_t offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+            unsigned int bytes = n << BDRV_SECTOR_BITS;
-+            error_report("failed to read %d bytes at offset %" PRId64 ": %s",
-+                         bytes, offset, strerror(-ret));
-+            memset(buf, 0, n * BDRV_SECTOR_SIZE);
-+            /* TODO: retry to read smaller chunks */
-         }
- 
-         sector_num += n;
-@@ -2018,6 +2028,7 @@ static int img_convert(int argc, char **argv)
-         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
-         .wr_in_order        = true,
-         .num_coroutines     = 8,
-+        .force_read         = false,
-     };
- 
-     for(;;) {
-@@ -2029,7 +2040,7 @@ static int img_convert(int argc, char **argv)
-             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-+        c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:RWU",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-@@ -2132,6 +2143,9 @@ static int img_convert(int argc, char **argv)
-         case 'U':
-             force_share = true;
-             break;
-+        case 'R':
-+            s.force_read = true;
-+            break;
-         case OPTION_OBJECT: {
-             QemuOpts *object_opts;
-             object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 3b6710a..94f7d80 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -325,7 +325,7 @@ Error on reading data
- 
- @end table
- 
--@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-R] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- 
- Convert the disk image @var{filename} or a snapshot @var{snapshot_param}
- to disk image @var{output_filename} using format @var{output_fmt}. It can be optionally compressed (@code{-c}
+diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
+new file mode 100755
+index 0000000..671a3c4
+--- /dev/null
++++ b/tests/qemu-iotests/253
+@@ -0,0 +1,69 @@
++#!/usr/bin/env python
++#
++# Test of the 'qemu-img convert' for a damaged image.
++#
++# Copyright (c) 2019 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import iotests
++import os
++from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
++    file_path, log
++
++iotests.verify_image_format(supported_fmts=['qcow2'])
++
++disk = file_path('disk')
++chunk = 256 * 1024
++bad_sector = 768
++blkdebug_file = os.path.join(iotests.test_dir, 'blkdebug.conf')
++
++
++def create_blkdebug_file():
++    file = open(blkdebug_file, 'w')
++    file.write('''
++[inject-error]
++event = "read_aio"
++errno = "5"
++once ="off"
++sector = "%d"
++''' % (bad_sector))
++    file.close()
++
++
++def write_to_disk(offset, size):
++    write = 'write -P 7 {} {}'.format(offset, size)
++    qemu_io('-c', write, disk)
++
++
++qemu_img_create('-f', iotests.imgfmt, disk, '1M')
++
++for num in range(1, 4):
++    write_to_disk((num-1) * chunk, chunk)
++
++create_blkdebug_file()
++disk_converted = disk + '_converted'
++log(qemu_img_pipe('convert', '-O', iotests.imgfmt, 'blkdebug:%s:%s'
++                  % (blkdebug_file, disk), disk_converted))
++log(qemu_img_pipe('convert', '-O', iotests.imgfmt, '-R', 'blkdebug:%s:%s'
++                  % (blkdebug_file, disk), disk_converted))
++
++# TODO: with a class, self.assertNotEqual(
++#       qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', disk),
++#       qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', disk_converted),
++#               'image file map matches the copied file after conversion')
++
++os.remove(disk_converted)
++os.remove(blkdebug_file)
+diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
+new file mode 100644
+index 0000000..b972541
+--- /dev/null
++++ b/tests/qemu-iotests/253.out
+@@ -0,0 +1,4 @@
++qemu-img: error while reading sector 0: Input/output error
++
++qemu-img: failed to read 786432 bytes at offset 0: Input/output error
++
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718..4cd2fe8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -248,3 +248,4 @@
+ 246 rw auto quick
+ 247 rw auto quick
+ 248 rw auto quick
++253 rw auto quick
 -- 
 1.8.3.1
 
