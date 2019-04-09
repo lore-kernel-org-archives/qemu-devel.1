@@ -2,87 +2,89 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF104C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB7BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85F662084C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:03:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 086632133D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cKWoLD40"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F662084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="uDPhRueM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086632133D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45294 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtD9-0005AQ-PW
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:02:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51442)
+	id 1hDtFg-0006w9-4s
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:05:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDt5u-00085V-GB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:31 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDt5v-00086y-BF
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDt5t-0004h5-5l
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:30 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54454)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDt5t-0004i2-MT
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:31 -0400
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:39007)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hDt5s-0004Yt-OZ
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hDt5t-0004fw-2n
 	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:29 -0400
-Received: by mail-wm1-x343.google.com with SMTP id c1so2754825wml.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:55:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=GhKLXN4x2Bh28KK1khKEa4UYDz15n5B2iNQEOKiXWDU=;
-	b=cKWoLD40bDwygYPNvWRBvY3qZSsxFEhVr8mEw0aqsYbO/2XBcwjPyYlEiRfhaknMhg
-	3Ytt06vf7abySROspb2mKhtA/+gXBlywU6eW/mkpawFNbplJdZ+raOMwR7p2WYh0hUGY
-	yWqWYNjzIpI0r56ZzqB6CEEg2bThvgPHkIwhdXw9idbLZLPgTe+JqULeoVFDPuJNMw/+
-	uFFSpTJH5Kbja7Hm4mFLZhv1j4JV5eroC+vU8/rgLmsKmrqoFFC+SoPrC7oxp1imWaCZ
-	+jFWhbFscP6kRtNYeBAAbCSpiTsWOjstyudyb5Mzcuamw7g3gyK8rS8yTa6Ropm7xpKS
-	OnYQ==
+Received: by mail-it1-x144.google.com with SMTP id 139so5733265ita.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
+	h=mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=0gqBrNUBN17mN32Poegd2PM0Plcs43VygO+lKXAYAhM=;
+	b=uDPhRueMIbQytScEK4U1AaxIwH/ms+6MnG0Ymr5d6l0pXKV7SucMSMLZpKd6V6KEIQ
+	AhImCnscpfv5FYelmKhMqprlhSDnDGj8m8Bkp2l8uBoIKoL92WuRc0t7jac05+tUbUZC
+	yYWzke15Mg4/anhfDkk8qilnbQVbZ05JepkpZvwwra/GN968yrU3kVyMh+TL6/KuuSWu
+	FVJicvo3JKdVtfh6bDnbFPSg1IytRX/Jr9ZGFwnDjoCGxbGwQunDachLwo/AnYGdG/ME
+	0zUzc1TD9P4fhxAssCZb/Cm25mKryd1wkzRqLpZrUk0/RGlGiMgY2rZjndhgk+nIO/Un
+	oBMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=GhKLXN4x2Bh28KK1khKEa4UYDz15n5B2iNQEOKiXWDU=;
-	b=E7D2lL8MBQYDEN3Ikf3GhkFF2eZXVaYXNpU+WjcZqG4mc3WivDLD2sTj6m7pY7HbEl
-	d0xUD0ha2nbOLApaaKwUZlllFjidB3umOoq1ofpf68l8Qi15g+lk9HBEHU/Ctpg7hOdu
-	4TtydmiFovr+tcNi8pEat8wE2N1KZ/mth6SZsu6BNra9Jd1x0780fXD/j0ENvc/uy1wS
-	cU/c2FO5026j+GyqPX0vuePrmnreumPheqLaV7r6HQahFinKFr3jbBbChCN+LgJmMgy4
-	Wz0zOPKZmr0i+WAI627k2eitgEuDk2lPXw1M4wf40QbCo2Wt+AjziCqFIeNPrVAqXSsU
-	pLAQ==
-X-Gm-Message-State: APjAAAVlMwhK+mJuHbFq/9yBA06ia7AyMlyVtHjoN1hLlGSatoRwdhxZ
-	gP4n2pRb4/Gp8gB0tiCuXcYqcaNT
-X-Google-Smtp-Source: APXvYqytC9j4er2lGii0cKFz5V5jD7BDBwqhBO91bKHMXoVcQqtKWGhairomXfOoLK2JLKg4D93r5Q==
-X-Received: by 2002:a1c:808c:: with SMTP id b134mr21818519wmd.16.1554825318737;
-	Tue, 09 Apr 2019 08:55:18 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	g84sm23117586wmf.25.2019.04.09.08.55.18
+	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=0gqBrNUBN17mN32Poegd2PM0Plcs43VygO+lKXAYAhM=;
+	b=RRjvxhFvzQOI8hDvYfcZEMHeWOxI/D3mjTChoX+6OcTV7qMA+ceEWfBddpSUd1yVnm
+	tpLE5z/iWuaR0VFh43kEq2BfRQmiiHRS1Lj+LiiK5vE0Bo4sftSjBTsWEL2yWl6gjDH3
+	lVvCrzoNvMJbJhdzCwD0Qby9mgafgpLSdA6uJj4bmMloiIpGAtuWPv5llGmVdBxxlk+9
+	uZNbsi0r3Behqe+f50woCXFLlXJiUb9+aLeKO+t5H5EEWOAEjl445S1KsobEN+FgYaQp
+	c4iR13z21+aQlsXbsVBm+yA/NlcGeuFzosAVwTeaakv3Qmt3sraV8lEcvIewPWQXNXV3
+	HzTg==
+X-Gm-Message-State: APjAAAWQZqDSpCmgfqEgZHYEbIXtSZt8i7Zxef09pOXoAnlzt4PeecFz
+	YCiob+Aj8dAkxi0nwHVZlt643w==
+X-Google-Smtp-Source: APXvYqwz2mbVMd8B8tnWgybVOc5/2SWBYuIM01zTWI/+Tfg6Kz6npZ8+dH4lMSxOUNNCymgn1GmOaA==
+X-Received: by 2002:a24:254c:: with SMTP id g73mr25203396itg.77.1554825327554; 
+	Tue, 09 Apr 2019 08:55:27 -0700 (PDT)
+Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
+	by smtp.gmail.com with ESMTPSA id
+	u26sm12798396iob.78.2019.04.09.08.55.26
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 08:55:18 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 17:55:12 +0200
-Message-Id: <1554825316-33288-2-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1554825316-33288-1-git-send-email-pbonzini@redhat.com>
-References: <1554825316-33288-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
+	Tue, 09 Apr 2019 08:55:27 -0700 (PDT)
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+In-Reply-To: <6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
+Date: Tue, 9 Apr 2019 11:55:25 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PULL 1/5] roms: Rename the EFIROM variable to avoid
- clashing with iPXE
+X-Received-From: 2607:f8b0:4864:20::144
+Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
+ missing AMD pflash functionality
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,85 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409155512.AsCryHoI0PvtpcWgHL9TqP68aTQLJJBARU5kkoh0qtg@z>
+Message-ID: <20190409155525._nz6pWhsSPEko0p0JzOiuUx_Fg7CzRS24kRKnEzlHtQ@z>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Hi Phil,
 
-The iPXE's 'veryclean' recipe removes $(EFIROM) even if the EFIROM
-macro originates from elsewhere:
+> On Apr 9, 2019, at 06:34, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
+>=20
+> Hi Stephen,
+>=20
+> [Cc'ing Markus and Laszlo, we have similar interest in pflash01 =
+testing]
+>=20
+> On 4/8/19 10:55 PM, Stephen Checkoway wrote:
+>> The goal of this patch series implement the following AMD command-set =
+parallel
+>> flash functionality:
+>> - flash interleaving;
+>> - nonuniform sector sizes;
+>> - erase suspend/resume commands; and
+>> - multi-sector erase.
+>=20
+> I am very glad you addressed these long overdue issues and very =
+pleased
+> by your patches :)
+> I'll thoroughly review it during next week (this won't get merge for =
+the
+> current 4.0 cycle anyway).
 
-  $ git checkout f590a812c21~
-  $ make -C roms clean EFIROM=$(type -P EfiRom)
-  make: Entering directory '/source/qemu/roms'
-  [...]
-  make -C ipxe/src veryclean
-  make[1]: Entering directory '/source/qemu/roms/ipxe/src'
-  rm -f bin{,-*}/*.* bin{,-*}/.certificate.* bin{,-*}/.certificates.* bin{,-*}/.private_key.* bin{,-*}/errors bin{,-*}/NIC ./util/zbin ./util/elf2efi32 ./util/elf2efi64 /usr/bin/EfiRom ./util/efifatbin ./util/iccfix ./util/einfo TAGS bin{,-*}/symtab
-  rm: cannot remove '/usr/bin/EfiRom': Permission denied
-  make[1]: *** [Makefile.housekeeping:1564: clean] Error 1
-  make[1]: Leaving directory '/source/qemu/roms/ipxe/src'
-  make: *** [Makefile:152: clean] Error 2
-  make: Leaving directory '/source/qemu/roms'
+Great!
 
-Before f590a812c21 this variable could be overridden or unset,
-and the 'veryclean' Makefile rule would not complain.
+> I started a similar cleanup (mostly pflash01 focused) and converted
+> DPRINTF to trace events, added few constants. I'll see if I can rebase
+> your work on top of mine. So far only your patch 2 (refactor) would be
+> modified, simplified as the "pull out all of the code to modify the
+> status into simple helper functions" part (which else I'd ask you to
+> move in a separate patch).
+>=20
+> We should think of more intereleaved tests, I'll prepare a table of
+> current QEMU models using this device and how is their intereleave
+> mapping. Hopefully it would be enough to simply add the existing
+> machines to your current musicpal qtest.
+>=20
+> Also I'd like to see some Top/Bottom block configuration qtests, your
+> patch #5 doesn't seem tested.
 
-Commit f590a812c21 enforces this variable to the Intel EfiRom
-tool provided by the EDK2 project.
+I included four tests =
+<https://patchew.org/QEMU/cover.1554774454.git.stephen.checkoway@oberlin.e=
+du/bbe417c354dfa908d5e1bc8f8ad7121ec9451682.1554774454.git.stephen.checkow=
+ay@oberlin.edu/>.
 
-To avoid the name clash and make the difference between the
-projects obvious, rename the variable used by the EDK2 project
-as EDK2_EFIROM.
+Patchew makes it hard to link to particular lines. Here's the same patch =
+on Github =
+<https://github.com/qemu/qemu/commit/a851d21347121a91ba9a39c133a8fbee6e84e=
+557#diff-d2ed797ca8898de80768bdfb390781dfR498>.
 
-Fixes: f590a812c21074e82228de3e1dfb57b75fc02b62
-Reported-by: Olaf Hering <olaf@aepfle.de>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190409134536.15548-2-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- roms/Makefile | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Are those sufficient or would you like more tests?
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 78d5dd1..d28252d 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -47,7 +47,7 @@ SEABIOS_EXTRAVERSION="-prebuilt.qemu.org"
- # We need that to combine multiple images (legacy bios,
- # efi ia32, efi x64) into a single rom binary.
- #
--EFIROM = edk2/BaseTools/Source/C/bin/EfiRom
-+EDK2_EFIROM = edk2/BaseTools/Source/C/bin/EfiRom
- 
- default:
- 	@echo "nothing is build by default"
-@@ -102,8 +102,8 @@ pxe-rom-%: build-pxe-roms
- 
- efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
- 
--efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
--	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
-+efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-+	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
- 		-b ipxe/src/bin/$(VID)$(DID).rom \
- 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
- 		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
-@@ -120,7 +120,7 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
- 
--$(EFIROM):
-+$(EDK2_EFIROM):
- 	$(MAKE) -C edk2/BaseTools
- 
- slof:
--- 
-1.8.3.1
+>=20
+>> During refactoring and implementation, I discovered several bugs that =
+are
+>> fixed here as well:
+>> - flash commands use only 11-bits of the address in most cases, but =
+the
+>>  current code uses all of them [1];
+>> - entering CFI mode from autoselect mode and then exiting CFI mode =
+should
+>>  return the chip to autoselect mode, but the current code returns to =
+read
+>>  array mode; and
+>> - reset command should be ignored during sector/chip erase, but the =
+current
+>>  code performs the reset.
+>>=20
+>> The first patch in the series adds a test for the existing behavior. =
+Tests for
+>> additional behavior/bug fixes are added in the relevant patch.
+>>=20
+>> 1. I found firmware in the wild that relies on the 11-bit address =
+behavior,
+>>   probably due to a bug in the firmware itself.
+>=20
+> Is it a musicpal firmware? Are you able to compare with real hardware?
+
+No, it's not musicpal. I'm not even sure what musicpal is, it was just =
+the most convenient choice for testing.  The real hardware is an =
+embedded system using an old AMD processor (Am486) with three different =
+AMD command set flash chips. The unlock addresses the firmware uses =
+don't actually match the part sheets (in most cases). It took quite a =
+while to realize that the flash hardware only uses 11 bits of address. =
+(It's clearly spelled out in the various part sheets, but I guess I =
+missed it on the first 15 or so readings.)
+
+> I vaguely remember some issue regarding address bus width when trying =
+to
+> implement the TopBlock small sectors, but I wasn't using the musicpal.
+> I'll see if I can find my old notes and test with your series.
+
+The one boot chip I'm using is the AM29F080B-90SI with top boot blocks. =
+It has an 8-bit address bus.
+
+--=20
+Stephen Checkoway
+
+
+
 
 
 
