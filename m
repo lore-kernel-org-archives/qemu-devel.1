@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37168)
+Received: from eggs.gnu.org ([209.51.188.92]:38824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDtq6-0002Qt-5c
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:43:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDtwr-0004OW-J7
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aruna.15@cse.mrt.ac.lk>) id 1hDtq4-00009B-US
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:43:14 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34526)
+	(envelope-from <peter.maydell@linaro.org>) id 1hDtwq-0004rG-HE
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:50:13 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39049)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aruna.15@cse.mrt.ac.lk>)
-	id 1hDtq4-00008d-Hb
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:43:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p10so21820436wrq.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:43:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDtwq-0004qc-9f
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:50:12 -0400
+Received: by mail-ot1-x344.google.com with SMTP id f10so10079229otb.6
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:50:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
 	<CAFEAcA-k0KEsjb0VvbhhkpvTN7nFBDNtqKwx-Lai5uYbCkztJA@mail.gmail.com>
 	<CAH95U0j6rHGdZj4B8DK-Ty-SqZHMb3Kmg16w+j3jx5bdkeijLQ@mail.gmail.com>
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Date: Tue, 9 Apr 2019 22:12:59 +0530
-Message-ID: <CAH95U0grFVf3jL3UXRGUH4ft+pC=qOEhj2zaNn2=-AEqZB6iuQ@mail.gmail.com>
+In-Reply-To: <CAH95U0j6rHGdZj4B8DK-Ty-SqZHMb3Kmg16w+j3jx5bdkeijLQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Apr 2019 17:50:00 +0100
+Message-ID: <CAFEAcA9DSaZE-dsKV4321meT2hBEJRLmWBLF0U5o0jG=mzcmRA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 0/4] Header cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,21 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-Thank you
-
-On Tue, Apr 9, 2019 at 10:12 PM, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-wrote:
-
+On Tue, 9 Apr 2019 at 17:42, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
+>
 > Yeah this is a stand alone patch.
->
-> On Tue, Apr 9, 2019 at 10:10 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On Tue, 9 Apr 2019 at 16:58, Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
->> wrote:
+
+OK, thanks -- just wanted to check there wasn't a missing
+bit. I think this could go in via the qemu-trivial tree
+so I have cc'd them.
+
+We're in the middle of a release at the moment, but we
+should reopen for development in a couple of weeks. If
+this patch still hasn't gone anywhere by a week or so after
+that then please follow up with a 'ping' to check it hasn't
+been forgotten by accident.
+
+> On Tue, Apr 9, 2019 at 10:10 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On Tue, 9 Apr 2019 at 16:58, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
 >> >
 >> > Removed unwanted includes from cpu-common.h
 >> > This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
@@ -81,23 +85,6 @@ wrote:
 >>    to be a stand-alone patch.
 >>
 >> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> thanks
->> -- PMM
->>
-> --
-> *Aruna* Jayasena
-> Embedded Systems and Computer Science Engineering Undergraduate
-> University of Moratuwa
-> *=E2=9C=86 **+94719872152 *
-> =E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-> <https://www.linkedin.com/in/arunajayasena/>
->
->
-> --
-*Aruna* Jayasena
-Embedded Systems and Computer Science Engineering Undergraduate
-University of Moratuwa
-*=E2=9C=86 **+94719872152 *
-=E2=9C=89 <aruna.15@cse.mrt.ac.lk> =E2=8C=A8 <http://archfx.github.io> in
-<https://www.linkedin.com/in/arunajayasena/>
+
+thanks
+-- PMM
