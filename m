@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55828)
+Received: from eggs.gnu.org ([209.51.188.92]:55868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLk-0003Uk-TB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLq-0003aU-5u
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLk-0005Cf-02
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57136)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLo-0005FX-QE
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtLj-0005C0-Jt
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:51 -0400
+	id 1hDtLo-0005Ew-FB
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:56 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  9 Apr 2019 18:10:07 +0200
-Message-Id: <20190409161009.6322-19-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:10:08 +0200
+Message-Id: <20190409161009.6322-20-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 18/20] monitor: start making
- qmp_human_monitor_command() asynchronous
+Subject: [Qemu-devel] [PATCH v4 19/20] monitor: teach HMP about asynchronous
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +31,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This prepares the work for HMP commands to be asynchronous.
+Similar to how we handle both synchronous and asynchronous commands in
+QMP, HMP gains a new async_cmd() that will allow the command to
+complete asynchronously. For interactive reasons, and command
+ordering, the HMP monitor is suspended until the asynchronous command
+completes.
 
-Start making QMP human-monitor-command asynchronous, although
-QmpReturn is used synchronously on error or after
-handle_hmp_command().
+It is expected that HMP async commands will be implemented re-using
+QMP async commands counterparts, so it reuses the QmpSession/QmpReturn
+for context handling (instead of introducing HmpSession/HmpReturn and
+having to convert from one to the other as we call QMP counterparts).
+
+hmp_dispatch_return_cb() will handle printing the result to the
+current monitor. It may have different ways to print the QmpReturn
+result to the current monitor. Currently, only error reporting is
+implemented.
+
+QMP human-monitor-command is modified to deal with an async HMP
+commands too. It creates a temporary session, and the return callback
+will return asynchronously to the original QMP command and destroy the
+temporary monitor when hmp->for_qmp_command is set.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qapi/misc.json |  3 ++-
- monitor.c      | 14 ++++++++------
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ monitor.c | 103 +++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 82 insertions(+), 21 deletions(-)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 8b3ca4fdd3..f8fd4824fb 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1344,7 +1344,8 @@
- ##
- { 'command': 'human-monitor-command',
-   'data': {'command-line': 'str', '*cpu-index': 'int'},
--  'returns': 'str' }
-+  'returns': 'str',
-+  'async': true }
-=20
- ##
- # @ObjectPropertyInfo:
 diff --git a/monitor.c b/monitor.c
-index 76bc2f8c7c..477ccd852d 100644
+index 477ccd852d..4943c7635c 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -743,8 +743,8 @@ static void monitor_data_destroy(Monitor *mon)
+@@ -130,13 +130,17 @@ typedef struct mon_cmd_t {
+     const char *params;
+     const char *help;
+     const char *flags; /* p=3Dpreconfig */
+-    void (*cmd)(Monitor *mon, const QDict *qdict);
++    union {
++        void (*cmd)(Monitor *mon, const QDict *qdict);
++        void (*async_cmd)(Monitor *mon, const QDict *qdict, QmpReturn *q=
+ret);
++    };
+     /* @sub_table is a list of 2nd level of commands. If it does not exi=
+st,
+      * cmd should be used. If it exists, sub_table[?].cmd should be
+      * used, and cmd of 1st level plays the role of help function.
+      */
+     struct mon_cmd_t *sub_table;
+     void (*command_completion)(ReadLineState *rs, int nb_args, const cha=
+r *str);
++    bool async;
+ } mon_cmd_t;
+=20
+ /* file descriptors passed via SCM_RIGHTS */
+@@ -207,6 +211,7 @@ struct Monitor {
+     int suspend_cnt;            /* Needs to be accessed atomically */
+     bool skip_flush;
+     bool use_io_thread;
++    QmpReturn *for_qmp_command;
+=20
+     /*
+      * State used only in the thread "owning" the monitor.
+@@ -707,7 +712,7 @@ static void monitor_qapi_event_init(void)
+                                                 qapi_event_throttle_equa=
+l);
+ }
+=20
+-static void handle_hmp_command(Monitor *mon, const char *cmdline);
++static bool handle_hmp_command(Monitor *mon, const char *cmdline);
+=20
+ static void monitor_iothread_init(void);
+=20
+@@ -743,16 +748,70 @@ static void monitor_data_destroy(Monitor *mon)
      g_queue_free(mon->qmp.qmp_requests);
  }
 =20
--char *qmp_human_monitor_command(const char *command_line, bool has_cpu_i=
-ndex,
--                                int64_t cpu_index, Error **errp)
-+void qmp_human_monitor_command(const char *command_line, bool has_cpu_in=
++static void free_hmp_monitor(void *opaque)
++{
++    Monitor *hmp =3D opaque;
++
++    qmp_session_destroy(&hmp->qmp.session);
++    monitor_data_destroy(hmp);
++    g_free(hmp);
++}
++
++static AioContext *monitor_get_aio_context(void)
++{
++    return iothread_get_aio_context(mon_iothread);
++}
++
++static void qmp_human_monitor_command_finish(Monitor *hmp, QmpReturn *qr=
+et)
++{
++    char *output;
++
++    qemu_mutex_lock(&hmp->mon_lock);
++    if (qstring_get_length(hmp->outbuf) > 0) {
++        output =3D g_strdup(qstring_get_str(hmp->outbuf));
++    } else {
++        output =3D g_strdup("");
++    }
++    qemu_mutex_unlock(&hmp->mon_lock);
++
++    qmp_human_monitor_command_return(qret, output);
++
++    if (hmp->for_qmp_command) {
++        aio_bh_schedule_oneshot(monitor_get_aio_context(),
++                                free_hmp_monitor, hmp);
++    }
++}
++
++static void hmp_dispatch_return_cb(QmpSession *session, QDict *rsp)
++{
++    Monitor *hmp =3D container_of(session, Monitor, qmp.session);
++    QDict *err =3D qdict_get_qdict(rsp, "error");
++    Monitor *old_mon =3D cur_mon;
++
++    cur_mon =3D hmp;
++    if (err) {
++        error_report("%s", qdict_get_str(err, "desc"));
++    } /* XXX: else, report depending on command */
++
++    if (hmp->for_qmp_command) {
++        qmp_human_monitor_command_finish(hmp, hmp->for_qmp_command);
++    } else {
++        monitor_resume(hmp);
++    }
++    cur_mon =3D old_mon;
++}
++
+ void qmp_human_monitor_command(const char *command_line, bool has_cpu_in=
 dex,
-+                               int64_t cpu_index, QmpReturn *qret)
+                                int64_t cpu_index, QmpReturn *qret)
  {
-     char *output =3D NULL;
-     Monitor *old_mon, hmp;
-@@ -757,15 +757,15 @@ char *qmp_human_monitor_command(const char *command=
-_line, bool has_cpu_index,
+-    char *output =3D NULL;
+-    Monitor *old_mon, hmp;
++    Monitor *old_mon, *hmp =3D g_new0(Monitor, 1);
+=20
+-    monitor_data_init(&hmp, true, false);
++    monitor_data_init(hmp, true, false);
++    qmp_session_init(&hmp->qmp.session, NULL, NULL, hmp_dispatch_return_=
+cb);
++    hmp->for_qmp_command =3D qret;
+=20
+     old_mon =3D cur_mon;
+-    cur_mon =3D &hmp;
++    cur_mon =3D hmp;
+=20
      if (has_cpu_index) {
          int ret =3D monitor_set_cpu(cpu_index);
-         if (ret < 0) {
--            cur_mon =3D old_mon;
--            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cpu-index",
-+            Error *err =3D NULL;
-+            error_setg(&err, QERR_INVALID_PARAMETER_VALUE, "cpu-index",
+@@ -761,25 +820,17 @@ void qmp_human_monitor_command(const char *command_=
+line, bool has_cpu_index,
+             error_setg(&err, QERR_INVALID_PARAMETER_VALUE, "cpu-index",
                         "a CPU number");
-+            qmp_return_error(qret, err);
+             qmp_return_error(qret, err);
++            monitor_data_destroy(hmp);
              goto out;
          }
      }
 =20
-     handle_hmp_command(&hmp, command_line);
--    cur_mon =3D old_mon;
-=20
-     qemu_mutex_lock(&hmp.mon_lock);
-     if (qstring_get_length(hmp.outbuf) > 0) {
-@@ -775,9 +775,11 @@ char *qmp_human_monitor_command(const char *command_=
-line, bool has_cpu_index,
+-    handle_hmp_command(&hmp, command_line);
+-
+-    qemu_mutex_lock(&hmp.mon_lock);
+-    if (qstring_get_length(hmp.outbuf) > 0) {
+-        output =3D g_strdup(qstring_get_str(hmp.outbuf));
+-    } else {
+-        output =3D g_strdup("");
++    if (!handle_hmp_command(hmp, command_line)) {
++        qmp_human_monitor_command_finish(hmp, qret);
      }
-     qemu_mutex_unlock(&hmp.mon_lock);
+-    qemu_mutex_unlock(&hmp.mon_lock);
+-
+-    qmp_human_monitor_command_return(qret, output);
 =20
-+    qmp_human_monitor_command_return(qret, output);
-+
  out:
-+    cur_mon =3D old_mon;
-     monitor_data_destroy(&hmp);
--    return output;
+     cur_mon =3D old_mon;
+-    monitor_data_destroy(&hmp);
  }
 =20
  static int compare_cmd(const char *name, const char *list)
+@@ -3438,7 +3489,7 @@ fail:
+     return NULL;
+ }
+=20
+-static void handle_hmp_command(Monitor *mon, const char *cmdline)
++static bool handle_hmp_command(Monitor *mon, const char *cmdline)
+ {
+     QDict *qdict;
+     const mon_cmd_t *cmd;
+@@ -3448,7 +3499,7 @@ static void handle_hmp_command(Monitor *mon, const =
+char *cmdline)
+=20
+     cmd =3D monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table=
+);
+     if (!cmd) {
+-        return;
++        return false;
+     }
+=20
+     qdict =3D monitor_parse_arguments(mon, &cmdline, cmd);
+@@ -3458,11 +3509,19 @@ static void handle_hmp_command(Monitor *mon, cons=
+t char *cmdline)
+         }
+         monitor_printf(mon, "Try \"help %.*s\" for more information\n",
+                        (int)(cmdline - cmd_start), cmd_start);
+-        return;
++        return false;
+     }
+=20
+-    cmd->cmd(mon, qdict);
++    if (cmd->async) {
++        QmpReturn *qret =3D qmp_return_new(&mon->qmp.session, NULL);
++        monitor_suspend(mon);
++        cmd->async_cmd(mon, qdict, qret);
++    } else {
++        cmd->cmd(mon, qdict);
++    }
+     qobject_unref(qdict);
++
++    return cmd->async;
+ }
+=20
+ static void cmd_completion(Monitor *mon, const char *name, const char *l=
+ist)
+@@ -4638,6 +4697,8 @@ void monitor_init(Chardev *chr, int flags)
+                                      NULL, mon, NULL, true);
+         }
+     } else {
++        qmp_session_init(&mon->qmp.session,
++                         NULL, NULL, hmp_dispatch_return_cb);
+         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_re=
+ad,
+                                  monitor_event, NULL, mon, NULL, true);
+     }
 --=20
 2.21.0.196.g041f5ea1cf
