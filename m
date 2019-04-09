@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55781)
+Received: from eggs.gnu.org ([209.51.188.92]:55801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLf-0003Gm-UT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:49 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLh-0003J1-GO
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLe-00058l-Kr
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34412)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLg-0005A3-2v
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtLe-00057d-9G
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:46 -0400
+	id 1hDtLf-00058r-AZ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:48 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  9 Apr 2019 18:09:59 +0200
-Message-Id: <20190409161009.6322-11-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:10:06 +0200
+Message-Id: <20190409161009.6322-18-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 10/20] QmpSession: keep a queue of pending
- commands
+Subject: [Qemu-devel] [PATCH v4 17/20] console: make screendump asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,126 +30,256 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following commit will introduce asynchronous commands. Let's keep
-the session aware of the pending commands, so we can do interesting
-things like order the replies, or cancel pending operations when the
-client is gone.
+Make screendump asynchronous to provide correct screendumps.
 
-The queue needs a lock, since QmpReturn may be called from any thread.
+For now, HMP doesn't have async support, so it has to remain
+synchronous and potentially incorrect to avoid races (following
+patches will add HMP asynchronous commands)
+
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h |  4 ++++
- qapi/qmp-dispatch.c         | 32 ++++++++++++++++++++++++++++++--
- 2 files changed, 34 insertions(+), 2 deletions(-)
+ qapi/ui.json         |   3 +-
+ include/ui/console.h |   3 ++
+ hmp.c                |   2 +-
+ ui/console.c         | 103 +++++++++++++++++++++++++++++++++++++++----
+ 4 files changed, 100 insertions(+), 11 deletions(-)
 
-diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 6c0d21968e..7c9de9780d 100644
---- a/include/qapi/qmp/dispatch.h
-+++ b/include/qapi/qmp/dispatch.h
-@@ -16,6 +16,7 @@
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 59e412139a..cbb3979172 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -96,7 +96,8 @@
+ #
+ ##
+ { 'command': 'screendump',
+-  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
++  'data': {'filename': 'str', '*device': 'str', '*head': 'int'},
++  'async': true }
 =20
- #include "qemu/queue.h"
- #include "qapi/qmp/json-parser.h"
-+#include "qemu/thread.h"
+ ##
+ # =3D=3D Spice
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 9415adadfe..2649c3cbfe 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -74,6 +74,9 @@ typedef struct MouseTransformInfo {
+ } MouseTransformInfo;
 =20
- typedef struct QmpReturn QmpReturn;
+ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
++void hmp_screendump_sync(const char *filename,
++                         bool has_device, const char *device,
++                         bool has_head, int64_t head, Error **errp);
 =20
-@@ -47,11 +48,14 @@ struct QmpSession {
-     const QmpCommandList *cmds;
-     JSONMessageParser parser;
-     QmpDispatchReturn *return_cb;
-+    QemuMutex pending_lock;
-+    QTAILQ_HEAD(, QmpReturn) pending;
+ /* keysym is a unicode code except for special keys (see QEMU_KEY_xxx
+    constants) */
+diff --git a/hmp.c b/hmp.c
+index 8eec768088..9428c90c5d 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2380,7 +2380,7 @@ void hmp_screendump(Monitor *mon, const QDict *qdic=
+t)
+     int64_t head =3D qdict_get_try_int(qdict, "head", 0);
+     Error *err =3D NULL;
+=20
+-    qmp_screendump(filename, id !=3D NULL, id, id !=3D NULL, head, &err)=
+;
++    hmp_screendump_sync(filename, id !=3D NULL, id, id !=3D NULL, head, =
+&err);
+     hmp_handle_error(mon, &err);
+ }
+=20
+diff --git a/ui/console.c b/ui/console.c
+index 3a7f71021f..620cd14b80 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -32,6 +32,7 @@
+ #include "chardev/char-fe.h"
+ #include "trace.h"
+ #include "exec/memory.h"
++#include "monitor/monitor.h"
+=20
+ #define DEFAULT_BACKSCROLL 512
+ #define CONSOLE_CURSOR_PERIOD 500
+@@ -116,6 +117,12 @@ typedef enum {
+     TEXT_CONSOLE_FIXED_SIZE
+ } console_type_t;
+=20
++struct qmp_screendump {
++    gchar *filename;
++    QmpReturn *ret;
++    QLIST_ENTRY(qmp_screendump) link;
++};
++
+ struct QemuConsole {
+     Object parent;
+=20
+@@ -166,6 +173,8 @@ struct QemuConsole {
+     uint8_t out_fifo_buf[16];
+     QEMUTimer *kbd_timer;
+=20
++    QLIST_HEAD(, qmp_screendump) qmp_screendumps;
++
+     QTAILQ_ENTRY(QemuConsole) next;
  };
 =20
- struct QmpReturn {
-     QmpSession *session;
-     QDict *rsp;
-+    QTAILQ_ENTRY(QmpReturn) entry;
- };
+@@ -192,6 +201,8 @@ static void dpy_refresh(DisplayState *s);
+ static DisplayState *get_alloc_displaystate(void);
+ static void text_console_update_cursor_timer(void);
+ static void text_console_update_cursor(void *opaque);
++static void ppm_save(const char *filename, DisplaySurface *ds,
++                     Error **errp);
 =20
- /**
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 5f75dc27bd..4699a6715b 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -32,11 +32,24 @@ QmpReturn *qmp_return_new(QmpSession *session, const =
-QObject *request)
-         qdict_put_obj(qret->rsp, "id", id);
+ static void gui_update(void *opaque)
+ {
+@@ -258,8 +269,48 @@ static void gui_setup_refresh(DisplayState *ds)
+     ds->have_text =3D have_text;
+ }
+=20
++static void qmp_screendump_finish(QemuConsole *con, struct qmp_screendum=
+p *dump)
++{
++    Error *err =3D NULL;
++    DisplaySurface *surface;
++    Monitor *prev_mon =3D cur_mon;
++
++    if (qmp_return_is_cancelled(dump->ret)) {
++        goto cleanup;
++    }
++
++    cur_mon =3D qmp_return_get_monitor(dump->ret);
++    surface =3D qemu_console_surface(con);
++    if (!surface) {
++        error_setg(&err, "no surface");
++    } else {
++        /*
++         * FIXME: async save with coroutine? it would have to copy or
++         * lock the surface.
++         */
++        ppm_save(dump->filename, surface, &err);
++    }
++
++    if (err) {
++        qmp_return_error(dump->ret, err);
++    } else {
++        qmp_screendump_return(dump->ret);
++    }
++    cur_mon =3D prev_mon;
++
++cleanup:
++    g_free(dump->filename);
++    QLIST_REMOVE(dump, link);
++    g_free(dump);
++}
++
+ void graphic_hw_update_done(QemuConsole *con)
+ {
++    struct qmp_screendump *dump, *next;
++
++    QLIST_FOREACH_SAFE(dump, &con->qmp_screendumps, link, next) {
++        qmp_screendump_finish(con, dump);
++    }
+ }
+=20
+ void graphic_hw_update(QemuConsole *con)
+@@ -355,30 +406,41 @@ write_err:
+     goto out;
+ }
+=20
+-void qmp_screendump(const char *filename, bool has_device, const char *d=
+evice,
+-                    bool has_head, int64_t head, Error **errp)
++
++static QemuConsole *get_console(bool has_device, const char *device,
++                                bool has_head, int64_t head, Error **err=
+p)
+ {
+-    QemuConsole *con;
+-    DisplaySurface *surface;
++    QemuConsole *con =3D NULL;
+=20
+     if (has_device) {
+         con =3D qemu_console_lookup_by_device_name(device, has_head ? he=
+ad : 0,
+                                                  errp);
+-        if (!con) {
+-            return;
+-        }
+     } else {
+         if (has_head) {
+             error_setg(errp, "'head' must be specified together with 'de=
+vice'");
+-            return;
++            return NULL;
+         }
+         con =3D qemu_console_lookup_by_index(0);
+         if (!con) {
+             error_setg(errp, "There is no console to take a screendump f=
+rom");
+-            return;
+         }
      }
 =20
-+    qemu_mutex_lock(&session->pending_lock);
-+    QTAILQ_INSERT_TAIL(&session->pending, qret, entry);
-+    qemu_mutex_unlock(&session->pending_lock);
++    return con;
++}
 +
-     return qret;
- }
-=20
- void qmp_return_free(QmpReturn *qret)
- {
-+    QmpSession *session =3D qret->session;
++void hmp_screendump_sync(const char *filename,
++                         bool has_device, const char *device,
++                         bool has_head, int64_t head, Error **errp)
++{
++    DisplaySurface *surface;
++    QemuConsole *con =3D get_console(has_device, device, has_head, head,=
+ errp);
 +
-+    if (session) {
-+        qemu_mutex_lock(&session->pending_lock);
++    if (!con) {
++        return;
 +    }
-+    QTAILQ_REMOVE(&session->pending, qret, entry);
-+    if (session) {
-+        qemu_mutex_unlock(&session->pending_lock);
-+    }
-     qobject_unref(qret->rsp);
-     g_free(qret);
- }
-@@ -44,7 +57,9 @@ void qmp_return_free(QmpReturn *qret)
- void qmp_return(QmpReturn *qret, QObject *rsp)
- {
-     qdict_put_obj(qret->rsp, "return", rsp ?: QOBJECT(qdict_new()));
--    qret->session->return_cb(qret->session, qret->rsp);
-+    if (qret->session) {
-+        qret->session->return_cb(qret->session, qret->rsp);
-+    }
-     qmp_return_free(qret);
++    /* This may not complete the drawing with Spice, you may have
++     * glitches or outdated dumps, use qmp instead! */
+     graphic_hw_update(con);
+     surface =3D qemu_console_surface(con);
+     if (!surface) {
+@@ -389,6 +451,28 @@ void qmp_screendump(const char *filename, bool has_d=
+evice, const char *device,
+     ppm_save(filename, surface, errp);
  }
 =20
-@@ -55,7 +70,9 @@ void qmp_return_error(QmpReturn *qret, Error *err)
-     qdict_put_str(qdict, "desc", error_get_pretty(err));
-     qdict_put_obj(qret->rsp, "error", QOBJECT(qdict));
-     error_free(err);
--    qret->session->return_cb(qret->session, qret->rsp);
-+    if (qret->session) {
-+        qret->session->return_cb(qret->session, qret->rsp);
-+    }
-     qmp_return_free(qret);
- }
-=20
-@@ -219,17 +236,28 @@ void qmp_session_init(QmpSession *session,
-                              session, NULL);
-     session->cmds =3D cmds;
-     session->return_cb =3D return_cb;
-+    qemu_mutex_init(&session->pending_lock);
-+    QTAILQ_INIT(&session->pending);
- }
-=20
- void qmp_session_destroy(QmpSession *session)
- {
-+    QmpReturn *ret, *next;
++void qmp_screendump(const char *filename,
++                    bool has_device, const char *device,
++                    bool has_head, int64_t head,
++                    QmpReturn *qret)
++{
++    Error *err =3D NULL;
++    struct qmp_screendump *dump =3D NULL;
++    QemuConsole *con =3D get_console(has_device, device, has_head, head,=
+ &err);
 +
-     if (!session->return_cb) {
-         return;
-     }
-=20
-+    qemu_mutex_lock(&session->pending_lock);
-+    QTAILQ_FOREACH_SAFE(ret, &session->pending, entry, next) {
-+        ret->session =3D NULL;
-+        QTAILQ_REMOVE(&session->pending, ret, entry);
++    if (!con) {
++        qmp_return_error(qret, err);
++        return;
 +    }
-+    qemu_mutex_unlock(&session->pending_lock);
-     session->cmds =3D NULL;
-     session->return_cb =3D NULL;
-     json_message_parser_destroy(&session->parser);
-+    qemu_mutex_destroy(&session->pending_lock);
- }
-=20
- void qmp_dispatch(QmpSession *session, QObject *request, bool allow_oob)
++
++    dump =3D g_new(struct qmp_screendump, 1);
++    dump->filename =3D g_strdup(filename);
++    dump->ret =3D qret;
++    QLIST_INSERT_HEAD(&con->qmp_screendumps, dump, link);
++
++    graphic_hw_update(con);
++}
++
+ void graphic_hw_text_update(QemuConsole *con, console_ch_t *chardata)
+ {
+     if (!con) {
+@@ -1293,6 +1377,7 @@ static QemuConsole *new_console(DisplayState *ds, c=
+onsole_type_t console_type,
+     obj =3D object_new(TYPE_QEMU_CONSOLE);
+     s =3D QEMU_CONSOLE(obj);
+     s->head =3D head;
++    QLIST_INIT(&s->qmp_screendumps);
+     object_property_add_link(obj, "device", TYPE_DEVICE,
+                              (Object **)&s->device,
+                              object_property_allow_set_link,
 --=20
 2.21.0.196.g041f5ea1cf
