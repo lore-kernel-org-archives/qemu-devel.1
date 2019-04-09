@@ -2,70 +2,74 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40241C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF6EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 092702064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:49:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="EpZ2MK/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 092702064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E2702064B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 14:52:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2702064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42730 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42787 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDs45-0007uM-3d
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 10:49:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51431)
+	id 1hDs7O-0000Rb-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 10:52:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDs2y-0007K3-36
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:48:24 -0400
+	(envelope-from <mst@redhat.com>) id 1hDs6b-00007J-DC
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hDs2x-0002e6-9O
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:48:24 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:39194)
+	(envelope-from <mst@redhat.com>) id 1hDs6a-0004mH-9b
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:09 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:38209)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hDs2w-0002aU-JX; Tue, 09 Apr 2019 10:48:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=XhTAqjAJUo/n5OIbPeRjaAmmxG/4TL62kJWkaM5PBZU=; 
-	b=EpZ2MK/DwXSk7CvBV3QovNFlEhP4fER5Mp4KOOxpC56HBIftatUQl4DkEvZH3mRxv9ltD6prgqzUWL1DDJKN5Tczz6QFwFevXaYcqiXjDKy7MBlzuftViDCU6nPWygslNDh0p3SsO8umvIY9iiWL9OZlz07DwW6saoilYJBvtF/bYvT3EgEU/aaWhv9gfpiY6OgGFGJaBE7MqfRZspJWhqbrLiaeltWHZiUu1IapdQaEEpm82JVPudu9kbbo+K+kotZx13vQ/Cbp6hYNEhC8f4HeISawTUbxTpX6zIufFP1YpQr4OyFP2eu51L+nvx5D+QB6vVwV7iy8yfRtngifAA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hDs2s-0007RX-90; Tue, 09 Apr 2019 16:48:18 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hDs2s-0006iE-67; Tue, 09 Apr 2019 16:48:18 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"qemu-devel\@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-block\@nongnu.org" <qemu-block@nongnu.org>
-In-Reply-To: <e27a15f8-c299-7a08-3594-680aa1342b2b@virtuozzo.com>
-References: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554747741-918964-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w517ec345zb.fsf@maestria.local.igalia.com>
-	<e27a15f8-c299-7a08-3594-680aa1342b2b@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Tue, 09 Apr 2019 16:48:18 +0200
-Message-ID: <w514l7744lp.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hDs6a-0004k4-38
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:52:08 -0400
+Received: by mail-qk1-f196.google.com with SMTP id g1so10419064qki.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 07:52:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=GrqC0GrHfTETn5jCZw9IW6WZERNACzdc7ouz7UhgXdE=;
+	b=s0LSbl1POQHXXb2QQdwgEaHaRZd/1Nom43HxzhmNbGT7uhLEaE8vWRqQmzJjbUF1XA
+	dKl0//5ywSmRvpVMj9mEx7uYu5l0j/6CKXqKpBbuLveSYD68yHXUiI1bF+iaF7vEoMAe
+	Cl7VzOcxtFuBFJ1GyYfocQOaOkzRI79L/a6ELDScFdGwyp/5ZObUzXh+CtsUe8EBGavO
+	b0fsoffybuB5KarKInGP1OuWT1dWAMZZfkxeZNLOgMOCI7vfcdq1G/bFpBXFdfBYkfYw
+	wUrcesmwNIWkK95+TZalODtZoGzCRkkeFj1Ty/TRl/pFbuE0flb0/TBapcM+ZZSVMrES
+	Tx/A==
+X-Gm-Message-State: APjAAAU3PD9K9RCXH+3iYNMrTFEWk4gsY5/+z/hEk3ig0yFRxxdNx6rY
+	Pyo+Rd2ZqLX3Awl7ChY5OvAJLQ==
+X-Google-Smtp-Source: APXvYqy+nUMEzF69W8oc/NvGLBKiy+FUkdDUNGq6zp+YHzS5QHtu6sJcNEJO9m1mBeNTt7XAJ2XqiQ==
+X-Received: by 2002:a05:620a:126e:: with SMTP id
+	b14mr28228494qkl.49.1554821523813; 
+	Tue, 09 Apr 2019 07:52:03 -0700 (PDT)
+Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
+	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
+	k41sm27653037qtc.89.2019.04.09.07.52.02
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 09 Apr 2019 07:52:02 -0700 (PDT)
+Date: Tue, 9 Apr 2019 10:52:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Message-ID: <20190409102526-mutt-send-email-mst@kernel.org>
+References: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] block: include base when checking
- image chain for block allocation
+Content-Disposition: inline
+In-Reply-To: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.222.196
+Subject: Re: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at
+ the passthrough of NVMe SSD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,51 +81,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409144818.gNSBF9jIrODUvHlp_dRrbdWdmhDn5pjDdFqG7HxegAs@z>
+Message-ID: <20190409145200.cdAOkcCq1LwFh5d-SxbJxqf8R4P-5ciGodCx1gT0g9Q@z>
 
-On Tue 09 Apr 2019 04:43:12 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>> -    while (intermediate && intermediate != base) {
->>> +    while (include_base || intermediate != base) {
->>>           int64_t pnum_inter;
->>>           int64_t size_inter;
->>>   
->>> @@ -2360,6 +2364,10 @@ int bdrv_is_allocated_above(BlockDriverState *top,
->>>               n = pnum_inter;
->>>           }
->>>   
->>> +        if (intermediate == base) {
->>> +            break;
->>> +        }
->>> +
->>>           intermediate = backing_bs(intermediate);
->> 
->> I find that the new condition + the break make things a bit less
->> readable. I think it would be simpler with something like this:
->> 
->>     BlockDriverState *stop_at = include_base ? backing_bs(base) : base;
->> 
->>     while (intermediate != stop_at) {
->>        ...
->>     }
->> 
->
-> But in this way you return back dependence on base, which we don't
-> freeze and which may disappear on some iteration. We should not touch
-> backing_bs(base) in any way.
+On Tue, Apr 09, 2019 at 02:14:56PM +0000, Zhuangyanying wrote:
+> From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> 
+> Recently I tested the performance of NVMe SSD passthrough and found that interrupts
+> were aggregated on vcpu0(or the first vcpu of each numa) by /proc/interrupts,when
+> GuestOS was upgraded to sles12sp3 (or redhat7.6). But /proc/irq/X/smp_affinity_list
+> shows that the interrupt is spread out, such as 0-10, 11-21,.... and so on.
+> This problem cannot be resolved by "echo X > /proc/irq/X/smp_affinity_list", because
+> the NVMe SSD interrupt is requested by the API pci_alloc_irq_vectors(), so the
+> interrupt has the IRQD_AFFINITY_MANAGED flag.
+> 
+> GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X capable devices",
+> but the implementation of __setup_irq has no corresponding modification. It is still
+> irq_startup(), then setup_affinity(), that is sending an affinity message when the
+> interrupt is unmasked. The bare metal configuration is successful, but qemu will
+> not trigger the msix update, and the affinity configuration fails.
+> The affinity is configured by /proc/irq/X/smp_affinity_list, implemented at
+> apic_ack_edge(), the bitmap is stored in pending_mask,
+> mask->__pci_write_msi_msg()->unmask,
+> and the timing is guaranteed, and the configuration takes effect.
+> 
+> The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce affinity
+> setting on startup of managed irqs" to ensure that the affinity is first issued
+> and then __irq_startup(), for the managerred interrupt. So configuration is
+> successful.
+> 
+> It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
+> (3.10.0-957.10.1) does not have backport the patch yet.
+> "if (is_masked == was_masked) return;" can it be removed at qemu?
+> What is the reason for this check?
 
-Ok, I see.
+The reason is simple:
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+The PCI spec says:
 
-(feel free to edit the comment with my suggestion, or leave it as it is
-if you prefer)
+Software must not modify the Address or Data fields of an entry while it is unmasked.
 
-Berto
+It's a guest bug then?
+
+> 
+> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> ---
+>  hw/pci/msix.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index 4e33641..e1ff533 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
+>  {
+>      bool is_masked = msix_is_masked(dev, vector);
+>  
+> -    if (is_masked == was_masked) {
+> -        return;
+> -    }
+> -
+>      msix_fire_vector_notifier(dev, vector, is_masked);
+>  
+>      if (!is_masked && msix_is_pending(dev, vector)) {
+> -- 
+> 1.8.3.1
+> 
 
