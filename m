@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE40C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9032CC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1336F2133D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:12:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1336F2133D
+	by mail.kernel.org (Postfix) with ESMTPS id 521C721473
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 521C721473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45651 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45672 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtMU-0003l2-6d
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:12:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55468)
+	id 1hDtP1-0005z3-FX
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:15:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKa-000250-J9
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:42 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKj-0002J7-Jg
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKZ-0004V6-1l
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34958)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKi-0004b2-EZ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtKY-0004UY-Mg
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:38 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hDtKi-0004aO-2G
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E9E8130D8DA2;
-	Tue,  9 Apr 2019 16:10:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 511C9308FF0E;
+	Tue,  9 Apr 2019 16:10:47 +0000 (UTC)
 Received: from localhost (ovpn-112-27.ams2.redhat.com [10.36.112.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 74C8C1A917;
-	Tue,  9 Apr 2019 16:10:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AF6C45D9C9;
+	Tue,  9 Apr 2019 16:10:42 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 18:09:52 +0200
-Message-Id: <20190409161009.6322-4-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:09:54 +0200
+Message-Id: <20190409161009.6322-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 09 Apr 2019 16:10:37 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 09 Apr 2019 16:10:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 03/20] qmp: add QmpSession
+Subject: [Qemu-devel] [PATCH v4 05/20] QmpSession: add json parser and use
+ it in qga
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,334 +77,185 @@ Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409160952.v_Hjw8kKtSE8mGUH35SZg13gCZOR0EBj13oLCX5k1Pk@z>
+Message-ID: <20190409160954.0gar1GErqKfqUqmooQbXX5WD7qQrt8LGeCtqB2jaWcQ@z>
 
-This structure will hold various data related to a QMP client session:
-the list of commands, the parser, the callbacks, the pending
-operations...
+Move JSON parser to QmpSession, and implement a simple handler to check
+the parsed tokens and call qmp_dispatch(). This is enough for a simple
+QMP client, like QGA.
+
+The QEMU monitor has more complicated handling of dispatching which
+will be addressed in a following patch to benefit from more common
+code.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h | 10 +++++++++-
- monitor.c                   | 18 ++++++++++--------
- qapi/qmp-dispatch.c         | 15 ++++++++++++---
- qga/main.c                  |  5 ++++-
- tests/test-qmp-cmds.c       | 28 ++++++++++++++++++++++------
- 5 files changed, 57 insertions(+), 19 deletions(-)
+ include/qapi/qmp/dispatch.h |  7 +++++++
+ qapi/qmp-dispatch.c         | 19 +++++++++++++++++++
+ qga/main.c                  | 31 +------------------------------
+ 3 files changed, 27 insertions(+), 30 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 5a9cf82472..3b53cfd788 100644
+index d1ce631a93..c84edff7d2 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -37,10 +37,18 @@ typedef struct QmpCommand
+@@ -15,6 +15,7 @@
+ #define QAPI_QMP_DISPATCH_H
 =20
- typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpCommandList;
+ #include "qemu/queue.h"
++#include "qapi/qmp/json-parser.h"
 =20
-+typedef struct QmpSession QmpSession;
-+
-+struct QmpSession {
-+    const QmpCommandList *cmds;
-+};
-+
- void qmp_register_command(QmpCommandList *cmds, const char *name,
-                           QmpCommandFunc *fn, QmpCommandOptions options)=
-;
- const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
-                                    const char *name);
-+void qmp_session_init(QmpSession *session, const QmpCommandList *cmds);
-+void qmp_session_destroy(QmpSession *session);
+ typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
+=20
+@@ -42,6 +43,7 @@ typedef void (QmpDispatchReturn) (QmpSession *session, =
+QDict *rsp);
+=20
+ struct QmpSession {
+     const QmpCommandList *cmds;
++    JSONMessageParser parser;
+     QmpDispatchReturn *return_cb;
+ };
+=20
+@@ -52,6 +54,11 @@ const QmpCommand *qmp_find_command(const QmpCommandLis=
+t *cmds,
+ void qmp_session_init(QmpSession *session,
+                       const QmpCommandList *cmds,
+                       QmpDispatchReturn *return_cb);
++static inline void
++qmp_session_feed(QmpSession *session, const char *buf, size_t count)
++{
++    json_message_parser_feed(&session->parser, buf, count);
++}
+ void qmp_session_destroy(QmpSession *session);
  void qmp_disable_command(QmpCommandList *cmds, const char *name);
  void qmp_enable_command(QmpCommandList *cmds, const char *name);
-=20
-@@ -48,7 +56,7 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
- const char *qmp_command_name(const QmpCommand *cmd);
- bool qmp_has_success_response(const QmpCommand *cmd);
- QDict *qmp_error_response(Error *err);
--QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
-+QDict *qmp_dispatch(QmpSession *session, QObject *request,
-                     bool allow_oob);
- bool qmp_is_oob(const QDict *dict);
-=20
-diff --git a/monitor.c b/monitor.c
-index abc5bdc4ba..a07175b4f8 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -174,7 +174,7 @@ typedef struct {
-      * qmp_capabilities succeeds, we go into command mode, and
-      * @command becomes &qmp_commands.
-      */
--    const QmpCommandList *commands;
-+    QmpSession session;
-     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
-@@ -520,7 +520,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, =
-QDict *qdict)
-     trace_monitor_protocol_event_emit(event, qdict);
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
-         if (monitor_is_qmp(mon)
--            && mon->qmp.commands !=3D &qmp_cap_negotiation_commands) {
-+            && mon->qmp.session.cmds !=3D &qmp_cap_negotiation_commands)=
- {
-             qmp_send_response(mon, qdict);
-         }
-     }
-@@ -729,6 +729,7 @@ static void monitor_data_destroy(Monitor *mon)
-     g_free(mon->mon_cpu_path);
-     qemu_chr_fe_deinit(&mon->chr, false);
-     if (monitor_is_qmp(mon)) {
-+        qmp_session_destroy(&mon->qmp.session);
-         json_message_parser_destroy(&mon->qmp.parser);
-     }
-     readline_free(mon->rs);
-@@ -1090,7 +1091,7 @@ CommandInfoList *qmp_query_commands(Error **errp)
- {
-     CommandInfoList *list =3D NULL;
-=20
--    qmp_for_each_command(cur_mon->qmp.commands, query_commands_cb, &list=
-);
-+    qmp_for_each_command(cur_mon->qmp.session.cmds, query_commands_cb, &=
-list);
-=20
-     return list;
- }
-@@ -1207,7 +1208,7 @@ static bool qmp_caps_accept(Monitor *mon, QMPCapabi=
-lityList *list,
- void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-                           Error **errp)
- {
--    if (cur_mon->qmp.commands =3D=3D &qmp_commands) {
-+    if (cur_mon->qmp.session.cmds =3D=3D &qmp_commands) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "Capabilities negotiation is already complete, command=
- "
-                   "ignored");
-@@ -1218,7 +1219,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapab=
-ilityList *enable,
-         return;
-     }
-=20
--    cur_mon->qmp.commands =3D &qmp_commands;
-+    cur_mon->qmp.session.cmds =3D &qmp_commands;
- }
-=20
- /* Set the current CPU defined by the user. Callers must hold BQL. */
-@@ -4121,11 +4122,11 @@ static void monitor_qmp_dispatch(Monitor *mon, QO=
-bject *req)
-     old_mon =3D cur_mon;
-     cur_mon =3D mon;
-=20
--    rsp =3D qmp_dispatch(mon->qmp.commands, req, qmp_oob_enabled(mon));
-+    rsp =3D qmp_dispatch(&mon->qmp.session, req, qmp_oob_enabled(mon));
-=20
-     cur_mon =3D old_mon;
-=20
--    if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
-+    if (mon->qmp.session.cmds =3D=3D &qmp_cap_negotiation_commands) {
-         error =3D qdict_get_qdict(rsp, "error");
-         if (error
-             && !g_strcmp0(qdict_get_try_str(error, "class"),
-@@ -4399,7 +4400,7 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-=20
-     switch (event) {
-     case CHR_EVENT_OPENED:
--        mon->qmp.commands =3D &qmp_cap_negotiation_commands;
-+        qmp_session_init(&mon->qmp.session, &qmp_cap_negotiation_command=
-s);
-         monitor_qmp_caps_reset(mon);
-         data =3D qmp_greeting(mon);
-         qmp_send_response(mon, data);
-@@ -4414,6 +4415,7 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-          * is closed.
-          */
-         monitor_qmp_cleanup_queues(mon);
-+        qmp_session_destroy(&mon->qmp.session);
-         json_message_parser_destroy(&mon->qmp.parser);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-                                  mon, NULL);
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index f9d43046aa..98a82ac33c 100644
+index 37b058cf97..803ec626cd 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -163,15 +163,24 @@ bool qmp_is_oob(const QDict *dict)
+@@ -163,6 +163,23 @@ bool qmp_is_oob(const QDict *dict)
          && !qdict_haskey(dict, "execute");
  }
 =20
--QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
--                    bool allow_oob)
-+void qmp_session_init(QmpSession *session, const QmpCommandList *cmds)
++static void qmp_json_emit(void *opaque, QObject *obj, Error *err)
 +{
-+    session->cmds =3D cmds;
++    QmpSession *session =3D opaque;
++
++    assert(!obj !=3D !err);
++
++    if (err) {
++        QDict *rsp =3D qmp_error_response(err);
++        session->return_cb(session, rsp);
++        qobject_unref(rsp);
++    } else {
++        qmp_dispatch(session, obj, false);
++    }
++
++    qobject_unref(obj);
 +}
 +
-+void qmp_session_destroy(QmpSession *session)
-+{
-+    session->cmds =3D NULL;
-+}
-+
-+QDict *qmp_dispatch(QmpSession *session, QObject *request, bool allow_oo=
-b)
- {
-     Error *err =3D NULL;
-     QDict *dict =3D qobject_to(QDict, request);
-     QObject *ret, *id =3D dict ? qdict_get(dict, "id") : NULL;
-     QDict *rsp;
+ void qmp_session_init(QmpSession *session,
+                       const QmpCommandList *cmds,
+                       QmpDispatchReturn *return_cb)
+@@ -170,6 +187,7 @@ void qmp_session_init(QmpSession *session,
+     assert(return_cb);
+     assert(!session->return_cb);
 =20
--    ret =3D do_qmp_dispatch(cmds, request, allow_oob, &err);
-+    ret =3D do_qmp_dispatch(session->cmds, request, allow_oob, &err);
-     if (err) {
-         rsp =3D qmp_error_response(err);
-     } else if (ret) {
++    json_message_parser_init(&session->parser, qmp_json_emit, session, N=
+ULL);
+     session->cmds =3D cmds;
+     session->return_cb =3D return_cb;
+ }
+@@ -182,6 +200,7 @@ void qmp_session_destroy(QmpSession *session)
+=20
+     session->cmds =3D NULL;
+     session->return_cb =3D NULL;
++    json_message_parser_destroy(&session->parser);
+ }
+=20
+ void qmp_dispatch(QmpSession *session, QObject *request, bool allow_oob)
 diff --git a/qga/main.c b/qga/main.c
-index 5b144b9250..bf0082df90 100644
+index 2a929936db..9cd27fc4b8 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -74,6 +74,7 @@ typedef struct GAPersistentState {
- typedef struct GAConfig GAConfig;
+@@ -18,7 +18,6 @@
+ #include <syslog.h>
+ #include <sys/wait.h>
+ #endif
+-#include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qstring.h"
+@@ -75,7 +74,6 @@ typedef struct GAConfig GAConfig;
 =20
  struct GAState {
-+    QmpSession session;
-     JSONMessageParser parser;
+     QmpSession session;
+-    JSONMessageParser parser;
      GMainLoop *main_loop;
      GAChannel *channel;
-@@ -572,7 +573,7 @@ static void process_event(void *opaque, QObject *obj,=
- Error *err)
+     bool virtio; /* fastpath to check for virtio to deal with poll() qui=
+rks */
+@@ -567,31 +565,6 @@ static void dispatch_return_cb(QmpSession *session, =
+QDict *rsp)
      }
+ }
 =20
-     g_debug("processing command");
--    rsp =3D qmp_dispatch(&ga_commands, obj, false);
-+    rsp =3D qmp_dispatch(&s->session, obj, false);
-=20
- end:
-     ret =3D send_response(s, rsp);
-@@ -1338,6 +1339,7 @@ static GAState *initialize_agent(GAConfig *config, =
+-/* handle requests/control events coming in over the channel */
+-static void process_event(void *opaque, QObject *obj, Error *err)
+-{
+-    GAState *s =3D opaque;
+-    int ret;
+-
+-    g_debug("process_event: called");
+-    assert(!obj !=3D !err);
+-
+-    if (err) {
+-        QDict *rsp =3D qmp_error_response(err);
+-
+-        ret =3D send_response(s, rsp);
+-        if (ret < 0) {
+-            g_warning("error sending error response: %s", strerror(-ret)=
+);
+-        }
+-        qobject_unref(rsp);
+-    } else {
+-        g_debug("processing command");
+-        qmp_dispatch(&s->session, obj, false);
+-    }
+-
+-    qobject_unref(obj);
+-}
+-
+ /* false return signals GAChannel to close the current client connection=
+ */
+ static gboolean channel_event_cb(GIOCondition condition, gpointer data)
+ {
+@@ -607,7 +580,7 @@ static gboolean channel_event_cb(GIOCondition conditi=
+on, gpointer data)
+     case G_IO_STATUS_NORMAL:
+         buf[count] =3D 0;
+         g_debug("read data, count: %d, data: %s", (int)count, buf);
+-        json_message_parser_feed(&s->parser, (char *)buf, (int)count);
++        qmp_session_feed(&s->session, (char *)buf, (int)count);
+         break;
+     case G_IO_STATUS_EOF:
+         g_debug("received EOF");
+@@ -1346,7 +1319,6 @@ static GAState *initialize_agent(GAConfig *config, =
 int socket_activation)
+     s->command_state =3D ga_command_state_new();
      ga_command_state_init(s, s->command_state);
      ga_command_state_init_all(s->command_state);
-     json_message_parser_init(&s->parser, process_event, s, NULL);
-+    qmp_session_init(&s->session, &ga_commands);
+-    json_message_parser_init(&s->parser, process_event, s, NULL);
+     qmp_session_init(&s->session, &ga_commands, dispatch_return_cb);
 =20
  #ifndef _WIN32
-     if (!register_signal_handlers()) {
-@@ -1369,6 +1371,7 @@ static void cleanup_agent(GAState *s)
-     CloseHandle(s->wakeup_event);
- #endif
-     if (s->command_state) {
-+        qmp_session_destroy(&s->session);
+@@ -1382,7 +1354,6 @@ static void cleanup_agent(GAState *s)
+         qmp_session_destroy(&s->session);
          ga_command_state_cleanup_all(s->command_state);
          ga_command_state_free(s->command_state);
-         json_message_parser_destroy(&s->parser);
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 630b1b9bac..7c39ec1657 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -113,44 +113,52 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org=
-_qemu_x_EnumList *a,
- /* test commands with no input and no return value */
- static void test_dispatch_cmd(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(!qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- static void test_dispatch_cmd_oob(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "exec-oob", "test-flags-command");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), true);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), true);
-     assert(resp !=3D NULL);
-     assert(!qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- /* test commands that return an error due to invalid parameters */
- static void test_dispatch_cmd_failure(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *args =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "user_def_cmd2");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(qdict_haskey(resp, "error"));
-=20
-@@ -164,36 +172,44 @@ static void test_dispatch_cmd_failure(void)
-=20
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- static void test_dispatch_cmd_success_response(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "cmd-success-response");
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     g_assert_null(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
-+
- static QObject *test_qmp_dispatch(QDict *req)
- {
-+    QmpSession session =3D { 0, };
-     QDict *resp;
-     QObject *ret;
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    qmp_session_init(&session, &qmp_commands);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp && !qdict_haskey(resp, "error"));
-     ret =3D qdict_get(resp, "return");
-     assert(ret);
-     qobject_ref(ret);
-     qobject_unref(resp);
-+    qmp_session_destroy(&session);
-     return ret;
- }
-=20
+-        json_message_parser_destroy(&s->parser);
+     }
+     g_free(s->pstate_filepath);
+     g_free(s->state_filepath_isfrozen);
 --=20
 2.21.0.196.g041f5ea1cf
 
