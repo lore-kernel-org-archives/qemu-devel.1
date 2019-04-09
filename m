@@ -2,91 +2,64 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9398AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 18:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C78C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 18:02:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ECA22084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 18:02:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="az1hU0QR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ECA22084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 417A82084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 18:02:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417A82084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47215 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47217 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDv4Z-00034j-00
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 14:02:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52340)
+	id 1hDv4q-0003GJ-G5
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 14:02:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDv2r-0001qI-UY
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hDv2x-0001wP-0X
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDv2q-0000sG-RT
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:29 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hDv2q-0000qq-EC
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:28 -0400
-Received: by mail-io1-xd41.google.com with SMTP id x3so15087304iol.10
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 11:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=Z8lLfZiLcg6LEoesR38urw7MTigj4hb6aHy9NAQKqOE=;
-	b=az1hU0QREPcUBB5soJkUpnX+9r1SHXqJqhCpoKWtCA9uq/EN3IeeYLJtsQQUAX3HzI
-	hFFP9bDV2g+Lr/PFuUkBWWswNIG28cGB5fRIfQbugNnvvP8lp3bDXLwkxCLIdv0yOTkO
-	ThYQzg5rcpzTAWBVlrZs4vsrYEGxWP/+OnfufLP4jHhUaYba/aeeknfUtzaZ6OKwxoBT
-	Ex86NgRevAIW2RFnIxkqh5rOlgOoPyhMRDdUL2+Ps00IpC/oaJT1+FMUf8h1hfiHalqY
-	6bz5DG2CMSLaZPbZ2kyp87hyz8/Xvbr+3ZnVXuy15ZsgR0n6Yj0T8NUuNTTkxREac8p5
-	BS+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=Z8lLfZiLcg6LEoesR38urw7MTigj4hb6aHy9NAQKqOE=;
-	b=shsaQV84isassmNjuI8+w8JkEnf94hvKyVqYlrnSE1TFplYvgs5CvHMvHFsvGa3FGI
-	T9ZC3W5MKBFF1Thgvpr0GGvoyh+2fZGs64U2LoXoSQu2OpfrY0YRCiIpa4/BtB6L8R3z
-	vgQzjPb6TitcfpsozndnJqY3Or6FXpCyoBUEXhDBYhtyk7b5jXy6EZSYLKouHg1ocgmO
-	VOO9RIfaH46yL8vrRy+qIfFiE1iJP+9x4yKi8AY0WBRCMpG/Uk5sJN7zufbz5XKR60Y4
-	3893dBW1Z1eTpfjgp0bbVlcHsruzSRAYxi+mI8PxY3u8aDrwk4UjW1xJw+DBD77Iywlq
-	bp8g==
-X-Gm-Message-State: APjAAAWSFw61+/w8IVdU1P6i3Kb6KULH7s8ZeGRoRXeazTlurW+kRp9S
-	m/Vx2HF2npEUlOHr2EQZIc/7dw==
-X-Google-Smtp-Source: APXvYqz1C6dDC7IJvkyUc0ARl8WmNNmr5T4zx75cyMssYJTdSnUFsXXS8deb4r5vC5pOVmhcSlFVjQ==
-X-Received: by 2002:a5d:85d5:: with SMTP id e21mr2765311ios.27.1554832827663; 
-	Tue, 09 Apr 2019 11:00:27 -0700 (PDT)
-Received: from ip-70-93.wireless.oberlin.edu (ip-70-93.wireless.oberlin.edu.
-	[132.162.70.93]) by smtp.gmail.com with ESMTPSA id
-	m81sm7246254itm.33.2019.04.09.11.00.26
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 11:00:26 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hDv2v-0000wI-Nf
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hDv2v-0000vk-AM
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 14:00:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8361FC0586D8
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 18:00:32 +0000 (UTC)
+Received: from work-vm (ovpn-117-233.ams2.redhat.com [10.36.117.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B04145D71F;
+	Tue,  9 Apr 2019 18:00:31 +0000 (UTC)
+Date: Tue, 9 Apr 2019 19:00:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190409180028.GE2964@work-vm>
+References: <20190408083627.7479-1-armbru@redhat.com>
+	<20190408083627.7479-13-armbru@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
-Date: Tue, 9 Apr 2019 14:00:24 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <625D0D17-9BBA-444F-8204-A182B04238EC@oberlin.edu>
-References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
-	<6cf20899-f643-950b-37b9-dcc47df0d72e@redhat.com>
-	<5C484463-F00B-4EC0-9272-DC23CEE8F376@oberlin.edu>
-	<0437475a-10ff-b8e0-3914-536a78f99b6e@redhat.com>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-X-Mailer: Apple Mail (2.3445.102.3)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
-Subject: Re: [Qemu-devel] [PATCH 00/10] block/pflash_cfi02: Implement
- missing AMD pflash functionality
+Content-Disposition: inline
+In-Reply-To: <20190408083627.7479-13-armbru@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 09 Apr 2019 18:00:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 12/15] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,64 +71,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409180024.NKSLTUcrg1g4I8zmwhLUk9KhNtz6SIGU1OZEf89ut-E@z>
+Message-ID: <20190409180029.JtQbVJGxsfvakKFTfabTW0rO7KNBqVUDf6bJmQ_0S5s@z>
 
+* Markus Armbruster (armbru@redhat.com) wrote:
+> We commonly want to print to the current monitor if we have one, else
+> to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+> we have is monitor_vfprintf(), which is rather unwieldy.  We often
+> print to stderr just because error_printf() is easier.
+> 
+> New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+> next commits will put them to use.
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
+OK, it seems a little odd not to have the fprintf as well, but OK.
 
-On Apr 9, 2019, at 12:15, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Since you did changes in the CFI table, I think we should add a tests
-> verifying the table is correctly generated for all you FlashConfig =
-entries.
-
-That's a good idea. Some of the values are essentially arbitrary (e.g., =
-how long an erase typically takes) but the CFI values that indicate =
-support for erase/suspend and erase regions at least should be tested. =
-I'll take a closer look at what all I changed (it has been a few months =
-since I wrote the code). Are there any in particular you think I should =
-be sure to test? Do you want me to add those tests to the appropriate =
-patches in the series or would you like an additional patch that adds =
-those tests? (The later is easier to do as modifying the earlier patches =
-in the series are likely to cause conflicts with later patches that I'd =
-need to resolve, but I can do either.)
-
-> I suppose you can not share the firmware binary. Can you share these
-> unlock addresses? Maybe once I reviewed carefully your series I might
-> ask you the (pflash) trace event output.
-
-I probably cannot share the binary but the unlock addresses are 0x1554 =
-and 0x2AA8. This is for two interleaved x8/x16 chips in x16 mode so =
-shifting right by 2 (1 for the interleaving and 1 because it's an x16 =
-chip) gives 0x555 and 0xAAA. The appropriate (word) unlock addresses for =
-the chips are 0x555 and 0x2AA which is what you get if you restrict to =
-11 bits.
-
-My guess is that the firmware authors took the byte unlock addresses =
-(0xAAA and 0x555), shifted left by 2, discovered that this didn't work, =
-tried the unlock addresses in the opposite order, and found that that =
-worked due to the chips only looking at 11 bits.
-
-Looking at hw/arm/musicpal.c, I see that it is using unlock addresses =
-0x5555 and 0x2AAA. My guess is this reflects a bug in some firmware and =
-it should be using 0x555 and 0x2AA. I haven't seen any AMD pflash chips =
-that used other unlock addresses, but I've only looked at about a dozen =
-part sheets and I'm not sure what chips the musicpal is actually using.
-
-
---=20
-Stephen Checkoway
-
-
-
-
-
+> ---
+>  MAINTAINERS               |  2 ++
+>  include/qemu/qemu-print.h | 19 ++++++++++++++++++
+>  stubs/monitor.c           |  5 +++++
+>  util/Makefile.objs        |  1 +
+>  util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 69 insertions(+)
+>  create mode 100644 include/qemu/qemu-print.h
+>  create mode 100644 util/qemu-print.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac8ab..1aa19dc4ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1895,6 +1895,8 @@ F: hmp.[ch]
+>  F: hmp-commands*.hx
+>  F: include/monitor/hmp-target.h
+>  F: tests/test-hmp.c
+> +F: include/qemu/qemu-print.h
+> +F: util/qemu-print.c
+>  
+>  Network device backends
+>  M: Jason Wang <jasowang@redhat.com>
+> diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+> new file mode 100644
+> index 0000000000..8fed32bf42
+> --- /dev/null
+> +++ b/include/qemu/qemu-print.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_PRINT_H
+> +#define QEMU_PRINT_H
+> +
+> +int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> +
+> +#endif
+> diff --git a/stubs/monitor.c b/stubs/monitor.c
+> index b57fe6c32f..b2ea975e40 100644
+> --- a/stubs/monitor.c
+> +++ b/stubs/monitor.c
+> @@ -6,6 +6,11 @@
+>  
+>  __thread Monitor *cur_mon;
+>  
+> +int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+> +{
+> +    abort();
+> +}
+> +
+>  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+>  {
+>      error_setg(errp, "only QEMU supports file descriptor passing");
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 835fcd69e2..9206878dec 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -23,6 +23,7 @@ util-obj-y += bitmap.o bitops.o hbitmap.o
+>  util-obj-y += fifo8.o
+>  util-obj-y += cacheinfo.o
+>  util-obj-y += error.o qemu-error.o
+> +util-obj-y += qemu-print.o
+>  util-obj-y += id.o
+>  util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+>  util-obj-y += qemu-option.o qemu-progress.o
+> diff --git a/util/qemu-print.c b/util/qemu-print.c
+> new file mode 100644
+> index 0000000000..86f9417af8
+> --- /dev/null
+> +++ b/util/qemu-print.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Print to stream or current monitor
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  Markus Armbruster <armbru@redhat.com>,
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "monitor/monitor.h"
+> +#include "qemu/qemu-print.h"
+> +
+> +/*
+> + * Print like vprintf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_vprintf(const char *fmt, va_list ap)
+> +{
+> +    if (cur_mon) {
+> +        return monitor_vprintf(cur_mon, fmt, ap);
+> +    }
+> +    return vprintf(fmt, ap);
+> +}
+> +
+> +/*
+> + * Print like printf().
+> + * Print to current monitor if we have one, else to stdout.
+> + */
+> +int qemu_printf(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    int ret;
+> +
+> +    va_start(ap, fmt);
+> +    ret = qemu_vprintf(fmt, ap);
+> +    va_end(ap);
+> +    return ret;
+> +}
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
