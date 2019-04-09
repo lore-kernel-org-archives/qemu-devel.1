@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40806)
+Received: from eggs.gnu.org ([209.51.188.92]:46577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsfg-0008Ng-Jt
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:25 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoN-0003DT-Jn
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsfd-0001L7-VN
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:24 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45266)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoL-00006a-Sf
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:23 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDsfc-0001AS-Q2
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:21 -0400
-Received: by mail-oi1-x243.google.com with SMTP id y84so13859576oia.12
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:28:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190409134536.15548-1-philmd@redhat.com>
-	<CAFEAcA9pc3Dw_X5b74+av0qq5hM7wB4uixSuh_TLwHAm8eGsqA@mail.gmail.com>
-	<e89332f2-1673-5192-6ad1-b4ade1b458eb@redhat.com>
-In-Reply-To: <e89332f2-1673-5192-6ad1-b4ade1b458eb@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Apr 2019 16:27:59 +0100
-Message-ID: <CAFEAcA8xexPWoBdQDYy8SsOD+OfoMSh=yHC-11DOcN5jp6888g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 0/2] roms: Avoid iPXE/EDK2
- EFIROM variable clash, pass CFLAGS to EDK2 build tools
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hDsoK-0008TB-2Q
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:21 -0400
+Received: by mail-io1-xd42.google.com with SMTP id v4so14682909ioj.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:37:13 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+In-Reply-To: <9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
+Date: Tue, 9 Apr 2019 11:37:10 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <98B3F0C7-6554-4455-B441-86605DA5D6C1@oberlin.edu>
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+	<c03b48badb28e3c98bcbaed092b5c40e7284db08.1554755001.git.stephen.checkoway@oberlin.edu>
+	<9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/10] block/pflash_cfi02: Add test for
+ supported commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Olaf Hering <olaf@aepfle.de>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 9 Apr 2019 at 16:25, Laszlo Ersek <lersek@redhat.com> wrote:
->
-> On 04/09/19 16:00, Peter Maydell wrote:
-> > Thanks. This is one of a handful of remaining bugs we
-> > should fix for 4.0, so I would ideally like to get this
-> > in rc3 today (or tomorrow if we have to slip rc3 a day).
-> > If people wanting to review this series could do so
-> > promptly I'd definitely appreciate it.
->
-> I hope I was quick enough.
 
-Yep, thanks. (I knew you'd had comments on v1 so I was
-assuming you'd want to review v2.)
 
-thanks
--- PMM
+On Apr 9, 2019, at 02:13, Thomas Huth <thuth@redhat.com> wrote:
+
+> We'd like to get rid of global_qtest in the long run (since it is
+> causing trouble for tests that run multiple instances of QEMU in
+> parallel, e.g. migration tests)... so if it is feasible, please don't
+> use it in new code anymore. Try to use a local variable in the =
+function
+> that call qtest_initf() and pass the test state around via a parameter
+> to the functions that need it.
+
+One of the patches introduces a FlashConfig structure which gets passed =
+around to all the functions. I could stuff the local qtest in there. The =
+earlier patches would still use global_qtest. Would that be acceptable =
+or would you prefer that global_qtest not appear in any of the patches?
+
+Or rather than putting it in the FlashConfig struct, I could just pass a =
+separate parameter around. Whatever you prefer.
+
+--=20
+Stephen Checkoway
