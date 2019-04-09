@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56286)
+Received: from eggs.gnu.org ([209.51.188.92]:59536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1hDoba-0004wy-1M
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:54 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hDoqY-00075w-Ou
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1hDobZ-00078w-4s
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:54 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28595)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hDobY-00071L-Q0
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:07:53 -0400
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Tue, 09 Apr 2019 12:56:18 +0200
+	(envelope-from <stefanha@gmail.com>) id 1hDoqT-0000cO-LI
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:23:22 -0400
+Date: Tue, 9 Apr 2019 12:18:52 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190409111852.GC16944@stefanha-x1.localdomain>
+References: <20190406040422.5276-1-aruna.15@cse.mrt.ac.lk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190409110732.5C5FF7465DB@zero.eik.bme.hu>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ati-vga: Fix check for blt outside vram
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="iFRdW5/EC4oqxDHL"
+Content-Disposition: inline
+In-Reply-To: <20190406040422.5276-1-aruna.15@cse.mrt.ac.lk>
+Subject: Re: [Qemu-devel] [PATCH 4/4] Header cleanups: Removed unwanted
+ includes from cpu-common.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Andrew Randrianasulu <randrianasulu@gmail.com>
+To: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Fix the check preventing calling pixman functions that would access
-memory outside allocated vram. The r128 X driver sometimes seem to try
-blits that span outside vram, this check prevents crashing QEMU in
-that case. (The r128 X driver may have problems even on real hardware
-so I'm not sure if it's a client bug or emulation problem but at least
-QEMU should survive.)
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
----
- hw/display/ati_2d.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+--iFRdW5/EC4oqxDHL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
-index bc98ba6eeb..fe3ae14864 100644
---- a/hw/display/ati_2d.c
-+++ b/hw/display/ati_2d.c
-@@ -79,10 +79,10 @@ void ati_2d_blt(ATIVGAState *s)
-                 s->regs.dst_width, s->regs.dst_height);
-         end =3D s->vga.vram_ptr + s->vga.vram_size;
-         if (src_bits >=3D end || dst_bits >=3D end ||
--            src_bits + (s->regs.src_y + s->regs.dst_height) * src_stride=
- +
--            s->regs.src_x >=3D end ||
--            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_stride=
- +
--            s->regs.dst_x >=3D end) {
-+            src_bits + s->regs.src_x + (s->regs.src_y + s->regs.dst_heig=
-ht) *
-+            src_stride * sizeof(uint32_t) >=3D end ||
-+            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_heig=
-ht) *
-+            dst_stride * sizeof(uint32_t) >=3D end) {
-             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n=
-");
-             return;
-         }
-@@ -140,8 +140,8 @@ void ati_2d_blt(ATIVGAState *s)
-                 filler);
-         end =3D s->vga.vram_ptr + s->vga.vram_size;
-         if (dst_bits >=3D end ||
--            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_stride=
- +
--            s->regs.dst_x >=3D end) {
-+            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_heig=
-ht) *
-+            dst_stride * sizeof(uint32_t) >=3D end) {
-             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n=
-");
-             return;
-         }
---=20
-2.13.7
+On Sat, Apr 06, 2019 at 09:34:22AM +0530, Aruna Jayasena wrote:
+> Removed unwanted includes from cpu-common.h
+> This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+>=20
+> Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+> ---
+>  include/exec/cpu-common.h | 2 --
+>  1 file changed, 2 deletions(-)
+
+Hi Aruna,
+I'd like to review and apply your patches.  It's a little difficult
+to understand the structure since there are several email threads with
+subject lines ("PATCH 4/4") that imply a relationship, but they were
+sent on different dates.
+
+The usual structure of the first patch submission is:
+
+  [PATCH 0/4] qemu-common.h: clean up qemu-common.h
+  +--- [PATCH 1/4] qemu-common.h: drop unused includes in util/
+  +--- [PATCH 2/4] ...
+  +--- [PATCH 3/4] ...
+  +--- [PATCH 4/4] ...
+
+Here PATCH 0 is a cover letter that describes the purpose of this patch
+series.  The actual patches (1, 2, 3, and 4) are part of the email
+thread started by the cover letter.  This relationship allows tools to
+treat the emails as a single patch series and it makes it easier for
+human reviewers to review your patches in their inbox.
+
+If you send a new revision of the patch series to address code review
+feedback:
+
+  [PATCH v2 0/4] qemu-common.h: clean up qemu-common.h
+  +--- [PATCH v2 1/4] qemu-common.h: drop unused includes in util/
+  +--- [PATCH v2 2/4] ...
+  +--- [PATCH v2 3/4] ...
+  +--- [PATCH v2 4/4] ...
+
+The "v2" revision number indicates that this series obsoletes the first
+patch submission.
+
+Please resend your patches and follow this structure.  You can use
+git-send-email --thread --no-chain-reply-to master.. to send the patch
+series.  Normally --thread and --no-chain-reply-to are defaults and you
+don't have to specify them explicitly.
+
+If you need help, feel free to ping me on IRC.  You may find it useful
+to send the email to yourself as a test first before sending to
+qemu-devel@nongnu.org.
+
+Stefan
+
+--iFRdW5/EC4oqxDHL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcrH+cAAoJEJykq7OBq3PIdXYH/0Ry2IGRPtOjpvHkAJoS4VyR
+ycCZ8cGS6rR7qOCKP/9BKOBdx71qAyAcp2EFtd1HYYAm28J3XXVaSnpcaDZ3q3ir
+dBo/JH/z/WhsGLM8guNtlwiE//we2zCyAJWJgC6dGFZ5EuvsIBsWmiqJkopM+SZG
+LIrT+DjgCNKSKJBJI31vwDL+OkqDsHtAYDc0cjQ/nKpkE95D6teAo9jyYye3QU9j
+jsJicjSWbsfvk52SUCMIDtNjz96zJvYaMn/1vyhL6xiOm9lXRwYUEjI5WAFm4mRl
+uLxMiYY9SMrEEMmkrKJbPvW7BnTkAYKFnsKiP11Rwns/zO2i/p8MdOBnW2YPXSA=
+=n19E
+-----END PGP SIGNATURE-----
+
+--iFRdW5/EC4oqxDHL--
