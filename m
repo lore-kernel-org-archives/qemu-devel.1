@@ -2,87 +2,84 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD75C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DDAC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAC982084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:35:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF7352084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:36:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4GWWyRV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAC982084F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7cEk/yY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7352084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46132 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46140 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtif-0005dZ-5q
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:35:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59286)
+	id 1hDtjt-0006U7-8T
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:36:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWm-0004a9-4s
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:17 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtic-0005kL-Lj
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWk-0003VE-V7
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:16 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37291)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtib-0003cV-OA
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:35:30 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:37486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hDtWk-0003UF-Kr
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:14 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w10so21725274wrm.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:14 -0700 (PDT)
+	id 1hDtib-0003XB-DR
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:35:29 -0400
+Received: by mail-wm1-x333.google.com with SMTP id v14so4088255wmf.2
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=yuUuDxVVhvaliOcBi/FPf1oamn6ohJyWlwtQJvK0xe8=;
-	b=N4GWWyRVPkOCIEtChuIdzWi/gK31m5rK10iK9ZaAWO97j9DaFYcfm6JDajGcU1ew4s
-	JQPAnx1jsD60XBJE1ShWdWZ+iOdtFf00hqSF4hFZIU/j3n2WjVRZzI0VP4/t+26zJuCT
-	SqI9HvbMg+C1cI7Xz/CEvSwqwDRd6qpXGTiE8Br30VkJehRuepMmTqAe8kJ4NOxgBJGm
-	c6S7xb0G7ruQr7CVLpAZOXB3pJpgYodBbZgMk/bDxy/J1k4PBxbdmEbfLd6CJ7k27xNM
-	3caU0LRscSLtczz1FlXiU/+C7z8QtHNUeywyp8VJfwryy/C/AkJLJHiRbUTwlH/3L6tV
-	oj4g==
+	h=sender:from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=0JtibV0dwo7Z7MQLq0lSRy0Pvf+3oj7T/AI7AlsTmbE=;
+	b=X7cEk/yYpohDdeFf9DLrptj1VDJfy618EWkolNfWmqScyYTCd/SlHMbjUeBvStG2hm
+	+UBaQphNztpuvJDXCIafGBcANMv1mvmlfpMiRBNGnNDQbjyv5Jzo01tBLxSj/Fni6vIk
+	rHXJu1e8w8PpKwUVGOXNJKdM8b8gNUQducwT+Jxg9OUTJwJEBsp28qtQzgI32TqL60NN
+	1KjyYiqhedmCJUurYScFRtc+FSna/zK5Lpc6+9ZOTRai7gCRVip7KlfwuNv6Be9N5SqQ
+	j66XFC2VYTZukJ6QayZ3q5AcHWt+YBEqKLvBM/p56TueuyUIIsoUbN+ZfUUMWxhYqnD0
+	iDNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=yuUuDxVVhvaliOcBi/FPf1oamn6ohJyWlwtQJvK0xe8=;
-	b=i7dI8xjNL3PBb44Z2O6q7ru0j0YHzMyK+hvGR7c51Hj/hmBma6Hs4q/sRI4DCXDg19
-	HJxfy1UGoHFbOq8WH4NZ6nTVAkZe5MwPKVGutsCzRRwTjJrNOE+Cw51rd3n3klTpw3ua
-	BLVIHA31tkj1Bm+c/665p0zCDb5Ga9Kr7v/42QOXt4sQI57qFgUShqHlN7OtkNkeiZRW
-	jlGH60ojcI1B8BUO6FoGZ4XB856tzSHzrtV/Wz7wXEn7xYosQqc70E49SfMu1dS93FLs
-	S7eBLHt1HKjK73bex6zOIWiI4StG5flrPFEqK/JOxTiEmIg7iSL545iDblKYv4oW2Ss7
-	8xfw==
-X-Gm-Message-State: APjAAAWtjrNFskEWRkrEr+CGpGbcfP5kV+c6va11xZkXJI0bohLT4wOW
-	unLZxmdytMwKtIY+PsW4aWifapgT
-X-Google-Smtp-Source: APXvYqwB92SFss/xtg++wewUs//c6kiLVdJUnKMqeDvX4zxz5533S6r4vV2zO6tDf3ZEJUzZlS4ieA==
-X-Received: by 2002:a5d:458f:: with SMTP id p15mr23213671wrq.188.1554826993397;
-	Tue, 09 Apr 2019 09:23:13 -0700 (PDT)
+	h=x-gm-message-state:sender:from:to:subject:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=0JtibV0dwo7Z7MQLq0lSRy0Pvf+3oj7T/AI7AlsTmbE=;
+	b=cASEedwjhShjfitJ7MSqHgB5N6Q9b8ygB1Mp3vHgPleNEOYFtG1019yilxxX8Rhbzp
+	RvQDC2HVYOsCuKPJBLT7W/mGbHleVJ/SvUulXQnvgFH6fNVjbrj1+GQyZe4iwTfdJp0o
+	+WiNhNVa+j2/jh9gOqqGVzKhA0txJtTOQdsty1l9Hb3Nt2TGqJ6q086N+HVEpKgZzcyC
+	RqdqlYL8UCKx7lR7vqgrRR+lDHW93mZwlIfF+DHlSPfz0lNtB5C9xxT9RD0bpVLpZvyH
+	gcen9zi4am6I1ZJTZVoqgw7SHM/JXbwadQZpJB4vsfcjEs+uHZ9AQw+/n9Gmhfg0XZMf
+	uXDA==
+X-Gm-Message-State: APjAAAWzb7K++OOrYlkoEb8D56YytWFsynoKXYdkPDb+eq0OzrVVgUwS
+	jvw4eYDAiOIXzlnqitlmjXZWqpVv
+X-Google-Smtp-Source: APXvYqxGTblp0CIiDewR7fwRhE+8WZp9kDrELmI+3mD41kwxarw2eMOvg8kLZM3sAyuLguWKZgd16A==
+X-Received: by 2002:a1c:7e55:: with SMTP id z82mr6942694wmc.11.1554827721553; 
+	Tue, 09 Apr 2019 09:35:21 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	e1sm59579736wrw.66.2019.04.09.09.23.12
+	l23sm13312650wmj.10.2019.04.09.09.35.20 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 09:23:12 -0700 (PDT)
+	Tue, 09 Apr 2019 09:35:20 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 18:23:04 +0200
-Message-Id: <1554826986-37164-4-git-send-email-pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 18:35:19 +0200
+Message-Id: <1554827719-10184-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
-References: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PULL 3/5] include/qemu/bswap.h: Use
- __builtin_memcpy() in accessor functions
+X-Received-From: 2a00:1450:4864:20::333
+Subject: [Qemu-devel] [PULL v3 0/5] Misc patches for QEMU 5.0-rc3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,126 +91,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409162304.jZVDUHe4vNolQ-icVmZ6yENVvsyVAb24YU0GUe7E1lM@z>
+Message-ID: <20190409163519.KzYl-Oa8Ykdz133HaFTOjJ73u3EysQ4A9X0fI2gNhQg@z>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+The following changes since commit 248987f92cfda8305d6d44ced23e173e62a8bc0e:
 
-In the accessor functions ld*_he_p() and st*_he_p() we use memcpy()
-to perform a load or store to a pointer which might not be aligned
-for the size of the type. We rely on the compiler to optimize this
-memcpy() into an efficient load or store instruction where possible.
-This is required for good performance, but at the moment it is also
-required for correct operation, because some users of these functions
-require that the access is atomic if the pointer is aligned, which
-will only be the case if the compiler has optimized out the memcpy().
-(The particular example where we discovered this is the virtio
-vring_avail_idx() which calls virtio_lduw_phys_cached() which
-eventually ends up calling lduw_he_p().)
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-04-09 10:02:30 +0100)
 
-Unfortunately some compile environments, such as the fortify-source
-setup used in Alpine Linux, define memcpy() to a wrapper function
-in a way that inhibits this compiler optimization.
+are available in the git repository at:
 
-The correct long-term fix here is to add a set of functions for
-doing atomic accesses into AddressSpaces (and to other relevant
-families of accessor functions like the virtio_*_phys_cached()
-ones), and make sure that callsites which want atomic behaviour
-use the correct functions.
 
-In the meantime, switch to using __builtin_memcpy() in the
-bswap.h accessor functions. This will make us robust against things
-like this fortify library in the short term. In the longer term
-it will mean that we don't end up with these functions being really
-badly-performing even if the semantics of the out-of-line memcpy()
-are correct.
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-Reported-by: Fernando Casas Schössow <casasfernando@outlook.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190318112938.8298-1-peter.maydell@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/qemu/bswap.h | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+for you to fetch changes up to 3e20c81ed87cb15cd04f929b075e244e0758641a:
 
-diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-index 5a70f78..2a9f3fe 100644
---- a/include/qemu/bswap.h
-+++ b/include/qemu/bswap.h
-@@ -316,51 +316,57 @@ static inline void stb_p(void *ptr, uint8_t v)
-     *(uint8_t *)ptr = v;
- }
- 
--/* Any compiler worth its salt will turn these memcpy into native unaligned
--   operations.  Thus we don't need to play games with packed attributes, or
--   inline byte-by-byte stores.  */
-+/*
-+ * Any compiler worth its salt will turn these memcpy into native unaligned
-+ * operations.  Thus we don't need to play games with packed attributes, or
-+ * inline byte-by-byte stores.
-+ * Some compilation environments (eg some fortify-source implementations)
-+ * may intercept memcpy() in a way that defeats the compiler optimization,
-+ * though, so we use __builtin_memcpy() to give ourselves the best chance
-+ * of good performance.
-+ */
- 
- static inline int lduw_he_p(const void *ptr)
- {
-     uint16_t r;
--    memcpy(&r, ptr, sizeof(r));
-+    __builtin_memcpy(&r, ptr, sizeof(r));
-     return r;
- }
- 
- static inline int ldsw_he_p(const void *ptr)
- {
-     int16_t r;
--    memcpy(&r, ptr, sizeof(r));
-+    __builtin_memcpy(&r, ptr, sizeof(r));
-     return r;
- }
- 
- static inline void stw_he_p(void *ptr, uint16_t v)
- {
--    memcpy(ptr, &v, sizeof(v));
-+    __builtin_memcpy(ptr, &v, sizeof(v));
- }
- 
- static inline int ldl_he_p(const void *ptr)
- {
-     int32_t r;
--    memcpy(&r, ptr, sizeof(r));
-+    __builtin_memcpy(&r, ptr, sizeof(r));
-     return r;
- }
- 
- static inline void stl_he_p(void *ptr, uint32_t v)
- {
--    memcpy(ptr, &v, sizeof(v));
-+    __builtin_memcpy(ptr, &v, sizeof(v));
- }
- 
- static inline uint64_t ldq_he_p(const void *ptr)
- {
-     uint64_t r;
--    memcpy(&r, ptr, sizeof(r));
-+    __builtin_memcpy(&r, ptr, sizeof(r));
-     return r;
- }
- 
- static inline void stq_he_p(void *ptr, uint64_t v)
- {
--    memcpy(ptr, &v, sizeof(v));
-+    __builtin_memcpy(ptr, &v, sizeof(v));
- }
- 
- static inline int lduw_le_p(const void *ptr)
+  tests: Make check-block a phony target (2019-04-09 18:34:21 +0200)
+
+----------------------------------------------------------------
+* fixes for Alpine and SuSE
+* fix crash when hot-plugging nvdimm on older machine types
+
+----------------------------------------------------------------
+Markus Armbruster (1):
+      tests: Make check-block a phony target
+
+Peter Maydell (1):
+      include/qemu/bswap.h: Use __builtin_memcpy() in accessor functions
+
+Philippe Mathieu-Daudé (2):
+      roms: Rename the EFIROM variable to avoid clashing with iPXE
+      roms: Allow passing configure options to the EDK2 build tools
+
+Thomas Huth (1):
+      hw/i386/pc: Fix crash when hot-plugging nvdimm on older machine types
+
+ hw/i386/pc.c           |  9 +++++++--
+ include/qemu/bswap.h   | 26 ++++++++++++++++----------
+ roms/Makefile          | 23 ++++++++++++++++++-----
+ tests/Makefile.include |  2 +-
+ 4 files changed, 42 insertions(+), 18 deletions(-)
 -- 
 1.8.3.1
-
-
 
