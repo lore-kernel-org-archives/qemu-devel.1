@@ -3,64 +3,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7002C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8AFC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8342A20830
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:03:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8342A20830
+	by mail.kernel.org (Postfix) with ESMTPS id 404A320830
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 23:05:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404A320830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50215 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50230 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDzmR-0007TR-Nn
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 19:03:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47794)
+	id 1hDzns-0000AU-Ed
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 19:05:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzjm-0005d8-UB
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:07 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDzjR-0005KR-53
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzjl-0001Rn-9A
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22464)
+	(envelope-from <lersek@redhat.com>) id 1hDzjQ-0001Bz-6n
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjk-0001ON-S9
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:05 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjP-0001BX-V5
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:44 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3C50C02492F;
-	Tue,  9 Apr 2019 23:01:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D8413099FCA;
+	Tue,  9 Apr 2019 23:00:43 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-114.rdu2.redhat.com
 	[10.10.120.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 592941001DC0;
-	Tue,  9 Apr 2019 23:00:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B66A4104C421;
+	Tue,  9 Apr 2019 23:00:40 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
 	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
 	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-Date: Wed, 10 Apr 2019 01:00:16 +0200
-Message-Id: <20190409230022.6462-7-lersek@redhat.com>
+Date: Wed, 10 Apr 2019 01:00:12 +0200
+Message-Id: <20190409230022.6462-3-lersek@redhat.com>
 In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
 References: <20190409230022.6462-1-lersek@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Tue, 09 Apr 2019 23:01:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Tue, 09 Apr 2019 23:00:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1 v4 06/12] roms/Makefile: replace the
- $(EDK2_EFIROM) target with "edk2-basetools"
+Subject: [Qemu-devel] [PATCH for-4.1 v4 02/12] roms/edk2-funcs.sh: require
+ gcc-4.8+ for building i386 and x86_64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,41 +76,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190409230016.obHnztCCIu0IeFTYfnRdm4Us2NTHzVkC5p9pWtCFYoI@z>
+Message-ID: <20190409230012.t3bQpX18wQYWvKJ3RNkdG2fnTN0hoV8fG9X7ep1Ca5I@z>
 
-We don't (can't) have a recipe for building just $(EDK2_EFIROM);
-therefore, while we call the target $(EDK2_EFIROM), we actually build all
-of the edk2 BaseTools. Rename the target to edk2-basetools, and update th=
-e
-iPXE prerequisite accordingly. This will let other targets depend on
-"edk2-basetools", where an $(EDK2_EFIROM) pre-requisite would be
-misleading.
+Adapt the qemu_edk2_get_toolchain() function in "roms/edk2-funcs.sh" in
+advance to edk2 commit 8d7cdfae8cb8 ("OvmfPkg: require GCC48 or later",
+2019-01-08), which is part of the "edk2-stable201903" tag.
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Igor Mammedov <imammedo@redhat.com>
 ---
 
 Notes:
     v4:
    =20
-    - rebase: resolve conflicts with
-   =20
-      - commit d912e795e029 ("roms: Rename the EFIROM variable to avoid
-        clashing with iPXE", 2019-04-09)
-   =20
-      - commit 1cab464136b4 ("roms: Allow passing configure options to th=
-e
-        EDK2 build tools", 2019-04-09)
-   =20
-    - refresh commit message accordingly: replace EFIROM references with
-      EDK2_EFIROM references
-   =20
-    - drop all previous feedback tags, consequently :(
-   =20
-      - Phil's R-b / T-b
-      - Michal's R-b
-      - Michael's R-b
-      - Igor's T-b
+    - no change
    =20
     v3:
    =20
@@ -121,31 +105,39 @@ e
    =20
     - pick up Michal's and Michael's R-b's
 
- roms/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ roms/edk2-funcs.sh | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 1ff78b63bb3a..93c3d467be14 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -102,7 +102,7 @@ pxe-rom-%: build-pxe-roms
-=20
- efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-=20
--efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-+efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
- 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
- 		-b ipxe/src/bin/$(VID)$(DID).rom \
- 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-@@ -131,7 +131,7 @@ build-efi-roms: build-pxe-roms
- #    EDK2_BASETOOLS_LDFLAGS=3D'...' \
- #    efirom
- #
--$(EDK2_EFIROM):
-+edk2-basetools:
- 	$(MAKE) -C edk2/BaseTools \
- 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
- 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+index 8930479dcb44..d1cb1e4a111e 100644
+--- a/roms/edk2-funcs.sh
++++ b/roms/edk2-funcs.sh
+@@ -149,23 +149,11 @@ qemu_edk2_get_toolchain()
+       # Run "git-blame" on "OvmfPkg/build.sh" in edk2 for more informati=
+on on
+       # the mapping below.
+       case "$gcc_version" in
+-        ([1-3].*|4.[0-3].*)
++        ([1-3].*|4.[0-7].*)
+           printf '%s: unsupported gcc version "%s"\n' \
+             "$program_name" "$gcc_version" >&2
+           return 1
+           ;;
+-        (4.4.*)
+-          printf 'GCC44\n'
+-          ;;
+-        (4.5.*)
+-          printf 'GCC45\n'
+-          ;;
+-        (4.6.*)
+-          printf 'GCC46\n'
+-          ;;
+-        (4.7.*)
+-          printf 'GCC47\n'
+-          ;;
+         (4.8.*)
+           printf 'GCC48\n'
+           ;;
 --=20
 2.19.1.3.g30247aa5d201
 
