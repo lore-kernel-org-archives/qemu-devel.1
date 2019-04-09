@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44591)
+Received: from eggs.gnu.org ([209.51.188.92]:45144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1hDrY1-0006Tu-DV
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:16:28 -0400
+	(envelope-from <berto@igalia.com>) id 1hDraB-0007fR-PU
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1hDrY0-0001iN-A9
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:16:25 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33392 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ann.zhuangyanying@huawei.com>)
-	id 1hDrXz-0001Zk-NF
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:16:24 -0400
-From: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Date: Tue, 9 Apr 2019 14:14:56 +0000
-Message-ID: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+	(envelope-from <berto@igalia.com>) id 1hDraA-0002r1-OB
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 10:18:39 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1554747741-918964-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1554747741-918964-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Tue, 09 Apr 2019 16:18:32 +0200
+Message-ID: <w517ec345zb.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at the
- passthrough of NVMe SSD
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] block: include base when checking
+ image chain for block allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com
-Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, Zhuang Yanying <ann.zhuangyanying@huawei.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+On Mon 08 Apr 2019 08:22:19 PM CEST, Andrey Shinkevich wrote:
+>   * Return true if (a prefix of) the given range is allocated in any image
+> - * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
+> + * between BASE and TOP (TOP included). To check the BASE image, set the
+> + * 'include_base' to 'true'. The BASE can be NULL to check if the given
+>   * offset is allocated in any image of the chain.  Return false otherwise,
+>   * or negative errno on failure.
 
-Recently I tested the performance of NVMe SSD passthrough and found that interrupts
-were aggregated on vcpu0(or the first vcpu of each numa) by /proc/interrupts,when
-GuestOS was upgraded to sles12sp3 (or redhat7.6). But /proc/irq/X/smp_affinity_list
-shows that the interrupt is spread out, such as 0-10, 11-21,.... and so on.
-This problem cannot be resolved by "echo X > /proc/irq/X/smp_affinity_list", because
-the NVMe SSD interrupt is requested by the API pci_alloc_irq_vectors(), so the
-interrupt has the IRQD_AFFINITY_MANAGED flag.
+I'm not a native speaker but that sounds a bit odd to me.
 
-GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X capable devices",
-but the implementation of __setup_irq has no corresponding modification. It is still
-irq_startup(), then setup_affinity(), that is sending an affinity message when the
-interrupt is unmasked. The bare metal configuration is successful, but qemu will
-not trigger the msix update, and the affinity configuration fails.
-The affinity is configured by /proc/irq/X/smp_affinity_list, implemented at
-apic_ack_edge(), the bitmap is stored in pending_mask,
-mask->__pci_write_msi_msg()->unmask,
-and the timing is guaranteed, and the configuration takes effect.
+Alternative: 
 
-The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce affinity
-setting on startup of managed irqs" to ensure that the affinity is first issued
-and then __irq_startup(), for the managerred interrupt. So configuration is
-successful.
+  * Return true if (a prefix of) the given range is allocated in any image
+  * between BASE and TOP (BASE is only included if include_base is set).
+  * BASE can be NULL to check if the given offset is allocated in any
+  * image of the chain.  Return false otherwise, or negative errno on
+  * failure.
 
-It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
-(3.10.0-957.10.1) does not have backport the patch yet.
-"if (is_masked == was_masked) return;" can it be removed at qemu?
-What is the reason for this check?
+> -    while (intermediate && intermediate != base) {
+> +    while (include_base || intermediate != base) {
+>          int64_t pnum_inter;
+>          int64_t size_inter;
+>  
+> @@ -2360,6 +2364,10 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+>              n = pnum_inter;
+>          }
+>  
+> +        if (intermediate == base) {
+> +            break;
+> +        }
+> +
+>          intermediate = backing_bs(intermediate);
 
-Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
----
- hw/pci/msix.c | 4 ----
- 1 file changed, 4 deletions(-)
+I find that the new condition + the break make things a bit less
+readable. I think it would be simpler with something like this:
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index 4e33641..e1ff533 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
- {
-     bool is_masked = msix_is_masked(dev, vector);
- 
--    if (is_masked == was_masked) {
--        return;
--    }
--
-     msix_fire_vector_notifier(dev, vector, is_masked);
- 
-     if (!is_masked && msix_is_pending(dev, vector)) {
--- 
-1.8.3.1
+   BlockDriverState *stop_at = include_base ? backing_bs(base) : base;
+
+   while (intermediate != stop_at) {
+      ...
+   }
+
+(stop_at is a terrible name, but I can't think of anything better at the
+moment)
+
+Berto
