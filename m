@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49319)
+Received: from eggs.gnu.org ([209.51.188.92]:51545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDxAh-0004et-MJ
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:16:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDxMV-0007OC-Ft
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDxAg-0004YM-RC
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:16:43 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:41878)
+	(envelope-from <peter.maydell@linaro.org>) id 1hDxMU-0003lq-Dz
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:55 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDxAg-0004XM-C2
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:16:42 -0400
-Received: by mail-oi1-x235.google.com with SMTP id v7so14712630oie.8
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 13:16:41 -0700 (PDT)
+	id 1hDxMU-0003lZ-3H
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:28:54 -0400
+Received: by mail-ot1-x342.google.com with SMTP id k21so16881568otf.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 13:28:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
-	<155481790266.8592.9119116041656314996.malone@wampee.canonical.com>
-	<CAAedzxqBuP98u=YkrK7NU7p7eECODcxHcvspTc09c0+FHFxNnA@mail.gmail.com>
-In-Reply-To: <CAAedzxqBuP98u=YkrK7NU7p7eECODcxHcvspTc09c0+FHFxNnA@mail.gmail.com>
+References: <20190409174018.25798-1-armbru@redhat.com>
+	<CAFEAcA8xg7wc+fX9Rn_F+L2jS0OzEwRcfjt==R5-YR6iphV=NA@mail.gmail.com>
+	<CAKmqyKNAT6a+a6MyhSh7RErUOyCPnEv-RKM4S-j12GS9dUMTYw@mail.gmail.com>
+In-Reply-To: <CAKmqyKNAT6a+a6MyhSh7RErUOyCPnEv-RKM4S-j12GS9dUMTYw@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Apr 2019 03:16:29 +0700
-Message-ID: <CAFEAcA9X+srbS8gFm-D3KwHZ=PBjTeswkJb3nRK+Hp4geD9-Bg@mail.gmail.com>
+Date: Tue, 9 Apr 2019 21:28:41 +0100
+Message-ID: <CAFEAcA9S0H=tX4wZOxwbar-UpxH3D+JUc0_6VRStz_doRKmB+g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq
- not an integer
+Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
+ overflowing in load_device_tree()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1814352 <1814352@bugs.launchpad.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On Wed, 10 Apr 2019 at 01:26, Erik Kline <1814352@bugs.launchpad.net> wrote:
-> Sure.  Looking at HEAD, and even the surrounding the lines, I think I
-> should have tried STRUCT_short_ifreq instead of STRUCT_int_ifreq, though
-> I'm not sure what the real difference would be.
+On Tue, 9 Apr 2019 at 21:15, Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Tue, Apr 9, 2019 at 1:08 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Wed, 10 Apr 2019 at 00:40, Markus Armbruster <armbru@redhat.com> wrote:
+> > >
+> > > If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
+> > > computation of @dt_size overflows to a negative number, which then
+> > > gets converted to a very large size_t for g_malloc0() and
+> > > load_image_size().  In the (fortunately improbable) case g_malloc0()
+> > > succeeds and load_image_size() survives, we'd assign the negative
+> > > number to *sizep.  What that would do to the callers I can't say, but
+> > > it's unlikely to be good.
+> > >
+> > > Fix by rejecting images whose size would overflow.
+> > >
+> > > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >
+> > I think this patch is missing some attributions for the
+> > security researchers who found the issue initially.
+> > PJP's patch for this from a couple of weeks back has a
+> > reported-by credit:
+> > https://patchew.org/QEMU/20190322073555.20889-1-ppandit@redhat.com/
+>
+> It seems like from that discussion that this patch is the correct approach.
+>
+> I can add the attributions and send a PR for 4.0. I'll send it by EOD
+> unless anyone has any objections.
 
-The multiple STRUCT_*_ifreq are working around the fact that
-our MK_STRUCT infrastructure can't handle unions. The struct
-ifreq is a char array followed by a union whose members are
-various different types. You should use the STRUCT_*_ifreq
-corresponding to whatever type the union field used by this
-particular ioctl is. For SIOCGIFNAME the ifr_ifindex is read,
-and that's an int, so you want STRUCT_int_ifreq. (If you used
-the 'short' version by mistake this would probably break for the
-case of big-endian guest and little-endian host or vice-versa
-because we'd swap the wrong amount of data.)
+Thanks. I think given it's 21:30 here I'm going to postpone
+tagging rc3 til tomorrow (mid-afternoon UK time). I'm still
+hoping we can avoid an rc4...
 
 thanks
 -- PMM
