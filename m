@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37163)
+Received: from eggs.gnu.org ([209.51.188.92]:37184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDr4V-0005bg-F1
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:45:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1hDr4c-0005gD-3C
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDr4U-00014d-Di
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:45:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDr4U-00014Q-5v
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:45:54 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue,  9 Apr 2019 15:45:36 +0200
-Message-Id: <20190409134536.15548-3-philmd@redhat.com>
-In-Reply-To: <20190409134536.15548-1-philmd@redhat.com>
-References: <20190409134536.15548-1-philmd@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hDr4b-000182-6D
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:46:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hDr4a-00017d-UJ
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 09:46:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hDr4Z-0004jI-2I
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 13:45:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 100E22E80CB
+	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 13:45:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 v3 2/2] roms: Allow passing configure
- options to the EDK2 build tools
+Date: Tue, 09 Apr 2019 13:36:31 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1812861 <1812861@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154816740902.19321.3239172253055110269.malonedeb@gac.canonical.com>
+Message-Id: <155481699208.7911.8526085627494961075.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1812861] Re: QEMU in user-mode emulation mode
+ crashes when the user program jumps to an invalid address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
 
-Since commit f590a812c210 we build the EDK2 EfiRom utility
-unconditionally.
+** Tags removed: usermode
+** Tags added: linux-user
 
-Some distributions require to use extra compiler/linker flags,
-i.e. SUSE which enforces the PIE protection (see [*]).
+-- =
 
-EDK2 build tools already provide a set of variables for that,
-use them to allow the caller to easily inject compiler/linker
-options..
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1812861
 
-Now build scripts can pass extra options, example:
+Title:
+  QEMU in user-mode emulation mode crashes when the user program jumps
+  to an invalid address
 
-  $ make -C roms \
-      EDK2_BASETOOLS_OPTFLAGS=3D'-fPIE' \
-      efirom
+Status in QEMU:
+  New
 
-[*] https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+Bug description:
+  Running this code:
 
-Reported-by: Olaf Hering <olaf@aepfle.de>
-Suggested-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- roms/Makefile | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+  void (*func)() =3D 0x12345678;
 
-diff --git a/roms/Makefile b/roms/Makefile
-index d28252dafdf..1ff78b63bb3 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -120,8 +120,21 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-=20
-+# Build scripts can pass compiler/linker flags to the EDK2 build tools
-+# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
-+# EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
-+#
-+# Example:
-+#
-+#  make -C roms \
-+#    EDK2_BASETOOLS_OPTFLAGS=3D'...' \
-+#    EDK2_BASETOOLS_LDFLAGS=3D'...' \
-+#    efirom
-+#
- $(EDK2_EFIROM):
--	$(MAKE) -C edk2/BaseTools
-+	$(MAKE) -C edk2/BaseTools \
-+		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
-+		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
-=20
- slof:
- 	$(MAKE) -C SLOF CROSS=3D$(powerpc64_cross_prefix) qemu
---=20
-2.20.1
+  int main()
+  {
+      func();
+      return 0;
+  }
+
+  Produces the following output:
+
+  qemu-arm-static: /build/qemu-DqynNa/qemu-2.8+dfsg/translate-all.c:175: tb=
+_lock: Assertion `!have_tb_lock' failed.
+  qemu-arm-static: /build/qemu-DqynNa/qemu-2.8+dfsg/translate-all.c:175: tb=
+_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault
+
+  The expected result is as follows:
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1812861/+subscriptions
