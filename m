@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55468)
+Received: from eggs.gnu.org ([209.51.188.92]:55495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKa-000250-J9
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:42 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKd-00028t-Hh
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKZ-0004V6-1l
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34958)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKb-0004X6-QX
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47283)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtKY-0004UY-Mg
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:38 -0400
+	id 1hDtKb-0004WI-Dz
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:41 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  9 Apr 2019 18:09:52 +0200
-Message-Id: <20190409161009.6322-4-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:09:53 +0200
+Message-Id: <20190409161009.6322-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 03/20] qmp: add QmpSession
+Subject: [Qemu-devel] [PATCH v4 04/20] QmpSession: add a return callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,331 +30,417 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This structure will hold various data related to a QMP client session:
-the list of commands, the parser, the callbacks, the pending
-operations...
+Introduce a return_cb to allow delaying finishing the dispatch
+and sending the response asynchronously. For now, this is just
+modifying qmp_dispatch() to call the callback synchronously.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h | 10 +++++++++-
- monitor.c                   | 18 ++++++++++--------
- qapi/qmp-dispatch.c         | 15 ++++++++++++---
- qga/main.c                  |  5 ++++-
- tests/test-qmp-cmds.c       | 28 ++++++++++++++++++++++------
- 5 files changed, 57 insertions(+), 19 deletions(-)
+ include/qapi/qmp/dispatch.h | 10 ++++--
+ monitor.c                   | 47 ++++++++++---------------
+ qapi/qmp-dispatch.c         | 22 +++++++++---
+ qga/main.c                  | 34 +++++++++++-------
+ tests/test-qmp-cmds.c       | 69 ++++++++++++++++++-------------------
+ 5 files changed, 98 insertions(+), 84 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 5a9cf82472..3b53cfd788 100644
+index 3b53cfd788..d1ce631a93 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -37,10 +37,18 @@ typedef struct QmpCommand
-=20
+@@ -38,16 +38,20 @@ typedef struct QmpCommand
  typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpCommandList;
 =20
-+typedef struct QmpSession QmpSession;
-+
-+struct QmpSession {
-+    const QmpCommandList *cmds;
-+};
-+
+ typedef struct QmpSession QmpSession;
++typedef void (QmpDispatchReturn) (QmpSession *session, QDict *rsp);
+=20
+ struct QmpSession {
+     const QmpCommandList *cmds;
++    QmpDispatchReturn *return_cb;
+ };
+=20
  void qmp_register_command(QmpCommandList *cmds, const char *name,
                            QmpCommandFunc *fn, QmpCommandOptions options)=
 ;
  const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
                                     const char *name);
-+void qmp_session_init(QmpSession *session, const QmpCommandList *cmds);
-+void qmp_session_destroy(QmpSession *session);
+-void qmp_session_init(QmpSession *session, const QmpCommandList *cmds);
++void qmp_session_init(QmpSession *session,
++                      const QmpCommandList *cmds,
++                      QmpDispatchReturn *return_cb);
+ void qmp_session_destroy(QmpSession *session);
  void qmp_disable_command(QmpCommandList *cmds, const char *name);
  void qmp_enable_command(QmpCommandList *cmds, const char *name);
-=20
-@@ -48,7 +56,7 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+@@ -56,8 +60,8 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
  const char *qmp_command_name(const QmpCommand *cmd);
  bool qmp_has_success_response(const QmpCommand *cmd);
  QDict *qmp_error_response(Error *err);
--QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
-+QDict *qmp_dispatch(QmpSession *session, QObject *request,
-                     bool allow_oob);
+-QDict *qmp_dispatch(QmpSession *session, QObject *request,
+-                    bool allow_oob);
++void qmp_dispatch(QmpSession *session, QObject *request,
++                  bool allow_oob);
  bool qmp_is_oob(const QDict *dict);
 =20
+ typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaque)=
+;
 diff --git a/monitor.c b/monitor.c
-index abc5bdc4ba..a07175b4f8 100644
+index a07175b4f8..c23ba76f78 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -174,7 +174,7 @@ typedef struct {
-      * qmp_capabilities succeeds, we go into command mode, and
-      * @command becomes &qmp_commands.
-      */
--    const QmpCommandList *commands;
-+    QmpSession session;
-     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
-@@ -520,7 +520,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, =
-QDict *qdict)
-     trace_monitor_protocol_event_emit(event, qdict);
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
-         if (monitor_is_qmp(mon)
--            && mon->qmp.commands !=3D &qmp_cap_negotiation_commands) {
-+            && mon->qmp.session.cmds !=3D &qmp_cap_negotiation_commands)=
- {
-             qmp_send_response(mon, qdict);
-         }
-     }
-@@ -729,6 +729,7 @@ static void monitor_data_destroy(Monitor *mon)
-     g_free(mon->mon_cpu_path);
-     qemu_chr_fe_deinit(&mon->chr, false);
-     if (monitor_is_qmp(mon)) {
-+        qmp_session_destroy(&mon->qmp.session);
-         json_message_parser_destroy(&mon->qmp.parser);
-     }
-     readline_free(mon->rs);
-@@ -1090,7 +1091,7 @@ CommandInfoList *qmp_query_commands(Error **errp)
- {
-     CommandInfoList *list =3D NULL;
-=20
--    qmp_for_each_command(cur_mon->qmp.commands, query_commands_cb, &list=
-);
-+    qmp_for_each_command(cur_mon->qmp.session.cmds, query_commands_cb, &=
-list);
-=20
-     return list;
- }
-@@ -1207,7 +1208,7 @@ static bool qmp_caps_accept(Monitor *mon, QMPCapabi=
-lityList *list,
- void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-                           Error **errp)
- {
--    if (cur_mon->qmp.commands =3D=3D &qmp_commands) {
-+    if (cur_mon->qmp.session.cmds =3D=3D &qmp_commands) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "Capabilities negotiation is already complete, command=
- "
-                   "ignored");
-@@ -1218,7 +1219,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapab=
-ilityList *enable,
-         return;
-     }
-=20
--    cur_mon->qmp.commands =3D &qmp_commands;
-+    cur_mon->qmp.session.cmds =3D &qmp_commands;
+@@ -4101,45 +4101,35 @@ static int monitor_can_read(void *opaque)
+     return !atomic_mb_read(&mon->suspend_cnt);
  }
 =20
- /* Set the current CPU defined by the user. Callers must hold BQL. */
-@@ -4121,11 +4122,11 @@ static void monitor_qmp_dispatch(Monitor *mon, QO=
-bject *req)
+-/*
+- * Emit QMP response @rsp with ID @id to @mon.
+- * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
+- * Nothing is emitted then.
+- */
+-static void monitor_qmp_respond(Monitor *mon, QDict *rsp)
++static void dispatch_return_cb(QmpSession *session, QDict *rsp)
+ {
+-    if (rsp) {
+-        qmp_send_response(mon, rsp);
++    Monitor *mon =3D container_of(session, Monitor, qmp.session);
++
++    if (mon->qmp.session.cmds =3D=3D &qmp_cap_negotiation_commands) {
++        QDict *error =3D qdict_get_qdict(rsp, "error");
++        if (error
++            && !g_strcmp0(qdict_get_try_str(error, "class"),
++                          QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOU=
+ND))) {
++            /* Provide a more useful error message */
++            qdict_del(error, "desc");
++            qdict_put_str(error, "desc", "Expecting capabilities negotia=
+tion"
++                          " with 'qmp_capabilities'");
++        }
+     }
++
++    qmp_send_response(mon, rsp);
+ }
+=20
+ static void monitor_qmp_dispatch(Monitor *mon, QObject *req)
+ {
+     Monitor *old_mon;
+-    QDict *rsp;
+-    QDict *error;
+=20
      old_mon =3D cur_mon;
      cur_mon =3D mon;
 =20
--    rsp =3D qmp_dispatch(mon->qmp.commands, req, qmp_oob_enabled(mon));
-+    rsp =3D qmp_dispatch(&mon->qmp.session, req, qmp_oob_enabled(mon));
+-    rsp =3D qmp_dispatch(&mon->qmp.session, req, qmp_oob_enabled(mon));
++    qmp_dispatch(&mon->qmp.session, req, qmp_oob_enabled(mon));
 =20
      cur_mon =3D old_mon;
+-
+-    if (mon->qmp.session.cmds =3D=3D &qmp_cap_negotiation_commands) {
+-        error =3D qdict_get_qdict(rsp, "error");
+-        if (error
+-            && !g_strcmp0(qdict_get_try_str(error, "class"),
+-                    QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) =
+{
+-            /* Provide a more useful error message */
+-            qdict_del(error, "desc");
+-            qdict_put_str(error, "desc", "Expecting capabilities negotia=
+tion"
+-                          " with 'qmp_capabilities'");
+-        }
+-    }
+-
+-    monitor_qmp_respond(mon, rsp);
+-    qobject_unref(rsp);
+ }
 =20
--    if (mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
-+    if (mon->qmp.session.cmds =3D=3D &qmp_cap_negotiation_commands) {
-         error =3D qdict_get_qdict(rsp, "error");
-         if (error
-             && !g_strcmp0(qdict_get_try_str(error, "class"),
-@@ -4399,7 +4400,7 @@ static void monitor_qmp_event(void *opaque, int eve=
+ /*
+@@ -4210,7 +4200,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
+         assert(req_obj->err);
+         rsp =3D qmp_error_response(req_obj->err);
+         req_obj->err =3D NULL;
+-        monitor_qmp_respond(mon, rsp);
++        qmp_send_response(req_obj->mon, rsp);
+         qobject_unref(rsp);
+     }
+=20
+@@ -4400,7 +4390,8 @@ static void monitor_qmp_event(void *opaque, int eve=
 nt)
 =20
      switch (event) {
      case CHR_EVENT_OPENED:
--        mon->qmp.commands =3D &qmp_cap_negotiation_commands;
-+        qmp_session_init(&mon->qmp.session, &qmp_cap_negotiation_command=
+-        qmp_session_init(&mon->qmp.session, &qmp_cap_negotiation_command=
 s);
++        qmp_session_init(&mon->qmp.session,
++                         &qmp_cap_negotiation_commands, dispatch_return_=
+cb);
          monitor_qmp_caps_reset(mon);
          data =3D qmp_greeting(mon);
          qmp_send_response(mon, data);
-@@ -4414,6 +4415,7 @@ static void monitor_qmp_event(void *opaque, int eve=
-nt)
-          * is closed.
-          */
-         monitor_qmp_cleanup_queues(mon);
-+        qmp_session_destroy(&mon->qmp.session);
-         json_message_parser_destroy(&mon->qmp.parser);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-                                  mon, NULL);
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index f9d43046aa..98a82ac33c 100644
+index 98a82ac33c..37b058cf97 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -163,15 +163,24 @@ bool qmp_is_oob(const QDict *dict)
+@@ -163,17 +163,28 @@ bool qmp_is_oob(const QDict *dict)
          && !qdict_haskey(dict, "execute");
  }
 =20
--QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
--                    bool allow_oob)
-+void qmp_session_init(QmpSession *session, const QmpCommandList *cmds)
-+{
-+    session->cmds =3D cmds;
-+}
+-void qmp_session_init(QmpSession *session, const QmpCommandList *cmds)
++void qmp_session_init(QmpSession *session,
++                      const QmpCommandList *cmds,
++                      QmpDispatchReturn *return_cb)
+ {
++    assert(return_cb);
++    assert(!session->return_cb);
 +
-+void qmp_session_destroy(QmpSession *session)
-+{
-+    session->cmds =3D NULL;
-+}
+     session->cmds =3D cmds;
++    session->return_cb =3D return_cb;
+ }
+=20
+ void qmp_session_destroy(QmpSession *session)
+ {
++    if (!session->return_cb) {
++        return;
++    }
 +
-+QDict *qmp_dispatch(QmpSession *session, QObject *request, bool allow_oo=
+     session->cmds =3D NULL;
++    session->return_cb =3D NULL;
+ }
+=20
+-QDict *qmp_dispatch(QmpSession *session, QObject *request, bool allow_oo=
 b)
++void qmp_dispatch(QmpSession *session, QObject *request, bool allow_oob)
  {
      Error *err =3D NULL;
      QDict *dict =3D qobject_to(QDict, request);
-     QObject *ret, *id =3D dict ? qdict_get(dict, "id") : NULL;
-     QDict *rsp;
-=20
--    ret =3D do_qmp_dispatch(cmds, request, allow_oob, &err);
-+    ret =3D do_qmp_dispatch(session->cmds, request, allow_oob, &err);
-     if (err) {
-         rsp =3D qmp_error_response(err);
-     } else if (ret) {
-diff --git a/qga/main.c b/qga/main.c
-index 5b144b9250..bf0082df90 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -74,6 +74,7 @@ typedef struct GAPersistentState {
- typedef struct GAConfig GAConfig;
-=20
- struct GAState {
-+    QmpSession session;
-     JSONMessageParser parser;
-     GMainLoop *main_loop;
-     GAChannel *channel;
-@@ -572,7 +573,7 @@ static void process_event(void *opaque, QObject *obj,=
- Error *err)
+@@ -188,12 +199,13 @@ QDict *qmp_dispatch(QmpSession *session, QObject *r=
+equest, bool allow_oob)
+         qdict_put_obj(rsp, "return", ret);
+     } else {
+         /* Can only happen for commands with QCO_NO_SUCCESS_RESP */
+-        rsp =3D NULL;
++        return;
      }
 =20
-     g_debug("processing command");
--    rsp =3D qmp_dispatch(&ga_commands, obj, false);
-+    rsp =3D qmp_dispatch(&s->session, obj, false);
+-    if (rsp && id) {
++    if (id) {
+         qdict_put_obj(rsp, "id", qobject_ref(id));
+     }
 =20
- end:
-     ret =3D send_response(s, rsp);
-@@ -1338,6 +1339,7 @@ static GAState *initialize_agent(GAConfig *config, =
+-    return rsp;
++    session->return_cb(session, rsp);
++    qobject_unref(rsp);
+ }
+diff --git a/qga/main.c b/qga/main.c
+index bf0082df90..2a929936db 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -558,29 +558,37 @@ static int send_response(GAState *s, const QDict *r=
+sp)
+     return 0;
+ }
+=20
++static void dispatch_return_cb(QmpSession *session, QDict *rsp)
++{
++    GAState *s =3D container_of(session, GAState, session);
++    int ret =3D send_response(s, rsp);
++    if (ret < 0) {
++        g_warning("error sending response: %s", strerror(-ret));
++    }
++}
++
+ /* handle requests/control events coming in over the channel */
+ static void process_event(void *opaque, QObject *obj, Error *err)
+ {
+     GAState *s =3D opaque;
+-    QDict *rsp;
+     int ret;
+=20
+     g_debug("process_event: called");
+     assert(!obj !=3D !err);
+-    if (err) {
+-        rsp =3D qmp_error_response(err);
+-        goto end;
+-    }
+=20
+-    g_debug("processing command");
+-    rsp =3D qmp_dispatch(&s->session, obj, false);
++    if (err) {
++        QDict *rsp =3D qmp_error_response(err);
+=20
+-end:
+-    ret =3D send_response(s, rsp);
+-    if (ret < 0) {
+-        g_warning("error sending error response: %s", strerror(-ret));
++        ret =3D send_response(s, rsp);
++        if (ret < 0) {
++            g_warning("error sending error response: %s", strerror(-ret)=
+);
++        }
++        qobject_unref(rsp);
++    } else {
++        g_debug("processing command");
++        qmp_dispatch(&s->session, obj, false);
+     }
+-    qobject_unref(rsp);
++
+     qobject_unref(obj);
+ }
+=20
+@@ -1339,7 +1347,7 @@ static GAState *initialize_agent(GAConfig *config, =
 int socket_activation)
      ga_command_state_init(s, s->command_state);
      ga_command_state_init_all(s->command_state);
      json_message_parser_init(&s->parser, process_event, s, NULL);
-+    qmp_session_init(&s->session, &ga_commands);
+-    qmp_session_init(&s->session, &ga_commands);
++    qmp_session_init(&s->session, &ga_commands, dispatch_return_cb);
 =20
  #ifndef _WIN32
      if (!register_signal_handlers()) {
-@@ -1369,6 +1371,7 @@ static void cleanup_agent(GAState *s)
-     CloseHandle(s->wakeup_event);
- #endif
-     if (s->command_state) {
-+        qmp_session_destroy(&s->session);
-         ga_command_state_cleanup_all(s->command_state);
-         ga_command_state_free(s->command_state);
-         json_message_parser_destroy(&s->parser);
 diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 630b1b9bac..7c39ec1657 100644
+index 7c39ec1657..3f41cc45bb 100644
 --- a/tests/test-qmp-cmds.c
 +++ b/tests/test-qmp-cmds.c
-@@ -113,44 +113,52 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org=
+@@ -109,22 +109,23 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org=
 _qemu_x_EnumList *a,
- /* test commands with no input and no return value */
- static void test_dispatch_cmd(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(!qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- static void test_dispatch_cmd_oob(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "exec-oob", "test-flags-command");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), true);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), true);
-     assert(resp !=3D NULL);
-     assert(!qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- /* test commands that return an error due to invalid parameters */
- static void test_dispatch_cmd_failure(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *args =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "user_def_cmd2");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(qdict_haskey(resp, "error"));
-=20
-@@ -164,36 +172,44 @@ static void test_dispatch_cmd_failure(void)
-=20
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp !=3D NULL);
-     assert(qdict_haskey(resp, "error"));
-=20
-     qobject_unref(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
- static void test_dispatch_cmd_success_response(void)
- {
-+    QmpSession session =3D { 0, };
-     QDict *req =3D qdict_new();
-     QDict *resp;
-=20
-+    qmp_session_init(&session, &qmp_commands);
-     qdict_put_str(req, "execute", "cmd-success-response");
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     g_assert_null(resp);
-     qobject_unref(req);
-+    qmp_session_destroy(&session);
- }
-=20
-+
- static QObject *test_qmp_dispatch(QDict *req)
- {
-+    QmpSession session =3D { 0, };
-     QDict *resp;
-     QObject *ret;
-=20
--    resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-+    qmp_session_init(&session, &qmp_commands);
-+    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
-     assert(resp && !qdict_haskey(resp, "error"));
-     ret =3D qdict_get(resp, "return");
-     assert(ret);
-     qobject_ref(ret);
-     qobject_unref(resp);
-+    qmp_session_destroy(&session);
      return ret;
  }
 =20
++static void dispatch_cmd_return(QmpSession *session, QDict *resp)
++{
++    assert(resp !=3D NULL);
++    assert(!qdict_haskey(resp, "error"));
++}
+=20
+ /* test commands with no input and no return value */
+ static void test_dispatch_cmd(void)
+ {
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+-    QDict *resp;
+=20
+-    qmp_session_init(&session, &qmp_commands);
++    qmp_session_init(&session, &qmp_commands, dispatch_cmd_return);
+     qdict_put_str(req, "execute", "user_def_cmd");
+=20
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
+-    assert(resp !=3D NULL);
+-    assert(!qdict_haskey(resp, "error"));
++    qmp_dispatch(&session, QOBJECT(req), false);
+=20
+-    qobject_unref(resp);
+     qobject_unref(req);
+     qmp_session_destroy(&session);
+ }
+@@ -133,82 +134,80 @@ static void test_dispatch_cmd_oob(void)
+ {
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+-    QDict *resp;
+=20
+-    qmp_session_init(&session, &qmp_commands);
++    qmp_session_init(&session, &qmp_commands, dispatch_cmd_return);
+     qdict_put_str(req, "exec-oob", "test-flags-command");
+=20
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), true);
+-    assert(resp !=3D NULL);
+-    assert(!qdict_haskey(resp, "error"));
++    qmp_dispatch(&session, QOBJECT(req), true);
+=20
+-    qobject_unref(resp);
+     qobject_unref(req);
+     qmp_session_destroy(&session);
+ }
+=20
++static void dispatch_cmd_failure_return(QmpSession *session, QDict *resp=
+)
++{
++    assert(resp !=3D NULL);
++    assert(qdict_haskey(resp, "error"));
++}
++
+ /* test commands that return an error due to invalid parameters */
+ static void test_dispatch_cmd_failure(void)
+ {
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+     QDict *args =3D qdict_new();
+-    QDict *resp;
+=20
+-    qmp_session_init(&session, &qmp_commands);
++    qmp_session_init(&session, &qmp_commands, dispatch_cmd_failure_retur=
+n);
+     qdict_put_str(req, "execute", "user_def_cmd2");
+=20
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
+-    assert(resp !=3D NULL);
+-    assert(qdict_haskey(resp, "error"));
++    qmp_dispatch(&session, QOBJECT(req), false);
+=20
+-    qobject_unref(resp);
+     qobject_unref(req);
+=20
+     /* check that with extra arguments it throws an error */
+     req =3D qdict_new();
+     qdict_put_int(args, "a", 66);
+     qdict_put(req, "arguments", args);
+-
+     qdict_put_str(req, "execute", "user_def_cmd");
+=20
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
+-    assert(resp !=3D NULL);
+-    assert(qdict_haskey(resp, "error"));
++    qmp_dispatch(&session, QOBJECT(req), false);
+=20
+-    qobject_unref(resp);
+     qobject_unref(req);
+     qmp_session_destroy(&session);
+ }
+=20
++static QObject *dispatch_ret;
++
+ static void test_dispatch_cmd_success_response(void)
+ {
+     QmpSession session =3D { 0, };
+     QDict *req =3D qdict_new();
+-    QDict *resp;
+=20
+-    qmp_session_init(&session, &qmp_commands);
++    qmp_session_init(&session, &qmp_commands, (QmpDispatchReturn *)abort=
+);
+     qdict_put_str(req, "execute", "cmd-success-response");
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
+-    g_assert_null(resp);
++
++    qmp_dispatch(&session, QOBJECT(req), false);
++
+     qobject_unref(req);
+     qmp_session_destroy(&session);
+ }
+=20
++static void dispatch_return(QmpSession *session, QDict *resp)
++{
++    assert(resp && !qdict_haskey(resp, "error"));
++    dispatch_ret =3D qdict_get(resp, "return");
++    qobject_ref(dispatch_ret);
++}
+=20
+ static QObject *test_qmp_dispatch(QDict *req)
+ {
+     QmpSession session =3D { 0, };
+-    QDict *resp;
+     QObject *ret;
+=20
+-    qmp_session_init(&session, &qmp_commands);
+-    resp =3D qmp_dispatch(&session, QOBJECT(req), false);
+-    assert(resp && !qdict_haskey(resp, "error"));
+-    ret =3D qdict_get(resp, "return");
+-    assert(ret);
+-    qobject_ref(ret);
+-    qobject_unref(resp);
++    qmp_session_init(&session, &qmp_commands, dispatch_return);
++    qmp_dispatch(&session, QOBJECT(req), false);
++    ret =3D dispatch_ret;
++    dispatch_ret =3D NULL;
+     qmp_session_destroy(&session);
+     return ret;
+ }
 --=20
 2.21.0.196.g041f5ea1cf
