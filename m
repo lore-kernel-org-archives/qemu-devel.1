@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54171)
+Received: from eggs.gnu.org ([209.51.188.92]:55365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hDtFY-00079j-2N
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:05:30 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKS-0001wp-9C
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hDtFT-0001mB-7E
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:05:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41770)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtKQ-0004Q1-ON
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hDtFO-0001gh-4N
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:05:20 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  9 Apr 2019 17:58:31 +0200
-Message-Id: <20190409155831.18764-1-eric.auger@redhat.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hDtKQ-0004M2-C6
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:10:30 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:09:50 +0200
+Message-Id: <20190409161009.6322-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.1] vfio/common: Introduce
- vfio_set_irq_signaling helper
+Subject: [Qemu-devel] [PATCH v4 01/20] qmp: constify QmpCommand and list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,574 +27,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
-Cc: aik@ozlabs.ru, cohuck@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The code used to assign an interrupt index/subindex to an
-eventfd is duplicated many times. Let's introduce an helper that
-allows to set/unset the signaling for an ACTION_TRIGGER or
-ACTION_UNMASK action.
+Since 0b69f6f72ce47a37a749b056b6d5ec64c61f11e8 "qapi: remove
+qmp_unregister_command()", the command list can be declared const.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
+ include/qapi/qmp/dispatch.h | 9 +++++----
+ monitor.c                   | 4 ++--
+ qapi/qmp-dispatch.c         | 6 +++---
+ qapi/qmp-registry.c         | 6 +++---
+ qga/commands.c              | 2 +-
+ qga/main.c                  | 6 +++---
+ 6 files changed, 17 insertions(+), 16 deletions(-)
 
-This is a follow-up to
-[PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
-It looks to me that introducing vfio_set_irq_signaling() has more
-benefits in term of code reduction and the helper abstraction
-looks cleaner.
----
- hw/vfio/common.c              |  61 +++++++++
- hw/vfio/pci.c                 | 224 ++++++++--------------------------
- hw/vfio/platform.c            |  55 +++------
- include/hw/vfio/vfio-common.h |   2 +
- 4 files changed, 134 insertions(+), 208 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 4374cc6176..f88fd10ca3 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -95,6 +95,67 @@ void vfio_mask_single_irqindex(VFIODevice *vbasedev, i=
-nt index)
-     ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
- }
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 9aa426a398..5a9cf82472 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -39,7 +39,8 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpComm=
+andList;
 =20
-+static inline const char *action_to_str(int action)
-+{
-+    switch (action) {
-+    case VFIO_IRQ_SET_ACTION_MASK:
-+        return "MASK";
-+    case VFIO_IRQ_SET_ACTION_UNMASK:
-+        return "UNMASK";
-+    case VFIO_IRQ_SET_ACTION_TRIGGER:
-+        return "TRIGGER";
-+    default:
-+        return "UNKNOWN ACTION";
-+    }
-+}
-+
-+int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex=
-,
-+                           int action, int fd, Error **errp)
-+{
-+    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
-+                                      .index =3D index };
-+    struct vfio_irq_set *irq_set;
-+    int argsz, ret =3D 0;
-+    int32_t *pfd;
-+
-+    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
-+    if (ret < 0) {
-+        error_setg_errno(errp, errno, "index %d does not exist", index);
-+        goto error;
-+    }
-+    if (irq_info.count < subindex + 1) {
-+        error_setg_errno(errp, errno, "subindex %d does not exist", subi=
-ndex);
-+        goto error;
-+    }
-+
-+    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set =3D g_malloc0(argsz);
-+    irq_set->argsz =3D argsz;
-+    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | action;
-+    irq_set->index =3D index;
-+    irq_set->start =3D subindex;
-+    irq_set->count =3D 1;
-+    pfd =3D (int32_t *)&irq_set->data;
-+    *pfd =3D fd;
-+
-+    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+
-+    g_free(irq_set);
-+
-+    if (ret) {
-+        error_setg_errno(errp, -ret, "VFIO_DEVICE_SET_IRQS failure");
-+        goto error;
-+    }
-+    return 0;
-+error:
-+    error_prepend(errp,
-+                  "Failed to %s %s eventfd signaling for interrupt [%d,%=
-d]: ",
-+                  fd < 0 ? "tear down" : "set up", action_to_str(action)=
-,
-+                  index, subindex);
-+    return ret;
-+}
-+
- /*
-  * IO Port/MMIO - Beware of the endians, VFIO is always little endian
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 504019c458..cd93ff6fa3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -113,9 +113,7 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev,=
- Error **errp)
-         .gsi =3D vdev->intx.route.irq,
-         .flags =3D KVM_IRQFD_FLAG_RESAMPLE,
-     };
--    struct vfio_irq_set *irq_set;
--    int ret, argsz;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-=20
-     if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
-         vdev->intx.route.mode !=3D PCI_INTX_ENABLED ||
-@@ -143,22 +141,10 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vde=
-v, Error **errp)
-         goto fail_irqfd;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_U=
-NMASK;
--    irq_set->index =3D VFIO_PCI_INTX_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D irqfd.resamplefd;
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    g_free(irq_set);
--    if (ret) {
--        error_setg_errno(errp, -ret, "failed to setup INTx unmask fd");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX,=
- 0,
-+                               VFIO_IRQ_SET_ACTION_UNMASK,
-+                               irqfd.resamplefd, &err)) {
-+        error_propagate(errp, err);
-         goto fail_vfio;
-     }
-=20
-@@ -262,10 +248,10 @@ static void vfio_intx_update(PCIDevice *pdev)
- static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
- {
-     uint8_t pin =3D vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN,=
- 1);
--    int ret, argsz, retval =3D 0;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-     Error *err =3D NULL;
-+    int32_t fd;
-+    int ret;
-+
-=20
-     if (!pin) {
-         return 0;
-@@ -292,27 +278,15 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Er=
-ror **errp)
-         error_setg_errno(errp, -ret, "event_notifier_init failed");
-         return ret;
-     }
-+    fd =3D event_notifier_get_fd(&vdev->intx.interrupt);
-+    qemu_set_fd_handler(fd, vfio_intx_interrupt, NULL, vdev);
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_T=
-RIGGER;
--    irq_set->index =3D VFIO_PCI_INTX_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->intx.interrupt);
--    qemu_set_fd_handler(*pfd, vfio_intx_interrupt, NULL, vdev);
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_setg_errno(errp, -ret, "failed to setup INTx fd");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX,=
- 0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_propagate(errp, err);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->intx.interrupt);
--        retval =3D -errno;
--        goto cleanup;
-+        return -errno;
-     }
-=20
-     vfio_intx_enable_kvm(vdev, &err);
-@@ -323,11 +297,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Err=
-or **errp)
-     vdev->interrupt =3D VFIO_INT_INTx;
-=20
-     trace_vfio_intx_enable(vdev->vbasedev.name);
--
--cleanup:
--    g_free(irq_set);
--
--    return retval;
-+    return 0;
- }
-=20
- static void vfio_intx_disable(VFIOPCIDevice *vdev)
-@@ -530,31 +500,19 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev,=
- unsigned int nr,
-             error_report("vfio: failed to enable vectors, %d", ret);
-         }
-     } else {
--        int argsz;
--        struct vfio_irq_set *irq_set;
--        int32_t *pfd;
--
--        argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--        irq_set =3D g_malloc0(argsz);
--        irq_set->argsz =3D argsz;
--        irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                         VFIO_IRQ_SET_ACTION_TRIGGER;
--        irq_set->index =3D VFIO_PCI_MSIX_IRQ_INDEX;
--        irq_set->start =3D nr;
--        irq_set->count =3D 1;
--        pfd =3D (int32_t *)&irq_set->data;
-+        Error *err =3D NULL;
-+        int32_t fd;
-=20
-         if (vector->virq >=3D 0) {
--            *pfd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-+            fd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-         } else {
--            *pfd =3D event_notifier_get_fd(&vector->interrupt);
-+            fd =3D event_notifier_get_fd(&vector->interrupt);
-         }
-=20
--        ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--        g_free(irq_set);
--        if (ret) {
--            error_report("vfio: failed to modify vector, %d", ret);
-+        if (vfio_set_irq_signaling(&vdev->vbasedev,
-+                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
-+                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &e=
-rr)) {
-+            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
+ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options)=
 ;
-         }
-     }
+-QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
++const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
++                                   const char *name);
+ void qmp_disable_command(QmpCommandList *cmds, const char *name);
+ void qmp_enable_command(QmpCommandList *cmds, const char *name);
 =20
-@@ -591,26 +549,10 @@ static void vfio_msix_vector_release(PCIDevice *pde=
-v, unsigned int nr)
-      * be re-asserted on unmask.  Nothing to do if already using QEMU mo=
-de.
+@@ -47,13 +48,13 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QDict *qmp_error_response(Error *err);
+-QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+                     bool allow_oob);
+ bool qmp_is_oob(const QDict *dict);
+=20
+-typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
++typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaque)=
+;
+=20
+-void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_f=
+n fn,
+                           void *opaque);
+=20
+ #endif
+diff --git a/monitor.c b/monitor.c
+index 4807bbe811..abc5bdc4ba 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -174,7 +174,7 @@ typedef struct {
+      * qmp_capabilities succeeds, we go into command mode, and
+      * @command becomes &qmp_commands.
       */
-     if (vector->virq >=3D 0) {
--        int argsz;
--        struct vfio_irq_set *irq_set;
--        int32_t *pfd;
-+        int32_t fd =3D event_notifier_get_fd(&vector->interrupt);
-=20
--        argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--        irq_set =3D g_malloc0(argsz);
--        irq_set->argsz =3D argsz;
--        irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                         VFIO_IRQ_SET_ACTION_TRIGGER;
--        irq_set->index =3D VFIO_PCI_MSIX_IRQ_INDEX;
--        irq_set->start =3D nr;
--        irq_set->count =3D 1;
--        pfd =3D (int32_t *)&irq_set->data;
--
--        *pfd =3D event_notifier_get_fd(&vector->interrupt);
--
--        ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--
--        g_free(irq_set);
-+        vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX,=
- nr,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, NULL);
-     }
+-    QmpCommandList *commands;
++    const QmpCommandList *commands;
+     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
+     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+     /*
+@@ -1071,7 +1071,7 @@ static void hmp_info_help(Monitor *mon, const QDict=
+ *qdict)
+     help_cmd(mon, "info");
  }
 =20
-@@ -2629,10 +2571,8 @@ static void vfio_err_notifier_handler(void *opaque=
-)
-  */
- static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+-static void query_commands_cb(QmpCommand *cmd, void *opaque)
++static void query_commands_cb(const QmpCommand *cmd, void *opaque)
  {
--    int ret;
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int32_t fd;
+     CommandInfoList *info, **list =3D opaque;
 =20
-     if (!vdev->pci_aer) {
-         return;
-@@ -2644,58 +2584,30 @@ static void vfio_register_err_notifier(VFIOPCIDev=
-ice *vdev)
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+    fd =3D event_notifier_get_fd(&vdev->err_notifier);
-+    qemu_set_fd_handler(fd, vfio_err_notifier_handler, NULL, vdev);
-=20
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->err_notifier);
--    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to set up error notification");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->err_notifier);
-         vdev->pci_aer =3D false;
-     }
--    g_free(irq_set);
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index e2c366e09e..f9d43046aa 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -75,14 +75,14 @@ static QDict *qmp_dispatch_check_obj(const QObject *r=
+equest, bool allow_oob,
+     return dict;
  }
 =20
- static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
+-static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
++static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *req=
+uest,
+                                 bool allow_oob, Error **errp)
  {
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--    int ret;
-+    Error *err =3D NULL;
+     Error *local_err =3D NULL;
+     bool oob;
+     const char *command;
+     QDict *args, *dict;
+-    QmpCommand *cmd;
++    const QmpCommand *cmd;
+     QObject *ret =3D NULL;
 =20
-     if (!vdev->pci_aer) {
-         return;
-     }
+     dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
+@@ -163,7 +163,7 @@ bool qmp_is_oob(const QDict *dict)
+         && !qdict_haskey(dict, "execute");
+ }
 =20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to de-assign error fd: %m");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-     }
--    g_free(irq_set);
-     qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
-                         NULL, NULL, vdev);
-     event_notifier_cleanup(&vdev->err_notifier);
-@@ -2718,77 +2630,43 @@ static void vfio_req_notifier_handler(void *opaqu=
+-QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+                     bool allow_oob)
+ {
+     Error *err =3D NULL;
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index ca00f74795..d0f9a1d3e3 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -27,7 +27,7 @@ void qmp_register_command(QmpCommandList *cmds, const c=
+har *name,
+     QTAILQ_INSERT_TAIL(cmds, cmd, node);
+ }
+=20
+-QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
++const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const cha=
+r *name)
+ {
+     QmpCommand *cmd;
+=20
+@@ -77,10 +77,10 @@ bool qmp_has_success_response(const QmpCommand *cmd)
+     return !(cmd->options & QCO_NO_SUCCESS_RESP);
+ }
+=20
+-void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_f=
+n fn,
+                           void *opaque)
+ {
+-    QmpCommand *cmd;
++    const QmpCommand *cmd;
+=20
+     QTAILQ_FOREACH(cmd, cmds, node) {
+         fn(cmd, opaque);
+diff --git a/qga/commands.c b/qga/commands.c
+index 0c7d1385c2..05e9ab6c3d 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -54,7 +54,7 @@ void qmp_guest_ping(Error **errp)
+     slog("guest-ping called");
+ }
+=20
+-static void qmp_command_info(QmpCommand *cmd, void *opaque)
++static void qmp_command_info(const QmpCommand *cmd, void *opaque)
+ {
+     GuestAgentInfo *info =3D opaque;
+     GuestAgentCommandInfo *cmd_info;
+diff --git a/qga/main.c b/qga/main.c
+index c0d77c79c4..5b144b9250 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -359,7 +359,7 @@ static gint ga_strcmp(gconstpointer str1, gconstpoint=
+er str2)
+ }
+=20
+ /* disable commands that aren't safe for fsfreeze */
+-static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
++static void ga_disable_non_whitelisted(const QmpCommand *cmd, void *opaq=
+ue)
+ {
+     bool whitelisted =3D false;
+     int i =3D 0;
+@@ -378,7 +378,7 @@ static void ga_disable_non_whitelisted(QmpCommand *cm=
+d, void *opaque)
+ }
+=20
+ /* [re-]enable all commands, except those explicitly blacklisted by user=
+ */
+-static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
++static void ga_enable_non_blacklisted(const QmpCommand *cmd, void *opaqu=
 e)
-=20
- static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
  {
--    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
--                                      .index =3D VFIO_PCI_REQ_IRQ_INDEX =
-};
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int32_t fd;
-=20
-     if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
-         return;
-     }
-=20
--    if (ioctl(vdev->vbasedev.fd,
--              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count=
- < 1) {
--        return;
--    }
--
-     if (event_notifier_init(&vdev->req_notifier, 0)) {
-         error_report("vfio: Unable to init event notifier for device req=
-uest");
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+    fd =3D event_notifier_get_fd(&vdev->req_notifier);
-+    qemu_set_fd_handler(fd, vfio_req_notifier_handler, NULL, vdev);
-=20
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->req_notifier);
--    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to set up device request notification=
-");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, =
-0,
-+                           VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->req_notifier);
-     } else {
-         vdev->req_enabled =3D true;
-     }
--
--    g_free(irq_set);
+     GList *blacklist =3D opaque;
+     const char *name =3D qmp_command_name(cmd);
+@@ -918,7 +918,7 @@ int64_t ga_get_fd_handle(GAState *s, Error **errp)
+     return handle;
  }
 =20
- static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+-static void ga_print_cmd(QmpCommand *cmd, void *opaque)
++static void ga_print_cmd(const QmpCommand *cmd, void *opaque)
  {
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-=20
-     if (!vdev->req_enabled) {
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to de-assign device request fd: %m");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-     }
--    g_free(irq_set);
-     qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
-                         NULL, NULL, vdev);
-     event_notifier_cleanup(&vdev->req_notifier);
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index 398db38f14..d60f391439 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -106,26 +106,19 @@ static int vfio_set_trigger_eventfd(VFIOINTp *intp,
-                                     eventfd_user_side_handler_t handler)
- {
-     VFIODevice *vbasedev =3D &intp->vdev->vbasedev;
--    struct vfio_irq_set *irq_set;
--    int argsz, ret;
--    int32_t *pfd;
-+    int32_t fd =3D event_notifier_get_fd(intp->interrupt);
-+    Error *err =3D NULL;
-+    int ret;
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_T=
-RIGGER;
--    irq_set->index =3D intp->pin;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D event_notifier_get_fd(intp->interrupt);
--    qemu_set_fd_handler(*pfd, (IOHandler *)handler, NULL, intp);
--    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret < 0) {
--        error_report("vfio: Failed to set trigger eventfd: %m");
--        qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
-+    qemu_set_fd_handler(fd, (IOHandler *)handler, NULL, intp);
-+
-+    ret =3D vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-+                                 VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err);
-+    if (ret) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
-+        qemu_set_fd_handler(fd, NULL, NULL, NULL);
-     }
--    g_free(irq_set);
-+
-     return ret;
+     printf("%s\n", qmp_command_name(cmd));
  }
-=20
-@@ -361,26 +354,18 @@ static void vfio_start_eventfd_injection(SysBusDevi=
-ce *sbdev, qemu_irq irq)
-  */
- static int vfio_set_resample_eventfd(VFIOINTp *intp)
- {
-+    int32_t fd =3D event_notifier_get_fd(intp->unmask);
-     VFIODevice *vbasedev =3D &intp->vdev->vbasedev;
--    struct vfio_irq_set *irq_set;
--    int argsz, ret;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int ret;
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_U=
-NMASK;
--    irq_set->index =3D intp->pin;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D event_notifier_get_fd(intp->unmask);
--    qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
--    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    g_free(irq_set);
--    if (ret < 0) {
--        error_report("vfio: Failed to set resample eventfd: %m");
-+    qemu_set_fd_handler(fd, NULL, NULL, NULL);
-+    ret =3D vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-+                                 VFIO_IRQ_SET_ACTION_UNMASK, fd, &err);
-+    if (ret) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
-     }
-+
-     return ret;
- }
-=20
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index 1155b79678..686d99ff8c 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -167,6 +167,8 @@ void vfio_put_base_device(VFIODevice *vbasedev);
- void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
- void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
- void vfio_mask_single_irqindex(VFIODevice *vbasedev, int index);
-+int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex=
-,
-+                           int action, int fd, Error **errp);
- void vfio_region_write(void *opaque, hwaddr addr,
-                            uint64_t data, unsigned size);
- uint64_t vfio_region_read(void *opaque,
 --=20
-2.20.1
+2.21.0.196.g041f5ea1cf
