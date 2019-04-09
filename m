@@ -2,110 +2,103 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80C8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 08:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0B0C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:01:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E93B20880
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 08:59:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3265520880
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:01:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UyB/ExAL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E93B20880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="Y0lGFjtV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3265520880
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37755 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37801 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDmbH-0000h1-QH
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 04:59:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50921)
+	id 1hDmcm-0001vX-H8
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 05:01:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDma7-0008TV-GG
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 04:58:16 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hDmbH-0000u6-L2
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 04:59:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hDma6-0005c1-HA
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 04:58:15 -0400
-Received: from mail-eopbgr130110.outbound.protection.outlook.com
-	([40.107.13.110]:50086
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1hDmbG-0006SR-7t
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 04:59:27 -0400
+Received: from mail-eopbgr790111.outbound.protection.outlook.com
+	([40.107.79.111]:39119
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hDma4-0005aU-4O; Tue, 09 Apr 2019 04:58:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hDmbF-0006QH-Pj
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 04:59:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=wavesemi.onmicrosoft.com; s=selector1-wavecomp-com;
 	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=Q+oRUnxO9YrUfYB9EMLguKdH9DSDydSSdDrvYyVq6EQ=;
-	b=UyB/ExALTodefb0DHRtkWwilt/0ewg9QfHz/0OwqZfAbxRxRRxZRsrfsUuZGjQl9SrIIJ4UWXPGFD5QxXI7qaXBL25ahFY3lX8eGvew290NQSTyFWLr8WBKshuBjfI7bl0vCBr1sXdjH6PHLsnbIcCmMXfG0V3t0MBQDFxxXwkQ=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3291.eurprd08.prod.outlook.com (52.134.111.29) with Microsoft
-	SMTP
+	bh=U/PX8oisIFHHadB1JOalBKH1rYFSJgLwckL2sZ/3SYo=;
+	b=Y0lGFjtVO1O0TRdFzBvSrBr9554jy1KvH9DaIbbChfU7gnYL99AYnijN0tpitv9XRLX9NxC+7/Wwna9n0diPJHLbZRr2PuenUxCoGlNJJbP2eEi+39r8e4/UHhNYqMn7ArGCqcc7NSD+rIVCU79v5EsvEymlWXS4vUlGUoBeS1w=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+	BN6PR2201MB1635.namprd22.prod.outlook.com (10.174.85.164) with
+	Microsoft SMTP
 	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1771.15; Tue, 9 Apr 2019 08:58:09 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1771.021;
-	Tue, 9 Apr 2019 08:58:09 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: [PATCH v4 3/3] block/stream: introduce a bottom node
-Thread-Index: AQHU7jgLObZ1QwoQV0aKntu9PwsjWqYziEEA
-Date: Tue, 9 Apr 2019 08:58:08 +0000
-Message-ID: <c977f2bc-914b-e470-5f44-8a72bdb54a41@virtuozzo.com>
-References: <1554747741-918964-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554747741-918964-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1554747741-918964-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Accept-Language: ru-RU, en-US
+	15.20.1771.16; Tue, 9 Apr 2019 08:59:21 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81]) by
+	BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81%2]) with mapi id 15.20.1792.009;
+	Tue, 9 Apr 2019 08:59:20 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Markus Armbruster <armbru@redhat.com>, Lidong Chen <lidong.chen@oracle.com>
+Thread-Topic: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+Thread-Index: AQHU7phafzj+YhuaTEG+PttwAAXDgKYzhii7
+Date: Tue, 9 Apr 2019 08:59:20 +0000
+Message-ID:
+ <BN6PR2201MB125156A5AB0000731B85E76BC62D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1554750276-19230-1-git-send-email-lidong.chen@oracle.com>,
+	<87mukziv48.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mukziv48.fsf@dusky.pond.sub.org>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0502CA0001.eurprd05.prod.outlook.com
-	(2603:10a6:3:e3::11) To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
 authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190409115805963
-x-originating-ip: [185.231.240.5]
+	smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b7a556cf-bb90-46e1-aff4-08d6bcc97c9d
+x-ms-office365-filtering-correlation-id: ebfd0876-fda6-4eaf-9c86-08d6bcc9a7cb
 x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600139)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3291; 
-x-ms-traffictypediagnostic: DB7PR08MB3291:
-x-microsoft-antispam-prvs: <DB7PR08MB3291A323B71DA5B76AFFEAAEC12D0@DB7PR08MB3291.eurprd08.prod.outlook.com>
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:BN6PR2201MB1635; 
+x-ms-traffictypediagnostic: BN6PR2201MB1635:
+x-microsoft-antispam-prvs: <BN6PR2201MB1635EC3100DD22E507E88917C62D0@BN6PR2201MB1635.namprd22.prod.outlook.com>
 x-forefront-prvs: 000227DA0C
 x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(39850400004)(136003)(396003)(346002)(376002)(189003)(199004)(86362001)(14454004)(229853002)(6486002)(8936002)(2906002)(54906003)(110136005)(2201001)(305945005)(31696002)(4744005)(6246003)(7736002)(6436002)(36756003)(53936002)(99286004)(476003)(6512007)(11346002)(446003)(107886003)(2616005)(66066001)(486006)(5660300002)(256004)(106356001)(386003)(102836004)(71190400001)(316002)(105586002)(25786009)(4326008)(6116002)(52116002)(186003)(2501003)(81166006)(97736004)(68736007)(3846002)(6506007)(71200400001)(81156014)(31686004)(26005)(478600001)(8676002)(76176011);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3291;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	SFS:(10019020)(39850400004)(396003)(136003)(346002)(376002)(366004)(189003)(199004)(4326008)(106356001)(8676002)(81156014)(6246003)(97736004)(68736007)(446003)(8936002)(316002)(186003)(5660300002)(71190400001)(81166006)(11346002)(14444005)(256004)(53936002)(26005)(486006)(71200400001)(478600001)(14454004)(33656002)(25786009)(476003)(86362001)(6506007)(53546011)(7416002)(55016002)(6436002)(76176011)(54906003)(55236004)(74316002)(9686003)(102836004)(66066001)(7736002)(305945005)(110136005)(105586002)(2906002)(6116002)(7696005)(229853002)(99286004)(52536014)(3846002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1635;
+	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
 	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
 	permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 4NTycuIV7lZqcZXrKO/fABppcRMAnPjK7FQZU0yCpaQq5Mp+9Oex3Ws0W7/hcQuYT3se3uJTU9vnoLcqlRlky2gMdFk4r007qFgmfqVEb7DpM6b+jUrs3XQ8LV8+j8xfG+UGfG3BGHUjxMMvPxa6hzl0ikAN5yb3DN3Ka6j8Ey3C/QRspmX1l9qFSel1Ma5CWA6lhZW9b8xUZl8n+Uhclb3tyBl3ZMCXl8hGp72UsBe5wR+Y0554T7N0tPc5R2ECrduGYAouBO2POLgBYuNCyAWjiMpY6W1qPM8/Xg76zWbuGCIX9w0I7BztodnLPqicH7fedEtK8SyTasZ8zqAoKErTlvGTF0jmgUuqNA5XId5pe3qFhZtfMNmZNRlCm9JshXaeyPAF4zP8l+143X0U1tuNOr22e9XgxgI2rGf4hug=
+x-microsoft-antispam-message-info: w7Us468akpckG0HUiLy+4XWi8MpbGhxP5qDHEOsRSJ+9xqMoroVXVSmjDRKsvQKczy8IvRT7fwZhy1NSg9BFB28QZwNQh6zDkSBenkURiT4xE9l/Lk7vQvrbaAEqSKyJ/WPN2mnJlmLLkgdZsxFxsUhE9lKuwCr1Dgwf9ApykfS3toBcJxqXnMxqExNtQXsVnbyGQOPsasnXvwMeBuCyB/pn4rm75osCzYFrtHevkazThMQ91OKOedu4KfTDF03oV6TpG7UDYA1BfmY/LbHH/AvUimcNmCcdGVGygDBsMXa/ZgoZ8teDPkat1hB97cQi5nRLQQJaB5fKLfmwopcNApUfAXWSz+V3H9wFqiTCn6xlkMylS5eNwErpj3FsNji1Teq7/sC/Efu05qgrbgcLSCUz6slXrJAePSlIadNM4p4=
 Content-Type: text/plain; charset="UTF-8"
-Content-ID: <56706CDD04DE954CB60868E1F773455D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7a556cf-bb90-46e1-aff4-08d6bcc97c9d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 08:58:08.8093 (UTC)
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebfd0876-fda6-4eaf-9c86-08d6bcc9a7cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 08:59:20.7189 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3291
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1635
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.110
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] block/stream: introduce a bottom
- node
+X-Received-From: 40.107.79.111
+Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,29 +110,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	"berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
-	"mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Jason Wang <jasowang@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"f4bug@amsat.org" <f4bug@amsat.org>,
+	"darren.kenny@oracle.com" <darren.kenny@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409085808.7LlIICk3ARb7cIFHwVSG5weM_iMT9Wzudz6tp1XSGwk@z>
+Message-ID: <20190409085920.1R_qQ08zKErGRPI7ZgW2uScUzpOc1-rkpxcER0By058@z>
 
-MDguMDQuMjAxOSAyMToyMiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSBib3R0b20g
-bm9kZSBpcyB0aGUgaW50ZXJtZWRpYXRlIGJsb2NrIGRldmljZSB0aGF0IGhhcyB0aGUgYmFzZSBh
-cyBpdHMNCj4gYmFja2luZyBpbWFnZS4gSXQgaXMgdXNlZCBpbnN0ZWFkIG9mIHRoZSBiYXNlIG5v
-ZGUgd2hpbGUgYSBibG9jayBzdHJlYW0NCj4gam9iIGlzIHJ1bm5pbmcgdG8gYXZvaWQgZGVwZW5k
-ZW5jeSBvbiB0aGUgYmFzZSB0aGF0IG1heSBjaGFuZ2UgZHVlIHRvIHRoZQ0KPiBwYXJhbGxlbCBq
-b2JzLiBUaGUgY2hhbmdlIG1heSB0YWtlIHBsYWNlIGR1ZSB0byBhIGZpbHRlciBub2RlIGFzIHdl
-bGwgdGhhdA0KPiBpcyBpbnNlcnRlZCBiZXR3ZWVuIHRoZSBiYXNlIGFuZCB0aGUgaW50ZXJtZWRp
-YXRlIGJvdHRvbSBub2RlLiBJdCBvY2N1cnMNCj4gd2hlbiB0aGUgYmFzZSBub2RlIGlzIHRoZSB0
-b3Agb25lIGZvciBhbm90aGVyIGNvbW1pdCBvciBzdHJlYW0gam9iLg0KPiBBZnRlciB0aGUgaW50
-cm9kdWN0aW9uIG9mIHRoZSBib3R0b20gbm9kZSwgZG9uJ3QgZnJlZXplIGl0cyBiYWNraW5nIGNo
-aWxkLA0KPiB0aGF0J3MgdGhlIGJhc2UsIGFueW1vcmUuDQo+IA0KPiBTdWdnZXN0ZWQtYnk6IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXk8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPiBT
-aWduZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96
-em8uY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNl
-bWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+>
+> Lidong Chen <lidong.chen@oracle.com> writes:
+>
+> > Due to an off-by-one error, the assert statements allow an
+> > out-of-bounds array access.
+> >
+> > Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+> > ---
+> >  hw/sd/sd.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> > index aaab15f..818f86c 100644
+> > --- a/hw/sd/sd.c
+> > +++ b/hw/sd/sd.c
+> > @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates =
+state)
+> >      if (state =3D=3D sd_inactive_state) {
+> >          return "inactive";
+> >      }
+> > -    assert(state <=3D ARRAY_SIZE(state_name));
+> > +    assert(state < ARRAY_SIZE(state_name));
+> >      return state_name[state];
+> >  }
+> >
+> > @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t r=
+sp)
+> >      if (rsp =3D=3D sd_r1b) {
+> >          rsp =3D sd_r1;
+> >      }
+> > -    assert(rsp <=3D ARRAY_SIZE(response_name));
+> > +    assert(rsp < ARRAY_SIZE(response_name));
+> >      return response_name[rsp];
+> >  }
+>
+> This is the second fix for this bug pattern in a fortnight.  Where's
+> one, there are more:
+>
+> $ git-grep '<=3D ARRAY_SIZE'
+> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
+]));
+> hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0=
+]));
+> hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <=3D ARRAY_SIZE(s-=
+>tx_fifo)) {
+> hw/sd/pxa2xx_mmci.c:        && s->tx_len <=3D ARRAY_SIZE(s->tx_fifo)
+> hw/sd/pxa2xx_mmci.c:        && s->rx_len <=3D ARRAY_SIZE(s->rx_fifo)
+> hw/sd/pxa2xx_mmci.c:        && s->resp_len <=3D ARRAY_SIZE(s->resp_fifo);
+> hw/sd/sd.c:    assert(state <=3D ARRAY_SIZE(state_name));
+> hw/sd/sd.c:    assert(rsp <=3D ARRAY_SIZE(response_name));
+> hw/usb/hcd-xhci.c:    assert(n <=3D ARRAY_SIZE(tmp));
+
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+> target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARR=
+AY_SIZE (multiple_regs)) {
+
+The last four items are OK as they are. The variable multiple_regs is, in f=
+act,
+an array of 9 int constants:
+
+static const int multiple_regs[] =3D { 16, 17, 18, 19, 20, 21, 22, 23, 30 }=
+;
+
+ARRAY_SIZE (multiple_regs) will always be equal to 9.
+
+The variable base_reglist (that is checked to be > 0 and <=3D9) is used
+in succeeding lines like this:
+
+        for (i =3D 0; i < base_reglist; i++) {
+            do_sw(env, addr, env->active_tc.gpr[multiple_regs[i]], mem_idx,
+                  GETPC());
+            addr +=3D 4;
+        }
+
+Therefore, the array multiple_regs will always be accessed within its bound=
+s.
+
+> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+> target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+> target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <=3D AR=
+RAY_SIZE(dbg->arch.bp));
+> tcg/tcg.c:    tcg_debug_assert(pi <=3D ARRAY_SIZE(op->args));
+> util/main-loop.c:    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
+> util/module.c:    assert(n_dirs <=3D ARRAY_SIZE(dirs));
+>
+> Lidong Chen, would you like to have a look at these?
+>
+> Cc'ing maintainers to help with further investigation.
+>
+
+Thank you for bringing this to our attention, Markus. And thanks to Lidong =
+too.
+
+Aleksandar
+
+P. S. Shouldn't perhaps our macro ARRAY_SIZE() be renamed to
+NUMBER_OF_ELEMENTS()?
+
+________________________________________
+From: Markus Armbruster <armbru@redhat.com>
+Sent: Tuesday, April 9, 2019 7:51:51 AM
+To: Lidong Chen
+Cc: qemu-devel@nongnu.org; darren.kenny@oracle.com; f4bug@amsat.org; Peter =
+Maydell; Jason Wang; Andrzej Zaborowski; Gerd Hoffmann; Aurelien Jarno; Ale=
+ksandar Markovic; Aleksandar Rikalo; David Gibson; Richard Henderson; Paolo=
+ Bonzini
+Subject: Re: [Qemu-devel] [PATCH] sd: Fix out-of-bounds assertions
+
+Lidong Chen <lidong.chen@oracle.com> writes:
+
+> Due to an off-by-one error, the assert statements allow an
+> out-of-bounds array access.
+>
+> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+> ---
+>  hw/sd/sd.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index aaab15f..818f86c 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates st=
+ate)
+>      if (state =3D=3D sd_inactive_state) {
+>          return "inactive";
+>      }
+> -    assert(state <=3D ARRAY_SIZE(state_name));
+> +    assert(state < ARRAY_SIZE(state_name));
+>      return state_name[state];
+>  }
+>
+> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp=
+)
+>      if (rsp =3D=3D sd_r1b) {
+>          rsp =3D sd_r1;
+>      }
+> -    assert(rsp <=3D ARRAY_SIZE(response_name));
+> +    assert(rsp < ARRAY_SIZE(response_name));
+>      return response_name[rsp];
+>  }
+
+This is the second fix for this bug pattern in a fortnight.  Where's
+one, there are more:
+
+$ git-grep '<=3D ARRAY_SIZE'
+hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0])=
+);
+hw/intc/arm_gicv3_cpuif.c:    assert(aprmax <=3D ARRAY_SIZE(cs->ich_apr[0])=
+);
+hw/net/stellaris_enet.c:        if (s->tx_fifo_len + 4 <=3D ARRAY_SIZE(s->t=
+x_fifo)) {
+hw/sd/pxa2xx_mmci.c:        && s->tx_len <=3D ARRAY_SIZE(s->tx_fifo)
+hw/sd/pxa2xx_mmci.c:        && s->rx_len <=3D ARRAY_SIZE(s->rx_fifo)
+hw/sd/pxa2xx_mmci.c:        && s->resp_len <=3D ARRAY_SIZE(s->resp_fifo);
+hw/sd/sd.c:    assert(state <=3D ARRAY_SIZE(state_name));
+hw/sd/sd.c:    assert(rsp <=3D ARRAY_SIZE(response_name));
+hw/usb/hcd-xhci.c:    assert(n <=3D ARRAY_SIZE(tmp));
+target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARRAY=
+_SIZE (multiple_regs)) {
+target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARRAY=
+_SIZE (multiple_regs)) {
+target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARRAY=
+_SIZE (multiple_regs)) {
+target/mips/op_helper.c:    if (base_reglist > 0 && base_reglist <=3D ARRAY=
+_SIZE (multiple_regs)) {
+target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+target/ppc/kvm.c:           <=3D ARRAY_SIZE(hw_debug_points));
+target/ppc/kvm.c:    assert((nb_hw_breakpoint + nb_hw_watchpoint) <=3D ARRA=
+Y_SIZE(dbg->arch.bp));
+tcg/tcg.c:    tcg_debug_assert(pi <=3D ARRAY_SIZE(op->args));
+util/main-loop.c:    g_assert(n_poll_fds <=3D ARRAY_SIZE(poll_fds));
+util/module.c:    assert(n_dirs <=3D ARRAY_SIZE(dirs));
+
+Lidong Chen, would you like to have a look at these?
+
+Cc'ing maintainers to help with further investigation.
 
