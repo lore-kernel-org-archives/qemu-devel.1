@@ -2,115 +2,81 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 510BCC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68519C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:55:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1017120833
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1017120833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 2D53420833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 19:55:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8c8/VYf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D53420833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48318 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48359 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDwp8-0005pI-CD
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:54:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44576)
+	id 1hDwqG-0006am-Gb
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 15:55:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hDwnp-00056g-ML
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:53:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hDwpB-000634-KB
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hDwno-0002kA-JE
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:53:05 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:38016
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hDwno-0002jq-91
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:53:04 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by v2201612906741603.powersrv.de (Postfix) with ESMTP id 03B2FDA1CC7;
-	Tue,  9 Apr 2019 21:46:43 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
-	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
-	port 10024)
-	with ESMTP id hofw6CnYUsui; Tue,  9 Apr 2019 21:46:41 +0200 (CEST)
-Received: from [192.168.178.24] (p57B42B4A.dip0.t-ipconnect.de [87.180.43.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128
-	bits)) (No client certificate requested)
-	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 3662DDA13FD; 
-	Tue,  9 Apr 2019 21:46:41 +0200 (CEST)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	Thomas Huth <thuth@redhat.com>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-Date: Tue, 9 Apr 2019 21:46:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hDwp8-00046R-Cm
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:54:27 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:33922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hDwp4-0003zF-74
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:54:24 -0400
+Received: by mail-ot1-x330.google.com with SMTP id k21so16787363otf.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 12:54:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=xkQa98a28VKjTQrGjpPepqcM83CyZTPDKD30JbWI/1Y=;
+	b=l8c8/VYfMQgQqPIsphW8hwqUPJ99LDAEiJMe9KpNxDIu1EOJLYhbhin1iN3KAA9Kn4
+	5qkxbALwgrob+r0z/zPGWDOl0Dqc0vQtG+kZOXbkrpNVfmJJDkJemykkV36E+r3mbb+o
+	LXTLx8BAYYxe2XNn7uhOEvkjKBj8I0lW72Top+PWvKf4wvOGJyB/0Pn36Z4BF/k2IFzA
+	UvjjdYzxeyXXErO+v+pv2W4sbgvi4GPvlxYYdTPSvn/KJlxIfH2Jo3LbJzlS0/SKaK8s
+	cRBbVF9HR9OGPONs90idRoTuMlVVxq8sva6Zt1Ze7dYX6NrUbehj3p1ActveFCwlZCvV
+	CoDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=xkQa98a28VKjTQrGjpPepqcM83CyZTPDKD30JbWI/1Y=;
+	b=E+fJkev76s8GZdPr4NxgYhg9y3jcPdLt+642F8p4Wrvr3IJ4AwtWB6djLhR4Pr9C4r
+	RYnDi2s6Q+IzWlGyFh652xk5aZZcitxUTIK9Snlg6iK8CIgIskE0SYnEbIkrZ8UqpFoJ
+	iZSfXqurxMFLRicCU4fDXOApAMqAYmdCxZ+XNdm+4L8ZW6yK1+/2mb/+Yyy/RDiPnHdX
+	+zK48SxbILjW6QthWV+94Aq5S0PRDIBkxpLziuCXRo63cBhjGdVLCDe1Cl2GKe7VPQWY
+	4RTl4EPp7LJ7fSwwduI2cOH7niwLbIqH5E4o9QVsD6BxMzyaA4ILo73E1NGRZpPntTqZ
+	vEOA==
+X-Gm-Message-State: APjAAAVr9Km5TIG88aaIOOrEC5SR8IPvjf98tzUPiMlcsmpipDXMjLVW
+	FSl9+474sOYo6oHW3hot1othICumwSJt9KSZnPxciw==
+X-Google-Smtp-Source: APXvYqyAnUELNb144rMpxqrhLcBo5V9T7rSLiGQylmAB5Y5zu0Kb7ipHDS47MC1R6Z11suu5qMS9Axwm7f4QW5m/A6s=
+X-Received: by 2002:a05:6830:1497:: with SMTP id
+	s23mr21786268otq.236.1554839659594; 
+	Tue, 09 Apr 2019 12:54:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
+References: <e61c4a17-910b-0066-92ae-3fabf4a4e3e3@weilnetz.de>
+In-Reply-To: <e61c4a17-910b-0066-92ae-3fabf4a4e3e3@weilnetz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 10 Apr 2019 02:54:11 +0700
+Message-ID:
+ <CAFEAcA-djqczK-BG-NBF3116fmmbxS5GPH94NGfDXWQU3dxoww@mail.gmail.com>
+To: Stefan Weil <sw@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 37.120.169.71
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::330
+Subject: Re: [Qemu-devel] Misaligned memory writes on ARM and other runtime
+ errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,55 +88,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
-	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+	QEMU Developer <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409194640.mu9OmEQgZZitaSNPJyW9OMbHYnmKKM_rMScW8taWIqU@z>
+Message-ID: <20190409195411.OQIrpPLUBcArgudHRqAN2HUemKKox-viuLPjXBPU3Vg@z>
 
-On 05.04.19 11:16, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/5/19 11:02 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Fri, Apr 05, 2019 at 10:47:54AM +0200, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->> Do the various crashes that you illustrate in that cover letter
->> still exist today ? If so, 2 years of continued brokenness with no
->> fixes would reinforce the the view that it is time to remove TCI
->> from the codebase.
->=20
-> Or find a maintainer and add tests...
+On Wed, 10 Apr 2019 at 02:12, Stefan Weil <sw@weilnetz.de> wrote:
+>
+> When QEMU for ARM is compiled with sanitizers
+> (--extra-cflags=-fsanitize=address,undefined), I see runtime errors for
+> qemu-arm which indicate misaligned memory writes:
+>
+> /qemu/linux-user/fd-trans.c:1389:18: runtime error: store to misaligned
+> address 0x42ff4b34 for type 'uint64_t', which requires 8 byte alignment
+>
+> The full sanitizer report is available from
+> https://qemu.weilnetz.de/doc/sanitizer.txt. Some of the reported runtime
+> errors can easily be fixed, for example by replacing "1 << 31"
+> (currently 188 matches) by "1U << 31" (currently only 70 matches).
 
-Thank you for CC'ing me. I could not spend much of my free time for QEMU
-last year and typically will miss important messages on the list unless
-my address is explicitly given. Nevertheless I still feel responsible
-for TCI, and I am also listed as maintainer in MAINTAINERS.
+The shift "errors" are not in fact errors -- we compile with -fwrapv
+to request a dialect of C where left shift of signed integers is
+well-defined and has 2s complement semantics. Some versions
+of the clang sanitizers don't correctly handle that flag as meaning
+that those shifts should no longer generate sanitizer warnings.
+If you're using a clang without that bug fix you can suppress the
+warnings by adding "-fno-sanitize=shift-base" to the --extra-cflags
+you pass to QEMU's configure.
 
-In the past there was only limited use of TCI (as far as I know), and
-the current implementation worked for many applications, for example to
-count the frequency of TCG opcodes.
+The misaligned accesses are definitely bugs. The linux-user code
+unfortunately has quite a lot of code in its data-structure conversion
+code that is pretty fast and loose about accessing fields in
+target-layout data structures.
 
-The known problems with the current implementation are
-
-* Misaligned memory accesses. This should be easy to fix. I already sent
-a patch (currently discussed) which fixed user mode emulation on ARM for =
-me.
-
-* Calling conventions. The current implementation works on many hosts,
-but for example not on Sparc. A fix would require simple calling
-conventions for all helper functions (for example stack based argument
-passing, can this be enforced?), or it needs to know the signature of
-each helper function at runtime. I'm afraid that fixing this would
-require much work. A runtime test whether calls of helper functions work
-correctly could be implemented easily and could abort the program
-execution when calls fail to pass the right arguments. Would such a
-runtime test help a little bit?
-
-* Performance. It can be improved a bit by implementing more TCG opcodes
-for the interpreter, but of course TCI is slower than TCG (which is
-slower than KVM).
-
-Cheers
-Stefan
+thanks
+-- PMM
 
