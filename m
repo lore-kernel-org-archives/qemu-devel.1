@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60192)
+Received: from eggs.gnu.org ([209.51.188.92]:33238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hDot6-00086w-36
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:26:01 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hDoxa-0000eL-Rc
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hDot3-0001oR-LX
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:26:00 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hDot3-0001o1-3t
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:25:57 -0400
-Received: by mail-wr1-x442.google.com with SMTP id g3so20359018wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 04:25:56 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1hDoxZ-0003mt-P8
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 07:30:38 -0400
+Date: Tue, 9 Apr 2019 12:26:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190409112608.GD16944@stefanha-x1.localdomain>
+References: <20190402121908.44081-1-slp@redhat.com>
 MIME-Version: 1.0
-References: <20190408083627.7479-1-armbru@redhat.com>
-	<20190408083627.7479-4-armbru@redhat.com>
-	<CAMxuvayc+RnpmFpUVFaLW2Uh8y6bZo2N4o6wu6YVyE1XRHtdWg@mail.gmail.com>
-	<87bm1gr83k.fsf@dusky.pond.sub.org>
-	<1f1ab942-49e9-0714-c6bc-65c7a0c4fa27@redhat.com>
-In-Reply-To: <1f1ab942-49e9-0714-c6bc-65c7a0c4fa27@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Apr 2019 13:25:43 +0200
-Message-ID: <CAJ+F1C+7gBUPFY5hJ8aCg4_KWJHiNMNx_6CjAQExOVKqmG7FOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/15] char-pty: Drop "char device
- redirected to" message
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hoZxPH4CaxYzWscb"
+Content-Disposition: inline
+In-Reply-To: <20190402121908.44081-1-slp@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] aio: Add a knob to always
+ poll if there are in-flight requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
-
-Hi
-
-On Tue, Apr 9, 2019 at 12:40 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 4/8/19 2:31 PM, Markus Armbruster wrote:
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >
-> >> Hi
-> >>
-> >> On Mon, Apr 8, 2019 at 10:36 AM Markus Armbruster <armbru@redhat.com> =
-wrote:
-> >>>
-> >>> char_pty_open() prints a "char device redirected to PTY_NAME (label
-> >>> LABEL)" message to the current monitor or else to stderr.  No other
-> >>> ChardevClass::open() prints anything on success.  Drop the message.
-> >>>
-> >>> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-> >>> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >>> ---
-> >>>  chardev/char-pty.c | 2 --
-> >>>  1 file changed, 2 deletions(-)
-> >>>
-> >>
-> >> I guess that was printed for convenience.
-> >>
-> >> Allocated pty can be read from "info chardev", so I suppose we can
-> >> make qemu more silent. Fine with me:
-> >>
-> >> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Thanks!
-> >
-> > If we should decide the message is still useful enough to be worth
-> > keeping, I could direct it to stdout instead of dropping it.
->
-> I prefer this, if Marc-Andr=C3=A9 is still OK.
-
-I don't mind, but I wonder if we really have users that care. Power
-users can easily get the associated pty from a monitor query.
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+--hoZxPH4CaxYzWscb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 02, 2019 at 02:19:08PM +0200, Sergio Lopez wrote:
+> The polling mode in aio_poll is able to trim down ~20us on the average
+> request latency, but it needs manual fine tuning to adjust it to the
+> characteristics of the storage.
+>=20
+> Here we add a new knob to the IOThread object, "poll-inflight". When
+> this knob is enabled, aio_poll will always use polling if there are
+> in-flight requests, ignoring the rest of poll-* parameters. If there
+> aren't any in-flight requests, the usual polling rules apply, which is
+> useful given that the default poll-max-ns value of 32us is usually
+> enough to catch a new request in the VQ when the Guest is putting
+> pressure on us.
+>=20
+> To keep track of the number of in-flight requests, AioContext has a
+> new counter which is increased/decreased by thread-pool.c and
+> linux-aio.c on request submission/completion.
+>=20
+> With poll-inflight, users willing to spend more Host CPU resources in
+> exchange for a lower latency just need to enable a single knob.
+>=20
+> This is just an initial version of this feature and I'm just sharing
+> it to get some early feedback. As such, managing this property through
+> QAPI is not yet implemented.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  block/linux-aio.c         |  7 +++++++
+>  include/block/aio.h       |  9 ++++++++-
+>  include/sysemu/iothread.h |  1 +
+>  iothread.c                | 33 +++++++++++++++++++++++++++++++++
+>  util/aio-posix.c          | 32 +++++++++++++++++++++++++++++++-
+>  util/thread-pool.c        |  3 +++
+>  6 files changed, 83 insertions(+), 2 deletions(-)
+
+Hi Sergio,
+More polling modes are useful for benchmarking and performance analysis.
+=46rom this perspective I think poll-inflight is worthwhile.
+
+Like most performance optimizations, the effectiveness of this new
+polling mode depends on the workload.  It could waste CPU, especially on
+a queue depth 1 workload with a slow disk.
+
+Do you think better self-tuning is possible?  Then users don't need to
+set tunables like this one.
+
+Stefan
+
+--hoZxPH4CaxYzWscb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcrIFQAAoJEJykq7OBq3PI8qEH/iryfV2vz33+lmOKyk29N+b+
+qk05411mD/cl8TAmQm05SIKmr9A0CNgdI0zCb8vLPtEadtV/yQA9wwFubTxcGKGS
+fZwQljUFVApmcARAIBRgZRQVXmGVGZ1+n5NbsPN1m4bchjpS1JslVLRFJrybSJ3z
+Xva4M4oQf/IL4OqDmhrJKQpFwPG/zBalvQEkQHPlsXdyR/ijpNl/hxA0uNW6ZCkp
+a4g7s8by5i43v5xCuK8Eb41hmGa3vpnpTatU7hm6WlguvVZKFpFGgQEBFVM7kh7O
+8kV5pJWbVKUACaf/C8mTeU12GIPiua6dXeijTya9x6kgmncJipeFMhtlx9T6N94=
+=L82Y
+-----END PGP SIGNATURE-----
+
+--hoZxPH4CaxYzWscb--
