@@ -2,86 +2,84 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E721EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A17C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC6662084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:27:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCA762084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbBAubcD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC6662084F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+jEs8YY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA762084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45891 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45906 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtay-0008L2-Tr
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:27:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59267)
+	id 1hDtcB-000186-Q5
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:28:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWl-0004Z9-4k
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWg-0004Uz-TI
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWk-0003US-4h
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:15 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:45458)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWf-0003Qx-P3
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:10 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:35194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hDtWj-0003TX-Tm
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:14 -0400
-Received: by mail-wr1-x429.google.com with SMTP id s15so21649839wra.12
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:13 -0700 (PDT)
+	id 1hDtWf-0003QN-Ap
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:09 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id w1so21739597wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=J/oX2Py0fTzs8jjZVuYDRStPJAK1DgZHWNwrWKfTCFU=;
-	b=nbBAubcDKlZUtyrL0DR9I9vj0e5w7B8rMWbAN+MsNvVZoSJlUN6qdSRFEeW7Ou++TK
-	CLTRt/CoufNL+T4nQ92JJzyx/3C6cTu8ShqobeWn+rYu9sGc1anhkMZwtaw8M+5wqLqq
-	hvyJHNJV3U22gUqDMFr+V7u66PY0CSOZxjC0EDV0F5Y4dPjFVSOuBGGoJ7O0ZEn+bq8r
-	m/Ad/lIonEWZDimtDU3msV62wGs64K49pXH7eHQovM5SY08HNxQn7d+6A5ZF07py2YpA
-	TC/foxsAbJSk4bHy8I+iTWn8Kx/A8rc2Tw33Tir1HMqYPOxXTYBEGNucxwcSXX/6XQ5H
-	IWHQ==
+	h=sender:from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=y/8PrclKnxmolPq5eYA0ddDNjqLNHWB3s8whob5ULbo=;
+	b=P+jEs8YYrrRa0sZctEVW2OE/83hl2kSROgcoPbpXvHiKvzx8Dy/251LhKwZQaQ3WCb
+	cF29/vyoDBuh1LR/o5dBs1W3zNhtEbW1D0I7OcvRSOZdoRtm/Ve6H+otp0pAOmXQ4kiJ
+	bJoiWWpGdubeQo5WqpY5pGch1q0hdvdO8OCYPacbpKpTRkPWesySsZ7mbGgTDHUbi+Rn
+	fHiKhGyWqi7F8mIJu4BQztqAc89Nq8Iv+7WvYKTiS1dRxkuGiIBu6l4Xffvv9hRNlSPR
+	N/myb+2Mzg5tSLHInEMRw2BWdESPrO2cUV3FBJTBnksHCKRCzUOxKUyiNhCLO/LY4vIZ
+	ViHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=J/oX2Py0fTzs8jjZVuYDRStPJAK1DgZHWNwrWKfTCFU=;
-	b=iT3Vb0ZWeXUTLbqt6aimdv13ZrNQEVpXCPvRpoBdtgyAaYSn6wu0qyDCuAe/fnoaE1
-	mNaj/4muQynRENSMU3M1I17Iii2T7x4Aj5TSdkypvpzyL+7K1BgIfkZSYsP3WLHZOkfZ
-	YQmBB3IYfVqtHSexz6yhBtE2rOAsyNQpKv4yImHExak3Nw/Kjm5VZzBfMK2U96cruAT7
-	wBhtfNzJh4zoXfvlcM5AqgiHKnBegdjz3p039VzyUiPqA8zM8yet3Zi80TtZdIdxybz0
-	PzsgsgE0JQLP4167bHLjZU4OwPofZjKlj+xzAHNX73datptZCQa3fuurUC4ISeNvIJKi
-	OpeA==
-X-Gm-Message-State: APjAAAUPdFN4KhC0ru1nfk6mKN/dRB8ziIzJXIOAdEO9/vb6GR9HA0rl
-	gM8wpoLiJWttA/dvsNbeoEEB8DYY
-X-Google-Smtp-Source: APXvYqyQ+r8lW1vi4HIicna5uqVl3dtZdMZ6WCxLHFH45Re4PX8qhJ0IQukPrkww3NHWl+JHO6aWeA==
-X-Received: by 2002:a5d:62c4:: with SMTP id o4mr2469619wrv.282.1554826992681; 
-	Tue, 09 Apr 2019 09:23:12 -0700 (PDT)
+	h=x-gm-message-state:sender:from:to:subject:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=y/8PrclKnxmolPq5eYA0ddDNjqLNHWB3s8whob5ULbo=;
+	b=psT6faeRYkI2R+LAi5iE8hlxPwf88+VowA+g38d9jMAG3ELBM03ZS+ivhPvzGrMEbp
+	SQ5CXfgCqWdF64vQS8Ert6sZe+W2hO+G3FRBHKhvXzKkhFuK4d+ar38Rw+w4n+DvEFwr
+	j5xbs5jowqQKoJtbwp8knRSNsG3FJqYHsN27TURkchEjwvV5D36bgle562xzGKSyPvw+
+	49C3lZ3+96+j09GLVnB2gOYT4mtdqv3Dmhg1v5tFMgEmI1O5daikRF1qLGDO7aC7pEL6
+	nDgaQwspXq3UYPrRhPrD5PAf1anrcYa8j0SvkO6G0NvONQiEL/KEkAxGqCBN+WAM24D0
+	96jA==
+X-Gm-Message-State: APjAAAXdDK/56nyHAnnJkaUeEMukBM3w1q+tgTqEL3z0HNA0uPcGyejw
+	vZxFUhBqqMuxhZ1Jup4e1BDWhgzD
+X-Google-Smtp-Source: APXvYqx2ovMJ4BeuffVzjHIGevDv3HkrJuPdayqg2cTi4L+wOhZdsfLnxYc1LrGp2UFYc39D/3LbXA==
+X-Received: by 2002:adf:dc83:: with SMTP id r3mr23130251wrj.179.1554826987939; 
+	Tue, 09 Apr 2019 09:23:07 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	e1sm59579736wrw.66.2019.04.09.09.23.08
+	e1sm59579736wrw.66.2019.04.09.09.23.07 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 09:23:12 -0700 (PDT)
+	Tue, 09 Apr 2019 09:23:07 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  9 Apr 2019 18:23:03 +0200
-Message-Id: <1554826986-37164-3-git-send-email-pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 18:23:01 +0200
+Message-Id: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
-References: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: [Qemu-devel] [PULL 2/5] roms: Allow passing configure options to
- the EDK2 build tools
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL v2 0/5] Misc patches for QEMU 4.0-rc3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,70 +91,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409162303.SCHQGX8savfw7AxuPoCdBIgb2eg43zfCe6e0V_-TK20@z>
+Message-ID: <20190409162301.DUKvd5aEcB70QatsYJfQ1rf0Zfcox5kvAaN0sKeNAHw@z>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+The following changes since commit 248987f92cfda8305d6d44ced23e173e62a8bc0e:
 
-Since commit f590a812c210 we build the EDK2 EfiRom utility
-unconditionally.
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-04-09 10:02:30 +0100)
 
-Some distributions require to use extra compiler/linker flags,
-i.e. SUSE which enforces the PIE protection (see [*]).
+are available in the git repository at:
 
-EDK2 build tools already provide a set of variables for that,
-use them to allow the caller to easily inject compiler/linker
-options..
 
-Now build scripts can pass extra options, example:
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-  $ make -C roms \
-      EDK2_BASETOOLS_OPTFLAGS='-fPIE' \
-      efirom
+for you to fetch changes up to 73a2f20946d387e971f2e18fe9503f4ea3a3c201:
 
-[*] https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
+  tests: Make check-block a phony target (2019-04-09 18:21:59 +0200)
 
-Reported-by: Olaf Hering <olaf@aepfle.de>
-Suggested-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190409134536.15548-3-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- roms/Makefile | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+----------------------------------------------------------------
+* fixes for Alpine and SuSE
+* fix crash when hot-plugging nvdimm on older machine types
 
-diff --git a/roms/Makefile b/roms/Makefile
-index d28252d..1ff78b6 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -120,8 +120,21 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
- 
-+# Build scripts can pass compiler/linker flags to the EDK2 build tools
-+# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
-+# EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
-+#
-+# Example:
-+#
-+#  make -C roms \
-+#    EDK2_BASETOOLS_OPTFLAGS='...' \
-+#    EDK2_BASETOOLS_LDFLAGS='...' \
-+#    efirom
-+#
- $(EDK2_EFIROM):
--	$(MAKE) -C edk2/BaseTools
-+	$(MAKE) -C edk2/BaseTools \
-+		EXTRA_OPTFLAGS='$(EDK2_BASETOOLS_OPTFLAGS)' \
-+		EXTRA_LDFLAGS='$(EDK2_BASETOOLS_LDFLAGS)'
- 
- slof:
- 	$(MAKE) -C SLOF CROSS=$(powerpc64_cross_prefix) qemu
+----------------------------------------------------------------
+Markus Armbruster (1):
+      tests: Make check-block a phony target
+
+Peter Maydell (1):
+      include/qemu/bswap.h: Use __builtin_memcpy() in accessor functions
+
+Philippe Mathieu-Daudé (2):
+      roms: Rename the EFIROM variable to avoid clashing with iPXE
+      roms: Allow passing configure options to the EDK2 build tools
+
+Thomas Huth (1):
+      hw/i386/pc: Fix crash when hot-plugging nvdimm on older machine types
+
+ hw/i386/pc.c           |  9 +++++++--
+ include/qemu/bswap.h   | 26 ++++++++++++++++----------
+ roms/Makefile          | 23 ++++++++++++++++++-----
+ tests/Makefile.include |  2 +-
+ 4 files changed, 42 insertions(+), 18 deletions(-)
 -- 
 1.8.3.1
-
 
 
