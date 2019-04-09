@@ -2,63 +2,81 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9409C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BBBC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC80F2084B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:49:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC80F2084B
+	by mail.kernel.org (Postfix) with ESMTPS id 9D1672133D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:57:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXYoMufp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1672133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45031 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45129 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDt01-00079N-Th
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:49:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50009)
+	id 1hDt7X-0000cW-PD
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:57:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hDsz1-0006sI-Ef
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:48:24 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDt5u-00085S-Di
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hDsz0-0006VT-Es
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:48:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54837)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hDsz0-0006RZ-4X
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:48:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EBCEF308622A;
-	Tue,  9 Apr 2019 15:42:21 +0000 (UTC)
-Received: from redhat.com (ovpn-116-51.ams2.redhat.com [10.36.116.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EAFD600D4;
-	Tue,  9 Apr 2019 15:42:21 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-Reply-To: <20190409151830.6024-1-peter.maydell@linaro.org> (Peter Maydell's
-	message of "Tue, 9 Apr 2019 16:18:30 +0100")
-References: <20190409151830.6024-1-peter.maydell@linaro.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-Date: Tue, 09 Apr 2019 17:46:42 +0200
-Message-ID: <87ef6byye5.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 09 Apr 2019 15:42:21 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0] migration/ram.c: Fix
- use-after-free in multifd_recv_unfill_packet()
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDt5t-0004hC-86
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:30 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1hDt5s-0004bc-Ts
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:55:29 -0400
+Received: by mail-wr1-x434.google.com with SMTP id h4so21584283wre.7
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=rDCyQEV68QiNrEEjUa3/5MOv4E0APgi3UE7jUK7dh9w=;
+	b=QXYoMufpXyP6aea4NrTIs2gkRl+RFCRAg9A6CONgkUL2qiU7R3RF2L/0nNX6RzCarp
+	md+d97qA2DHVEY7jXdHVr6XJOFIxQPa4WGKX//aPV7KNsbJpLz8s7iTTm1kCg0OVBadr
+	W1K8nR706B3wRO5T4wsw+t7U5PfVBGNquMGaQCCol7fFtUWe7K17YAGRFEpa+iBVs2uO
+	ZEuBgtQL3P/AuUxwgmJpjaCRO0ttAmGuEZIq5+ngwG1qz+i7y/D2saBVAkAbENpte5Q+
+	7H1sBIcljAr9XmyPirDInGj2lsAvMSFQAoMqD1yX0UQMzVh7IRxvyeIN4yRyvTGHb3sB
+	6WHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	:in-reply-to:references;
+	bh=rDCyQEV68QiNrEEjUa3/5MOv4E0APgi3UE7jUK7dh9w=;
+	b=TDk7jFxYr+LHKkhLac5CQRDD84o1XUxoDS4H263hIYO4OMPuhh3Gn7SPjf0AM1/Esq
+	lXvK070qNfWc52sloRqv83NaZNtcCBx9Xw3Pm+vJgGcVqfJGRobqBcPOGQZxChk9eXde
+	Xw8cr2+56RG9PElXRbCTd/NF7TkPFVdXQx6HL25SH2OnKoE0N/AVRHpVkEjyCxWLCwWE
+	mgYw8nUnPOu+4cgvpqRfw6K2ler+1FaxZ9I8QcpqiFFoXL3iYTtjBJ9zVJKl03Wsuio/
+	h9tY1EQCiOA3R1yzJzfZN3Cl0WjCAqCJekevpcxWiIyM0sGTBegDpisIUTHGxf9UllG5
+	AeeQ==
+X-Gm-Message-State: APjAAAX/RZvHhH51kxwcRI75e9enkxd2HwP2dR5Z6V4Sy5f9e7GDyY4v
+	vwxAKJqJBlK9PqYfdGKmqbxqPqpC
+X-Google-Smtp-Source: APXvYqzzFdcvReecMVCOcu3Mv5RKoRGsC9MJPqCbnKpUWCn1QkCUb3lxDhcvFOKPivEL9/aFeJuYcg==
+X-Received: by 2002:adf:f8c1:: with SMTP id f1mr15675455wrq.151.1554825322691; 
+	Tue, 09 Apr 2019 08:55:22 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	g84sm23117586wmf.25.2019.04.09.08.55.21
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 08:55:22 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Apr 2019 17:55:16 +0200
+Message-Id: <1554825316-33288-6-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1554825316-33288-1-git-send-email-pbonzini@redhat.com>
+References: <1554825316-33288-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::434
+Subject: [Qemu-devel] [PULL 5/5] tests: Make check-block a phony target
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,61 +88,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409154642.WI6azhBHuiVOp-496Dkixp80r6HU6EaKToVPQg5F4N8@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409155516.w4lGTEmtaGQr9mTmnqd9CxsjL190yP5gH8deABO5mXQ@z>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> Coverity points out (CID 1400442) that in this code:
->
->     if (packet->pages_alloc > p->pages->allocated) {
->         multifd_pages_clear(p->pages);
->         multifd_pages_init(packet->pages_alloc);
->     }
->
-> we free p->pages in multifd_pages_clear() but continue to
-> use it in the following code. We also leak memory, because
-> multifd_pages_init() returns the pointer to a new MultiFDPages_t
-> struct but we are ignoring its return value.
->
-> Fix both of these bugs by adding the missing assignment of
-> the newly created struct to p->pages.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+From: Markus Armbruster <armbru@redhat.com>
 
-ouch,
+Fixes: b93b63f574c "test makefile overhaul"
 
-good catch.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190319072104.32591-1-armbru@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 6b904d7..36fc73f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1164,7 +1164,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ 
+ # Consolidated targets
+ 
+-.PHONY: check-qapi-schema check-qtest check-unit check check-clean
++.PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-- 
+1.8.3.1
 
-
-
-> I don't know anything about the multifd code, but this seems like
-> the obvious fix based on looking at what the clear and init
-> functions are doing. I have only run 'make check' on this,
-> so review and testing definitely in order. I think we should
-> really put this into 4.0, which means ideally I'd like to
-> commit it to master today or tomorrow, though...
-> ---
->  migration/ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f68beeeeffc..1ca9ba77b6a 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -851,7 +851,7 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
->       */
->      if (packet->pages_alloc > p->pages->allocated) {
->          multifd_pages_clear(p->pages);
-> -        multifd_pages_init(packet->pages_alloc);
-> +        p->pages = multifd_pages_init(packet->pages_alloc);
->      }
->  
->      p->pages->used = be32_to_cpu(packet->pages_used);
 
