@@ -2,69 +2,63 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B6BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C2BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCDEB2084F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:29:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCDEB2084F
+	by mail.kernel.org (Postfix) with ESMTPS id CD8952084F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 16:30:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8952084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45928 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46015 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDtd9-00021o-4l
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:29:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59601)
+	id 1hDte7-0002ui-2r
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 12:30:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1hDtXy-0005kG-2t
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:24:31 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtM1-0003kV-Af
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1hDtXv-0004Rz-AC
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:24:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11529)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtM0-0005N9-4P
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:12:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>)
-	id 1hDtXt-0004Ft-20; Tue, 09 Apr 2019 12:24:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hDtLz-0005MV-P5
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:12:08 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C54753005127;
-	Tue,  9 Apr 2019 16:24:10 +0000 (UTC)
-Received: from kinshicho (unknown [10.43.2.212])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A03911001E6B;
-	Tue,  9 Apr 2019 16:24:09 +0000 (UTC)
-Message-ID: <fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-Date: Tue, 09 Apr 2019 18:24:07 +0200
-In-Reply-To: <20190408042747.GI16627@umbus.fritz.box>
-References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
-	<20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20190328183923.lcd3p6fpy4qvvxoo@maxibm>
-	<20190329132951.451d4ef0@bahia.lan>
-	<20190401145858.lw7v3xt7fqanp6nc@maxibm>
-	<20190402122807.1a141e37@bahia.lan>
-	<20190408042747.GI16627@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DEE98125A;
+	Tue,  9 Apr 2019 16:11:57 +0000 (UTC)
+Received: from localhost (ovpn-112-27.ams2.redhat.com [10.36.112.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2A0FD17AD8;
+	Tue,  9 Apr 2019 16:11:56 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  9 Apr 2019 18:10:09 +0200
+Message-Id: <20190409161009.6322-21-marcandre.lureau@redhat.com>
+In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 09 Apr 2019 16:24:10 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 09 Apr 2019 16:12:02 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
- get-vpd RTAS interface
+Subject: [Qemu-devel] [PATCH v4 20/20] hmp: call the asynchronous QMP
+ screendump to fix outdated/glitches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,87 +70,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	"Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409162407.D5RZgCNXANuT8fbev2ev_KdWCAzHlnUNxhoxCx5Pv3Y@z>
+Message-ID: <20190409161009.Zy-cblHnSv8NgCCVzPpVPFYSJXwow3-97tP3k1ofoOc@z>
 
-Apologies for taking this long to respond.
+In order to fix the bad screendumps (same as rhbz#1230527), call into
+the asynchonous version of the QMP command.
 
-On Mon, 2019-04-08 at 14:27 +1000, David Gibson wrote:
-> On Tue, Apr 02, 2019 at 12:28:07PM +0200, Greg Kurz wrote:
-> > The recent fixes around "host-serial" and "host-model" simply moved
-> > the decision to expose host data to the upper layer, ie. libvirt
-> > which should be involved in this discussion.
-> 
-> Right, that's deliberate.  Note that roughly-equivalent information on
-> x86 is currently supplied via the SMBIOS.  OpenStack Nova sets that,
-> rather than qemu, and I'd like to move towards a common configuration
-> model with x86, though it's a fairly long path to there.
-> 
-> OpenStack had an equivalent security problem to our one, which it
-> addressed by taking the host serial from /etc/machine-id if present
-> rather than the real host info.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hmp.h           |  3 ++-
+ hmp.c           |  6 ++----
+ ui/console.c    | 22 ----------------------
+ hmp-commands.hx |  3 ++-
+ 4 files changed, 6 insertions(+), 28 deletions(-)
 
-IIUC the situation is a bit different between x86 and ppc64, because
-while for the latter SPAPR defines a way for the guest to access
-information about the host it's running on, that's not the case for
-the former, at least to the best of my knowledge.
-
-What OpenStack is doing is reading the machine-id (if explicitly
-configured to do so: the default is to use the guest's own UUID[1])
-and exposing that as the *guest* serial, not as the *host* serial.
-
-From libvirt's point of view, the entire mechanism is entirely
-optional, so unless the management layer explicitly asks it to set
-a certain value for the serial, libvirt will simply pass no
-information down to QEMU.
-
-The relevant XML elements[2] are clearly modeled after x86, so I
-wonder if Nova is setting them also on ppc64 and if so, what the
-guest will ultimately see...
-
-> > Cc'ing Andrea for expertise. Problem exposed below.
-> > 
-> > The pseries machine used to expose the content of the host's
-> > /proc/device-tree/system-id and /proc/device-tree/model in the guest
-> > DT. This led to a CVE and QEMU doesn't do that anymore for new machine
-> > types. Instead, two new properties where added to the pseries machine:
-> > 
-> > pseries-4.0.host-serial=string (Host serial number to advertise in guest device tree)
-> > pseries-4.0.host-model=string (Host model to advertise in guest device tree)
-> > 
-> > It is up to the caller to pass something... which may be anything,
-> > including something like $(cat /proc/device-tree/system-id) or
-> > randomly generated.
-
-What happens if the caller doesn't provide any value? Will QEMU come
-up with something itself?
-
-Adding a few extra knobs in the vein as the existing ones sounds like
-a fairly reasonable idea. It will still be up to the management layer
-to actually provide the values.
-
-> > Is there a chance libvirt can be taught to pass a different string
-> > to the target QEMU in case of migration ?
-
-libvirt already supports providing a different XML to the target
-host, so changing a couple values should be no big deal.
-
-
-As a final note, unless I've gotten it wrong and x86 actually *does*
-provide a way for the guest to figure out its host's serial, then any
-software relying on the attributes defined by SPAPR is ultimately not
-portable to non-ppc64 hardware and should probably be rearchitected
-to go through the management layer, as Daniel was also suggesting
-earlier in the thread.
-
-
-[1] https://github.com/openstack/nova/blob/master/nova/virt/libvirt/driver.py#L364-L372
-[2] https://libvirt.org/formatdomain.html#elementsSysinfo
--- 
-Andrea Bolognani / Red Hat / Virtualization
+diff --git a/hmp.h b/hmp.h
+index 43617f2646..4059c8bea9 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -16,6 +16,7 @@
+=20
+ #include "qemu-common.h"
+ #include "qemu/readline.h"
++#include "qapi/qmp/dispatch.h"
+=20
+ void hmp_info_name(Monitor *mon, const QDict *qdict);
+ void hmp_info_version(Monitor *mon, const QDict *qdict);
+@@ -102,7 +103,7 @@ void hmp_netdev_del(Monitor *mon, const QDict *qdict)=
+;
+ void hmp_getfd(Monitor *mon, const QDict *qdict);
+ void hmp_closefd(Monitor *mon, const QDict *qdict);
+ void hmp_sendkey(Monitor *mon, const QDict *qdict);
+-void hmp_screendump(Monitor *mon, const QDict *qdict);
++void hmp_screendump_async(Monitor *mon, const QDict *qdict, QmpReturn *q=
+ret);
+ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
+diff --git a/hmp.c b/hmp.c
+index 9428c90c5d..60d2bc1c76 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2373,15 +2373,13 @@ err_out:
+     goto out;
+ }
+=20
+-void hmp_screendump(Monitor *mon, const QDict *qdict)
++void hmp_screendump_async(Monitor *mon, const QDict *qdict, QmpReturn *q=
+ret)
+ {
+     const char *filename =3D qdict_get_str(qdict, "filename");
+     const char *id =3D qdict_get_try_str(qdict, "device");
+     int64_t head =3D qdict_get_try_int(qdict, "head", 0);
+-    Error *err =3D NULL;
+=20
+-    hmp_screendump_sync(filename, id !=3D NULL, id, id !=3D NULL, head, =
+&err);
+-    hmp_handle_error(mon, &err);
++    qmp_screendump(filename, id !=3D NULL, id, id !=3D NULL, head, qret)=
+;
+ }
+=20
+ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+diff --git a/ui/console.c b/ui/console.c
+index 620cd14b80..c259cf68aa 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -429,28 +429,6 @@ static QemuConsole *get_console(bool has_device, con=
+st char *device,
+     return con;
+ }
+=20
+-void hmp_screendump_sync(const char *filename,
+-                         bool has_device, const char *device,
+-                         bool has_head, int64_t head, Error **errp)
+-{
+-    DisplaySurface *surface;
+-    QemuConsole *con =3D get_console(has_device, device, has_head, head,=
+ errp);
+-
+-    if (!con) {
+-        return;
+-    }
+-    /* This may not complete the drawing with Spice, you may have
+-     * glitches or outdated dumps, use qmp instead! */
+-    graphic_hw_update(con);
+-    surface =3D qemu_console_surface(con);
+-    if (!surface) {
+-        error_setg(errp, "no surface");
+-        return;
+-    }
+-
+-    ppm_save(filename, surface, errp);
+-}
+-
+ void qmp_screendump(const char *filename,
+                     bool has_device, const char *device,
+                     bool has_head, int64_t head,
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 9b4035965c..638b59e764 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -278,7 +278,8 @@ ETEXI
+         .params     =3D "filename [device [head]]",
+         .help       =3D "save screen from head 'head' of display device =
+'device' "
+                       "into PPM image 'filename'",
+-        .cmd        =3D hmp_screendump,
++        .async_cmd  =3D hmp_screendump_async,
++        .async      =3D true,
+     },
+=20
+ STEXI
+--=20
+2.21.0.196.g041f5ea1cf
 
 
