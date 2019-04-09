@@ -2,73 +2,85 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 013AEC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 03:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC4FC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 04:15:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1BF020883
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 03:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1BF020883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BC41420855
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 04:15:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ydro3mSX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC41420855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34635 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34775 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDhs4-0007Np-Mo
-	for qemu-devel@archiver.kernel.org; Mon, 08 Apr 2019 23:56:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43454)
+	id 1hDiAQ-0002FU-SJ
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 00:15:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDhrF-000729-Fd
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 23:55:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hDi8p-0001PO-Mx
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 00:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDhrD-0008MV-Uy
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 23:55:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55542)
+	(envelope-from <richard.henderson@linaro.org>) id 1hDi8o-00007y-Fx
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 00:13:47 -0400
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:41099)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hDhrD-0008LK-L6
-	for qemu-devel@nongnu.org; Mon, 08 Apr 2019 23:55:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hDhrB-0000yI-Fz
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 03:55:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6FBDB2E80C7
-	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 03:55:33 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Apr 2019 03:46:49 -0000
-From: Chen Zhang <1823831@bugs.launchpad.net>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hDi8o-000075-8F
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 00:13:46 -0400
+Received: by mail-pg1-x52b.google.com with SMTP id f6so8513847pgs.8
+	for <qemu-devel@nongnu.org>; Mon, 08 Apr 2019 21:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=fNgDJEtSfSlRgEnoJPzj+CuwzjJQh8hSC2zVaPEmKgU=;
+	b=Ydro3mSXg9+S/NZUWn9Q5BRc93afTOCTJB+rnsjptEMPgw858p2Dv/IRvotVHMiKmp
+	WJQkvacIDfluUolgGBwnZKQSo0DhARb7I6T/Ob4wVCoxmOVW+FoOkif7NApCXXuF2Zzb
+	Ma5gXXQkxnkyEem0qABWkrvlx3iUwLToJ8UGrLax0ESk34IxQWaVDIcIzyMnjLUcnh31
+	teDvVk9enCov6aMyhP8al37Hl9h3yNmsDOqmbm6ne87QzkImSAfjBccWcgxLbRVUsIG0
+	jWVwN1q8nNRKOqr2utq5QQIMdQrwOSMcRQ5nfsEuZ04S2s9ABoDJWaYrUdeTaQe+Lt7t
+	8Xmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=fNgDJEtSfSlRgEnoJPzj+CuwzjJQh8hSC2zVaPEmKgU=;
+	b=eSEBXAjYxSr1ki0L6Oh2tHSS1+iiOyr+OAw7mPNo9SO/4dBA7Te66mSrgb9CRyqGaz
+	lvIPjE8/YjZQzqJg+lgTlACiLe+FCz20Hy7jm0hUX/R2nJYAtqf6dLj4i1ltrRYBFIeL
+	cjctCViWK1jXXJXSiMo8iHYlcFAK2e+PLATgXV1fvUdd2/I1h1wVvJjP9O4tY/Y5RKfY
+	WVP68Bx89/t94v9bWd6mnPqqjxF6ExPS1igJzkd79TMBQxfVHxqOH7zHER+Pv5YXfVq0
+	zgc4sgm3yj581AcIe17gD082vz14tcaOcbI25Fh2M/llgLpT8w0t3sB38I4za1FQb+5M
+	smGw==
+X-Gm-Message-State: APjAAAVWmCLxqRpdSjFeJDLWtHHrkvyebkLBZ9C8bj/6v83MKn8k2etm
+	pz0aZ/sGW+hiC4yAi3RpBiXjD+qSKVs=
+X-Google-Smtp-Source: APXvYqy+fQ4lAgjwejK7It7UJMg9Csenr1IadXivoeTTe1DkABmoEP3/K/m6DddTVbFWr2FNs63aQg==
+X-Received: by 2002:a65:64c8:: with SMTP id t8mr31964254pgv.248.1554783224787; 
+	Mon, 08 Apr 2019 21:13:44 -0700 (PDT)
+Received: from localhost.localdomain (rrcs-173-198-79-114.west.biz.rr.com.
+	[173.198.79.114]) by smtp.gmail.com with ESMTPSA id
+	d129sm46012024pfa.142.2019.04.08.21.13.43
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 08 Apr 2019 21:13:44 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: hvf osx
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cuser2
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Chen Zhang (cuser2)
-Message-Id:
- <155478160922.20745.7830680070590942423.malonedeb@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e687226e397affac1ff128513f367273f76bd4c4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823831] [NEW] BSD bootloader halts with
- hypervisor.framework
+Date: Mon,  8 Apr 2019 18:13:37 -1000
+Message-Id: <20190409041337.23602-3-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190409041337.23602-1-richard.henderson@linaro.org>
+References: <20190409041337.23602-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::52b
+Subject: [Qemu-devel] [PATCH 2/2] HACK: Test avx2 state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,65 +89,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823831 <1823831@bugs.launchpad.net>
+Cc: jan.bobek@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409034649.KEv7kVJPH9NFD-b9c_k1qltMlZeLafBDIkmw-mrhEug@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190409041337.hAlvXTFsrURfUviFb3BhkGywJFe6DQC1XT0KSwp1XXw@z>
 
-Public bug reported:
+In order to not be a hack, we'd have to test whether avx2 exists.
 
-Guest: FreeBSD 12.0 Install CD
-Host: MacOS 11.14.3 qemu master at 90fb864a7df0a9af677352e94f8225f7b03de922
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ test_i386.S | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-Command arguments:
+diff --git a/test_i386.S b/test_i386.S
+index 05344d7..55815fe 100644
+--- a/test_i386.S
++++ b/test_i386.S
+@@ -23,24 +23,24 @@
+ 	add	$2f-1b, BASE
+ #endif
+ 
+-	movdqa	0(BASE), %xmm0
+-	movdqa	1*16(BASE), %xmm1
+-	movdqa	2*16(BASE), %xmm2
+-	movdqa	3*16(BASE), %xmm3
+-	movdqa	4*16(BASE), %xmm4
+-	movdqa	5*16(BASE), %xmm5
+-	movdqa	6*16(BASE), %xmm6
+-	movdqa	7*16(BASE), %xmm7
++	vmovdqa	0(BASE), %ymm0
++	vmovdqa	1*32(BASE), %ymm1
++	vmovdqa	2*32(BASE), %ymm2
++	vmovdqa	3*32(BASE), %ymm3
++	vmovdqa	4*32(BASE), %ymm4
++	vmovdqa	5*32(BASE), %ymm5
++	vmovdqa	6*32(BASE), %ymm6
++	vmovdqa	7*32(BASE), %ymm7
+ 
+ #ifdef __x86_64__
+-	movdqa	8*16(BASE), %xmm8
+-	movdqa	9*16(BASE), %xmm9
+-	movdqa	10*16(BASE), %xmm10
+-	movdqa	11*16(BASE), %xmm11
+-	movdqa	12*16(BASE), %xmm12
+-	movdqa	13*16(BASE), %xmm13
+-	movdqa	14*16(BASE), %xmm14
+-	movdqa	15*16(BASE), %xmm15
++	vmovdqa	8*32(BASE), %ymm8
++	vmovdqa	9*32(BASE), %ymm9
++	vmovdqa	10*32(BASE), %ymm10
++	vmovdqa	11*32(BASE), %ymm11
++	vmovdqa	12*32(BASE), %ymm12
++	vmovdqa	13*32(BASE), %ymm13
++	vmovdqa	14*32(BASE), %ymm14
++	vmovdqa	15*32(BASE), %ymm15
+ #endif
+ 
+ 	xor	%eax, %eax
+@@ -75,6 +75,6 @@
+ 2:
+ 	.set	i, 0
+ 	.rept	256
+-	.byte	i
++	.byte	i, i, i, i
+ 	.set	i, i + 1
+ 	.endr
+-- 
+2.17.1
 
-qemu-system-x86_64 -m 4000m -cdrom Downloads/FreeBSD-12.0-RELEASE-
-amd64-bootonly.iso
-
-When qemu was run with -accel hvf, the bootloader would halt after
-showing the menu. The bootloader would not respond to any keyboard
-events.
-
-Without acceleration option, the bootloader would count down to zero and
-proceed.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: hvf osx
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823831
-
-Title:
-  BSD bootloader halts with hypervisor.framework
-
-Status in QEMU:
-  New
-
-Bug description:
-  Guest: FreeBSD 12.0 Install CD
-  Host: MacOS 11.14.3 qemu master at 90fb864a7df0a9af677352e94f8225f7b03de9=
-22
-
-  Command arguments:
-
-  qemu-system-x86_64 -m 4000m -cdrom Downloads/FreeBSD-12.0-RELEASE-
-  amd64-bootonly.iso
-
-  When qemu was run with -accel hvf, the bootloader would halt after
-  showing the menu. The bootloader would not respond to any keyboard
-  events.
-
-  Without acceleration option, the bootloader would count down to zero
-  and proceed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823831/+subscriptions
 
