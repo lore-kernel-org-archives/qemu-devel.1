@@ -2,79 +2,60 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9486EC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDB5C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:40:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E8C20818
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:38:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E8C20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB3D7205F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 10:40:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB3D7205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38836 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38866 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDo9A-0003UN-KS
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 06:38:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49265)
+	id 1hDoAm-00050N-A8
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 06:40:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDo6w-0001pE-Jl
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:36:15 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo2H-0006Nl-W8
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hDo6v-0000uh-JN
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:36:14 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40740)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hDo6v-0000uG-9c
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:36:13 -0400
-Received: by mail-wr1-f66.google.com with SMTP id h4so20195699wre.7
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 03:36:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=hpXbdlw7PdaJYcTg8shkgWQ2Iuma1R4+F70kszDPHKo=;
-	b=mQt6n23mDMEZ8KW6QBksDlk+are2YTFwxqFDVvm5UsFqDbleRWC9jSYiax75CSu+jG
-	iErl4YXzPFMTPFIRjnZd7Uq3Ch2JwY4gEcRn+egFjF+FZ65yxE1iNw4CWNO6cReW27NX
-	PwaMEZRJ73sONzwbEi2T+EgZl2e95p6vgTlAUKX4xbvcwpQO4J98KoPIycYn2Vr6Dcno
-	maznrjuia1naJ423zRirS0oHdNJ0fHiX0xwbSDBOMRR2O9rQ2RuQdnrmwHZDKXb2xqhi
-	yfCwbLmstGHaG+IYPzYRPgKHiQPsG2YUhQ/09ANvFw2t6GUbPXZ3o27ck2+81uq4ucdq
-	8Cag==
-X-Gm-Message-State: APjAAAVx5RIRuAVg0GZ4wuy8fTXIuX8yKT4ZWF35L9WUcXyFjfkJ6Np2
-	85IT2RvephPL+HZ0sTHzO4iavA==
-X-Google-Smtp-Source: APXvYqxklrCWIpD2Olf5JdGnPGnMli0oiEY/8D0lPN8Y0r45jVT932I2voQrfjjcJPjk2C0cgIObew==
-X-Received: by 2002:adf:ec4e:: with SMTP id w14mr23215431wrn.53.1554806172283; 
-	Tue, 09 Apr 2019 03:36:12 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	s18sm13917651wmc.41.2019.04.09.03.36.11
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 09 Apr 2019 03:36:11 -0700 (PDT)
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>
-References: <20190409053320.14612-1-sw@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dcf3ed0d-f850-69bf-fc52-827b1e2a1a9e@redhat.com>
-Date: Tue, 9 Apr 2019 12:36:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo2G-0007S6-Ub
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 06:31:25 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60594 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hDo2C-0007Ob-Vd; Tue, 09 Apr 2019 06:31:21 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+	by Forcepoint Email with ESMTP id C68807842779D2009383;
+	Tue,  9 Apr 2019 18:31:17 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+	DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server
+	id 14.3.408.0; Tue, 9 Apr 2019 18:31:08 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+	<imammedo@redhat.com>
+Date: Tue, 9 Apr 2019 11:29:35 +0100
+Message-ID: <20190409102935.28292-9-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190409053320.14612-1-sw@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH] Update configure
+X-Received-From: 45.249.212.32
+Subject: [Qemu-devel] [PATCH v4 8/8] hw/arm/boot: Expose the PC-DIMM nodes
+ in the DT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,34 +67,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+	linuxarm@huawei.com, xuwei5@hisilicon.com,
+	shannon.zhaosl@gmail.com, sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409103610.bVnCBRCA8GjMO-hYTTSe3Dg3CJwW8eRHkTlplz9O028@z>
+Message-ID: <20190409102935.j7bST3ENACek5NzGO9qr90eGpMMDW1dYtHWsa07JM6Y@z>
 
-On 4/9/19 7:33 AM, Stefan Weil wrote:
-> The last *.aml file was removed in commit 13b1881aacc7e5018773bd545bbaf8d5476699ee.
-> 
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+This patch adds memory nodes corresponding to PC-DIMM regions.
+This will enable support for cold plugged device memory for Guests
+with DT boot.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-> ---
->  configure | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 1c563a7027..9c5d9a8c96 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7886,7 +7886,6 @@ LINKS="$LINKS python"
->  for bios_file in \
->      $source_path/pc-bios/*.bin \
->      $source_path/pc-bios/*.lid \
-> -    $source_path/pc-bios/*.aml \
->      $source_path/pc-bios/*.rom \
->      $source_path/pc-bios/*.dtb \
->      $source_path/pc-bios/*.img \
-> 
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 8c840ba..150e1ed 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/numa.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
++#include "hw/mem/memory-device.h"
+ #include "elf.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/config-file.h"
+@@ -538,6 +539,41 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+ }
+ 
++static int fdt_add_hotpluggable_memory_nodes(void *fdt,
++                                             uint32_t acells, uint32_t scells) {
++    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
++    MemoryDeviceInfo *mi;
++    int ret = 0;
++
++    for (info = info_list; info != NULL; info = info->next) {
++        mi = info->value;
++        switch (mi->type) {
++        case MEMORY_DEVICE_INFO_KIND_DIMM:
++        {
++            PCDIMMDeviceInfo *di = mi->u.dimm.data;
++
++            ret = fdt_add_memory_node(fdt, acells, di->addr, scells,
++                                      di->size, di->node, true);
++            if (ret) {
++                fprintf(stderr,
++                        "couldn't add PCDIMM /memory@%"PRIx64" node\n",
++                        di->addr);
++                goto out;
++            }
++            break;
++        }
++        default:
++            fprintf(stderr, "%s memory nodes are not yet supported\n",
++                    MemoryDeviceInfoKind_str(mi->type));
++            ret = -ENOENT;
++            goto out;
++        }
++    }
++out:
++    qapi_free_MemoryDeviceInfoList(info_list);
++    return ret;
++}
++
+ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                  hwaddr addr_limit, AddressSpace *as)
+ {
+@@ -637,6 +673,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         }
+     }
+ 
++    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
++    if (rc < 0) {
++        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
++        goto fail;
++    }
++
+     rc = fdt_path_offset(fdt, "/chosen");
+     if (rc < 0) {
+         qemu_fdt_add_subnode(fdt, "/chosen");
+-- 
+2.7.4
+
+
 
