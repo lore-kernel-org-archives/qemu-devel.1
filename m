@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59267)
+Received: from eggs.gnu.org ([209.51.188.92]:59294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWl-0004Z9-4k
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWm-0004ab-LB
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWk-0003US-4h
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:15 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:45458)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hDtWl-0003W8-Nm
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:16 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41959)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hDtWj-0003TX-Tm
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:14 -0400
-Received: by mail-wr1-x429.google.com with SMTP id s15so21649839wra.12
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:13 -0700 (PDT)
+	id 1hDtWl-0003V7-Hm
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:23:15 -0400
+Received: by mail-wr1-x434.google.com with SMTP id r4so21688793wrq.8
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 09:23:15 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  9 Apr 2019 18:23:03 +0200
-Message-Id: <1554826986-37164-3-git-send-email-pbonzini@redhat.com>
+Date: Tue,  9 Apr 2019 18:23:05 +0200
+Message-Id: <1554826986-37164-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
 References: <1554826986-37164-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/5] roms: Allow passing configure options to
- the EDK2 build tools
+Subject: [Qemu-devel] [PULL 4/5] hw/i386/pc: Fix crash when hot-plugging
+ nvdimm on older machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +29,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Since commit f590a812c210 we build the EDK2 EfiRom utility
-unconditionally.
+QEMU currently crashes when you try to hot-plug an "nvdimm" device
+on older machine types:
 
-Some distributions require to use extra compiler/linker flags,
-i.e. SUSE which enforces the PIE protection (see [*]).
+$ qemu-system-x86_64 -monitor stdio -M pc-1.1
+QEMU 3.1.92 monitor - type 'help' for more information
+(qemu) device_add nvdimm,id=nvdimmn1
+qemu-system-x86_64: /home/thuth/devel/qemu/util/error.c:57: error_setv:
+ Assertion `*errp == ((void *)0)' failed.
+Aborted (core dumped)
 
-EDK2 build tools already provide a set of variables for that,
-use them to allow the caller to easily inject compiler/linker
-options..
+The call to hotplug_handler_pre_plug() in pc_memory_pre_plug() has been
+added recently before the check whether nvdimm is enabled. It should
+be done after the check. And while we're at it, also check the errp
+after the hotplug_handler_pre_plug(), otherwise errors are silently
+ignored here.
 
-Now build scripts can pass extra options, example:
-
-  $ make -C roms \
-      EDK2_BASETOOLS_OPTFLAGS='-fPIE' \
-      efirom
-
-[*] https://lists.opensuse.org/opensuse-factory/2017-06/msg00403.html
-
-Reported-by: Olaf Hering <olaf@aepfle.de>
-Suggested-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190409134536.15548-3-philmd@redhat.com>
+Fixes: 9040e6dfa8c3fed87695a3de555d2c775727bb51
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190407092314.11066-1-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- roms/Makefile | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ hw/i386/pc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/roms/Makefile b/roms/Makefile
-index d28252d..1ff78b6 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -120,8 +120,21 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 6077d27..f2c15bf 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2078,6 +2078,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     const MachineState *ms = MACHINE(hotplug_dev);
+     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+     const uint64_t legacy_align = TARGET_PAGE_SIZE;
++    Error *local_err = NULL;
  
-+# Build scripts can pass compiler/linker flags to the EDK2 build tools
-+# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
-+# EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
-+#
-+# Example:
-+#
-+#  make -C roms \
-+#    EDK2_BASETOOLS_OPTFLAGS='...' \
-+#    EDK2_BASETOOLS_LDFLAGS='...' \
-+#    efirom
-+#
- $(EDK2_EFIROM):
--	$(MAKE) -C edk2/BaseTools
-+	$(MAKE) -C edk2/BaseTools \
-+		EXTRA_OPTFLAGS='$(EDK2_BASETOOLS_OPTFLAGS)' \
-+		EXTRA_LDFLAGS='$(EDK2_BASETOOLS_LDFLAGS)'
+     /*
+      * When -no-acpi is used with Q35 machine type, no ACPI is built,
+@@ -2090,13 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
  
- slof:
- 	$(MAKE) -C SLOF CROSS=$(powerpc64_cross_prefix) qemu
+-    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
+-
+     if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
+         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+         return;
+     }
+ 
++    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
+                      pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
+ }
 -- 
 1.8.3.1
