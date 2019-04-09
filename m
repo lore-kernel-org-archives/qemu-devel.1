@@ -6,78 +6,86 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2722C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6B5C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:38:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA64A206B7
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93B5A20883
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 15:38:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hbpjwrkL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA64A206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="ze54xeBV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B5A20883
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44115 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44767 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDsgv-0000nI-1Q
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:29:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40806)
+	id 1hDspH-0003gD-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 11:38:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsfg-0008Ng-Jt
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:25 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoN-0003DT-Jn
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hDsfd-0001L7-VN
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:24 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45266)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hDsoL-00006a-Sf
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:23 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hDsfc-0001AS-Q2
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:28:21 -0400
-Received: by mail-oi1-x243.google.com with SMTP id y84so13859576oia.12
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=JTZ649fAskZCWH4BCMR+J9fxk61NLvC0J/SWv1w2srk=;
-	b=hbpjwrkLL/wPU9S0OxdcY6QcDBu3qFUf9lBxPpdDKN5Ls/XCkb6B/kqhGaKTF77rMp
-	/H6HIa5IhEp7TIwC49z4X4ih1qtZ4e28Ozy997semcC/GkgrAMH2pUIByebMu61Sf+an
-	x1OZmBTTGMLsJ8DSVJao/xPoobtJ6ydt297jSSwA8PGeGCRPFpzA4BEqRsFOUaNwa2l+
-	fXoF1XoWZq5wTWbofMyndXSYH93E9K6N9M0XCCU3hHkJLr0HBwDgL0BYgVEBSpHhd4TU
-	2HDREKiynKCVNjFOXTcdD/oifTTQrOh+wpma63nIzGaiXXJh+dYEkadhlThj0+X7gGn5
-	tmTQ==
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hDsoK-0008TB-2Q
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 11:37:21 -0400
+Received: by mail-io1-xd42.google.com with SMTP id v4so14682909ioj.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 08:37:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
+	h=mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=gX9NsXUd1ErUayh3aaMZYIRanGqtnledw62C6vGXhms=;
+	b=ze54xeBVWjYns3BE/WfTaYQB3il+h+xD5OGL5FDpt33GWFFJrkOaLPxU6LnCs5z1oj
+	vFnSVYvGTmkysW6uDAa6lPzlvNR6PqLv6dnmD8AwXwJNE20sfl+sHdMw/ZTEhIjyOzLi
+	Bhq5nSNn6/2K/a2+2B+MiCduxPaibhtskaHymIJnkoE8jfNlcbmAwnz7Gtuhs/gKoXQT
+	Pl2nvTXbO5wXmLysKQDJrRKprEKkC4xROq/iLwbPINnBQ3a5UFhAVhYltW/nJlJhpJ/U
+	XA2jaDZRFcU4p3VSyVhWeJK86irxEltMEsWgWgk5KWA9tQVzUEb9dQIQPBzYfzwLY2In
+	3kyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=JTZ649fAskZCWH4BCMR+J9fxk61NLvC0J/SWv1w2srk=;
-	b=fQsYqNZiuk7YrL3jYWzV5Hcmbo031MBmM1wcg4YTDNcv0Kba/orVYivW2KtxajF2it
-	uekNrgyHzXo0fYwE0j1UaOwHtOnruXL42QsrGGQt+wGkoqgZaNCyblqBCUtt15OVKp+/
-	prsBzixknN87/xKFd4lrj9i5gb0dBwq7e2ze6RzepY78jT/kU6OG5wCFBFCcc7aX2c9k
-	doeaBDtbi8FyEc67oPze09SLRXswEn4NEJPp+lBpPbLCpm5mtCXnjDVUsr/vAjT/gkNV
-	EK1L8Mw5Xs5A0cRyvGdYi0M72rhrYhgL5OLyJ3AiKWlsa4KSDcDe5U//KdgoyLt6VUKx
-	nEJw==
-X-Gm-Message-State: APjAAAVOgMJJcEq/lxkhRN6XMgIe5Ary6xZequXLVs9BkrP11ZYvMU+b
-	yTCY1b6OlwVQBFq26ovU/ul2bdh2FAkMbjgtzNcRyg==
-X-Google-Smtp-Source: APXvYqxgFv7+4B3zLxyp7C4Jp0/1rjxtatXaHMnf9aujCWTcTmABfOZg+hqE26jx3TJUfevnqCYI1l2wPvgmTKUQK9k=
-X-Received: by 2002:aca:e84c:: with SMTP id f73mr20100876oih.163.1554823690637;
-	Tue, 09 Apr 2019 08:28:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190409134536.15548-1-philmd@redhat.com>
-	<CAFEAcA9pc3Dw_X5b74+av0qq5hM7wB4uixSuh_TLwHAm8eGsqA@mail.gmail.com>
-	<e89332f2-1673-5192-6ad1-b4ade1b458eb@redhat.com>
-In-Reply-To: <e89332f2-1673-5192-6ad1-b4ade1b458eb@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Apr 2019 16:27:59 +0100
-Message-ID:
- <CAFEAcA8xexPWoBdQDYy8SsOD+OfoMSh=yHC-11DOcN5jp6888g@mail.gmail.com>
-To: Laszlo Ersek <lersek@redhat.com>
+	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=gX9NsXUd1ErUayh3aaMZYIRanGqtnledw62C6vGXhms=;
+	b=gJuBWRzQfJm6qGs1dyvCJXLLD02TyuLo7e+PvcUW9K1GM/5Pn7rSt8HFUz9uAROm4I
+	cF9c3fSgxSG0r7dAuOrmU5YsK1xTd675rFpQqTbatrfa9OJGtJySDJDUtVcKEN4tZuPM
+	wvC1yLeVuDXE1HHTI2XHgEVRXNuNMdkCQ4LKehtA1Z1GGrb4y4x09H6Se4Nah7vwHrKr
+	3LKtC0Te9bjQfcxXjcuyKhNct7//iICUWqTOV8k93L7kXa3Dzk1J35iPrYVoRjhdY6bk
+	yqHj/cqno3GyNDBEUAMIH+j9hHnGkCwyhrKjbLrJGheNKngaSzl6hroxKi9WPbhdBupa
+	baaw==
+X-Gm-Message-State: APjAAAX9Ucz5T0tWY4kx7sFM6I0uPd2GzotaA5Sw5nPW+2iidt0Ek7uO
+	+duXNu2Wqvm8ePqdrdAak6peng==
+X-Google-Smtp-Source: APXvYqzl/mTVCZj6UJd4PKfPKZgk22Ku4kI8T1uXOs+RyU7Mqjh0COfup3ur9xQsnIZUDQ4a/LUoPQ==
+X-Received: by 2002:a6b:5c0a:: with SMTP id z10mr15510236ioh.138.1554824232429;
+	Tue, 09 Apr 2019 08:37:12 -0700 (PDT)
+Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
+	by smtp.gmail.com with ESMTPSA id
+	z24sm12676518ioi.67.2019.04.09.08.37.11
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 08:37:11 -0700 (PDT)
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+In-Reply-To: <9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
+Date: Tue, 9 Apr 2019 11:37:10 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <98B3F0C7-6554-4455-B441-86605DA5D6C1@oberlin.edu>
+References: <cover.1554755001.git.stephen.checkoway@oberlin.edu>
+	<c03b48badb28e3c98bcbaed092b5c40e7284db08.1554755001.git.stephen.checkoway@oberlin.edu>
+	<9409d9bf-c513-d82b-d438-9173fc582d7f@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 0/2] roms: Avoid iPXE/EDK2
- EFIROM variable clash, pass CFLAGS to EDK2 build tools
+X-Received-From: 2607:f8b0:4864:20::d42
+Subject: Re: [Qemu-devel] [PATCH 01/10] block/pflash_cfi02: Add test for
+ supported commands
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,29 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Olaf Hering <olaf@aepfle.de>, "Michael S . Tsirkin" <mst@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409152759.yq0fi8N7F9oGE9T_-NJ5xC5vqn943V4-oj3wtbmyQF4@z>
+Message-ID: <20190409153710.jvMd06L_jfzcH4T49piCWrN7LxFJTDzPWdsokEEoxVI@z>
 
-On Tue, 9 Apr 2019 at 16:25, Laszlo Ersek <lersek@redhat.com> wrote:
->
-> On 04/09/19 16:00, Peter Maydell wrote:
-> > Thanks. This is one of a handful of remaining bugs we
-> > should fix for 4.0, so I would ideally like to get this
-> > in rc3 today (or tomorrow if we have to slip rc3 a day).
-> > If people wanting to review this series could do so
-> > promptly I'd definitely appreciate it.
->
-> I hope I was quick enough.
 
-Yep, thanks. (I knew you'd had comments on v1 so I was
-assuming you'd want to review v2.)
 
-thanks
--- PMM
+On Apr 9, 2019, at 02:13, Thomas Huth <thuth@redhat.com> wrote:
+
+> We'd like to get rid of global_qtest in the long run (since it is
+> causing trouble for tests that run multiple instances of QEMU in
+> parallel, e.g. migration tests)... so if it is feasible, please don't
+> use it in new code anymore. Try to use a local variable in the =
+function
+> that call qtest_initf() and pass the test state around via a parameter
+> to the functions that need it.
+
+One of the patches introduces a FlashConfig structure which gets passed =
+around to all the functions. I could stuff the local qtest in there. The =
+earlier patches would still use global_qtest. Would that be acceptable =
+or would you prefer that global_qtest not appear in any of the patches?
+
+Or rather than putting it in the FlashConfig struct, I could just pass a =
+separate parameter around. Whatever you prefer.
+
+--=20
+Stephen Checkoway
+
+
+
+
+
 
