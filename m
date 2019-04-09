@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55692)
+Received: from eggs.gnu.org ([209.51.188.92]:55711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLR-00032e-RO
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:35 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLT-00034p-Et
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLN-0004xe-Oi
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33046)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hDtLS-00050w-5L
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hDtLN-0004wB-3c
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:29 -0400
+	id 1hDtLR-0004xm-Ph
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 12:11:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  9 Apr 2019 18:10:00 +0200
-Message-Id: <20190409161009.6322-12-marcandre.lureau@redhat.com>
+Date: Tue,  9 Apr 2019 18:10:01 +0200
+Message-Id: <20190409161009.6322-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 11/20] QmpSession: return orderly
+Subject: [Qemu-devel] [PATCH v4 12/20] qmp: introduce asynchronous command
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,190 +31,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-QEMU will gain support for asynchronous commands, and may thus finish
-commands in various order. However, the clients expect replies in
-order. Let's enforce ordering of replies in QmpReturn: starting from
-the older command, process each pending QmpReturn, and return until
-reaching one that is unfinished.
-
-Or if the command is OOB, it should return immediately.
+Add a new type of command, QmpCommandFuncAsync: those commands can
+return later thanks to QmpReturn. This commit introduces the new type
+and register function and teach qmp_dipatch() to call it without
+qmp_return(). The async_fn callback will be responsible for calling
+qmp_return(), either synchronously or asynchronously.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h |  2 ++
- qapi/qmp-dispatch.c         | 61 ++++++++++++++++++++++++++++++-------
- tests/test-qmp-cmds.c       | 33 ++++++++++++++++++++
- 3 files changed, 85 insertions(+), 11 deletions(-)
+ include/qapi/qmp/dispatch.h | 10 +++++++++-
+ qapi/qmp-dispatch.c         | 27 ++++++++++++++++-----------
+ qapi/qmp-registry.c         | 27 ++++++++++++++++++++++++---
+ 3 files changed, 49 insertions(+), 15 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 7c9de9780d..92d6fd1afb 100644
+index 92d6fd1afb..6aef0abc70 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -55,6 +55,8 @@ struct QmpSession {
- struct QmpReturn {
-     QmpSession *session;
-     QDict *rsp;
-+    bool oob;
-+    bool finished;
-     QTAILQ_ENTRY(QmpReturn) entry;
- };
+@@ -21,6 +21,7 @@
+ typedef struct QmpReturn QmpReturn;
 =20
+ typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
++typedef void (QmpCommandAsyncFunc)(QDict *, QmpReturn *);
+=20
+ typedef enum QmpCommandOptions
+ {
+@@ -28,12 +29,16 @@ typedef enum QmpCommandOptions
+     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
+     QCO_ALLOW_OOB             =3D  (1U << 1),
+     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
++    QCO_ASYNC                 =3D  (1U << 3),
+ } QmpCommandOptions;
+=20
+ typedef struct QmpCommand
+ {
+     const char *name;
+-    QmpCommandFunc *fn;
++    union {
++        QmpCommandFunc *fn;
++        QmpCommandAsyncFunc *async_fn;
++    };
+     QmpCommandOptions options;
+     QTAILQ_ENTRY(QmpCommand) node;
+     bool enabled;
+@@ -88,6 +93,9 @@ void qmp_return_error(QmpReturn *qret, Error *err);
+=20
+ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options)=
+;
++void qmp_register_async_command(QmpCommandList *cmds, const char *name,
++                                QmpCommandAsyncFunc *fn,
++                                QmpCommandOptions options);
+ const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
+                                    const char *name);
+ void qmp_session_init(QmpSession *session,
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 4699a6715b..546a6c9f7b 100644
+index 546a6c9f7b..1f493af67a 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -25,6 +25,7 @@ QmpReturn *qmp_return_new(QmpSession *session, const QO=
-bject *request)
-     const QDict *req =3D qobject_to(QDict, request);
-     QObject *id =3D req ? qdict_get(req, "id") : NULL;
-=20
-+    qret->oob =3D req ? qmp_is_oob(req) : false;
-     qret->session =3D session;
-     qret->rsp =3D qdict_new();
-     if (id) {
-@@ -39,6 +40,15 @@ QmpReturn *qmp_return_new(QmpSession *session, const Q=
-Object *request)
-     return qret;
+@@ -171,7 +171,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *r=
+equest, bool allow_oob,
+     return dict;
  }
 =20
-+static void qmp_return_free_with_lock(QmpReturn *qret)
-+{
-+    if (qret->session) {
-+        QTAILQ_REMOVE(&qret->session->pending, qret, entry);
-+    }
-+    qobject_unref(qret->rsp);
-+    g_free(qret);
-+}
-+
- void qmp_return_free(QmpReturn *qret)
+-static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *req=
+uest,
++static QObject *do_qmp_dispatch(QmpSession *session, QObject *request,
+                                 bool allow_oob, Error **errp)
  {
-     QmpSession *session =3D qret->session;
-@@ -46,21 +56,53 @@ void qmp_return_free(QmpReturn *qret)
-     if (session) {
-         qemu_mutex_lock(&session->pending_lock);
+     Error *local_err =3D NULL;
+@@ -193,7 +193,7 @@ static QObject *do_qmp_dispatch(const QmpCommandList =
+*cmds, QObject *request,
+         command =3D qdict_get_str(dict, "exec-oob");
+         oob =3D true;
      }
--    QTAILQ_REMOVE(&session->pending, qret, entry);
-+
-+    qmp_return_free_with_lock(qret);
-+
-     if (session) {
-         qemu_mutex_unlock(&session->pending_lock);
+-    cmd =3D qmp_find_command(cmds, command);
++    cmd =3D qmp_find_command(session->cmds, command);
+     if (cmd =3D=3D NULL) {
+         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "The command %s has not been found", command);
+@@ -224,14 +224,19 @@ static QObject *do_qmp_dispatch(const QmpCommandLis=
+t *cmds, QObject *request,
+         qobject_ref(args);
      }
--    qobject_unref(qret->rsp);
--    g_free(qret);
-+}
+=20
+-    cmd->fn(args, &ret, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
+-        g_assert(!ret);
+-    } else if (!ret) {
+-        /* TODO turn into assertion */
+-        ret =3D QOBJECT(qdict_new());
 +
-+static void qmp_return_orderly(QmpReturn *qret)
-+{
-+    QmpSession *session =3D qret->session;
-+    QmpReturn *ret, *next;
-+
-+    if (!session) {
-+        /* the session was destroyed before return, discard */
-+        qmp_return_free(qret);
-+        return;
-+    }
-+    if (qret->oob) {
-+        session->return_cb(session, qret->rsp);
-+        qmp_return_free(qret);
-+        return;
-+    }
-+
-+    qret->finished =3D true;
-+
-+    qemu_mutex_lock(&session->pending_lock);
-+    /*
-+     * Process the list of pending and call return_cb until reaching
-+     * an unfinished.
-+     */
-+    QTAILQ_FOREACH_SAFE(ret, &session->pending, entry, next) {
-+        if (!ret->finished) {
-+            break;
++    if (cmd->options & QCO_ASYNC) {
++        cmd->async_fn(args, qmp_return_new(session, request));
++    } else {
++        cmd->fn(args, &ret, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++        } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
++            g_assert(!ret);
++        } else if (!ret) {
++            /* TODO turn into assertion */
++            ret =3D QOBJECT(qdict_new());
 +        }
-+        session->return_cb(session, ret->rsp);
-+        ret->session =3D session;
-+        qmp_return_free_with_lock(ret);
-+    }
-+
-+    qemu_mutex_unlock(&session->pending_lock);
- }
+     }
 =20
- void qmp_return(QmpReturn *qret, QObject *rsp)
+     qobject_unref(args);
+@@ -304,7 +309,7 @@ void qmp_dispatch(QmpSession *session, QObject *reque=
+st, bool allow_oob)
+     Error *err =3D NULL;
+     QObject *ret;
+=20
+-    ret =3D do_qmp_dispatch(session->cmds, request, allow_oob, &err);
++    ret =3D do_qmp_dispatch(session, request, allow_oob, &err);
+     if (err) {
+         qmp_return_error(qmp_return_new(session, request), err);
+     } else if (ret) {
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index d0f9a1d3e3..0f3d521ce5 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -15,16 +15,37 @@
+ #include "qemu/osdep.h"
+ #include "qapi/qmp/dispatch.h"
+=20
+-void qmp_register_command(QmpCommandList *cmds, const char *name,
+-                          QmpCommandFunc *fn, QmpCommandOptions options)
++
++static QmpCommand *qmp_command_new(QmpCommandList *cmds, const char *nam=
+e,
++                                   QmpCommandOptions options)
  {
-     qdict_put_obj(qret->rsp, "return", rsp ?: QOBJECT(qdict_new()));
--    if (qret->session) {
--        qret->session->return_cb(qret->session, qret->rsp);
--    }
--    qmp_return_free(qret);
-+    qmp_return_orderly(qret);
- }
+     QmpCommand *cmd =3D g_malloc0(sizeof(*cmd));
 =20
- void qmp_return_error(QmpReturn *qret, Error *err)
-@@ -70,10 +112,7 @@ void qmp_return_error(QmpReturn *qret, Error *err)
-     qdict_put_str(qdict, "desc", error_get_pretty(err));
-     qdict_put_obj(qret->rsp, "error", QOBJECT(qdict));
-     error_free(err);
--    if (qret->session) {
--        qret->session->return_cb(qret->session, qret->rsp);
--    }
--    qmp_return_free(qret);
-+    qmp_return_orderly(qret);
- }
-=20
- static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_=
-oob,
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index b4d0b0440a..c4593552e3 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -327,6 +327,38 @@ static void test_dealloc_partial(void)
-     qapi_free_UserDefTwo(ud2);
- }
-=20
-+typedef struct QmpReturnOrderly {
-+    QmpSession session;
-+    int returns;
-+} QmpReturnOrderly;
+     cmd->name =3D name;
+-    cmd->fn =3D fn;
+     cmd->enabled =3D true;
+     cmd->options =3D options;
+     QTAILQ_INSERT_TAIL(cmds, cmd, node);
 +
-+static void dispatch_return_orderly(QmpSession *session, QDict *resp)
-+{
-+    QmpReturnOrderly *o =3D container_of(session, QmpReturnOrderly, sess=
-ion);
-+
-+    o->returns++;
++    return cmd;
 +}
 +
-+static void test_qmp_return_orderly(void)
-+{
-+    QDict *dict =3D qdict_new();
-+    QmpReturnOrderly o =3D { 0, };
-+    QmpReturn *r1, *r2, *r3;
 +
-+    qmp_session_init(&o.session, &qmp_commands, NULL, dispatch_return_or=
-derly);
-+    r1 =3D qmp_return_new(&o.session, NULL);
-+    qdict_put_str(dict, "exec-oob", "test");
-+    r2 =3D qmp_return_new(&o.session, QOBJECT(dict));
-+    r3 =3D qmp_return_new(&o.session, NULL);
-+    qmp_return(r3, NULL);
-+    g_assert_cmpint(o.returns, =3D=3D, 0);
-+    qmp_return(r2, NULL);
-+    g_assert_cmpint(o.returns, =3D=3D, 1);
-+    qmp_return(r1, NULL);
-+    g_assert_cmpint(o.returns, =3D=3D, 3);
-+    qmp_session_destroy(&o.session);
-+    qobject_unref(dict);
++void qmp_register_command(QmpCommandList *cmds, const char *name,
++                          QmpCommandFunc *fn, QmpCommandOptions options)
++{
++    QmpCommand *cmd =3D qmp_command_new(cmds, name, options);
++
++    assert(!(options & QCO_ASYNC));
++    cmd->fn =3D fn;
 +}
++
++void qmp_register_async_command(QmpCommandList *cmds, const char *name,
++                            QmpCommandAsyncFunc *fn, QmpCommandOptions o=
+ptions)
++{
++    QmpCommand *cmd =3D qmp_command_new(cmds, name, options);
++
++    assert(options & QCO_ASYNC);
++    cmd->async_fn =3D fn;
+ }
 =20
- int main(int argc, char **argv)
- {
-@@ -340,6 +372,7 @@ int main(int argc, char **argv)
-                     test_dispatch_cmd_success_response);
-     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
-     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
-+    g_test_add_func("/qmp/return_orderly", test_qmp_return_orderly);
-=20
-     test_qmp_init_marshal(&qmp_commands);
-     g_test_run();
+ const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const cha=
+r *name)
 --=20
 2.21.0.196.g041f5ea1cf
