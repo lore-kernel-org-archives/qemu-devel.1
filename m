@@ -2,64 +2,93 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAD4C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B1FC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:27:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A286E20651
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:10:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A286E20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3038B20833
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 09:27:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDmwW4IF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3038B20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37892 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38014 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDmlv-0004bN-PG
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 05:10:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53581)
+	id 1hDn2o-0008DI-2L
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 05:27:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDml7-0004JB-ED
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:09:38 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDn22-0007p3-Tn
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hDml5-0003Rg-FK
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:09:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>)
-	id 1hDml1-0003Oc-4q; Tue, 09 Apr 2019 05:09:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D4A0C04D295;
-	Tue,  9 Apr 2019 09:09:29 +0000 (UTC)
-Received: from work-vm (ovpn-117-233.ams2.redhat.com [10.36.117.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 41F985D719;
-	Tue,  9 Apr 2019 09:09:25 +0000 (UTC)
-Date: Tue, 9 Apr 2019 10:09:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190409090922.GC2964@work-vm>
-References: <20190409085245.31548-1-thuth@redhat.com>
-	<20190409085245.31548-5-thuth@redhat.com>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hDn22-0005Do-5K
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:27:06 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hDn21-0005Ch-Lu
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 05:27:06 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h4so19910111wre.7
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 02:27:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:references:from:message-id:date:user-agent:mime-version
+	:in-reply-to:content-transfer-encoding:content-language;
+	bh=8Mw77qPG9fd9FzZy9dXdJcPVigNa0ZKUjLv2FyOj5bo=;
+	b=iDmwW4IFQCRxMhOFxv1VxG4qciFCOXLZj/eqtZ3N/9H54GtwIDCYKh+g66CGscrq+c
+	XQZImwxenaVPuYFFkBofCxBfr2qKRZjKCC/uuxwR6Pew1GvEXm+itUDCQeht55p01uXl
+	LwPiys+JUdjbArLTxhTD6Knch6wIwRmiM0j1CmEGPSjaAjJfNrI95D24bXmYGsJE3jdE
+	1qCUbVZue7O6T37N/9U9iyTbZ4UevKGbEgR9Mra4BaTXr8zWg3IDl5OLWU4FNyRvTTMf
+	9PH/dToZKgNWnbLqKS/0OLK507CX+c0qKAQXz11SX5jSiAadqA3RS0laxoobgGJ93YRO
+	2C6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=8Mw77qPG9fd9FzZy9dXdJcPVigNa0ZKUjLv2FyOj5bo=;
+	b=T7FE9jauzFVSusgOIiPuOioUztGng/g5KZHpmoORENyIryf0VP+y8eeeqMvcC7U1Gs
+	lS2aYGe1K+O2Hj/+CMTX0Gi3/XY4BLm5gOHqVJBYeyFm+PFIg3pfYlvH5Z7yUhOL/gKx
+	ELtk9EcvrdcYc2jn+bMFoOrW3kflJZ5uh3A5Omoy0oyLu6zA1Sfm8WLOz0YZQNRQLWXq
+	hR7Fhe0Oa82B6j/3cmNI1l2NbzAP7pMetkH2ie9ZFWDo3dc239AdOuLh85gQ1AUcZk0V
+	5m7ctAusevhOH+q+4965ixgXRdbc5F3pJnYiioV0W74zWQ+EsPwG1tvv2+A91tnh+kLJ
+	lI4Q==
+X-Gm-Message-State: APjAAAW5ndn7VrxzzNn257n/MkA0o5CsVJu5i/n5rU5/+k7TXFk95RKK
+	AReHYAu4V8Kb9hyylC/s9n0=
+X-Google-Smtp-Source: APXvYqxlqtFGZ2RvAkM7ydQvxfLjVPjjTXroNukTA4I34MXctckDwkHrjb27rH0FT0dxj4Xf6AE62A==
+X-Received: by 2002:adf:cc85:: with SMTP id p5mr18687284wrj.101.1554802024584; 
+	Tue, 09 Apr 2019 02:27:04 -0700 (PDT)
+Received: from localhost.localdomain ([37.142.144.27])
+	by smtp.gmail.com with ESMTPSA id
+	x21sm21579340wrd.45.2019.04.09.02.27.03
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 02:27:03 -0700 (PDT)
+To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>, qemu-devel@nongnu.org,
+	Yuval Shaia <yuval.shaia@oracle.com>
+References: <20190407115839.25054-1-skrtbhtngr@gmail.com>
+	<CAMzgYoODOUz8yJQH1=a_=e8HKEuRFv6UyX0Rost4NfWNxe91KQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <2651615a-5722-31f1-23e9-478eaad13099@gmail.com>
+Date: Tue, 9 Apr 2019 11:28:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190409085245.31548-5-thuth@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 09 Apr 2019 09:09:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 4/5] tests/test-hmp: Use
- qtest_init() instead of qtest_start()
+In-Reply-To: <CAMzgYoODOUz8yJQH1=a_=e8HKEuRFv6UyX0Rost4NfWNxe91KQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH RESEND v2 0/2] Move hvf_cpu_synchronize*
+ calls to cpu_synchronize* functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,93 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Hannes Reinecke <hare@suse.com>, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, armbru@redhat.com,
-	Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409090922.CQQqpm_xz2VqNf0kWzxma9-NBk7n_5RQuloaViAuF9A@z>
+Message-ID: <20190409082807.QWX5LEAA0nrotiIU3RoZ2ZZfTuW4Tkfs8I1NT330SRw@z>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> qtest_start() + qtest_end() should be avoided, since they use the
-> global_qtest variable that we want to get rid of in the long run
-> Use qtest_init() and qtest_quit() instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> ---
->  tests/test-hmp.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 54a01824dc..f0d843e34a 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -72,13 +72,13 @@ static const char *hmp_cmds[] = {
->  };
->  
->  /* Run through the list of pre-defined commands */
-> -static void test_commands(void)
-> +static void test_commands(QTestState *qts)
->  {
->      char *response;
->      int i;
->  
->      for (i = 0; hmp_cmds[i] != NULL; i++) {
-> -        response = hmp("%s", hmp_cmds[i]);
-> +        response = qtest_hmp(qts, "%s", hmp_cmds[i]);
->          if (verbose) {
->              fprintf(stderr,
->                      "\texecute HMP command: %s\n"
-> @@ -91,11 +91,11 @@ static void test_commands(void)
->  }
->  
->  /* Run through all info commands and call them blindly (without arguments) */
-> -static void test_info_commands(void)
-> +static void test_info_commands(QTestState *qts)
->  {
->      char *resp, *info, *info_buf, *endp;
->  
-> -    info_buf = info = hmp("help info");
-> +    info_buf = info = qtest_hmp(qts, "help info");
->  
->      while (*info) {
->          /* Extract the info command, ignore parameters and description */
-> @@ -107,7 +107,7 @@ static void test_info_commands(void)
->          if (verbose) {
->              fprintf(stderr, "\t%s\n", info);
->          }
-> -        resp = hmp("%s", info);
-> +        resp = qtest_hmp(qts, "%s", info);
->          g_free(resp);
->          /* And move forward to the next line */
->          info = strchr(endp + 1, '\n');
-> @@ -124,14 +124,15 @@ static void test_machine(gconstpointer data)
->  {
->      const char *machine = data;
->      char *args;
-> +    QTestState *qts;
->  
->      args = g_strdup_printf("-S -M %s", machine);
-> -    qtest_start(args);
-> +    qts = qtest_init(args);
->  
-> -    test_info_commands();
-> -    test_commands();
-> +    test_info_commands(qts);
-> +    test_commands(qts);
->  
-> -    qtest_end();
-> +    qtest_quit(qts);
->      g_free(args);
->      g_free((void *)data);
->  }
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On 4/7/19 3:05 PM, Sukrit Bhatnagar wrote:
+> Hi,
+> Are the patches in good enough shape to be merged?
+
+Hi Sukrit,
+
+Where is the patch itself :) ?
+
+Also be sure to add the maintainers to cc.
+You can get them by running ./scripts/get_maintainers.pl script on your 
+patch.
+
+Please re-send it.
+
+Thanks,
+Marcel
+
+> Thanks,
+> Sukrit
+
 
