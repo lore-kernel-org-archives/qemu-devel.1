@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47723)
+Received: from eggs.gnu.org ([209.51.188.92]:47762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzjb-0005RA-Cb
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:56 -0400
+	(envelope-from <lersek@redhat.com>) id 1hDzjh-0005XX-5b
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hDzjZ-0001ID-VH
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33712)
+	(envelope-from <lersek@redhat.com>) id 1hDzjg-0001My-2P
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjZ-0001Hc-LH
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:00:53 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hDzjf-0001MP-Qx
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 19:01:00 -0400
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Wed, 10 Apr 2019 01:00:13 +0200
-Message-Id: <20190409230022.6462-4-lersek@redhat.com>
+Date: Wed, 10 Apr 2019 01:00:15 +0200
+Message-Id: <20190409230022.6462-6-lersek@redhat.com>
 In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
 References: <20190409230022.6462-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.1 v4 03/12]
- tests/uefi-test-tools/build.sh: work around TianoCore#1607
+Subject: [Qemu-devel] [PATCH for-4.1 v4 05/12] roms/edk2-funcs.sh: add the
+ qemu_edk2_get_thread_count() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,15 +29,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-The edk2-stabe201903 release introduced Python3 support to edk2's
-BaseTools; however the Python3 enablement breaks in a corner case (which
-is nevertheless supported by the edk2 community), namely the in-module
-parallelization that we utilize.
-
-This is tracked under
-<https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>. For now, work
-around the issue (in advance) by forcing Python2. (The workaround is a
-no-op before we move to edk2-stabe201903 in the roms/edk2 submodule.)
+The edk2 "build" utility natively supports building modules (that is, INF
+files) in parallel. The feature is not useful when building a single
+module (with the "-m" option), but it is useful for platform firmware
+builds (which include many modules). Add a function that determines the
+"-n" option argument for "build", from the MAKEFLAGS variable (i.e. based
+on the presence of a make job server).
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
@@ -62,23 +59,48 @@ Notes:
    =20
     - pick up Michal's and Michael's R-b's
 
- tests/uefi-test-tools/build.sh | 3 +++
- 1 file changed, 3 insertions(+)
+ roms/edk2-funcs.sh | 25 ++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/build=
-.sh
-index e2b52c855c39..8aa7935c43bb 100755
---- a/tests/uefi-test-tools/build.sh
-+++ b/tests/uefi-test-tools/build.sh
-@@ -29,6 +29,9 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
- export WORKSPACE=3D$PWD
- mkdir -p Conf
+diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+index d1cb1e4a111e..a9fae7ee891b 100644
+--- a/roms/edk2-funcs.sh
++++ b/roms/edk2-funcs.sh
+@@ -226,3 +226,28 @@ qemu_edk2_set_cross_env()
 =20
-+# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
-+export PYTHON_COMMAND=3Dpython2
+   eval "export $cross_prefix_var=3D\$cross_prefix"
+ }
 +
- # Source "edksetup.sh" carefully.
- set +e +u +C
- source "$PACKAGES_PATH/edksetup.sh"
++
++# Determine the "-n" option argument (that is, the number of modules to =
+build
++# in parallel) for the edk2 "build" utility. Print the result to the sta=
+ndard
++# output.
++#
++# Parameters:
++#   $1: the value of the MAKEFLAGS variable
++qemu_edk2_get_thread_count()
++{
++  local makeflags=3D"$1"
++
++  if [[ "$makeflags" =3D=3D *--jobserver-auth=3D* ]] ||
++     [[ "$makeflags" =3D=3D *--jobserver-fds=3D* ]]; then
++    # If there is a job server, allow the edk2 "build" utility to parall=
+elize
++    # as many module builds as there are logical CPUs in the system. The=
+ "make"
++    # instances forked by "build" are supposed to limit themselves throu=
+gh the
++    # job server. The zero value below causes the edk2 "build" utility t=
+o fetch
++    # the logical CPU count with Python's multiprocessing.cpu_count() me=
+thod.
++    printf '0\n'
++  else
++    # Build a single module at a time.
++    printf '1\n'
++  fi
++}
 --=20
 2.19.1.3.g30247aa5d201
