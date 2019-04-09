@@ -2,71 +2,103 @@ Return-Path: <SRS0=I56D=SL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9578C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 20:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC14C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 20:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82A9E20830
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 20:32:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A9E20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A15802084B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Apr 2019 20:40:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgfTnrLz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15802084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48781 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hDxPm-0000dG-M0
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 16:32:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51876)
+	id 1hDxXp-0002qG-Og
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 16:40:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDxOH-0008KH-Az
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hDxWX-0002GI-Dc
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:39:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hDxOG-0004iB-0Q
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45378)
+	(envelope-from <richard.henderson@linaro.org>) id 1hDxWW-0003Ik-1C
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:39:17 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45816)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hDxOF-0004gq-Nt
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:30:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hDxOE-00064H-FO
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 20:30:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 50F822E80CB
-	for <qemu-devel@nongnu.org>; Tue,  9 Apr 2019 20:30:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hDxWV-0003Bw-Ci
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 16:39:15 -0400
+Received: by mail-pf1-x444.google.com with SMTP id e24so10409479pfi.12
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 13:39:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=ON7nVGQd1U92Uq9TPVlwfIR/ndaITgSTUa6S+xHUEHA=;
+	b=CgfTnrLzuj3y6ZFtSILE/T968TiWC4Qox9dttTCmjs/9MiAookuoLncEJaMXrO5svs
+	JVpm6isVzesGzM71aDdM9WAInaH8tGar54XaM/IhbOovLwyr6tQzrIXlxDiPKZA9TqAp
+	BfGjQpFh95ZBJ7SvyZXpDzkQMZ6OhpGdiz09vKz22r8gDWcY8jpsf6nh0Bsl3FrRxFh+
+	/5Cp0APrQCrFNGSGIEGyNwbrZusJqZL4/LN6/iwDfHyjx4/cbfUxDry7bVKTQvHSorM7
+	kVOPyAZ+ED/WeVBaw9Ljt2v8EH/HaX21pROnVgWn3ug4LVbkDh3OYN12zjlPaT5ZC8Kf
+	mctA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ON7nVGQd1U92Uq9TPVlwfIR/ndaITgSTUa6S+xHUEHA=;
+	b=rT3ADv38FmlYh/tS2T0kA5c5yKMyguD8uQfehkBSrJ+MZjPWUbcdAtJ4lwYNzK3vvS
+	CAbGHRr/B1+NHG1HW+2RsNze8DhJOfDtKT8rQ4m+MU+baekzIc8NmD11pcM9l/qZ4N4Z
+	odx4LiYbw++CTo0vB79kfMe/SEDz9dhk+u/9M15GR6pbsbHyKV3lUASfBuyuOBtINncR
+	uLoHfjryTR3RhugIV7enEgvRxkXl69tCPpHJspKGMGH7vYmpbC77WRMDihkQRV1ryG2y
+	vKMNO6Vz0i9XvpFsyOWoukWJHmFvB0D1AOm9CvkHrAa19rJB033eWlbBCBSH07Z4jx2M
+	WHFw==
+X-Gm-Message-State: APjAAAU9wIeUzm/3atTb4uNOeesrXwwpsa9O7Je5l5K3hewdM+S9hvUF
+	bX0VbeP7HpUEGWUKr4wNN7GvsQ==
+X-Google-Smtp-Source: APXvYqzw1Dlo5EJq1Wo8fPrTqnKkZSB0DIR4ejCV6JXRVOej94tE4HHi7GxBdNCM3A05mwam4/ihIg==
+X-Received: by 2002:a63:6193:: with SMTP id
+	v141mr37185072pgb.392.1554842354006; 
+	Tue, 09 Apr 2019 13:39:14 -0700 (PDT)
+Received: from [192.168.3.43] (rrcs-173-198-79-114.west.biz.rr.com.
+	[173.198.79.114]) by smtp.gmail.com with ESMTPSA id
+	p14sm22905439pfa.26.2019.04.09.13.39.11
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 09 Apr 2019 13:39:12 -0700 (PDT)
+To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+	<berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20190404185730.GA22512@ls3530.dellerweb.de>
+	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
+	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
+	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
+	<20190405090212.GF6105@redhat.com>
+	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
+	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <35359e2b-7f07-8815-4f2b-f1435abc4e63@linaro.org>
+Date: Tue, 9 Apr 2019 10:39:08 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Apr 2019 20:24:09 -0000
-From: john <johnandersenpdx@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: johnandersenpdx
-X-Launchpad-Bug-Reporter: john (johnandersenpdx)
-X-Launchpad-Bug-Modifier: john (johnandersenpdx)
-References: <154966719970.21699.16286451963680929757.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155484144917.14327.2914254769567120464.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 8a37bab4a2700a7366d021d4f077ecf7077796ba
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1815252] Re: virtio-9p-pci passthrough fsync hang
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
+ on non-release architectures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,132 +107,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1815252 <1815252@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
+	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190409202409.uxpO7HW5y-wsITvkzaNbcs9i3Juk2MaMLWXIft_a_0E@z>
+Message-ID: <20190409203908.Bwyo98Zc7W1VuYpx2f1V5A5hL-AAn1BOCqZ4GCfrZ0k@z>
 
-Damn, I just ran into this bug again! Then realized I'd already reported
-it.... :(
+On 4/9/19 9:46 AM, Stefan Weil wrote:
+> * Calling conventions. The current implementation works on many hosts,
+> but for example not on Sparc. A fix would require simple calling
+> conventions for all helper functions (for example stack based argument
+> passing, can this be enforced?), or it needs to know the signature of
+> each helper function at runtime. I'm afraid that fixing this would
+> require much work. A runtime test whether calls of helper functions work
+> correctly could be implemented easily and could abort the program
+> execution when calls fail to pass the right arguments. Would such a
+> runtime test help a little bit?
 
--- =
+In the rewrite of tci that I proposed some years ago,
+I used libffi for this.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815252
+Those patches could probably be recovered...
 
-Title:
-  virtio-9p-pci passthrough fsync hang
+https://patchwork.ozlabs.org/patch/348528/
+https://patchwork.ozlabs.org/patch/348527/
 
-Status in QEMU:
-  New
 
-Bug description:
-  Tested against QEMU: e47f81b617684c4546af286d307b69014a83538a
-
-  and $qemu-system-x86_64 --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.9)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  + exec sudo qemu-system-x86_64 -enable-kvm -bios /usr/share/ovmf/OVMF.fd =
--cpu host -smp sockets=3D1,cpus=3D4,cores=3D2 -m 2048 -vga none -nographic =
--chardev socket,id=3Dchrtpm0,path=3D/tmp/clrwifi/swtpm2/tpm-sock -tpmdev em=
-ulator,id=3Dtpm0,chardev=3Dchrtpm0 -device tpm-tis,tpmdev=3Dtpm0 -device vi=
-rtio-rng-pci -netdev user,id=3Dmynet0,hostfwd=3Dtcp::10022-:22 -device virt=
-io-net-pci,netdev=3Dmynet0 -kernel /home/.../Documents/c/iwd/tools/bzImage =
--append 'console=3DttyS0,115200n8 quiet kvm-intel.nested=3D1 init=3D/usr/bi=
-n/bash initcall_debug tsc=3Dreliable no_timer_check noreplace-smp cryptomgr=
-.notests rootfstype=3D9p root=3D/dev/root rootflags=3Dtrans=3Dvirtio,versio=
-n=3D9p2000.u rw' -fsdev local,id=3Dfsdev-root,path=3Dmnt,security_model=3Dp=
-assthrough -device virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root
-  [    0.000000] Linux version 4.19.0-rc2 (...) (gcc version 7.3.0 (Ubuntu =
-7.3.0-27ubuntu1~18.04)) #10 SMP Fri Feb 8 13:55:20 PST 2019
-  [    0.000000] Command line: console=3DttyS0,115200n8 quiet kvm-intel.nes=
-ted=3D1 init=3D/usr/bin/bash initcall_debug tsc=3Dreliable no_timer_check n=
-oreplace-smp cryptomgr.notests rootfstype=3D9p root=3D/dev/root rootflags=
-=3Dtrans=3Dvirtio,version=3D9p2000.u rw
-  [    0.000000] KERNEL supported cpus:
-  [    0.000000]   Intel GenuineIntel
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating poi=
-nt registers'
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
-  [    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
-  [    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 =
-bytes, using 'standard' format.
-  [    0.000000] BIOS-provided physical RAM map:
-  [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000810000-0x00000000008fffff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x0000000000900000-0x000000007e87efff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e87f000-0x000000007e888fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e889000-0x000000007e889fff] ACP=
-I data
-  [    0.000000] BIOS-e820: [mem 0x000000007e88a000-0x000000007e88bfff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e88c000-0x000000007e88ffff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e890000-0x000000007e8a9fff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007e8aa000-0x000000007e8b9fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e8ba000-0x000000007e8bafff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007e8bb000-0x000000007e9e5fff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e9e6000-0x000000007e9edfff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e9ee000-0x000000007eb1afff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007eb1b000-0x000000007fb9afff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007fb9b000-0x000000007fbf2fff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007fbf3000-0x000000007fbfafff] ACP=
-I data
-  [    0.000000] BIOS-e820: [mem 0x000000007fbfb000-0x000000007fbfefff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007fbff000-0x000000007ff3ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007ff40000-0x000000007ff5ffff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007ff60000-0x000000007fffffff] ACP=
-I NVS
-  [    0.352469] acpiphp_ibm: ibm_acpiphp_init: acpi_walk_namespace failed
-  Started bpfilter
-  bash: cannot set terminal process group (-1): Inappropriate ioctl for dev=
-ice
-  bash: no job control in this shell
-  grep: /proc/cpuinfo: No such file or directory
-  grep: /proc/cpuinfo: No such file or directory
-  root@clr / # passwd
-  ...
-  openat(AT_FDCWD, "/etc/nshadow", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 4
-  umask(077)                              =3D 077
-  openat(AT_FDCWD, "/etc/shadow", O_RDONLY|O_CREAT|O_CLOEXEC, 000) =3D 5
-  fcntl(5, F_GETFL)                       =3D 0x8000 (flags O_RDONLY|O_LARG=
-EFILE)
-  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  fchown(4, 0, 0)                         =3D 0
-  fchmod(4, 0100644)                      =3D 0
-  lseek(5, 0, SEEK_CUR)                   =3D 0
-  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  read(5, "", 8192)                       =3D 0
-  close(5)                                =3D 0
-  fstat(4, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  write(4, "root:$6$jihvB1NonG88C5Yt$kvDCqF7"..., 124) =3D 124
-  fsync(4 <- hung here
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815252/+subscriptions
+r~
 
