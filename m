@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36940)
+Received: from eggs.gnu.org ([209.51.188.92]:37508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDw4V-0003PA-16
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:06:16 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hDw6T-0004W6-KY
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hDw4T-0004jh-3n
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:06:14 -0400
-Resent-Message-Id: <E1hDw4T-0004jh-3n@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21527)
+	(envelope-from <no-reply@patchew.org>) id 1hDw6R-0005V0-N9
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:08:16 -0400
+Resent-Message-Id: <E1hDw6R-0005V0-N9@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hDw4S-0004j9-Pa
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:06:13 -0400
-Message-ID: <155483673694.12882.12776277604345697825@76452e4e88f2>
+	id 1hDw6P-0005RE-Qz
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 15:08:14 -0400
+Message-ID: <155483686717.12882.10707512671940658071@76452e4e88f2>
 In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
 Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Tue, 9 Apr 2019 12:05:38 -0700 (PDT)
+Date: Tue, 9 Apr 2019 12:07:48 -0700 (PDT)
 Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
  type
 List-Id: <qemu-devel.nongnu.org>
@@ -34,13 +34,13 @@ Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, armbru@red
 
 UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQwOTE2MTAwOS42MzIy
 LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxl
-ZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBh
-bmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3Ug
-Y2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdF
-VF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMTkwNDA5MTYxMDA5LjYzMjItMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vdGVz
-dGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+ZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVz
+dGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIg
+aW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
+Z3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMjAxOTA0MDkxNjEwMDkuNjMyMi0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0
+aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
