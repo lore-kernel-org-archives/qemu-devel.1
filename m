@@ -2,78 +2,65 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC9EC10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08820C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 630CE2082A
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:36:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630CE2082A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 89A842082A
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:40:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A842082A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35768 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35846 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEI5f-0008Dl-Ii
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 14:36:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60782)
+	id 1hEI9E-0002OH-4B
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 14:40:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe.barajas@intel.com>) id 1hEHOI-0006pE-TU
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:52:07 -0400
+	(envelope-from <crobinso@redhat.com>) id 1hEI5S-0008OQ-GB
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe.barajas@intel.com>) id 1hEHOH-0001hs-TD
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:52:06 -0400
-Received: from mga17.intel.com ([192.55.52.151]:39974)
+	(envelope-from <crobinso@redhat.com>) id 1hEI5R-0001Vg-LN
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:36:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe.barajas@intel.com>)
-	id 1hEHOH-0001f6-EF
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:52:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	10 Apr 2019 10:51:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,334,1549958400"; 
-	d="scan'208,217";a="133144922"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-	by orsmga008.jf.intel.com with ESMTP; 10 Apr 2019 10:51:56 -0700
-Received: from fmsmsx118.amr.corp.intel.com (10.18.116.18) by
-	fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server
-	(TLS) id 14.3.408.0; Wed, 10 Apr 2019 10:51:56 -0700
-Received: from fmsmsx124.amr.corp.intel.com ([169.254.8.175]) by
-	fmsmsx118.amr.corp.intel.com ([169.254.1.37]) with mapi id
-	14.03.0415.000; Wed, 10 Apr 2019 10:51:56 -0700
-From: "Barajas, Felipe" <felipe.barajas@intel.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: QEMU Logo question
-Thread-Index: AdTvxaGzGRKzD9anTdKnP8O68SDvqw==
-Date: Wed, 10 Apr 2019 17:51:56 +0000
-Message-ID:
- <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTQwYWJlYWUtMjZjYi00ZWMwLWE5NzktM2Y1YTliZjlmMTI3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZ1cxYUdYd3JUMFhOTndCdndWVXg2bjBsa1pEQVg2Y1BjbVBlVmFzekFZcHlIR1hKUWxLWW9cL2hvMlQ1bytObksifQ==
-x-originating-ip: [10.1.200.108]
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1hEI5R-0001Ul-A5
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:36:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4399E37E88;
+	Wed, 10 Apr 2019 18:36:39 +0000 (UTC)
+Received: from [10.10.123.233] (ovpn-123-233.rdu2.redhat.com [10.10.123.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 304D9608EB;
+	Wed, 10 Apr 2019 18:36:37 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <f61645d0b3720a039423532d49dd65588d9bccd8.1554919328.git.crobinso@redhat.com>
+	<4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <4ee1fc10-b718-7100-8e38-f6afe5fdbe9a@redhat.com>
+Date: Wed, 10 Apr 2019 14:36:37 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.151
-X-Mailman-Approved-At: Wed, 10 Apr 2019 14:35:02 -0400
+In-Reply-To: <4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] QEMU Logo question
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Wed, 10 Apr 2019 18:36:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] hmp: delvm: use hmp_handle_error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,24 +72,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410175156.Y9rjEKZu9JdWXGlN3GMoKXD0iqwZ_0xM-i79pWqGLEc@z>
+Message-ID: <20190410183637.tldZuZ87UjRKmA7OFcIfR8iwHfjlc7mf8GJWOO9dPQY@z>
 
-Hi,
+On 4/10/19 2:27 PM, Eric Blake wrote:
+> On 4/10/19 1:03 PM, Cole Robinson wrote:
+>> This gives us the consistent 'Error:' prefix added in 66363e9a43f,
+>> which helps users like libvirt who still need to scrape hmp error
+>> messages to detect failure.
+>>
+>> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+>> ---
+>>  hmp.c | 7 ++++---
+>>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> Not enough to drive -rc4 on its own, but worth adding to our wishlist of
+> potential easy patches if we do have a release blocker surface.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 8eec768088..74a4bfc1f9 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -1481,10 +1481,11 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
+>>      const char *name = qdict_get_str(qdict, "name");
+>>  
+>>      if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
+>> -        error_reportf_err(err,
+>> -                          "Error while deleting snapshot on device '%s': ",
+>> -                          bdrv_get_device_name(bs));
+>> +        error_prepend(&err,
+>> +                      "Error while deleting snapshot on device '%s': ",
+> 
+> Do we want to reword the message (maybe s/Error while //) to avoid the
+> word "Error" twice in the same line?
+> 
 
-I am trying to understand who in the QEMU community can give me permission =
-to use the QEMU logo in a whitepaper.
-I am an application engineer at Intel and I have prepared some benchmarks u=
-sing QEMU as a solution accelerated by Intel hardware (CPUs, SSDs, etc)
-I would like to use the QEMU logo in this white paper.
+I'm fine with that, and I checked it won't affect libvirt's error
+scraping in this area
 
-Do you know who in the community would have authority to give me such permi=
-ssion ?
-
-Thank you
-
-Felipe Barajas
-
+Thanks,
+Cole
 
