@@ -2,82 +2,58 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85A8C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B68C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:22:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 221BA2075B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:03:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221BA2075B
+	by mail.kernel.org (Postfix) with ESMTPS id 456C92082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:22:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 456C92082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37148 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37316 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEJRV-0002Xa-1r
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:03:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59908)
+	id 1hEJjw-0007t2-3R
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:22:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEJQd-0002GH-55
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:02:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEJiF-0006q4-Sc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEJQV-0008VO-S1
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:02:35 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEJQR-0007wN-O2
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:02:29 -0400
-Received: by mail-wr1-f67.google.com with SMTP id g3so4363086wrx.9
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 13:01:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=G4RH2D6PPWQz6Xc+ZAdvZ+q0zeeNMRyHXYBq7Rf5VB0=;
-	b=ZoHQ7h9MzEp2gOAMy3rYq2abytG7eGXFn+aLok4bk5ZsFI8SStUyKloSHVCg6CezWu
-	FIsogXUhzWcjAOfYwqof/6OC4AkOC5XdbYzRrbPupeGH5OIB8KKpKRNgordUKY907V9p
-	la6gSVkL3vVoOz1krHhJF89ucMdrFJZkYRg3/MExV60w/R0gRo1OYHSb65/tmvcT/8oi
-	sZnyKFUt+XqW8463m7v/vz9Ck8BZ35Uu+/n3FlQQp6RVBX/YUBogKLO+T4nqxCnl9lJb
-	U7+EIH7nrmcjrjs93HepN9NJepAyWQ+1PdAEaNfAf018vcqqIJPeDVlm7jKBFsJuoPUN
-	byUQ==
-X-Gm-Message-State: APjAAAXRlsLb1yQ7nS4KyiFb8PxGs9dSs54i+POn4XrwPUbunqwzmWQs
-	Wwrc4JQDnQViqWjjXXCcxp7UhQ==
-X-Google-Smtp-Source: APXvYqymGI8vLX4yZ0xiA9uLf+D8tY494tXWInDdqRJG1SnZngHCqubWpRCAike+jQ2Od3qFlsTVKA==
-X-Received: by 2002:adf:e4c2:: with SMTP id v2mr27889256wrm.124.1554926485180; 
-	Wed, 10 Apr 2019 13:01:25 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	o2sm29376356wrs.89.2019.04.10.13.01.24
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 10 Apr 2019 13:01:24 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-devel@nongnu.org,
-	Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <laurent@vivier.eu>
-References: <20190305051007.56009-1-stephen.checkoway@oberlin.edu>
-	<52a82d3a-3b79-c61d-93fa-f087af45f6fb@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1328f591-897f-8762-d324-cccb5f63a360@redhat.com>
-Date: Wed, 10 Apr 2019 22:01:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mreitz@redhat.com>) id 1hEJi8-0004FR-Ba
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:20:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hEJi1-0004Cz-G9; Wed, 10 Apr 2019 16:20:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D65CF30C16B6;
+	Wed, 10 Apr 2019 20:20:35 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B7705D71E;
+	Wed, 10 Apr 2019 20:20:34 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Wed, 10 Apr 2019 22:20:22 +0200
+Message-Id: <20190410202033.28617-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <52a82d3a-3b79-c61d-93fa-f087af45f6fb@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 10 Apr 2019 20:20:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] hw/char/escc: Lower irq when transmit
- buffer is filled
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 00/11] block: Deal with filters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,102 +65,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
-	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410200118.F5dbss4z7jXP99icTMdDTjycqw_c6iG8O4X-R-BhsmE@z>
+Message-ID: <20190410202022.unH37BGNRJtDIDGDkByvmixKywyR4hhuWlbHk7YXMN8@z>
 
-On 3/6/19 12:01 PM, Paolo Bonzini wrote:
-> On 05/03/19 06:10, Stephen Checkoway wrote:
->> The SCC/ESCC will briefly stop asserting an interrupt when the
->> transmit FIFO is filled.
->>
->> This code doesn't model the transmit FIFO/shift register so the
->> pending transmit interrupt is never deasserted which means that an
->> edge-triggered interrupt controller will never see the low-to-high
->> transition it needs to raise another interrupt. The practical
->> consequence of this is that guest firmware with an interrupt service
->> routine for the ESCC that does not send all of the data it has
->> immediately will stop sending data if the following sequence of
->> events occurs:
->> 1. Disable processor interrupts
->> 2. Write a character to the ESCC
->> 3. Add additional characters to a buffer which is drained by the ISR
->> 4. Enable processor interrupts
->>
->> In this case, the first character will be sent, the interrupt will
->> fire and the ISR will output the second character. Since the pending
->> transmit interrupt remains asserted, no additional interrupts will
->> ever fire.
->>
->> This fixes that situation by explicitly lowering the IRQ when a
->> character is written to the buffer.
->>
->> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> 
-> Looks good but I would like Mark to give his ack as well.
-> 
-> Mark, could you also add hw/char/escc.c to both SPARC and Mac sections
-> of MAINTAINERS?
-
-Cc'ing Artyom who also made some changes in this file, and Laurent.
+Note: This is technically the first part of my active mirror followup.
+But just very technically.  I noticed that that followup started to
+consist of two parts, namely (A) fix filtery things in the block layer,
+and (B) fix active mirror.  So I decided to split it.  This is part A.
+Part B is =E2=80=9Cmirror: Mainly coroutine refinements=E2=80=9D.
 
 
-Stephen, which particular chipset are you using?
+When we introduced filters, we did it a bit casually.  Sure, we talked a
+lot about them before, but that was mostly discussion about where
+implicit filters should be added to the graph (note that we currently
+only have two implicit filters, those being mirror and commit).  But in
+the end, we really just designated some drivers filters (Quorum,
+blkdebug, etc.) and added some specifically (throttle, COR), without
+really looking through the block layer to see where issues might occur.
 
-This file models various types. I had a talk with Mark or Laurent at
-last KVM forum about this device. IIRC, while the sun4m machines use a
-real chipset, the MacIO embeds an slighly modified IP core.
+It turns out vast areas of the block layer just don=E2=80=99t know about =
+filters
+and cannot really handle them.  Many cases will work in practice, in
+others, well, too bad, you cannot use some feature because some part
+deep inside the block layer looks at your filters and thinks they are
+format nodes.
 
-I can't find what you describe in the Z85C30 doc, however in the ESCC
-datasheet referenced in escc.c (which happens to be a 85MiB pdf!!!) I found:
+This series sets out to correct a bit of that.  I lost my head many
+times and I=E2=80=99m sure this series is incomplete in many ways, but it=
+ really
+doesn=E2=80=99t do any good if it sits on my disk any longer, it needs to=
+ go out
+now.
 
-  Transmit Interrupts and Transmit Buffer Empty Bit on the NMOS/CMOS
+The most important patches of this series are patches 2 and 3.  These
+introduce functions to encapsulate bs->backing and bs->file accesses.
+Because sometimes, bs->backing means COW, sometimes it means filtered
+node.  And sometimes, bs->file means metadata storage, and sometimes it
+means filtered node.  With this functions, it=E2=80=99s always clear what=
+ the
+caller wants, and it will always get what it wants.
 
-  The TxIP is reset either by writing data to the transmit buffer or
-  by issuing the Reset Tx Int command in WR0.
+Besides that, patch 2 introduces functions to skip filters which may be
+used by parts of the block layer that just don=E2=80=99t care about them.
 
-I understand the NMOS/CMOS desc. matches the Z85C30 (no FIFO used).
 
-So your description and patch makes sens.
-What worries me is the controller could have other pending IRQs to
-deliver and you are clearing them. Shouldn't we only clear the
-INTR_TXINT bit, and call escc_update_irq() which should lower the IRQ if
-no bits are pending?
+Secondly, the restraints put on mirror=E2=80=99s @replaces parameter are
+revisited and fixed.
 
-Maybe as:
 
-    s->wregs[W_INTR] &= ~INTR_TXINT;
-    escc_update_irq(s);
+Thirdly, BDS.backing_file is changed to be constant.  I don=E2=80=99t qui=
+te know
+why we modify it whenever we change a BDS=E2=80=99s backing file, but tha=
+t=E2=80=99s
+definitely not quite right.  This fixes things like being able to
+perform a commit on a file (using relative filenames) in a directory
+that=E2=80=99s not qemu=E2=80=99s CWD.
 
-Thanks,
 
-Phil.
+Finally, a number of tests are added.
 
-> Thanks,
-> 
-> Paolo
-> 
->> ---
->>  hw/char/escc.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/char/escc.c b/hw/char/escc.c
->> index 628f5f81f7..bea55ad8da 100644
->> --- a/hw/char/escc.c
->> +++ b/hw/char/escc.c
->> @@ -509,6 +509,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->>          break;
->>      case SERIAL_DATA:
->>          trace_escc_mem_writeb_data(CHN_C(s), val);
->> +        qemu_irq_lower(s->irq);
->>          s->tx = val;
->>          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
->>              if (qemu_chr_fe_backend_connected(&s->chr)) {
->>
-> 
-> 
+
+There are probably many things that are worthy of discussion, of which
+only some come to my head, e.g.:
+
+- In which cases do we want to skip filters, in which cases do we want
+  to skip implicit filters?
+  My approach was to basically never skip explicitly added filters,
+  except when it=E2=80=99s about finding a file in some tree (e.g. in a b=
+acking
+  chain).  Maybe there are cases where you think we should skip even
+  explicitly added filters.
+
+- I made interesting decisions like =E2=80=9CWhen you mirror from a node,=
+ we
+  should indeed mirror from that node, but when replacing it, we should
+  skip leave all implicit filters on top intact.=E2=80=9D  You may disagr=
+ee with
+  that.
+  (My reasoning here is that users aren=E2=80=99t supposed to know about
+  implicit filters, and therefore, they should not intend to remove
+  them.  Also, mirror accepts only root nodes as the source, so you
+  cannot really specify the node below the implicit filters.  But you
+  can use @replaces to drop the implicit filters, if you know they are
+  there.)
+
+- bdrv_query_bds_stats() is changed: =E2=80=9Cparent=E2=80=9D now means s=
+torage,
+  =E2=80=9Cbacking=E2=80=9D means COW.  This is what makes sense, althoug=
+h it breaks
+  compatibility; but only for filters that use bs->backing for the
+  filtered child (i.e. mirror top and commit top).  The alternatives
+  would be:
+  - Leave everything as it is.  But this means that whenever you add
+    another filter (throttle or COR), the backing chain is still broken
+    because they use bs->file for their filtered child.  So this is not
+    really an option.
+  - Present all filtered children under =E2=80=9Cbacking=E2=80=9D.  We wo=
+uld need to
+    present them under =E2=80=9Cparent=E2=80=9D as well, though, if they =
+are referenced
+    as bs->file, otherwise this too would break compatibility and would
+    not be any better.
+    This seems rather broken because we may present the same node twice
+    (once as =E2=80=9Cparent=E2=80=9D, once as =E2=80=9Cbacking=E2=80=9D)=
+.
+    Well, or we decide to break compatibility here, too, but to me it
+    seems wrong to present filtered nodes under =E2=80=9Cbacking=E2=80=9D=
+ but not under
+    =E2=80=9Cparent=E2=80=9D.
+
+  So I went for the solution that makes the most sense to me.
+
+
+v4:
+- Dropped patch 2 because it=E2=80=99s in master
+- (New) patch 2:
+  - Fixed the description of BDS.is_filter (requested by Kevin); I
+    didn=E2=80=99t do that before patch 1 because the description is kind=
+ of
+    wrong today already (Quorum does not have a bs->file but has been
+    marked a filter from the start).  It was only kind of wrong
+    because the description just claims that some callbacks get
+    automatically passed to bs->file, not that the filter must have
+    bs->file present.  But then patch 1 is correct without adjusting the
+    description, and we only need to do so here, in patch 2.  (Because
+    now the callbacks may be passed to bs->backing, too.)
+  - Rebase conflicts, mostly due to *backing_chain_frozen() and reopen
+    stuff in general (we usually still want to access bs->backing
+    instead of using the new functions because this is specifically
+    about bs->backing, not about the COW child).
+Patch 7: Keep iotest 245 passing
+
+
+git-backport-diff against v3:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/11:[----] [--] 'block: Mark commit and mirror as filter drivers'
+002/11:[0034] [FC] 'block: Filtered children access functions'
+003/11:[----] [--] 'block: Storage child access function'
+004/11:[----] [-C] 'block: Inline bdrv_co_block_status_from_*()'
+005/11:[----] [--] 'block: Fix check_to_replace_node()'
+006/11:[----] [--] 'iotests: Add tests for mirror @replaces loops'
+007/11:[0004] [FC] 'block: Leave BDS.backing_file constant'
+008/11:[----] [--] 'iotests: Add filter commit test cases'
+009/11:[----] [--] 'iotests: Add filter mirror test cases'
+010/11:[----] [--] 'iotests: Add test for commit in sub directory'
+011/11:[----] [--] 'iotests: Test committing to overridden backing'
+
+
+Max Reitz (11):
+  block: Mark commit and mirror as filter drivers
+  block: Filtered children access functions
+  block: Storage child access function
+  block: Inline bdrv_co_block_status_from_*()
+  block: Fix check_to_replace_node()
+  iotests: Add tests for mirror @replaces loops
+  block: Leave BDS.backing_file constant
+  iotests: Add filter commit test cases
+  iotests: Add filter mirror test cases
+  iotests: Add test for commit in sub directory
+  iotests: Test committing to overridden backing
+
+ qapi/block-core.json           |   4 +
+ include/block/block.h          |   2 +
+ include/block/block_int.h      |  87 +++++---
+ block.c                        | 381 +++++++++++++++++++++++++++------
+ block/backup.c                 |   8 +-
+ block/blkdebug.c               |   7 +-
+ block/blklogwrites.c           |   1 -
+ block/block-backend.c          |  16 +-
+ block/commit.c                 |  36 ++--
+ block/copy-on-read.c           |   2 -
+ block/io.c                     | 102 ++++-----
+ block/mirror.c                 |  24 ++-
+ block/qapi.c                   |  42 ++--
+ block/snapshot.c               |  40 ++--
+ block/stream.c                 |  13 +-
+ block/throttle.c               |   1 -
+ blockdev.c                     | 122 +++++++++--
+ migration/block-dirty-bitmap.c |   4 +-
+ nbd/server.c                   |   6 +-
+ qemu-img.c                     |  41 ++--
+ tests/qemu-iotests/020         |  36 ++++
+ tests/qemu-iotests/020.out     |  10 +
+ tests/qemu-iotests/040         | 191 +++++++++++++++++
+ tests/qemu-iotests/040.out     |   4 +-
+ tests/qemu-iotests/041         | 270 ++++++++++++++++++++++-
+ tests/qemu-iotests/041.out     |   4 +-
+ tests/qemu-iotests/184.out     |   7 +-
+ tests/qemu-iotests/191.out     |   1 -
+ tests/qemu-iotests/204.out     |   1 +
+ tests/qemu-iotests/228         |   6 +-
+ tests/qemu-iotests/228.out     |   6 +-
+ tests/qemu-iotests/245         |   4 +-
+ 32 files changed, 1194 insertions(+), 285 deletions(-)
+
+--=20
+2.20.1
+
 
