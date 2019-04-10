@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46650)
+Received: from eggs.gnu.org ([209.51.188.92]:47597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hECCZ-0004Gd-1h
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hECHf-0006K7-Rv
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hECCY-0006vk-3Z
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55060)
+	(envelope-from <cohuck@redhat.com>) id 1hECHe-00038S-FJ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hECCX-0006u0-MU
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2FFF7F6A8
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 12:19:35 +0000 (UTC)
-References: <20190318171521.8524-1-pbonzini@redhat.com>
-	<20190318171521.8524-4-pbonzini@redhat.com>
-	<6792361a-9a55-c97e-51e4-888ec87aeb7b@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b419a03e-a512-66ec-220a-c787e3e6739e@redhat.com>
-Date: Wed, 10 Apr 2019 14:19:25 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hECHe-00036Z-3U
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:54 -0400
+Date: Wed, 10 Apr 2019 14:24:26 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190410142426.5bf0d9a4.cohuck@redhat.com>
+In-Reply-To: <20190410040826.24371-3-pagupta@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-3-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6792361a-9a55-c97e-51e4-888ec87aeb7b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/13] libqos: move common i2c code to
- libqos
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +27,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com
 
-On 09/04/19 11:42, Thomas Huth wrote:
->> -static void tmp105_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
->> -                         uint16_t value)
->> -{
->> -    uint8_t cmd[3];
->> -    uint8_t resp[2];
->> -
->> -    cmd[0] = reg;
->> -    cmd[1] = value >> 8;
->> -    cmd[2] = value & 255;
->> -    i2c_send(i2c, addr, cmd, 3);
->> -    i2c_recv(i2c, addr, resp, 2);
->> -    g_assert_cmphex(resp[0], ==, cmd[1]);
->> -    g_assert_cmphex(resp[1], ==, cmd[2]);
->> -}
-> ... but the old set8/16 functions also used i2c_recv() and
-> g_assert_cmphex() ... shouldn't this be added to the new functions, too?
+On Wed, 10 Apr 2019 09:38:22 +0530
+Pankaj Gupta <pagupta@redhat.com> wrote:
 
-That is dependent on the actual device you are working with.  I probably
-should add some code to the tmp105 test that tests this behavior too.
+> This patch adds virtio-pmem driver for KVM guest.
+> 
+> Guest reads the persistent memory range information from
+> Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> creates a nd_region object with the persistent memory
+> range information so that existing 'nvdimm/pmem' driver
+> can reserve this into system memory map. This way
+> 'virtio-pmem' driver uses existing functionality of pmem
+> driver to register persistent memory compatible for DAX
+> capable filesystems.
+> 
+> This also provides function to perform guest flush over
+> VIRTIO from 'pmem' driver when userspace performs flush
+> on DAX memory range.
+> 
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
+>  drivers/virtio/Kconfig           |  10 +++
+>  drivers/virtio/Makefile          |   1 +
+>  drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
+>  include/linux/virtio_pmem.h      |  60 +++++++++++++++
+>  include/uapi/linux/virtio_ids.h  |   1 +
+>  include/uapi/linux/virtio_pmem.h |  10 +++
+>  7 files changed, 294 insertions(+)
+>  create mode 100644 drivers/nvdimm/virtio_pmem.c
+>  create mode 100644 drivers/virtio/pmem.c
+>  create mode 100644 include/linux/virtio_pmem.h
+>  create mode 100644 include/uapi/linux/virtio_pmem.h
+> 
+(...)
+> diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
+> new file mode 100644
+> index 000000000000..cc9de9589d56
+> --- /dev/null
+> +++ b/drivers/virtio/pmem.c
+> @@ -0,0 +1,124 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * virtio_pmem.c: Virtio pmem Driver
+> + *
+> + * Discovers persistent memory range information
+> + * from host and registers the virtual pmem device
+> + * with libnvdimm core.
+> + */
+> +#include <linux/virtio_pmem.h>
+> +#include <../../drivers/nvdimm/nd.h>
+> +
+> +static struct virtio_device_id id_table[] = {
+> +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> +	{ 0 },
+> +};
+> +
+> + /* Initialize virt queue */
+> +static int init_vq(struct virtio_pmem *vpmem)
 
-Paolo
+IMHO, you don't gain much by splitting off this function...
+
+> +{
+> +	struct virtqueue *vq;
+> +
+> +	/* single vq */
+> +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
+> +				host_ack, "flush_queue");
+> +	if (IS_ERR(vq))
+> +		return PTR_ERR(vq);
+
+I'm personally not a fan of chained assignments... I think I'd just
+drop the 'vq' variable and operate on vpmem->req_vq directly.
+
+> +
+> +	spin_lock_init(&vpmem->pmem_lock);
+> +	INIT_LIST_HEAD(&vpmem->req_list);
+> +
+> +	return 0;
+> +};
+> +
+> +static int virtio_pmem_probe(struct virtio_device *vdev)
+> +{
+> +	int err = 0;
+> +	struct resource res;
+> +	struct virtio_pmem *vpmem;
+> +	struct nvdimm_bus *nvdimm_bus;
+> +	struct nd_region_desc ndr_desc = {};
+> +	int nid = dev_to_node(&vdev->dev);
+> +	struct nd_region *nd_region;
+> +
+> +	if (!vdev->config->get) {
+> +		dev_err(&vdev->dev, "%s failure: config disabled\n",
+
+Maybe s/config disabled/config access disabled/ ? That seems to be the
+more common message.
+
+> +			__func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
+> +					GFP_KERNEL);
+
+Here, the vpmem variable makes sense for convenience, but I'm again not
+a fan of the chaining :)
+
+> +	if (!vpmem) {
+> +		err = -ENOMEM;
+> +		goto out_err;
+> +	}
+> +
+> +	vpmem->vdev = vdev;
+> +	err = init_vq(vpmem);
+> +	if (err)
+> +		goto out_err;
+> +
+> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +			start, &vpmem->start);
+> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +			size, &vpmem->size);
+> +
+> +	res.start = vpmem->start;
+> +	res.end   = vpmem->start + vpmem->size-1;
+> +	vpmem->nd_desc.provider_name = "virtio-pmem";
+> +	vpmem->nd_desc.module = THIS_MODULE;
+> +
+> +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> +						&vpmem->nd_desc);
+
+And here :)
+
+> +	if (!nvdimm_bus)
+> +		goto out_vq;
+> +
+> +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
+> +
+> +	ndr_desc.res = &res;
+> +	ndr_desc.numa_node = nid;
+> +	ndr_desc.flush = virtio_pmem_flush;
+> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
+> +	nd_region->provider_data =  dev_to_virtio
+> +					(nd_region->dev.parent->parent);
+
+Isn't it clear that this parent chain will always end up at &vdev->dev?
+Maybe simply set ->provider_data to vdev directly? (Does it need to
+grab a reference count of the device, BTW?)
+
+> +
+> +	if (!nd_region)
+> +		goto out_nd;
+
+Probably better to do this check before you access nd_region's
+members :)
+
+> +
+> +	return 0;
+> +out_nd:
+> +	err = -ENXIO;
+> +	nvdimm_bus_unregister(nvdimm_bus);
+> +out_vq:
+> +	vdev->config->del_vqs(vdev);
+> +out_err:
+> +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> +	return err;
+> +}
+> +
+> +static void virtio_pmem_remove(struct virtio_device *vdev)
+> +{
+> +	struct virtio_pmem *vpmem = vdev->priv;
+> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> +
+> +	nvdimm_bus_unregister(nvdimm_bus);
+
+I haven't followed this around the nvdimm code, but is the nd_region
+you created during probe cleaned up automatically, or would you need to
+do something here?
+
+> +	vdev->config->del_vqs(vdev);
+> +	vdev->config->reset(vdev);
+> +	kfree(vpmem);
+
+You allocated vpmem via devm_kzalloc; isn't it freed automatically on
+remove?
+
+> +}
+> +
+> +static struct virtio_driver virtio_pmem_driver = {
+> +	.driver.name		= KBUILD_MODNAME,
+> +	.driver.owner		= THIS_MODULE,
+> +	.id_table		= id_table,
+> +	.probe			= virtio_pmem_probe,
+> +	.remove			= virtio_pmem_remove,
+> +};
+> +
+> +module_virtio_driver(virtio_pmem_driver);
+> +MODULE_DEVICE_TABLE(virtio, id_table);
+> +MODULE_DESCRIPTION("Virtio pmem driver");
+> +MODULE_LICENSE("GPL");
+
+Only looked at this from the general virtio driver angle; seems fine
+apart from some easy-to-fix issues and some personal style preference
+things.
