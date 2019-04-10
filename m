@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66189C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A968C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2245220830
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:30:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2245220830
+	by mail.kernel.org (Postfix) with ESMTPS id 537D920830
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:45:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537D920830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37472 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37613 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEJrR-000741-E2
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:30:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34834)
+	id 1hEK5l-0003fp-I8
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:45:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiV-00070X-4U
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1hEK4q-0003AK-48
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiT-0004SH-Nb
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41864)
+	(envelope-from <eblake@redhat.com>) id 1hEK4o-0000QN-De
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:44:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEJiQ-0004O4-0y; Wed, 10 Apr 2019 16:21:02 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hEK4a-0000HP-HY; Wed, 10 Apr 2019 16:43:58 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3DEDB3078AAE;
-	Wed, 10 Apr 2019 20:21:01 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C810F5D9D5;
-	Wed, 10 Apr 2019 20:21:00 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 10 Apr 2019 22:20:30 +0200
-Message-Id: <20190410202033.28617-9-mreitz@redhat.com>
-In-Reply-To: <20190410202033.28617-1-mreitz@redhat.com>
-References: <20190410202033.28617-1-mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id C493D30254A0;
+	Wed, 10 Apr 2019 20:43:49 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-117-110.phx2.redhat.com [10.3.117.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 94C565D9CD;
+	Wed, 10 Apr 2019 20:43:46 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 10 Apr 2019 15:42:17 -0500
+Message-Id: <20190410204215.5963-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 10 Apr 2019 20:21:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 10 Apr 2019 20:43:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 08/11] iotests: Add filter commit test cases
+Subject: [Qemu-devel] [PATCH for-4.0?] iotest: Fix 241 to run in generic
+ directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,177 +66,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+	John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410202030.lykM_jhTZaW4vTziq-Y_TECIT4B85bZ6Cf5roMnefKk@z>
+Message-ID: <20190410204217.JyIkGufdmNKDgEyB_AMvs9aJi-x71UvbA4lSrJC8S98@z>
 
-This patch adds some tests on how commit copes with filter nodes.
+Filter the qemu-nbd server output to get rid of a direct reference
+to my build directory.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Fixes: e9dce9cb
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/040     | 130 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/040.out |   4 +-
- 2 files changed, 132 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index b81133a474..dc3fe57fbd 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -394,5 +394,135 @@ class TestReopenOverlay(ImageCommitTestCase):
-     def test_reopen_overlay(self):
-         self.run_commit_test(self.img1, self.img0)
-=20
-+class TestCommitWithFilters(iotests.QMPTestCase):
-+    img0 =3D os.path.join(iotests.test_dir, '0.img')
-+    img1 =3D os.path.join(iotests.test_dir, '1.img')
-+    img2 =3D os.path.join(iotests.test_dir, '2.img')
-+    img3 =3D os.path.join(iotests.test_dir, '3.img')
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, self.img0, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img1, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img2, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img3, '1M')
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.launch()
-+        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
-, id=3D'tg')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                'node-name': 'top-filter',
-+                'driver': 'throttle',
-+                'throttle-group': 'tg',
-+                'file': {
-+                    'node-name': 'cow-3',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': self.img3
-+                    },
-+                    'backing': {
-+                        'node-name': 'cow-2',
-+                        'driver': iotests.imgfmt,
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': self.img2
-+                        },
-+                        'backing': {
-+                            'node-name': 'cow-1',
-+                            'driver': iotests.imgfmt,
-+                            'file': {
-+                                'driver': 'file',
-+                                'filename': self.img1
-+                            },
-+                            'backing': {
-+                                'node-name': 'bottom-filter',
-+                                'driver': 'throttle',
-+                                'throttle-group': 'tg',
-+                                'file': {
-+                                    'node-name': 'cow-0',
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': self.img0
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }
-+                }
-+            })
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(self.img3)
-+        os.remove(self.img2)
-+        os.remove(self.img1)
-+        os.remove(self.img0)
-+
-+    # Filters make for funny filenames, so we cannot just use
-+    # self.imgX for the block-commit parameters
-+    def get_filename(self, node):
-+        return self.vm.node_info(node)['image']['filename']
-+
-+    def test_filterless_commit(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dself.get_filename('cow-2'),
-+                             base=3Dself.get_filename('cow-1'))
-+        self.assert_qmp(result, 'return', {})
-+        self.wait_until_completed(drive=3D'commit')
-+
-+    def test_commit_through_filter(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dself.get_filename('cow-1'),
-+                             base=3Dself.get_filename('cow-0'))
-+        # Cannot commit through explicitly added filters (yet,
-+        # although in the future we probably want to make users use
-+        # blockdev-copy for this)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', 'Cannot commit through exp=
-licit filter nodes')
-+
-+    def test_filtered_active_commit_with_filter(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             base=3Dself.get_filename('cow-2'))
-+        # Not specifying @top means active commit, so including the
-+        # filter on top (which is not allowed right now)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', 'Cannot commit through exp=
-licit filter nodes')
-+
-+    def test_filtered_active_commit_without_filter(self):
-+        cow3_name =3D self.get_filename('cow-3')
-+
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dcow3_name,
-+                             base=3Dself.get_filename('cow-2'))
-+        # This is how you'd want to specify committing img3 into img2
-+        # disregarding the filter on top of img3 -- but that does not
-+        # work, because you can only specify names of backing files
-+        # (and img3 is not a backing file).  The solution for this
-+        # would be for block-commit to accept node names.
-+        # Note that even if it did work, the above command would
-+        # result in a non-active commit, because img3 is not the top
-+        # node.  Which is wrong, because img3 can still be written to,
-+        # so it should be an active commit, but that is a different
-+        # story.
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+                        'Top image file %s not found' % cow3_name)
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 802ffaa0c0..220a5fa82c 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--...........................................
-+...............................................
- ----------------------------------------------------------------------
--Ran 43 tests
-+Ran 47 tests
-=20
- OK
+Not worth -rc4 on its own, but if something else pops up that requires
+another spin, I plan on a pull request for this one. Otherwise it
+slips to 4.1, and 4.0 just has a broken iotest.
+
+ tests/qemu-iotests/241     | 4 +++-
+ tests/qemu-iotests/241.out | 6 +++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tests/qemu-iotests/241 b/tests/qemu-iotests/241
+index 4b196857387..017a736aaba 100755
+--- a/tests/qemu-iotests/241
++++ b/tests/qemu-iotests/241
+@@ -28,6 +28,7 @@ nbd_unix_socket=3D$TEST_DIR/test_qemu_nbd_socket
+ _cleanup()
+ {
+     _cleanup_test_img
++    rm -f "$TEST_DIR/server.log"
+     nbd_server_stop
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+@@ -69,12 +70,13 @@ echo
+
+ # Intentionally omit '-f' to force image probing, which in turn forces
+ # sector alignment, here at the server.
+-nbd_server_start_unix_socket "$TEST_IMG_FILE"
++nbd_server_start_unix_socket "$TEST_IMG_FILE" 2> "$TEST_DIR/server.log"
+
+ $QEMU_NBD_PROG --list -k $nbd_unix_socket | grep '\(size\|min\)'
+ $QEMU_IMG map -f raw --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
+ $QEMU_IO -f raw -c map "$TEST_IMG"
+ nbd_server_stop
++cat "$TEST_DIR/server.log" | _filter_testdir
+
+ echo
+ echo "=3D=3D=3D Exporting unaligned raw image, forced client sector alig=
+nment =3D=3D=3D"
+diff --git a/tests/qemu-iotests/241.out b/tests/qemu-iotests/241.out
+index f481074a02e..75f9f465e52 100644
+--- a/tests/qemu-iotests/241.out
++++ b/tests/qemu-iotests/241.out
+@@ -10,13 +10,13 @@ QA output created by 241
+
+ =3D=3D=3D Exporting unaligned raw image, forced server sector alignment =
+=3D=3D=3D
+
+-WARNING: Image format was not specified for '/home/eblake/qemu/tests/qem=
+u-iotests/scratch/t.raw' and probing guessed raw.
+-         Automatically detecting the format is dangerous for raw images,=
+ write operations on block 0 will be restricted.
+-         Specify the 'raw' format explicitly to remove the restrictions.
+   size:  1024
+   min block: 512
+ [{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, =
+"offset": OFFSET}]
+ 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
++WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing=
+ guessed raw.
++         Automatically detecting the format is dangerous for raw images,=
+ write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+
+ =3D=3D=3D Exporting unaligned raw image, forced client sector alignment =
+=3D=3D=3D
+
 --=20
 2.20.1
 
