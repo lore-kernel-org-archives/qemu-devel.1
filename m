@@ -2,91 +2,69 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE396C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED91C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:56:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7756C20818
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:56:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sJ3s+09+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7756C20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8BF0B20693
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:56:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF0B20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32775 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32779 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEEdy-0004m6-F6
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 10:56:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51000)
+	id 1hEEeL-00057f-Pd
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 10:56:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hEEcm-00042U-F4
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:54:53 -0400
+	(envelope-from <lersek@redhat.com>) id 1hEEd2-0004CZ-2K
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hEEcl-0008EC-Aa
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:54:52 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36219)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
-	id 1hEEci-0008C3-I5; Wed, 10 Apr 2019 10:54:48 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y13so3359790wrd.3;
-	Wed, 10 Apr 2019 07:54:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=oQ2jwaqugorts+WPSxD3ShCdkBPE9FILfqIx5QHq95I=;
-	b=sJ3s+09+GZHIWrMZKnWLJzlFDmUJUh21T5dC5d99xn+lCmAlaa1GFpjxwIALX9Ja92
-	IOPHC3jOicq3QhVMRFSKb9d0Xmpaxnx5Pf+/DNGT1msSXDNyNDRp3AxwYIFBsLM1okKj
-	lfOuF1obE/yD8ihX2ye530XjVyCynAB6HzZtgLjdwx10aPNwR1sJmT6PsOJxEm53hCef
-	4lqSoifOTKBWNPrA2hu22ZZEYASUTDL0imvj05S2wJs0Svc6/O3MH1qkBi6KJwGAXBOj
-	/QYo4zuxR9yQkhsy6FgY0MTnoyemJMG/xTFVEDmhVlavRd+xiU20/TvBtbi3G0tO30zF
-	2ydw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=oQ2jwaqugorts+WPSxD3ShCdkBPE9FILfqIx5QHq95I=;
-	b=VJbKt9gn7nl/TZh9zzxhQ+9EaP6lRvhrFRBmlGOSY4DuN8SXhSJlw8XO+yB7adcoYP
-	i27gyJdwFxGuXoPn+GdHzABL9hfMH06DTxWhfIUWNP5BDLOAjuo8Rau28zkhTIgAlgLn
-	KPqoDyI0nisgxyRvDOexVgdYiOjNBkjOxK6Za4wm1GBdAhKXtuj6q7wibn7FQnmab8dj
-	2NVqtgYw8k99dUvZCYgrOleJtSKsXKUlwgcZAAPITIFkve4SjYftwTVdkInfxck8bbfP
-	k1SC4nu+AMOGerHZcqZjWHhUNp4cP6l4uVruSpUb5qhaD1GVM3xC6U33abyvjXdYqyWx
-	Bjjw==
-X-Gm-Message-State: APjAAAXQhCaurKm8N0EVynd8KAMCyMn4PZBkdbfjf5k3l92AjXQHSO1u
-	+MYXJZcagAhBXRvnwSUezKU=
-X-Google-Smtp-Source: APXvYqxMjhmWdmnkfYY03NmkZ0/JyoW9cWkoivrnwnUF5zXGmM79o7GkdHp5lQdrhob2Yexu3Jl7Aw==
-X-Received: by 2002:a5d:530e:: with SMTP id e14mr24906411wrv.18.1554908086886; 
-	Wed, 10 Apr 2019 07:54:46 -0700 (PDT)
-Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
-	p3sm53598956wrx.71.2019.04.10.07.54.44
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 10 Apr 2019 07:54:45 -0700 (PDT)
-Date: Wed, 10 Apr 2019 15:54:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190410145444.GA11035@stefanha-x1.localdomain>
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<ad53e61a-a911-c019-3f68-2bd05b7be944@redhat.com>
-	<468cc6c9-c338-a4fe-57b1-b4df5b2b24c0@virtuozzo.com>
-	<20190408100442.GA11997@linux.fritz.box>
-	<20190408101449.GB11997@linux.fritz.box>
+	(envelope-from <lersek@redhat.com>) id 1hEEd0-0008Pu-51
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:55:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hEEcz-0008OU-Qc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:55:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D4D230A9CC8;
+	Wed, 10 Apr 2019 14:55:04 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-133.rdu2.redhat.com
+	[10.10.121.133])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 50C4563F95;
+	Wed, 10 Apr 2019 14:54:51 +0000 (UTC)
+To: Olaf Hering <olaf@aepfle.de>
+References: <20190405153314.2068-1-philmd@redhat.com>
+	<20190405153314.2068-3-philmd@redhat.com>
+	<fbf6f219-4821-67be-27b2-42a0bad9746a@redhat.com>
+	<20190410082554.6c595b3f.olaf@aepfle.de>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6746a549-3ebf-80f3-e67a-62e536aa06be@redhat.com>
+Date: Wed, 10 Apr 2019 16:54:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4Ckj6UjgE2iN1+kY"
-Content-Disposition: inline
-In-Reply-To: <20190408101449.GB11997@linux.fritz.box>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/io.c: fix for the
- allocation failure
+In-Reply-To: <20190410082554.6c595b3f.olaf@aepfle.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 10 Apr 2019 14:55:05 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 2/2] roms: Allow the EDK2_EFIROM
+ variable to be overridden
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,136 +76,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Denis Lunev <den@virtuozzo.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410145444.D1e4IyN2cI_cd2rZGpOgphF3HOXcAHhr-K1TKPkJo4E@z>
+Message-ID: <20190410145450.e7QqZAcXVByYjZNkvsijjbMD0HPf8OE9PpSCOWRoY5Y@z>
 
+On 04/10/19 08:25, Olaf Hering wrote:
+> Am Mon, 8 Apr 2019 13:05:07 +0200
+> schrieb Laszlo Ersek <lersek@redhat.com>:
+>
+>> Then build scripts could be updated to invoke:
+>>
+>>   make -C roms \
+>>     EDK2_BASETOOLS_OPTFLAGS='...' \
+>>     EDK2_BASETOOLS_LDFLAGS='...' \
+>>     efirom
+>
+> The question remains: 'But why?'.
 
---4Ckj6UjgE2iN1+kY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Because it lets you pass "-fno-pie" & friends.
 
-On Mon, Apr 08, 2019 at 12:14:49PM +0200, Kevin Wolf wrote:
-> Am 08.04.2019 um 12:04 hat Kevin Wolf geschrieben:
-> > Am 08.04.2019 um 11:44 hat Andrey Shinkevich geschrieben:
-> > >=20
-> > >=20
-> > > On 06/04/2019 01:50, John Snow wrote:
-> > > >=20
-> > > >=20
-> > > > On 4/5/19 10:24 AM, Andrey Shinkevich wrote:
-> > > >> On a file system used by the customer, fallocate() returns an error
-> > > >> if the block is not properly aligned. So, bdrv_co_pwrite_zeroes()
-> > > >> fails. We can handle that case the same way as it is done for the
-> > > >> unsupported cases, namely, call to bdrv_driver_pwritev() that writ=
-es
-> > > >> zeroes to an image for the unaligned chunk of the block.
-> > > >>
-> > > >> Suggested-by: Denis V. Lunev <den@openvz.org>
-> > > >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > > >> ---
-> > > >>   block/io.c | 2 +-
-> > > >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >>
-> > > >> diff --git a/block/io.c b/block/io.c
-> > > >> index dfc153b..0412a51 100644
-> > > >> --- a/block/io.c
-> > > >> +++ b/block/io.c
-> > > >> @@ -1516,7 +1516,7 @@ static int coroutine_fn bdrv_co_do_pwrite_ze=
-roes(BlockDriverState *bs,
-> > > >>               assert(!bs->supported_zero_flags);
-> > > >>           }
-> > > >>  =20
-> > > >> -        if (ret =3D=3D -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK=
-)) {
-> > > >> +        if (ret < 0 && !(flags & BDRV_REQ_NO_FALLBACK)) {
-> > > >>               /* Fall back to bounce buffer if write zeroes is uns=
-upported */
-> > > >>               BdrvRequestFlags write_flags =3D flags & ~BDRV_REQ_Z=
-ERO_WRITE;
-> > > >>  =20
-> > > >>
-> > > >=20
-> > > > I suppose that if fallocate fails for any reason and we're allowing
-> > > > fallback, we're either going to succeed ... or fail again very soon
-> > > > thereafter.
-> > > >=20
-> > > > Are there any cases where it is vital to not ignore the first fallo=
-cate
-> > > > failure? I'm a little wary of ignoring the return code from
-> > > > bdrv_co_pwrite_zeroes, but I am assuming that if there is a "real"
-> > > > failure here that the following bounce writes will also fail "safel=
-y."
-> > > >=20
-> > > > I'm not completely confident, but I have no tangible objections:
-> > > > Reviewed-by: John Snow <jsnow@redhat.com>
-> > > >=20
-> > >=20
-> > > Thank you for your review, John!
-> > >=20
-> > > Let me clarify the circumstances and quote the bug report:
-> > > "Customer had Win-2012 VM with 50GB system disk which was later resiz=
-ed=20
-> > > to 256GB without resizing the partition inside VM.
-> > > Now, while trying to resize to 50G, the following error will appear
-> > > 'Failed to reduce the number of L2 tables: Invalid argument'
-> > > It was found that it is possible to shrink the disk to 128G and any s=
-ize=20
-> > > above that number, but size below 128G will bring the mentioned error=
-=2E"
-> > >=20
-> > > The fallocate() returns no error on that file system if the offset and
-> > > the (offset + bytes) parameters of the bdrv_co_do_pwrite_zeroes() both
-> > > are aligned to 4K.
-> >=20
-> > What is the return value you get from this file system?
-> >=20
-> > Maybe turning that into ENOTSUP in file-posix would be less invasive.
-> > Just falling back for any error gives me the vague feeling that it could
-> > cause problems sooner or later.
->=20
-> Also, which file system is this? This seems to be a file system bug.
-> fallocate() isn't documented to possibly have alignment restrictions for
-> FALLOC_FL_ZERO_RANGE (if this is the operation you're talking about).
-> FALLOC_FL_PUNCH_HOLE even explicitly mentions the behaviour for partial
-> blocks, so there is no doubt that operations for partial blocks are
-> considered valid. Operations that may impose restrictions are explicitly
-> documented as such.
->=20
-> So in any case, this would only be a workaround for a buggy file system.
-> The real bug needs to be fixed there.
+> Why can edk2 not be built with '-fno-pie' right away?
 
-I agree regarding the root cause of the bug, but the fallback behavior
-is reasonable IMO.
+Those flags are not universal across gcc/binutils versions.
 
-Andrey: If you update the patch with a more specific errno I'll queue
-that patch instead.
+Some gcc/binutils versions don't enable PIE to begin with.
 
-Stefan
+Some gcc/binutils versions take different PIE-disablement flags
+(considering both the compiler and the linker) from other gcc/binutils
+versions.
 
---4Ckj6UjgE2iN1+kY
-Content-Type: application/pgp-signature; name="signature.asc"
+For example, please refer to the following *iPXE* commit:
 
------BEGIN PGP SIGNATURE-----
+> commit 7c395b0e21806b946fe944a27fc273407f357ea1
+> Author: Michael Brown <mcb30@ipxe.org>
+> Date:   Wed Jun 14 12:33:16 2017 +0100
+>
+>     [build] Use -no-pie on newer versions of gcc
+>
+>     Some distributions patch gcc to generate position independent
+>     executables by default.  We currently include a workaround to check
+>     for this and to add -fno-PIE -nopie to CFLAGS if required.
+>
+>     Newer patched versions of gcc require -fno-PIE -no-pie instead.  Check
+>     for both variants.
+>
+>     Reported-by: Nathan Rennie-Waldock <nathan.renniewaldock@gmail.com>
+>     Originally-fixed-by: Markos Chandras <mchandras@suse.de>
+>     Signed-off-by: Michael Brown <mcb30@ipxe.org>
 
-iQEcBAEBAgAGBQJcrgO0AAoJEJykq7OBq3PINnIIAKa/FHkhOU/Ig9ItoT/P43Sf
-IvgoBgvK4A4evNGF+wYDPhTTS+pwXvdstPNu/CgKTeOHAXK2UasgC3gmoBc4TvMR
-CaK6eqtpIT83bk6ef+6JROOCJguWh6MxtLOUs4l9q4PJG9AMQytveaPrag42pFzC
-CxNc1YaDzkRxgDqiWYVI0hXgi3d79C00e5SzUpn4rwRDeGGpbUOnP9WCRvITiyTF
-0xv1hIoPB6dH+bpssjjgBcanIUYlwicwS8sbUeZGTWpCswOsrI88BEIU+jPtCDny
-+r1Ftwm9x4COrnExIIp/OuyzDCrInq4PWA8lBVv5TwS8Q6+LAuSFjKw5EQYy0/s=
-=4zWi
------END PGP SIGNATURE-----
+(I remember this commit because the logic it had added actually failed
+on a system that I used once for building iPXE -- it was an x86_64
+system with both a native gcc, and a *different version*
+x86_64-to-x86_64 *cross* gcc. The selection logic determined the flags
+for the one compiler toolchain, but then passed the flags to the other
+compiler toolchain. The build broke. I narrowed it down to the above
+commit, and then shrugged it off; it wasn't important enough to spend
+more time on it.)
 
---4Ckj6UjgE2iN1+kY--
+I also refer you to the following *edk2* commit:
+
+> commit 11d0cd23dd1bc15a6e6a1598250ea2e0c4c36e9a
+> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Date:   Mon Jun 18 10:23:49 2018 +0200
+>
+>     BaseTools/tools_def IA32: drop -no-pie linker option for GCC49
+>
+>     As reported by Liming, GCC 4.9.2 does not support the -no-pie
+>     linker option that we added to the GCC49 and GCC5 toolchain
+>     profiles in commit c25d3905523a ("BaseTools/tools_def IA32:
+>     disable PIE code generation explicitly") to work around issues
+>     with recent distro toolchains that enable PIE code generation
+>     by default.
+>
+>     So rollback the changes for GCC49 but preserve them for GCC5
+>
+>     Contributed-under: TianoCore Contribution Agreement 1.1
+>     Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>     Acked-by: Laszlo Ersek <lersek@redhat.com>
+
+The above facility will let you stuff the options into the edk2
+BaseTools build, in your downstream qemu.spec file, that match your
+downstream gcc/binutils version.
+
+Most build hosts will need no flags.
+
+> Did noone approach the edk2 developers yet that their buildsystem is
+> broken in that regard?
+
+Well, have you?
+
+I don't remember anyone else reporting such an issue yet, on edk2-devel
+or elsewhere, with building BaseTools. I certainly remember
+collaborating with Gary Lin from SUSE on various stuff, but not this.
+
+You are welcome to file a bug at <https://bugzilla.tianocore.org/>.
+Please pick "EDK2" for "Product", "Code" for "Component", and
+"BaseTools" for "Package".
+
+... Please don't try to force a "zero build-interface changes" policy on
+upstream, just so you can avoid a small tweak in a downstream build
+script when you rebase. Not even the gcc/binutils command lines conform
+to that. We all hope downstream rebases to be painless, and upstreams do
+strive to help with that, but the downstream rebase experience is never
+*entirely* painless (or automated).
+
+Thanks,
+Laszlo
 
