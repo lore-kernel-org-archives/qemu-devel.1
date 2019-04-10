@@ -2,91 +2,85 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751F4C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A15C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:38:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 494A420818
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:34:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 494A420818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A0E62082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:38:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWeMUu8R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0E62082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33444 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33509 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEFEd-0005sY-Hx
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:33:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33016)
+	id 1hEFIX-0007VH-8W
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:38:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEFDf-0005Wj-7K
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:33:00 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hEFHh-0007CL-Ql
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEFDe-0007hV-5B
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:32:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hEFDb-0007ez-Qk; Wed, 10 Apr 2019 11:32:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D8097F6A8;
-	Wed, 10 Apr 2019 15:32:49 +0000 (UTC)
-Received: from [10.3.117.110] (ovpn-117-110.phx2.redhat.com [10.3.117.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B8D3017CEF;
-	Wed, 10 Apr 2019 15:32:48 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20190410152429.8076-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
-Date: Wed, 10 Apr 2019 10:32:47 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <catherine.hecx@gmail.com>) id 1hEFHg-0001ox-6A
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:09 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hEFHf-0001mM-MP
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:08 -0400
+Received: by mail-oi1-x243.google.com with SMTP id n187so2145067oih.6
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=GdhLz5IRjWkvRLihhX1EWk26B326Mr5Dtd31AcTUfWU=;
+	b=RWeMUu8RMablZ/V5K3UTs23+sHPOnLv96jpNDJGJz+kbBLSwON8WgoFPZnLgfQBj4i
+	EXukdg3431ghW0IV7uYUOCkPqH9D69C5aOvB3XThpvvyvnu0+5CSAE9DKOV9JOjTjxBI
+	CKWuNKurwBQzNJOs6Dualq8vtofxyZR1+c28sqXIo04rWXxSNmbsBdwdLHrY1BZcbIY6
+	CPBdkJwHWeud9pWz34X9UX/VuwOcqxHaQz321w0hHLCmWsb1eSmbr6uRs4VAPfLZgs7y
+	VTH+oGlDPn9J6N+EKpaGk/GWWOEa3ZG2wrHYt19+38Z/U3Iq1/ztyZ+GmKOTB58XkqgW
+	jdbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=GdhLz5IRjWkvRLihhX1EWk26B326Mr5Dtd31AcTUfWU=;
+	b=bw/1QlU9yHjXQIgiQpvDy6hZOf5xb+R7xMsPcwSDkOEQsjwDlfbcGuBQ6MRxEcNQYg
+	tYhOnjXtQYucb6bjZIGKhJh6uyk6T5CC1+/jImc0q6LU+a98LCVlSBerF2/nNBiqP1sU
+	Cf/kWJXmiuEhaCCVyAKtnA2HOu/A0ovDXYvj2u5S0aRmFbWiDbm+L3Qmy24I7oRAYyJn
+	qmY0Ba8+oQSojRb/oAkaiYufZsQBNV0LEoDBmVRrYOaO4h16gddCjxOO9uUZleuQfWYX
+	t257kT0pgOEMplQz7rqU2051ZyD85YhhrzIrXFuIfTAx5dJVJEPYQZBOBuEJzQI9/H4n
+	QASw==
+X-Gm-Message-State: APjAAAUSfCoeBZkoTfQgzileJfptv7F1Ytq3fwqD14VCkyb0lNpMUnKC
+	vfxPa8lyC6C0QI36PBBR0wiK4eFBuIiaSR9TjUs=
+X-Google-Smtp-Source: APXvYqyeN7b/IYGvFYSO2tK4FYm7a3Wa6GyaD5t6JhiJsHXeq2WsiGV9hUPp+vzKr+UzuBlud4Q1bpnL3aXOsnIjWS8=
+X-Received: by 2002:aca:3c55:: with SMTP id j82mr2898602oia.84.1554910626278; 
+	Wed, 10 Apr 2019 08:37:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190410152429.8076-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SSfFH4GuxXhoBL1jyp2RhZk14GPbZhGxk"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Wed, 10 Apr 2019 15:32:49 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	<20190408123542.1a4de426@redhat.com>
+	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
+	<20190410145908.GF2980@work-vm>
+In-Reply-To: <20190410145908.GF2980@work-vm>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Wed, 10 Apr 2019 23:36:55 +0800
+Message-ID:
+ <CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.1] commit: Make base read-only if
- there is an early failure
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,78 +92,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410153247.FgN_jT7bwixKu25MR0xzq5Jq_YGHRzT2pEuf7KYO1i4@z>
+Message-ID: <20190410153655.1Gusq0Wni9QzpVnsrcrrzR0hupd0WDvW9oYib0tFACU@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SSfFH4GuxXhoBL1jyp2RhZk14GPbZhGxk
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.1] commit: Make base read-only if there
- is an early failure
-References: <20190410152429.8076-1-berto@igalia.com>
-In-Reply-To: <20190410152429.8076-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Dr. David
 
-On 4/10/19 10:24 AM, Alberto Garcia wrote:
-> You can reproduce this by passing an invalid filter-node-name (like
-> "1234") to block-commit. In this case the base image is put in
-> read-write mode but is never reset back to read-only.
->=20
+On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <dgilbert@redhat.com>
+wrote:
 
-Is it worth iotest coverage?
+> * Catherine Ho (catherine.hecx@gmail.com) wrote:
+> > Hi Igor
+> >
+> >
+> > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > > On Sun,  7 Apr 2019 22:19:05 -0400
+> > > Catherine Ho <catherine.hecx@gmail.com> wrote:
+> > >
+> > > > Currently it is not forbidden to use "-object
+> > > memory-backend-file,share=on"
+> > > > and together with "-incoming". But after incoming migration is
+> finished,
+> > > > the memory-backend-file will be definitely written if share=on. So
+> the
+> > > > memory-backend-file can only be used once, but failed in the 2nd time
+> > > > incoming.
+> > > >
+> > > > Thus it gives a warning and the users can run the qemu if they really
+> > > > want to do it.
+> > >
+> > > Shouldn't we add a migration blocker in such a case instead of warning
+> > > and letting qemu run wild?
+> > >
+> >
+> > IMO, it doesn't need to block this. With share=on and -incoming, the user
+> > can
+> > still save the device memory state into memory-backend file again if
+> > ignore-shared
+> > capability is on.
+> >
+> > If we block this, the user can't use the ignore-shared capability in
+> > incoming
+> > migration.
+>
+> -incomign with share=on is a perfectly normal thing to do - it just
+> depends who you are sharing the file with and the lifetime of that
+> shared file.
+>
+> For example; if you're just running a qemu with vhost-user then you
+> use share=on - however wyou typically select the backend file as
+> a new file from /dev/shm - it's not a file that you previously migrated
+> to.
+>
+Thanks,
+but using a new file from /dev/shm means kernel will start from
+start_kernel or early? Is it different from the x-ignore-shared case?
+If we remove the share=on in incoming migration, all the writting
+of ram will not be flush into the memory backend file. Thus we
+can use the base memory backend file for ever.
+e.g.
+1) save the vm like a snapshot, current ram state is "kernel
+has been started, systemd has been started"
+2) restore it with -incoming and *no* share=on flag
+3) restore it with -incoming and *no* share=on again...
+In contrary, if we use share=on, the base backend file will
+be written at once after 1st time incoming.
 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/commit.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/block/commit.c b/block/commit.c
-> index ba60fef58a..698eda1dfe 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -384,6 +384,9 @@ fail:
->      if (s->top) {
->          blk_unref(s->top);
->      }
-> +    if (s->base_read_only) {
-> +        bdrv_reopen_set_read_only(base, true, NULL);
-> +    }
->      job_early_fail(&s->common.job);
->      /* commit_top_bs has to be replaced after deleting the block job,
->       * otherwise this would fail because of lack of permissions. */
->=20
+So, IMO, no "share=on" is the proper usage of incoming migration
+when ignore-shared is on.
+Please correct me if sth is wrong, thanks:)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+B.R.
+Catherine
 
 
---SSfFH4GuxXhoBL1jyp2RhZk14GPbZhGxk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyuDJ8ACgkQp6FrSiUn
-Q2om6Af+JXBOhMwwGuFpb2hnTImvIhSc5xvm0LU2yQa3sfaVOvIwueqq3bzMMFYU
-kxxfBQ2SQYEnWFpVqB0eOPQamzmT8vXGBOvACvxXYDtffPAswhoqKGYZOetZWadE
-MRIYM018C9J0OcZ38DKNUzV/2hlBClGSL+fCDwvC6C2gf7AeSwZv5xk2uX0kIv5Z
-ZoWXkIs/oyoAjNGqOiRwrqMQ2W2iLbRCRbJgBoec4i2odqw093PgRgYwfqmzuCZr
-qcIWPKiWgKafVI+GgYhrr7GH7BS0vr9wYRVVMWeIf+bbhQyhk5JSreO8M0zoKzMU
-Bkc5mCL3DZMwF0bsDo3N9sTpBJOTzw==
-=4eFA
------END PGP SIGNATURE-----
-
---SSfFH4GuxXhoBL1jyp2RhZk14GPbZhGxk--
-
+> QEMU has no way to know about the provenance of the shared file it's
+> been given, so we can't really warn people about it.
+>
+> Dave
+>
+> > B.R.
+> > Catherine
+> >
+> > >
+> > >
+> > > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> > > > ---
+> > > >  backends/hostmem-file.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > >
+> > > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > > > index 37ac6445d2..59429ee0b4 100644
+> > > > --- a/backends/hostmem-file.c
+> > > > +++ b/backends/hostmem-file.c
+> > > > @@ -16,6 +16,7 @@
+> > > >  #include "sysemu/hostmem.h"
+> > > >  #include "sysemu/sysemu.h"
+> > > >  #include "qom/object_interfaces.h"
+> > > > +#include "migration/migration.h"
+> > > >
+> > > >  /* hostmem-file.c */
+> > > >  /**
+> > > > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend
+> *backend,
+> > > Error **errp)
+> > > >          }
+> > > >      }
+> > > >
+> > > > +    /*
+> > > > +     * In ignore shared case, if share=on for host memory backend
+> file,
+> > > > +     * the ram might be written after incoming process is finished.
+> Thus
+> > > > +     * the memory backend can't be reused for 2nd/3rd... incoming
+> > > > +     */
+> > > > +    if (backend->share && migrate_ignore_shared()
+> > > > +                       && runstate_check(RUN_STATE_INMIGRATE))
+> > > > +        warn_report("share=on for memory backend file might be "
+> > > > +                        "conflicted with incoming in ignore shared
+> > > case");
+> > > > +
+> > > >      backend->force_prealloc = mem_prealloc;
+> > > >      name = host_memory_backend_get_name(backend);
+> > > >      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+> > >
+> > >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
