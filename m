@@ -2,56 +2,82 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E22E5C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 11:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E89A9C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 11:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEBC32083E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 11:38:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEBC32083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF6062083E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 11:41:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="mnaTtgNI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF6062083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57853 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57889 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEBYx-0008UO-Pd
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 07:38:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36699)
+	id 1hEBc0-00019r-TT
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 07:41:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
-	id 1hEBYE-00088a-0c
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:37:58 -0400
+	(envelope-from <r.bolshakov@yadro.com>) id 1hEBbF-0000fd-Bc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
-	id 1hEBYC-0003pe-Ux
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:37:57 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:44540)
+	(envelope-from <r.bolshakov@yadro.com>) id 1hEBbE-0006rb-Ga
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:41:05 -0400
+Received: from mta-01.yadro.com ([89.207.88.251]:40554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
-	id 1hEBY7-0003cw-UT; Wed, 10 Apr 2019 07:37:52 -0400
-X-IronPort-AV: E=Sophos;i="5.60,332,1549929600"; d="scan'208";a="83207791"
-Date: Wed, 10 Apr 2019 12:37:42 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Paul Durrant <paul.durrant@citrix.com>
-Message-ID: <20190410113742.GD1435@perard.uk.xensource.com>
-References: <20190408151617.13025-1-paul.durrant@citrix.com>
-	<20190408151617.13025-2-paul.durrant@citrix.com>
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1hEBbD-0006oK-VG
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:41:04 -0400
+Received: from localhost (unknown [127.0.0.1])
+	by mta-01.yadro.com (Postfix) with ESMTP id F0BD341927;
+	Wed, 10 Apr 2019 11:40:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+	user-agent:in-reply-to:content-disposition:content-type
+	:content-type:mime-version:references:message-id:subject:subject
+	:from:from:date:date:received:received:received; s=mta-01; t=
+	1554896458; x=1556710859; bh=gLzRIvUe/B0A9Q+nIznvMw1vtVZxlmG1PIw
+	velrVxMk=; b=mnaTtgNILpyDMpcGN52ziRI16R8xziNEP/A6Y10WjirHOAAeTi6
+	iEj/OKDp0IGweznQeQU1SUtgbQij/ftGFvsfiGqA9dfp1MmDVDokW1zM/PdZntPU
+	mwml6c0fOjeP4Q/xK5rJQIytHLNbKQRvCX+SBkSVzKzZbC35oUVkJS2k=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+	by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id h9tz3b3ceB9m; Wed, 10 Apr 2019 14:40:58 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+	[172.17.10.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mta-01.yadro.com (Postfix) with ESMTPS id 1123C41203;
+	Wed, 10 Apr 2019 14:40:58 +0300 (MSK)
+Received: from localhost (172.17.128.60) by T-EXCH-02.corp.yadro.com
+	(172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32;
+	Wed, 10 Apr 2019 14:40:57 +0300
+Date: Wed, 10 Apr 2019 14:40:51 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Message-ID: <20190410114027.53l4ph7an3pnclqr@SPB-NB-133.local>
+References: <20190407115839.25054-1-skrtbhtngr@gmail.com>
+	<20190407115839.25054-2-skrtbhtngr@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190408151617.13025-2-paul.durrant@citrix.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 162.221.156.55
-Subject: Re: [Qemu-devel] [PATCH 1/3] xen-bus: use a separate fd for each
- event channel
+In-Reply-To: <20190407115839.25054-2-skrtbhtngr@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Originating-IP: [172.17.128.60]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+	T-EXCH-02.corp.yadro.com (172.17.10.102)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 89.207.88.251
+Subject: Re: [Qemu-devel] [PATCH RESEND v2 1/2] hvf: declare hvf_handle_io
+ if NEED_CPU_H is defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,38 +89,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410113742.4_QfOJv9ExZZvnX62o1nwD1L8U06cUKKKRhCSvkMR8I@z>
+Message-ID: <20190410114051.TKUcqdsafMik3G_IZDLf1OFrrr61UBpSlWCaSxsvBlI@z>
 
-On Mon, Apr 08, 2019 at 04:16:15PM +0100, Paul Durrant wrote:
-> To better support use of IOThread-s it will be necessary to be able to set
-> the AioContext for each XenEventChannel and hence it is necessary to open a
-> separate handle to libxenevtchan for each channel.
+On Sun, Apr 07, 2019 at 05:28:38PM +0530, Sukrit Bhatnagar wrote:
+> hvf_handle_io needs the poisoned type CPUArchState as its argument.
+> Declaring it if NEED_CPU_H is defined enables include/sysemu/hvf.h
+> to be included for common object compilation as well.
 > 
-> This patch stops using NotifierList for event channel callbacks, replacing
-> that construct by a list of complete XenEventChannel structures. Each of
-> these now has a xenevtchn_handle pointer in place of the single pointer
-> previously held in the XenDevice structure. The individual handles are
-> opened/closed in xen_device_bind/unbind_event_channel(), replacing the
-> single open/close in xen_device_realize/unrealize().
-> 
-> NOTE: This patch does not add an AioContext parameter to
->       xen_device_bind_event_channel(). That will be done in a subsequent
->       patch.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-
-There are a few places were I would have like to add an assert, but they
-can't be compiled-out in QEMU :-(.
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
 Thanks,
-
--- 
-Anthony PERARD
+Roman
 
