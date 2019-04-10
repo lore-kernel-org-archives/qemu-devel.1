@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35551)
+Received: from eggs.gnu.org ([209.51.188.92]:35736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEFOl-0001RC-E3
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:44:28 -0400
+	(envelope-from <ybettan@redhat.com>) id 1hEFPc-0001xc-Jh
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEFOj-00063G-GG
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEFOj-0005wQ-0E
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:44:25 -0400
-Date: Wed, 10 Apr 2019 11:44:21 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1051460502.20833720.1554911061402.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190410143826.GA7856@lap1>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-3-pagupta@redhat.com>
-	<20190410142426.5bf0d9a4.cohuck@redhat.com>
-	<20190410143826.GA7856@lap1>
+	(envelope-from <ybettan@redhat.com>) id 1hEFPb-00072F-CZ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:20 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:32952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1hEFPa-00071O-V8
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:19 -0400
+Received: by mail-wr1-f66.google.com with SMTP id q1so3591755wrp.0
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:45:17 -0700 (PDT)
+References: <20190401111843.54528-1-ybettan@redhat.com>
+	<20190409131734.GE16944@stefanha-x1.localdomain>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
+Date: Wed, 10 Apr 2019 18:45:14 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190409131734.GE16944@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,233 +30,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan j williams <dan.j.williams@intel.com>, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, pbonzini@redhat.com, kilobyte@angband.pl
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, ailan@redhat.com, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
 
-> > 
-> > > This patch adds virtio-pmem driver for KVM guest.
-> > > 
-> > > Guest reads the persistent memory range information from
-> > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > > creates a nd_region object with the persistent memory
-> > > range information so that existing 'nvdimm/pmem' driver
-> > > can reserve this into system memory map. This way
-> > > 'virtio-pmem' driver uses existing functionality of pmem
-> > > driver to register persistent memory compatible for DAX
-> > > capable filesystems.
-> > > 
-> > > This also provides function to perform guest flush over
-> > > VIRTIO from 'pmem' driver when userspace performs flush
-> > > on DAX memory range.
-> > > 
-> > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > > ---
-> > >  drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
-> > >  drivers/virtio/Kconfig           |  10 +++
-> > >  drivers/virtio/Makefile          |   1 +
-> > >  drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
-> > >  include/linux/virtio_pmem.h      |  60 +++++++++++++++
-> > >  include/uapi/linux/virtio_ids.h  |   1 +
-> > >  include/uapi/linux/virtio_pmem.h |  10 +++
-> > >  7 files changed, 294 insertions(+)
-> > >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> > >  create mode 100644 drivers/virtio/pmem.c
-> > >  create mode 100644 include/linux/virtio_pmem.h
-> > >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> > > 
-> > (...)
-> > > diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
-> > > new file mode 100644
-> > > index 000000000000..cc9de9589d56
-> > > --- /dev/null
-> > > +++ b/drivers/virtio/pmem.c
-> > > @@ -0,0 +1,124 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +/*
-> > > + * virtio_pmem.c: Virtio pmem Driver
-> > > + *
-> > > + * Discovers persistent memory range information
-> > > + * from host and registers the virtual pmem device
-> > > + * with libnvdimm core.
-> > > + */
-> > > +#include <linux/virtio_pmem.h>
-> > > +#include <../../drivers/nvdimm/nd.h>
-> > > +
-> > > +static struct virtio_device_id id_table[] = {
-> > > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> > > +	{ 0 },
-> > > +};
-> > > +
-> > > + /* Initialize virt queue */
-> > > +static int init_vq(struct virtio_pmem *vpmem)
-> > 
-> > IMHO, you don't gain much by splitting off this function...
-> 
-> It make sense to have all the vq-init-related stuff in one function, so
-> here pmem_lock and req_list are used only for the vq.
+On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
+> On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
+>> The main goal is to add an example device to Qemu to be used as template or
+>> guideline for contributors when they wish to create a new virtio device.
+>>
+>> Another reason for this device is to document "the right way" to write
+>> a new virtio device in Qemu.
+>>
+>> This device is a simple device and its functionality is to increase its input
+>> by 1.
+>>
+>> The device driver is located at:
+>> https://github.com/ybettan/QemuDeviceDrivers.git
+>>
+>> In addition I am writing a blog to give a logical overview of the virtio
+>> protocol and a step-by-step guide to write a new virtio device.
+>> This blog can be found at https://howtovms.wordpress.com.
+>>
+>> scripts/checkpatch.pl have some errors do to "//" (old style one line comment),
+>> those lines contains FIXMEs for the next version and will be removed.
+>>
+>> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
 
-Yes.
 
-> Saying that - maybe it would be better to have the 3 in one struct.
-> 
-> > 
-> > > +{
-> > > +	struct virtqueue *vq;
-> > > +
-> > > +	/* single vq */
-> > > +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
-> > > +				host_ack, "flush_queue");
-> > > +	if (IS_ERR(vq))
-> > > +		return PTR_ERR(vq);
-> > 
-> > I'm personally not a fan of chained assignments... I think I'd just
-> > drop the 'vq' variable and operate on vpmem->req_vq directly.
-> 
-> +1
+Hi Stefan and thank you for your review.
 
-Will drop extra vq.
+> Where is the specification for this device?  The lack of specification
+> is already not "the right way".
 
-> 
-> > 
-> > > +
-> > > +	spin_lock_init(&vpmem->pmem_lock);
-> > > +	INIT_LIST_HEAD(&vpmem->req_list);
-> > > +
-> > > +	return 0;
-> > > +};
-> > > +
-> > > +static int virtio_pmem_probe(struct virtio_device *vdev)
-> > > +{
-> > > +	int err = 0;
-> > > +	struct resource res;
-> > > +	struct virtio_pmem *vpmem;
-> > > +	struct nvdimm_bus *nvdimm_bus;
-> > > +	struct nd_region_desc ndr_desc = {};
-> > > +	int nid = dev_to_node(&vdev->dev);
-> > > +	struct nd_region *nd_region;
-> > > +
-> > > +	if (!vdev->config->get) {
-> > > +		dev_err(&vdev->dev, "%s failure: config disabled\n",
-> > 
-> > Maybe s/config disabled/config access disabled/ ? That seems to be the
-> > more common message.
-> > 
-> > > +			__func__);
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
-> > > +					GFP_KERNEL);
-> > 
-> > Here, the vpmem variable makes sense for convenience, but I'm again not
-> > a fan of the chaining :)
-> 
-> +1
 
-here as well.
 
-> 
-> > 
-> > > +	if (!vpmem) {
-> > > +		err = -ENOMEM;
-> > > +		goto out_err;
-> > > +	}
-> > > +
-> > > +	vpmem->vdev = vdev;
-> > > +	err = init_vq(vpmem);
-> > > +	if (err)
-> > > +		goto out_err;
-> > > +
-> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > > +			start, &vpmem->start);
-> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > > +			size, &vpmem->size);
-> > > +
-> > > +	res.start = vpmem->start;
-> > > +	res.end   = vpmem->start + vpmem->size-1;
-> > > +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> > > +	vpmem->nd_desc.module = THIS_MODULE;
-> > > +
-> > > +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> > > +						&vpmem->nd_desc);
-> > 
-> > And here :)
-> > 
-> > > +	if (!nvdimm_bus)
-> > > +		goto out_vq;
-> > > +
-> > > +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
-> > > +
-> > > +	ndr_desc.res = &res;
-> > > +	ndr_desc.numa_node = nid;
-> > > +	ndr_desc.flush = virtio_pmem_flush;
-> > > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> > > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> > > +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
-> > > +	nd_region->provider_data =  dev_to_virtio
-> > > +					(nd_region->dev.parent->parent);
-> > 
-> > Isn't it clear that this parent chain will always end up at &vdev->dev?
-> > Maybe simply set ->provider_data to vdev directly? (Does it need to
-> > grab a reference count of the device, BTW?)
-> > 
-> > > +
-> > > +	if (!nd_region)
-> > > +		goto out_nd;
-> > 
-> > Probably better to do this check before you access nd_region's
-> > members :)
-> > 
-> > > +
-> > > +	return 0;
-> > > +out_nd:
-> > > +	err = -ENXIO;
-> > > +	nvdimm_bus_unregister(nvdimm_bus);
-> > > +out_vq:
-> > > +	vdev->config->del_vqs(vdev);
-> > > +out_err:
-> > > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> > > +	return err;
-> > > +}
-> > > +
-> > > +static void virtio_pmem_remove(struct virtio_device *vdev)
-> > > +{
-> > > +	struct virtio_pmem *vpmem = vdev->priv;
-> > > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> > > +
-> > > +	nvdimm_bus_unregister(nvdimm_bus);
-> > 
-> > I haven't followed this around the nvdimm code, but is the nd_region
-> > you created during probe cleaned up automatically, or would you need to
-> > do something here?
-> > 
-> > > +	vdev->config->del_vqs(vdev);
-> > > +	vdev->config->reset(vdev);
-> > > +	kfree(vpmem);
-> > 
-> > You allocated vpmem via devm_kzalloc; isn't it freed automatically on
-> > remove?
-> > 
-> > > +}
-> > > +
-> > > +static struct virtio_driver virtio_pmem_driver = {
-> > > +	.driver.name		= KBUILD_MODNAME,
-> > > +	.driver.owner		= THIS_MODULE,
-> > > +	.id_table		= id_table,
-> > > +	.probe			= virtio_pmem_probe,
-> > > +	.remove			= virtio_pmem_remove,
-> > > +};
-> > > +
-> > > +module_virtio_driver(virtio_pmem_driver);
-> > > +MODULE_DEVICE_TABLE(virtio, id_table);
-> > > +MODULE_DESCRIPTION("Virtio pmem driver");
-> > > +MODULE_LICENSE("GPL");
-> > 
-> > Only looked at this from the general virtio driver angle; seems fine
-> > apart from some easy-to-fix issues and some personal style preference
-> > things.
-> 
+Another step in this process is to write a specification for this 
+device. Since I am learning the virtio protocol while implementing this 
+example device it was easier for me to start with the device and from 
+there write its specification but take into consideration that the 
+specification will be written soon.
 
-Best regards,
-Pankaj
+
+>
+> There are multiple problems with the code, but the larger issue is that
+> this example device is just helping people shoot themselves in the foot
+> more easily.
+
+
+If you can point me to those problem I will be glad so I can update the 
+code and understand those problems you are talking about.
+
+
+>
+> The difficulty with VIRTIO is not how to implement devices/drivers, it's
+> that people don't read the specification and therefore do not understand
+> the device model properly.  The spec is dry and missing information in
+> some places.  I think more accessible documentation, like your blog, can
+> help here.
+
+
+As I said, the blog will be updated with explanations on each step of 
+the communication between the device and the driver and the reason it is 
+not there yet is because I preferred getting some reviews, make the code 
+better and only then documenting "the write way" to not mislead peoples.
+
+
+>
+> If you would like to educate people about VIRTIO, then explaining the
+> device model, lifecycle, how to change a device in a
+> backwards-compatible way, virtqueue semantics, etc are the topics that
+> deserve attention.
+>
+> For someone who has learnt these topics, implementing the device/driver
+> is not hard.  For someone who doesn't understand these topics, no
+> example device will help.  At best they will copy-paste together
+> something that sort of works but has issues.
+
+
+For me, reading the specification and even reading some code examples 
+over the internet didn't made me understand it until I saw the related 
+code so I agree with you it is not enough yet but all the other parts 
+are on there way.
+
+
+The final purpose is to have:
+
+1. device specification
+
+2. device implementation
+
+3. device driver
+
+4. blog
+
+maybe I should have written it at the beginning, this is not the entire 
+project but it is its start.
+
+
+>
+> Stefan
+
+
+Thanks again for your review.
