@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37615)
+Received: from eggs.gnu.org ([209.51.188.92]:38584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEHmJ-0006uM-Mg
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1hEHrZ-0000Us-Gu
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEHmI-0001Qw-LM
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:55 -0400
-References: <20190410045707.16923-1-philmd@redhat.com>
-	<e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
-	<94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <78374d70-fa22-73a0-823e-9d483b91d008@redhat.com>
-Date: Wed, 10 Apr 2019 20:16:46 +0200
+	(envelope-from <eblake@redhat.com>) id 1hEHrX-00043u-Ni
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:22:21 -0400
+References: <20190409210655.777-1-jsnow@redhat.com>
+	<87y34i2zbt.fsf@dusky.pond.sub.org>
+	<3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+Date: Wed, 10 Apr 2019 13:22:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: Correct the
- EDK2_BASETOOLS_OPTFLAGS variable description
+In-Reply-To: <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 04/10/19 17:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/10/19 4:58 PM, Laszlo Ersek wrote:
->> On 04/10/19 06:57, Philippe Mathieu-Daud=C3=A9 wrote:
->>> In commit 1cab464136b4 we incorrectly described the
->>> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
->>> options to the EDK2 build tools, but it only expands
->>> the CFLAGS (not to the CPPFLAGS).
->>> Update the description to be more accurate.
->>>
->>> Reported-by: Laszlo Ersek <lersek@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>  roms/Makefile | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/roms/Makefile b/roms/Makefile
->>> index 1ff78b63bb3..d7fd6025e7c 100644
->>> --- a/roms/Makefile
->>> +++ b/roms/Makefile
->>> @@ -120,8 +120,8 @@ build-efi-roms: build-pxe-roms
->>>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->>>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
->>> =20
->>> -# Build scripts can pass compiler/linker flags to the EDK2 build too=
-ls
->>> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
->>> +# Build scripts can pass compiler/linker flags to the EDK2
->>> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
->>>  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
->>>  #
->>>  # Example:
->>>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
+References: <20190409210655.777-1-jsnow@redhat.com>
+ <87y34i2zbt.fsf@dusky.pond.sub.org>
+ <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+In-Reply-To: <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/10/19 12:37 PM, John Snow wrote:
+>=20
+>=20
+> On 4/10/19 1:39 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
 >>
->> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>>> It turns out that having options listed in three places continues to =
+be
+>>> a bad idea. I'm still toying with the idea of an improved infrastruct=
+ure
+>>> here, but in the meantime, another bandaid.
+>>>
+
 >>
->> Please noone submit a pull request with this patch (for 4.1) until my
->> edk2 bundling series is merged; as this one will likely introduce
->> another contextual conflict, and I'd *really* like to avoid another
->> rebase on my end, due to such an issue.
+>> Nice to have in 4.0.
+>>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
 >=20
-> Thanks for the review. I'll rebase it on top of your 'bundle edk2
-> platform firmware with QEMU' v4 and resend (later).
+> If it can go in for 4.0, who stages it? Kevin?
 
-Thank you!
+At this point, we've missed -rc3; the fix on its own is not a
+release-blocker, but if something else comes up that requires -rc4 for
+an actual release blocker, we can sort out someone sending a pull
+request for this one at the same time. (I'm aware of a couple of iotest
+fixups in the same boat... Guess it's time to start updating the wiki to
+point to email threads where we document 'wish list' patches)
 
-> Feel free to include it on top of your pullreq.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-... I think I'll keep that pullreq as minimal as it can be. :)
 
-Thanks
-Laszlo
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->=20
-> Regards,
->=20
-> Phil.
->=20
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyuNFEACgkQp6FrSiUn
+Q2o5xwf9EtKJgQbBEnV7buNM89Z7a3lLWfW1GhWFEiNt61BGcMG2WqlsQGTbvbP9
+hY1i4+KUDaAhJ11YeyZvIUS5jV6wzhFl+MoS2wlZ3v++g4aisUm9ll04JXpzpyrX
+UDLpOTXLWUSpavX8z1UV+Rj3FU4csTfRQmA7iiDjnTAqYRZ2i+rvvHhr5lwCoj+b
+mUO3Taavdhi6uONirYyHnvabBnT0Hzj5UgGXW8ybL1A5c9iC8PpcC5R6iYoIBZn/
+gYj6HVIHQT5xiLxdQW7hMuTUnuNsyOFq3yiBsle8tWimQiES/AN2GaaksSGcrtyn
+6Q28QFRgi9+4sR89zOPAiycHj6bDrA==
+=hLYg
+-----END PGP SIGNATURE-----
+
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ--
