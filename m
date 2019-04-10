@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42662)
+Received: from eggs.gnu.org ([209.51.188.92]:42685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHh-0000er-PY
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEKHj-0000gY-II
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHg-00089M-CJ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEKHi-0008AI-5S
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:31 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 10 Apr 2019 22:57:11 +0200
-Message-Id: <20190410205715.2209-3-mreitz@redhat.com>
+Date: Wed, 10 Apr 2019 22:57:12 +0200
+Message-Id: <20190410205715.2209-4-mreitz@redhat.com>
 In-Reply-To: <20190410205715.2209-1-mreitz@redhat.com>
 References: <20190410205715.2209-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/6] qemu-img: Add salvaging mode to convert
+Subject: [Qemu-devel] [PATCH v2 3/6] blkdebug: Add @iotype error option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,245 +24,228 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This adds a salvaging mode (--salvage) to qemu-img convert which ignores
-read errors and treats the respective areas as containing only zeroes.
-This can be used for instance to at least partially recover the data
-from terminally corrupted qcow2 images.
+This new error option allows users of blkdebug to inject errors only on
+certain kinds of I/O operations.  Users usually want to make a very
+specific operation fail, not just any; but right now they simply hope
+that the event that triggers the error injection is followed up with
+that very operation.  That may not be true, however, because the block
+layer is changing (including blkdebug, which may increase the number of
+types of I/O operations on which to inject errors).
+
+The new option's default has been chosen to keep backwards
+compatibility.
+
+Note that similar to the internal representation, we could choose to
+expose this option as a list of I/O types.  But there is no practical
+use for this, because as described above, users usually know exactly
+which kind of operation they want to make fail, so there is no need to
+specify multiple I/O types at once.  In addition, exposing this option
+as a list would require non-trivial changes to qemu_opts_absorb_qdict().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c       | 85 ++++++++++++++++++++++++++++++++++++------------
- qemu-img-cmds.hx |  4 +--
- qemu-img.texi    |  5 +++
- 3 files changed, 71 insertions(+), 23 deletions(-)
+ qapi/block-core.json | 26 +++++++++++++++++++++++
+ block/blkdebug.c     | 50 ++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 67 insertions(+), 9 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index c53666aa41..c2216e67a6 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -66,6 +66,7 @@ enum {
-     OPTION_SIZE =3D 264,
-     OPTION_PREALLOCATION =3D 265,
-     OPTION_SHRINK =3D 266,
-+    OPTION_SALVAGE =3D 267,
- };
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ccbfff9d0..5141e91172 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3235,6 +3235,26 @@
+             'l1_shrink_write_table', 'l1_shrink_free_l2_clusters',
+             'cor_write'] }
 =20
- typedef enum OutputFormat {
-@@ -1569,6 +1570,7 @@ typedef struct ImgConvertState {
-     int64_t target_backing_sectors; /* negative if unknown */
-     bool wr_in_order;
-     bool copy_range;
-+    bool salvage;
-     bool quiet;
-     int min_sparse;
-     int alignment;
-@@ -1616,25 +1618,44 @@ static int convert_iteration_sectors(ImgConvertSt=
-ate *s, int64_t sector_num)
++##
++# @BlkdebugIOType:
++#
++# Kinds of I/O that blkdebug can inject errors in.
++#
++# @read: .bdrv_co_preadv()
++#
++# @write: .bdrv_co_pwritev()
++#
++# @write-zeroes: .bdrv_co_pwrite_zeroes()
++#
++# @discard: .bdrv_co_pdiscard()
++#
++# @flush: .bdrv_co_flush_to_disk()
++#
++# Since: 4.1
++##
++{ 'enum': 'BlkdebugIOType',
++  'data': [ 'read', 'write', 'write-zeroes', 'discard', 'flush' ] }
++
+ ##
+ # @BlkdebugInjectErrorOptions:
+ #
+@@ -3245,6 +3265,11 @@
+ # @state:       the state identifier blkdebug needs to be in to
+ #               actually trigger the event; defaults to "any"
+ #
++# @iotype:      the type of I/O operations on which this error should
++#               be injected; defaults to "all read, write,
++#               write-zeroes, discard, and flush operations"
++#               (since: 4.1)
++#
+ # @errno:       error identifier (errno) to be returned; defaults to
+ #               EIO
+ #
+@@ -3262,6 +3287,7 @@
+ { 'struct': 'BlkdebugInjectErrorOptions',
+   'data': { 'event': 'BlkdebugEvent',
+             '*state': 'int',
++            '*iotype': 'BlkdebugIOType',
+             '*errno': 'int',
+             '*sector': 'int',
+             '*once': 'bool',
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index efd9441625..ca84b12e32 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -75,6 +75,7 @@ typedef struct BlkdebugRule {
+     int state;
+     union {
+         struct {
++            uint64_t iotype_mask;
+             int error;
+             int immediately;
+             int once;
+@@ -91,6 +92,9 @@ typedef struct BlkdebugRule {
+     QSIMPLEQ_ENTRY(BlkdebugRule) active_next;
+ } BlkdebugRule;
+=20
++QEMU_BUILD_BUG_MSG(BLKDEBUGIO_TYPE__MAX > 64,
++                   "BlkdebugIOType mask does not fit into an uint64_t");
++
+ static QemuOptsList inject_error_opts =3D {
+     .name =3D "inject-error",
+     .head =3D QTAILQ_HEAD_INITIALIZER(inject_error_opts.head),
+@@ -103,6 +107,10 @@ static QemuOptsList inject_error_opts =3D {
+             .name =3D "state",
+             .type =3D QEMU_OPT_NUMBER,
+         },
++        {
++            .name =3D "iotype",
++            .type =3D QEMU_OPT_STRING,
++        },
+         {
+             .name =3D "errno",
+             .type =3D QEMU_OPT_NUMBER,
+@@ -162,6 +170,8 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
+or **errp)
+     int event;
+     struct BlkdebugRule *rule;
+     int64_t sector;
++    BlkdebugIOType iotype;
++    Error *local_error =3D NULL;
+=20
+     /* Find the right event for the rule */
+     event_name =3D qemu_opt_get(opts, "event");
+@@ -192,6 +202,26 @@ static int add_rule(void *opaque, QemuOpts *opts, Er=
+ror **errp)
+         sector =3D qemu_opt_get_number(opts, "sector", -1);
+         rule->options.inject.offset =3D
+             sector =3D=3D -1 ? -1 : sector * BDRV_SECTOR_SIZE;
++
++        iotype =3D qapi_enum_parse(&BlkdebugIOType_lookup,
++                                 qemu_opt_get(opts, "iotype"),
++                                 BLKDEBUGIO_TYPE__MAX, &local_error);
++        if (local_error) {
++            error_propagate(errp, local_error);
++            return -1;
++        }
++        if (iotype !=3D BLKDEBUGIO_TYPE__MAX) {
++            rule->options.inject.iotype_mask =3D (1ull << iotype);
++        } else {
++            /* Apply the default */
++            rule->options.inject.iotype_mask =3D
++                (1ull << BLKDEBUGIO_TYPE_READ)
++                | (1ull << BLKDEBUGIO_TYPE_WRITE)
++                | (1ull << BLKDEBUGIO_TYPE_WRITE_ZEROES)
++                | (1ull << BLKDEBUGIO_TYPE_DISCARD)
++                | (1ull << BLKDEBUGIO_TYPE_FLUSH);
++        }
++
+         break;
+=20
+     case ACTION_SET_STATE:
+@@ -470,7 +500,8 @@ out:
+     return ret;
+ }
+=20
+-static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t by=
+tes)
++static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t by=
+tes,
++                      BlkdebugIOType iotype)
+ {
+     BDRVBlkdebugState *s =3D bs->opaque;
+     BlkdebugRule *rule =3D NULL;
+@@ -480,9 +511,10 @@ static int rule_check(BlockDriverState *bs, uint64_t=
+ offset, uint64_t bytes)
+     QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+         uint64_t inject_offset =3D rule->options.inject.offset;
+=20
+-        if (inject_offset =3D=3D -1 ||
+-            (bytes && inject_offset >=3D offset &&
+-             inject_offset < offset + bytes))
++        if ((inject_offset =3D=3D -1 ||
++             (bytes && inject_offset >=3D offset &&
++              inject_offset < offset + bytes)) &&
++            (rule->options.inject.iotype_mask & (1ull << iotype)))
+         {
+             break;
+         }
+@@ -521,7 +553,7 @@ blkdebug_co_preadv(BlockDriverState *bs, uint64_t off=
+set, uint64_t bytes,
+         assert(bytes <=3D bs->bl.max_transfer);
      }
 =20
-     if (s->sector_next_status <=3D sector_num) {
--        int64_t count =3D n * BDRV_SECTOR_SIZE;
-+        uint64_t offset =3D (sector_num - src_cur_offset) * BDRV_SECTOR_=
-SIZE;
-+        int64_t count;
+-    err =3D rule_check(bs, offset, bytes);
++    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_READ);
+     if (err) {
+         return err;
+     }
+@@ -542,7 +574,7 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t of=
+fset, uint64_t bytes,
+         assert(bytes <=3D bs->bl.max_transfer);
+     }
 =20
--        if (s->target_has_backing) {
-+        do {
-+            count =3D n * BDRV_SECTOR_SIZE;
-+
-+            if (s->target_has_backing) {
-+                ret =3D bdrv_block_status(blk_bs(s->src[src_cur]), offse=
-t,
-+                                        count, &count, NULL, NULL);
-+            } else {
-+                ret =3D bdrv_block_status_above(blk_bs(s->src[src_cur]),=
- NULL,
-+                                              offset, count, &count, NUL=
-L,
-+                                              NULL);
-+            }
-+
-+            if (ret < 0) {
-+                if (s->salvage) {
-+                    if (n =3D=3D 1) {
-+                        if (!s->quiet) {
-+                            warn_report("error while reading block statu=
-s at "
-+                                        "offset %" PRIu64 ": %s", offset=
-,
-+                                        strerror(-ret));
-+                        }
-+                        /* Just try to read the data, then */
-+                        ret =3D BDRV_BLOCK_DATA;
-+                        count =3D BDRV_SECTOR_SIZE;
-+                    } else {
-+                        /* Retry on a shorter range */
-+                        n =3D DIV_ROUND_UP(n, 4);
-+                    }
-+                } else {
-+                    error_report("error while reading block status at of=
-fset "
-+                                 "%" PRIu64 ": %s", offset, strerror(-re=
-t));
-+                    return ret;
-+                }
-+            }
-+        } while (ret < 0);
+-    err =3D rule_check(bs, offset, bytes);
++    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_WRITE);
+     if (err) {
+         return err;
+     }
+@@ -552,7 +584,7 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t of=
+fset, uint64_t bytes,
 =20
--            ret =3D bdrv_block_status(blk_bs(s->src[src_cur]),
--                                    (sector_num - src_cur_offset) *
--                                    BDRV_SECTOR_SIZE,
--                                    count, &count, NULL, NULL);
--        } else {
--            ret =3D bdrv_block_status_above(blk_bs(s->src[src_cur]), NUL=
-L,
--                                          (sector_num - src_cur_offset) =
-*
--                                          BDRV_SECTOR_SIZE,
--                                          count, &count, NULL, NULL);
--        }
--        if (ret < 0) {
--            error_report("error while reading block status of sector %" =
-PRId64
--                         ": %s", sector_num, strerror(-ret));
--            return ret;
--        }
-         n =3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
-=20
-         if (ret & BDRV_BLOCK_ZERO) {
-@@ -1671,6 +1692,7 @@ static int convert_iteration_sectors(ImgConvertStat=
-e *s, int64_t sector_num)
- static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sect=
-or_num,
-                                         int nb_sectors, uint8_t *buf)
+ static int blkdebug_co_flush(BlockDriverState *bs)
  {
-+    uint64_t single_read_until =3D 0;
-     int n, ret;
-     QEMUIOVector qiov;
+-    int err =3D rule_check(bs, 0, 0);
++    int err =3D rule_check(bs, 0, 0, BLKDEBUGIO_TYPE_FLUSH);
 =20
-@@ -1679,6 +1701,7 @@ static int coroutine_fn convert_co_read(ImgConvertS=
-tate *s, int64_t sector_num,
-         BlockBackend *blk;
-         int src_cur;
-         int64_t bs_sectors, src_cur_offset;
-+        uint64_t offset;
+     if (err) {
+         return err;
+@@ -586,7 +618,7 @@ static int coroutine_fn blkdebug_co_pwrite_zeroes(Blo=
+ckDriverState *bs,
+         assert(bytes <=3D bs->bl.max_pwrite_zeroes);
+     }
 =20
-         /* In the case of compression with multiple source files, we can=
- get a
-          * nb_sectors that spreads into the next part. So we must be abl=
-e to
-@@ -1687,14 +1710,30 @@ static int coroutine_fn convert_co_read(ImgConver=
-tState *s, int64_t sector_num,
-         blk =3D s->src[src_cur];
-         bs_sectors =3D s->src_sectors[src_cur];
+-    err =3D rule_check(bs, offset, bytes);
++    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_WRITE_ZEROES);
+     if (err) {
+         return err;
+     }
+@@ -620,7 +652,7 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDri=
+verState *bs,
+         assert(bytes <=3D bs->bl.max_pdiscard);
+     }
 =20
-+        offset =3D (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+
-         n =3D MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset)=
-);
-+        if (single_read_until > offset) {
-+            n =3D 1;
-+        }
-         qemu_iovec_init_buf(&qiov, buf, n << BDRV_SECTOR_BITS);
-=20
--        ret =3D blk_co_preadv(
--                blk, (sector_num - src_cur_offset) << BDRV_SECTOR_BITS,
--                n << BDRV_SECTOR_BITS, &qiov, 0);
-+        ret =3D blk_co_preadv(blk, offset, n << BDRV_SECTOR_BITS, &qiov,=
- 0);
-         if (ret < 0) {
--            return ret;
-+            if (s->salvage) {
-+                if (n > 1) {
-+                    single_read_until =3D offset + (n << BDRV_SECTOR_BIT=
-S);
-+                    continue;
-+                } else {
-+                    if (!s->quiet) {
-+                        warn_report("error while reading offset %" PRIu6=
-4
-+                                    ": %s", offset, strerror(-ret));
-+                    }
-+                    memset(buf, 0, BDRV_SECTOR_SIZE);
-+                }
-+            } else {
-+                return ret;
-+            }
-         }
-=20
-         sector_num +=3D n;
-@@ -2028,6 +2067,7 @@ static int img_convert(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {"force-share", no_argument, 0, 'U'},
-             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OP=
-TS},
-+            {"salvage", no_argument, 0, OPTION_SALVAGE},
-             {0, 0, 0, 0}
-         };
-         c =3D getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-@@ -2145,6 +2185,9 @@ static int img_convert(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts =3D true;
-             break;
-+        case OPTION_SALVAGE:
-+            s.salvage =3D true;
-+            break;
-         case OPTION_TARGET_IMAGE_OPTS:
-             tgt_image_opts =3D true;
-             break;
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 1526f327a5..d6f444586c 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -44,9 +44,9 @@ STEXI
- ETEXI
-=20
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [--target-image-opts] [=
--U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O outpu=
-t_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size=
-] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [=
--U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O outpu=
-t_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size=
-] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_=
-filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [--target-image-=
-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{s=
-rc_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options=
-}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutin=
-es}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-=
-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{s=
-rc_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options=
-}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutin=
-es}] [-W] [--salvage] @var{filename} [@var{filename2} [...]] @var{output_=
-filename}
- ETEXI
-=20
- DEF("create", img_create,
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 3b6710a580..827ee9fe32 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -175,6 +175,11 @@ improve performance if the data is remote, such as w=
-ith NFS or iSCSI backends,
- but will not automatically sparsify zero sectors, and may result in a fu=
-lly
- allocated target image depending on the host support for getting allocat=
-ion
- information.
-+@item --salvage
-+Try to ignore I/O errors when reading.  Unless in quiet mode (@code{-q})=
-, errors
-+will still be printed.  Areas that cannot be read from the source will b=
-e
-+treated as containing only zeroes.  This option has no effect in copy of=
-floading
-+mode (@code{-C}).
- @end table
-=20
- Parameters to dd subcommand:
+-    err =3D rule_check(bs, offset, bytes);
++    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_DISCARD);
+     if (err) {
+         return err;
+     }
 --=20
 2.20.1
