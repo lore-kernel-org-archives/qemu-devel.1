@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60271)
+Received: from eggs.gnu.org ([209.51.188.92]:39511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hE6p7-0002LW-DH
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:06 -0400
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1hE7RU-0008L3-OG
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hE6p6-0001eD-B9
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:05 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:33406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hE6p5-0001cx-Px
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:04 -0400
-Received: by mail-lf1-x142.google.com with SMTP id j11so910911lfm.0
-	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 23:35:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190409174018.25798-1-armbru@redhat.com>
-	<f018f4d8-7fb2-9037-3b5a-b34f1c5d876d@redhat.com>
-	<874l764eez.fsf@dusky.pond.sub.org>
-	<38442eb0-501e-dbf8-60e0-74675a999dba@redhat.com>
-	<87bm1e2yfa.fsf@dusky.pond.sub.org>
-In-Reply-To: <87bm1e2yfa.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Apr 2019 23:34:33 -0700
-Message-ID: <CAKmqyKM7fX6UqSU5K+w25xGxO2K4kqtyoRz7LMFN7GtBYL56KA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1hE7RT-00022I-9c
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:14:44 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2429 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ann.zhuangyanying@huawei.com>)
+	id 1hE7RL-0001uw-Lm
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:14:38 -0400
+From: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Date: Wed, 10 Apr 2019 07:14:17 +0000
+Message-ID: <EC9759BC1E3E98429B5DE9A03DF86D8B59ED165F@DGGEML523-MBX.china.huawei.com>
+References: <1554819296-14960-1-git-send-email-ann.zhuangyanying@huawei.com>
+	<20190409110149-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190409110149-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
- overflowing in load_device_tree()
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] msix: fix interrupt aggregation problem at
+ the passthrough of NVMe SSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,70 +30,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
-On Tue, Apr 9, 2019 at 10:59 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->
-> > On 4/10/19 7:28 AM, Markus Armbruster wrote:
-> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-> >>> On 4/9/19 7:40 PM, Markus Armbruster wrote:
-> >>>> If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
-> >>>> computation of @dt_size overflows to a negative number, which then
-> >>>> gets converted to a very large size_t for g_malloc0() and
-> >>>> load_image_size().  In the (fortunately improbable) case g_malloc0()
-> >>>> succeeds and load_image_size() survives, we'd assign the negative
-> >>>> number to *sizep.  What that would do to the callers I can't say, bu=
-t
-> >>>> it's unlikely to be good.
-> >>>>
-> >>>> Fix by rejecting images whose size would overflow.
-> >>>>
-> >>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >>>> ---
-> >>>>  device_tree.c | 4 ++++
-> >>>>  1 file changed, 4 insertions(+)
-> >>>>
-> >>>> diff --git a/device_tree.c b/device_tree.c
-> >>>> index 296278e12a..f8b46b3c73 100644
-> >>>> --- a/device_tree.c
-> >>>> +++ b/device_tree.c
-> >>>> @@ -84,6 +84,10 @@ void *load_device_tree(const char *filename_path,=
- int *sizep)
-> >>>>                       filename_path);
-> >>>>          goto fail;
-> >>>>      }
-> >>>> +    if (dt_size > INT_MAX / 2 - 10000) {
-> >>>
-> >>> We should avoid magic number duplication.
-> >>> That said, this patch looks safe.
-> >>>
-> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>
-> >> Thanks!
-> >>
-> >>> BTW how did you figure that out?
-> >>
-> >> Downstream handling of upstream commit da885fe1ee8 led me to the
-> >> function.  I spotted dt_size =3D get_image_size(filename_path).
-> >> Experience has taught me to check the left hand side's type.  Bad.  Th=
-en
-> >> I saw how dt_size gets increased.  Worse.
+
+
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Tuesday, April 09, 2019 11:04 PM
+> To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+> Cc: marcel.apfelbaum@gmail.com; qemu-devel@nongnu.org; Gonglei (Arei)
+> <arei.gonglei@huawei.com>
+> Subject: Re: [PATCH] msix: fix interrupt aggregation problem at the
+> passthrough of NVMe SSD
+>=20
+> On Tue, Apr 09, 2019 at 02:14:56PM +0000, Zhuangyanying wrote:
+> > From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 > >
-> > So you genuinely neglected to mention Kurtis Miller then :)
->
-> Explanation, not excuse: the only occurence of the name in my downstream
-> reading was a two-liner BZ comment, which I totally missed in my haste
-> to give the fix a chance to make 4.0.  I certainly didn't mean to
-> deprive him of credit!
+> > Recently I tested the performance of NVMe SSD passthrough and found
+> > that interrupts were aggregated on vcpu0(or the first vcpu of each
+> > numa) by /proc/interrupts,when GuestOS was upgraded to sles12sp3 (or
+> > redhat7.6). But /proc/irq/X/smp_affinity_list shows that the interrupt =
+is
+> spread out, such as 0-10, 11-21,.... and so on.
+> > This problem cannot be resolved by "echo X >
+> > /proc/irq/X/smp_affinity_list", because the NVMe SSD interrupt is
+> > requested by the API pci_alloc_irq_vectors(), so the interrupt has the
+> IRQD_AFFINITY_MANAGED flag.
+> >
+> > GuestOS sles12sp3 backport "automatic interrupt affinity for MSI/MSI-X
+> > capable devices", but the implementation of __setup_irq has no
+> > corresponding modification. It is still irq_startup(), then
+> > setup_affinity(), that is sending an affinity message when the interrup=
+t is
+> unmasked.
+>=20
+> So does latest upstream still change data/address of an unmasked vector?
+>=20
+The latest upstream works fine. Affinity configuration is successful.
 
-No worries. I have sent the pull request and it includes the reported by.
+The original order at my understanding is
+nvme_setup_io_queues()
+ \     \
+  \     --->pci_alloc_irq_vectors_affinity()
+   \        \
+    \        -> msi_domain_alloc_irqs()
+     \         \     /* if IRQD_AFFINITY_MANAGED, then "mask =3D affinity "=
+ */
+      \         -> ...-> __irq_alloc_descs()
+       \             \  /* cpumask_copy(desc->irq_common_data.affinity, aff=
+inity); */
+        \             -> ...-> desc_smp_init()
+         ->request_threaded_irq()
+            \
+             ->__setup_irq()
+               \  \
+                \  ->irq_startup()->msi_domain_activate()
+                 \      \
+                  \      ->irq_enable()->pci_msi_unmask_irq()
+                   \
+                    -->setup_affinity()
+                       \    \
+                        \    -->if (irqd_affinity_is_managed(&desc->irq_dat=
+a))=20
+                         \           set =3D desc->irq_common_data.affinity=
+;
+                          \          cpumask_and(mask, cpu_online_mask, set=
+);
+                           \
+                            -->irq_do_set_affinity()
+                                   \
+                                    -->msi_domain_set_affinity()
+                                          \   /* Actual setting affinity*/
+                                           -->__pci_write_msi_msg()
 
-Alistair
+Afetr commit e43b3b58:" genirq/cpuhotplug: Enforce affinity setting on star=
+tup of managed irqs "
+@@ -265,8 +265,8 @@ int irq_startup(struct irq_desc *desc, bool resend, boo=
+l force)
+ 			irq_setup_affinity(desc);
+ 			break;
+ 		case IRQ_STARTUP_MANAGED:
++			irq_do_set_affinity(d, aff, false);
+ 			ret =3D __irq_startup (desc);
+-			irq_set_affinity_locked(d, aff, false);
+ 			break;
+First irq_do_set_affinity(), then __irq_startup(),that is unmask irq.
 
->
-> [...]
->
+> > The bare metal configuration is successful, but qemu will not trigger
+> > the msix update, and the affinity configuration fails.
+> > The affinity is configured by /proc/irq/X/smp_affinity_list,
+> > implemented at apic_ack_edge(), the bitmap is stored in pending_mask,
+> > mask->__pci_write_msi_msg()->unmask,
+> > and the timing is guaranteed, and the configuration takes effect.
+> >
+> > The GuestOS linux-master incorporates the "genirq/cpuhotplug: Enforce
+> > affinity setting on startup of managed irqs" to ensure that the
+> > affinity is first issued and then __irq_startup(), for the managerred
+> > interrupt. So configuration is successful.
+> >
+> > It now looks like sles12sp3 (up to sles15sp1, linux-4.12.x), redhat7.6
+> > (3.10.0-957.10.1) does not have backport the patch yet.
+>=20
+> Sorry - which patch?
+genirq/cpuhotplug: Enforce affinity setting on startup of managed irqs
+commit e43b3b58
+>=20
+> > "if (is_masked =3D=3D was_masked) return;" can it be removed at qemu?
+> > What is the reason for this check?
+> >
+> > Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+> > ---
+> >  hw/pci/msix.c | 4 ----
+> >  1 file changed, 4 deletions(-)
+> >
+> > diff --git a/hw/pci/msix.c b/hw/pci/msix.c index 4e33641..e1ff533
+> > 100644
+> > --- a/hw/pci/msix.c
+> > +++ b/hw/pci/msix.c
+> > @@ -119,10 +119,6 @@ static void msix_handle_mask_update(PCIDevice
+> > *dev, int vector, bool was_masked)  {
+> >      bool is_masked =3D msix_is_masked(dev, vector);
+> >
+> > -    if (is_masked =3D=3D was_masked) {
+> > -        return;
+> > -    }
+> > -
+> >      msix_fire_vector_notifier(dev, vector, is_masked);
+> >
+> >      if (!is_masked && msix_is_pending(dev, vector)) {
+>=20
+>=20
+> To add to that, notifiers generally assume that updates come in pairs, un=
+mask
+> followed by mask.
+>=20
+>=20
+>=20
+> > --
+> > 1.8.3.1
+> >
