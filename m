@@ -2,60 +2,92 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA4DC10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C58BC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEA0F20818
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:05:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA0F20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E34EF2082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:39:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="iY8mz6KA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E34EF2082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37901 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38200 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEKPF-0005qy-BG
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 17:05:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42753)
+	id 1hEKwG-0005oH-C7
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 17:39:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHr-0000ou-I5
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:41 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hEKrf-0003Gd-TO
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 17:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHp-0008Dz-Th
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEKHm-0008CN-4X; Wed, 10 Apr 2019 16:57:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5DD8981F01;
-	Wed, 10 Apr 2019 20:57:33 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B4C5A5C3FD;
-	Wed, 10 Apr 2019 20:57:32 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 10 Apr 2019 22:57:15 +0200
-Message-Id: <20190410205715.2209-7-mreitz@redhat.com>
-In-Reply-To: <20190410205715.2209-1-mreitz@redhat.com>
-References: <20190410205715.2209-1-mreitz@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Wed, 10 Apr 2019 20:57:33 +0000 (UTC)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hEKgQ-00076g-F1
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 17:23:04 -0400
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:38736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hEKgM-00070k-Kc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 17:23:02 -0400
+Received: by mail-it1-x141.google.com with SMTP id f22so5980791ita.3
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 14:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
+	h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+	:references; bh=oX/6YdDoDVg7CojU7LrvJTpsZ1sNTog7DBtEGTrGq4I=;
+	b=iY8mz6KAGFvrXJ0PgJX1tH2I54fZ70f+wvwN8+tJTkt8Thdm0R7jTUEA1uONfV6LtT
+	d1hmy51iEysFYgrC+6ncsy/6qfuUM1dFJcNtv9k3a522IMAIN+bvfWpW9TVHA7DVfy/M
+	aOv3hcs+wOi3Ohcr3cFHPo86O7sImEtihLkkqYlPqAi/4fkDKCYg/OtBqfhnwx1Afmaf
+	52EQnuIAf7HFus7ryj+cDSMPeytnjiZPEuQRIxOpZqt604IkHzRRBqGO0BpC65wpVMHg
+	t7Q8IWpcE99apmXCWtncwbhhpAu9ROzd2YGEnHvJl/qNy3w++/bY4lEIja8vmPoiI1ZW
+	proA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:message-id:mime-version:subject:date
+	:in-reply-to:cc:to:references;
+	bh=oX/6YdDoDVg7CojU7LrvJTpsZ1sNTog7DBtEGTrGq4I=;
+	b=KfTX5h3f+Lc7sgaucCzCWBe4SaaIjyIvEiiyy7n8OsrODC3QNvpdsceRDsIsX7WWd2
+	x7fiFryKgyodBK36np3/oo0skK9cBtsNFoAm4qbigx1OWppwqqKxLq/F1fJylHgfMq6a
+	zQrHPY/G9w28W0ae7aIagGE2IrQ6TAAYJOAXLVGS7wEw5M84zkDXfOu1pPa4MUsXfl/i
+	RFKGu7HkILhDmo7hQHkZpjECGGcRRZ4wpppu1hh4H3t6PofG3a+dEQXH3Hb+XuS4G1a6
+	rtpjKTeEKA5NCae13Ab8H26fGKjc2MNhR7gKim/ZJJydnnPt5k9bR9wPbxXU+AnkoxJ8
+	3SWg==
+X-Gm-Message-State: APjAAAWuElYqp7907nSuPkGak5E5iJsl83rUNKM0LZFXYRKLRrvS9i66
+	GR2GSxr8AxBvypTJ06XplAHYZg==
+X-Google-Smtp-Source: APXvYqyUjqMqAEqbzpP6Ft3IJQ6lZal3UJCwKspMw/6pd5T6O2qr1dKX8IMGrFYdYfna/Hzh00YaZQ==
+X-Received: by 2002:a24:2509:: with SMTP id g9mr5082518itg.149.1554931372791; 
+	Wed, 10 Apr 2019 14:22:52 -0700 (PDT)
+Received: from ?IPv6:2600:380:a55d:99f0:c406:ea61:ae88:5e28?
+	([2600:380:a55d:99f0:c406:ea61:ae88:5e28])
+	by smtp.gmail.com with ESMTPSA id
+	y22sm14015106ioa.47.2019.04.10.14.22.50
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 10 Apr 2019 14:22:52 -0700 (PDT)
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Message-Id: <437475C9-2835-4CBC-8A38-FF95E29569FA@oberlin.edu>
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Date: Wed, 10 Apr 2019 17:22:45 -0400
+In-Reply-To: <1328f591-897f-8762-d324-cccb5f63a360@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190305051007.56009-1-stephen.checkoway@oberlin.edu>
+	<52a82d3a-3b79-c61d-93fa-f087af45f6fb@redhat.com>
+	<1328f591-897f-8762-d324-cccb5f63a360@redhat.com>
+X-Mailer: Apple Mail (2.3445.102.3)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::141
+X-Mailman-Approved-At: Wed, 10 Apr 2019 17:38:17 -0400
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 6/6] iotests: Test qemu-img convert --salvage
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] hw/char/escc: Lower irq when transmit
+ buffer is filled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,274 +99,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	"Denis V . Lunev" <den@openvz.org>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Laurent Vivier <laurent@vivier.eu>,
+	=?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410205715.3QCboTdFzJuQ_RbgA_K8dd39Dwl8P6u8xRJqMkCEOPM@z>
+Message-ID: <20190410212245.MG3KJaXkkHTnhxdc_jlIct48gfmvQSoa_rLOqY_lSlo@z>
 
-This test converts a simple image to another, but blkdebug injects
-block_status and read faults at some offsets.  The resulting image
-should be the same as the input image, except that sectors that could
-not be read have to be 0.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/249     | 163 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/249.out |  43 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 207 insertions(+)
- create mode 100755 tests/qemu-iotests/249
- create mode 100644 tests/qemu-iotests/249.out
 
-diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
-new file mode 100755
-index 0000000000..d3883d75f3
---- /dev/null
-+++ b/tests/qemu-iotests/249
-@@ -0,0 +1,163 @@
-+#!/bin/bash
-+#
-+# Test qemu-img convert --salvage
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmreitz@redhat.com
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=3D$PWD
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
-+
-+$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
-+
-+
-+sector_size=3D512
-+
-+# Offsets on which to fail block-status.  Keep in ascending order so
-+# the indexing done by _filter_offsets will appear in ascending order
-+# in the output as well.
-+status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
-+                     $((33 * 1024 * 1024 + 512))"
-+
-+# Offsets on which to fail reads.  Keep in ascending order for the
-+# same reason.
-+# Element 1 is shared with $status_fail_offsets on purpose.
-+# Elements 2 and later test what happens when a continuous range of
-+# sectors is inaccessible.
-+read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
-+                   $((33 * 1024 * 1024 + 512))
-+                   $(seq $((34 * 1024 * 1024)) $sector_size \
-+                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
-+
-+
-+# blkdebug must be above the format layer so it can intercept all
-+# block-status events
-+source_img=3D"json:{'driver': 'blkdebug',
-+                  'image': {
-+                      'driver': '$IMGFMT',
-+                      'file': {
-+                          'driver': 'file',
-+                          'filename': '$TEST_IMG.orig'
-+                      }
-+                  },
-+                  'inject-error': ["
-+
-+for ofs in $status_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'block-status',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+for ofs in $read_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'read',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+# Remove the trailing comma and terminate @inject-error and json:{}
-+source_img=3D"${source_img%,} ] }"
-+
-+
-+echo
-+
-+
-+_filter_offsets() {
-+    filters=3D
-+
-+    index=3D0
-+    for ofs in $2
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/status_fail_offset_$index/=
-"
-+        index=3D$((index + 1))
-+    done
-+
-+    index=3D0
-+    for ofs in $3
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/read_fail_offset_$index/"
-+        index=3D$((index + 1))
-+    done
-+
-+    sed $filters
-+}
-+
-+# While determining the number of allocated sectors in the input
-+# image, we should see one block status warning per element of
-+# $status_fail_offsets.
-+#
-+# Then, the image is read.  Since the block status is queried in
-+# basically the same way, the same warnings as in the previous step
-+# should reappear.  Interleaved with those we should see a read
-+# warning per element of $read_fail_offsets.
-+# Note that $read_fail_offsets and $status_fail_offsets share an
-+# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
-+# "status_fail_offset_1" in the output is the same as
-+# "read_fail_offset_1".
-+$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
-+    | _filter_offsets '%i' "$status_fail_offsets" "$read_fail_offsets"
-+
-+echo
-+
-+# The offsets where the block status could not be determined should
-+# have been treated as containing data and thus should be correct in
-+# the output image.
-+# The offsets where reading failed altogether should be 0.  Make them
-+# 0 in the input image, too, so we can compare both images.
-+for ofs in $read_fail_offsets
-+do
-+    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
-+        | _filter_qemu_io \
-+        | _filter_offsets '%i' '' "$read_fail_offsets"
-+done
-+
-+echo
-+
-+# These should be equal now.
-+$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
-new file mode 100644
-index 0000000000..9213d3e450
---- /dev/null
-+++ b/tests/qemu-iotests/249.out
-@@ -0,0 +1,43 @@
-+QA output created by 249
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
-+wrote 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
-output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
-t/output error
-+qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
-output error
-+
-+wrote 512/512 bytes at offset read_fail_offset_0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_1
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_2
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_3
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_4
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_5
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_6
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_7
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_8
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_9
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index bae7718380..a2e2f507e8 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -248,3 +248,4 @@
- 246 rw auto quick
- 247 rw auto quick
- 248 rw auto quick
-+249 auto quick
+On Apr 10, 2019, at 16:01, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
+
+> On 3/6/19 12:01 PM, Paolo Bonzini wrote:
+>> On 05/03/19 06:10, Stephen Checkoway wrote:
+>>> The SCC/ESCC will briefly stop asserting an interrupt when the
+>>> transmit FIFO is filled.
+>>>=20
+>>> This code doesn't model the transmit FIFO/shift register so the
+>>> pending transmit interrupt is never deasserted which means that an
+>>> edge-triggered interrupt controller will never see the low-to-high
+>>> transition it needs to raise another interrupt. The practical
+>>> consequence of this is that guest firmware with an interrupt service
+>>> routine for the ESCC that does not send all of the data it has
+>>> immediately will stop sending data if the following sequence of
+>>> events occurs:
+>>> 1. Disable processor interrupts
+>>> 2. Write a character to the ESCC
+>>> 3. Add additional characters to a buffer which is drained by the ISR
+>>> 4. Enable processor interrupts
+>>>=20
+>>> In this case, the first character will be sent, the interrupt will
+>>> fire and the ISR will output the second character. Since the pending
+>>> transmit interrupt remains asserted, no additional interrupts will
+>>> ever fire.
+>>>=20
+>>> This fixes that situation by explicitly lowering the IRQ when a
+>>> character is written to the buffer.
+>>>=20
+>>> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+>>=20
+>> Looks good but I would like Mark to give his ack as well.
+>>=20
+>> Mark, could you also add hw/char/escc.c to both SPARC and Mac =
+sections
+>> of MAINTAINERS?
+>=20
+> Cc'ing Artyom who also made some changes in this file, and Laurent.
+>=20
+>=20
+> Stephen, which particular chipset are you using?
+
+I'm away from the hardware, but my notes say Z80C30. I've included the =
+image from the board if you want to try to decipher the rest of the part =
+number. My best guess is it's a Z85C3008VEC. If it's important, I can =
+ask someone who is a few thousand km closer to the hardware than I =
+currently am to take a look.
+
+
+
+> This file models various types. I had a talk with Mark or Laurent at
+> last KVM forum about this device. IIRC, while the sun4m machines use a
+> real chipset, the MacIO embeds an slighly modified IP core.
+>=20
+> I can't find what you describe in the Z85C30 doc, however in the ESCC
+> datasheet referenced in escc.c (which happens to be a 85MiB pdf!!!) I =
+found:
+
+(This chip is ridiculously configurable, I honestly found it much easier =
+to write a driver by reverse engineering existing firmware than by =
+reading the part sheet.)
+
+>=20
+>  Transmit Interrupts and Transmit Buffer Empty Bit on the NMOS/CMOS
+>=20
+>  The TxIP is reset either by writing data to the transmit buffer or
+>  by issuing the Reset Tx Int command in WR0.
+>=20
+> I understand the NMOS/CMOS desc. matches the Z85C30 (no FIFO used).
+
+It has been a little while since I was last looking at this, but my =
+recollection was the SCC has a 1-byte transmit buffer and the ESCC has a =
+small (4 maybe?) byte transmit buffer. But in either case writing data =
+to the transmit buffer should clear the interrupt.
+
+> So your description and patch makes sens.
+> What worries me is the controller could have other pending IRQs to
+> deliver and you are clearing them. Shouldn't we only clear the
+> INTR_TXINT bit, and call escc_update_irq() which should lower the IRQ =
+if
+> no bits are pending?
+>=20
+> Maybe as:
+>=20
+>    s->wregs[W_INTR] &=3D ~INTR_TXINT;
+>    escc_update_irq(s);
+
+Ah, I think I see. In this case, escc_update_irq() will lower the IRQ if =
+no other interrupts are pending and the set_txint() will raise it again. =
+Otherwise, it'll remain raised. I can give this a shot and see how it =
+goes. (I think this should be R_INTR instead of W_INTR, but I'll double =
+check once I have an opportunity to dig into this again.)
+
+Thanks for looking at this!
+
+Steve
+
+
 --=20
-2.20.1
+Stephen Checkoway
+
+
+
 
 
