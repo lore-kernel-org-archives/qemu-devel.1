@@ -2,66 +2,74 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37799C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF5BC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC5DD2083E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:25:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC5DD2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1520217F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:26:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1520217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58976 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58989 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hECIP-0006fn-Vs
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 08:25:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47597)
+	id 1hECJa-0007fK-1d
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 08:26:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hECHf-0006K7-Rv
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1hECIp-0007Fe-IF
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hECHe-00038S-FJ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hECHe-00036Z-3U
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:24:54 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 627DB307D972;
-	Wed, 10 Apr 2019 12:24:51 +0000 (UTC)
-Received: from gondolin (ovpn-204-33.brq.redhat.com [10.40.204.33])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9704616939;
-	Wed, 10 Apr 2019 12:24:30 +0000 (UTC)
-Date: Wed, 10 Apr 2019 14:24:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190410142426.5bf0d9a4.cohuck@redhat.com>
-In-Reply-To: <20190410040826.24371-3-pagupta@redhat.com>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-3-pagupta@redhat.com>
-Organization: Red Hat GmbH
+	(envelope-from <bounces@canonical.com>) id 1hECIo-0004Gc-Gt
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:26:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hECIo-0004FS-8n
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:26:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hECIn-0007dE-2s
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 12:26:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0275F2E80C9
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 12:26:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 10 Apr 2019 12:24:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Apr 2019 12:08:08 -0000
+From: Thomas Huth <1572959@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sylvain-m th-huth
+X-Launchpad-Bug-Reporter: Sylvain (sylvain-m)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20160421104958.17539.32983.malonedeb@soybean.canonical.com>
+Message-Id:
+ <155489808867.20511.17680902118216981333.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: fca9516cdb5a70eaf29cd3e16cb1b959cb12d4d1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1572959] Re: bcm2835_property: inconsistent
+ values when both setting and querying the framebuffer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,229 +78,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
-	david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger.kernel@dilger.ca, zwisler@kernel.org,
-	aarcange@redhat.com, dave.jiang@intel.com,
-	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
-	david@redhat.com, willy@infradead.org, hch@infradead.org,
-	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
-	pbonzini@redhat.com, dan.j.williams@intel.com,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong.eric@gmail.com,
-	darrick.wong@oracle.com, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Reply-To: Bug 1572959 <1572959@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410122426.-kMX24ezSHgc0ABTyhyNS-zCG6lsOYmHrbDKETV7f4Q@z>
+Message-ID: <20190410120808.dEKAb-iZr417srcCHN1pJosiHF7x2ZFSFgefN2nSaGA@z>
 
-On Wed, 10 Apr 2019 09:38:22 +0530
-Pankaj Gupta <pagupta@redhat.com> wrote:
+The patch had been merged here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D27a5dc7be6a55b60039e3=
+920
 
-> This patch adds virtio-pmem driver for KVM guest.
-> 
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
-> 
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
->  drivers/virtio/Kconfig           |  10 +++
->  drivers/virtio/Makefile          |   1 +
->  drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
->  include/linux/virtio_pmem.h      |  60 +++++++++++++++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  10 +++
->  7 files changed, 294 insertions(+)
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 drivers/virtio/pmem.c
->  create mode 100644 include/linux/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
-> 
-(...)
-> diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
-> new file mode 100644
-> index 000000000000..cc9de9589d56
-> --- /dev/null
-> +++ b/drivers/virtio/pmem.c
-> @@ -0,0 +1,124 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and registers the virtual pmem device
-> + * with libnvdimm core.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include <../../drivers/nvdimm/nd.h>
-> +
-> +static struct virtio_device_id id_table[] = {
-> +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> +	{ 0 },
-> +};
-> +
-> + /* Initialize virt queue */
-> +static int init_vq(struct virtio_pmem *vpmem)
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-IMHO, you don't gain much by splitting off this function...
+-- =
 
-> +{
-> +	struct virtqueue *vq;
-> +
-> +	/* single vq */
-> +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
-> +				host_ack, "flush_queue");
-> +	if (IS_ERR(vq))
-> +		return PTR_ERR(vq);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1572959
 
-I'm personally not a fan of chained assignments... I think I'd just
-drop the 'vq' variable and operate on vpmem->req_vq directly.
+Title:
+  bcm2835_property: inconsistent values when both setting and querying
+  the framebuffer
 
-> +
-> +	spin_lock_init(&vpmem->pmem_lock);
-> +	INIT_LIST_HEAD(&vpmem->req_list);
-> +
-> +	return 0;
-> +};
-> +
-> +static int virtio_pmem_probe(struct virtio_device *vdev)
-> +{
-> +	int err = 0;
-> +	struct resource res;
-> +	struct virtio_pmem *vpmem;
-> +	struct nvdimm_bus *nvdimm_bus;
-> +	struct nd_region_desc ndr_desc = {};
-> +	int nid = dev_to_node(&vdev->dev);
-> +	struct nd_region *nd_region;
-> +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config disabled\n",
+Status in QEMU:
+  Fix Released
 
-Maybe s/config disabled/config access disabled/ ? That seems to be the
-more common message.
+Bug description:
+  As the framebuffer settings are copied into the result message before
+  it is reconfigured, inconsistent behavior can happen when, for
+  instance, you set with a single message the width, height, and depth,
+  and ask at the same time to allocate the buffer and get the pitch and
+  the size.
 
-> +			__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
-> +					GFP_KERNEL);
+  In this case, the reported pitch and size would be incorrect as they
+  were computed with the initial values of width, height and depth, not
+  the ones the client requested.
 
-Here, the vpmem variable makes sense for convenience, but I'm again not
-a fan of the chaining :)
+  Attached is a patch also sent to the qemu-devel mailing list.
 
-> +	if (!vpmem) {
-> +		err = -ENOMEM;
-> +		goto out_err;
-> +	}
-> +
-> +	vpmem->vdev = vdev;
-> +	err = init_vq(vpmem);
-> +	if (err)
-> +		goto out_err;
-> +
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			start, &vpmem->start);
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			size, &vpmem->size);
-> +
-> +	res.start = vpmem->start;
-> +	res.end   = vpmem->start + vpmem->size-1;
-> +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> +	vpmem->nd_desc.module = THIS_MODULE;
-> +
-> +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> +						&vpmem->nd_desc);
-
-And here :)
-
-> +	if (!nvdimm_bus)
-> +		goto out_vq;
-> +
-> +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
-> +
-> +	ndr_desc.res = &res;
-> +	ndr_desc.numa_node = nid;
-> +	ndr_desc.flush = virtio_pmem_flush;
-> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
-> +	nd_region->provider_data =  dev_to_virtio
-> +					(nd_region->dev.parent->parent);
-
-Isn't it clear that this parent chain will always end up at &vdev->dev?
-Maybe simply set ->provider_data to vdev directly? (Does it need to
-grab a reference count of the device, BTW?)
-
-> +
-> +	if (!nd_region)
-> +		goto out_nd;
-
-Probably better to do this check before you access nd_region's
-members :)
-
-> +
-> +	return 0;
-> +out_nd:
-> +	err = -ENXIO;
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +out_vq:
-> +	vdev->config->del_vqs(vdev);
-> +out_err:
-> +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> +	return err;
-> +}
-> +
-> +static void virtio_pmem_remove(struct virtio_device *vdev)
-> +{
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> +
-> +	nvdimm_bus_unregister(nvdimm_bus);
-
-I haven't followed this around the nvdimm code, but is the nd_region
-you created during probe cleaned up automatically, or would you need to
-do something here?
-
-> +	vdev->config->del_vqs(vdev);
-> +	vdev->config->reset(vdev);
-> +	kfree(vpmem);
-
-You allocated vpmem via devm_kzalloc; isn't it freed automatically on
-remove?
-
-> +}
-> +
-> +static struct virtio_driver virtio_pmem_driver = {
-> +	.driver.name		= KBUILD_MODNAME,
-> +	.driver.owner		= THIS_MODULE,
-> +	.id_table		= id_table,
-> +	.probe			= virtio_pmem_probe,
-> +	.remove			= virtio_pmem_remove,
-> +};
-> +
-> +module_virtio_driver(virtio_pmem_driver);
-> +MODULE_DEVICE_TABLE(virtio, id_table);
-> +MODULE_DESCRIPTION("Virtio pmem driver");
-> +MODULE_LICENSE("GPL");
-
-Only looked at this from the general virtio driver angle; seems fine
-apart from some easy-to-fix issues and some personal style preference
-things.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1572959/+subscriptions
 
