@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43273)
+Received: from eggs.gnu.org ([209.51.188.92]:43301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hE1yP-0007Om-Gw
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:22 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hE1yR-0007QV-Kl
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hE1yO-0001sC-H1
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hE1yQ-00020a-HP
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:23 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  9 Apr 2019 21:24:10 -0400
-Message-Id: <20190410012413.31569-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/3] qemu-img: remove command documentation
- duplication
+Date: Tue,  9 Apr 2019 21:24:11 -0400
+Message-Id: <20190410012413.31569-2-jsnow@redhat.com>
+In-Reply-To: <20190410012413.31569-1-jsnow@redhat.com>
+References: <20190410012413.31569-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 1/3] qemu-img: fix .hx and .texi disparity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +22,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, eblake@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 
-This might hopefully cut down on the doc duplication/mismatching
-until I can devise something more comprehensive.
+It turns out that having options listed in three places continues to be
+a bad idea. I'm still toying with the idea of an improved infrastructure
+here, but in the meantime, another bandaid.
 
-Ideally, I'd like to redo all of the documentation for qemu-img
-nearly from scratch; with a parser generator that helps generate
-the documentation as well so they'll never get out of date.
+There are three locations:
+(1) .hx file, formatted as texi
+(2) .hx file, formatted as human readable.
+(3) .texi file, as section headers, formatted as texi.
 
-That's probably quite a ways off, and maybe there are other
-structural changes we want to make with respect to sphinx and
-other build tools, so I am sending something very minimal instead.
+You can compare the two summaries within the .hx file like so:
 
-This ought to be functionally identical down to the last char.
+Human-readable command summaries:
+`./qemu-img --help | grep 'Command syntax' -A14`
+Detokenized texi command summaries:
+`grep "@item" qemu-img-cmds.hx | sed -E 's|@var\{([^\}]*?)\}|\1|g'`
 
-(I've re-included patch one which I have sent to the list separately,
-purely as a dependency if you want to apply these patches.)
+You can compare the two separate texi summaries like so:
 
-John Snow (3):
-  qemu-img: fix .hx and .texi disparity
-  pxtool: Add new qemu-img command info generation tool
-  qemu-img.texi: use macros for command summaries
+Texi command summaries:
+`grep "@item" qemu-img-cmds.hx"`
+Texi command headers:
+grep -E "@item.*@var" qemu-img.texi | tail -14
 
- qemu-img.texi      |  28 ++++----
- Makefile           |   8 +--
- qemu-img-cmds.json | 165 +++++++++++++++++++++++++++++++++++++++++++++
- qemu-img-cmds.hx   | 102 ----------------------------
- scripts/pxtool.py  |  53 +++++++++++++++
- 5 files changed, 236 insertions(+), 120 deletions(-)
- create mode 100644 qemu-img-cmds.json
- delete mode 100644 qemu-img-cmds.hx
- create mode 100755 scripts/pxtool.py
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ qemu-img.texi    | 4 ++--
+ qemu-img-cmds.hx | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 3b6710a580..724f244ba1 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -197,7 +197,7 @@ Command description:
+ 
+ @table @option
+ 
+-@item amend [--object @var{objectdef}] [--image-opts] [-p] [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
++@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ 
+ Amends the image format specific @var{options} for the image file
+ @var{filename}. Not all file formats support this operation.
+@@ -424,7 +424,7 @@ To enumerate information about each disk image in the above chain, starting from
+ qemu-img info --backing-chain snap2.qcow2
+ @end example
+ 
+-@item map [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
++@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [-U] @var{filename}
+ 
+ Dump the metadata of image @var{filename} and its backing file chain.
+ In particular, this commands dumps the allocation state of every sector
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 1526f327a5..4b47f7495d 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -46,7 +46,7 @@ ETEXI
+ DEF("convert", img_convert,
+     "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
+ STEXI
+-@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+ 
+ DEF("create", img_create,
 -- 
 2.17.2
