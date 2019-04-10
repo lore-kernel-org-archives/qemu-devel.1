@@ -2,77 +2,85 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD2BC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8433CC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C5BB20830
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:47:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C5BB20830
+	by mail.kernel.org (Postfix) with ESMTPS id 5292820830
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:48:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5292820830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33627 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33633 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEFRj-0003G7-Kw
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:47:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35736)
+	id 1hEFSs-0003yt-JD
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:48:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1hEFPc-0001xc-Jh
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:22 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEFS0-0003aS-UP
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1hEFPb-00072F-CZ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:20 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:32952)
+	(envelope-from <philmd@redhat.com>) id 1hEFRz-0000Kq-SE
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:47:48 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1hEFPa-00071O-V8
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:45:19 -0400
-Received: by mail-wr1-f66.google.com with SMTP id q1so3591755wrp.0
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:45:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEFRz-0000KS-Jk
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:47:47 -0400
+Received: by mail-wr1-f68.google.com with SMTP id s15so3509189wra.12
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:47:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=qoDKwqlvapgW6tne1tssBY/WYkaOW8WmQnE4ooecE4k=;
-	b=Av1qwPCj+wu6VNwAdxEj+z3gKOww7t521tATWq3fMm8RPib2Qrv/qYB6R2nNfBxb0K
-	waYD295Y5nkeBrZLVW1wbRTFAtxh2ULkcwWHIfVlKiLemeRBWgvLvuLDOA+XNwrdYM6Z
-	6l+0iNA6skDptfj2JkRmqib9oykHi02G6+hV6/TUYm8SPo0Aotoj5m+pGh46dtIig+lN
-	98AgVnV+snAjUvS1RyxFkOsO+mhgSFnVQmBOqC2QiZ+9DOJ1UslPLcW7fp6EFr2YmK5d
-	TyT4i8NncF9AgUOh4eTUhHlRSZdfxcN0ppoxdqIHBJthQikD6mTdDPFWr6hzqA2ek+5X
-	yyeA==
-X-Gm-Message-State: APjAAAVOxlvJSiejs/c1oPAOYaSpHzQktLzcHXoOltMk/QlXagUjI7e5
-	riyPrRe/7I43zgj2tpPLHmbwbQ==
-X-Google-Smtp-Source: APXvYqyMHD68egJD1iM8dalYGcdWQoTICEXUbFI7sRiqJbNuZfq09PvhGa14G60pEeql5n7VV3t5bw==
-X-Received: by 2002:a5d:6646:: with SMTP id f6mr5630126wrw.68.1554911116532;
-	Wed, 10 Apr 2019 08:45:16 -0700 (PDT)
-Received: from [192.168.2.101] ([5.29.212.195])
+	h=x-gm-message-state:from:subject:to:cc:references:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Jv2R4TL82JObXLXMxk7XdxPubWu6kQ2cnqgnOTkhfQk=;
+	b=CPnkPOyOOH2aSNjBgkd40eU6TXV5gJxBdwnpV7QTYGg0btHnUyzClGwATI/Su7CqSS
+	XQqjh6VukBSf3vEPOkPT6Zjzwhc3WIpusl+HiPodbUToNieobn8tPXYrAAvCC8amMpgZ
+	CCsSrjvIkshtPTfVyvURoabhOBztttT05BXBx15la3zGvnRIbB+MYF0IQ9sVoLdaUM3S
+	/7RbT/AFDjWsEf9xyxETKHUENnpkSHuTK/nZ3/IeMW8naRwhYnFLL94shZUAclSo15lL
+	qVjoEgHuu1kp99LeG68OUU5Iu0hSK/DYXAGePvwXD6yNiDERAejf1PX4n57gKZwvzJ+k
+	JcIA==
+X-Gm-Message-State: APjAAAU2z402eJIWYu4zGkY09bUS98uj+Il840vkhtD1hEAfAGWMJD5+
+	c6fKk3GTag/Y9PYqPP9UiYJGVw==
+X-Google-Smtp-Source: APXvYqzDKt33OongdEIH02fo3QKNBdceG0ivd4iT0Wg2ZGxyJh+M3zZfsfem2g+nlqjt6jxEB8haWQ==
+X-Received: by 2002:adf:ef0b:: with SMTP id e11mr16353113wro.244.1554911266580;
+	Wed, 10 Apr 2019 08:47:46 -0700 (PDT)
+Received: from [10.201.33.53] ([195.166.127.210])
 	by smtp.gmail.com with ESMTPSA id
-	j7sm51424855wrt.96.2019.04.10.08.45.15
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 10 Apr 2019 08:45:15 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190401111843.54528-1-ybettan@redhat.com>
-	<20190409131734.GE16944@stefanha-x1.localdomain>
-From: Yoni Bettan <ybettan@redhat.com>
-Message-ID: <1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
-Date: Wed, 10 Apr 2019 18:45:14 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
-	Gecko/20100101 Thunderbird/60.6.1
+	s189sm5009757wmf.45.2019.04.10.08.47.45
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 10 Apr 2019 08:47:45 -0700 (PDT)
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <20190409174018.25798-1-armbru@redhat.com>
+	<f018f4d8-7fb2-9037-3b5a-b34f1c5d876d@redhat.com>
+	<874l764eez.fsf@dusky.pond.sub.org>
+	<38442eb0-501e-dbf8-60e0-74675a999dba@redhat.com>
+	<87bm1e2yfa.fsf@dusky.pond.sub.org>
+	<CAKmqyKM7fX6UqSU5K+w25xGxO2K4kqtyoRz7LMFN7GtBYL56KA@mail.gmail.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <b73bbac0-a501-0004-5a41-748e2b23ab13@redhat.com>
+Date: Wed, 10 Apr 2019 17:47:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190409131734.GE16944@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAKmqyKM7fX6UqSU5K+w25xGxO2K4kqtyoRz7LMFN7GtBYL56KA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
+X-Received-From: 209.85.221.68
+Subject: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
+ overflowing in load_device_tree()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,112 +92,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, ailan@redhat.com,
-	qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Sergio Lopez <slp@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410154514.Eh7TWEE-BSXJGQCqDNhydl4I1-GLcvNlfvtQHV277cs@z>
+Message-ID: <20190410154744.pPjf2y_2lD7zfsjes8hagSGqF6GSGWhYlQ3bGGzGdY8@z>
 
-
-On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
-> On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
->> The main goal is to add an example device to Qemu to be used as template or
->> guideline for contributors when they wish to create a new virtio device.
+On 4/10/19 8:34 AM, Alistair Francis wrote:
+> On Tue, Apr 9, 2019 at 10:59 PM Markus Armbruster <armbru@redhat.com> wrote:
+>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>> On 4/10/19 7:28 AM, Markus Armbruster wrote:
+>>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>>>> On 4/9/19 7:40 PM, Markus Armbruster wrote:
+>>>>>> If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
+>>>>>> computation of @dt_size overflows to a negative number, which then
+>>>>>> gets converted to a very large size_t for g_malloc0() and
+>>>>>> load_image_size().  In the (fortunately improbable) case g_malloc0()
+>>>>>> succeeds and load_image_size() survives, we'd assign the negative
+>>>>>> number to *sizep.  What that would do to the callers I can't say, but
+>>>>>> it's unlikely to be good.
+>>>>>>
+>>>>>> Fix by rejecting images whose size would overflow.
+>>>>>>
+>>>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>>>> ---
+>>>>>>  device_tree.c | 4 ++++
+>>>>>>  1 file changed, 4 insertions(+)
+>>>>>>
+>>>>>> diff --git a/device_tree.c b/device_tree.c
+>>>>>> index 296278e12a..f8b46b3c73 100644
+>>>>>> --- a/device_tree.c
+>>>>>> +++ b/device_tree.c
+>>>>>> @@ -84,6 +84,10 @@ void *load_device_tree(const char *filename_path, int *sizep)
+>>>>>>                       filename_path);
+>>>>>>          goto fail;
+>>>>>>      }
+>>>>>> +    if (dt_size > INT_MAX / 2 - 10000) {
+>>>>>
+>>>>> We should avoid magic number duplication.
+>>>>> That said, this patch looks safe.
+>>>>>
+>>>>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>>
+>>>> Thanks!
+>>>>
+>>>>> BTW how did you figure that out?
+>>>>
+>>>> Downstream handling of upstream commit da885fe1ee8 led me to the
+>>>> function.  I spotted dt_size = get_image_size(filename_path).
+>>>> Experience has taught me to check the left hand side's type.  Bad.  Then
+>>>> I saw how dt_size gets increased.  Worse.
+>>>
+>>> So you genuinely neglected to mention Kurtis Miller then :)
 >>
->> Another reason for this device is to document "the right way" to write
->> a new virtio device in Qemu.
+>> Explanation, not excuse: the only occurence of the name in my downstream
+>> reading was a two-liner BZ comment, which I totally missed in my haste
+>> to give the fix a chance to make 4.0.  I certainly didn't mean to
+>> deprive him of credit!
+
+My English teacher explained me neglected sounds like a
+reprimand/reproach (as in negligence), sorry I didn't mean to be rude
+here, I wanted to say something like "Peter remarked you did gave
+credits to the first one who reported this issue, but since you figured
+this bug via your own way, the omission was not intentional then."
+
+> No worries. I have sent the pull request and it includes the reported by.
+> 
+> Alistair
+> 
 >>
->> This device is a simple device and its functionality is to increase its input
->> by 1.
+>> [...]
 >>
->> The device driver is located at:
->> https://github.com/ybettan/QemuDeviceDrivers.git
->>
->> In addition I am writing a blog to give a logical overview of the virtio
->> protocol and a step-by-step guide to write a new virtio device.
->> This blog can be found at https://howtovms.wordpress.com.
->>
->> scripts/checkpatch.pl have some errors do to "//" (old style one line comment),
->> those lines contains FIXMEs for the next version and will be removed.
->>
->> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
-
-
-Hi Stefan and thank you for your review.
-
-> Where is the specification for this device?  The lack of specification
-> is already not "the right way".
-
-
-
-Another step in this process is to write a specification for this 
-device. Since I am learning the virtio protocol while implementing this 
-example device it was easier for me to start with the device and from 
-there write its specification but take into consideration that the 
-specification will be written soon.
-
-
->
-> There are multiple problems with the code, but the larger issue is that
-> this example device is just helping people shoot themselves in the foot
-> more easily.
-
-
-If you can point me to those problem I will be glad so I can update the 
-code and understand those problems you are talking about.
-
-
->
-> The difficulty with VIRTIO is not how to implement devices/drivers, it's
-> that people don't read the specification and therefore do not understand
-> the device model properly.  The spec is dry and missing information in
-> some places.  I think more accessible documentation, like your blog, can
-> help here.
-
-
-As I said, the blog will be updated with explanations on each step of 
-the communication between the device and the driver and the reason it is 
-not there yet is because I preferred getting some reviews, make the code 
-better and only then documenting "the write way" to not mislead peoples.
-
-
->
-> If you would like to educate people about VIRTIO, then explaining the
-> device model, lifecycle, how to change a device in a
-> backwards-compatible way, virtqueue semantics, etc are the topics that
-> deserve attention.
->
-> For someone who has learnt these topics, implementing the device/driver
-> is not hard.  For someone who doesn't understand these topics, no
-> example device will help.  At best they will copy-paste together
-> something that sort of works but has issues.
-
-
-For me, reading the specification and even reading some code examples 
-over the internet didn't made me understand it until I saw the related 
-code so I agree with you it is not enough yet but all the other parts 
-are on there way.
-
-
-The final purpose is to have:
-
-1. device specification
-
-2. device implementation
-
-3. device driver
-
-4. blog
-
-maybe I should have written it at the beginning, this is not the entire 
-project but it is its start.
-
-
->
-> Stefan
-
-
-Thanks again for your review.
-
 
