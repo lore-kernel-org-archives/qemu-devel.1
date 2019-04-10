@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33019)
+Received: from eggs.gnu.org ([209.51.188.92]:33439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hE958-0001Ds-IY
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:59:47 -0400
+	(envelope-from <quintela@redhat.com>) id 1hE97d-0002TO-MG
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hE957-00047N-7A
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:59:46 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 10 Apr 2019 08:59:37 +0000
-Message-ID: <eed87958-a12e-25ab-45f7-c533390c3dc9@virtuozzo.com>
-References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1554821792-968307-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1554821792-968307-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <40AC2A6562D5534AA1B9E40BD581CA2F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <quintela@redhat.com>) id 1hE97T-0005Gn-ES
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:02:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hE97Q-0005Di-Ra
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:02:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EB97307AD02
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 09:02:07 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <b991a4d0e6c4253bc08b2794c6084be55fc72e1d.1554851834.git.crobinso@redhat.com>
+	(Cole Robinson's message of "Tue, 9 Apr 2019 19:19:57 -0400")
+References: <b991a4d0e6c4253bc08b2794c6084be55fc72e1d.1554851834.git.crobinso@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 10 Apr 2019 11:06:35 +0200
+Message-ID: <8736mqz0tg.fsf@trasno.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: new test 253 check qemu-img
- convert force read
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: savevm: fix error code with
+ migration blockers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +34,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Cole Robinson <crobinso@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-MDkuMDQuMjAxOSAxNzo1NiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEEgbmV3IHRlc3Qg
-Zm9yIHRoZSBwYXRjaCAncWVtdS1pbWcgY29udmVydDogaWdub3JlIHJlYWQgZXJyb3JzJw0KPiAN
-Cj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZp
-cnR1b3p6by5jb20+DQo+IC0tLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNTMgICAgIHwgNjkg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgIHRlc3Rz
-L3FlbXUtaW90ZXN0cy8yNTMub3V0IHwgIDQgKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2dy
-b3VwICAgfCAgMSArDQo+ICAgMyBmaWxlcyBjaGFuZ2VkLCA3NCBpbnNlcnRpb25zKCspDQo+ICAg
-Y3JlYXRlIG1vZGUgMTAwNzU1IHRlc3RzL3FlbXUtaW90ZXN0cy8yNTMNCj4gICBjcmVhdGUgbW9k
-ZSAxMDA2NDQgdGVzdHMvcWVtdS1pb3Rlc3RzLzI1My5vdXQNCj4gDQo+IGRpZmYgLS1naXQgYS90
-ZXN0cy9xZW11LWlvdGVzdHMvMjUzIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1Mw0KPiBuZXcgZmls
-ZSBtb2RlIDEwMDc1NQ0KPiBpbmRleCAwMDAwMDAwLi42NzFhM2M0DQo+IC0tLSAvZGV2L251bGwN
-Cj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1Mw0KPiBAQCAtMCwwICsxLDY5IEBADQo+ICsj
-IS91c3IvYmluL2VudiBweXRob24NCj4gKyMNCj4gKyMgVGVzdCBvZiB0aGUgJ3FlbXUtaW1nIGNv
-bnZlcnQnIGZvciBhIGRhbWFnZWQgaW1hZ2UuDQo+ICsjDQo+ICsjIENvcHlyaWdodCAoYykgMjAx
-OSBWaXJ0dW96em8gSW50ZXJuYXRpb25hbCBHbWJIDQo+ICsjDQo+ICsjIFRoaXMgcHJvZ3JhbSBp
-cyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5DQo+
-ICsjIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Ug
-YXMgcHVibGlzaGVkIGJ5DQo+ICsjIHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhl
-ciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vuc2UsIG9yDQo+ICsjIChhdCB5b3VyIG9wdGlvbikgYW55
-IGxhdGVyIHZlcnNpb24uDQo+ICsjDQo+ICsjIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBp
-biB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLA0KPiArIyBidXQgV0lUSE9VVCBBTlkg
-V0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZg0KPiArIyBNRVJD
-SEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhl
-DQo+ICsjIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuDQo+ICsj
-DQo+ICsjIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFs
-IFB1YmxpYyBMaWNlbnNlDQo+ICsjIGFsb25nIHdpdGggdGhpcyBwcm9ncmFtLiAgSWYgbm90LCBz
-ZWUgPGh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy8+Lg0KPiArIw0KPiArDQo+ICtpbXBvcnQg
-aW90ZXN0cw0KPiAraW1wb3J0IG9zDQo+ICtmcm9tIGlvdGVzdHMgaW1wb3J0IHFlbXVfaW1nX2Ny
-ZWF0ZSwgcWVtdV9pbywgcWVtdV9pbWdfcGlwZSwgXA0KPiArICAgIGZpbGVfcGF0aCwgbG9nDQo+
-ICsNCj4gK2lvdGVzdHMudmVyaWZ5X2ltYWdlX2Zvcm1hdChzdXBwb3J0ZWRfZm10cz1bJ3Fjb3cy
-J10pDQo+ICsNCj4gK2Rpc2sgPSBmaWxlX3BhdGgoJ2Rpc2snKQ0KPiArY2h1bmsgPSAyNTYgKiAx
-MDI0DQo+ICtiYWRfc2VjdG9yID0gNzY4DQo+ICtibGtkZWJ1Z19maWxlID0gb3MucGF0aC5qb2lu
-KGlvdGVzdHMudGVzdF9kaXIsICdibGtkZWJ1Zy5jb25mJykNCj4gKw0KPiArDQo+ICtkZWYgY3Jl
-YXRlX2Jsa2RlYnVnX2ZpbGUoKToNCj4gKyAgICBmaWxlID0gb3BlbihibGtkZWJ1Z19maWxlLCAn
-dycpDQo+ICsgICAgZmlsZS53cml0ZSgnJycNCj4gK1tpbmplY3QtZXJyb3JdDQo+ICtldmVudCA9
-ICJyZWFkX2FpbyINCj4gK2Vycm5vID0gIjUiDQo+ICtvbmNlID0ib2ZmIg0KPiArc2VjdG9yID0g
-IiVkIg0KPiArJycnICUgKGJhZF9zZWN0b3IpKQ0KPiArICAgIGZpbGUuY2xvc2UoKQ0KPiArDQo+
-ICsNCj4gK2RlZiB3cml0ZV90b19kaXNrKG9mZnNldCwgc2l6ZSk6DQo+ICsgICAgd3JpdGUgPSAn
-d3JpdGUgLVAgNyB7fSB7fScuZm9ybWF0KG9mZnNldCwgc2l6ZSkNCj4gKyAgICBxZW11X2lvKCct
-YycsIHdyaXRlLCBkaXNrKQ0KPiArDQo+ICsNCj4gK3FlbXVfaW1nX2NyZWF0ZSgnLWYnLCBpb3Rl
-c3RzLmltZ2ZtdCwgZGlzaywgJzFNJykNCj4gKw0KPiArZm9yIG51bSBpbiByYW5nZSgxLCA0KToN
-Cj4gKyAgICB3cml0ZV90b19kaXNrKChudW0tMSkgKiBjaHVuaywgY2h1bmspDQo+ICsNCj4gK2Ny
-ZWF0ZV9ibGtkZWJ1Z19maWxlKCkNCj4gK2Rpc2tfY29udmVydGVkID0gZGlzayArICdfY29udmVy
-dGVkJw0KPiArbG9nKHFlbXVfaW1nX3BpcGUoJ2NvbnZlcnQnLCAnLU8nLCBpb3Rlc3RzLmltZ2Zt
-dCwgJ2Jsa2RlYnVnOiVzOiVzJw0KPiArICAgICAgICAgICAgICAgICAgJSAoYmxrZGVidWdfZmls
-ZSwgZGlzayksIGRpc2tfY29udmVydGVkKSkNCj4gK2xvZyhxZW11X2ltZ19waXBlKCdjb252ZXJ0
-JywgJy1PJywgaW90ZXN0cy5pbWdmbXQsICctUicsICdibGtkZWJ1ZzolczolcycNCj4gKyAgICAg
-ICAgICAgICAgICAgICUgKGJsa2RlYnVnX2ZpbGUsIGRpc2spLCBkaXNrX2NvbnZlcnRlZCkpDQo+
-ICsNCj4gKyMgVE9ETzogd2l0aCBhIGNsYXNzLCBzZWxmLmFzc2VydE5vdEVxdWFsKA0KPiArIyAg
-ICAgICBxZW11X2lvKCctZicsIGlvdGVzdHMuaW1nZm10LCAnLXJVJywgJy1jJywgJ21hcCcsIGRp
-c2spLA0KPiArIyAgICAgICBxZW11X2lvKCctZicsIGlvdGVzdHMuaW1nZm10LCAnLXJVJywgJy1j
-JywgJ21hcCcsIGRpc2tfY29udmVydGVkKSwNCj4gKyMgICAgICAgICAgICAgICAnaW1hZ2UgZmls
-ZSBtYXAgbWF0Y2hlcyB0aGUgY29waWVkIGZpbGUgYWZ0ZXIgY29udmVyc2lvbicpDQoNCllvdSBt
-YXkgdXNlIGp1c3QgYXNzZXJ0LiBCdXQgbWFwcyB3aWxsIG5vdCBiZSBkaWZmZXJlbnQuIEkgdGhp
-bmsgYmV0dGVyIGlzIHRvDQpjaGVjayByZXN1bHRpbmcgaW1hZ2UgYnkgcWVtdS1pbyByZWFkIC1Q
-Lg0KDQo+ICsNCj4gK29zLnJlbW92ZShkaXNrX2NvbnZlcnRlZCkNCj4gK29zLnJlbW92ZShibGtk
-ZWJ1Z19maWxlKQ0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1My5vdXQgYi90
-ZXN0cy9xZW11LWlvdGVzdHMvMjUzLm91dA0KPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiBpbmRl
-eCAwMDAwMDAwLi5iOTcyNTQxDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvdGVzdHMvcWVtdS1p
-b3Rlc3RzLzI1My5vdXQNCj4gQEAgLTAsMCArMSw0IEBADQo+ICtxZW11LWltZzogZXJyb3Igd2hp
-bGUgcmVhZGluZyBzZWN0b3IgMDogSW5wdXQvb3V0cHV0IGVycm9yDQo+ICsNCj4gK3FlbXUtaW1n
-OiBmYWlsZWQgdG8gcmVhZCA3ODY0MzIgYnl0ZXMgYXQgb2Zmc2V0IDA6IElucHV0L291dHB1dCBl
-cnJvcg0KPiArDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgYi90ZXN0
-cy9xZW11LWlvdGVzdHMvZ3JvdXANCj4gaW5kZXggYmFlNzcxOC4uNGNkMmZlOCAxMDA2NDQNCj4g
-LS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0
-cy9ncm91cA0KPiBAQCAtMjQ4LDMgKzI0OCw0IEBADQo+ICAgMjQ2IHJ3IGF1dG8gcXVpY2sNCj4g
-ICAyNDcgcncgYXV0byBxdWljaw0KPiAgIDI0OCBydyBhdXRvIHF1aWNrDQo+ICsyNTMgcncgYXV0
-byBxdWljaw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Cole Robinson <crobinso@redhat.com> wrote:
+> The only caller that checks the error code is looking for != 0,
+> so returning false is incorrect.
+>
+> Fixes: 5aaac467938 "migration: savevm: consult migration blockers"
+>
+> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
