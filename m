@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52163)
+Received: from eggs.gnu.org ([209.51.188.92]:52481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEEg5-0006na-Gs
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:58:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEEh4-0007TU-OX
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEEg2-0001tQ-0d
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:58:15 -0400
-References: <20190410045707.16923-1-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
-Date: Wed, 10 Apr 2019 16:58:02 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1hEEh2-0002ef-Gg
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:59:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEEh2-0002eH-5v
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:59:16 -0400
+Date: Wed, 10 Apr 2019 15:59:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190410145908.GF2980@work-vm>
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	<20190408123542.1a4de426@redhat.com>
+	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190410045707.16923-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: Correct the
- EDK2_BASETOOLS_OPTFLAGS variable description
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 04/10/19 06:57, Philippe Mathieu-Daud=C3=A9 wrote:
-> In commit 1cab464136b4 we incorrectly described the
-> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
-> options to the EDK2 build tools, but it only expands
-> the CFLAGS (not to the CPPFLAGS).
-> Update the description to be more accurate.
->=20
-> Reported-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  roms/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/roms/Makefile b/roms/Makefile
-> index 1ff78b63bb3..d7fd6025e7c 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -120,8 +120,8 @@ build-efi-roms: build-pxe-roms
->  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-> =20
-> -# Build scripts can pass compiler/linker flags to the EDK2 build tools
-> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
-> +# Build scripts can pass compiler/linker flags to the EDK2
-> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
->  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
->  #
->  # Example:
->=20
+* Catherine Ho (catherine.hecx@gmail.com) wrote:
+> Hi Igor
+> 
+> 
+> On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com> wrote:
+> 
+> > On Sun,  7 Apr 2019 22:19:05 -0400
+> > Catherine Ho <catherine.hecx@gmail.com> wrote:
+> >
+> > > Currently it is not forbidden to use "-object
+> > memory-backend-file,share=on"
+> > > and together with "-incoming". But after incoming migration is finished,
+> > > the memory-backend-file will be definitely written if share=on. So the
+> > > memory-backend-file can only be used once, but failed in the 2nd time
+> > > incoming.
+> > >
+> > > Thus it gives a warning and the users can run the qemu if they really
+> > > want to do it.
+> >
+> > Shouldn't we add a migration blocker in such a case instead of warning
+> > and letting qemu run wild?
+> >
+> 
+> IMO, it doesn't need to block this. With share=on and -incoming, the user
+> can
+> still save the device memory state into memory-backend file again if
+> ignore-shared
+> capability is on.
+> 
+> If we block this, the user can't use the ignore-shared capability in
+> incoming
+> migration.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+-incomign with share=on is a perfectly normal thing to do - it just
+depends who you are sharing the file with and the lifetime of that
+shared file.
 
-Please noone submit a pull request with this patch (for 4.1) until my
-edk2 bundling series is merged; as this one will likely introduce
-another contextual conflict, and I'd *really* like to avoid another
-rebase on my end, due to such an issue.
+For example; if you're just running a qemu with vhost-user then you
+use share=on - however wyou typically select the backend file as
+a new file from /dev/shm - it's not a file that you previously migrated
+to.
 
-Thanks!
-Laszlo
+QEMU has no way to know about the provenance of the shared file it's
+been given, so we can't really warn people about it.
+
+Dave
+
+> B.R.
+> Catherine
+> 
+> >
+> >
+> > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> > > ---
+> > >  backends/hostmem-file.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >
+> > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > > index 37ac6445d2..59429ee0b4 100644
+> > > --- a/backends/hostmem-file.c
+> > > +++ b/backends/hostmem-file.c
+> > > @@ -16,6 +16,7 @@
+> > >  #include "sysemu/hostmem.h"
+> > >  #include "sysemu/sysemu.h"
+> > >  #include "qom/object_interfaces.h"
+> > > +#include "migration/migration.h"
+> > >
+> > >  /* hostmem-file.c */
+> > >  /**
+> > > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
+> > Error **errp)
+> > >          }
+> > >      }
+> > >
+> > > +    /*
+> > > +     * In ignore shared case, if share=on for host memory backend file,
+> > > +     * the ram might be written after incoming process is finished. Thus
+> > > +     * the memory backend can't be reused for 2nd/3rd... incoming
+> > > +     */
+> > > +    if (backend->share && migrate_ignore_shared()
+> > > +                       && runstate_check(RUN_STATE_INMIGRATE))
+> > > +        warn_report("share=on for memory backend file might be "
+> > > +                        "conflicted with incoming in ignore shared
+> > case");
+> > > +
+> > >      backend->force_prealloc = mem_prealloc;
+> > >      name = host_memory_backend_get_name(backend);
+> > >      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+> >
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
