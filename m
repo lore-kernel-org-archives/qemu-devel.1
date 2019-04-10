@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41846)
+Received: from eggs.gnu.org ([209.51.188.92]:43273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hE1nc-0005hh-7O
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hE1yP-0007Om-Gw
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hE1nS-0002bB-F0
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:05 -0400
-Received: from mga12.intel.com ([192.55.52.136]:60193)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hE1nR-0002By-0t
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:02 -0400
-Date: Wed, 10 Apr 2019 09:12:31 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190410011231.GA29083@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
- MCFG table
+	(envelope-from <jsnow@redhat.com>) id 1hE1yO-0001sC-H1
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:24:21 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue,  9 Apr 2019 21:24:10 -0400
+Message-Id: <20190410012413.31569-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 0/3] qemu-img: remove command documentation
+ duplication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, ehabkost@redhat.com, richardw.yang@linux.intel.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
->Dummy table (with signature "QEMU") creation came from original SeaBIOS
->codebase. And QEMU would have to keep it around if there were Q35 machine
->that depended on keeping ACPI tables blob constant size. Luckily there
->were no versioned Q35 machine types before commit:
->  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
->which obsoleted need to keep ACPI tables blob the same size on source/destination.
->
+This might hopefully cut down on the doc duplication/mismatching
+until I can devise something more comprehensive.
 
-I am not sure getting the "versioned Q35" correctly. Seems originally there is
-q35-1.4?
+Ideally, I'd like to redo all of the documentation for qemu-img
+nearly from scratch; with a parser generator that helps generate
+the documentation as well so they'll never get out of date.
 
-commit bf3caa3dc17552b323cec6831301a22cfc98ecd5
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Fri Feb 8 14:06:15 2013 +0100
+That's probably quite a ways off, and maybe there are other
+structural changes we want to make with respect to sphinx and
+other build tools, so I am sending something very minimal instead.
 
-    pc: add compatibility machine types for 1.4
-    
-    Adds both pc-i440fx-1.4 and pc-q35-1.4.
+This ought to be functionally identical down to the last char.
 
+(I've re-included patch one which I have sent to the list separately,
+purely as a dependency if you want to apply these patches.)
 
+John Snow (3):
+  qemu-img: fix .hx and .texi disparity
+  pxtool: Add new qemu-img command info generation tool
+  qemu-img.texi: use macros for command summaries
+
+ qemu-img.texi      |  28 ++++----
+ Makefile           |   8 +--
+ qemu-img-cmds.json | 165 +++++++++++++++++++++++++++++++++++++++++++++
+ qemu-img-cmds.hx   | 102 ----------------------------
+ scripts/pxtool.py  |  53 +++++++++++++++
+ 5 files changed, 236 insertions(+), 120 deletions(-)
+ create mode 100644 qemu-img-cmds.json
+ delete mode 100644 qemu-img-cmds.hx
+ create mode 100755 scripts/pxtool.py
 
 -- 
-Wei Yang
-Help you, Help me
+2.17.2
