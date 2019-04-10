@@ -2,63 +2,81 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B2AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6F9C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C431D217D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:17:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C431D217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 4B492206DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:19:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B492206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33040 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEEz6-0004aA-0v
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:17:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55956)
+	id 1hEF0Q-0005fB-H1
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:19:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hEEwg-0002Pz-JM
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:15:27 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEEw6-0002Bq-CL
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hEEjd-0004Gx-87
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:01:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hEEjc-0004GX-UI
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:01:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB5F83002F84;
-	Wed, 10 Apr 2019 15:01:55 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BAB45608A7;
-	Wed, 10 Apr 2019 15:01:54 +0000 (UTC)
-Date: Wed, 10 Apr 2019 17:01:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190410170150.1c447b12@redhat.com>
-In-Reply-To: <20190410142756.GA3136@richard>
-References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-	<20190410142756.GA3136@richard>
+	(envelope-from <philmd@redhat.com>) id 1hEEra-0002Pm-Bm
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:10:11 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:35947)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEEra-0002NS-1u
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:10:10 -0400
+Received: by mail-wr1-f67.google.com with SMTP id y13so3426093wrd.3
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:10:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=VWCdYuIv8A8sotIdH42gPUWzgFmGL7v+5Ac3ulYJ28E=;
+	b=j4l1GcprRM0iURvwPy6eiQz3pM5JXHY+XfBdJCj7hkCHptKK/7IHhcH3kD0kUA2dVk
+	0+CIf83XpFELMG36KzcNnZroeFetRUkcqa+a9jfd0FFJU+7oE/I2J4hl1vZg9C79aGuE
+	8YBIN127WsrcUgaIviSAk2QBTN9fG/8NrQlXGyVNEjhRB5PlPH0lgoyOPTWv6BJHenDu
+	VrXIUR+w7N2Wq5tQ+5ne5j7V7pChpbD0eu9ieVy6qkAZm9Ws2+YTXA9TcfSggR4KVQYK
+	V4N4LsiSNl+MHHOHHU9PR+zemAbebT7D/1IUT/IsHH0HrW4zOc94z9NO8NasOUcMa2H/
+	+2HQ==
+X-Gm-Message-State: APjAAAVRs9hyeiZ7MWgudrd01WtBgt2MxvmfNzCTPFST7mhF1cStTOVl
+	RYwLv5B6pw0TKhxNFqj+ktClvsPSJes=
+X-Google-Smtp-Source: APXvYqxgPicNvyJbC6lzKwFGvIUv6X0jKndBsxpgjaGTUi5cTys8u2ce98GOPhoULpGdZiY4uYDETw==
+X-Received: by 2002:a5d:4843:: with SMTP id n3mr22626188wrs.256.1554909008364; 
+	Wed, 10 Apr 2019 08:10:08 -0700 (PDT)
+Received: from [10.201.33.53] ([195.166.127.210])
+	by smtp.gmail.com with ESMTPSA id
+	j9sm43143556wrr.93.2019.04.10.08.10.07
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 10 Apr 2019 08:10:07 -0700 (PDT)
+To: Laszlo Ersek <lersek@redhat.com>, qemu-trivial@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190410045707.16923-1-philmd@redhat.com>
+	<e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
+Date: Wed, 10 Apr 2019 17:10:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Wed, 10 Apr 2019 15:01:55 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
- MCFG table
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: Correct the
+ EDK2_BASETOOLS_OPTFLAGS variable description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,82 +88,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410150150.fZFCHLrV8LND3PVDnIwc0nxvD9gbHIWxDD4MjPZ79Y0@z>
+Message-ID: <20190410151006.3K34AdbEm8u6q62Zoujr0Gz6a-CWGOA0DrSMx2W16_A@z>
 
-On Wed, 10 Apr 2019 22:27:56 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
-
-[...]
-> >@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> >     mcfg->allocation[0].start_bus_number = 0;
-> >     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
-> > 
-> >-    /* MCFG is used for ECAM which can be enabled or disabled by guest.  
+On 4/10/19 4:58 PM, Laszlo Ersek wrote:
+> On 04/10/19 06:57, Philippe Mathieu-Daudé wrote:
+>> In commit 1cab464136b4 we incorrectly described the
+>> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
+>> options to the EDK2 build tools, but it only expands
+>> the CFLAGS (not to the CPPFLAGS).
+>> Update the description to be more accurate.
+>>
+>> Reported-by: Laszlo Ersek <lersek@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  roms/Makefile | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/roms/Makefile b/roms/Makefile
+>> index 1ff78b63bb3..d7fd6025e7c 100644
+>> --- a/roms/Makefile
+>> +++ b/roms/Makefile
+>> @@ -120,8 +120,8 @@ build-efi-roms: build-pxe-roms
+>>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+>>  
+>> -# Build scripts can pass compiler/linker flags to the EDK2 build tools
+>> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
+>> +# Build scripts can pass compiler/linker flags to the EDK2
+>> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
+>>  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
+>>  #
+>>  # Example:
+>>
 > 
-> I want to cnfirm what is "enabled or disabled by guest" here.
-
-Firmware theoretically during PCI initialization may disable ECAM support
-and that's when we do no need MCFG. In practice that's not happening
-(SeaBIOS or UEFI) but we in case there is out there a firmware that does
-disable ECAM we do not generate MCFG.
-
-Note:
-ACPI tables generated twice, 1st when QEMU starts and the second time
-when firmware accesses fwcfg to read blobs for the 1st time.
-The later happens after PCI subsystem was initialized by firmware.
-At that time we know if ECAM was enabled or not.
-
-> If we don't reserve mcfg and "guest" enable mcfg during running, the ACPI
-> table size changed. But the destination still has the original table size,
-> since destination "guest" keep sleep during this period.
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 > 
-> Now the migration would face table size difference
+> Please noone submit a pull request with this patch (for 4.1) until my
+> edk2 bundling series is merged; as this one will likely introduce
+> another contextual conflict, and I'd *really* like to avoid another
+> rebase on my end, due to such an issue.
 
-with commit a1666142db we do not care as all the tables created on
-source will be migrated to destination as is overwriting whatever blobs
-destination created on startup.
+Thanks for the review. I'll rebase it on top of your 'bundle edk2
+platform firmware with QEMU' v4 and resend (later). Feel free to include
+it on top of your pullreq.
 
-> and break migration?
-nope,
+Regards,
 
-to help you figure out why it works
-look at what following git commits did:
-  git log c8d6f66ae7..a1666142db
-and pay attention to 'used_length'
-
-> 
-> >-     * To avoid table size changes (which create migration issues),
-> >-     * always create the table even if there are no allocations,
-> >-     * but set the signature to a reserved value in this case.
-> >-     * ACPI spec requires OSPMs to ignore such tables.
-> >-     */
-> >-    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
-> >-        /* Reserved signature: ignored by OSPM */
-> >-        sig = "QEMU";
-> >-    } else {
-> >-        sig = "MCFG";
-> >-    }
-> >-    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
-> >+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> > }
-> > 
-> > /*
-> >@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
-> >     }
-> >     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
-> >     qobject_unref(o);
-> >+    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
-> >+        return false;
-> >+    }
-> > 
-> >     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
-> >     assert(o);
-> >-- 
-> >2.7.4  
-> 
-
+Phil.
 
