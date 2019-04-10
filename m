@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49592)
+Received: from eggs.gnu.org ([209.51.188.92]:50172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hECSP-00011c-5O
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:36:03 -0400
+	(envelope-from <arekm@maven.pl>) id 1hE8HU-0003Hu-KK
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hECSO-0004jT-80
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:36:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hECSN-0004iA-WE
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:36:00 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 10 Apr 2019 14:35:50 +0200
-Message-Id: <20190410123550.2362-1-thuth@redhat.com>
+	(envelope-from <arekm@maven.pl>) id 1hE8HS-0004u0-Me
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:28 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arekm@maven.pl>) id 1hE8HO-0004pv-UJ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:25 -0400
+Received: by mail-lj1-x241.google.com with SMTP id r24so1248521ljg.3
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 01:08:20 -0700 (PDT)
+References: <20190410040826.24371-1-pagupta@redhat.com>
+From: =?UTF-8?Q?Arkadiusz_Mi=c5=9bkiewicz?= <arekm@maven.pl>
+Message-ID: <946ba5b9-62c1-aaec-9ca7-a71e154340db@maven.pl>
+Date: Wed, 10 Apr 2019 10:08:15 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.1] gitlab-ci.yml: Test the TCG
- interpreter in a CI pipeline
+In-Reply-To: <20190410040826.24371-1-pagupta@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: pl
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/6] virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +29,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
-Cc: philmd@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, berrange@redhat.com, deller@gmx.de
+To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com
 
-So far we do not have any test coverage for TCI (the TCG interpreter) yet=
-.
-Thus let's add a CI pipeline that runs at least some basic TCG tests with
-a TCI build, to make sure that there are no further regressions.
+On 10/04/2019 06:08, Pankaj Gupta wrote:
+>  This patch series has implementation for "virtio pmem". 
+>  "virtio pmem" is fake persistent memory(nvdimm) in guest 
+>  which allows to bypass the guest page cache. This also
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- NB: I did not include the sparc and sparc64 targets here since they are
- currently broken with TCI. Also "make check-tcg" does not work with
- x86_64-linux-user yet ... in case someone wants to fix that...
+Will kernel pstore be able to use this persistent memory for storing
+crash dumps?
 
- .gitlab-ci.yml | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 79d02cf740..c63bf2f822 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -71,3 +71,18 @@ build-clang:
-                      ppc-softmmu s390x-softmmu x86_64-softmmu arm-linux-=
-user"
-  - make -j2
-  - make -j2 check
-+
-+build-tci:
-+ script:
-+ - TARGETS=3D"aarch64 alpha arm hppa m68k microblaze moxie ppc64 s390x x=
-86_64"
-+ - ./configure --enable-tcg-interpreter
-+      --target-list=3D"$(for tg in $TARGETS; do echo -n ${tg}'-softmmu '=
-; done)"
-+ - make -j2
-+ - make tests/boot-serial-test tests/cdrom-test tests/pxe-test
-+ - for tg in $TARGETS ; do
-+     export QTEST_QEMU_BINARY=3D"${tg}-softmmu/qemu-system-${tg}" ;
-+     ./tests/boot-serial-test || exit 1 ;
-+     ./tests/cdrom-test || exit 1 ;
-+   done
-+ - QTEST_QEMU_BINARY=3D"x86_64-softmmu/qemu-system-x86_64" ./tests/pxe-t=
-est
-+ - QTEST_QEMU_BINARY=3D"s390x-softmmu/qemu-system-s390x" ./tests/pxe-tes=
-t -m slow
---=20
-2.21.0
+-- 
+Arkadiusz Miśkiewicz, arekm / ( maven.pl | pld-linux.org )
