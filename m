@@ -2,61 +2,65 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE89C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 736A3C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:40:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6870C20850
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:37:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6870C20850
+	by mail.kernel.org (Postfix) with ESMTPS id 3CC8F20850
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:40:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC8F20850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53867 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53913 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE5vP-00067W-7r
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 01:37:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50959)
+	id 1hE5yi-0007m4-I5
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 01:40:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hE5uY-0005pl-RR
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:36:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1hE5xq-00075Q-ML
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hE5uX-0007j3-Tu
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:36:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58780)
+	(envelope-from <armbru@redhat.com>) id 1hE5xo-0001Ir-Iz
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:40:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hE5uX-0007il-Mv; Wed, 10 Apr 2019 01:36:37 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hE5xk-0001G6-6o; Wed, 10 Apr 2019 01:39:56 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDF283091740;
-	Wed, 10 Apr 2019 05:36:36 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-50.brq.redhat.com [10.40.204.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E65D5D719;
-	Wed, 10 Apr 2019 05:36:32 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Wed, 10 Apr 2019 07:36:29 +0200
-Message-Id: <20190410053629.28829-1-philmd@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id C02DF307DAA3;
+	Wed, 10 Apr 2019 05:39:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D14F5D719;
+	Wed, 10 Apr 2019 05:39:51 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 234461138648; Wed, 10 Apr 2019 07:39:50 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+References: <20190409210655.777-1-jsnow@redhat.com>
+Date: Wed, 10 Apr 2019 07:39:50 +0200
+In-Reply-To: <20190409210655.777-1-jsnow@redhat.com> (John Snow's message of
+	"Tue, 9 Apr 2019 17:06:55 -0400")
+Message-ID: <87y34i2zbt.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 10 Apr 2019 05:36:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 10 Apr 2019 05:39:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] roms: List and describe the Makefile 'clean'
- rule
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,66 +72,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410053629.4aqGWSK6QPnBTPZ-fImrvDmH49hveKOmkNovKDSHmKE@z>
+Message-ID: <20190410053950.sD4Z-hl0z8khs24aHq1CcSvqoxaDkHf2uqr0mjgQ2oM@z>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- roms/Makefile | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+John Snow <jsnow@redhat.com> writes:
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 1ff78b63bb3..f55c4a2d3bb 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -61,6 +61,8 @@ default:
- 	@echo "  skiboot        -- update skiboot.lid"
- 	@echo "  u-boot.e500    -- update u-boot.e500"
- 	@echo "  u-boot.sam460  -- update u-boot.sam460"
-+	@echo "  clean          -- delete the files generated by the previous" =
-\
-+	                          "build targets"
-=20
- bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256=
-k
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
-@@ -102,7 +104,7 @@ pxe-rom-%: build-pxe-roms
-=20
- efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-=20
--efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-+efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
- 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
- 		-b ipxe/src/bin/$(VID)$(DID).rom \
- 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-@@ -131,7 +133,7 @@ build-efi-roms: build-pxe-roms
- #    EDK2_BASETOOLS_LDFLAGS=3D'...' \
- #    efirom
- #
--$(EDK2_EFIROM):
-+edk2-basetools:
- 	$(MAKE) -C edk2/BaseTools \
- 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
- 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
-@@ -156,6 +158,9 @@ skiboot:
- 	$(MAKE) -C skiboot CROSS=3D$(powerpc64_cross_prefix)
- 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
-=20
-+efi: edk2-basetools
-+	$(MAKE) -f Makefile.edk2
-+
- clean:
- 	rm -rf seabios/.config seabios/out seabios/builds
- 	$(MAKE) -C sgabios clean
-@@ -166,3 +171,4 @@ clean:
- 	rm -rf u-boot/build.e500
- 	$(MAKE) -C u-boot-sam460ex distclean
- 	$(MAKE) -C skiboot clean
-+	$(MAKE) -f Makefile.edk2 clean
---=20
-2.20.1
+> It turns out that having options listed in three places continues to be
+> a bad idea. I'm still toying with the idea of an improved infrastructure
+> here, but in the meantime, another bandaid.
+>
+> There are three locations:
+> (1) .hx file, formatted as texi
+> (2) .hx file, formatted as human readable.
+> (3) .texi file, as section headers, formatted as texi.
+>
+> You can compare the two summaries within the .hx file like so:
+>
+> Human-readable command summaries:
+> `./qemu-img --help | grep 'Command syntax' -A14`
+> Detokenized texi command summaries:
+> `grep "@item" qemu-img-cmds.hx | sed -E 's|@var\{([^\}]*?)\}|\1|g'`
+>
+> You can compare the two separate texi summaries like so:
+>
+> Texi command summaries:
+> `grep "@item" qemu-img-cmds.hx"`
+> Texi command headers:
+> grep -E "@item.*@var" qemu-img.texi | tail -14
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
+Extra points for explaining how you found the issues in detail
+sufficient for reproducing.
+
+Nice to have in 4.0.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
