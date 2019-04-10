@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35248)
+Received: from eggs.gnu.org ([209.51.188.92]:37615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1hEHZS-0002o7-HO
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:03:39 -0400
+	(envelope-from <lersek@redhat.com>) id 1hEHmJ-0006uM-Mg
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1hEHZR-0001fE-MT
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:03:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44170)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1hEHZR-0001ep-ER
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:03:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE42781E19
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:03:36 +0000 (UTC)
-From: Cole Robinson <crobinso@redhat.com>
-Date: Wed, 10 Apr 2019 14:03:31 -0400
-Message-Id: <f61645d0b3720a039423532d49dd65588d9bccd8.1554919328.git.crobinso@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1hEHmI-0001Qw-LM
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:55 -0400
+References: <20190410045707.16923-1-philmd@redhat.com>
+	<e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
+	<94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <78374d70-fa22-73a0-823e-9d483b91d008@redhat.com>
+Date: Wed, 10 Apr 2019 20:16:46 +0200
 MIME-Version: 1.0
+In-Reply-To: <94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hmp: delvm: use hmp_handle_error
+Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: Correct the
+ EDK2_BASETOOLS_OPTFLAGS variable description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, Cole Robinson <crobinso@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-This gives us the consistent 'Error:' prefix added in 66363e9a43f,
-which helps users like libvirt who still need to scrape hmp error
-messages to detect failure.
+On 04/10/19 17:10, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/10/19 4:58 PM, Laszlo Ersek wrote:
+>> On 04/10/19 06:57, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> In commit 1cab464136b4 we incorrectly described the
+>>> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
+>>> options to the EDK2 build tools, but it only expands
+>>> the CFLAGS (not to the CPPFLAGS).
+>>> Update the description to be more accurate.
+>>>
+>>> Reported-by: Laszlo Ersek <lersek@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>>  roms/Makefile | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/roms/Makefile b/roms/Makefile
+>>> index 1ff78b63bb3..d7fd6025e7c 100644
+>>> --- a/roms/Makefile
+>>> +++ b/roms/Makefile
+>>> @@ -120,8 +120,8 @@ build-efi-roms: build-pxe-roms
+>>>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>>>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+>>> =20
+>>> -# Build scripts can pass compiler/linker flags to the EDK2 build too=
+ls
+>>> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
+>>> +# Build scripts can pass compiler/linker flags to the EDK2
+>>> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
+>>>  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
+>>>  #
+>>>  # Example:
+>>>
+>>
+>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>>
+>> Please noone submit a pull request with this patch (for 4.1) until my
+>> edk2 bundling series is merged; as this one will likely introduce
+>> another contextual conflict, and I'd *really* like to avoid another
+>> rebase on my end, due to such an issue.
+>=20
+> Thanks for the review. I'll rebase it on top of your 'bundle edk2
+> platform firmware with QEMU' v4 and resend (later).
 
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
----
- hmp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Thank you!
 
-diff --git a/hmp.c b/hmp.c
-index 8eec768088..74a4bfc1f9 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1481,10 +1481,11 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
-     const char *name =3D qdict_get_str(qdict, "name");
-=20
-     if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
--        error_reportf_err(err,
--                          "Error while deleting snapshot on device '%s':=
- ",
--                          bdrv_get_device_name(bs));
-+        error_prepend(&err,
-+                      "Error while deleting snapshot on device '%s': ",
-+                      bdrv_get_device_name(bs));
-     }
-+    hmp_handle_error(mon, &err);
- }
-=20
- void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
---=20
-2.21.0
+> Feel free to include it on top of your pullreq.
+
+... I think I'll keep that pullreq as minimal as it can be. :)
+
+Thanks
+Laszlo
+
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
