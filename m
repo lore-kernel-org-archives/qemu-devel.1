@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34791)
+Received: from eggs.gnu.org ([209.51.188.92]:34813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiS-0006y4-Uz
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEJiT-0006z7-N3
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiR-0004QM-BC
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEJiR-0004QV-FQ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:05 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 10 Apr 2019 22:20:26 +0200
-Message-Id: <20190410202033.28617-5-mreitz@redhat.com>
+Date: Wed, 10 Apr 2019 22:20:25 +0200
+Message-Id: <20190410202033.28617-4-mreitz@redhat.com>
 In-Reply-To: <20190410202033.28617-1-mreitz@redhat.com>
 References: <20190410202033.28617-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 04/11] block: Inline
- bdrv_co_block_status_from_*()
+Subject: [Qemu-devel] [PATCH v4 03/11] block: Storage child access function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,237 +24,448 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-With bdrv_filtered_rw_bs(), we can easily handle this default filter
-behavior in bdrv_co_block_status().
+For completeness' sake, add a function for accessing a node's storage
+child, too.  For filters, this is their filtered child; for non-filters,
+this is bs->file.
 
-blkdebug wants to have an additional assertion, so it keeps its own
-implementation, except bdrv_co_block_status_from_file() needs to be
-inlined there.
+Some places are deliberately left unconverted:
+- BDS opening/closing functions where bs->file is handled specially
+  (which is basically wrong, but at least simplifies probing)
+- bdrv_co_block_status_from_file(), because its name implies that it
+  points to ->file
+- bdrv_snapshot_goto() in one places unrefs bs->file.  Such a
+  modification is not covered by this patch and is therefore just
+  safeguarded by an additional assert(), but otherwise kept as-is.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h | 22 -----------------
- block/blkdebug.c          |  7 ++++--
- block/blklogwrites.c      |  1 -
- block/commit.c            |  1 -
- block/copy-on-read.c      |  2 --
- block/io.c                | 51 +++++++++++++--------------------------
- block/mirror.c            |  1 -
- block/throttle.c          |  1 -
- 8 files changed, 22 insertions(+), 64 deletions(-)
+ include/block/block_int.h |  6 +++++
+ block.c                   | 53 ++++++++++++++++++++++++++++-----------
+ block/io.c                | 22 +++++++---------
+ block/qapi.c              |  7 +++---
+ block/snapshot.c          | 40 ++++++++++++++++-------------
+ 5 files changed, 81 insertions(+), 47 deletions(-)
 
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d0309e6307..76c7c0a111 100644
+index b22b1164f8..d0309e6307 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -1187,28 +1187,6 @@ void bdrv_format_default_perms(BlockDriverState *b=
-s, BdrvChild *c,
-                                uint64_t perm, uint64_t shared,
-                                uint64_t *nperm, uint64_t *nshared);
-=20
--/*
-- * Default implementation for drivers to pass bdrv_co_block_status() to
-- * their file.
-- */
--int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
--                                                bool want_zero,
--                                                int64_t offset,
--                                                int64_t bytes,
--                                                int64_t *pnum,
--                                                int64_t *map,
--                                                BlockDriverState **file)=
-;
--/*
-- * Default implementation for drivers to pass bdrv_co_block_status() to
-- * their backing file.
-- */
--int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
--                                                   bool want_zero,
--                                                   int64_t offset,
--                                                   int64_t bytes,
--                                                   int64_t *pnum,
--                                                   int64_t *map,
--                                                   BlockDriverState **fi=
-le);
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
- void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)=
-;
- bool blk_dev_has_removable_media(BlockBackend *blk);
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index efd9441625..7950ae729c 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -637,8 +637,11 @@ static int coroutine_fn blkdebug_co_block_status(Blo=
-ckDriverState *bs,
-                                                  BlockDriverState **file=
-)
- {
-     assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
--    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
--                                          pnum, map, file);
-+    assert(bs->file && bs->file->bs);
-+    *pnum =3D bytes;
-+    *map =3D offset;
-+    *file =3D bs->file->bs;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+@@ -1243,6 +1243,7 @@ int refresh_total_sectors(BlockDriverState *bs, int=
+64_t hint);
+ BdrvChild *bdrv_filtered_cow_child(BlockDriverState *bs);
+ BdrvChild *bdrv_filtered_rw_child(BlockDriverState *bs);
+ BdrvChild *bdrv_filtered_child(BlockDriverState *bs);
++BdrvChild *bdrv_storage_child(BlockDriverState *bs);
+ BlockDriverState *bdrv_skip_implicit_filters(BlockDriverState *bs);
+ BlockDriverState *bdrv_skip_rw_filters(BlockDriverState *bs);
+ BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs);
+@@ -1267,4 +1268,9 @@ static inline BlockDriverState *bdrv_filtered_bs(Bl=
+ockDriverState *bs)
+     return child_bs(bdrv_filtered_child(bs));
  }
 =20
- static void blkdebug_close(BlockDriverState *bs)
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index eb2b4901a5..1eb4a5c613 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -518,7 +518,6 @@ static BlockDriver bdrv_blk_log_writes =3D {
-     .bdrv_co_pwrite_zeroes  =3D blk_log_writes_co_pwrite_zeroes,
-     .bdrv_co_flush_to_disk  =3D blk_log_writes_co_flush_to_disk,
-     .bdrv_co_pdiscard       =3D blk_log_writes_co_pdiscard,
--    .bdrv_co_block_status   =3D bdrv_co_block_status_from_file,
++static inline BlockDriverState *bdrv_storage_bs(BlockDriverState *bs)
++{
++    return child_bs(bdrv_storage_child(bs));
++}
++
+ #endif /* BLOCK_INT_H */
+diff --git a/block.c b/block.c
+index e8f6febda0..89cb6de4c3 100644
+--- a/block.c
++++ b/block.c
+@@ -4404,15 +4404,21 @@ exit:
+ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs;
++
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
++
+     if (drv->bdrv_get_allocated_file_size) {
+         return drv->bdrv_get_allocated_file_size(bs);
+     }
+-    if (bs->file) {
+-        return bdrv_get_allocated_file_size(bs->file->bs);
++
++    storage_bs =3D bdrv_storage_bs(bs);
++    if (storage_bs) {
++        return bdrv_get_allocated_file_size(storage_bs);
+     }
++
+     return -ENOTSUP;
+ }
 =20
-     .is_filter              =3D true,
-     .strong_runtime_opts    =3D blk_log_writes_strong_runtime_opts,
-diff --git a/block/commit.c b/block/commit.c
-index 252007fd57..c366ee9655 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -254,7 +254,6 @@ static void bdrv_commit_top_child_perm(BlockDriverSta=
-te *bs, BdrvChild *c,
- static BlockDriver bdrv_commit_top =3D {
-     .format_name                =3D "commit_top",
-     .bdrv_co_preadv             =3D bdrv_commit_top_preadv,
--    .bdrv_co_block_status       =3D bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      =3D bdrv_commit_top_refresh_filename,
-     .bdrv_child_perm            =3D bdrv_commit_top_child_perm,
+@@ -4982,7 +4988,7 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, con=
+st char *event,
+                           const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_storage_bs(bs);
+     }
 =20
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 53972b1da3..fe9260163c 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -150,8 +150,6 @@ static BlockDriver bdrv_copy_on_read =3D {
-     .bdrv_eject                         =3D cor_eject,
-     .bdrv_lock_medium                   =3D cor_lock_medium,
+     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
+@@ -4995,7 +5001,7 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, con=
+st char *event,
+ int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_storage_bs(bs);
+     }
 =20
--    .bdrv_co_block_status               =3D bdrv_co_block_status_from_fi=
-le,
--
-     .bdrv_recurse_is_first_non_filter   =3D cor_recurse_is_first_non_fil=
-ter,
+     if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
+@@ -5008,7 +5014,7 @@ int bdrv_debug_remove_breakpoint(BlockDriverState *=
+bs, const char *tag)
+ int bdrv_debug_resume(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && (!bs->drv || !bs->drv->bdrv_debug_resume)) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_storage_bs(bs);
+     }
 =20
-     .has_variable_length                =3D true,
+     if (bs && bs->drv && bs->drv->bdrv_debug_resume) {
+@@ -5021,7 +5027,7 @@ int bdrv_debug_resume(BlockDriverState *bs, const c=
+har *tag)
+ bool bdrv_debug_is_suspended(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_is_suspended) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_storage_bs(bs);
+     }
+=20
+     if (bs && bs->drv && bs->drv->bdrv_debug_is_suspended) {
+@@ -6142,14 +6148,23 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         bs->exact_filename[0] =3D '\0';
+=20
+         drv->bdrv_refresh_filename(bs);
+-    } else if (bs->file) {
+-        /* Try to reconstruct valid information from the underlying file=
+ */
++    } else if (bdrv_storage_child(bs)) {
++        /*
++         * Try to reconstruct valid information from the underlying
++         * file -- this only works for format nodes (filter nodes
++         * cannot be probed and as such must be selected by the user
++         * either through an options dict, or through a special
++         * filename which the filter driver must construct in its
++         * .bdrv_refresh_filename() implementation).
++         */
++        BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+=20
+         bs->exact_filename[0] =3D '\0';
+=20
+         /*
+          * We can use the underlying file's filename if:
+          * - it has a filename,
++         * - the current BDS is not a filter,
+          * - the file is a protocol BDS, and
+          * - opening that file (as this BDS's format) will automatically=
+ create
+          *   the BDS tree we have right now, that is:
+@@ -6158,11 +6173,10 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+          *   - no non-file child of this BDS has been overridden by the =
+user
+          *   Both of these conditions are represented by generate_json_f=
+ilename.
+          */
+-        if (bs->file->bs->exact_filename[0] &&
+-            bs->file->bs->drv->bdrv_file_open &&
+-            !generate_json_filename)
++        if (storage_bs->exact_filename[0] && storage_bs->drv->bdrv_file_=
+open &&
++            !drv->is_filter && !generate_json_filename)
+         {
+-            strcpy(bs->exact_filename, bs->file->bs->exact_filename);
++            strcpy(bs->exact_filename, storage_bs->exact_filename);
+         }
+     }
+=20
+@@ -6179,6 +6193,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+ char *bdrv_dirname(BlockDriverState *bs, Error **errp)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs;
+=20
+     if (!drv) {
+         error_setg(errp, "Node '%s' is ejected", bs->node_name);
+@@ -6189,8 +6204,9 @@ char *bdrv_dirname(BlockDriverState *bs, Error **er=
+rp)
+         return drv->bdrv_dirname(bs, errp);
+     }
+=20
+-    if (bs->file) {
+-        return bdrv_dirname(bs->file->bs, errp);
++    storage_bs =3D bdrv_storage_bs(bs);
++    if (storage_bs) {
++        return bdrv_dirname(storage_bs, errp);
+     }
+=20
+     bdrv_refresh_filename(bs);
+@@ -6324,6 +6340,15 @@ BdrvChild *bdrv_filtered_child(BlockDriverState *b=
+s)
+     return cow_child ?: rw_child;
+ }
+=20
++/*
++ * Return the child that stores the data that is allocated on this
++ * node.  This may or may not include metadata.
++ */
++BdrvChild *bdrv_storage_child(BlockDriverState *bs)
++{
++    return bdrv_filtered_rw_child(bs) ?: bs->file;
++}
++
+ static BlockDriverState *bdrv_skip_filters(BlockDriverState *bs,
+                                            bool stop_on_explicit_filter)
+ {
 diff --git a/block/io.c b/block/io.c
-index 5c33ecc080..8d124bae5c 100644
+index 83c2b6b46a..5c33ecc080 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1993,36 +1993,6 @@ typedef struct BdrvCoBlockStatusData {
-     bool done;
- } BdrvCoBlockStatusData;
+@@ -118,17 +118,10 @@ static void bdrv_merge_limits(BlockLimits *dst, con=
+st BlockLimits *src)
+ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BlockDriver *drv =3D bs->drv;
+-    BlockDriverState *storage_bs;
++    BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+     BlockDriverState *cow_bs =3D bdrv_filtered_cow_bs(bs);
+     Error *local_err =3D NULL;
 =20
--int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
--                                                bool want_zero,
--                                                int64_t offset,
--                                                int64_t bytes,
--                                                int64_t *pnum,
--                                                int64_t *map,
--                                                BlockDriverState **file)
--{
--    assert(bs->file && bs->file->bs);
--    *pnum =3D bytes;
--    *map =3D offset;
--    *file =3D bs->file->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
--}
+-    /*
+-     * FIXME: There should be a function for this, and in fact there
+-     * will be as of a follow-up patch.
+-     */
+-    storage_bs =3D
+-        child_bs(bs->file) ?: bdrv_filtered_rw_bs(bs);
 -
--int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
--                                                   bool want_zero,
--                                                   int64_t offset,
--                                                   int64_t bytes,
--                                                   int64_t *pnum,
--                                                   int64_t *map,
--                                                   BlockDriverState **fi=
-le)
--{
--    assert(bs->backing && bs->backing->bs);
--    *pnum =3D bytes;
--    *map =3D offset;
--    *file =3D bs->backing->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
--}
--
- /*
-  * Returns the allocation status of the specified sectors.
-  * Drivers not implementing the functionality are assumed to not support
-@@ -2063,6 +2033,7 @@ static int coroutine_fn bdrv_co_block_status(BlockD=
-riverState *bs,
-     BlockDriverState *local_file =3D NULL;
-     int64_t aligned_offset, aligned_bytes;
-     uint32_t align;
-+    bool has_filtered_child;
+     memset(&bs->bl, 0, sizeof(bs->bl));
 =20
-     assert(pnum);
-     *pnum =3D 0;
-@@ -2088,7 +2059,8 @@ static int coroutine_fn bdrv_co_block_status(BlockD=
-riverState *bs,
+     if (!drv) {
+@@ -2390,6 +2383,7 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVect=
+or *qiov, int64_t pos,
+                    bool is_read)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+     int ret =3D -ENOTSUP;
 =20
-     /* Must be non-NULL or bdrv_getlength() would have failed */
-     assert(bs->drv);
--    if (!bs->drv->bdrv_co_block_status) {
-+    has_filtered_child =3D bs->drv->is_filter && bdrv_filtered_rw_child(=
-bs);
-+    if (!bs->drv->bdrv_co_block_status && !has_filtered_child) {
-         *pnum =3D bytes;
-         ret =3D BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes =3D=3D total_size) {
-@@ -2109,9 +2081,20 @@ static int coroutine_fn bdrv_co_block_status(Block=
-DriverState *bs,
-     aligned_offset =3D QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes =3D ROUND_UP(offset + bytes, align) - aligned_offset;
+     bdrv_inc_in_flight(bs);
+@@ -2402,8 +2396,8 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVect=
+or *qiov, int64_t pos,
+         } else {
+             ret =3D drv->bdrv_save_vmstate(bs, qiov, pos);
+         }
+-    } else if (bs->file) {
+-        ret =3D bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
++    } else if (storage_bs) {
++        ret =3D bdrv_co_rw_vmstate(storage_bs, qiov, pos, is_read);
+     }
 =20
--    ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
--                                        aligned_bytes, pnum, &local_map,
--                                        &local_file);
-+    if (bs->drv->bdrv_co_block_status) {
-+        ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_off=
-set,
-+                                            aligned_bytes, pnum, &local_=
-map,
-+                                            &local_file);
-+    } else {
-+        /* Default code for filters */
+     bdrv_dec_in_flight(bs);
+@@ -2530,6 +2524,7 @@ static void coroutine_fn bdrv_flush_co_entry(void *=
+opaque)
+=20
+ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+ {
++    BlockDriverState *storage_bs;
+     int current_gen;
+     int ret =3D 0;
+=20
+@@ -2559,7 +2554,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs=
+)
+     }
+=20
+     /* Write back cached data to the OS even with cache=3Dunsafe */
+-    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_OS);
++    BLKDBG_EVENT(bdrv_storage_child(bs), BLKDBG_FLUSH_TO_OS);
+     if (bs->drv->bdrv_co_flush_to_os) {
+         ret =3D bs->drv->bdrv_co_flush_to_os(bs);
+         if (ret < 0) {
+@@ -2577,7 +2572,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs=
+)
+         goto flush_parent;
+     }
+=20
+-    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
++    BLKDBG_EVENT(bdrv_storage_child(bs), BLKDBG_FLUSH_TO_DISK);
+     if (!bs->drv) {
+         /* bs->drv->bdrv_co_flush() might have ejected the BDS
+          * (even in case of apparent success) */
+@@ -2622,7 +2617,8 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs=
+)
+      * in the case of cache=3Dunsafe, so there are no useless flushes.
+      */
+ flush_parent:
+-    ret =3D bs->file ? bdrv_co_flush(bs->file->bs) : 0;
++    storage_bs =3D bdrv_storage_bs(bs);
++    ret =3D storage_bs ? bdrv_co_flush(storage_bs) : 0;
+ out:
+     /* Notify any pending flushes that we have completed */
+     if (ret =3D=3D 0) {
+diff --git a/block/qapi.c b/block/qapi.c
+index 478c6f5e0d..e026d27077 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -509,7 +509,7 @@ static void bdrv_query_blk_stats(BlockDeviceStats *ds=
+, BlockBackend *blk)
+ static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
+                                         bool blk_level)
+ {
+-    BlockDriverState *cow_bs;
++    BlockDriverState *storage_bs, *cow_bs;
+     BlockStats *s =3D NULL;
+=20
+     s =3D g_malloc0(sizeof(*s));
+@@ -533,9 +533,10 @@ static BlockStats *bdrv_query_bds_stats(BlockDriverS=
+tate *bs,
+=20
+     s->stats->wr_highest_offset =3D stat64_get(&bs->wr_highest_offset);
+=20
+-    if (bs->file) {
++    storage_bs =3D bdrv_storage_bs(bs);
++    if (storage_bs) {
+         s->has_parent =3D true;
+-        s->parent =3D bdrv_query_bds_stats(bs->file->bs, blk_level);
++        s->parent =3D bdrv_query_bds_stats(storage_bs, blk_level);
+     }
+=20
+     cow_bs =3D bdrv_filtered_cow_bs(bs);
+diff --git a/block/snapshot.c b/block/snapshot.c
+index f2f48f926a..3032cd0341 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -154,8 +154,9 @@ int bdrv_can_snapshot(BlockDriverState *bs)
+     }
+=20
+     if (!drv->bdrv_snapshot_create) {
+-        if (bs->file !=3D NULL) {
+-            return bdrv_can_snapshot(bs->file->bs);
++        BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
++        if (storage_bs) {
++            return bdrv_can_snapshot(storage_bs);
+         }
+         return 0;
+     }
+@@ -167,14 +168,15 @@ int bdrv_snapshot_create(BlockDriverState *bs,
+                          QEMUSnapshotInfo *sn_info)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
+     if (drv->bdrv_snapshot_create) {
+         return drv->bdrv_snapshot_create(bs, sn_info);
+     }
+-    if (bs->file) {
+-        return bdrv_snapshot_create(bs->file->bs, sn_info);
++    if (storage_bs) {
++        return bdrv_snapshot_create(storage_bs, sn_info);
+     }
+     return -ENOTSUP;
+ }
+@@ -184,6 +186,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+                        Error **errp)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs;
+     int ret, open_ret;
+=20
+     if (!drv) {
+@@ -204,39 +207,40 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         return ret;
+     }
+=20
+-    if (bs->file) {
+-        BlockDriverState *file;
++    storage_bs =3D bdrv_storage_bs(bs);
++    if (storage_bs) {
+         QDict *options =3D qdict_clone_shallow(bs->options);
+         QDict *file_options;
+         Error *local_err =3D NULL;
+=20
+-        file =3D bs->file->bs;
+         /* Prevent it from getting deleted when detached from bs */
+-        bdrv_ref(file);
++        bdrv_ref(storage_bs);
+=20
+         qdict_extract_subqdict(options, &file_options, "file.");
+         qobject_unref(file_options);
+-        qdict_put_str(options, "file", bdrv_get_node_name(file));
++        qdict_put_str(options, "file", bdrv_get_node_name(storage_bs));
+=20
+         if (drv->bdrv_close) {
+             drv->bdrv_close(bs);
+         }
 +
-+        local_file =3D bdrv_filtered_rw_bs(bs);
-+        assert(local_file);
-+
-+        *pnum =3D aligned_bytes;
-+        local_map =3D aligned_offset;
-+        ret =3D BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
-+    }
-     if (ret < 0) {
-         *pnum =3D 0;
-         goto out;
-diff --git a/block/mirror.c b/block/mirror.c
-index 80cef587f0..2e521c726a 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1487,7 +1487,6 @@ static BlockDriver bdrv_mirror_top =3D {
-     .bdrv_co_pwrite_zeroes      =3D bdrv_mirror_top_pwrite_zeroes,
-     .bdrv_co_pdiscard           =3D bdrv_mirror_top_pdiscard,
-     .bdrv_co_flush              =3D bdrv_mirror_top_flush,
--    .bdrv_co_block_status       =3D bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      =3D bdrv_mirror_top_refresh_filename,
-     .bdrv_child_perm            =3D bdrv_mirror_top_child_perm,
++        assert(bs->file->bs =3D=3D storage_bs);
+         bdrv_unref_child(bs, bs->file);
+         bs->file =3D NULL;
 =20
-diff --git a/block/throttle.c b/block/throttle.c
-index f64dcc27b9..b6922e734f 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -259,7 +259,6 @@ static BlockDriver bdrv_throttle =3D {
-     .bdrv_reopen_prepare                =3D   throttle_reopen_prepare,
-     .bdrv_reopen_commit                 =3D   throttle_reopen_commit,
-     .bdrv_reopen_abort                  =3D   throttle_reopen_abort,
--    .bdrv_co_block_status               =3D   bdrv_co_block_status_from_=
-file,
+-        ret =3D bdrv_snapshot_goto(file, snapshot_id, errp);
++        ret =3D bdrv_snapshot_goto(storage_bs, snapshot_id, errp);
+         open_ret =3D drv->bdrv_open(bs, options, bs->open_flags, &local_=
+err);
+         qobject_unref(options);
+         if (open_ret < 0) {
+-            bdrv_unref(file);
++            bdrv_unref(storage_bs);
+             bs->drv =3D NULL;
+             /* A bdrv_snapshot_goto() error takes precedence */
+             error_propagate(errp, local_err);
+             return ret < 0 ? ret : open_ret;
+         }
 =20
-     .bdrv_co_drain_begin                =3D   throttle_co_drain_begin,
-     .bdrv_co_drain_end                  =3D   throttle_co_drain_end,
+-        assert(bs->file->bs =3D=3D file);
+-        bdrv_unref(file);
++        assert(bs->file->bs =3D=3D storage_bs);
++        bdrv_unref(storage_bs);
+         return ret;
+     }
+=20
+@@ -272,6 +276,7 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+                          Error **errp)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+     int ret;
+=20
+     if (!drv) {
+@@ -288,8 +293,8 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+=20
+     if (drv->bdrv_snapshot_delete) {
+         ret =3D drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
+-    } else if (bs->file) {
+-        ret =3D bdrv_snapshot_delete(bs->file->bs, snapshot_id, name, er=
+rp);
++    } else if (storage_bs) {
++        ret =3D bdrv_snapshot_delete(storage_bs, snapshot_id, name, errp=
+);
+     } else {
+         error_setg(errp, "Block format '%s' used by device '%s' "
+                    "does not support internal snapshot deletion",
+@@ -305,14 +310,15 @@ int bdrv_snapshot_list(BlockDriverState *bs,
+                        QEMUSnapshotInfo **psn_info)
+ {
+     BlockDriver *drv =3D bs->drv;
++    BlockDriverState *storage_bs =3D bdrv_storage_bs(bs);
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
+     if (drv->bdrv_snapshot_list) {
+         return drv->bdrv_snapshot_list(bs, psn_info);
+     }
+-    if (bs->file) {
+-        return bdrv_snapshot_list(bs->file->bs, psn_info);
++    if (storage_bs) {
++        return bdrv_snapshot_list(storage_bs, psn_info);
+     }
+     return -ENOTSUP;
+ }
 --=20
 2.20.1
