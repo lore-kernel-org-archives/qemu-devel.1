@@ -2,90 +2,63 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCB0C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25232C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:31:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CBC020818
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:27:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBC020818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ECF2D20818
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:31:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF2D20818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33303 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33425 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEF8o-0003rR-M0
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:27:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59759)
+	id 1hEFCc-0005BY-5T
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:31:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEF7n-0003MJ-QS
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:26:56 -0400
+	(envelope-from <prvs=996b1c52f=Paul.Durrant@citrix.com>)
+	id 1hEFBl-0004oS-JW
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEF7m-0004lW-TS
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:26:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50308)
+	(envelope-from <prvs=996b1c52f=Paul.Durrant@citrix.com>)
+	id 1hEFBk-0006gx-Fz
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:31:01 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:26682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEF7k-0004i0-Jg; Wed, 10 Apr 2019 11:26:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CAE030BA36F;
-	Wed, 10 Apr 2019 15:26:45 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E65185C223;
-	Wed, 10 Apr 2019 15:26:43 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6bd4c6e6-a7f1-99f4-c6bf-77099a49e4e1@redhat.com>
-Date: Wed, 10 Apr 2019 17:26:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <prvs=996b1c52f=Paul.Durrant@citrix.com>)
+	id 1hEFBk-0006bQ-0X; Wed, 10 Apr 2019 11:31:00 -0400
+X-IronPort-AV: E=Sophos;i="5.60,332,1549929600"; d="scan'208";a="88651039"
+From: Paul Durrant <Paul.Durrant@citrix.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Thread-Topic: [PATCH 2/3] xen-bus: allow AioContext to be specified for each
+	event channel
+Thread-Index: AQHU7h4IPncTeUxY+ESOf6AKMI/BvKY1PAwAgABHK7A=
+Date: Wed, 10 Apr 2019 15:20:05 +0000
+Message-ID: <582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
+References: <20190408151617.13025-1-paul.durrant@citrix.com>
+	<20190408151617.13025-3-paul.durrant@citrix.com>
+	<20190410125708.GE1435@perard.uk.xensource.com>
+In-Reply-To: <20190410125708.GE1435@perard.uk.xensource.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Wed, 10 Apr 2019 15:26:45 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img convert: ignore read errors
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 185.25.65.24
+Subject: Re: [Qemu-devel] [PATCH 2/3] xen-bus: allow AioContext to be
+ specified for each event channel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,56 +70,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410152642.-oLCFECKCZTmTnv-hhvAWcNLh8Y6SfV-UE0Fo4pyOxM@z>
+Message-ID: <20190410152005.mbbKE4ATMM_PqkXW-XhbhHlJnSoOGTPuk1fKe3zCvB4@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX
-From: Max Reitz <mreitz@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <6bd4c6e6-a7f1-99f4-c6bf-77099a49e4e1@redhat.com>
-Subject: Re: [PATCH 0/2] qemu-img convert: ignore read errors
-References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 10 April 2019 13:57
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-devel@lists.xenproj=
+ect.org; Stefano Stabellini
+> <sstabellini@kernel.org>; Stefan Hajnoczi <stefanha@redhat.com>; Kevin Wo=
+lf <kwolf@redhat.com>; Max
+> Reitz <mreitz@redhat.com>
+> Subject: Re: [PATCH 2/3] xen-bus: allow AioContext to be specified for ea=
+ch event channel
+>=20
+> On Mon, Apr 08, 2019 at 04:16:16PM +0100, Paul Durrant wrote:
+> > This patch adds an AioContext parameter to xen_device_bind_event_channe=
+l()
+> > and then uses aio_set_fd_handler() to set the callback rather than
+> > qemu_set_fd_handler().
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > ---
+> > @@ -943,6 +944,7 @@ static void xen_device_event(void *opaque)
+> >  }
+> >
+> >  XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+> > +                                               AioContext *ctx,
+> >                                                 unsigned int port,
+> >                                                 XenEventHandler handler=
+,
+> >                                                 void *opaque, Error **e=
+rrp)
+> > @@ -968,8 +970,9 @@ XenEventChannel *xen_device_bind_event_channel(XenD=
+evice *xendev,
+> >      channel->handler =3D handler;
+> >      channel->opaque =3D opaque;
+> >
+> > -    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), xen_device_event, =
+NULL,
+> > -                        channel);
+> > +    channel->ctx =3D ctx;
+> > +    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false=
+,
+> > +                       xen_device_event, NULL, NULL, channel);
+>=20
+> I wonder if the `'is_external' parameter of aio_set_fd_handler shoud be
+> `true' here, instead. That flag seems to be used when making a snapshot
+> of a blockdev, for example.
+>=20
+> That was introduced by:
+> dca21ef23ba48f6f1428c59f295a857e5dc203c8^..c07bc2c1658fffeee08eb46402b2f6=
+6d55b07586
+>=20
+> What do you think?
 
-On 09.04.19 16:56, Andrey Shinkevich wrote:
-> The 'qemu-img convert' new command option 'force read' with the key '-R=
-'
-> allows converting a damaged image to get all the available information
-> in case of the read errors. The program reports read errors and continu=
-e
-> the image conversion. The users should keep in their minds that the
-> resulting image is inconsistent.
+Interesting. I admit I was merely transcribing what qemu_set_fd_handler() p=
+asses without really looking into the values. Looking at the arguments that=
+ virtio-blk passes to aio_set_event_notifier() though, and what 'is_externa=
+l' means, it would appear that setting it to true is probably the right thi=
+ng to do. Do you want me to send a v2 of the series or can you fix it up?
 
-I=E2=80=99ve already sent a series =E2=80=9CAdd salvaging mode to convert=
-=E2=80=9D back in December.
+  Cheers,
 
-Max
+    Paul
 
-
---rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuCzIACgkQ9AfbAGHV
-z0DMowgAipgl1FtpRlHE6Nuz7jr0zt3ErFmnNAnlaq4hWy3x8DnbCECoZWgf4WIz
-GDQYdcMtb98gUL7p5bcpR76U11oaxOEKrtxj5JMRZkySlDwN8SnNeamTZ1UEYikc
-1s0LBbhQrMQ41rC1sRKBSQLjOsT/ZJddZybDTm8tuxVxs+4pNe/fjOo+WVn7exRa
-nnAWd+z5gw6L9voxrtrIOF9sfvx1RqXKkYmybCk6+O8QhzrBa2Fi1bbMUInvBGVI
-E/zyHQ/ACDqiKUHzHtgUcbJMosa9EFzfhua4ozS66DDFO17gQUdR1XUy/EcQVvdT
-0RyAM3UIIrBdhcfogWzB8wnneElqhg==
-=DVBD
------END PGP SIGNATURE-----
-
---rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX--
+>=20
+>=20
+> --
+> Anthony PERARD
 
