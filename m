@@ -2,88 +2,58 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8340DC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90808C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4682420854
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:22:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UTJl6GMU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4682420854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63663206DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:24:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63663206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33172 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33208 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEF3G-0008Ek-7w
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:22:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55902)
+	id 1hEF5O-000182-H4
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:24:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hEEwS-0002LW-NG
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:15:15 -0400
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hEF49-0000XG-8r
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hEEkl-00050g-Nf
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:03:08 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45561)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
-	id 1hEEkl-000501-9Y; Wed, 10 Apr 2019 11:03:07 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s15so3323989wra.12;
-	Wed, 10 Apr 2019 08:03:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=4u5ikV2mcJohIqwdsvLuzluNaH++1Z1tZwJF5NL/vsc=;
-	b=UTJl6GMUK24Yr4bwb2pE+wJdaSzLSH6MoaTF4mraVFvI1TZd1pnP2u3Fi0438X1MI7
-	UaTdEMakAWY9KX6fltsnGNrMGZGFhFugnhuzWwJ7SoeDtlWQy/8F5K7twxz2s8LWZOK/
-	1zPtlE2wswG20Ce8ag9VgikCnA2OgudMdk08X2GFSBcU8s+O83nefgpZpzEiyzbIQhTC
-	JA2maSj1+HWx3lBQlpuZCDPRtF7QpPVs5BOd9nb1zErwgZiMwS9iZF4aKEeRW+rPbTCg
-	icQ17ewWj62MyXAS65X2j/S6VpyTQTaN7XdSBhi7r6qa46zxZYXYPXsEXRZo1MFSd0mR
-	17Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=4u5ikV2mcJohIqwdsvLuzluNaH++1Z1tZwJF5NL/vsc=;
-	b=Ty/wA28ExcGlBO7TON7Na8asJUcKPGs9VVCyvTAgf55Px4QIqlEiCV6cH93Bnd1mlm
-	F3ITIb0idG2XR7wPLHDAsVUREXS1e0oiQvSrRlCEIzme5go7ngG3abNNCwfWkMBO8hkz
-	U9WtCvWbU58ZzOQSjFvjTeP+1wghCeELSAGG8ymzjPRNZ8d1B2EsTKfd8eEB/kqFnxM/
-	ZlwdqEYv66dTdKXM3+hensNxm3ncRzXywUcdF5GcP94Xrgz7BALjQzuMYYQviPiGRNZy
-	tWePPqd+a06thiiWBhdjaco3ZqF6WNdasi12eVLYMr6eNYDs9PHJWuA5zL93rpBwR5Di
-	Utvg==
-X-Gm-Message-State: APjAAAUIxVNRkZapvzEWhn6JkESaUewcIKt0kPvdNxouUct8sx25YioY
-	dfpgEJRafW9z+OG3+5KrEeo=
-X-Google-Smtp-Source: APXvYqz32zwRWqKNxwnLkGmUOv0y+/NnjMO45b5k+HvGYJQcv5TXiMcFtD25BKkrm+gIxHTRiAhniQ==
-X-Received: by 2002:adf:e790:: with SMTP id n16mr16912744wrm.292.1554908586036;
-	Wed, 10 Apr 2019 08:03:06 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-	by smtp.gmail.com with ESMTPSA id n1sm2018494wmc.19.2019.04.10.08.03.04
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 10 Apr 2019 08:03:04 -0700 (PDT)
-Date: Wed, 10 Apr 2019 16:03:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190410150303.GC11035@stefanha-x1.localdomain>
-References: <20190409122823.12416-1-pbonzini@redhat.com>
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hEF48-0002pp-7m
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:23:09 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:63022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hEF47-0002p5-Rp; Wed, 10 Apr 2019 11:23:08 -0400
+X-IronPort-AV: E=Sophos;i="5.60,332,1549929600"; d="scan'208";a="83237225"
+Date: Wed, 10 Apr 2019 16:22:58 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Message-ID: <20190410152258.GG1435@perard.uk.xensource.com>
+References: <20190408151617.13025-1-paul.durrant@citrix.com>
+	<20190408151617.13025-3-paul.durrant@citrix.com>
+	<20190410125708.GE1435@perard.uk.xensource.com>
+	<582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Fig2xvG2VGoz8o/s"
+Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190409122823.12416-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0?] aio-posix: ensure poll mode is
- left when aio_notify is called
+X-Received-From: 162.221.156.55
+Subject: Re: [Qemu-devel] [PATCH 2/3] xen-bus: allow AioContext to be
+ specified for each event channel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,64 +65,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	Sergio Lopez <slp@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410150303.5vvkMuzrhQEW0WyhPXcvVUmADYCYHah9kZ5f5ckr7qg@z>
+Message-ID: <20190410152258.z2nCH9sDglal5YyszNz8kYvfF81DVTn5Co0j0qIVAcU@z>
 
+On Wed, Apr 10, 2019 at 04:20:05PM +0100, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > Sent: 10 April 2019 13:57
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Stefano Stabellini
+> > <sstabellini@kernel.org>; Stefan Hajnoczi <stefanha@redhat.com>; Kevin Wolf <kwolf@redhat.com>; Max
+> > Reitz <mreitz@redhat.com>
+> > Subject: Re: [PATCH 2/3] xen-bus: allow AioContext to be specified for each event channel
+> > 
+> > On Mon, Apr 08, 2019 at 04:16:16PM +0100, Paul Durrant wrote:
+> > > This patch adds an AioContext parameter to xen_device_bind_event_channel()
+> > > and then uses aio_set_fd_handler() to set the callback rather than
+> > > qemu_set_fd_handler().
+> > >
+> > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > ---
+> > > @@ -943,6 +944,7 @@ static void xen_device_event(void *opaque)
+> > >  }
+> > >
+> > >  XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+> > > +                                               AioContext *ctx,
+> > >                                                 unsigned int port,
+> > >                                                 XenEventHandler handler,
+> > >                                                 void *opaque, Error **errp)
+> > > @@ -968,8 +970,9 @@ XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+> > >      channel->handler = handler;
+> > >      channel->opaque = opaque;
+> > >
+> > > -    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), xen_device_event, NULL,
+> > > -                        channel);
+> > > +    channel->ctx = ctx;
+> > > +    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false,
+> > > +                       xen_device_event, NULL, NULL, channel);
+> > 
+> > I wonder if the `'is_external' parameter of aio_set_fd_handler shoud be
+> > `true' here, instead. That flag seems to be used when making a snapshot
+> > of a blockdev, for example.
+> > 
+> > That was introduced by:
+> > dca21ef23ba48f6f1428c59f295a857e5dc203c8^..c07bc2c1658fffeee08eb46402b2f66d55b07586
+> > 
+> > What do you think?
+> 
+> Interesting. I admit I was merely transcribing what qemu_set_fd_handler() passes without really looking into the values. Looking at the arguments that virtio-blk passes to aio_set_event_notifier() though, and what 'is_external' means, it would appear that setting it to true is probably the right thing to do. Do you want me to send a v2 of the series or can you fix it up?
 
---Fig2xvG2VGoz8o/s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'll fix that up.
 
-On Tue, Apr 09, 2019 at 02:28:23PM +0200, Paolo Bonzini wrote:
-> With aio=3Dthread, adaptive polling makes latency worse rather than
-> better, because it delays the execution of the ThreadPool's
-> completion bottom half.
->=20
-> event_notifier_poll() does run while polling, detecting that
-> a bottom half was scheduled by a worker thread, but because
-> ctx->notifier is explicitly ignored in run_poll_handlers_once(),
-> scheduling the BH does not count as making progress and
-> run_poll_handlers() keeps running.  Fix this by recomputing
-> the deadline after *timeout could have changed.
->=20
-> With this change, ThreadPool still cannot participate in polling
-> but at least it does not suffer from extra latency.
->=20
-> Reported-by: Sergio Lopez <slp@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@gmail.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: qemu-block@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <1553692145-86728-1-git-send-email-pbonzini@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->         v1->v2: use qemu_soonest_timeout to handle timeout =3D=3D -1
->  util/aio-posix.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Thanks, applied to my block-next tree:
-https://github.com/stefanha/qemu/commits/block-next
+Thanks,
 
-Stefan
-
---Fig2xvG2VGoz8o/s
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcrgWnAAoJEJykq7OBq3PIjywIAIYjMKHjVNwEQGlLNJRHLlSQ
-PHejF26dHEYZxCCQkOl8VNrugqewMktEsLiyKpNMClgnWAy+mSyMGr5jFk02v2WB
-Up0Ulyh8mCHNlRDWHkbJ/68Bwu5IEYJG9VsmKvMVsAsp8JfghUnaZk1EX77xEC5V
-ET2koBSudiReu3UvV1HJiNrUP0eFMrpQgmaIzJS7Dyi0cL7RC7zSF+wQ04xYbTlp
-iQ3AylU0CbC3cTo9s7OZbCzLaYcdG7isL1ZIcPCBhMIxydyOgmhVsZ0MiK4XvJUs
-EYoBFMUcZIROqcqtGpr3L0EhE1nSV5NsCQ05ZDEYfQI9TiJs90sRNwqT9vfJuBU=
-=bF7p
------END PGP SIGNATURE-----
-
---Fig2xvG2VGoz8o/s--
+-- 
+Anthony PERARD
 
