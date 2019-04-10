@@ -2,117 +2,87 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41617C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 06:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11CBC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 06:35:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09DD52082A
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 06:34:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DD52082A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 72E322084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 06:35:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4W3L1Cm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72E322084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54442 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54486 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE6oF-0001zo-8p
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 02:34:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59898)
+	id 1hE6pq-0002jk-Mq
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 02:35:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hE6nG-0001fq-PE
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:33:11 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hE6p7-0002LW-DH
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hE6nE-0007xk-WD
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:33:10 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:53136
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hE6nB-0007pv-N7
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:33:06 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by v2201612906741603.powersrv.de (Postfix) with ESMTP id A0DD8DA0F5A;
-	Wed, 10 Apr 2019 08:24:31 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
-	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
-	port 10024)
-	with ESMTP id ZbDvghVynL2q; Wed, 10 Apr 2019 08:24:30 +0200 (CEST)
-Received: from [192.168.178.24] (p57B42B4A.dip0.t-ipconnect.de [87.180.43.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128
-	bits)) (No client certificate requested)
-	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 8FA8DDA0CE7; 
-	Wed, 10 Apr 2019 08:24:30 +0200 (CEST)
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
-	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
-	<berrange@redhat.com>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-	<b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
-	mQINBFXCNBcBEACUbHx9FWsS1ATrhLGAS+Nc6bFQHPR3CpUQ4v++RiMg25bF6Ov1RsYEcovI
-	0DXGh6Ma+l6dRlvUXV8tMvNwqghDUr5KY7LN6tgcFKjBbXdv9VlKiWiMLKBrARcFKxx1sfLp
-	1P8RiaUdKsgy2Hq4T1PPy9ENTL1/FBG6P/Rw0rO9zOB+yNHcRJ5diDnERbi3x7qoaPUra2Ig
-	lmQk/uxXKC0aNIhpNLNiQ+YpwTUN9q3eG6B9/3CG8RGtFzH9vDPlLvtUX+01a2gCifTi3iH3
-	8EEK8ACXIRs2dszlxMneKTvflXfvyCM1O+59wGcICQxltxLLhHSCJjOQyWdR2JUtn//XjVWM
-	mf6bBT7Imx3DhhfFRlA+/Lw9Zah66DJrZgiV0LqoN/2f031TzD3FCBiGQEMC072MvSQ1DdJN
-	OiRE1iWO0teLOxaFSbvJS9ij8CFSQQTnSVZs0YXGBal+1kMeaKo9sO4tkaAR2190IlMNanig
-	CTJfeFqxzZkoki378grSHdGUTGKfwNPflTOA6Pw6xuUcxW55LB3lBsPqb0289P8o9dTR7582
-	e6XTkpzqe/z/fYmfI9YXIjGY8WBMRbsuQA30JLq1/n/zwxAOr2P9y4nqTMMgFOtQS8w4G46K
-	UMY/5IspZp2VnPwvazUo2zpYiUSLo1hFHx2jrePYNu2KLROXpwARAQABtBxTdGVmYW4gV2Vp
-	bCA8c3dAd2VpbG5ldHouZGU+iQI6BBMBCAAkAhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheA
-	BQJV04LlAhkBAAoJEOCMIdVndFCtP5QP/1U8yWZzHeHufRFxtMsK1PERiLuKyGRH2oE5NWVc
-	5QQHZZ2ypXu53o2ZbZxmdy8+4lXiPWWwYVqto3V7bPaMTvQhIT0I3c3ZEZsvwyEEE6QdRs52
-	haZwX+TzNMQ5mOePdM2m4WqO0oU7YHU2WFf54MBmAGtj3FAQEAlZAaMiJs2aApw/4t35ICL1
-	Sb0FY8d8lKBbIFOAaFfrlQTC3y8eMTk1QxOVtdXpRrOl6OE0alWn97NRqeZlBm0P+BEvdgTP
-	Qt+9rxbe4ulgKME2LkbDhLqf0m2+xMXb7T4LiHbQYnnWKGZyogpFaw3PuRVd9m8uxx1F8b4U
-	jNzI9x2Ez5LDv8NHpSY0LGwvVmkgELYbcbyiftbuw81gJuM7k4IW5GR85kTH6y/Sq6JNaI4p
-	909IK8X4eeoCkAqEVmDOo1D5DytgxIV/PErrin82OIDXLENzOWfPPtUTO+H7qUe80NS2HLPG
-	IveYSjuYKBB6n2JhPkUD7xxMEdh5Ukqi1WIBSV4Tuk3/ubHajP5bqg4QP3Wo1AyICX09A1QQ
-	DajtMkyxXhYxr826EGcRD2WUUprGNYwaks4YiPuvOAJxSYprKWT6UDHzE3S8u4uZZm9H8cyg
-	Fa3pysJwTmbmrBAP1lMolwXHky60dPnKPmFyArGC0utAH7QELXzBybnE/vSNttNT1D+HuQIN
-	BFXcnj0BEAC32cCu2MWeqZEcvShjkoKsXk42mHrGbeuh/viVn8JOQbTO706GZtazoww2weAz
-	uVEYhwqi7u9RATz9MReHf7R5F0KIRhc/2NhNNeixT/7L+E5jffH1LD+0IQdeLPoz6unvg7U/
-	7OpdKWbHzPM3Lfd0N1dRP5sXULpjtYQKEgiOU58sc4F5rM10KoPFEMz8Ip4j9RbH/CbTPUM0
-	S4PxytRciB3Fjd0ECbVsErTjX7cZc/yBgs3ip7BPVWgbflhrc+utML/MwC6ZqCOIXf/U0ICY
-	fp5I7PDbUSWgMFHvorWegMYJ9EzZ2nTvytL8E75C2U3j5RZAuQH5ysfGpdaTS76CRrYDtkEc
-	ViTL+hRUgrX9qvqzCdNEePbQZr6u6TNx3FBEnaTAZ5GuosfUk7ynvam2+zAzLNU+GTywTZL2
-	WU+tvOePp9z1/mbLnH2LkWHgy3bPu77AFJ1yTbBXl5OEQ/PtTOJeC1urvgeNru26hDFSFyk4
-	gFcqXxswu2PGU7tWYffXZXN+IFipCS718eDcT8eL66ifZ8lqJ8Vu5WJmp9mr1spP9RYbT7Rw
-	pzZ3iiz7e7AZyOtpSMIVJeYZTbtiqJbyN4zukhrTdCgCFYgf0CkA5UGpYXp2sXPr+gVxKX2p
-	tj/gid4n95vR7KMeWV6DJ0YS4hKGtdhkuJCpJfjKP/e8TwARAQABiQIfBBgBCAAJBQJV3J49
-	AhsMAAoJEOCMIdVndFCtYRoQAJOu3RZTEvUBPoFqsnd849VmOKKg77cs+HD3xyLtp95JwQrz
-	hwa/4ouDFrC86jt1vARfpVx5C8nQtNnWhg+5h5kyOIbtB1/27CCTdXAd/hL2k3GyrJXEc+i0
-	31E9bCqgf2KGY7+aXu4LeAfRIWJT9FGVzdz1f+77pJuRIRRmtSs8VAond2l+OcDdEI9Mjd9M
-	qvyPJwDkDkDvsNptrcv4xeNzvX+2foxkJmYru6dJ+leritsasiAxacUowGB5E41RZEUg6bmV
-	F4SMseIAEKWLy3hPGvYBOzADhq2YLgnM/wn9Y9Z7bEMy+w5e75saBbkFI7TncxDPUnIl/UTE
-	KU1ORi5WWbvXYkUTtfNzZyD0/v3oojcIoZvK1OlpOtXHdlqOodjXF9nLe8eiVHyl8ZnzFxhe
-	EW2QPvX8FLKqmSs9W9saQtk6bhv9LNYIYINjH3EEH/+bbmV+ln4O7a73Wm8L3tnpC3LmdGn2
-	Rm8B6J2ZK6ci1TRDiMpCUWefpnIuE+TibC5VJR5zx0Yh11rxxBFob8mWktRmLZyeEoCcZoBo
-	sbJxD80QxWO03zPpkcJ7d4BrVsQ/BJkBtEe4Jn4iqHqA/OcrzwuEZSv+/MdgoqfblBZhDusm
-	LYfVy7wFDeVClG6eQIiK2EnmDChLRkVIQzbkV0iG+NJVVJHLGK7/OsO47+zq
-Message-ID: <eba5dd64-53c7-4daa-a851-00cf9d7aff25@weilnetz.de>
-Date: Wed, 10 Apr 2019 08:24:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alistair23@gmail.com>) id 1hE6p6-0001eD-B9
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:05 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:33406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hE6p5-0001cx-Px
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 02:35:04 -0400
+Received: by mail-lf1-x142.google.com with SMTP id j11so910911lfm.0
+	for <qemu-devel@nongnu.org>; Tue, 09 Apr 2019 23:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=FehoX2UAa4UQY+U6PXbGv1aWT6BqrJCCnc+aOZG60/U=;
+	b=H4W3L1CmzM4v4NUlmFVzhlPoPQIh+Jtlmu4eDo4eaS+Uq1seAUCy0XscBK4Rrcs54e
+	xSZgWyxHlCza4h727JX5yTb1C0VKvfWX4I4voqRjLcYWbR4V6k/TZ5pTq6KDaHvXBSJj
+	VbSbJqMJyyfpbP0GNl43apdRz5jUsSdtGBxTfE7WFxhq7GAdO3kmg3W/CCMC8xZCj7ME
+	a2lwW+CIbqxvUAmyNihKlMO4WcJGBvoRLn4lcn9RxVg3OaueHvFRXr5PsLzBaRCT3uNT
+	frA8i6sK+7nn8dmWDYeWQmRQCXDIqDh4M7cZ5Y8F/AAzuKZAQua6wUnLkLy3X8JeQ9f8
+	8AkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=FehoX2UAa4UQY+U6PXbGv1aWT6BqrJCCnc+aOZG60/U=;
+	b=cY7UjPf7Gcv1s6Vk4wZ6XbxOkPQI2dxW696Bgsbb48Zd9hqmIojSdy2S1xL2LIlgy+
+	0FFuh4VbTz2fiFnIvPSVvnwkFlArRdvZMqScgEljqBmTRyBwoO4q0AODwZgcY1jVWOsa
+	zUh5cMwpDIYvVUDgLNTuVLAicCxyqlwmEwYxrTFOhbK8g+SxjyoRgsJYYX2c8xyNFCS6
+	IOqCC99kvIuqIVgSCybd2eqtWrJYC3JOrreXrLual+ROsRALlSYgS5n8WxlNA50x85LT
+	r8zawkWbc/Xo7zRKTQO9cb7z40G3b3vnfehVg18mt4G6SlOCj0mD4o15wTUbs3j+gH4y
+	0JlA==
+X-Gm-Message-State: APjAAAVEh+PtS6fqciICms52Hv8FV74oigjjJRdv5BhRnHjJzatN1L1W
+	NL8HjoeeyoQNs2N41yTiRKjrlzovS9I9mHvbSP8=
+X-Google-Smtp-Source: APXvYqxuzbnQjFpBM79ausix4Xnhd8gRwCRMtXIpS4Vp2yfWfgGjGvBmH2YcUo5TU31GazbqR5EnQD7TAgnudiqJmlQ=
+X-Received: by 2002:ac2:41d8:: with SMTP id d24mr7675705lfi.56.1554878102646; 
+	Tue, 09 Apr 2019 23:35:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
+References: <20190409174018.25798-1-armbru@redhat.com>
+	<f018f4d8-7fb2-9037-3b5a-b34f1c5d876d@redhat.com>
+	<874l764eez.fsf@dusky.pond.sub.org>
+	<38442eb0-501e-dbf8-60e0-74675a999dba@redhat.com>
+	<87bm1e2yfa.fsf@dusky.pond.sub.org>
+In-Reply-To: <87bm1e2yfa.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 9 Apr 2019 23:34:33 -0700
+Message-ID:
+ <CAKmqyKM7fX6UqSU5K+w25xGxO2K4kqtyoRz7LMFN7GtBYL56KA@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 37.120.169.71
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
+ overflowing in load_device_tree()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,32 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
-	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410062430.BB6kncN3fv2TQ0g4HKGWBg_tJb8oZjXHccZbVRMQKSQ@z>
+Message-ID: <20190410063433.q1AaDKT9alc43PBzxWZoDj8lLvRconuh3G3q2JX5lUQ@z>
 
-On 10.04.19 08:07, Thomas Huth wrote:
-> That's great, good to know that you're still interested in TCI! ... but
-> I think one of the main problems is still that we completely lack test
-> coverage for TCI - the code always is in danger to bit-rot if it is not
-> tested by default.
+On Tue, Apr 9, 2019 at 10:59 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>
+> > On 4/10/19 7:28 AM, Markus Armbruster wrote:
+> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> >>> On 4/9/19 7:40 PM, Markus Armbruster wrote:
+> >>>> If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
+> >>>> computation of @dt_size overflows to a negative number, which then
+> >>>> gets converted to a very large size_t for g_malloc0() and
+> >>>> load_image_size().  In the (fortunately improbable) case g_malloc0()
+> >>>> succeeds and load_image_size() survives, we'd assign the negative
+> >>>> number to *sizep.  What that would do to the callers I can't say, bu=
+t
+> >>>> it's unlikely to be good.
+> >>>>
+> >>>> Fix by rejecting images whose size would overflow.
+> >>>>
+> >>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>>> ---
+> >>>>  device_tree.c | 4 ++++
+> >>>>  1 file changed, 4 insertions(+)
+> >>>>
+> >>>> diff --git a/device_tree.c b/device_tree.c
+> >>>> index 296278e12a..f8b46b3c73 100644
+> >>>> --- a/device_tree.c
+> >>>> +++ b/device_tree.c
+> >>>> @@ -84,6 +84,10 @@ void *load_device_tree(const char *filename_path,=
+ int *sizep)
+> >>>>                       filename_path);
+> >>>>          goto fail;
+> >>>>      }
+> >>>> +    if (dt_size > INT_MAX / 2 - 10000) {
+> >>>
+> >>> We should avoid magic number duplication.
+> >>> That said, this patch looks safe.
+> >>>
+> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >>
+> >> Thanks!
+> >>
+> >>> BTW how did you figure that out?
+> >>
+> >> Downstream handling of upstream commit da885fe1ee8 led me to the
+> >> function.  I spotted dt_size =3D get_image_size(filename_path).
+> >> Experience has taught me to check the left hand side's type.  Bad.  Th=
+en
+> >> I saw how dt_size gets increased.  Worse.
+> >
+> > So you genuinely neglected to mention Kurtis Miller then :)
+>
+> Explanation, not excuse: the only occurence of the name in my downstream
+> reading was a two-liner BZ comment, which I totally missed in my haste
+> to give the fix a chance to make 4.0.  I certainly didn't mean to
+> deprive him of credit!
 
+No worries. I have sent the pull request and it includes the reported by.
 
-Ideally it would be possible to build a QEMU executable with KVM (on
-those hosts which support it), native TCG and TCI, so users could decide
-at runtime which of the three alternatives they want. Then CI builds
-(not necessarily production builds) would include all source files and
-could also run tests with TCI if desired.
+Alistair
 
-It was not possible to have native and interpreted TCG selectable at
-runtime when I started the TCI implementation, but time went on and QEMU
-and TCG evolved, so maybe it is now possible.
-
-Stefan
-
+>
+> [...]
+>
 
