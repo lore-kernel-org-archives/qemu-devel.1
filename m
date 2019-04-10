@@ -2,69 +2,61 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E69C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE89C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6806B20850
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:31:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6806B20850
+	by mail.kernel.org (Postfix) with ESMTPS id 6870C20850
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 05:37:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6870C20850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53813 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53867 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE5pl-0004dc-Mp
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 01:31:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50089)
+	id 1hE5vP-00067W-7r
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 01:37:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hE5or-0004MW-1n
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:30:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1hE5uY-0005pl-RR
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hE5op-0005Gw-RB
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:30:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44490)
+	(envelope-from <philmd@redhat.com>) id 1hE5uX-0007j3-Tu
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:36:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hE5op-0005GE-Ha
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 01:30:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hE5uX-0007il-Mv; Wed, 10 Apr 2019 01:36:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC4508046D;
-	Wed, 10 Apr 2019 05:30:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 08AAA600CC;
-	Wed, 10 Apr 2019 05:30:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 83CBF1138648; Wed, 10 Apr 2019 07:30:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190409174018.25798-1-armbru@redhat.com>
-	<CAFEAcA8xg7wc+fX9Rn_F+L2jS0OzEwRcfjt==R5-YR6iphV=NA@mail.gmail.com>
-	<CAKmqyKNAT6a+a6MyhSh7RErUOyCPnEv-RKM4S-j12GS9dUMTYw@mail.gmail.com>
-	<CAFEAcA9S0H=tX4wZOxwbar-UpxH3D+JUc0_6VRStz_doRKmB+g@mail.gmail.com>
-Date: Wed, 10 Apr 2019 07:30:37 +0200
-In-Reply-To: <CAFEAcA9S0H=tX4wZOxwbar-UpxH3D+JUc0_6VRStz_doRKmB+g@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 9 Apr 2019 21:28:41 +0100")
-Message-ID: <8736mq4ebm.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id DDF283091740;
+	Wed, 10 Apr 2019 05:36:36 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-50.brq.redhat.com [10.40.204.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E65D5D719;
+	Wed, 10 Apr 2019 05:36:32 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-trivial@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Wed, 10 Apr 2019 07:36:29 +0200
+Message-Id: <20190410053629.28829-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 10 Apr 2019 05:30:41 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 10 Apr 2019 05:36:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0-maybe] device_tree: Fix integer
- overflowing in load_device_tree()
+Subject: [Qemu-devel] [PATCH] roms: List and describe the Makefile 'clean'
+ rule
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,52 +68,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Sergio Lopez <slp@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Alistair Francis <alistair23@gmail.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410053037.4hhxr_-H13kuQCxgrWl9APj47PprvRq3HqKX5lc-zpY@z>
+Message-ID: <20190410053629.4aqGWSK6QPnBTPZ-fImrvDmH49hveKOmkNovKDSHmKE@z>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ roms/Makefile | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-> On Tue, 9 Apr 2019 at 21:15, Alistair Francis <alistair23@gmail.com> wrote:
->>
->> On Tue, Apr 9, 2019 at 1:08 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->> >
->> > On Wed, 10 Apr 2019 at 00:40, Markus Armbruster <armbru@redhat.com> wrote:
->> > >
->> > > If the value of get_image_size() exceeds INT_MAX / 2 - 10000, the
->> > > computation of @dt_size overflows to a negative number, which then
->> > > gets converted to a very large size_t for g_malloc0() and
->> > > load_image_size().  In the (fortunately improbable) case g_malloc0()
->> > > succeeds and load_image_size() survives, we'd assign the negative
->> > > number to *sizep.  What that would do to the callers I can't say, but
->> > > it's unlikely to be good.
->> > >
->> > > Fix by rejecting images whose size would overflow.
->> > >
->> > > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> >
->> > I think this patch is missing some attributions for the
->> > security researchers who found the issue initially.
->> > PJP's patch for this from a couple of weeks back has a
->> > reported-by credit:
->> > https://patchew.org/QEMU/20190322073555.20889-1-ppandit@redhat.com/
+diff --git a/roms/Makefile b/roms/Makefile
+index 1ff78b63bb3..f55c4a2d3bb 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -61,6 +61,8 @@ default:
+ 	@echo "  skiboot        -- update skiboot.lid"
+ 	@echo "  u-boot.e500    -- update u-boot.e500"
+ 	@echo "  u-boot.sam460  -- update u-boot.sam460"
++	@echo "  clean          -- delete the files generated by the previous" =
+\
++	                          "build targets"
+=20
+ bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256=
+k
+ 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+@@ -102,7 +104,7 @@ pxe-rom-%: build-pxe-roms
+=20
+ efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+=20
+-efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
++efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
+ 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+ 		-b ipxe/src/bin/$(VID)$(DID).rom \
+ 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
+@@ -131,7 +133,7 @@ build-efi-roms: build-pxe-roms
+ #    EDK2_BASETOOLS_LDFLAGS=3D'...' \
+ #    efirom
+ #
+-$(EDK2_EFIROM):
++edk2-basetools:
+ 	$(MAKE) -C edk2/BaseTools \
+ 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
+ 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+@@ -156,6 +158,9 @@ skiboot:
+ 	$(MAKE) -C skiboot CROSS=3D$(powerpc64_cross_prefix)
+ 	cp skiboot/skiboot.lid ../pc-bios/skiboot.lid
+=20
++efi: edk2-basetools
++	$(MAKE) -f Makefile.edk2
++
+ clean:
+ 	rm -rf seabios/.config seabios/out seabios/builds
+ 	$(MAKE) -C sgabios clean
+@@ -166,3 +171,4 @@ clean:
+ 	rm -rf u-boot/build.e500
+ 	$(MAKE) -C u-boot-sam460ex distclean
+ 	$(MAKE) -C skiboot clean
++	$(MAKE) -f Makefile.edk2 clean
+--=20
+2.20.1
 
-Uh, I missed that thread.  Thanks for doing my homework for me!
-
->> It seems like from that discussion that this patch is the correct approach.
->>
->> I can add the attributions and send a PR for 4.0. I'll send it by EOD
->> unless anyone has any objections.
->
-> Thanks. I think given it's 21:30 here I'm going to postpone
-> tagging rc3 til tomorrow (mid-afternoon UK time). I'm still
-> hoping we can avoid an rc4...
-
-Want me to look for a few more integer overflows today?  ;-P
 
