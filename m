@@ -2,85 +2,71 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A15C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C290CC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A0E62082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:38:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWeMUu8R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0E62082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 857E82082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:39:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857E82082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33509 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33520 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEFIX-0007VH-8W
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:38:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34032)
+	id 1hEFJt-0008NG-RO
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:39:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEFHh-0007CL-Ql
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:11 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hEFIa-0007cC-17
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEFHg-0001ox-6A
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:09 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39396)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hEFHf-0001mM-MP
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:37:08 -0400
-Received: by mail-oi1-x243.google.com with SMTP id n187so2145067oih.6
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 08:37:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=GdhLz5IRjWkvRLihhX1EWk26B326Mr5Dtd31AcTUfWU=;
-	b=RWeMUu8RMablZ/V5K3UTs23+sHPOnLv96jpNDJGJz+kbBLSwON8WgoFPZnLgfQBj4i
-	EXukdg3431ghW0IV7uYUOCkPqH9D69C5aOvB3XThpvvyvnu0+5CSAE9DKOV9JOjTjxBI
-	CKWuNKurwBQzNJOs6Dualq8vtofxyZR1+c28sqXIo04rWXxSNmbsBdwdLHrY1BZcbIY6
-	CPBdkJwHWeud9pWz34X9UX/VuwOcqxHaQz321w0hHLCmWsb1eSmbr6uRs4VAPfLZgs7y
-	VTH+oGlDPn9J6N+EKpaGk/GWWOEa3ZG2wrHYt19+38Z/U3Iq1/ztyZ+GmKOTB58XkqgW
-	jdbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=GdhLz5IRjWkvRLihhX1EWk26B326Mr5Dtd31AcTUfWU=;
-	b=bw/1QlU9yHjXQIgiQpvDy6hZOf5xb+R7xMsPcwSDkOEQsjwDlfbcGuBQ6MRxEcNQYg
-	tYhOnjXtQYucb6bjZIGKhJh6uyk6T5CC1+/jImc0q6LU+a98LCVlSBerF2/nNBiqP1sU
-	Cf/kWJXmiuEhaCCVyAKtnA2HOu/A0ovDXYvj2u5S0aRmFbWiDbm+L3Qmy24I7oRAYyJn
-	qmY0Ba8+oQSojRb/oAkaiYufZsQBNV0LEoDBmVRrYOaO4h16gddCjxOO9uUZleuQfWYX
-	t257kT0pgOEMplQz7rqU2051ZyD85YhhrzIrXFuIfTAx5dJVJEPYQZBOBuEJzQI9/H4n
-	QASw==
-X-Gm-Message-State: APjAAAUSfCoeBZkoTfQgzileJfptv7F1Ytq3fwqD14VCkyb0lNpMUnKC
-	vfxPa8lyC6C0QI36PBBR0wiK4eFBuIiaSR9TjUs=
-X-Google-Smtp-Source: APXvYqyeN7b/IYGvFYSO2tK4FYm7a3Wa6GyaD5t6JhiJsHXeq2WsiGV9hUPp+vzKr+UzuBlud4Q1bpnL3aXOsnIjWS8=
-X-Received: by 2002:aca:3c55:: with SMTP id j82mr2898602oia.84.1554910626278; 
-	Wed, 10 Apr 2019 08:37:06 -0700 (PDT)
+	(envelope-from <pagupta@redhat.com>) id 1hEFIY-0002Pj-J9
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:38:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEFIY-0002P3-3r
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:38:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D956181114;
+	Wed, 10 Apr 2019 15:38:00 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BD0155DA5B;
+	Wed, 10 Apr 2019 15:38:00 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 7000F3FA45;
+	Wed, 10 Apr 2019 15:38:00 +0000 (UTC)
+Date: Wed, 10 Apr 2019 11:38:00 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <1663006162.20832248.1554910680080.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190410142426.5bf0d9a4.cohuck@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-3-pagupta@redhat.com>
+	<20190410142426.5bf0d9a4.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-	<20190408123542.1a4de426@redhat.com>
-	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
-	<20190410145908.GF2980@work-vm>
-In-Reply-To: <20190410145908.GF2980@work-vm>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Wed, 10 Apr 2019 23:36:55 +0800
-Message-ID:
- <CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.117, 10.4.195.26]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: ni96j4d6FUDPJPNtE4chnh/uKdN03w==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 10 Apr 2019 15:38:01 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,137 +78,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+	linux-nvdimm@lists.01.org,
+	vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+	willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, pbonzini@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410153655.1Gusq0Wni9QzpVnsrcrrzR0hupd0WDvW9oYib0tFACU@z>
-
-Hi Dr. David
-
-On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
-
-> * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > Hi Igor
-> >
-> >
-> > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > > On Sun,  7 Apr 2019 22:19:05 -0400
-> > > Catherine Ho <catherine.hecx@gmail.com> wrote:
-> > >
-> > > > Currently it is not forbidden to use "-object
-> > > memory-backend-file,share=on"
-> > > > and together with "-incoming". But after incoming migration is
-> finished,
-> > > > the memory-backend-file will be definitely written if share=on. So
-> the
-> > > > memory-backend-file can only be used once, but failed in the 2nd time
-> > > > incoming.
-> > > >
-> > > > Thus it gives a warning and the users can run the qemu if they really
-> > > > want to do it.
-> > >
-> > > Shouldn't we add a migration blocker in such a case instead of warning
-> > > and letting qemu run wild?
-> > >
-> >
-> > IMO, it doesn't need to block this. With share=on and -incoming, the user
-> > can
-> > still save the device memory state into memory-backend file again if
-> > ignore-shared
-> > capability is on.
-> >
-> > If we block this, the user can't use the ignore-shared capability in
-> > incoming
-> > migration.
->
-> -incomign with share=on is a perfectly normal thing to do - it just
-> depends who you are sharing the file with and the lifetime of that
-> shared file.
->
-> For example; if you're just running a qemu with vhost-user then you
-> use share=on - however wyou typically select the backend file as
-> a new file from /dev/shm - it's not a file that you previously migrated
-> to.
->
-Thanks,
-but using a new file from /dev/shm means kernel will start from
-start_kernel or early? Is it different from the x-ignore-shared case?
-If we remove the share=on in incoming migration, all the writting
-of ram will not be flush into the memory backend file. Thus we
-can use the base memory backend file for ever.
-e.g.
-1) save the vm like a snapshot, current ram state is "kernel
-has been started, systemd has been started"
-2) restore it with -incoming and *no* share=on flag
-3) restore it with -incoming and *no* share=on again...
-In contrary, if we use share=on, the base backend file will
-be written at once after 1st time incoming.
-
-So, IMO, no "share=on" is the proper usage of incoming migration
-when ignore-shared is on.
-Please correct me if sth is wrong, thanks:)
-
-B.R.
-Catherine
+Message-ID: <20190410153800.szNCAQEe_fSQskt9Q8xy4922aNLvrrCzXCklOs1f1gE@z>
 
 
-> QEMU has no way to know about the provenance of the shared file it's
-> been given, so we can't really warn people about it.
->
-> Dave
->
-> > B.R.
-> > Catherine
-> >
-> > >
-> > >
-> > > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > > > ---
-> > > >  backends/hostmem-file.c | 11 +++++++++++
-> > > >  1 file changed, 11 insertions(+)
-> > > >
-> > > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > > > index 37ac6445d2..59429ee0b4 100644
-> > > > --- a/backends/hostmem-file.c
-> > > > +++ b/backends/hostmem-file.c
-> > > > @@ -16,6 +16,7 @@
-> > > >  #include "sysemu/hostmem.h"
-> > > >  #include "sysemu/sysemu.h"
-> > > >  #include "qom/object_interfaces.h"
-> > > > +#include "migration/migration.h"
-> > > >
-> > > >  /* hostmem-file.c */
-> > > >  /**
-> > > > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend
-> *backend,
-> > > Error **errp)
-> > > >          }
-> > > >      }
-> > > >
-> > > > +    /*
-> > > > +     * In ignore shared case, if share=on for host memory backend
-> file,
-> > > > +     * the ram might be written after incoming process is finished.
-> Thus
-> > > > +     * the memory backend can't be reused for 2nd/3rd... incoming
-> > > > +     */
-> > > > +    if (backend->share && migrate_ignore_shared()
-> > > > +                       && runstate_check(RUN_STATE_INMIGRATE))
-> > > > +        warn_report("share=on for memory backend file might be "
-> > > > +                        "conflicted with incoming in ignore shared
-> > > case");
-> > > > +
-> > > >      backend->force_prealloc = mem_prealloc;
-> > > >      name = host_memory_backend_get_name(backend);
-> > > >      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-> > >
-> > >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+> 
+> > This patch adds virtio-pmem driver for KVM guest.
+> > 
+> > Guest reads the persistent memory range information from
+> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > creates a nd_region object with the persistent memory
+> > range information so that existing 'nvdimm/pmem' driver
+> > can reserve this into system memory map. This way
+> > 'virtio-pmem' driver uses existing functionality of pmem
+> > driver to register persistent memory compatible for DAX
+> > capable filesystems.
+> > 
+> > This also provides function to perform guest flush over
+> > VIRTIO from 'pmem' driver when userspace performs flush
+> > on DAX memory range.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
+> >  drivers/virtio/Kconfig           |  10 +++
+> >  drivers/virtio/Makefile          |   1 +
+> >  drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
+> >  include/linux/virtio_pmem.h      |  60 +++++++++++++++
+> >  include/uapi/linux/virtio_ids.h  |   1 +
+> >  include/uapi/linux/virtio_pmem.h |  10 +++
+> >  7 files changed, 294 insertions(+)
+> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
+> >  create mode 100644 drivers/virtio/pmem.c
+> >  create mode 100644 include/linux/virtio_pmem.h
+> >  create mode 100644 include/uapi/linux/virtio_pmem.h
+> > 
+> (...)
+> > diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
+> > new file mode 100644
+> > index 000000000000..cc9de9589d56
+> > --- /dev/null
+> > +++ b/drivers/virtio/pmem.c
+> > @@ -0,0 +1,124 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * virtio_pmem.c: Virtio pmem Driver
+> > + *
+> > + * Discovers persistent memory range information
+> > + * from host and registers the virtual pmem device
+> > + * with libnvdimm core.
+> > + */
+> > +#include <linux/virtio_pmem.h>
+> > +#include <../../drivers/nvdimm/nd.h>
+> > +
+> > +static struct virtio_device_id id_table[] = {
+> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> > +	{ 0 },
+> > +};
+> > +
+> > + /* Initialize virt queue */
+> > +static int init_vq(struct virtio_pmem *vpmem)
+> 
+> IMHO, you don't gain much by splitting off this function...
+
+o.k. I kept this for better code structure.
+
+> 
+> > +{
+> > +	struct virtqueue *vq;
+> > +
+> > +	/* single vq */
+> > +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
+> > +				host_ack, "flush_queue");
+> > +	if (IS_ERR(vq))
+> > +		return PTR_ERR(vq);
+> 
+> I'm personally not a fan of chained assignments... I think I'd just
+> drop the 'vq' variable and operate on vpmem->req_vq directly.
+
+Sure.
+
+> 
+> > +
+> > +	spin_lock_init(&vpmem->pmem_lock);
+> > +	INIT_LIST_HEAD(&vpmem->req_list);
+> > +
+> > +	return 0;
+> > +};
+> > +
+> > +static int virtio_pmem_probe(struct virtio_device *vdev)
+> > +{
+> > +	int err = 0;
+> > +	struct resource res;
+> > +	struct virtio_pmem *vpmem;
+> > +	struct nvdimm_bus *nvdimm_bus;
+> > +	struct nd_region_desc ndr_desc = {};
+> > +	int nid = dev_to_node(&vdev->dev);
+> > +	struct nd_region *nd_region;
+> > +
+> > +	if (!vdev->config->get) {
+> > +		dev_err(&vdev->dev, "%s failure: config disabled\n",
+> 
+> Maybe s/config disabled/config access disabled/ ? That seems to be the
+> more common message.
+
+This is better.
+
+> 
+> > +			__func__);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
+> > +					GFP_KERNEL);
+> 
+> Here, the vpmem variable makes sense for convenience, but I'm again not
+> a fan of the chaining :)
+
+Sure will change :)
+
+> 
+> > +	if (!vpmem) {
+> > +		err = -ENOMEM;
+> > +		goto out_err;
+> > +	}
+> > +
+> > +	vpmem->vdev = vdev;
+> > +	err = init_vq(vpmem);
+> > +	if (err)
+> > +		goto out_err;
+> > +
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			start, &vpmem->start);
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			size, &vpmem->size);
+> > +
+> > +	res.start = vpmem->start;
+> > +	res.end   = vpmem->start + vpmem->size-1;
+> > +	vpmem->nd_desc.provider_name = "virtio-pmem";
+> > +	vpmem->nd_desc.module = THIS_MODULE;
+> > +
+> > +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> > +						&vpmem->nd_desc);
+> 
+> And here :)
+
+Sure.
+
+> 
+> > +	if (!nvdimm_bus)
+> > +		goto out_vq;
+> > +
+> > +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
+> > +
+> > +	ndr_desc.res = &res;
+> > +	ndr_desc.numa_node = nid;
+> > +	ndr_desc.flush = virtio_pmem_flush;
+> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> > +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
+> > +	nd_region->provider_data =  dev_to_virtio
+> > +					(nd_region->dev.parent->parent);
+> 
+> Isn't it clear that this parent chain will always end up at &vdev->dev?
+
+Yes, It will resolve to &vdev->dev.
+
+> Maybe simply set ->provider_data to vdev directly? (Does it need to
+> grab a reference count of the device, BTW?)
+
+reference is already taken when registering the device with nvdimm_bus.
+
+> 
+> > +
+> > +	if (!nd_region)
+> > +		goto out_nd;
+> 
+> Probably better to do this check before you access nd_region's
+> members :)
+
+ah Sorry! Will correct this.
+
+> 
+> > +
+> > +	return 0;
+> > +out_nd:
+> > +	err = -ENXIO;
+> > +	nvdimm_bus_unregister(nvdimm_bus);
+> > +out_vq:
+> > +	vdev->config->del_vqs(vdev);
+> > +out_err:
+> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> > +	return err;
+> > +}
+> > +
+> > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> > +{
+> > +	struct virtio_pmem *vpmem = vdev->priv;
+> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > +
+> > +	nvdimm_bus_unregister(nvdimm_bus);
+> 
+> I haven't followed this around the nvdimm code, but is the nd_region
+> you created during probe cleaned up automatically, or would you need to
+> do something here?
+
+'nvdimm_bus_unregister' does that.
+> 
+> > +	vdev->config->del_vqs(vdev);
+> > +	vdev->config->reset(vdev);
+> > +	kfree(vpmem);
+> 
+> You allocated vpmem via devm_kzalloc; isn't it freed automatically on
+> remove?
+
+yes. Will remove free(vpmem).
+
+> 
+> > +}
+> > +
+> > +static struct virtio_driver virtio_pmem_driver = {
+> > +	.driver.name		= KBUILD_MODNAME,
+> > +	.driver.owner		= THIS_MODULE,
+> > +	.id_table		= id_table,
+> > +	.probe			= virtio_pmem_probe,
+> > +	.remove			= virtio_pmem_remove,
+> > +};
+> > +
+> > +module_virtio_driver(virtio_pmem_driver);
+> > +MODULE_DEVICE_TABLE(virtio, id_table);
+> > +MODULE_DESCRIPTION("Virtio pmem driver");
+> > +MODULE_LICENSE("GPL");
+> 
+> Only looked at this from the general virtio driver angle; seems fine
+> apart from some easy-to-fix issues and some personal style preference
+> things.
+
+Thank you for the review.
+
+Best regards,
+Pankaj
+> 
+
