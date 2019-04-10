@@ -2,76 +2,83 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9EFC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46272C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A01E4217D6
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AAF32083E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="VCbfWikv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A01E4217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yPwhWFfg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AAF32083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56367 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56375 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE9WO-0000EE-JL
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 05:27:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39281)
+	id 1hE9XS-0000r9-4r
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 05:29:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VZ-0008Kv-6X
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hE9WY-0000Rs-Tp
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VY-00014A-5q
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:05 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:38784)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VX-0000xk-G2
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:04 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::162])
-	by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 441122E1512;
-	Wed, 10 Apr 2019 12:26:59 +0300 (MSK)
-Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net
-	[2a02:6b8:0:1a2d::30])
-	by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	2yLQePubGh-QwMqtOd1; Wed, 10 Apr 2019 12:26:59 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1554888419; bh=qzVUe+kFoue1PLwKTfFPiIOFXUwUUgzArHlxHpLVHgc=;
-	h=Message-Id:Date:Subject:To:From:Cc;
-	b=VCbfWikvBVL0wXcHp5Jm9saEbV74OQsrZdVFhsmQuXKJfRvY7gGENyZv/vuu5VADM
-	gJLXSJZuprOs900ZwmHrscKpFDYnUnwIyyAoPI2LC0MCkHevMjouYtOiHcIaFiqEMp
-	265tSwqkxvZrwfdxgYP/tQa4Cn8sTxh+z/23G1/U=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
-	[2a02:6b8:0:40c:1c6a:cfcd:3ad6:4876])
-	by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
-	4IllViJHpG-QwYeQP9I; Wed, 10 Apr 2019 12:26:58 +0300
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-	(Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Juan Quintela <quintela@redhat.com>
-Date: Wed, 10 Apr 2019 12:26:52 +0300
-Message-Id: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <peter.maydell@linaro.org>) id 1hE9WX-00026k-3K
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:28:06 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41905)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hE9WU-000226-T9
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:28:03 -0400
+Received: by mail-oi1-x241.google.com with SMTP id v7so1155527oie.8
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 02:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=/tG0y3vVY/SWRlpNZfUF3z94PacdSU10RSQoJxdIRz4=;
+	b=yPwhWFfg/Y+hRNY3PkGXRSt1emGrKCOtDCwVKdrhcJ873nc8YZJX0So57/1yGzkT0j
+	BzjjeoneL/fvd6cWGMw3SP5CAlxaR4dMQw3npcs5tb8enuyUGg3hanSaBskN7Zw0cHby
+	VD7O57XHpbElZ4ZPU1fekL1CFUk+SyOHdNWs2dckHtFP6tS5CQshbMraV4VxJiqij4g8
+	fciiRpXq48kIoDT8EKlIPXC+doa/N08b7384Qlx2pO36n3igFxc+dnh9yuxhi9KgUiAE
+	DQdzuVxtNyQYBnO9EcXMR9tWUqAzv+4uRcGpxkXyrPREV3EsAMwtFuQ3htZYIE4z2BN6
+	ik5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=/tG0y3vVY/SWRlpNZfUF3z94PacdSU10RSQoJxdIRz4=;
+	b=JpPy9TAZIygVa73Uv9I/EAcExgK2LF4Hx899AbP40HI+08q0OK0sPNc3eR4eewIGtP
+	nXEqpSFRwmCBuQ0YkG/nTRf2SCL9X28TM4l2q7GwE2uh9bMEC5WMzoN4Rj40Sb1TmrFO
+	c62tengWzyKXJ8fMdFOVliDM8UBD1kmEkO6LsM4CiYKQFISzIsIjZviwCTyYmnZ3tMP2
+	sy7b2rv1x+wecUUG0cxH0bDlVDNjETHx2BQTB3EUsQU2Vj2GshDLZCIs3Yn4ZR5yN9XZ
+	HcbojFIkH63Snh0rrNkUSIEH8Dd6Ga1eBWaPE1Z0gUBD5GPAvyIKLlMjuwKmpduLEpWU
+	TuYg==
+X-Gm-Message-State: APjAAAVwe3SBETgwiYW9jJDXsQo1/9MWIQoJMURkeKrrNXEMK4Xc1QEA
+	1l7p/CNEUYh0Hl79kqwyA76jGz004+zxMWHGdQVLRw==
+X-Google-Smtp-Source: APXvYqwa4PLNyf+fKthxKbC1OfonMNV6jAIQBPLvpDVMSO7fFgmIpfb5wAGWYiyiFDjOSCRJiYhBh/PP7gYFMvGZe1M=
+X-Received: by 2002:aca:e84c:: with SMTP id f73mr1844271oih.163.1554888480907; 
+	Wed, 10 Apr 2019 02:28:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20190409235401.12671-1-alistair.francis@wdc.com>
+In-Reply-To: <20190409235401.12671-1-alistair.francis@wdc.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 10 Apr 2019 10:27:49 +0100
+Message-ID:
+ <CAFEAcA9UxJv4qLz9syMiSgZ5h3zwFUsdPH72DDXV6JhtqriG_A@mail.gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a02:6b8:0:1619::183
-Subject: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PULL 0/1] device-tree queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,128 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410092652.4nFQyo97XngUWfuefOdbsr5Y_9vtQGy_EIWBdAUvV8c@z>
+Message-ID: <20190410092749.ZcocayJK1mc1TovQz7zxL_rEhipCi3K83EvhwQHOVZc@z>
 
-Currently such case is possible for incoming:
-QMP: add-fd (fdset =3D 0, fd of some file):
-    adds fd to fdset 0 and returns QEMU's fd (e.g. 33)
-QMP: migrate-incoming (uri =3D "fd:33"): fd is stored in QIOChannel *ioc
-...
-Incoming migration completes and unrefs ioc -> close(33)
-QMP: remove-fd (fdset =3D 0, fd =3D 33):
-    removes fd from fdset 0 and qemu_close() -> close(33) =3D> double clo=
-se
+On Wed, 10 Apr 2019 at 00:55, Alistair Francis <Alistair.Francis@wdc.com> wrote:
+>
+> The following changes since commit f151f8aca5cf5da24f6eb743a55a2233091ae532:
+>
+>   migration/ram.c: Fix use-after-free in multifd_recv_unfill_packet() (2019-04-09 20:46:34 +0100)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:alistair23/qemu.git tags/pull-device-tree-20190409-1
+>
+> for you to fetch changes up to 065e6298a75164b4347682b63381dbe752c2b156:
+>
+>   device_tree: Fix integer overflowing in load_device_tree() (2019-04-09 16:35:40 -0700)
+>
+> ----------------------------------------------------------------
+> Single device tree fix for 4.0
+>
+> A single patch to avoid an overflow when loading device trees.
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (1):
+>       device_tree: Fix integer overflowing in load_device_tree()
 
-For outgoing migration the case is the same but getfd instead of add-fd.
-Fix it by duping client's fd.
+Applied, thanks.
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
----
- migration/fd.c         | 39 +++++++++++++++++++++++++++++++--------
- migration/trace-events |  4 ++--
- 2 files changed, 33 insertions(+), 10 deletions(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-diff --git a/migration/fd.c b/migration/fd.c
-index a7c13df4ad..c9ff07ac41 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -15,6 +15,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "channel.h"
- #include "fd.h"
- #include "migration.h"
-@@ -26,15 +27,27 @@
- void fd_start_outgoing_migration(MigrationState *s, const char *fdname, =
-Error **errp)
- {
-     QIOChannel *ioc;
--    int fd =3D monitor_get_fd(cur_mon, fdname, errp);
-+    int fd, dup_fd;
-+
-+    fd =3D monitor_get_fd(cur_mon, fdname, errp);
-     if (fd =3D=3D -1) {
-         return;
-     }
-=20
--    trace_migration_fd_outgoing(fd);
--    ioc =3D qio_channel_new_fd(fd, errp);
-+    /* fd is previously created by qmp command 'getfd',
-+     * so client is responsible to close it. Dup it to save original val=
-ue from
-+     * QIOChannel's destructor */
-+    dup_fd =3D qemu_dup(fd);
-+    if (dup_fd =3D=3D -1) {
-+        error_setg(errp, "Cannot dup fd %s: %s (%d)", fdname, strerror(e=
-rrno),
-+                   errno);
-+        return;
-+    }
-+
-+    trace_migration_fd_outgoing(fd, dup_fd);
-+    ioc =3D qio_channel_new_fd(dup_fd, errp);
-     if (!ioc) {
--        close(fd);
-+        close(dup_fd);
-         return;
-     }
-=20
-@@ -55,14 +68,24 @@ static gboolean fd_accept_incoming_migration(QIOChann=
-el *ioc,
- void fd_start_incoming_migration(const char *infd, Error **errp)
- {
-     QIOChannel *ioc;
--    int fd;
-+    int fd, dup_fd;
-=20
-     fd =3D strtol(infd, NULL, 0);
--    trace_migration_fd_incoming(fd);
-=20
--    ioc =3D qio_channel_new_fd(fd, errp);
-+    /* fd is previously created by qmp command 'add-fd' or something els=
-e,
-+     * so client is responsible to close it. Dup it to save original val=
-ue from
-+     * QIOChannel's destructor */
-+    dup_fd =3D qemu_dup(fd);
-+    if (dup_fd =3D=3D -1) {
-+        error_setg(errp, "Cannot dup fd %d: %s (%d)", fd, strerror(errno=
-),
-+                   errno);
-+        return;
-+    }
-+
-+    trace_migration_fd_incoming(fd, dup_fd);
-+    ioc =3D qio_channel_new_fd(dup_fd, errp);
-     if (!ioc) {
--        close(fd);
-+        close(dup_fd);
-         return;
-     }
-=20
-diff --git a/migration/trace-events b/migration/trace-events
-index de2e136e57..d2d30a6b3c 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -258,8 +258,8 @@ migration_exec_outgoing(const char *cmd) "cmd=3D%s"
- migration_exec_incoming(const char *cmd) "cmd=3D%s"
-=20
- # fd.c
--migration_fd_outgoing(int fd) "fd=3D%d"
--migration_fd_incoming(int fd) "fd=3D%d"
-+migration_fd_outgoing(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
-+migration_fd_incoming(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
-=20
- # socket.c
- migration_socket_incoming_accepted(void) ""
---=20
-2.21.0
-
+-- PMM
 
