@@ -2,83 +2,122 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B493C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259E9C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6216E20818
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:06:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIxgf5MJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6216E20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E604C2083E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 12:21:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E604C2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58697 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58906 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEBzp-0008Il-J1
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 08:06:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43229)
+	id 1hECDt-000571-3h
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 08:21:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skrtbhtngr@gmail.com>) id 1hEBz0-0007hB-Ds
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:05:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hECCZ-0004Gd-1h
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skrtbhtngr@gmail.com>) id 1hEByz-0002kL-6Z
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:05:38 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
-	id 1hEByy-0002iy-SH
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:05:37 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 4so2332693wmf.1
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 05:05:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=H6arAZUCJAqn8Gp1x2euzhy3Wv5NCJO/Q1GzgeVPfNY=;
-	b=MIxgf5MJ/U8K/voLn19+yuo4iMUIYFhwLRPtuERRfMJMkU5La/A+6FfsDTQsIwPKVl
-	aODos8fjeEebOa/AsLxSj06SEFSBki6oOSxnAYmWdo7OybI1BHkDMU5fz/DP4bOckF7Q
-	HUeVCJukZJ5UkKhi67IZKynOpovLn46URqfchHT5rQCOFnBcWXQJMEI84QyU9SEPrJEf
-	6hP5NYvbIasdAQnHqr8hHGla2oHkadbucFMkZjvgZeuzLIXfK8WsoNzG69DWuVUaSIAJ
-	L3JzMe9PlCYCrFh2HgE3lhIdKHA2VZ2JoFjhZO9cEzVmhHF+LZARRR9RER/DZF3Q4iTO
-	GucQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=H6arAZUCJAqn8Gp1x2euzhy3Wv5NCJO/Q1GzgeVPfNY=;
-	b=mHCty+VEDiwNjaByEqS1OE2mX897CyYSDYzr+MakRdETegG8qtCuy8/ZUT+6FqMxsH
-	xMldzK4MgFgPhvO4UILmxsUng7ORRLaUolxhZUf3lsMYul/QtvLhs7IFdUTp3xSEBYzm
-	C64mSzkR7TBVo1Lapbd2wx56zFOPMh4hwdkj2qMJuikJBPMmskBZNNocMmJRvPV0Fx0Y
-	ixZ+zGAd7sCB7dV90BvN/eRJsoHNiWQAdhUDwhkwZEJFaC4BVLz6jAcyXAAg4XGWfO2k
-	ZphXq/Rbp5huF99a3lCHMBlFB1eNzehEEHiPLFsRVWWMUAvub89ZW6yiQ4grrXMhUm7/
-	SA7g==
-X-Gm-Message-State: APjAAAUFOShAstAOpN7UGhIi9BJr3FOovXrR7u94490bmHoseDFY0ms5
-	rf0T6qw2vPB0pjLF2JFBaVY/D2I/FKfAtmlPvbU=
-X-Google-Smtp-Source: APXvYqxbkX2aPNX2n6kkEacQftcWrY5PYBce7aYqEbpY3zoFJaEpSg94F4TFmslQ9qdqYfnr76miexiDzFxdKbC1u/c=
-X-Received: by 2002:a7b:cf2b:: with SMTP id m11mr2410256wmg.56.1554897935175; 
-	Wed, 10 Apr 2019 05:05:35 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1hECCY-0006vk-3Z
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hECCX-0006u0-MU
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:19:38 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2FFF7F6A8
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 12:19:35 +0000 (UTC)
+Received: from [10.36.112.57] (ovpn-112-57.ams2.redhat.com [10.36.112.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CAE15F9C9;
+	Wed, 10 Apr 2019 12:19:28 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190318171521.8524-1-pbonzini@redhat.com>
+	<20190318171521.8524-4-pbonzini@redhat.com>
+	<6792361a-9a55-c97e-51e4-888ec87aeb7b@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <b419a03e-a512-66ec-220a-c787e3e6739e@redhat.com>
+Date: Wed, 10 Apr 2019 14:19:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190407115839.25054-1-skrtbhtngr@gmail.com>
-	<20190407115839.25054-3-skrtbhtngr@gmail.com>
-	<20190410115001.56bbbelcmxwcqp7v@SPB-NB-133.local>
-In-Reply-To: <20190410115001.56bbbelcmxwcqp7v@SPB-NB-133.local>
-From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-Date: Wed, 10 Apr 2019 17:35:23 +0530
-Message-ID:
- <CAMzgYoMqE20=L+n+tjt8Nb10Tidxr0C6OumQ8vvQ423xJxnN=w@mail.gmail.com>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
+In-Reply-To: <6792361a-9a55-c97e-51e4-888ec87aeb7b@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH RESEND v2 2/2] cpus: move
- hvf_cpu_synchronize* calls to cpu_synchronize* functions
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 10 Apr 2019 12:19:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 03/13] libqos: move common i2c code to
+ libqos
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,125 +129,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410120523.F74M2urtHYiIu_8Wo3Gz6xSjjO7SY2EtV3-9pz6_XdY@z>
+Message-ID: <20190410121925.6wq1wOzOv7BblCE87UjbGuOw5DKo2O5r9fnHKOsM2f8@z>
 
-On Wed, 10 Apr 2019 at 17:20, Roman Bolshakov <r.bolshakov@yadro.com> wrote:
->
-> On Sun, Apr 07, 2019 at 05:28:39PM +0530, Sukrit Bhatnagar wrote:
-> > Keep the calls made to synchronize cpu by all hypervisors in one place
-> > inside cpu_synchronize_* functions in include/sysemu/hw_accel.h
-> >
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-> > ---
-> >  cpus.c                    | 12 ------------
-> >  include/sysemu/hw_accel.h | 10 ++++++++++
-> >  2 files changed, 10 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/cpus.c b/cpus.c
-> > index e83f72b48b..026df0dc5f 100644
-> > --- a/cpus.c
-> > +++ b/cpus.c
-> > @@ -1021,10 +1021,6 @@ void cpu_synchronize_all_states(void)
-> >
-> >      CPU_FOREACH(cpu) {
-> >          cpu_synchronize_state(cpu);
-> > -        /* TODO: move to cpu_synchronize_state() */
-> > -        if (hvf_enabled()) {
-> > -            hvf_cpu_synchronize_state(cpu);
-> > -        }
-> >      }
-> >  }
-> >
-> > @@ -1034,10 +1030,6 @@ void cpu_synchronize_all_post_reset(void)
-> >
-> >      CPU_FOREACH(cpu) {
-> >          cpu_synchronize_post_reset(cpu);
-> > -        /* TODO: move to cpu_synchronize_post_reset() */
-> > -        if (hvf_enabled()) {
-> > -            hvf_cpu_synchronize_post_reset(cpu);
-> > -        }
-> >      }
-> >  }
-> >
-> > @@ -1047,10 +1039,6 @@ void cpu_synchronize_all_post_init(void)
-> >
-> >      CPU_FOREACH(cpu) {
-> >          cpu_synchronize_post_init(cpu);
-> > -        /* TODO: move to cpu_synchronize_post_init() */
-> > -        if (hvf_enabled()) {
-> > -            hvf_cpu_synchronize_post_init(cpu);
-> > -        }
-> >      }
-> >  }
-> >
-> > diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-> > index d2ddfb5ad0..bf081b4026 100644
-> > --- a/include/sysemu/hw_accel.h
-> > +++ b/include/sysemu/hw_accel.h
-> > @@ -15,6 +15,7 @@
-> >  #include "sysemu/hax.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/whpx.h"
-> > +#include "sysemu/hvf.h"
-> >
-> >  static inline void cpu_synchronize_state(CPUState *cpu)
-> >  {
-> > @@ -27,6 +28,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
-> >      if (whpx_enabled()) {
-> >          whpx_cpu_synchronize_state(cpu);
-> >      }
-> > +    if (hvf_enabled()) {
-> > +        hvf_cpu_synchronize_state(cpu);
-> > +    }
-> >  }
-> >
-> >  static inline void cpu_synchronize_post_reset(CPUState *cpu)
-> > @@ -40,6 +44,9 @@ static inline void cpu_synchronize_post_reset(CPUState *cpu)
-> >      if (whpx_enabled()) {
-> >          whpx_cpu_synchronize_post_reset(cpu);
-> >      }
-> > +    if (hvf_enabled()) {
-> > +        hvf_cpu_synchronize_post_reset(cpu);
-> > +    }
-> >  }
-> >
-> >  static inline void cpu_synchronize_post_init(CPUState *cpu)
-> > @@ -53,6 +60,9 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
-> >      if (whpx_enabled()) {
-> >          whpx_cpu_synchronize_post_init(cpu);
-> >      }
-> > +    if (hvf_enabled()) {
-> > +        hvf_cpu_synchronize_post_init(cpu);
-> > +    }
-> >  }
-> >
-> >  static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
-> > --
-> > 2.20.1
-> >
-> >
->
-> Hi Sukrit,
->
-> The commit itself looks sane but qemu starts to hang during BIOS boot
-> after I've applied it if I run it with hvf accel.
+On 09/04/19 11:42, Thomas Huth wrote:
+>> -static void tmp105_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+>> -                         uint16_t value)
+>> -{
+>> -    uint8_t cmd[3];
+>> -    uint8_t resp[2];
+>> -
+>> -    cmd[0] = reg;
+>> -    cmd[1] = value >> 8;
+>> -    cmd[2] = value & 255;
+>> -    i2c_send(i2c, addr, cmd, 3);
+>> -    i2c_recv(i2c, addr, resp, 2);
+>> -    g_assert_cmphex(resp[0], ==, cmd[1]);
+>> -    g_assert_cmphex(resp[1], ==, cmd[2]);
+>> -}
+> ... but the old set8/16 functions also used i2c_recv() and
+> g_assert_cmphex() ... shouldn't this be added to the new functions, too?
 
-Hi Roman,
-Thanks for reviewing the patches.
-If this is happening, then I assume patches are not ready
-to be merged into qemu-stable.
-Do you have any idea why the problem is not detected
-during tests, but rather at runtime?
-I am not really sure if this patch (2/2) has anything to do with
-the problem but the previous patch (1/2) might.
+That is dependent on the actual device you are working with.  I probably
+should add some code to the tmp105 test that tests this behavior too.
 
-> Thanks,
-> Roman
+Paolo
 
