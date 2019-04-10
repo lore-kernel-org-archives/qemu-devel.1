@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50456)
+Received: from eggs.gnu.org ([209.51.188.92]:36699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEAVV-0004V6-9D
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 06:31:06 -0400
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hEBYE-00088a-0c
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:37:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEAVT-0007GF-Q1
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 06:31:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEAVI-0006zf-8H
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 06:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEAVD-0006HF-7C
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 10:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1FA362E80CB
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 10:30:47 +0000 (UTC)
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hEBYC-0003pe-Ux
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 07:37:57 -0400
+Date: Wed, 10 Apr 2019 12:37:42 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20190410113742.GD1435@perard.uk.xensource.com>
+References: <20190408151617.13025-1-paul.durrant@citrix.com>
+	<20190408151617.13025-2-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Apr 2019 10:17:49 -0000
-From: Chen Zhang <1823831@bugs.launchpad.net>
-Reply-To: Bug 1823831 <1823831@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155478160922.20745.7830680070590942423.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155489146957.13592.8870069133695509847.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823831] Re: BSD bootloader halts with
- hypervisor.framework
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190408151617.13025-2-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] xen-bus: use a separate fd for each
+ event channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
 
-In good versions (27e18b8952f8b7a1e26350846f8a0d5a9b33bfb8), calls to
-x86_cpu_has_work(), likely due to IRQ 0, returned interchanging true or
-false.
+On Mon, Apr 08, 2019 at 04:16:15PM +0100, Paul Durrant wrote:
+> To better support use of IOThread-s it will be necessary to be able to set
+> the AioContext for each XenEventChannel and hence it is necessary to open a
+> separate handle to libxenevtchan for each channel.
+> 
+> This patch stops using NotifierList for event channel callbacks, replacing
+> that construct by a list of complete XenEventChannel structures. Each of
+> these now has a xenevtchn_handle pointer in place of the single pointer
+> previously held in the XenDevice structure. The individual handles are
+> opened/closed in xen_device_bind/unbind_event_channel(), replacing the
+> single open/close in xen_device_realize/unrealize().
+> 
+> NOTE: This patch does not add an AioContext parameter to
+>       xen_device_bind_event_channel(). That will be done in a subsequent
+>       patch.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-In bad versions (92d5f1a4147c3722b5e9a8bcfb7dc261b7a8b855), all calls
-returned false.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
--- =
+There are a few places were I would have like to add an assert, but they
+can't be compiled-out in QEMU :-(.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823831
+Thanks,
 
-Title:
-  BSD bootloader halts with hypervisor.framework
-
-Status in QEMU:
-  New
-
-Bug description:
-  Guest: FreeBSD 12.0 Install CD
-  Host: MacOS 11.14.3 qemu master at 90fb864a7df0a9af677352e94f8225f7b03de9=
-22
-
-  Command arguments:
-
-  qemu-system-x86_64 -m 4000m -cdrom Downloads/FreeBSD-12.0-RELEASE-
-  amd64-bootonly.iso
-
-  When qemu was run with -accel hvf, the bootloader would halt after
-  showing the menu. The bootloader would not respond to any keyboard
-  events.
-
-  Without acceleration option, the bootloader would count down to zero
-  and proceed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823831/+subscriptions
+-- 
+Anthony PERARD
