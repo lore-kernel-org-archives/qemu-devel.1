@@ -2,60 +2,90 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB959C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCB0C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:27:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4393D2133D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:26:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="MtXVCco4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4393D2133D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CBC020818
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 15:27:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBC020818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33257 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33303 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEF7I-0002sE-Dm
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:26:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59317)
+	id 1hEF8o-0003rR-M0
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 11:27:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEF67-0001n5-MN
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:25:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEF7n-0003MJ-QS
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEF66-0003rk-PC
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:25:11 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:40401)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hEF66-0003fP-3v; Wed, 10 Apr 2019 11:25:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Message-Id:Date:Subject:Cc:To:From;
-	bh=NiiZmZYoiKLqKCOmTx7ABlStDDvDLIoMY/T9jpTUQNI=; 
-	b=MtXVCco4y7+4K8ToetNE6fSR/isNMiLbxQKFfcF/ysMWl5gAxiTDHszmNXAlXfmb7AdB+Zu5rq4cMyaS2rHZJF71KUBPrZf4X3bz9z1/9PIpTRAMq8XukxztMDI3WtyE1LgQdUVHMmqgAlzR8aOjT9DwlYl75SJ7TueumQ5Jkpe88KNwM1rtHAHN2cbzEM6H12kioqINHIhQogdMdMxwma3TSeJJni98XAeyPuE0m2uW0kAqAl/aVmkHtetuX8TB97UwTgGRzbvOBq2oYbUaF5b1UYobps0JwDldXRXSzhvSFz3OpdfyZ6iw7nZI9ElY2gfAV5fDEQDPm+3W89jueg==;
-Received: from 178-55-128-240.bb.dnainternet.fi ([178.55.128.240]
-	helo=perseus.local) by fanzine.igalia.com with esmtpsa 
-	(Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
-	id 1hEF5l-0001la-OW; Wed, 10 Apr 2019 17:24:49 +0200
-Received: from berto by perseus.local with local (Exim 4.89)
-	(envelope-from <berto@igalia.com>)
-	id 1hEF5W-00026z-G3; Wed, 10 Apr 2019 18:24:34 +0300
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 10 Apr 2019 18:24:29 +0300
-Message-Id: <20190410152429.8076-1-berto@igalia.com>
-X-Mailer: git-send-email 2.11.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: [Qemu-devel] [PATCH for-4.1] commit: Make base read-only if there
- is an early failure
+	(envelope-from <mreitz@redhat.com>) id 1hEF7m-0004lW-TS
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 11:26:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hEF7k-0004i0-Jg; Wed, 10 Apr 2019 11:26:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CAE030BA36F;
+	Wed, 10 Apr 2019 15:26:45 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E65185C223;
+	Wed, 10 Apr 2019 15:26:43 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6bd4c6e6-a7f1-99f4-c6bf-77099a49e4e1@redhat.com>
+Date: Wed, 10 Apr 2019 17:26:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 10 Apr 2019 15:26:45 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img convert: ignore read errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,38 +97,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410152429.6uDIxyyeGNtBkltCW4k-OjLlm4bNm4ExOt2eKeJqTu4@z>
+Message-ID: <20190410152642.-oLCFECKCZTmTnv-hhvAWcNLh8Y6SfV-UE0Fo4pyOxM@z>
 
-You can reproduce this by passing an invalid filter-node-name (like
-"1234") to block-commit. In this case the base image is put in
-read-write mode but is never reset back to read-only.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <6bd4c6e6-a7f1-99f4-c6bf-77099a49e4e1@redhat.com>
+Subject: Re: [PATCH 0/2] qemu-img convert: ignore read errors
+References: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1554821792-968307-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/commit.c | 3 +++
- 1 file changed, 3 insertions(+)
+On 09.04.19 16:56, Andrey Shinkevich wrote:
+> The 'qemu-img convert' new command option 'force read' with the key '-R=
+'
+> allows converting a damaged image to get all the available information
+> in case of the read errors. The program reports read errors and continu=
+e
+> the image conversion. The users should keep in their minds that the
+> resulting image is inconsistent.
 
-diff --git a/block/commit.c b/block/commit.c
-index ba60fef58a..698eda1dfe 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -384,6 +384,9 @@ fail:
-     if (s->top) {
-         blk_unref(s->top);
-     }
-+    if (s->base_read_only) {
-+        bdrv_reopen_set_read_only(base, true, NULL);
-+    }
-     job_early_fail(&s->common.job);
-     /* commit_top_bs has to be replaced after deleting the block job,
-      * otherwise this would fail because of lack of permissions. */
--- 
-2.11.0
+I=E2=80=99ve already sent a series =E2=80=9CAdd salvaging mode to convert=
+=E2=80=9D back in December.
 
+Max
+
+
+--rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuCzIACgkQ9AfbAGHV
+z0DMowgAipgl1FtpRlHE6Nuz7jr0zt3ErFmnNAnlaq4hWy3x8DnbCECoZWgf4WIz
+GDQYdcMtb98gUL7p5bcpR76U11oaxOEKrtxj5JMRZkySlDwN8SnNeamTZ1UEYikc
+1s0LBbhQrMQ41rC1sRKBSQLjOsT/ZJddZybDTm8tuxVxs+4pNe/fjOo+WVn7exRa
+nnAWd+z5gw6L9voxrtrIOF9sfvx1RqXKkYmybCk6+O8QhzrBa2Fi1bbMUInvBGVI
+E/zyHQ/ACDqiKUHzHtgUcbJMosa9EFzfhua4ozS66DDFO17gQUdR1XUy/EcQVvdT
+0RyAM3UIIrBdhcfogWzB8wnneElqhg==
+=DVBD
+-----END PGP SIGNATURE-----
+
+--rcqxSIdXoJut0VCcInnsaDjQQNfxrJzqX--
 
