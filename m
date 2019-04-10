@@ -2,92 +2,125 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C7AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66356C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F94A2082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:04:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F94A2082E
+	by mail.kernel.org (Postfix) with ESMTPS id 3A6852082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:11:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6852082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34824 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34896 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEGef-0001Tk-DD
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 13:04:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51900)
+	id 1hEGlI-00034w-9F
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 13:11:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGdl-000189-4F
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:04:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hEGkV-0002kQ-IN
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGdk-0006BN-6O
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:04:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46470)
+	(envelope-from <pbonzini@redhat.com>) id 1hEGkU-0002gu-Bb
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:10:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44924)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEGde-00065P-Oa; Wed, 10 Apr 2019 13:03:55 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hEGkS-0002eL-Up
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:10:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62FCA3078AAE;
-	Wed, 10 Apr 2019 17:03:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E2089104C421;
-	Wed, 10 Apr 2019 17:03:51 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1551895813.git.berto@igalia.com>
-	<e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 245CF30992BA;
+	Wed, 10 Apr 2019 17:10:55 +0000 (UTC)
+Received: from [10.36.112.15] (unknown [10.36.112.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D5AC5C3FD;
+	Wed, 10 Apr 2019 17:10:53 +0000 (UTC)
+To: Roman Bolshakov <r.bolshakov@yadro.com>,
+	Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+References: <20190407115839.25054-1-skrtbhtngr@gmail.com>
+	<20190407115839.25054-3-skrtbhtngr@gmail.com>
+	<20190410115001.56bbbelcmxwcqp7v@SPB-NB-133.local>
+	<CAMzgYoMqE20=L+n+tjt8Nb10Tidxr0C6OumQ8vvQ423xJxnN=w@mail.gmail.com>
+	<20190410140244.l5viavfey2ymzw6k@SPB-NB-133.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-Date: Wed, 10 Apr 2019 19:03:50 +0200
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <ed7dd764-ff54-58a3-b4b4-ed6951da6ef6@redhat.com>
+Date: Wed, 10 Apr 2019 19:10:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20190410140244.l5viavfey2ymzw6k@SPB-NB-133.local>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 10 Apr 2019 17:03:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 10 Apr 2019 17:10:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] qemu-iotests: Test the
- x-blockdev-reopen QMP command
+Subject: Re: [Qemu-devel] [PATCH RESEND v2 2/2] cpus: move
+ hvf_cpu_synchronize* calls to cpu_synchronize* functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,94 +132,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410170350.CL1XivdMvlzGZY9zYsk3FnfgV3CgX2Q83LpjYY11DdY@z>
+Message-ID: <20190410171051.qhnNp1MvPTlNtCwiHg01w2h6ft_7hdlHcPcTB69JHB8@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-Subject: Re: [PATCH v2 13/13] qemu-iotests: Test the x-blockdev-reopen QMP
- command
-References: <cover.1551895813.git.berto@igalia.com>
- <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-In-Reply-To: <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10/04/19 16:02, Roman Bolshakov wrote:
+> I've applied, built and tested both sequentially. Applying and running
+> with patch 1/2 alone doesn't result in the behavior I mentioned. I also
+> tried to apply only the first hunk that moves hvf_cpu_synchronize_state
+> into cpu_synchronize_state and it also causes the issue with BIOS.
+> 
+> Honestly, I don't know if the tests run qemu with hvf accel. AFAIK
+> kvm-unit-tests can be used to test an accel itself.
 
-On 06.03.19 19:11, Alberto Garcia wrote:
-> This patch adds several tests for the x-blockdev-reopen QMP command.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  tests/qemu-iotests/243     | 991 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/243.out |   5 +
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 997 insertions(+)
->  create mode 100644 tests/qemu-iotests/243
->  create mode 100644 tests/qemu-iotests/243.out
->=20
-> diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
-> new file mode 100644
-> index 0000000000..35b30092ca
-> --- /dev/null
-> +++ b/tests/qemu-iotests/243
-> @@ -0,0 +1,991 @@
+No, tests do not cover HVF.
 
-[...]
-
-> +    # If an image has a backing file then the 'backing' option must be=
-
-> +    # passed on reopen. We don't allow leaving the option out in this
-> +    # case because it's unclear what the correct semantics would be.
-> +    def test_missing_backing_options_1(self):
-
-[...]
-
-> +        # hd0 has no backing file: we can omit the 'backing' option
-> +        self.reopen(opts)
-
-[...]
-
-> +        # Detach hd2 from hd0.
-> +        self.reopen(opts, {'backing': None})
-> +        self.reopen(opts, {}, "backing is missing for 'hd0'")
-
-I don=E2=80=99t understand the second test.  hd0 has no default backing f=
-ile and
-it currently has no backing child attached to it.  Why would this call
-fail now?
-
-I=E2=80=99m asking because this no longer throws an error after =E2=80=9C=
-block: Leave
-BDS.backing_file constant=E2=80=9D of my =E2=80=9Cblock: Deal with filter=
-s=E2=80=9D series.
-
-Max
-
-
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuIfYACgkQ9AfbAGHV
-z0C8IAf9F+SVG9TWeDOQfua02TtwAY/o9h92UZA6H3hfgXQNr4AkWDrqJgbKLoa8
-2qswPehoi7vOF3KVv17I2Y270LbKwQOucb40QSJzGT2Pwbuted48nuSDmfujGikL
-IIilMJ7zVkBIsetEVALew5V9bYr66rGIcouVytvqOXMjDFm5q0DsqsoERHDHRk/c
-cK41W+K/zNBtHdaaa/2T6UjSX0JS2Ogq8ahwyIL2CiiHJu8Q81zDdGilg4UeOeYT
-tjdk3VXOftOIkddxYmYUN+OA7TFTlppJkDcKYXttrYEWTS3S14HImFEFo37zHkha
-2sR8nHdfrtCXeo3kdH/TxEumrO32pA==
-=dRjU
------END PGP SIGNATURE-----
-
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4--
+Paolo
 
