@@ -2,117 +2,74 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE2CC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 07:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C759C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 07:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70D7220674
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 07:49:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D7220674
+	by mail.kernel.org (Postfix) with ESMTPS id 4D9DE206B7
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 07:58:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9DE206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55253 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55349 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE7z5-0007iS-DN
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 03:49:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46773)
+	id 1hE87a-0000tq-2e
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 03:58:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hE7yF-0007RH-3Q
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:48:36 -0400
+	(envelope-from <slp@redhat.com>) id 1hE86f-0000YC-3h
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hE7yE-0007k8-4C
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:48:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hE7yD-0007iS-Nv
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:48:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAFBB88AAB;
-	Wed, 10 Apr 2019 07:48:31 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 865F8600D4;
-	Wed, 10 Apr 2019 07:48:27 +0000 (UTC)
-To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
-	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
-	<berrange@redhat.com>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <d3a11b60-8b66-2c1e-6cb8-2616ee2cabc6@redhat.com>
-Date: Wed, 10 Apr 2019 09:48:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <slp@redhat.com>) id 1hE86e-0005Un-2a
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:57:17 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1hE86d-0005TJ-Np
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 03:57:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id y13so1725027wrd.3
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 00:57:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version;
+	bh=KmtzcoZl4wq4YIcoWNxb3kcrWqTNSZXy7jZ7440FuXg=;
+	b=nUotkQ/ghOt2hqbKFL4jOeLxujnBoxHcWXh5FBS9MF+cjTqR4/JHsyZQmB133JzU5e
+	VJlSMyaeTq7ZIO8BrAUFtGdfFEcSeJAn4S7GUdQlHFM3o+IfPsl05lw6iGV8Bx03bv75
+	j0oNAwL7xFDXG3wu2aBgvL6+dEgBKuILA4NnL/HW3c2r9VcNP/tmAEnQgRgJtcNYXORJ
+	9WeNMw5Rayk1/xhQoB820icUaRBJN4nVt5SdxQ01JS4k5WPG4hGyFodVhK+FqAJOd79S
+	85/8iOVXEgdVt6hPF0WXm6tefxZ4NvJTeKbhblHg+siikl/e7UFunmr6YmIshYDpYJWC
+	Pfpg==
+X-Gm-Message-State: APjAAAVWGRNoIPJ4ZawdN3gnF4Pv57YzgMb+LArgegopesi0i9cxnMex
+	YlXwsJn4S4NCfuTcwd8XMGEnvg==
+X-Google-Smtp-Source: APXvYqx+wPJNBR+tkLK94cpATIPz1uYuJfji3kIsDQqugY2Ifsd0EGBWoAEVpBR502R6GIK91KigmA==
+X-Received: by 2002:adf:f78c:: with SMTP id q12mr4728783wrp.172.1554883033352; 
+	Wed, 10 Apr 2019 00:57:13 -0700 (PDT)
+Received: from dritchie.redhat.com (226.red-88-11-92.dynamicip.rima-tde.net.
+	[88.11.92.226])
+	by smtp.gmail.com with ESMTPSA id d7sm1414219wmf.31.2019.04.10.00.57.11
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 10 Apr 2019 00:57:12 -0700 (PDT)
+References: <20190409122823.12416-1-pbonzini@redhat.com>
+User-agent: mu4e 1.0; emacs 26.1
+From: Sergio Lopez <slp@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+In-reply-to: <20190409122823.12416-1-pbonzini@redhat.com>
+Date: Wed, 10 Apr 2019 09:56:57 +0200
+Message-ID: <87k1g2i986.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 10 Apr 2019 07:48:32 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+	[fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.0?] aio-posix: ensure poll mode is
+ left when aio_notify is called
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,25 +81,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
-	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410074826.qscJTEfiWJZtJ0PB6VTy2xsBOfMEQYRGqjjANzrkoho@z>
+Message-ID: <20190410075657.KQ4txSYyCOoRpduBlxPBpL-1gzkP8G3DjKV4M2NC1r0@z>
 
-On 09/04/2019 21.46, Stefan Weil wrote:
-[...]
-> The known problems with the current implementation are
-[...]
-> * Calling conventions. The current implementation works on many hosts,
-> but for example not on Sparc
-Is there also a problem with the sparc *target* (i.e. not only sparc
-hosts)? TCI does not seem to work here:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
- https://gitlab.com/huth/qemu/-/jobs/193861498
 
- Thomas
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> With aio=3Dthread, adaptive polling makes latency worse rather than
+> better, because it delays the execution of the ThreadPool's
+> completion bottom half.
+>
+> event_notifier_poll() does run while polling, detecting that
+> a bottom half was scheduled by a worker thread, but because
+> ctx->notifier is explicitly ignored in run_poll_handlers_once(),
+> scheduling the BH does not count as making progress and
+> run_poll_handlers() keeps running.  Fix this by recomputing
+> the deadline after *timeout could have changed.
+>
+> With this change, ThreadPool still cannot participate in polling
+> but at least it does not suffer from extra latency.
+>
+> Reported-by: Sergio Lopez <slp@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@gmail.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: qemu-block@nongnu.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <1553692145-86728-1-git-send-email-pbonzini@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: use qemu_soonest_timeout to handle timeout =3D=3D -1
+>  util/aio-posix.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index 6fbfa7924f..db11021287 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -519,6 +519,10 @@ static bool run_poll_handlers_once(AioContext *ctx, =
+int64_t *timeout)
+>          if (!node->deleted && node->io_poll &&
+>              aio_node_check(ctx, node->is_external) &&
+>              node->io_poll(node->opaque)) {
+> +            /*
+> +             * Polling was successful, exit try_poll_mode immediately
+> +             * to adjust the next polling time.
+> +             */
+>              *timeout =3D 0;
+>              if (node->opaque !=3D &ctx->notifier) {
+>                  progress =3D true;
+> @@ -558,8 +562,9 @@ static bool run_poll_handlers(AioContext *ctx, int64_=
+t max_ns, int64_t *timeout)
+>      do {
+>          progress =3D run_poll_handlers_once(ctx, timeout);
+>          elapsed_time =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_=
+time;
+> -    } while (!progress && elapsed_time < max_ns
+> -             && !atomic_read(&ctx->poll_disable_cnt));
+> +        max_ns =3D qemu_soonest_timeout(*timeout, max_ns);
+> +        assert(!(max_ns && progress));
+> +    } while (elapsed_time < max_ns && !atomic_read(&ctx->poll_disable_cn=
+t));
+>=20=20
+>      /* If time has passed with no successful polling, adjust *timeout to
+>       * keep the same ending time.
+> @@ -585,8 +590,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_=
+t max_ns, int64_t *timeout)
+>   */
+>  static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
+>  {
+> -    /* See qemu_soonest_timeout() uint64_t hack */
+> -    int64_t max_ns =3D MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
+> +    int64_t max_ns =3D qemu_soonest_timeout(*timeout, ctx->poll_ns);
+>=20=20
+>      if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
+>          poll_set_started(ctx, true);
+
+Thanks, this one does the trick.
+
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAlytockACgkQ9GknjS8M
+AjWsuA/+MB7HiJgUqJbaMu1asj8/3LtHotIOJmK+DZv1Sa7J7AVwoaCwU626npVi
+beEkN9XfnPZBUS3sRrK+mg7VxOjYDNyK28tmjtga8QLmJ8A39hNKaIoaR1QY9j8c
+kr3HxOVzi5pFOZIGNF0Nm91TnxPai6cYO4vEZ4PAjW014ROfBGnEqaqNqtOeVbJA
+PgAvjGEe0Qw9HMGeAVNA/Cinhcps06N+hvSDgELsg0vmRvSWihOtPXNPpLkVAWbD
+FO9oCrBTVcyVwoDWAnXIKUR0dS5br7pdsA9S/UiYGlsAa/MeRXMhV5ulTN8y7nq8
+Ly3Okc1TYfzXblTiMC1N4owu3ldMdV5H5F+TUtEeit8czdK0+wZvsmpQKeE2ALA4
+hOhkpW5ws+L7ZDhnOiiQG3NGjeYv5m425H2XtsowbALb6ABDqCy0GPJiqm57OZh6
+l6WFL/sJx9KWIHc9OhqTGh+mmJYq9dtALVLPfYa+8Uc1O1115LQ1GYAP29PtERId
+SK2e3kZAD6F8c1wL/FuRW3hAKr8XcFjJlVoZRcIPgq/UH8BElCRivLzCSdDLzVu5
+CY/pjiEvjf21yOsaFtGB69b1s9aYEIWHUI+pPC4ls0umZjOgxKPo2lvvg/Ae274T
+hn2vlg0E+FfO5b25iJRTCNYwgWMPszOQ6jLBpy+ZKyvKjuqh7EI=
+=O1vw
+-----END PGP SIGNATURE-----
+--=-=-=--
 
