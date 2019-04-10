@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40062)
+Received: from eggs.gnu.org ([209.51.188.92]:40064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hE4hI-0004tH-SP
+	(envelope-from <pagupta@redhat.com>) id 1hE4hI-0004tJ-Sk
 	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 00:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hE4hG-0004hL-Ld
+	(envelope-from <pagupta@redhat.com>) id 1hE4hG-0004hF-Kp
 	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 00:18:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45342)
+Received: from mx1.redhat.com ([209.132.183.28]:45340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hE4hG-0004gn-8K
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hE4hG-0004gp-8h
 	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 00:18:50 -0400
 From: Pankaj Gupta <pagupta@redhat.com>
-Date: Wed, 10 Apr 2019 09:38:20 +0530
-Message-Id: <20190410040826.24371-1-pagupta@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/6] virtio pmem driver
+Date: Wed, 10 Apr 2019 09:38:22 +0530
+Message-Id: <20190410040826.24371-3-pagupta@redhat.com>
+In-Reply-To: <20190410040826.24371-1-pagupta@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,195 +26,382 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
 Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com, pagupta@redhat.com
 
- This patch series has implementation for "virtio pmem".=20
- "virtio pmem" is fake persistent memory(nvdimm) in guest=20
- which allows to bypass the guest page cache. This also
- implements a VIRTIO based asynchronous flush mechanism. =20
-=20
- Sharing guest kernel driver in this patchset with the=20
- changes suggested in v4. Tested with Qemu side device=20
- emulation [6] for virtio-pmem.=20
+This patch adds virtio-pmem driver for KVM guest.
 
- We have incorporated all the suggestions in V4. Documented=20
- the impact of possible page cache side channel attacks with=20
- suggested countermeasures.
-=20
- Details of project idea for 'virtio pmem' flushing interface=20
- is shared [3] & [4].
+Guest reads the persistent memory range information from
+Qemu over VIRTIO and registers it on nvdimm_bus. It also
+creates a nd_region object with the persistent memory
+range information so that existing 'nvdimm/pmem' driver
+can reserve this into system memory map. This way
+'virtio-pmem' driver uses existing functionality of pmem
+driver to register persistent memory compatible for DAX
+capable filesystems.
 
- Implementation is divided into two parts:
- New virtio pmem guest driver and qemu code changes for new=20
- virtio pmem paravirtualized device.
+This also provides function to perform guest flush over
+VIRTIO from 'pmem' driver when userspace performs flush
+on DAX memory range.
 
-1. Guest virtio-pmem kernel driver
----------------------------------
-   - Reads persistent memory range from paravirt device and=20
-     registers with 'nvdimm_bus'. =20
-   - 'nvdimm/pmem' driver uses this information to allocate=20
-     persistent memory region and setup filesystem operations=20
-     to the allocated memory.=20
-   - virtio pmem driver implements asynchronous flushing=20
-     interface to flush from guest to host.
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+ drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
+ drivers/virtio/Kconfig           |  10 +++
+ drivers/virtio/Makefile          |   1 +
+ drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
+ include/linux/virtio_pmem.h      |  60 +++++++++++++++
+ include/uapi/linux/virtio_ids.h  |   1 +
+ include/uapi/linux/virtio_pmem.h |  10 +++
+ 7 files changed, 294 insertions(+)
+ create mode 100644 drivers/nvdimm/virtio_pmem.c
+ create mode 100644 drivers/virtio/pmem.c
+ create mode 100644 include/linux/virtio_pmem.h
+ create mode 100644 include/uapi/linux/virtio_pmem.h
 
-2. Qemu virtio-pmem device
----------------------------------
-   - Creates virtio pmem device and exposes a memory range to=20
-     KVM guest.=20
-   - At host side this is file backed memory which acts as=20
-     persistent memory.=20
-   - Qemu side flush uses aio thread pool API's and virtio=20
-     for asynchronous guest multi request handling.=20
-
-   David Hildenbrand CCed also posted a modified version[7] of=20
-   qemu virtio-pmem code based on updated Qemu memory device API.=20
-
- Virtio-pmem security implications and countermeasures:
- -----------------------------------------------------
-
- In previous posting of kernel driver, there was discussion [9]
- on possible implications of page cache side channel attacks with=20
- virtio pmem. After thorough analysis of details of known side=20
- channel attacks, below are the suggestions:
-
- - Depends entirely on how host backing image file is mapped=20
-   into guest address space.=20
-
- - virtio-pmem device emulation, by default shared mapping is used
-   to map host backing file. It is recommended to use separate
-   backing file at host side for every guest. This will prevent
-   any possibility of executing common code from multiple guests
-   and any chance of inferring guest local data based based on=20
-   execution time.
-
- - If backing file is required to be shared among multiple guests=20
-   it is recommended to don't support host page cache eviction=20
-   commands from the guest driver. This will avoid any possibility
-   of inferring guest local data or host data from another guest.=20
-
- - Proposed device specification [8] for virtio-pmem device with=20
-   details of possible security implications and suggested=20
-   countermeasures for device emulation.
-
- Virtio-pmem errors handling:
- ----------------------------------------
-  Checked behaviour of virtio-pmem for below types of errors
-  Need suggestions on expected behaviour for handling these errors?
-
-  - Hardware Errors: Uncorrectable recoverable Errors:=20
-  a] virtio-pmem:=20
-    - As per current logic if error page belongs to Qemu process,=20
-      host MCE handler isolates(hwpoison) that page and send SIGBUS.=20
-      Qemu SIGBUS handler injects exception to KVM guest.=20
-    - KVM guest then isolates the page and send SIGBUS to guest=20
-      userspace process which has mapped the page.=20
- =20
-  b] Existing implementation for ACPI pmem driver:=20
-    - Handles such errors with MCE notifier and creates a list=20
-      of bad blocks. Read/direct access DAX operation return EIO=20
-      if accessed memory page fall in bad block list.
-    - It also starts backgound scrubbing. =20
-    - Similar functionality can be reused in virtio-pmem with MCE=20
-      notifier but without scrubbing(no ACPI/ARS)? Need inputs to=20
-      confirm if this behaviour is ok or needs any change?
-
-Changes from PATCH v4: [1]
-- Factor out MAP_SYNC supported functionality to a common helper
-				[Dave, Darrick, Jan]
-- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
-
-Changes from PATCH v3: [2]
-- Use generic dax_synchronous() helper to check for DAXDEV_SYNC=20
-  flag - [Dan, Darrick, Jan]
-- Add 'is_nvdimm_async' function
-- Document page cache side channel attacks implications &=20
-  countermeasures - [Dave Chinner, Michael]
-
-Changes from PATCH v2:=20
-- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan]=20
-- Use name 'virtio pmem' in place of 'fake dax'=20
-
-Changes from PATCH v1:=20
-- 0-day build test for build dependency on libnvdimm=20
-
- Changes suggested by - [Dan Williams]
-- Split the driver into two parts virtio & pmem =20
-- Move queuing of async block request to block layer
-- Add "sync" parameter in nvdimm_flush function
-- Use indirect call for nvdimm_flush
-- Don=E2=80=99t move declarations to common global header e.g nd.h
-- nvdimm_flush() return 0 or -EIO if it fails
-- Teach nsio_rw_bytes() that the flush can fail
-- Rename nvdimm_flush() to generic_nvdimm_flush()
-- Use 'nd_region->provider_data' for long dereferencing
-- Remove virtio_pmem_freeze/restore functions
-- Remove BSD license text with SPDX license text
-
-- Add might_sleep() in virtio_pmem_flush - [Luiz]
-- Make spin_lock_irqsave() narrow
-
-Changes from RFC v3
-- Rebase to latest upstream - Luiz
-- Call ndregion->flush in place of nvdimm_flush- Luiz
-- kmalloc return check - Luiz
-- virtqueue full handling - Stefan
-- Don't map entire virtio_pmem_req to device - Stefan
-- request leak, correct sizeof req- Stefan
-- Move declaration to virtio_pmem.c
-
-Changes from RFC v2:
-- Add flush function in the nd_region in place of switching
-  on a flag - Dan & Stefan
-- Add flush completion function with proper locking and wait
-  for host side flush completion - Stefan & Dan
-- Keep userspace API in uapi header file - Stefan, MST
-- Use LE fields & New device id - MST
-- Indentation & spacing suggestions - MST & Eric
-- Remove extra header files & add licensing - Stefan
-
-Changes from RFC v1:
-- Reuse existing 'pmem' code for registering persistent=20
-  memory and other operations instead of creating an entirely=20
-  new block driver.
-- Use VIRTIO driver to register memory information with=20
-  nvdimm_bus and create region_type accordingly.=20
-- Call VIRTIO flush from existing pmem driver.
-
-Pankaj Gupta (6):
-   libnvdimm: nd_region flush callback support
-   virtio-pmem: Add virtio-pmem guest driver
-   libnvdimm: add nd_region buffered dax_dev flag
-   dax: check synchronous mapping is supported
-   ext4: disable map_sync for virtio pmem
-   xfs: disable map_sync for virtio pmem
-
-[1] https://lkml.org/lkml/2019/4/3/394
-[2] https://lkml.org/lkml/2019/1/9/471
-[3] https://www.spinics.net/lists/kvm/msg149761.html
-[4] https://www.spinics.net/lists/kvm/msg153095.html =20
-[5] https://lkml.org/lkml/2018/8/31/413
-[6] https://marc.info/?l=3Dlinux-kernel&m=3D153572228719237&w=3D2=20
-[7] https://marc.info/?l=3Dqemu-devel&m=3D153555721901824&w=3D2
-[8] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
-[9] https://lkml.org/lkml/2019/1/9/1191
-
- drivers/acpi/nfit/core.c         |    4 -
- drivers/dax/bus.c                |    2=20
- drivers/dax/super.c              |   13 +++-
- drivers/md/dm.c                  |    2=20
- drivers/nvdimm/claim.c           |    6 +
- drivers/nvdimm/nd.h              |    1=20
- drivers/nvdimm/pmem.c            |   17 +++--
- drivers/nvdimm/region_devs.c     |   45 +++++++++++++-
- drivers/nvdimm/virtio_pmem.c     |   88 +++++++++++++++++++++++++++
- drivers/virtio/Kconfig           |   10 +++
- drivers/virtio/Makefile          |    1=20
- drivers/virtio/pmem.c            |  124 ++++++++++++++++++++++++++++++++=
-+++++++
- fs/ext4/file.c                   |   11 +--
- fs/xfs/xfs_file.c                |   10 +--
- include/linux/dax.h              |   32 +++++++++-
- include/linux/libnvdimm.h        |    9 ++
- include/linux/virtio_pmem.h      |   60 ++++++++++++++++++
- include/uapi/linux/virtio_ids.h  |    1=20
- include/uapi/linux/virtio_pmem.h |   10 +++
- 19 files changed, 419 insertions(+), 27 deletions(-)
+diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+new file mode 100644
+index 000000000000..01044cc2f3a3
+--- /dev/null
++++ b/drivers/nvdimm/virtio_pmem.c
+@@ -0,0 +1,88 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * virtio_pmem.c: Virtio pmem Driver
++ *
++ * Discovers persistent memory range information
++ * from host and provides a virtio based flushing
++ * interface.
++ */
++#include <linux/virtio_pmem.h>
++#include "nd.h"
++
++ /* The interrupt handler */
++void host_ack(struct virtqueue *vq)
++{
++	unsigned int len;
++	unsigned long flags;
++	struct virtio_pmem_request *req, *req_buf;
++	struct virtio_pmem *vpmem = vq->vdev->priv;
++
++	spin_lock_irqsave(&vpmem->pmem_lock, flags);
++	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
++		req->done = true;
++		wake_up(&req->host_acked);
++
++		if (!list_empty(&vpmem->req_list)) {
++			req_buf = list_first_entry(&vpmem->req_list,
++					struct virtio_pmem_request, list);
++			list_del(&vpmem->req_list);
++			req_buf->wq_buf_avail = true;
++			wake_up(&req_buf->wq_buf);
++		}
++	}
++	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
++}
++EXPORT_SYMBOL_GPL(host_ack);
++
++ /* The request submission function */
++int virtio_pmem_flush(struct nd_region *nd_region)
++{
++	int err;
++	unsigned long flags;
++	struct scatterlist *sgs[2], sg, ret;
++	struct virtio_device *vdev = nd_region->provider_data;
++	struct virtio_pmem *vpmem = vdev->priv;
++	struct virtio_pmem_request *req;
++
++	might_sleep();
++	req = kmalloc(sizeof(*req), GFP_KERNEL);
++	if (!req)
++		return -ENOMEM;
++
++	req->done = req->wq_buf_avail = false;
++	strcpy(req->name, "FLUSH");
++	init_waitqueue_head(&req->host_acked);
++	init_waitqueue_head(&req->wq_buf);
++	sg_init_one(&sg, req->name, strlen(req->name));
++	sgs[0] = &sg;
++	sg_init_one(&ret, &req->ret, sizeof(req->ret));
++	sgs[1] = &ret;
++
++	spin_lock_irqsave(&vpmem->pmem_lock, flags);
++	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
++	if (err) {
++		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
++
++		list_add_tail(&vpmem->req_list, &req->list);
++		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
++
++		/* When host has read buffer, this completes via host_ack */
++		wait_event(req->wq_buf, req->wq_buf_avail);
++		spin_lock_irqsave(&vpmem->pmem_lock, flags);
++	}
++	err = virtqueue_kick(vpmem->req_vq);
++	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
++
++	if (!err) {
++		err = -EIO;
++		goto ret;
++	}
++	/* When host has read buffer, this completes via host_ack */
++	wait_event(req->host_acked, req->done);
++	err = req->ret;
++ret:
++	kfree(req);
++	return err;
++};
++EXPORT_SYMBOL_GPL(virtio_pmem_flush);
++MODULE_LICENSE("GPL");
+diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+index 35897649c24f..9f634a2ed638 100644
+--- a/drivers/virtio/Kconfig
++++ b/drivers/virtio/Kconfig
+@@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
+ 
+ 	  If unsure, say Y.
+ 
++config VIRTIO_PMEM
++	tristate "Support for virtio pmem driver"
++	depends on VIRTIO
++	depends on LIBNVDIMM
++	help
++	This driver provides support for virtio based flushing interface
++	for persistent memory range.
++
++	If unsure, say M.
++
+ config VIRTIO_BALLOON
+ 	tristate "Virtio balloon driver"
+ 	depends on VIRTIO
+diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
+index 3a2b5c5dcf46..143ce91eabe9 100644
+--- a/drivers/virtio/Makefile
++++ b/drivers/virtio/Makefile
+@@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
+ virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
+ obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
++obj-$(CONFIG_VIRTIO_PMEM) += pmem.o ../nvdimm/virtio_pmem.o
+diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
+new file mode 100644
+index 000000000000..cc9de9589d56
+--- /dev/null
++++ b/drivers/virtio/pmem.c
+@@ -0,0 +1,124 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * virtio_pmem.c: Virtio pmem Driver
++ *
++ * Discovers persistent memory range information
++ * from host and registers the virtual pmem device
++ * with libnvdimm core.
++ */
++#include <linux/virtio_pmem.h>
++#include <../../drivers/nvdimm/nd.h>
++
++static struct virtio_device_id id_table[] = {
++	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
++	{ 0 },
++};
++
++ /* Initialize virt queue */
++static int init_vq(struct virtio_pmem *vpmem)
++{
++	struct virtqueue *vq;
++
++	/* single vq */
++	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
++				host_ack, "flush_queue");
++	if (IS_ERR(vq))
++		return PTR_ERR(vq);
++
++	spin_lock_init(&vpmem->pmem_lock);
++	INIT_LIST_HEAD(&vpmem->req_list);
++
++	return 0;
++};
++
++static int virtio_pmem_probe(struct virtio_device *vdev)
++{
++	int err = 0;
++	struct resource res;
++	struct virtio_pmem *vpmem;
++	struct nvdimm_bus *nvdimm_bus;
++	struct nd_region_desc ndr_desc = {};
++	int nid = dev_to_node(&vdev->dev);
++	struct nd_region *nd_region;
++
++	if (!vdev->config->get) {
++		dev_err(&vdev->dev, "%s failure: config disabled\n",
++			__func__);
++		return -EINVAL;
++	}
++
++	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
++					GFP_KERNEL);
++	if (!vpmem) {
++		err = -ENOMEM;
++		goto out_err;
++	}
++
++	vpmem->vdev = vdev;
++	err = init_vq(vpmem);
++	if (err)
++		goto out_err;
++
++	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
++			start, &vpmem->start);
++	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
++			size, &vpmem->size);
++
++	res.start = vpmem->start;
++	res.end   = vpmem->start + vpmem->size-1;
++	vpmem->nd_desc.provider_name = "virtio-pmem";
++	vpmem->nd_desc.module = THIS_MODULE;
++
++	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
++						&vpmem->nd_desc);
++	if (!nvdimm_bus)
++		goto out_vq;
++
++	dev_set_drvdata(&vdev->dev, nvdimm_bus);
++
++	ndr_desc.res = &res;
++	ndr_desc.numa_node = nid;
++	ndr_desc.flush = virtio_pmem_flush;
++	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
++	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
++	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
++	nd_region->provider_data =  dev_to_virtio
++					(nd_region->dev.parent->parent);
++
++	if (!nd_region)
++		goto out_nd;
++
++	return 0;
++out_nd:
++	err = -ENXIO;
++	nvdimm_bus_unregister(nvdimm_bus);
++out_vq:
++	vdev->config->del_vqs(vdev);
++out_err:
++	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
++	return err;
++}
++
++static void virtio_pmem_remove(struct virtio_device *vdev)
++{
++	struct virtio_pmem *vpmem = vdev->priv;
++	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
++
++	nvdimm_bus_unregister(nvdimm_bus);
++	vdev->config->del_vqs(vdev);
++	vdev->config->reset(vdev);
++	kfree(vpmem);
++}
++
++static struct virtio_driver virtio_pmem_driver = {
++	.driver.name		= KBUILD_MODNAME,
++	.driver.owner		= THIS_MODULE,
++	.id_table		= id_table,
++	.probe			= virtio_pmem_probe,
++	.remove			= virtio_pmem_remove,
++};
++
++module_virtio_driver(virtio_pmem_driver);
++MODULE_DEVICE_TABLE(virtio, id_table);
++MODULE_DESCRIPTION("Virtio pmem driver");
++MODULE_LICENSE("GPL");
+diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
+new file mode 100644
+index 000000000000..224f9d934be6
+--- /dev/null
++++ b/include/linux/virtio_pmem.h
+@@ -0,0 +1,60 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * virtio_pmem.h: virtio pmem Driver
++ *
++ * Discovers persistent memory range information
++ * from host and provides a virtio based flushing
++ * interface.
++ **/
++
++#ifndef _LINUX_VIRTIO_PMEM_H
++#define _LINUX_VIRTIO_PMEM_H
++
++#include <linux/virtio_ids.h>
++#include <linux/module.h>
++#include <linux/virtio_config.h>
++#include <uapi/linux/virtio_pmem.h>
++#include <linux/libnvdimm.h>
++#include <linux/spinlock.h>
++
++struct virtio_pmem_request {
++	/* Host return status corresponding to flush request */
++	int ret;
++
++	/* command name*/
++	char name[16];
++
++	/* Wait queue to process deferred work after ack from host */
++	wait_queue_head_t host_acked;
++	bool done;
++
++	/* Wait queue to process deferred work after virt queue buffer avail */
++	wait_queue_head_t wq_buf;
++	bool wq_buf_avail;
++	struct list_head list;
++};
++
++struct virtio_pmem {
++	struct virtio_device *vdev;
++
++	/* Virtio pmem request queue */
++	struct virtqueue *req_vq;
++
++	/* nvdimm bus registers virtio pmem device */
++	struct nvdimm_bus *nvdimm_bus;
++	struct nvdimm_bus_descriptor nd_desc;
++
++	/* List to store deferred work if virtqueue is full */
++	struct list_head req_list;
++
++	/* Synchronize virtqueue data */
++	spinlock_t pmem_lock;
++
++	/* Memory region information */
++	uint64_t start;
++	uint64_t size;
++};
++
++void host_ack(struct virtqueue *vq);
++int virtio_pmem_flush(struct nd_region *nd_region);
++#endif
+diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+index 6d5c3b2d4f4d..346389565ac1 100644
+--- a/include/uapi/linux/virtio_ids.h
++++ b/include/uapi/linux/virtio_ids.h
+@@ -43,5 +43,6 @@
+ #define VIRTIO_ID_INPUT        18 /* virtio input */
+ #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+ #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
++#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+ 
+ #endif /* _LINUX_VIRTIO_IDS_H */
+diff --git a/include/uapi/linux/virtio_pmem.h b/include/uapi/linux/virtio_pmem.h
+new file mode 100644
+index 000000000000..fa3f7d52717a
+--- /dev/null
++++ b/include/uapi/linux/virtio_pmem.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
++#define _UAPI_LINUX_VIRTIO_PMEM_H
++
++struct virtio_pmem_config {
++	__le64 start;
++	__le64 size;
++};
++#endif
+-- 
+2.20.1
