@@ -2,117 +2,58 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A28AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 08:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD6EC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 08:26:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C17206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 08:23:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C17206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F5B4206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 08:26:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5B4206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55617 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55668 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE8WD-0005wH-9m
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 04:23:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53568)
+	id 1hE8YX-0007Bn-B3
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 04:26:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hE8VF-0005Mr-MZ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:22:42 -0400
+	(envelope-from <jack@suse.cz>) id 1hE8Xe-0006QW-1c
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hE8VE-0006ON-Nh
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:22:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35436)
+	(envelope-from <jack@suse.cz>) id 1hE8Xd-0007wk-0d
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:25:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36538 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hE8VE-0006Nm-DE
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:22:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BCA930642A7;
-	Wed, 10 Apr 2019 08:22:39 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0A8495DA5B;
-	Wed, 10 Apr 2019 08:22:33 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
-	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
-	<berrange@redhat.com>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-	<b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <0e30df69-c534-da63-a21b-813281b39b86@redhat.com>
-Date: Wed, 10 Apr 2019 10:22:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1hE8Xc-0007vL-Ma
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:25:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+	by mx1.suse.de (Postfix) with ESMTP id 30A60ABD4;
+	Wed, 10 Apr 2019 08:25:06 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+	id 1D74A1E429B; Wed, 10 Apr 2019 10:25:04 +0200 (CEST)
+Date: Wed, 10 Apr 2019 10:25:04 +0200
+From: Jan Kara <jack@suse.cz>
+To: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <20190410082504.GF1426@quack2.suse.cz>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-5-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Wed, 10 Apr 2019 08:22:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+Content-Disposition: inline
+In-Reply-To: <20190410040826.24371-5-pagupta@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+	timestamps) [generic]
+X-Received-From: 195.135.220.15
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] dax: check synchronous mapping is
+ supported
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,63 +65,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
-	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
+	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger.kernel@dilger.ca, zwisler@kernel.org,
+	aarcange@redhat.com, dave.jiang@intel.com,
+	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
+	david@redhat.com, willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
+	pbonzini@redhat.com, dan.j.williams@intel.com,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong.eric@gmail.com,
+	darrick.wong@oracle.com, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410082232.Gl1GVzhCk-2Zbyj6bbn0Amr40IWLNqLBWxRw3yCEg-A@z>
+Message-ID: <20190410082504.cuDATQAnBK7k8czRC0C3nRYBua5yhKoORlzpcYcaLAQ@z>
 
-On 10/04/2019 08.07, Thomas Huth wrote:
-> On 09/04/2019 21.46, Stefan Weil wrote:
->> On 05.04.19 11:16, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 4/5/19 11:02 AM, Daniel P. Berrang=C3=A9 wrote:
->>>> On Fri, Apr 05, 2019 at 10:47:54AM +0200, Philippe Mathieu-Daud=C3=A9=
- wrote:
->>>> Do the various crashes that you illustrate in that cover letter
->>>> still exist today ? If so, 2 years of continued brokenness with no
->>>> fixes would reinforce the the view that it is time to remove TCI
->>>> from the codebase.
->>>
->>> Or find a maintainer and add tests...
->>
->> Thank you for CC'ing me. I could not spend much of my free time for QE=
-MU
->> last year and typically will miss important messages on the list unles=
-s
->> my address is explicitly given. Nevertheless I still feel responsible
->> for TCI, and I am also listed as maintainer in MAINTAINERS.
->=20
-> That's great, good to know that you're still interested in TCI! ... but
-> I think one of the main problems is still that we completely lack test
-> coverage for TCI - the code always is in danger to bit-rot if it is not
-> tested by default.
->=20
-> I could maybe have a try to add some test to our .gitlab-ci.yml file ..=
-.
-> if you or somebody else could add one to .travis.yml, that would be
-> great. Something like:
->=20
->  - ./configure --enable-tcg-interpreter --target-list=3Dalpha-softmmu,p=
-pc64-softmmu,i386-softmmu,sparc-softmmu,microblaze-softmmu,moxie-softmmu,=
-arm-softmmu,hppa-softmmu
->  - make
->  - make tests/boot-serial-test
->  - QTEST_QEMU_BINARY=3D"alpha-softmmu/qemu-system-alpha"  ./tests/boot-=
-serial-test
->  - QTEST_QEMU_BINARY=3D"ppc64-softmmu/qemu-system-ppc64"  ./tests/boot-=
-serial-test
->  - ...
+On Wed 10-04-19 09:38:24, Pankaj Gupta wrote:
+> This patch introduces 'daxdev_mapping_supported' helper
+> which checks if 'MAP_SYNC' is supported with filesystem
+> mapping. It also checks if corresponding dax_device is
+> synchronous. Virtio pmem device is asynchronous and
+> does not not support VM_SYNC. 
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  include/linux/dax.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/include/linux/dax.h b/include/linux/dax.h
+> index b896706a5ee9..4a2a60ffec86 100644
+> --- a/include/linux/dax.h
+> +++ b/include/linux/dax.h
+> @@ -38,6 +38,24 @@ void kill_dax(struct dax_device *dax_dev);
+>  void dax_write_cache(struct dax_device *dax_dev, bool wc);
+>  bool dax_write_cache_enabled(struct dax_device *dax_dev);
+>  bool dax_synchronous(struct dax_device *dax_dev);
+> +
+> +/*
+> + * Callers check if synchronous mapping is enabled for DAX file
+> + * and attached dax device is also synchronous.
+> + *
+> + * dax_synchronous function verifies if dax device is synchronous.
+> + * Currently, only virtio pmem device supports asynchronous device
+> + * flush.
+> + */
 
-Additionally, I think it should be possible to compile with the
-x86_64-linux-user target and then to run "make check-tcg" ... however,
-that currently crashes with:
+Thanks for the patch! I'd restructure this comment like:
 
-TODO qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
-qemu/tcg/tci.c:859: tcg fatal error
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+/*
+ * Check if given mapping is supported by the file / underlying device.
+ */
+> +static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
+> +				struct dax_device *dax_dev)
+> +{
 
- Thomas
+	/* Everyone supports non-sync mappings */
+> +	if (!(vma->vm_flags & VM_SYNC))
+> +		return true;
+	/* Sync mappings are supported only for files using DAX */
+> +	if (!IS_DAX(file_inode(vma->vm_file)))
+> +		return false;
+	/* Underlying device must support persisting through CPU instructions */
+> +	return dax_synchronous(dax_dev);
+> +}
+>  #else
+>  static inline struct dax_device *dax_get_by_host(const char *host)
+>  {
+> @@ -69,6 +87,11 @@ static inline bool dax_synchronous(struct dax_device *dax_dev)
+>  {
+>  	return true;
+>  }
+> +static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
+> +				struct dax_device *dax_dev)
+> +{
+> +	return true;
+
+This looks wrong. Shouldn't it rather be:
+
+	return !(vma->flags & VM_SYNC);
+
+?
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
