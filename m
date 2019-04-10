@@ -2,61 +2,66 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8DBC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0D3C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:33:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE71720850
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:29:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE71720850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAD2120850
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 14:33:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD2120850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60633 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60683 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEEEE-0003d6-Mv
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 10:29:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44818)
+	id 1hEEHo-0004yP-UJ
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 10:33:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hEED7-00031U-15
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:28:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hEEGu-0004f2-OT
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hEED6-0004FX-1r
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:28:21 -0400
-Received: from mga06.intel.com ([134.134.136.31]:11947)
+	(envelope-from <cohuck@redhat.com>) id 1hEEGt-00087R-Ls
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:32:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hEED5-0004De-NI
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:28:19 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-	by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	10 Apr 2019 07:28:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,332,1549958400"; d="scan'208";a="222240458"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga001.jf.intel.com with ESMTP; 10 Apr 2019 07:28:16 -0700
-Date: Wed, 10 Apr 2019 22:27:56 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190410142756.GA3136@richard>
-References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hEEGt-00086o-BT
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:32:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E98103082E0F;
+	Wed, 10 Apr 2019 14:32:03 +0000 (UTC)
+Received: from gondolin (ovpn-204-33.brq.redhat.com [10.40.204.33])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E921F19C7E;
+	Wed, 10 Apr 2019 14:31:43 +0000 (UTC)
+Date: Wed, 10 Apr 2019 16:31:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <20190410163139.4a04175e.cohuck@redhat.com>
+In-Reply-To: <127904196.20807948.1554904981681.JavaMail.zimbra@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-3-pagupta@redhat.com>
+	<20190410091216-mutt-send-email-mst@kernel.org>
+	<127904196.20807948.1554904981681.JavaMail.zimbra@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
- MCFG table
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 10 Apr 2019 14:32:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,93 +73,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: ehabkost@redhat.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org,
-	mst@redhat.com
+Cc: jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, jasowang@redhat.com,
+	david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+	linux-nvdimm@lists.01.org, vishal l verma <vishal.l.verma@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, willy@infradead.org,
+	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, imammedo@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410142756.3nKugQRUFXjEj8voF4_16RBaAWA6li83G27Ys2mSbjc@z>
+Message-ID: <20190410143139.GusCarASVoTyvMtBjhIeSvvYyGFe75ZVnmnubhtfDoQ@z>
 
-On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
->Dummy table (with signature "QEMU") creation came from original SeaBIOS
->codebase. And QEMU would have to keep it around if there were Q35 machine
->that depended on keeping ACPI tables blob constant size. Luckily there
->were no versioned Q35 machine types before commit:
->  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
->which obsoleted need to keep ACPI tables blob the same size on source/destination.
+On Wed, 10 Apr 2019 10:03:01 -0400 (EDT)
+Pankaj Gupta <pagupta@redhat.com> wrote:
 
-I think we should keep table blob the same size on source/destination.
+> > 
+> > On Wed, Apr 10, 2019 at 09:38:22AM +0530, Pankaj Gupta wrote:  
+> > > This patch adds virtio-pmem driver for KVM guest.
+> > > 
+> > > Guest reads the persistent memory range information from
+> > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > > creates a nd_region object with the persistent memory
+> > > range information so that existing 'nvdimm/pmem' driver
+> > > can reserve this into system memory map. This way
+> > > 'virtio-pmem' driver uses existing functionality of pmem
+> > > driver to register persistent memory compatible for DAX
+> > > capable filesystems.
+> > > 
+> > > This also provides function to perform guest flush over
+> > > VIRTIO from 'pmem' driver when userspace performs flush
+> > > on DAX memory range.
+> > > 
+> > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 
-But with resizable MemoryRegion, we don't need to reserve some dummy space.
-Because we can expand it later.
-
->
->Considering the 1st versioned machine is pc-q35-2.4, the dummy table
->is not really necessary and it's safe to drop it without breaking
->cross version migration in both directions unconditionally.
->
->Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->---
-> hw/i386/acpi-build.c | 18 ++++--------------
-> 1 file changed, 4 insertions(+), 14 deletions(-)
->
->diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->index 416da31..8671e25 100644
->--- a/hw/i386/acpi-build.c
->+++ b/hw/i386/acpi-build.c
->@@ -2401,7 +2401,6 @@ static void
-> build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> {
->     AcpiTableMcfg *mcfg;
->-    const char *sig;
->     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+> > > diff --git a/include/uapi/linux/virtio_ids.h
+> > > b/include/uapi/linux/virtio_ids.h
+> > > index 6d5c3b2d4f4d..346389565ac1 100644
+> > > --- a/include/uapi/linux/virtio_ids.h
+> > > +++ b/include/uapi/linux/virtio_ids.h
+> > > @@ -43,5 +43,6 @@
+> > >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> > >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> > >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > > +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+> > >  
+> > >  #endif /* _LINUX_VIRTIO_IDS_H */  
+> > 
+> > Didn't Paolo point out someone is using 25 for audio?  
 > 
->     mcfg = acpi_data_push(table_data, len);
->@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
->     mcfg->allocation[0].start_bus_number = 0;
->     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
 > 
->-    /* MCFG is used for ECAM which can be enabled or disabled by guest.
-
-I want to cnfirm what is "enabled or disabled by guest" here.
-
-If we don't reserve mcfg and "guest" enable mcfg during running, the ACPI
-table size changed. But the destination still has the original table size,
-since destination "guest" keep sleep during this period.
-
-Now the migration would face table size difference and break migration?
-
->-     * To avoid table size changes (which create migration issues),
->-     * always create the table even if there are no allocations,
->-     * but set the signature to a reserved value in this case.
->-     * ACPI spec requires OSPMs to ignore such tables.
->-     */
->-    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
->-        /* Reserved signature: ignored by OSPM */
->-        sig = "QEMU";
->-    } else {
->-        sig = "MCFG";
->-    }
->-    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
->+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> }
+> Sorry! I did not notice this.
 > 
-> /*
->@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->     }
->     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
->     qobject_unref(o);
->+    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
->+        return false;
->+    }
+> > 
+> > Please, reserve an ID with the Virtio TC before using it.  
 > 
->     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
->     assert(o);
->-- 
->2.7.4
+> I thought I requested[1] ID 25.
+> 
+> [1] https://github.com/oasis-tcs/virtio-spec/issues/38
+> [2] https://lists.oasis-open.org/archives/virtio-dev/201805/threads.html
+> 
+> In that case I will send request for next available ID i.e 26?
 
--- 
-Wei Yang
-Help you, Help me
+Have the folks using this for audio sent a reservation request as well?
+If not, I'd say the first requester should get the id...
+
+(And yes, we need to be quicker with voting on/applying id
+reservations :/)
 
