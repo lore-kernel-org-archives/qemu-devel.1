@@ -2,91 +2,77 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4BEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFEDC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:47:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0021B206DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:41:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0021B206DF
+	by mail.kernel.org (Postfix) with ESMTPS id 1E415206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:47:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E415206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34482 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34620 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEGHi-0008Qq-8F
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:41:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46609)
+	id 1hEGNe-0002cq-Qd
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:47:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGGa-0007iX-0h
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:40:04 -0400
+	(envelope-from <mst@redhat.com>) id 1hEGMd-0002AP-MU
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGGZ-0006Xv-6V
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:40:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEGGW-0006WS-TF; Wed, 10 Apr 2019 12:40:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E20653086204;
-	Wed, 10 Apr 2019 16:39:59 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 506B561102;
-	Wed, 10 Apr 2019 16:39:58 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190410162918.9343-1-mreitz@redhat.com>
-	<aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
-Date: Wed, 10 Apr 2019 18:39:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mst@redhat.com>) id 1hEGMc-0002GK-FH
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:46:19 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:47004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hEGMc-0002Fo-9s
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:46:18 -0400
+Received: by mail-qt1-f196.google.com with SMTP id z17so3594597qts.13
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 09:46:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=wTZgbHHgkuc02Ro6e9QqtN7TkTJsuUpWH/R1Yu8H+2c=;
+	b=FJbGdIwKf13PqJ0yD78IyjwPA2atPAIgQVZQA0Rksf2OV4A6DmIQjpD6bxOPTKvv3c
+	mwhgZaaDVB0OqIh7eGTMp0OHmmA95OMWkZYFB/4bvBQ12fefLwPgyUdzZWiSyJC3rUTd
+	WMzQvzKQrng1mr9kmh9CkYeTDwgBhbtq+mK8ibOhZUIkS2ernKpnhl/EACHMKqgnwUDX
+	KMSw8lupI36w+2Or1/UUyMPHZSJ7Y70lup2KB+Sucp8Ol6b17vkf29omSDqjorjb0yBc
+	VoEkBwm0nHDISfJ1/Psce99dHVrcaaIWwWhFIWHKDZdU4fcLHFeUNIIC3W0K62cnDa/n
+	trew==
+X-Gm-Message-State: APjAAAXumZtmhiteKIpALnL/rRF/bLVZjZ2d3nAvPQ/os+EZ/HjbLCnM
+	+KTZEnXT+DmzZg3i7GH70YR5sQ==
+X-Google-Smtp-Source: APXvYqzo2oB9aEeCxQF7UkVfHE1VMd09kGpmcV7fL9Txo0VqCS7eRqZuS9unOq1Egz2WPuNxoQfPtw==
+X-Received: by 2002:a0c:d167:: with SMTP id c36mr26941640qvh.1.1554914776715; 
+	Wed, 10 Apr 2019 09:46:16 -0700 (PDT)
+Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
+	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
+	h24sm24983836qte.50.2019.04.10.09.46.13
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 10 Apr 2019 09:46:15 -0700 (PDT)
+Date: Wed, 10 Apr 2019 12:46:12 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190410124114-mutt-send-email-mst@kernel.org>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-3-pagupta@redhat.com>
+	<20190410091216-mutt-send-email-mst@kernel.org>
+	<127904196.20807948.1554904981681.JavaMail.zimbra@redhat.com>
+	<20190410163139.4a04175e.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2Xzr4c9HRwJtAye50aRY2gVKvSONxqsgU"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 10 Apr 2019 16:39:59 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190410163139.4a04175e.cohuck@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotests: Let 245 pass on tmpfs
+	[fuzzy]
+X-Received-From: 209.85.160.196
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,69 +84,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Pankaj Gupta <pagupta@redhat.com>, jack@suse.cz, kvm@vger.kernel.org,
+	david@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+	qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+	linux-nvdimm@lists.01.org,
+	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
+	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, imammedo@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410163956.teWunrJqTCW4SNrQDl2M_yLiXkAVxUgTYagbQOO8aOc@z>
+Message-ID: <20190410164612.KljWEe7cG8i5qCOhT0pZa_9cVqVInIrRaQZNx8AEWrE@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2Xzr4c9HRwJtAye50aRY2gVKvSONxqsgU
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotests: Let 245 pass on tmpfs
-References: <20190410162918.9343-1-mreitz@redhat.com>
- <aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
-In-Reply-To: <aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 10, 2019 at 04:31:39PM +0200, Cornelia Huck wrote:
+> On Wed, 10 Apr 2019 10:03:01 -0400 (EDT)
+> Pankaj Gupta <pagupta@redhat.com> wrote:
+> 
+> > > 
+> > > On Wed, Apr 10, 2019 at 09:38:22AM +0530, Pankaj Gupta wrote:  
+> > > > This patch adds virtio-pmem driver for KVM guest.
+> > > > 
+> > > > Guest reads the persistent memory range information from
+> > > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > > > creates a nd_region object with the persistent memory
+> > > > range information so that existing 'nvdimm/pmem' driver
+> > > > can reserve this into system memory map. This way
+> > > > 'virtio-pmem' driver uses existing functionality of pmem
+> > > > driver to register persistent memory compatible for DAX
+> > > > capable filesystems.
+> > > > 
+> > > > This also provides function to perform guest flush over
+> > > > VIRTIO from 'pmem' driver when userspace performs flush
+> > > > on DAX memory range.
+> > > > 
+> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> 
+> > > > diff --git a/include/uapi/linux/virtio_ids.h
+> > > > b/include/uapi/linux/virtio_ids.h
+> > > > index 6d5c3b2d4f4d..346389565ac1 100644
+> > > > --- a/include/uapi/linux/virtio_ids.h
+> > > > +++ b/include/uapi/linux/virtio_ids.h
+> > > > @@ -43,5 +43,6 @@
+> > > >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> > > >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> > > >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > > > +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+> > > >  
+> > > >  #endif /* _LINUX_VIRTIO_IDS_H */  
+> > > 
+> > > Didn't Paolo point out someone is using 25 for audio?  
+> > 
+> > 
+> > Sorry! I did not notice this.
+> > 
+> > > 
+> > > Please, reserve an ID with the Virtio TC before using it.  
+> > 
+> > I thought I requested[1] ID 25.
+> > 
+> > [1] https://github.com/oasis-tcs/virtio-spec/issues/38
+> > [2] https://lists.oasis-open.org/archives/virtio-dev/201805/threads.html
+> > 
+> > In that case I will send request for next available ID i.e 26?
+> 
+> Have the folks using this for audio sent a reservation request as well?
+> If not, I'd say the first requester should get the id...
 
-On 10.04.19 18:39, Eric Blake wrote:
-> On 4/10/19 11:29 AM, Max Reitz wrote:
->> tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
->> @direct if the filesystem does not support it.
->>
->> Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/245 | 10 ++++++++--
->>  1 file changed, 8 insertions(+), 2 deletions(-)
->=20
-> Are you trying to get this in 4.0-rc3? (As a test, it has no bearing on=
+No but I think they ship their's already. No one ships pmem
+so it's less pain for everyone if we just skip 25.
 
-> the actual binaries; fewer testsuite failures are nice if we squeeze it=
+> (And yes, we need to be quicker with voting on/applying id
+> reservations :/)
 
-> in, but at the same time it is not enough to delay the release if it
-> does not get fixed until 4.1).
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+We can't vote on what was not proposed for a vote.
+At the moment that responsibility is with the commented
+once discussion on the comment has taken place.
 
-If there are other patches for rc3, we could take this as well.  But
-there is no point in making a pull request just for this.
+I think what's missing is a description of the process
+in the README. Want to write it up and post it?
 
-Max
-
-
---2Xzr4c9HRwJtAye50aRY2gVKvSONxqsgU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuHFwACgkQ9AfbAGHV
-z0AkXggAheRZgXSdvLICfULz40QOJIP5bTCvfzgDC5AMNwLKNpL1ySskYZHxgbta
-Qlo2Ils0mbVOmxOTuQokhMNX+Uw9j3KFra/SPUp6tYIYXHzQSckHqq3jrwHmsHM8
-UqQcXGlhaBc/6MonHOKntord5f4/mXCOahkHya/dx+/vHVLkd2gQy1wq/o8OuRPB
-ktYtIt/O2ceGCyTzOzG+d41GXpSCMUB7WaMPym7l+ll83BSbAFgLyYd+8oAleJaz
-lA1IOye5QbbJS8Kj1drYP1U7ORnV8nDaAw+Pbf0AhXqQ0/DTfaV5wf8XenamXY1I
-yU8l8iB/es7RecFutGHZWhVjX0Y/hg==
-=q7Nr
------END PGP SIGNATURE-----
-
---2Xzr4c9HRwJtAye50aRY2gVKvSONxqsgU--
+-- 
+MST
 
