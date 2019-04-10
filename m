@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB74DC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA4DC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:05:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 708B1204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:03:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 708B1204EC
+	by mail.kernel.org (Postfix) with ESMTPS id EEA0F20818
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 21:05:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA0F20818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37901 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEKNr-00058G-Ll
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 17:03:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42685)
+	id 1hEKPF-0005qy-BG
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 17:05:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHj-0000gY-II
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEKHr-0000ou-I5
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEKHi-0008AI-5S
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55928)
+	(envelope-from <mreitz@redhat.com>) id 1hEKHp-0008Dz-Th
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEKHe-00088i-SE; Wed, 10 Apr 2019 16:57:27 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hEKHm-0008CN-4X; Wed, 10 Apr 2019 16:57:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F7A13099FC4;
-	Wed, 10 Apr 2019 20:57:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5DD8981F01;
+	Wed, 10 Apr 2019 20:57:33 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E1A519C6F;
-	Wed, 10 Apr 2019 20:57:25 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B4C5A5C3FD;
+	Wed, 10 Apr 2019 20:57:32 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 10 Apr 2019 22:57:12 +0200
-Message-Id: <20190410205715.2209-4-mreitz@redhat.com>
+Date: Wed, 10 Apr 2019 22:57:15 +0200
+Message-Id: <20190410205715.2209-7-mreitz@redhat.com>
 In-Reply-To: <20190410205715.2209-1-mreitz@redhat.com>
 References: <20190410205715.2209-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 10 Apr 2019 20:57:26 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 10 Apr 2019 20:57:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 3/6] blkdebug: Add @iotype error option
+Subject: [Qemu-devel] [PATCH v2 6/6] iotests: Test qemu-img convert --salvage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,231 +76,264 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410205712.lsNrHSzuwUbWI16Xgn19jp1REtZ7oRUo_R3WPUPA25Y@z>
+Message-ID: <20190410205715.3QCboTdFzJuQ_RbgA_K8dd39Dwl8P6u8xRJqMkCEOPM@z>
 
-This new error option allows users of blkdebug to inject errors only on
-certain kinds of I/O operations.  Users usually want to make a very
-specific operation fail, not just any; but right now they simply hope
-that the event that triggers the error injection is followed up with
-that very operation.  That may not be true, however, because the block
-layer is changing (including blkdebug, which may increase the number of
-types of I/O operations on which to inject errors).
-
-The new option's default has been chosen to keep backwards
-compatibility.
-
-Note that similar to the internal representation, we could choose to
-expose this option as a list of I/O types.  But there is no practical
-use for this, because as described above, users usually know exactly
-which kind of operation they want to make fail, so there is no need to
-specify multiple I/O types at once.  In addition, exposing this option
-as a list would require non-trivial changes to qemu_opts_absorb_qdict().
+This test converts a simple image to another, but blkdebug injects
+block_status and read faults at some offsets.  The resulting image
+should be the same as the input image, except that sectors that could
+not be read have to be 0.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 26 +++++++++++++++++++++++
- block/blkdebug.c     | 50 ++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 67 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/249     | 163 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out |  43 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 207 insertions(+)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7ccbfff9d0..5141e91172 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3235,6 +3235,26 @@
-             'l1_shrink_write_table', 'l1_shrink_free_l2_clusters',
-             'cor_write'] }
-=20
-+##
-+# @BlkdebugIOType:
+diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
+new file mode 100755
+index 0000000000..d3883d75f3
+--- /dev/null
++++ b/tests/qemu-iotests/249
+@@ -0,0 +1,163 @@
++#!/bin/bash
 +#
-+# Kinds of I/O that blkdebug can inject errors in.
++# Test qemu-img convert --salvage
 +#
-+# @read: .bdrv_co_preadv()
++# Copyright (C) 2018 Red Hat, Inc.
 +#
-+# @write: .bdrv_co_pwritev()
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# @write-zeroes: .bdrv_co_pwrite_zeroes()
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
-+# @discard: .bdrv_co_pdiscard()
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
-+# @flush: .bdrv_co_flush_to_disk()
-+#
-+# Since: 4.1
-+##
-+{ 'enum': 'BlkdebugIOType',
-+  'data': [ 'read', 'write', 'write-zeroes', 'discard', 'flush' ] }
 +
- ##
- # @BlkdebugInjectErrorOptions:
- #
-@@ -3245,6 +3265,11 @@
- # @state:       the state identifier blkdebug needs to be in to
- #               actually trigger the event; defaults to "any"
- #
-+# @iotype:      the type of I/O operations on which this error should
-+#               be injected; defaults to "all read, write,
-+#               write-zeroes, discard, and flush operations"
-+#               (since: 4.1)
++# creator
++owner=3Dmreitz@redhat.com
++
++seq=3D$(basename $0)
++echo "QA output created by $seq"
++
++here=3D$PWD
++status=3D1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt generic
++_supported_proto file
++_supported_os Linux
++
++
++TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
++
++$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
++
++
++sector_size=3D512
++
++# Offsets on which to fail block-status.  Keep in ascending order so
++# the indexing done by _filter_offsets will appear in ascending order
++# in the output as well.
++status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
++                     $((33 * 1024 * 1024 + 512))"
++
++# Offsets on which to fail reads.  Keep in ascending order for the
++# same reason.
++# Element 1 is shared with $status_fail_offsets on purpose.
++# Elements 2 and later test what happens when a continuous range of
++# sectors is inaccessible.
++read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
++                   $((33 * 1024 * 1024 + 512))
++                   $(seq $((34 * 1024 * 1024)) $sector_size \
++                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
++
++
++# blkdebug must be above the format layer so it can intercept all
++# block-status events
++source_img=3D"json:{'driver': 'blkdebug',
++                  'image': {
++                      'driver': '$IMGFMT',
++                      'file': {
++                          'driver': 'file',
++                          'filename': '$TEST_IMG.orig'
++                      }
++                  },
++                  'inject-error': ["
++
++for ofs in $status_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'block-status',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++for ofs in $read_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'read',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++# Remove the trailing comma and terminate @inject-error and json:{}
++source_img=3D"${source_img%,} ] }"
++
++
++echo
++
++
++_filter_offsets() {
++    filters=3D
++
++    index=3D0
++    for ofs in $2
++    do
++        filters+=3D" -e s/$(printf "$1" $ofs)/status_fail_offset_$index/=
+"
++        index=3D$((index + 1))
++    done
++
++    index=3D0
++    for ofs in $3
++    do
++        filters+=3D" -e s/$(printf "$1" $ofs)/read_fail_offset_$index/"
++        index=3D$((index + 1))
++    done
++
++    sed $filters
++}
++
++# While determining the number of allocated sectors in the input
++# image, we should see one block status warning per element of
++# $status_fail_offsets.
 +#
- # @errno:       error identifier (errno) to be returned; defaults to
- #               EIO
- #
-@@ -3262,6 +3287,7 @@
- { 'struct': 'BlkdebugInjectErrorOptions',
-   'data': { 'event': 'BlkdebugEvent',
-             '*state': 'int',
-+            '*iotype': 'BlkdebugIOType',
-             '*errno': 'int',
-             '*sector': 'int',
-             '*once': 'bool',
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index efd9441625..ca84b12e32 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -75,6 +75,7 @@ typedef struct BlkdebugRule {
-     int state;
-     union {
-         struct {
-+            uint64_t iotype_mask;
-             int error;
-             int immediately;
-             int once;
-@@ -91,6 +92,9 @@ typedef struct BlkdebugRule {
-     QSIMPLEQ_ENTRY(BlkdebugRule) active_next;
- } BlkdebugRule;
-=20
-+QEMU_BUILD_BUG_MSG(BLKDEBUGIO_TYPE__MAX > 64,
-+                   "BlkdebugIOType mask does not fit into an uint64_t");
++# Then, the image is read.  Since the block status is queried in
++# basically the same way, the same warnings as in the previous step
++# should reappear.  Interleaved with those we should see a read
++# warning per element of $read_fail_offsets.
++# Note that $read_fail_offsets and $status_fail_offsets share an
++# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
++# "status_fail_offset_1" in the output is the same as
++# "read_fail_offset_1".
++$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
++    | _filter_offsets '%i' "$status_fail_offsets" "$read_fail_offsets"
 +
- static QemuOptsList inject_error_opts =3D {
-     .name =3D "inject-error",
-     .head =3D QTAILQ_HEAD_INITIALIZER(inject_error_opts.head),
-@@ -103,6 +107,10 @@ static QemuOptsList inject_error_opts =3D {
-             .name =3D "state",
-             .type =3D QEMU_OPT_NUMBER,
-         },
-+        {
-+            .name =3D "iotype",
-+            .type =3D QEMU_OPT_STRING,
-+        },
-         {
-             .name =3D "errno",
-             .type =3D QEMU_OPT_NUMBER,
-@@ -162,6 +170,8 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
-or **errp)
-     int event;
-     struct BlkdebugRule *rule;
-     int64_t sector;
-+    BlkdebugIOType iotype;
-+    Error *local_error =3D NULL;
-=20
-     /* Find the right event for the rule */
-     event_name =3D qemu_opt_get(opts, "event");
-@@ -192,6 +202,26 @@ static int add_rule(void *opaque, QemuOpts *opts, Er=
-ror **errp)
-         sector =3D qemu_opt_get_number(opts, "sector", -1);
-         rule->options.inject.offset =3D
-             sector =3D=3D -1 ? -1 : sector * BDRV_SECTOR_SIZE;
++echo
 +
-+        iotype =3D qapi_enum_parse(&BlkdebugIOType_lookup,
-+                                 qemu_opt_get(opts, "iotype"),
-+                                 BLKDEBUGIO_TYPE__MAX, &local_error);
-+        if (local_error) {
-+            error_propagate(errp, local_error);
-+            return -1;
-+        }
-+        if (iotype !=3D BLKDEBUGIO_TYPE__MAX) {
-+            rule->options.inject.iotype_mask =3D (1ull << iotype);
-+        } else {
-+            /* Apply the default */
-+            rule->options.inject.iotype_mask =3D
-+                (1ull << BLKDEBUGIO_TYPE_READ)
-+                | (1ull << BLKDEBUGIO_TYPE_WRITE)
-+                | (1ull << BLKDEBUGIO_TYPE_WRITE_ZEROES)
-+                | (1ull << BLKDEBUGIO_TYPE_DISCARD)
-+                | (1ull << BLKDEBUGIO_TYPE_FLUSH);
-+        }
++# The offsets where the block status could not be determined should
++# have been treated as containing data and thus should be correct in
++# the output image.
++# The offsets where reading failed altogether should be 0.  Make them
++# 0 in the input image, too, so we can compare both images.
++for ofs in $read_fail_offsets
++do
++    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
++        | _filter_qemu_io \
++        | _filter_offsets '%i' '' "$read_fail_offsets"
++done
 +
-         break;
-=20
-     case ACTION_SET_STATE:
-@@ -470,7 +500,8 @@ out:
-     return ret;
- }
-=20
--static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t by=
-tes)
-+static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t by=
-tes,
-+                      BlkdebugIOType iotype)
- {
-     BDRVBlkdebugState *s =3D bs->opaque;
-     BlkdebugRule *rule =3D NULL;
-@@ -480,9 +511,10 @@ static int rule_check(BlockDriverState *bs, uint64_t=
- offset, uint64_t bytes)
-     QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-         uint64_t inject_offset =3D rule->options.inject.offset;
-=20
--        if (inject_offset =3D=3D -1 ||
--            (bytes && inject_offset >=3D offset &&
--             inject_offset < offset + bytes))
-+        if ((inject_offset =3D=3D -1 ||
-+             (bytes && inject_offset >=3D offset &&
-+              inject_offset < offset + bytes)) &&
-+            (rule->options.inject.iotype_mask & (1ull << iotype)))
-         {
-             break;
-         }
-@@ -521,7 +553,7 @@ blkdebug_co_preadv(BlockDriverState *bs, uint64_t off=
-set, uint64_t bytes,
-         assert(bytes <=3D bs->bl.max_transfer);
-     }
-=20
--    err =3D rule_check(bs, offset, bytes);
-+    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_READ);
-     if (err) {
-         return err;
-     }
-@@ -542,7 +574,7 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t of=
-fset, uint64_t bytes,
-         assert(bytes <=3D bs->bl.max_transfer);
-     }
-=20
--    err =3D rule_check(bs, offset, bytes);
-+    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_WRITE);
-     if (err) {
-         return err;
-     }
-@@ -552,7 +584,7 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t of=
-fset, uint64_t bytes,
-=20
- static int blkdebug_co_flush(BlockDriverState *bs)
- {
--    int err =3D rule_check(bs, 0, 0);
-+    int err =3D rule_check(bs, 0, 0, BLKDEBUGIO_TYPE_FLUSH);
-=20
-     if (err) {
-         return err;
-@@ -586,7 +618,7 @@ static int coroutine_fn blkdebug_co_pwrite_zeroes(Blo=
-ckDriverState *bs,
-         assert(bytes <=3D bs->bl.max_pwrite_zeroes);
-     }
-=20
--    err =3D rule_check(bs, offset, bytes);
-+    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_WRITE_ZEROES);
-     if (err) {
-         return err;
-     }
-@@ -620,7 +652,7 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDri=
-verState *bs,
-         assert(bytes <=3D bs->bl.max_pdiscard);
-     }
-=20
--    err =3D rule_check(bs, offset, bytes);
-+    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_DISCARD);
-     if (err) {
-         return err;
-     }
++echo
++
++# These should be equal now.
++$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
+new file mode 100644
+index 0000000000..9213d3e450
+--- /dev/null
++++ b/tests/qemu-iotests/249.out
+@@ -0,0 +1,43 @@
++QA output created by 249
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
++wrote 67108864/67108864 bytes at offset 0
++64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
+output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
+t/output error
++qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
+output error
++
++wrote 512/512 bytes at offset read_fail_offset_0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_1
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_2
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_3
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_4
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_5
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_6
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_7
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_8
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_9
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718380..a2e2f507e8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -248,3 +248,4 @@
+ 246 rw auto quick
+ 247 rw auto quick
+ 248 rw auto quick
++249 auto quick
 --=20
 2.20.1
 
