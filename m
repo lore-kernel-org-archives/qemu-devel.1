@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38467)
+Received: from eggs.gnu.org ([209.51.188.92]:43558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hELy2-0001x7-T5
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 18:45:20 -0400
+	(envelope-from <prvs=996be2310=Alistair.Francis@wdc.com>)
+	id 1hEMV1-0007jM-3C
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 19:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hELy1-0007dm-Lj
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 18:45:18 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:35402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1hELy1-0007cO-8Z
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 18:45:17 -0400
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190409142925.GG16944@stefanha-x1.localdomain>
-Date: Thu, 11 Apr 2019 01:45:06 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AC01E2C2-1944-42C5-A944-220EE6F8A489@oracle.com>
-References: <20190321075545.14929-1-nir.weiner@oracle.com>
-	<20190409142925.GG16944@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-scsi: Support live migration
+	(envelope-from <prvs=996be2310=Alistair.Francis@wdc.com>)
+	id 1hEMPB-0002cF-Vc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 19:13:24 -0400
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 10 Apr 2019 23:11:00 +0000
+Message-ID: <9043c3a6bc54faa98ed9fedc0c6c929c993a0bf9.1554937288.git.alistair.francis@wdc.com>
+References: <cover.1554937288.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1554937288.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH for 4.1 v3 6/6] riscv: Add a generic spike
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +26,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Nir Weiner <nir.weiner@oracle.com>, qemu-devel@nongnu.org, bijan.mottahedeh@oracle.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "palmer@sifive.com" <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "ijc@hellion.org.uk" <ijc@hellion.org.uk>
 
-
-
-> On 9 Apr 2019, at 17:29, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->=20
-> On Thu, Mar 21, 2019 at 09:55:42AM +0200, Nir Weiner wrote:
->> Originally migration was not possible with vhost-scsi because
->> as part of migration, the source host target SCSI device state
->> needs to be saved and loaded into the destination host target SCSI
->> device. This cannot be done by QEMU.
->>=20
->> As this can be handled either by external orchestrator or by having
->> shared-storage (i.e. iSCSI), there is no reason to limit the
->> orchestrator from being able to explictly specify it wish to enable
->> migration even when VM have a vhost-scsi device.
->>=20
->> Liran Alon (1):
->>  vhost-scsi: Allow user to enable migration
->>=20
->> Nir Weiner (2):
->>  vhost-scsi: The vhost device should be stopped when the VM is not
->>    running
->>  vhost-scsi: Add vmstate descriptor
->>=20
->> hw/scsi/vhost-scsi.c                  | 57 =
-++++++++++++++++++++++-----
->> include/hw/virtio/vhost-scsi-common.h |  1 +
->> 2 files changed, 48 insertions(+), 10 deletions(-)
->=20
-> What happens when migration is attempted while there is in-flight I/O =
-in
-> the vring?
->=20
-> Stefan
-
-What do you define as =E2=80=9Cin-flight I/O=E2=80=9D? I think there is =
-a need to separate the discussion here to multiple cases:
-
-1) The I/O request was written to vring but guest have not yet written =
-to doorbell:
-This is the simplest case. No state is lost as the vring is migrated =
-from source host to dest host as part of guest memory migration.
-Also, the vring properties (E.g. Guest base address) is transferred from =
-source host to dest host as part of vhost-scsi VMState.
-(See patch 2/3 of series which adds VMSTATE_VIRTIO_DEVICE to vhost-scsi =
-VMState which will cause virtio_save() to save vring on migration =
-stream).
-
-2) The I/O request was written to vring and the guest have written to =
-doorbell:
-The I/O request was submitted and processed by the vhost-scsi backend. =
-Therefore, the I/O request was sent to the remote TGT server.
-If the the TGT server has performed the write and returned ACK but the =
-ACK was not received by guest, then guest is expected to initiate the =
-write again.
-(Similar to what happens for a momentary TGT server downtime / network =
-downtime). So this isn=E2=80=99t suppose to be an issue.
-
-An interesting case is what happens if there is an in-flight I/O write =
-request (Request A) performed by source host that was sent already over =
-the network to the TGT server.
-But until it reaches the TGT server, the VM running on dest performs =
-another I/O write request (Request B) to the same sector which results =
-in Request B being handled by TGT server before Request A. In this case, =
-it is possible that TGT server will actually overwrite data written by =
-Request B with older request Request A that arrived to TGT later.
-(This will be the result in case of using an iSCSI TGT).
-But, there are various techniques that TGT server can implement to avoid =
-this. For example, fencing-out requests from any older iSCSI connection =
-than the most recent one.
-
-In general, vhost-scsi migration shouldn=E2=80=99t be different than =
-vhost-net or vhost-vsock migration.
-The only thing that may be problematic in case of vhost-scsi is because =
-the source host target SCSI device state may need to be saved and =
-restored on dest host target SCSI device.
-However, when using a shared-storage via iSCSI, this concern is =
-irrelevant. Therefore, this patch series attempts to allow the admin to =
-remove the migration-blocker limitation from vhost-scsi if it is using =
-such a setup. As described in cover-letter.
-
--Liran
+QWRkIGEgZ2VuZXJpYyBzcGlrZSBtYWNoaW5lIChub3QgdGllZCB0byBhIHZlcnNpb24pIGFuZCBk
+ZXByZWNhdGUgdGhlDQpzcGlrZSBtYWhpbmVzIHRoYXQgYXJlIHRpZWQgdG8gYSBzcGVjaWZpYyB2
+ZXJzaW9uLiBBcyB3ZSBjYW4gbm93IHNwZWNpZnkNCnRoZSBDUFUgdmlhIHRoZSBjb21tYW5kIGxp
+bmUgd2Ugbm8gbG9uZGVyIG5lZWQgc3BlY2lmaWMgdmVyc2lvbnMgb2YgdGhlDQpzcGlrZSBtYWNo
+aW5lcy4NCg0KU2lnbmVkLW9mZi1ieTogQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNp
+c0B3ZGMuY29tPg0KLS0tDQogaHcvcmlzY3Yvc3Bpa2UuYyB8IDEwNiArKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KIDEgZmlsZSBjaGFuZ2VkLCAxMDUgaW5z
+ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvcmlzY3Yvc3Bpa2Uu
+YyBiL2h3L3Jpc2N2L3NwaWtlLmMNCmluZGV4IDJhMDAwYTU4MDAuLjlkM2Y3Y2VjNGQgMTAwNjQ0
+DQotLS0gYS9ody9yaXNjdi9zcGlrZS5jDQorKysgYi9ody9yaXNjdi9zcGlrZS5jDQpAQCAtMzks
+NiArMzksNyBAQA0KICNpbmNsdWRlICJjaGFyZGV2L2NoYXIuaCINCiAjaW5jbHVkZSAic3lzZW11
+L2FyY2hfaW5pdC5oIg0KICNpbmNsdWRlICJzeXNlbXUvZGV2aWNlX3RyZWUuaCINCisjaW5jbHVk
+ZSAic3lzZW11L3F0ZXN0LmgiDQogI2luY2x1ZGUgImV4ZWMvYWRkcmVzcy1zcGFjZXMuaCINCiAj
+aW5jbHVkZSAiZWxmLmgiDQogDQpAQCAtMTYwLDcgKzE2MSw4OSBAQCBzdGF0aWMgdm9pZCBjcmVh
+dGVfZmR0KFNwaWtlU3RhdGUgKnMsIGNvbnN0IHN0cnVjdCBNZW1tYXBFbnRyeSAqbWVtbWFwLA0K
+ICAgICAgICAgcWVtdV9mZHRfYWRkX3N1Ym5vZGUoZmR0LCAiL2Nob3NlbiIpOw0KICAgICAgICAg
+cWVtdV9mZHRfc2V0cHJvcF9zdHJpbmcoZmR0LCAiL2Nob3NlbiIsICJib290YXJncyIsIGNtZGxp
+bmUpOw0KICAgICB9DQotIH0NCit9DQorDQorc3RhdGljIHZvaWQgc3Bpa2VfYm9hcmRfaW5pdChN
+YWNoaW5lU3RhdGUgKm1hY2hpbmUpDQorew0KKyAgICBjb25zdCBzdHJ1Y3QgTWVtbWFwRW50cnkg
+Km1lbW1hcCA9IHNwaWtlX21lbW1hcDsNCisNCisgICAgU3Bpa2VTdGF0ZSAqcyA9IGdfbmV3MChT
+cGlrZVN0YXRlLCAxKTsNCisgICAgTWVtb3J5UmVnaW9uICpzeXN0ZW1fbWVtb3J5ID0gZ2V0X3N5
+c3RlbV9tZW1vcnkoKTsNCisgICAgTWVtb3J5UmVnaW9uICptYWluX21lbSA9IGdfbmV3KE1lbW9y
+eVJlZ2lvbiwgMSk7DQorICAgIE1lbW9yeVJlZ2lvbiAqbWFza19yb20gPSBnX25ldyhNZW1vcnlS
+ZWdpb24sIDEpOw0KKyAgICBpbnQgaTsNCisNCisgICAgLyogSW5pdGlhbGl6ZSBTT0MgKi8NCisg
+ICAgb2JqZWN0X2luaXRpYWxpemVfY2hpbGQoT0JKRUNUKG1hY2hpbmUpLCAic29jIiwgJnMtPnNv
+Yywgc2l6ZW9mKHMtPnNvYyksDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRZUEVfUklT
+Q1ZfSEFSVF9BUlJBWSwgJmVycm9yX2Fib3J0LCBOVUxMKTsNCisgICAgb2JqZWN0X3Byb3BlcnR5
+X3NldF9zdHIoT0JKRUNUKCZzLT5zb2MpLCBtYWNoaW5lLT5jcHVfdHlwZSwgImNwdS10eXBlIiwN
+CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmVycm9yX2Fib3J0KTsNCisgICAgb2JqZWN0
+X3Byb3BlcnR5X3NldF9pbnQoT0JKRUNUKCZzLT5zb2MpLCBzbXBfY3B1cywgIm51bS1oYXJ0cyIs
+DQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQorICAgIG9iamVj
+dF9wcm9wZXJ0eV9zZXRfYm9vbChPQkpFQ1QoJnMtPnNvYyksIHRydWUsICJyZWFsaXplZCIsDQor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQorDQorICAgIC8qIHJl
+Z2lzdGVyIHN5c3RlbSBtYWluIG1lbW9yeSAoYWN0dWFsIFJBTSkgKi8NCisgICAgbWVtb3J5X3Jl
+Z2lvbl9pbml0X3JhbShtYWluX21lbSwgTlVMTCwgInJpc2N2LnNwaWtlLnJhbSIsDQorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgbWFjaGluZS0+cmFtX3NpemUsICZlcnJvcl9mYXRhbCk7DQor
+ICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbihzeXN0ZW1fbWVtb3J5LCBtZW1tYXBbU1BJ
+S0VfRFJBTV0uYmFzZSwNCisgICAgICAgIG1haW5fbWVtKTsNCisNCisgICAgLyogY3JlYXRlIGRl
+dmljZSB0cmVlICovDQorICAgIGNyZWF0ZV9mZHQocywgbWVtbWFwLCBtYWNoaW5lLT5yYW1fc2l6
+ZSwgbWFjaGluZS0+a2VybmVsX2NtZGxpbmUpOw0KKw0KKyAgICAvKiBib290IHJvbSAqLw0KKyAg
+ICBtZW1vcnlfcmVnaW9uX2luaXRfcm9tKG1hc2tfcm9tLCBOVUxMLCAicmlzY3Yuc3Bpa2UubXJv
+bSIsDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgbWVtbWFwW1NQSUtFX01ST01dLnNpemUs
+ICZlcnJvcl9mYXRhbCk7DQorICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbihzeXN0ZW1f
+bWVtb3J5LCBtZW1tYXBbU1BJS0VfTVJPTV0uYmFzZSwNCisgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIG1hc2tfcm9tKTsNCisNCisgICAgaWYgKG1hY2hpbmUtPmtlcm5lbF9maWxlbmFt
+ZSkgew0KKyAgICAgICAgbG9hZF9rZXJuZWwobWFjaGluZS0+a2VybmVsX2ZpbGVuYW1lKTsNCisg
+ICAgfQ0KKw0KKyAgICAvKiByZXNldCB2ZWN0b3IgKi8NCisgICAgdWludDMyX3QgcmVzZXRfdmVj
+WzhdID0gew0KKyAgICAgICAgMHgwMDAwMDI5NywgICAgICAgICAgICAgICAgICAvKiAxOiAgYXVp
+cGMgIHQwLCAlcGNyZWxfaGkoZHRiKSAqLw0KKyAgICAgICAgMHgwMjAyODU5MywgICAgICAgICAg
+ICAgICAgICAvKiAgICAgYWRkaSAgIGExLCB0MCwgJXBjcmVsX2xvKDFiKSAqLw0KKyAgICAgICAg
+MHhmMTQwMjU3MywgICAgICAgICAgICAgICAgICAvKiAgICAgY3NyciAgIGEwLCBtaGFydGlkICAq
+Lw0KKyNpZiBkZWZpbmVkKFRBUkdFVF9SSVNDVjMyKQ0KKyAgICAgICAgMHgwMTgyYTI4MywgICAg
+ICAgICAgICAgICAgICAvKiAgICAgbHcgICAgIHQwLCAyNCh0MCkgKi8NCisjZWxpZiBkZWZpbmVk
+KFRBUkdFVF9SSVNDVjY0KQ0KKyAgICAgICAgMHgwMTgyYjI4MywgICAgICAgICAgICAgICAgICAv
+KiAgICAgbGQgICAgIHQwLCAyNCh0MCkgKi8NCisjZW5kaWYNCisgICAgICAgIDB4MDAwMjgwNjcs
+ICAgICAgICAgICAgICAgICAgLyogICAgIGpyICAgICB0MCAqLw0KKyAgICAgICAgMHgwMDAwMDAw
+MCwNCisgICAgICAgIG1lbW1hcFtTUElLRV9EUkFNXS5iYXNlLCAgICAgLyogc3RhcnQ6IC5kd29y
+ZCBEUkFNX0JBU0UgKi8NCisgICAgICAgIDB4MDAwMDAwMDAsDQorICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIC8qIGR0YjogKi8NCisgICAgfTsNCisNCisgICAgLyogY29weSBp
+biB0aGUgcmVzZXQgdmVjdG9yIGluIGxpdHRsZV9lbmRpYW4gYnl0ZSBvcmRlciAqLw0KKyAgICBm
+b3IgKGkgPSAwOyBpIDwgc2l6ZW9mKHJlc2V0X3ZlYykgPj4gMjsgaSsrKSB7DQorICAgICAgICBy
+ZXNldF92ZWNbaV0gPSBjcHVfdG9fbGUzMihyZXNldF92ZWNbaV0pOw0KKyAgICB9DQorICAgIHJv
+bV9hZGRfYmxvYl9maXhlZF9hcygibXJvbS5yZXNldCIsIHJlc2V0X3ZlYywgc2l6ZW9mKHJlc2V0
+X3ZlYyksDQorICAgICAgICAgICAgICAgICAgICAgICAgICBtZW1tYXBbU1BJS0VfTVJPTV0uYmFz
+ZSwgJmFkZHJlc3Nfc3BhY2VfbWVtb3J5KTsNCisNCisgICAgLyogY29weSBpbiB0aGUgZGV2aWNl
+IHRyZWUgKi8NCisgICAgaWYgKGZkdF9wYWNrKHMtPmZkdCkgfHwgZmR0X3RvdGFsc2l6ZShzLT5m
+ZHQpID4NCisgICAgICAgICAgICBtZW1tYXBbU1BJS0VfTVJPTV0uc2l6ZSAtIHNpemVvZihyZXNl
+dF92ZWMpKSB7DQorICAgICAgICBlcnJvcl9yZXBvcnQoIm5vdCBlbm91Z2ggc3BhY2UgdG8gc3Rv
+cmUgZGV2aWNlLXRyZWUiKTsNCisgICAgICAgIGV4aXQoMSk7DQorICAgIH0NCisgICAgcWVtdV9m
+ZHRfZHVtcGR0YihzLT5mZHQsIGZkdF90b3RhbHNpemUocy0+ZmR0KSk7DQorICAgIHJvbV9hZGRf
+YmxvYl9maXhlZF9hcygibXJvbS5mZHQiLCBzLT5mZHQsIGZkdF90b3RhbHNpemUocy0+ZmR0KSwN
+CisgICAgICAgICAgICAgICAgICAgICAgICAgIG1lbW1hcFtTUElLRV9NUk9NXS5iYXNlICsgc2l6
+ZW9mKHJlc2V0X3ZlYyksDQorICAgICAgICAgICAgICAgICAgICAgICAgICAmYWRkcmVzc19zcGFj
+ZV9tZW1vcnkpOw0KKw0KKyAgICAvKiBpbml0aWFsaXplIEhUSUYgdXNpbmcgc3ltYm9scyBmb3Vu
+ZCBpbiBsb2FkX2tlcm5lbCAqLw0KKyAgICBodGlmX21tX2luaXQoc3lzdGVtX21lbW9yeSwgbWFz
+a19yb20sICZzLT5zb2MuaGFydHNbMF0uZW52LCBzZXJpYWxfaGQoMCkpOw0KKw0KKyAgICAvKiBD
+b3JlIExvY2FsIEludGVycnVwdG9yICh0aW1lciBhbmQgSVBJKSAqLw0KKyAgICBzaWZpdmVfY2xp
+bnRfY3JlYXRlKG1lbW1hcFtTUElLRV9DTElOVF0uYmFzZSwgbWVtbWFwW1NQSUtFX0NMSU5UXS5z
+aXplLA0KKyAgICAgICAgc21wX2NwdXMsIFNJRklWRV9TSVBfQkFTRSwgU0lGSVZFX1RJTUVDTVBf
+QkFTRSwgU0lGSVZFX1RJTUVfQkFTRSk7DQorfQ0KIA0KIHN0YXRpYyB2b2lkIHNwaWtlX3YxXzEw
+XzBfYm9hcmRfaW5pdChNYWNoaW5lU3RhdGUgKm1hY2hpbmUpDQogew0KQEAgLTE3Miw2ICsyNTUs
+MTIgQEAgc3RhdGljIHZvaWQgc3Bpa2VfdjFfMTBfMF9ib2FyZF9pbml0KE1hY2hpbmVTdGF0ZSAq
+bWFjaGluZSkNCiAgICAgTWVtb3J5UmVnaW9uICptYXNrX3JvbSA9IGdfbmV3KE1lbW9yeVJlZ2lv
+biwgMSk7DQogICAgIGludCBpOw0KIA0KKyAgICBpZiAoIXF0ZXN0X2VuYWJsZWQoKSkgew0KKyAg
+ICAgICAgaW5mb19yZXBvcnQoIlRoZSBTcGlrZSB2MS4xMC4wIG1hY2hpbmUgaGFzIGJlZW4gZGVw
+cmVjZWF0ZWQuICINCisgICAgICAgICAgICAgICAgICAgICJQbGVhc2UgdXNlIHRoZSBkZW5lcmlj
+IHNwaWtlIG1hY2hpbmUgYW5kIHNwZWNpZnkgdGhlIElTQSAiDQorICAgICAgICAgICAgICAgICAg
+ICAidmVyc2lvbnMgdXNpbmcgLWNwdS4iKTsNCisgICAgfQ0KKw0KICAgICAvKiBJbml0aWFsaXpl
+IFNPQyAqLw0KICAgICBvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZChPQkpFQ1QobWFjaGluZSksICJz
+b2MiLCAmcy0+c29jLCBzaXplb2Yocy0+c29jKSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgVFlQRV9SSVNDVl9IQVJUX0FSUkFZLCAmZXJyb3JfYWJvcnQsIE5VTEwpOw0KQEAgLTI1NCw2
+ICszNDMsMTIgQEAgc3RhdGljIHZvaWQgc3Bpa2VfdjFfMDlfMV9ib2FyZF9pbml0KE1hY2hpbmVT
+dGF0ZSAqbWFjaGluZSkNCiAgICAgTWVtb3J5UmVnaW9uICptYXNrX3JvbSA9IGdfbmV3KE1lbW9y
+eVJlZ2lvbiwgMSk7DQogICAgIGludCBpOw0KIA0KKyAgICBpZiAoIXF0ZXN0X2VuYWJsZWQoKSkg
+ew0KKyAgICAgICAgaW5mb19yZXBvcnQoIlRoZSBTcGlrZSB2MS4wOS4xIG1hY2hpbmUgaGFzIGJl
+ZW4gZGVwcmVjZWF0ZWQuICINCisgICAgICAgICAgICAgICAgICAgICJQbGVhc2UgdXNlIHRoZSBk
+ZW5lcmljIHNwaWtlIG1hY2hpbmUgYW5kIHNwZWNpZnkgdGhlIElTQSAiDQorICAgICAgICAgICAg
+ICAgICAgICAidmVyc2lvbnMgdXNpbmcgLWNwdS4iKTsNCisgICAgfQ0KKw0KICAgICAvKiBJbml0
+aWFsaXplIFNPQyAqLw0KICAgICBvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZChPQkpFQ1QobWFjaGlu
+ZSksICJzb2MiLCAmcy0+c29jLCBzaXplb2Yocy0+c29jKSwNCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgVFlQRV9SSVNDVl9IQVJUX0FSUkFZLCAmZXJyb3JfYWJvcnQsIE5VTEwpOw0KQEAg
+LTM1OSw4ICs0NTQsMTcgQEAgc3RhdGljIHZvaWQgc3Bpa2VfdjFfMTBfMF9tYWNoaW5lX2luaXQo
+TWFjaGluZUNsYXNzICptYykNCiAgICAgbWMtPmRlc2MgPSAiUklTQy1WIFNwaWtlIEJvYXJkIChQ
+cml2aWxlZ2VkIElTQSB2MS4xMCkiOw0KICAgICBtYy0+aW5pdCA9IHNwaWtlX3YxXzEwXzBfYm9h
+cmRfaW5pdDsNCiAgICAgbWMtPm1heF9jcHVzID0gMTsNCit9DQorDQorc3RhdGljIHZvaWQgc3Bp
+a2VfbWFjaGluZV9pbml0KE1hY2hpbmVDbGFzcyAqbWMpDQorew0KKyAgICBtYy0+ZGVzYyA9ICJS
+SVNDLVYgU3Bpa2UgQm9hcmQiOw0KKyAgICBtYy0+aW5pdCA9IHNwaWtlX2JvYXJkX2luaXQ7DQor
+ICAgIG1jLT5tYXhfY3B1cyA9IDE7DQogICAgIG1jLT5pc19kZWZhdWx0ID0gMTsNCisgICAgbWMt
+PmRlZmF1bHRfY3B1X3R5cGUgPSBTUElLRV9WMV8xMF8wX0NQVTsNCiB9DQogDQogREVGSU5FX01B
+Q0hJTkUoInNwaWtlX3YxLjkuMSIsIHNwaWtlX3YxXzA5XzFfbWFjaGluZV9pbml0KQ0KIERFRklO
+RV9NQUNISU5FKCJzcGlrZV92MS4xMCIsIHNwaWtlX3YxXzEwXzBfbWFjaGluZV9pbml0KQ0KK0RF
+RklORV9NQUNISU5FKCJzcGlrZSIsIHNwaWtlX21hY2hpbmVfaW5pdCkNCi0tIA0KMi4yMS4wDQoN
+Cg==
