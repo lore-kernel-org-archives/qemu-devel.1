@@ -2,74 +2,63 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A078AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 13:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F153C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 13:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6456C20830
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 13:14:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6456C20830
+	by mail.kernel.org (Postfix) with ESMTPS id 0F5A62070D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 13:58:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5A62070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59775 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hED3M-0005SH-0k
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 09:14:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57035)
+	id 1hEDkE-00020r-18
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 09:58:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hED2F-0004pp-5v
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:13:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEDjM-0001jb-Hf
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hED2D-0005P7-6O
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:13:03 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:43873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hED2C-0005Oe-U1
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:13:01 -0400
-Received: by mail-qk1-f195.google.com with SMTP id c20so1132355qkc.10
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 06:13:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=F+NzLIiu4ZWeb8ligJU7/LgleCdIA8ao/P1yUghVSp8=;
-	b=Qofi85Dvz7/Pxqqd762LMF8W1XEQrZ3kdVPqP7wxtJWK9vSNLo5eU9wbTp+mKAMBWh
-	kBBeFkOuZQWNidnwQjuvfMXBRlEGY0aVwabC9LJTjpatIXplJwglPtemuaOPL3sySlXz
-	M8mAeLrr0NLotkhz99PdpDqoYRUhz75s7ZBdrgosWK7BJFi3r/AX/ChyV5o2P5aWluEy
-	s3IO6UTg8J2qT8Mrwc4DXHJUbXI+J0TBZJBASSsJnPE8S2E3UTq4ByeE5AEcY6I79YfG
-	tBkxAo9qERAkg3T3T2xuOyDf9eO1G46sLmWepkC0wvIdfArDjomCmzyp5kpUzH371PvR
-	RHCw==
-X-Gm-Message-State: APjAAAVDk+ud/j2ZTHO6RGwj8IPXCjDAWVIu6wTojKn4EI6/EWG2Z2IZ
-	K9KJjyv9dF09oYL9tRddeu3X0Q==
-X-Google-Smtp-Source: APXvYqyb3Vx7ohgKHLFyxlOdgIozC/Ynj+45wnRX3Ub7YwlpBDUwUxO8EMHwK1qvW7HCwT8VFG8gBg==
-X-Received: by 2002:a05:620a:132b:: with SMTP id
-	p11mr33137177qkj.279.1554901979910; 
-	Wed, 10 Apr 2019 06:12:59 -0700 (PDT)
-Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
-	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
-	d21sm25984705qtc.91.2019.04.10.06.12.56
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 10 Apr 2019 06:12:58 -0700 (PDT)
-Date: Wed, 10 Apr 2019 09:12:55 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190410091216-mutt-send-email-mst@kernel.org>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-3-pagupta@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1hEDjK-0004wf-Sp
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEDjK-0004vh-GR
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ACDA481F35;
+	Wed, 10 Apr 2019 13:57:32 +0000 (UTC)
+Received: from work-vm (ovpn-117-246.ams2.redhat.com [10.36.117.246])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BAED1001E67;
+	Wed, 10 Apr 2019 13:57:30 +0000 (UTC)
+Date: Wed, 10 Apr 2019 14:57:26 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>, armbru@redhat.com,
+	berrange@redhat.com
+Message-ID: <20190410135725.GE2980@work-vm>
+References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190410040826.24371-3-pagupta@redhat.com>
+In-Reply-To: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 10 Apr 2019 13:57:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.195
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,410 +70,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, david@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger.kernel@dilger.ca, zwisler@kernel.org,
-	aarcange@redhat.com, dave.jiang@intel.com,
-	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
-	willy@infradead.org, hch@infradead.org,
-	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
-	pbonzini@redhat.com, dan.j.williams@intel.com,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong.eric@gmail.com,
-	darrick.wong@oracle.com, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru,
+	Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410131255.0IgEElBIOIzSuZAnHH_r_IxfNYdQV0F3FgE7RQiwWmQ@z>
+Message-ID: <20190410135726.vq9BYgvMyQf0msrgPlb2DKfBrvFJT-MMKxqLb1wZsUs@z>
 
-On Wed, Apr 10, 2019 at 09:38:22AM +0530, Pankaj Gupta wrote:
-> This patch adds virtio-pmem driver for KVM guest.
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> Currently such case is possible for incoming:
+> QMP: add-fd (fdset = 0, fd of some file):
+>     adds fd to fdset 0 and returns QEMU's fd (e.g. 33)
+> QMP: migrate-incoming (uri = "fd:33"): fd is stored in QIOChannel *ioc
+> ...
+> Incoming migration completes and unrefs ioc -> close(33)
+> QMP: remove-fd (fdset = 0, fd = 33):
+>     removes fd from fdset 0 and qemu_close() -> close(33) => double close
+
+Well spotted! That would very rarely cause a problem, but is a race.
+
+> For outgoing migration the case is the same but getfd instead of add-fd.
+> Fix it by duping client's fd.
 > 
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
-> 
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+
+Note your patch hit a problem building on windows; I don't think we have
+a qemu_dup for windows.
+
+However, I think this problem is wider than just migration.
+For example, I see that dump.c also uses monitor_get_fd, and it's
+dump_cleanup also does a close on the fd. So I guess it hits the same
+problem?
+Also, qmp.c in qmp_add_client does a close on the fd in some error cases
+(I've not followed the normal case).
+
+So perhaps all the users of monitor_get_fd are hitting this problem.
+
+Should we be doing the dup in monitor_get_fd?
+
+Dave
+
+
 > ---
->  drivers/nvdimm/virtio_pmem.c     |  88 ++++++++++++++++++++++
->  drivers/virtio/Kconfig           |  10 +++
->  drivers/virtio/Makefile          |   1 +
->  drivers/virtio/pmem.c            | 124 +++++++++++++++++++++++++++++++
->  include/linux/virtio_pmem.h      |  60 +++++++++++++++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  10 +++
->  7 files changed, 294 insertions(+)
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 drivers/virtio/pmem.c
->  create mode 100644 include/linux/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
+>  migration/fd.c         | 39 +++++++++++++++++++++++++++++++--------
+>  migration/trace-events |  4 ++--
+>  2 files changed, 33 insertions(+), 10 deletions(-)
 > 
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> new file mode 100644
-> index 000000000000..01044cc2f3a3
-> --- /dev/null
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -0,0 +1,88 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include "nd.h"
-> +
-> + /* The interrupt handler */
-> +void host_ack(struct virtqueue *vq)
-> +{
-> +	unsigned int len;
-> +	unsigned long flags;
-> +	struct virtio_pmem_request *req, *req_buf;
-> +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> +		req->done = true;
-> +		wake_up(&req->host_acked);
-> +
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf = list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			list_del(&vpmem->req_list);
-> +			req_buf->wq_buf_avail = true;
-> +			wake_up(&req_buf->wq_buf);
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +}
-> +EXPORT_SYMBOL_GPL(host_ack);
-> +
-> + /* The request submission function */
-> +int virtio_pmem_flush(struct nd_region *nd_region)
-> +{
-> +	int err;
-> +	unsigned long flags;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	struct virtio_device *vdev = nd_region->provider_data;
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct virtio_pmem_request *req;
-> +
-> +	might_sleep();
-> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	req->done = req->wq_buf_avail = false;
-> +	strcpy(req->name, "FLUSH");
-> +	init_waitqueue_head(&req->host_acked);
-> +	init_waitqueue_head(&req->wq_buf);
-> +	sg_init_one(&sg, req->name, strlen(req->name));
-> +	sgs[0] = &sg;
-> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> +	sgs[1] = &ret;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> +	if (err) {
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> +
-> +		list_add_tail(&vpmem->req_list, &req->list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* When host has read buffer, this completes via host_ack */
-> +		wait_event(req->wq_buf, req->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
-> +	err = virtqueue_kick(vpmem->req_vq);
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +	if (!err) {
-> +		err = -EIO;
-> +		goto ret;
-> +	}
-> +	/* When host has read buffer, this completes via host_ack */
-> +	wait_event(req->host_acked, req->done);
-> +	err = req->ret;
-> +ret:
-> +	kfree(req);
-> +	return err;
-> +};
-> +EXPORT_SYMBOL_GPL(virtio_pmem_flush);
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 35897649c24f..9f634a2ed638 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
+> diff --git a/migration/fd.c b/migration/fd.c
+> index a7c13df4ad..c9ff07ac41 100644
+> --- a/migration/fd.c
+> +++ b/migration/fd.c
+> @@ -15,6 +15,7 @@
+>   */
 >  
->  	  If unsure, say Y.
+>  #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>  #include "channel.h"
+>  #include "fd.h"
+>  #include "migration.h"
+> @@ -26,15 +27,27 @@
+>  void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp)
+>  {
+>      QIOChannel *ioc;
+> -    int fd = monitor_get_fd(cur_mon, fdname, errp);
+> +    int fd, dup_fd;
+> +
+> +    fd = monitor_get_fd(cur_mon, fdname, errp);
+>      if (fd == -1) {
+>          return;
+>      }
 >  
-> +config VIRTIO_PMEM
-> +	tristate "Support for virtio pmem driver"
-> +	depends on VIRTIO
-> +	depends on LIBNVDIMM
-> +	help
-> +	This driver provides support for virtio based flushing interface
-> +	for persistent memory range.
+> -    trace_migration_fd_outgoing(fd);
+> -    ioc = qio_channel_new_fd(fd, errp);
+> +    /* fd is previously created by qmp command 'getfd',
+> +     * so client is responsible to close it. Dup it to save original value from
+> +     * QIOChannel's destructor */
+> +    dup_fd = qemu_dup(fd);
+> +    if (dup_fd == -1) {
+> +        error_setg(errp, "Cannot dup fd %s: %s (%d)", fdname, strerror(errno),
+> +                   errno);
+> +        return;
+> +    }
 > +
-> +	If unsure, say M.
-> +
->  config VIRTIO_BALLOON
->  	tristate "Virtio balloon driver"
->  	depends on VIRTIO
-> diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-> index 3a2b5c5dcf46..143ce91eabe9 100644
-> --- a/drivers/virtio/Makefile
-> +++ b/drivers/virtio/Makefile
-> @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
->  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
->  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
->  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
-> +obj-$(CONFIG_VIRTIO_PMEM) += pmem.o ../nvdimm/virtio_pmem.o
-> diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
-> new file mode 100644
-> index 000000000000..cc9de9589d56
-> --- /dev/null
-> +++ b/drivers/virtio/pmem.c
-> @@ -0,0 +1,124 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and registers the virtual pmem device
-> + * with libnvdimm core.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include <../../drivers/nvdimm/nd.h>
-> +
-> +static struct virtio_device_id id_table[] = {
-> +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> +	{ 0 },
-> +};
-> +
-> + /* Initialize virt queue */
-> +static int init_vq(struct virtio_pmem *vpmem)
-> +{
-> +	struct virtqueue *vq;
-> +
-> +	/* single vq */
-> +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
-> +				host_ack, "flush_queue");
-> +	if (IS_ERR(vq))
-> +		return PTR_ERR(vq);
-> +
-> +	spin_lock_init(&vpmem->pmem_lock);
-> +	INIT_LIST_HEAD(&vpmem->req_list);
-> +
-> +	return 0;
-> +};
-> +
-> +static int virtio_pmem_probe(struct virtio_device *vdev)
-> +{
-> +	int err = 0;
-> +	struct resource res;
-> +	struct virtio_pmem *vpmem;
-> +	struct nvdimm_bus *nvdimm_bus;
-> +	struct nd_region_desc ndr_desc = {};
-> +	int nid = dev_to_node(&vdev->dev);
-> +	struct nd_region *nd_region;
-> +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config disabled\n",
-> +			__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
-> +					GFP_KERNEL);
-> +	if (!vpmem) {
-> +		err = -ENOMEM;
-> +		goto out_err;
-> +	}
-> +
-> +	vpmem->vdev = vdev;
-> +	err = init_vq(vpmem);
-> +	if (err)
-> +		goto out_err;
-> +
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			start, &vpmem->start);
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			size, &vpmem->size);
-> +
-> +	res.start = vpmem->start;
-> +	res.end   = vpmem->start + vpmem->size-1;
-> +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> +	vpmem->nd_desc.module = THIS_MODULE;
-> +
-> +	vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> +						&vpmem->nd_desc);
-> +	if (!nvdimm_bus)
-> +		goto out_vq;
-> +
-> +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
-> +
-> +	ndr_desc.res = &res;
-> +	ndr_desc.numa_node = nid;
-> +	ndr_desc.flush = virtio_pmem_flush;
-> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> +	nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
-> +	nd_region->provider_data =  dev_to_virtio
-> +					(nd_region->dev.parent->parent);
-> +
-> +	if (!nd_region)
-> +		goto out_nd;
-> +
-> +	return 0;
-> +out_nd:
-> +	err = -ENXIO;
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +out_vq:
-> +	vdev->config->del_vqs(vdev);
-> +out_err:
-> +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> +	return err;
-> +}
-> +
-> +static void virtio_pmem_remove(struct virtio_device *vdev)
-> +{
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> +
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +	vdev->config->del_vqs(vdev);
-> +	vdev->config->reset(vdev);
-> +	kfree(vpmem);
-> +}
-> +
-> +static struct virtio_driver virtio_pmem_driver = {
-> +	.driver.name		= KBUILD_MODNAME,
-> +	.driver.owner		= THIS_MODULE,
-> +	.id_table		= id_table,
-> +	.probe			= virtio_pmem_probe,
-> +	.remove			= virtio_pmem_remove,
-> +};
-> +
-> +module_virtio_driver(virtio_pmem_driver);
-> +MODULE_DEVICE_TABLE(virtio, id_table);
-> +MODULE_DESCRIPTION("Virtio pmem driver");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
-> new file mode 100644
-> index 000000000000..224f9d934be6
-> --- /dev/null
-> +++ b/include/linux/virtio_pmem.h
-> @@ -0,0 +1,60 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * virtio_pmem.h: virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + **/
-> +
-> +#ifndef _LINUX_VIRTIO_PMEM_H
-> +#define _LINUX_VIRTIO_PMEM_H
-> +
-> +#include <linux/virtio_ids.h>
-> +#include <linux/module.h>
-> +#include <linux/virtio_config.h>
-> +#include <uapi/linux/virtio_pmem.h>
-> +#include <linux/libnvdimm.h>
-> +#include <linux/spinlock.h>
-> +
-> +struct virtio_pmem_request {
-> +	/* Host return status corresponding to flush request */
-> +	int ret;
-> +
-> +	/* command name*/
-> +	char name[16];
-> +
-> +	/* Wait queue to process deferred work after ack from host */
-> +	wait_queue_head_t host_acked;
-> +	bool done;
-> +
-> +	/* Wait queue to process deferred work after virt queue buffer avail */
-> +	wait_queue_head_t wq_buf;
-> +	bool wq_buf_avail;
-> +	struct list_head list;
-> +};
-> +
-> +struct virtio_pmem {
-> +	struct virtio_device *vdev;
-> +
-> +	/* Virtio pmem request queue */
-> +	struct virtqueue *req_vq;
-> +
-> +	/* nvdimm bus registers virtio pmem device */
-> +	struct nvdimm_bus *nvdimm_bus;
-> +	struct nvdimm_bus_descriptor nd_desc;
-> +
-> +	/* List to store deferred work if virtqueue is full */
-> +	struct list_head req_list;
-> +
-> +	/* Synchronize virtqueue data */
-> +	spinlock_t pmem_lock;
-> +
-> +	/* Memory region information */
-> +	uint64_t start;
-> +	uint64_t size;
-> +};
-> +
-> +void host_ack(struct virtqueue *vq);
-> +int virtio_pmem_flush(struct nd_region *nd_region);
-> +#endif
-> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
-> index 6d5c3b2d4f4d..346389565ac1 100644
-> --- a/include/uapi/linux/virtio_ids.h
-> +++ b/include/uapi/linux/virtio_ids.h
-> @@ -43,5 +43,6 @@
->  #define VIRTIO_ID_INPUT        18 /* virtio input */
->  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
->  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+> +    trace_migration_fd_outgoing(fd, dup_fd);
+> +    ioc = qio_channel_new_fd(dup_fd, errp);
+>      if (!ioc) {
+> -        close(fd);
+> +        close(dup_fd);
+>          return;
+>      }
 >  
->  #endif /* _LINUX_VIRTIO_IDS_H */
-
-Didn't Paolo point out someone is using 25 for audio?
-
-Please, reserve an ID with the Virtio TC before using it.
-
-> diff --git a/include/uapi/linux/virtio_pmem.h b/include/uapi/linux/virtio_pmem.h
-> new file mode 100644
-> index 000000000000..fa3f7d52717a
-> --- /dev/null
-> +++ b/include/uapi/linux/virtio_pmem.h
-> @@ -0,0 +1,10 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
+> @@ -55,14 +68,24 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
+>  void fd_start_incoming_migration(const char *infd, Error **errp)
+>  {
+>      QIOChannel *ioc;
+> -    int fd;
+> +    int fd, dup_fd;
+>  
+>      fd = strtol(infd, NULL, 0);
+> -    trace_migration_fd_incoming(fd);
+>  
+> -    ioc = qio_channel_new_fd(fd, errp);
+> +    /* fd is previously created by qmp command 'add-fd' or something else,
+> +     * so client is responsible to close it. Dup it to save original value from
+> +     * QIOChannel's destructor */
+> +    dup_fd = qemu_dup(fd);
+> +    if (dup_fd == -1) {
+> +        error_setg(errp, "Cannot dup fd %d: %s (%d)", fd, strerror(errno),
+> +                   errno);
+> +        return;
+> +    }
 > +
-> +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> +
-> +struct virtio_pmem_config {
-> +	__le64 start;
-> +	__le64 size;
-> +};
-> +#endif
+> +    trace_migration_fd_incoming(fd, dup_fd);
+> +    ioc = qio_channel_new_fd(dup_fd, errp);
+>      if (!ioc) {
+> -        close(fd);
+> +        close(dup_fd);
+>          return;
+>      }
+>  
+> diff --git a/migration/trace-events b/migration/trace-events
+> index de2e136e57..d2d30a6b3c 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -258,8 +258,8 @@ migration_exec_outgoing(const char *cmd) "cmd=%s"
+>  migration_exec_incoming(const char *cmd) "cmd=%s"
+>  
+>  # fd.c
+> -migration_fd_outgoing(int fd) "fd=%d"
+> -migration_fd_incoming(int fd) "fd=%d"
+> +migration_fd_outgoing(int fd, int dup_fd) "fd=%d dup_fd=%d"
+> +migration_fd_incoming(int fd, int dup_fd) "fd=%d dup_fd=%d"
+>  
+>  # socket.c
+>  migration_socket_incoming_accepted(void) ""
 > -- 
-> 2.20.1
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
