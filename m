@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35718)
+Received: from eggs.gnu.org ([209.51.188.92]:39281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Hu-0005d0-Ut
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:13:00 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VZ-0008Kv-6X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tp-OW
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tE-DC
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:56 -0400
-Date: Wed, 10 Apr 2019 11:12:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190410111241.43094201@redhat.com>
-In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
-References: <20190409230022.6462-1-lersek@redhat.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VY-00014A-5q
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:05 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:38784)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VX-0000xk-G2
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:04 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+Date: Wed, 10 Apr 2019 12:26:52 +0300
+Message-Id: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v4 00/12] bundle edk2 platform
- firmware with QEMU
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: yc-core@yandex-team.ru, qemu-devel@nongnu.org
 
-On Wed, 10 Apr 2019 01:00:10 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Currently such case is possible for incoming:
+QMP: add-fd (fdset =3D 0, fd of some file):
+    adds fd to fdset 0 and returns QEMU's fd (e.g. 33)
+QMP: migrate-incoming (uri =3D "fd:33"): fd is stored in QIOChannel *ioc
+...
+Incoming migration completes and unrefs ioc -> close(33)
+QMP: remove-fd (fdset =3D 0, fd =3D 33):
+    removes fd from fdset 0 and qemu_close() -> close(33) =3D> double clo=
+se
 
-> Repo:   https://github.com/lersek/qemu.git
-> Branch: edk2_build_v4
-> 
-> Posting a v4 is necessary because patch #6 needs
-> - manual conflict resolution against some commits between v4.0.0-rc2 and
->   v4.0.0-rc3,
-> - and corresponding commit message updates.
-> 
-> These are noted in more detail on the patch itself:
-> 
->   [PATCH for-4.1 v4 06/12]
->   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
-> 
-> Due to this update, I had to drop all previous feedback tags on this
-> patch. I plan to send a pullreq as soon as 4.0 is released, so please
-> re-review / retest the above patch (and *only* the above patch) soon.
-> (The notes on the patch list the tags individually that I've now
-> dropped.)
-> 
-> Version 3, that is:
-> 
->   [Qemu-devel] [PATCH for-4.1 v3 00/12] bundle edk2 platform firmware with QEMU
+For outgoing migration the case is the same but getfd instead of add-fd.
+Fix it by duping client's fd.
 
-For whole series:
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+---
+ migration/fd.c         | 39 +++++++++++++++++++++++++++++++--------
+ migration/trace-events |  4 ++--
+ 2 files changed, 33 insertions(+), 10 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> 
-> was posted at:
-> 
->   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg06148.html
->   http://mid.mail-archive.com/20190321113408.19929-1-lersek@redhat.com
-> 
-> Thanks,
-> Laszlo
-> 
-> Laszlo Ersek (12):
->   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
->   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
->   tests/uefi-test-tools/build.sh: work around TianoCore#1607
->   roms/edk2: advance to tag edk2-stable201903
->   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
->   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
->   roms: build edk2 firmware binaries and variable store templates
->   pc-bios: add edk2 firmware binaries and variable store templates
->   pc-bios: document the edk2 firmware images; add firmware descriptors
->   tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
->   Makefile: install the edk2 firmware images and their descriptors
->   MAINTAINERS: add the "EDK2 Firmware" subsystem
-> 
->  .gitignore                                     |   1 +
->  MAINTAINERS                                    |  12 +
->  Makefile                                       |  29 ++-
->  configure                                      |   1 +
->  pc-bios/README                                 |  11 +
->  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
->  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
->  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
->  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
->  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
->  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
->  pc-bios/edk2-aarch64-code.fd.bz2               | Bin 0 -> 1177603 bytes
->  pc-bios/edk2-arm-code.fd.bz2                   | Bin 0 -> 1173662 bytes
->  pc-bios/edk2-arm-vars.fd.bz2                   | Bin 0 -> 263 bytes
->  pc-bios/edk2-i386-code.fd.bz2                  | Bin 0 -> 1688659 bytes
->  pc-bios/edk2-i386-secure-code.fd.bz2           | Bin 0 -> 1881979 bytes
->  pc-bios/edk2-i386-vars.fd.bz2                  | Bin 0 -> 190 bytes
->  pc-bios/edk2-licenses.txt                      | 209 ++++++++++++++++
->  pc-bios/edk2-x86_64-code.fd.bz2                | Bin 0 -> 1669280 bytes
->  pc-bios/edk2-x86_64-secure-code.fd.bz2         | Bin 0 -> 1901210 bytes
->  roms/Makefile                                  |   9 +-
->  roms/Makefile.edk2                             | 148 ++++++++++++
->  roms/edk2                                      |   2 +-
->  roms/edk2-build.sh                             |  55 +++++
->  roms/edk2-funcs.sh                             | 253 ++++++++++++++++++++
->  tests/Makefile.include                         |   2 +-
->  tests/uefi-test-tools/build.sh                 | 100 +-------
->  27 files changed, 934 insertions(+), 96 deletions(-)
->  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
->  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
->  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
->  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
->  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
->  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
->  create mode 100644 pc-bios/edk2-aarch64-code.fd.bz2
->  create mode 100644 pc-bios/edk2-arm-code.fd.bz2
->  create mode 100644 pc-bios/edk2-arm-vars.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-code.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-secure-code.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-vars.fd.bz2
->  create mode 100644 pc-bios/edk2-licenses.txt
->  create mode 100644 pc-bios/edk2-x86_64-code.fd.bz2
->  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd.bz2
->  create mode 100644 roms/Makefile.edk2
->  create mode 100755 roms/edk2-build.sh
->  create mode 100644 roms/edk2-funcs.sh
-> 
+diff --git a/migration/fd.c b/migration/fd.c
+index a7c13df4ad..c9ff07ac41 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -15,6 +15,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "channel.h"
+ #include "fd.h"
+ #include "migration.h"
+@@ -26,15 +27,27 @@
+ void fd_start_outgoing_migration(MigrationState *s, const char *fdname, =
+Error **errp)
+ {
+     QIOChannel *ioc;
+-    int fd =3D monitor_get_fd(cur_mon, fdname, errp);
++    int fd, dup_fd;
++
++    fd =3D monitor_get_fd(cur_mon, fdname, errp);
+     if (fd =3D=3D -1) {
+         return;
+     }
+=20
+-    trace_migration_fd_outgoing(fd);
+-    ioc =3D qio_channel_new_fd(fd, errp);
++    /* fd is previously created by qmp command 'getfd',
++     * so client is responsible to close it. Dup it to save original val=
+ue from
++     * QIOChannel's destructor */
++    dup_fd =3D qemu_dup(fd);
++    if (dup_fd =3D=3D -1) {
++        error_setg(errp, "Cannot dup fd %s: %s (%d)", fdname, strerror(e=
+rrno),
++                   errno);
++        return;
++    }
++
++    trace_migration_fd_outgoing(fd, dup_fd);
++    ioc =3D qio_channel_new_fd(dup_fd, errp);
+     if (!ioc) {
+-        close(fd);
++        close(dup_fd);
+         return;
+     }
+=20
+@@ -55,14 +68,24 @@ static gboolean fd_accept_incoming_migration(QIOChann=
+el *ioc,
+ void fd_start_incoming_migration(const char *infd, Error **errp)
+ {
+     QIOChannel *ioc;
+-    int fd;
++    int fd, dup_fd;
+=20
+     fd =3D strtol(infd, NULL, 0);
+-    trace_migration_fd_incoming(fd);
+=20
+-    ioc =3D qio_channel_new_fd(fd, errp);
++    /* fd is previously created by qmp command 'add-fd' or something els=
+e,
++     * so client is responsible to close it. Dup it to save original val=
+ue from
++     * QIOChannel's destructor */
++    dup_fd =3D qemu_dup(fd);
++    if (dup_fd =3D=3D -1) {
++        error_setg(errp, "Cannot dup fd %d: %s (%d)", fd, strerror(errno=
+),
++                   errno);
++        return;
++    }
++
++    trace_migration_fd_incoming(fd, dup_fd);
++    ioc =3D qio_channel_new_fd(dup_fd, errp);
+     if (!ioc) {
+-        close(fd);
++        close(dup_fd);
+         return;
+     }
+=20
+diff --git a/migration/trace-events b/migration/trace-events
+index de2e136e57..d2d30a6b3c 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -258,8 +258,8 @@ migration_exec_outgoing(const char *cmd) "cmd=3D%s"
+ migration_exec_incoming(const char *cmd) "cmd=3D%s"
+=20
+ # fd.c
+-migration_fd_outgoing(int fd) "fd=3D%d"
+-migration_fd_incoming(int fd) "fd=3D%d"
++migration_fd_outgoing(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
++migration_fd_incoming(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
+=20
+ # socket.c
+ migration_socket_incoming_accepted(void) ""
+--=20
+2.21.0
