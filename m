@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34920)
+Received: from eggs.gnu.org ([209.51.188.92]:35718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Dq-0003on-Ui
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:08:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hE9Hu-0005d0-Ut
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Do-0001Il-E1
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:08:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34910)
+	(envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tp-OW
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hE9Do-0001HH-4U
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:08:44 -0400
-Date: Wed, 10 Apr 2019 11:08:33 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tE-DC
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:56 -0400
+Date: Wed, 10 Apr 2019 11:12:41 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190410110833.4db9721f@redhat.com>
-In-Reply-To: <20190410011231.GA29083@richard>
-References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-	<20190410011231.GA29083@richard>
+Message-ID: <20190410111241.43094201@redhat.com>
+In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
+References: <20190409230022.6462-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
- MCFG table
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v4 00/12] bundle edk2 platform
+ firmware with QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, ehabkost@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 10 Apr 2019 09:12:31 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+On Wed, 10 Apr 2019 01:00:10 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-> On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
-> >Dummy table (with signature "QEMU") creation came from original SeaBIOS
-> >codebase. And QEMU would have to keep it around if there were Q35 machine
-> >that depended on keeping ACPI tables blob constant size. Luckily there
-> >were no versioned Q35 machine types before commit:
-> >  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
-> >which obsoleted need to keep ACPI tables blob the same size on source/destination.
-> >  
+> Repo:   https://github.com/lersek/qemu.git
+> Branch: edk2_build_v4
 > 
-> I am not sure getting the "versioned Q35" correctly. Seems originally there is
-> q35-1.4?
+> Posting a v4 is necessary because patch #6 needs
+> - manual conflict resolution against some commits between v4.0.0-rc2 and
+>   v4.0.0-rc3,
+> - and corresponding commit message updates.
 > 
-> commit bf3caa3dc17552b323cec6831301a22cfc98ecd5
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Fri Feb 8 14:06:15 2013 +0100
+> These are noted in more detail on the patch itself:
 > 
->     pc: add compatibility machine types for 1.4
->     
->     Adds both pc-i440fx-1.4 and pc-q35-1.4.
+>   [PATCH for-4.1 v4 06/12]
+>   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
+> 
+> Due to this update, I had to drop all previous feedback tags on this
+> patch. I plan to send a pullreq as soon as 4.0 is released, so please
+> re-review / retest the above patch (and *only* the above patch) soon.
+> (The notes on the patch list the tags individually that I've now
+> dropped.)
+> 
+> Version 3, that is:
+> 
+>   [Qemu-devel] [PATCH for-4.1 v3 00/12] bundle edk2 platform firmware with QEMU
 
-current upstream has only pc-q35-2.4 as earliest versioned Q35
-machine type (try to run: qemu-system-x86_64 -M help)
+For whole series:
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> 
+> was posted at:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg06148.html
+>   http://mid.mail-archive.com/20190321113408.19929-1-lersek@redhat.com
+> 
+> Thanks,
+> Laszlo
+> 
+> Laszlo Ersek (12):
+>   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+>   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+>   tests/uefi-test-tools/build.sh: work around TianoCore#1607
+>   roms/edk2: advance to tag edk2-stable201903
+>   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+>   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
+>   roms: build edk2 firmware binaries and variable store templates
+>   pc-bios: add edk2 firmware binaries and variable store templates
+>   pc-bios: document the edk2 firmware images; add firmware descriptors
+>   tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
+>   Makefile: install the edk2 firmware images and their descriptors
+>   MAINTAINERS: add the "EDK2 Firmware" subsystem
+> 
+>  .gitignore                                     |   1 +
+>  MAINTAINERS                                    |  12 +
+>  Makefile                                       |  29 ++-
+>  configure                                      |   1 +
+>  pc-bios/README                                 |  11 +
+>  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
+>  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
+>  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
+>  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
+>  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
+>  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
+>  pc-bios/edk2-aarch64-code.fd.bz2               | Bin 0 -> 1177603 bytes
+>  pc-bios/edk2-arm-code.fd.bz2                   | Bin 0 -> 1173662 bytes
+>  pc-bios/edk2-arm-vars.fd.bz2                   | Bin 0 -> 263 bytes
+>  pc-bios/edk2-i386-code.fd.bz2                  | Bin 0 -> 1688659 bytes
+>  pc-bios/edk2-i386-secure-code.fd.bz2           | Bin 0 -> 1881979 bytes
+>  pc-bios/edk2-i386-vars.fd.bz2                  | Bin 0 -> 190 bytes
+>  pc-bios/edk2-licenses.txt                      | 209 ++++++++++++++++
+>  pc-bios/edk2-x86_64-code.fd.bz2                | Bin 0 -> 1669280 bytes
+>  pc-bios/edk2-x86_64-secure-code.fd.bz2         | Bin 0 -> 1901210 bytes
+>  roms/Makefile                                  |   9 +-
+>  roms/Makefile.edk2                             | 148 ++++++++++++
+>  roms/edk2                                      |   2 +-
+>  roms/edk2-build.sh                             |  55 +++++
+>  roms/edk2-funcs.sh                             | 253 ++++++++++++++++++++
+>  tests/Makefile.include                         |   2 +-
+>  tests/uefi-test-tools/build.sh                 | 100 +-------
+>  27 files changed, 934 insertions(+), 96 deletions(-)
+>  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
+>  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
+>  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
+>  create mode 100644 pc-bios/edk2-aarch64-code.fd.bz2
+>  create mode 100644 pc-bios/edk2-arm-code.fd.bz2
+>  create mode 100644 pc-bios/edk2-arm-vars.fd.bz2
+>  create mode 100644 pc-bios/edk2-i386-code.fd.bz2
+>  create mode 100644 pc-bios/edk2-i386-secure-code.fd.bz2
+>  create mode 100644 pc-bios/edk2-i386-vars.fd.bz2
+>  create mode 100644 pc-bios/edk2-licenses.txt
+>  create mode 100644 pc-bios/edk2-x86_64-code.fd.bz2
+>  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd.bz2
+>  create mode 100644 roms/Makefile.edk2
+>  create mode 100755 roms/edk2-build.sh
+>  create mode 100644 roms/edk2-funcs.sh
+> 
