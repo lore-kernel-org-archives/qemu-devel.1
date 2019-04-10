@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38207)
+Received: from eggs.gnu.org ([209.51.188.92]:39468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEDjM-0001jb-Hf
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:39 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEDny-0003Io-Sa
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:02:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEDjK-0004wf-Sp
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33016)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEDnt-0008E5-CF
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:02:22 -0400
+Received: from mga06.intel.com ([134.134.136.31]:10314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEDjK-0004vh-GR
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 09:57:34 -0400
-Date: Wed, 10 Apr 2019 14:57:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190410135725.GE2980@work-vm>
-References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hEDns-0008BB-S7
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 10:02:17 -0400
+Date: Wed, 10 Apr 2019 22:01:53 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190410140153.GA2919@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+	<20190410011231.GA29083@richard>
+	<20190410110833.4db9721f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+In-Reply-To: <20190410110833.4db9721f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
+ MCFG table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,138 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>, armbru@redhat.com, berrange@redhat.com
-Cc: Juan Quintela <quintela@redhat.com>, yc-core@yandex-team.ru, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, ehabkost@redhat.com
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Currently such case is possible for incoming:
-> QMP: add-fd (fdset = 0, fd of some file):
->     adds fd to fdset 0 and returns QEMU's fd (e.g. 33)
-> QMP: migrate-incoming (uri = "fd:33"): fd is stored in QIOChannel *ioc
-> ...
-> Incoming migration completes and unrefs ioc -> close(33)
-> QMP: remove-fd (fdset = 0, fd = 33):
->     removes fd from fdset 0 and qemu_close() -> close(33) => double close
+On Wed, Apr 10, 2019 at 11:08:33AM +0200, Igor Mammedov wrote:
+>On Wed, 10 Apr 2019 09:12:31 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>> On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
+>> >Dummy table (with signature "QEMU") creation came from original SeaBIOS
+>> >codebase. And QEMU would have to keep it around if there were Q35 machine
+>> >that depended on keeping ACPI tables blob constant size. Luckily there
+>> >were no versioned Q35 machine types before commit:
+>> >  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
+>> >which obsoleted need to keep ACPI tables blob the same size on source/destination.
+>> >  
+>> 
+>> I am not sure getting the "versioned Q35" correctly. Seems originally there is
+>> q35-1.4?
+>> 
+>> commit bf3caa3dc17552b323cec6831301a22cfc98ecd5
+>> Author: Paolo Bonzini <pbonzini@redhat.com>
+>> Date:   Fri Feb 8 14:06:15 2013 +0100
+>> 
+>>     pc: add compatibility machine types for 1.4
+>>     
+>>     Adds both pc-i440fx-1.4 and pc-q35-1.4.
+>
+>current upstream has only pc-q35-2.4 as earliest versioned Q35
+>machine type (try to run: qemu-system-x86_64 -M help)
 
-Well spotted! That would very rarely cause a problem, but is a race.
+Yes, I see those old type are removed. This means we don't want to support
+those old types, right? Because those old types can't be migrated to latest
+upstream qemu.
 
-> For outgoing migration the case is the same but getfd instead of add-fd.
-> Fix it by duping client's fd.
-> 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-
-Note your patch hit a problem building on windows; I don't think we have
-a qemu_dup for windows.
-
-However, I think this problem is wider than just migration.
-For example, I see that dump.c also uses monitor_get_fd, and it's
-dump_cleanup also does a close on the fd. So I guess it hits the same
-problem?
-Also, qmp.c in qmp_add_client does a close on the fd in some error cases
-(I've not followed the normal case).
-
-So perhaps all the users of monitor_get_fd are hitting this problem.
-
-Should we be doing the dup in monitor_get_fd?
-
-Dave
-
-
-> ---
->  migration/fd.c         | 39 +++++++++++++++++++++++++++++++--------
->  migration/trace-events |  4 ++--
->  2 files changed, 33 insertions(+), 10 deletions(-)
-> 
-> diff --git a/migration/fd.c b/migration/fd.c
-> index a7c13df4ad..c9ff07ac41 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -15,6 +15,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "channel.h"
->  #include "fd.h"
->  #include "migration.h"
-> @@ -26,15 +27,27 @@
->  void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp)
->  {
->      QIOChannel *ioc;
-> -    int fd = monitor_get_fd(cur_mon, fdname, errp);
-> +    int fd, dup_fd;
-> +
-> +    fd = monitor_get_fd(cur_mon, fdname, errp);
->      if (fd == -1) {
->          return;
->      }
->  
-> -    trace_migration_fd_outgoing(fd);
-> -    ioc = qio_channel_new_fd(fd, errp);
-> +    /* fd is previously created by qmp command 'getfd',
-> +     * so client is responsible to close it. Dup it to save original value from
-> +     * QIOChannel's destructor */
-> +    dup_fd = qemu_dup(fd);
-> +    if (dup_fd == -1) {
-> +        error_setg(errp, "Cannot dup fd %s: %s (%d)", fdname, strerror(errno),
-> +                   errno);
-> +        return;
-> +    }
-> +
-> +    trace_migration_fd_outgoing(fd, dup_fd);
-> +    ioc = qio_channel_new_fd(dup_fd, errp);
->      if (!ioc) {
-> -        close(fd);
-> +        close(dup_fd);
->          return;
->      }
->  
-> @@ -55,14 +68,24 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
->  void fd_start_incoming_migration(const char *infd, Error **errp)
->  {
->      QIOChannel *ioc;
-> -    int fd;
-> +    int fd, dup_fd;
->  
->      fd = strtol(infd, NULL, 0);
-> -    trace_migration_fd_incoming(fd);
->  
-> -    ioc = qio_channel_new_fd(fd, errp);
-> +    /* fd is previously created by qmp command 'add-fd' or something else,
-> +     * so client is responsible to close it. Dup it to save original value from
-> +     * QIOChannel's destructor */
-> +    dup_fd = qemu_dup(fd);
-> +    if (dup_fd == -1) {
-> +        error_setg(errp, "Cannot dup fd %d: %s (%d)", fd, strerror(errno),
-> +                   errno);
-> +        return;
-> +    }
-> +
-> +    trace_migration_fd_incoming(fd, dup_fd);
-> +    ioc = qio_channel_new_fd(dup_fd, errp);
->      if (!ioc) {
-> -        close(fd);
-> +        close(dup_fd);
->          return;
->      }
->  
-> diff --git a/migration/trace-events b/migration/trace-events
-> index de2e136e57..d2d30a6b3c 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -258,8 +258,8 @@ migration_exec_outgoing(const char *cmd) "cmd=%s"
->  migration_exec_incoming(const char *cmd) "cmd=%s"
->  
->  # fd.c
-> -migration_fd_outgoing(int fd) "fd=%d"
-> -migration_fd_incoming(int fd) "fd=%d"
-> +migration_fd_outgoing(int fd, int dup_fd) "fd=%d dup_fd=%d"
-> +migration_fd_incoming(int fd, int dup_fd) "fd=%d dup_fd=%d"
->  
->  # socket.c
->  migration_socket_incoming_accepted(void) ""
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Wei Yang
+Help you, Help me
