@@ -2,68 +2,81 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5A4C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC51C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:56:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F59D20820
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:54:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F59D20820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63A3320830
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:56:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rWf/ONNC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A3320830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34700 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34741 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEGU9-0005Bw-CV
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:54:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49544)
+	id 1hEGWV-00068L-Lc
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:56:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEGTD-0004kz-Ne
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:53:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEGVg-0005dY-2x
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEGTC-0006KF-5M
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:53:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hEGTB-0006If-RE
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:53:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5F5B38046D;
-	Wed, 10 Apr 2019 16:53:04 +0000 (UTC)
-Received: from gondolin (ovpn-204-33.brq.redhat.com [10.40.204.33])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0CC6A104C421;
-	Wed, 10 Apr 2019 16:52:45 +0000 (UTC)
-Date: Wed, 10 Apr 2019 18:52:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190410185241.1b0b1982.cohuck@redhat.com>
-In-Reply-To: <20190410124114-mutt-send-email-mst@kernel.org>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-3-pagupta@redhat.com>
-	<20190410091216-mutt-send-email-mst@kernel.org>
-	<127904196.20807948.1554904981681.JavaMail.zimbra@redhat.com>
-	<20190410163139.4a04175e.cohuck@redhat.com>
-	<20190410124114-mutt-send-email-mst@kernel.org>
-Organization: Red Hat GmbH
+	(envelope-from <peter.maydell@linaro.org>) id 1hEGVf-00080M-1G
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:39 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEGVe-0007zf-OJ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:38 -0400
+Received: by mail-oi1-x242.google.com with SMTP id j132so2397042oib.2
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 09:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=AZKYUAD26Q4BWm3XwOGYBaDpcNOx4LZhF83PEPTQMPk=;
+	b=rWf/ONNC5CZw9IbavJoO1uAwOYe19tnKqbXuyIRvuO+Gz+WwbN88MADRbou+bf+07b
+	t8TB7XnkSdRLOsu2JpdSuHVYg1lqt2XQTsnKdwbrba/F7wKQKOkukaRAZMahimLlcYw5
+	Bpj9Io57hmsnJU6UEUTuCuWQX1k+bK4Z+b28Kzmwcx5jaA+lnryacNyQVcA+8mCqZm1k
+	p5vHNuZzN9WIyspYG2pwlmvP3Hg1o8lqyz6JJOp0Uk0eDIi4HLrg4rUymb4qhUxcmIbI
+	kaCYkfIee5wYlv7rSsnX9dfRCfaopKoKlub3e6RktR2u1Nl4fizwB3YT4UZd50D5Y41F
+	/KmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=AZKYUAD26Q4BWm3XwOGYBaDpcNOx4LZhF83PEPTQMPk=;
+	b=IxDnKF76YFwwwm3R8/PI47a5s1AKzgtTmTyvrnB58xuEUozBRIRtKiWTRf4HzqlVeE
+	oN3MTXIPWmAQ7Vf87+SkiyRXIyjO8+jTMC6JMTM7MLhxHKdK1APIdUvNSKGX70KDEt5o
+	RJhpcRsEXplDrC44Gw96YyK+AFVbBKqMxpm/dRTEz1HLqqnHUPRnURjJJK96E7mTX5o6
+	ERaWN1tC/vU4oGTXrpfQxLOPAe2pvjw1HaHHWPm8O2Nee7wvb9t/52KLCb2x+QBVDUnX
+	jf3Mgt2FnCGvI2S051a7wFnJdRlT5PAhWDzyTSBypj/Wr7g34lqEuTmX6iqlkd7QGS44
+	3hjg==
+X-Gm-Message-State: APjAAAUcyXErHe06urQXXvS6or2AN2RJ/1krYaZvHKuVHm/SFsAcYrgt
+	L3zlmEtW8a8DlOxlmgjxhsz82EAH5nZ3nrMdEidODQ==
+X-Google-Smtp-Source: APXvYqz46MqHkH0x+vH3+ySHezhmIP6VbXvmtua1LM1AfHy4x2rJfNYb21ni+tAEvNIfPn1/IGe+DWpzzjp6OxAw6mw=
+X-Received: by 2002:aca:e054:: with SMTP id x81mr3279005oig.146.1554915336823; 
+	Wed, 10 Apr 2019 09:55:36 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190410162918.9343-1-mreitz@redhat.com>
+	<aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
+	<3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
+In-Reply-To: <3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 10 Apr 2019 17:55:25 +0100
+Message-ID:
+ <CAFEAcA-iOuvsPoUGNOCaJFBsaC-D7WcxM3X_2FNw1r_gsb8SxQ@mail.gmail.com>
+To: Max Reitz <mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 10 Apr 2019 16:53:04 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] virtio-pmem: Add virtio pmem driver
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotests: Let 245 pass on tmpfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,100 +88,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pagupta@redhat.com>, jack@suse.cz, kvm@vger.kernel.org,
-	david@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-	qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410165241.ikfNGBEdlZhv6Zkez5V0mz6YGjsNvJAILJicUv7aCQM@z>
+Message-ID: <20190410165525.oba8AeO9q1D3mx_DZduVmewkDTb2ydN2WkDMY9GSFXw@z>
 
-On Wed, 10 Apr 2019 12:46:12 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Wed, 10 Apr 2019 at 17:40, Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 10.04.19 18:39, Eric Blake wrote:
+> > On 4/10/19 11:29 AM, Max Reitz wrote:
+> >> tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
+> >> @direct if the filesystem does not support it.
+> >>
+> >> Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  tests/qemu-iotests/245 | 10 ++++++++--
+> >>  1 file changed, 8 insertions(+), 2 deletions(-)
+> >
+> > Are you trying to get this in 4.0-rc3? (As a test, it has no bearing on
+> > the actual binaries; fewer testsuite failures are nice if we squeeze it
+> > in, but at the same time it is not enough to delay the release if it
+> > does not get fixed until 4.1).
+> >
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> If there are other patches for rc3, we could take this as well.  But
+> there is no point in making a pull request just for this.
 
-> On Wed, Apr 10, 2019 at 04:31:39PM +0200, Cornelia Huck wrote:
-> > On Wed, 10 Apr 2019 10:03:01 -0400 (EDT)
-> > Pankaj Gupta <pagupta@redhat.com> wrote:
-> >   
-> > > > 
-> > > > On Wed, Apr 10, 2019 at 09:38:22AM +0530, Pankaj Gupta wrote:    
-> > > > > This patch adds virtio-pmem driver for KVM guest.
-> > > > > 
-> > > > > Guest reads the persistent memory range information from
-> > > > > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > > > > creates a nd_region object with the persistent memory
-> > > > > range information so that existing 'nvdimm/pmem' driver
-> > > > > can reserve this into system memory map. This way
-> > > > > 'virtio-pmem' driver uses existing functionality of pmem
-> > > > > driver to register persistent memory compatible for DAX
-> > > > > capable filesystems.
-> > > > > 
-> > > > > This also provides function to perform guest flush over
-> > > > > VIRTIO from 'pmem' driver when userspace performs flush
-> > > > > on DAX memory range.
-> > > > > 
-> > > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>  
-> >   
-> > > > > diff --git a/include/uapi/linux/virtio_ids.h
-> > > > > b/include/uapi/linux/virtio_ids.h
-> > > > > index 6d5c3b2d4f4d..346389565ac1 100644
-> > > > > --- a/include/uapi/linux/virtio_ids.h
-> > > > > +++ b/include/uapi/linux/virtio_ids.h
-> > > > > @@ -43,5 +43,6 @@
-> > > > >  #define VIRTIO_ID_INPUT        18 /* virtio input */
-> > > > >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
-> > > > >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> > > > > +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
-> > > > >  
-> > > > >  #endif /* _LINUX_VIRTIO_IDS_H */    
-> > > > 
-> > > > Didn't Paolo point out someone is using 25 for audio?    
-> > > 
-> > > 
-> > > Sorry! I did not notice this.
-> > >   
-> > > > 
-> > > > Please, reserve an ID with the Virtio TC before using it.    
-> > > 
-> > > I thought I requested[1] ID 25.
-> > > 
-> > > [1] https://github.com/oasis-tcs/virtio-spec/issues/38
-> > > [2] https://lists.oasis-open.org/archives/virtio-dev/201805/threads.html
-> > > 
-> > > In that case I will send request for next available ID i.e 26?  
-> > 
-> > Have the folks using this for audio sent a reservation request as well?
-> > If not, I'd say the first requester should get the id...  
-> 
-> No but I think they ship their's already. No one ships pmem
-> so it's less pain for everyone if we just skip 25.
+rc3 has been tagged already, I'm afraid. rc4 will be only
+if something release-critical crops up.
 
-Ugh. Ok, then we should change pmem...
-
-> 
-> > (And yes, we need to be quicker with voting on/applying id
-> > reservations :/)  
-> 
-> We can't vote on what was not proposed for a vote.
-> At the moment that responsibility is with the commented
-> once discussion on the comment has taken place.
-> 
-> I think what's missing is a description of the process
-> in the README. Want to write it up and post it?
-
-I can add that to my TODO list, can't promise speedy resolution, though.
+thanks
+-- PMM
 
