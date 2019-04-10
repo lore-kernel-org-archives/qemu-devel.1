@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40310)
+Received: from eggs.gnu.org ([209.51.188.92]:42611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEK5o-0003v4-FW
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:45:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEKHb-0000Zj-V3
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEK5n-0001Ht-5O
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:45:12 -0400
-References: <20190403030526.12258-1-eblake@redhat.com>
-	<20190403030526.12258-5-eblake@redhat.com>
-	<7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <77387fd3-3265-b48a-c2f6-a8a0613dfbb1@redhat.com>
-Date: Wed, 10 Apr 2019 15:44:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1hEKHa-00085s-Ou
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:57:23 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 10 Apr 2019 22:57:09 +0200
+Message-Id: <20190410205715.2209-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lXN7o32Pb9Z2M95NEAcAeW39pdi9YvpYS"
-Subject: Re: [Qemu-devel] [PATCH 4/7] iotests: Update 241 to expose backing
- layer fragmentation
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/6] qemu-img: Add salvaging mode to convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +19,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lXN7o32Pb9Z2M95NEAcAeW39pdi9YvpYS
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <77387fd3-3265-b48a-c2f6-a8a0613dfbb1@redhat.com>
-Subject: Re: [PATCH 4/7] iotests: Update 241 to expose backing layer
- fragmentation
-References: <20190403030526.12258-1-eblake@redhat.com>
- <20190403030526.12258-5-eblake@redhat.com>
- <7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
-In-Reply-To: <7f20c0df-5ff3-cd2f-391f-3dae1a4cb51c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 4/8/19 8:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 03.04.2019 6:05, Eric Blake wrote:
->> Previous commits have mentioned that our NBD server still sends
->> unaligned fragments when an active layer with large advertised minimum=
+This series adds a --salvage option to qemu-img convert.  With this,
+qemu-img will not abort when it encounters an I/O error.  Instead, it
+tries to narrow it down and will treat the affected sectors as being
+completely 0 (and print a warning).
 
->> block size is backed by another layer with a smaller block
->> size. Expand the test to actually cover this scenario, by using qcow2
->> encryption (which forces 512-byte alignment) with an unaligned raw
->> backing file.
->>
->> The test passes, but only because the client side works around the
->> server's non-compliance; if you repeat the test manually with tracing
->> turned on, you will see the server sending a status for 1000 bytes
->> data then 1048 bytes hole, which is not aligned. But reverting commit
->> 737d3f5244 shows that it is indeed the client working around the bug
->> in the server.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> Oops, 241 fails for me:
->=20
-> -WARNING: Image format was not specified for '/home/eblake/qemu/tests/q=
-emu-iotests/scratch/t.raw' and probing guessed raw.
-> +WARNING: Image format was not specified for '/work/src/qemu/eric/tests=
-/qemu-iotests/scratch/t.raw' and probing guessed raw.
->=20
-> We forget to filter output :(
+Testing this is not so easy, because while real I/O errors during read
+operations should be treated as described above, errors encountered
+during bdrv_block_status() should just be ignored and the affected
+sectors should be considered allocated.  But blkdebug does not yet have
+a way to intercept this, and:
 
-The filter bug is pre-existing; separate patch for that is now posted.
+(1) Just adding a new block-status event would be silly, because I don't
+    want an event, I want it to fail on a certain kind of operation, on
+    a certain sector range, independently of any events, so why can't we
+    just do that?  See patch 4.
 
->=20
-> Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+(2) If we just make blkdebug intercept .bdrv_co_block_status() like all
+    other kinds of operations, at least iotest 041 fails, which does
+    exactly that silly thing: It uses the read_aio event to wait for any
+    read.  But it turns out that there may be a bdrv_*block_status()
+    call in between, so suddenly the wrong operation yields an error.
+    As I said, the real fault here is that it does not really make sense
+    to pray that the operation you want to fail is the one that is
+    immediately executed after some event that you hope will trigger
+    that operation.
+    See patch 3.
 
-I saw this email before -rc3, but thought I had only introduced the
-problem in this patch which I omitted from my rc3 pull request. Oh well,
-the actual break in iotests came earlier; if there's an -rc4 for other
-reasons, we'll get the test fixed then.
+So patch 3 allows blkdebug users to select which kind of I/O operation
+they actually want to make fail, and patch 4 allows them to not use any
+event, but to have a rule active all the time.
+
+Together, we can then enable error injection for block-status in patch 5
+and make use of event=3Dnone iotype=3Dblock-status in patch 6.
+
+
+v2:
+- Patch 2:
+  - 2058c2ad261de7f58fae01d63d3d0efa484caf2a has added an error message
+    when message when *block_status() fails.  Continue using this
+    message (with the problematic offset instead of the sector index),
+    and adjust my new messages to fit its style.
+  - Context conflict due to c075a0af22442e88226a6cef22da3fafccfb5d7e
+- Patch 3: %s/4\.0/4.1/
+- Patch 4: %s/4\.0/4.1/
+- Patch 6: Amendments necessitated by the changes to the warnings added
+           in patch 2
+
+
+git-backport-diff against v2:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/6:[----] [--] 'qemu-img: Move quiet into ImgConvertState'
+002/6:[0017] [FC] 'qemu-img: Add salvaging mode to convert'
+003/6:[0004] [FC] 'blkdebug: Add @iotype error option'
+004/6:[0002] [FC] 'blkdebug: Add "none" event'
+005/6:[----] [-C] 'blkdebug: Inject errors on .bdrv_co_block_status()'
+006/6:[0035] [FC] 'iotests: Test qemu-img convert --salvage'
+
+
+Max Reitz (6):
+  qemu-img: Move quiet into ImgConvertState
+  qemu-img: Add salvaging mode to convert
+  blkdebug: Add @iotype error option
+  blkdebug: Add "none" event
+  blkdebug: Inject errors on .bdrv_co_block_status()
+  iotests: Test qemu-img convert --salvage
+
+ qapi/block-core.json       |  33 +++++++-
+ block/blkdebug.c           |  60 ++++++++++++--
+ qemu-img.c                 |  98 ++++++++++++++++------
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.texi              |   5 ++
+ tests/qemu-iotests/249     | 163 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out |  43 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 8 files changed, 368 insertions(+), 39 deletions(-)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---lXN7o32Pb9Z2M95NEAcAeW39pdi9YvpYS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyuVcoACgkQp6FrSiUn
-Q2o0cQf+IAtnrEi0vQYdC1KCx134jRTfmA4IXXmcSuxbYlDoA7/0Mt00SbwzMl/L
-6dZMWkNjS79YpvzmjgwV7BSGuaygwIoDNqc4tWb3d624zgCXKEq5WOiN7Rq9k3hA
-9kO/u8ES8WmoQ6Zb7lU0rDe3TXXc5+4eAk6p+lG8BUxx9P2GXUBbjy7E7eaClj0t
-Urk1PLLpDFmeBSylGI3g1RJKNYh00OlVhE468drOBH1t5ey34s3J9MCQpEI5cIIB
-H+sI515YLBYYNGzjdhRUqn1yeskWTRz1VRch3TEFjpk9m1Rxp2SRr/m+/mdepxlx
-oMwrkJP9COPZQHgNW3DxUD46ANKPWg==
-=ecaD
------END PGP SIGNATURE-----
-
---lXN7o32Pb9Z2M95NEAcAeW39pdi9YvpYS--
+2.20.1
