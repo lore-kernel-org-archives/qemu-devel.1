@@ -2,65 +2,76 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3173C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9EFC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B65BF2075B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:13:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65BF2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A01E4217D6
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 09:27:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="VCbfWikv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A01E4217D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56209 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56367 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE9Ie-0005wM-VE
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 05:13:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35718)
+	id 1hE9WO-0000EE-JL
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 05:27:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Hu-0005d0-Ut
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:13:00 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VZ-0008Kv-6X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tp-OW
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hE9Hs-0004tE-DC
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:12:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6743819D4C6;
-	Wed, 10 Apr 2019 09:12:55 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 754565D719;
-	Wed, 10 Apr 2019 09:12:45 +0000 (UTC)
-Date: Wed, 10 Apr 2019 11:12:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20190410111241.43094201@redhat.com>
-In-Reply-To: <20190409230022.6462-1-lersek@redhat.com>
-References: <20190409230022.6462-1-lersek@redhat.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VY-00014A-5q
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:05 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:38784)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hE9VX-0000xk-G2
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 05:27:04 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::162])
+	by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 441122E1512;
+	Wed, 10 Apr 2019 12:26:59 +0300 (MSK)
+Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net
+	[2a02:6b8:0:1a2d::30])
+	by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+	2yLQePubGh-QwMqtOd1; Wed, 10 Apr 2019 12:26:59 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; 
+	t=1554888419; bh=qzVUe+kFoue1PLwKTfFPiIOFXUwUUgzArHlxHpLVHgc=;
+	h=Message-Id:Date:Subject:To:From:Cc;
+	b=VCbfWikvBVL0wXcHp5Jm9saEbV74OQsrZdVFhsmQuXKJfRvY7gGENyZv/vuu5VADM
+	gJLXSJZuprOs900ZwmHrscKpFDYnUnwIyyAoPI2LC0MCkHevMjouYtOiHcIaFiqEMp
+	265tSwqkxvZrwfdxgYP/tQa4Cn8sTxh+z/23G1/U=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+	dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+	[2a02:6b8:0:40c:1c6a:cfcd:3ad6:4876])
+	by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+	4IllViJHpG-QwYeQP9I; Wed, 10 Apr 2019 12:26:58 +0300
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Juan Quintela <quintela@redhat.com>
+Date: Wed, 10 Apr 2019 12:26:52 +0300
+Message-Id: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 10 Apr 2019 09:12:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v4 00/12] bundle edk2 platform
- firmware with QEMU
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a02:6b8:0:1619::183
+Subject: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,112 +80,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
-	mprivozn@redhat.com, f4bug@amsat.org, philmd@redhat.com, kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410091241.mL3SlvEQMB_8ouUu6XnvfccFrxBQ-OA3gYhYX2VyblE@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190410092652.4nFQyo97XngUWfuefOdbsr5Y_9vtQGy_EIWBdAUvV8c@z>
 
-On Wed, 10 Apr 2019 01:00:10 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Currently such case is possible for incoming:
+QMP: add-fd (fdset =3D 0, fd of some file):
+    adds fd to fdset 0 and returns QEMU's fd (e.g. 33)
+QMP: migrate-incoming (uri =3D "fd:33"): fd is stored in QIOChannel *ioc
+...
+Incoming migration completes and unrefs ioc -> close(33)
+QMP: remove-fd (fdset =3D 0, fd =3D 33):
+    removes fd from fdset 0 and qemu_close() -> close(33) =3D> double clo=
+se
 
-> Repo:   https://github.com/lersek/qemu.git
-> Branch: edk2_build_v4
-> 
-> Posting a v4 is necessary because patch #6 needs
-> - manual conflict resolution against some commits between v4.0.0-rc2 and
->   v4.0.0-rc3,
-> - and corresponding commit message updates.
-> 
-> These are noted in more detail on the patch itself:
-> 
->   [PATCH for-4.1 v4 06/12]
->   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
-> 
-> Due to this update, I had to drop all previous feedback tags on this
-> patch. I plan to send a pullreq as soon as 4.0 is released, so please
-> re-review / retest the above patch (and *only* the above patch) soon.
-> (The notes on the patch list the tags individually that I've now
-> dropped.)
-> 
-> Version 3, that is:
-> 
->   [Qemu-devel] [PATCH for-4.1 v3 00/12] bundle edk2 platform firmware with QEMU
+For outgoing migration the case is the same but getfd instead of add-fd.
+Fix it by duping client's fd.
 
-For whole series:
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+---
+ migration/fd.c         | 39 +++++++++++++++++++++++++++++++--------
+ migration/trace-events |  4 ++--
+ 2 files changed, 33 insertions(+), 10 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> 
-> was posted at:
-> 
->   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg06148.html
->   http://mid.mail-archive.com/20190321113408.19929-1-lersek@redhat.com
-> 
-> Thanks,
-> Laszlo
-> 
-> Laszlo Ersek (12):
->   roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
->   roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
->   tests/uefi-test-tools/build.sh: work around TianoCore#1607
->   roms/edk2: advance to tag edk2-stable201903
->   roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
->   roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
->   roms: build edk2 firmware binaries and variable store templates
->   pc-bios: add edk2 firmware binaries and variable store templates
->   pc-bios: document the edk2 firmware images; add firmware descriptors
->   tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
->   Makefile: install the edk2 firmware images and their descriptors
->   MAINTAINERS: add the "EDK2 Firmware" subsystem
-> 
->  .gitignore                                     |   1 +
->  MAINTAINERS                                    |  12 +
->  Makefile                                       |  29 ++-
->  configure                                      |   1 +
->  pc-bios/README                                 |  11 +
->  pc-bios/descriptors/50-edk2-i386-secure.json   |  34 +++
->  pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 +++
->  pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
->  pc-bios/descriptors/60-edk2-arm.json           |  31 +++
->  pc-bios/descriptors/60-edk2-i386.json          |  33 +++
->  pc-bios/descriptors/60-edk2-x86_64.json        |  34 +++
->  pc-bios/edk2-aarch64-code.fd.bz2               | Bin 0 -> 1177603 bytes
->  pc-bios/edk2-arm-code.fd.bz2                   | Bin 0 -> 1173662 bytes
->  pc-bios/edk2-arm-vars.fd.bz2                   | Bin 0 -> 263 bytes
->  pc-bios/edk2-i386-code.fd.bz2                  | Bin 0 -> 1688659 bytes
->  pc-bios/edk2-i386-secure-code.fd.bz2           | Bin 0 -> 1881979 bytes
->  pc-bios/edk2-i386-vars.fd.bz2                  | Bin 0 -> 190 bytes
->  pc-bios/edk2-licenses.txt                      | 209 ++++++++++++++++
->  pc-bios/edk2-x86_64-code.fd.bz2                | Bin 0 -> 1669280 bytes
->  pc-bios/edk2-x86_64-secure-code.fd.bz2         | Bin 0 -> 1901210 bytes
->  roms/Makefile                                  |   9 +-
->  roms/Makefile.edk2                             | 148 ++++++++++++
->  roms/edk2                                      |   2 +-
->  roms/edk2-build.sh                             |  55 +++++
->  roms/edk2-funcs.sh                             | 253 ++++++++++++++++++++
->  tests/Makefile.include                         |   2 +-
->  tests/uefi-test-tools/build.sh                 | 100 +-------
->  27 files changed, 934 insertions(+), 96 deletions(-)
->  create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
->  create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
->  create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
->  create mode 100644 pc-bios/descriptors/60-edk2-arm.json
->  create mode 100644 pc-bios/descriptors/60-edk2-i386.json
->  create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
->  create mode 100644 pc-bios/edk2-aarch64-code.fd.bz2
->  create mode 100644 pc-bios/edk2-arm-code.fd.bz2
->  create mode 100644 pc-bios/edk2-arm-vars.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-code.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-secure-code.fd.bz2
->  create mode 100644 pc-bios/edk2-i386-vars.fd.bz2
->  create mode 100644 pc-bios/edk2-licenses.txt
->  create mode 100644 pc-bios/edk2-x86_64-code.fd.bz2
->  create mode 100644 pc-bios/edk2-x86_64-secure-code.fd.bz2
->  create mode 100644 roms/Makefile.edk2
->  create mode 100755 roms/edk2-build.sh
->  create mode 100644 roms/edk2-funcs.sh
-> 
+diff --git a/migration/fd.c b/migration/fd.c
+index a7c13df4ad..c9ff07ac41 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -15,6 +15,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "channel.h"
+ #include "fd.h"
+ #include "migration.h"
+@@ -26,15 +27,27 @@
+ void fd_start_outgoing_migration(MigrationState *s, const char *fdname, =
+Error **errp)
+ {
+     QIOChannel *ioc;
+-    int fd =3D monitor_get_fd(cur_mon, fdname, errp);
++    int fd, dup_fd;
++
++    fd =3D monitor_get_fd(cur_mon, fdname, errp);
+     if (fd =3D=3D -1) {
+         return;
+     }
+=20
+-    trace_migration_fd_outgoing(fd);
+-    ioc =3D qio_channel_new_fd(fd, errp);
++    /* fd is previously created by qmp command 'getfd',
++     * so client is responsible to close it. Dup it to save original val=
+ue from
++     * QIOChannel's destructor */
++    dup_fd =3D qemu_dup(fd);
++    if (dup_fd =3D=3D -1) {
++        error_setg(errp, "Cannot dup fd %s: %s (%d)", fdname, strerror(e=
+rrno),
++                   errno);
++        return;
++    }
++
++    trace_migration_fd_outgoing(fd, dup_fd);
++    ioc =3D qio_channel_new_fd(dup_fd, errp);
+     if (!ioc) {
+-        close(fd);
++        close(dup_fd);
+         return;
+     }
+=20
+@@ -55,14 +68,24 @@ static gboolean fd_accept_incoming_migration(QIOChann=
+el *ioc,
+ void fd_start_incoming_migration(const char *infd, Error **errp)
+ {
+     QIOChannel *ioc;
+-    int fd;
++    int fd, dup_fd;
+=20
+     fd =3D strtol(infd, NULL, 0);
+-    trace_migration_fd_incoming(fd);
+=20
+-    ioc =3D qio_channel_new_fd(fd, errp);
++    /* fd is previously created by qmp command 'add-fd' or something els=
+e,
++     * so client is responsible to close it. Dup it to save original val=
+ue from
++     * QIOChannel's destructor */
++    dup_fd =3D qemu_dup(fd);
++    if (dup_fd =3D=3D -1) {
++        error_setg(errp, "Cannot dup fd %d: %s (%d)", fd, strerror(errno=
+),
++                   errno);
++        return;
++    }
++
++    trace_migration_fd_incoming(fd, dup_fd);
++    ioc =3D qio_channel_new_fd(dup_fd, errp);
+     if (!ioc) {
+-        close(fd);
++        close(dup_fd);
+         return;
+     }
+=20
+diff --git a/migration/trace-events b/migration/trace-events
+index de2e136e57..d2d30a6b3c 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -258,8 +258,8 @@ migration_exec_outgoing(const char *cmd) "cmd=3D%s"
+ migration_exec_incoming(const char *cmd) "cmd=3D%s"
+=20
+ # fd.c
+-migration_fd_outgoing(int fd) "fd=3D%d"
+-migration_fd_incoming(int fd) "fd=3D%d"
++migration_fd_outgoing(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
++migration_fd_incoming(int fd, int dup_fd) "fd=3D%d dup_fd=3D%d"
+=20
+ # socket.c
+ migration_socket_incoming_accepted(void) ""
+--=20
+2.21.0
 
 
