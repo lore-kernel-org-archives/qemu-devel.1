@@ -2,91 +2,118 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F79AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 19:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31446C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 19:32:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E0E2070D
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 19:30:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E0E2070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3AF22070D
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 19:32:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3AF22070D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36791 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36803 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEIvh-0005ky-Qc
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 15:30:41 -0400
+	id 1hEIxj-0007Ow-1G
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 15:32:47 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:53358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEIuN-0004sO-E4
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:29:20 -0400
+	(envelope-from <sw@weilnetz.de>) id 1hEIuP-0004sO-W1
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEItG-0004be-38
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:28:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEItE-0004ah-HE; Wed, 10 Apr 2019 15:28:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC3A23086218;
-	Wed, 10 Apr 2019 19:28:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 86678608EB;
-	Wed, 10 Apr 2019 19:28:04 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190401145741.28322-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+	(envelope-from <sw@weilnetz.de>) id 1hEItB-0004Zd-6A
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:28:06 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:45520
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <sw@weilnetz.de>) id 1hEItA-0004Ys-QZ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:28:05 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id D9E7BDB288E;
+	Wed, 10 Apr 2019 21:22:12 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024)
+	with ESMTP id 04Juv8et2Kmh; Wed, 10 Apr 2019 21:22:12 +0200 (CEST)
+Received: from [192.168.178.24] (p57B42B4A.dip0.t-ipconnect.de [87.180.43.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128
+	bits)) (No client certificate requested)
+	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id ECC90DA3169; 
+	Wed, 10 Apr 2019 21:22:11 +0200 (CEST)
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+	<berrange@redhat.com>
+References: <20190404185730.GA22512@ls3530.dellerweb.de>
+	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
+	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
+	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
+	<20190405090212.GF6105@redhat.com>
+	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
+	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
+	<b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
+	<0e30df69-c534-da63-a21b-813281b39b86@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d62dd532-2da4-40ee-7054-616c87907dd4@redhat.com>
-Date: Wed, 10 Apr 2019 21:28:02 +0200
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <d251a37c-4bf2-27a3-9714-c443ee1cb1e2@weilnetz.de>
+Date: Wed, 10 Apr 2019 21:22:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190401145741.28322-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LTnHzBBIahXPJq4ZVlHP2MvzhL74LnGpN"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 10 Apr 2019 19:28:07 +0000 (UTC)
+In-Reply-To: <0e30df69-c534-da63-a21b-813281b39b86@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] qemu-img: Saner printing of
- large file sizes
+X-Received-From: 37.120.169.71
+Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
+ on non-release architectures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,108 +125,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
-	"Richard W . M . Jones" <rjones@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
+	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410192802.UQ1CDz4hw-sXVBZNCWxMIf23qbO2zbWjpsjC0HT-YE8@z>
+Message-ID: <20190410192211.YvPcdaK9rI-N9vUZMQSsCVCvZcG36563rVYrm-qZWn8@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LTnHzBBIahXPJq4ZVlHP2MvzhL74LnGpN
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org,
- "Richard W . M . Jones" <rjones@redhat.com>,
- Alberto Garcia <berto@igalia.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <d62dd532-2da4-40ee-7054-616c87907dd4@redhat.com>
-Subject: Re: [PATCH for-4.1 v2] qemu-img: Saner printing of large file sizes
-References: <20190401145741.28322-1-eblake@redhat.com>
-In-Reply-To: <20190401145741.28322-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01.04.19 16:57, Eric Blake wrote:
-> Disk sizes close to INT64_MAX cause overflow, for some pretty
-> ridiculous output:
+On 10.04.19 10:22, Thomas Huth wrote:
+> Additionally, I think it should be possible to compile with the
+> x86_64-linux-user target and then to run "make check-tcg" ... however,
+> that currently crashes with:
 >=20
->   $ ./nbdkit -U - memory size=3D$((2**63 - 512)) --run 'qemu-img info $=
-nbd'
->   image: nbd+unix://?socket=3D/tmp/nbdkitHSAzNz/socket
->   file format: raw
->   virtual size: -8388607T (9223372036854775296 bytes)
->   disk size: unavailable
->=20
-> But there's no reason to have two separate implementations of integer
-> to human-readable abbreviation, where one has overflow and stops at
-> 'T', while the other avoids overflow and goes all the way to 'E'. With
-> this patch, the output now claims 8EiB instead of -8388607T, which
-> really is the correct rounding of largest file size supported by qemu
-> (we could go 511 bytes larger if we used byte-accurate sizing instead
-> of rounding up to the next sector boundary, but that wouldn't change
-> the human-readable result).
->=20
-> Quite a few iotests need updates to expected output to match.
->=20
-> Reported-by: Richard W.M. Jones <rjones@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> v2 - actually update iotests to match; no change to block/ code so R-b =
-added
+> TODO qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
+> qemu/tcg/tci.c:859: tcg fatal error
+> qemu: uncaught target signal 11 (Segmentation fault) - core dumped
 
-There are more iotests this breaks.  First, there is 059 for vmdk, which
-looks just like the rest.
+That's easy to fix. I implemented only those TCG opcodes which really
+were executed during testing. This test triggers an assertion because it
+needs INDEX_op_ld16u_i64 which was missing up to now.
 
-But for -m32, it gets a bit more difficult.  Every size above 999 GB
-(1000 GB gets rounded to 1 TB, which is 2^31 * 512) gets printed as
-"inf [unit]":
+I'll send a patch which adds support for INDEX_op_ld16u_i64.
 
-$ ./qemu-img create -f qcow2 /tmp/foo.qcow2 1T
-$ ./qemu-img info /tmp/foo.qcow2
-[...]
-virtual size: inf TiB (1099511627776 bytes)
-[...]
+Thank you for your tests.
 
-$ ./qemu-img create -f qcow2 /tmp/foo.qcow2 1P
-$ ./qemu-img info /tmp/foo.qcow2
-[...]
-virtual size: inf PiB (1125899906842624 bytes)
-[...]
+Stefan
 
-This breaks the iotests that test the maximum disk size of more exotic
-formats.  I can see failures for vdi, vhdx, and parallels.
-
-But regardless of the iotests, we shouldn=E2=80=99t show the size as infi=
-nite
-just because of -m32.
-
-Max
-
-
---LTnHzBBIahXPJq4ZVlHP2MvzhL74LnGpN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuQ8IACgkQ9AfbAGHV
-z0Dozwf8CKH5VQnBcHBXDQ2qt/VzI9o8gKDNDrIstgFW2C67jCUK2Rf5ebMYfBCy
-TagUJN+vRpyJgltOG+OVBe0SeiW2GsCcvlQtUfC67LDcHT5ycoPC9o9LSsyhQRHw
-wC6KNswyLDPxMz+z/lSpSinGh9NbGGtvzKd2K+PfkKPZ657++4Uj7RDiCReTWN4A
-1BAR2U2PCmy01n+222GVuJm5vj8BLEF6MAS/pLVADq9jngoV+k4bC5EBN9p5g3VY
-Se4a5O+MD9X9feq82+ad8snFUy68g/J7QT7GpG9+v1PigJOjGgTjvU22QpEg/R69
-GLobqdfAAv+ymsJrgtqD3jAK0mPiXw==
-=jIJr
------END PGP SIGNATURE-----
-
---LTnHzBBIahXPJq4ZVlHP2MvzhL74LnGpN--
 
