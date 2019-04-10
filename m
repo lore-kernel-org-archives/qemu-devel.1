@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3DEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A85B4C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B49D21741
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:26:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B49D21741
+	by mail.kernel.org (Postfix) with ESMTPS id 6A99B20830
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 20:28:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A99B20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37405 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37429 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEJnR-0003bM-78
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:26:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34891)
+	id 1hEJpL-0005Mx-Ir
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 16:28:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiX-00073S-BV
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hEJiS-0006y4-Uz
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEJiW-0004UP-1N
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60074)
+	(envelope-from <mreitz@redhat.com>) id 1hEJiR-0004QM-BC
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 16:21:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEJiS-0004Qr-Jp; Wed, 10 Apr 2019 16:21:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hEJiL-0004Hm-NP; Wed, 10 Apr 2019 16:20:58 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D225830A223D;
-	Wed, 10 Apr 2019 20:21:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B0C6316468C;
+	Wed, 10 Apr 2019 20:20:51 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 359DB5D71E;
-	Wed, 10 Apr 2019 20:21:03 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1007C19C65;
+	Wed, 10 Apr 2019 20:20:47 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 10 Apr 2019 22:20:31 +0200
-Message-Id: <20190410202033.28617-10-mreitz@redhat.com>
+Date: Wed, 10 Apr 2019 22:20:26 +0200
+Message-Id: <20190410202033.28617-5-mreitz@redhat.com>
 In-Reply-To: <20190410202033.28617-1-mreitz@redhat.com>
 References: <20190410202033.28617-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Wed, 10 Apr 2019 20:21:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 10 Apr 2019 20:20:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 09/11] iotests: Add filter mirror test cases
+Subject: [Qemu-devel] [PATCH v4 04/11] block: Inline
+ bdrv_co_block_status_from_*()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,205 +74,240 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410202031.XR3LRCc2Z-BgyeUhqTAvH9Qsm8-zP1kgL18maIv5bNQ@z>
+Message-ID: <20190410202026.42aQ1zhTDHDuEAxxcxiBE4AHP1KRiYKB6lPjP5vwQKA@z>
 
-This patch adds some test cases how mirroring relates to filters.  One
-of them tests what happens when you mirror off a filtered COW node, two
-others use the mirror filter node as basically our only example of an
-implicitly created filter node so far (besides the commit filter).
+With bdrv_filtered_rw_bs(), we can easily handle this default filter
+behavior in bdrv_co_block_status().
 
+blkdebug wants to have an additional assertion, so it keeps its own
+implementation, except bdrv_co_block_status_from_file() needs to be
+inlined there.
+
+Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/041     | 146 ++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/041.out |   4 +-
- 2 files changed, 147 insertions(+), 3 deletions(-)
+ include/block/block_int.h | 22 -----------------
+ block/blkdebug.c          |  7 ++++--
+ block/blklogwrites.c      |  1 -
+ block/commit.c            |  1 -
+ block/copy-on-read.c      |  2 --
+ block/io.c                | 51 +++++++++++++--------------------------
+ block/mirror.c            |  1 -
+ block/throttle.c          |  1 -
+ 8 files changed, 22 insertions(+), 64 deletions(-)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 0c1432f189..c2b5299f62 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -20,8 +20,9 @@
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index d0309e6307..76c7c0a111 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1187,28 +1187,6 @@ void bdrv_format_default_perms(BlockDriverState *b=
+s, BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared);
 =20
- import time
- import os
-+import json
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_img_pipe, qemu_io
+-/*
+- * Default implementation for drivers to pass bdrv_co_block_status() to
+- * their file.
+- */
+-int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+-                                                bool want_zero,
+-                                                int64_t offset,
+-                                                int64_t bytes,
+-                                                int64_t *pnum,
+-                                                int64_t *map,
+-                                                BlockDriverState **file)=
+;
+-/*
+- * Default implementation for drivers to pass bdrv_co_block_status() to
+- * their backing file.
+- */
+-int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+-                                                   bool want_zero,
+-                                                   int64_t offset,
+-                                                   int64_t bytes,
+-                                                   int64_t *pnum,
+-                                                   int64_t *map,
+-                                                   BlockDriverState **fi=
+le);
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)=
+;
+ bool blk_dev_has_removable_media(BlockBackend *blk);
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index efd9441625..7950ae729c 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -637,8 +637,11 @@ static int coroutine_fn blkdebug_co_block_status(Blo=
+ckDriverState *bs,
+                                                  BlockDriverState **file=
+)
+ {
+     assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
+-    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
+-                                          pnum, map, file);
++    assert(bs->file && bs->file->bs);
++    *pnum =3D bytes;
++    *map =3D offset;
++    *file =3D bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+ }
 =20
- backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
- target_backing_img =3D os.path.join(iotests.test_dir, 'target-backing.im=
-g')
-@@ -1191,5 +1192,148 @@ class TestReplaces(iotests.QMPTestCase):
-         os.remove(test_img)
-         os.remove(target_img)
+ static void blkdebug_close(BlockDriverState *bs)
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index eb2b4901a5..1eb4a5c613 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -518,7 +518,6 @@ static BlockDriver bdrv_blk_log_writes =3D {
+     .bdrv_co_pwrite_zeroes  =3D blk_log_writes_co_pwrite_zeroes,
+     .bdrv_co_flush_to_disk  =3D blk_log_writes_co_flush_to_disk,
+     .bdrv_co_pdiscard       =3D blk_log_writes_co_pdiscard,
+-    .bdrv_co_block_status   =3D bdrv_co_block_status_from_file,
 =20
-+# Tests for mirror with filters (and how the mirror filter behaves, as
-+# an example for an implicit filter)
-+class TestFilters(iotests.QMPTestCase):
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, test=
-_img)
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, targ=
-et_img)
-+
-+        qemu_io('-c', 'write -P 1 0 512k', backing_img)
-+        qemu_io('-c', 'write -P 2 512k 512k', test_img)
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.launch()
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'target',
-+                                'driver': iotests.imgfmt,
-+                                'file': {
-+                                    'driver': 'file',
-+                                    'filename': target_img
-+                                },
-+                                'backing': None
-+                            })
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.filterless_chain =3D {
-+                'node-name': 'source',
-+                'driver': iotests.imgfmt,
-+                'file': {
-+                    'driver': 'file',
-+                    'filename': test_img
-+                },
-+                'backing': {
-+                    'node-name': 'backing',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': backing_img
-+                    }
-+                }
-+            }
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+
-+        os.remove(test_img)
-+        os.remove(target_img)
-+        os.remove(backing_img)
-+
-+    def test_cor(self):
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'filter',
-+                                'driver': 'copy-on-read',
-+                                'file': self.filterless_chain
-+                            })
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-mirror',
-+                             job_id=3D'mirror',
-+                             device=3D'filter',
-+                             target=3D'target',
-+                             sync=3D'top')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.complete_and_wait('mirror')
-+
-+        self.vm.qmp('blockdev-del', node_name=3D'target')
-+
-+        target_map =3D qemu_img_pipe('map', '--output=3Djson', target_im=
-g)
-+        target_map =3D json.loads(target_map)
-+
-+        assert target_map[0]['start'] =3D=3D 0
-+        assert target_map[0]['length'] =3D=3D 512 * 1024
-+        assert target_map[0]['depth'] =3D=3D 1
-+
-+        assert target_map[1]['start'] =3D=3D 512 * 1024
-+        assert target_map[1]['length'] =3D=3D 512 * 1024
-+        assert target_map[1]['depth'] =3D=3D 0
-+
-+    def test_implicit_mirror_filter(self):
-+        result =3D self.vm.qmp('blockdev-add', **self.filterless_chain)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # We need this so we can query from above the mirror node
-+        result =3D self.vm.qmp('device_add',
-+                             driver=3D'virtio-blk',
-+                             id=3D'virtio',
-+                             bus=3D'pci.0',
-+                             drive=3D'source')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-mirror',
-+                             job_id=3D'mirror',
-+                             device=3D'source',
-+                             target=3D'target',
-+                             sync=3D'top')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # The mirror filter is now an implicit node, so it should be
-+        # invisible when querying the backing chain
-+        device_info =3D self.vm.qmp('query-block')['return'][0]
-+        assert device_info['qdev'] =3D=3D '/machine/peripheral/virtio/vi=
-rtio-backend'
-+
-+        assert device_info['inserted']['node-name'] =3D=3D 'source'
-+
-+        image_info =3D device_info['inserted']['image']
-+        assert image_info['filename'] =3D=3D test_img
-+        assert image_info['backing-image']['filename'] =3D=3D backing_im=
-g
-+
-+        self.complete_and_wait('mirror')
-+
-+    def test_explicit_mirror_filter(self):
-+        # Same test as above, but this time we give the mirror filter
-+        # a node-name so it will not be invisible
-+        result =3D self.vm.qmp('blockdev-add', **self.filterless_chain)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # We need this so we can query from above the mirror node
-+        result =3D self.vm.qmp('device_add',
-+                             driver=3D'virtio-blk',
-+                             id=3D'virtio',
-+                             bus=3D'pci.0',
-+                             drive=3D'source')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-mirror',
-+                             job_id=3D'mirror',
-+                             device=3D'source',
-+                             target=3D'target',
-+                             sync=3D'top',
-+                             filter_node_name=3D'mirror-filter')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # With a node-name given to it, the mirror filter should now
-+        # be visible
-+        device_info =3D self.vm.qmp('query-block')['return'][0]
-+        assert device_info['qdev'] =3D=3D '/machine/peripheral/virtio/vi=
-rtio-backend'
-+
-+        assert device_info['inserted']['node-name'] =3D=3D 'mirror-filte=
-r'
-+
-+        self.complete_and_wait('mirror')
-+
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index 2c448b4239..ffc779b4d1 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--........................................................................=
-..................
-+........................................................................=
-.....................
- ----------------------------------------------------------------------
--Ran 90 tests
-+Ran 93 tests
+     .is_filter              =3D true,
+     .strong_runtime_opts    =3D blk_log_writes_strong_runtime_opts,
+diff --git a/block/commit.c b/block/commit.c
+index 252007fd57..c366ee9655 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -254,7 +254,6 @@ static void bdrv_commit_top_child_perm(BlockDriverSta=
+te *bs, BdrvChild *c,
+ static BlockDriver bdrv_commit_top =3D {
+     .format_name                =3D "commit_top",
+     .bdrv_co_preadv             =3D bdrv_commit_top_preadv,
+-    .bdrv_co_block_status       =3D bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      =3D bdrv_commit_top_refresh_filename,
+     .bdrv_child_perm            =3D bdrv_commit_top_child_perm,
 =20
- OK
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 53972b1da3..fe9260163c 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -150,8 +150,6 @@ static BlockDriver bdrv_copy_on_read =3D {
+     .bdrv_eject                         =3D cor_eject,
+     .bdrv_lock_medium                   =3D cor_lock_medium,
+=20
+-    .bdrv_co_block_status               =3D bdrv_co_block_status_from_fi=
+le,
+-
+     .bdrv_recurse_is_first_non_filter   =3D cor_recurse_is_first_non_fil=
+ter,
+=20
+     .has_variable_length                =3D true,
+diff --git a/block/io.c b/block/io.c
+index 5c33ecc080..8d124bae5c 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1993,36 +1993,6 @@ typedef struct BdrvCoBlockStatusData {
+     bool done;
+ } BdrvCoBlockStatusData;
+=20
+-int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+-                                                bool want_zero,
+-                                                int64_t offset,
+-                                                int64_t bytes,
+-                                                int64_t *pnum,
+-                                                int64_t *map,
+-                                                BlockDriverState **file)
+-{
+-    assert(bs->file && bs->file->bs);
+-    *pnum =3D bytes;
+-    *map =3D offset;
+-    *file =3D bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+-}
+-
+-int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+-                                                   bool want_zero,
+-                                                   int64_t offset,
+-                                                   int64_t bytes,
+-                                                   int64_t *pnum,
+-                                                   int64_t *map,
+-                                                   BlockDriverState **fi=
+le)
+-{
+-    assert(bs->backing && bs->backing->bs);
+-    *pnum =3D bytes;
+-    *map =3D offset;
+-    *file =3D bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+-}
+-
+ /*
+  * Returns the allocation status of the specified sectors.
+  * Drivers not implementing the functionality are assumed to not support
+@@ -2063,6 +2033,7 @@ static int coroutine_fn bdrv_co_block_status(BlockD=
+riverState *bs,
+     BlockDriverState *local_file =3D NULL;
+     int64_t aligned_offset, aligned_bytes;
+     uint32_t align;
++    bool has_filtered_child;
+=20
+     assert(pnum);
+     *pnum =3D 0;
+@@ -2088,7 +2059,8 @@ static int coroutine_fn bdrv_co_block_status(BlockD=
+riverState *bs,
+=20
+     /* Must be non-NULL or bdrv_getlength() would have failed */
+     assert(bs->drv);
+-    if (!bs->drv->bdrv_co_block_status) {
++    has_filtered_child =3D bs->drv->is_filter && bdrv_filtered_rw_child(=
+bs);
++    if (!bs->drv->bdrv_co_block_status && !has_filtered_child) {
+         *pnum =3D bytes;
+         ret =3D BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+         if (offset + bytes =3D=3D total_size) {
+@@ -2109,9 +2081,20 @@ static int coroutine_fn bdrv_co_block_status(Block=
+DriverState *bs,
+     aligned_offset =3D QEMU_ALIGN_DOWN(offset, align);
+     aligned_bytes =3D ROUND_UP(offset + bytes, align) - aligned_offset;
+=20
+-    ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
+-                                        aligned_bytes, pnum, &local_map,
+-                                        &local_file);
++    if (bs->drv->bdrv_co_block_status) {
++        ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_off=
+set,
++                                            aligned_bytes, pnum, &local_=
+map,
++                                            &local_file);
++    } else {
++        /* Default code for filters */
++
++        local_file =3D bdrv_filtered_rw_bs(bs);
++        assert(local_file);
++
++        *pnum =3D aligned_bytes;
++        local_map =3D aligned_offset;
++        ret =3D BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
++    }
+     if (ret < 0) {
+         *pnum =3D 0;
+         goto out;
+diff --git a/block/mirror.c b/block/mirror.c
+index 80cef587f0..2e521c726a 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1487,7 +1487,6 @@ static BlockDriver bdrv_mirror_top =3D {
+     .bdrv_co_pwrite_zeroes      =3D bdrv_mirror_top_pwrite_zeroes,
+     .bdrv_co_pdiscard           =3D bdrv_mirror_top_pdiscard,
+     .bdrv_co_flush              =3D bdrv_mirror_top_flush,
+-    .bdrv_co_block_status       =3D bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      =3D bdrv_mirror_top_refresh_filename,
+     .bdrv_child_perm            =3D bdrv_mirror_top_child_perm,
+=20
+diff --git a/block/throttle.c b/block/throttle.c
+index f64dcc27b9..b6922e734f 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -259,7 +259,6 @@ static BlockDriver bdrv_throttle =3D {
+     .bdrv_reopen_prepare                =3D   throttle_reopen_prepare,
+     .bdrv_reopen_commit                 =3D   throttle_reopen_commit,
+     .bdrv_reopen_abort                  =3D   throttle_reopen_abort,
+-    .bdrv_co_block_status               =3D   bdrv_co_block_status_from_=
+file,
+=20
+     .bdrv_co_drain_begin                =3D   throttle_co_drain_begin,
+     .bdrv_co_drain_end                  =3D   throttle_co_drain_end,
 --=20
 2.20.1
 
