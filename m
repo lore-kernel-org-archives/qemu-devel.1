@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50027)
+Received: from eggs.gnu.org ([209.51.188.92]:50484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEGVg-0005dY-2x
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:41 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEGXi-0006wj-D4
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEGVf-00080M-1G
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:39 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEGVe-0007zf-OJ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:55:38 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j132so2397042oib.2
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 09:55:37 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hEGXh-0001Iy-2F
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:57:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65398)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEGXg-0001IZ-NZ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:57:45 -0400
+Date: Wed, 10 Apr 2019 17:57:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190410165736.GG2980@work-vm>
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	<20190408123542.1a4de426@redhat.com>
+	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
+	<20190410145908.GF2980@work-vm>
+	<CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190410162918.9343-1-mreitz@redhat.com>
-	<aa9b357f-3485-9819-fa93-23afe6fdb2d1@redhat.com>
-	<3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
-In-Reply-To: <3620d581-c849-f768-b9d4-239ff09f174f@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Apr 2019 17:55:25 +0100
-Message-ID: <CAFEAcA-iOuvsPoUGNOCaJFBsaC-D7WcxM3X_2FNw1r_gsb8SxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotests: Let 245 pass on tmpfs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Catherine Ho <catherine.hecx@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Wed, 10 Apr 2019 at 17:40, Max Reitz <mreitz@redhat.com> wrote:
->
-> On 10.04.19 18:39, Eric Blake wrote:
-> > On 4/10/19 11:29 AM, Max Reitz wrote:
-> >> tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
-> >> @direct if the filesystem does not support it.
-> >>
-> >> Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
-> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >> ---
-> >>  tests/qemu-iotests/245 | 10 ++++++++--
-> >>  1 file changed, 8 insertions(+), 2 deletions(-)
+* Catherine Ho (catherine.hecx@gmail.com) wrote:
+> Hi Dr. David
+> 
+> On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <dgilbert@redhat.com>
+> wrote:
+> 
+> > * Catherine Ho (catherine.hecx@gmail.com) wrote:
+> > > Hi Igor
+> > >
+> > >
+> > > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com> wrote:
+> > >
+> > > > On Sun,  7 Apr 2019 22:19:05 -0400
+> > > > Catherine Ho <catherine.hecx@gmail.com> wrote:
+> > > >
+> > > > > Currently it is not forbidden to use "-object
+> > > > memory-backend-file,share=on"
+> > > > > and together with "-incoming". But after incoming migration is
+> > finished,
+> > > > > the memory-backend-file will be definitely written if share=on. So
+> > the
+> > > > > memory-backend-file can only be used once, but failed in the 2nd time
+> > > > > incoming.
+> > > > >
+> > > > > Thus it gives a warning and the users can run the qemu if they really
+> > > > > want to do it.
+> > > >
+> > > > Shouldn't we add a migration blocker in such a case instead of warning
+> > > > and letting qemu run wild?
+> > > >
+> > >
+> > > IMO, it doesn't need to block this. With share=on and -incoming, the user
+> > > can
+> > > still save the device memory state into memory-backend file again if
+> > > ignore-shared
+> > > capability is on.
+> > >
+> > > If we block this, the user can't use the ignore-shared capability in
+> > > incoming
+> > > migration.
 > >
-> > Are you trying to get this in 4.0-rc3? (As a test, it has no bearing on
-> > the actual binaries; fewer testsuite failures are nice if we squeeze it
-> > in, but at the same time it is not enough to delay the release if it
-> > does not get fixed until 4.1).
+> > -incomign with share=on is a perfectly normal thing to do - it just
+> > depends who you are sharing the file with and the lifetime of that
+> > shared file.
 > >
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
->
-> If there are other patches for rc3, we could take this as well.  But
-> there is no point in making a pull request just for this.
+> > For example; if you're just running a qemu with vhost-user then you
+> > use share=on - however wyou typically select the backend file as
+> > a new file from /dev/shm - it's not a file that you previously migrated
+> > to.
+> >
+> Thanks,
+> but using a new file from /dev/shm means kernel will start from
+> start_kernel or early? Is it different from the x-ignore-shared case?
+> If we remove the share=on in incoming migration, all the writting
+> of ram will not be flush into the memory backend file. Thus we
+> can use the base memory backend file for ever.
+> e.g.
+> 1) save the vm like a snapshot, current ram state is "kernel
+> has been started, systemd has been started"
+> 2) restore it with -incoming and *no* share=on flag
+> 3) restore it with -incoming and *no* share=on again...
+> In contrary, if we use share=on, the base backend file will
+> be written at once after 1st time incoming.
+> 
+> So, IMO, no "share=on" is the proper usage of incoming migration
+> when ignore-shared is on.
+> Please correct me if sth is wrong, thanks:)
 
-rc3 has been tagged already, I'm afraid. rc4 will be only
-if something release-critical crops up.
+OK, I see what you're trying to do - you mean for the 'snapshotting'
+case;  but that's not the only use.  Another use is for being able to
+do a very quick upgrade of the running qemu to a new qemu binary
+version; and in that case you want to be able to write to the shared
+file so that you can repeatedly do the quick migrate.
 
-thanks
--- PMM
+Dave
+
+> 
+> B.R.
+> Catherine
+> 
+> 
+> > QEMU has no way to know about the provenance of the shared file it's
+> > been given, so we can't really warn people about it.
+> >
+> > Dave
+> >
+> > > B.R.
+> > > Catherine
+> > >
+> > > >
+> > > >
+> > > > > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> > > > > ---
+> > > > >  backends/hostmem-file.c | 11 +++++++++++
+> > > > >  1 file changed, 11 insertions(+)
+> > > > >
+> > > > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > > > > index 37ac6445d2..59429ee0b4 100644
+> > > > > --- a/backends/hostmem-file.c
+> > > > > +++ b/backends/hostmem-file.c
+> > > > > @@ -16,6 +16,7 @@
+> > > > >  #include "sysemu/hostmem.h"
+> > > > >  #include "sysemu/sysemu.h"
+> > > > >  #include "qom/object_interfaces.h"
+> > > > > +#include "migration/migration.h"
+> > > > >
+> > > > >  /* hostmem-file.c */
+> > > > >  /**
+> > > > > @@ -79,6 +80,16 @@ file_backend_memory_alloc(HostMemoryBackend
+> > *backend,
+> > > > Error **errp)
+> > > > >          }
+> > > > >      }
+> > > > >
+> > > > > +    /*
+> > > > > +     * In ignore shared case, if share=on for host memory backend
+> > file,
+> > > > > +     * the ram might be written after incoming process is finished.
+> > Thus
+> > > > > +     * the memory backend can't be reused for 2nd/3rd... incoming
+> > > > > +     */
+> > > > > +    if (backend->share && migrate_ignore_shared()
+> > > > > +                       && runstate_check(RUN_STATE_INMIGRATE))
+> > > > > +        warn_report("share=on for memory backend file might be "
+> > > > > +                        "conflicted with incoming in ignore shared
+> > > > case");
+> > > > > +
+> > > > >      backend->force_prealloc = mem_prealloc;
+> > > > >      name = host_memory_backend_get_name(backend);
+> > > > >      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+> > > >
+> > > >
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
