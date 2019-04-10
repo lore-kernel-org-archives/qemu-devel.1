@@ -2,58 +2,78 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A46C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B67C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:31:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0946C206DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:30:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0946C206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6F6206DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 16:31:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UTtYiqjP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6F6206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34364 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34366 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEG7R-0005DE-5P
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:30:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44629)
+	id 1hEG7p-0005VA-KV
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 12:31:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEG6N-0004eP-5D
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:29:32 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hEG6b-0004md-2S
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEG6M-000698-8p
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:29:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hEG6J-00065g-VS; Wed, 10 Apr 2019 12:29:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CC5D83F4C;
-	Wed, 10 Apr 2019 16:29:26 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4757A5D72E;
-	Wed, 10 Apr 2019 16:29:19 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 10 Apr 2019 18:29:18 +0200
-Message-Id: <20190410162918.9343-1-mreitz@redhat.com>
+	(envelope-from <fintelia@gmail.com>) id 1hEG6a-0006O5-3F
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 12:29:44 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:41981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
+	id 1hEG6Y-0006Hp-FI; Wed, 10 Apr 2019 12:29:42 -0400
+Received: by mail-lj1-x242.google.com with SMTP id k8so2708563lja.8;
+	Wed, 10 Apr 2019 09:29:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:from:date:message-id:subject:to:cc;
+	bh=l8vm+xUorX7C+t0Kbe+tK1Hn6sNLPaRk09jJpVsMse4=;
+	b=UTtYiqjPnvsEmeby95wWAcAFG84CxUw0OrpGczpjKKP1/TrPW/Pa5S9EXBVKYRtk10
+	ngyoNrA2IFq66uWFMQhdlKWIsMcGXSQuPN/qhHAnsxwiYBhML4EV9kjAGgXxv1V5uN4q
+	GEO//IQSfWaqiXjWHyR0c/adJlhRP/ckAGXsl68zpvd+W3e11UDh+nK3zZJUELycuze8
+	qDC5lNoNxW16bDNDrHPbUTQJk3SwMwK3NQcoZQMhaD+2qM00XgC+XWSD6mA9blpzeTwh
+	rV1va5Q9hrufgZMLPs/j6UO78qVzTYu2I13odfwz3fNA/puO8ahnsvEAfjWjlti28i9o
+	eHKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+	bh=l8vm+xUorX7C+t0Kbe+tK1Hn6sNLPaRk09jJpVsMse4=;
+	b=Klv3t7aVPdegGL2eXnR0ixy+NPxcIzY4I2JqTtioNumNgMuvDKmZupAEsLvcI/1gI7
+	aGAO9VR6Cui6sVphEBWovwm7W4gh8s0oX891ToVeq7a1YJgnJ4wR4UQyz6Zl8O9Te8si
+	bjwGBDingm1aXEJp72izKKb0EuMfKgG+8Q/SDROTyVwcJJ8tpP3vL3zcEb2LpfKakB2a
+	2JZcXfBHPsxtpOsVjUsasKJR/mf3aixTh52aWFPkN//+oP0o/iN1QUEMfNfKYdbh4IDS
+	KvwtVjyCA4guNjdu/EqSUPNMqePfDAeJqBRGT8Z7ONAta4GZDzVxWQgN3yOOxfusiaTC
+	i3jA==
+X-Gm-Message-State: APjAAAWzfDucK5FyQ9SMkDAtME0C/BHJvL8mGLfUnQ7LFeng0DeFtyF4
+	ZPlAlbenk1xJ5utCnkyJ/+bDdn9qyfpA3zhB+3Cx9EhqiEM=
+X-Google-Smtp-Source: APXvYqwXR1pTuBq476qmtTm0pNk7pG83xRayj5xaC6B4O3hnPVZUhNlbh0Ov0vCba4iAMUI5TqzgEwoBJuVNlMZbe4M=
+X-Received: by 2002:a2e:9ac3:: with SMTP id p3mr23824919ljj.109.1554913778003; 
+	Wed, 10 Apr 2019 09:29:38 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 10 Apr 2019 16:29:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] iotests: Let 245 pass on tmpfs
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Wed, 10 Apr 2019 12:29:11 -0400
+Message-ID:
+ <CANnJOVHbCGcgnHT3qVbHGFh_Ba0=FqABSoM2SG9ddf-fawwaYg@mail.gmail.com>
+To: qemu-devel@nongnu.org
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] [PATCH] target/riscv: Remove unused include of
+ riscv_htif.h for virt board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,57 +85,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410162918.LnbtyNil7mwR8nxn82_xlupkpEI5MQABudjeYJJdQEM@z>
+Message-ID: <20190410162911.6ouOrXsxsrB6NTL8bXkxrYjlx_gV2FmpZbu9hHwHsz8@z>
 
-tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
-@direct if the filesystem does not support it.
+Unless I'm missing something, the virt board doesn't support HTIF and
+should not be including this header.
 
-Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Jonathan
+
+Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
 ---
- tests/qemu-iotests/245 | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/riscv/virt.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index 7891a210c1..a04c6235c1 100644
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -209,6 +209,12 @@ class TestBlockdevReopen(iotests.QMPTestCase):
-=20
-     # Reopen an image several times changing some of its options
-     def test_reopen(self):
-+        # Check whether the filesystem supports O_DIRECT
-+        if 'O_DIRECT' in qemu_io('-f', 'raw', '-t', 'none', '-c', 'quit'=
-, hd_path[0]):
-+            supports_direct =3D False
-+        else:
-+            supports_direct =3D True
-+
-         # Open the hd1 image passing all backing options
-         opts =3D hd_opts(1)
-         opts['backing'] =3D hd_opts(0)
-@@ -231,9 +237,9 @@ class TestBlockdevReopen(iotests.QMPTestCase):
-         self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
-         self.assert_qmp(self.get_node('hd1'), 'cache/direct', False)
-         self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', False)
--        self.reopen(opts, {'cache': { 'direct': True, 'no-flush': True }=
-})
-+        self.reopen(opts, {'cache': { 'direct': supports_direct, 'no-flu=
-sh': True }})
-         self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
--        self.assert_qmp(self.get_node('hd1'), 'cache/direct', True)
-+        self.assert_qmp(self.get_node('hd1'), 'cache/direct', supports_d=
-irect)
-         self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', True)
-=20
-         # Reopen again with the original options
---=20
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index fc4c6b306e..3526463034 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -29,7 +29,6 @@
+ #include "hw/sysbus.h"
+ #include "hw/char/serial.h"
+ #include "target/riscv/cpu.h"
+-#include "hw/riscv/riscv_htif.h"
+ #include "hw/riscv/riscv_hart.h"
+ #include "hw/riscv/sifive_plic.h"
+ #include "hw/riscv/sifive_clint.h"
+-- 
 2.20.1
-
-
