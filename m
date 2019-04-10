@@ -2,142 +2,93 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A72DC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3137DC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:03:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E866F2063F
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 17:56:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E866F2063F
+	by mail.kernel.org (Postfix) with ESMTPS id EC9C4206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:03:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9C4206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35328 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35401 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEHSx-000080-0f
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 13:56:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33208)
+	id 1hEHYx-0002Sr-OY
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 14:03:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEHRm-0007Zs-IY
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:55:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1hEHXh-0001w3-4X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEHRk-0003nL-RI
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:55:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52619)
+	(envelope-from <eblake@redhat.com>) id 1hEHXd-0000Rd-6q
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:01:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11489)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hEHRg-0003gs-OV; Wed, 10 Apr 2019 13:55:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hEHXZ-0000Ol-7H; Wed, 10 Apr 2019 14:01:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F411307CB29;
-	Wed, 10 Apr 2019 17:55:35 +0000 (UTC)
-Received: from [10.18.17.206] (dhcp-17-206.bos.redhat.com [10.18.17.206])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 42070272D2;
-	Wed, 10 Apr 2019 17:55:34 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190410012413.31569-1-jsnow@redhat.com>
-	<20190410012413.31569-3-jsnow@redhat.com>
-	<87sguq2yn1.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id ED36C753F7;
+	Wed, 10 Apr 2019 18:01:39 +0000 (UTC)
+Received: from [10.3.117.110] (ovpn-117-110.phx2.redhat.com [10.3.117.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 50126BA83;
+	Wed, 10 Apr 2019 18:01:39 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20190401140903.19186-1-eblake@redhat.com>
+	<20190401140903.19186-8-eblake@redhat.com>
+	<22c4f9fa-a740-0d01-7b45-c802817f4f6c@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <004289a6-9df9-ae99-53e6-56e555709434@redhat.com>
-Date: Wed, 10 Apr 2019 13:55:33 -0400
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <1b8e1af8-cde5-75d5-a4d4-a0b6d56e6608@redhat.com>
+Date: Wed, 10 Apr 2019 13:01:38 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.4.0
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <87sguq2yn1.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <22c4f9fa-a740-0d01-7b45-c802817f4f6c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8n8u6I1ehrjWNfSgI7SYBycbTXmXXogK0"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 10 Apr 2019 17:55:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Wed, 10 Apr 2019 18:01:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] pxtool: Add new qemu-img command
- info generation tool
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [Qemu-block] [PULL 07/14] iotests: Add 241 to test
+ NBD on unaligned images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -149,107 +100,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410175533.6hBf77wjN4ob_hoBc8M8j0hAkrl8CJvLYUljhKOEvBw@z>
+Message-ID: <20190410180138.UCjfRM6Z18GOpDHuIWGR_Ic5Uq0oLlJYbzhYJZ7Oj3w@z>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8n8u6I1ehrjWNfSgI7SYBycbTXmXXogK0
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
+Message-ID: <1b8e1af8-cde5-75d5-a4d4-a0b6d56e6608@redhat.com>
+Subject: Re: [Qemu-block] [PULL 07/14] iotests: Add 241 to test NBD on
+ unaligned images
+References: <20190401140903.19186-1-eblake@redhat.com>
+ <20190401140903.19186-8-eblake@redhat.com>
+ <22c4f9fa-a740-0d01-7b45-c802817f4f6c@redhat.com>
+In-Reply-To: <22c4f9fa-a740-0d01-7b45-c802817f4f6c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 4/10/19 12:45 PM, Max Reitz wrote:
+> On 01.04.19 16:08, Eric Blake wrote:
+>> Add a test for the NBD client workaround in the previous patch.  It's
+>> not really feasible for an iotest to assume a specific tracing engine,=
 
-On 4/10/19 1:54 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> Presently we use hxtool and a .hx format to generate a few things like
->> the qemu_img subcommand dispatch table, the qemu_img help() display output,
->> and a help output in qemu-img.texi.
+>> so we can't really probe trace_nbd_parse_blockstatus_compliance to see=
+
+>> if the server was fixed vs. whether the client just worked around the
+>> server (other than by rearranging order between code patches and this
+>> test). But having a successful exchange sure beats the previous state
+>> of an error message. Since format probing can change alignment, we can=
+
+>> use that as an easy way to test several configurations.
 >>
->> Unfortunately, this means that this information is duplicated in at least
->> three places:
+>> Not tested yet, but worth adding to this test in future patches: an
+>> NBD server that can advertise a non-sector-aligned size (such as
+>> nbdkit) causes qemu as the NBD client to misbehave when it rounds the
+>> size up and accesses beyond the advertised size. Qemu as NBD server
+>> never advertises a non-sector-aligned size (since bdrv_getlength()
+>> currently rounds up to sector boundaries); until qemu can act as such
+>> a server, testing that flaw will have to rely on external binaries.
 >>
->> (1) in qemu-img-cmds.hx as a human readable string
->> (2) in qemu-img-cmds.hx as a texi string
->> (3) in qemu-img.texi again, as a texi string
->>
->> We can do a little better, though: all of these sources can be generated
->> from a single json file. Add a new small tool ("pxtool") that can do this.
->>
->> This tool can at least handle generating (1) and (2) from the same source
->> without needing to reduplicate that information. Deduplicating (3) happens
->> in the next patch.
->>
->> Notes:
->>  - The json format was chosen to be very "stupid", and the command line
->>    documentation is being kept one-per-line to make future diffs easier
->>    to read.
->>  - It's easy enough to generate the human-readable output from the texi
->>    output by removing '@var{foo}' with 'foo'.
->>  - The qemu-img command dispatch always calls img_cmdname, so we don't
->>    need to store this information separately, either.
->>  - The need for DEF() macros could be removed as well, but I left it in
->>    to create a minimally disruptive patch.
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
-> We got just five .hx:
-> 
->     qemu-img.cmds.hx            killed off by this patch
->     qemu-options.hx             CLI QAPIfication should kill this off
->     hw/audio/pl041.hx           misnamed, not actually food for hxtool
->     hmp-commands.hx             no exit strategy
->     hmp-commands-info.hx            for these two, yet
-> 
-> CLI QAPIfication got stuck in the back-burner, and as long as that's the
-> case, it's not an alternative to your patches.
-> 
 
-Good to know. I figure that at least while we wait on something more
-comprehensive there's no real short term harm in tidying up.
+>> +++ b/tests/qemu-iotests/241.out
 
-Something I'd really like to do is define a python/json-esque
-configuration file that allows you to specify some "common options" that
-are shared between all of the sub-commands, and then define each command
-in terms of both which common options it possesses, and then any local
-command-specific options it has.
+>> +=3D=3D=3D Exporting unaligned raw image, forced server sector alignme=
+nt =3D=3D=3D
+>> +
+>> +WARNING: Image format was not specified for '/home/eblake/qemu/tests/=
+qemu-iotests/scratch/t.raw' and probing guessed raw.
+>> +         Automatically detecting the format is dangerous for raw imag=
+es, write operations on block 0 will be restricted.
+>> +         Specify the 'raw' format explicitly to remove the restrictio=
+ns.
+>=20
+> Is there a patch for this already?
 
-(Why the common options design? So that argument names and command
-options can be encouraged to be identical and identically documented
-between all subcommands that use them.)
+Oh shoot. I saw the complaint about the hard-coded path needing a
+filter, and still failed to fix it in time for 4.0-rc3. Not a driver for
+-rc4 on its own, but if we have something else pop up that mandates
+-rc4, I'll get that fix in.
 
-Then, from the configuration file, generate all of the necessary C
-parsers (I have a protoype for this, it's not difficult to do in at
-least the basic case) that can return boxed command arguments, and then
-also generate the help strings from that metadata.
+Will post shortly...
 
-I suspect that work *IS* something that might brush up against / should
-use (or extend) QAPI code.
+>=20
+> Also, I planned to reply to the original patch =E2=80=93 but where is i=
+t?  The
+> latest version I can see on the list is v3, and that only has seven
+> lines in the reference output.  Well, the difference would explain why
+> Vladimir would give a Tested-by to a test that clearly will not run on
+> his machine.
 
-Then, I'd like to find a way to split qemu-img.texi into sub-command
-files and find a way to source the same "informative text" for both:
+Yeah, this line in the commit message is evidence of my botching things:
 
-(1) The texi output, as per usual, and
-(2) qemu-img subcommand --help
+> [eblake: add forced-512 alignment, and nbdkit reproducer comment]
 
-such that --help, when passed as an argument to the subcommand, prints
-out help only relevant to the subcommand instead, e.g.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-`qemu-img check --help`
 
-might print the "common options" section only as it relates to commands
-actually used by the check command, then prints the check section of the
-texi as formatted for terminals.
+--8n8u6I1ehrjWNfSgI7SYBycbTXmXXogK0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-This way, we can have manpages, html pages, and interactive help text
-all derived from the same semi-automated sources, always up to date and
-much easier to read/discover/parse by human eyeballs.
+-----BEGIN PGP SIGNATURE-----
 
-That's what I'd like to accomplish, ultimately.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyuL4IACgkQp6FrSiUn
+Q2q7pAf/S13b2Nt/gvgjp96NtHWUI0kH8BcvzRYjCgmE4jQjt9rrVdQsjracpjyj
+1x4xC62YNtYLEmLutU3fU+z6S/o1brtkz0mnddcb3XZWtMGg6RJECFa2R1muVKcu
+B3t3lcW6QhsSdpcXm2hDI5k3idljpEPVmN2LuWrkg7anCHnAfnajmCZC9Hi6+t+W
++ZU0PorW9p6/4q75PlwcvDwC9Dz3cY/WZ0R/eQXaiSZEACMM5yulAvO2jz3IZ72P
+V1pkKGgZTsnihCPVHtEqh1Z2hPISC8bAj1N0+lXlA+JkjZCmdo9Ht4/shqOawMf+
+N0WofQer42WNBstR3AwwD+HsV6Hptg==
+=f6sx
+-----END PGP SIGNATURE-----
 
-For now, I think this RFC set is not harmful and won't bother anybody.
-It's definitely not worse than what we have now, fragility of removing
-@var{} tokens and all.
-
---js
-
+--8n8u6I1ehrjWNfSgI7SYBycbTXmXXogK0--
 
