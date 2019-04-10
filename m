@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50172)
+Received: from eggs.gnu.org ([209.51.188.92]:53883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arekm@maven.pl>) id 1hE8HU-0003Hu-KK
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:29 -0400
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hECmx-0000cM-3p
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arekm@maven.pl>) id 1hE8HS-0004u0-Me
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:28 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arekm@maven.pl>) id 1hE8HO-0004pv-UJ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 04:08:25 -0400
-Received: by mail-lj1-x241.google.com with SMTP id r24so1248521ljg.3
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 01:08:20 -0700 (PDT)
-References: <20190410040826.24371-1-pagupta@redhat.com>
-From: =?UTF-8?Q?Arkadiusz_Mi=c5=9bkiewicz?= <arekm@maven.pl>
-Message-ID: <946ba5b9-62c1-aaec-9ca7-a71e154340db@maven.pl>
-Date: Wed, 10 Apr 2019 10:08:15 +0200
+	(envelope-from <prvs=9966e4c82=anthony.perard@citrix.com>)
+	id 1hECmw-0003LM-3X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 08:57:15 -0400
+Date: Wed, 10 Apr 2019 13:57:08 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20190410125708.GE1435@perard.uk.xensource.com>
+References: <20190408151617.13025-1-paul.durrant@citrix.com>
+	<20190408151617.13025-3-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20190410040826.24371-1-pagupta@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: pl
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] virtio pmem driver
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190408151617.13025-3-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] xen-bus: allow AioContext to be
+ specified for each event channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 10/04/2019 06:08, Pankaj Gupta wrote:
->  This patch series has implementation for "virtio pmem". 
->  "virtio pmem" is fake persistent memory(nvdimm) in guest 
->  which allows to bypass the guest page cache. This also
+On Mon, Apr 08, 2019 at 04:16:16PM +0100, Paul Durrant wrote:
+> This patch adds an AioContext parameter to xen_device_bind_event_channel()
+> and then uses aio_set_fd_handler() to set the callback rather than
+> qemu_set_fd_handler().
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> @@ -943,6 +944,7 @@ static void xen_device_event(void *opaque)
+>  }
+>  
+>  XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+> +                                               AioContext *ctx,
+>                                                 unsigned int port,
+>                                                 XenEventHandler handler,
+>                                                 void *opaque, Error **errp)
+> @@ -968,8 +970,9 @@ XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+>      channel->handler = handler;
+>      channel->opaque = opaque;
+>  
+> -    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), xen_device_event, NULL,
+> -                        channel);
+> +    channel->ctx = ctx;
+> +    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), false,
+> +                       xen_device_event, NULL, NULL, channel);
 
-Will kernel pstore be able to use this persistent memory for storing
-crash dumps?
+I wonder if the `'is_external' parameter of aio_set_fd_handler shoud be
+`true' here, instead. That flag seems to be used when making a snapshot
+of a blockdev, for example.
+
+That was introduced by:
+dca21ef23ba48f6f1428c59f295a857e5dc203c8^..c07bc2c1658fffeee08eb46402b2f66d55b07586
+
+What do you think?
+
 
 -- 
-Arkadiusz Miśkiewicz, arekm / ( maven.pl | pld-linux.org )
+Anthony PERARD
