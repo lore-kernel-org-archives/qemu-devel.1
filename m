@@ -2,69 +2,92 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 556FFC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB34C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:23:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30DCA2077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30DCA2077C
+	by mail.kernel.org (Postfix) with ESMTPS id D78A32077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 18:23:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D78A32077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35533 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35588 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEHnI-0007Ho-DW
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 14:17:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37615)
+	id 1hEHsO-0000q0-My
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 14:23:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEHmJ-0006uM-Mg
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1hEHrZ-0000Us-Gu
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEHmI-0001Qw-LM
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:16:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49574)
+	(envelope-from <eblake@redhat.com>) id 1hEHrX-00043u-Ni
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 14:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>)
-	id 1hEHmG-0001JC-LX; Wed, 10 Apr 2019 14:16:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hEHrS-00041W-UL; Wed, 10 Apr 2019 14:22:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBB4D33025E;
-	Wed, 10 Apr 2019 18:16:50 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-133.rdu2.redhat.com
-	[10.10.121.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B5F11001E67;
-	Wed, 10 Apr 2019 18:16:47 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-References: <20190410045707.16923-1-philmd@redhat.com>
-	<e52ff725-a297-5b3c-af7a-1df30baf464f@redhat.com>
-	<94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <78374d70-fa22-73a0-823e-9d483b91d008@redhat.com>
-Date: Wed, 10 Apr 2019 20:16:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	by mx1.redhat.com (Postfix) with ESMTPS id BDE623019885;
+	Wed, 10 Apr 2019 18:22:13 +0000 (UTC)
+Received: from [10.3.117.110] (ovpn-117-110.phx2.redhat.com [10.3.117.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D1905D719;
+	Wed, 10 Apr 2019 18:22:10 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <20190409210655.777-1-jsnow@redhat.com>
+	<87y34i2zbt.fsf@dusky.pond.sub.org>
+	<3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+Date: Wed, 10 Apr 2019 13:22:09 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <94d17504-2366-c5c9-59ee-a958e9dc0b82@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 10 Apr 2019 18:16:51 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 10 Apr 2019 18:22:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: Correct the
- EDK2_BASETOOLS_OPTFLAGS variable description
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,67 +99,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190410181646.5HM2W2QQ9uyyCmkdUC8EKSgP9vZh7zEa0w9ERG5e2xE@z>
+Message-ID: <20190410182209.Axp02bCElcR_4zKhumxJRLxKb7UR2y0lCKizzwJhqYE@z>
 
-On 04/10/19 17:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/10/19 4:58 PM, Laszlo Ersek wrote:
->> On 04/10/19 06:57, Philippe Mathieu-Daud=C3=A9 wrote:
->>> In commit 1cab464136b4 we incorrectly described the
->>> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
->>> options to the EDK2 build tools, but it only expands
->>> the CFLAGS (not to the CPPFLAGS).
->>> Update the description to be more accurate.
->>>
->>> Reported-by: Laszlo Ersek <lersek@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>  roms/Makefile | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/roms/Makefile b/roms/Makefile
->>> index 1ff78b63bb3..d7fd6025e7c 100644
->>> --- a/roms/Makefile
->>> +++ b/roms/Makefile
->>> @@ -120,8 +120,8 @@ build-efi-roms: build-pxe-roms
->>>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->>>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
->>> =20
->>> -# Build scripts can pass compiler/linker flags to the EDK2 build too=
-ls
->>> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
->>> +# Build scripts can pass compiler/linker flags to the EDK2
->>> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
->>>  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
->>>  #
->>>  # Example:
->>>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
+References: <20190409210655.777-1-jsnow@redhat.com>
+ <87y34i2zbt.fsf@dusky.pond.sub.org>
+ <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+In-Reply-To: <3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/10/19 12:37 PM, John Snow wrote:
+>=20
+>=20
+> On 4/10/19 1:39 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
 >>
->> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>>> It turns out that having options listed in three places continues to =
+be
+>>> a bad idea. I'm still toying with the idea of an improved infrastruct=
+ure
+>>> here, but in the meantime, another bandaid.
+>>>
+
 >>
->> Please noone submit a pull request with this patch (for 4.1) until my
->> edk2 bundling series is merged; as this one will likely introduce
->> another contextual conflict, and I'd *really* like to avoid another
->> rebase on my end, due to such an issue.
+>> Nice to have in 4.0.
+>>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
 >=20
-> Thanks for the review. I'll rebase it on top of your 'bundle edk2
-> platform firmware with QEMU' v4 and resend (later).
+> If it can go in for 4.0, who stages it? Kevin?
 
-Thank you!
+At this point, we've missed -rc3; the fix on its own is not a
+release-blocker, but if something else comes up that requires -rc4 for
+an actual release blocker, we can sort out someone sending a pull
+request for this one at the same time. (I'm aware of a couple of iotest
+fixups in the same boat... Guess it's time to start updating the wiki to
+point to email threads where we document 'wish list' patches)
 
-> Feel free to include it on top of your pullreq.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-... I think I'll keep that pullreq as minimal as it can be. :)
 
-Thanks
-Laszlo
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->=20
-> Regards,
->=20
-> Phil.
->=20
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyuNFEACgkQp6FrSiUn
+Q2o5xwf9EtKJgQbBEnV7buNM89Z7a3lLWfW1GhWFEiNt61BGcMG2WqlsQGTbvbP9
+hY1i4+KUDaAhJ11YeyZvIUS5jV6wzhFl+MoS2wlZ3v++g4aisUm9ll04JXpzpyrX
+UDLpOTXLWUSpavX8z1UV+Rj3FU4csTfRQmA7iiDjnTAqYRZ2i+rvvHhr5lwCoj+b
+mUO3Taavdhi6uONirYyHnvabBnT0Hzj5UgGXW8ybL1A5c9iC8PpcC5R6iYoIBZn/
+gYj6HVIHQT5xiLxdQW7hMuTUnuNsyOFq3yiBsle8tWimQiES/AN2GaaksSGcrtyn
+6Q28QFRgi9+4sR89zOPAiycHj6bDrA==
+=hLYg
+-----END PGP SIGNATURE-----
+
+--HUKSuqAU5tfKfvZxavBJImSgOFHCrrUdZ--
 
