@@ -1,34 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:53358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hEIuP-0004sO-W1
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:29:22 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hEIuX-0004sO-6p
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hEItB-0004Zd-6A
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:28:06 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:45520
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hEItA-0004Ys-QZ
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:28:05 -0400
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-	<b6df5f4b-d567-bab0-fb9d-78ca20154ec7@redhat.com>
-	<0e30df69-c534-da63-a21b-813281b39b86@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <d251a37c-4bf2-27a3-9714-c443ee1cb1e2@weilnetz.de>
-Date: Wed, 10 Apr 2019 21:22:11 +0200
+	(envelope-from <stefanha@gmail.com>) id 1hEIrM-0003Sj-H3
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:26:14 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hEIrK-0003RC-EQ
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 15:26:10 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v14so3832786wmf.2
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 12:26:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0e30df69-c534-da63-a21b-813281b39b86@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+References: <20190401111843.54528-1-ybettan@redhat.com>
+	<20190409131734.GE16944@stefanha-x1.localdomain>
+	<1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
+In-Reply-To: <1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 10 Apr 2019 20:25:57 +0100
+Message-ID: <CAJSP0QWYS+UHmXyvhtLcLW9iumfi29Fa7AJdGPC9OwagwekWmg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,24 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Yoni Bettan <ybettan@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Amnon Ilan <ailan@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 10.04.19 10:22, Thomas Huth wrote:
-> Additionally, I think it should be possible to compile with the
-> x86_64-linux-user target and then to run "make check-tcg" ... however,
-> that currently crashes with:
->=20
-> TODO qemu/tcg/tci.c:859: tcg_qemu_tb_exec()
-> qemu/tcg/tci.c:859: tcg fatal error
-> qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+On Wed, Apr 10, 2019 at 4:45 PM Yoni Bettan <ybettan@redhat.com> wrote:
+> On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
+> > On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
+> > There are multiple problems with the code, but the larger issue is that
+> > this example device is just helping people shoot themselves in the foot
+> > more easily.
+>
+>
+> If you can point me to those problem I will be glad so I can update the
+> code and understand those problems you are talking about.
 
-That's easy to fix. I implemented only those TCG opcodes which really
-were executed during testing. This test triggers an assertion because it
-needs INDEX_op_ld16u_i64 which was missing up to now.
+Please see Eduardo's reply.  I didn't review much since he already
+pointed out many things.
 
-I'll send a patch which adds support for INDEX_op_ld16u_i64.
+One thing he didn't mention:
++    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
 
-Thank you for your tests.
+The return value can be NULL.  Spurious notifications could happen so
+the code shouldn't crash when this returns NULL.
+
+I apologize for the critical replies.  What you're doing is valuable.
+I think explaining the VIRTIO device model and the order in which
+things are done will lead to higher quality devices so I'm making a
+lot of noise about it :).
 
 Stefan
