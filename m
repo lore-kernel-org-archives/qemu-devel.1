@@ -2,61 +2,62 @@ Return-Path: <SRS0=gZkW=SM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B655C10F0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 01:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3526C10F0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 01:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D21F20857
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 01:12:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D21F20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C352A20857
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Apr 2019 01:13:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C352A20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51531 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51537 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hE1n8-0005Pq-FL
-	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 21:12:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33800)
+	id 1hE1oN-00060Y-2Z
+	for qemu-devel@archiver.kernel.org; Tue, 09 Apr 2019 21:13:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghook@redhat.com>) id 1hE0v7-0003h2-07
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 20:16:54 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hE1nc-0005hh-7O
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghook@redhat.com>) id 1hE0v5-0001m4-U6
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 20:16:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45460)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hE1nS-0002bB-F0
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:05 -0400
+Received: from mga12.intel.com ([192.55.52.136]:60193)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghook@redhat.com>) id 1hE0v5-0001kf-Lw
-	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 20:16:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0763D3DFCD
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 00:08:09 +0000 (UTC)
-Received: from rhel74-ghook-amd.khw1.lab.eng.bos.redhat.com
-	(rhel74-ghook-amd.khw1.lab.eng.bos.redhat.com [10.16.200.139])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6AF326146F;
-	Wed, 10 Apr 2019 00:08:08 +0000 (UTC)
-From: Gary R Hook <ghook@redhat.com>
-To: rhvirt-patches@redhat.com
-Date: Tue,  9 Apr 2019 20:08:02 -0400
-Message-Id: <20190410000803.1744-2-ghook@redhat.com>
-In-Reply-To: <20190410000803.1744-1-ghook@redhat.com>
-References: <20190410000803.1744-1-ghook@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 10 Apr 2019 00:08:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Mailman-Approved-At: Tue, 09 Apr 2019 21:10:01 -0400
-Subject: [Qemu-devel] [RHEL-8.1 virt 1/2] memory: Fix the memory region type
- assignment order
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hE1nR-0002By-0t
+	for qemu-devel@nongnu.org; Tue, 09 Apr 2019 21:13:02 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	09 Apr 2019 18:12:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,331,1549958400"; d="scan'208";a="134419586"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga006.jf.intel.com with ESMTP; 09 Apr 2019 18:12:50 -0700
+Date: Wed, 10 Apr 2019 09:12:31 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190410011231.GA29083@richard>
+References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.136
+Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
+ MCFG table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,71 +69,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, ghook@redhat.com,
-	qemu-devel@nongnu.org
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: ehabkost@redhat.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org,
+	mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190410000802.eFhyldKmFMNKSY_hCvBHvbxLEkQQHvK0sl2JbGZJ02E@z>
+Message-ID: <20190410011231.0b3jqgJC2sBAE5K1M7MPR5SinCcUCsq5g4nYIT8WFfU@z>
 
-BZ: 1667249
-Branch: rhel-8.1.0
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1667249
-Upstream Status: 4.0.0-rc1
-Build Info: https://brewweb.engineering.redhat.com/brew/taskinfo?taskID=20980582
-Conflicts: None
+On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
+>Dummy table (with signature "QEMU") creation came from original SeaBIOS
+>codebase. And QEMU would have to keep it around if there were Q35 machine
+>that depended on keeping ACPI tables blob constant size. Luckily there
+>were no versioned Q35 machine types before commit:
+>  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
+>which obsoleted need to keep ACPI tables blob the same size on source/destination.
+>
 
-commit 2ddb89b00f947f785c9ca6742f28f954e3b75e62
-Author: Singh, Brijesh <brijesh.singh@amd.com>
-Date:   Mon Feb 4 22:23:39 2019 +0000
+I am not sure getting the "versioned Q35" correctly. Seems originally there is
+q35-1.4?
 
-    memory: Fix the memory region type assignment order
+commit bf3caa3dc17552b323cec6831301a22cfc98ecd5
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri Feb 8 14:06:15 2013 +0100
 
-    Currently, a callback registered through the RAMBlock notifier
-    is not able to get the memory region type (i.e callback is not
-    able to use memory_region_is_ram_device function). This is
-    because mr->ram assignment happens _after_ the memory is allocated
-    whereas the callback is executed during allocation.
+    pc: add compatibility machine types for 1.4
+    
+    Adds both pc-i440fx-1.4 and pc-q35-1.4.
 
-    Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1667249
-    Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-    Cc: Paolo Bonzini <pbonzini@redhat.com>
-    Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-    Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-    Message-Id: <20190204222322.26766-2-brijesh.singh@amd.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Cc: Paolo Bonzini <pbonzini@redhat.com> 
-Cc: qemu-devel@nongnu.org 
----
- memory.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/memory.c b/memory.c
-index 4974f972d5..04ff5e9108 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1631,10 +1631,17 @@ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-                                        uint64_t size,
-                                        void *ptr)
- {
--    memory_region_init_ram_ptr(mr, owner, name, size, ptr);
-+    memory_region_init(mr, owner, name, size);
-+    mr->ram = true;
-+    mr->terminates = true;
-     mr->ram_device = true;
-     mr->ops = &ram_device_mem_ops;
-     mr->opaque = mr;
-+    mr->destructor = memory_region_destructor_ram;
-+    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-+    /* qemu_ram_alloc_from_ptr cannot fail with ptr != NULL.  */
-+    assert(ptr != NULL);
-+    mr->ram_block = qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal);
- }
- 
- void memory_region_init_alias(MemoryRegion *mr,
 -- 
-2.18.1
-
+Wei Yang
+Help you, Help me
 
