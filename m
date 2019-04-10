@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51900)
+Received: from eggs.gnu.org ([209.51.188.92]:53261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGdl-000189-4F
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:04:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hEGkV-0002kQ-IN
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hEGdk-0006BN-6O
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:04:01 -0400
-References: <cover.1551895813.git.berto@igalia.com>
-	<e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-Date: Wed, 10 Apr 2019 19:03:50 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1hEGkU-0002gu-Bb
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:10:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hEGkS-0002eL-Up
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 13:10:57 -0400
+References: <20190407115839.25054-1-skrtbhtngr@gmail.com>
+	<20190407115839.25054-3-skrtbhtngr@gmail.com>
+	<20190410115001.56bbbelcmxwcqp7v@SPB-NB-133.local>
+	<CAMzgYoMqE20=L+n+tjt8Nb10Tidxr0C6OumQ8vvQ423xJxnN=w@mail.gmail.com>
+	<20190410140244.l5viavfey2ymzw6k@SPB-NB-133.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ed7dd764-ff54-58a3-b4b4-ed6951da6ef6@redhat.com>
+Date: Wed, 10 Apr 2019 19:10:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4"
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] qemu-iotests: Test the
- x-blockdev-reopen QMP command
+In-Reply-To: <20190410140244.l5viavfey2ymzw6k@SPB-NB-133.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RESEND v2 2/2] cpus: move
+ hvf_cpu_synchronize* calls to cpu_synchronize* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>, Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-Subject: Re: [PATCH v2 13/13] qemu-iotests: Test the x-blockdev-reopen QMP
- command
-References: <cover.1551895813.git.berto@igalia.com>
- <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-In-Reply-To: <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10/04/19 16:02, Roman Bolshakov wrote:
+> I've applied, built and tested both sequentially. Applying and running
+> with patch 1/2 alone doesn't result in the behavior I mentioned. I also
+> tried to apply only the first hunk that moves hvf_cpu_synchronize_state
+> into cpu_synchronize_state and it also causes the issue with BIOS.
+> 
+> Honestly, I don't know if the tests run qemu with hvf accel. AFAIK
+> kvm-unit-tests can be used to test an accel itself.
 
-On 06.03.19 19:11, Alberto Garcia wrote:
-> This patch adds several tests for the x-blockdev-reopen QMP command.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  tests/qemu-iotests/243     | 991 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/243.out |   5 +
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 997 insertions(+)
->  create mode 100644 tests/qemu-iotests/243
->  create mode 100644 tests/qemu-iotests/243.out
->=20
-> diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
-> new file mode 100644
-> index 0000000000..35b30092ca
-> --- /dev/null
-> +++ b/tests/qemu-iotests/243
-> @@ -0,0 +1,991 @@
+No, tests do not cover HVF.
 
-[...]
-
-> +    # If an image has a backing file then the 'backing' option must be=
-
-> +    # passed on reopen. We don't allow leaving the option out in this
-> +    # case because it's unclear what the correct semantics would be.
-> +    def test_missing_backing_options_1(self):
-
-[...]
-
-> +        # hd0 has no backing file: we can omit the 'backing' option
-> +        self.reopen(opts)
-
-[...]
-
-> +        # Detach hd2 from hd0.
-> +        self.reopen(opts, {'backing': None})
-> +        self.reopen(opts, {}, "backing is missing for 'hd0'")
-
-I don=E2=80=99t understand the second test.  hd0 has no default backing f=
-ile and
-it currently has no backing child attached to it.  Why would this call
-fail now?
-
-I=E2=80=99m asking because this no longer throws an error after =E2=80=9C=
-block: Leave
-BDS.backing_file constant=E2=80=9D of my =E2=80=9Cblock: Deal with filter=
-s=E2=80=9D series.
-
-Max
-
-
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyuIfYACgkQ9AfbAGHV
-z0C8IAf9F+SVG9TWeDOQfua02TtwAY/o9h92UZA6H3hfgXQNr4AkWDrqJgbKLoa8
-2qswPehoi7vOF3KVv17I2Y270LbKwQOucb40QSJzGT2Pwbuted48nuSDmfujGikL
-IIilMJ7zVkBIsetEVALew5V9bYr66rGIcouVytvqOXMjDFm5q0DsqsoERHDHRk/c
-cK41W+K/zNBtHdaaa/2T6UjSX0JS2Ogq8ahwyIL2CiiHJu8Q81zDdGilg4UeOeYT
-tjdk3VXOftOIkddxYmYUN+OA7TFTlppJkDcKYXttrYEWTS3S14HImFEFo37zHkha
-2sR8nHdfrtCXeo3kdH/TxEumrO32pA==
-=dRjU
------END PGP SIGNATURE-----
-
---wsXlU5LRRQdBRHDSEsLlWxlKtWPY1NAj4--
+Paolo
