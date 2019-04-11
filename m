@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50408)
+Received: from eggs.gnu.org ([209.51.188.92]:51039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <steven.price@arm.com>) id 1hEbgL-0003Sb-Mc
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:32:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbiL-0004v1-D3
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <steven.price@arm.com>) id 1hEbgJ-0003Or-Jb
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:32:05 -0400
-References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
-	<CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
-	<136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
-	<22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
-	<20190315085948.GB10950@e113682-lin.lund.arm.com>
-	<ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
-	<101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
-	<662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
-	<1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
-	<0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
-	<3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <ef3e617e-aa51-88d8-1e06-450febee43a4@arm.com>
-Date: Thu, 11 Apr 2019 16:31:39 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbiK-0004pM-G9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:09 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEbiK-0004oY-52
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:08 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y84so5248942oia.12
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:34:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] arm/cpu: fix soft lockup panic after
- resuming from stop
+References: <20190409160219.19026-1-eric.auger@redhat.com>
+	<20190410001640.GA25214@xz-x1>
+In-Reply-To: <20190410001640.GA25214@xz-x1>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2019 16:33:55 +0100
+Message-ID: <CAFEAcA9LZ21fkGsvw_0+Pro64-JP33qKim8aRNcPnzg9mt16CA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/arm/smmuv3: Remove
+ SMMUNotifierNode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,140 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+To: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 11/04/2019 08:27, Heyi Guo wrote:
-> Hi Steve,
->=20
-> After reading kernel code about time keeping and something related, I'v=
-e
-> not got a clear picture of how we can use MSR_KVM_WALL_CLOCK_NEW to kee=
-p
-> wall clock in guest VM.
->=20
-> 1. On X86, MSR_KVM_WALL_CLOCK_NEW is only used by the callback of syste=
-m
-> suspend and resume; I didn't find it used for runtime wall clock readin=
-g.
-
-The MSR is only to provide an offset from the guest's view of system
-time to the actual wall-clock time. Like you mention it's used on resume
-to resynchronise with wall-clock time.
-
-Looking at this more carefully, I think I may have got a bit confused
-with how this works on x86. As you say MSR_KVM_WALL_CLOCK_NEW is only
-used on boot (and suspend/resume) to provide the difference between the
-TSC and wall-clock.
-
-MSR_KVM_SYSTEM_TIME_NEW seems to be the MSR that provides the offset
-between the host's TSC and the guest's view of time. In particular the
-KVM request KVM_REQ_CLOCK_UPDATE causes this to be updated.
-
-There's a lot of code in there to deal with e.g. the host's TSC going
-backwards (due to buggy hardware, but also due to suspend/hibernate).
-
-> 2. To use the MSR for wall clock synchronization, shall we register KVM
-> PV-clock as a higher rating clock source, so that it will be bound to
-> tk_core.timekeeper and be read at each time of running
-> update_wall_time() in each timer tick?
+On Wed, 10 Apr 2019 at 01:16, Peter Xu <peterx@redhat.com> wrote:
 >
-> 3. If the above is true, how can we keep the paravirtualized wall clock
-> always updated? Is it always trapped to the hypervisor? I'm afraid this
-> may cause performance loss. If there is no trap and the data is updated
-> by the hypervisor periodically, how can we guarantee the accuracy?
+> On Tue, Apr 09, 2019 at 06:02:19PM +0200, Eric Auger wrote:
+> > The SMMUNotifierNode struct is not necessary and brings extra
+> > complexity so let's remove it. We now directly track the SMMUDevices
+> > which have registered IOMMU MR notifiers.
+> >
+> > This is inspired from the same transformation on intel-iommu
+> > done in commit b4a4ba0d68f50f218ee3957b6638dbee32a5eeef
+> > ("intel-iommu: remove IntelIOMMUNotifierNode")
+> >
+> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 
-We obviously don't want to be making frequent hypercalls (or other
-traps) - so the idea is to provide the guest with a structure which is
-updated when the host is aware something has changed. The guest then
-reads this structure (using a version field to avoid races with the
-host) and uses it compute it's own version of time.
+Thanks; applied to target-arm.next for 4.1.
 
-> Meanwhile it seems easier to use KVM_KVMCLOCK_CTRL to get rid of false
-> positive soft lock panic, and guest can rely on cntvct for wall clock
-> updating as it does now, and it seems not difficult for the hypervisor
-> to keep cntvct "always on" and "monotonic".
->=20
-> Please let me know if I miss something.
-
-Yes I'm coming around to that way of thinking - as long as the
-hypervisor provides the "always on"/"monotonic" properties then really
-the only missing bit is informing the guest when it was paused so it can
-"do the right thing". This does appear to be what the x86 code is doing,
-but I have to admit I struggle to fully understand it.
-
-Steve
-
-> Thanks,
-> Heyi
->=20
-> On 2019/3/27 1:12, Steven Price wrote:
->> Hi Heyi,
->>
->> On 26/03/2019 13:53, Heyi Guo wrote:
->>> I also tested save/restore operations, and observed that clock in gue=
-st
->>> would not jump after restoring either. If we consider guest clock not
->>> being synchronized with real wall clock as an issue, does it mean
->>> save/restore function has the same issue?
->> Basically at the moment when the guest isn't running you have a choice
->> of two behaviours:
->>
->> =C2=A0 1. Stop (i.e. save/restore) CNTVCT - this means that the guest =
-sees no
->> time occur. If the guest needs to have a concept of wall-clock time
->> (e.g. it communicates with other systems over a network) then this can
->> cause problems (e.g. timeouts might be wrong, certificates might start
->> appearing to be in the future etc).
->>
->> =C2=A0 2. Leave CNTVCT running - the guest sees the time pass but inte=
-rprets
->> the vCPUs as effectively having locked up. Linux will trigger the soft
->> lockup warning.
->>
->> There are two ways of solving this, which match the two behaviours abo=
-ve:
->>
->> =C2=A0 1. Provide the guest with a view of wall-clock time. The obviou=
-s way of
->> doing this is with a pvclock implementation like MSR_KVM_WALL_CLOCK_NE=
-W
->> for x86.
->>
->> =C2=A0 2. Inform the guest to ignore the apparent "soft-lockup". There=
-'s
->> already an ioctl for x86 for this: KVM_KVMCLOCK_CTRL
->>
->> My preference is for option 1 - as this gives the guest a good view of
->> both the time that it is actually executing (useful for internal
->> watchdog timers like the soft-lockup one in Linux) and maintains a vie=
-w
->> of wall-clock time (useful when communicating with other external
->> services - e.g. the a server on the internet). Your patch to QEMU
->> provides the first step of that, but as you mention there's much more
->> to do.
->>
->> One thing I haven't investigated in great detail is how KVM handles th=
-e
->> timer during various forms of suspend. In particular for suspend types
->> like full hibernation the host's physical counter will jump (quite
->> possibly backwards) - I haven't looked in detail how KVM presents this
->> to the guest. Hopefully not by making it go backwards!
->>
->> I'm not sure how much time I'm going to have to look at this in the ne=
-ar
->> future, but please keep me in the loop if you decide to tackle any of
->> this.
->>
->> Thanks,
->>
->> Steve
->>
->> .
->>
->=20
->=20
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+-- PMM
