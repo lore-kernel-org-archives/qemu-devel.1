@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59608)
+Received: from eggs.gnu.org ([209.51.188.92]:59836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEffA-0007El-99
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:47:09 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfg2-0007fp-JC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:48:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEff9-0001i4-Bc
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:47:08 -0400
-References: <20190313162812.8885-1-armbru@redhat.com>
-	<8cd63797-76f6-9ba8-0113-13a4bf04e6ed@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hEfg1-00029D-Lt
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:48:02 -0400
+References: <20190304071631.27567-1-richardw.yang@linux.intel.com>
+	<20190304071631.27567-3-richardw.yang@linux.intel.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9585a1fc-fc7c-d3f4-06be-46d1a544a0ce@vivier.eu>
-Date: Thu, 11 Apr 2019 21:46:59 +0200
+Message-ID: <9a8d8585-4113-8ffe-d025-abd49c208428@vivier.eu>
+Date: Thu, 11 Apr 2019 21:42:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <8cd63797-76f6-9ba8-0113-13a4bf04e6ed@redhat.com>
+In-Reply-To: <20190304071631.27567-3-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Clean up includes
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v6 2/2] CODING_STYLE: indent
+ example code as all others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, viktor.prutyanov@phystech.edu, QEMU Trivial <qemu-trivial@nongnu.org>, kraxel@redhat.com, marcel.apfelbaum@gmail.com, alex.bennee@linaro.org
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, philmd@redhat.com, mjt@tls.msk.ru, imammedo@redhat.com, eblake@redhat.com, sgarzare@redhat.com
 
-On 21/03/2019 10:21, Thomas Huth wrote:
-> On 13/03/2019 17.28, Markus Armbruster wrote:
->> Clean up includes so that osdep.h is included first and headers
->> which it implies are not included manually.
->>
->> This commit was created with scripts/clean-includes, with the changes
->> to the following files manually reverted:
->>
->>     contrib/libvhost-user/libvhost-user-glib.h
->>     contrib/libvhost-user/libvhost-user.c
->>     contrib/libvhost-user/libvhost-user.h
->>     linux-user/mips64/cpu_loop.c
->>     linux-user/mips64/signal.c
->>     linux-user/sparc64/cpu_loop.c
->>     linux-user/sparc64/signal.c
->>     linux-user/x86_64/cpu_loop.c
->>     linux-user/x86_64/signal.c
->>     slirp/src/*
->>     target/s390x/gen-features.c
->>     tests/migration/s390x/a-b-bios.c
->>     tests/test-rcu-simpleq.c
->>     tests/test-rcu-tailq.c
->>     tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
->>
->> We're in the process of spinning out slirp/.  tests/uefi-test-tools/
->> is guest software.  The remaining reverts are the same as in commit
->> b7d89466dde.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  contrib/elf2dmp/main.c   | 3 +--
->>  contrib/elf2dmp/pdb.c    | 3 +--
->>  hw/display/ati.c         | 1 +
->>  hw/display/ati_2d.c      | 1 +
->>  hw/display/ati_dbg.c     | 1 +
->>  hw/display/ati_int.h     | 1 -
->>  include/hw/cpu/cluster.h | 1 -
->>  tests/fp/platform.h      | 1 -
->>  tests/libqos/qgraph.h    | 4 ----
->>  tests/qos-test.c         | 2 +-
->>  10 files changed, 6 insertions(+), 12 deletions(-)
+On 04/03/2019 08:16, Wei Yang wrote:
+> All the example code are indented with four spaces except this one.
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Fix this by adding four spaces here.
 > 
-
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  CODING_STYLE | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index 90321e9c28..cb8edcbb36 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -147,10 +147,10 @@ block to a separate function altogether.
+>  When comparing a variable for (in)equality with a constant, list the
+>  constant on the right, as in:
+>  
+> -if (a == 1) {
+> -    /* Reads like: "If a equals 1" */
+> -    do_something();
+> -}
+> +    if (a == 1) {
+> +        /* Reads like: "If a equals 1" */
+> +        do_something();
+> +    }
+>  
+>  Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
+>  Besides, good compilers already warn users when '==' is mis-typed as '=',
+> 
 
 Applied to my trivial-patches branch.
 
