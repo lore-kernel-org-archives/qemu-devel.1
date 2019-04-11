@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37280)
+Received: from eggs.gnu.org ([209.51.188.92]:38511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEb0J-0000QJ-0O
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:48:40 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1hEb3f-0002pB-4a
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEb0H-0005mH-VQ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:48:38 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 14:48:34 +0000
-Message-ID: <1391b876-74ed-21f0-c41f-f2fb22d2eae7@virtuozzo.com>
-References: <20190225152053.15976-1-kwolf@redhat.com>
-	<20190225152053.15976-17-kwolf@redhat.com>
-	<4f9792a1-4702-62d0-cad4-4da1169baa3b@virtuozzo.com>
-	<20190411141548.GE5694@linux.fritz.box>
-In-Reply-To: <20190411141548.GE5694@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E9EE2ADBB56E354E88D16BB86987D596@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dan.j.williams@intel.com>) id 1hEb3d-00006T-Jo
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:07 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1hEb3d-0008Rn-1k
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:05 -0400
+Received: by mail-ot1-x342.google.com with SMTP id m10so5497079otp.2
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 07:52:00 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 16/71] nbd: Increase bs->in_flight during
- AioContext switch
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+In-Reply-To: <20190410040826.24371-2-pagupta@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 11 Apr 2019 07:51:48 -0700
+Message-ID: <CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Christoph Hellwig <hch@infradead.org>, Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, jmoyer <jmoyer@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval.shaia@oracle.com
 
-MTEuMDQuMjAxOSAxNzoxNSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDQuMjAxOSB1bSAx
-NTo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDI1
-LjAyLjIwMTkgMTg6MTksIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gYmRydl9kcmFpbigpIG11c3Qg
-bm90IGxlYXZlIGNvbm5lY3Rpb25fY28gc2NoZWR1bGVkLCBzbyBicy0+aW5fZmxpZ2h0DQo+Pj4g
-bmVlZHMgdG8gYmUgaW5jcmVhc2VkIHdoaWxlIHRoZSBjb3JvdXRpbmUgaXMgd2FpdGluZyB0byBi
-ZSBzY2hlZHVsZWQNCj4+PiBpbiB0aGUgbmV3IEFpb0NvbnRleHQgYWZ0ZXIgbmJkX2NsaWVudF9h
-dHRhY2hfYWlvX2NvbnRleHQoKS4NCj4+DQo+PiBIaSENCj4+DQo+PiBJIGhhdmUgc29tZSBxdWVz
-dGlvbnMsIGNvdWxkIHlvdSBleHBsYWluLCBwbGVhc2U/DQo+Pg0KPj4gImJkcnZfZHJhaW4oKSBt
-dXN0IG5vdCBsZWF2ZSBjb25uZWN0aW9uX2NvIHNjaGVkdWxlZCIgLSBpdCdzIGJlY2F1c2Ugd2Ug
-d2FudCB0byBiZQ0KPj4gc3VyZSB0aGF0IGNvbm5lY3Rpb25fY28geWllbGRlZCBmcm9tIG5iZF9y
-ZWFkX2VvZiwgeWVzPw0KPj4NCj4+IEJ1dCBpdCBpcyBndWFyYW50ZWVkIGJ5IGFpb193YWl0X2Jo
-X29uZXNob3QuLiBXaHkgZG8gd2UgbmVlZCBhZGRpdGlvaW5hbGx5IGluYy9kZWMNCj4+IGJzLT5p
-bl9mbGlnaHQgPw0KPiANCj4gV2l0aG91dCBpbmNyZW1lbnRpbmcgYnMtPmluX2ZsaWdodCwgbm90
-aGluZyB3b3VsZCBndWFyYW50ZWUgdGhhdA0KPiBhaW9fcG9sbCgpIGlzIGNhbGxlZCBhbmQgdGhl
-IEJIIGlzIGFjdHVhbGx5IGV4ZWN1dGVkIGJlZm9yZSBiZHJ2X2RyYWluKCkNCj4gcmV0dXJucy4N
-Cg0KRG9uJ3QgZm9sbG93Li4gRG9uJ3Qgd2Ugd2FudCBleGFjdGx5IHRoaXMsIHdlIHdhbnQgQkgg
-dG8gYmUgZXhlY3V0ZWQgd2hpbGUgbm9kZSBpcyBzdGlsbA0KZHJhaW5lZCwgYXMgeW91IHdyaXRl
-IGluIGNvbW1lbnQ/DQoNCj4gDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBLZXZpbiBXb2xmIDxr
-d29sZkByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIGJsb2NrL25iZC1jbGllbnQuYyB8IDIw
-ICsrKysrKysrKysrKysrKysrKy0tDQo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlv
-bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJkLWNs
-aWVudC5jIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+Pj4gaW5kZXggNjBmMzhmMDMyMC4uYmZiYWY3
-ZWJlOSAxMDA2NDQNCj4+PiAtLS0gYS9ibG9jay9uYmQtY2xpZW50LmMNCj4+PiArKysgYi9ibG9j
-ay9uYmQtY2xpZW50LmMNCj4+PiBAQCAtOTc3LDE0ICs5NzcsMzAgQEAgdm9pZCBuYmRfY2xpZW50
-X2RldGFjaF9haW9fY29udGV4dChCbG9ja0RyaXZlclN0YXRlICpicykNCj4+PiAgICAgICAgcWlv
-X2NoYW5uZWxfZGV0YWNoX2Fpb19jb250ZXh0KFFJT19DSEFOTkVMKGNsaWVudC0+aW9jKSk7DQo+
-Pj4gICAgfQ0KPj4+ICAgIA0KPj4+ICtzdGF0aWMgdm9pZCBuYmRfY2xpZW50X2F0dGFjaF9haW9f
-Y29udGV4dF9iaCh2b2lkICpvcGFxdWUpDQo+Pj4gK3sNCj4+PiArICAgIEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzID0gb3BhcXVlOw0KPj4+ICsgICAgTkJEQ2xpZW50U2Vzc2lvbiAqY2xpZW50ID0gbmJk
-X2dldF9jbGllbnRfc2Vzc2lvbihicyk7DQo+Pj4gKw0KPj4+ICsgICAgLyogVGhlIG5vZGUgaXMg
-c3RpbGwgZHJhaW5lZCwgc28gd2Uga25vdyB0aGUgY29yb3V0aW5lIGhhcyB5aWVsZGVkIGluDQo+
-Pj4gKyAgICAgKiBuYmRfcmVhZF9lb2YoKSwgdGhlIG9ubHkgcGxhY2Ugd2hlcmUgYnMtPmluX2Zs
-aWdodCBjYW4gcmVhY2ggMCwgb3IgaXQgaXMNCj4+PiArICAgICAqIGVudGVyZWQgZm9yIHRoZSBm
-aXJzdCB0aW1lLiBCb3RoIHBsYWNlcyBhcmUgc2FmZSBmb3IgZW50ZXJpbmcgdGhlDQo+Pj4gKyAg
-ICAgKiBjb3JvdXRpbmUuKi8NCj4+PiArICAgIHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlcihicy0+
-YWlvX2NvbnRleHQsIGNsaWVudC0+Y29ubmVjdGlvbl9jbyk7DQo+Pj4gKyAgICBiZHJ2X2RlY19p
-bl9mbGlnaHQoYnMpOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICAgIHZvaWQgbmJkX2NsaWVudF9hdHRh
-Y2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+Pj4gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBBaW9Db250ZXh0ICpuZXdfY29udGV4dCkNCj4+PiAgICB7
-DQo+Pj4gICAgICAgIE5CRENsaWVudFNlc3Npb24gKmNsaWVudCA9IG5iZF9nZXRfY2xpZW50X3Nl
-c3Npb24oYnMpOw0KPj4+ICAgICAgICBxaW9fY2hhbm5lbF9hdHRhY2hfYWlvX2NvbnRleHQoUUlP
-X0NIQU5ORUwoY2xpZW50LT5pb2MpLCBuZXdfY29udGV4dCk7DQo+Pj4gICAgDQo+Pj4gLSAgICAv
-KiBGSVhNRSBSZWFsbHkgbmVlZCBhIGJkcnZfaW5jX2luX2ZsaWdodCgpIGhlcmUgKi8NCj4+PiAt
-ICAgIGFpb19jb19zY2hlZHVsZShuZXdfY29udGV4dCwgY2xpZW50LT5jb25uZWN0aW9uX2NvKTsN
-Cj4+PiArICAgIGJkcnZfaW5jX2luX2ZsaWdodChicyk7DQo+Pj4gKw0KPj4+ICsgICAgLyogTmVl
-ZCB0byB3YWl0IGhlcmUgZm9yIHRoZSBCSCB0byBydW4gYmVjYXVzZSB0aGUgQkggbXVzdCBydW4g
-d2hpbGUgdGhlDQo+Pj4gKyAgICAgKiBub2RlIGlzIHN0aWxsIGRyYWluZWQuICovDQo+Pj4gKyAg
-ICBhaW9fd2FpdF9iaF9vbmVzaG90KG5ld19jb250ZXh0LCBuYmRfY2xpZW50X2F0dGFjaF9haW9f
-Y29udGV4dF9iaCwgYnMpOw0KPj4+ICAgIH0NCj4+PiAgICANCj4+PiAgICB2b2lkIG5iZF9jbGll
-bnRfY2xvc2UoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4NCj4+DQo+Pg0KPj4gLS0gDQo+PiBC
-ZXN0IHJlZ2FyZHMsDQo+PiBWbGFkaW1pcg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
-aXINCg==
+On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>
+> This patch adds functionality to perform flush from guest
+> to host over VIRTIO. We are registering a callback based
+> on 'nd_region' type. virtio_pmem driver requires this special
+> flush function. For rest of the region types we are registering
+> existing flush function. Report error returned by host fsync
+> failure to userspace.
+>
+> This also handles asynchronous flush requests from the block layer
+> by creating a child bio and chaining it with parent bio.
+>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+[..]
+> diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+> index b4ef7d9ff22e..fb1041ab32a6 100644
+> --- a/drivers/nvdimm/region_devs.c
+> +++ b/drivers/nvdimm/region_devs.c
+> @@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
+>                 return rc;
+>         if (!flush)
+>                 return -EINVAL;
+> -       nvdimm_flush(nd_region);
+> +       rc = nvdimm_flush(nd_region, NULL, false);
+> +       if (rc)
+> +               return rc;
+>
+>         return len;
+>  }
+> @@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
+>         dev->of_node = ndr_desc->of_node;
+>         nd_region->ndr_size = resource_size(ndr_desc->res);
+>         nd_region->ndr_start = ndr_desc->res->start;
+> +       if (ndr_desc->flush)
+> +               nd_region->flush = ndr_desc->flush;
+> +       else
+> +               nd_region->flush = generic_nvdimm_flush;
+> +
+>         nd_device_register(dev);
+>
+>         return nd_region;
+> @@ -1125,11 +1132,36 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+>  }
+>  EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+>
+> +int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool async)
+> +{
+
+I don't quite see the point of the 'async' argument. All the usages of
+this routine are either
+
+nvdimm_flush(nd_region, bio, true)
+...or:
+nvdimm_flush(nd_region, NULL, false)
+
+...so why not gate async behavior on the presence of the 'bio' argument?
+
+
+> +       int rc = 0;
+> +
+> +       /* Create child bio for asynchronous flush and chain with
+> +        * parent bio. Otherwise directly call nd_region flush.
+> +        */
+> +       if (async && bio->bi_iter.bi_sector != -1) {
+> +
+> +               struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> +
+> +               if (!child)
+> +                       return -ENOMEM;
+> +               bio_copy_dev(child, bio);
+> +               child->bi_opf = REQ_PREFLUSH;
+> +               child->bi_iter.bi_sector = -1;
+> +               bio_chain(child, bio);
+> +               submit_bio(child);
+
+I understand how this works, but it's a bit too "magical" for my
+taste. I would prefer that all flush implementations take an optional
+'bio' argument rather than rely on the make_request implementation to
+stash the bio away on a driver specific list.
+
+> +       } else {
+> +               if (nd_region->flush(nd_region))
+> +                       rc = -EIO;
+
+Given the common case wants to be fast and synchronous I think we
+should try to avoid retpoline overhead by default. So something like
+this:
+
+if (nd_region->flush == generic_nvdimm_flush)
+    rc = generic_nvdimm_flush(...);
