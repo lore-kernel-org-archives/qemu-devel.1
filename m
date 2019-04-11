@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36749)
+Received: from eggs.gnu.org ([209.51.188.92]:36893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEOZU-00042o-Qc
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:10 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEOZw-0004KP-2r
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEOZT-0008GU-UH
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:08 -0400
-References: <20190409210655.777-1-jsnow@redhat.com>
-	<87y34i2zbt.fsf@dusky.pond.sub.org>
-	<3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
-	<e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d36b8962-ed7d-f315-479b-d7de78d906e6@redhat.com>
-Date: Wed, 10 Apr 2019 21:32:01 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEOZv-0000E7-0B
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:36 -0400
+Received: from mga11.intel.com ([192.55.52.93]:55063)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hEOZu-0000AT-Ls
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:34 -0400
+Date: Thu, 11 Apr 2019 09:32:11 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190411013211.GA8515@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+	<20190410142756.GA3136@richard>
+	<20190410170150.1c447b12@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190410170150.1c447b12@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
+ MCFG table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, ehabkost@redhat.com
 
+On Wed, Apr 10, 2019 at 05:01:50PM +0200, Igor Mammedov wrote:
+>On Wed, 10 Apr 2019 22:27:56 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>[...]
+>> >@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>> >     mcfg->allocation[0].start_bus_number = 0;
+>> >     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+>> > 
+>> >-    /* MCFG is used for ECAM which can be enabled or disabled by guest.  
+>> 
+>> I want to cnfirm what is "enabled or disabled by guest" here.
+>
+>Firmware theoretically during PCI initialization may disable ECAM support
+>and that's when we do no need MCFG. In practice that's not happening
+>(SeaBIOS or UEFI) but we in case there is out there a firmware that does
+>disable ECAM we do not generate MCFG.
+>
+>Note:
+>ACPI tables generated twice, 1st when QEMU starts and the second time
+>when firmware accesses fwcfg to read blobs for the 1st time.
+>The later happens after PCI subsystem was initialized by firmware.
+>At that time we know if ECAM was enabled or not.
+>
 
+That's much clear, thanks :-)
 
-On 4/10/19 2:22 PM, Eric Blake wrote:
-> On 4/10/19 12:37 PM, John Snow wrote:
->>
->>
->> On 4/10/19 1:39 AM, Markus Armbruster wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> It turns out that having options listed in three places continues to be
->>>> a bad idea. I'm still toying with the idea of an improved infrastructure
->>>> here, but in the meantime, another bandaid.
->>>>
-> 
->>>
->>> Nice to have in 4.0.
->>>
->>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>>
->>
->> If it can go in for 4.0, who stages it? Kevin?
-> 
-> At this point, we've missed -rc3; the fix on its own is not a
-> release-blocker, but if something else comes up that requires -rc4 for
-> an actual release blocker, we can sort out someone sending a pull
-> request for this one at the same time. (I'm aware of a couple of iotest
-> fixups in the same boat... Guess it's time to start updating the wiki to
-> point to email threads where we document 'wish list' patches)
-> 
+So this is the guest BIOS instead of guest kernel who may disable/enable it.
 
-OK. I also have... a pretty major bitmaps documentation rewrite which I
-probably won't have ready in time for a theoretical rc4 either, so I
-guess I'll need to include it for 4.0.1.
+>> If we don't reserve mcfg and "guest" enable mcfg during running, the ACPI
+>> table size changed. But the destination still has the original table size,
+>> since destination "guest" keep sleep during this period.
+>> 
+>> Now the migration would face table size difference
+>
+>with commit a1666142db we do not care as all the tables created on
+>source will be migrated to destination as is overwriting whatever blobs
+>destination created on startup.
+>
+>> and break migration?
+>nope,
+>
+>to help you figure out why it works
+>look at what following git commits did:
+>  git log c8d6f66ae7..a1666142db
+>and pay attention to 'used_length'
+>
 
-I didn't realize how badly out of date the bitmaps.rst file had gotten.
-I'll keep hammering away at it.
+To be honest, this is what I feel confused in your previous reply.
 
---js
+First I want to confirm both fields in RAMBlock affects the migration:
+
+* used_length
+* max_length
+
+Both of them should be the same on both source/destination, otherwise the
+migration would fail.
+
+Then I thought the migration would be broken if source/destination has
+different knowledge about acpi table size. Because this will introduce
+different value of used_length, even we have resizable MemoryRegion.
+
+The 1st time ACPI generation flow:
+
+    acpi_add_rom_blob
+        rom_add_blob
+            rom_set_mr
+                memory_region_init_resizable_ram
+                    qemu_ram_alloc_resizable
+    		        new_block->used_length = size
+    		        new_block->max_length = max_size
+
+The 2nd time ACPI generation flow:
+
+    acpi_ram_update
+        memory_regioin_ram_resize
+            qemu_ram_resize
+                block->used_length = new_size
+
+The max_length is always the same, while used_length would be changed to the
+actual table_blob size.
+
+In case source/destination has different knowledge about acpi table size, the
+table_blob size(even after aligned) could be different.
+
+This is why I thought there is still some chance to break migration after
+resizable MemoryRegion.
+
+Do I miss something?
+
+-- 
+Wei Yang
+Help you, Help me
