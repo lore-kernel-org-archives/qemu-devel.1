@@ -2,82 +2,61 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F36C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C12C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1942077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:52:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="zi4I18XM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1942077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0808A2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0808A2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50154 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50169 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEb4R-00038l-VZ
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:52:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38511)
+	id 1hEb6I-0004Zh-76
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:54:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hEb3f-0002pB-4a
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4W-0003H7-P2
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hEb3d-00006T-Jo
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:07 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1hEb3d-0008Rn-1k
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:05 -0400
-Received: by mail-ot1-x342.google.com with SMTP id m10so5497079otp.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 07:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=intel-com.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=HrHI1yUQh4ijcB7YHVwA9JPy3wKlBzvWJG6Efesd/f0=;
-	b=zi4I18XMGtYXeCFOI7IgUdbB0EOZdbnJeoa3l20X2Gqlcl0YR55UhU5luYmUa6cHU5
-	EqcmShYr64nYFlNtn7Rd+1lIJH9XABBmZCQPUOavNMLs+0n9I8m1OuY2+KD0JtN93YcX
-	3rvvNLyeug/w5aNDC5fj4CjwQPXARfaplfRzq12KFQ4x2cbAHrzA+mENqSKh1c617RSg
-	xlJAToPXjpLqe1zcSJodjCgmY5dhUdHQiVkQchFEI36jgwV1c+a/Zf73ibOfskPgdlC8
-	PjhIrDB/UX3hLAtfZ9Gz/P0KisQxQ6VH57FKrSFjl+UerDKSD8YHx1TPbaLhBc3i7fUT
-	dpzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=HrHI1yUQh4ijcB7YHVwA9JPy3wKlBzvWJG6Efesd/f0=;
-	b=h77wX4OEKAm92ILk/gAMOqbIkIs4yetZbJyMIwIUMOMR0WKcRbIkFBskLfV1ig5q/3
-	7SLX7/4QDR9hoTjpEbLaNv4tI9enObQK1h4DBoM5u7JxRqLCQQ6ytbOV31ceUcC7lC1y
-	83Ak7UCLO1UHlpWAbgb/kEQKdk6pbFLROhuM4F8Bls+Y6N4/CDqHmEVJhsQiXYyk5UfJ
-	yPrDfv98KMFFhuALwhV/U5KuX3A/MOFQ1+ZV1YMgks5B7ZpN8+pnjlpe1hkhP1RJ7z8v
-	45WVbnANhIdWXMdayeXyOM7ap9cA2Q+ZGFbh+Y7Ocx1bk+irbf2uymDUa1q51GRrSdje
-	RZEQ==
-X-Gm-Message-State: APjAAAU3MZTi9l5xgNamG9/iInBoVkMK0yjl+3X39tdvL/FeVxeiRFz7
-	31Om6iAMuTvlp0fx3F6TVhGK4L3gKuWTxVMLQo/Bsg==
-X-Google-Smtp-Source: APXvYqzmftlTRUTwhQDYzvgypbDnyLvMFUn2U/nKPouHN/rEyYp+JGo6QjH+KjaSpQBo5LMn3j6ZwzdKIOwlKbwUyTU=
-X-Received: by 2002:a9d:3f4b:: with SMTP id m69mr32615377otc.246.1554994319729;
-	Thu, 11 Apr 2019 07:51:59 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hEb4V-0000kN-J0
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4V-0000jd-2X
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 615D8C0AD432
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 308285D71F
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id BCEF41138648; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 16:52:41 +0200
+Message-Id: <20190411145256.8614-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-2-pagupta@redhat.com>
-In-Reply-To: <20190410040826.24371-2-pagupta@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 11 Apr 2019 07:51:48 -0700
-Message-ID:
- <CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
-To: Pankaj Gupta <pagupta@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
- support
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 00/15] Clean up use of error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,127 +68,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	virtualization@lists.linux-foundation.org,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>,
-	Vishal L Verma <vishal.l.verma@intel.com>,
-	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
-	Rik van Riel <riel@surriel.com>, yuval.shaia@oracle.com,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-xfs <linux-xfs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411145148.CZxf5YjJXQRN_5ZK8_0F20z9s6cKL-Nhlvu5lYRtatM@z>
+Message-ID: <20190411145241.3hM7dsGOzJ0Dx-DSuOvkQ8YwWCoSFRxTk6Rj_DUy6JA@z>
 
-On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
->
-> This patch adds functionality to perform flush from guest
-> to host over VIRTIO. We are registering a callback based
-> on 'nd_region' type. virtio_pmem driver requires this special
-> flush function. For rest of the region types we are registering
-> existing flush function. Report error returned by host fsync
-> failure to userspace.
->
-> This also handles asynchronous flush requests from the block layer
-> by creating a child bio and chaining it with parent bio.
->
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
-[..]
-> diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-> index b4ef7d9ff22e..fb1041ab32a6 100644
-> --- a/drivers/nvdimm/region_devs.c
-> +++ b/drivers/nvdimm/region_devs.c
-> @@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
->                 return rc;
->         if (!flush)
->                 return -EINVAL;
-> -       nvdimm_flush(nd_region);
-> +       rc = nvdimm_flush(nd_region, NULL, false);
-> +       if (rc)
-> +               return rc;
->
->         return len;
->  }
-> @@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
->         dev->of_node = ndr_desc->of_node;
->         nd_region->ndr_size = resource_size(ndr_desc->res);
->         nd_region->ndr_start = ndr_desc->res->start;
-> +       if (ndr_desc->flush)
-> +               nd_region->flush = ndr_desc->flush;
-> +       else
-> +               nd_region->flush = generic_nvdimm_flush;
-> +
->         nd_device_register(dev);
->
->         return nd_region;
-> @@ -1125,11 +1132,36 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
->  }
->  EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
->
-> +int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool async)
-> +{
+This series cleans up two kinds of error_printf() misuse:
 
-I don't quite see the point of the 'async' argument. All the usages of
-this routine are either
+* Errors and warnings should be reported with error_report() and
+  warn_report().
 
-nvdimm_flush(nd_region, bio, true)
-...or:
-nvdimm_flush(nd_region, NULL, false)
+* Help output should be go to stdout, not stderr.
 
-...so why not gate async behavior on the presence of the 'bio' argument?
+This is obviously for 4.1.  If nobody objects, I'll take the whole
+series through my tree.
 
+v2:
+* PATCH 02: Commit message tweaked, indentation fixed [Eric]
+* PATCH 10: Indentation fixed [Marcel]
+* PATCH 11: Use-after-free fixed [Patchew]
+* PATCH 12: test-util-sockets.c updated along with stubs/monitor.c
+* PATCH 14: Commit message typo [Eric]
 
-> +       int rc = 0;
-> +
-> +       /* Create child bio for asynchronous flush and chain with
-> +        * parent bio. Otherwise directly call nd_region flush.
-> +        */
-> +       if (async && bio->bi_iter.bi_sector != -1) {
-> +
-> +               struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> +
-> +               if (!child)
-> +                       return -ENOMEM;
-> +               bio_copy_dev(child, bio);
-> +               child->bi_opf = REQ_PREFLUSH;
-> +               child->bi_iter.bi_sector = -1;
-> +               bio_chain(child, bio);
-> +               submit_bio(child);
+Markus Armbruster (15):
+  qemu-img: Use error_vreport() in error_exit()
+  block/ssh: Do not report read/write/flush errors to the user
+  char-pty: Drop "char device redirected to" message
+  loader-fit: Wean off error_printf()
+  mips/boston: Report errors with error_report(), not error_printf()
+  pci: Report fatal errors with error_report(), not error_printf()
+  hpet: Report warnings with warn_report(), not error_printf()
+  vfio: Report warnings with warn_report(), not error_printf()
+  s390x/kvm: Report warnings with warn_report(), not error_printf()
+  vl: Make -machine $TYPE,help and -accel help print to stdout
+  monitor error: Make printf()-like functions return a value
+  qemu-print: New qemu_printf(), qemu_vprintf() etc.
+  blockdev: Make -drive format=3Dhelp print to stdout
+  char: Make -chardev help print to stdout
+  monitor: Simplify how -device/device_add print help
 
-I understand how this works, but it's a bit too "magical" for my
-taste. I would prefer that all flush implementations take an optional
-'bio' argument rather than rely on the make_request implementation to
-stash the bio away on a driver specific list.
+ MAINTAINERS                 |  2 ++
+ block/ssh.c                 | 38 +++++++-------------
+ block/trace-events          |  3 ++
+ blockdev.c                  |  9 ++---
+ chardev/char-pty.c          |  2 --
+ chardev/char.c              |  3 +-
+ hw/core/loader-fit.c        | 62 +++++++++++++++++++--------------
+ hw/mips/boston.c            |  6 ++--
+ hw/pci/pci.c                |  2 +-
+ hw/timer/hpet.c             |  2 +-
+ hw/vfio/pci.c               | 19 ++++++----
+ include/monitor/monitor.h   |  7 ++--
+ include/qemu/error-report.h |  8 ++---
+ include/qemu/qemu-print.h   | 19 ++++++++++
+ monitor.c                   | 69 ++++++++++++++++++-------------------
+ qdev-monitor.c              | 36 ++++++++-----------
+ qemu-img.c                  |  6 ++--
+ stubs/error-printf.c        | 13 ++++---
+ stubs/monitor.c             |  5 +++
+ target/s390x/kvm.c          |  2 +-
+ tests/test-util-sockets.c   |  1 +
+ util/Makefile.objs          |  1 +
+ util/qemu-error.c           | 12 ++++---
+ util/qemu-print.c           | 42 ++++++++++++++++++++++
+ vl.c                        | 10 +++---
+ 25 files changed, 224 insertions(+), 155 deletions(-)
+ create mode 100644 include/qemu/qemu-print.h
+ create mode 100644 util/qemu-print.c
 
-> +       } else {
-> +               if (nd_region->flush(nd_region))
-> +                       rc = -EIO;
+--=20
+2.17.2
 
-Given the common case wants to be fast and synchronous I think we
-should try to avoid retpoline overhead by default. So something like
-this:
-
-if (nd_region->flush == generic_nvdimm_flush)
-    rc = generic_nvdimm_flush(...);
 
