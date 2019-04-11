@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54884)
+Received: from eggs.gnu.org ([209.51.188.92]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsa-000390-97
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:25 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsY-0002dl-9n
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWdn-0007Fg-Tq
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:08 -0400
+	(envelope-from <david@redhat.com>) id 1hEWe8-0007PE-0I
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:29 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 11 Apr 2019 12:08:08 +0200
-Message-Id: <20190411100836.646-14-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:12 +0200
+Message-Id: <20190411100836.646-18-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 13/41] s390x/tcg: Implement VECTOR COUNT
- TRAILING ZEROS
+Subject: [Qemu-devel] [PATCH v1 17/41] s390x/tcg: Implement VECTOR LOAD
+ POSITIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +25,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Implement it similar to VECTOR COUNT LEADING ZEROS.
+Similar to VECTOR LOAD COMPLEMENT but unfortunately we don't have a
+gvec helper.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
  target/s390x/helper.h           |  2 ++
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 28 ++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 14 ++++++++++++++
- 4 files changed, 46 insertions(+)
+ target/s390x/translate_vx.inc.c | 40 +++++++++++++++++++++++++++++++++
+ target/s390x/vec_int_helper.c   | 14 ++++++++++++
+ 4 files changed, 58 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index e25e1467ae..83e5070821 100644
+index 18a3df6b07..065c4c6ea3 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -154,6 +154,8 @@ DEF_HELPER_FLAGS_4(gvec_vavgl8, TCG_CALL_NO_RWG, void=
-, ptr, cptr, cptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vavgl16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
- DEF_HELPER_FLAGS_3(gvec_vclz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vclz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
+@@ -164,6 +164,8 @@ DEF_HELPER_FLAGS_5(gvec_vgfma8, TCG_CALL_NO_RWG, void=
+, ptr, cptr, cptr, cptr, i3
+ DEF_HELPER_FLAGS_5(gvec_vgfma16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ cptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_vgfma32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ cptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_vgfma64, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vlp8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vlp16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index be3c07aafb..a355b7f62f 100644
+index 07868ff082..fc8886ff42 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1086,6 +1086,8 @@
-     E(0xe7f9, VCHL,    VRR_b, V,   0, 0, 0, 0, vc, 0, TCG_COND_GTU, IF_V=
-EC)
- /* VECTOR COUNT LEADING ZEROS */
-     F(0xe753, VCLZ,    VRR_a, V,   0, 0, 0, 0, vclz, 0, IF_VEC)
-+/* VECTOR COUNT TRAILING ZEROS */
-+    F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
+@@ -1096,6 +1096,8 @@
+     F(0xe7bc, VGFMA,   VRR_d, V,   0, 0, 0, 0, vgfma, 0, IF_VEC)
+ /* VECTOR LOAD COMPLEMENT */
+     F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
++/* VECTOR LOAD POSITIVE */
++    F(0xe7df, VLP,     VRR_a, V,   0, 0, 0, 0, vlp, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 299924a7cc..23d5870dc5 100644
+index 28436cb01a..8cab3f876a 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1406,3 +1406,31 @@ static DisasJumpType op_vclz(DisasContext *s, Disa=
-sOps *o)
-     gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
+@@ -1496,3 +1496,43 @@ static DisasJumpType op_vlc(DisasContext *s, Disas=
+Ops *o)
+                   get_field(s->fields, v2));
      return DISAS_NEXT;
  }
 +
-+static void gen_ctz_i32(TCGv_i32 d, TCGv_i32 a)
++static void gen_lp_i32(TCGv_i32 d, TCGv_i32 a)
 +{
-+    tcg_gen_ctzi_i32(d, a, 32);
++    TCGv_i32 zero =3D tcg_const_i32(0);
++    TCGv_i32 neg =3D tcg_temp_new_i32();
++
++    tcg_gen_neg_i32(neg, a);
++    tcg_gen_movcond_i32(TCG_COND_LT, d, a, zero, neg, a);
++    tcg_temp_free_i32(neg);
++    tcg_temp_free_i32(zero);
 +}
 +
-+static void gen_ctz_i64(TCGv_i64 d, TCGv_i64 a)
++static void gen_lp_i64(TCGv_i64 d, TCGv_i64 a)
 +{
-+    tcg_gen_ctzi_i64(d, a, 64);
++    TCGv_i64 zero =3D tcg_const_i64(0);
++    TCGv_i64 neg =3D tcg_temp_new_i64();
++
++    tcg_gen_neg_i64(neg, a);
++    tcg_gen_movcond_i64(TCG_COND_LT, d, a, zero, neg, a);
++    tcg_temp_free_i64(neg);
++    tcg_temp_free_i64(zero);
 +}
 +
-+static DisasJumpType op_vctz(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlp(DisasContext *s, DisasOps *o)
 +{
 +    const uint8_t es =3D get_field(s->fields, m3);
 +    static const GVecGen2 g[4] =3D {
-+        { .fno =3D gen_helper_gvec_vctz8, },
-+        { .fno =3D gen_helper_gvec_vctz16, },
-+        { .fni4 =3D gen_ctz_i32, },
-+        { .fni8 =3D gen_ctz_i64, },
++        { .fno =3D gen_helper_gvec_vlp8, },
++        { .fno =3D gen_helper_gvec_vlp16, },
++        { .fni4 =3D gen_lp_i32, },
++        { .fni8 =3D gen_lp_i64, },
 +    };
 +
 +    if (es > ES_64) {
@@ -106,18 +119,18 @@ sOps *o)
 +}
 diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
 c
-index 366962cfbe..c589f92765 100644
+index 99dd0653f6..574f707abf 100644
 --- a/target/s390x/vec_int_helper.c
 +++ b/target/s390x/vec_int_helper.c
-@@ -107,3 +107,17 @@ void HELPER(gvec_vclz##BITS)(void *v1, const void *v=
-2, uint32_t desc)          \
+@@ -289,3 +289,17 @@ void HELPER(gvec_vgfma64)(void *v1, const void *v2, =
+const void *v3,
+     s390_vec_xor(&tmp1, &tmp1, &tmp2);
+     s390_vec_xor(v1, &tmp1, v4);
  }
- DEF_VCLZ(8)
- DEF_VCLZ(16)
 +
-+#define DEF_VCTZ(BITS)                                                  =
++#define DEF_VLP(BITS)                                                   =
        \
-+void HELPER(gvec_vctz##BITS)(void *v1, const void *v2, uint32_t desc)   =
++void HELPER(gvec_vlp##BITS)(void *v1, const void *v2, uint32_t desc)    =
        \
 +{                                                                       =
        \
@@ -127,16 +140,16 @@ index 366962cfbe..c589f92765 100644
        \
 +    for (i =3D 0; i < (128 / BITS); i++) {                              =
          \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
++        const int##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);   =
          \
 +                                                                        =
        \
-+        s390_vec_write_element##BITS(v1, i, ctz32(a));                  =
++        s390_vec_write_element##BITS(v1, i, a < 0 ? -a : a);            =
        \
 +    }                                                                   =
        \
 +}
-+DEF_VCTZ(8)
-+DEF_VCTZ(16)
++DEF_VLP(8)
++DEF_VLP(16)
 --=20
 2.20.1
