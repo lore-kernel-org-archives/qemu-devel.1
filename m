@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36434)
+Received: from eggs.gnu.org ([209.51.188.92]:51700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hEhzw-0004gP-Ug
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:16:45 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hEjXc-0003dL-La
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hEhzv-0002R0-Ht
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:16:44 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:39425)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hEhzt-0002OR-Ke
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:16:41 -0400
-Received: by mail-ed1-x544.google.com with SMTP id k45so6613600edb.6
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:16:40 -0700 (PDT)
-Date: Thu, 11 Apr 2019 22:16:38 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190411221638.wiok2e7eik5btwq2@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1hEjXV-0001pw-3l
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:32 -0400
+Received: from mail-eopbgr750079.outbound.protection.outlook.com
+	([40.107.75.79]:25504
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hEjXL-0001hc-SY
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:22 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Thu, 11 Apr 2019 23:55:15 +0000
+Message-ID: <20190411235456.12918-1-brijesh.singh@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8CE87D8491C0CC43A0A6F806EDDF16D7@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
- MCFG table
+Subject: [Qemu-devel] [PATCH v2] target/i386: sev: add 'sev-max-guests'
+ field to 'query-sev-capabilities'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, richardw.yang@linux.intel.com, ehabkost@redhat.com, mst@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Erik Skultety <eskultet@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
 
-On Tue, Apr 09, 2019 at 05:00:37PM +0200, Igor Mammedov wrote:
->Dummy table (with signature "QEMU") creation came from original SeaBIOS
->codebase. And QEMU would have to keep it around if there were Q35 machine
->that depended on keeping ACPI tables blob constant size. Luckily there
->were no versioned Q35 machine types before commit:
->  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
->which obsoleted need to keep ACPI tables blob the same size on source/destination.
->
->Considering the 1st versioned machine is pc-q35-2.4, the dummy table
->is not really necessary and it's safe to drop it without breaking
->cross version migration in both directions unconditionally.
->
->Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-
->---
-> hw/i386/acpi-build.c | 18 ++++--------------
-> 1 file changed, 4 insertions(+), 14 deletions(-)
->
->diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->index 416da31..8671e25 100644
->--- a/hw/i386/acpi-build.c
->+++ b/hw/i386/acpi-build.c
->@@ -2401,7 +2401,6 @@ static void
-> build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> {
->     AcpiTableMcfg *mcfg;
->-    const char *sig;
->     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
-> 
->     mcfg = acpi_data_push(table_data, len);
->@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
->     mcfg->allocation[0].start_bus_number = 0;
->     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
-> 
->-    /* MCFG is used for ECAM which can be enabled or disabled by guest.
->-     * To avoid table size changes (which create migration issues),
->-     * always create the table even if there are no allocations,
->-     * but set the signature to a reserved value in this case.
->-     * ACPI spec requires OSPMs to ignore such tables.
->-     */
->-    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
->-        /* Reserved signature: ignored by OSPM */
->-        sig = "QEMU";
->-    } else {
->-        sig = "MCFG";
->-    }
->-    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
->+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> }
-> 
-> /*
->@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->     }
->     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
->     qobject_unref(o);
->+    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
->+        return false;
->+    }
-> 
->     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
->     assert(o);
->-- 
->2.7.4
->
-
--- 
-Wei Yang
-Help you, Help me
+VGhlcmUgYXJlIGxpbWl0ZWQgbnVtYmVycyBvZiB0aGUgU0VWIGd1ZXN0cyB0aGF0IGNhbiBiZSBy
+dW4gY29uY3VycmVudGx5Lg0KQSBtYW5hZ2VtZW50IGFwcGxpY2F0aW9ucyBtYXkgbmVlZCB0byBr
+bm93IHRoaXMgbGltaXQgc28gdGhhdCBpdCBjYW4gcGxhY2UNClNFViBWTXMgb24gaG9zdHMgd2hp
+Y2ggaGF2ZSBzdWl0YWJsZSByZXNvdXJjZXMgYXZhaWxhYmxlLg0KDQpDdXJyZW50bHksIHRoaXMg
+bGltaXQgaXMgbm90IGV4cG9zZWQgdG8gdGhlIGFwcGxpY2F0aW9uLiBBZGQgYSBuZXcNCidzZXYt
+bWF4LWd1ZXN0JyBmaWVsZCBpbiB0aGUgcXVlcnktc2V2LWNhcGFiaWxpdGllcyB0byBwcm92aWRl
+IHRoaXMNCmluZm9ybWF0aW9uLg0KDQpDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
+LmNvbT4NCkNjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQpDYzogRXJp
+YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQpDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVy
+cmFuZ2VAcmVkaGF0LmNvbT4NCkNjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0K
+Q2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQpDYzogVG9tIExlbmRhY2t5
+IDxUaG9tYXMuTGVuZGFja3lAYW1kLmNvbT4NClNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2gg
+PGJyaWplc2guc2luZ2hAYW1kLmNvbT4NCi0tLQ0KDQpjaGFuZ2VzIHNpbmNlIHYxOg0KIC0gZG9j
+dW1lbnQgdGhlIG5ldyBmaWVsZCBhbmQgYWRkIChzaW5jZSA0LjEpIGFubm90YXRpb24uDQoNCiBx
+YXBpL3RhcmdldC5qc29uICB8IDkgKysrKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2LmMgfCA5ICsr
+KysrKystLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMo
+LSkNCg0KZGlmZiAtLWdpdCBhL3FhcGkvdGFyZ2V0Lmpzb24gYi9xYXBpL3RhcmdldC5qc29uDQpp
+bmRleCAxZDRkNTRiNjAwLi44Y2Q0ZmM3OTE5IDEwMDY0NA0KLS0tIGEvcWFwaS90YXJnZXQuanNv
+bg0KKysrIGIvcWFwaS90YXJnZXQuanNvbg0KQEAgLTE3NywxMyArMTc3LDE3IEBADQogIyBAcmVk
+dWNlZC1waHlzLWJpdHM6IE51bWJlciBvZiBwaHlzaWNhbCBBZGRyZXNzIGJpdCByZWR1Y3Rpb24g
+d2hlbiBTRVYgaXMNCiAjICAgICAgICAgICAgICAgICAgICAgZW5hYmxlZA0KICMNCisjIEBzZXYt
+bWF4LWd1ZXN0czogbWF4aW11bSBudW1iZXIgb2YgY29uY3VycmVudCBTRVYgZ3Vlc3Qgd2l0aCBT
+RVYtRVMgZGlzYWJsZWQNCisjICAgICAgICAgICAgICAgICAgKHNpbmNlIDQuMSkNCisjDQogIyBT
+aW5jZTogMi4xMg0KICMjDQogeyAnc3RydWN0JzogJ1NldkNhcGFiaWxpdHknLA0KICAgJ2RhdGEn
+OiB7ICdwZGgnOiAnc3RyJywNCiAgICAgICAgICAgICAnY2VydC1jaGFpbic6ICdzdHInLA0KICAg
+ICAgICAgICAgICdjYml0cG9zJzogJ2ludCcsDQotICAgICAgICAgICAgJ3JlZHVjZWQtcGh5cy1i
+aXRzJzogJ2ludCd9LA0KKyAgICAgICAgICAgICdyZWR1Y2VkLXBoeXMtYml0cyc6ICdpbnQnLA0K
+KyAgICAgICAgICAgICdzZXYtbWF4LWd1ZXN0cyc6ICdpbnQnfSwNCiAgICdpZic6ICdkZWZpbmVk
+KFRBUkdFVF9JMzg2KScgfQ0KIA0KICMjDQpAQCAtMjAwLDcgKzIwNCw4IEBADQogIw0KICMgLT4g
+eyAiZXhlY3V0ZSI6ICJxdWVyeS1zZXYtY2FwYWJpbGl0aWVzIiB9DQogIyA8LSB7ICJyZXR1cm4i
+OiB7ICJwZGgiOiAiOENDREQ4REREIiwgImNlcnQtY2hhaW4iOiAiODg4Q0NDRERERUUiLA0KLSMg
+ICAgICAgICAgICAgICAgICAiY2JpdHBvcyI6IDQ3LCAicmVkdWNlZC1waHlzLWJpdHMiOiA1fX0N
+CisjICAgICAgICAgICAgICAgICAgImNiaXRwb3MiOiA0NywgInJlZHVjZWQtcGh5cy1iaXRzIjog
+NSwNCisjICAgICAgICAgICAgICAgICAgInNldi1tYXgtZ3Vlc3RzIiA6IDE1fX0NCiAjDQogIyMN
+CiB7ICdjb21tYW5kJzogJ3F1ZXJ5LXNldi1jYXBhYmlsaXRpZXMnLCAncmV0dXJucyc6ICdTZXZD
+YXBhYmlsaXR5JywNCmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9zZXYuYyBiL3RhcmdldC9pMzg2
+L3Nldi5jDQppbmRleCBjZDc3ZjZiNWQ0Li42ODI5NTg2ZmJlIDEwMDY0NA0KLS0tIGEvdGFyZ2V0
+L2kzODYvc2V2LmMNCisrKyBiL3RhcmdldC9pMzg2L3Nldi5jDQpAQCAtNDg4LDcgKzQ4OCw3IEBA
+IHNldl9nZXRfY2FwYWJpbGl0aWVzKHZvaWQpDQogICAgIGd1Y2hhciAqcGRoX2RhdGEgPSBOVUxM
+Ow0KICAgICBndWNoYXIgKmNlcnRfY2hhaW5fZGF0YSA9IE5VTEw7DQogICAgIHNpemVfdCBwZGhf
+bGVuID0gMCwgY2VydF9jaGFpbl9sZW4gPSAwOw0KLSAgICB1aW50MzJfdCBlYng7DQorICAgIHVp
+bnQzMl90IGVieCwgZWN4LCBlZHg7DQogICAgIGludCBmZDsNCiANCiAgICAgZmQgPSBvcGVuKERF
+RkFVTFRfU0VWX0RFVklDRSwgT19SRFdSKTsNCkBAIC01MDcsNyArNTA3LDcgQEAgc2V2X2dldF9j
+YXBhYmlsaXRpZXModm9pZCkNCiAgICAgY2FwLT5wZGggPSBnX2Jhc2U2NF9lbmNvZGUocGRoX2Rh
+dGEsIHBkaF9sZW4pOw0KICAgICBjYXAtPmNlcnRfY2hhaW4gPSBnX2Jhc2U2NF9lbmNvZGUoY2Vy
+dF9jaGFpbl9kYXRhLCBjZXJ0X2NoYWluX2xlbik7DQogDQotICAgIGhvc3RfY3B1aWQoMHg4MDAw
+MDAxRiwgMCwgTlVMTCwgJmVieCwgTlVMTCwgTlVMTCk7DQorICAgIGhvc3RfY3B1aWQoMHg4MDAw
+MDAxRiwgMCwgTlVMTCwgJmVieCwgJmVjeCwgJmVkeCk7DQogICAgIGNhcC0+Y2JpdHBvcyA9IGVi
+eCAmIDB4M2Y7DQogDQogICAgIC8qDQpAQCAtNTE2LDYgKzUxNiwxMSBAQCBzZXZfZ2V0X2NhcGFi
+aWxpdGllcyh2b2lkKQ0KICAgICAgKi8NCiAgICAgY2FwLT5yZWR1Y2VkX3BoeXNfYml0cyA9IDE7
+DQogDQorICAgIC8qDQorICAgICAqIFRoZSBtYXhpbXVtIG51bWJlciBvZiBTRVYgZ3Vlc3RzIHdp
+dGggU0VWLUVTIGRpc2FibGVkIHRoYXQgY2FuIHJ1bg0KKyAgICAgKiBzaW11bHRhbmVvdXNseS4N
+CisgICAgICovDQorICAgIGNhcC0+c2V2X21heF9ndWVzdHMgPSBlY3ggLSBlZHggKyAxOw0KIG91
+dDoNCiAgICAgZ19mcmVlKHBkaF9kYXRhKTsNCiAgICAgZ19mcmVlKGNlcnRfY2hhaW5fZGF0YSk7
+DQotLSANCjIuMTcuMQ0KDQo=
