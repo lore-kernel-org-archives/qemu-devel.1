@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39113)
+Received: from eggs.gnu.org ([209.51.188.92]:39146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vp-53
+	(envelope-from <armbru@redhat.com>) id 1hEb4n-0003WF-4f
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4j-0000rz-3j
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15597)
+	(envelope-from <armbru@redhat.com>) id 1hEb4l-0000sg-3n
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4i-0000nL-Pe
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4i-0000nG-TQ
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6BC2880E4B
+	by mx1.redhat.com (Postfix) with ESMTPS id 512BC3167E40
 	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:03 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:55 +0200
-Message-Id: <20190411145256.8614-15-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:53 +0200
+Message-Id: <20190411145256.8614-13-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 14/15] char: Make -chardev help print to
- stdout
+Subject: [Qemu-devel] [PATCH v2 12/15] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +34,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Command line help explicitly requested by the user should be printed
-to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
-use qemu_printf() instead of error_printf().  Plain printf() would be
-wrong because we need to print to the current monitor for "chardev-add
-help".
+We commonly want to print to the current monitor if we have one, else
+to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+we have is monitor_vfprintf(), which is rather unwieldy.  We often
+print to stderr just because error_printf() is easier.
 
-Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+next commits will put them to use.
+
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- chardev/char.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ MAINTAINERS               |  2 ++
+ include/qemu/qemu-print.h | 19 ++++++++++++++++++
+ stubs/monitor.c           |  5 +++++
+ tests/test-util-sockets.c |  1 +
+ util/Makefile.objs        |  1 +
+ util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 70 insertions(+)
+ create mode 100644 include/qemu/qemu-print.h
+ create mode 100644 util/qemu-print.c
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 514cd6b0c3..54724a56b1 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -28,6 +28,7 @@
- #include "sysemu/sysemu.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 56139ac8ab..1aa19dc4ef 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1895,6 +1895,8 @@ F: hmp.[ch]
+ F: hmp-commands*.hx
+ F: include/monitor/hmp-target.h
+ F: tests/test-hmp.c
++F: include/qemu/qemu-print.h
++F: util/qemu-print.c
+=20
+ Network device backends
+ M: Jason Wang <jasowang@redhat.com>
+diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+new file mode 100644
+index 0000000000..8fed32bf42
+--- /dev/null
++++ b/include/qemu/qemu-print.h
+@@ -0,0 +1,19 @@
++/*
++ * Print to stream or current monitor
++ *
++ * Copyright (C) 2019 Red Hat Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_PRINT_H
++#define QEMU_PRINT_H
++
++int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++
++#endif
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index b57fe6c32f..b2ea975e40 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -6,6 +6,11 @@
+=20
+ __thread Monitor *cur_mon;
+=20
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
++{
++    abort();
++}
++
+ int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+ {
+     error_setg(errp, "only QEMU supports file descriptor passing");
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 6195a3ac36..fd1ced058c 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -70,6 +70,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+  * otherwise we get duplicate syms at link time.
+  */
+ __thread Monitor *cur_mon;
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort()=
+; }
+ void monitor_init(Chardev *chr, int flags) {}
+=20
+=20
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 835fcd69e2..9206878dec 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -23,6 +23,7 @@ util-obj-y +=3D bitmap.o bitops.o hbitmap.o
+ util-obj-y +=3D fifo8.o
+ util-obj-y +=3D cacheinfo.o
+ util-obj-y +=3D error.o qemu-error.o
++util-obj-y +=3D qemu-print.o
+ util-obj-y +=3D id.o
+ util-obj-y +=3D iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+ util-obj-y +=3D qemu-option.o qemu-progress.o
+diff --git a/util/qemu-print.c b/util/qemu-print.c
+new file mode 100644
+index 0000000000..86f9417af8
+--- /dev/null
++++ b/util/qemu-print.c
+@@ -0,0 +1,42 @@
++/*
++ * Print to stream or current monitor
++ *
++ * Copyright (C) 2019 Red Hat Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "monitor/monitor.h"
 +#include "qemu/qemu-print.h"
- #include "chardev/char.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-char.h"
-@@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMain=
-Context *context,
-=20
-         chardev_name_foreach(help_string_append, str);
-=20
--        error_printf("Available chardev backend types: %s\n", str->str);
-+        qemu_printf("Available chardev backend types: %s\n", str->str);
-         g_string_free(str, true);
-         return NULL;
-     }
++
++/*
++ * Print like vprintf().
++ * Print to current monitor if we have one, else to stdout.
++ */
++int qemu_vprintf(const char *fmt, va_list ap)
++{
++    if (cur_mon) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vprintf(fmt, ap);
++}
++
++/*
++ * Print like printf().
++ * Print to current monitor if we have one, else to stdout.
++ */
++int qemu_printf(const char *fmt, ...)
++{
++    va_list ap;
++    int ret;
++
++    va_start(ap, fmt);
++    ret =3D qemu_vprintf(fmt, ap);
++    va_end(ap);
++    return ret;
++}
 --=20
 2.17.2
