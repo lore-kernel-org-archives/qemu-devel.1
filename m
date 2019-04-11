@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51841)
+Received: from eggs.gnu.org ([209.51.188.92]:51858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEaBb-0001Ga-Nd
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:56:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEaBf-0001Qq-KL
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEaBZ-0005lB-Pd
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:56:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEaBd-0005nQ-Lg
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:56:19 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 15:56:01 +0200
-Message-Id: <20190411135602.21725-2-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 15:56:02 +0200
+Message-Id: <20190411135602.21725-3-armbru@redhat.com>
 In-Reply-To: <20190411135602.21725-1-armbru@redhat.com>
 References: <20190411135602.21725-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] pflash_cfi01: New
- pflash_cfi01_legacy_drive()
+Subject: [Qemu-devel] [PATCH 2/2] hw/arm/virt: Support firmware
+ configuration with -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +23,358 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: lersek@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-Factored out of pc_system_firmware_init() so the next commit can reuse
-it in hw/arm/virt.c.
+The ARM virt machines put firmware in flash memory.  To configure it,
+you use -drive if=pflash,unit=0,... and optionally -drive
+if=pflash,unit=1,...
+
+Why two -drive?  This permits setting up one part of the flash memory
+read-only, and the other part read/write.  It also makes upgrading
+firmware on the host easier.  Below the hood, we get two separate
+flash devices, because we were too lazy to improve our flash device
+models to support sector protection.
+
+The problem at hand is to do the same with -blockdev somehow, as one
+more step towards deprecating -drive.
+
+We recently solved this problem for x86 PC machines, in commit
+ebc29e1beab.  See the commit message for design rationale.
+
+This commit solves it for ARM virt basically the same way: new machine
+properties pflash0, pflash1 forward to the onboard flash devices'
+properties.  Requires creating the onboard devices in the
+.instance_init() method virt_instance_init().  The existing code to
+pick up drives defined with -drive if=pflash is replaced by code to
+desugar into the machine properties.
+
+There are a few behavioral differences, though:
+
+* The flash devices are always present (x86: only present if
+  configured)
+
+* Flash base addresses and sizes are fixed (x86: sizes depend on
+  images, mapped back to back below a fixed address)
+
+* -bios configures contents of first pflash (x86: -bios configures ROM
+   contents)
+
+* -bios is rejected when first pflash is also configured with -machine
+   pflash0=... (x86: bios is silently ignored then)
+
+* -machine pflash1=... does not require -machine pflash0=... (x86: it
+   does).
+
+The actual code is a bit simpler than for x86 mostly due to the first
+two differences.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/block/pflash_cfi01.c  | 30 ++++++++++++++++++++++++++++++
- hw/i386/pc_sysfw.c       | 19 ++-----------------
- include/hw/block/flash.h |  1 +
- 3 files changed, 33 insertions(+), 17 deletions(-)
+ hw/arm/virt.c         | 192 +++++++++++++++++++++++++++---------------
+ include/hw/arm/virt.h |   2 +
+ 2 files changed, 124 insertions(+), 70 deletions(-)
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 16dfae14b8..eba01b1447 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -44,9 +44,12 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "qemu/bitops.h"
-+#include "qemu/error-report.h"
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
-+#include "qemu/option.h"
- #include "hw/sysbus.h"
-+#include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ce2664a30b..8ce7ecca80 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -30,6 +30,7 @@
  
-@@ -968,6 +971,33 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
-     return &fl->mem;
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
++#include "qemu/option.h"
+ #include "qapi/error.h"
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+@@ -871,25 +872,19 @@ static void create_virtio_devices(const VirtMachineState *vms, qemu_irq *pic)
+     }
  }
  
-+/*
-+ * Handle -drive if=pflash for machines that use machine properties.
-+ * Map unit#i (0 < i <= @ndev) to @dev[i]'s property "drive".
-+ */
-+void pflash_cfi01_legacy_drive(PFlashCFI01 *dev[], int ndev)
-+{
-+    int i;
-+    DriveInfo *dinfo;
-+    Location loc;
+-static void create_one_flash(const char *name, hwaddr flashbase,
+-                             hwaddr flashsize, const char *file,
+-                             MemoryRegion *sysmem)
++#define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
 +
-+    for (i = 0; i < ndev; i++) {
-+        dinfo = drive_get(IF_PFLASH, 0, i);
-+        if (!dinfo) {
-+            continue;
-+        }
-+        loc_push_none(&loc);
-+        qemu_opts_loc_restore(dinfo->opts);
-+        if (dev[i]->blk) {
-+            error_report("clashes with -machine");
-+            exit(1);
-+        }
-+        qdev_prop_set_drive(DEVICE(dev[i]), "drive",
-+                            blk_by_legacy_dinfo(dinfo), &error_fatal);
-+        loc_pop(&loc);
-+    }
++static PFlashCFI01 *virt_pflash_create1(VirtMachineState *vms,
++                                        const char *name,
++                                        const char *alias_prop_name)
+ {
+-    /* Create and map a single flash device. We use the same
+-     * parameters as the flash devices on the Versatile Express board.
++    /*
++     * Create a single flash device.  We use the same parameters as
++     * the flash devices on the Versatile Express board.
+      */
+-    DriveInfo *dinfo = drive_get_next(IF_PFLASH);
+     DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
+-    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+-    const uint64_t sectorlength = 256 * 1024;
+ 
+-    if (dinfo) {
+-        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+-                            &error_abort);
+-    }
+-
+-    qdev_prop_set_uint32(dev, "num-blocks", flashsize / sectorlength);
+-    qdev_prop_set_uint64(dev, "sector-length", sectorlength);
++    qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
+     qdev_prop_set_uint8(dev, "width", 4);
+     qdev_prop_set_uint8(dev, "device-width", 2);
+     qdev_prop_set_bit(dev, "big-endian", false);
+@@ -898,41 +893,41 @@ static void create_one_flash(const char *name, hwaddr flashbase,
+     qdev_prop_set_uint16(dev, "id2", 0x00);
+     qdev_prop_set_uint16(dev, "id3", 0x00);
+     qdev_prop_set_string(dev, "name", name);
++    object_property_add_child(OBJECT(vms), name, OBJECT(dev),
++                              &error_abort);
++    object_property_add_alias(OBJECT(vms), alias_prop_name,
++                              OBJECT(dev), "drive", &error_abort);
++    return PFLASH_CFI01(dev);
 +}
 +
- static void postload_update_cb(void *opaque, int running, RunState state)
- {
-     PFlashCFI01 *pfl = opaque;
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index c628540774..d58e47184c 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -269,32 +269,17 @@ void pc_system_firmware_init(PCMachineState *pcms,
- {
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     int i;
--    DriveInfo *pflash_drv;
-     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
--    Location loc;
- 
-     if (!pcmc->pci_enabled) {
-         old_pc_system_rom_init(rom_memory, true);
-         return;
-     }
- 
--    /* Map legacy -drive if=pflash to machine properties */
-+    pflash_cfi01_legacy_drive(pcms->flash, ARRAY_SIZE(pcms->flash));
++static void virt_flash_create(VirtMachineState *vms)
++{
++    vms->flash[0] = virt_pflash_create1(vms, "virt.flash0", "pflash0");
++    vms->flash[1] = virt_pflash_create1(vms, "virt.flash1", "pflash1");
++}
 +
-     for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
-         pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
--        pflash_drv = drive_get(IF_PFLASH, 0, i);
--        if (!pflash_drv) {
--            continue;
--        }
--        loc_push_none(&loc);
--        qemu_opts_loc_restore(pflash_drv->opts);
--        if (pflash_blk[i]) {
--            error_report("clashes with -machine");
++static void virt_flash_map1(PFlashCFI01 *flash,
++                            hwaddr base, hwaddr size,
++                            MemoryRegion *sysmem)
++{
++    DeviceState *dev = DEVICE(flash);
++
++    assert(size % VIRT_FLASH_SECTOR_SIZE == 0);
++    assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
++    qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
+     qdev_init_nofail(dev);
+ 
+-    memory_region_add_subregion(sysmem, flashbase,
+-                                sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
+-
+-    if (file) {
+-        char *fn;
+-        int image_size;
+-
+-        if (drive_get(IF_PFLASH, 0, 0)) {
+-            error_report("The contents of the first flash device may be "
+-                         "specified with -bios or with -drive if=pflash... "
+-                         "but you cannot use both options at once");
 -            exit(1);
 -        }
--        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
--        qdev_prop_set_drive(DEVICE(pcms->flash[i]),
--                            "drive", pflash_blk[i], &error_fatal);
--        loc_pop(&loc);
+-        fn = qemu_find_file(QEMU_FILE_TYPE_BIOS, file);
+-        if (!fn) {
+-            error_report("Could not find ROM image '%s'", file);
+-            exit(1);
+-        }
+-        image_size = load_image_mr(fn, sysbus_mmio_get_region(sbd, 0));
+-        g_free(fn);
+-        if (image_size < 0) {
+-            error_report("Could not load ROM image '%s'", file);
+-            exit(1);
+-        }
+-    }
++    memory_region_add_subregion(sysmem, base,
++                                sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
++                                                       0));
+ }
+ 
+-static void create_flash(const VirtMachineState *vms,
+-                         MemoryRegion *sysmem,
+-                         MemoryRegion *secure_sysmem)
++static void virt_flash_map(VirtMachineState *vms,
++                           MemoryRegion *sysmem,
++                           MemoryRegion *secure_sysmem)
+ {
+-    /* Create two flash devices to fill the VIRT_FLASH space in the memmap.
+-     * Any file passed via -bios goes in the first of these.
++    /*
++     * Map two flash devices to fill the VIRT_FLASH space in the memmap.
+      * sysmem is the system memory space. secure_sysmem is the secure view
+      * of the system, and the first flash device should be made visible only
+      * there. The second flash device is visible to both secure and nonsecure.
+@@ -941,13 +936,21 @@ static void create_flash(const VirtMachineState *vms,
+      */
+     hwaddr flashsize = vms->memmap[VIRT_FLASH].size / 2;
+     hwaddr flashbase = vms->memmap[VIRT_FLASH].base;
++
++    virt_flash_map1(vms->flash[0], flashbase, flashsize,
++                    secure_sysmem);
++    virt_flash_map1(vms->flash[1], flashbase + flashsize, flashsize,
++                    sysmem);
++}
++
++static void virt_flash_fdt(VirtMachineState *vms,
++                           MemoryRegion *sysmem,
++                           MemoryRegion *secure_sysmem)
++{
++    hwaddr flashsize = vms->memmap[VIRT_FLASH].size / 2;
++    hwaddr flashbase = vms->memmap[VIRT_FLASH].base;
+     char *nodename;
+ 
+-    create_one_flash("virt.flash0", flashbase, flashsize,
+-                     bios_name, secure_sysmem);
+-    create_one_flash("virt.flash1", flashbase + flashsize, flashsize,
+-                     NULL, sysmem);
+-
+     if (sysmem == secure_sysmem) {
+         /* Report both flash devices as a single node in the DT */
+         nodename = g_strdup_printf("/flash@%" PRIx64, flashbase);
+@@ -959,7 +962,8 @@ static void create_flash(const VirtMachineState *vms,
+         qemu_fdt_setprop_cell(vms->fdt, nodename, "bank-width", 4);
+         g_free(nodename);
+     } else {
+-        /* Report the devices as separate nodes so we can mark one as
++        /*
++         * Report the devices as separate nodes so we can mark one as
+          * only visible to the secure world.
+          */
+         nodename = g_strdup_printf("/secflash@%" PRIx64, flashbase);
+@@ -982,6 +986,48 @@ static void create_flash(const VirtMachineState *vms,
+     }
+ }
+ 
++static bool virt_firmware_init(VirtMachineState *vms,
++                               MemoryRegion *sysmem,
++                               MemoryRegion *secure_sysmem)
++{
++    BlockBackend *pflash_blk0;
++
++    pflash_cfi01_legacy_drive(vms->flash, ARRAY_SIZE(vms->flash));
++    virt_flash_map(vms, sysmem, secure_sysmem);
++
++    pflash_blk0 = pflash_cfi01_get_blk(vms->flash[0]);
++
++    if (bios_name) {
++        char *fname;
++        MemoryRegion *mr;
++        int image_size;
++
++        if (pflash_blk0) {
++            error_report("The contents of the first flash device may be "
++                         "specified with -bios or with -drive if=pflash... "
++                         "but you cannot use both options at once");
++            exit(1);
++        }
++
++        /* Fall back to -bios */
++
++        fname = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        if (!fname) {
++            error_report("Could not find ROM image '%s'", bios_name);
++            exit(1);
++        }
++        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(vms->flash[0]), 0);
++        image_size = load_image_mr(fname, mr);
++        g_free(fname);
++        if (image_size < 0) {
++            error_report("Could not load ROM image '%s'", bios_name);
++            exit(1);
++        }
++    }
++
++    return pflash_blk0 || bios_name;
++}
++
+ static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
+ {
+     hwaddr base = vms->memmap[VIRT_FW_CFG].base;
+@@ -1421,7 +1467,7 @@ static void machvirt_init(MachineState *machine)
+     MemoryRegion *secure_sysmem = NULL;
+     int n, virt_max_cpus;
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+-    bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
++    bool firmware_loaded;
+     bool aarch64 = true;
+ 
+     /*
+@@ -1460,6 +1506,27 @@ static void machvirt_init(MachineState *machine)
+         exit(1);
      }
  
-     /* Reject gaps */
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index a0f488732a..f6a68c2a4c 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -24,6 +24,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-                                    int be);
- BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
- MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
-+void pflash_cfi01_legacy_drive(PFlashCFI01 *dev[], int ndev);
++    if (vms->secure) {
++        if (kvm_enabled()) {
++            error_report("mach-virt: KVM does not support Security extensions");
++            exit(1);
++        }
++
++        /*
++         * The Secure view of the world is the same as the NonSecure,
++         * but with a few extra devices. Create it as a container region
++         * containing the system memory at low priority; any secure-only
++         * devices go in at higher priority and take precedence.
++         */
++        secure_sysmem = g_new(MemoryRegion, 1);
++        memory_region_init(secure_sysmem, OBJECT(machine), "secure-memory",
++                           UINT64_MAX);
++        memory_region_add_subregion_overlap(secure_sysmem, 0, sysmem, -1);
++    }
++
++    firmware_loaded = virt_firmware_init(vms, sysmem,
++                                         secure_sysmem ?: sysmem);
++
+     /* If we have an EL3 boot ROM then the assumption is that it will
+      * implement PSCI itself, so disable QEMU's internal implementation
+      * so it doesn't get in the way. Instead of starting secondary
+@@ -1505,23 +1572,6 @@ static void machvirt_init(MachineState *machine)
+         exit(1);
+     }
  
- /* pflash_cfi02.c */
+-    if (vms->secure) {
+-        if (kvm_enabled()) {
+-            error_report("mach-virt: KVM does not support Security extensions");
+-            exit(1);
+-        }
+-
+-        /* The Secure view of the world is the same as the NonSecure,
+-         * but with a few extra devices. Create it as a container region
+-         * containing the system memory at low priority; any secure-only
+-         * devices go in at higher priority and take precedence.
+-         */
+-        secure_sysmem = g_new(MemoryRegion, 1);
+-        memory_region_init(secure_sysmem, OBJECT(machine), "secure-memory",
+-                           UINT64_MAX);
+-        memory_region_add_subregion_overlap(secure_sysmem, 0, sysmem, -1);
+-    }
+-
+     create_fdt(vms);
  
+     possible_cpus = mc->possible_cpu_arch_ids(machine);
+@@ -1610,7 +1660,7 @@ static void machvirt_init(MachineState *machine)
+                                     &machine->device_memory->mr);
+     }
+ 
+-    create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
++    virt_flash_fdt(vms, sysmem, secure_sysmem);
+ 
+     create_gic(vms, pic);
+ 
+@@ -1956,6 +2006,8 @@ static void virt_instance_init(Object *obj)
+                                     NULL);
+ 
+     vms->irqmap = a15irqmap;
++
++    virt_flash_create(vms);
+ }
+ 
+ static const TypeInfo virt_machine_info = {
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 507517c603..424070924e 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -35,6 +35,7 @@
+ #include "qemu/notify.h"
+ #include "hw/boards.h"
+ #include "hw/arm/arm.h"
++#include "hw/block/flash.h"
+ #include "sysemu/kvm.h"
+ #include "hw/intc/arm_gicv3_common.h"
+ 
+@@ -113,6 +114,7 @@ typedef struct {
+     Notifier machine_done;
+     DeviceState *platform_bus_dev;
+     FWCfgState *fw_cfg;
++    PFlashCFI01 *flash[2];
+     bool secure;
+     bool highmem;
+     bool highmem_ecam;
 -- 
 2.17.2
