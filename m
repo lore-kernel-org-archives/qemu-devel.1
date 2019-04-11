@@ -3,64 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B4EC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38593C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F13542077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13542077C
+	by mail.kernel.org (Postfix) with ESMTPS id 0C3C12077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3C12077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50202 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEb6T-0004lH-8J
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:55:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38962)
+	id 1hEb7D-0005MC-78
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:55:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kt-0l
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kv-1Z
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4W-0000lZ-Rg
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51178)
+	(envelope-from <armbru@redhat.com>) id 1hEb4X-0000lo-2o
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28361)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4W-0000kv-Hb
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hEb4W-0000kx-OM; Thu, 11 Apr 2019 10:53:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C951D23E6D8;
-	Thu, 11 Apr 2019 14:52:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0031A30B96F6;
+	Thu, 11 Apr 2019 14:53:00 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9630D5D704;
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C381018502;
 	Thu, 11 Apr 2019 14:52:59 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id CDD1E1132B38; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+	id DC08111329CF; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:46 +0200
-Message-Id: <20190411145256.8614-6-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:50 +0200
+Message-Id: <20190411145256.8614-10-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 11 Apr 2019 14:52:59 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 11 Apr 2019 14:53:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 05/15] mips/boston: Report errors with
- error_report(), not error_printf()
+Subject: [Qemu-devel] [PATCH v2 09/15] s390x/kvm: Report warnings with
+ warn_report(), not error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,54 +69,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Paul Burton <pburton@wavecomp.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411145246.oE7lmdW2YMDwaTuHl2o7gVWEljnzXmTP6ieSYjbYGfw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411145250.h8CXwp_M4-6OQOdwXjxm9HQpnV0Koz7OXSuekstBz0E@z>
 
-Cc: Paul Burton <pburton@wavecomp.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
+-ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
+ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
+failures.
+
+kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
+in the latter failure mode.  Since this is obviously a warning, use
+warn_report().
+
+Perhaps the reporting should be left to the caller.  It could warn on
+failure other than -ENOSYS.
+
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/mips/boston.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/s390x/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index e5bab3cadc..a8b29f62f5 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -528,21 +528,21 @@ static void boston_mach_init(MachineState *machine)
-         fw_size =3D load_image_targphys(machine->firmware,
-                                       0x1fc00000, 4 * MiB);
-         if (fw_size =3D=3D -1) {
--            error_printf("unable to load firmware image '%s'\n",
-+            error_report("unable to load firmware image '%s'",
-                           machine->firmware);
-             exit(1);
-         }
-     } else if (machine->kernel_filename) {
-         fit_err =3D load_fit(&boston_fit_loader, machine->kernel_filenam=
-e, s);
-         if (fit_err) {
--            error_printf("unable to load FIT image\n");
-+            error_report("unable to load FIT image");
-             exit(1);
-         }
-=20
-         gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
-                      s->kernel_entry, s->fdt_base, is_64b);
-     } else if (!qtest_enabled()) {
--        error_printf("Please provide either a -kernel or -bios argument\=
-n");
-+        error_report("Please provide either a -kernel or -bios argument"=
-);
-         exit(1);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 19530fb94e..2c6e35b5aa 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+ 
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
+     if (ret < 0) {
+-        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
++        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
      }
+     return ret;
  }
---=20
+-- 
 2.17.2
 
 
