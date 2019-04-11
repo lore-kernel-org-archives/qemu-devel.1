@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43732)
+Received: from eggs.gnu.org ([209.51.188.92]:43811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEbKG-0008Tw-Gp
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:09:17 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hEbKW-0000Dg-8z
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEbKE-0003N9-M0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:09:16 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 15:09:03 +0000
-Message-ID: <22d74d69-931b-cb52-1338-fe825bd098f8@virtuozzo.com>
-References: <20190410204215.5963-1-eblake@redhat.com>
-	<61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
-	<111374f2-ad0c-3f81-9c51-33201c63b6c5@redhat.com>
-In-Reply-To: <111374f2-ad0c-3f81-9c51-33201c63b6c5@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <93DBA4F4E77E604F98A66BD6219CFBE2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <fintelia@gmail.com>) id 1hEbKU-0003es-Ce
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:09:31 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotest: Fix 241 to run in generic
- directory
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Thu, 11 Apr 2019 11:08:57 -0400
+Message-ID: <CANnJOVF2gE3b-C5zSb85SGoP+9cD9xOQQ5Z4tmsGouagR3xo0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH v2] target/riscv: Remove unused include of
+ riscv_htif.h for virt board riscv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +20,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-riscv@nongnu.org
 
-MTEuMDQuMjAxOSAxNzo0NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNC8xMS8xOSAyOjU3IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTAuMDQuMjAxOSAyMzo0
-MiwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBGaWx0ZXIgdGhlIHFlbXUtbmJkIHNlcnZlciBvdXRw
-dXQgdG8gZ2V0IHJpZCBvZiBhIGRpcmVjdCByZWZlcmVuY2UNCj4+PiB0byBteSBidWlsZCBkaXJl
-Y3RvcnkuDQo+Pj4NCj4+PiBGaXhlczogZTlkY2U5Y2INCj4+PiBSZXBvcnRlZC1ieTogTWF4IFJl
-aXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxl
-Ymxha2VAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+Pg0KPj4+IE5vdCB3b3J0aCAtcmM0IG9uIGl0
-cyBvd24sIGJ1dCBpZiBzb21ldGhpbmcgZWxzZSBwb3BzIHVwIHRoYXQgcmVxdWlyZXMNCj4+PiBh
-bm90aGVyIHNwaW4sIEkgcGxhbiBvbiBhIHB1bGwgcmVxdWVzdCBmb3IgdGhpcyBvbmUuIE90aGVy
-d2lzZSBpdA0KPj4+IHNsaXBzIHRvIDQuMSwgYW5kIDQuMCBqdXN0IGhhcyBhIGJyb2tlbiBpb3Rl
-c3QuDQo+Pj4NCj4gDQo+Pj4gQEAgLTY5LDEyICs3MCwxMyBAQCBlY2hvDQo+Pj4NCj4+PiAgICAj
-IEludGVudGlvbmFsbHkgb21pdCAnLWYnIHRvIGZvcmNlIGltYWdlIHByb2JpbmcsIHdoaWNoIGlu
-IHR1cm4gZm9yY2VzDQo+Pj4gICAgIyBzZWN0b3IgYWxpZ25tZW50LCBoZXJlIGF0IHRoZSBzZXJ2
-ZXIuDQo+Pj4gLW5iZF9zZXJ2ZXJfc3RhcnRfdW5peF9zb2NrZXQgIiRURVNUX0lNR19GSUxFIg0K
-Pj4+ICtuYmRfc2VydmVyX3N0YXJ0X3VuaXhfc29ja2V0ICIkVEVTVF9JTUdfRklMRSIgMj4gIiRU
-RVNUX0RJUi9zZXJ2ZXIubG9nIg0KPj4+DQo+IA0KPj4+ICAgIDEgS2lCICgweDQwMCkgYnl0ZXMg
-ICAgIGFsbG9jYXRlZCBhdCBvZmZzZXQgMCBieXRlcyAoMHgwKQ0KPj4+ICtXQVJOSU5HOiBJbWFn
-ZSBmb3JtYXQgd2FzIG5vdCBzcGVjaWZpZWQgZm9yICdURVNUX0RJUi90LnJhdycgYW5kIHByb2Jp
-bmcgZ3Vlc3NlZCByYXcuDQo+Pj4gKyAgICAgICAgIEF1dG9tYXRpY2FsbHkgZGV0ZWN0aW5nIHRo
-ZSBmb3JtYXQgaXMgZGFuZ2Vyb3VzIGZvciByYXcgaW1hZ2VzLCB3cml0ZSBvcGVyYXRpb25zIG9u
-IGJsb2NrIDAgd2lsbCBiZSByZXN0cmljdGVkLg0KPj4+ICsgICAgICAgICBTcGVjaWZ5IHRoZSAn
-cmF3JyBmb3JtYXQgZXhwbGljaXRseSB0byByZW1vdmUgdGhlIHJlc3RyaWN0aW9ucy4NCj4+DQo+
-PiBNYXkgYmUsIGp1c3QgYWRkIC1mIHJhdyB0byBuYmQgc2VydmVyLCB0byBtYWtlIHRoaXMgbWVz
-c2FnZSBkaXNhcHBlYXI/IEFuZCB0aGFuLCBkb24ndCBkbyBhbnkgcmVkaXJlY3Rpb25zLCBhcyBp
-ZiB0aGVyZQ0KPj4gd2lsbCBiZSBmYWlsZWQgdW5maWx0ZXJlZCBvdXRwdXQgaXQgaXMgT0s/DQo+
-IA0KPiBOby4gU2VlIHRoZSBjb21tZW50IGluIHRoZSB0ZXN0IC0gaXQgaXMgaW50ZW50aW9uYWwg
-dGhhdCB3ZSBhcmUgb21pdHRpbmcNCj4gLWYsIGluIHR3byBkaWZmZXJlbnQgcGxhY2VzLCBpbiBv
-cmRlciB0byBnZXQgdGhyZWUgdGVzdCBzY2VuYXJpb3M6DQo+IA0KPiBub3JtYWw6IHNlcnZlciAn
-LWYgcmF3JyAxLWJ5dGUgYWxpZ24sIGNsaWVudCAnLWYgcmF3JyAxLWJ5dGUgYWxpZ24NCj4gc2Vy
-dmVyLWNvbnN0cmFpbmVkOiBzZXJ2ZXIgb21pdCBmb3IgNTEyLWJ5dGUgYWxpZ24sIGNsaWVudCAn
-LWYgcmF3Jw0KPiBvYmV5cyBzZXJ2ZXIgYWxpZ24NCj4gY2xpZW50LWNvbnN0cmFpbmVkOiBzZXJ2
-ZXIgJy1mIHJhdycgMS1ieXRlIGFsaWduLCBjbGllbnQgb21pdCBmb3INCj4gaW50ZW50aW9uYWwg
-NTEyLWJ5dGUgYWxpZ24NCj4gDQo+IGluIG9yZGVyIHRvIHNob3cgYm90aCB0aGF0IHRoZSBzZXJ2
-ZXIgd2l0aCBmb3JjZWQgYWxpZ25tZW50IGlzIGFibGUgdG8NCj4gcm91bmQgcmVxdWVzdHMgY29y
-cmVjdGx5IGJlZm9yZSBzZW5kaW5nIHRvIHRoZSBjbGllbnQsIGFuZCB0byBzaG93IHRoYXQNCj4g
-dGhlIGNsaWVudCB3aXRoIGZvcmNlZCBhbGlnbm1lbnQgaXMgYWJsZSB0byByb3VuZCByZXF1ZXN0
-cyBjb3JyZWN0bHkgaW4NCj4gc3BpdGUgb2YgdGhlIHNlcnZlciBzZW5kaW5nIGFuc3dlcnMgbmFy
-cm93ZXIgdGhhbiB0aGUgY2xpZW50IHdhbnRzLg0KPiANCj4gSW4gNC4xLCB3aGVuIE1heCdzIGZp
-bHRlciBoYW5kbGluZyBwYXRjaGVzIGxhbmQsIGl0IHdpbGwgYmUgcG9zc2libGUgdG8NCj4gdXNl
-IHRoZSBibGtkZWJ1ZyBkcml2ZXIgdG8gZm9yY2UgYWxpZ25tZW50IGluc3RlYWQgb2Ygb21pdHRp
-bmcgJy1mIHJhdyc7DQo+IGF0IHdoaWNoIHBvaW50IHdlIGNhbiB0YWtlIGF3YXkgdGhlIHNlcnZl
-ci5sb2cgZmlsZS4gQnV0IHVudGlsIHRoZQ0KPiBmaWx0ZXIgaGFuZGxpbmcgcGF0Y2hlcyBsYW5k
-LCBhbnkgdXNlIG9mIGJsa2RlYnVnIGNhdXNlcyBvZGQgdGVzdA0KPiBtaXNiZWhhdmlvcnMgYmVj
-YXVzZSBub3QgZXZlcnl0aGluZyBpbiB0aGUgYmxvY2sgbGF5ZXIgcHJvcGVybHkgc2Vlcw0KPiB0
-aHJvdWdoIGZpbHRlciBub2Rlcy4NCj4gDQoNClVuZGVyc3RhbmQgbm93LCB0aGFua3MuDQoNClJl
-dmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
-b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+---
+ hw/riscv/virt.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index fc4c6b306e..3526463034 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -29,7 +29,6 @@
+ #include "hw/sysbus.h"
+ #include "hw/char/serial.h"
+ #include "target/riscv/cpu.h"
+-#include "hw/riscv/riscv_htif.h"
+ #include "hw/riscv/riscv_hart.h"
+ #include "hw/riscv/sifive_plic.h"
+ #include "hw/riscv/sifive_clint.h"
+-- 
+2.20.1
