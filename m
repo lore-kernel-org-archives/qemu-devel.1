@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38214)
+Received: from eggs.gnu.org ([209.51.188.92]:38212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTT-0003F6-OT
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:34 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTT-0003Es-Gk
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTP-0000tB-89
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:30 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:58966)
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTM-0000RA-8X
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:29 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hEXTN-0007Hb-Jj
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:27 -0400
+	id 1hEXTL-0007Hd-Pu
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:24 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 11 Apr 2019 14:01:55 +0300
-Message-Id: <20190411110157.14252-2-yuval.shaia@oracle.com>
-In-Reply-To: <20190411110157.14252-1-yuval.shaia@oracle.com>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+Date: Thu, 11 Apr 2019 14:01:54 +0300
+Message-Id: <20190411110157.14252-1-yuval.shaia@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC 1/3] virtio-net: Move some virtio-net-pci decl to
- include/hw/virtio
+Subject: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +27,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, cohuck@redhat.com, marcel.apfelbaum@gmail.com, linux-rdma@vger.kernel.org, jgg@mellanox.com
 Cc: Yuval Shaia <yuval.shaia@oracle.com>
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- hw/virtio/virtio-net-pci.c         | 18 ++-------------
- include/hw/virtio/virtio-net-pci.h | 35 ++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 16 deletions(-)
- create mode 100644 include/hw/virtio/virtio-net-pci.h
+Data center backends use more and more RDMA or RoCE devices and more and
+more software runs in virtualized environment.
+There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
 
-diff --git a/hw/virtio/virtio-net-pci.c b/hw/virtio/virtio-net-pci.c
-index db07ab9e21..63617d5550 100644
---- a/hw/virtio/virtio-net-pci.c
-+++ b/hw/virtio/virtio-net-pci.c
-@@ -17,24 +17,10 @@
- 
- #include "qemu/osdep.h"
- 
--#include "hw/virtio/virtio-net.h"
-+#include "hw/virtio/virtio-net-pci.h"
- #include "virtio-pci.h"
- #include "qapi/error.h"
- 
--typedef struct VirtIONetPCI VirtIONetPCI;
--
--/*
-- * virtio-net-pci: This extends VirtioPCIProxy.
-- */
--#define TYPE_VIRTIO_NET_PCI "virtio-net-pci-base"
--#define VIRTIO_NET_PCI(obj) \
--        OBJECT_CHECK(VirtIONetPCI, (obj), TYPE_VIRTIO_NET_PCI)
--
--struct VirtIONetPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIONet vdev;
--};
--
- static Property virtio_net_properties[] = {
-     DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-@@ -82,7 +68,7 @@ static void virtio_net_pci_instance_init(Object *obj)
- 
- static const VirtioPCIDeviceTypeInfo virtio_net_pci_info = {
-     .base_name             = TYPE_VIRTIO_NET_PCI,
--    .generic_name          = "virtio-net-pci",
-+    .generic_name          = TYPE_VIRTIO_NET_PCI_GENERIC,
-     .transitional_name     = "virtio-net-pci-transitional",
-     .non_transitional_name = "virtio-net-pci-non-transitional",
-     .instance_size = sizeof(VirtIONetPCI),
-diff --git a/include/hw/virtio/virtio-net-pci.h b/include/hw/virtio/virtio-net-pci.h
-new file mode 100644
-index 0000000000..f14e6ed992
---- /dev/null
-+++ b/include/hw/virtio/virtio-net-pci.h
-@@ -0,0 +1,35 @@
-+/*
-+ * PCI Virtio Network Device
-+ *
-+ * Copyright IBM, Corp. 2007
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_VIRTIO_NET_PCI_H
-+#define QEMU_VIRTIO_NET_PCI_H
-+
-+#include "hw/virtio/virtio-net.h"
-+#include "virtio-pci.h"
-+
-+typedef struct VirtIONetPCI VirtIONetPCI;
-+
-+/*
-+ * virtio-net-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_NET_PCI_GENERIC "virtio-net-pci"
-+#define TYPE_VIRTIO_NET_PCI "virtio-net-pci-base"
-+#define VIRTIO_NET_PCI(obj) \
-+        OBJECT_CHECK(VirtIONetPCI, (obj), TYPE_VIRTIO_NET_PCI)
-+
-+struct VirtIONetPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIONet vdev;
-+};
-+
-+#endif
+Virtio is the optimal solution since is the de-facto para-virtualizaton
+technology and also because the Virtio specification
+allows Hardware Vendors to support Virtio protocol natively in order to
+achieve bare metal performance.
+
+This RFC is an effort to addresses challenges in defining the RDMA/RoCE
+Virtio Specification and a look forward on possible implementation
+techniques.
+
+Open issues/Todo list:
+List is huge, this is only start point of the project.
+Anyway, here is one example of item in the list:
+- Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+  in order to support for example 32K QPs we will need 64K VirtQ. Not sure
+  that this is reasonable so one option is to have one for all and
+  multiplex the traffic on it. This is not good approach as by design it
+  introducing an optional starvation. Another approach would be multi
+  queues and round-robin (for example) between them.
+
+Expectations from this posting:
+In general, any comment is welcome, starting from hey, drop this as it is a
+very bad idea, to yeah, go ahead, we really want it.
+Idea here is that since it is not a minor effort i first want to know if
+there is some sort interest in the community for such device.
+
+The scope of the implementation is limited to probing the device and doing
+some basic ibverbs commands. Data-path is not yet implemented. So with this
+one can expect only that driver is (partialy) loaded and basic queries and
+resource allocation is done.
+
+One note regarding the patchset.
+I know it is not standard to collaps patches from several repos as i did
+here (qemu and linux) but decided to do it anyway so the whole picture can
+be seen.
+
+patch 1: virtio-net: Move some virtio-net-pci decl to include/hw/virtio
+	This is a prelimenary patch just as a hack so i will not need to
+	impelement new netdev
+patch 2: hw/virtio-rdma: VirtIO rdma device
+	The implementation of the device
+patch 3: RDMA/virtio-rdma: VirtIO rdma driver
+	The device driver
+
 -- 
 2.20.1
