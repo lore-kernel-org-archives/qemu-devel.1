@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B220AC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DE1C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83F8E20850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:49:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F8E20850
+	by mail.kernel.org (Postfix) with ESMTPS id 9635720850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:51:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9635720850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46086 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46160 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXGx-0000aY-MW
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:49:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54884)
+	id 1hEXIw-0002Dm-N4
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:51:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsa-000390-97
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:25 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsc-00039p-7d
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWdn-0007Fg-Tq
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56024)
+	(envelope-from <david@redhat.com>) id 1hEWdi-0007DU-Ub
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hEWdn-0007FJ-In; Thu, 11 Apr 2019 06:09:07 -0400
+	id 1hEWdi-0007DA-Ne; Thu, 11 Apr 2019 06:09:02 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7A6E308CFAF;
-	Thu, 11 Apr 2019 10:09:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 09E2DC00733A;
+	Thu, 11 Apr 2019 10:09:02 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 86DF71001E71;
-	Thu, 11 Apr 2019 10:09:05 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AC4D81001E71;
+	Thu, 11 Apr 2019 10:09:00 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:08:08 +0200
-Message-Id: <20190411100836.646-14-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:05 +0200
+Message-Id: <20190411100836.646-11-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 11 Apr 2019 10:09:06 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Thu, 11 Apr 2019 10:09:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 13/41] s390x/tcg: Implement VECTOR COUNT
- TRAILING ZEROS
+Subject: [Qemu-devel] [PATCH v1 10/41] s390x/tcg: Implement VECTOR ELEMENT
+ COMPARE *
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,121 +75,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411100808.Ibj4M3qg_LyA3VDP9dgfK9GNc8VzAQBApQ63t23RakI@z>
+Message-ID: <20190411100805.2N9A50BvO-N0idxDPRMj9VQWWu_UY0dIQUW0u9hi3Gw@z>
 
-Implement it similar to VECTOR COUNT LEADING ZEROS.
+Fairly easy to implement, we can make use of the existing CC helpers
+cmps64 and cmpu64 - we siply have to sign extend the elements.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 28 ++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 14 ++++++++++++++
- 4 files changed, 46 insertions(+)
+ target/s390x/insn-data.def      |  4 ++++
+ target/s390x/translate_vx.inc.c | 20 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index e25e1467ae..83e5070821 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -154,6 +154,8 @@ DEF_HELPER_FLAGS_4(gvec_vavgl8, TCG_CALL_NO_RWG, void=
-, ptr, cptr, cptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vavgl16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
- DEF_HELPER_FLAGS_3(gvec_vclz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vclz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index be3c07aafb..a355b7f62f 100644
+index 64459465c5..52e398f515 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1086,6 +1086,8 @@
-     E(0xe7f9, VCHL,    VRR_b, V,   0, 0, 0, 0, vc, 0, TCG_COND_GTU, IF_V=
-EC)
- /* VECTOR COUNT LEADING ZEROS */
-     F(0xe753, VCLZ,    VRR_a, V,   0, 0, 0, 0, vclz, 0, IF_VEC)
-+/* VECTOR COUNT TRAILING ZEROS */
-+    F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
+@@ -1074,6 +1074,10 @@
+     F(0xe7f0, VAVGL,   VRR_c, V,   0, 0, 0, 0, vavgl, 0, IF_VEC)
+ /* VECTOR CHECKSUM */
+     F(0xe766, VCKSM,   VRR_c, V,   0, 0, 0, 0, vcksm, 0, IF_VEC)
++/* VECTOR ELEMENT COMPARE */
++    F(0xe7db, VEC,     VRR_a, V,   0, 0, 0, 0, vec, cmps64, IF_VEC)
++/* VECTOR ELEMENT COMPARE LOGICAL */
++    F(0xe7d9, VECL,    VRR_a, V,   0, 0, 0, 0, vec, cmpu64, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 299924a7cc..23d5870dc5 100644
+index 7a7e185d43..c7462d1bb1 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1406,3 +1406,31 @@ static DisasJumpType op_vclz(DisasContext *s, Disa=
-sOps *o)
-     gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
+@@ -1327,3 +1327,23 @@ static DisasJumpType op_vcksm(DisasContext *s, Dis=
+asOps *o)
+     tcg_temp_free_i32(sum);
      return DISAS_NEXT;
  }
 +
-+static void gen_ctz_i32(TCGv_i32 d, TCGv_i32 a)
-+{
-+    tcg_gen_ctzi_i32(d, a, 32);
-+}
-+
-+static void gen_ctz_i64(TCGv_i64 d, TCGv_i64 a)
-+{
-+    tcg_gen_ctzi_i64(d, a, 64);
-+}
-+
-+static DisasJumpType op_vctz(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vec(DisasContext *s, DisasOps *o)
 +{
 +    const uint8_t es =3D get_field(s->fields, m3);
-+    static const GVecGen2 g[4] =3D {
-+        { .fno =3D gen_helper_gvec_vctz8, },
-+        { .fno =3D gen_helper_gvec_vctz16, },
-+        { .fni4 =3D gen_ctz_i32, },
-+        { .fni8 =3D gen_ctz_i64, },
-+    };
++    const uint8_t enr =3D NUM_VEC_ELEMENTS(es) / 2 - 1;
++    const bool logical =3D s->fields->op2 =3D=3D 0xd9;
 +
 +    if (es > ES_64) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
-+    gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
++
++    o->in1 =3D tcg_temp_new_i64();
++    o->in2 =3D tcg_temp_new_i64();
++    read_vec_element_i64(o->in1, get_field(s->fields, v1), enr,
++                         es | logical ? 0 : MO_SIGN);
++    read_vec_element_i64(o->in2, get_field(s->fields, v2), enr,
++                         es | logical ? 0 : MO_SIGN);
 +    return DISAS_NEXT;
 +}
-diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
-c
-index 366962cfbe..c589f92765 100644
---- a/target/s390x/vec_int_helper.c
-+++ b/target/s390x/vec_int_helper.c
-@@ -107,3 +107,17 @@ void HELPER(gvec_vclz##BITS)(void *v1, const void *v=
-2, uint32_t desc)          \
- }
- DEF_VCLZ(8)
- DEF_VCLZ(16)
-+
-+#define DEF_VCTZ(BITS)                                                  =
-       \
-+void HELPER(gvec_vctz##BITS)(void *v1, const void *v2, uint32_t desc)   =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, ctz32(a));                  =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VCTZ(8)
-+DEF_VCTZ(16)
 --=20
 2.20.1
 
