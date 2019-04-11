@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36859)
+Received: from eggs.gnu.org ([209.51.188.92]:37280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEazd-000074-U9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:47:58 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEb0J-0000QJ-0O
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEazY-0005LC-7i
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:47:55 -0400
-References: <20190410204215.5963-1-eblake@redhat.com>
-	<61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <111374f2-ad0c-3f81-9c51-33201c63b6c5@redhat.com>
-Date: Thu, 11 Apr 2019 09:47:34 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEb0H-0005mH-VQ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:48:38 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 14:48:34 +0000
+Message-ID: <1391b876-74ed-21f0-c41f-f2fb22d2eae7@virtuozzo.com>
+References: <20190225152053.15976-1-kwolf@redhat.com>
+	<20190225152053.15976-17-kwolf@redhat.com>
+	<4f9792a1-4702-62d0-cad4-4da1169baa3b@virtuozzo.com>
+	<20190411141548.GE5694@linux.fritz.box>
+In-Reply-To: <20190411141548.GE5694@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E9EE2ADBB56E354E88D16BB86987D596@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lCg0bCzthqmVZ5ux4fdjoWjBu4UfuniYP"
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotest: Fix 241 to run in generic
- directory
+Subject: Re: [Qemu-devel] [PULL 16/71] nbd: Increase bs->in_flight during
+ AioContext switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lCg0bCzthqmVZ5ux4fdjoWjBu4UfuniYP
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <111374f2-ad0c-3f81-9c51-33201c63b6c5@redhat.com>
-Subject: Re: [PATCH for-4.0?] iotest: Fix 241 to run in generic directory
-References: <20190410204215.5963-1-eblake@redhat.com>
- <61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
-In-Reply-To: <61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/11/19 2:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 10.04.2019 23:42, Eric Blake wrote:
->> Filter the qemu-nbd server output to get rid of a direct reference
->> to my build directory.
->>
->> Fixes: e9dce9cb
->> Reported-by: Max Reitz <mreitz@redhat.com>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>
->> Not worth -rc4 on its own, but if something else pops up that requires=
-
->> another spin, I plan on a pull request for this one. Otherwise it
->> slips to 4.1, and 4.0 just has a broken iotest.
->>
-
->> @@ -69,12 +70,13 @@ echo
->>
->>   # Intentionally omit '-f' to force image probing, which in turn forc=
-es
->>   # sector alignment, here at the server.
->> -nbd_server_start_unix_socket "$TEST_IMG_FILE"
->> +nbd_server_start_unix_socket "$TEST_IMG_FILE" 2> "$TEST_DIR/server.lo=
-g"
->>
-
->>   1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
->> +WARNING: Image format was not specified for 'TEST_DIR/t.raw' and prob=
-ing guessed raw.
->> +         Automatically detecting the format is dangerous for raw imag=
-es, write operations on block 0 will be restricted.
->> +         Specify the 'raw' format explicitly to remove the restrictio=
-ns.
->=20
-> May be, just add -f raw to nbd server, to make this message disappear? =
-And than, don't do any redirections, as if there
-> will be failed unfiltered output it is OK?
-
-No. See the comment in the test - it is intentional that we are omitting
--f, in two different places, in order to get three test scenarios:
-
-normal: server '-f raw' 1-byte align, client '-f raw' 1-byte align
-server-constrained: server omit for 512-byte align, client '-f raw'
-obeys server align
-client-constrained: server '-f raw' 1-byte align, client omit for
-intentional 512-byte align
-
-in order to show both that the server with forced alignment is able to
-round requests correctly before sending to the client, and to show that
-the client with forced alignment is able to round requests correctly in
-spite of the server sending answers narrower than the client wants.
-
-In 4.1, when Max's filter handling patches land, it will be possible to
-use the blkdebug driver to force alignment instead of omitting '-f raw';
-at which point we can take away the server.log file. But until the
-filter handling patches land, any use of blkdebug causes odd test
-misbehaviors because not everything in the block layer properly sees
-through filter nodes.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---lCg0bCzthqmVZ5ux4fdjoWjBu4UfuniYP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlyvU4YACgkQp6FrSiUn
-Q2ojxAgAhL8AHmx3Vd2BDEoBPUVbsmLMcNsVzqqGEeGrV2wZR7YpT8a5Zc4ixn2p
-b+a19WQfkrPKj1NNGaTsAsggVyiZWwxBP1IzKIcXOt9hLb/+uPljxj3jF6y3mOcC
-SrBmlKxDj2JydeF/nPW9cA77pEIwbtYIyhZ2h2vuRT8zKPY0/zZDchqRhgl7qE5r
-gBYfAuygfw4xfoYPa4nB4U34GrMSgDizlrAy4ghSrEsvSR/R4UGNwftqcToQ2y6L
-y66+O4+2oYgE2wBf/lTn9IkOzvCbMRdp0p+HSoXtiUPNNWG7PNzZY/xrwEuWDIBJ
-XV6H7imiuJBcvMv7rNQdfEj5DJsBfg==
-=KGq9
------END PGP SIGNATURE-----
-
---lCg0bCzthqmVZ5ux4fdjoWjBu4UfuniYP--
+MTEuMDQuMjAxOSAxNzoxNSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDQuMjAxOSB1bSAx
+NTo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDI1
+LjAyLjIwMTkgMTg6MTksIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gYmRydl9kcmFpbigpIG11c3Qg
+bm90IGxlYXZlIGNvbm5lY3Rpb25fY28gc2NoZWR1bGVkLCBzbyBicy0+aW5fZmxpZ2h0DQo+Pj4g
+bmVlZHMgdG8gYmUgaW5jcmVhc2VkIHdoaWxlIHRoZSBjb3JvdXRpbmUgaXMgd2FpdGluZyB0byBi
+ZSBzY2hlZHVsZWQNCj4+PiBpbiB0aGUgbmV3IEFpb0NvbnRleHQgYWZ0ZXIgbmJkX2NsaWVudF9h
+dHRhY2hfYWlvX2NvbnRleHQoKS4NCj4+DQo+PiBIaSENCj4+DQo+PiBJIGhhdmUgc29tZSBxdWVz
+dGlvbnMsIGNvdWxkIHlvdSBleHBsYWluLCBwbGVhc2U/DQo+Pg0KPj4gImJkcnZfZHJhaW4oKSBt
+dXN0IG5vdCBsZWF2ZSBjb25uZWN0aW9uX2NvIHNjaGVkdWxlZCIgLSBpdCdzIGJlY2F1c2Ugd2Ug
+d2FudCB0byBiZQ0KPj4gc3VyZSB0aGF0IGNvbm5lY3Rpb25fY28geWllbGRlZCBmcm9tIG5iZF9y
+ZWFkX2VvZiwgeWVzPw0KPj4NCj4+IEJ1dCBpdCBpcyBndWFyYW50ZWVkIGJ5IGFpb193YWl0X2Jo
+X29uZXNob3QuLiBXaHkgZG8gd2UgbmVlZCBhZGRpdGlvaW5hbGx5IGluYy9kZWMNCj4+IGJzLT5p
+bl9mbGlnaHQgPw0KPiANCj4gV2l0aG91dCBpbmNyZW1lbnRpbmcgYnMtPmluX2ZsaWdodCwgbm90
+aGluZyB3b3VsZCBndWFyYW50ZWUgdGhhdA0KPiBhaW9fcG9sbCgpIGlzIGNhbGxlZCBhbmQgdGhl
+IEJIIGlzIGFjdHVhbGx5IGV4ZWN1dGVkIGJlZm9yZSBiZHJ2X2RyYWluKCkNCj4gcmV0dXJucy4N
+Cg0KRG9uJ3QgZm9sbG93Li4gRG9uJ3Qgd2Ugd2FudCBleGFjdGx5IHRoaXMsIHdlIHdhbnQgQkgg
+dG8gYmUgZXhlY3V0ZWQgd2hpbGUgbm9kZSBpcyBzdGlsbA0KZHJhaW5lZCwgYXMgeW91IHdyaXRl
+IGluIGNvbW1lbnQ/DQoNCj4gDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBLZXZpbiBXb2xmIDxr
+d29sZkByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIGJsb2NrL25iZC1jbGllbnQuYyB8IDIw
+ICsrKysrKysrKysrKysrKysrKy0tDQo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJkLWNs
+aWVudC5jIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+Pj4gaW5kZXggNjBmMzhmMDMyMC4uYmZiYWY3
+ZWJlOSAxMDA2NDQNCj4+PiAtLS0gYS9ibG9jay9uYmQtY2xpZW50LmMNCj4+PiArKysgYi9ibG9j
+ay9uYmQtY2xpZW50LmMNCj4+PiBAQCAtOTc3LDE0ICs5NzcsMzAgQEAgdm9pZCBuYmRfY2xpZW50
+X2RldGFjaF9haW9fY29udGV4dChCbG9ja0RyaXZlclN0YXRlICpicykNCj4+PiAgICAgICAgcWlv
+X2NoYW5uZWxfZGV0YWNoX2Fpb19jb250ZXh0KFFJT19DSEFOTkVMKGNsaWVudC0+aW9jKSk7DQo+
+Pj4gICAgfQ0KPj4+ICAgIA0KPj4+ICtzdGF0aWMgdm9pZCBuYmRfY2xpZW50X2F0dGFjaF9haW9f
+Y29udGV4dF9iaCh2b2lkICpvcGFxdWUpDQo+Pj4gK3sNCj4+PiArICAgIEJsb2NrRHJpdmVyU3Rh
+dGUgKmJzID0gb3BhcXVlOw0KPj4+ICsgICAgTkJEQ2xpZW50U2Vzc2lvbiAqY2xpZW50ID0gbmJk
+X2dldF9jbGllbnRfc2Vzc2lvbihicyk7DQo+Pj4gKw0KPj4+ICsgICAgLyogVGhlIG5vZGUgaXMg
+c3RpbGwgZHJhaW5lZCwgc28gd2Uga25vdyB0aGUgY29yb3V0aW5lIGhhcyB5aWVsZGVkIGluDQo+
+Pj4gKyAgICAgKiBuYmRfcmVhZF9lb2YoKSwgdGhlIG9ubHkgcGxhY2Ugd2hlcmUgYnMtPmluX2Zs
+aWdodCBjYW4gcmVhY2ggMCwgb3IgaXQgaXMNCj4+PiArICAgICAqIGVudGVyZWQgZm9yIHRoZSBm
+aXJzdCB0aW1lLiBCb3RoIHBsYWNlcyBhcmUgc2FmZSBmb3IgZW50ZXJpbmcgdGhlDQo+Pj4gKyAg
+ICAgKiBjb3JvdXRpbmUuKi8NCj4+PiArICAgIHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlcihicy0+
+YWlvX2NvbnRleHQsIGNsaWVudC0+Y29ubmVjdGlvbl9jbyk7DQo+Pj4gKyAgICBiZHJ2X2RlY19p
+bl9mbGlnaHQoYnMpOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICAgIHZvaWQgbmJkX2NsaWVudF9hdHRh
+Y2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+Pj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBBaW9Db250ZXh0ICpuZXdfY29udGV4dCkNCj4+PiAgICB7
+DQo+Pj4gICAgICAgIE5CRENsaWVudFNlc3Npb24gKmNsaWVudCA9IG5iZF9nZXRfY2xpZW50X3Nl
+c3Npb24oYnMpOw0KPj4+ICAgICAgICBxaW9fY2hhbm5lbF9hdHRhY2hfYWlvX2NvbnRleHQoUUlP
+X0NIQU5ORUwoY2xpZW50LT5pb2MpLCBuZXdfY29udGV4dCk7DQo+Pj4gICAgDQo+Pj4gLSAgICAv
+KiBGSVhNRSBSZWFsbHkgbmVlZCBhIGJkcnZfaW5jX2luX2ZsaWdodCgpIGhlcmUgKi8NCj4+PiAt
+ICAgIGFpb19jb19zY2hlZHVsZShuZXdfY29udGV4dCwgY2xpZW50LT5jb25uZWN0aW9uX2NvKTsN
+Cj4+PiArICAgIGJkcnZfaW5jX2luX2ZsaWdodChicyk7DQo+Pj4gKw0KPj4+ICsgICAgLyogTmVl
+ZCB0byB3YWl0IGhlcmUgZm9yIHRoZSBCSCB0byBydW4gYmVjYXVzZSB0aGUgQkggbXVzdCBydW4g
+d2hpbGUgdGhlDQo+Pj4gKyAgICAgKiBub2RlIGlzIHN0aWxsIGRyYWluZWQuICovDQo+Pj4gKyAg
+ICBhaW9fd2FpdF9iaF9vbmVzaG90KG5ld19jb250ZXh0LCBuYmRfY2xpZW50X2F0dGFjaF9haW9f
+Y29udGV4dF9iaCwgYnMpOw0KPj4+ICAgIH0NCj4+PiAgICANCj4+PiAgICB2b2lkIG5iZF9jbGll
+bnRfY2xvc2UoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4NCj4+DQo+Pg0KPj4gLS0gDQo+PiBC
+ZXN0IHJlZ2FyZHMsDQo+PiBWbGFkaW1pcg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
+aXINCg==
