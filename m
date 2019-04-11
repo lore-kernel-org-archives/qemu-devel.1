@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59617)
+Received: from eggs.gnu.org ([209.51.188.92]:60998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEdtg-00029f-BZ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:54:01 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hEdzO-0004V7-UK
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEdtf-0007go-5P
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:54:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hEdte-0007fE-Sz
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:53:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DAB43168914
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 17:53:57 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 11 Apr 2019 19:53:45 +0200
-Message-Id: <20190411175345.19414-1-thuth@redhat.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1hEdzN-0002gC-SP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:54 -0400
+Received: from mail-eopbgr680045.outbound.protection.outlook.com
+	([40.107.68.45]:44014
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hEdzN-0002ff-HG
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:53 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Thu, 11 Apr 2019 17:59:50 +0000
+Message-ID: <20190411175931.29235-1-brijesh.singh@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <92061E548BE82E4A8C5B684CFD4CD405@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1] Declare -realtime as deprecated
+Subject: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests' field
+ to 'query-sev-capabilities'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, libvir-list@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Erik Skultety <eskultet@redhat.com>
 
-The old -realtime mlock=3Don|off parameter does exactly the same as the
-new -overcommit mem-lock=3Don|off parameter. Additionally, "-realtime"
-does not activate any additional "realtime" capabilities as the name
-might indicate. We should avoid to confuse the users this way, so
-let's deprecate the old -realtime option.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Deprecation has already been suggested last year:
-  https://patchwork.kernel.org/patch/10480963/#22026215
- ... but apparently we forgot to really do it.
-
- qemu-deprecated.texi | 5 +++++
- vl.c                 | 2 ++
- 2 files changed, 7 insertions(+)
-
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 2219386769..2c45204f3f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -72,6 +72,11 @@ backend settings instead of environment variables.  To=
- ease migration to
- the new format, the ``-audiodev-help'' option can be used to convert
- the current values of the environment variables to ``-audiodev'' options=
-.
-=20
-+@subsection -realtime (since 4.1)
-+
-+The @code{-realtime mlock=3Don|off} argument has been replaced by the
-+@code{-overcommit mem-lock=3Don|off} argument.
-+
- @section QEMU Machine Protocol (QMP) commands
-=20
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/vl.c b/vl.c
-index c696ad2a13..d6a2779b70 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3912,6 +3912,8 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 break;
-             case QEMU_OPTION_realtime:
-+                warn_report("'-realtime mlock=3D...' is deprecated, plea=
-se use "
-+                             "'-overcommit mem-lock=3D...' instead");
-                 opts =3D qemu_opts_parse_noisily(qemu_find_opts("realtim=
-e"),
-                                                optarg, false);
-                 if (!opts) {
---=20
-2.21.0
+VGhlcmUgYXJlIGxpbWl0ZWQgbnVtYmVycyBvZiB0aGUgU0VWIGd1ZXN0cyB0aGF0IGNhbiBiZSBy
+dW4gY29uY3VycmVudGx5Lg0KQSBtYW5hZ2VtZW50IGFwcGxpY2F0aW9ucyBtYXkgbmVlZCB0byBr
+bm93IHRoaXMgbGltaXQgc28gdGhhdCBpdCBjYW4gcGxhY2UNClNFViBWTXMgb24gaG9zdHMgd2hp
+Y2ggaGF2ZSBzdWl0YWJsZSByZXNvdXJjZXMgYXZhaWxhYmxlLg0KDQpDdXJyZW50bHksIHRoaXMg
+bGltaXQgaXMgbm90IGV4cG9zZWQgdG8gdGhlIGFwcGxpY2F0aW9uLiBBZGQgYSBuZXcNCidzZXYt
+bWF4LWd1ZXN0JyBmaWVsZCBpbiB0aGUgcXVlcnktc2V2LWNhcGFiaWxpdGllcyB0byBwcm92aWRl
+IHRoaXMNCmluZm9ybWF0aW9uLg0KDQpDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
+LmNvbT4NCkNjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQpDYzogRXJp
+YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQpDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVy
+cmFuZ2VAcmVkaGF0LmNvbT4NCkNjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0K
+Q2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQpTaWduZWQtb2ZmLWJ5OiBC
+cmlqZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQotLS0NCiBxYXBpL3RhcmdldC5q
+c29uICB8IDYgKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2LmMgfCA2ICsrKystLQ0KIDIgZmlsZXMg
+Y2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEv
+cWFwaS90YXJnZXQuanNvbiBiL3FhcGkvdGFyZ2V0Lmpzb24NCmluZGV4IDFkNGQ1NGI2MDAuLmI0
+NTEyMWQzMGIgMTAwNjQ0DQotLS0gYS9xYXBpL3RhcmdldC5qc29uDQorKysgYi9xYXBpL3Rhcmdl
+dC5qc29uDQpAQCAtMTgzLDcgKzE4Myw4IEBADQogICAnZGF0YSc6IHsgJ3BkaCc6ICdzdHInLA0K
+ICAgICAgICAgICAgICdjZXJ0LWNoYWluJzogJ3N0cicsDQogICAgICAgICAgICAgJ2NiaXRwb3Mn
+OiAnaW50JywNCi0gICAgICAgICAgICAncmVkdWNlZC1waHlzLWJpdHMnOiAnaW50J30sDQorICAg
+ICAgICAgICAgJ3JlZHVjZWQtcGh5cy1iaXRzJzogJ2ludCcsDQorICAgICAgICAgICAgJ3Nldi1t
+YXgtZ3Vlc3RzJzogJ2ludCd9LA0KICAgJ2lmJzogJ2RlZmluZWQoVEFSR0VUX0kzODYpJyB9DQog
+DQogIyMNCkBAIC0yMDAsNyArMjAxLDggQEANCiAjDQogIyAtPiB7ICJleGVjdXRlIjogInF1ZXJ5
+LXNldi1jYXBhYmlsaXRpZXMiIH0NCiAjIDwtIHsgInJldHVybiI6IHsgInBkaCI6ICI4Q0NERDhE
+REQiLCAiY2VydC1jaGFpbiI6ICI4ODhDQ0NERERFRSIsDQotIyAgICAgICAgICAgICAgICAgICJj
+Yml0cG9zIjogNDcsICJyZWR1Y2VkLXBoeXMtYml0cyI6IDV9fQ0KKyMgICAgICAgICAgICAgICAg
+ICAiY2JpdHBvcyI6IDQ3LCAicmVkdWNlZC1waHlzLWJpdHMiOiA1LA0KKyMgICAgICAgICAgICAg
+ICAgICAic2V2LW1heC1ndWVzdHMiIDogMTV9fQ0KICMNCiAjIw0KIHsgJ2NvbW1hbmQnOiAncXVl
+cnktc2V2LWNhcGFiaWxpdGllcycsICdyZXR1cm5zJzogJ1NldkNhcGFiaWxpdHknLA0KZGlmZiAt
+LWdpdCBhL3RhcmdldC9pMzg2L3Nldi5jIGIvdGFyZ2V0L2kzODYvc2V2LmMNCmluZGV4IGNkNzdm
+NmI1ZDQuLmJiMGNkNzlhY2QgMTAwNjQ0DQotLS0gYS90YXJnZXQvaTM4Ni9zZXYuYw0KKysrIGIv
+dGFyZ2V0L2kzODYvc2V2LmMNCkBAIC00ODgsNyArNDg4LDcgQEAgc2V2X2dldF9jYXBhYmlsaXRp
+ZXModm9pZCkNCiAgICAgZ3VjaGFyICpwZGhfZGF0YSA9IE5VTEw7DQogICAgIGd1Y2hhciAqY2Vy
+dF9jaGFpbl9kYXRhID0gTlVMTDsNCiAgICAgc2l6ZV90IHBkaF9sZW4gPSAwLCBjZXJ0X2NoYWlu
+X2xlbiA9IDA7DQotICAgIHVpbnQzMl90IGVieDsNCisgICAgdWludDMyX3QgZWJ4LCBlY3gsIGVk
+eDsNCiAgICAgaW50IGZkOw0KIA0KICAgICBmZCA9IG9wZW4oREVGQVVMVF9TRVZfREVWSUNFLCBP
+X1JEV1IpOw0KQEAgLTUwNyw3ICs1MDcsNyBAQCBzZXZfZ2V0X2NhcGFiaWxpdGllcyh2b2lkKQ0K
+ICAgICBjYXAtPnBkaCA9IGdfYmFzZTY0X2VuY29kZShwZGhfZGF0YSwgcGRoX2xlbik7DQogICAg
+IGNhcC0+Y2VydF9jaGFpbiA9IGdfYmFzZTY0X2VuY29kZShjZXJ0X2NoYWluX2RhdGEsIGNlcnRf
+Y2hhaW5fbGVuKTsNCiANCi0gICAgaG9zdF9jcHVpZCgweDgwMDAwMDFGLCAwLCBOVUxMLCAmZWJ4
+LCBOVUxMLCBOVUxMKTsNCisgICAgaG9zdF9jcHVpZCgweDgwMDAwMDFGLCAwLCBOVUxMLCAmZWJ4
+LCAmZWN4LCAmZWR4KTsNCiAgICAgY2FwLT5jYml0cG9zID0gZWJ4ICYgMHgzZjsNCiANCiAgICAg
+LyoNCkBAIC01MTYsNiArNTE2LDggQEAgc2V2X2dldF9jYXBhYmlsaXRpZXModm9pZCkNCiAgICAg
+ICovDQogICAgIGNhcC0+cmVkdWNlZF9waHlzX2JpdHMgPSAxOw0KIA0KKyAgICAvKiB0aGUgbWF4
+aW11bSBudW1iZXIgb2YgU0VWIGd1ZXN0cyB0aGF0IGNhbiBydW4gc2ltdWx0YW5lb3VzbHkgKi8N
+CisgICAgY2FwLT5zZXZfbWF4X2d1ZXN0cyA9IGVjeCAtIGVkeCArIDE7DQogb3V0Og0KICAgICBn
+X2ZyZWUocGRoX2RhdGEpOw0KICAgICBnX2ZyZWUoY2VydF9jaGFpbl9kYXRhKTsNCi0tIA0KMi4x
+Ny4xDQoNCg==
