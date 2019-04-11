@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52657)
+Received: from eggs.gnu.org ([209.51.188.92]:55260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEbnn-0001Iv-QA
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:50 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEbvi-000889-7b
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEbnm-0008Ef-Gv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:47 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEbnm-0008E2-5w
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:46 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s15so7932348wra.12
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:39:45 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Apr 2019 16:39:42 +0100
-Message-Id: <20190411153942.4533-1-peter.maydell@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEbvg-00056u-T2
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:47:58 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 15:47:19 +0000
+Message-ID: <c68db798-c0c8-f3f5-7f5b-cb672bfa66b6@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-9-vsementsov@virtuozzo.com>
+	<ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
+In-Reply-To: <ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0FCA2F016697C547BFD486736BA6A98D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target/arm: Implement NSACR gating of floating
- point
+Subject: Re: [Qemu-devel] [PATCH v4 08/10] block/nbd: add cmdline and qapi
+ parameter reconnect-delay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-The NSACR register allows secure code to configure the FPU
-to be inaccessible to non-secure code. If the NSACR.CP10
-bit is set then:
- * NS accesses to the FPU trap as UNDEF (ie to NS EL1 or EL2)
- * CPACR.{CP10,CP11} behave as if RAZ/WI
- * HCPTR.{TCP11,TCP10} behave as if RAO/WI
-
-Note that we do not implement the NSACR.NSASEDIS bit which
-gates only access to Advanced SIMD, in the same way that
-we don't implement the equivalent CPACR.ASEDIS and HCPTR.TASE.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I noticed we were missing NSACR handling here while looking at
-M profile floating point, but it turns out that M profile NSACR
-isn't really the same, so the two don't share code. This patch
-fixes the A-profile NSACR handling. Note that this only affects
-CPUs with an AArch32 EL3.
-
- target/arm/helper.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 73 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a0dd1f99974..26105f13e70 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -903,9 +903,36 @@ static void cpacr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-         }
-         value &= mask;
-     }
-+
-+    /*
-+     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
-+     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
-+     */
-+    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
-+        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
-+        value &= ~(0xf << 20);
-+        value |= env->cp15.cpacr_el1 & (0xf << 20);
-+    }
-+
-     env->cp15.cpacr_el1 = value;
- }
- 
-+static uint64_t cpacr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    /*
-+     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
-+     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
-+     */
-+    uint64_t value = env->cp15.cpacr_el1;
-+
-+    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
-+        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
-+        value &= ~(0xf << 20);
-+    }
-+    return value;
-+}
-+
-+
- static void cpacr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
- {
-     /* Call cpacr_write() so that we reset with the correct RAO bits set
-@@ -971,7 +998,7 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
-     { .name = "CPACR", .state = ARM_CP_STATE_BOTH, .opc0 = 3,
-       .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 2, .accessfn = cpacr_access,
-       .access = PL1_RW, .fieldoffset = offsetof(CPUARMState, cp15.cpacr_el1),
--      .resetfn = cpacr_reset, .writefn = cpacr_write },
-+      .resetfn = cpacr_reset, .writefn = cpacr_write, .readfn = cpacr_read },
-     REGINFO_SENTINEL
- };
- 
-@@ -4656,6 +4683,36 @@ uint64_t arm_hcr_el2_eff(CPUARMState *env)
-     return ret;
- }
- 
-+static void cptr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                           uint64_t value)
-+{
-+    /*
-+     * For A-profile AArch32 EL3, if NSACR.CP10
-+     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
-+     */
-+    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
-+        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
-+        value &= ~(0x3 << 10);
-+        value |= env->cp15.cptr_el[2] & (0x3 << 10);
-+    }
-+    env->cp15.cptr_el[2] = value;
-+}
-+
-+static uint64_t cptr_el2_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    /*
-+     * For A-profile AArch32 EL3, if NSACR.CP10
-+     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
-+     */
-+    uint64_t value = env->cp15.cptr_el[2];
-+
-+    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
-+        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
-+        value &= ~(0x3 << 10);
-+    }
-+    return value;
-+}
-+
- static const ARMCPRegInfo el2_cp_reginfo[] = {
-     { .name = "HCR_EL2", .state = ARM_CP_STATE_AA64,
-       .type = ARM_CP_IO,
-@@ -4703,7 +4760,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-     { .name = "CPTR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 2,
-       .access = PL2_RW, .accessfn = cptr_access, .resetvalue = 0,
--      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]) },
-+      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]),
-+      .readfn = cptr_el2_read, .writefn = cptr_el2_write },
-     { .name = "MAIR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 10, .crm = 2, .opc2 = 0,
-       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.mair_el[2]),
-@@ -12804,6 +12862,19 @@ int fp_exception_el(CPUARMState *env, int cur_el)
-         break;
-     }
- 
-+    /*
-+     * The NSACR allows A-profile AArch32 EL3 and M-profile secure mode
-+     * to control non-secure access to the FPU. It doesn't have any
-+     * effect if EL3 is AArch64 or if EL3 doesn't exist at all.
-+     */
-+    if ((arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
-+         cur_el <= 2 && !arm_is_secure_below_el3(env))) {
-+        if (!extract32(env->cp15.nsacr, 10, 1)) {
-+            /* FP insns act as UNDEF */
-+            return cur_el == 2 ? 2 : 1;
-+        }
-+    }
-+
-     /* For the CPTR registers we don't need to guard with an ARM_FEATURE
-      * check because zero bits in the registers mean "don't trap".
-      */
--- 
-2.20.1
+MDUuMDEuMjAxOSAxOjI1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiA3LzMxLzE4IDEyOjMwIFBN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gUmVjb25uZWN0IHdpbGwg
+YmUgaW1wbGVtZW50ZWQgaW4gdGhlIGZvbGxvd2luZyBjb21taXQsIHNvIGZvciBub3csDQo+PiBp
+biBzZW1hbnRpY3MgYmVsb3csIGRpc2Nvbm5lY3QgaXRzZWxmIGlzIGEgInNlcmlvdXMgZXJyb3Ii
+Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
+ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBxYXBpL2Jsb2NrLWNvcmUuanNv
+biB8IDEyICsrKysrKysrKysrLQ0KPj4gICBibG9jay9uYmQtY2xpZW50LmggICB8ICAxICsNCj4+
+ICAgYmxvY2svbmJkLWNsaWVudC5jICAgfCAgMSArDQo+PiAgIGJsb2NrL25iZC5jICAgICAgICAg
+IHwgMTYgKysrKysrKysrKysrKysrLQ0KPj4gICA0IGZpbGVzIGNoYW5nZWQsIDI4IGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29y
+ZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IGluZGV4IDViOTA4NGEzOTQuLmNmMDM0
+MDJlYzUgMTAwNjQ0DQo+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gKysrIGIvcWFw
+aS9ibG9jay1jb3JlLmpzb24NCj4+IEBAIC0zNTExLDEzICszNTExLDIzIEBADQo+PiAgICMgICAg
+ICAgICAgICAgICAgICB0cmFkaXRpb25hbCAiYmFzZTphbGxvY2F0aW9uIiBibG9jayBzdGF0dXMg
+KHNlZQ0KPj4gICAjICAgICAgICAgICAgICAgICAgTkJEX09QVF9MSVNUX01FVEFfQ09OVEVYVCBp
+biB0aGUgTkJEIHByb3RvY29sKSAoc2luY2UgMy4wKQ0KPj4gICAjDQo+PiArIyBAcmVjb25uZWN0
+LWRlbGF5OiBSZWNvbm5lY3QgZGVsYXkuIE9uIGRpc2Nvbm5lY3QsIG5iZCBjbGllbnQgdHJpZXMg
+dG8gY29ubmVjdA0KPiANCj4gTWF5YmUgJ09uIHVuZXhwZWN0ZWQgZGlzY29ubmVjdCcsIHNpbmNl
+IGludGVudGlvbmFsIGRpc2Nvbm5lY3QgaXMgbm90DQo+IHVuZXhwZWN0ZWQuDQo+IA0KPj4gKyMg
+ICAgICAgICAgICAgICAgICAgYWdhaW4sIHVudGlsIHN1Y2Nlc3Mgb3Igc2VyaW91cyBlcnJvci4g
+RHVyaW5nIGZpcnN0DQo+PiArIyAgICAgICAgICAgICAgICAgICBAcmVjb25uZWN0LWRlbGF5IHNl
+Y29uZHMgb2YgcmVjb25uZWN0aW5nIGxvb3AgYWxsIHJlcXVlc3RzDQo+PiArIyAgICAgICAgICAg
+ICAgICAgICBhcmUgcGF1c2VkIGFuZCBoYXZlIGEgY2hhbmNlIHRvIHJlcnVuLCBpZiBzdWNjZXNz
+ZnVsDQo+PiArIyAgICAgICAgICAgICAgICAgICBjb25uZWN0IG9jY3VyZXMgZHVyaW5nIHRoaXMg
+dGltZS4gQWZ0ZXIgQHJlY29ubmVjdC1kZWxheQ0KPiANCj4gb2NjdXJzDQo+IA0KPj4gKyMgICAg
+ICAgICAgICAgICAgICAgc2Vjb25kcyBhbGwgZGVsYXllZCByZXF1ZXN0cyBhcmUgZmFpbGVkIGFu
+ZCBhbGwgZm9sbG93aW5nDQo+PiArIyAgICAgICAgICAgICAgICAgICByZXF1ZXN0cyB3aWxsIGJl
+IGZhaWxlZCB0byAodW50aWwgc3VjY2Vzc2Z1bGwgcmVjb25uZWN0KS4NCj4gDQo+IHN1Y2Nlc3Nm
+dWwNCj4gDQo+PiArIyAgICAgICAgICAgICAgICAgICBEZWZhdWx0IDMwMCBzZWNvbmRzIChTaW5j
+ZSAzLjEpDQo+IA0KPiBNeSBkZWxheSBpbiByZXZpZXdpbmcgbWVhbnMgdGhpcyBub3cgaGFzIHRv
+IGJlIDQuMC4NCj4gDQo+IEknbSBndWVzc2luZyB0aGF0IGEgZGVsYXkgb2YgMCBtZWFucyBkaXNh
+YmxlIGF1dG8tcmVjb25uZWN0Lg0KDQpJIGRvdWJ0LCBhcyByZWNvbm5lY3QtZGVsYXk9MCBpcyBh
+IHZhbGlkIGNhc2UsIHdoZW4gYWxsIHJlcXVlc3QgYXJlIGZhaWxlZA0KKHByZS1wYXRjaCBiZWhh
+dmlvciksIGJ1dCB3ZSBzdGlsbCB0cnkgdG8gcmVjb25uZWN0IGluIGJhY2tncm91bmQuIEFueSBy
+ZWFzb24NCm5vdCB0byB0cnk/IElmIGFueSwgSSBzdWdnZXN0IG9uZSBvZiB0aGUgZm9sbG93aW5n
+Og0KDQoxLiB0cmVhdCBhYnNlbmNlIG9mIHRoZSBvcHRpb24gYXMgbm8tcmVjb25uZWN0LWF0LWFs
+bC4gU28gYWJzZW5jZSBhbmQgMCB3b3VsZCBiZQ0KICAgIG5vdCB0aGUgc2FtZQ0KDQoyLiB1c2Ug
+LTEgdmFsdWUgYXMgbm8tcmVjb25uZWN0LWF0LWFsbA0KDQozLiBhZGRpdGlvbmFsIGJvb2wgb3B0
+aW9uICJyZWNvbm5lY3QiDQoNCj4gIEZyb20gYQ0KPiBiYWNrd2FyZHMtY29tcGF0aWJpbGl0eSBz
+dGFuZHBvaW50LCBubyBhdXRvLXJlY29ubmVjdCBpcyBtb3JlIGluIGxpbmUNCj4gd2l0aCB3aGF0
+IHdlIHByZXZpb3VzbHkgaGFkIC0gYnV0IGZyb20gYSB1c2FiaWxpdHkgc3RhbmRwb2ludCwgdHJ5
+aW5nIHRvDQo+IHJlY29ubmVjdCBjYW4gYXZvaWQgdHVybmluZyB0cmFuc2llbnQgbmV0d29yayBo
+aWNjdXBzIGludG8gcGVybWFuZW50DQo+IGxvc3Mgb2YgYSBkZXZpY2UgdG8gRUlPIGVycm9ycywg
+ZXNwZWNpYWxseSBpZiB0aGUgcmV0cnkgdGltZW91dCBpcyBsb25nDQo+IGVub3VnaCB0byBhbGxv
+dyBhbiBhZG1pbmlzdHJhdG9yIHRvIHJlcm91dGUgdGhlIG5ldHdvcmsgdG8gYW4NCj4gYWx0ZXJu
+YXRpdmUgc2VydmVyLiAgU28gSSdtIHByb2JhYmx5IG9rYXkgd2l0aCB0aGUgZGVmYXVsdCBiZWlu
+Zw0KPiBub24temVybyAtIGJ1dCBpdCBET0VTIG1lYW4gdGhhdCB3aGVyZSB5b3UgdXNlZCB0byBn
+ZXQgaW5zdGFudCBFSU8NCj4gZmFpbHVyZXMgd2hlbiBhIG5ldHdvcmsgY29ubmVjdGlvbiB3YXMg
+c2V2ZXJlZCwgeW91IG5vdyBoYXZlIHRvIHdhaXQgZm9yDQo+IHRoZSByZWNvbm5lY3QgZGVsYXkg
+dG8gZXhwaXJlLCBhbmQgNSBtaW51dGVzIGNhbiBiZSBhIGxvbmcgd2FpdC4gIFNpbmNlDQo+IHRo
+ZSBsb25nIGRlbGF5IGlzIGd1ZXN0LW9ic2VydmFibGUsIGNhbiB3ZSBydW4gaW50byBpc3N1ZXMg
+d2hlcmUgYSBndWVzdA0KPiB0aGF0IGlzIGN1cnJlbnRseSB1c2VkIHRvIGluc3RhbnQgRUlPIGFu
+ZCB0b3RhbCBsb3NzIG9mIHRoZSBkZXZpY2UgY291bGQNCj4gaW5zdGVhZCBnZXQgY29uZnVzZWQg
+Ynkgbm90IGdldHRpbmcgYW55IHJlc3BvbnNlIGZvciB1cCB0byA1IG1pbnV0ZXMsDQo+IHdoZXRo
+ZXIgb3Igbm90IHRoYXQgcmVzcG9uc2UgZXZlbnR1YWxseSB0dXJucyBvdXQgdG8gYmUgRUlPIG9y
+IGENCj4gc3VjY2Vzc2Z1bCByZWNvdmVyeT8NCj4gDQo+PiArKysgYi9ibG9jay9uYmQuYw0KPj4g
+QEAgLTM2MCw2ICszNjAsMTggQEAgc3RhdGljIFFlbXVPcHRzTGlzdCBuYmRfcnVudGltZV9vcHRz
+ID0gew0KPj4gICAgICAgICAgICAgICAuaGVscCA9ICJleHBlcmltZW50YWw6IGV4cG9zZSBuYW1l
+ZCBkaXJ0eSBiaXRtYXAgaW4gcGxhY2Ugb2YgIg0KPj4gICAgICAgICAgICAgICAgICAgICAgICJi
+bG9jayBzdGF0dXMiLA0KPj4gICAgICAgICAgIH0sDQo+PiArICAgICAgICB7DQo+PiArICAgICAg
+ICAgICAgLm5hbWUgPSAicmVjb25uZWN0LWRlbGF5IiwNCj4+ICsgICAgICAgICAgICAudHlwZSA9
+IFFFTVVfT1BUX05VTUJFUiwNCj4+ICsgICAgICAgICAgICAuaGVscCA9ICJSZWNvbm5lY3QgZGVs
+YXkuIE9uIGRpc2Nvbm5lY3QsIG5iZCBjbGllbnQgdHJpZXMgdG8iDQo+PiArICAgICAgICAgICAg
+ICAgICAgICAiY29ubmVjdCBhZ2FpbiwgdW50aWwgc3VjY2VzcyBvciBzZXJpb3VzIGVycm9yLiBE
+dXJpbmciDQo+PiArICAgICAgICAgICAgICAgICAgICAiZmlyc3QgQHJlY29ubmVjdC1kZWxheSBz
+ZWNvbmRzIG9mIHJlY29ubmVjdGluZyBsb29wIGFsbCINCj4+ICsgICAgICAgICAgICAgICAgICAg
+ICJyZXF1ZXN0cyBhcmUgcGF1c2VkIGFuZCBoYXZlIGEgY2hhbmNlIHRvIHJlcnVuLCBpZiINCj4+
+ICsgICAgICAgICAgICAgICAgICAgICJzdWNjZXNzZnVsIGNvbm5lY3Qgb2NjdXJlcyBkdXJpbmcg
+dGhpcyB0aW1lLiBBZnRlciINCj4+ICsgICAgICAgICAgICAgICAgICAgICJAcmVjb25uZWN0LWRl
+bGF5IHNlY29uZHMgYWxsIGRlbGF5ZWQgcmVxdWVzdHMgYXJlIGZhaWxlZCINCj4+ICsgICAgICAg
+ICAgICAgICAgICAgICJhbmQgYWxsIGZvbGxvd2luZyByZXF1ZXN0cyB3aWxsIGJlIGZhaWxlZCB0
+byAodW50aWwiDQo+PiArICAgICAgICAgICAgICAgICAgICAic3VjY2Vzc2Z1bGwgcmVjb25uZWN0
+KS4gRGVmYXVsdCAzMDAgc2Vjb25kcyIsDQo+IA0KPiBTYW1lIHR5cG9zIGFzIGluIHFhcGkuDQo+
+IA0KPiBUaGUgVUkgYXNwZWN0cyBsb29rIGZpbmUsIG5vdyBJIG5lZWQgdG8gcmV2aWV3IHRoZSBw
+YXRjaCBzZXJpZXMgZm9yIGNvZGUNCj4gaXNzdWVzIDopDQo+IA0KPiANCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
