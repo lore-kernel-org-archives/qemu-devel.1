@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50415)
+Received: from eggs.gnu.org ([209.51.188.92]:50426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTm-0004ZF-Nu
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTm-0004ZH-Vt
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bQ-Mk
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bl-Qs
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:14 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 20:27:03 +0300
-Message-Id: <20190411172709.205032-2-vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 20:27:07 +0300
+Message-Id: <20190411172709.205032-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20190411172709.205032-1-vsementsov@virtuozzo.com>
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v6 1/7] block/nbd-client: split connection_co
- start out of nbd_client_connect
+Subject: [Qemu-devel] [PATCH v6 5/7] qemu-coroutine-sleep: introduce
+ qemu_co_sleep_wake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-nbd_client_connect is going to be used from connection_co, so, let's
-refactor nbd_client_connect in advance, leaving io channel
-configuration all in nbd_client_connect.
+Introduce a function to gracefully wake-up a coroutine, sleeping in
+qemu_co_sleep_ns() sleep.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ include/qemu/coroutine.h    |  6 ++++++
+ util/qemu-coroutine-sleep.c | 20 ++++++++++++++++----
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 790ecc1ee1..facf8f8099 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -1180,12 +1180,8 @@ static int nbd_client_connect(BlockDriverState *bs,
-         object_ref(OBJECT(client->ioc));
-     }
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 9801e7f5a4..ec765c26f0 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -278,6 +278,12 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
+  */
+ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
  
--    /* Now that we're connected, set the socket to be non-blocking and
--     * kick the reply mechanism.  */
-     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
--    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
--    bdrv_inc_in_flight(bs);
--    nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
-+    qio_channel_attach_aio_context(client->ioc, bdrv_get_aio_context(bs));
++/*
++ * Wake a coroutine if it is sleeping by qemu_co_sleep_ns. Timer will be
++ * deleted.
++ */
++void qemu_co_sleep_wake(Coroutine *co);
++
+ /**
+  * Yield until a file descriptor becomes readable
+  *
+diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+index 4bfdd30cbf..bcc6afca3e 100644
+--- a/util/qemu-coroutine-sleep.c
++++ b/util/qemu-coroutine-sleep.c
+@@ -17,13 +17,24 @@
+ #include "qemu/timer.h"
+ #include "block/aio.h"
  
-     logout("Established connection with NBD server\n");
-     return 0;
-@@ -1215,12 +1211,22 @@ int nbd_client_init(BlockDriverState *bs,
-                     const char *x_dirty_bitmap,
-                     Error **errp)
- {
-+    int ret;
-     NBDClientSession *client = nbd_get_client_session(bs);
- 
-     client->bs = bs;
-     qemu_co_mutex_init(&client->send_mutex);
-     qemu_co_queue_init(&client->free_sema);
- 
--    return nbd_client_connect(bs, saddr, export, tlscreds, hostname,
--                              x_dirty_bitmap, errp);
-+    ret = nbd_client_connect(bs, saddr, export, tlscreds, hostname,
-+                             x_dirty_bitmap, errp);
-+    if (ret < 0) {
-+        return ret;
++const char *qemu_co_sleep_ns__scheduled = "qemu_co_sleep_ns";
++
++void qemu_co_sleep_wake(Coroutine *co)
++{
++    /* Write of schedule protected by barrier write in aio_co_schedule */
++    const char *scheduled = atomic_cmpxchg(&co->scheduled,
++                                           qemu_co_sleep_ns__scheduled, NULL);
++
++    if (scheduled == qemu_co_sleep_ns__scheduled) {
++        aio_co_wake(co);
 +    }
++}
 +
-+    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
-+    bdrv_inc_in_flight(bs);
-+    aio_co_schedule(bdrv_get_aio_context(bs), client->connection_co);
-+
-+    return 0;
+ static void co_sleep_cb(void *opaque)
+ {
+     Coroutine *co = opaque;
+ 
+-    /* Write of schedule protected by barrier write in aio_co_schedule */
+-    atomic_set(&co->scheduled, NULL);
+-    aio_co_wake(co);
++    qemu_co_sleep_wake(co);
  }
+ 
+ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
+@@ -32,7 +43,8 @@ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
+     QEMUTimer *ts;
+     Coroutine *co = qemu_coroutine_self();
+ 
+-    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL, __func__);
++    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL,
++                                           qemu_co_sleep_ns__scheduled);
+     if (scheduled) {
+         fprintf(stderr,
+                 "%s: Co-routine was already scheduled in '%s'\n",
 -- 
 2.18.0
