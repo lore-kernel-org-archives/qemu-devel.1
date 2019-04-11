@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39060)
+Received: from eggs.gnu.org ([209.51.188.92]:39062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4i-0003TN-Ph
+	(envelope-from <armbru@redhat.com>) id 1hEb4i-0003TO-Pp
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4h-0000qj-0K
+	(envelope-from <armbru@redhat.com>) id 1hEb4g-0000qI-Pb
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13704)
+Received: from mx1.redhat.com ([209.132.183.28]:14273)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4e-0000nb-Tg
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:10 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4d-0000mu-1U
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 618BE3003091
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:02 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:47 +0200
-Message-Id: <20190411145256.8614-7-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:44 +0200
+Message-Id: <20190411145256.8614-4-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/15] pci: Report fatal errors with
- error_report(), not error_printf()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
+ redirected to" message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +34,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+char_pty_open() prints a "char device redirected to PTY_NAME (label
+LABEL)" message to the current monitor or else to stderr.  No other
+ChardevClass::open() prints anything on success.  Drop the message.
+
+Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/pci/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ chardev/char-pty.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 6d13ef877b..1808b242dd 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -951,7 +951,7 @@ static uint16_t pci_req_id_cache_extract(PCIReqIDCache *cache)
-         result = PCI_BUILD_BDF(bus_n, 0);
-         break;
-     default:
--        error_printf("Invalid PCI requester ID cache type: %d\n",
-+        error_report("Invalid PCI requester ID cache type: %d",
-                      cache->type);
-         exit(1);
-         break;
--- 
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index b034332edd..a48d3e5d20 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
+     qemu_set_nonblock(master_fd);
+=20
+     chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+-    error_printf("char device redirected to %s (label %s)\n",
+-                 pty_name, chr->label);
+=20
+     s =3D PTY_CHARDEV(chr);
+     s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+--=20
 2.17.2
