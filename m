@@ -2,82 +2,63 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 910E1C282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3714C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:20:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5693A2083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:20:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uB3A2tMU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5693A2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A5B3E2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:20:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5B3E2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48001 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48014 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEYgs-0006yz-CM
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 08:20:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56427)
+	id 1hEYgw-00072U-UC
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 08:20:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEYfJ-0006Ni-Ko
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:18:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hEYfR-0006Pu-SG
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEYfH-0001q7-Me
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:18:49 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEYfE-0001mU-2k
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:18:45 -0400
-Received: by mail-oi1-x241.google.com with SMTP id l203so4698659oia.3
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 05:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=5uDn2ZUjwTyOqfDEKC5PGB65jziL38BFw27hm01Tnro=;
-	b=uB3A2tMUhvUkfXdbmXmds+5m0eo7PbAq2vCNG/tfMnsPAx5TSEKLLXg6GjgJWj2cxT
-	ovW9NuLcwNmXVTAgeShePvpFJKnGNfcs5qkTuS/9dO8WHgmaCs5PiafjWcv7t5s81A9/
-	t1YQzq3cmNzrs6kjg6VmnSRmC9ZsiDQQ5SqZm88GB9lsiKi1eN0IIo39yKiWelSboHFn
-	81JA3C3GUraKaotzFgXXc+3fYeyf9WwEpGA+YYjUtmEjhPDcK7/X19yqG1RPb75RGIVp
-	ydLaleLdwNeC3uzuQ0zgPacWCrZA9Fwmev0YZJr0pPUOUYJHCDtPypPiQbRoUhqeCM5N
-	+1dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=5uDn2ZUjwTyOqfDEKC5PGB65jziL38BFw27hm01Tnro=;
-	b=Z/SqCLLl4kiMoMcjqL11rzsypWil/IP2WItOjkPWs2zzsujsCoCofpdiPr0CtVjrDV
-	zl4TFil/6++cPs5TJjJ3MQseafLw1rhZH5S+VLHy3z3zq4fo30FM0/VfygcH2esg0StW
-	0YNror2Zq/auHtE0mbvlm5oKx8hjVciYjMfQqDc58dwccA7tKHF7jFSypPIXwe0Yl13U
-	VGtRokQF5TvSM77q3HmRdTDxJrQeVIU43GrMwWjGMbIim8Z58eDeFCTdT96h9NyTbR6W
-	kjpBgSqTqRR+iZGpQ0xsZkqtrL4JYaodr6HWBko0szLRzC4AZdbCErG09LvBNeTs8+fp
-	Ibtg==
-X-Gm-Message-State: APjAAAUgxmDp9i/mf6/Reu/uAdGeH1qlRP7k83LgzXtWjswixpLG9Ebv
-	vhgHyWoulWHUiArvziiMOpC8kLJjf9VAa4XlMGrzRw==
-X-Google-Smtp-Source: APXvYqwoJCLsDnUs9nsSHz1AfXCGntkb4a6dm7kQoNg/yXwiShyGXXazL7vKnPOidT/ohDPEHo2mkicXTJ7LdJNZKQI=
-X-Received: by 2002:aca:e84c:: with SMTP id f73mr5957965oih.163.1554985121752; 
-	Thu, 11 Apr 2019 05:18:41 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <imammedo@redhat.com>) id 1hEYfQ-0001uC-Ka
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:18:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
+	id 1hEYfQ-0001u0-9I; Thu, 11 Apr 2019 08:18:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B3613065457;
+	Thu, 11 Apr 2019 12:18:55 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A0EEE605CF;
+	Thu, 11 Apr 2019 12:18:52 +0000 (UTC)
+Date: Thu, 11 Apr 2019 14:18:48 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <20190411141848.119ee969@redhat.com>
+In-Reply-To: <efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
 References: <cover.1554937288.git.alistair.francis@wdc.com>
-	<9043c3a6bc54faa98ed9fedc0c6c929c993a0bf9.1554937288.git.alistair.francis@wdc.com>
-	<20190411140629.3a672b39@redhat.com>
-In-Reply-To: <20190411140629.3a672b39@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Apr 2019 13:18:30 +0100
-Message-ID:
- <CAFEAcA-oOfZD=tas4QP3SeSOJJ+eM_9o=v05U=scsc78Z4p3FQ@mail.gmail.com>
-To: Igor Mammedov <imammedo@redhat.com>
+	<efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 6/6] riscv: Add a generic spike
- machine
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 11 Apr 2019 12:18:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 2/6] target/riscv: Fall back to
+ generating a RISC-V CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,51 +70,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
 	"palmer@sifive.com" <palmer@sifive.com>,
+	"qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	"ijc@hellion.org.uk" <ijc@hellion.org.uk>,
-	"alistair23@gmail.com" <alistair23@gmail.com>
+	"ijc@hellion.org.uk" <ijc@hellion.org.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411121830.p4TQW0RKry2qVXofjsG6gCoi0D79W2YhyTvCz8XNAEk@z>
+Message-ID: <20190411121848.nJYzCKHH-dGNUweAAyx_jA-cV-6e3cvYC1JGod8FF0I@z>
 
-On Thu, 11 Apr 2019 at 13:07, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Wed, 10 Apr 2019 23:11:00 +0000
-> Alistair Francis <Alistair.Francis@wdc.com> wrote:
-> > +    /* register system main memory (actual RAM) */
-> > +    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
-> > +                           machine->ram_size, &error_fatal);
-> do you really care about migration? if not then _nomigrate flavor would
-> be more suitable.
+On Wed, 10 Apr 2019 23:10:25 +0000
+Alistair Francis <Alistair.Francis@wdc.com> wrote:
 
-Every machine model should care about migration, at least to
-the extent of making savevm/loadvm snapshots work. Using
-memory_region_init_ram_nomigrate() is a bad idea in new
-code: it exists only for the benefit of older code which
-is handling the migration of the backing RAM by hand for
-migration-compatibility reasons.
+> If a user specifies a CPU that we don't understand then we want to fall
+> back to a CPU generated from the ISA string.
+It might look like a nice thing to do at the beginning, but
+fallbacks become a source of pain in future and get in the way
+of refactorings if there is a promise to maintain defaults (fallbacks)
+stable.
 
-> >      /* Initialize SOC */
-> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-> >                              TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-> > @@ -254,6 +343,12 @@ static void spike_v1_09_1_board_init(MachineState *machine)
-> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-> >      int i;
-> >
-> > +    if (!qtest_enabled()) {
-> > +        info_report("The Spike v1.09.1 machine has been depreceated. "
-> > +                    "Please use the deneric spike machine and specify the ISA "
+I suggest do not fallback to anything, just fail cleanly
+with informative error telling users what is wrong and let user
+fix their invalid CLI in the first place.
 
-"generic"
+ 
+> At the moment the generated CPU is assumed to be a privledge spec
+> version 1.10 CPU with an MMU. This can be changed in the future.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> v3:
+>  - Ensure a minimal length so we don't run off the end of the string.
+>  - Don't parse the rv32/rv64 in the loop
+>  target/riscv/cpu.c | 101 ++++++++++++++++++++++++++++++++++++++++++++-
+>  target/riscv/cpu.h |   2 +
+>  2 files changed, 102 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d61bce6d55..27be9e412a 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -19,6 +19,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/log.h"
+> +#include "qemu/error-report.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "qapi/error.h"
+> @@ -103,6 +104,99 @@ static void set_resetvec(CPURISCVState *env, int resetvec)
+>  #endif
+>  }
+>  
+> +static void riscv_generate_cpu_init(Object *obj)
+> +{
+> +    RISCVCPU *cpu = RISCV_CPU(obj);
+> +    CPURISCVState *env = &cpu->env;
+> +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
+> +    const char *riscv_cpu = mcc->isa_str;
+> +    target_ulong target_misa = 0;
+> +    target_ulong rvxlen = 0;
+> +    int i;
+> +    bool valid = false;
+> +
+> +    /*
+> +     * We need at least 5 charecters for the string to be valid. Check that
+> +     * now so we can be lazier later.
+> +     */
+> +    if (strlen(riscv_cpu) < 5) {
+> +        error_report("'%s' does not appear to be a valid RISC-V ISA string",
+> +                     riscv_cpu);
+> +        exit(1);
+> +    }
+> +
+> +    if (riscv_cpu[0] == 'r' && riscv_cpu[1] == 'v') {
+> +        /* Starts with "rv" */
+> +        if (riscv_cpu[2] == '3' && riscv_cpu[3] == '2') {
+> +            valid = true;
+> +            rvxlen = RV32;
+> +        }
+> +        if (riscv_cpu[2] == '6' && riscv_cpu[3] == '4') {
+> +            valid = true;
+> +            rvxlen = RV64;
+> +        }
+> +    }
+> +
+> +    if (!valid) {
+> +        error_report("'%s' does not appear to be a valid RISC-V CPU",
+> +                     riscv_cpu);
+> +        exit(1);
+> +    }
+> +
+> +    for (i = 4; i < strlen(riscv_cpu); i++) {
+> +        switch (riscv_cpu[i]) {
+> +        case 'i':
+> +            if (target_misa & RVE) {
+> +                error_report("I and E extensions are incompatible");
+> +                exit(1);
+> +            }
+> +            target_misa |= RVI;
+> +            continue;
+> +        case 'e':
+> +            if (target_misa & RVI) {
+> +                error_report("I and E extensions are incompatible");
+> +                exit(1);
+> +            }
+> +            target_misa |= RVE;
+> +            continue;
+> +        case 'g':
+> +            target_misa |= RVI | RVM | RVA | RVF | RVD;
+> +            continue;
+> +        case 'm':
+> +            target_misa |= RVM;
+> +            continue;
+> +        case 'a':
+> +            target_misa |= RVA;
+> +            continue;
+> +        case 'f':
+> +            target_misa |= RVF;
+> +            continue;
+> +        case 'd':
+> +            target_misa |= RVD;
+> +            continue;
+> +        case 'c':
+> +            target_misa |= RVC;
+> +            continue;
+> +        case 's':
+> +            target_misa |= RVS;
+> +            continue;
+> +        case 'u':
+> +            target_misa |= RVU;
+> +            continue;
+> +        default:
+> +            warn_report("QEMU does not support the %c extension",
+> +                        riscv_cpu[i]);
+> +            continue;
+> +        }
+> +    }
+> +
+> +    set_misa(env, rvxlen | target_misa);
+> +    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> +    set_resetvec(env, DEFAULT_RSTVEC);
+> +    set_feature(env, RISCV_FEATURE_MMU);
+> +    set_feature(env, RISCV_FEATURE_PMP);
+> +}
+> +
+>  static void riscv_any_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+> @@ -178,6 +272,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
+>  static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+> +    RISCVCPUClass *mcc;
+>      char *typename;
+>      char **cpuname;
+>  
+> @@ -188,7 +283,10 @@ static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
+>      g_free(typename);
+>      if (!oc || !object_class_dynamic_cast(oc, TYPE_RISCV_CPU) ||
+>          object_class_is_abstract(oc)) {
+> -        return NULL;
+> +        /* No CPU found, try the generic CPU and pass in the ISA string */
+> +        oc = object_class_by_name(TYPE_RISCV_CPU_GEN);
+> +        mcc = RISCV_CPU_CLASS(oc);
+> +        mcc->isa_str = g_strdup(cpu_model);
+>      }
+>      return oc;
+>  }
+> @@ -440,6 +538,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+>          .class_init = riscv_cpu_class_init,
+>      },
+>      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+> +    DEFINE_CPU(TYPE_RISCV_CPU_GEN,              riscv_generate_cpu_init),
+>  #if defined(TARGET_RISCV32)
+>      DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init),
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 20bce8742e..453108a855 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -48,6 +48,7 @@
+>  #define CPU_RESOLVING_TYPE TYPE_RISCV_CPU
+>  
+>  #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
+> +#define TYPE_RISCV_CPU_GEN              RISCV_CPU_TYPE_NAME("rv*")
+>  #define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
+>  #define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
+>  #define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
+> @@ -211,6 +212,7 @@ typedef struct RISCVCPUClass {
+>      /*< public >*/
+>      DeviceRealize parent_realize;
+>      void (*parent_reset)(CPUState *cpu);
+> +    const char *isa_str;
+>  } RISCVCPUClass;
+>  
+>  /**
 
-> > +                    "versions using -cpu.");
-> > +    }
-> > +
-
-thanks
--- PMM
 
