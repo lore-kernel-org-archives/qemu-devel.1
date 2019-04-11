@@ -2,75 +2,82 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B56C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F38EC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6DC620850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:16:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DC620850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C93832075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:36:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWC20TEn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93832075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54439 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54633 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEg7Y-0005KD-1r
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:16:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38628)
+	id 1hEgRD-0003V6-Tz
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:36:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEg6d-0004u2-P9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:15:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hEgQP-000345-Su
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEg6c-0000ZU-RY
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:15:31 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:34253)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hEg6Z-0000QX-KP; Thu, 11 Apr 2019 16:15:27 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MqsL3-1gaeWf17Ev-00msZq; Thu, 11 Apr 2019 22:15:20 +0200
-To: Markus Armbruster <armbru@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
-	<CAFEAcA-k0KEsjb0VvbhhkpvTN7nFBDNtqKwx-Lai5uYbCkztJA@mail.gmail.com>
-	<CAH95U0j6rHGdZj4B8DK-Ty-SqZHMb3Kmg16w+j3jx5bdkeijLQ@mail.gmail.com>
-	<CAFEAcA9DSaZE-dsKV4321meT2hBEJRLmWBLF0U5o0jG=mzcmRA@mail.gmail.com>
-	<87d0lu4exq.fsf@dusky.pond.sub.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <d18656fb-332b-5e01-cb86-efa692ff5daa@vivier.eu>
-Date: Thu, 11 Apr 2019 22:15:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alistair23@gmail.com>) id 1hEgQN-0002Ww-MC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:35:57 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hEgQN-0002Uw-4V; Thu, 11 Apr 2019 16:35:55 -0400
+Received: by mail-lj1-x244.google.com with SMTP id v22so6783349lje.9;
+	Thu, 11 Apr 2019 13:35:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=0YEC0qTAtljJN7l1k2Kt+2ksJhdaERyqcEVYSrkGvYU=;
+	b=hWC20TEnZBK8KwmQq+9fAdW7cfy00vqDiWVr7riRXQBSH86xwowVwGDgwhj9f7KET9
+	e9Pwjn1M4BIA2kptRFUCUNO8F3PUia7oCmIgT3budhkWv17yZdqUuXzLYAul6dTNGVbI
+	VHT5svLUCimzMHzIALLOREYAWJ3hp9Eym6oGATZJo06iPKUGe1FsO5yAImO70LntwNBn
+	2uzwskUa8J1g1vfluucoJ8+WoszRt7+GwJE+HN94ZmjM5SzigJgdO1HvFjCqu+1qHzWC
+	CG+lzgoIZ8kvgC9yZaBgqeL8hxYq8oie6A/x650GZnfljBdHCvhmhS0Xx0cJYrtVovH8
+	Hk3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=0YEC0qTAtljJN7l1k2Kt+2ksJhdaERyqcEVYSrkGvYU=;
+	b=FLhaSxFhiGBUNQi+La/DYWKXwJa1SE+Sj+Tn6SkwBqN1IWNXQWOZ3oGdMnGt9IY+dy
+	HNZ0hFHnCem6rwVtO3mmPBRksS0bF9cTQ59EBCp89+HYBT3c8lDOChARJpvPnD1HenCj
+	AabCiWl4rceZD98jCcAxAWVnz+g3hGZEEkskrpLLCuEA93/pkIdomd1Maql30bl3ugPE
+	q8QY83ilkByfadFnqvUSYgdsUiByFopb97QJaYoNpkzd9Y2x3dwQcbmHUJNn6j+9aEm3
+	8PqzrypLVf0zVgt1hn2kQNptMDrl/egEFOsM7XuiwU8BIv64N2wzFuATxOKPzs5Fr9+V
+	1jDQ==
+X-Gm-Message-State: APjAAAUBQKEYhpkcWfIRylVTGrab6NHB+yYoEKPuCTV/g/RSJA/mifT9
+	z+k2RFtsG345jjFhHGCjhJgXEaV+k6jFcYY4fAk=
+X-Google-Smtp-Source: APXvYqxtRt9GYXh+NwoJYCKt/Mf77u823o1BCUjX5sszARTe0LxpIV3SrwLToQYP87qqhmqV72qXOhnTjBMqN3F+YJM=
+X-Received: by 2002:a2e:8888:: with SMTP id k8mr27752973lji.43.1555014953123; 
+	Thu, 11 Apr 2019 13:35:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87d0lu4exq.fsf@dusky.pond.sub.org>
+References: <cover.1554937288.git.alistair.francis@wdc.com>
+	<9043c3a6bc54faa98ed9fedc0c6c929c993a0bf9.1554937288.git.alistair.francis@wdc.com>
+	<20190411140629.3a672b39@redhat.com>
+In-Reply-To: <20190411140629.3a672b39@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 11 Apr 2019 13:34:16 -0700
+Message-ID:
+ <CAKmqyKMqx8FxAfPhkMbLzpxwDVxhiMDeU3pd=O0GbU-sCeoJZw@mail.gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:YXUFUrL/cYKBtBP8NmnxLWyhNdSk1MT3oBQwm4vWZxfOCh8Rkey
-	S4EqonlHMfUmwjC8Gx5sbY5AtAAMbQ9kzDAFp8BUgEOkcARDA2CTYLaQZKNVcqkkthjaeBv
-	I2Hl62L33Rwa9w55/YfXdOTcTRPzkN1pFpabOc8Ib931Gx0gVe1PlPBVS/nBAjmb4YCPWO1
-	Ucb9kkI49a+0IBQb1+TdA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Mgbw+UZtIaQ=:AC/zdgt/QR1iEKG1nQX8PB
-	nYr71hqAMC6Zp4XYtF38n5j26kVb5px+8fPj0BX+M2py4uqLjE4kbtOjnHN+omJpWfIXQun/2
-	lP5yRRDu3VjWBoijuFg6/gKSWa54wiIA+FncQcf0wQVua+jXwpBhzuZU7FUssFztyKg2GQwkP
-	Tt1V1REWIycsX/bb35nA2Y+4LZJBnP8drfmCqKDTLWHBXdbF3UcKj5jLe83vPbCrBnqu4qVWr
-	/P25403RUDtQxBxQnGa3wTQVDS4u1Vgs5jRxm6GW/EeeUwA3I01/W6z1XfGI84DttlSvIUjRJ
-	hnyUYp5Khln3rr8/+HJfMqWHDM0KpBlLUyKwgn5g16eTKpG0l7JTJbh3/i87lsBmbCFzwHjoO
-	PI/2xAS+8/p6/gYpXMSApu1A0IIQumF0Xxn3klW+6Pzov5bSMYkpihezV3eQqI8uhGPqNt0LD
-	HZLmafpvv2qTleEkF+timQcuhTz9AaBhkS+wdaeBwt5f3YRnkoiamjKA1Pw4XYlJe/757TYFA
-	tTjbNcw1rQ8P5S0y/8BfVsIPGq/yljXqPMZh6IZ5ZHJ7NAu5zSC/CzpkjtgILEJvoh/+TeLzL
-	Z5USDj9Ji2ORBWsuVjsPimXPc9hrA94ZFCpRcRllWdeO9pRgsiI8i/tERa2zA1N1A5rZWM0GF
-	b4llOmnJrfCR/gLz4UpD+J50RFdveE5+ObURuGEEeuAvez6dRrAsuedPyLu/H7B2AXTLK0/hG
-	/RiJzofgoZWXAUFBOj6GFetVZpGUf0iqBhyGu8BeNJs+HuMqbjeBlAGyKV8=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: Re: [Qemu-devel] [Qemu-trivial]  [PATCH 0/4] Header cleanups
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 6/6] riscv: Add a generic spike
+ machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,42 +89,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>,
-	QEMU Trivial <qemu-trivial@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+	"palmer@sifive.com" <palmer@sifive.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	"ijc@hellion.org.uk" <ijc@hellion.org.uk>,
+	"alistair23@gmail.com" <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411201519.oEZ4-cUF_51-FJT7icOdLYclHUZ-mQ8ZrUeNhp8ViZM@z>
+Message-ID: <20190411203416.MhOVMrASFye4LU9qqVOoNd6CucfoDAACQJZJxG78oD0@z>
 
-On 10/04/2019 07:17, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On Tue, 9 Apr 2019 at 17:42, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
->>>
->>> Yeah this is a stand alone patch.
->>
->> OK, thanks -- just wanted to check there wasn't a missing
->> bit. I think this could go in via the qemu-trivial tree
->> so I have cc'd them.
->>
->> We're in the middle of a release at the moment, but we
->> should reopen for development in a couple of weeks. If
->> this patch still hasn't gone anywhere by a week or so after
->> that then please follow up with a 'ping' to check it hasn't
->> been forgotten by accident.
-> 
-> Hopefully, qemu-trivial won't wait for the next development cycle to
-> begin just to queue patches for it.
-> 
-> Regardless, patch submitters should watch their patches and inquire when
-> they don't get up within a reasonable time frame.  Normally, waiting for
-> two weeks feels about right.  Perhaps give it an extra week or so when
-> the release circus is in town (like now).
-> 
+On Thu, Apr 11, 2019 at 5:06 AM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Wed, 10 Apr 2019 23:11:00 +0000
+> Alistair Francis <Alistair.Francis@wdc.com> wrote:
+>
+> > Add a generic spike machine (not tied to a version) and deprecate the
+> > spike mahines that are tied to a specific version. As we can now specify
+> > the CPU via the command line we no londer need specific versions of the
+> > spike machines.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>
+> For cpu and initial RAM related parts:
+>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
+>
+> a couple of questions below.
+> > ---
+> >  hw/riscv/spike.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 105 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> > index 2a000a5800..9d3f7cec4d 100644
+> > --- a/hw/riscv/spike.c
+> > +++ b/hw/riscv/spike.c
+> > @@ -39,6 +39,7 @@
+> >  #include "chardev/char.h"
+> >  #include "sysemu/arch_init.h"
+> >  #include "sysemu/device_tree.h"
+> > +#include "sysemu/qtest.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "elf.h"
+> >
+> > @@ -160,7 +161,89 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+> >          qemu_fdt_add_subnode(fdt, "/chosen");
+> >          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> >      }
+> > - }
+> > +}
+> > +
+> > +static void spike_board_init(MachineState *machine)
+> > +{
+> > +    const struct MemmapEntry *memmap = spike_memmap;
+> > +
+> > +    SpikeState *s = g_new0(SpikeState, 1);
+> > +    MemoryRegion *system_memory = get_system_memory();
+> > +    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> > +    int i;
+> > +
+> > +    /* Initialize SOC */
+> > +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> > +                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+> > +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> > +                            &error_abort);
+> > +    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+> > +                            &error_abort);
+> > +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+> > +                            &error_abort);
+> > +
+> > +    /* register system main memory (actual RAM) */
+> > +    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+> > +                           machine->ram_size, &error_fatal);
+> do you really care about migration? if not then _nomigrate flavor would
+> be more suitable.
+>
+> > +    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
+> > +        main_mem);
+> > +
+> > +    /* create device tree */
+> > +    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+> > +
+> > +    /* boot rom */
+> > +    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
+> > +                           memmap[SPIKE_MROM].size, &error_fatal);
+> > +    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
+> > +                                mask_rom);
+> > +
+> > +    if (machine->kernel_filename) {
+> > +        load_kernel(machine->kernel_filename);
+> > +    }
+> > +
+> > +    /* reset vector */
+> > +    uint32_t reset_vec[8] = {
+> > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > +        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > +        0xf1402573,                  /*     csrr   a0, mhartid  */
+> > +#if defined(TARGET_RISCV32)
+> > +        0x0182a283,                  /*     lw     t0, 24(t0) */
+> > +#elif defined(TARGET_RISCV64)
+> > +        0x0182b283,                  /*     ld     t0, 24(t0) */
+> > +#endif
+> > +        0x00028067,                  /*     jr     t0 */
+> > +        0x00000000,
+> > +        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
+> > +        0x00000000,
+> > +                                     /* dtb: */
+> > +    };
+> > +
+> > +    /* copy in the reset vector in little_endian byte order */
+> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > +    }
+> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> > +                          memmap[SPIKE_MROM].base, &address_space_memory);
+> > +
+> > +    /* copy in the device tree */
+> > +    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+> > +            memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
+> > +        error_report("not enough space to store device-tree");
+> > +        exit(1);
+> > +    }
+> > +    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+> > +    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+> > +                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
+> > +                          &address_space_memory);
+> > +
+> > +    /* initialize HTIF using symbols found in load_kernel */
+> > +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+> > +
+> > +    /* Core Local Interruptor (timer and IPI) */
+> > +    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+> > +        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+> > +}
+> >
+> >  static void spike_v1_10_0_board_init(MachineState *machine)
+> >  {
+> > @@ -172,6 +255,12 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> >      int i;
+> >
+> > +    if (!qtest_enabled()) {
+> > +        info_report("The Spike v1.10.0 machine has been depreceated. "
+> > +                    "Please use the deneric spike machine and specify the ISA "
+> > +                    "versions using -cpu.");
+> > +    }
+> Did you mean deprecated in sense that machines will be removed in 2 releases
+> according to QEMU's deprecation policy?
 
-Applied to my trivial-patches branch.
+That is the plan.
 
-Thanks,
-Laurent
+Alistair
+
+>
+> > +
+> >      /* Initialize SOC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> >                              TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+> > @@ -254,6 +343,12 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> >      int i;
+> >
+> > +    if (!qtest_enabled()) {
+> > +        info_report("The Spike v1.09.1 machine has been depreceated. "
+> > +                    "Please use the deneric spike machine and specify the ISA "
+> > +                    "versions using -cpu.");
+> > +    }
+> > +
+> >      /* Initialize SOC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> >                              TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+> > @@ -359,8 +454,17 @@ static void spike_v1_10_0_machine_init(MachineClass *mc)
+> >      mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
+> >      mc->init = spike_v1_10_0_board_init;
+> >      mc->max_cpus = 1;
+> > +}
+> > +
+> > +static void spike_machine_init(MachineClass *mc)
+> > +{
+> > +    mc->desc = "RISC-V Spike Board";
+> > +    mc->init = spike_board_init;
+> > +    mc->max_cpus = 1;
+> >      mc->is_default = 1;
+> > +    mc->default_cpu_type = SPIKE_V1_10_0_CPU;
+> >  }
+> >
+> >  DEFINE_MACHINE("spike_v1.9.1", spike_v1_09_1_machine_init)
+> >  DEFINE_MACHINE("spike_v1.10", spike_v1_10_0_machine_init)
+> > +DEFINE_MACHINE("spike", spike_machine_init)
+>
 
