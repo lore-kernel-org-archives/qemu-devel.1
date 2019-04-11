@@ -2,86 +2,108 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A8C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 07:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76346C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 07:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BEDB217D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 07:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B6162133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 07:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUvRxMmY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BEDB217D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JQkejJz5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6162133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43432 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEUWy-0005CZ-5Z
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 03:53:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45291)
+	id 1hEUb2-0006Vc-HE
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 03:58:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hEUW5-0004sP-PD
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 03:53:03 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEUaH-00069h-57
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 03:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hEUW3-0000HP-VX
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 03:53:01 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:36104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hEUW3-0000FP-FD
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 03:52:59 -0400
-Received: by mail-oi1-x232.google.com with SMTP id l203so4132220oia.3
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 00:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Lx5CbrZPH3PhO2G2A0aso1rFAgFLrTfZ/PDJi8WQL1E=;
-	b=KUvRxMmY77JK09Hne8iJjwcdBCbN0g3yaFgFxJObQFGdCcJnykHaaoZNOmKAuZx6N9
-	neLQ/RyGzMNbW26s9lRE1jCI0/vCyhqn5hatkBp6tUYCggJqSeCjwYpxgpCYkILakSs/
-	ORQjRWXBef750OO/DRKAkOOKaXCpESwOqV+fERpAZVkaz+GiGIPufR/qWBCSVsiVOxDU
-	KVPHhGipRBuytoZ5SP0LRF6Q+xiZqebhNByDlr7aeVhMnPrv/GXVqJWO8wsZeG237ayS
-	iz/BEJDlprS9IQE3RygEbBRiPM8n7/qpoIFAL9NUcP8fvPix7g2gqsPdVMxfSvkLMs/0
-	aDrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Lx5CbrZPH3PhO2G2A0aso1rFAgFLrTfZ/PDJi8WQL1E=;
-	b=G9Oyp1vDsP0hS6OhGOHFDqf7scOTC7KG3PHb5mZZsET6KZVlU0YfBXp1ZmBcClS3fK
-	u8tRHIrOF61hLBE2G0FdAO42hUt/2TQGYxk8j4a3ZQSMZDS2kjTTBoJCmLhMZKctNlFN
-	cTJqqSuNx/63wz71s4wTOWOgoab/H2rAPXNzPyx4mHhPFR3XML42BSCrkkWJyuUbGU+n
-	hxjDf6+k8s8T9ggeEakzM/IcVv8GHAMwlPeUJwPKx1OVdEtPPZr325Kn95HZ4kBQd4rI
-	ykybZLQ/j0aP1bNxaUXDuGU1eLOEAD1gBAO3F8xsUKidmb8zl0flkFZQ0tLsDbQk/98U
-	8fFQ==
-X-Gm-Message-State: APjAAAW6eV74iA3LqnQg72t1s9HjPdvE/GsqmP9xmTBwVrqaulBXKzKC
-	houDu86HvsFhgbx+P+YFxh0Cp7m2OeKe+QaH0X8=
-X-Google-Smtp-Source: APXvYqz7JLMzyPjC9LJWSASna/TE2JzehgOEMKlePKCH47kk58EuUBaHqqs4iauvTrIF7/qvTtSLSkektdEIoZ8uM6E=
-X-Received: by 2002:aca:d88b:: with SMTP id p133mr5465133oig.56.1554969178106; 
-	Thu, 11 Apr 2019 00:52:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <5CADFEB7.01C57B.25694@m12-14.163.com>
-	<e7a59573-5252-71b7-210b-5a8335f5a5c1@redhat.com>
-	<CAKXe6S+w4A6YubgQib5H2QXE=eLFLWFQE-mOHYBM5PTXKaYAOA@mail.gmail.com>
-	<e5f15cd9-c34c-737d-4fa2-2aee7c5f0ad9@redhat.com>
-In-Reply-To: <e5f15cd9-c34c-737d-4fa2-2aee7c5f0ad9@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 11 Apr 2019 15:52:22 +0800
-Message-ID:
- <CAKXe6SLRaxmRy-sraaee-Z04KLgwB8_rRz7ejSu_vDm+7RETPw@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::232
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEUaF-0004WY-Q4
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 03:57:21 -0400
+Received: from mail-eopbgr60123.outbound.protection.outlook.com
+	([40.107.6.123]:55553
+	helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hEUaB-0004LX-4T; Thu, 11 Apr 2019 03:57:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=zpmmAZFuaOus0UJ73Liof9gkIit0tlaF/LbomLnvrlU=;
+	b=JQkejJz520ISts1SBPMKBIkMuqfD4iC59njHwf56IGR/qIIMTv0h/ndgp7h+Ka6QnPE44Am8MekYah64lRKQ6cSSeQFk4M0KglQfn30mKGjGOEiknuVk8MfsDEmjI4g2qNC6b7GEBscYju1vQkN8znEG+5C4YwQUfjmQgNKDE0w=
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
+	DB7PR08MB3705.eurprd08.prod.outlook.com (20.178.46.32) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.16; Thu, 11 Apr 2019 07:57:09 +0000
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949]) by
+	DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1771.021;
+	Thu, 11 Apr 2019 07:57:09 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+Thread-Topic: [PATCH for-4.0?] iotest: Fix 241 to run in generic directory
+Thread-Index: AQHU794br5Dm4Z3L90Owhq8BvbeODqY2mJSA
+Date: Thu, 11 Apr 2019 07:57:09 +0000
+Message-ID: <61e3b78b-4daf-eebc-7e8b-860c57658933@virtuozzo.com>
+References: <20190410204215.5963-1-eblake@redhat.com>
+In-Reply-To: <20190410204215.5963-1-eblake@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0172.eurprd05.prod.outlook.com
+	(2603:10a6:3:f8::20) To DB7PR08MB3851.eurprd08.prod.outlook.com
+	(2603:10a6:10:7b::30)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190411105706952
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d54af721-37de-47e8-5b90-08d6be534c41
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3705; 
+x-ms-traffictypediagnostic: DB7PR08MB3705:
+x-microsoft-antispam-prvs: <DB7PR08MB37050FC3C0106A9AE584ADB5C12F0@DB7PR08MB3705.eurprd08.prod.outlook.com>
+x-forefront-prvs: 00046D390F
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(376002)(39840400004)(346002)(396003)(366004)(136003)(199004)(189003)(6436002)(99286004)(3846002)(6116002)(6246003)(6486002)(76176011)(66066001)(97736004)(229853002)(6512007)(5660300002)(305945005)(52116002)(71190400001)(71200400001)(2501003)(14444005)(86362001)(105586002)(31686004)(7736002)(36756003)(53936002)(186003)(102836004)(386003)(256004)(26005)(6506007)(476003)(8936002)(316002)(8676002)(11346002)(446003)(2616005)(81166006)(81156014)(486006)(14454004)(478600001)(2906002)(4326008)(68736007)(110136005)(106356001)(31696002)(25786009)(54906003)(41533002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3705;
+	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: blnPtd2V8MT0TeD+X4FkyMaQnaDqRwPI5hwNuTGl1rM1+soUhJp5SrhxpjjgzfV2ZvqrLSimSTV4D3oFe7V/p753n2axnWKyPMd8x4bp2asBQObMmshZ+O+lcF13NPwUhEGrC3PPJxKfcAST2nXuOigHJ2wRs0lpiOnm2EbPb4YEoBSI06RtfmFc6+9x+G7wtH+m/eJT3E5HZP0HbxWWXlAiN7TMwebTJovFH5Y4D+u5ixsetKbuHSP2AVMNd3xDUHYquOD59BH0i+zn1cl6G/y3aJwipHewzjyqb6kyLjJxCo9eTvxWRUHrVyaYnv+aQ4kfWdnUTYkdmrCZaIqi4j/8/e5hHKP5c+GKaLE6YJNrVsIlk8iZEOtn3R0gqHSeVQFTLI+NVxJQ07HULkxDwItReQqxkZXvoz9bFIZhoRI=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] 
-	=?utf-8?q?Questions_about_acpi_interrupt_link_devic?=
-	=?utf-8?b?ZSdzIOKAmF9QUlMnIGZpZWxk?=
+Content-ID: <DF693769F7DBCF459259172BF60F38D4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d54af721-37de-47e8-5b90-08d6be534c41
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 07:57:09.3810 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3705
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.123
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] iotest: Fix 241 to run in generic
+ directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,80 +115,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"mst@redhat.com" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411075222.ZXGAlGwcLTiXk79VWH6IZjHpp2QXfpHUykh9PWe0PWU@z>
+Message-ID: <20190411075709.KL5vJ5dCopKbLzJ9h1FmJHvmOGxtNGIxoi_KvYflSdg@z>
 
-Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8811=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=883:44=E5=86=99=E9=81=93=EF=BC=9A
+MTAuMDQuMjAxOSAyMzo0MiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gRmlsdGVyIHRoZSBxZW11LW5i
+ZCBzZXJ2ZXIgb3V0cHV0IHRvIGdldCByaWQgb2YgYSBkaXJlY3QgcmVmZXJlbmNlDQo+IHRvIG15
+IGJ1aWxkIGRpcmVjdG9yeS4NCj4gDQo+IEZpeGVzOiBlOWRjZTljYg0KPiBSZXBvcnRlZC1ieTog
+TWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFr
+ZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiANCj4gTm90IHdvcnRoIC1yYzQgb24gaXRz
+IG93biwgYnV0IGlmIHNvbWV0aGluZyBlbHNlIHBvcHMgdXAgdGhhdCByZXF1aXJlcw0KPiBhbm90
+aGVyIHNwaW4sIEkgcGxhbiBvbiBhIHB1bGwgcmVxdWVzdCBmb3IgdGhpcyBvbmUuIE90aGVyd2lz
+ZSBpdA0KPiBzbGlwcyB0byA0LjEsIGFuZCA0LjAganVzdCBoYXMgYSBicm9rZW4gaW90ZXN0Lg0K
+PiANCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjQxICAgICB8IDQgKysrLQ0KPiAgIHRlc3RzL3Fl
+bXUtaW90ZXN0cy8yNDEub3V0IHwgNiArKystLS0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDYgaW5z
+ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11
+LWlvdGVzdHMvMjQxIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MQ0KPiBpbmRleCA0YjE5Njg1NzM4
+Ny4uMDE3YTczNmFhYmEgMTAwNzU1DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDENCj4g
+KysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MQ0KPiBAQCAtMjgsNiArMjgsNyBAQCBuYmRfdW5p
+eF9zb2NrZXQ9JFRFU1RfRElSL3Rlc3RfcWVtdV9uYmRfc29ja2V0DQo+ICAgX2NsZWFudXAoKQ0K
+PiAgIHsNCj4gICAgICAgX2NsZWFudXBfdGVzdF9pbWcNCj4gKyAgICBybSAtZiAiJFRFU1RfRElS
+L3NlcnZlci5sb2ciDQo+ICAgICAgIG5iZF9zZXJ2ZXJfc3RvcA0KPiAgIH0NCj4gICB0cmFwICJf
+Y2xlYW51cDsgZXhpdCBcJHN0YXR1cyIgMCAxIDIgMyAxNQ0KPiBAQCAtNjksMTIgKzcwLDEzIEBA
+IGVjaG8NCj4gDQo+ICAgIyBJbnRlbnRpb25hbGx5IG9taXQgJy1mJyB0byBmb3JjZSBpbWFnZSBw
+cm9iaW5nLCB3aGljaCBpbiB0dXJuIGZvcmNlcw0KPiAgICMgc2VjdG9yIGFsaWdubWVudCwgaGVy
+ZSBhdCB0aGUgc2VydmVyLg0KPiAtbmJkX3NlcnZlcl9zdGFydF91bml4X3NvY2tldCAiJFRFU1Rf
+SU1HX0ZJTEUiDQo+ICtuYmRfc2VydmVyX3N0YXJ0X3VuaXhfc29ja2V0ICIkVEVTVF9JTUdfRklM
+RSIgMj4gIiRURVNUX0RJUi9zZXJ2ZXIubG9nIg0KPiANCj4gICAkUUVNVV9OQkRfUFJPRyAtLWxp
+c3QgLWsgJG5iZF91bml4X3NvY2tldCB8IGdyZXAgJ1woc2l6ZVx8bWluXCknDQo+ICAgJFFFTVVf
+SU1HIG1hcCAtZiByYXcgLS1vdXRwdXQ9anNvbiAiJFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9p
+bWdfbWFwDQo+ICAgJFFFTVVfSU8gLWYgcmF3IC1jIG1hcCAiJFRFU1RfSU1HIg0KPiAgIG5iZF9z
+ZXJ2ZXJfc3RvcA0KPiArY2F0ICIkVEVTVF9ESVIvc2VydmVyLmxvZyIgfCBfZmlsdGVyX3Rlc3Rk
+aXINCj4gDQo+ICAgZWNobw0KPiAgIGVjaG8gIj09PSBFeHBvcnRpbmcgdW5hbGlnbmVkIHJhdyBp
+bWFnZSwgZm9yY2VkIGNsaWVudCBzZWN0b3IgYWxpZ25tZW50ID09PSINCj4gZGlmZiAtLWdpdCBh
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDEub3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MS5vdXQN
+Cj4gaW5kZXggZjQ4MTA3NGEwMmUuLjc1ZjlmNDY1ZTUyIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9x
+ZW11LWlvdGVzdHMvMjQxLm91dA0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQxLm91dA0K
+PiBAQCAtMTAsMTMgKzEwLDEzIEBAIFFBIG91dHB1dCBjcmVhdGVkIGJ5IDI0MQ0KPiANCj4gICA9
+PT0gRXhwb3J0aW5nIHVuYWxpZ25lZCByYXcgaW1hZ2UsIGZvcmNlZCBzZXJ2ZXIgc2VjdG9yIGFs
+aWdubWVudCA9PT0NCj4gDQo+IC1XQVJOSU5HOiBJbWFnZSBmb3JtYXQgd2FzIG5vdCBzcGVjaWZp
+ZWQgZm9yICcvaG9tZS9lYmxha2UvcWVtdS90ZXN0cy9xZW11LWlvdGVzdHMvc2NyYXRjaC90LnJh
+dycgYW5kIHByb2JpbmcgZ3Vlc3NlZCByYXcuDQo+IC0gICAgICAgICBBdXRvbWF0aWNhbGx5IGRl
+dGVjdGluZyB0aGUgZm9ybWF0IGlzIGRhbmdlcm91cyBmb3IgcmF3IGltYWdlcywgd3JpdGUgb3Bl
+cmF0aW9ucyBvbiBibG9jayAwIHdpbGwgYmUgcmVzdHJpY3RlZC4NCj4gLSAgICAgICAgIFNwZWNp
+ZnkgdGhlICdyYXcnIGZvcm1hdCBleHBsaWNpdGx5IHRvIHJlbW92ZSB0aGUgcmVzdHJpY3Rpb25z
+Lg0KPiAgICAgc2l6ZTogIDEwMjQNCj4gICAgIG1pbiBibG9jazogNTEyDQo+ICAgW3sgInN0YXJ0
+IjogMCwgImxlbmd0aCI6IDEwMjQsICJkZXB0aCI6IDAsICJ6ZXJvIjogZmFsc2UsICJkYXRhIjog
+dHJ1ZSwgIm9mZnNldCI6IE9GRlNFVH1dDQo+ICAgMSBLaUIgKDB4NDAwKSBieXRlcyAgICAgYWxs
+b2NhdGVkIGF0IG9mZnNldCAwIGJ5dGVzICgweDApDQo+ICtXQVJOSU5HOiBJbWFnZSBmb3JtYXQg
+d2FzIG5vdCBzcGVjaWZpZWQgZm9yICdURVNUX0RJUi90LnJhdycgYW5kIHByb2JpbmcgZ3Vlc3Nl
+ZCByYXcuDQo+ICsgICAgICAgICBBdXRvbWF0aWNhbGx5IGRldGVjdGluZyB0aGUgZm9ybWF0IGlz
+IGRhbmdlcm91cyBmb3IgcmF3IGltYWdlcywgd3JpdGUgb3BlcmF0aW9ucyBvbiBibG9jayAwIHdp
+bGwgYmUgcmVzdHJpY3RlZC4NCj4gKyAgICAgICAgIFNwZWNpZnkgdGhlICdyYXcnIGZvcm1hdCBl
+eHBsaWNpdGx5IHRvIHJlbW92ZSB0aGUgcmVzdHJpY3Rpb25zLg0KDQpNYXkgYmUsIGp1c3QgYWRk
+IC1mIHJhdyB0byBuYmQgc2VydmVyLCB0byBtYWtlIHRoaXMgbWVzc2FnZSBkaXNhcHBlYXI/IEFu
+ZCB0aGFuLCBkb24ndCBkbyBhbnkgcmVkaXJlY3Rpb25zLCBhcyBpZiB0aGVyZQ0Kd2lsbCBiZSBm
+YWlsZWQgdW5maWx0ZXJlZCBvdXRwdXQgaXQgaXMgT0s/DQoNCj4gDQo+ICAgPT09IEV4cG9ydGlu
+ZyB1bmFsaWduZWQgcmF3IGltYWdlLCBmb3JjZWQgY2xpZW50IHNlY3RvciBhbGlnbm1lbnQgPT09
+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
-> On 11/04/19 02:57, Li Qiang wrote:
-> >
-> >
-> > Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>> =E4=BA=
-=8E2019
-> > =E5=B9=B44=E6=9C=8810=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8811:5=
-5=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >     On 10/04/19 16:33, Li Qiang wrote:
-> >     > Hi all,
-> >     >
-> >     >
-> >     >
-> >     > I see the link device =E2=80=98_PRS=E2=80=99  uses irq line 5, 10=
-, 11 in
-> >     > =E2=80=98build_link_dev=E2=80=99 function.
-> >     >
-> >     > But I never see the 5 lines uses in the guest, just uses 10 and 1=
-1.
-> >     >
-> >     > Why this happen?  Maybe related with the guest?
-> >
-> >     Because the MADT table tells the guest to only use lines 10 and 11.
-> The
-> >     BIOS configures the chipset that way.
-> >
-> >
-> > Hi Paolo,
-> >
-> > I read the MADT spec, and found that it may related with 'Entry Type 2 =
-:
-> > Interrupt Source Override'.
-> > However, in build_madt function, I found following code when fill
-> > interrupt source overide.
-> >
-> > #define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
-> >         if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
-> >             /* No need for a INT source override structure. */
-> >             continue;
-> >         }
-> >
-> > Seems the madt doesn't play a role?
-> >
-> > Also in the seabios code, I see the pci interrupt linking device is
-> > routed hard-coded by pci_irqs.
-> > So this means the seabios doesn't use the madt/dsdt table to configure
-> > PCI interrupt routing?
->
-> Yeah, the MADT doesn't matter, I got confused.  It's just the firmware's
-> definition of pci_irqs that affects the behavior you're seeing.
->
->
-Hello Paolo,
-
-Thanks so much for your confirmation! I appreciate it.
-I'm confused by the massive acpi table/concepts recently.
-
-Thanks,
-Li Qiang
-
-
-
-
-
-
-> Paolo
->
