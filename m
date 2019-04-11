@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5740C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB18DC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 931C520850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:04:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 931C520850
+	by mail.kernel.org (Postfix) with ESMTPS id 8266F20850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:06:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8266F20850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53026 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53070 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEe3w-0006YE-It
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:04:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34114)
+	id 1hEe5p-0008Au-Rj
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:06:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEe2q-0006C0-MB
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1hEe4w-0007Ym-Vw
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEe2o-0004aP-I8
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38808)
+	(envelope-from <berrange@redhat.com>) id 1hEe4v-00061i-1e
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:05:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEe2o-0004Zv-9X
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEe4p-0005pH-FS
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:05:35 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3635E2CD7F8
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 18:03:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ECE723D960;
+	Thu, 11 Apr 2019 18:05:25 +0000 (UTC)
 Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C38625C207;
-	Thu, 11 Apr 2019 18:03:17 +0000 (UTC)
-Date: Thu, 11 Apr 2019 19:03:14 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B1F0619D2;
+	Thu, 11 Apr 2019 18:05:18 +0000 (UTC)
+Date: Thu, 11 Apr 2019 19:05:16 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190411180314.GI3641@redhat.com>
-References: <20190411175345.19414-1-thuth@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Message-ID: <20190411180516.GJ3641@redhat.com>
+References: <20190411175931.29235-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190411175345.19414-1-thuth@redhat.com>
+In-Reply-To: <20190411175931.29235-1-brijesh.singh@amd.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 11 Apr 2019 18:03:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Thu, 11 Apr 2019 18:05:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [libvirt] [PATCH for-QEMU-4.1] Declare -realtime
- as deprecated
+Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
+ field to 'query-sev-capabilities'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,76 +73,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>
+Cc: Erik Skultety <eskultet@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411180314.Y3lz6tcUvNjmMtK5XIGdkYcoSgru1grXfM-awQ2AHms@z>
+Message-ID: <20190411180516.UrAvdoHHOeYdU_BDdaZWnlYuJc1x_lT2KGZxnWOMqKU@z>
 
-On Thu, Apr 11, 2019 at 07:53:45PM +0200, Thomas Huth wrote:
-> The old -realtime mlock=on|off parameter does exactly the same as the
-> new -overcommit mem-lock=on|off parameter. Additionally, "-realtime"
-> does not activate any additional "realtime" capabilities as the name
-> might indicate. We should avoid to confuse the users this way, so
-> let's deprecate the old -realtime option.
-
-FYI libvirt currently uses  -realtime mlock=on so will need adapting
-to cope with this change.
-
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Thu, Apr 11, 2019 at 05:59:50PM +0000, Singh, Brijesh wrote:
+> There are limited numbers of the SEV guests that can be run concurrentl=
+y.
+> A management applications may need to know this limit so that it can pl=
+ace
+> SEV VMs on hosts which have suitable resources available.
+>=20
+> Currently, this limit is not exposed to the application. Add a new
+> 'sev-max-guest' field in the query-sev-capabilities to provide this
+> information.
+>=20
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Erik Skultety <eskultet@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  Deprecation has already been suggested last year:
->   https://patchwork.kernel.org/patch/10480963/#22026215
->  ... but apparently we forgot to really do it.
-> 
->  qemu-deprecated.texi | 5 +++++
->  vl.c                 | 2 ++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 2219386769..2c45204f3f 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -72,6 +72,11 @@ backend settings instead of environment variables.  To ease migration to
->  the new format, the ``-audiodev-help'' option can be used to convert
->  the current values of the environment variables to ``-audiodev'' options.
->  
-> +@subsection -realtime (since 4.1)
-> +
-> +The @code{-realtime mlock=on|off} argument has been replaced by the
-> +@code{-overcommit mem-lock=on|off} argument.
-> +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-> diff --git a/vl.c b/vl.c
-> index c696ad2a13..d6a2779b70 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3912,6 +3912,8 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  break;
->              case QEMU_OPTION_realtime:
-> +                warn_report("'-realtime mlock=...' is deprecated, please use "
-> +                             "'-overcommit mem-lock=...' instead");
->                  opts = qemu_opts_parse_noisily(qemu_find_opts("realtime"),
->                                                 optarg, false);
->                  if (!opts) {
-> -- 
-> 2.21.0
-> 
-> --
-> libvir-list mailing list
-> libvir-list@redhat.com
-> https://www.redhat.com/mailman/listinfo/libvir-list
+>  qapi/target.json  | 6 ++++--
+>  target/i386/sev.c | 6 ++++--
+>  2 files changed, 8 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/qapi/target.json b/qapi/target.json
+> index 1d4d54b600..b45121d30b 100644
+> --- a/qapi/target.json
+> +++ b/qapi/target.json
+> @@ -183,7 +183,8 @@
+
+A few lines above here you need to document the new field
+with (since 4.1) annotation.
+
+>    'data': { 'pdh': 'str',
+>              'cert-chain': 'str',
+>              'cbitpos': 'int',
+> -            'reduced-phys-bits': 'int'},
+> +            'reduced-phys-bits': 'int',
+> +            'sev-max-guests': 'int'},
+>    'if': 'defined(TARGET_I386)' }
+> =20
+>  ##
+> @@ -200,7 +201,8 @@
+>  #
+>  # -> { "execute": "query-sev-capabilities" }
+>  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
+> +#                  "cbitpos": 47, "reduced-phys-bits": 5,
+> +#                  "sev-max-guests" : 15}}
+>  #
+>  ##
+>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index cd77f6b5d4..bb0cd79acd 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -488,7 +488,7 @@ sev_get_capabilities(void)
+>      guchar *pdh_data =3D NULL;
+>      guchar *cert_chain_data =3D NULL;
+>      size_t pdh_len =3D 0, cert_chain_len =3D 0;
+> -    uint32_t ebx;
+> +    uint32_t ebx, ecx, edx;
+>      int fd;
+> =20
+>      fd =3D open(DEFAULT_SEV_DEVICE, O_RDWR);
+> @@ -507,7 +507,7 @@ sev_get_capabilities(void)
+>      cap->pdh =3D g_base64_encode(pdh_data, pdh_len);
+>      cap->cert_chain =3D g_base64_encode(cert_chain_data, cert_chain_le=
+n);
+> =20
+> -    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
+> +    host_cpuid(0x8000001F, 0, NULL, &ebx, &ecx, &edx);
+>      cap->cbitpos =3D ebx & 0x3f;
+> =20
+>      /*
+> @@ -516,6 +516,8 @@ sev_get_capabilities(void)
+>       */
+>      cap->reduced_phys_bits =3D 1;
+> =20
+> +    /* the maximum number of SEV guests that can run simultaneously */
+> +    cap->sev_max_guests =3D ecx - edx + 1;
+>  out:
+>      g_free(pdh_data);
+>      g_free(cert_chain_data);
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
