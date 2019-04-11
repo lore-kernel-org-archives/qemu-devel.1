@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45239)
+Received: from eggs.gnu.org ([209.51.188.92]:47600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hES2U-0003xT-PO
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1hESHg-0006g7-Qa
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:30:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hES2T-0002iP-SD
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34962)
+	(envelope-from <thuth@redhat.com>) id 1hESHf-0005gP-KF
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:30:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hES2T-0002hd-Iv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:17 -0400
-References: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hESHf-0005fx-7d
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:29:59 -0400
+References: <20190410194838.10123-1-sw@weilnetz.de>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <62a249a3-f0ed-fa10-f1cc-4ba0cb2594f9@redhat.com>
-Date: Thu, 11 Apr 2019 07:14:13 +0200
+Message-ID: <a6cef4ba-026c-75e7-d63b-70bb79621583@redhat.com>
+Date: Thu, 11 Apr 2019 07:29:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
+In-Reply-To: <20190410194838.10123-1-sw@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU Logo question
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tci: Add implementation for
+ INDEX_op_ld16u_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Barajas, Felipe" <felipe.barajas@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Beno=c3=aet_Canet?= <benoit.canet@nodalink.com>, Benoit Canet <benoit@irqsave.net>
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 10/04/2019 19.51, Barajas, Felipe wrote:
-> Hi,
->=20
-> I am trying to understand who in the QEMU community can give me permiss=
-ion to use the QEMU logo in a whitepaper.
-> I am an application engineer at Intel and I have prepared some benchmar=
-ks using QEMU as a solution accelerated by Intel hardware (CPUs, SSDs, et=
-c)
-> I would like to use the QEMU logo in this white paper.
->=20
-> Do you know who in the community would have authority to give me such p=
-ermission ?
+On 10/04/2019 21.48, Stefan Weil wrote:
+> This fixes "make check-tcg" on a Debian x86_64 host.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  tcg/tci.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/tcg/tci.c b/tcg/tci.c
+> index 33edca1903..a6208653e8 100644
+> --- a/tcg/tci.c
+> +++ b/tcg/tci.c
+> @@ -127,6 +127,12 @@ static void tci_write_reg8(tcg_target_ulong *regs, TCGReg index, uint8_t value)
+>      tci_write_reg(regs, index, value);
+>  }
+>  
+> +static void
+> +tci_write_reg16(tcg_target_ulong *regs, TCGReg index, uint16_t value)
+> +{
+> +    tci_write_reg(regs, index, value);
+> +}
+> +
+>  static void
+>  tci_write_reg32(tcg_target_ulong *regs, TCGReg index, uint32_t value)
+>  {
+> @@ -585,6 +591,8 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+>              tci_write_reg8(regs, t0, *(uint8_t *)(t1 + t2));
+>              break;
+>          case INDEX_op_ld8s_i32:
+> +            TODO();
+> +            break;
+>          case INDEX_op_ld16u_i32:
+>              TODO();
+>              break;
+> @@ -854,7 +862,14 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+>              tci_write_reg8(regs, t0, *(uint8_t *)(t1 + t2));
+>              break;
+>          case INDEX_op_ld8s_i64:
+> +            TODO();
+> +            break;
+>          case INDEX_op_ld16u_i64:
+> +            t0 = *tb_ptr++;
+> +            t1 = tci_read_r(regs, &tb_ptr);
+> +            t2 = tci_read_s32(&tb_ptr);
+> +            tci_write_reg16(regs, t0, *(uint16_t *)(t1 + t2));
+> +            break;
+>          case INDEX_op_ld16s_i64:
+>              TODO();
+>              break;
+> 
 
-The logo has been designed by Beno=C3=AEt Canet, see:
+Works for me, too:
 
- http://lists.gnu.org/archive/html/qemu-devel/2012-02/msg02865.html
+ https://gitlab.com/huth/qemu/-/jobs/194622472
 
-It is licensed under the terms of CC BY 3.0 :
-
- http://creativecommons.org/licenses/by/3.0/
-
- HTH,
-  Thomas
+Tested-by: Thomas Huth <thuth@redhat.com>
