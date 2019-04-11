@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35743)
+Received: from eggs.gnu.org ([209.51.188.92]:36557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTZ-0002IE-0l
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:02 -0400
+	(envelope-from <mst@redhat.com>) id 1hEOYQ-0003a3-3X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTX-0005jB-Kt
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:00 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34742)
+	(envelope-from <mst@redhat.com>) id 1hEOYP-0007gv-2y
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:44790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hEOTX-0005j5-8L
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:25:59 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k21so3780884otf.1
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:25:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hEOYO-0007gk-Tv
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
+Received: by mail-qk1-f195.google.com with SMTP id y5so2484433qkc.11
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
+Date: Wed, 10 Apr 2019 21:30:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190410213001-mutt-send-email-mst@kernel.org>
+References: <20190401111843.54528-1-ybettan@redhat.com>
+	<20190409131734.GE16944@stefanha-x1.localdomain>
+	<1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
+	<CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
 MIME-Version: 1.0
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-	<20190408123542.1a4de426@redhat.com>
-	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
-	<20190410145908.GF2980@work-vm>
-	<CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
-	<20190410165736.GG2980@work-vm>
-In-Reply-To: <20190410165736.GG2980@work-vm>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Thu, 11 Apr 2019 09:25:46 +0800
-Message-ID: <CAEn6zmFTTYZwPtQ0UQZz=a8UnAWUDxz6VuZ1Lpdq860MZ6foYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Yoni Bettan <ybettan@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Amnon Ilan <ailan@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Dr. David
-
-On Thu, 11 Apr 2019 at 00:57, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
-
-> * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > Hi Dr. David
+On Wed, Apr 10, 2019 at 08:15:32PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 10, 2019 at 4:45 PM Yoni Bettan <ybettan@redhat.com> wrote:
+> > On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
+> > > On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
+> > The final purpose is to have:
 > >
-> > On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <
-> dgilbert@redhat.com>
-> > wrote:
+> > 1. device specification
 > >
-> > > * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > > > Hi Igor
-> > > >
-> > > >
-> > > > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com>
-> wrote:
-> > > >
-> > > > > On Sun,  7 Apr 2019 22:19:05 -0400
-> > > > > Catherine Ho <catherine.hecx@gmail.com> wrote:
-> > > > >
-> > > > > > Currently it is not forbidden to use "-object
-> > > > > memory-backend-file,share=on"
-> > > > > > and together with "-incoming". But after incoming migration is
-> > > finished,
-> > > > > > the memory-backend-file will be definitely written if share=on.
-> So
-> > > the
-> > > > > > memory-backend-file can only be used once, but failed in the 2nd
-> time
-> > > > > > incoming.
-> > > > > >
-> > > > > > Thus it gives a warning and the users can run the qemu if they
-> really
-> > > > > > want to do it.
-> > > > >
-> > > > > Shouldn't we add a migration blocker in such a case instead of
-> warning
-> > > > > and letting qemu run wild?
-> > > > >
-> > > >
-> > > > IMO, it doesn't need to block this. With share=on and -incoming, the
-> user
-> > > > can
-> > > > still save the device memory state into memory-backend file again if
-> > > > ignore-shared
-> > > > capability is on.
-> > > >
-> > > > If we block this, the user can't use the ignore-shared capability in
-> > > > incoming
-> > > > migration.
-> > >
-> > > -incomign with share=on is a perfectly normal thing to do - it just
-> > > depends who you are sharing the file with and the lifetime of that
-> > > shared file.
-> > >
-> > > For example; if you're just running a qemu with vhost-user then you
-> > > use share=on - however wyou typically select the backend file as
-> > > a new file from /dev/shm - it's not a file that you previously migrated
-> > > to.
-> > >
-> > Thanks,
-> > but using a new file from /dev/shm means kernel will start from
-> > start_kernel or early? Is it different from the x-ignore-shared case?
-> > If we remove the share=on in incoming migration, all the writting
-> > of ram will not be flush into the memory backend file. Thus we
-> > can use the base memory backend file for ever.
-> > e.g.
-> > 1) save the vm like a snapshot, current ram state is "kernel
-> > has been started, systemd has been started"
-> > 2) restore it with -incoming and *no* share=on flag
-> > 3) restore it with -incoming and *no* share=on again...
-> > In contrary, if we use share=on, the base backend file will
-> > be written at once after 1st time incoming.
+> > 2. device implementation
 > >
-> > So, IMO, no "share=on" is the proper usage of incoming migration
-> > when ignore-shared is on.
-> > Please correct me if sth is wrong, thanks:)
->
-> OK, I see what you're trying to do - you mean for the 'snapshotting'
-> case;  but that's not the only use.  Another use is for being able to
-> do a very quick upgrade of the running qemu to a new qemu binary
-> version; and in that case you want to be able to write to the shared
-> file so that you can repeatedly do the quick migrate.
->
-> Dave
->
-> Ah, that quick upgrade example makes sense to me. Thanks for the
-explanation.
+> > 3. device driver
+> >
+> > 4. blog
+> >
+> > maybe I should have written it at the beginning, this is not the entire
+> > project but it is its start.
+> 
+> The way I'd design VIRTIO devices without prior knowledge is:
+> 
+> 1. Learn the VIRTIO device model.  Understand the concepts in VIRTIO.
+> <-- this is hard today, there's not much good documentation
 
-B.R.
-Catherine
+Best doc is still probably Rusty's whitepaper. It only covers 0.X
+spec so somewhat outdated but it does explain the concepts I think.
+
+> 2. Design an initial version of the device spec.  Mostly configuration
+> layout, virtqueues, and request structs.  Not much text is necessary
+> at this point, but it's critical for thinking through features before
+> implementation.
+> 
+> 3. Implement guest driver and device emulation.
+> 
+> 4. Iterate on spec and implementation until it's functionally complete.
+> 
+> 5. Submit the spec to the VIRTIO Technical Committee.
+> 
+> 6. Submit driver and device emulation patches.  They can be merged
+> when the spec is approved/close to approved.
+> 
+> Are you jumping to #3?  This is likely to lead to poor quality
+> implementations and specs because the fundamental VIRTIO concepts
+> weren't understood.
+> 
+> If the point is to educate others and/or do it "the right way", then I
+> would really avoid hacking around without first doing the other steps.
+> 
+> Stefan
