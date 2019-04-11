@@ -2,65 +2,109 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C0CC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBBDC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:35:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3A7120850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62A4F206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="E5eb1g6g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A7120850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MMluVUEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62A4F206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49749 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49941 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEae4-0005Wk-Rt
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:25:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58697)
+	id 1hEanp-0003oF-82
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:35:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEaca-0004ch-VH
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:24:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEam8-0002rv-7L
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEaca-000120-18
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:24:08 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:49196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hEacZ-00011Q-LC; Thu, 11 Apr 2019 10:24:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=References:In-Reply-To:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-	bh=gm9gzrh60/aW5yEJfW6bCvZ7dai+MaRbJhO1rJNnMWo=; 
-	b=E5eb1g6gsQRGxqcgsJFlHjHZAAKz1o1E7sc5G5aGjuA1vCoOH9i9D1/eiOoU5Nl+LIHFP7FIb+5W4RiA+OEyjkaELqLj7U+oWlcY2XAtXjlfYdqDjWNzAnyGA5fx4ZEj5jTVYKzVgReyBKWd440WriX/UbEY8PSanCkiM+uKbgVvQA5GOdEvrLIbkh9rQRqNXeOVC4Cibs54nEWBT/nSaWzZG+GpTxrdRLZUDNBUc7NrQTC18fzZZj0kyoGy4D5j9nb16SmnGPa4XZGjE9B6AIC9lYVQ8nrVMk3WAu/X8nMBldw0OZvkHO4qrz7m1YaT9ZMvkzezi2wPvLYI0/zugA==;
-Received: from 178-55-128-240.bb.dnainternet.fi ([178.55.128.240]
-	helo=perseus.local) by fanzine.igalia.com with esmtpsa 
-	(Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
-	id 1hEacW-00019K-81; Thu, 11 Apr 2019 16:24:04 +0200
-Received: from berto by perseus.local with local (Exim 4.89)
-	(envelope-from <berto@igalia.com>)
-	id 1hEacH-0001i1-1K; Thu, 11 Apr 2019 17:23:49 +0300
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 17:23:45 +0300
-Message-Id:
- <f1f5fd6b89d74151dda9dbe758ae9f5f53e744e2.1554992449.git.berto@igalia.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <cover.1554992449.git.berto@igalia.com>
-References: <cover.1554992449.git.berto@igalia.com>
-In-Reply-To: <cover.1554992449.git.berto@igalia.com>
-References: <cover.1554992449.git.berto@igalia.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: [Qemu-devel] [PATCH for-4.1 1/2] block: Fix check for default
- backing files in bdrv_reopen_prepare()
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEam6-0004N4-RW
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:34:00 -0400
+Received: from mail-ve1eur03on0711.outbound.protection.outlook.com
+	([2a01:111:f400:fe09::711]:7952
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hEam5-0004Ks-Ad; Thu, 11 Apr 2019 10:33:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=Zn8nKelapxjP1M/7hRwo6pVCV+X50+ISrLJQe8TLJrg=;
+	b=MMluVUECmSkhG3plMJmJsu01tlreozCTifXrhgANAafcAAr56SpE42/0NnsQgD/LXqk0Vz4kB3gCdPMnYANvy7iOlsjAwzArwZQImYoblnutJVmk6mZ2TMHLvpS9kGJEa6+VaadjDwxDNaKcNlksYejxR2/UPc61+EEiozBIvpU=
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
+	DB7PR08MB3002.eurprd08.prod.outlook.com (52.134.109.156) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.19; Thu, 11 Apr 2019 14:33:46 +0000
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949]) by
+	DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1771.021;
+	Thu, 11 Apr 2019 14:33:46 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [PATCH v2 2/6] qemu-img: Add salvaging mode to convert
+Thread-Index: AQHU7+AAiPxuQx+lk0aT0pbmGGq3XqY3B2CA
+Date: Thu, 11 Apr 2019 14:33:46 +0000
+Message-ID: <acb069c8-5207-368e-e972-baa2ba44d850@virtuozzo.com>
+References: <20190410205715.2209-1-mreitz@redhat.com>
+	<20190410205715.2209-3-mreitz@redhat.com>
+In-Reply-To: <20190410205715.2209-3-mreitz@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR09CA0079.eurprd09.prod.outlook.com
+	(2603:10a6:7:3d::23) To DB7PR08MB3851.eurprd08.prod.outlook.com
+	(2603:10a6:10:7b::30)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190411173343853
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2934e394-299b-4cda-56e6-08d6be8ab478
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3002; 
+x-ms-traffictypediagnostic: DB7PR08MB3002:
+x-microsoft-antispam-prvs: <DB7PR08MB3002C39549A6C03589F479C4C12F0@DB7PR08MB3002.eurprd08.prod.outlook.com>
+x-forefront-prvs: 00046D390F
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(346002)(376002)(136003)(396003)(39840400004)(366004)(189003)(199004)(86362001)(2501003)(26005)(186003)(54906003)(110136005)(7736002)(25786009)(71200400001)(66066001)(107886003)(229853002)(316002)(97736004)(81166006)(305945005)(71190400001)(53936002)(14454004)(6486002)(81156014)(8936002)(8676002)(6246003)(102836004)(105586002)(5660300002)(31696002)(6436002)(68736007)(31686004)(6512007)(3846002)(6116002)(52116002)(76176011)(99286004)(2616005)(476003)(386003)(446003)(6506007)(256004)(11346002)(106356001)(36756003)(4326008)(478600001)(486006)(2906002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3002;
+	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: SVHHJB2ruPeCMSvuX66JhSZC3wGvMD+EvMaUIm9XIZngPdsr4R53iR6MOyc0W9OwLlbUBuIVTgDM4VK/ApqlaG9YVSK7PGmTQf/P8VbqAijkOlllqd4ULBV1oVLfH82+9P7PiOhXcvecfIGjdaCQlnJymiHCGvB4Kvm50xnGWnki5rsDE1VFfEtx6akf1XuVloS+LCrsvXwGwRi/DZ4E5N0XoF1zW1J9JhqbVB/zlJlGq+4dsRs+2jy5UDi5AzxPu6EYCRfW4rg82aEc6oGdoJa7CKYiMbPnu9nNNYe9IFSy4Eso8rzlO7/5+ciNJcJ9uJ1wJ4UmJ/Iw9eUNdwcTYfG/tw8cASx6VsrgFwZ5Y06pCftHQ1i6OgX4coCL+Zs7oKOBaN1RoLdbbMkOXoTZnofd9o6XD4mIC9B+ZJsFbUs=
+Content-Type: text/plain; charset="UTF-8"
+Content-ID: <D1551631D7758F4291502F5A2E12A034@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2934e394-299b-4cda-56e6-08d6be8ab478
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 14:33:46.3874 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3002
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe09::711
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qemu-img: Add salvaging mode to
+ convert
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,59 +116,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411142345.xlv6bdKsph6_YEBwMvdgMHbmntlUGoYilGLiGh5Wa-g@z>
+Message-ID: <20190411143346.h0czAxW6Lw5XAeNMuohCRM7GByDb-eUP-ojhfmj1rpc@z>
 
-x-blockdev-reopen requires that the 'backing' parameter is specified
-when an image has a backing file attached or when there is a default
-backing file in the image metadata.
-
-The latter can be checked by reading bs->auto_backing_file, but
-bdrv_reopen_prepare() is using bs->backing_file.
-
-This bug should be detected by iotest 245, but unfortunately the test
-expectation is wrong so it must be corrected as well.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reported-by: Max Reitz <mreitz@redhat.com>
----
- block.c                | 3 ++-
- tests/qemu-iotests/245 | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/block.c b/block.c
-index 16615bc876..e496999e2f 100644
---- a/block.c
-+++ b/block.c
-@@ -3634,7 +3634,8 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-      * its metadata. Otherwise the 'backing' option can be omitted.
-      */
-     if (drv->supports_backing && reopen_state->backing_missing &&
--        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_file[0])) {
-+        (backing_bs(reopen_state->bs) ||
-+         reopen_state->bs->auto_backing_file[0])) {
-         error_setg(errp, "backing is missing for '%s'",
-                    reopen_state->bs->node_name);
-         ret = -EINVAL;
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index 7891a210c1..9784ca3ced 100644
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -716,7 +716,7 @@ class TestBlockdevReopen(iotests.QMPTestCase):
- 
-         # Detach hd2 from hd0.
-         self.reopen(opts, {'backing': None})
--        self.reopen(opts, {}, "backing is missing for 'hd0'")
-+        self.reopen(opts)
- 
-         # Remove both hd0 and hd2
-         result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
--- 
-2.11.0
-
+MTAuMDQuMjAxOSAyMzo1NywgTWF4IFJlaXR6IHdyb3RlOg0KPiBUaGlzIGFkZHMgYSBzYWx2YWdp
+bmcgbW9kZSAoLS1zYWx2YWdlKSB0byBxZW11LWltZyBjb252ZXJ0IHdoaWNoIGlnbm9yZXMNCj4g
+cmVhZCBlcnJvcnMgYW5kIHRyZWF0cyB0aGUgcmVzcGVjdGl2ZSBhcmVhcyBhcyBjb250YWluaW5n
+IG9ubHkgemVyb2VzLg0KPiBUaGlzIGNhbiBiZSB1c2VkIGZvciBpbnN0YW5jZSB0byBhdCBsZWFz
+dCBwYXJ0aWFsbHkgcmVjb3ZlciB0aGUgZGF0YQ0KPiBmcm9tIHRlcm1pbmFsbHkgY29ycnVwdGVk
+IHFjb3cyIGltYWdlcy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0eiA8bXJlaXR6QHJl
+ZGhhdC5jb20+DQo+IC0tLQ0KDQpbLi5dDQoNCj4gLS0tIGEvcWVtdS1pbWcudGV4aQ0KPiArKysg
+Yi9xZW11LWltZy50ZXhpDQo+IEBAIC0xNzUsNiArMTc1LDExIEBAIGltcHJvdmUgcGVyZm9ybWFu
+Y2UgaWYgdGhlIGRhdGEgaXMgcmVtb3RlLCBzdWNoIGFzIHdpdGggTkZTIG9yIGlTQ1NJIGJhY2tl
+bmRzLA0KPiAgIGJ1dCB3aWxsIG5vdCBhdXRvbWF0aWNhbGx5IHNwYXJzaWZ5IHplcm8gc2VjdG9y
+cywgYW5kIG1heSByZXN1bHQgaW4gYSBmdWxseQ0KPiAgIGFsbG9jYXRlZCB0YXJnZXQgaW1hZ2Ug
+ZGVwZW5kaW5nIG9uIHRoZSBob3N0IHN1cHBvcnQgZm9yIGdldHRpbmcgYWxsb2NhdGlvbg0KPiAg
+IGluZm9ybWF0aW9uLg0KPiArQGl0ZW0gLS1zYWx2YWdlDQo+ICtUcnkgdG8gaWdub3JlIEkvTyBl
+cnJvcnMgd2hlbiByZWFkaW5nLiAgVW5sZXNzIGluIHF1aWV0IG1vZGUgKEBjb2Rley1xfSksIGVy
+cm9ycw0KPiArd2lsbCBzdGlsbCBiZSBwcmludGVkLiAgQXJlYXMgdGhhdCBjYW5ub3QgYmUgcmVh
+ZCBmcm9tIHRoZSBzb3VyY2Ugd2lsbCBiZQ0KPiArdHJlYXRlZCBhcyBjb250YWluaW5nIG9ubHkg
+emVyb2VzLiAgVGhpcyBvcHRpb24gaGFzIG5vIGVmZmVjdCBpbiBjb3B5IG9mZmxvYWRpbmcNCj4g
+K21vZGUgKEBjb2Rley1DfSkuDQoNCklzbid0IGl0IGJldHRlciB0byByZXN0cmljdCBzdWNoIGl0
+LCBpbnN0ZWFkIG9mIGNyZWF0aW5nIG1lYW5pbmdsZXNzIGNvbWJpbmF0aW9uPw0KQW5kIGRyb3Ag
+dGhlIHJlc3RyaWN0aW9uIGlmIHdlIHN1cHBvcnQgaXQgaW4gZnV0dXJlLCBpbnN0ZWFkIG9mIHNp
+bGVudCBtb3ZlIGZyb20NCm5vb3AgdG8gdGhlIGZlYXR1cmU/DQoNCk90aGVyd2lzZSwgbG9va3Mg
+T0sgZm9yIG1lLiBJIGRpc2xpa2UgbWl4aW5nIGJ5dGUtYmFzZWQgYW5kIHNlY3Rvci1iYXNlZCBs
+b2dpYywgYnV0IGl0DQppcyBub3QgYWJvdXQgdGhlIHNlcmllcywgd2Ugc2hvdWxkIG1vdmUgdG8g
+Ynl0ZS1iYXNlZCBsaWtlIGluIG90aGVyIHBsYWNlcywgYW5kIGl0IG1heQ0KYmUgZG9uZSBsYXRl
+ci4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
