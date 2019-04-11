@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56838)
+Received: from eggs.gnu.org ([209.51.188.92]:57467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEWxp-0008JH-48
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:50 -0400
+	(envelope-from <berto@igalia.com>) id 1hEWzd-0001rK-3o
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEWxn-0000Bx-AJ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:48 -0400
-Resent-Message-Id: <E1hEWxn-0000Bx-AJ@eggs.gnu.org>
-Message-ID: <155497852263.12882.17138118894178379111@76452e4e88f2>
-In-Reply-To: <20190411102025.22559-1-cohuck@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berto@igalia.com>) id 1hEWza-00019q-6t
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:31:41 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
+References: <20190410152429.8076-1-berto@igalia.com>
+	<bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
+Date: Thu, 11 Apr 2019 12:31:33 +0200
+Message-ID: <w51bm1cvnne.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-4.1] commit: Make base read-only if
+ there is an early failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cohuck@redhat.com
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMTEwMjAyNS4yMjU1
-OS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTQuMV0gaHc6IGFkZCBjb21w
-YXQgbWFjaGluZXMgZm9yIDQuMQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0
-YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQtMS1yaWNo
-YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAg
-IHBhdGNoZXcvMjAxOTA0MTEwNjM0MDguMzk5OC0xLWNsZ0BrYW9kLm9yZyAtPiBwYXRjaGV3LzIw
-MTkwNDExMDYzNDA4LjM5OTgtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAg
-ICAgcGF0Y2hldy8yMDE5MDQxMTA3MTczOS4yMjg4OS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50
-ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MTEwNzE3MzkuMjI4ODktMS1yaWNoYXJkdy55YW5nQGxp
-bnV4LmludGVsLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDEx
-MTAyMDI1LjIyNTU5LTEtY29odWNrQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQxMTEwMjAy
-NS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKNTU3NDZkZGFlOCBodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4Old4
-VikKIzU4OiBGSUxFOiBody9pMzg2L3BjLmM6MTE4OgorR2xvYmFsUHJvcGVydHkgcGNfY29tcGF0
-XzRfMFtdID17fTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDE2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgNTU3NDZkZGFlOGI2
-IChodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed 10 Apr 2019 05:32:47 PM CEST, Eric Blake wrote:
+> On 4/10/19 10:24 AM, Alberto Garcia wrote:
+>> You can reproduce this by passing an invalid filter-node-name (like
+>> "1234") to block-commit. In this case the base image is put in
+>> read-write mode but is never reset back to read-only.
+>
+> Is it worth iotest coverage?
+
+I couldn't think of any way to reproduce this that would trigger an
+error on an iotest, but I think I have one now, I'll try to write
+something.
+
+Berto
