@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0430C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F5EC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 21:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B025E2146F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:46:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B025E2146F
+	by mail.kernel.org (Postfix) with ESMTPS id 20EC820850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 21:07:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20EC820850
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54736 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54926 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEgb4-0006hh-Vt
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:46:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45408)
+	id 1hEguZ-0004ZC-A2
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 17:07:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEgaE-0006OS-39
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:46:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1hEgtK-00043R-WB
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEgaD-0005Bo-1c
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:46:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46572)
+	(envelope-from <bounces@canonical.com>) id 1hEgtJ-0000po-HH
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:05:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEgaC-0005B4-PX
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:46:04 -0400
+	id 1hEgtJ-0000mV-8e
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:05:49 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEga9-000238-3N
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 20:46:01 +0000
+	id 1hEgtH-00052b-To
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 21:05:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F29832E81C9
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 20:45:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CF10F2E80CC
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 21:05:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Apr 2019 20:36:38 -0000
+Date: Thu, 11 Apr 2019 20:52:52 -0000
 From: =?utf-8?q?Matthias_L=C3=BCscher?= <1823790@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,13 +57,13 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
 References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
 Message-Id:
- <155501499891.7911.12140611810489192279.malone@wampee.canonical.com>
+ <155501597210.13466.17748252574136665465.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18920";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c43ffc834eb51d02a6feae7b9bc1264d5187ba6b
+X-Launchpad-Hash: fc75bee32f59d3b01c4b5eeecd5b1957fc51f9fe
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC
@@ -82,14 +82,13 @@ Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411203638.OUNeHigvMYZI2Cnk6NOebCdeFsRv5HwCUDPvODaGeJ0@z>
+Message-ID: <20190411205252.TzDunbqDR4ZClNrvE8qjoxBWShdja4VQV4M4CQHRWW8@z>
 
-This is probably the tight loop that gets triggered:
-https://github.com/systemd/systemd/commit/217d89678269334f461e9abeeffed5707=
-7b21454
-
-It looks like the previous implementation was just a bit more
-"tolerant".
+I have just studied a bit the systemd code and this brought me to the
+following idea/temporary workaround: What about returning -1 (error) and
+setting errno when getsockopt(fd, SOL_SOCKET, SO_PEERSEC, ...) gets
+called? This would then let systemd know that SO_PEERSEC is not (yet)
+implemented.
 
 -- =
 
