@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45113)
+Received: from eggs.gnu.org ([209.51.188.92]:45421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEWDi-0005N8-0x
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:42:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEWEs-0005wv-TB
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEWDf-0006TG-Hl
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:42:09 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33200)
+	(envelope-from <philmd@redhat.com>) id 1hEWEr-00072j-B0
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:43:22 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEWDe-0006Rr-A4
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:42:06 -0400
-Received: by mail-wr1-f66.google.com with SMTP id q1so6468117wrp.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 02:42:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEWEr-00072A-0W
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:43:21 -0400
+Received: by mail-wr1-f68.google.com with SMTP id s15so6379285wra.12
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 02:43:20 -0700 (PDT)
 References: <20190315032629.21234-1-richard.henderson@linaro.org>
-	<20190315032629.21234-10-richard.henderson@linaro.org>
+	<20190315032629.21234-11-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <119d86ff-1436-d847-fefe-b71011d1557e@redhat.com>
-Date: Thu, 11 Apr 2019 11:42:01 +0200
+Message-ID: <d20cf0a8-73a8-b913-2668-2924e5253834@redhat.com>
+Date: Thu, 11 Apr 2019 11:43:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190315032629.21234-10-richard.henderson@linaro.org>
+In-Reply-To: <20190315032629.21234-11-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 09/23] util: Add qemu_guest_getrandom
- and associated routines
+Subject: Re: [Qemu-devel] [PATCH v3 10/23] cpus: Initialize pseudo-random
+ seeds for all guest cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,208 +34,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
 On 3/15/19 4:26 AM, Richard Henderson wrote:
-> This routine is intended to produce high-quality random numbers to the
-> guest.  Normally, such numbers are crypto quality from the host, but a
-> command-line option can force the use of a fully deterministic sequence
-> for use while debugging.
+> When the -seed option is given, call qemu_guest_random_seed_main,
+> putting the subsystem into deterministic mode.  Pass derived seeds
+> to each cpu created; which is a no-op unless the subsystem is in
+> deterministic mode.
 > 
 > Cc: Daniel P. Berrangé <berrange@redhat.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/qemu/guest-random.h | 68 +++++++++++++++++++++++++++
->  util/guest-random.c         | 93 +++++++++++++++++++++++++++++++++++++
->  util/Makefile.objs          |  1 +
->  3 files changed, 162 insertions(+)
->  create mode 100644 include/qemu/guest-random.h
->  create mode 100644 util/guest-random.c
+>  include/qom/cpu.h |  1 +
+>  cpus.c            |  9 +++++++++
+>  vl.c              |  4 ++++
+>  qemu-options.hx   | 10 ++++++++++
+>  4 files changed, 24 insertions(+)
 > 
-> diff --git a/include/qemu/guest-random.h b/include/qemu/guest-random.h
-> new file mode 100644
-> index 0000000000..09ff9c2236
-> --- /dev/null
-> +++ b/include/qemu/guest-random.h
-> @@ -0,0 +1,68 @@
-> +/*
-> + * QEMU guest-visible random functions
-> + *
-> + * Copyright 2019 Linaro, Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License as published by the Free
-> + * Software Foundation; either version 2 of the License, or (at your option)
-> + * any later version.
-> + */
-> +
-> +#ifndef QEMU_GUEST_RANDOM_H
-> +#define QEMU_GUEST_RANDOM_H
-> +
-> +/**
-> + * qemu_guest_random_seed_main(const char *optarg, Error **errp)
-> + * @optarg: a non-NULL pointer to a C string
-> + * @errp: an error indicator
-> + *
-> + * The @optarg value is that which accompanies the -seed argument.
-> + * This forces qemu_guest_getrandom into deterministic mode.
-> + *
-> + * Returns 0 on success, < 0 on failure while setting *errp.
-> + */
-> +int qemu_guest_random_seed_main(const char *optarg, Error **errp);
-> +
-> +/**
-> + * qemu_guest_random_seed_thread_part1(void)
-> + *
-> + * If qemu_getrandom is in deterministic mode, returns an
-> + * independent seed for the new thread.  Otherwise returns 0.
-> + */
-> +uint64_t qemu_guest_random_seed_thread_part1(void);
-> +
-> +/**
-> + * qemu_guest_random_seed_thread_part2(uint64_t seed)
-> + * @seed: a value for the new thread.
-> + *
-> + * If qemu_guest_getrandom is in deterministic mode, this stores an
-> + * independent seed for the new thread.  Otherwise a no-op.
-> + */
-> +void qemu_guest_random_seed_thread_part2(uint64_t seed);
-> +
-> +/**
-> + * qemu_guest_getrandom(void *buf, size_t len, Error **errp)
-> + * @buf: a buffer of bytes to be written
-> + * @len: the number of bytes in @buf
-> + * @errp: an error indicator
-> + *
-> + * Fills len bytes in buf with random data.  This should only be used
-> + * for data presented to the guest.  Host-side crypto services should
-> + * use qcrypto_random_bytes.
-> + *
-> + * Returns 0 on success, < 0 on failure while setting *errp.
-> + */
-> +int qemu_guest_getrandom(void *buf, size_t len, Error **errp);
-> +
-> +/**
-> + * qemu_guest_getrandom_nofail(void *buf, size_t len)
-> + * @buf: a buffer of bytes to be written
-> + * @len: the number of bytes in @buf
-
-API documentation appreciated, thanks!
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 1d6099e5d4..343cc6d51e 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -372,6 +372,7 @@ struct CPUState {
+>      int singlestep_enabled;
+>      int64_t icount_budget;
+>      int64_t icount_extra;
+> +    uint64_t random_seed;
+>      sigjmp_buf jmp_env;
+>  
+>      QemuMutex work_mutex;
+> diff --git a/cpus.c b/cpus.c
+> index e83f72b48b..6d88f6bfcd 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -49,6 +49,7 @@
+>  #include "qemu/option.h"
+>  #include "qemu/bitmap.h"
+>  #include "qemu/seqlock.h"
+> +#include "qemu/guest-random.h"
+>  #include "tcg.h"
+>  #include "hw/nmi.h"
+>  #include "sysemu/replay.h"
+> @@ -1275,6 +1276,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      /* signal CPU creation */
+>      cpu->created = true;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+>          if (cpu_can_run(cpu)) {
+> @@ -1318,6 +1320,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>      /* signal CPU creation */
+>      cpu->created = true;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+>          qemu_mutex_unlock_iothread();
+> @@ -1477,6 +1480,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>      cpu->created = true;
+>      cpu->can_do_io = 1;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      /* wait for initial kick-off after machine start */
+>      while (first_cpu->stopped) {
+> @@ -1591,6 +1595,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>  
+>      hax_init_vcpu(cpu);
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+>          if (cpu_can_run(cpu)) {
+> @@ -1630,6 +1635,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      /* signal CPU creation */
+>      cpu->created = true;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+>          if (cpu_can_run(cpu)) {
+> @@ -1670,6 +1676,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      /* signal CPU creation */
+>      cpu->created = true;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+>          if (cpu_can_run(cpu)) {
+> @@ -1723,6 +1730,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      cpu->can_do_io = 1;
+>      current_cpu = cpu;
+>      qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      /* process any pending work */
+>      cpu->exit_request = 1;
+> @@ -2070,6 +2078,7 @@ void qemu_init_vcpu(CPUState *cpu)
+>      cpu->nr_cores = smp_cores;
+>      cpu->nr_threads = smp_threads;
+>      cpu->stopped = true;
+> +    cpu->random_seed = qemu_guest_random_seed_thread_part1();
+>  
+>      if (!cpu->as) {
+>          /* If the target cpu hasn't set up any address spaces itself,
+> diff --git a/vl.c b/vl.c
+> index c1d5484e12..d84f883c2c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -128,6 +128,7 @@ int main(int argc, char **argv)
+>  #include "qapi/qapi-commands-ui.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "sysemu/iothread.h"
+> +#include "qemu/guest-random.h"
+>  
+>  #define MAX_VIRTIO_CONSOLES 1
+>  
+> @@ -3330,6 +3331,9 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_DFILTER:
+>                  qemu_set_dfilter_ranges(optarg, &error_fatal);
+>                  break;
+> +            case QEMU_OPTION_seed:
+> +                qemu_guest_random_seed_main(optarg, &error_fatal);
+> +                break;
+>              case QEMU_OPTION_s:
+>                  add_device_config(DEV_GDB, "tcp::" DEFAULT_GDBSTUB_PORT);
+>                  break;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08749a3391..b8da998668 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3601,6 +3601,16 @@ the 0x200 sized block starting at 0xffffffc000080000 and another 0x1000 sized
+>  block starting at 0xffffffc00005f000.
+>  ETEXI
+>  
+> +DEF("seed", HAS_ARG, QEMU_OPTION_seed, \
+> +    "-seed number       seed the pseudo-random number generator\n",
+> +    QEMU_ARCH_ALL)
+> +STEXI
+> +@item -seed @var{number}
+> +@findex -seed
+> +Force the guest to use a deterministic pseudo-random number generator, seeded
+> +with @var{number}.  This does not affect crypto routines within the host.
+> +ETEXI
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> + *
-> + * Like qemu_guest_getrandom, but will assert for failure.
-> + * Use this when there is no reasonable recovery.
-> + */
-> +void qemu_guest_getrandom_nofail(void *buf, size_t len);
 > +
-> +#endif /* QEMU_GUEST_RANDOM_H */
-> diff --git a/util/guest-random.c b/util/guest-random.c
-> new file mode 100644
-> index 0000000000..e8124a3cad
-> --- /dev/null
-> +++ b/util/guest-random.c
-> @@ -0,0 +1,93 @@
-> +/*
-> + * QEMU guest-visible random functions
-> + *
-> + * Copyright 2019 Linaro, Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License as published by the Free
-> + * Software Foundation; either version 2 of the License, or (at your option)
-> + * any later version.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/cutils.h"
-> +#include "qapi/error.h"
-> +#include "qemu/guest-random.h"
-> +#include "crypto/random.h"
-> +
-> +
-> +static __thread GRand *thread_rand;
-> +static bool deterministic;
-> +
-> +
-> +static int glib_random_bytes(void *buf, size_t len)
-> +{
-> +    GRand *rand = thread_rand;
-> +    size_t i;
-> +    uint32_t x;
-> +
-> +    if (unlikely(rand == NULL)) {
-> +        /* Thread not initialized for a cpu, or main w/o -seed.  */
-> +        thread_rand = rand = g_rand_new();
-> +    }
-> +
-> +    for (i = 0; i + 4 <= len; i += 4) {
-> +        x = g_rand_int(rand);
-> +        __builtin_memcpy(buf + i, &x, 4);
-> +    }
-> +    if (i < len) {
-> +        x = g_rand_int(rand);
-> +        __builtin_memcpy(buf + i, &x, i - len);
-> +    }
-> +    return 0;
-> +}
-> +
-> +int qemu_guest_getrandom(void *buf, size_t len, Error **errp)
-> +{
-> +    if (unlikely(deterministic)) {
-> +        /* Deterministic implementation using Glib's Mersenne Twister.  */
-> +        return glib_random_bytes(buf, len);
-> +    } else {
-> +        /* Non-deterministic implementation using crypto routines.  */
-> +        return qcrypto_random_bytes(buf, len, errp);
-> +    }
-> +}
-> +
-> +void qemu_guest_getrandom_nofail(void *buf, size_t len)
-> +{
-> +    qemu_guest_getrandom(buf, len, &error_fatal);
-> +}
-> +
-> +uint64_t qemu_guest_random_seed_thread_part1(void)
-> +{
-> +    if (deterministic) {
-> +        uint64_t ret;
-> +        glib_random_bytes(&ret, sizeof(ret));
-> +        return ret;
-> +    }
-> +    return 0;
-> +}
-> +
-> +void qemu_guest_random_seed_thread_part2(uint64_t seed)
-> +{
-> +    g_assert(thread_rand == NULL);
-> +    if (deterministic) {
-> +        thread_rand =
-> +            g_rand_new_with_seed_array((const guint32 *)&seed,
-> +                                       sizeof(seed) / sizeof(guint32));
-> +    }
-> +}
-> +
-> +int qemu_guest_random_seed_main(const char *optarg, Error **errp)
-> +{
-> +    unsigned long long seed;
-> +    if (parse_uint_full(optarg, &seed, 0)) {
-> +        error_setg(errp, "Invalid seed number: %s", optarg);
-> +        return -1;
-> +    } else {
-> +        deterministic = true;
-> +        qemu_guest_random_seed_thread_part2(seed);
-> +        return 0;
-> +    }
-> +}
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 835fcd69e2..4d4db653cc 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -53,5 +53,6 @@ util-obj-y += iova-tree.o
->  util-obj-$(CONFIG_INOTIFY1) += filemonitor-inotify.o
->  util-obj-$(CONFIG_LINUX) += vfio-helpers.o
->  util-obj-$(CONFIG_OPENGL) += drm.o
-> +util-obj-y += guest-random.o
->  
->  stub-obj-y += filemonitor-stub.o
+>  DEF("L", HAS_ARG, QEMU_OPTION_L, \
+>      "-L path         set the directory for the BIOS, VGA BIOS and keymaps\n",
+>      QEMU_ARCH_ALL)
 > 
