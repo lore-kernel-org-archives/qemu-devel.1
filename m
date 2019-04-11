@@ -2,101 +2,69 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CBCC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28214C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:23:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E8A32082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:21:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qJ6x5zJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8A32082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DC2882082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:23:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC2882082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42471 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hET5z-0006m0-4F
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 02:21:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56257)
+	id 1hET7D-0007U3-5a
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 02:23:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hET5C-0006On-RO
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:21:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1hET6M-00073Q-TV
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:22:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hET5B-0004N5-EW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:21:10 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hET5B-0004Lt-2N
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:21:09 -0400
-Received: by mail-pg1-x541.google.com with SMTP id z9so2985499pgu.10
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 23:21:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=nyiCHi7zME5UQOV+l9GTfI0qnIOZ+CyisJ2CB1o74TI=;
-	b=qJ6x5zJojnwU4XMwitXcWc6n9I6zm/5TfJ/OTte5XLXjenPb/EKEf9musd29OGWd2I
-	sYo6ACuR3dEv1/HADD2bNVJzadqEVyF0LBQzlRcJ+OJLmdGNPH6sndTVkSny9XnxgUUX
-	v4JqBlJjHsjBYbpOB9xA9Jj6CAF1gEPgoN4h20Br1f2aIbT+qi+bmF5egtpG9doWVbcZ
-	My0d6DwUQyXszcv/86Obig7+64+ABvr5b+0CvSl11x1CJsccyKFAxVSj64sZcl+NKobW
-	KDJ6fwi2ZU4qrQ16hv2RZA7mr/B9ZNG4lUqJKV5Ez/00hF3xzRiEwGl6p6Og574f5N5S
-	QcgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=nyiCHi7zME5UQOV+l9GTfI0qnIOZ+CyisJ2CB1o74TI=;
-	b=f4Mcwkoh0pje2xWc/QWPJ7O5C1dl+JscrjX6AnOxalBGJLZpJw4Y3O0VHjkfCkFSqa
-	yjkelYhF56OYaTCPpryCQczwTdSSmE3BLAroi7YiklLZIQ22oPlGL0n0zEP7zc77bDqM
-	NwTtOFqH707wIg+7lCM6kgETELHd+NFMS7vBsj+AGrc8vzSVPjgWKlxsFTrcraQN8RmZ
-	bGk6nhZM+v4Gk2AuSpZnQJZSAVlHSrT5GVGQe67HdPxGIgJ0SMdAMQeK6nj18Nommit5
-	hmzYlsDDUpNYw18oEMK3P5S51XB2lmWvOZQlvwczBfg8RdZwcObe2iEVGqBBIBUedqN3
-	6dPg==
-X-Gm-Message-State: APjAAAWT350Xtb8EnFRlr6nTzcHFEQcROJpJAIJUhYtBOiKWr7T45tgb
-	4mkZtMLZFAkEh9M6vJ+xcoi3+A==
-X-Google-Smtp-Source: APXvYqzKlZ/1hP0zq5et5vkWkIzd6mZw5LfULao5i3TTebHV7v4BbiAuca4TLCs/5FvIwvuehR5Lww==
-X-Received: by 2002:aa7:9088:: with SMTP id i8mr48482206pfa.118.1554963665940; 
-	Wed, 10 Apr 2019 23:21:05 -0700 (PDT)
-Received: from [192.168.3.43] (rrcs-173-197-98-123.west.biz.rr.com.
-	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
-	b16sm52017691pfo.168.2019.04.10.23.21.03
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 10 Apr 2019 23:21:04 -0700 (PDT)
-To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
-	<philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
-	<berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
-References: <20190404185730.GA22512@ls3530.dellerweb.de>
-	<CAFEAcA9xP8CtXEruuzPHCyuDT5EyMMHFGdCJdfFBhX+C2Jr36A@mail.gmail.com>
-	<b48c6984-f0fc-a597-53a0-4869c822ce73@gmx.de>
-	<068f4832-7e0b-8850-ffa0-fcf1ecd50295@redhat.com>
-	<20190405090212.GF6105@redhat.com>
-	<740ce541-c92d-5369-1191-eb73fc861fdd@redhat.com>
-	<a53b3bab-5aa4-b37f-f194-7788bce1d04b@weilnetz.de>
-	<35359e2b-7f07-8815-4f2b-f1435abc4e63@linaro.org>
-	<526e88d8-1c5e-1598-6ad3-9b4152ece556@weilnetz.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <a04b5f09-4c21-04bc-f224-e9d0b3fb1d79@linaro.org>
-Date: Wed, 10 Apr 2019 20:21:00 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <armbru@redhat.com>) id 1hET6L-0004yd-Mj
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:22:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hET6I-0004xZ-Qv; Thu, 11 Apr 2019 02:22:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C3E0230832CD;
+	Thu, 11 Apr 2019 06:22:16 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D3795D9CD;
+	Thu, 11 Apr 2019 06:22:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 050D41138648; Thu, 11 Apr 2019 08:22:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+References: <20190410012413.31569-1-jsnow@redhat.com>
+	<20190410012413.31569-3-jsnow@redhat.com>
+	<87sguq2yn1.fsf@dusky.pond.sub.org>
+	<004289a6-9df9-ae99-53e6-56e555709434@redhat.com>
+Date: Thu, 11 Apr 2019 08:22:12 +0200
+In-Reply-To: <004289a6-9df9-ae99-53e6-56e555709434@redhat.com> (John Snow's
+	message of "Wed, 10 Apr 2019 13:55:33 -0400")
+Message-ID: <87a7gxukmj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <526e88d8-1c5e-1598-6ad3-9b4152ece556@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH] configure: Automatically fall back to TCI
- on non-release architectures
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 11 Apr 2019 06:22:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] pxtool: Add new qemu-img command
+ info generation tool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,76 +76,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>,
-	Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+	qemu-block@nongnu.org, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411062100.R-CGkS36JgLRC1BS-WO-COVXDPJEudhiNrhR7D4OQxQ@z>
+Message-ID: <20190411062212.NWg9ii3IeFaOa4vNY9Bq83GpJlvvxypQfFkmIu_SlyM@z>
 
-On 4/9/19 8:17 PM, Stefan Weil wrote:
-> On 09.04.19 22:39, Richard Henderson wrote:
->> On 4/9/19 9:46 AM, Stefan Weil wrote:
->>> * Calling conventions. The current implementation works on many hosts,
->>> but for example not on Sparc. A fix would require simple calling
->>> conventions for all helper functions (for example stack based argument
->>> passing, can this be enforced?), or it needs to know the signature of
->>> each helper function at runtime. I'm afraid that fixing this would
->>> require much work. A runtime test whether calls of helper functions work
->>> correctly could be implemented easily and could abort the program
->>> execution when calls fail to pass the right arguments. Would such a
->>> runtime test help a little bit?
->>
->> In the rewrite of tci that I proposed some years ago,
->> I used libffi for this.
->>
->> Those patches could probably be recovered...
->>
->> https://patchwork.ozlabs.org/patch/348528/
->> https://patchwork.ozlabs.org/patch/348527/
-> 
-> 
-> The first patch is the important one because it adds the signature to
-> each helper function. As soon as this information is passed to the
-> interpreter, the rest is simple. It should not be necessary to add a new
-> dependency on libffi, because there are no foreign calling conventions
-> here: all helpers use the C calling convention of the host architecture.
+John Snow <jsnow@redhat.com> writes:
 
-Perhaps the "foreign" in libffi is confusing you.  Its goal *is* the C calling
-convention of the host architecture.
+> On 4/10/19 1:54 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> Presently we use hxtool and a .hx format to generate a few things like
+>>> the qemu_img subcommand dispatch table, the qemu_img help() display output,
+>>> and a help output in qemu-img.texi.
+>>>
+>>> Unfortunately, this means that this information is duplicated in at least
+>>> three places:
+>>>
+>>> (1) in qemu-img-cmds.hx as a human readable string
+>>> (2) in qemu-img-cmds.hx as a texi string
+>>> (3) in qemu-img.texi again, as a texi string
+>>>
+>>> We can do a little better, though: all of these sources can be generated
+>>> from a single json file. Add a new small tool ("pxtool") that can do this.
+>>>
+>>> This tool can at least handle generating (1) and (2) from the same source
+>>> without needing to reduplicate that information. Deduplicating (3) happens
+>>> in the next patch.
+>>>
+>>> Notes:
+>>>  - The json format was chosen to be very "stupid", and the command line
+>>>    documentation is being kept one-per-line to make future diffs easier
+>>>    to read.
+>>>  - It's easy enough to generate the human-readable output from the texi
+>>>    output by removing '@var{foo}' with 'foo'.
+>>>  - The qemu-img command dispatch always calls img_cmdname, so we don't
+>>>    need to store this information separately, either.
+>>>  - The need for DEF() macros could be removed as well, but I left it in
+>>>    to create a minimally disruptive patch.
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> 
+>> We got just five .hx:
+>> 
+>>     qemu-img.cmds.hx            killed off by this patch
+>>     qemu-options.hx             CLI QAPIfication should kill this off
+>>     hw/audio/pl041.hx           misnamed, not actually food for hxtool
+>>     hmp-commands.hx             no exit strategy
+>>     hmp-commands-info.hx            for these two, yet
+>> 
+>> CLI QAPIfication got stuck in the back-burner, and as long as that's the
+>> case, it's not an alternative to your patches.
+>> 
+>
+> Good to know. I figure that at least while we wait on something more
+> comprehensive there's no real short term harm in tidying up.
+>
+> Something I'd really like to do is define a python/json-esque
+> configuration file that allows you to specify some "common options" that
+> are shared between all of the sub-commands, and then define each command
+> in terms of both which common options it possesses, and then any local
+> command-specific options it has.
+>
+> (Why the common options design? So that argument names and command
+> options can be encouraged to be identical and identically documented
+> between all subcommands that use them.)
 
-> The TCG implementation for Sparc (and other hosts with special calling
-> conventions) must also have some minimum information on the signatures
-> of the helper functions. It should be possible to use the same
-> information for TCI. Maybe your approach ist a general form which could
-> be used for any TCG implementation.
+In QAPI, you'd define a common base type.
 
-We currently capture only enough information to support the TCG native hosts.
-If we were to attempt to support, e.g. m68k as a host, then we would have to
-expand this.  What I capture for libffi is exact, so it's certainly possible.
+> Then, from the configuration file, generate all of the necessary C
+> parsers (I have a protoype for this, it's not difficult to do in at
+> least the basic case) that can return boxed command arguments, and then
+> also generate the help strings from that metadata.
 
-But the number of possible function signatures is large.  I forget the simple
-math that expresses this well, but doing this the long way suggests 4372 as the
-number of combinations (up to 6 arguments of 3 types; 4 return types).
+With QAPI, we generate reference documentation from the doc comments.
 
-This number is large enough that you cannot just open code all of the possible
-calls.  You absolutely have to know something about the host compiler's calling
-convention.
+My RFC patches for command line QAPIfication generate a CLI parser using
+getopt_long_only().
 
-I see only 3 possibilities for this:
+They keep help texts in the QAPI schema.  Generating their formal part
+from the type definition should be feasible.  Generating it without
+regressing readability might turn out to be non-trivial.
 
-(1) Use per host ifdefs and/or assembly to DTRT within TCI.
-    This admits that TCI requires *some* porting and does
-    not automatically run everywhere.
-(2) Use an external library that already has said assembly,
-    and has already been ported to every interesting processor,
-    since it is often done along with the compiler port.
-(3) Write a proper TCG backend for each host.
+My patches generate *one* CLI parser.  We have many, and some of them
+want to share types.  There's more than one way to skin this cat, but
+it'll have to be skinned.
 
-If you see another possibility, please enlighten me.
+> I suspect that work *IS* something that might brush up against / should
+> use (or extend) QAPI code.
 
+Seems likely.
 
-r~
+> Then, I'd like to find a way to split qemu-img.texi into sub-command
+> files and find a way to source the same "informative text" for both:
+>
+> (1) The texi output, as per usual, and
+> (2) qemu-img subcommand --help
+>
+> such that --help, when passed as an argument to the subcommand, prints
+> out help only relevant to the subcommand instead, e.g.
+>
+> `qemu-img check --help`
+>
+> might print the "common options" section only as it relates to commands
+> actually used by the check command, then prints the check section of the
+> texi as formatted for terminals.
+>
+> This way, we can have manpages, html pages, and interactive help text
+> all derived from the same semi-automated sources, always up to date and
+> much easier to read/discover/parse by human eyeballs.
+>
+> That's what I'd like to accomplish, ultimately.
+>
+> For now, I think this RFC set is not harmful and won't bother anybody.
+> It's definitely not worse than what we have now, fragility of removing
+> @var{} tokens and all.
+
+Makes sense.  I just hope we can avoid duplicating work.
 
