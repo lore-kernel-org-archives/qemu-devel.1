@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48312)
+Received: from eggs.gnu.org ([209.51.188.92]:48321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZz-0005kn-2y
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEbZz-0005kx-6r
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZv-0006fx-WA
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44444)
+	(envelope-from <armbru@redhat.com>) id 1hEbZx-0006ht-6L
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZs-0006Vq-MR
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZv-0006af-EP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD1C49F74C
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 779373007452
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 17:25:09 +0200
-Message-Id: <20190411152520.10061-7-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 17:25:15 +0200
+Message-Id: <20190411152520.10061-13-armbru@redhat.com>
 In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
 References: <20190411152520.10061-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/17] qsp: Simplify how qsp_report() prints
+Subject: [Qemu-devel] [PATCH 12/17] qom/cpu: Simplify how
+ CPUClass::dump_statistics() prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +33,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-qsp_report() takes an fprintf()-like callback and a FILE * to pass to
-it.
+CPUClass method dump_statistics() takes an fprintf()-like callback and
+a FILE * to pass to it.
 
-Its only caller hmp_sync_profile() passes monitor_fprintf() and the
-current monitor cast to FILE *.  monitor_fprintf() casts it right
-back, and is otherwise identical to monitor_printf().  The
-type-punning is ugly.
+Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
+monitor_fprintf() and the current monitor cast to FILE *.
+monitor_fprintf() casts it right back, and is otherwise identical to
+monitor_printf().  The type-punning is ugly.
 
 Drop the callback, and call qemu_printf() instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/block/qapi.h |  1 +
- include/qemu/qsp.h   |  6 ++----
- monitor.c            |  2 +-
- util/qsp.c           | 21 +++++++++++----------
- 4 files changed, 15 insertions(+), 15 deletions(-)
+ include/qom/cpu.h      | 11 ++++-------
+ monitor.c              |  2 +-
+ qom/cpu.c              |  5 ++---
+ target/ppc/cpu.h       |  3 +--
+ target/ppc/translate.c |  9 ++++-----
+ 5 files changed, 12 insertions(+), 18 deletions(-)
 
-diff --git a/include/block/qapi.h b/include/block/qapi.h
-index 83bdb098bd..a891f43b9c 100644
---- a/include/block/qapi.h
-+++ b/include/block/qapi.h
-@@ -27,6 +27,7 @@
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1d6099e5d4..31bafee2b1 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -184,8 +184,7 @@ typedef struct CPUClass {
+     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                        int flags);
+     GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+-    void (*dump_statistics)(CPUState *cpu, FILE *f,
+-                            fprintf_function cpu_fprintf, int flags);
++    void (*dump_statistics)(CPUState *cpu, int flags);
+     int64_t (*get_arch_id)(CPUState *cpu);
+     bool (*get_paging_enabled)(const CPUState *cpu);
+     void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
+@@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+ /**
+  * cpu_dump_statistics:
+  * @cpu: The CPU whose state is to be dumped.
+- * @f: File to dump to.
+- * @cpu_fprintf: Function to dump with.
+  * @flags: Flags what to dump.
+  *
+- * Dumps CPU statistics.
++ * Dump CPU statistics to the current monitor if we have one, else to
++ * stdout.
+  */
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags);
++void cpu_dump_statistics(CPUState *cpu, int flags);
  
- #include "block/block.h"
- #include "block/snapshot.h"
-+#include "qemu/fprintf-fn.h"
- 
- BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-                                         BlockDriverState *bs, Error **errp);
-diff --git a/include/qemu/qsp.h b/include/qemu/qsp.h
-index a94c464f90..bf36aabfa8 100644
---- a/include/qemu/qsp.h
-+++ b/include/qemu/qsp.h
-@@ -11,15 +11,13 @@
- #ifndef QEMU_QSP_H
- #define QEMU_QSP_H
- 
--#include "qemu/fprintf-fn.h"
--
- enum QSPSortBy {
-     QSP_SORT_BY_TOTAL_WAIT_TIME,
-     QSP_SORT_BY_AVG_WAIT_TIME,
- };
- 
--void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
--                enum QSPSortBy sort_by, bool callsite_coalesce);
-+void qsp_report(size_t max, enum QSPSortBy sort_by,
-+                bool callsite_coalesce);
- 
- bool qsp_is_enabled(void);
- void qsp_enable(void);
+ #ifndef CONFIG_USER_ONLY
+ /**
 diff --git a/monitor.c b/monitor.c
-index 7573689585..1650ceec3a 100644
+index 0819b99ef7..fb5b681099 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1336,7 +1336,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
-     enum QSPSortBy sort_by;
- 
-     sort_by = mean ? QSP_SORT_BY_AVG_WAIT_TIME : QSP_SORT_BY_TOTAL_WAIT_TIME;
--    qsp_report((FILE *)mon, monitor_fprintf, max, sort_by, coalesce);
-+    qsp_report(max, sort_by, coalesce);
- }
- 
- static void hmp_info_history(Monitor *mon, const QDict *qdict)
-diff --git a/util/qsp.c b/util/qsp.c
-index 410f1ba004..5264c97342 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -56,7 +56,9 @@
-  *   Critical-Section Execution to Improve the Performance of Multithreaded
-  *   Applications", USENIX ATC'12.
-  */
-+
- #include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/thread.h"
- #include "qemu/timer.h"
- #include "qemu/qht.h"
-@@ -678,8 +680,7 @@ static gboolean qsp_tree_report(gpointer key, gpointer value, gpointer udata)
-     return FALSE;
- }
- 
--static void
--pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-+static void pr_report(const QSPReport *rep)
- {
-     char *dashes;
-     size_t max_len = 0;
-@@ -702,15 +703,15 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-     /* white space to leave to the right of "Call site" */
-     callsite_rspace = callsite_len - strlen("Call site");
- 
--    pr(f, "Type               Object  Call site%*s  Wait Time (s)  "
--       "       Count  Average (us)\n", callsite_rspace, "");
-+    qemu_printf("Type               Object  Call site%*s  Wait Time (s)  "
-+                "       Count  Average (us)\n", callsite_rspace, "");
- 
-     /* build a horizontal rule with dashes */
-     n_dashes = 79 + callsite_rspace;
-     dashes = g_malloc(n_dashes + 1);
-     memset(dashes, '-', n_dashes);
-     dashes[n_dashes] = '\0';
--    pr(f, "%s\n", dashes);
-+    qemu_printf("%s\n", dashes);
- 
-     for (i = 0; i < rep->n_entries; i++) {
-         const QSPReportEntry *e = &rep->entries[i];
-@@ -726,11 +727,11 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-                                e->callsite_at,
-                                callsite_len - (int)strlen(e->callsite_at), "",
-                                e->time_s, e->n_acqs, e->ns_avg * 1e-3);
--        pr(f, "%s", s->str);
-+        qemu_printf("%s", s->str);
-         g_string_free(s, TRUE);
+@@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "No CPU available\n");
+         return;
      }
- 
--    pr(f, "%s\n", dashes);
-+    qemu_printf("%s\n", dashes);
-     g_free(dashes);
+-    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
++    cpu_dump_statistics(cs, 0);
  }
  
-@@ -746,8 +747,8 @@ static void report_destroy(QSPReport *rep)
-     g_free(rep->entries);
+ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index a8d2958956..029e7fe9b0 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+     }
  }
  
--void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
--                enum QSPSortBy sort_by, bool callsite_coalesce)
-+void qsp_report(size_t max, enum QSPSortBy sort_by,
-+                bool callsite_coalesce)
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags)
++void cpu_dump_statistics(CPUState *cpu, int flags)
  {
-     GTree *tree = g_tree_new_full(qsp_tree_cmp, &sort_by, g_free, NULL);
-     QSPReport rep;
-@@ -762,7 +763,7 @@ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
-     g_tree_foreach(tree, qsp_tree_report, &rep);
-     g_tree_destroy(tree);
+     CPUClass *cc = CPU_GET_CLASS(cpu);
  
--    pr_report(&rep, f, cpu_fprintf);
-+    pr_report(&rep);
-     report_destroy(&rep);
+     if (cc->dump_statistics) {
+-        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
++        cc->dump_statistics(cpu, flags);
+     }
  }
  
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8572241364..27a36b9605 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
+ bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                         int flags);
+-void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
+-                             fprintf_function cpu_fprintf, int flags);
++void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
+ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index badc1ae1a3..f99f27a134 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+ #undef RFPL
+ }
+ 
+-void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+-                             fprintf_function cpu_fprintf, int flags)
++void ppc_cpu_dump_statistics(CPUState *cs, int flags)
+ {
+ #if defined(DO_PPC_STATISTICS)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+@@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                         handler = t3[op3];
+                         if (handler->count == 0)
+                             continue;
+-                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
++                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
+                                     "%016" PRIx64 " %" PRId64 "\n",
+                                     op1, op2, op3, op1, (op3 << 5) | op2,
+                                     handler->oname,
+@@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                 } else {
+                     if (handler->count == 0)
+                         continue;
+-                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
++                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
+                                 "%016" PRIx64 " %" PRId64 "\n",
+                                 op1, op2, op1, op2, handler->oname,
+                                 handler->count, handler->count);
+@@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+         } else {
+             if (handler->count == 0)
+                 continue;
+-            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
++            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
+                         " %" PRId64 "\n",
+                         op1, op1, handler->oname,
+                         handler->count, handler->count);
 -- 
 2.17.2
