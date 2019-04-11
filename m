@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33192)
+Received: from eggs.gnu.org ([209.51.188.92]:34147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfnc-0002ym-LJ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:55:53 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfr7-0004pY-E9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfnb-0006aw-Pf
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:55:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfr6-0008LS-1x
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:59:29 -0400
+References: <20181126105125.30973-1-marcandre.lureau@redhat.com>
+	<7c5bc3fe-116e-f29c-977d-cac890bdfa93@redhat.com>
+	<1d019621-50b2-1118-a477-e7fffc8147ff@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-References: <20190327095634.53038-1-sgarzare@redhat.com>
-	<20190327095634.53038-2-sgarzare@redhat.com>
-	<9e0618f0-e889-5e37-fc4c-b44ada5fe509@vivier.eu>
-Message-ID: <3e50baae-995f-c857-f733-2bdddffc9609@vivier.eu>
-Date: Thu, 11 Apr 2019 21:55:42 +0200
+Message-ID: <6ee8f393-2760-9b06-cc7f-8d9e5ce48930@vivier.eu>
+Date: Thu, 11 Apr 2019 21:59:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <9e0618f0-e889-5e37-fc4c-b44ada5fe509@vivier.eu>
+In-Reply-To: <1d019621-50b2-1118-a477-e7fffc8147ff@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 1/2] block/vhdx: Remove
- redundant IEC binary prefixes definition
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] doc: fix the configuration
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +26,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Jeff Cody <codyprime@gmail.com>, John Snow <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 11/04/2019 21:54, Laurent Vivier wrote:
-> On 27/03/2019 10:56, Stefano Garzarella wrote:
->> IEC binary prefixes are already defined in "qemu/units.h",
->> so we can remove redundant definitions in "block/vhdx.h".
+On 30/03/2019 17:30, Thomas Huth wrote:
+> On 07/02/2019 17.31, Philippe Mathieu-Daudé wrote:
+>> On 11/26/18 11:51 AM, Marc-André Lureau wrote:
+>>> Use a CONFDIR variable to show the configured sysconf path in the
+>>> generated documentations (html, man pages etc).
+>>>
+>>> Related to:
+>>> https://bugzilla.redhat.com/show_bug.cgi?id=1644985
+>>>
+>>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 >>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  block/vhdx.c | 3 ++-
->>  block/vhdx.h | 6 +-----
->>  2 files changed, 3 insertions(+), 6 deletions(-)
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >>
->> diff --git a/block/vhdx.c b/block/vhdx.c
->> index b785aef4b7..7cd1fc3731 100644
->> --- a/block/vhdx.c
->> +++ b/block/vhdx.c
->> @@ -1889,7 +1889,8 @@ static int coroutine_fn vhdx_co_create(BlockdevCreateOptions *opts,
->>          return -EINVAL;
->>      }
->>      if (block_size > VHDX_BLOCK_SIZE_MAX) {
->> -        error_setg(errp, "Block size must not exceed %d", VHDX_BLOCK_SIZE_MAX);
->> +        error_setg(errp, "Block size must not exceed %" PRId64,
->> +                   VHDX_BLOCK_SIZE_MAX);
->>          return -EINVAL;
->>      }
->>  
->> diff --git a/block/vhdx.h b/block/vhdx.h
->> index 1bfb4e4f73..bf72090c8f 100644
->> --- a/block/vhdx.h
->> +++ b/block/vhdx.h
->> @@ -17,11 +17,7 @@
->>  
->>  #ifndef BLOCK_VHDX_H
->>  #define BLOCK_VHDX_H
->> -
->> -#define KiB              (1 * 1024)
->> -#define MiB            (KiB * 1024)
->> -#define GiB            (MiB * 1024)
->> -#define TiB ((uint64_t) GiB * 1024)
->> +#include "qemu/units.h"
->>  
->>  #define DEFAULT_LOG_SIZE 1048576 /* 1MiB */
->>  /* Structures and fields present in the VHDX file */
->>
+>>> ---
+>>>  Makefile     | 9 ++++++---
+>>>  qemu-ga.texi | 4 ++--
+>>>  2 files changed, 8 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/Makefile b/Makefile
+>>> index 9cc4dae1a6..a39c231d1c 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -932,11 +932,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
+>>>  MAKEINFO=makeinfo
+>>>  MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
+>>>  MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
+>>> -TEXI2PODFLAGS=$(MAKEINFOINCLUDES) "-DVERSION=$(VERSION)"
+>>> +TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
+>>>  TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
+>>>  
+>>> -docs/version.texi: $(SRC_PATH)/VERSION
+>>> -	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
+>>> +docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+>>> +	$(call quiet-command,(\
+>>> +		echo "@set VERSION $(VERSION)" && \
+>>> +		echo "@set CONFDIR $(qemu_confdir)" \
+>>> +	)> $@,"GEN","$@")
+>>>  
+>>>  %.html: %.texi docs/version.texi
+>>>  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+>>> diff --git a/qemu-ga.texi b/qemu-ga.texi
+>>> index 4c7a8fd163..f00ad830f2 100644
+>>> --- a/qemu-ga.texi
+>>> +++ b/qemu-ga.texi
+>>> @@ -30,7 +30,7 @@ set user's password
+>>>  @end itemize
+>>>  
+>>>  qemu-ga will read a system configuration file on startup (located at
+>>> -@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
+>>> +@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
+>>>  configuration options on the command line. For the same key, the last
+>>>  option wins, but the lists accumulate (see below for configuration
+>>>  file format).
+>>> @@ -58,7 +58,7 @@ file format).
+>>>    Enable fsfreeze hook. Accepts an optional argument that specifies
+>>>    script to run on freeze/thaw. Script will be called with
+>>>    'freeze'/'thaw' arguments accordingly (default is
+>>> -  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
+>>> +  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
+>>>    not follow -F with a space (for example:
+>>>    @samp{-F/var/run/fsfreezehook.sh}).
 > 
-> Applied to my trivial-patches branch.
+> Ping^2
+> 
+> I think this could also go via qemu-trivial...?
+> 
+>  Thomas
+> 
 
-Removed as Kevin already applied it to block-next.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
