@@ -2,71 +2,83 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A10C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF2CC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0219620818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:47:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0219620818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EB9620818
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:48:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xHnKzDwL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EB9620818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51053 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51057 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbvB-0007Vq-7B
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:47:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52531)
+	id 1hEbvr-0007zt-6m
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:48:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEbnR-00010m-MW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbd9-0000Pd-De
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEbnQ-00085Q-PP
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEbnQ-0007wx-9d
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE506308B232;
-	Thu, 11 Apr 2019 15:39:14 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DF405D961;
-	Thu, 11 Apr 2019 15:39:10 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id C61B741F3C;
-	Thu, 11 Apr 2019 15:39:06 +0000 (UTC)
-Date: Thu, 11 Apr 2019 11:39:06 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Message-ID: <393821092.21153045.1554997146416.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-4-pagupta@redhat.com>
-	<CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbd8-0000qs-Eg
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:28:47 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEbd8-0000pn-5e
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:28:46 -0400
+Received: by mail-ot1-x342.google.com with SMTP id k21so5613919otf.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:28:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=XYYsrFHGswDJzCTPuKo+xM5aht6kUZN06zVl0UdRDwk=;
+	b=xHnKzDwLKfAS0xebJ1gwBuFO2YYe0dy0LBxnGJhj45/cQOGNz6+Mt0iQ3TtLX1/XFQ
+	KC0rdsTibG8xRzVipQpQmZz+BMvCJ5uqW8j2YYSQjk8VOIJztv3b1OtlvAAzY6qWbf1o
+	YWnwjM6XpQaVX4KNkMlG6WMH+4Ko/NFczCQKfiL+l8+6ONwlZaEMcWW0nVMlfQM5fiTq
+	Ufh7P4qq8JkaB+iP6sP+KpoymmPScHnJxzqaJR1llfCDs0HYcAFiqwiiqRUSEtxaAEcs
+	0EA80P1lmH+khvNdPIoODOTxmNy5QxlL8SC7dD3jOBnvkPrAysbood4Ewmg9q6OCDyAj
+	HSBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=XYYsrFHGswDJzCTPuKo+xM5aht6kUZN06zVl0UdRDwk=;
+	b=ErhEfkoFe22pq4eQzr5cgdCfnkWE1v7aNUFJmePFIJY3/wx7ZuwdytGg/6EgiOR5dS
+	JF141Lu93S40L7SxzZbF9hKKAmRtWaIgsmn0TDGmhhhTk5x34ECZTIoAVQg+Yhbnm6CV
+	lIYLNXFLje7YieWtAggcHypyB17Fxm6Dcp/SqvIDZ4MME6mXvieiyCSXXta3gZdCQkB8
+	yFKEzbewxVVsZHWe3hd5NVECvPXf6PZH9zDi2nadecz6qM5WMMHV00l+j0JR/8EBJqNB
+	0qzRB9kBumn5KkQ3e08LAy7CkVblnrpad+AUSwbqMAUpQllT7Ru88wzcvNPC9g+6hKuN
+	C8Gw==
+X-Gm-Message-State: APjAAAXXiUsMth7SHd68VxVLsj70NhllsSwA39Vx8cm3Bj2+BhVkfwKP
+	vgoe5zYc2ihm9YuApQkXHWSSQV2/YG+r8bz29vdDkw==
+X-Google-Smtp-Source: APXvYqz/toKaGMbhtZrV6VwvL+ldYydbtioztAl1A0EAN12foMFvWOZN4yUIYljNDiVNVDcT0ALXcqvuQ85GIkkfrIM=
+X-Received: by 2002:a05:6830:1cb:: with SMTP id
+	r11mr27768250ota.302.1554996525415; 
+	Thu, 11 Apr 2019 08:28:45 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190328062222.8409-1-joel@jms.id.au>
+	<20190328062222.8409-3-joel@jms.id.au>
+In-Reply-To: <20190328062222.8409-3-joel@jms.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2019 16:28:34 +0100
+Message-ID:
+ <CAFEAcA9G9Xrt5nDRJrSCC1SdeR987YzK+etRLTSyokLE+yyJSw@mail.gmail.com>
+To: Joel Stanley <joel@jms.id.au>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.71, 10.4.195.19]
-Thread-Topic: libnvdimm: add dax_dev sync flag
-Thread-Index: c0h6aJgeiBnDRJuQUzBrBpkw3+vU/Q==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 11 Apr 2019 15:39:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libnvdimm: add dax_dev sync flag
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/aspeed: Add RTC to SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,82 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	virtualization@lists.linux-foundation.org,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>,
-	Vishal L Verma <vishal.l.verma@intel.com>,
-	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
-	Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-xfs <linux-xfs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Igor Mammedov <imammedo@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411153906.yY_g0UK3A4nNSN66UJWhrzQeJQzBIX5LG5HQsqLrMXQ@z>
+Message-ID: <20190411152834._ZNHagyD_62yB3XTsZY5P7ooo1uKQqtfHAg0UFonji0@z>
+
+On Thu, 28 Mar 2019 at 06:22, Joel Stanley <joel@jms.id.au> wrote:
+>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/arm/aspeed_soc.c         | 15 +++++++++++++++
+>  include/hw/arm/aspeed_soc.h |  2 ++
+>  2 files changed, 17 insertions(+)
+>
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index a27233d4876b..628ec633c91a 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -32,6 +32,7 @@
+>  #define ASPEED_SOC_SDMC_BASE        0x1E6E0000
+>  #define ASPEED_SOC_SCU_BASE         0x1E6E2000
+>  #define ASPEED_SOC_SRAM_BASE        0x1E720000
+> +#define ASPEED_SOC_RTC_BASE         0x1E781000
+>  #define ASPEED_SOC_TIMER_BASE       0x1E782000
+>  #define ASPEED_SOC_WDT_BASE         0x1E785000
+>  #define ASPEED_SOC_I2C_BASE         0x1E78A000
+> @@ -135,6 +136,10 @@ static void aspeed_soc_init(Object *obj)
+>      object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
+>      qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
+>
+> +    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_ASPEED_RTC);
+> +    object_property_add_child(obj, "rtc", OBJECT(&s->rtc), NULL);
+> +    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
+
+These three lines should be written
+       sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
+                             TYPE_ASPEED_RTC);
+
+which is both shorter and also avoids leaking a reference to
+the child object.
+
+(We should also at some point fix the existing uses of this
+pattern in this file.)
 
 
-Hi Dan,
-
-Thank you for the review.
-
-> >
-> > This patch adds 'DAXDEV_SYNC' flag which is set
-> > for nd_region doing synchronous flush. This later
-> > is used to disable MAP_SYNC functionality for
-> > ext4 & xfs filesystem for devices don't support
-> > synchronous flush.
-> >
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  drivers/dax/bus.c            |  2 +-
-> >  drivers/dax/super.c          | 13 ++++++++++++-
-> >  drivers/md/dm.c              |  2 +-
-> >  drivers/nvdimm/pmem.c        |  3 ++-
-> >  drivers/nvdimm/region_devs.c |  7 +++++++
-> >  include/linux/dax.h          |  9 +++++++--
-> >  include/linux/libnvdimm.h    |  1 +
-> >  7 files changed, 31 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
-> > index 2109cfe80219..431bf7d2a7f9 100644
-> > --- a/drivers/dax/bus.c
-> > +++ b/drivers/dax/bus.c
-> > @@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region
-> > *dax_region, int id,
-> >          * No 'host' or dax_operations since there is no access to this
-> >          * device outside of mmap of the resulting character device.
-> >          */
-> > -       dax_dev = alloc_dax(dev_dax, NULL, NULL);
-> > +       dax_dev = alloc_dax(dev_dax, NULL, NULL, true);
-> 
-> I find apis that take a boolean as unreadable. What does 'true' mean?
-> It wastes time to go look at the function definition vs something
-> like:
-> 
->     alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
-
-Agree. Will change as suggested.
-
-Best regards,
-Pankaj
-> 
+thanks
+-- PMM
 
