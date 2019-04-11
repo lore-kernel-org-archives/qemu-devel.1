@@ -2,79 +2,72 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EEDC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B42C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 865E22070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:45:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 865E22070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE0252070D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:48:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0252070D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54010 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEfdy-0006XH-P1
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:45:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59146)
+	id 1hEfgA-0007cg-VC
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:48:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEfdB-000625-2U
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEffA-0007El-99
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEfd9-0000cH-5s
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEfd5-0000ak-IN
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:01 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y197so8116261wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:44:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=eXYNXIUDBz02ft5TYfBJasZetXxdXPyiPUATBW+pV4c=;
-	b=lW7o7TLbl2T9sBps0Fh2w3GZnhmsytbYLqGJ/ugBWK3zbzimApb1VVQztc3Pk5xDTB
-	utXcSB3VbyqM25MJNHBnrgcba80HOW9mD3Zb8g1kzTnaA8fNBChTmmz32Yl0V9abKz/8
-	LEGGDD+Qeq/siCwKbu6EAY06e0EQufRyD4F/PSq0hmIVhLJoWZPDLGSsoaXuUVmHAoU8
-	XJTUb3Q7UzGzwL3ekLxs1fJswbvtibs+vT2vVNVvKo7nXePJLM60UQHqESVM1q6E7bp0
-	dKeDlRlnzW4zM36lPybOT4j0UG5JbiVDxaoPOGQL43Mr5mYQdtLywMo0f1ns7FKwttMB
-	FZlA==
-X-Gm-Message-State: APjAAAVPGJor9UCfyJMWEzJPZJOB7yRdsxemm5a99n/aK2VC8qRQT/B+
-	8boptCqDjq0GLrOdC//tK9mhqg==
-X-Google-Smtp-Source: APXvYqzIOPmWhvpmpmXR613apa40YhfPmv5rBjIIZBbfDjrI4YE5lqPJlRI2tsRRJvL2wE0gvZzSpA==
-X-Received: by 2002:a1c:5543:: with SMTP id j64mr8049334wmb.37.1555011896848; 
-	Thu, 11 Apr 2019 12:44:56 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	f15sm50244371wru.21.2019.04.11.12.44.55
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 11 Apr 2019 12:44:56 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190411182240.5957-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e869e7fd-26f1-6bac-9a48-f302e4095a5c@redhat.com>
-Date: Thu, 11 Apr 2019 21:44:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <laurent@vivier.eu>) id 1hEff9-0001i4-Bc
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:47:08 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:60001)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hEff8-0001h2-SI; Thu, 11 Apr 2019 15:47:07 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1M4K6z-1hEOXs1pTt-000OvG; Thu, 11 Apr 2019 21:47:01 +0200
+To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190313162812.8885-1-armbru@redhat.com>
+	<8cd63797-76f6-9ba8-0113-13a4bf04e6ed@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <9585a1fc-fc7c-d3f4-06be-46d1a544a0ce@vivier.eu>
+Date: Thu, 11 Apr 2019 21:46:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190411182240.5957-1-thuth@redhat.com>
+In-Reply-To: <8cd63797-76f6-9ba8-0113-13a4bf04e6ed@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:BsLtIAyNBcvpkz0AYDgdIQuMWkHGIaA34Ha9Is1vN4UrNPMPdec
+	Qzxu+CcMoWehvY3NEN0GgrQ+EwltCm8vpgeHGYDwkdRgXTdeMC3ZbtcKRPoqm54pzPnLhiP
+	GOWZzKx+8uVayCm+9NACbUTZRbVXQ3B/UKHncNHqNBSk6gofkhUO0t71uY5R27WqmoGu/Gb
+	OhTz3eqTvM6s1X43Z6+7w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:EPUUrfK9nQw=:SlXxgXllZLsU09YiH9DPRv
+	B53iyGKKkNr/7tyntouA2JAhyzgC9+CzE3du5RPTxdkJ5SEEbZGHD/yqrJkxX5MhJjD4e9oAv
+	zF8HEitLAZF34XEggMTHmqWxt6A7RhnB0RI/jsla7K1qKyFvXNGC+a+CTs6ExUulAjO5Vt9uL
+	hH/GURcH6L4wB0APzR5oeXHO36MmX4DOUlYwWXGS/iXbDHz6OQz4WIyu43fx4ks1i07jilCmI
+	2ZkZ6Z+Maem2GDdWX1q9YGh46wNiRGZeukXWxzQc+FIkCdQXziI4URYYOTKgsSNzar2/prCxm
+	ceroTzXvnaNE+yHXFlb2992CHPfHisIwlQWCpTABCX8L8se0h0Lgv70aIf1yrMkScSWkbmmPI
+	2RqTGSD42FijU+nogV0tjLrg367NherGV81Mq1S68H4qcitbQ9SP4cH/f5d5M67u0/7NTIDrQ
+	NHp6FVIM+SeoZGuWDQeYy5VO2hJV2i/zsiS1+qjqlvolzocd+sSTUP0YFRoEqZ0VvvBCZ1E55
+	2X3ARRY0d9lbrwqZHyppOBlQQQ1sTX15QRfFov6iEC51ba71Xy1zzI89wGEY8Do6WJgnBls+Q
+	VEjfMx6Ou+kX4n+UVE7miNUVHmbo5pT0jrgDkV1GmlxvbZd9Y6VJ7mimZ1gWIrLuV1zki1xtT
+	kbIF0RtTfI+hvuvbI8XFSE4cmaEk0WRknf/j4FZrMFYAC5b75gAsYaAtnLkFzX7+y1rb72dVT
+	D8OeQlmqmkTuJrXlpVjl3U0S04ACbHnBwUAAs/CFOfpqavjWt3zx9RU4cQk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch
- for the ps2.c file
+X-Received-From: 212.227.126.134
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Clean up includes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,60 +79,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com,
+	viktor.prutyanov@phystech.edu,
+	QEMU Trivial <qemu-trivial@nongnu.org>, kraxel@redhat.com,
+	alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411194455.StxWbLIn66d-owqApNubAqqZ-1ySfjqoSKsi9a6Agow@z>
+Message-ID: <20190411194659.pqLeFO-OgRMd5Iof0vN99HJOf6wyFN7Y5AVevuUYv_g@z>
 
-On 4/11/19 8:22 PM, Thomas Huth wrote:
-> ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
-
-Hehe I have the same patch staged locally =)
-
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/input/Kconfig       | 5 +++++
->  hw/input/Makefile.objs | 2 +-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+On 21/03/2019 10:21, Thomas Huth wrote:
+> On 13/03/2019 17.28, Markus Armbruster wrote:
+>> Clean up includes so that osdep.h is included first and headers
+>> which it implies are not included manually.
+>>
+>> This commit was created with scripts/clean-includes, with the changes
+>> to the following files manually reverted:
+>>
+>>     contrib/libvhost-user/libvhost-user-glib.h
+>>     contrib/libvhost-user/libvhost-user.c
+>>     contrib/libvhost-user/libvhost-user.h
+>>     linux-user/mips64/cpu_loop.c
+>>     linux-user/mips64/signal.c
+>>     linux-user/sparc64/cpu_loop.c
+>>     linux-user/sparc64/signal.c
+>>     linux-user/x86_64/cpu_loop.c
+>>     linux-user/x86_64/signal.c
+>>     slirp/src/*
+>>     target/s390x/gen-features.c
+>>     tests/migration/s390x/a-b-bios.c
+>>     tests/test-rcu-simpleq.c
+>>     tests/test-rcu-tailq.c
+>>     tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
+>>
+>> We're in the process of spinning out slirp/.  tests/uefi-test-tools/
+>> is guest software.  The remaining reverts are the same as in commit
+>> b7d89466dde.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  contrib/elf2dmp/main.c   | 3 +--
+>>  contrib/elf2dmp/pdb.c    | 3 +--
+>>  hw/display/ati.c         | 1 +
+>>  hw/display/ati_2d.c      | 1 +
+>>  hw/display/ati_dbg.c     | 1 +
+>>  hw/display/ati_int.h     | 1 -
+>>  include/hw/cpu/cluster.h | 1 -
+>>  tests/fp/platform.h      | 1 -
+>>  tests/libqos/qgraph.h    | 4 ----
+>>  tests/qos-test.c         | 2 +-
+>>  10 files changed, 6 insertions(+), 12 deletions(-)
 > 
-> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-> index e2e66f0858..316573f782 100644
-> --- a/hw/input/Kconfig
-> +++ b/hw/input/Kconfig
-> @@ -8,10 +8,15 @@ config LM832X
->  config PCKBD
->      bool
->      default y
-> +    select PS2
->      depends on ISA_BUS
->  
->  config PL050
->      bool
-> +    select PS2
-> +
-> +config PS2
-> +    bool
->  
->  config STELLARIS_INPUT
->      bool
-> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
-> index c8b00f71ec..6db5ee0e71 100644
-> --- a/hw/input/Makefile.objs
-> +++ b/hw/input/Makefile.objs
-> @@ -3,7 +3,7 @@ common-obj-y += hid.o
->  common-obj-$(CONFIG_LM832X) += lm832x.o
->  common-obj-$(CONFIG_PCKBD) += pckbd.o
->  common-obj-$(CONFIG_PL050) += pl050.o
-> -common-obj-y += ps2.o
-> +common-obj-$(CONFIG_PS2) += ps2.o
->  common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
->  common-obj-$(CONFIG_TSC2005) += tsc2005.o
->  
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > 
+
+
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
 
