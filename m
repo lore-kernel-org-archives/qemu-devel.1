@@ -2,61 +2,64 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C12C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 658DFC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0808A2077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0808A2077C
+	by mail.kernel.org (Postfix) with ESMTPS id 2A32B2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:54:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A32B2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50169 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50171 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEb6I-0004Zh-76
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:54:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38903)
+	id 1hEb6O-0004hL-Ax
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:54:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4W-0003H7-P2
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4X-0003Hb-Hv
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4V-0000kN-J0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37496)
+	(envelope-from <armbru@redhat.com>) id 1hEb4V-0000kk-S3
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4V-0000jd-2X
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4V-0000k6-GF
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:52:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 615D8C0AD432
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD5B32DA9AE;
+	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 308285D71F
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E0295D9C4;
+	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id BCEF41138648; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+	id CA3E71132B74; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:41 +0200
-Message-Id: <20190411145256.8614-1-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:45 +0200
+Message-Id: <20190411145256.8614-5-armbru@redhat.com>
+In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
+References: <20190411145256.8614-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
+	(mx1.redhat.com [10.5.110.29]);
 	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 00/15] Clean up use of error_printf()
+Subject: [Qemu-devel] [PATCH v2 04/15] loader-fit: Wean off error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,74 +71,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Paul Burton <pburton@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411145241.3hM7dsGOzJ0Dx-DSuOvkQ8YwWCoSFRxTk6Rj_DUy6JA@z>
+Message-ID: <20190411145245.11bxtrDVQc2TNCwGeNvxJrxAAYohv8rfn96qPChUEzI@z>
 
-This series cleans up two kinds of error_printf() misuse:
+load_fit() reports errors with error_printf() instead of
+error_report().  Worse, it even reports errors it actually recovers
+from, in fit_cfg_compatible() and fit_load_fdt().  Messed up in
+initial commit 51b58561c1d.
 
-* Errors and warnings should be reported with error_report() and
-  warn_report().
+Convert the helper functions for load_fit() to Error.  Make sure each
+failure path sets an error.
 
-* Help output should be go to stdout, not stderr.
+Fix fit_cfg_compatible() and fit_load_fdt() not to report errors they
+actually recover from.
 
-This is obviously for 4.1.  If nobody objects, I'll take the whole
-series through my tree.
+Convert load_fit() to error_report().
 
-v2:
-* PATCH 02: Commit message tweaked, indentation fixed [Eric]
-* PATCH 10: Indentation fixed [Marcel]
-* PATCH 11: Use-after-free fixed [Patchew]
-* PATCH 12: test-util-sockets.c updated along with stubs/monitor.c
-* PATCH 14: Commit message typo [Eric]
+Cc: Paul Burton <pburton@wavecomp.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/core/loader-fit.c | 62 +++++++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 26 deletions(-)
 
-Markus Armbruster (15):
-  qemu-img: Use error_vreport() in error_exit()
-  block/ssh: Do not report read/write/flush errors to the user
-  char-pty: Drop "char device redirected to" message
-  loader-fit: Wean off error_printf()
-  mips/boston: Report errors with error_report(), not error_printf()
-  pci: Report fatal errors with error_report(), not error_printf()
-  hpet: Report warnings with warn_report(), not error_printf()
-  vfio: Report warnings with warn_report(), not error_printf()
-  s390x/kvm: Report warnings with warn_report(), not error_printf()
-  vl: Make -machine $TYPE,help and -accel help print to stdout
-  monitor error: Make printf()-like functions return a value
-  qemu-print: New qemu_printf(), qemu_vprintf() etc.
-  blockdev: Make -drive format=3Dhelp print to stdout
-  char: Make -chardev help print to stdout
-  monitor: Simplify how -device/device_add print help
-
- MAINTAINERS                 |  2 ++
- block/ssh.c                 | 38 +++++++-------------
- block/trace-events          |  3 ++
- blockdev.c                  |  9 ++---
- chardev/char-pty.c          |  2 --
- chardev/char.c              |  3 +-
- hw/core/loader-fit.c        | 62 +++++++++++++++++++--------------
- hw/mips/boston.c            |  6 ++--
- hw/pci/pci.c                |  2 +-
- hw/timer/hpet.c             |  2 +-
- hw/vfio/pci.c               | 19 ++++++----
- include/monitor/monitor.h   |  7 ++--
- include/qemu/error-report.h |  8 ++---
- include/qemu/qemu-print.h   | 19 ++++++++++
- monitor.c                   | 69 ++++++++++++++++++-------------------
- qdev-monitor.c              | 36 ++++++++-----------
- qemu-img.c                  |  6 ++--
- stubs/error-printf.c        | 13 ++++---
- stubs/monitor.c             |  5 +++
- target/s390x/kvm.c          |  2 +-
- tests/test-util-sockets.c   |  1 +
- util/Makefile.objs          |  1 +
- util/qemu-error.c           | 12 ++++---
- util/qemu-print.c           | 42 ++++++++++++++++++++++
- vl.c                        | 10 +++---
- 25 files changed, 224 insertions(+), 155 deletions(-)
- create mode 100644 include/qemu/qemu-print.h
- create mode 100644 util/qemu-print.c
-
+diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+index 447f60857d..f27b6af942 100644
+--- a/hw/core/loader-fit.c
++++ b/hw/core/loader-fit.c
+@@ -18,6 +18,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "qemu/units.h"
+ #include "exec/memory.h"
+ #include "hw/loader.h"
+@@ -33,7 +34,7 @@
+ #define FIT_LOADER_MAX_PATH (128)
+=20
+ static const void *fit_load_image_alloc(const void *itb, const char *nam=
+e,
+-                                        int *poff, size_t *psz)
++                                        int *poff, size_t *psz, Error **=
+errp)
+ {
+     const void *data;
+     const char *comp;
+@@ -46,6 +47,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+     off =3D fdt_path_offset(itb, path);
+     if (off < 0) {
++        error_setg(errp, "can't find node %s", path);
+         return NULL;
+     }
+     if (poff) {
+@@ -54,6 +56,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+     data =3D fdt_getprop(itb, off, "data", &sz);
+     if (!data) {
++        error_setg(errp, "can't get %s/data", path);
+         return NULL;
+     }
+=20
+@@ -73,7 +76,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+         uncomp_len =3D gunzip(uncomp_data, uncomp_len, (void *) data, sz=
+);
+         if (uncomp_len < 0) {
+-            error_printf("unable to decompress %s image\n", name);
++            error_setg(errp, "unable to decompress %s image", name);
+             g_free(uncomp_data);
+             return NULL;
+         }
+@@ -85,18 +88,19 @@ static const void *fit_load_image_alloc(const void *i=
+tb, const char *name,
+         return data;
+     }
+=20
+-    error_printf("unknown compression '%s'\n", comp);
++    error_setg(errp, "unknown compression '%s'", comp);
+     return NULL;
+ }
+=20
+ static int fit_image_addr(const void *itb, int img, const char *name,
+-                          hwaddr *addr)
++                          hwaddr *addr, Error **errp)
+ {
+     const void *prop;
+     int len;
+=20
+     prop =3D fdt_getprop(itb, img, name, &len);
+     if (!prop) {
++        error_setg(errp, "can't find %s address", name);
+         return -ENOENT;
+     }
+=20
+@@ -108,13 +112,14 @@ static int fit_image_addr(const void *itb, int img,=
+ const char *name,
+         *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
+         return 0;
+     default:
+-        error_printf("invalid %s address length %d\n", name, len);
++        error_setg(errp, "invalid %s address length %d", name, len);
+         return -EINVAL;
+     }
+ }
+=20
+ static int fit_load_kernel(const struct fit_loader *ldr, const void *itb=
+,
+-                           int cfg, void *opaque, hwaddr *pend)
++                           int cfg, void *opaque, hwaddr *pend,
++                           Error **errp)
+ {
+     const char *name;
+     const void *data;
+@@ -126,26 +131,26 @@ static int fit_load_kernel(const struct fit_loader =
+*ldr, const void *itb,
+=20
+     name =3D fdt_getprop(itb, cfg, "kernel", NULL);
+     if (!name) {
+-        error_printf("no kernel specified by FIT configuration\n");
++        error_setg(errp, "no kernel specified by FIT configuration");
+         return -EINVAL;
+     }
+=20
+-    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+);
++    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+, errp);
+     if (!data) {
+-        error_printf("unable to load kernel image from FIT\n");
++        error_prepend(errp, "unable to load kernel image from FIT: ");
+         return -EINVAL;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
++    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
+     if (err) {
+-        error_printf("unable to read kernel load address from FIT\n");
++        error_prepend(errp, "unable to read kernel load address from FIT=
+: ");
+         ret =3D err;
+         goto out;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr);
++    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr, errp);
+     if (err) {
+-        error_printf("unable to read kernel entry address from FIT\n");
++        error_prepend(errp, "unable to read kernel entry address from FI=
+T: ");
+         ret =3D err;
+         goto out;
+     }
+@@ -172,7 +177,7 @@ out:
+=20
+ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+                         int cfg, void *opaque, const void *match_data,
+-                        hwaddr kernel_end)
++                        hwaddr kernel_end, Error **errp)
+ {
+     const char *name;
+     const void *data;
+@@ -187,16 +192,18 @@ static int fit_load_fdt(const struct fit_loader *ld=
+r, const void *itb,
+         return 0;
+     }
+=20
+-    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+);
++    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+, errp);
+     if (!data) {
+-        error_printf("unable to load FDT image from FIT\n");
++        error_prepend(errp, "unable to load FDT image from FIT: ");
+         return -EINVAL;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
++    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
+     if (err =3D=3D -ENOENT) {
+         load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
++        error_free(*errp);
+     } else if (err) {
++        error_prepend(errp, "unable to read FDT load address from FIT: "=
+);
+         ret =3D err;
+         goto out;
+     }
+@@ -229,7 +236,7 @@ static bool fit_cfg_compatible(const void *itb, int c=
+fg, const char *compat)
+         return false;
+     }
+=20
+-    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL);
++    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL, NULL);
+     if (!fdt) {
+         return false;
+     }
+@@ -252,11 +259,12 @@ out:
+=20
+ int load_fit(const struct fit_loader *ldr, const char *filename, void *o=
+paque)
+ {
++    Error *err =3D NULL;
+     const struct fit_loader_match *match;
+     const void *itb, *match_data =3D NULL;
+     const char *def_cfg_name;
+     char path[FIT_LOADER_MAX_PATH];
+-    int itb_size, configs, cfg_off, off, err;
++    int itb_size, configs, cfg_off, off;
+     hwaddr kernel_end;
+     int ret;
+=20
+@@ -267,6 +275,7 @@ int load_fit(const struct fit_loader *ldr, const char=
+ *filename, void *opaque)
+=20
+     configs =3D fdt_path_offset(itb, "/configurations");
+     if (configs < 0) {
++        error_report("can't find node /configurations");
+         ret =3D configs;
+         goto out;
+     }
+@@ -301,20 +310,21 @@ int load_fit(const struct fit_loader *ldr, const ch=
+ar *filename, void *opaque)
+     }
+=20
+     if (cfg_off < 0) {
+-        /* couldn't find a configuration to use */
++        error_report("can't find configuration");
+         ret =3D cfg_off;
+         goto out;
+     }
+=20
+-    err =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end);
+-    if (err) {
+-        ret =3D err;
++    ret =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end, &err=
+);
++    if (ret) {
++        error_report_err(err);
+         goto out;
+     }
+=20
+-    err =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
+nd);
+-    if (err) {
+-        ret =3D err;
++    ret =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
+nd,
++                       &err);
++    if (ret) {
++        error_report_err(err);
+         goto out;
+     }
+=20
 --=20
 2.17.2
 
