@@ -2,65 +2,83 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA17BC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372B4C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:05:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82DCE2133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:05:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82DCE2133D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 007722133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:05:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JxmwuncU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 007722133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46463 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46493 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXWD-0004p1-IH
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:05:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56838)
+	id 1hEXWa-0005E8-7X
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:05:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEWxp-0008JH-48
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEXS6-0002Jt-On
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEWxn-0000Bx-AJ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:48 -0400
-Resent-Date: Thu, 11 Apr 2019 06:29:48 -0400
-Resent-Message-Id: <E1hEWxn-0000Bx-AJ@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21515)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hEWxY-0008Q4-Nn; Thu, 11 Apr 2019 06:29:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1554978531; cv=none; d=zoho.com; s=zohoarc; 
-	b=KLzm4Y6Rz9lqDLs+RS3RsGP+4e1lsSN2IR4qGAAtSdS7lfgurFdfYf8L0cCQas35zHOzFhcX6r9+JEc6TIW0M5gcm85g/Vg725CDRmwszDrVmYvAfzKQQRPYVghG4qiFXjz9cYHMHjlqdmoyAETR0ta1jHIXben0eOsQAay6/IE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1554978531;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=XYqnnWDIGInqZxEBYUKuZp3tHsFcmdpy7H8CtTLpncQ=; 
-	b=RrSDqjl0naT6UFBb0n5O9THVhJEU9PiW2Unc1oxiXKjGcy9SaBaOXzyBjNr13IVJ4EkKjo491Eu5rlqpXqMy/oc/MwqIxTl5h6wRuFZe/OOYYALoC0QO3XhU3a64x2un/hOJr9I0lLImHY4LjnWeTrk1ImR1TrDqiVxfzoMwMZc=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1554978526210312.8661830096032;
-	Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
-Message-ID: <155497852263.12882.17138118894178379111@76452e4e88f2>
-In-Reply-To: <20190411102025.22559-1-cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hEXRz-0000QK-P5
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:01:04 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:40839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEXRk-00042N-DE
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:00:59 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id 3so4509783oir.7
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 04:00:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=halBmWWCApfzc7ZVLPfqRJpEuD31B5OTbGmlt2Lax9o=;
+	b=JxmwuncUwNrdFggyvVYzMWavKcZEadlKJm5S6JGuDuxfq28/h7JYCi0Hf8YALAIdID
+	Om6MmD55CIeeaWAtKjkAkusRI428O9o0rghRhwMqhIBLZI67ptB2xDLdvwryOiq3D2vY
+	F3EjWNJbM9pn7uugGUQ76jz723Vjze55CqLgLoA3iWOo2p0CfzK7dHPyrvheOBlAdaXw
+	WmnyKHJfXoZnAq7WiEYShlBK2qs9MKQ5uS7UH8w1AIBAsXq4W2pAckDiB+giLEppogbi
+	gJwapNQAWBx0wMDNJuTli0cuSeQhnI9A0J/mRT3aGTVhoR/ELh4WuPjgmXHYP68MqgB/
+	9xPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=halBmWWCApfzc7ZVLPfqRJpEuD31B5OTbGmlt2Lax9o=;
+	b=B71fRpr+l5S0es2eRDFWgSBiPz0rGkylrBpVU/6/kLGLfEcO8uO7ktjUEVEMwbCa8Y
+	6J3y547tN9/dQNwaelzUJNfX3TeAU9KPCKSeQv8FzZsZS5cxZ6iXyI9Zu15Zv7IZ3k5U
+	suDAwcKxqG+JY4SbtgugpSxy8iSnKysWhaJt5oWiXWTekO7jn0MBdB70SOjSmz20zrr8
+	MEGdrhgKJaXXf+q01JItnVbSNFeJlZc7b1twYFs4tee4f68H5HTMCWO4tt6c6WzsY8EY
+	BocjMAmhgCXmZMCqd7LVotAUbClIU7L9BkNNy2PfKx1TTpg8Z7LmDUQeI4UE7Ozhtb9W
+	fJNQ==
+X-Gm-Message-State: APjAAAVg3UNVjtc30jEOjLvWtRKeME2tvtGA3DxJb85yNZT5qEy2Y11A
+	ZaEXNd3n0EzpryXAEgYQ2MJUiIgi4lbdONzwEgqNMw==
+X-Google-Smtp-Source: APXvYqwPf3p3NRDbGnXujdVLUgREGdEy1tSqdr85fWBVsEsUTxJH2K20k+lwJ3gkf7m0bwxRI1Bd6EXl1W+5yaLosZ8=
+X-Received: by 2002:aca:e84c:: with SMTP id f73mr5728758oih.163.1554980438912; 
+	Thu, 11 Apr 2019 04:00:38 -0700 (PDT)
 MIME-Version: 1.0
+References: <201904110044.38853.randrianasulu@gmail.com>
+	<CAFEAcA9NN=wyVz5t+See_1dgvDM1xJ=_OPd1QWwiFMUASzoLaA@mail.gmail.com>
+	<201904111258.04551.randrianasulu@gmail.com>
+In-Reply-To: <201904111258.04551.randrianasulu@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2019 12:00:27 +0100
+Message-ID:
+ <CAFEAcA8BuzPkGKkeHH0EgDn08MJuWXbQwiwjuxT1vu5irmw4hg@mail.gmail.com>
+To: Andrew Randrianasulu <randrianasulu@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: cohuck@redhat.com
-Date: Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::22f
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 4.0.0-rc3 is now available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,53 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, cohuck@redhat.com,
-	ehabkost@redhat.com, mst@redhat.com, david@redhat.com,
-	qemu-devel@nongnu.org, pasic@linux.ibm.com,
-	borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
-	qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
-	david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411102846.wllwqQ3dv3PtBljj7xyHQUClgQdhvzyPstm8yEacmGY@z>
+Message-ID: <20190411110027.T7GL4CTfurmQAWioEpJ_2QoGBOIFpU4hGn3SOQUAix4@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMTEwMjAyNS4yMjU1
-OS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTQuMV0gaHc6IGFkZCBjb21w
-YXQgbWFjaGluZXMgZm9yIDQuMQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0
-YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQtMS1yaWNo
-YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAg
-IHBhdGNoZXcvMjAxOTA0MTEwNjM0MDguMzk5OC0xLWNsZ0BrYW9kLm9yZyAtPiBwYXRjaGV3LzIw
-MTkwNDExMDYzNDA4LjM5OTgtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAg
-ICAgcGF0Y2hldy8yMDE5MDQxMTA3MTczOS4yMjg4OS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50
-ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MTEwNzE3MzkuMjI4ODktMS1yaWNoYXJkdy55YW5nQGxp
-bnV4LmludGVsLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDEx
-MTAyMDI1LjIyNTU5LTEtY29odWNrQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQxMTEwMjAy
-NS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKNTU3NDZkZGFlOCBodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4Old4
-VikKIzU4OiBGSUxFOiBody9pMzg2L3BjLmM6MTE4OgorR2xvYmFsUHJvcGVydHkgcGNfY29tcGF0
-XzRfMFtdID17fTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDE2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgNTU3NDZkZGFlOGI2
-IChodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Thu, 11 Apr 2019 at 11:03, Andrew Randrianasulu
+<randrianasulu@gmail.com> wrote:
+>
+> =D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=
+=82 Thursday 11 April 2019 12:14:45 Peter Maydell =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BB(=D0=B0):
+> > On Wed, 10 Apr 2019 at 22:51, Andrew Randrianasulu
+> > <randrianasulu@gmail.com> wrote:
+> > >
+> > > Please also include this patch in next -rc or final, it fixes 32-bit =
+compilation:
+> > >
+> > > https://patchew.org/QEMU/20190402073018.17747-1-kraxel%40redhat.com/
+> > > ([Qemu-devel] [PATCH] curses: fix wchar_t printf warning)
+> > >
+> > > without it I get
+> > >
+> > > ui/curses.c: In function 'get_ucs':
+> > > ui/curses.c:456:25: error: format '%x' expects argument of type 'unsi=
+gned int', but argument 3 has type 'wchar_t {aka long int}' [-Werror=3Dform=
+at=3D]
+> > >          fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UC=
+S-2: %s\n",
+> > >
+> >
+> > Rats, I'd forgotten about that one. What platform does it fail
+> > to compile on, though? I test on 32-bit Linux and Windows compiles,
+> > and they work OK.
+>
+> This is slackware (mix of many versions) + gcc (GCC) 5.5.0.
+> Probably, this error will not show up if you don't have ncurses-dev packa=
+ges,
+> so configure will NOT enable curses ui ?
 
+It turns out my 32-bit system has libncurses5-dev but not
+libncursesw5-dev, so when we added the widechar requirement
+it just stopped building the curses UI. I've now fixed that.
+On the other hand, I still don't see the error. I think
+my gcc/glibc combo must define wchar_t as 'int' anyway
+(this is 32-bit arm).
+
+thanks
+-- PMM
 
