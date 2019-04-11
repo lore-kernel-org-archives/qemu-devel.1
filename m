@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51920)
+Received: from eggs.gnu.org ([209.51.188.92]:52531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEblT-0007s2-5p
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:24 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hEbnR-00010m-MW
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEblP-0006tP-De
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39030)
+	(envelope-from <pagupta@redhat.com>) id 1hEbnQ-00085Q-PP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEblM-0006s6-Kq
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DC02C033499
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:37:15 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190411145256.8614-1-armbru@redhat.com>
-	<20190411145256.8614-4-armbru@redhat.com>
-	<0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com>
-Date: Thu, 11 Apr 2019 17:37:11 +0200
-In-Reply-To: <0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com> (Paolo
-	Bonzini's message of "Thu, 11 Apr 2019 17:22:20 +0200")
-Message-ID: <87tvf4v9i0.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEbnQ-0007wx-9d
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:24 -0400
+Date: Thu, 11 Apr 2019 11:39:06 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <393821092.21153045.1554997146416.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-4-pagupta@redhat.com>
+	<CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
- redirected to" message
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libnvdimm: add dax_dev sync flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Christoph Hellwig <hch@infradead.org>, Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, jmoyer <jmoyer@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval shaia <yuval.shaia@oracle.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 11/04/19 16:52, Markus Armbruster wrote:
->> char_pty_open() prints a "char device redirected to PTY_NAME (label
->> LABEL)" message to the current monitor or else to stderr.  No other
->> ChardevClass::open() prints anything on success.  Drop the message.
->>=20
->> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  chardev/char-pty.c | 2 --
->>  1 file changed, 2 deletions(-)
->>=20
->> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
->> index b034332edd..a48d3e5d20 100644
->> --- a/chardev/char-pty.c
->> +++ b/chardev/char-pty.c
->> @@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
->>      qemu_set_nonblock(master_fd);
->>=20=20
->>      chr->filename =3D g_strdup_printf("pty:%s", pty_name);
->> -    error_printf("char device redirected to %s (label %s)\n",
->> -                 pty_name, chr->label);
->>=20=20
->>      s =3D PTY_CHARDEV(chr);
->>      s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
->
-> The reason for the message is that the char device is completely useless
-> until the user knows the /dev/pts/N path[1].  You can get it with "info
-> chardev" (aka query-chardev for QMP) but there's an interesting chicken
-> and egg problem if the pty is for your monitor...
->
-> Paolo
+Hi Dan,
 
-During review of v1, I wrote:
+Thank you for the review.
 
-    If we should decide the message is still useful enough to be worth
-    keeping, I could direct it to stdout instead of dropping it.
+> >
+> > This patch adds 'DAXDEV_SYNC' flag which is set
+> > for nd_region doing synchronous flush. This later
+> > is used to disable MAP_SYNC functionality for
+> > ext4 & xfs filesystem for devices don't support
+> > synchronous flush.
+> >
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/dax/bus.c            |  2 +-
+> >  drivers/dax/super.c          | 13 ++++++++++++-
+> >  drivers/md/dm.c              |  2 +-
+> >  drivers/nvdimm/pmem.c        |  3 ++-
+> >  drivers/nvdimm/region_devs.c |  7 +++++++
+> >  include/linux/dax.h          |  9 +++++++--
+> >  include/linux/libnvdimm.h    |  1 +
+> >  7 files changed, 31 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
+> > index 2109cfe80219..431bf7d2a7f9 100644
+> > --- a/drivers/dax/bus.c
+> > +++ b/drivers/dax/bus.c
+> > @@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region
+> > *dax_region, int id,
+> >          * No 'host' or dax_operations since there is no access to this
+> >          * device outside of mmap of the resulting character device.
+> >          */
+> > -       dax_dev = alloc_dax(dev_dax, NULL, NULL);
+> > +       dax_dev = alloc_dax(dev_dax, NULL, NULL, true);
+> 
+> I find apis that take a boolean as unreadable. What does 'true' mean?
+> It wastes time to go look at the function definition vs something
+> like:
+> 
+>     alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
 
-No clear conclusion emerged, so I did nothing for v2.  If we conclude to
-keep the message now, I'll gladly do that.
+Agree. Will change as suggested.
 
-> [1] once you know it, you can use the monitor's readline interface with
-> e.g. "socat STDIO,cfmakeraw FILE:/dev/pts/1"
-
-There's also
-
-    $ socat UNIX:/path/to/socket READLINE,history=3D$HOME/.hmp_history,prom=
-pt=3D'(qemu) '
-
-Lacks completion.  But then our very own reimplementation of readline
-lacks any number of other features.
+Best regards,
+Pankaj
+> 
