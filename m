@@ -2,79 +2,61 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD28C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 822DBC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:28:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 599432084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:28:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 599432084D
+	by mail.kernel.org (Postfix) with ESMTPS id 3F8FD2084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:28:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F8FD2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45739 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45741 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEWwn-00072m-Ac
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:28:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54395)
+	id 1hEWwr-000772-4T
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:28:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEWrw-0002Xe-5X
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:23:45 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsA-0002Us-1d
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:23:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEWkT-0001IS-Ob
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:16:02 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEWkT-0001IB-Dn
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:16:01 -0400
-Received: by mail-wr1-f68.google.com with SMTP id y13so6590526wrd.3
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 03:16:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=d3NOtjxHER99BInKn/txR6jRHb13DjNXBrQBXYCwe9Q=;
-	b=Acf6ZV3xq9oP7UdUh6ki/7SZL6YpqCwVfdzua2gmreAeYop7nS7i1shvWA8pNZV5zZ
-	8zMZyBKOvV8JwLR7NICWfML+563GUbOekdfjR3CUJciwS9ftUuGcZhvSFMPVR8onnBe5
-	i3sGJZkAw7tm+SSoe/Sptfdd1asvSNUjEgoFqmUisc+9SrodCG9DlOxg7BQfva8wbsTO
-	9PrVrIrZ0ifNrLS6VdAj15GiBxBT77/cos710/r4/t1CWYFCLitRjBz9+ycD461yxzsg
-	nnMxqroCZw0coruGNX13qnr53AEVdBrFjteTHGDsE0UAhUGyRZ53d5kAOq0Tf38L7JyZ
-	ycvg==
-X-Gm-Message-State: APjAAAUZVbPW08nE3eED+x1f4O+OxU3Md0g8pQtwhiUrM3r5xbTOQNpR
-	h+uMsP5daGqD2afTrB+10SARMw==
-X-Google-Smtp-Source: APXvYqy5JkKAUNWTMlsCFqoIdyEEyMLUsP0Dlm/XJDoxxMw15piqdnhelLE3FnDPk61imLdDNHYKQA==
-X-Received: by 2002:adf:de8d:: with SMTP id w13mr31108154wrl.26.1554977760396; 
-	Thu, 11 Apr 2019 03:16:00 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	a126sm4194044wmh.4.2019.04.11.03.15.59
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 11 Apr 2019 03:15:59 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190325090047.122981-1-ysato@users.sourceforge.jp>
-	<20190401140318.80498-1-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <655a45ed-cd6b-b8d8-72fa-d4ebca3dcd1a@redhat.com>
-Date: Thu, 11 Apr 2019 12:15:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <david@redhat.com>) id 1hEWex-0007nh-3e
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:10:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46207)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hEWew-0007nS-RO; Thu, 11 Apr 2019 06:10:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 223B02C9A6;
+	Thu, 11 Apr 2019 10:10:18 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BD1811001E82;
+	Thu, 11 Apr 2019 10:10:14 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 12:08:34 +0200
+Message-Id: <20190411100836.646-40-david@redhat.com>
+In-Reply-To: <20190411100836.646-1-david@redhat.com>
+References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190401140318.80498-1-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Thu, 11 Apr 2019 10:10:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH RFC v6 00/12] Add RX archtecture support
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v1 39/41] s390x/tcg: Implement VECTOR SUM
+ ACROSS QUADWORD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,52 +68,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411101559.XG4ypwYtCBlAuDmYCd9bTR6yKW-xFRmd--uCGmTXO44@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411100834.8L0Bn9Mt3xW03yCoU1HAg5LLDtLlYrwyVs3N0NjHYtw@z>
 
-Hi Yoshinori,
+Similar to VECTOR SUM ACROSS DOUBLEWORD, however without a loop and
+using 128-bit calculations.
 
-On 4/1/19 4:03 PM, Yoshinori Sato wrote:
-> Hello.
-> This patch series is added Renesas RX target emulation.
-> 
-> Update review comments.
-> 
-> My git repository is bellow.
-> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git
-> 
-> Testing binaries bellow.
-> u-boot
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-> 
-> starting
-> $ gzip -d u-boot.bin.gz
-> $ qemu-system-rx -bios u-boot.bin
-> 
-> linux and pico-root (only sash)
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
->            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
-> 
-> starting
-> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
-> 
-> Changes v5.
-> Fix undocumented instruction behavior.
-> (PUSHM/POPM/RTSD/MVFC/MVTC)
-> More useful messages for invalid operands.
-[...]
-Please don't post your series iterations are as reply to previous
-series, it makes harder to find them.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-FYI I use Thunderbird as email client, with mails grouped by thread.
-Since you sent v4 as reply to v3, and similar v5 -> v4 and this v6 ->
-v5, my client kept all subsequent activity folded under the "v3" cover.
-Then I missed to review it.
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index dd37003082..2483ee01d7 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1184,6 +1184,8 @@
+     F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
+ /* VECTOR SUM ACROSS DOUBLEWORD */
+     F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
++/* VECTOR SUM ACROSS QUADWORD */
++    F(0xe767, VSUMQ,   VRR_c, V,   0, 0, 0, 0, vsumq, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 2168a519fa..995c2b4461 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2254,3 +2254,35 @@ static DisasJumpType op_vsumg(DisasContext *s, Dis=
+asOps *o)
+     tcg_temp_free_i64(tmp);
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vsumq(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    const uint8_t max_idx =3D NUM_VEC_ELEMENTS(es) - 1;
++    TCGv_i64 sumh, suml, zero, tmpl;
++    uint8_t idx;
++
++    if (es < ES_32 || es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    sumh =3D tcg_const_i64(0);
++    suml =3D tcg_temp_new_i64();
++    zero =3D tcg_const_i64(0);
++    tmpl =3D tcg_temp_new_i64();
++
++    read_vec_element_i64(suml, get_field(s->fields, v3), max_idx, es);
++    for (idx =3D 0; idx <=3D max_idx; idx++) {
++        read_vec_element_i64(tmpl, get_field(s->fields, v2), idx, es);
++        tcg_gen_add2_i64(suml, sumh, suml, sumh, tmpl, zero);
++    }
++    write_vec_element_i64(sumh, get_field(s->fields, v1), 0, ES_64);
++    write_vec_element_i64(suml, get_field(s->fields, v1), 1, ES_64);
++
++    tcg_temp_free_i64(sumh);
++    tcg_temp_free_i64(suml);
++    tcg_temp_free_i64(zero);
++    tcg_temp_free_i64(tmpl);
++    return DISAS_NEXT;
++}
+--=20
+2.20.1
 
-Regards,
-
-Phil.
 
