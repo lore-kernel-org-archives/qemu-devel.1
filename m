@@ -5,72 +5,138 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF086C10F11
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4B9C10F11
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F67020674
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:31:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F67020674
+	by mail.kernel.org (Postfix) with ESMTPS id DDF1820674
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:33:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDF1820674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40051 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40063 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEOZK-0003sv-LG
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 21:31:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36557)
+	id 1hEOav-0004hW-4n
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 21:33:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hEOYQ-0003a3-3X
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hEOZU-00042o-Qc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hEOYP-0007gv-2y
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hEOYO-0007gk-Tv
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
-Received: by mail-qk1-f195.google.com with SMTP id y5so2484433qkc.11
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=kFYzzDCm70A+7FT/vT7bxff2QgQb2SRrM+UAT7566Us=;
-	b=W+OMZUjawKU/C7ZCCvzMUlUzdyV24Wu7I0LSAUvKlwoDygaVvsolTHHHgCywPYbx/O
-	HffmYjolPtCF4INU/WEK67rbm7/vu4qkxjAQ2D9K+9ibcP/SSil/pghVE7LWgUYsm3rX
-	MI3Z9HW843CzFrTcX9wed9K7HyIKS090c5qKhm1SSwato0W4RBT4m44khKvyOl2NDNOB
-	TYIOxOUo+8nAhNUKIpjvsWNHoOwXHM81TnT9jBE4Sa9aiN+74Q8NCxXyTb4mMVQFk+fE
-	cQS3+TrTeKd8ODnY9+pk1rTqDe2vatKypjKR3GZ5/NN9Bam5UnRvgJzjW/+kNzYfItDG
-	xkVw==
-X-Gm-Message-State: APjAAAVfpZJPhJmnOVINIZOJs0wBtK1iaCgekEJvZDs5+NoJmdbta2zp
-	RrhRr/2DkgHWLbtHWt3HIGxVtQ==
-X-Google-Smtp-Source: APXvYqz5wLY0cyBYGKmaR3L0+2iplXTYnK5mbWXN89ZzoMC2NignGs7gm7mStd/c2NwF4k0+gCvUBg==
-X-Received: by 2002:a37:9ac3:: with SMTP id
-	c186mr35484221qke.117.1554946260089; 
-	Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
-Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
-	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
-	d21sm27933434qtc.91.2019.04.10.18.30.58
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 10 Apr 2019 18:30:58 -0700 (PDT)
-Date: Wed, 10 Apr 2019 21:30:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190410213001-mutt-send-email-mst@kernel.org>
-References: <20190401111843.54528-1-ybettan@redhat.com>
-	<20190409131734.GE16944@stefanha-x1.localdomain>
-	<1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
-	<CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1hEOZT-0008GU-UH
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hEOZQ-0008ES-Of; Wed, 10 Apr 2019 21:32:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9D843082E10;
+	Thu, 11 Apr 2019 01:32:02 +0000 (UTC)
+Received: from [10.18.17.206] (dhcp-17-206.bos.redhat.com [10.18.17.206])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1E0A65C28F;
+	Thu, 11 Apr 2019 01:32:02 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <20190409210655.777-1-jsnow@redhat.com>
+	<87y34i2zbt.fsf@dusky.pond.sub.org>
+	<3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+	<e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <d36b8962-ed7d-f315-479b-d7de78d906e6@redhat.com>
+Date: Wed, 10 Apr 2019 21:32:01 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 11 Apr 2019 01:32:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.195
-Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,58 +148,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoni Bettan <ybettan@redhat.com>, Amnon Ilan <ailan@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411013056.aB_ieZUEb2MYAG0xVmRV98QXY4CLXW5Oe__rCwKZwik@z>
+Message-ID: <20190411013201.4NkZfrWhgxaoVIFFtGAhheAtAzPE2MnXNgy4Gl_p0rI@z>
 
-On Wed, Apr 10, 2019 at 08:15:32PM +0100, Stefan Hajnoczi wrote:
-> On Wed, Apr 10, 2019 at 4:45 PM Yoni Bettan <ybettan@redhat.com> wrote:
-> > On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
-> > > On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
-> > The final purpose is to have:
-> >
-> > 1. device specification
-> >
-> > 2. device implementation
-> >
-> > 3. device driver
-> >
-> > 4. blog
-> >
-> > maybe I should have written it at the beginning, this is not the entire
-> > project but it is its start.
-> 
-> The way I'd design VIRTIO devices without prior knowledge is:
-> 
-> 1. Learn the VIRTIO device model.  Understand the concepts in VIRTIO.
-> <-- this is hard today, there's not much good documentation
 
-Best doc is still probably Rusty's whitepaper. It only covers 0.X
-spec so somewhat outdated but it does explain the concepts I think.
 
-> 2. Design an initial version of the device spec.  Mostly configuration
-> layout, virtqueues, and request structs.  Not much text is necessary
-> at this point, but it's critical for thinking through features before
-> implementation.
+On 4/10/19 2:22 PM, Eric Blake wrote:
+> On 4/10/19 12:37 PM, John Snow wrote:
+>>
+>>
+>> On 4/10/19 1:39 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> It turns out that having options listed in three places continues to be
+>>>> a bad idea. I'm still toying with the idea of an improved infrastructure
+>>>> here, but in the meantime, another bandaid.
+>>>>
 > 
-> 3. Implement guest driver and device emulation.
+>>>
+>>> Nice to have in 4.0.
+>>>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>>
+>>
+>> If it can go in for 4.0, who stages it? Kevin?
 > 
-> 4. Iterate on spec and implementation until it's functionally complete.
+> At this point, we've missed -rc3; the fix on its own is not a
+> release-blocker, but if something else comes up that requires -rc4 for
+> an actual release blocker, we can sort out someone sending a pull
+> request for this one at the same time. (I'm aware of a couple of iotest
+> fixups in the same boat... Guess it's time to start updating the wiki to
+> point to email threads where we document 'wish list' patches)
 > 
-> 5. Submit the spec to the VIRTIO Technical Committee.
-> 
-> 6. Submit driver and device emulation patches.  They can be merged
-> when the spec is approved/close to approved.
-> 
-> Are you jumping to #3?  This is likely to lead to poor quality
-> implementations and specs because the fundamental VIRTIO concepts
-> weren't understood.
-> 
-> If the point is to educate others and/or do it "the right way", then I
-> would really avoid hacking around without first doing the other steps.
-> 
-> Stefan
+
+OK. I also have... a pretty major bitmaps documentation rewrite which I
+probably won't have ready in time for a theoretical rc4 either, so I
+guess I'll need to include it for 4.0.1.
+
+I didn't realize how badly out of date the bitmaps.rst file had gotten.
+I'll keep hammering away at it.
+
+--js
 
