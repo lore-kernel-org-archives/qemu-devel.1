@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44072)
+Received: from eggs.gnu.org ([209.51.188.92]:48407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hEehA-0002zc-EW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:45:09 -0400
+	(envelope-from <lersek@redhat.com>) id 1hEexD-0007Ye-E9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hEeh9-0005Hc-Go
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:45:08 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:54862)
+	(envelope-from <lersek@redhat.com>) id 1hEexC-0007Xr-Da
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1hEeh9-0005CB-7W
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:45:07 -0400
-Date: Thu, 11 Apr 2019 20:45:02 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190411184502.xvesnriqcocyvuan@function>
-References: <20190405184648.17029-1-dgilbert@redhat.com>
-	<20190405212501.cdg4u3m7ihldcop4@function>
-	<20190408084653.GB2687@work-vm>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hEexC-0007X0-6D
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:42 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <20190411175931.29235-1-brijesh.singh@amd.com>
+	<61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
+Message-ID: <33d5a129-52d6-e9d6-6211-59e97aff975e@redhat.com>
+Date: Thu, 11 Apr 2019 21:01:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190408084653.GB2687@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] slirp: Gcc 9 -O3 fix
+In-Reply-To: <61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
+ field to 'query-sev-capabilities'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, jan.kiszka@siemens.com
+To: "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Erik Skultety <eskultet@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hello,
+On 04/11/19 20:10, Laszlo Ersek wrote:
+> On 04/11/19 19:59, Singh, Brijesh wrote:
+>> There are limited numbers of the SEV guests that can be run concurrent=
+ly.
+>> A management applications may need to know this limit so that it can p=
+lace
+>> SEV VMs on hosts which have suitable resources available.
+>>
+>> Currently, this limit is not exposed to the application. Add a new
+>> 'sev-max-guest' field in the query-sev-capabilities to provide this
+>> information.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> Cc: Laszlo Ersek <lersek@redhat.com>
+>> Cc: Erik Skultety <eskultet@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  qapi/target.json  | 6 ++++--
+>>  target/i386/sev.c | 6 ++++--
+>>  2 files changed, 8 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/qapi/target.json b/qapi/target.json
+>> index 1d4d54b600..b45121d30b 100644
+>> --- a/qapi/target.json
+>> +++ b/qapi/target.json
+>> @@ -183,7 +183,8 @@
+>>    'data': { 'pdh': 'str',
+>>              'cert-chain': 'str',
+>>              'cbitpos': 'int',
+>> -            'reduced-phys-bits': 'int'},
+>> +            'reduced-phys-bits': 'int',
+>> +            'sev-max-guests': 'int'},
+>=20
+> Would it be useful to make this new field optional? E.g. if it was
+> missing, libvirtd could assume "no limit".
+>=20
+> Again, not sure if that's useful, but it's not hard to introduce the
+> field as optional now. Removing mandatory fields later is impossible.
 
-Dr. David Alan Gilbert, le lun. 08 avril 2019 09:46:53 +0100, a ecrit:
-> 'soread' has the comment:
-> 
->         /*
->          * No need to check if there's enough room to read.
->          * soread wouldn't have been called if there weren't
->          */
->         sopreprbuf(so, iov, &n);
-> 
-> the compiler doesn't realise that, and is moaning about the case
-> where the if (len <=0) return happens and the following 
-> code tries to use iov.
+On second thought, if we're sure the hardware / encryption engine will
+always have this kind of limitation, then mandatory looks fine.
 
-I see. Perhaps we should make this an assert then? In case this isn't
-true, i.e. soread() is called even if no room is available, returning 0
-would probably just let the caller just try again, and we should rather
-just plainly crash than hang?
-
-Samuel
+Thanks
+Laszlo
