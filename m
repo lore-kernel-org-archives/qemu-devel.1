@@ -2,61 +2,94 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 561C3C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3974AC282CE
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:35:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24B602083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B602083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0227E20850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:35:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mTwHXO3g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0227E20850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50811 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50813 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbhz-0004Ey-Ur
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:33:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48360)
+	id 1hEbjA-0005BL-29
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:35:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEba1-0005n1-59
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hEbdd-0000nT-Ua
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:29:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZz-0006kr-76
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZx-0006aI-6W
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CAC6653FC
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC877108F82D;
-	Thu, 11 Apr 2019 15:25:24 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id C7DDC113279E; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 17:25:20 +0200
-Message-Id: <20190411152520.10061-18-armbru@redhat.com>
-In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
-References: <20190411152520.10061-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 17/17] include: Move fprintf_function to disas/
+	(envelope-from <richard.henderson@linaro.org>) id 1hEbdd-0001Bq-3c
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:29:17 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:36830)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hEbdc-0001BM-O8
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:29:17 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id 85so3688046pgc.3
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=ktJGr5Jfv361QpuU4BPGXzMuOOrLXeJvQKQH/1BYFxA=;
+	b=mTwHXO3gcX17PEZfr3sBY51B163qSmuh3pPYKBAMfsR6QSCU4HKheLf10ysDKK/ylI
+	m1vTSdjF5aJbFBtjPj7aHksHyOu2kAOBR66yJeaELfc8rcEiR1074kJ0vXOXDhRUIbX4
+	mt1HueiKM8eCns3XM5coUsKUHIJQNNUU5cP1n+aghD42oQurh6A67InYIcAqYtR8LRPE
+	Lcf3cAyNtNqJYPULdyLUbefmuYF+O0W2jlmn7lMtyJfAB03/TmiNlLvDeZtbUWlIwmot
+	v8R3qwQGq/6AD7tqpFQdgJYBmXwlrntgGkr30HzN7kszqRV00AmfOEwxA7kflVYJmvBQ
+	8t5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ktJGr5Jfv361QpuU4BPGXzMuOOrLXeJvQKQH/1BYFxA=;
+	b=SUPou3VWCDMfJ85t97PnGV5auILHBjQeKWGZwtJkodQ50neWfuZmNlr0Hxm3QSdCLq
+	W3u4buMxtqFkGvYMnPlclFCOMyTjsXa7Y+CrfdaxD18S0qCgr3CpN5hTWTXRwkf2CzMb
+	HnS9NY5XRxQW1/bulr0m85gAS9L18xBIHK/wqh4hbJtzPj3tF/OCOBpYWvT6MSx/GWXU
+	/5ExN9wuztg4ISJMYgm0YoLPr1mzZKpE0+Oga9QvMLs0jk9vHnHlSJqmPTIE2O6zUA+p
+	nPzAKD8OpuPJX8hTVlD7WNgin7BxuC9/0BFA38s+vaBEhU7y3uJuhsMyq+aXMLKtM6E6
+	Sn9Q==
+X-Gm-Message-State: APjAAAW+4bqAVxUC0o0iZXfZYqUrpqnNwVgS+WwbUzf9as/dfwpb7x3N
+	ey8zi9nq0BDMSLJNpjqKEtQAHg==
+X-Google-Smtp-Source: APXvYqzg6FxFaUgoGItKRv2NJlhchZIHFKRHtYTHxGFEa8SqMITH/SGElpnzLgDw9rwZ5myQ7WjwZQ==
+X-Received: by 2002:aa7:8719:: with SMTP id b25mr50418362pfo.90.1554996555195; 
+	Thu, 11 Apr 2019 08:29:15 -0700 (PDT)
+Received: from [192.168.3.43] (rrcs-173-197-98-123.west.biz.rr.com.
+	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
+	81sm30366441pfy.89.2019.04.11.08.29.13
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 11 Apr 2019 08:29:14 -0700 (PDT)
+To: Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>,
+	qemu-devel@nongnu.org
+References: <20190410194838.10123-1-sw@weilnetz.de>
+	<46e4ee2d-f991-1910-db15-0ec216ab9cab@twiddle.net>
+	<f7f4f96e-7900-45e8-10ef-65f7870b3c3e@weilnetz.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <7423e23c-244b-3481-db82-e84baa4976d1@linaro.org>
+Date: Thu, 11 Apr 2019 05:29:10 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <f7f4f96e-7900-45e8-10ef-65f7870b3c3e@weilnetz.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::52d
+Subject: Re: [Qemu-devel] [PATCH] tci: Add implementation for
+ INDEX_op_ld16u_i64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,73 +101,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411152520.nZRR36eNwPu3jnxLCDcf12_A8nvFUQ-Ks4HMnQkHRTk@z>
+Message-ID: <20190411152910.ylEDvDnCKFhFljOwmNgSSaiYfkZixHDkCHLcaK84R00@z>
 
-The previous commits have eliminated fprintf_function outside
-disassemblers, simplifying code and cleaning up the ugly type-punning
-fprintf_function seems to attract.  Move fprintf_function to
-include/disas/dis-asm.h to reduce the temptation to abuse it.
+On 4/10/19 9:37 PM, Stefan Weil wrote:
+>> Why not use tci_write_reg64, since that is the size of the register you're
+>> modifying?  Let the zero-extension explicit in the name of the opcode to be
+>> reflected in the zero-extension implied by the passing of a uint16_t value to a
+>> uint64_t argument.
+> 
+> I think that using tci_write_reg64 would be wrong on 32 bit hosts.
 
-I considered renaming it to fprintf_ftype (reverting that part of
-commit 6e2d864edf5, v0.14.0) to get us closer to binutils, but I
-figure the fork is too distant to make this worthwhile.
+... as would using INDEX_op_ld16u_i64 in the first place.
+This is already within #if TCG_TARGET_REG_BITS == 64.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- include/disas/dis-asm.h   |  5 +++--
- include/qemu/fprintf-fn.h | 14 --------------
- 2 files changed, 3 insertions(+), 16 deletions(-)
- delete mode 100644 include/qemu/fprintf-fn.h
 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 41b61c85f9..9240ec32c2 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -9,8 +9,6 @@
- #ifndef DISAS_BFD_H
- #define DISAS_BFD_H
- 
--#include "qemu/fprintf-fn.h"
--
- typedef void *PTR;
- typedef uint64_t bfd_vma;
- typedef int64_t bfd_signed_vma;
-@@ -243,6 +241,9 @@ typedef struct symbol_cache_entry
-     } udata;
- } asymbol;
- 
-+typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
-+
- enum dis_insn_type {
-   dis_noninsn,			/* Not a valid instruction */
-   dis_nonbranch,		/* Not a branch instruction */
-diff --git a/include/qemu/fprintf-fn.h b/include/qemu/fprintf-fn.h
-deleted file mode 100644
-index 9068a960b3..0000000000
---- a/include/qemu/fprintf-fn.h
-+++ /dev/null
-@@ -1,14 +0,0 @@
--/*
-- * Typedef for fprintf-alike function pointers.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
--
--#ifndef QEMU_FPRINTF_FN_H
--#define QEMU_FPRINTF_FN_H
--
--typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
--    GCC_FMT_ATTR(2, 3);
--
--#endif
--- 
-2.17.2
-
+r~
 
