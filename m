@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36350)
+Received: from eggs.gnu.org ([209.51.188.92]:37742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEXOR-0007Xd-DP
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:57:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEXS6-0002Jt-On
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEXOP-0006qz-GT
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:57:19 -0400
-Date: Thu, 11 Apr 2019 12:56:55 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190411125655.7feab799.cohuck@redhat.com>
-In-Reply-To: <155497852263.12882.17138118894178379111@76452e4e88f2>
-References: <20190411102025.22559-1-cohuck@redhat.com>
-	<155497852263.12882.17138118894178379111@76452e4e88f2>
+	(envelope-from <peter.maydell@linaro.org>) id 1hEXRz-0000QK-P5
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:01:04 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:40839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEXRk-00042N-DE
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:00:59 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id 3so4509783oir.7
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 04:00:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
+References: <201904110044.38853.randrianasulu@gmail.com>
+	<CAFEAcA9NN=wyVz5t+See_1dgvDM1xJ=_OPd1QWwiFMUASzoLaA@mail.gmail.com>
+	<201904111258.04551.randrianasulu@gmail.com>
+In-Reply-To: <201904111258.04551.randrianasulu@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2019 12:00:27 +0100
+Message-ID: <CAFEAcA8BuzPkGKkeHH0EgDn08MJuWXbQwiwjuxT1vu5irmw4hg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 4.0.0-rc3 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,18 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Andrew Randrianasulu <randrianasulu@gmail.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
-no-reply@patchew.org wrote:
+On Thu, 11 Apr 2019 at 11:03, Andrew Randrianasulu
+<randrianasulu@gmail.com> wrote:
+>
+> =D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=
+=82 Thursday 11 April 2019 12:14:45 Peter Maydell =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BB(=D0=B0):
+> > On Wed, 10 Apr 2019 at 22:51, Andrew Randrianasulu
+> > <randrianasulu@gmail.com> wrote:
+> > >
+> > > Please also include this patch in next -rc or final, it fixes 32-bit =
+compilation:
+> > >
+> > > https://patchew.org/QEMU/20190402073018.17747-1-kraxel%40redhat.com/
+> > > ([Qemu-devel] [PATCH] curses: fix wchar_t printf warning)
+> > >
+> > > without it I get
+> > >
+> > > ui/curses.c: In function 'get_ucs':
+> > > ui/curses.c:456:25: error: format '%x' expects argument of type 'unsi=
+gned int', but argument 3 has type 'wchar_t {aka long int}' [-Werror=3Dform=
+at=3D]
+> > >          fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UC=
+S-2: %s\n",
+> > >
+> >
+> > Rats, I'd forgotten about that one. What platform does it fail
+> > to compile on, though? I test on 32-bit Linux and Windows compiles,
+> > and they work OK.
+>
+> This is slackware (mix of many versions) + gcc (GCC) 5.5.0.
+> Probably, this error will not show up if you don't have ncurses-dev packa=
+ges,
+> so configure will NOT enable curses ui ?
 
-> === OUTPUT BEGIN ===
-> ERROR: spaces required around that '=' (ctx:WxV)
-> #58: FILE: hw/i386/pc.c:118:
-> +GlobalProperty pc_compat_4_0[] ={};
->                                 ^
-> 
-> total: 1 errors, 0 warnings, 160 lines checked
+It turns out my 32-bit system has libncurses5-dev but not
+libncursesw5-dev, so when we added the widechar requirement
+it just stopped building the curses UI. I've now fixed that.
+On the other hand, I still don't see the error. I think
+my gcc/glibc combo must define wchar_t as 'int' anyway
+(this is 32-bit arm).
 
-Yeah; trivial to fix by whoever applies this.
+thanks
+-- PMM
