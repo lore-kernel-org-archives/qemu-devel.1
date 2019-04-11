@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48201)
+Received: from eggs.gnu.org ([209.51.188.92]:48237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZs-0005YO-6Q
+	(envelope-from <armbru@redhat.com>) id 1hEbZv-0005f6-CR
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZr-0006UP-8V
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37698)
+	(envelope-from <armbru@redhat.com>) id 1hEbZs-0006YQ-QH
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZq-0006TC-T0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZs-0006Vh-F9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:24 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2BC6A30AA3A0
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC5B6C0740E0
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 17:25:04 +0200
-Message-Id: <20190411152520.10061-2-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 17:25:16 +0200
+Message-Id: <20190411152520.10061-14-armbru@redhat.com>
 In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
 References: <20190411152520.10061-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/17] include: Include fprintf-fn.h only where
- needed
+Subject: [Qemu-devel] [PATCH 13/17] qemu-print: New qemu_fprintf(),
+ qemu_vfprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +33,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
+Code that doesn't want to know about current monitor vs. stdout
+vs. stderr takes an fprintf_function callback and a FILE * argument to
+pass to it.  Actual arguments are either fprintf() and stdout or
+stderr, or monitor_fprintf() and the current monitor cast to FILE *.
+monitor_fprintf() casts it right back, and is otherwise identical to
+monitor_printf().  The type-punning is ugly.
+
+New qemu_fprintf() and qemu_vprintf() address this need without type
+punning: they are like fprintf() and vfprintf(), except they print to
+the current monitor when passed a null FILE *.  The next commits will
+put them to use.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qemu-common.h | 2 --
- include/qemu/cutils.h | 2 --
- include/sysemu/cpus.h | 1 +
- 3 files changed, 1 insertion(+), 4 deletions(-)
+ include/qemu/qemu-print.h |  4 ++++
+ util/qemu-print.c         | 27 +++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index a102245519..f891e05e7e 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -12,8 +12,6 @@
- #ifndef QEMU_COMMON_H
- #define QEMU_COMMON_H
+diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+index 8fed32bf42..40b596262f 100644
+--- a/include/qemu/qemu-print.h
++++ b/include/qemu/qemu-print.h
+@@ -16,4 +16,8 @@
+ int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+ int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
  
--#include "qemu/fprintf-fn.h"
--
- #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
- 
- /* Copyright string for -version arguments, About dialogs, etc */
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index d2dad3057c..12301340a4 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -1,8 +1,6 @@
- #ifndef QEMU_CUTILS_H
- #define QEMU_CUTILS_H
- 
--#include "qemu/fprintf-fn.h"
--
- /**
-  * pstrcpy:
-  * @buf: buffer to copy string into
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 731756d948..eea0010b53 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -1,6 +1,7 @@
- #ifndef QEMU_CPUS_H
- #define QEMU_CPUS_H
- 
-+#include "qemu/fprintf-fn.h"
- #include "qemu/timer.h"
- 
- /* cpus.c */
++int qemu_vfprintf(FILE *stream, const char *fmt, va_list ap)
++    GCC_FMT_ATTR(2, 0);
++int qemu_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
++
+ #endif
+diff --git a/util/qemu-print.c b/util/qemu-print.c
+index 86f9417af8..e79d6b8396 100644
+--- a/util/qemu-print.c
++++ b/util/qemu-print.c
+@@ -40,3 +40,30 @@ int qemu_printf(const char *fmt, ...)
+     va_end(ap);
+     return ret;
+ }
++
++/*
++ * Print like vfprintf()
++ * Print to @stream if non-null, else to current monitor.
++ */
++int qemu_vfprintf(FILE *stream, const char *fmt, va_list ap)
++{
++    if (!stream) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vfprintf(stream, fmt, ap);
++}
++
++/*
++ * Print like fprintf().
++ * Print to @stream if non-null, else to current monitor.
++ */
++int qemu_fprintf(FILE *stream, const char *fmt, ...)
++{
++    va_list ap;
++    int ret;
++
++    va_start(ap, fmt);
++    ret = qemu_vfprintf(stream, fmt, ap);
++    va_end(ap);
++    return ret;
++}
 -- 
 2.17.2
