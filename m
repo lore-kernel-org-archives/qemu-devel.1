@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34499)
+Received: from eggs.gnu.org ([209.51.188.92]:36350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hEXHv-0001ma-2Y
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:36 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hEXOR-0007Xd-DP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hEXHt-0006fX-W5
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:35 -0400
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 11 Apr 2019 12:50:25 +0200
-Message-Id: <20190411105025.97397-2-sgarzare@redhat.com>
-In-Reply-To: <20190411105025.97397-1-sgarzare@redhat.com>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1hEXOP-0006qz-GT
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:57:19 -0400
+Date: Thu, 11 Apr 2019 12:56:55 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190411125655.7feab799.cohuck@redhat.com>
+In-Reply-To: <155497852263.12882.17138118894178379111@76452e4e88f2>
+References: <20190411102025.22559-1-cohuck@redhat.com>
+	<155497852263.12882.17138118894178379111@76452e4e88f2>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically the
- image size
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +24,17 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-RBD APIs don't allow us to write more than the size set with rbd_create()
-or rbd_resize().
-In order to support growing images (eg. qcow2), we resize the image
-before RW operations that exceed the current size.
+On Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
+no-reply@patchew.org wrote:
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1171007
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- block/rbd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> === OUTPUT BEGIN ===
+> ERROR: spaces required around that '=' (ctx:WxV)
+> #58: FILE: hw/i386/pc.c:118:
+> +GlobalProperty pc_compat_4_0[] ={};
+>                                 ^
+> 
+> total: 1 errors, 0 warnings, 160 lines checked
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..228658e20a 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
-     rbd_image_t image;
-     char *image_name;
-     char *snap;
-+    uint64_t image_size;
- } BDRVRBDState;
-=20
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-@@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict=
- *options, int flags,
-         goto failed_open;
-     }
-=20
-+    r =3D rbd_get_size(s->image, &s->image_size);
-+    if (r < 0) {
-+        error_setg_errno(errp, -r, "error reading image size from %s",
-+                         s->image_name);
-+        rbd_close(s->image);
-+        goto failed_open;
-+    }
-+
-     /* If we are using an rbd snapshot, we must be r/o, otherwise
-      * leave as-is */
-     if (s->snap !=3D NULL) {
-@@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *b=
-s,
-         rcb->buf =3D acb->bounce;
-     }
-=20
-+    /*
-+     * RBD APIs don't allow us to write more than actual size, so in ord=
-er
-+     * to support growing images, we resize the image before RW operatio=
-ns
-+     * that exceed the current size.
-+     */
-+    if (s->image_size < off + size) {
-+        r =3D rbd_resize(s->image, off + size);
-+        if (r < 0) {
-+            goto failed;
-+        }
-+
-+        s->image_size =3D off + size;
-+    }
-+
-     acb->ret =3D 0;
-     acb->error =3D 0;
-     acb->s =3D s;
-@@ -1066,6 +1089,8 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-         return r;
-     }
-=20
-+    s->image_size =3D offset;
-+
-     return 0;
- }
-=20
---=20
-2.20.1
+Yeah; trivial to fix by whoever applies this.
