@@ -2,87 +2,75 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97603C10F11
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF086C10F11
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:31:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F11020873
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:26:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sYsLGNx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F11020873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F67020674
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 01:31:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F67020674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40005 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40051 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEOUM-0002bb-9B
-	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 21:26:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35743)
+	id 1hEOZK-0003sv-LG
+	for qemu-devel@archiver.kernel.org; Wed, 10 Apr 2019 21:31:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTZ-0002IE-0l
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:02 -0400
+	(envelope-from <mst@redhat.com>) id 1hEOYQ-0003a3-3X
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTX-0005jB-Kt
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:00 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34742)
+	(envelope-from <mst@redhat.com>) id 1hEOYP-0007gv-2y
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:44790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hEOTX-0005j5-8L
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:25:59 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k21so3780884otf.1
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=cscDqqLc5SgyFFaW1pafhPj5eGjAs1lSqq1091zJ3dU=;
-	b=sYsLGNx5Kza/DX0k9M0tGW6mOC4VNkhAAn2jUkQclUdwhLWd+ACA+92WMrukb9Vy1X
-	A3CXhWGDFuRTghTislqB+76bjmEp6n9pyjPjfnlpQ6vJsjZ/TxQImSu8yar98D2jfkvf
-	X06KFHKZO8mKqCV004weRd+0bH3m1C5SqLAl0Md28TMTMMgGPy4d3a+fKZZozO2WG4cc
-	IVWq0lxDR6lNs5SgP5NCJ8ePTGyrO+u8PXT85Yn8zPL9NuV/67nJP7gLpDPSsDub77mY
-	ZRvO/mHXB4YOK+KJsxi3+tN/XurfU51wwTQQakVOu71XTZSTL40+Nd9pDKpj4XXpEXdF
-	SMbg==
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hEOYO-0007gk-Tv
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
+Received: by mail-qk1-f195.google.com with SMTP id y5so2484433qkc.11
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=cscDqqLc5SgyFFaW1pafhPj5eGjAs1lSqq1091zJ3dU=;
-	b=hLVV8gMHQ6pBrWzRyl54zlv3lZ/fb3tlodlXTTdN4tFdfptAIwIZqw+lw7T/Fi1x+c
-	BYqAyA/ykwDdg45AQY8o5Q7P83GiRau8U+8kAX734ZB4kBWf/3/5mKfiK2JOLFEKBT7m
-	fxA9Dn8C4sdthFawtte8Tq4A6+7ob1ObxoglGnXfqEzKiKp87PaVmSosTm9kuKE3O5yu
-	gefjIwRX89PmU03ITFKxorcfT3HLmj8LzglvOH0it1w0JtWkGj0I8SvJnNJkN4oi6ctS
-	Nwoz73Ew0CGEcjV6C3ft+/wiAvjiwsy1rNv5h+UnfxDwIjaLM6SpBnD3zdnjI2FzbKLP
-	Z3Aw==
-X-Gm-Message-State: APjAAAU8Lwqg44EgRolRY80BtUFIi2mbVGrcucnsNdZGVazwQuazM8iz
-	GSfI7nvT/Lf3oM1ayHD+4XhfXWEptpOtgXlIpBg=
-X-Google-Smtp-Source: APXvYqxT03NWVUyvOhHGIWrqjA6Qu7Yni1dwC+ztcdeK9569GNZWEv5hHnRUSVjIDhi+/CCpNaAYq45SxAkKWFfxms8=
-X-Received: by 2002:a9d:758d:: with SMTP id s13mr31144160otk.306.1554945958361;
-	Wed, 10 Apr 2019 18:25:58 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=kFYzzDCm70A+7FT/vT7bxff2QgQb2SRrM+UAT7566Us=;
+	b=W+OMZUjawKU/C7ZCCvzMUlUzdyV24Wu7I0LSAUvKlwoDygaVvsolTHHHgCywPYbx/O
+	HffmYjolPtCF4INU/WEK67rbm7/vu4qkxjAQ2D9K+9ibcP/SSil/pghVE7LWgUYsm3rX
+	MI3Z9HW843CzFrTcX9wed9K7HyIKS090c5qKhm1SSwato0W4RBT4m44khKvyOl2NDNOB
+	TYIOxOUo+8nAhNUKIpjvsWNHoOwXHM81TnT9jBE4Sa9aiN+74Q8NCxXyTb4mMVQFk+fE
+	cQS3+TrTeKd8ODnY9+pk1rTqDe2vatKypjKR3GZ5/NN9Bam5UnRvgJzjW/+kNzYfItDG
+	xkVw==
+X-Gm-Message-State: APjAAAVfpZJPhJmnOVINIZOJs0wBtK1iaCgekEJvZDs5+NoJmdbta2zp
+	RrhRr/2DkgHWLbtHWt3HIGxVtQ==
+X-Google-Smtp-Source: APXvYqz5wLY0cyBYGKmaR3L0+2iplXTYnK5mbWXN89ZzoMC2NignGs7gm7mStd/c2NwF4k0+gCvUBg==
+X-Received: by 2002:a37:9ac3:: with SMTP id
+	c186mr35484221qke.117.1554946260089; 
+	Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
+Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
+	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
+	d21sm27933434qtc.91.2019.04.10.18.30.58
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 10 Apr 2019 18:30:58 -0700 (PDT)
+Date: Wed, 10 Apr 2019 21:30:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190410213001-mutt-send-email-mst@kernel.org>
+References: <20190401111843.54528-1-ybettan@redhat.com>
+	<20190409131734.GE16944@stefanha-x1.localdomain>
+	<1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
+	<CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
 MIME-Version: 1.0
-References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
-	<20190408123542.1a4de426@redhat.com>
-	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
-	<20190410145908.GF2980@work-vm>
-	<CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
-	<20190410165736.GG2980@work-vm>
-In-Reply-To: <20190410165736.GG2980@work-vm>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Thu, 11 Apr 2019 09:25:46 +0800
-Message-ID:
- <CAEn6zmFTTYZwPtQ0UQZz=a8UnAWUDxz6VuZ1Lpdq860MZ6foYg@mail.gmail.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
- memory-backend-file, share=on and in incoming migration
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.222.195
+Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,105 +82,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Yoni Bettan <ybettan@redhat.com>, Amnon Ilan <ailan@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411012546.yxooqx3YoD7094WExb9Nvsnpz_fevMiF9gZ2EgFLJZ8@z>
+Message-ID: <20190411013056.aB_ieZUEb2MYAG0xVmRV98QXY4CLXW5Oe__rCwKZwik@z>
 
-Hi Dr. David
-
-On Thu, 11 Apr 2019 at 00:57, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
-
-> * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > Hi Dr. David
+On Wed, Apr 10, 2019 at 08:15:32PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 10, 2019 at 4:45 PM Yoni Bettan <ybettan@redhat.com> wrote:
+> > On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
+> > > On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
+> > The final purpose is to have:
 > >
-> > On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <
-> dgilbert@redhat.com>
-> > wrote:
+> > 1. device specification
 > >
-> > > * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > > > Hi Igor
-> > > >
-> > > >
-> > > > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com>
-> wrote:
-> > > >
-> > > > > On Sun,  7 Apr 2019 22:19:05 -0400
-> > > > > Catherine Ho <catherine.hecx@gmail.com> wrote:
-> > > > >
-> > > > > > Currently it is not forbidden to use "-object
-> > > > > memory-backend-file,share=on"
-> > > > > > and together with "-incoming". But after incoming migration is
-> > > finished,
-> > > > > > the memory-backend-file will be definitely written if share=on.
-> So
-> > > the
-> > > > > > memory-backend-file can only be used once, but failed in the 2nd
-> time
-> > > > > > incoming.
-> > > > > >
-> > > > > > Thus it gives a warning and the users can run the qemu if they
-> really
-> > > > > > want to do it.
-> > > > >
-> > > > > Shouldn't we add a migration blocker in such a case instead of
-> warning
-> > > > > and letting qemu run wild?
-> > > > >
-> > > >
-> > > > IMO, it doesn't need to block this. With share=on and -incoming, the
-> user
-> > > > can
-> > > > still save the device memory state into memory-backend file again if
-> > > > ignore-shared
-> > > > capability is on.
-> > > >
-> > > > If we block this, the user can't use the ignore-shared capability in
-> > > > incoming
-> > > > migration.
-> > >
-> > > -incomign with share=on is a perfectly normal thing to do - it just
-> > > depends who you are sharing the file with and the lifetime of that
-> > > shared file.
-> > >
-> > > For example; if you're just running a qemu with vhost-user then you
-> > > use share=on - however wyou typically select the backend file as
-> > > a new file from /dev/shm - it's not a file that you previously migrated
-> > > to.
-> > >
-> > Thanks,
-> > but using a new file from /dev/shm means kernel will start from
-> > start_kernel or early? Is it different from the x-ignore-shared case?
-> > If we remove the share=on in incoming migration, all the writting
-> > of ram will not be flush into the memory backend file. Thus we
-> > can use the base memory backend file for ever.
-> > e.g.
-> > 1) save the vm like a snapshot, current ram state is "kernel
-> > has been started, systemd has been started"
-> > 2) restore it with -incoming and *no* share=on flag
-> > 3) restore it with -incoming and *no* share=on again...
-> > In contrary, if we use share=on, the base backend file will
-> > be written at once after 1st time incoming.
+> > 2. device implementation
 > >
-> > So, IMO, no "share=on" is the proper usage of incoming migration
-> > when ignore-shared is on.
-> > Please correct me if sth is wrong, thanks:)
->
-> OK, I see what you're trying to do - you mean for the 'snapshotting'
-> case;  but that's not the only use.  Another use is for being able to
-> do a very quick upgrade of the running qemu to a new qemu binary
-> version; and in that case you want to be able to write to the shared
-> file so that you can repeatedly do the quick migrate.
->
-> Dave
->
-> Ah, that quick upgrade example makes sense to me. Thanks for the
-explanation.
+> > 3. device driver
+> >
+> > 4. blog
+> >
+> > maybe I should have written it at the beginning, this is not the entire
+> > project but it is its start.
+> 
+> The way I'd design VIRTIO devices without prior knowledge is:
+> 
+> 1. Learn the VIRTIO device model.  Understand the concepts in VIRTIO.
+> <-- this is hard today, there's not much good documentation
 
-B.R.
-Catherine
+Best doc is still probably Rusty's whitepaper. It only covers 0.X
+spec so somewhat outdated but it does explain the concepts I think.
+
+> 2. Design an initial version of the device spec.  Mostly configuration
+> layout, virtqueues, and request structs.  Not much text is necessary
+> at this point, but it's critical for thinking through features before
+> implementation.
+> 
+> 3. Implement guest driver and device emulation.
+> 
+> 4. Iterate on spec and implementation until it's functionally complete.
+> 
+> 5. Submit the spec to the VIRTIO Technical Committee.
+> 
+> 6. Submit driver and device emulation patches.  They can be merged
+> when the spec is approved/close to approved.
+> 
+> Are you jumping to #3?  This is likely to lead to poor quality
+> implementations and specs because the fundamental VIRTIO concepts
+> weren't understood.
+> 
+> If the point is to educate others and/or do it "the right way", then I
+> would really avoid hacking around without first doing the other steps.
+> 
+> Stefan
+
