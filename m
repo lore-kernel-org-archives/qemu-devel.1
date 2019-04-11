@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58549)
+Received: from eggs.gnu.org ([209.51.188.92]:59146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfb3-0004lm-16
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEfdB-000625-2U
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfb2-00081H-3e
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:52 -0400
-References: <20190304071631.27567-1-richardw.yang@linux.intel.com>
-	<20190304071631.27567-2-richardw.yang@linux.intel.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4cd402a1-4da3-dc2e-82ad-64249c5fddc0@vivier.eu>
-Date: Thu, 11 Apr 2019 21:42:26 +0200
+	(envelope-from <philmd@redhat.com>) id 1hEfd9-0000cH-5s
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:35341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEfd5-0000ak-IN
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:01 -0400
+Received: by mail-wm1-f65.google.com with SMTP id y197so8116261wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:44:58 -0700 (PDT)
+References: <20190411182240.5957-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e869e7fd-26f1-6bac-9a48-f302e4095a5c@redhat.com>
+Date: Thu, 11 Apr 2019 21:44:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190304071631.27567-2-richardw.yang@linux.intel.com>
+In-Reply-To: <20190411182240.5957-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v6 1/2] CODING_STYLE:
- specify the indent rule for multiline code
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch
+ for the ps2.c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: peter.maydell@linaro.org, philmd@redhat.com, mjt@tls.msk.ru, imammedo@redhat.com, eblake@redhat.com, sgarzare@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 04/03/2019 08:16, Wei Yang wrote:
-> We didn't specify the indent rule for multiline code here, which may
-> mislead users. And in current code, the code use various styles.
-> 
-> Add this rule in CODING_STYLE to make sure this is clear to every one.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> 
+On 4/11/19 8:22 PM, Thomas Huth wrote:
+> ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
+
+Hehe I have the same patch staged locally =)
+
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
-> v6:
->    * add ) for last example of function
-> v5:
->    * different rules -> various styles
->    * describe function variants separately
->    * take struct out
-> v4:
->    * widths -> width
->    * add an exception example for function
-> v3:
->    * misleading -> mislead
->    * add comma after arg2 in example
-> v2:
->    * rephrase changelog suggested by Eric Blake
->      - remove one redundant line
->      - fix some awkward grammar
->      - add { ; at the end of example
-> ---
->  CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
+>  hw/input/Kconfig       | 5 +++++
+>  hw/input/Makefile.objs | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/CODING_STYLE b/CODING_STYLE
-> index ec075dedc4..90321e9c28 100644
-> --- a/CODING_STYLE
-> +++ b/CODING_STYLE
-> @@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
+> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+> index e2e66f0858..316573f782 100644
+> --- a/hw/input/Kconfig
+> +++ b/hw/input/Kconfig
+> @@ -8,10 +8,15 @@ config LM832X
+>  config PCKBD
+>      bool
+>      default y
+> +    select PS2
+>      depends on ISA_BUS
 >  
->  Do not leave whitespace dangling off the ends of lines.
+>  config PL050
+>      bool
+> +    select PS2
+> +
+> +config PS2
+> +    bool
 >  
-> +1.1 Multiline Indent
-> +
-> +There are several places where indent is necessary:
-> +
-> + - if/else
-> + - while/for
-> + - function definition & call
-> +
-> +When breaking up a long line to fit within line width, we need a proper indent
-> +for the following lines.
-> +
-> +In case of if/else, while/for, align the secondary lines just after the
-> +opening parenthesis of the first.
-> +
-> +For example:
-> +
-> +    if (a == 1 &&
-> +        b == 2) {
-> +
-> +    while (a == 1 &&
-> +           b == 2) {
-> +
-> +In case of function, there are several variants:
-> +
-> +    * 4 spaces indent from the beginning
-> +    * align the secondary lines just after the opening parenthesis of the
-> +      first
-> +
-> +For example:
-> +
-> +    do_something(x, y,
-> +        z);
-> +
-> +    do_something(x, y,
-> +                 z);
-> +
-> +    do_something(x, do_another(y,
-> +                               z));
-> +
->  2. Line width
+>  config STELLARIS_INPUT
+>      bool
+> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+> index c8b00f71ec..6db5ee0e71 100644
+> --- a/hw/input/Makefile.objs
+> +++ b/hw/input/Makefile.objs
+> @@ -3,7 +3,7 @@ common-obj-y += hid.o
+>  common-obj-$(CONFIG_LM832X) += lm832x.o
+>  common-obj-$(CONFIG_PCKBD) += pckbd.o
+>  common-obj-$(CONFIG_PL050) += pl050.o
+> -common-obj-y += ps2.o
+> +common-obj-$(CONFIG_PS2) += ps2.o
+>  common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+>  common-obj-$(CONFIG_TSC2005) += tsc2005.o
 >  
->  Lines should be 80 characters; try not to make them longer.
 > 
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
