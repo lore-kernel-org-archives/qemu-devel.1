@@ -2,67 +2,62 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21998C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D6CC282CE
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:39:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6E332083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:38:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6E332083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95E862083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:39:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E862083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50889 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50895 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbmh-0008Rk-34
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:38:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50408)
+	id 1hEbnd-0000pF-MV
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:39:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <steven.price@arm.com>) id 1hEbgL-0003Sb-Mc
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:32:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEbZz-0005kx-6r
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <steven.price@arm.com>) id 1hEbgJ-0003Or-Jb
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:32:05 -0400
-Received: from foss.arm.com ([217.140.101.70]:41512)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <steven.price@arm.com>)
-	id 1hEbgF-00034M-8k; Thu, 11 Apr 2019 11:31:59 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 107F980D;
-	Thu, 11 Apr 2019 08:31:42 -0700 (PDT)
-Received: from [10.1.196.69] (e112269-lin.cambridge.arm.com [10.1.196.69])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDBE83F68F;
-	Thu, 11 Apr 2019 08:31:40 -0700 (PDT)
-To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
-References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
-	<CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
-	<136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
-	<22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
-	<20190315085948.GB10950@e113682-lin.lund.arm.com>
-	<ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
-	<101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
-	<662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
-	<1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
-	<0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
-	<3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <ef3e617e-aa51-88d8-1e06-450febee43a4@arm.com>
-Date: Thu, 11 Apr 2019 16:31:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <armbru@redhat.com>) id 1hEbZx-0006ht-6L
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZv-0006af-EP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 779373007452
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8695119652;
+	Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id ACA70113298A; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 17:25:15 +0200
+Message-Id: <20190411152520.10061-13-armbru@redhat.com>
+In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
+References: <20190411152520.10061-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] [RFC] arm/cpu: fix soft lockup panic after
- resuming from stop
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 12/17] qom/cpu: Simplify how
+ CPUClass::dump_statistics() prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,146 +69,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+Cc: dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411153139.VtWWWR3h4zu5ONXgSc-atOcnWjreDrgIS0b2RFDErHA@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411152515.9nHgJMETn7w_pX9lM3w6ci_ohCJBZjsH4EOD0d1k04M@z>
 
-On 11/04/2019 08:27, Heyi Guo wrote:
-> Hi Steve,
->=20
-> After reading kernel code about time keeping and something related, I'v=
-e
-> not got a clear picture of how we can use MSR_KVM_WALL_CLOCK_NEW to kee=
-p
-> wall clock in guest VM.
->=20
-> 1. On X86, MSR_KVM_WALL_CLOCK_NEW is only used by the callback of syste=
-m
-> suspend and resume; I didn't find it used for runtime wall clock readin=
-g.
+CPUClass method dump_statistics() takes an fprintf()-like callback and
+a FILE * to pass to it.
 
-The MSR is only to provide an offset from the guest's view of system
-time to the actual wall-clock time. Like you mention it's used on resume
-to resynchronise with wall-clock time.
+Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
+monitor_fprintf() and the current monitor cast to FILE *.
+monitor_fprintf() casts it right back, and is otherwise identical to
+monitor_printf().  The type-punning is ugly.
 
-Looking at this more carefully, I think I may have got a bit confused
-with how this works on x86. As you say MSR_KVM_WALL_CLOCK_NEW is only
-used on boot (and suspend/resume) to provide the difference between the
-TSC and wall-clock.
+Drop the callback, and call qemu_printf() instead.
 
-MSR_KVM_SYSTEM_TIME_NEW seems to be the MSR that provides the offset
-between the host's TSC and the guest's view of time. In particular the
-KVM request KVM_REQ_CLOCK_UPDATE causes this to be updated.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qom/cpu.h      | 11 ++++-------
+ monitor.c              |  2 +-
+ qom/cpu.c              |  5 ++---
+ target/ppc/cpu.h       |  3 +--
+ target/ppc/translate.c |  9 ++++-----
+ 5 files changed, 12 insertions(+), 18 deletions(-)
 
-There's a lot of code in there to deal with e.g. the host's TSC going
-backwards (due to buggy hardware, but also due to suspend/hibernate).
-
-> 2. To use the MSR for wall clock synchronization, shall we register KVM
-> PV-clock as a higher rating clock source, so that it will be bound to
-> tk_core.timekeeper and be read at each time of running
-> update_wall_time() in each timer tick?
->
-> 3. If the above is true, how can we keep the paravirtualized wall clock
-> always updated? Is it always trapped to the hypervisor? I'm afraid this
-> may cause performance loss. If there is no trap and the data is updated
-> by the hypervisor periodically, how can we guarantee the accuracy?
-
-We obviously don't want to be making frequent hypercalls (or other
-traps) - so the idea is to provide the guest with a structure which is
-updated when the host is aware something has changed. The guest then
-reads this structure (using a version field to avoid races with the
-host) and uses it compute it's own version of time.
-
-> Meanwhile it seems easier to use KVM_KVMCLOCK_CTRL to get rid of false
-> positive soft lock panic, and guest can rely on cntvct for wall clock
-> updating as it does now, and it seems not difficult for the hypervisor
-> to keep cntvct "always on" and "monotonic".
->=20
-> Please let me know if I miss something.
-
-Yes I'm coming around to that way of thinking - as long as the
-hypervisor provides the "always on"/"monotonic" properties then really
-the only missing bit is informing the guest when it was paused so it can
-"do the right thing". This does appear to be what the x86 code is doing,
-but I have to admit I struggle to fully understand it.
-
-Steve
-
-> Thanks,
-> Heyi
->=20
-> On 2019/3/27 1:12, Steven Price wrote:
->> Hi Heyi,
->>
->> On 26/03/2019 13:53, Heyi Guo wrote:
->>> I also tested save/restore operations, and observed that clock in gue=
-st
->>> would not jump after restoring either. If we consider guest clock not
->>> being synchronized with real wall clock as an issue, does it mean
->>> save/restore function has the same issue?
->> Basically at the moment when the guest isn't running you have a choice
->> of two behaviours:
->>
->> =C2=A0 1. Stop (i.e. save/restore) CNTVCT - this means that the guest =
-sees no
->> time occur. If the guest needs to have a concept of wall-clock time
->> (e.g. it communicates with other systems over a network) then this can
->> cause problems (e.g. timeouts might be wrong, certificates might start
->> appearing to be in the future etc).
->>
->> =C2=A0 2. Leave CNTVCT running - the guest sees the time pass but inte=
-rprets
->> the vCPUs as effectively having locked up. Linux will trigger the soft
->> lockup warning.
->>
->> There are two ways of solving this, which match the two behaviours abo=
-ve:
->>
->> =C2=A0 1. Provide the guest with a view of wall-clock time. The obviou=
-s way of
->> doing this is with a pvclock implementation like MSR_KVM_WALL_CLOCK_NE=
-W
->> for x86.
->>
->> =C2=A0 2. Inform the guest to ignore the apparent "soft-lockup". There=
-'s
->> already an ioctl for x86 for this: KVM_KVMCLOCK_CTRL
->>
->> My preference is for option 1 - as this gives the guest a good view of
->> both the time that it is actually executing (useful for internal
->> watchdog timers like the soft-lockup one in Linux) and maintains a vie=
-w
->> of wall-clock time (useful when communicating with other external
->> services - e.g. the a server on the internet). Your patch to QEMU
->> provides the first step of that, but as you mention there's much more
->> to do.
->>
->> One thing I haven't investigated in great detail is how KVM handles th=
-e
->> timer during various forms of suspend. In particular for suspend types
->> like full hibernation the host's physical counter will jump (quite
->> possibly backwards) - I haven't looked in detail how KVM presents this
->> to the guest. Hopefully not by making it go backwards!
->>
->> I'm not sure how much time I'm going to have to look at this in the ne=
-ar
->> future, but please keep me in the loop if you decide to tackle any of
->> this.
->>
->> Thanks,
->>
->> Steve
->>
->> .
->>
->=20
->=20
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1d6099e5d4..31bafee2b1 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -184,8 +184,7 @@ typedef struct CPUClass {
+     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                        int flags);
+     GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+-    void (*dump_statistics)(CPUState *cpu, FILE *f,
+-                            fprintf_function cpu_fprintf, int flags);
++    void (*dump_statistics)(CPUState *cpu, int flags);
+     int64_t (*get_arch_id)(CPUState *cpu);
+     bool (*get_paging_enabled)(const CPUState *cpu);
+     void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
+@@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+ /**
+  * cpu_dump_statistics:
+  * @cpu: The CPU whose state is to be dumped.
+- * @f: File to dump to.
+- * @cpu_fprintf: Function to dump with.
+  * @flags: Flags what to dump.
+  *
+- * Dumps CPU statistics.
++ * Dump CPU statistics to the current monitor if we have one, else to
++ * stdout.
+  */
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags);
++void cpu_dump_statistics(CPUState *cpu, int flags);
+ 
+ #ifndef CONFIG_USER_ONLY
+ /**
+diff --git a/monitor.c b/monitor.c
+index 0819b99ef7..fb5b681099 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "No CPU available\n");
+         return;
+     }
+-    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
++    cpu_dump_statistics(cs, 0);
+ }
+ 
+ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index a8d2958956..029e7fe9b0 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+     }
+ }
+ 
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags)
++void cpu_dump_statistics(CPUState *cpu, int flags)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+ 
+     if (cc->dump_statistics) {
+-        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
++        cc->dump_statistics(cpu, flags);
+     }
+ }
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8572241364..27a36b9605 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
+ bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                         int flags);
+-void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
+-                             fprintf_function cpu_fprintf, int flags);
++void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
+ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index badc1ae1a3..f99f27a134 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+ #undef RFPL
+ }
+ 
+-void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+-                             fprintf_function cpu_fprintf, int flags)
++void ppc_cpu_dump_statistics(CPUState *cs, int flags)
+ {
+ #if defined(DO_PPC_STATISTICS)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+@@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                         handler = t3[op3];
+                         if (handler->count == 0)
+                             continue;
+-                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
++                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
+                                     "%016" PRIx64 " %" PRId64 "\n",
+                                     op1, op2, op3, op1, (op3 << 5) | op2,
+                                     handler->oname,
+@@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                 } else {
+                     if (handler->count == 0)
+                         continue;
+-                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
++                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
+                                 "%016" PRIx64 " %" PRId64 "\n",
+                                 op1, op2, op1, op2, handler->oname,
+                                 handler->count, handler->count);
+@@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+         } else {
+             if (handler->count == 0)
+                 continue;
+-            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
++            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
+                         " %" PRId64 "\n",
+                         op1, op1, handler->oname,
+                         handler->count, handler->count);
+-- 
+2.17.2
 
 
