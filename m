@@ -2,74 +2,105 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131FCC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3F2C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:10:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D80DD20850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:08:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80DD20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 39CFC20850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:10:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="eNgtwyzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CFC20850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54327 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54342 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEfzS-0001Sn-5d
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:08:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36506)
+	id 1hEg1R-000298-AI
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:10:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfyC-0000kA-Ar
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:06:49 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hEg0a-0001pj-9k
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfyB-0003tw-CN
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:06:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:48421)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hEfy8-0003jj-Oy; Thu, 11 Apr 2019 16:06:45 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MeCYx-1gdPaw3s7L-00bHiM; Thu, 11 Apr 2019 22:01:30 +0200
-To: Markus Armbruster <armbru@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-References: <20190311083234.20841-1-richardw.yang@linux.intel.com>
-	<20190312084313.webcenp43tk3yfmm@steredhat>
-	<87tvfghqg7.fsf@dusky.pond.sub.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <51367507-2b5a-151d-af0f-5404448bbdad@vivier.eu>
-Date: Thu, 11 Apr 2019 22:01:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
-MIME-Version: 1.0
-In-Reply-To: <87tvfghqg7.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1hEg0Y-00059d-NW
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:16 -0400
+Received: from mail-eopbgr770103.outbound.protection.outlook.com
+	([40.107.77.103]:61644
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hEg0Y-00058B-Ao
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=wavesemi.onmicrosoft.com; s=selector1-wavecomp-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=9A1+xpoIWxzBvXflTLnUOkI7l7dxJGgWRcQHoMlkib4=;
+	b=eNgtwyzOm3EnZj0w1SD3XuwE8iPueNlkxeh3AZgURfi9embnkrCzKK/wlGiKwIlTbZwB9JaEtWpBpv0mp86nOCqOEQKlrXC7StgU7ourDPppZJ3XdHsHmTaaPqPvdzDSLKHmXLRXDrPT6JnOl6zKeUcKQkTBepFet0DxaZhvNfg=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+	BN6PR2201MB1699.namprd22.prod.outlook.com (10.161.156.21) with
+	Microsoft SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1771.19; Thu, 11 Apr 2019 20:09:09 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81]) by
+	BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::3c70:1ca4:2aa:9e81%2]) with mapi id 15.20.1792.009;
+	Thu, 11 Apr 2019 20:09:09 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Jules Irenge <jbi.octave@gmail.com>
+Thread-Topic: [PATCH v3 2/4] target/mips: add or remove space to fix
+	checkpatch errors
+Thread-Index: AQHU68od18Qw0T5Oq0awmrPtostyFaY3bLDo
+Date: Thu, 11 Apr 2019 20:09:09 +0000
+Message-ID:
+ <BN6PR2201MB125112CE3BBE8E7DCA624750C62F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190405160938.27494-1-jbi.octave@gmail.com>,
+	<20190405160938.27494-3-jbi.octave@gmail.com>
+In-Reply-To: <20190405160938.27494-3-jbi.octave@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:23VmX65z7zcw3eA8ma19KipOHGAOQ/RGNYlSOeDq70vxdPniDFS
-	nuTbIdrtCzMjOUVcX2Qfg0q1Bps+e5biIntQwjxd0ic4VA5C0e0CFakBLJDllRHC+RYJYlX
-	hlBXS3Ms01x47ddHHPbugm8fZgBesc7DhnRRb5eTuBoAsYjuZq7UZDrw85Ro9p6z8PgbDeB
-	YGy8DbuRj9wevWUFjeRzQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:mgSHuX1mVUs=:AYO5QZJVe+2+iithowgRVz
-	2F4YQbaGNLKOKPmR9e2Ot6xLuclCILlj9Ja3R+srIwzGrrJTltJaO85UnJYSNRW/xlE1PZV8X
-	HXxPeqTNrgMbg5EWTaSaRReGMHuV8aBA+iPTUq/7P1ojOh3P5pCC/pqhSAI3h9UBNHBx5C3Y/
-	tFJ2XnSJ8ceK6+nLnbAEseFZvYtK8Agf8rRhvQnn0O4l4qdObVmi+Q/UohvpvRsbfuPayBltb
-	2eakvrlf7+A2tCSg2mPT+c/aOGUfzYQfzXYKKPdTXJNBexR1qiBen/TewCDpmwm6NztHkc2aL
-	lDUz639UvIloMpgBcJ3FzgeLEjNpIA+93AMJ6WnxkQs1Bv29pWVAyMWUh1U9CoOdVy+4IKEVq
-	UmKTAKJ/vn5sWBXIfz1r7VFGX+TW+DBeIhXRvXs0X9nLx7rkwsWEkPEmkv7KMXLRm50DzwwSM
-	BQ7RUSxud0LXCGlxJxn8difmevE0QrhiWRjggYFhbcs1k2MPgE7+GgWm+TDI6f3IiXTVr/+7P
-	DJ7f+UUqEgFTh2O0owcz1wMPVtepngTAOZ5Y6agzXB55aYjNthvHVSbddRAQK5QtZ5S9r5xBK
-	eYd7045dNiZrdnR0XYLldTt/Uwse+il3rqISe1PVqnOgk+C3svRovSv3MeXkK3vAXheJE3F3T
-	33HngOyzZ8g3F+bUhNQLMizSpAEfbN9Ub6vTK38SVB0dvwCJjFGoS9OoDLjpNYI+vCDUYXUEZ
-	CwuiEDQVb9w9HK6SDgQHeQR5d1OKciitMTU5ytYu+30YKwWf71iu+HNg71g=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] qom: use
- object_new_with_type in object_new_with_propv
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 676bf13e-8502-457c-3054-08d6beb98ebe
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:BN6PR2201MB1699; 
+x-ms-traffictypediagnostic: BN6PR2201MB1699:
+x-microsoft-antispam-prvs: <BN6PR2201MB1699BB16C19AAACF038118C0C62F0@BN6PR2201MB1699.namprd22.prod.outlook.com>
+x-forefront-prvs: 00046D390F
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(396003)(376002)(39850400004)(136003)(366004)(346002)(189003)(199004)(81156014)(25786009)(81166006)(305945005)(6436002)(66066001)(6506007)(52536014)(74316002)(9686003)(26005)(2906002)(316002)(106356001)(478600001)(71200400001)(55016002)(33656002)(53936002)(55236004)(7736002)(102836004)(186003)(3846002)(14454004)(7696005)(97736004)(486006)(6116002)(446003)(8936002)(68736007)(4326008)(86362001)(5660300002)(6916009)(54906003)(99286004)(8676002)(229853002)(76176011)(256004)(105586002)(476003)(6246003)(4744005)(11346002)(71190400001);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1699;
+	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: LZLiev4ca1m59Hhhhs9j39InT9G8iNErWoFjdktbZll5XQsD5I8nP2qMCf90kMCNwAJBy55euOYmw9b1NBjvEPcio7kWsjMHQfO/uJox3wmKqsLbWSUgwQbnOYgDkmiZAjTqstP4vAAB8seJ0WVfzMX12wwP6ZWDRi4hn6DLYSFzXJQ42K1ZORtumkr5QgI9S6TR4ONy8K1u8ElkkI+cdZfW0yTcDDonUa9Y5A+KLwL6z/SAMbk3E5C8C83RrvsdvBTxeD8GoQF4LflySkg3I4CAKzqcLpOE3Ty2QJL2kVaLj4FYCEBY2trhaC8wDwam3mjr9oaaYL1MmRLLEIV+HLI9R8W8wzUCKgi26ggl6geICwG/3Z4KFaOZav3GkrVFifiWGJyB6ijgBe10ykyZbUISTqW4i/0boakgqHhYWUQ=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 676bf13e-8502-457c-3054-08d6beb98ebe
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 20:09:09.1178 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1699
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.77.103
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/mips: add or remove space to
+ fix checkpatch errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,40 +112,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>, afaerber@suse.de
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411200128.yn9w84KPZfOF9dtQim0k7uOcDvlsiLI5njyVKTJilCU@z>
+Message-ID: <20190411200909.tXoIXcve5k-FaEU1gmUz4aIxDdpeUNnx-UG1CXRznPw@z>
 
-On 02/04/2019 08:27, Markus Armbruster wrote:
-> Stefano Garzarella <sgarzare@redhat.com> writes:
-> 
->> On Mon, Mar 11, 2019 at 04:32:34PM +0800, Wei Yang wrote:
->>> Function object_new_with_propv already get the Type of the object, so we
->>> could leverage object_new_with_type here.
->>>
->>> [make check test pass]
->>>
->>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>> ---
->>>  qom/object.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> LGTM. Just a note for future patches:
->> I think that info like "[make check test pass]" should go after the
->> three dashes to avoid to store it in the commit message.
-> 
-> Yes.  Whoever applies  should delete this line.
-> 
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Cc: qemu-trivial for merging.
-> 
+> From: Jules Irenge <jbi.octave@gmail.com>
+> Subject: [PATCH v3 2/4] target/mips: add or remove space to fix checkpatc=
+h errors
+>
+> Add or remove space to fix errors issued by checkpatch.pl tool
+> "ERROR: spaces required around ..."
+> "ERROR: space required after that"
+> "ERROR: space required before the open parenthesis"
+> "ERROR: space prohibited between function name and open parenthesis"
+> within "target/mips/cpu.h" file.
+>=20
+> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+> ---
 
-Applied to my trivial-patches branch with updated commit message.
+Hi, Jules,
 
-Thanks,
-Laurent
+I think if you merge this patch (2/4) and the next one (3/4), your series w=
+ould be good to go.
+
+Sincerely,
+Aleksandar
+
 
