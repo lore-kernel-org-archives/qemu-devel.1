@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54884)
+Received: from eggs.gnu.org ([209.51.188.92]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsi-000390-0l
+	(envelope-from <david@redhat.com>) id 1hEWsh-0002dl-U2
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWdR-00077C-Rv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:08:46 -0400
+	(envelope-from <david@redhat.com>) id 1hEWdX-00079O-Vm
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:08:53 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 11 Apr 2019 12:07:57 +0200
-Message-Id: <20190411100836.646-3-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:00 +0200
+Message-Id: <20190411100836.646-6-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 02/41] s390x/tcg: Implement VECTOR ADD
+Subject: [Qemu-devel] [PATCH v1 05/41] s390x/tcg: Implement VECTOR ADD WITH
+ CARRY COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +25,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Introduce two types of fancy new helpers that will be reused a couple of
-times
-
-1. gen_gvec_fn_3: Call an existing tcg_gen_gvec_X function with 3
-   parameters, simplifying parameter passing
-2. gen_gvec128_3_i64: Call a function that performs 128 bit calculations
-   using two 64 bit values per vector.
-
-Luckily, for VECTOR ADD we already have everything we need.
+Again, use a helper as calculating the carry is even more involved than
+for VECTOR ADD COMPUTE CARRY.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  5 ++++
- target/s390x/translate_vx.inc.c | 52 +++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+ target/s390x/helper.h           |  1 +
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 13 +++++++++++++
+ target/s390x/vec_int_helper.c   | 16 ++++++++++++++++
+ 4 files changed, 32 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 2c1b223248..e1847e8877 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -147,6 +147,7 @@ DEF_HELPER_FLAGS_4(vstl, TCG_CALL_NO_WG, void, env, c=
+ptr, i64, i64)
+=20
+ /* =3D=3D=3D Vector Integer Instructions =3D=3D=3D */
+ DEF_HELPER_FLAGS_4(gvec_vacc128, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
++DEF_HELPER_FLAGS_5(gvec_vaccc128, TCG_CALL_NO_RWG, void, ptr, cptr, cptr=
+, cptr, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 71fa9b8d6c..74a0ccc770 100644
+index 38d1e22a6d..a531b21908 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1054,6 +1054,11 @@
- /* VECTOR UNPACK LOGICAL LOW */
-     F(0xe7d4, VUPLL,   VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
+@@ -1062,6 +1062,8 @@
+     F(0xe7f1, VACC,    VRR_c, V,   0, 0, 0, 0, vacc, 0, IF_VEC)
+ /* VECTOR ADD WITH CARRY */
+     F(0xe7bb, VAC,     VRR_d, V,   0, 0, 0, 0, vac, 0, IF_VEC)
++/* VECTOR ADD WITH CARRY COMPUTE CARRY */
++    F(0xe7b9, VACCC,   VRR_d, V,   0, 0, 0, 0, vaccc, 0, IF_VEC)
 =20
-+/* =3D=3D=3D Vector Integer Instructions =3D=3D=3D */
-+
-+/* VECTOR ADD */
-+    F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
-+
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
-     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL=
-, IF_PRIV)
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 76f9a5d939..2f84ea0511 100644
+index 111b0b7c69..a264aa0c5a 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -157,6 +157,41 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, ui=
-nt8_t reg, TCGv_i64 enr,
-                      16)
- #define gen_gvec_dup64i(v1, c) \
-     tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
-+#define gen_gvec_fn_3(fn, es, v1, v2, v3) \
-+    tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
-2), \
-+                      vec_full_reg_offset(v3), 16, 16)
-+
-+/*
-+ * Helper to carry out a 128 bit vector computation using 2 i64 values p=
-er
-+ * vector.
-+ */
-+typedef void (*gen_gvec128_3_i64_fn)(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 =
-al,
-+                                     TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 =
-bh);
-+static void gen_gvec128_3_i64(gen_gvec128_3_i64_fn fn, uint8_t d, uint8_=
-t a,
-+                              uint8_t b)
-+{
-+        TCGv_i64 dh =3D tcg_temp_new_i64();
-+        TCGv_i64 dl =3D tcg_temp_new_i64();
-+        TCGv_i64 ah =3D tcg_temp_new_i64();
-+        TCGv_i64 al =3D tcg_temp_new_i64();
-+        TCGv_i64 bh =3D tcg_temp_new_i64();
-+        TCGv_i64 bl =3D tcg_temp_new_i64();
-+
-+        read_vec_element_i64(ah, a, 0, ES_64);
-+        read_vec_element_i64(al, a, 1, ES_64);
-+        read_vec_element_i64(bh, b, 0, ES_64);
-+        read_vec_element_i64(bl, b, 1, ES_64);
-+        fn(dl, dh, al, ah, bl, bh);
-+        write_vec_element_i64(dh, d, 0, ES_64);
-+        write_vec_element_i64(dl, d, 1, ES_64);
-+
-+        tcg_temp_free_i64(dh);
-+        tcg_temp_free_i64(dl);
-+        tcg_temp_free_i64(ah);
-+        tcg_temp_free_i64(al);
-+        tcg_temp_free_i64(bh);
-+        tcg_temp_free_i64(bl);
-+}
-=20
- static void gen_gvec_dupi(uint8_t es, uint8_t reg, uint64_t c)
- {
-@@ -933,3 +968,20 @@ static DisasJumpType op_vup(DisasContext *s, DisasOp=
-s *o)
-     tcg_temp_free_i64(tmp);
+@@ -1122,3 +1122,16 @@ static DisasJumpType op_vac(DisasContext *s, Disas=
+Ops *o)
+                       get_field(s->fields, v4));
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_va(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vaccc(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+
-+    if (es > ES_128) {
++    if (get_field(s->fields, m5) !=3D ES_128) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
-+    } else if (es =3D=3D ES_128) {
-+        gen_gvec128_3_i64(tcg_gen_add2_i64, get_field(s->fields, v1),
-+                          get_field(s->fields, v2), get_field(s->fields,=
- v3));
-+        return DISAS_NEXT;
 +    }
-+    gen_gvec_fn_3(add, es, get_field(s->fields, v1), get_field(s->fields=
-, v2),
-+                  get_field(s->fields, v3));
++
++    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
++                   get_field(s->fields, v3), get_field(s->fields, v4), 0=
+,
++                   gen_helper_gvec_vaccc128);
 +    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
+c
+index 0b232571bc..97fc559da0 100644
+--- a/target/s390x/vec_int_helper.c
++++ b/target/s390x/vec_int_helper.c
+@@ -45,3 +45,19 @@ void HELPER(gvec_vacc128)(void *v1, const void *v2, co=
+nst void *v3,
+     dst->doubleword[0] =3D 0;
+     dst->doubleword[1] =3D s390_vec_add(&tmp, v2, v3);
+ }
++
++void HELPER(gvec_vaccc128)(void *v1, const void *v2, const void *v3,
++                           const void *v4, uint32_t desc)
++{
++    const S390Vector old_carry =3D {
++        .doubleword[0] =3D 0,
++        .doubleword[1] =3D ((S390Vector *)v4)->doubleword[1] & 1,
++    };
++    S390Vector tmp, *dst =3D v1;
++    bool carry;
++
++    carry =3D s390_vec_add(&tmp, v2, v3);
++    carry |=3D s390_vec_add(&tmp, &tmp, &old_carry);
++    dst->doubleword[0] =3D 0;
++    dst->doubleword[1] =3D carry;
 +}
 --=20
 2.20.1
