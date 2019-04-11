@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38191)
+Received: from eggs.gnu.org ([209.51.188.92]:38256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTR-0003Cj-Vj
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:38 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTZ-0003Il-PR
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTL-0000Km-H0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:27 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:42600)
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEXTP-0000uL-Bw
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:33 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:42616)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hEXTL-0007id-5A
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:23 -0400
+	id 1hEXTO-00082s-Gt
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:02:27 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 11 Apr 2019 14:01:56 +0300
-Message-Id: <20190411110157.14252-3-yuval.shaia@oracle.com>
+Date: Thu, 11 Apr 2019 14:01:57 +0300
+Message-Id: <20190411110157.14252-4-yuval.shaia@oracle.com>
 In-Reply-To: <20190411110157.14252-1-yuval.shaia@oracle.com>
 References: <20190411110157.14252-1-yuval.shaia@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC 2/3] hw/virtio-rdma: VirtIO rdma device
+Subject: [Qemu-devel] [RFC 3/3] RDMA/virtio-rdma: VirtIO rdma driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,838 +31,1248 @@ Cc: Yuval Shaia <yuval.shaia@oracle.com>
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/Kconfig                                  |   1 +
- hw/rdma/Kconfig                             |   4 +
- hw/rdma/Makefile.objs                       |   2 +
- hw/rdma/virtio/virtio-rdma-ib.c             | 287 ++++++++++++++++++++
- hw/rdma/virtio/virtio-rdma-ib.h             |  93 +++++++
- hw/rdma/virtio/virtio-rdma-main.c           | 185 +++++++++++++
- hw/virtio/Makefile.objs                     |   1 +
- hw/virtio/virtio-rdma-pci.c                 | 108 ++++++++
- include/hw/pci/pci.h                        |   1 +
- include/hw/virtio/virtio-rdma.h             |  44 +++
- include/standard-headers/linux/virtio_ids.h |   1 +
- 11 files changed, 727 insertions(+)
- create mode 100644 hw/rdma/Kconfig
- create mode 100644 hw/rdma/virtio/virtio-rdma-ib.c
- create mode 100644 hw/rdma/virtio/virtio-rdma-ib.h
- create mode 100644 hw/rdma/virtio/virtio-rdma-main.c
- create mode 100644 hw/virtio/virtio-rdma-pci.c
- create mode 100644 include/hw/virtio/virtio-rdma.h
+ drivers/infiniband/Kconfig                    |   1 +
+ drivers/infiniband/hw/Makefile                |   1 +
+ drivers/infiniband/hw/virtio/Kconfig          |   6 +
+ drivers/infiniband/hw/virtio/Makefile         |   4 +
+ drivers/infiniband/hw/virtio/virtio_rdma.h    |  40 +
+ .../infiniband/hw/virtio/virtio_rdma_device.c |  59 ++
+ .../infiniband/hw/virtio/virtio_rdma_device.h |  32 +
+ drivers/infiniband/hw/virtio/virtio_rdma_ib.c | 711 ++++++++++++++++++
+ drivers/infiniband/hw/virtio/virtio_rdma_ib.h |  48 ++
+ .../infiniband/hw/virtio/virtio_rdma_main.c   | 149 ++++
+ .../infiniband/hw/virtio/virtio_rdma_netdev.c |  44 ++
+ .../infiniband/hw/virtio/virtio_rdma_netdev.h |  33 +
+ include/uapi/linux/virtio_ids.h               |   1 +
+ 13 files changed, 1129 insertions(+)
+ create mode 100644 drivers/infiniband/hw/virtio/Kconfig
+ create mode 100644 drivers/infiniband/hw/virtio/Makefile
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma.h
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_device.c
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_device.h
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_ib.c
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_ib.h
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_main.c
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_netdev.c
+ create mode 100644 drivers/infiniband/hw/virtio/virtio_rdma_netdev.h
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index d5ecd02070..88b9f15007 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -26,6 +26,7 @@ source pci-bridge/Kconfig
- source pci-host/Kconfig
- source pcmcia/Kconfig
- source pci/Kconfig
-+source rdma/Kconfig
- source scsi/Kconfig
- source sd/Kconfig
- source smbios/Kconfig
-diff --git a/hw/rdma/Kconfig b/hw/rdma/Kconfig
-new file mode 100644
-index 0000000000..b10bd7182b
---- /dev/null
-+++ b/hw/rdma/Kconfig
-@@ -0,0 +1,4 @@
-+config VIRTIO_RDMA
-+    bool
-+    default y
-+    depends on VIRTIO
-diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
-index c354e60e5b..ed640882be 100644
---- a/hw/rdma/Makefile.objs
-+++ b/hw/rdma/Makefile.objs
-@@ -3,3 +3,5 @@ obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o rdma.o
- obj-$(CONFIG_PCI) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
-                      vmw/pvrdma_qp_ops.o vmw/pvrdma_main.o
+diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
+index a1fb840de45d..218a47d4cecf 100644
+--- a/drivers/infiniband/Kconfig
++++ b/drivers/infiniband/Kconfig
+@@ -107,6 +107,7 @@ source "drivers/infiniband/hw/hfi1/Kconfig"
+ source "drivers/infiniband/hw/qedr/Kconfig"
+ source "drivers/infiniband/sw/rdmavt/Kconfig"
+ source "drivers/infiniband/sw/rxe/Kconfig"
++source "drivers/infiniband/hw/virtio/Kconfig"
  endif
-+obj-$(CONFIG_VIRTIO_RDMA) += virtio/virtio-rdma-main.o \
-+                             virtio/virtio-rdma-ib.o
-diff --git a/hw/rdma/virtio/virtio-rdma-ib.c b/hw/rdma/virtio/virtio-rdma-ib.c
+ 
+ source "drivers/infiniband/ulp/ipoib/Kconfig"
+diff --git a/drivers/infiniband/hw/Makefile b/drivers/infiniband/hw/Makefile
+index e4f31c1be8f7..10ffb2c421e4 100644
+--- a/drivers/infiniband/hw/Makefile
++++ b/drivers/infiniband/hw/Makefile
+@@ -14,3 +14,4 @@ obj-$(CONFIG_INFINIBAND_HFI1)		+= hfi1/
+ obj-$(CONFIG_INFINIBAND_HNS)		+= hns/
+ obj-$(CONFIG_INFINIBAND_QEDR)		+= qedr/
+ obj-$(CONFIG_INFINIBAND_BNXT_RE)	+= bnxt_re/
++obj-$(CONFIG_INFINIBAND_VIRTIO_RDMA)	+= virtio/
+diff --git a/drivers/infiniband/hw/virtio/Kconfig b/drivers/infiniband/hw/virtio/Kconfig
 new file mode 100644
-index 0000000000..2590a831a2
+index 000000000000..92e41691cf5d
 --- /dev/null
-+++ b/hw/rdma/virtio/virtio-rdma-ib.c
-@@ -0,0 +1,287 @@
++++ b/drivers/infiniband/hw/virtio/Kconfig
+@@ -0,0 +1,6 @@
++config INFINIBAND_VIRTIO_RDMA
++	tristate "VirtIO Paravirtualized RDMA Driver"
++	depends on NETDEVICES && ETHERNET && PCI && INET
++	---help---
++	  This driver provides low-level support for VirtIO Paravirtual
++	  RDMA adapter.
+diff --git a/drivers/infiniband/hw/virtio/Makefile b/drivers/infiniband/hw/virtio/Makefile
+new file mode 100644
+index 000000000000..fb637e467167
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/Makefile
+@@ -0,0 +1,4 @@
++obj-$(CONFIG_INFINIBAND_VIRTIO_RDMA) += virtio_rdma.o
++
++virtio_rdma-y := virtio_rdma_main.o virtio_rdma_device.o virtio_rdma_ib.o \
++		 virtio_rdma_netdev.o
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma.h b/drivers/infiniband/hw/virtio/virtio_rdma.h
+new file mode 100644
+index 000000000000..7896a2dfb812
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma.h
+@@ -0,0 +1,40 @@
 +/*
-+ * Virtio RDMA Device - IB verbs
++ * Virtio RDMA device: Driver main data types
 + *
-+ * Copyright (C) 2019 Oracle
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
 + *
-+ * Authors:
-+ *  Yuval Shaia <yuval.shaia@oracle.com>
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
 + *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 + */
 +
-+#include <infiniband/verbs.h>
++#ifndef __VIRTIO_RDMA__
++#define __VIRTIO_RDMA__
 +
-+#include "qemu/osdep.h"
++#include <linux/virtio.h>
++#include <rdma/ib_verbs.h>
 +
-+#include "virtio-rdma-ib.h"
-+#include "../rdma_utils.h"
-+#include "../rdma_rm.h"
-+#include "../rdma_backend.h"
-+
-+int virtio_rdma_query_device(VirtIORdma *rdev, struct iovec *in,
-+                             struct iovec *out)
-+{
-+    struct ibv_device_attr attr = {};
-+    int offs;
-+    size_t s;
-+
-+    addrconf_addr_eui48((unsigned char *)&attr.sys_image_guid,
-+                        (const char *)&rdev->netdev->mac);
-+
-+    attr.max_mr_size = 4096;
-+    attr.page_size_cap = 4096;
-+    attr.vendor_id = 1;
-+    attr.vendor_part_id = 1;
-+    attr.hw_ver = VIRTIO_RDMA_HW_VER;
-+    attr.max_qp = 1024;
-+    attr.max_qp_wr = 1024;
-+    attr.device_cap_flags = 0;
-+    attr.max_sge = 64;
-+    attr.max_sge_rd = 64;
-+    attr.max_cq = 1024;
-+    attr.max_cqe = 64;
-+    attr.max_mr = 1024;
-+    attr.max_pd = 1024;
-+    attr.max_qp_rd_atom = 0;
-+    attr.max_ee_rd_atom = 0;
-+    attr.max_res_rd_atom = 0;
-+    attr.max_qp_init_rd_atom = 0;
-+    attr.max_ee_init_rd_atom = 0;
-+    attr.atomic_cap = IBV_ATOMIC_NONE;
-+    attr.max_ee = 0;
-+    attr.max_rdd = 0;
-+    attr.max_mw = 0;
-+    attr.max_raw_ipv6_qp = 0;
-+    attr.max_raw_ethy_qp = 0;
-+    attr.max_mcast_grp = 0;
-+    attr.max_mcast_qp_attach = 0;
-+    attr.max_total_mcast_qp_attach = 0;
-+    attr.max_ah = 1024;
-+    attr.max_fmr = 0;
-+    attr.max_map_per_fmr = 0;
-+    attr.max_srq = 0;
-+    attr.max_srq_wr = 0;
-+    attr.max_srq_sge = 0;
-+    attr.max_pkeys = 1;
-+    attr.local_ca_ack_delay = 0;
-+    attr.phys_port_cnt = VIRTIO_RDMA_PORT_CNT;
-+
-+    offs = offsetof(struct ibv_device_attr, sys_image_guid);
-+    s = iov_from_buf(out, 1, 0, (void *)&attr + offs, sizeof(attr) - offs);
-+
-+    return s == sizeof(attr) - offs ? VIRTIO_RDMA_CTRL_OK :
-+                                      VIRTIO_RDMA_CTRL_ERR;
-+}
-+
-+int virtio_rdma_query_port(VirtIORdma *rdev, struct iovec *in,
-+                           struct iovec *out)
-+{
-+    struct ibv_port_attr attr = {};
-+    struct cmd_query_port cmd = {};
-+    int offs;
-+    size_t s;
-+
-+    s = iov_to_buf(in, 1, 0, &cmd, sizeof(cmd));
-+    if (s != sizeof(cmd)) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    if (cmd.port != 1) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    attr.state = IBV_PORT_ACTIVE;
-+    attr.max_mtu = attr.active_mtu = IBV_MTU_1024;
-+    attr.gid_tbl_len = 256;
-+    attr.port_cap_flags = 0;
-+    attr.max_msg_sz = 1024;
-+    attr.bad_pkey_cntr = 0;
-+    attr.qkey_viol_cntr = 0;
-+    attr.pkey_tbl_len = 1;
-+    attr.lid = 0;
-+    attr.sm_lid = 0;
-+    attr.lmc = 0;
-+    attr.max_vl_num = 1;
-+    attr.sm_sl = 0;
-+    attr.subnet_timeout = 0;
-+    attr.init_type_reply = 0;
-+    attr.active_width = 0;
-+    attr.active_speed = 0;
-+    attr.phys_state = 0;
-+
-+    offs = offsetof(struct ibv_port_attr, state);
-+    s = iov_from_buf(out, 1, 0, (void *)&attr + offs, sizeof(attr) - offs);
-+
-+    return s == sizeof(attr) - offs ? VIRTIO_RDMA_CTRL_OK :
-+                                      VIRTIO_RDMA_CTRL_ERR;
-+}
-+
-+int virtio_rdma_create_cq(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out)
-+{
-+    struct cmd_create_cq cmd = {};
-+    struct rsp_create_cq rsp = {};
-+    size_t s;
-+    int rc;
-+
-+    s = iov_to_buf(in, 1, 0, &cmd, sizeof(cmd));
-+    if (s != sizeof(cmd)) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    /* TODO: Define MAX_CQE */
-+#define MAX_CQE 1024
-+    /* TODO: Check MAX_CQ */
-+    if (cmd.cqe > MAX_CQE) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    printf("%s: %d\n", __func__, cmd.cqe);
-+
-+    /* TODO: Create VirtQ */
-+
-+    rc = rdma_rm_alloc_cq(rdev->rdma_dev_res, rdev->backend_dev, cmd.cqe,
-+                          &rsp.cqn, NULL);
-+    if (rc) {
-+        /* TODO: Destroy VirtQ */
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    printf("%s: %d\n", __func__, rsp.cqn);
-+
-+    s = iov_from_buf(out, 1, 0, &rsp, sizeof(rsp));
-+
-+    return s == sizeof(rsp) ? VIRTIO_RDMA_CTRL_OK :
-+                              VIRTIO_RDMA_CTRL_ERR;
-+}
-+
-+int virtio_rdma_destroy_cq(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out)
-+{
-+    struct cmd_destroy_cq cmd = {};
-+    size_t s;
-+
-+    s = iov_to_buf(in, 1, 0, &cmd, sizeof(cmd));
-+    if (s != sizeof(cmd)) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    printf("%s: %d\n", __func__, cmd.cqn);
-+
-+    /* TODO: Destroy VirtQ */
-+
-+    rdma_rm_dealloc_cq(rdev->rdma_dev_res, cmd.cqn);
-+
-+    return VIRTIO_RDMA_CTRL_OK;
-+}
-+
-+int virtio_rdma_create_pd(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out)
-+{
-+    struct rsp_create_pd rsp = {};
-+    size_t s;
-+    int rc;
-+
-+    /* TODO: Check MAX_PD */
-+
-+    /* TODO: ctx */
-+    rc = rdma_rm_alloc_pd(rdev->rdma_dev_res, rdev->backend_dev, &rsp.pdn,
-+                          0);
-+    if (rc)
-+        return VIRTIO_RDMA_CTRL_ERR;
-+
-+    printf("%s: %d\n", __func__, rsp.pdn);
-+
-+    s = iov_from_buf(out, 1, 0, &rsp, sizeof(rsp));
-+
-+    return s == sizeof(rsp) ? VIRTIO_RDMA_CTRL_OK :
-+                              VIRTIO_RDMA_CTRL_ERR;
-+}
-+
-+int virtio_rdma_destroy_pd(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out)
-+{
-+    struct cmd_destroy_pd cmd = {};
-+    size_t s;
-+
-+    s = iov_to_buf(in, 1, 0, &cmd, sizeof(cmd));
-+    if (s != sizeof(cmd)) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    printf("%s: %d\n", __func__, cmd.pdn);
-+
-+    rdma_rm_dealloc_cq(rdev->rdma_dev_res, cmd.pdn);
-+
-+    return VIRTIO_RDMA_CTRL_OK;
-+}
-+
-+int virtio_rdma_get_dma_mr(VirtIORdma *rdev, struct iovec *in,
-+                           struct iovec *out)
-+{
-+    struct cmd_get_dma_mr cmd = {};
-+    struct rsp_get_dma_mr rsp = {};
-+    size_t s;
-+
-+    s = iov_to_buf(in, 1, 0, &cmd, sizeof(cmd));
-+    if (s != sizeof(cmd)) {
-+        return VIRTIO_RDMA_CTRL_ERR;
-+    }
-+
-+    /* TODO: Call rdma_rm_alloc_mr */
-+    rsp.mrn = 0x10;
-+    rsp.lkey = 0x11;
-+    rsp.rkey = 0x12;
-+    printf("%s: 0x%x\n", __func__, rsp.mrn);
-+
-+    s = iov_from_buf(out, 1, 0, &rsp, sizeof(rsp));
-+
-+    return s == sizeof(rsp) ? VIRTIO_RDMA_CTRL_OK :
-+                              VIRTIO_RDMA_CTRL_ERR;
-+}
-+
-+static void virtio_rdma_init_dev_caps(VirtIORdma *rdev)
-+{
-+    rdev->dev_attr.max_qp_wr = 1024;
-+}
-+
-+int virtio_rdma_init_ib(VirtIORdma *rdev)
-+{
-+    int rc;
-+
-+    virtio_rdma_init_dev_caps(rdev);
-+
-+    rdev->rdma_dev_res = g_malloc0(sizeof(RdmaDeviceResources));
-+    rdev->backend_dev = g_malloc0(sizeof(RdmaBackendDev));
-+
-+    rc = rdma_backend_init(rdev->backend_dev, NULL, rdev->rdma_dev_res,
-+                           rdev->backend_device_name,
-+                           rdev->backend_port_num, &rdev->dev_attr,
-+                           &rdev->mad_chr);
-+    if (rc) {
-+        rdma_error_report("Fail to initialize backend device");
-+        return rc;
-+    }
-+
-+    rc = rdma_rm_init(rdev->rdma_dev_res, &rdev->dev_attr);
-+    if (rc) {
-+        rdma_error_report("Fail to initialize resource manager");
-+        return rc;
-+    }
-+
-+    /* rdma_backend_start(rdev->backend_dev); */
-+
-+    return 0;
-+}
-+
-+void virtio_rdma_fini_ib(VirtIORdma *rdev)
-+{
-+    /* rdma_backend_stop(rdev->backend_dev); */
-+    rdma_rm_fini(rdev->rdma_dev_res, rdev->backend_dev,
-+                 rdev->backend_eth_device_name);
-+    rdma_backend_fini(rdev->backend_dev);
-+    g_free(rdev->rdma_dev_res);
-+    g_free(rdev->backend_dev);
-+}
-diff --git a/hw/rdma/virtio/virtio-rdma-ib.h b/hw/rdma/virtio/virtio-rdma-ib.h
-new file mode 100644
-index 0000000000..c4bdc063ac
---- /dev/null
-+++ b/hw/rdma/virtio/virtio-rdma-ib.h
-@@ -0,0 +1,93 @@
-+/*
-+ * Virtio RDMA Device - IB verbs
-+ *
-+ * Copyright (C) 2019 Oracle
-+ *
-+ * Authors:
-+ *  Yuval Shaia <yuval.shaia@oracle.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/iov.h"
-+#include "hw/virtio/virtio-rdma.h"
-+
-+/* TODO: Move to uapi header file */
-+#define VIRTIO_RDMA_CTRL_OK    0
-+#define VIRTIO_RDMA_CTRL_ERR   1
-+
-+enum {
-+    VIRTIO_CMD_QUERY_DEVICE = 10,
-+    VIRTIO_CMD_QUERY_PORT,
-+    VIRTIO_CMD_CREATE_CQ,
-+    VIRTIO_CMD_DESTROY_CQ,
-+    VIRTIO_CMD_CREATE_PD,
-+    VIRTIO_CMD_DESTROY_PD,
-+    VIRTIO_CMD_GET_DMA_MR,
++struct virtio_rdma_info {
++	struct ib_device ib_dev;
++	struct virtio_device *vdev;
++	struct virtqueue *ctrl_vq;
++	wait_queue_head_t acked; /* arm on send to host, release on recv */
++	struct net_device *netdev;
 +};
 +
++static inline struct virtio_rdma_info *to_vdev(struct ib_device *ibdev)
++{
++	return container_of(ibdev, struct virtio_rdma_info, ib_dev);
++}
++
++#endif
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_device.c b/drivers/infiniband/hw/virtio/virtio_rdma_device.c
+new file mode 100644
+index 000000000000..ae41e530644f
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_device.c
+@@ -0,0 +1,59 @@
++/*
++ * Virtio RDMA device: Device related functions and data
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#include <linux/virtio_config.h>
++
++#include "virtio_rdma.h"
++
++static void rdma_ctrl_ack(struct virtqueue *vq)
++{
++	struct virtio_rdma_info *dev = vq->vdev->priv;
++
++	wake_up(&dev->acked);
++
++	printk("%s\n", __func__);
++}
++
++int init_device(struct virtio_rdma_info *dev)
++{
++#define TMP_MAX_VQ 1
++	int rc;
++	struct virtqueue *vqs[TMP_MAX_VQ];
++	vq_callback_t *cbs[TMP_MAX_VQ];
++	const char *names[TMP_MAX_VQ];
++
++	names[0] = "ctrl";
++	cbs[0] = rdma_ctrl_ack;
++	cbs[0] = NULL;
++
++	rc = virtio_find_vqs(dev->vdev, TMP_MAX_VQ, vqs, cbs, names, NULL);
++	if (rc)
++		return rc;
++
++	dev->ctrl_vq = vqs[0];
++
++	return 0;
++}
++
++void fini_device(struct virtio_rdma_info *dev)
++{
++	dev->vdev->config->reset(dev->vdev);
++	dev->vdev->config->del_vqs(dev->vdev);
++}
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_device.h b/drivers/infiniband/hw/virtio/virtio_rdma_device.h
+new file mode 100644
+index 000000000000..d9b1240daf92
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_device.h
+@@ -0,0 +1,32 @@
++/*
++ * Virtio RDMA device: Device related functions and data
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#ifndef __VIRTIO_RDMA_DEVICE__
++#define __VIRTIO_RDMA_DEVICE__
++
++#define VIRTIO_RDMA_BOARD_ID	1
++#define VIRTIO_RDMA_HW_NAME	"virtio-rdma"
++#define VIRTIO_RDMA_HW_REV	1
++#define VIRTIO_RDMA_DRIVER_VER	"1.0"
++
++int init_device(struct virtio_rdma_info *dev);
++void fini_device(struct virtio_rdma_info *dev);
++
++#endif
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_ib.c b/drivers/infiniband/hw/virtio/virtio_rdma_ib.c
+new file mode 100644
+index 000000000000..02bf4a332611
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_ib.c
+@@ -0,0 +1,711 @@
++/*
++ * Virtio RDMA device: IB related functions and data
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#include <linux/scatterlist.h>
++#include <linux/virtio.h>
++#include <rdma/ib_mad.h>
++
++#include "virtio_rdma.h"
++#include "virtio_rdma_device.h"
++#include "virtio_rdma_ib.h"
++
++/* TODO: Move to uapi header file */
++
++/*
++ * Control virtqueue data structures
++ *
++ * The control virtqueue expects a header in the first sg entry
++ * and an ack/status response in the last entry.  Data for the
++ * command goes in between.
++ */
++
++#define VIRTIO_RDMA_CTRL_OK	0
++#define VIRTIO_RDMA_CTRL_ERR	1
++
 +struct control_buf {
-+    uint8_t cmd;
-+    uint8_t status;
++	__u8 cmd;
++	__u8 status;
++};
++
++enum {
++	VIRTIO_CMD_QUERY_DEVICE = 10,
++	VIRTIO_CMD_QUERY_PORT,
++	VIRTIO_CMD_CREATE_CQ,
++	VIRTIO_CMD_DESTROY_CQ,
++	VIRTIO_CMD_CREATE_PD,
++	VIRTIO_CMD_DESTROY_PD,
++	VIRTIO_CMD_GET_DMA_MR,
 +};
 +
 +struct cmd_query_port {
-+    uint8_t port;
++	__u8 port;
 +};
 +
 +struct cmd_create_cq {
-+    uint32_t cqe;
++	__u32 cqe;
 +};
 +
 +struct rsp_create_cq {
-+    uint32_t cqn;
++	__u32 cqn;
 +};
 +
 +struct cmd_destroy_cq {
-+    uint32_t cqn;
++	__u32 cqn;
 +};
 +
 +struct rsp_create_pd {
-+    uint32_t pdn;
++	__u32 pdn;
 +};
 +
 +struct cmd_destroy_pd {
-+    uint32_t pdn;
++	__u32 pdn;
 +};
 +
 +struct cmd_get_dma_mr {
-+    uint32_t pdn;
-+    uint32_t access_flags;
++	__u32 pdn;
++	__u32 access_flags;
 +};
 +
 +struct rsp_get_dma_mr {
-+    uint32_t mrn;
-+    uint32_t lkey;
-+    uint32_t rkey;
++	__u32 mrn;
++	__u32 lkey;
++	__u32 rkey;
 +};
 +
 +/* TODO: Move to uapi header file */
 +
-+#define VIRTIO_RDMA_PORT_CNT    1
-+#define VIRTIO_RDMA_HW_VER      1
++struct virtio_rdma_ib_cq {
++	struct ib_cq ibcq;
++	u32 cq_handle;
++};
 +
-+int virtio_rdma_init_ib(VirtIORdma *rdev);
-+void virtio_rdma_fini_ib(VirtIORdma *rdev);
++/* TODO: For the scope fof the RFC i'm utilizing ib*_*_attr structures */
 +
-+int virtio_rdma_query_device(VirtIORdma *rdev, struct iovec *in,
-+                             struct iovec *out);
-+int virtio_rdma_query_port(VirtIORdma *rdev, struct iovec *in,
-+                           struct iovec *out);
-+int virtio_rdma_create_cq(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out);
-+int virtio_rdma_destroy_cq(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out);
-+int virtio_rdma_create_pd(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out);
-+int virtio_rdma_destroy_pd(VirtIORdma *rdev, struct iovec *in,
-+                          struct iovec *out);
-+int virtio_rdma_get_dma_mr(VirtIORdma *rdev, struct iovec *in,
-+                           struct iovec *out);
-diff --git a/hw/rdma/virtio/virtio-rdma-main.c b/hw/rdma/virtio/virtio-rdma-main.c
++static int virtio_rdma_exec_cmd(struct virtio_rdma_info *di, int cmd,
++				struct scatterlist *in, struct scatterlist *out)
++{
++	struct scatterlist *sgs[4], hdr, status;
++	struct control_buf *ctrl;
++	unsigned tmp;
++	int rc;
++
++	ctrl = kmalloc(sizeof(*ctrl), GFP_ATOMIC);
++	ctrl->cmd = cmd;
++	ctrl->status = ~0;
++
++	sg_init_one(&hdr, &ctrl->cmd, sizeof(ctrl->cmd));
++	sgs[0] = &hdr;
++	sgs[1] = in;
++	sgs[2] = out;
++	sg_init_one(&status, &ctrl->status, sizeof(ctrl->status));
++	sgs[3] = &status;
++
++	rc = virtqueue_add_sgs(di->ctrl_vq, sgs, 2, 2, di, GFP_ATOMIC);
++	if (rc)
++		goto out;
++
++	if (unlikely(!virtqueue_kick(di->ctrl_vq))) {
++		goto out_with_status;
++	}
++
++	/* Spin for a response, the kick causes an ioport write, trapping
++	 * into the hypervisor, so the request should be handled
++	 * immediately */
++	while (!virtqueue_get_buf(di->ctrl_vq, &tmp) &&
++	       !virtqueue_is_broken(di->ctrl_vq))
++		cpu_relax();
++
++out_with_status:
++	printk("%s: cmd %d, status %d\n", __func__, ctrl->cmd, ctrl->status);
++	rc = ctrl->status == VIRTIO_RDMA_CTRL_OK ? 0 : 1;
++
++out:
++	kfree(ctrl);
++
++	return rc;
++}
++
++static int virtio_rdma_port_immutable(struct ib_device *ibdev, u8 port_num,
++				      struct ib_port_immutable *immutable)
++{
++	struct ib_port_attr attr;
++	int rc;
++
++	rc = ib_query_port(ibdev, port_num, &attr);
++	if (rc)
++		return rc;
++
++	immutable->core_cap_flags |= RDMA_CORE_PORT_IBA_ROCE_UDP_ENCAP;
++	immutable->pkey_tbl_len = attr.pkey_tbl_len;
++	immutable->gid_tbl_len = attr.gid_tbl_len;
++	immutable->max_mad_size = IB_MGMT_MAD_SIZE;
++
++	return 0;
++}
++
++static int virtio_rdma_query_device(struct ib_device *ibdev,
++				    struct ib_device_attr *props,
++				    struct ib_udata *uhw)
++{
++	struct scatterlist data;
++	int offs;
++	int rc;
++
++	if (uhw->inlen || uhw->outlen)
++		return -EINVAL;
++
++	/* We start with sys_image_guid because of inconsistency beween ib_
++	 * and ibv_ */
++	offs = offsetof(struct ib_device_attr, sys_image_guid);
++	sg_init_one(&data, (void *)props + offs, sizeof(*props) - offs);
++
++	rc = virtio_rdma_exec_cmd(to_vdev(ibdev), VIRTIO_CMD_QUERY_DEVICE, NULL,
++				  &data);
++
++	printk("%s: sys_image_guid 0x%llx\n", __func__,
++	       be64_to_cpu(props->sys_image_guid));
++
++	return rc;
++}
++
++static int virtio_rdma_query_port(struct ib_device *ibdev, u8 port,
++				  struct ib_port_attr *props)
++{
++	struct scatterlist in, out;
++	struct cmd_query_port *cmd;
++	int offs;
++	int rc;
++
++	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!cmd)
++		return -ENOMEM;
++
++	/* We start with state because of inconsistency beween ib and ibv */
++	offs = offsetof(struct ib_port_attr, state);
++	sg_init_one(&out, (void *)props + offs, sizeof(*props) - offs);
++
++	cmd->port = port;
++	sg_init_one(&in, cmd, sizeof(*cmd));
++	printk("%s: port %d\n", __func__, cmd->port);
++
++	rc = virtio_rdma_exec_cmd(to_vdev(ibdev), VIRTIO_CMD_QUERY_PORT, &in,
++				  &out);
++
++	printk("%s: gid_tbl_len %d\n", __func__, props->gid_tbl_len);
++
++	kfree(cmd);
++
++	return rc;
++}
++
++static struct net_device *virtio_rdma_get_netdev(struct ib_device *ibdev,
++						 u8 port_num)
++{
++	struct virtio_rdma_info *ri = to_vdev(ibdev);
++
++	printk("%s:\n", __func__);
++
++	return ri->netdev;
++}
++
++struct ib_cq *virtio_rdma_create_cq(struct ib_device *ibdev,
++				    const struct ib_cq_init_attr *attr,
++				    struct ib_ucontext *context,
++				    struct ib_udata *udata)
++{
++	struct scatterlist in, out;
++	struct virtio_rdma_ib_cq *vcq;
++	struct cmd_create_cq *cmd;
++	struct rsp_create_cq *rsp;
++	struct ib_cq *cq = NULL;
++	int rc;
++
++	/* TODO: Check MAX_CQ */
++
++	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!cmd)
++		return ERR_PTR(-ENOMEM);
++
++	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
++	if (!rsp) {
++		kfree(cmd);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
++	if (!vcq)
++		goto out;
++
++	cmd->cqe = attr->cqe;
++	sg_init_one(&in, cmd, sizeof(*cmd));
++	printk("%s: cqe %d\n", __func__, cmd->cqe);
++
++	sg_init_one(&out, rsp, sizeof(*rsp));
++
++	rc = virtio_rdma_exec_cmd(to_vdev(ibdev), VIRTIO_CMD_CREATE_CQ, &in,
++				  &out);
++	if (rc)
++		goto out_err;
++
++	printk("%s: cqn 0x%x\n", __func__, rsp->cqn);
++	vcq->cq_handle = rsp->cqn;
++	vcq->ibcq.cqe = attr->cqe;
++	cq = &vcq->ibcq;
++
++	goto out;
++
++out_err:
++	kfree(vcq);
++	return ERR_PTR(rc);
++
++out:
++	kfree(rsp);
++	kfree(cmd);
++	return cq;
++}
++
++int virtio_rdma_destroy_cq(struct ib_cq *cq)
++{
++	struct virtio_rdma_ib_cq *vcq;
++	struct scatterlist in;
++	struct cmd_destroy_cq *cmd;
++	int rc;
++
++	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!cmd)
++		return -ENOMEM;
++
++	vcq = container_of(cq, struct virtio_rdma_ib_cq, ibcq);
++
++	cmd->cqn = vcq->cq_handle;
++	sg_init_one(&in, cmd, sizeof(*cmd));
++
++	rc = virtio_rdma_exec_cmd(to_vdev(cq->device), VIRTIO_CMD_DESTROY_CQ,
++				  &in, NULL);
++
++	kfree(cmd);
++
++	kfree(vcq);
++
++	return rc;
++}
++
++int virtio_rdma_alloc_pd(struct ib_pd *ibpd, struct ib_ucontext *context,
++			 struct ib_udata *udata)
++{
++	struct virtio_rdma_pd *pd = to_vpd(ibpd);
++	struct ib_device *ibdev = ibpd->device;
++	struct rsp_create_pd *rsp;
++	struct scatterlist out;
++	int rc;
++
++	/* TODO: Check MAX_PD */
++
++	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
++	if (!rsp)
++		return -ENOMEM;
++
++	sg_init_one(&out, rsp, sizeof(*rsp));
++
++	rc = virtio_rdma_exec_cmd(to_vdev(ibdev), VIRTIO_CMD_CREATE_PD, NULL,
++				  &out);
++	if (rc)
++		goto out;
++
++	pd->pd_handle = rsp->pdn;
++
++	printk("%s: pd_handle=%d\n", __func__, pd->pd_handle);
++
++out:
++	kfree(rsp);
++
++	printk("%s: rc=%d\n", __func__, rc);
++	return rc;
++}
++
++void virtio_rdma_dealloc_pd(struct ib_pd *pd)
++{
++	struct virtio_rdma_pd *vpd = to_vpd(pd);
++	struct ib_device *ibdev = pd->device;
++	struct cmd_destroy_pd *cmd;
++	struct scatterlist in;
++
++	printk("%s:\n", __func__);
++
++	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!cmd)
++		return;
++
++	cmd->pdn = vpd->pd_handle;
++	sg_init_one(&in, cmd, sizeof(*cmd));
++
++	virtio_rdma_exec_cmd(to_vdev(ibdev), VIRTIO_CMD_DESTROY_PD, &in, NULL);
++
++	kfree(cmd);
++}
++
++struct ib_mr *virtio_rdma_get_dma_mr(struct ib_pd *pd, int acc)
++
++{
++	struct virtio_rdma_user_mr *mr;
++	struct scatterlist in, out;
++	struct cmd_get_dma_mr *cmd = NULL;
++	struct rsp_get_dma_mr *rsp = NULL;
++	int rc;
++
++	mr = kzalloc(sizeof(*mr), GFP_KERNEL);
++	if (!mr)
++		return ERR_PTR(-ENOMEM);
++
++	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!cmd) {
++		kfree(mr);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
++	if (!cmd) {
++		kfree(mr);
++		kfree(cmd);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	cmd->pdn = to_vpd(pd)->pd_handle;
++	cmd->access_flags = acc;
++	sg_init_one(&in, cmd, sizeof(*cmd));
++
++	sg_init_one(&out, rsp, sizeof(*rsp));
++
++	rc = virtio_rdma_exec_cmd(to_vdev(pd->device), VIRTIO_CMD_GET_DMA_MR,
++				  &in, &out);
++	if (rc) {
++		kfree(mr);
++		kfree(cmd);
++		return ERR_PTR(rc);
++	}
++
++	mr->mr_handle = rsp->mrn;
++	mr->ibmr.lkey = rsp->lkey;
++	mr->ibmr.rkey = rsp->rkey;
++
++	printk("%s: mr_handle=0x%x\n", __func__, mr->mr_handle);
++
++	kfree(cmd);
++	kfree(rsp);
++
++	return &mr->ibmr;
++}
++
++struct ib_qp *virtio_rdma_create_qp(struct ib_pd *pd,
++				    struct ib_qp_init_attr *init_attr,
++				    struct ib_udata *udata)
++{
++	/* struct pvrdma_dev *dev = to_vdev(pd->device); */
++	struct virtio_rdma_qp *qp;
++
++	printk("%s:\n", __func__);
++
++	qp = kzalloc(sizeof(*qp), GFP_KERNEL);
++	if (!qp)
++		return ERR_PTR(-ENOMEM);
++
++	return &qp->ibqp;
++}
++
++int virtio_rdma_query_gid(struct ib_device *ibdev, u8 port, int index,
++			  union ib_gid *gid)
++{
++	memset(gid, 0, sizeof(union ib_gid));
++
++	printk("%s: port %d, index %d\n", __func__, port, index);
++
++	return 0;
++}
++
++static int virtio_rdma_add_gid(const struct ib_gid_attr *attr, void **context)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++struct ib_mr *virtio_rdma_alloc_mr(struct ib_pd *pd, enum ib_mr_type mr_type,
++				   u32 max_num_sg)
++{
++	printk("%s: mr_type %d, max_num_sg %d\n", __func__, mr_type,
++	       max_num_sg);
++
++	return NULL;
++}
++
++int virtio_rdma_alloc_ucontext(struct ib_ucontext *uctx, struct ib_udata *udata)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++struct ib_ah *virtio_rdma_create_ah(struct ib_pd *pd,
++				    struct rdma_ah_attr *ah_attr, u32 flags,
++				    struct ib_udata *udata)
++{
++	printk("%s:\n", __func__);
++
++	return NULL;
++}
++
++void virtio_rdma_dealloc_ucontext(struct ib_ucontext *ibcontext)
++
++{
++}
++
++static int virtio_rdma_del_gid(const struct ib_gid_attr *attr, void **context)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_dereg_mr(struct ib_mr *ibmr)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_destroy_ah(struct ib_ah *ah, u32 flags)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++struct virtio_rdma_cq {
++	struct ib_cq ibcq;
++};
++
++int virtio_rdma_destroy_qp(struct ib_qp *qp)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++static void virtio_rdma_get_fw_ver_str(struct ib_device *device, char *str)
++{
++	printk("%s:\n", __func__);
++}
++
++enum rdma_link_layer virtio_rdma_port_link_layer(struct ib_device *ibdev,
++						 u8 port)
++{
++	return IB_LINK_LAYER_ETHERNET;
++}
++
++int virtio_rdma_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg,
++			  int sg_nents, unsigned int *sg_offset)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_mmap(struct ib_ucontext *ibcontext, struct vm_area_struct *vma)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_modify_port(struct ib_device *ibdev, u8 port, int mask,
++			    struct ib_port_modify *props)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
++			  int attr_mask, struct ib_udata *udata)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_poll_cq(struct ib_cq *ibcq, int num_entries, struct ib_wc *wc)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
++			  const struct ib_recv_wr **bad_wr)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
++			  const struct ib_send_wr **bad_wr)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_query_pkey(struct ib_device *ibdev, u8 port, u16 index,
++			   u16 *pkey)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++int virtio_rdma_query_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
++			 int attr_mask, struct ib_qp_init_attr *init_attr)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++struct ib_mr *virtio_rdma_reg_user_mr(struct ib_pd *pd, u64 start, u64 length,
++				      u64 virt_addr, int access_flags,
++				      struct ib_udata *udata)
++{
++	printk("%s:\n", __func__);
++
++	return NULL;
++}
++
++int virtio_rdma_req_notify_cq(struct ib_cq *ibcq,
++			      enum ib_cq_notify_flags notify_flags)
++{
++	printk("%s:\n", __func__);
++
++	return 0;
++}
++
++static const struct ib_device_ops virtio_rdma_dev_ops = {
++	.get_port_immutable = virtio_rdma_port_immutable,
++	.query_device = virtio_rdma_query_device,
++	.query_port = virtio_rdma_query_port,
++	.get_netdev = virtio_rdma_get_netdev,
++	.create_cq = virtio_rdma_create_cq,
++	.destroy_cq = virtio_rdma_destroy_cq,
++	.alloc_pd = virtio_rdma_alloc_pd,
++	.dealloc_pd = virtio_rdma_dealloc_pd,
++	.get_dma_mr = virtio_rdma_get_dma_mr,
++	.create_qp = virtio_rdma_create_qp,
++	.query_gid = virtio_rdma_query_gid,
++	.add_gid = virtio_rdma_add_gid,
++	.alloc_mr = virtio_rdma_alloc_mr,
++	.alloc_ucontext = virtio_rdma_alloc_ucontext,
++	.create_ah = virtio_rdma_create_ah,
++	.dealloc_ucontext = virtio_rdma_dealloc_ucontext,
++	.del_gid = virtio_rdma_del_gid,
++	.dereg_mr = virtio_rdma_dereg_mr,
++	.destroy_ah = virtio_rdma_destroy_ah,
++	.destroy_qp = virtio_rdma_destroy_qp,
++	.get_dev_fw_str = virtio_rdma_get_fw_ver_str,
++	.get_link_layer = virtio_rdma_port_link_layer,
++	.get_port_immutable = virtio_rdma_port_immutable,
++	.map_mr_sg = virtio_rdma_map_mr_sg,
++	.mmap = virtio_rdma_mmap,
++	.modify_port = virtio_rdma_modify_port,
++	.modify_qp = virtio_rdma_modify_qp,
++	.poll_cq = virtio_rdma_poll_cq,
++	.post_recv = virtio_rdma_post_recv,
++	.post_send = virtio_rdma_post_send,
++	.query_device = virtio_rdma_query_device,
++	.query_pkey = virtio_rdma_query_pkey,
++	.query_port = virtio_rdma_query_port,
++	.query_qp = virtio_rdma_query_qp,
++	.reg_user_mr = virtio_rdma_reg_user_mr,
++	.req_notify_cq = virtio_rdma_req_notify_cq,
++	INIT_RDMA_OBJ_SIZE(ib_pd, virtio_rdma_pd, ibpd),
++};
++
++static ssize_t hca_type_show(struct device *device,
++			     struct device_attribute *attr, char *buf)
++{
++	return sprintf(buf, "%s-%s\n", VIRTIO_RDMA_HW_NAME,
++		       VIRTIO_RDMA_DRIVER_VER);
++}
++static DEVICE_ATTR_RO(hca_type);
++
++static ssize_t hw_rev_show(struct device *device,
++			   struct device_attribute *attr, char *buf)
++{
++	return sprintf(buf, "%d\n", VIRTIO_RDMA_HW_REV);
++}
++static DEVICE_ATTR_RO(hw_rev);
++
++static ssize_t board_id_show(struct device *device,
++			     struct device_attribute *attr, char *buf)
++{
++	return sprintf(buf, "%d\n", VIRTIO_RDMA_BOARD_ID);
++}
++static DEVICE_ATTR_RO(board_id);
++
++static struct attribute *virtio_rdmaa_class_attributes[] = {
++	&dev_attr_hw_rev.attr,
++	&dev_attr_hca_type.attr,
++	&dev_attr_board_id.attr,
++	NULL,
++};
++
++static const struct attribute_group virtio_rdmaa_attr_group = {
++	.attrs = virtio_rdmaa_class_attributes,
++};
++
++int init_ib(struct virtio_rdma_info *ri)
++{
++	int rc;
++
++	ri->ib_dev.owner = THIS_MODULE;
++	ri->ib_dev.num_comp_vectors = 1;
++	ri->ib_dev.dev.parent = &ri->vdev->dev;
++	ri->ib_dev.node_type = RDMA_NODE_IB_CA;
++	ri->ib_dev.phys_port_cnt = 1;
++	ri->ib_dev.uverbs_cmd_mask =
++		(1ull << IB_USER_VERBS_CMD_QUERY_DEVICE)	|
++		(1ull << IB_USER_VERBS_CMD_QUERY_PORT)		|
++		(1ull << IB_USER_VERBS_CMD_CREATE_CQ)		|
++		(1ull << IB_USER_VERBS_CMD_DESTROY_CQ)		|
++		(1ull << IB_USER_VERBS_CMD_ALLOC_PD)		|
++		(1ull << IB_USER_VERBS_CMD_DEALLOC_PD);
++
++	rdma_set_device_sysfs_group(&ri->ib_dev, &virtio_rdmaa_attr_group);
++
++	ib_set_device_ops(&ri->ib_dev, &virtio_rdma_dev_ops);
++
++	rc = ib_register_device(&ri->ib_dev, "virtio_rdma%d");
++
++	return rc;
++}
++
++void fini_ib(struct virtio_rdma_info *ri)
++{
++	ib_unregister_device(&ri->ib_dev);
++}
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_ib.h b/drivers/infiniband/hw/virtio/virtio_rdma_ib.h
 new file mode 100644
-index 0000000000..54f75b14c0
+index 000000000000..7b82a60581ff
 --- /dev/null
-+++ b/hw/rdma/virtio/virtio-rdma-main.c
-@@ -0,0 +1,185 @@
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_ib.h
+@@ -0,0 +1,48 @@
 +/*
-+ * Virtio RDMA Device
++ * Virtio RDMA device: IB related functions and data
 + *
-+ * Copyright (C) 2019 Oracle
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
 + *
-+ * Authors:
-+ *  Yuval Shaia <yuval.shaia@oracle.com>
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
 + *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 + */
 +
-+#include <infiniband/verbs.h>
++#ifndef __VIRTIO_RDMA_IB__
++#define __VIRTIO_RDMA_IB__
 +
-+#include "qemu/osdep.h"
-+#include "hw/virtio/virtio.h"
-+#include "qemu/error-report.h"
-+#include "hw/virtio/virtio-bus.h"
-+#include "hw/virtio/virtio-rdma.h"
-+#include "include/standard-headers/linux/virtio_ids.h"
++#include <rdma/ib_verbs.h>
 +
-+#include "virtio-rdma-ib.h"
-+#include "../rdma_rm_defs.h"
-+#include "../rdma_utils.h"
-+
-+static void virtio_rdma_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIORdma *r = VIRTIO_RDMA(vdev);
-+    struct control_buf cb;
-+    VirtQueueElement *e;
-+    size_t s;
-+
-+    virtio_queue_set_notification(vq, 0);
-+
-+    for (;;) {
-+        e = virtqueue_pop(vq, sizeof(VirtQueueElement));
-+        if (!e) {
-+            break;
-+        }
-+
-+        if (iov_size(e->in_sg, e->in_num) < sizeof(cb.status) ||
-+            iov_size(e->out_sg, e->out_num) < sizeof(cb.cmd)) {
-+            virtio_error(vdev, "Got invalid message size");
-+            virtqueue_detach_element(vq, e, 0);
-+            g_free(e);
-+            break;
-+        }
-+
-+        s = iov_to_buf(&e->out_sg[0], 1, 0, &cb.cmd, sizeof(cb.cmd));
-+        if (s != sizeof(cb.cmd)) {
-+            cb.status = VIRTIO_RDMA_CTRL_ERR;
-+        } else {
-+            printf("cmd=%d\n", cb.cmd);
-+            switch (cb.cmd) {
-+            case VIRTIO_CMD_QUERY_DEVICE:
-+                cb.status = virtio_rdma_query_device(r, &e->out_sg[1],
-+                                                     &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_QUERY_PORT:
-+                cb.status = virtio_rdma_query_port(r, &e->out_sg[1],
-+                                                   &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_CREATE_CQ:
-+                cb.status = virtio_rdma_create_cq(r, &e->out_sg[1],
-+                                                  &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_DESTROY_CQ:
-+                cb.status = virtio_rdma_destroy_cq(r, &e->out_sg[1],
-+                                                  &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_CREATE_PD:
-+                cb.status = virtio_rdma_create_pd(r, &e->out_sg[1],
-+                                                  &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_DESTROY_PD:
-+                cb.status = virtio_rdma_destroy_pd(r, &e->out_sg[1],
-+                                                  &e->in_sg[0]);
-+                break;
-+            case VIRTIO_CMD_GET_DMA_MR:
-+                cb.status = virtio_rdma_get_dma_mr(r, &e->out_sg[1],
-+                                                  &e->in_sg[0]);
-+                break;
-+            default:
-+                cb.status = VIRTIO_RDMA_CTRL_ERR;
-+            }
-+        }
-+        printf("status=%d\n", cb.status);
-+        s = iov_from_buf(&e->in_sg[1], 1, 0, &cb.status, sizeof(cb.status));
-+        assert(s == sizeof(cb.status));
-+
-+        virtqueue_push(vq, e, sizeof(cb.status));
-+        virtio_notify(vdev, vq);
-+    }
-+
-+    virtio_queue_set_notification(vq, 1);
-+}
-+
-+static void virtio_rdma_device_realize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VirtIORdma *r = VIRTIO_RDMA(dev);
-+    int rc;
-+
-+    rc = virtio_rdma_init_ib(r);
-+    if (rc) {
-+        rdma_error_report("Fail to initialize IB layer");
-+        return;
-+    }
-+
-+    virtio_init(vdev, "virtio-rdma", VIRTIO_ID_RDMA, 1024);
-+
-+    r->ctrl_vq = virtio_add_queue(vdev, 64, virtio_rdma_handle_ctrl);
-+}
-+
-+static void virtio_rdma_device_unrealize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VirtIORdma *r = VIRTIO_RDMA(dev);
-+
-+    virtio_del_queue(vdev, 0);
-+
-+    virtio_cleanup(vdev);
-+
-+    virtio_rdma_fini_ib(r);
-+}
-+
-+static uint64_t virtio_rdma_get_features(VirtIODevice *vdev, uint64_t features,
-+                                        Error **errp)
-+{
-+    /* virtio_add_feature(&features, VIRTIO_NET_F_MAC); */
-+
-+    vdev->backend_features = features;
-+
-+    return features;
-+}
-+
-+
-+static Property virtio_rdma_dev_properties[] = {
-+    DEFINE_PROP_STRING("netdev", VirtIORdma, backend_eth_device_name),
-+    DEFINE_PROP_STRING("ibdev",VirtIORdma, backend_device_name),
-+    DEFINE_PROP_UINT8("ibport", VirtIORdma, backend_port_num, 1),
-+    DEFINE_PROP_UINT64("dev-caps-max-mr-size", VirtIORdma, dev_attr.max_mr_size,
-+                       MAX_MR_SIZE),
-+    DEFINE_PROP_INT32("dev-caps-max-qp", VirtIORdma, dev_attr.max_qp, MAX_QP),
-+    DEFINE_PROP_INT32("dev-caps-max-cq", VirtIORdma, dev_attr.max_cq, MAX_CQ),
-+    DEFINE_PROP_INT32("dev-caps-max-mr", VirtIORdma, dev_attr.max_mr, MAX_MR),
-+    DEFINE_PROP_INT32("dev-caps-max-pd", VirtIORdma, dev_attr.max_pd, MAX_PD),
-+    DEFINE_PROP_INT32("dev-caps-qp-rd-atom", VirtIORdma,
-+                       dev_attr.max_qp_rd_atom, MAX_QP_RD_ATOM),
-+    DEFINE_PROP_INT32("dev-caps-max-qp-init-rd-atom", VirtIORdma,
-+                      dev_attr.max_qp_init_rd_atom, MAX_QP_INIT_RD_ATOM),
-+    DEFINE_PROP_INT32("dev-caps-max-ah", VirtIORdma, dev_attr.max_ah, MAX_AH),
-+    DEFINE_PROP_CHR("mad-chardev", VirtIORdma, mad_chr),
-+    DEFINE_PROP_END_OF_LIST(),
++struct virtio_rdma_pd {
++	struct ib_pd ibpd;
++	u32 pd_handle;
 +};
 +
-+static void virtio_rdma_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+    vdc->realize = virtio_rdma_device_realize;
-+    vdc->unrealize = virtio_rdma_device_unrealize;
-+    vdc->get_features = virtio_rdma_get_features;
-+
-+    dc->desc = "Virtio RDMA Device";
-+    dc->props = virtio_rdma_dev_properties;
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+}
-+
-+static const TypeInfo virtio_rdma_info = {
-+    .name = TYPE_VIRTIO_RDMA,
-+    .parent = TYPE_VIRTIO_DEVICE,
-+    .instance_size = sizeof(VirtIORdma),
-+    .class_init = virtio_rdma_class_init,
++struct virtio_rdma_user_mr {
++	struct ib_mr ibmr;
++	u32 mr_handle;
 +};
 +
-+static void virtio_register_types(void)
-+{
-+    type_register_static(&virtio_rdma_info);
-+}
-+
-+type_init(virtio_register_types)
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index f2ab667a21..fd701feb9f 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
- obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
- obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
- obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
-+obj-$(CONFIG_VIRTIO_RDMA) += virtio-rdma-pci.o
- obj-$(CONFIG_VIRTIO_SERIAL) += virtio-serial-pci.o
- endif
- else
-diff --git a/hw/virtio/virtio-rdma-pci.c b/hw/virtio/virtio-rdma-pci.c
-new file mode 100644
-index 0000000000..36efce285b
---- /dev/null
-+++ b/hw/virtio/virtio-rdma-pci.c
-@@ -0,0 +1,108 @@
-+/*
-+ * Virtio rdma PCI Bindings
-+ *
-+ * Copyright (C) 2019 Oracle
-+ *
-+ * Authors:
-+ *  Yuval Shaia <yuval.shaia@oracle.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "hw/virtio/virtio-net-pci.h"
-+#include "hw/virtio/virtio-rdma.h"
-+#include "virtio-pci.h"
-+#include "qapi/error.h"
-+
-+typedef struct VirtIORdmaPCI VirtIORdmaPCI;
-+
-+/*
-+ * virtio-rdma-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_RDMA_PCI "virtio-rdma-pci-base"
-+#define VIRTIO_RDMA_PCI(obj) \
-+        OBJECT_CHECK(VirtIORdmaPCI, (obj), TYPE_VIRTIO_RDMA_PCI)
-+
-+struct VirtIORdmaPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIORdma vdev;
++struct virtio_rdma_qp {
++	struct ib_qp ibqp;
 +};
 +
-+static Property virtio_rdma_properties[] = {
-+    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-+                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-+    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_rdma_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static inline struct virtio_rdma_pd *to_vpd(struct ib_pd *ibpd)
 +{
-+    VirtIORdmaPCI *dev = VIRTIO_RDMA_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+    VirtIONetPCI *vnet_pci;
-+    PCIDevice *func0;
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+
-+    func0 = pci_get_function_0(&vpci_dev->pci_dev);
-+    /* Break if not virtio device in slot 0 */
-+    if (strcmp(object_get_typename(OBJECT(func0)),
-+               TYPE_VIRTIO_NET_PCI_GENERIC)) {
-+        error_setg(errp, "Device on %x.0 is type %s but must be %s",
-+                   PCI_SLOT(vpci_dev->pci_dev.devfn),
-+                   object_get_typename(OBJECT(func0)),
-+                   TYPE_VIRTIO_NET_PCI_GENERIC);
-+        return;
-+    }
-+    vnet_pci = VIRTIO_NET_PCI(func0);
-+    dev->vdev.netdev = &vnet_pci->vdev;
++	return container_of(ibpd, struct virtio_rdma_pd, ibpd);
 +}
 +
-+static void virtio_rdma_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    VirtioPCIClass *vpciklass = VIRTIO_PCI_CLASS(klass);
-+
-+    k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    k->device_id = PCI_DEVICE_ID_VIRTIO_RDMA;
-+    k->revision = VIRTIO_PCI_ABI_VERSION;
-+    k->class_id = PCI_CLASS_NETWORK_OTHER;
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+    dc->props = virtio_rdma_properties;
-+    vpciklass->realize = virtio_rdma_pci_realize;
-+}
-+
-+static void virtio_rdma_pci_instance_init(Object *obj)
-+{
-+    VirtIORdmaPCI *dev = VIRTIO_RDMA_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_RDMA);
-+    /*
-+    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-+                              "bootindex", &error_abort);
-+    */
-+}
-+
-+static const VirtioPCIDeviceTypeInfo virtio_rdma_pci_info = {
-+    .base_name             = TYPE_VIRTIO_RDMA_PCI,
-+    .generic_name          = "virtio-rdma-pci",
-+    .transitional_name     = "virtio-rdma-pci-transitional",
-+    .non_transitional_name = "virtio-rdma-pci-non-transitional",
-+    .instance_size = sizeof(VirtIORdmaPCI),
-+    .instance_init = virtio_rdma_pci_instance_init,
-+    .class_init    = virtio_rdma_pci_class_init,
-+};
-+
-+static void virtio_rdma_pci_register(void)
-+{
-+    virtio_pci_types_register(&virtio_rdma_pci_info);
-+}
-+
-+type_init(virtio_rdma_pci_register)
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index d87f5f93e9..c2d34c382f 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -85,6 +85,7 @@ extern bool pci_available;
- #define PCI_DEVICE_ID_VIRTIO_RNG         0x1005
- #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
- #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
-+#define PCI_DEVICE_ID_VIRTIO_RDMA        0x1013
- 
- #define PCI_VENDOR_ID_REDHAT             0x1b36
- #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
-diff --git a/include/hw/virtio/virtio-rdma.h b/include/hw/virtio/virtio-rdma.h
-new file mode 100644
-index 0000000000..3c7534cd8a
---- /dev/null
-+++ b/include/hw/virtio/virtio-rdma.h
-@@ -0,0 +1,44 @@
-+/*
-+ * Virtio RDMA Device
-+ *
-+ * Copyright (C) 2019 Oracle
-+ *
-+ * Authors:
-+ *  Yuval Shaia <yuval.shaia@oracle.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_VIRTIO_RDMA_H
-+#define QEMU_VIRTIO_RDMA_H
-+
-+#include <infiniband/verbs.h>
-+
-+#include "chardev/char-fe.h"
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/virtio-net.h"
-+
-+#define TYPE_VIRTIO_RDMA "virtio-rdma-device"
-+#define VIRTIO_RDMA(obj) \
-+        OBJECT_CHECK(VirtIORdma, (obj), TYPE_VIRTIO_RDMA)
-+
-+typedef struct RdmaBackendDev RdmaBackendDev;
-+typedef struct RdmaDeviceResources RdmaDeviceResources;
-+struct ibv_device_attr;
-+
-+typedef struct VirtIORdma {
-+    VirtIODevice parent_obj;
-+    VirtQueue *ctrl_vq;
-+    VirtIONet *netdev;
-+    RdmaBackendDev *backend_dev;
-+    RdmaDeviceResources *rdma_dev_res;
-+    CharBackend mad_chr;
-+    char *backend_eth_device_name;
-+    char *backend_device_name;
-+    uint8_t backend_port_num;
-+    struct ibv_device_attr dev_attr;
-+} VirtIORdma;
++int init_ib(struct virtio_rdma_info *ri);
++void fini_ib(struct virtio_rdma_info *ri);
 +
 +#endif
-diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-index 6d5c3b2d4f..bd2c699450 100644
---- a/include/standard-headers/linux/virtio_ids.h
-+++ b/include/standard-headers/linux/virtio_ids.h
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_main.c b/drivers/infiniband/hw/virtio/virtio_rdma_main.c
+new file mode 100644
+index 000000000000..811533d63160
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_main.c
+@@ -0,0 +1,149 @@
++/*
++ * Virtio RDMA device
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#include <linux/err.h>
++#include <linux/scatterlist.h>
++#include <linux/spinlock.h>
++#include <linux/virtio.h>
++#include <linux/module.h>
++#include <uapi/linux/virtio_ids.h>
++
++#include "virtio_rdma.h"
++#include "virtio_rdma_device.h"
++#include "virtio_rdma_ib.h"
++#include "virtio_rdma_netdev.h"
++
++/* TODO:
++ * - How to hook to unload driver, we need to undo all the stuff with did
++ *   for all the devices that probed
++ * -
++ */
++
++static int virtio_rdma_probe(struct virtio_device *vdev)
++{
++	struct virtio_rdma_info *ri;
++	int rc = -EIO;
++
++	ri = ib_alloc_device(virtio_rdma_info, ib_dev);
++	if (!ri) {
++		pr_err("Fail to allocate IB device\n");
++		rc = -ENOMEM;
++		goto out;
++	}
++	vdev->priv = ri;
++
++	ri->vdev = vdev;
++
++	rc = init_device(ri);
++	if (rc) {
++		pr_err("Fail to connect to device\n");
++		goto out_dealloc_ib_device;
++	}
++
++	rc = init_netdev(ri);
++	if (rc) {
++		pr_err("Fail to connect to NetDev layer\n");
++		goto out_fini_device;
++	}
++
++	rc = init_ib(ri);
++	if (rc) {
++		pr_err("Fail to connect to IB layer\n");
++		goto out_fini_netdev;
++	}
++
++	pr_info("VirtIO RDMA device %d probed\n", vdev->index);
++
++	goto out;
++
++out_fini_netdev:
++	fini_netdev(ri);
++
++out_fini_device:
++	fini_device(ri);
++
++out_dealloc_ib_device:
++	ib_dealloc_device(&ri->ib_dev);
++
++	vdev->priv = NULL;
++
++out:
++	return rc;
++}
++
++static void virtio_rdma_remove(struct virtio_device *vdev)
++{
++	struct virtio_rdma_info *ri = vdev->priv;
++
++	if (!ri)
++		return;
++
++	vdev->priv = NULL;
++
++	fini_ib(ri);
++
++	fini_netdev(ri);
++
++	fini_device(ri);
++
++	ib_dealloc_device(&ri->ib_dev);
++
++	pr_info("VirtIO RDMA device %d removed\n", vdev->index);
++}
++
++static struct virtio_device_id id_table[] = {
++	{ VIRTIO_ID_RDMA, VIRTIO_DEV_ANY_ID },
++	{ 0 },
++};
++
++static struct virtio_driver virtio_rdma_driver = {
++	.driver.name	= KBUILD_MODNAME,
++	.driver.owner	= THIS_MODULE,
++	.id_table	= id_table,
++	.probe		= virtio_rdma_probe,
++	.remove		= virtio_rdma_remove,
++};
++
++static int __init virtio_rdma_init(void)
++{
++	int rc;
++
++	rc = register_virtio_driver(&virtio_rdma_driver);
++	if (rc) {
++		pr_err("%s: Fail to register virtio driver (%d)\n", __func__,
++		       rc);
++		return rc;
++	}
++
++	return 0;
++}
++
++static void __exit virtio_rdma_fini(void)
++{
++	unregister_virtio_driver(&virtio_rdma_driver);
++}
++
++module_init(virtio_rdma_init);
++module_exit(virtio_rdma_fini);
++
++MODULE_DEVICE_TABLE(virtio, id_table);
++MODULE_AUTHOR("Yuval Shaia");
++MODULE_DESCRIPTION("Virtio RDMA driver");
++MODULE_LICENSE("Dual BSD/GPL");
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_netdev.c b/drivers/infiniband/hw/virtio/virtio_rdma_netdev.c
+new file mode 100644
+index 000000000000..001f30b3e0b9
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_netdev.c
+@@ -0,0 +1,44 @@
++/*
++ * Virtio RDMA device
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#include "virtio_rdma_netdev.h"
++
++int init_netdev(struct virtio_rdma_info *ri)
++{
++	struct net_device *dev;
++	struct virtio_rdma_netdev_info *vrndi;
++
++	dev = alloc_etherdev(sizeof(struct virtio_rdma_netdev_info));
++	if (!dev) {
++		return -ENOMEM;
++	}
++
++	SET_NETDEV_DEV(dev, &ri->vdev->dev);
++	vrndi = netdev_priv(dev);
++	vrndi->ri = ri;
++	ri->netdev = dev;
++
++	return 0;
++}
++
++void fini_netdev(struct virtio_rdma_info *ri)
++{
++	unregister_netdev(ri->netdev);
++}
+diff --git a/drivers/infiniband/hw/virtio/virtio_rdma_netdev.h b/drivers/infiniband/hw/virtio/virtio_rdma_netdev.h
+new file mode 100644
+index 000000000000..e7e5d276d8ec
+--- /dev/null
++++ b/drivers/infiniband/hw/virtio/virtio_rdma_netdev.h
+@@ -0,0 +1,33 @@
++/*
++ * Virtio RDMA device: Netdev related functions and data
++ *
++ * Copyright (C) 2019 Yuval Shaia Oracle Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#ifndef __VIRTIO_RDMA_NETDEV__
++#define __VIRTIO_RDMA_NETDEV__
++
++#include "virtio_rdma.h"
++
++struct virtio_rdma_netdev_info {
++	struct virtio_rdma_info *ri;
++};
++
++int init_netdev(struct virtio_rdma_info *ri);
++void fini_netdev(struct virtio_rdma_info *ri);
++
++#endif
+diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+index 6d5c3b2d4f4d..288ee6fec8d3 100644
+--- a/include/uapi/linux/virtio_ids.h
++++ b/include/uapi/linux/virtio_ids.h
 @@ -43,5 +43,6 @@
  #define VIRTIO_ID_INPUT        18 /* virtio input */
  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-+#define VIRTIO_ID_RDMA         26 /* virtio crypto */
++#define VIRTIO_ID_RDMA         26 /* RDMA */
  
  #endif /* _LINUX_VIRTIO_IDS_H */
 -- 
-2.20.1
+2.17.0
