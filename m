@@ -6,58 +6,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF1AC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D53C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61BBB20818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BBB20818
+	by mail.kernel.org (Postfix) with ESMTPS id D84F620818
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:08:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84F620818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50393 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50411 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbIK-0007LK-Mm
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:07:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39112)
+	id 1hEbJm-000888-Ve
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:08:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vn-4n
+	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vp-53
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4i-0000rS-OJ
+	(envelope-from <armbru@redhat.com>) id 1hEb4j-0000rz-3j
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9535)
+Received: from mx1.redhat.com ([209.132.183.28]:15597)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4g-0000mf-Or
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4i-0000nL-Pe
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D43B5D5F6
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BC2880E4B
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 375291001E6E;
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 10DBD5D705;
 	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 064351132783; Thu, 11 Apr 2019 16:52:57 +0200 (CEST)
+	id 0121711327DB; Thu, 11 Apr 2019 16:52:57 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:56 +0200
-Message-Id: <20190411145256.8614-16-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:55 +0200
+Message-Id: <20190411145256.8614-15-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 11 Apr 2019 14:53:03 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 15/15] monitor: Simplify how
- -device/device_add print help
+Subject: [Qemu-devel] [PATCH v2 14/15] char: Make -chardev help print to
+ stdout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,158 +72,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411145256.YdHUgknDV4EwqKxCOKaCMxYxxpLj0xpe_AKn-M9Sibc@z>
+Message-ID: <20190411145255.nDoPrrT18rMcf74iqNjcG1ZJBT6Szt46cTzhFiAC1ds@z>
 
-Commit a95db58f210 added monitor_vfprintf() as an error_printf()
-generalized from stderr to arbitrary streams, then used it wrapped in
-helper out_printf() to print -device/device_add help to stdout.  Use
-qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
+Command line help explicitly requested by the user should be printed
+to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
+use qemu_printf() instead of error_printf().  Plain printf() would be
+wrong because we need to print to the current monitor for "chardev-add
+help".
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/monitor/monitor.h |  3 ---
- monitor.c                 | 16 ++++------------
- qdev-monitor.c            | 36 ++++++++++++++----------------------
- 3 files changed, 18 insertions(+), 37 deletions(-)
+ chardev/char.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index e4c3717454..316a168c41 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
- int monitor_fdset_dup_fd_find(int dup_fd);
- 
--int monitor_vfprintf(FILE *stream,
--                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
--
- #endif /* MONITOR_H */
-diff --git a/monitor.c b/monitor.c
-index 7b4a78d798..10be8bdb86 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
-     monitor_flush(opaque);
- }
- 
--/*
-- * Print to current monitor if we have one, else to stream.
-- */
--int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
--{
--    if (cur_mon && !monitor_cur_is_qmp()) {
--        return monitor_vprintf(cur_mon, fmt, ap);
--    }
--    return vfprintf(stream, fmt, ap);
--}
--
- /*
-  * Print to current monitor if we have one, else to stderr.
-  */
- int error_vprintf(const char *fmt, va_list ap)
- {
--    return monitor_vfprintf(stderr, fmt, ap);
-+    if (cur_mon && !monitor_cur_is_qmp()) {
-+        return monitor_vprintf(cur_mon, fmt, ap);
-+    }
-+    return vfprintf(stderr, fmt, ap);
- }
- 
- int error_vprintf_unless_qmp(const char *fmt, va_list ap)
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index d4320986a2..373b9ad445 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -31,6 +31,7 @@
+diff --git a/chardev/char.c b/chardev/char.c
+index 514cd6b0c3..54724a56b1 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -28,6 +28,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/config-file.h"
  #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "qemu/option.h"
 +#include "qemu/qemu-print.h"
- #include "sysemu/block-backend.h"
- #include "migration/misc.h"
- 
-@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
-     return (qdev_class_get_alias(dc) != NULL);
- }
- 
--static void out_printf(const char *fmt, ...)
--{
--    va_list ap;
--
--    va_start(ap, fmt);
--    monitor_vfprintf(stdout, fmt, ap);
--    va_end(ap);
--}
--
- static void qdev_print_devinfo(DeviceClass *dc)
- {
--    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-+    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-     if (dc->bus_type) {
--        out_printf(", bus %s", dc->bus_type);
-+        qemu_printf(", bus %s", dc->bus_type);
+ #include "chardev/char.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-char.h"
+@@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMain=
+Context *context,
+=20
+         chardev_name_foreach(help_string_append, str);
+=20
+-        error_printf("Available chardev backend types: %s\n", str->str);
++        qemu_printf("Available chardev backend types: %s\n", str->str);
+         g_string_free(str, true);
+         return NULL;
      }
-     if (qdev_class_has_alias(dc)) {
--        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-+        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-     }
-     if (dc->desc) {
--        out_printf(", desc \"%s\"", dc->desc);
-+        qemu_printf(", desc \"%s\"", dc->desc);
-     }
-     if (!dc->user_creatable) {
--        out_printf(", no-user");
-+        qemu_printf(", no-user");
-     }
--    out_printf("\n");
-+    qemu_printf("\n");
- }
- 
- static void qdev_print_devinfos(bool show_no_user)
-@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
-                 continue;
-             }
-             if (!cat_printed) {
--                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-+                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-                 cat_printed = true;
-             }
-             qdev_print_devinfo(dc);
-@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
-     }
- 
-     if (prop_list) {
--        out_printf("%s options:\n", driver);
-+        qemu_printf("%s options:\n", driver);
-     } else {
--        out_printf("There are no options for %s.\n", driver);
-+        qemu_printf("There are no options for %s.\n", driver);
-     }
-     for (prop = prop_list; prop; prop = prop->next) {
-         int len;
--        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-+        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-         if (prop->value->has_description) {
-             if (len < 24) {
--                out_printf("%*s", 24 - len, "");
-+                qemu_printf("%*s", 24 - len, "");
-             }
--            out_printf(" - %s\n", prop->value->description);
-+            qemu_printf(" - %s\n", prop->value->description);
-         } else {
--            out_printf("\n");
-+            qemu_printf("\n");
-         }
-     }
- 
--- 
+--=20
 2.17.2
 
 
