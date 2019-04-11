@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38962)
+Received: from eggs.gnu.org ([209.51.188.92]:38971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kt-0l
+	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003L0-3T
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4W-0000lZ-Rg
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51178)
+	(envelope-from <armbru@redhat.com>) id 1hEb4X-0000mK-Dy
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14670)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4W-0000kv-Hb
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:00 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4X-0000lF-1z
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A5B2653E1
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:46 +0200
-Message-Id: <20190411145256.8614-6-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:52 +0200
+Message-Id: <20190411145256.8614-12-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 05/15] mips/boston: Report errors with
- error_report(), not error_printf()
+Subject: [Qemu-devel] [PATCH v2 11/15] monitor error: Make printf()-like
+ functions return a value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +31,277 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Cc: Paul Burton <pburton@wavecomp.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+printf() & friends return the number of characters written on success,
+negative value on error.
+
+monitor_printf(), monitor_vfprintf(), monitor_vprintf(),
+error_printf(), error_printf_unless_qmp(), error_vprintf(), and
+error_vprintf_unless_qmp() return void.  Some of them carry a TODO
+comment asking for int instead.
+
+Improve them to return int like printf() does.
+
+This makes our use of monitor_printf() as fprintf_function slightly
+less dirty: the function cast no longer adds a return value that isn't
+there.  It still changes a parameter's pointer type.  That will be
+addressed in a future commit.
+
+monitor_vfprintf() always returns zero.  Improve it to return the
+proper value.
+
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/mips/boston.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/monitor/monitor.h   |  8 ++---
+ include/qemu/error-report.h |  8 ++---
+ monitor.c                   | 61 ++++++++++++++++++++-----------------
+ stubs/error-printf.c        | 13 +++++---
+ util/qemu-error.c           | 12 +++++---
+ 5 files changed, 57 insertions(+), 45 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index e5bab3cadc..a8b29f62f5 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -528,21 +528,21 @@ static void boston_mach_init(MachineState *machine)
-         fw_size =3D load_image_targphys(machine->firmware,
-                                       0x1fc00000, 4 * MiB);
-         if (fw_size =3D=3D -1) {
--            error_printf("unable to load firmware image '%s'\n",
-+            error_report("unable to load firmware image '%s'",
-                           machine->firmware);
-             exit(1);
-         }
-     } else if (machine->kernel_filename) {
-         fit_err =3D load_fit(&boston_fit_loader, machine->kernel_filenam=
-e, s);
-         if (fit_err) {
--            error_printf("unable to load FIT image\n");
-+            error_report("unable to load FIT image");
-             exit(1);
-         }
-=20
-         gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
-                      s->kernel_entry, s->fdt_base, is_64b);
-     } else if (!qtest_enabled()) {
--        error_printf("Please provide either a -kernel or -bios argument\=
-n");
-+        error_report("Please provide either a -kernel or -bios argument"=
-);
-         exit(1);
-     }
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index c1b40a9cac..e4c3717454 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -28,9 +28,9 @@ void monitor_resume(Monitor *mon);
+ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp);
+ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp);
+ 
+-void monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+-void monitor_printf(Monitor *mon, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
++int monitor_printf(Monitor *mon, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ int monitor_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ void monitor_flush(Monitor *mon);
+ int monitor_set_cpu(int cpu_index);
+@@ -48,7 +48,7 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int monitor_fdset_dup_fd_find(int dup_fd);
+ 
+-void monitor_vfprintf(FILE *stream,
+-                      const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
++int monitor_vfprintf(FILE *stream,
++                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+ 
+ #endif /* MONITOR_H */
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index 0a8d9cc9ea..5db4e5db0d 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -30,10 +30,10 @@ void loc_set_none(void);
+ void loc_set_cmdline(char **argv, int idx, int cnt);
+ void loc_set_file(const char *fname, int lno);
+ 
+-void error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+-void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+-void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+-void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++int error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++int error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++int error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++int error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_set_progname(const char *argv0);
+ 
+ void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+diff --git a/monitor.c b/monitor.c
+index 4807bbe811..7b4a78d798 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -430,15 +430,14 @@ void monitor_flush(Monitor *mon)
  }
---=20
+ 
+ /* flush at every end of line */
+-static void monitor_puts(Monitor *mon, const char *str)
++static int monitor_puts(Monitor *mon, const char *str)
+ {
++    int i;
+     char c;
+ 
+     qemu_mutex_lock(&mon->mon_lock);
+-    for(;;) {
+-        c = *str++;
+-        if (c == '\0')
+-            break;
++    for (i = 0; str[i]; i++) {
++        c = str[i];
+         if (c == '\n') {
+             qstring_append_chr(mon->outbuf, '\r');
+         }
+@@ -448,39 +447,48 @@ static void monitor_puts(Monitor *mon, const char *str)
+         }
+     }
+     qemu_mutex_unlock(&mon->mon_lock);
++
++    return i;
+ }
+ 
+-void monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+ {
+     char *buf;
++    int n;
+ 
+     if (!mon)
+-        return;
++        return -1;
+ 
+     if (monitor_is_qmp(mon)) {
+-        return;
++        return -1;
+     }
+ 
+     buf = g_strdup_vprintf(fmt, ap);
+-    monitor_puts(mon, buf);
++    n = monitor_puts(mon, buf);
+     g_free(buf);
++    return n;
+ }
+ 
+-void monitor_printf(Monitor *mon, const char *fmt, ...)
++int monitor_printf(Monitor *mon, const char *fmt, ...)
+ {
++    int ret;
++
+     va_list ap;
+     va_start(ap, fmt);
+-    monitor_vprintf(mon, fmt, ap);
++    ret = monitor_vprintf(mon, fmt, ap);
+     va_end(ap);
++    return ret;
+ }
+ 
+ int monitor_fprintf(FILE *stream, const char *fmt, ...)
+ {
++    int ret;
++
+     va_list ap;
+     va_start(ap, fmt);
+-    monitor_vprintf((Monitor *)stream, fmt, ap);
++    ret = monitor_vprintf((Monitor *)stream, fmt, ap);
+     va_end(ap);
+-    return 0;
++    return ret;
+ }
+ 
+ static void qmp_send_response(Monitor *mon, const QDict *rsp)
+@@ -4535,35 +4543,32 @@ static void monitor_readline_flush(void *opaque)
+ 
+ /*
+  * Print to current monitor if we have one, else to stream.
+- * TODO should return int, so callers can calculate width, but that
+- * requires surgery to monitor_vprintf().  Left for another day.
+  */
+-void monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
++int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+ {
+     if (cur_mon && !monitor_cur_is_qmp()) {
+-        monitor_vprintf(cur_mon, fmt, ap);
+-    } else {
+-        vfprintf(stream, fmt, ap);
++        return monitor_vprintf(cur_mon, fmt, ap);
+     }
++    return vfprintf(stream, fmt, ap);
+ }
+ 
+ /*
+  * Print to current monitor if we have one, else to stderr.
+- * TODO should return int, so callers can calculate width, but that
+- * requires surgery to monitor_vprintf().  Left for another day.
+  */
+-void error_vprintf(const char *fmt, va_list ap)
++int error_vprintf(const char *fmt, va_list ap)
+ {
+-    monitor_vfprintf(stderr, fmt, ap);
++    return monitor_vfprintf(stderr, fmt, ap);
+ }
+ 
+-void error_vprintf_unless_qmp(const char *fmt, va_list ap)
++int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+ {
+-    if (cur_mon && !monitor_cur_is_qmp()) {
+-        monitor_vprintf(cur_mon, fmt, ap);
+-    } else if (!cur_mon) {
+-        vfprintf(stderr, fmt, ap);
++    if (!cur_mon) {
++        return vfprintf(stderr, fmt, ap);
+     }
++    if (!monitor_cur_is_qmp()) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return -1;
+ }
+ 
+ static void monitor_list_append(Monitor *mon)
+diff --git a/stubs/error-printf.c b/stubs/error-printf.c
+index 99c6406668..1f9d3b3714 100644
+--- a/stubs/error-printf.c
++++ b/stubs/error-printf.c
+@@ -2,19 +2,22 @@
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ 
+-void error_vprintf(const char *fmt, va_list ap)
++int error_vprintf(const char *fmt, va_list ap)
+ {
++    int ret;
++
+     if (g_test_initialized() && !g_test_subprocess() &&
+         getenv("QTEST_SILENT_ERRORS")) {
+         char *msg = g_strdup_vprintf(fmt, ap);
+         g_test_message("%s", msg);
++        ret = strlen(msg);
+         g_free(msg);
+-    } else {
+-        vfprintf(stderr, fmt, ap);
++        return ret;
+     }
++    return vfprintf(stderr, fmt, ap);
+ }
+ 
+-void error_vprintf_unless_qmp(const char *fmt, va_list ap)
++int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+ {
+-    error_vprintf(fmt, ap);
++    return error_vprintf(fmt, ap);
+ }
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index fcbe8a1f74..36eb3ea239 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -24,22 +24,26 @@ typedef enum {
+     REPORT_TYPE_INFO,
+ } report_type;
+ 
+-void error_printf(const char *fmt, ...)
++int error_printf(const char *fmt, ...)
+ {
+     va_list ap;
++    int ret;
+ 
+     va_start(ap, fmt);
+-    error_vprintf(fmt, ap);
++    ret = error_vprintf(fmt, ap);
+     va_end(ap);
++    return ret;
+ }
+ 
+-void error_printf_unless_qmp(const char *fmt, ...)
++int error_printf_unless_qmp(const char *fmt, ...)
+ {
+     va_list ap;
++    int ret;
+ 
+     va_start(ap, fmt);
+-    error_vprintf_unless_qmp(fmt, ap);
++    ret = error_vprintf_unless_qmp(fmt, ap);
+     va_end(ap);
++    return ret;
+ }
+ 
+ static Location std_loc = {
+-- 
 2.17.2
