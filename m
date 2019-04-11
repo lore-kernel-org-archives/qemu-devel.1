@@ -5,58 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE03C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 881A1C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:07:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F6612075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:03:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6612075B
+	by mail.kernel.org (Postfix) with ESMTPS id 0C16620818
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:07:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C16620818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52261 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52325 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEd6k-0005gk-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:03:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44776)
+	id 1hEdB5-0007QF-56
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:07:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEd5m-0005Nk-GQ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:02:27 -0400
+	(envelope-from <jdillama@redhat.com>) id 1hEdAF-00074Y-1B
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:07:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEd5l-0007Lr-Dw
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:02:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hEd5l-0007L7-3D
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:02:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E7FAD30832C5;
-	Thu, 11 Apr 2019 17:02:23 +0000 (UTC)
-Received: from gondolin (ovpn-204-124.brq.redhat.com [10.40.204.124])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E5F951001E7D;
-	Thu, 11 Apr 2019 17:02:18 +0000 (UTC)
-Date: Thu, 11 Apr 2019 19:02:15 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190411190215.2163572e.cohuck@redhat.com>
-In-Reply-To: <20190411110157.14252-1-yuval.shaia@oracle.com>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-Organization: Red Hat GmbH
+	(envelope-from <jdillama@redhat.com>) id 1hEdAD-0001z4-Ui
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:07:03 -0400
+Received: from mail-ed1-f46.google.com ([209.85.208.46]:38192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hEdAD-0001xY-J7
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:07:01 -0400
+Received: by mail-ed1-f46.google.com with SMTP id d13so5877522edr.5
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 10:07:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+	:from:date:message-id:subject:to:cc;
+	bh=1OpuT5+EyVVVDbsIOdaFbG+ZYNhAy0foMVhSSX5IlnY=;
+	b=VXFVLaHCZo+SExMPcpi1qoiWn8Mpe9lVLaNYn6HR0WHc1edNy7WIqRZA0PoMxV3LQI
+	KutnkhdN3fW1+VzuY1xg7ebYRiXrtonqu7jOPSY7cLHbDpr7QVsHZ5iqXQCIq4F8UFoG
+	PFJO8HlhE5FT2IhfejWUcxpboYdJ6rE170PQ/mhcOYwayMV0BsZT0djsLuUkcTiqE0vN
+	EDNBdyoRG9vPisFI6zvlbVFBye81eSDbnC7ZOYfuXikCEsYeur2R2u6mmtOiivUjaEUm
+	HuCMuW/IsdR/fu4oLqjSAyQZbwKTir1WI/DQeo3YkUqCCRPGWFK9zVdEfvx0Yi0uUMda
+	ptGg==
+X-Gm-Message-State: APjAAAUA9zO+LD4wzvPDY32Q55ZbHxPlJCWkAgU6Mn/FXFI9Gx7enweL
+	H/b9MNZkxSy8tXY5RJ9kuHvZP9b6kMkYTGcK3znvSA==
+X-Google-Smtp-Source: APXvYqx9gd8tDNCPFY7FJlP9PG+DeNlvhINXfveay0tIdE2IkM85k710xfgfSQQ/ieDVV6sDrafWreJP1G/CvCCU94E=
+X-Received: by 2002:a50:8985:: with SMTP id g5mr11282600edg.65.1555002420424; 
+	Thu, 11 Apr 2019 10:07:00 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
+	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
+	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+In-Reply-To: <20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+From: Jason Dillaman <jdillama@redhat.com>
+Date: Thu, 11 Apr 2019 13:06:49 -0400
+Message-ID:
+ <CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 11 Apr 2019 17:02:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+	[fuzzy]
+X-Received-From: 209.85.208.46
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,76 +77,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org, jgg@mellanox.com
+Reply-To: dillaman@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+	qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>, dillaman <dillaman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411170215.R4_0gbdehMddytlHNgMzxTyruzsqB6oK9KGNKte_9qw@z>
+Message-ID: <20190411170649._qh1KOpBvcSQyETe_jjwnJpyMdRi_r7pdnPCpqCwZkk@z>
 
-On Thu, 11 Apr 2019 14:01:54 +0300
-Yuval Shaia <yuval.shaia@oracle.com> wrote:
+On Thu, Apr 11, 2019 at 9:02 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> On Thu, Apr 11, 2019 at 08:35:44AM -0400, Jason Dillaman wrote:
+> > On Thu, Apr 11, 2019 at 7:00 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > >
+> > > RBD APIs don't allow us to write more than the size set with rbd_create()
+> > > or rbd_resize().
+> > > In order to support growing images (eg. qcow2), we resize the image
+> > > before RW operations that exceed the current size.
+> >
+> > What's the use-case for storing qcow2 images within a RBD image? RBD
+> > images are already thinly provisioned, they support snapshots, they
+> > can form a parent/child linked image hierarchy.
+> >
+>
+> Hi Jason,
+> I understand your point of view, maybe one use case could be if you have
+> a qcow2 image and you want to put it in the rdb pool without convert it.
+>
+> I'm going through this BZ [1] and I'll ask if they have other
+> use cases in mind.
 
-> Data center backends use more and more RDMA or RoCE devices and more and
-> more software runs in virtualized environment.
-> There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> 
-> Virtio is the optimal solution since is the de-facto para-virtualizaton
-> technology and also because the Virtio specification
-> allows Hardware Vendors to support Virtio protocol natively in order to
-> achieve bare metal performance.
-> 
-> This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> Virtio Specification and a look forward on possible implementation
-> techniques.
-> 
-> Open issues/Todo list:
-> List is huge, this is only start point of the project.
-> Anyway, here is one example of item in the list:
-> - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
->   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
->   that this is reasonable so one option is to have one for all and
->   multiplex the traffic on it. This is not good approach as by design it
->   introducing an optional starvation. Another approach would be multi
->   queues and round-robin (for example) between them.
-> 
-> Expectations from this posting:
-> In general, any comment is welcome, starting from hey, drop this as it is a
-> very bad idea, to yeah, go ahead, we really want it.
-> Idea here is that since it is not a minor effort i first want to know if
-> there is some sort interest in the community for such device.
+Assuming no good use-cases, perhaps it would just be better to make
+the qemu-img error messages more clear.
 
-My first reaction is: Sounds sensible, but it would be good to have a
-spec for this :)
+> Anyway, if we want to support only raw format on RBD driver, maybe we
+> should return something different from current behaviour, also avoiding
+> to create the image:
+>
+> $ qemu-img create -f qcow2 rbd:test/qcow.img 1G
+>   qemu-img: rbd:test/qcow.img: Could not write qcow2 header: Invalid argument
+>
+> What do you think?
+>
+> Thanks,
+> Stefano
+>
+> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1171007
 
-You'll need a spec if you want this to go forward anyway, so at least a
-sketch would be good to answer questions such as how many virtqueues
-you use for which purpose, what is actually put on the virtqueues,
-whether there are negotiable features, and what the expectations for
-the device and the driver are. It also makes it easier to understand
-how this is supposed to work in practice.
 
-If folks agree that this sounds useful, the next step would be to
-reserve an id for the device type.
 
-> 
-> The scope of the implementation is limited to probing the device and doing
-> some basic ibverbs commands. Data-path is not yet implemented. So with this
-> one can expect only that driver is (partialy) loaded and basic queries and
-> resource allocation is done.
-> 
-> One note regarding the patchset.
-> I know it is not standard to collaps patches from several repos as i did
-> here (qemu and linux) but decided to do it anyway so the whole picture can
-> be seen.
-> 
-> patch 1: virtio-net: Move some virtio-net-pci decl to include/hw/virtio
-> 	This is a prelimenary patch just as a hack so i will not need to
-> 	impelement new netdev
-> patch 2: hw/virtio-rdma: VirtIO rdma device
-> 	The implementation of the device
-> patch 3: RDMA/virtio-rdma: VirtIO rdma driver
-> 	The device driver
-> 
-
+-- 
+Jason
 
