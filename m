@@ -2,69 +2,67 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0240CC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD87C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:53:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C436020818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:51:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C436020818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B74C20818
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:53:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B74C20818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51128 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbzE-0002CZ-3O
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:51:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51920)
+	id 1hEc0v-00033n-Hc
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:53:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEblT-0007s2-5p
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:24 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hEbxn-00010k-IS
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEblP-0006tP-De
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEblM-0006s6-Kq
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DC02C033499
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:37:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 566BC5C21E;
-	Thu, 11 Apr 2019 15:37:13 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id E1E5F1138648; Thu, 11 Apr 2019 17:37:11 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20190411145256.8614-1-armbru@redhat.com>
-	<20190411145256.8614-4-armbru@redhat.com>
-	<0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com>
-Date: Thu, 11 Apr 2019 17:37:11 +0200
-In-Reply-To: <0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com> (Paolo
-	Bonzini's message of "Thu, 11 Apr 2019 17:22:20 +0200")
-Message-ID: <87tvf4v9i0.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <no-reply@patchew.org>) id 1hEbxl-0006Ld-Ui
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:07 -0400
+Resent-Date: Thu, 11 Apr 2019 11:50:07 -0400
+Resent-Message-Id: <E1hEbxl-0006Ld-Ui@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hEbxl-0006KT-IO
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1554997772; cv=none; d=zoho.com; s=zohoarc; 
+	b=jBUVeT44NBTiCrLiP4uvj9rNbGP2mnw2qOO4WDY3uxp/l5+yqqvhGmoeoMJXN1JMgj4zyaojiLl9w1lhsljv4FchstdJX1XDWqWdz0voELhIHJk4tEynp4iUGwnWfW2ro8ydBjYJ4B3d8+2G2AvpJr+evDsiz+sY/5e/HqB6Cuc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1554997772;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=o2uNu2SHUSwCGS6givKxQQnBlzlNr7dgUVztVgM0EaQ=; 
+	b=MdwPpAssVA+W1AYzT2YXyKNsS5YJ9E1/suTFi+vjD4sI8sUBNLdsXszt6pUXjYIgRzmLnizDjG+67dlIXSGaqT7c/V5UqfTHybLrlG9+OwUmqj2kcvPo9tN0LdU/Lvy0PwRN8Cf3jfJNso1jzv0/9N8Ty8YBpiErltuStvs5D68=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1554997770172817.999063572373;
+	Thu, 11 Apr 2019 08:49:30 -0700 (PDT)
+Message-ID: <155499776897.12882.4547540276165132649@76452e4e88f2>
+In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Thu, 11 Apr 2019 15:37:15 +0000 (UTC)
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Thu, 11 Apr 2019 08:49:30 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
- redirected to" message
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 00/17] Clean up and simplify around
+ fprintf_function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,65 +74,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411153711.puFYd7w085Ahvgnun5J_MSGjhlF9HW0qo1NQmZf5xpg@z>
+Message-ID: <20190411154930.UXb2pmefGM7WRXt8MQkLgIJcRYx3z-NhG0CoUAeZpRI@z>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMTE1MjUyMC4xMDA2
+MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxMTE1MjUyMC4xMDA2MS0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTddIENsZWFuIHVwIGFuZCBz
+aW1wbGlmeSBhcm91bmQgZnByaW50Zl9mdW5jdGlvbgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTExNTI1MjAu
+MTAwNjEtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDExMTUyNTIwLjEwMDYx
+LTEtYXJtYnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
+MDE5MDQxMTE1Mzk0Mi40NTMzLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcv
+MjAxOTA0MTExNTM5NDIuNDUzMy0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM1N2JmNDA2ZTcgaW5jbHVkZTogTW92ZSBmcHJpbnRmX2Z1
+bmN0aW9uIHRvIGRpc2FzLwozZjQwZTMxZTYxIGRpc2FzOiBSZW5hbWUgaW5jbHVkZS9kaXNhcy9i
+ZmQuaCBiYWNrIHRvIGluY2x1ZGUvZGlzYXMvZGlzLWFzbS5oCmZjNDY3NTM1ZmUgbW9uaXRvcjog
+Q2xlYW4gdXAgaG93IG1vbml0b3JfZGlzYXMoKSBmdW5uZWxzIG91dHB1dCB0byBtb25pdG9yCjJm
+ZWUzMjJlNmMgcW9tL2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOmNwdV9kdW1wX3N0YXRlKCkg
+cHJpbnRzCjljYjAzMmFhNDEgcWVtdS1wcmludDogTmV3IHFlbXVfZnByaW50ZigpLCBxZW11X3Zm
+cHJpbnRmKCkKNjI2NmEyYWNiZCBxb20vY3B1OiBTaW1wbGlmeSBob3cgQ1BVQ2xhc3M6OmR1bXBf
+c3RhdGlzdGljcygpIHByaW50cwo0NjQ0NGQ2MmY4IHRhcmdldC9pMzg2OiBTaW1wbGlmeSBob3cg
+eDg2X2NwdV9kdW1wX2xvY2FsX2FwaWNfc3RhdGUoKSBwcmludHMKOTdkODNiYzlkMSB0YXJnZXQ6
+IENsZWFuIHVwIGhvdyB0aGUgZHVtcF9tbXUoKSBwcmludApjMjE4ZTM0OTZmIHRhcmdldDogU2lt
+cGxpZnkgaG93IHRoZSBUQVJHRVRfY3B1X2xpc3QoKSBwcmludApkZTRmYTQ1ZDFlIG1lbW9yeTog
+Q2xlYW4gdXAgaG93IG10cmVlX2luZm8oKSBwcmludHMKMTc3NmEzYmUxMCBibG9jay9xYXBpOiBD
+bGVhbiB1cCBob3cgd2UgcHJpbnQgdG8gbW9uaXRvciBvciBzdGRvdXQKN2FiNTk1ZDE5MyBxc3A6
+IFNpbXBsaWZ5IGhvdyBxc3BfcmVwb3J0KCkgcHJpbnRzCmUyMTUyN2IxNDMgdGNnOiBTaW1wbGlm
+eSBob3cgZHVtcF9kcmlmdF9pbmZvKCkgcHJpbnRzCjg2NmZjM2MyYjAgdGNnOiBTaW1wbGlmeSBo
+b3cgZHVtcF9leGVjX2luZm8oKSBwcmludHMKMmNiMzY2NWNkNSB0Y2c6IFNpbXBsaWZ5IGhvdyBk
+dW1wX29wY291bnRfaW5mbygpIHByaW50cwoyNTFiY2Y1N2IzIHRyYWNlOiBTaW1wbGlmeSBob3cg
+c3RfcHJpbnRfdHJhY2VfZmlsZV9zdGF0dXMoKSBwcmludHMKZDgxZmQ2MzAwYyBpbmNsdWRlOiBJ
+bmNsdWRlIGZwcmludGYtZm4uaCBvbmx5IHdoZXJlIG5lZWRlZAoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KMS8xNyBDaGVja2luZyBjb21taXQgZDgxZmQ2MzAwYzQzIChpbmNsdWRlOiBJbmNsdWRlIGZw
+cmludGYtZm4uaCBvbmx5IHdoZXJlIG5lZWRlZCkKMi8xNyBDaGVja2luZyBjb21taXQgMjUxYmNm
+NTdiMzdhICh0cmFjZTogU2ltcGxpZnkgaG93IHN0X3ByaW50X3RyYWNlX2ZpbGVfc3RhdHVzKCkg
+cHJpbnRzKQozLzE3IENoZWNraW5nIGNvbW1pdCAyY2IzNjY1Y2Q1NmMgKHRjZzogU2ltcGxpZnkg
+aG93IGR1bXBfb3Bjb3VudF9pbmZvKCkgcHJpbnRzKQo0LzE3IENoZWNraW5nIGNvbW1pdCA4NjZm
+YzNjMmIwMzAgKHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZXhlY19pbmZvKCkgcHJpbnRzKQo1LzE3
+IENoZWNraW5nIGNvbW1pdCBlMjE1MjdiMTQzZTEgKHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZHJp
+ZnRfaW5mbygpIHByaW50cykKNi8xNyBDaGVja2luZyBjb21taXQgN2FiNTk1ZDE5MzJiIChxc3A6
+IFNpbXBsaWZ5IGhvdyBxc3BfcmVwb3J0KCkgcHJpbnRzKQo3LzE3IENoZWNraW5nIGNvbW1pdCAx
+Nzc2YTNiZTEwNGYgKGJsb2NrL3FhcGk6IENsZWFuIHVwIGhvdyB3ZSBwcmludCB0byBtb25pdG9y
+IG9yIHN0ZG91dCkKOC8xNyBDaGVja2luZyBjb21taXQgZGU0ZmE0NWQxZWJjIChtZW1vcnk6IENs
+ZWFuIHVwIGhvdyBtdHJlZV9pbmZvKCkgcHJpbnRzKQo5LzE3IENoZWNraW5nIGNvbW1pdCBjMjE4
+ZTM0OTZmYzEgKHRhcmdldDogU2ltcGxpZnkgaG93IHRoZSBUQVJHRVRfY3B1X2xpc3QoKSBwcmlu
+dCkKMTAvMTcgQ2hlY2tpbmcgY29tbWl0IDk3ZDgzYmM5ZDEzOSAodGFyZ2V0OiBDbGVhbiB1cCBo
+b3cgdGhlIGR1bXBfbW11KCkgcHJpbnQpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM5NDk6IEZJTEU6IHRhcmdldC94dGVuc2EvbW11X2hlbHBlci5jOjc4NDoKKyAgICAgICAgICAg
+ICAgICAgICAgcWVtdV9wcmludGYoIlx0VmFkZHIgICAgICAgUGFkZHIgICAgICAgQVNJRCAgQXR0
+ciBSV1ggQ2FjaGVcbiIKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODQ4IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDEwLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzE3IENoZWNr
+aW5nIGNvbW1pdCA0NjQ0NGQ2MmY4M2QgKHRhcmdldC9pMzg2OiBTaW1wbGlmeSBob3cgeDg2X2Nw
+dV9kdW1wX2xvY2FsX2FwaWNfc3RhdGUoKSBwcmludHMpCjEyLzE3IENoZWNraW5nIGNvbW1pdCA2
+MjY2YTJhY2JkZGEgKHFvbS9jcHU6IFNpbXBsaWZ5IGhvdyBDUFVDbGFzczo6ZHVtcF9zdGF0aXN0
+aWNzKCkgcHJpbnRzKQoxMy8xNyBDaGVja2luZyBjb21taXQgOWNiMDMyYWE0MWY5IChxZW11LXBy
+aW50OiBOZXcgcWVtdV9mcHJpbnRmKCksIHFlbXVfdmZwcmludGYoKSkKMTQvMTcgQ2hlY2tpbmcg
+Y29tbWl0IDJmZWUzMjJlNmNiOCAocW9tL2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOmNwdV9k
+dW1wX3N0YXRlKCkgcHJpbnRzKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNzc6
+IEZJTEU6IHRhcmdldC9pMzg2L2hlbHBlci5jOjQxOToKKyAgICAgICAgcWVtdV9mcHJpbnRmKGYs
+ICJSQVg9JTAxNiIgUFJJeDY0ICIgUkJYPSUwMTYiIFBSSXg2NCAiIFJDWD0lMDE2IiBQUkl4NjQg
+IiBSRFg9JTAxNiIgUFJJeDY0ICJcbiIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MTA3ODogRklMRTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDIwOgorICAgICAgICAgICAgICAgICAg
+ICAgIlJTST0lMDE2IiBQUkl4NjQgIiBSREk9JTAxNiIgUFJJeDY0ICIgUkJQPSUwMTYiIFBSSXg2
+NCAiIFJTUD0lMDE2IiBQUkl4NjQgIlxuIgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiMxMDc5OiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxwZXIuYzo0MjE6CisgICAgICAgICAgICAgICAg
+ICAgICAiUjggPSUwMTYiIFBSSXg2NCAiIFI5ID0lMDE2IiBQUkl4NjQgIiBSMTA9JTAxNiIgUFJJ
+eDY0ICIgUjExPSUwMTYiIFBSSXg2NCAiXG4iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzEwODA6IEZJTEU6IHRhcmdldC9pMzg2L2hlbHBlci5jOjQyMjoKKyAgICAgICAgICAgICAg
+ICAgICAgICJSMTI9JTAxNiIgUFJJeDY0ICIgUjEzPSUwMTYiIFBSSXg2NCAiIFIxND0lMDE2IiBQ
+Ukl4NjQgIiBSMTU9JTAxNiIgUFJJeDY0ICJcbiIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMTA4MTogRklMRTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDIzOgorICAgICAgICAgICAg
+ICAgICAgICAgIlJJUD0lMDE2IiBQUkl4NjQgIiBSRkw9JTA4eCBbJWMlYyVjJWMlYyVjJWNdIENQ
+TD0lZCBJST0lZCBBMjA9JWQgU01NPSVkIEhMVD0lZFxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMTg5OiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxwZXIuYzo0OTQ6CisgICAg
+ICAgIHFlbXVfZnByaW50ZihmLCAiQ1IwPSUwOHggQ1IyPSUwMTYiIFBSSXg2NCAiIENSMz0lMDE2
+IiBQUkl4NjQgIiBDUjQ9JTA4eFxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiMxNzkwOiBGSUxFOiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoyOTc5MToKKyAgICBxZW11X2Zw
+cmludGYoZiwgIkNQMCBTdGF0dXMgIDB4JTA4eCBDYXVzZSAgIDB4JTA4eCBFUEMgICAgMHgiIFRB
+UkdFVF9GTVRfbHggIlxuIiwKCnRvdGFsOiA1IGVycm9ycywgMiB3YXJuaW5ncywgMjU4MyBsaW5l
+cyBjaGVja2VkCgpQYXRjaCAxNC8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTUvMTcg
+Q2hlY2tpbmcgY29tbWl0IGZjNDY3NTM1ZmU3YSAobW9uaXRvcjogQ2xlYW4gdXAgaG93IG1vbml0
+b3JfZGlzYXMoKSBmdW5uZWxzIG91dHB1dCB0byBtb25pdG9yKQoxNi8xNyBDaGVja2luZyBjb21t
+aXQgM2Y0MGUzMWU2MTRhIChkaXNhczogUmVuYW1lIGluY2x1ZGUvZGlzYXMvYmZkLmggYmFjayB0
+byBpbmNsdWRlL2Rpc2FzL2Rpcy1hc20uaCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk2OiAKcmVuYW1l
+IGZyb20gaW5jbHVkZS9kaXNhcy9iZmQuaAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
+OTIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTcvMTcgQ2hlY2tpbmcgY29tbWl0IGM1N2JmNDA2ZTcyNSAoaW5jbHVkZTogTW92ZSBmcHJpbnRm
+X2Z1bmN0aW9uIHRvIGRpc2FzLykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDQ6IApkZWxldGVkIGZpbGUg
+bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTcgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMTcvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MTExNTI1MjAuMTAwNjEt
+MS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
-> On 11/04/19 16:52, Markus Armbruster wrote:
->> char_pty_open() prints a "char device redirected to PTY_NAME (label
->> LABEL)" message to the current monitor or else to stderr.  No other
->> ChardevClass::open() prints anything on success.  Drop the message.
->>=20
->> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  chardev/char-pty.c | 2 --
->>  1 file changed, 2 deletions(-)
->>=20
->> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
->> index b034332edd..a48d3e5d20 100644
->> --- a/chardev/char-pty.c
->> +++ b/chardev/char-pty.c
->> @@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
->>      qemu_set_nonblock(master_fd);
->>=20=20
->>      chr->filename =3D g_strdup_printf("pty:%s", pty_name);
->> -    error_printf("char device redirected to %s (label %s)\n",
->> -                 pty_name, chr->label);
->>=20=20
->>      s =3D PTY_CHARDEV(chr);
->>      s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
->
-> The reason for the message is that the char device is completely useless
-> until the user knows the /dev/pts/N path[1].  You can get it with "info
-> chardev" (aka query-chardev for QMP) but there's an interesting chicken
-> and egg problem if the pty is for your monitor...
->
-> Paolo
-
-During review of v1, I wrote:
-
-    If we should decide the message is still useful enough to be worth
-    keeping, I could direct it to stdout instead of dropping it.
-
-No clear conclusion emerged, so I did nothing for v2.  If we conclude to
-keep the message now, I'll gladly do that.
-
-> [1] once you know it, you can use the monitor's readline interface with
-> e.g. "socat STDIO,cfmakeraw FILE:/dev/pts/1"
-
-There's also
-
-    $ socat UNIX:/path/to/socket READLINE,history=3D$HOME/.hmp_history,prom=
-pt=3D'(qemu) '
-
-Lacks completion.  But then our very own reimplementation of readline
-lacks any number of other features.
 
