@@ -2,62 +2,59 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8D8C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3033C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0D562184B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:01:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D562184B
+	by mail.kernel.org (Postfix) with ESMTPS id 940112133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:02:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940112133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46401 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46405 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXSm-0002c6-3N
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:01:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34499)
+	id 1hEXT3-0002ko-7M
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:02:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hEXHv-0001ma-2Y
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:36 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsj-0002Us-UF
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hEXHt-0006fX-W5
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43696)
+	(envelope-from <david@redhat.com>) id 1hEWdO-00075z-Oc
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:08:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>)
-	id 1hEXHr-0006dB-Bo; Thu, 11 Apr 2019 06:50:31 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hEWdO-00075f-EI; Thu, 11 Apr 2019 06:08:42 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2FCD88AC8;
-	Thu, 11 Apr 2019 10:50:30 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-116-245.ams2.redhat.com
-	[10.36.116.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1EF461001E67;
-	Thu, 11 Apr 2019 10:50:28 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A02E3D956;
+	Thu, 11 Apr 2019 10:08:40 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 048441001E71;
+	Thu, 11 Apr 2019 10:08:36 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:50:25 +0200
-Message-Id: <20190411105025.97397-2-sgarzare@redhat.com>
-In-Reply-To: <20190411105025.97397-1-sgarzare@redhat.com>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
+Date: Thu, 11 Apr 2019 12:07:55 +0200
+Message-Id: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Thu, 11 Apr 2019 10:50:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Thu, 11 Apr 2019 10:08:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically the
- image size
+Subject: [Qemu-devel] [PATCH v1 00/41] s390x/tcg: Vector Instruction Support
+ Part 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,87 +66,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411105025.FuZ5Qm8bd8QIdDQ1QcdXNRKBy3DM8Ud2pGg5BOXBqH0@z>
+Message-ID: <20190411100755.6C-5-5Nqo6xFe3hMV2hNXdu_VpJWbzY2IJjNHfOw-yY@z>
 
-RBD APIs don't allow us to write more than the size set with rbd_create()
-or rbd_resize().
-In order to support growing images (eg. qcow2), we resize the image
-before RW operations that exceed the current size.
+This is the second part of vector instruction support for s390x. It is
+based on the series soon to land upstream:
+    [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1171007
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- block/rbd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Part 1: Vector Support Instructions
+Part 2: Vector Integer Instructions
+Part 3: Vector String Instructions
+Part 4: Vector Floating-Point Instructions
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..228658e20a 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
-     rbd_image_t image;
-     char *image_name;
-     char *snap;
-+    uint64_t image_size;
- } BDRVRBDState;
-=20
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-@@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict=
- *options, int flags,
-         goto failed_open;
-     }
-=20
-+    r =3D rbd_get_size(s->image, &s->image_size);
-+    if (r < 0) {
-+        error_setg_errno(errp, -r, "error reading image size from %s",
-+                         s->image_name);
-+        rbd_close(s->image);
-+        goto failed_open;
-+    }
-+
-     /* If we are using an rbd snapshot, we must be r/o, otherwise
-      * leave as-is */
-     if (s->snap !=3D NULL) {
-@@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *b=
-s,
-         rcb->buf =3D acb->bounce;
-     }
-=20
-+    /*
-+     * RBD APIs don't allow us to write more than actual size, so in ord=
-er
-+     * to support growing images, we resize the image before RW operatio=
-ns
-+     * that exceed the current size.
-+     */
-+    if (s->image_size < off + size) {
-+        r =3D rbd_resize(s->image, off + size);
-+        if (r < 0) {
-+            goto failed;
-+        }
-+
-+        s->image_size =3D off + size;
-+    }
-+
-     acb->ret =3D 0;
-     acb->error =3D 0;
-     acb->s =3D s;
-@@ -1066,6 +1089,8 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-         return r;
-     }
-=20
-+    s->image_size =3D offset;
-+
-     return 0;
- }
-=20
+The current state can be found at (kept updated):
+    https://github.com/davidhildenbrand/qemu/tree/vx
+
+With the current state I can boot Linux kernel + user space compiled with
+SIMD support. This allows to boot distributions compiled exclusively for
+z13, requiring SIMD support. Also, it is now possible to build a complete
+kernel using rpmbuild as quite some issues have been sorted out.
+
+In this part, all Vector Integer Instructions introduced with the
+"Vector Facility" are added. Some instructions part of the Vector Extensi=
+on
+Facilities are also added.
+
+David Hildenbrand (41):
+  tcg: Implement tcg_gen_gvec_3i()
+  s390x/tcg: Implement VECTOR ADD
+  s390x/tcg: Implement VECTOR ADD COMPUTE CARRY
+  s390x/tcg: Implement VECTOR ADD WITH CARRY
+  s390x/tcg: Implement VECTOR ADD WITH CARRY COMPUTE CARRY
+  s390x/tcg: Implement VECTOR AND (WITH COMPLEMENT)
+  s390x/tcg: Implement VECTOR AVERAGE
+  s390x/tcg: Implement VECTOR AVERAGE LOGICAL
+  s390x/tcg: Implement VECTOR CHECKSUM
+  s390x/tcg: Implement VECTOR ELEMENT COMPARE *
+  s390x/tcg: Implement VECTOR COMPARE *
+  s390x/tcg: Implement VECTOR COUNT LEADING ZEROS
+  s390x/tcg: Implement VECTOR COUNT TRAILING ZEROS
+  s390x/tcg: Implement VECTOR EXCLUSIVE OR
+  s390x/tcg: Implement VECTOR GALOIS FIELD MULTIPLY SUM (AND ACCUMULATE)
+  s390x/tcg: Implement VECTOR LOAD COMPLEMENT
+  s390x/tcg: Implement VECTOR LOAD POSITIVE
+  s390x/tcg: Implement VECTOR (MAXIMUM|MINIMUM) (LOGICAL)
+  s390x/tcg: Implement VECTOR MULTIPLY AND ADD *
+  s390x/tcg: Implement VECTOR MULTIPLY *
+  s390x/tcg: Implement VECTOR NAND
+  s390x/tcg: Implement VECTOR NOR
+  s390x/tcg: Implement VECTOR NOT EXCLUSIVE OR
+  s390x/tcg: Implement VECTOR OR
+  s390x/tcg: Implement VECTOR OR WITH COMPLEMENT
+  s390x/tcg: Implement VECTOR POPULATION COUNT
+  s390x/tcg: Implement VECTOR ELEMENT ROTATE LEFT LOGICAL
+  s390x/tcg: Implement VECTOR ELEMENT ROTATE AND INSERT UNDER MASK
+  s390x/tcg: Implement VECTOR ELEMENT SHIFT
+  s390x/tcg: Implement VECTOR SHIFT LEFT (BY BYTE)
+  s390x/tcg: Implement VECTOR SHIFT LEFT DOUBLE BY BYTE
+  s390x/tcg: Implement VECTOR SHIFT RIGHT ARITHMETIC
+  s390x/tcg: Implement VECTOR SHIFT RIGHT LOGICAL *
+  s390x/tcg: Implement VECTOR SUBTRACT
+  s390x/tcg: Implement VECTOR SUBTRACT COMPUTE BORROW INDICATION
+  s390x/tcg: Implement VECTOR SUBTRACT WITH BORROW INDICATION
+  s390x/tcg: Implement VECTOR SUBTRACT WITH BORROW COMPUTE BORROW
+    INDICATION
+  s390x/tcg: Implement VECTOR SUM ACROSS DOUBLEWORD
+  s390x/tcg: Implement VECTOR SUM ACROSS QUADWORD
+  s390x/tcg: Implement VECTOR SUM ACROSS WORD
+  s390x/tcg: Implement VECTOR TEST UNDER MASK
+
+ target/s390x/Makefile.objs      |    2 +-
+ target/s390x/cc_helper.c        |   17 +
+ target/s390x/helper.c           |    1 +
+ target/s390x/helper.h           |   91 ++
+ target/s390x/insn-data.def      |  137 +++
+ target/s390x/internal.h         |    1 +
+ target/s390x/translate.c        |    2 +
+ target/s390x/translate_vx.inc.c | 1393 +++++++++++++++++++++++++++++++
+ target/s390x/vec_int_helper.c   |  839 +++++++++++++++++++
+ tcg/tcg-op-gvec.c               |  139 +++
+ tcg/tcg-op-gvec.h               |   24 +
+ 11 files changed, 2645 insertions(+), 1 deletion(-)
+ create mode 100644 target/s390x/vec_int_helper.c
+
 --=20
 2.20.1
 
