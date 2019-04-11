@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38965)
+Received: from eggs.gnu.org ([209.51.188.92]:38997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kw-1b
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4c-0003Mn-Tm
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4X-0000lu-42
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4W-0000l0-QP
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4Y-0000n3-RN
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:51 +0200
-Message-Id: <20190411145256.8614-11-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:42 +0200
+Message-Id: <20190411145256.8614-2-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/15] vl: Make -machine $TYPE,
- help and -accel help print to stdout
+Subject: [Qemu-devel] [PATCH v2 01/15] qemu-img: Use error_vreport() in
+ error_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +21,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Command line help help explicitly requested by the user should be
-printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
-$TYPE,help and -accel help to match: use printf() instead of
-error_printf().
+error_exit() uses low-level error_printf() to report errors.
+Modernize it to use error_vreport().
 
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- vl.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ qemu-img.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index c696ad2a13..fdfa1c7453 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
-             continue;
-         }
+diff --git a/qemu-img.c b/qemu-img.c
+index aa6f81f1ea..55201fb913 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -85,13 +85,11 @@ static void QEMU_NORETURN GCC_FMT_ATTR(1, 2) error_exit(const char *fmt, ...)
+ {
+     va_list ap;
  
--        error_printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
--                     prop->name, prop->type);
-+        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
-+               prop->name, prop->type);
-         if (prop->description) {
--            error_printf(" (%s)\n", prop->description);
-+            printf(" (%s)\n", prop->description);
-         } else {
--            error_printf("\n");
-+            printf("\n");
-         }
-     }
+-    error_printf("qemu-img: ");
+-
+     va_start(ap, fmt);
+-    error_vprintf(fmt, ap);
++    error_vreport(fmt, ap);
+     va_end(ap);
  
-@@ -3643,7 +3643,7 @@ int main(int argc, char **argv, char **envp)
-                                                      optarg, true);
-                 optarg = qemu_opt_get(accel_opts, "accel");
-                 if (!optarg || is_help_option(optarg)) {
--                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
-+                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
-                     exit(0);
-                 }
-                 opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
+-    error_printf("\nTry 'qemu-img --help' for more information\n");
++    error_printf("Try 'qemu-img --help' for more information\n");
+     exit(EXIT_FAILURE);
+ }
+ 
 -- 
 2.17.2
