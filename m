@@ -6,59 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF68DC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC49C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:25:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3DD12133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:25:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3DD12133D
+	by mail.kernel.org (Postfix) with ESMTPS id AA0B32133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA0B32133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45680 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45700 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEWth-000427-Ob
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:25:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54388)
+	id 1hEWu5-0004R9-RJ
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:25:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEWrq-0002Us-Nq
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:23:40 -0400
+	(envelope-from <david@redhat.com>) id 1hEWs8-0002dl-NG
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:23:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEWox-0003X1-4W
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:20:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47028)
+	(envelope-from <david@redhat.com>) id 1hEWf0-0007oi-En
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:10:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hEWov-0003Vm-Be; Thu, 11 Apr 2019 06:20:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hEWf0-0007oS-3v; Thu, 11 Apr 2019 06:10:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DCBB5AFF4;
-	Thu, 11 Apr 2019 10:20:36 +0000 (UTC)
-Received: from localhost (ovpn-204-124.brq.redhat.com [10.40.204.124])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DA35B5D704;
-	Thu, 11 Apr 2019 10:20:28 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 11 Apr 2019 12:20:25 +0200
-Message-Id: <20190411102025.22559-1-cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+	by mx1.redhat.com (Postfix) with ESMTPS id 62D663091740;
+	Thu, 11 Apr 2019 10:10:21 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0D8E21001E71;
+	Thu, 11 Apr 2019 10:10:19 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 12:08:36 +0200
+Message-Id: <20190411100836.646-42-david@redhat.com>
+In-Reply-To: <20190411100836.646-1-david@redhat.com>
+References: <20190411100836.646-1-david@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 11 Apr 2019 10:20:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 11 Apr 2019 10:10:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
+Subject: [Qemu-devel] [PATCH v1 41/41] s390x/tcg: Implement VECTOR TEST
+ UNDER MASK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,240 +68,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
-	qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411102025.X3XvrQ2gJcH8PdmUpeQZbErH6V1aqBUG8UslCMPPBGA@z>
+Message-ID: <20190411100836.MypdY7s9d9a5d-2ClHGhUyPbFbCE3a18RxH_R4DaO0M@z>
 
-Add 4.1 machine types for arm/i440fx/q35/s390x/spapr.
+Let's return the cc value directly via cpu_env. Unfortunately there
+isn't a simple way to calculate the value lazily - one would have to
+calculate and store e.g. the population count of the mask and the
+result so it can be evaluated in a cc helper.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+But as VTM only sets the cc, we can assume the value will be needed soon
+either way.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
+ target/s390x/helper.h           |  1 +
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 11 +++++++++++
+ target/s390x/vec_int_helper.c   | 18 ++++++++++++++++++
+ 4 files changed, 32 insertions(+)
 
-IIRC, we agreed last time that we want to merge a patch introducing
-the new compat machines first thing in a new development cycle. So
-here's that patch for 4.1.
-
----
- hw/arm/virt.c              |  9 ++++++++-
- hw/core/machine.c          |  3 +++
- hw/i386/pc.c               |  3 +++
- hw/i386/pc_piix.c          | 14 +++++++++++++-
- hw/i386/pc_q35.c           | 13 ++++++++++++-
- hw/ppc/spapr.c             | 15 +++++++++++++--
- hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
- include/hw/boards.h        |  3 +++
- include/hw/i386/pc.h       |  3 +++
- 9 files changed, 71 insertions(+), 6 deletions(-)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index ce2664a30b7f..16ba67f7a768 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1978,10 +1978,17 @@ static void machvirt_machine_init(void)
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index d040e4cd07..200d1730f4 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -234,6 +234,7 @@ DEF_HELPER_FLAGS_4(gvec_vscbi8, TCG_CALL_NO_RWG, void=
+, ptr, cptr, cptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_vscbi16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
+ DEF_HELPER_FLAGS_4(gvec_vscbi128, TCG_CALL_NO_RWG, void, ptr, cptr, cptr=
+, i32)
+ DEF_HELPER_FLAGS_5(gvec_vsbcbi128, TCG_CALL_NO_RWG, void, ptr, cptr, cpt=
+r, cptr, i32)
++DEF_HELPER_4(gvec_vtm, void, ptr, cptr, env, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index a52db41388..e61475bdc4 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1188,6 +1188,8 @@
+     F(0xe767, VSUMQ,   VRR_c, V,   0, 0, 0, 0, vsumq, 0, IF_VEC)
+ /* VECTOR SUM ACROSS WORD */
+     F(0xe764, VSUM,    VRR_c, V,   0, 0, 0, 0, vsum, 0, IF_VEC)
++/* VECTOR TEST UNDER MASK */
++    F(0xe7d8, VTM,     VRR_a, V,   0, 0, 0, 0, vtm, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 59a9885892..eacf68ec28 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -191,6 +191,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+ #define gen_gvec_2i_ool(v1, v2, c, data, fn) \
+     tcg_gen_gvec_2i_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2)=
+, \
+                         c, 16, 16, data, fn)
++#define gen_gvec_2_ptr(v1, v2, ptr, data, fn) \
++    tcg_gen_gvec_2_ptr(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
+ \
++                       ptr, 16, 16, data, fn)
+ #define gen_gvec_3(v1, v2, v3, gen) \
+     tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
+                    vec_full_reg_offset(v3), 16, 16, gen)
+@@ -2315,3 +2318,11 @@ static DisasJumpType op_vsum(DisasContext *s, Disa=
+sOps *o)
+     tcg_temp_free_i32(tmp);
+     return DISAS_NEXT;
  }
- type_init(machvirt_machine_init);
- 
-+static void virt_machine_4_1_options(MachineClass *mc)
++
++static DisasJumpType op_vtm(DisasContext *s, DisasOps *o)
 +{
++    gen_gvec_2_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
++                   cpu_env, 0, gen_helper_gvec_vtm);
++    set_cc_static(s);
++    return DISAS_NEXT;
 +}
-+DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
-+
- static void virt_machine_4_0_options(MachineClass *mc)
- {
-+    virt_machine_4_1_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
+c
+index 95686e79fd..f5bdaff633 100644
+--- a/target/s390x/vec_int_helper.c
++++ b/target/s390x/vec_int_helper.c
+@@ -819,3 +819,21 @@ void HELPER(gvec_vsbcbi128)(void *v1, const void *v2=
+, const void *v3,
+     dst->doubleword[0] =3D 0;
+     dst->doubleword[1] =3D borrow;
  }
--DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
-+DEFINE_VIRT_MACHINE(4, 0)
- 
- static void virt_machine_3_1_options(MachineClass *mc)
- {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 743fef28982c..5d046a43e3d2 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -24,6 +24,9 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
- 
-+GlobalProperty hw_compat_4_0[] = {};
-+const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
 +
- GlobalProperty hw_compat_3_1[] = {
-     { "pcie-root-port", "x-speed", "2_5" },
-     { "pcie-root-port", "x-width", "1" },
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f2c15bf1f2c3..868303cf6427 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -115,6 +115,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
- /* Physical Address of PVH entry point read from kernel ELF NOTE */
- static size_t pvh_start_addr;
- 
-+GlobalProperty pc_compat_4_0[] ={};
-+const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
-+
- GlobalProperty pc_compat_3_1[] = {
-     { "intel-iommu", "dma-drain", "off" },
-     { "Opteron_G3" "-" TYPE_X86_CPU, "rdtscp", "off" },
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 8ad8e885c6b1..2a7700b564d3 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -428,13 +428,25 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
- 
--static void pc_i440fx_4_0_machine_options(MachineClass *m)
-+static void pc_i440fx_4_1_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v4_1, "pc-i440fx-4.1", NULL,
-+                      pc_i440fx_4_1_machine_options);
-+
-+static void pc_i440fx_4_0_machine_options(MachineClass *m)
++void HELPER(gvec_vtm)(void *v1, const void *v2, CPUS390XState *env,
++                      uint32_t desc)
 +{
-+    pc_i440fx_4_1_machine_options(m);
-+    m->alias = NULL;
-+    m->is_default = 0;
-+    compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-+    compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
++    S390Vector tmp;
++
++    s390_vec_and(&tmp, v1, v2);
++    if (s390_vec_is_zero(&tmp)) {
++        /* Selected bits all zeros; or all mask bits zero */
++        env->cc_op =3D 0;
++    } else if (s390_vec_equal(&tmp, v2)) {
++        /* Selected bits all ones */
++        env->cc_op =3D 3;
++    } else {
++        /* Selected bits a mix of zeros and ones */
++        env->cc_op =3D 1;
++    }
 +}
-+
- DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
-                       pc_i440fx_4_0_machine_options);
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 372c6b73bebd..37dd350511a9 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -365,12 +365,23 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_4_0_machine_options(MachineClass *m)
-+static void pc_q35_4_1_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
- }
- 
-+DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-+                   pc_q35_4_1_machine_options);
-+
-+static void pc_q35_4_0_machine_options(MachineClass *m)
-+{
-+    pc_q35_4_1_machine_options(m);
-+    m->alias = NULL;
-+    compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-+    compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
-+}
-+
- DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
-                    pc_q35_4_0_machine_options);
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b52b82d298ef..8438741ec23c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4344,15 +4344,26 @@ static const TypeInfo spapr_machine_info = {
-     }                                                                \
-     type_init(spapr_machine_register_##suffix)
- 
-+/*
-+ * pseries-4.1
-+ */
-+static void spapr_machine_4_1_class_options(MachineClass *mc)
-+{
-+    /* Defaults for the latest behaviour inherited from the base class */
-+}
-+
-+DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
-+
- /*
-  * pseries-4.0
-  */
- static void spapr_machine_4_0_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    spapr_machine_4_1_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
- }
- 
--DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-+DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
- 
- /*
-  * pseries-3.1
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index d11069b860b4..02470e78c74d 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -646,14 +646,26 @@ bool css_migration_enabled(void)
-     }                                                                         \
-     type_init(ccw_machine_register_##suffix)
- 
-+static void ccw_machine_4_1_instance_options(MachineState *machine)
-+{
-+}
-+
-+static void ccw_machine_4_1_class_options(MachineClass *mc)
-+{
-+}
-+DEFINE_CCW_MACHINE(4_1, "4.1", true);
-+
- static void ccw_machine_4_0_instance_options(MachineState *machine)
- {
-+    ccw_machine_4_1_instance_options(machine);
- }
- 
- static void ccw_machine_4_0_class_options(MachineClass *mc)
- {
-+    ccw_machine_4_1_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
- }
--DEFINE_CCW_MACHINE(4_0, "4.0", true);
-+DEFINE_CCW_MACHINE(4_0, "4.0", false);
- 
- static void ccw_machine_3_1_instance_options(MachineState *machine)
- {
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index e231860666a1..fe1885cbffa0 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -293,6 +293,9 @@ struct MachineState {
-     } \
-     type_init(machine_initfn##_register_types)
- 
-+extern GlobalProperty hw_compat_4_0[];
-+extern const size_t hw_compat_4_0_len;
-+
- extern GlobalProperty hw_compat_3_1[];
- extern const size_t hw_compat_3_1_len;
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index ca65ef18afb4..43df7230a22b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
-+extern GlobalProperty pc_compat_4_0[];
-+extern const size_t pc_compat_4_0_len;
-+
- extern GlobalProperty pc_compat_3_1[];
- extern const size_t pc_compat_3_1_len;
- 
--- 
-2.17.2
+--=20
+2.20.1
 
 
