@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54884)
+Received: from eggs.gnu.org ([209.51.188.92]:54895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsS-000390-D9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:17 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsT-00039p-Fm
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWeM-0007Wi-G5
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:43 -0400
+	(envelope-from <david@redhat.com>) id 1hEWeF-0007Tq-K6
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:36 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 11 Apr 2019 12:08:21 +0200
-Message-Id: <20190411100836.646-27-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:19 +0200
+Message-Id: <20190411100836.646-25-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 26/41] s390x/tcg: Implement VECTOR
- POPULATION COUNT
+Subject: [Qemu-devel] [PATCH v1 24/41] s390x/tcg: Implement VECTOR OR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +24,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Similar to VECTOR COUNT TRAILING ZEROES.
+Reuse a gvec helper.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 19 +++++++++++++++++++
- target/s390x/vec_int_helper.c   | 14 ++++++++++++++
- 4 files changed, 37 insertions(+)
+ target/s390x/insn-data.def      | 2 ++
+ target/s390x/translate_vx.inc.c | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index a44cc462ae..a306378950 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -200,6 +200,8 @@ DEF_HELPER_FLAGS_4(gvec_vmo32, TCG_CALL_NO_RWG, void,=
- ptr, cptr, cptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vmlo8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vmlo16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
- DEF_HELPER_FLAGS_4(gvec_vmlo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
-+DEF_HELPER_FLAGS_3(gvec_vpopct8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vpopct16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 52171252be..0f786d6ab1 100644
+index b549b76b96..fb74374a0a 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1144,6 +1144,8 @@
-     F(0xe76a, VO,      VRR_c, V,   0, 0, 0, 0, vo, 0, IF_VEC)
- /* VECTOR OR WITH COMPLEMENT */
-     F(0xe76f, VOC,     VRR_c, VE,  0, 0, 0, 0, voc, 0, IF_VEC)
-+/* VECTOR POPULATION COUNT */
-+    F(0xe750, VPOPCT,  VRR_a, V,   0, 0, 0, 0, vpopct, 0, IF_VEC)
+@@ -1140,6 +1140,8 @@
+     F(0xe76b, VNO,     VRR_c, V,   0, 0, 0, 0, vno, 0, IF_VEC)
+ /* VECTOR NOT EXCLUSIVE OR */
+     F(0xe76c, VNX,     VRR_c, VE,  0, 0, 0, 0, vnx, 0, IF_VEC)
++/* VECTOR OR */
++    F(0xe76a, VO,      VRR_c, V,   0, 0, 0, 0, vo, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 08ebc7fc4c..df17b8242d 100644
+index df6cf514b2..b0b54a49a3 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1824,3 +1824,22 @@ static DisasJumpType op_voc(DisasContext *s, Disas=
+@@ -1810,3 +1810,10 @@ static DisasJumpType op_vnx(DisasContext *s, Disas=
 Ops *o)
                    get_field(s->fields, v3));
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vpopct(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vo(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m3);
-+    static const GVecGen2 g[4] =3D {
-+        { .fno =3D gen_helper_gvec_vpopct8, },
-+        { .fno =3D gen_helper_gvec_vpopct16, },
-+        { .fni4 =3D tcg_gen_ctpop_i32, },
-+        { .fni8 =3D tcg_gen_ctpop_i64, },
-+    };
-+
-+    if (es > ES_64 || (es !=3D ES_8 && !s390_has_feat(S390_FEAT_VECTOR_E=
-NH))) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
++    gen_gvec_fn_3(or, ES_8, get_field(s->fields, v1), get_field(s->field=
+s, v2),
++                  get_field(s->fields, v3));
 +    return DISAS_NEXT;
 +}
-diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
-c
-index b818c513a9..f49d5c2ffb 100644
---- a/target/s390x/vec_int_helper.c
-+++ b/target/s390x/vec_int_helper.c
-@@ -526,3 +526,17 @@ void HELPER(gvec_vmlo##BITS)(void *v1, const void *v=
-2, const void *v3,         \
- DEF_VMLO(8, 16)
- DEF_VMLO(16, 32)
- DEF_VMLO(32, 64)
-+
-+#define DEF_VPOPCT(BITS)                                                =
-       \
-+void HELPER(gvec_vpopct##BITS)(void *v1, const void *v2, uint32_t desc) =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, ctpop32(a));                =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VPOPCT(8)
-+DEF_VPOPCT(16)
 --=20
 2.20.1
