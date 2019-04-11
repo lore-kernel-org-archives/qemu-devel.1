@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35254)
+Received: from eggs.gnu.org ([209.51.188.92]:35605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEfuG-0006Sr-Op
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:02:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfvn-0007AR-GN
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hEfuE-0001fV-7Y
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:02:44 -0400
-References: <20190410012413.31569-1-jsnow@redhat.com>
-	<20190410012413.31569-3-jsnow@redhat.com>
-	<87sguq2yn1.fsf@dusky.pond.sub.org>
-	<004289a6-9df9-ae99-53e6-56e555709434@redhat.com>
-	<87a7gxukmj.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <01d9a861-cc2a-38a0-c471-cfefa9dbbf3b@redhat.com>
-Date: Thu, 11 Apr 2019 16:02:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfvl-0002VW-GC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:04:19 -0400
+References: <20190404091725.20595-1-dgilbert@redhat.com>
+	<20190404091957.GL10471@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <87f831be-0707-2820-8378-e0cf617fa3c7@vivier.eu>
+Date: Thu, 11 Apr 2019 22:03:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <87a7gxukmj.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190404091957.GL10471@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] pxtool: Add new qemu-img command
- info generation tool
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] configure: fix pam test
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 4/11/19 2:22 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
+On 04/04/2019 11:19, Daniel P. Berrangé wrote:
+> CC trivial
 > 
->> On 4/10/19 1:54 AM, Markus Armbruster wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>
->>>> Presently we use hxtool and a .hx format to generate a few things like
->>>> the qemu_img subcommand dispatch table, the qemu_img help() display output,
->>>> and a help output in qemu-img.texi.
->>>>
->>>> Unfortunately, this means that this information is duplicated in at least
->>>> three places:
->>>>
->>>> (1) in qemu-img-cmds.hx as a human readable string
->>>> (2) in qemu-img-cmds.hx as a texi string
->>>> (3) in qemu-img.texi again, as a texi string
->>>>
->>>> We can do a little better, though: all of these sources can be generated
->>>> from a single json file. Add a new small tool ("pxtool") that can do this.
->>>>
->>>> This tool can at least handle generating (1) and (2) from the same source
->>>> without needing to reduplicate that information. Deduplicating (3) happens
->>>> in the next patch.
->>>>
->>>> Notes:
->>>>  - The json format was chosen to be very "stupid", and the command line
->>>>    documentation is being kept one-per-line to make future diffs easier
->>>>    to read.
->>>>  - It's easy enough to generate the human-readable output from the texi
->>>>    output by removing '@var{foo}' with 'foo'.
->>>>  - The qemu-img command dispatch always calls img_cmdname, so we don't
->>>>    need to store this information separately, either.
->>>>  - The need for DEF() macros could be removed as well, but I left it in
->>>>    to create a minimally disruptive patch.
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>
->>> We got just five .hx:
->>>
->>>     qemu-img.cmds.hx            killed off by this patch
->>>     qemu-options.hx             CLI QAPIfication should kill this off
->>>     hw/audio/pl041.hx           misnamed, not actually food for hxtool
->>>     hmp-commands.hx             no exit strategy
->>>     hmp-commands-info.hx            for these two, yet
->>>
->>> CLI QAPIfication got stuck in the back-burner, and as long as that's the
->>> case, it's not an alternative to your patches.
->>>
+> On Thu, Apr 04, 2019 at 10:17:25AM +0100, Dr. David Alan Gilbert (git) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >>
->> Good to know. I figure that at least while we wait on something more
->> comprehensive there's no real short term harm in tidying up.
+>> The pam test generates a warning on Fedora 29 with -O3 compilation
+>> because the headers declare that the pam_conversation pointer to
+>> pam_start must be non-NULL.  Change it to use the same 0 initialised
+>> structure as we actually use in qauthz.
 >>
->> Something I'd really like to do is define a python/json-esque
->> configuration file that allows you to specify some "common options" that
->> are shared between all of the sub-commands, and then define each command
->> in terms of both which common options it possesses, and then any local
->> command-specific options it has.
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>  configure | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Acked-by: Daniel P. Berrangé <berrange@redhat.com>
+> 
 >>
->> (Why the common options design? So that argument names and command
->> options can be encouraged to be identical and identically documented
->> between all subcommands that use them.)
+>> diff --git a/configure b/configure
+>> index 1c563a7027..73f7ad2be0 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2946,9 +2946,9 @@ if test "$auth_pam" != "no"; then
+>>  int main(void) {
+>>     const char *service_name = "qemu";
+>>     const char *user = "frank";
+>> -   const struct pam_conv *pam_conv = NULL;
+>> +   const struct pam_conv pam_conv = { 0 };
+>>     pam_handle_t *pamh = NULL;
+>> -   pam_start(service_name, user, pam_conv, &pamh);
+>> +   pam_start(service_name, user, &pam_conv, &pamh);
+>>     return 0;
+>>  }
+>>  EOF
 > 
-> In QAPI, you'd define a common base type.
-> 
->> Then, from the configuration file, generate all of the necessary C
->> parsers (I have a protoype for this, it's not difficult to do in at
->> least the basic case) that can return boxed command arguments, and then
->> also generate the help strings from that metadata.
-> 
-> With QAPI, we generate reference documentation from the doc comments.
-> 
-> My RFC patches for command line QAPIfication generate a CLI parser using
-> getopt_long_only().
-> 
-> They keep help texts in the QAPI schema.  Generating their formal part
-> from the type definition should be feasible.  Generating it without
-> regressing readability might turn out to be non-trivial.
-> 
-> My patches generate *one* CLI parser.  We have many, and some of them
-> want to share types.  There's more than one way to skin this cat, but
-> it'll have to be skinned.
-> 
->> I suspect that work *IS* something that might brush up against / should
->> use (or extend) QAPI code.
-> 
-> Seems likely.
-> 
->> Then, I'd like to find a way to split qemu-img.texi into sub-command
->> files and find a way to source the same "informative text" for both:
->>
->> (1) The texi output, as per usual, and
->> (2) qemu-img subcommand --help
->>
->> such that --help, when passed as an argument to the subcommand, prints
->> out help only relevant to the subcommand instead, e.g.
->>
->> `qemu-img check --help`
->>
->> might print the "common options" section only as it relates to commands
->> actually used by the check command, then prints the check section of the
->> texi as formatted for terminals.
->>
->> This way, we can have manpages, html pages, and interactive help text
->> all derived from the same semi-automated sources, always up to date and
->> much easier to read/discover/parse by human eyeballs.
->>
->> That's what I'd like to accomplish, ultimately.
->>
->> For now, I think this RFC set is not harmful and won't bother anybody.
->> It's definitely not worse than what we have now, fragility of removing
->> @var{} tokens and all.
-> 
-> Makes sense.  I just hope we can avoid duplicating work.
+> Regards,
+> Daniel
 > 
 
-I'm not going to proceed any further than this RFC without us having a
-meeting to discuss the work. I'm willing to learn QAPI and do it a bit,
-it's a thread I'd rather like to pull, but I don't want to duplicate any
-work, no.
+Applied to my trivial-patches branch.
 
-If that involves me reviewing patches when the tree opens, please CC me,
-and let's have a chat!
-
-In the meantime, what are your thoughts on patches 2-3 here?
-
---js
+Thanks,
+Laurent
