@@ -2,65 +2,59 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFCEC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F30FC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 980692133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:08:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Yec+rCcM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980692133D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD5372083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:09:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5372083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46527 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46543 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXYl-0007ff-Sv
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:07:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57467)
+	id 1hEXa8-0008R6-VI
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:09:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEWzd-0001rK-3o
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:31:41 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hEXHu-0001lg-3q
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEWza-00019q-6t
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:31:41 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:58158)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hEWzY-00018w-N8; Thu, 11 Apr 2019 06:31:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=6jPcdCh+D0eHM7v/rQNV1UNA7MLiHHVPfEZ8pRY6jMk=; 
-	b=Yec+rCcM5P7pS4jbdtqOSE5pBw5UeufB6ezhk7w4j9V3FeSHgNraeq3AhJFHPc0kqSgUBbWIEc9Q2rW0B+wbtDYnd5GVKLtJaAanngktumSmD8I/RYqMnWD5RuMmLKcg+5PO8Q52ERyOWfj8G2mdAX6Pi+EyAw2eiNLUYi1O5ymp1kjB3W78D21nzgpU+l/+WNKQgVthSOVlY+bxYLc2jsZ4apAx7fz2dAznuMcm6QbYIqrkLX6PD8O8ipAfcr736jsaiGjhUYbmL1DyEFbJ/2SHJ7IPE8SRtiJ5MCg1y72duURTrwU6MesYfet11XeFzq+yYG21PY1v09JR9/ZSLg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hEWzV-000311-IF; Thu, 11 Apr 2019 12:31:33 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hEWzV-0004vW-FD; Thu, 11 Apr 2019 12:31:33 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-In-Reply-To: <bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
-References: <20190410152429.8076-1-berto@igalia.com>
-	<bc400e47-0140-1983-9a1b-16eb1f30fdb3@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Thu, 11 Apr 2019 12:31:33 +0200
-Message-ID: <w51bm1cvnne.fsf@maestria.local.igalia.com>
+	(envelope-from <sgarzare@redhat.com>) id 1hEXHt-0006fH-4h
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:50:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39289)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>)
+	id 1hEXHq-0006ZF-RO; Thu, 11 Apr 2019 06:50:31 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C136CAC08E;
+	Thu, 11 Apr 2019 10:50:28 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-116-245.ams2.redhat.com
+	[10.36.116.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 39F1B1001E67;
+	Thu, 11 Apr 2019 10:50:25 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 12:50:24 +0200
+Message-Id: <20190411105025.97397-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH for-4.1] commit: Make base read-only if
- there is an early failure
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Thu, 11 Apr 2019 10:50:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH RFC 0/1] block/rbd: increase dynamically the
+ image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,24 +66,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411103133.hskPuKvAwCYEwvbLmJFE_RaJ3tflxS5VpiPOH7JNlYE@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411105024.zrDG1Qgn67bhV4zlRRRI703D0Ih-jsFP_IpueYmd9L4@z>
 
-On Wed 10 Apr 2019 05:32:47 PM CEST, Eric Blake wrote:
-> On 4/10/19 10:24 AM, Alberto Garcia wrote:
->> You can reproduce this by passing an invalid filter-node-name (like
->> "1234") to block-commit. In this case the base image is put in
->> read-write mode but is never reset back to read-only.
->
-> Is it worth iotest coverage?
+RBD APIs don't allow us to write more than the maximum size of the file s=
+et
+with rbd_create() or rbd_resize(), so we are not able to create/use a qco=
+w2
+image with the rbd driver.
 
-I couldn't think of any way to reproduce this that would trigger an
-error on an iotest, but I think I have one now, I'll try to write
-something.
+What I found is the following:
+- when qcow2 uses the rbd driver, the new file is created (rbd_create)
+  with the size equals to 0. (qemu_opt_get_size_del(opts,
+  BLOCK_OPT_SIZE, 0) returns 0 in qemu_rbd_co_create_opts())
+- the file is truncated (implemented with rbd_resize) to 0 before to
+  write the qcow2 header.
+- the "size" parameter passed to rbd_create() or rbd_resize() is
+  interpreted as the maximum size of the file, this means that all
+  writes that exceed that size, fails and returns -22.
 
-Berto
+As a workaround, I'm checking if the RW operations exceed the maximum
+size and then I'll resize the file. It works, but I'm not sure it is the
+right way.
+
+Any suggestions?
+
+Thanks,
+Stefano
+
+Stefano Garzarella (1):
+  block/rbd: increase dynamically the image size
+
+ block/rbd.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+--=20
+2.20.1
+
 
