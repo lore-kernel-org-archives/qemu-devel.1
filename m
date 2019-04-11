@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39112)
+Received: from eggs.gnu.org ([209.51.188.92]:40203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vn-4n
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1hEb8J-0006vs-M8
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4i-0000rS-OJ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9535)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4g-0000mf-Or
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D43B5D5F6
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:56 +0200
-Message-Id: <20190411145256.8614-16-armbru@redhat.com>
-In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
-References: <20190411145256.8614-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 15/15] monitor: Simplify how
- -device/device_add print help
+	(envelope-from <dan.j.williams@intel.com>) id 1hEb8F-0002zf-RG
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:56:54 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46887)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1hEb8C-0002yF-2a
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:56:50 -0400
+Received: by mail-ot1-x342.google.com with SMTP id s24so5452413otk.13
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 07:56:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-4-pagupta@redhat.com>
+In-Reply-To: <20190410040826.24371-4-pagupta@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 11 Apr 2019 07:56:36 -0700
+Message-ID: <CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libnvdimm: add dax_dev sync flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,152 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Christoph Hellwig <hch@infradead.org>, Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, jmoyer <jmoyer@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval.shaia@oracle.com
 
-Commit a95db58f210 added monitor_vfprintf() as an error_printf()
-generalized from stderr to arbitrary streams, then used it wrapped in
-helper out_printf() to print -device/device_add help to stdout.  Use
-qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
+On Tue, Apr 9, 2019 at 9:10 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>
+> This patch adds 'DAXDEV_SYNC' flag which is set
+> for nd_region doing synchronous flush. This later
+> is used to disable MAP_SYNC functionality for
+> ext4 & xfs filesystem for devices don't support
+> synchronous flush.
+>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  drivers/dax/bus.c            |  2 +-
+>  drivers/dax/super.c          | 13 ++++++++++++-
+>  drivers/md/dm.c              |  2 +-
+>  drivers/nvdimm/pmem.c        |  3 ++-
+>  drivers/nvdimm/region_devs.c |  7 +++++++
+>  include/linux/dax.h          |  9 +++++++--
+>  include/linux/libnvdimm.h    |  1 +
+>  7 files changed, 31 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
+> index 2109cfe80219..431bf7d2a7f9 100644
+> --- a/drivers/dax/bus.c
+> +++ b/drivers/dax/bus.c
+> @@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region *dax_region, int id,
+>          * No 'host' or dax_operations since there is no access to this
+>          * device outside of mmap of the resulting character device.
+>          */
+> -       dax_dev = alloc_dax(dev_dax, NULL, NULL);
+> +       dax_dev = alloc_dax(dev_dax, NULL, NULL, true);
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- include/monitor/monitor.h |  3 ---
- monitor.c                 | 16 ++++------------
- qdev-monitor.c            | 36 ++++++++++++++----------------------
- 3 files changed, 18 insertions(+), 37 deletions(-)
+I find apis that take a boolean as unreadable. What does 'true' mean?
+It wastes time to go look at the function definition vs something
+like:
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index e4c3717454..316a168c41 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
- int monitor_fdset_dup_fd_find(int dup_fd);
- 
--int monitor_vfprintf(FILE *stream,
--                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
--
- #endif /* MONITOR_H */
-diff --git a/monitor.c b/monitor.c
-index 7b4a78d798..10be8bdb86 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
-     monitor_flush(opaque);
- }
- 
--/*
-- * Print to current monitor if we have one, else to stream.
-- */
--int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
--{
--    if (cur_mon && !monitor_cur_is_qmp()) {
--        return monitor_vprintf(cur_mon, fmt, ap);
--    }
--    return vfprintf(stream, fmt, ap);
--}
--
- /*
-  * Print to current monitor if we have one, else to stderr.
-  */
- int error_vprintf(const char *fmt, va_list ap)
- {
--    return monitor_vfprintf(stderr, fmt, ap);
-+    if (cur_mon && !monitor_cur_is_qmp()) {
-+        return monitor_vprintf(cur_mon, fmt, ap);
-+    }
-+    return vfprintf(stderr, fmt, ap);
- }
- 
- int error_vprintf_unless_qmp(const char *fmt, va_list ap)
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index d4320986a2..373b9ad445 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -31,6 +31,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "qemu/option.h"
-+#include "qemu/qemu-print.h"
- #include "sysemu/block-backend.h"
- #include "migration/misc.h"
- 
-@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
-     return (qdev_class_get_alias(dc) != NULL);
- }
- 
--static void out_printf(const char *fmt, ...)
--{
--    va_list ap;
--
--    va_start(ap, fmt);
--    monitor_vfprintf(stdout, fmt, ap);
--    va_end(ap);
--}
--
- static void qdev_print_devinfo(DeviceClass *dc)
- {
--    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-+    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-     if (dc->bus_type) {
--        out_printf(", bus %s", dc->bus_type);
-+        qemu_printf(", bus %s", dc->bus_type);
-     }
-     if (qdev_class_has_alias(dc)) {
--        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-+        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-     }
-     if (dc->desc) {
--        out_printf(", desc \"%s\"", dc->desc);
-+        qemu_printf(", desc \"%s\"", dc->desc);
-     }
-     if (!dc->user_creatable) {
--        out_printf(", no-user");
-+        qemu_printf(", no-user");
-     }
--    out_printf("\n");
-+    qemu_printf("\n");
- }
- 
- static void qdev_print_devinfos(bool show_no_user)
-@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
-                 continue;
-             }
-             if (!cat_printed) {
--                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-+                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-                 cat_printed = true;
-             }
-             qdev_print_devinfo(dc);
-@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
-     }
- 
-     if (prop_list) {
--        out_printf("%s options:\n", driver);
-+        qemu_printf("%s options:\n", driver);
-     } else {
--        out_printf("There are no options for %s.\n", driver);
-+        qemu_printf("There are no options for %s.\n", driver);
-     }
-     for (prop = prop_list; prop; prop = prop->next) {
-         int len;
--        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-+        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-         if (prop->value->has_description) {
-             if (len < 24) {
--                out_printf("%*s", 24 - len, "");
-+                qemu_printf("%*s", 24 - len, "");
-             }
--            out_printf(" - %s\n", prop->value->description);
-+            qemu_printf(" - %s\n", prop->value->description);
-         } else {
--            out_printf("\n");
-+            qemu_printf("\n");
-         }
-     }
- 
--- 
-2.17.2
+    alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
