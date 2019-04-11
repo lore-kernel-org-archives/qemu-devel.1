@@ -2,92 +2,94 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37045C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 21:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7C5C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 22:17:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF8752146F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 21:41:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8752146F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 128652146F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 22:17:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhNSjMxE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 128652146F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55244 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55646 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEhSE-0003zi-SZ
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 17:41:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57991)
+	id 1hEi0f-0004w1-V7
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 18:17:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEhRP-0003Cc-Ui
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:41:05 -0400
+	(envelope-from <richard.weiyang@gmail.com>) id 1hEhz3-0003bd-VC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEhRN-0008MI-Ms
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:41:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58340)
+	(envelope-from <richard.weiyang@gmail.com>) id 1hEhz0-0001Aa-NX
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:15:49 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:43125)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEhRN-0008Lg-DY
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 17:41:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEhRL-0000iA-NZ
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 21:40:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A27D92E80CB
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 21:40:59 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1hEhyx-00011v-DL
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 18:15:45 -0400
+Received: by mail-ed1-x541.google.com with SMTP id w3so6595518edu.10
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=oy3WlVFoNBuFHKTQXULKz2rLZBfIRunXzYqzcqFX+Hk=;
+	b=NhNSjMxEiVpGoq2z9B0XLgqE2WLx+sJ+RpoCJy2ea4bLNnwvHhHknxiNXnbrxO+GSr
+	2rUs9KvxXraD5TZF88laFIG/6vpTz+PPPvsQnUJdeWHRiqasn6NdqG5AHdJrU6Vp6oCi
+	Q5AdXx3JpIo6iTxsm3SVSFEc2iB68jkEUCLq/uSgHZHC37Ql14snZQUh0c3EgGRRHZhZ
+	ChORhgVHyAfPztJvurdblckhlyfn29/oUHjjGdlYQ6MYt/V/LwNT7zKWvBxJ4ZxLNhci
+	8n1uXS6DJeGENkd6pnRIgpWxXNtlme11Ohb7UgSj/skaUGdbpSZtqoTg2Ai/+X6exeey
+	U10A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+	:references:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=oy3WlVFoNBuFHKTQXULKz2rLZBfIRunXzYqzcqFX+Hk=;
+	b=Q3AE2k9YR8mjrdGcAkQeiDU87H2M0MjGNdLpvdmOjPbbW4oh+BAmsOh2RCDq4mK7da
+	NStV6iZ7xeAHzoh8ErdxotbDH6GsezGYN+Iqi8gwojPzlvb4sq2hT2DlSA4NEpW+ZUrv
+	ghrmEG/pCoRRRUMdYnc1A9GCrgHlLO5iAZ5Hu9EGnlLzODaJaO5o+EaTzeWv5iZ0z+sy
+	9vdTTAhZ1CGA/yXO70eGD9iFz6oSrFCifX7b/1X9qb7k0xN1fNcoh9REExnac8ypgqQ4
+	fR/ntXyInCMwvLxn4enAmoQjO5OIVCOCiJRUjLuI+qPMtYXZB38IiKabuC+RBiYUY5p3
+	CEOw==
+X-Gm-Message-State: APjAAAW10A4uodCRYPKmO06ZQWSDTyvsK+15h+A4d273ibow5S9pJYfE
+	/tW16BjJT4YfQ56M79pSVKI=
+X-Google-Smtp-Source: APXvYqzMreqKDhfMlTmMpgpF1ZQusFI+UIH36yL8jYIDtreMuBLhcmUPqHt2Mvzm1ObCCZR4rWq/fw==
+X-Received: by 2002:a50:a704:: with SMTP id h4mr31982154edc.7.1555020936405;
+	Thu, 11 Apr 2019 15:15:36 -0700 (PDT)
+Received: from localhost ([185.92.221.13]) by smtp.gmail.com with ESMTPSA id
+	w25sm11078315eds.39.2019.04.11.15.15.35
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 11 Apr 2019 15:15:35 -0700 (PDT)
+Date: Thu, 11 Apr 2019 22:15:35 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190411221535.6oirewsnbmnhp2sk@master>
+References: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+	<20190410142756.GA3136@richard>
+	<20190410170150.1c447b12@redhat.com>
+	<20190411013211.GA8515@richard>
+	<20190411134627.15d7c340@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Apr 2019 21:28:22 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddstreet
-X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
-X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id:
- <155501810243.13430.11606260479219447999.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b7e5de920f67c2701291698d4445aa17e4a16b9d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
- vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
+Content-Disposition: inline
+In-Reply-To: <20190411134627.15d7c340@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH for-4.1] q35: acpi: do not create dummy
+ MCFG table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,183 +98,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com,
+	Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411212822.eDy9UkuJle2AjGBy5f70GBWVsUHKB8Qen1U2pV38GGU@z>
+Message-ID: <20190411221535.eQ7jJnnbDyfIf3LahCXi1VyH6kQoRmfymz-yhvvfTjM@z>
 
-test builds in https://launchpad.net/~ddstreet/+archive/ubuntu/lp1823458
+On Thu, Apr 11, 2019 at 01:46:27PM +0200, Igor Mammedov wrote:
+>On Thu, 11 Apr 2019 09:32:11 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
 
--- =
+[...]
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
+>> To be honest, this is what I feel confused in your previous reply.
+>> 
+>> First I want to confirm both fields in RAMBlock affects the migration:
+>> 
+>> * used_length
+>> * max_length
+>> 
+>> Both of them should be the same on both source/destination, otherwise the
+>> migration would fail.
+>well, it works fine for me.
+>Where do you see max_length being used during migration?
+>
 
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
+I asked my colleague, but seems you are right.
 
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Trusty:
-  In Progress
-Status in qemu source package in Xenial:
-  In Progress
-Status in qemu source package in Bionic:
-  In Progress
-Status in qemu source package in Cosmic:
-  In Progress
-Status in qemu source package in Disco:
-  In Progress
+>
+>> Then I thought the migration would be broken if source/destination has
+>> different knowledge about acpi table size. Because this will introduce
+>> different value of used_length, even we have resizable MemoryRegion.
+>> 
+>> The 1st time ACPI generation flow:
+>> 
+>>     acpi_add_rom_blob
+>>         rom_add_blob
+>>             rom_set_mr
+>>                 memory_region_init_resizable_ram
+>>                     qemu_ram_alloc_resizable
+>>     		        new_block->used_length = size
+>>     		        new_block->max_length = max_size
+>> 
+>> The 2nd time ACPI generation flow:
+>> 
+>>     acpi_ram_update
+>>         memory_regioin_ram_resize
+>>             qemu_ram_resize
+>>                 block->used_length = new_size
+>> 
+>> The max_length is always the same, while used_length would be changed to the
+>> actual table_blob size.
+>> 
+>> In case source/destination has different knowledge about acpi table size, the
+>> table_blob size(even after aligned) could be different.
+>> 
+>> This is why I thought there is still some chance to break migration after
+>> resizable MemoryRegion.
+>> 
+>> Do I miss something?
+>yes, you did, max_length does not influence migration stream.
+>see what above mentioned commits and ram_load() -> "if (length != block->used_length)" do.
+>
 
-Bug description:
-  [impact]
+I see this in the code.
 
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
+So the destination will check length and adjust self's length if it
+doesn't equal to the source.
 
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+Thanks :-)
 
-  [test case]
-
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
-
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
-
-  [regression potential]
-
-  the change adds flags to prevent repeated calls to both
-  vhost_net_stop() and vhost_net_cleanup() (really, prevents repeated
-  calls to vhost_dev_cleanup(), but vhost_net_cleanup() does nothing
-  else).  Any regression would be seen when stopping and/or cleaning up
-  a vhost net.  Regressions might include failure to hot-remove a vhost
-  net from a guest, or failure to cleanup (i.e. mem leak), or crashes
-  during cleanup or stopping a vhost net.
-
-  However, the flags are very unintrusive, and only in the shutdown path
-  (of a vhost_dev or vhost_net), and are unlikely to cause any
-  regressions.
-
-  [other info]
-
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).  However, this appears to still apply upstream, and I am
-  sending a patch to the qemu list to patch upstream as well.
-
-  The specific race condition for this (in the qemu 2.5 code version)
-  is:
-
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
-
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
-
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
-
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
-
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
-
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
-
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
+-- 
+Wei Yang
+Help you, Help me
 
