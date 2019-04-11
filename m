@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30638C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA749C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3805217D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3805217D4
+	by mail.kernel.org (Postfix) with ESMTPS id AD13420652
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:49:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD13420652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46080 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46082 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXFg-00084Y-5d
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:48:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54388)
+	id 1hEXGR-0000Bp-TR
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:49:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsW-0002Us-Je
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:22 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsa-00039p-6A
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWe8-0007PM-5q
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53162)
+	(envelope-from <david@redhat.com>) id 1hEWdr-0007HB-86
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hEWe6-0007Mu-3c; Thu, 11 Apr 2019 06:09:28 -0400
+	id 1hEWdq-0007Gp-So; Thu, 11 Apr 2019 06:09:11 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AA84301899D;
-	Thu, 11 Apr 2019 10:09:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 261C33680A;
+	Thu, 11 Apr 2019 10:09:10 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 978721001E82;
-	Thu, 11 Apr 2019 10:09:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C511F1001E71;
+	Thu, 11 Apr 2019 10:09:08 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:08:14 +0200
-Message-Id: <20190411100836.646-20-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:10 +0200
+Message-Id: <20190411100836.646-16-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 11 Apr 2019 10:09:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Thu, 11 Apr 2019 10:09:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 19/41] s390x/tcg: Implement VECTOR MULTIPLY
- AND ADD *
+Subject: [Qemu-devel] [PATCH v1 15/41] s390x/tcg: Implement VECTOR GALOIS
+ FIELD MULTIPLY SUM (AND ACCUMULATE)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,243 +75,250 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411100814.NzS8f4bxTRZ_EtQjw0jKV1BwMDzx_qTqTaX-0LEyINU@z>
+Message-ID: <20190411100810.mCBqdYDOOIth0eVI0RxQIVoRzpB-DaOrfvKNUrDyiMQ@z>
 
-Quite some variants to handle. At least handle some 32-bit element
-variants via gvec expansion (we could also handle 16/32-bit variants
-for ODD and EVEN easily via gvec expansion, but let's keep it simple
-for now).
+A galois field multiplication in field 2 is like binary multiplication,
+however instead of doing ordinary binary additions, xor's are performed.
+So no carries are considered.
+
+Implement all variants via helpers. s390_vec_sar() and s390_vec_shr()
+will be reused later on.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  18 +++++
- target/s390x/insn-data.def      |  14 ++++
- target/s390x/translate_vx.inc.c | 122 +++++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 123 ++++++++++++++++++++++++++++++++
- 4 files changed, 277 insertions(+)
+ target/s390x/helper.h           |   8 ++
+ target/s390x/insn-data.def      |   4 +
+ target/s390x/translate_vx.inc.c |  38 ++++++++
+ target/s390x/vec_int_helper.c   | 168 ++++++++++++++++++++++++++++++++
+ 4 files changed, 218 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 065c4c6ea3..b73a35107e 100644
+index 83e5070821..18a3df6b07 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -166,6 +166,24 @@ DEF_HELPER_FLAGS_5(gvec_vgfma32, TCG_CALL_NO_RWG, vo=
-id, ptr, cptr, cptr, cptr, i
- DEF_HELPER_FLAGS_5(gvec_vgfma64, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+@@ -156,6 +156,14 @@ DEF_HELPER_FLAGS_3(gvec_vclz8, TCG_CALL_NO_RWG, void=
+, ptr, cptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_vclz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_vctz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_vctz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
++DEF_HELPER_FLAGS_4(gvec_vgfm8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
+32)
++DEF_HELPER_FLAGS_4(gvec_vgfm16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vgfm32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vgfm64, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_5(gvec_vgfma8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+cptr, i32)
++DEF_HELPER_FLAGS_5(gvec_vgfma16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
  cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vlp8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vlp16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmal8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, c=
-ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmal16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmah8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, c=
-ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmah16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmalh8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmalh16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
++DEF_HELPER_FLAGS_5(gvec_vgfma32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
  cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmae8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, c=
-ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmae16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmae32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmale8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmale16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmale32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmao8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, c=
-ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmao16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmao32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmalo8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmalo16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vmalo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
++DEF_HELPER_FLAGS_5(gvec_vgfma64, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
  cptr, i32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index b22d9f0f6a..7ccec0544f 100644
+index b8400c191a..add174b793 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1106,6 +1106,20 @@
-     F(0xe7fe, VMN,     VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
- /* VECTOR MINIMUM LOGICAL */
-     F(0xe7fc, VMNL,    VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD LOW */
-+    F(0xe7aa, VMAL,    VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD HIGH */
-+    F(0xe7ab, VMAH,    VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD LOGICAL HIGH */
-+    F(0xe7a9, VMALH,   VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD EVEN */
-+    F(0xe7ae, VMAE,    VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD LOGICAL EVEN */
-+    F(0xe7ac, VMALE,   VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD ODD */
-+    F(0xe7af, VMAO,    VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY AND ADD LOGICAL ODD */
-+    F(0xe7ad, VMALO,   VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
+@@ -1090,6 +1090,10 @@
+     F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
+ /* VECTOR EXCLUSIVE OR */
+     F(0xe76d, VX,      VRR_c, V,   0, 0, 0, 0, vx, 0, IF_VEC)
++/* VECTOR GALOIS FIELD MULTIPLY SUM */
++    F(0xe7b4, VGFM,    VRR_c, V,   0, 0, 0, 0, vgfm, 0, IF_VEC)
++/* VECTOR GALOIS FIELD MULTIPLY SUM AND ACCUMULATE */
++    F(0xe7bc, VGFMA,   VRR_d, V,   0, 0, 0, 0, vgfma, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index aae1ff107a..4967af6a07 100644
+index 85a0f20b90..fe36d027b6 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1567,3 +1567,125 @@ static DisasJumpType op_vmx(DisasContext *s, Disa=
-sOps *o)
-     }
+@@ -1441,3 +1441,41 @@ static DisasJumpType op_vx(DisasContext *s, DisasO=
+ps *o)
+                  get_field(s->fields, v3));
      return DISAS_NEXT;
  }
 +
-+static void gen_mal_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b, TCGv_i32 c)
++static DisasJumpType op_vgfm(DisasContext *s, DisasOps *o)
 +{
-+    TCGv_i32 t0 =3D tcg_temp_new_i32();
-+
-+    tcg_gen_mul_i32(t0, a, b);
-+    tcg_gen_add_i32(d, t0, c);
-+
-+    tcg_temp_free_i32(t0);
-+}
-+
-+static void gen_mah_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b, TCGv_i32 c)
-+{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+
-+    tcg_gen_ext_i32_i64(t0, a);
-+    tcg_gen_ext_i32_i64(t1, b);
-+    tcg_gen_ext_i32_i64(t2, c);
-+    tcg_gen_mul_i64(t0, t0, t1);
-+    tcg_gen_add_i64(t0, t0, t2);
-+    tcg_gen_extrh_i64_i32(d, t0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t2);
-+}
-+
-+static void gen_malh_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b, TCGv_i32 c)
-+{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+
-+    tcg_gen_extu_i32_i64(t0, a);
-+    tcg_gen_extu_i32_i64(t1, b);
-+    tcg_gen_extu_i32_i64(t2, c);
-+    tcg_gen_mul_i64(t0, t0, t1);
-+    tcg_gen_add_i64(t0, t0, t2);
-+    tcg_gen_extrh_i64_i32(d, t0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t2);
-+}
-+
-+static DisasJumpType op_vma(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m5);
-+    static const GVecGen4 g_vmal[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmal8, },
-+        { .fno =3D gen_helper_gvec_vmal16, },
-+        { .fni4 =3D gen_mal_i32, },
++    const uint8_t es =3D get_field(s->fields, m4);
++    static const GVecGen3 g[4] =3D {
++        { .fno =3D gen_helper_gvec_vgfm8, },
++        { .fno =3D gen_helper_gvec_vgfm16, },
++        { .fno =3D gen_helper_gvec_vgfm32, },
++        { .fno =3D gen_helper_gvec_vgfm64, },
 +    };
-+    static const GVecGen4 g_vmah[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmah8, },
-+        { .fno =3D gen_helper_gvec_vmah16, },
-+        { .fni4 =3D gen_mah_i32, },
-+    };
-+    static const GVecGen4 g_vmalh[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmalh8, },
-+        { .fno =3D gen_helper_gvec_vmalh16, },
-+        { .fni4 =3D gen_malh_i32, },
-+    };
-+    static const GVecGen4 g_vmae[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmae8, },
-+        { .fno =3D gen_helper_gvec_vmae16, },
-+        { .fno =3D gen_helper_gvec_vmae32, },
-+    };
-+    static const GVecGen4 g_vmale[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmale8, },
-+        { .fno =3D gen_helper_gvec_vmale16, },
-+        { .fno =3D gen_helper_gvec_vmale32, },
-+    };
-+    static const GVecGen4 g_vmao[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmao8, },
-+        { .fno =3D gen_helper_gvec_vmao16, },
-+        { .fno =3D gen_helper_gvec_vmao32, },
-+    };
-+    static const GVecGen4 g_vmalo[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmalo8, },
-+        { .fno =3D gen_helper_gvec_vmalo16, },
-+        { .fno =3D gen_helper_gvec_vmalo32, },
-+    };
-+    const GVecGen4 *fn;
 +
-+    if (es > ES_32) {
++    if (es > ES_64) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
++    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
++               get_field(s->fields, v3), &g[es]);
++    return DISAS_NEXT;
++}
 +
-+    switch (s->fields->op2) {
-+    case 0xaa:
-+        fn =3D &g_vmal[es];
-+        break;
-+    case 0xab:
-+        fn =3D &g_vmah[es];
-+        break;
-+    case 0xa9:
-+        fn =3D &g_vmalh[es];
-+        break;
-+    case 0xae:
-+        fn =3D &g_vmae[es];
-+        break;
-+    case 0xac:
-+        fn =3D &g_vmale[es];
-+        break;
-+    case 0xaf:
-+        fn =3D &g_vmao[es];
-+        break;
-+    case 0xad:
-+        fn =3D &g_vmalo[es];
-+        break;
-+    default:
-+        g_assert_not_reached();
++static DisasJumpType op_vgfma(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m5);
++    static const GVecGen4 g[4] =3D {
++        { .fno =3D gen_helper_gvec_vgfma8, },
++        { .fno =3D gen_helper_gvec_vgfma16, },
++        { .fno =3D gen_helper_gvec_vgfma32, },
++        { .fno =3D gen_helper_gvec_vgfma64, },
++    };
++
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
 +    }
-+
 +    gen_gvec_4(get_field(s->fields, v1), get_field(s->fields, v2),
-+               get_field(s->fields, v3), get_field(s->fields, v4), fn);
++               get_field(s->fields, v3), get_field(s->fields, v4), &g[es=
+]);
 +    return DISAS_NEXT;
 +}
 diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
 c
-index 574f707abf..424f248325 100644
+index c589f92765..99dd0653f6 100644
 --- a/target/s390x/vec_int_helper.c
 +++ b/target/s390x/vec_int_helper.c
-@@ -303,3 +303,126 @@ void HELPER(gvec_vlp##BITS)(void *v1, const void *v=
-2, uint32_t desc)           \
+@@ -37,6 +37,60 @@ static bool s390_vec_add(S390Vector *d, const S390Vect=
+or *a,
+     return high_carry;
  }
- DEF_VLP(8)
- DEF_VLP(16)
+=20
++static bool s390_vec_is_zero(const S390Vector *v)
++{
++    return !v->doubleword[0] && !v->doubleword[1];
++}
 +
-+#define DEF_VMAL(BITS)                                                  =
++static void s390_vec_xor(S390Vector *res, const S390Vector *a,
++                         const S390Vector *b)
++{
++    res->doubleword[0] =3D a->doubleword[0] ^ b->doubleword[0];
++    res->doubleword[1] =3D a->doubleword[1] ^ b->doubleword[1];
++}
++
++static void s390_vec_shl(S390Vector *d, const S390Vector *a, uint64_t co=
+unt)
++{
++    uint64_t tmp;
++
++    g_assert(count < 128);
++    if (count =3D=3D 0) {
++        d->doubleword[0] =3D a->doubleword[0];
++        d->doubleword[1] =3D a->doubleword[1];
++    } else if (count =3D=3D 64) {
++        d->doubleword[0] =3D a->doubleword[1];
++        d->doubleword[1] =3D 0;
++    } else if (count < 64) {
++        tmp =3D extract64(a->doubleword[1], 64 - count, count);
++        d->doubleword[1] =3D a->doubleword[1] << count;
++        d->doubleword[0] =3D (a->doubleword[0] << count) | tmp;
++    } else {
++        d->doubleword[0] =3D a->doubleword[1] << (count - 64);
++        d->doubleword[1] =3D 0;
++    }
++}
++
++static void s390_vec_shr(S390Vector *d, const S390Vector *a, uint64_t co=
+unt)
++{
++    uint64_t tmp;
++
++    g_assert(count < 128);
++    if (count =3D=3D 0) {
++        d->doubleword[0] =3D a->doubleword[0];
++        d->doubleword[1] =3D a->doubleword[1];
++    } else if (count =3D=3D 64) {
++        d->doubleword[1] =3D a->doubleword[0];
++        d->doubleword[0] =3D 0;
++    } else if (count < 64) {
++        tmp =3D a->doubleword[1] >> count;
++        d->doubleword[1] =3D deposit64(tmp, 64 - count, count, a->double=
+word[0]);
++        d->doubleword[0] =3D a->doubleword[0] >> count;
++    } else {
++        d->doubleword[1] =3D a->doubleword[0] >> (count - 64);
++        d->doubleword[0] =3D 0;
++    }
++}
++
+ void HELPER(gvec_vacc128)(void *v1, const void *v2, const void *v3,
+                           uint32_t desc)
+ {
+@@ -121,3 +175,117 @@ void HELPER(gvec_vctz##BITS)(void *v1, const void *=
+v2, uint32_t desc)          \
+ }
+ DEF_VCTZ(8)
+ DEF_VCTZ(16)
++
++/* like binary multiplication, but XOR instead of addition */
++#define DEF_GALOIS_MULTIPLY(BITS, TBITS)                                =
        \
-+void HELPER(gvec_vmal##BITS)(void *v1, const void *v2, const void *v3,  =
++static uint##TBITS##_t galois_multiply##BITS(uint##TBITS##_t a,         =
        \
-+                             const void *v4, uint32_t desc)             =
++                                             uint##TBITS##_t b)         =
+       \
++{                                                                       =
+       \
++    uint##TBITS##_t res =3D 0;                                          =
+         \
++                                                                        =
+       \
++    while (b) {                                                         =
+       \
++        if (b & 0x1) {                                                  =
+       \
++            res =3D res ^ a;                                            =
+         \
++        }                                                               =
+       \
++        a =3D a << 1;                                                   =
+         \
++        b =3D b >> 1;                                                   =
+         \
++    }                                                                   =
+       \
++    return res;                                                         =
+       \
++}
++DEF_GALOIS_MULTIPLY(8, 16)
++DEF_GALOIS_MULTIPLY(16, 32)
++DEF_GALOIS_MULTIPLY(32, 64)
++
++static S390Vector galois_multiply64(uint64_t a, uint64_t b)
++{
++    S390Vector res =3D {};
++    S390Vector va =3D {
++        .doubleword[1] =3D a,
++    };
++    S390Vector vb =3D {
++        .doubleword[1] =3D b,
++    };
++
++    while (!s390_vec_is_zero(&vb)) {
++        if (vb.doubleword[1] & 0x1) {
++            s390_vec_xor(&res, &res, &va);
++        }
++        s390_vec_shl(&va, &va, 1);
++        s390_vec_shr(&vb, &vb, 1);
++    }
++    return res;
++}
++
++#define DEF_VGFM(BITS, TBITS)                                           =
+       \
++void HELPER(gvec_vgfm##BITS)(void *v1, const void *v2, const void *v3,  =
+       \
++                             uint32_t desc)                             =
        \
 +{                                                                       =
        \
@@ -319,57 +326,49 @@ index 574f707abf..424f248325 100644
        \
 +                                                                        =
        \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
++    for (i =3D 0; i < (128 / TBITS); i++) {                             =
          \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
++        uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i * 2);    =
          \
-+        const uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i);  =
++        uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i * 2);    =
          \
-+        const uint##BITS##_t c =3D s390_vec_read_element##BITS(v4, i);  =
++        uint##TBITS##_t d =3D galois_multiply##BITS(a, b);              =
          \
 +                                                                        =
        \
-+        s390_vec_write_element##BITS(v1, i, a * b + c);                 =
++        a =3D s390_vec_read_element##BITS(v2, i * 2 + 1);               =
+         \
++        b =3D s390_vec_read_element##BITS(v3, i * 2 + 1);               =
+         \
++        d =3D d ^ galois_multiply32(a, b);                              =
+         \
++        s390_vec_write_element##TBITS(v1, i, d);                        =
        \
 +    }                                                                   =
        \
 +}
-+DEF_VMAL(8)
-+DEF_VMAL(16)
++DEF_VGFM(8, 16)
++DEF_VGFM(16, 32)
++DEF_VGFM(32, 64)
 +
-+#define DEF_VMAH(BITS)                                                  =
-       \
-+void HELPER(gvec_vmah##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             const void *v4, uint32_t desc)             =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const int32_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(v=
-2, i);   \
-+        const int32_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(v=
-3, i);   \
-+        const int32_t c =3D (int##BITS##_t)s390_vec_read_element##BITS(v=
-4, i);   \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, (a * b + c) >> BITS);       =
-       \
-+    }                                                                   =
-       \
++void HELPER(gvec_vgfm64)(void *v1, const void *v2, const void *v3,
++                         uint32_t desc)
++{
++    S390Vector tmp1, tmp2;
++    uint64_t a, b;
++
++    a =3D s390_vec_read_element64(v2, 0);
++    b =3D s390_vec_read_element64(v3, 0);
++    tmp1 =3D galois_multiply64(a, b);
++    a =3D s390_vec_read_element64(v2, 1);
++    b =3D s390_vec_read_element64(v3, 1);
++    tmp2 =3D galois_multiply64(a, b);
++    s390_vec_xor(v1, &tmp1, &tmp2);
 +}
-+DEF_VMAH(8)
-+DEF_VMAH(16)
 +
-+#define DEF_VMALH(BITS)                                                 =
++#define DEF_VGFMA(BITS, TBITS)                                          =
        \
-+void HELPER(gvec_vmalh##BITS)(void *v1, const void *v2, const void *v3, =
++void HELPER(gvec_vgfma##BITS)(void *v1, const void *v2, const void *v3, =
        \
 +                              const void *v4, uint32_t desc)            =
        \
@@ -379,147 +378,48 @@ index 574f707abf..424f248325 100644
        \
 +                                                                        =
        \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
++    for (i =3D 0; i < (128 / TBITS); i++) {                             =
          \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
++        uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i * 2);    =
          \
-+        const uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i);  =
++        uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i * 2);    =
          \
-+        const uint##BITS##_t c =3D s390_vec_read_element##BITS(v4, i);  =
++        uint##TBITS##_t d =3D galois_multiply##BITS(a, b);              =
          \
 +                                                                        =
        \
-+        s390_vec_write_element##BITS(v1, i, (a * b + c) >> BITS);       =
++        a =3D s390_vec_read_element##BITS(v2, i * 2 + 1);               =
+         \
++        b =3D s390_vec_read_element##BITS(v3, i * 2 + 1);               =
+         \
++        d =3D d ^ galois_multiply32(a, b);                              =
+         \
++        d =3D d ^ s390_vec_read_element##TBITS(v4, i);                  =
+         \
++        s390_vec_write_element##TBITS(v1, i, d);                        =
        \
 +    }                                                                   =
        \
 +}
-+DEF_VMALH(8)
-+DEF_VMALH(16)
++DEF_VGFMA(8, 16)
++DEF_VGFMA(16, 32)
++DEF_VGFMA(32, 64)
 +
-+#define DEF_VMAE(BITS, TBITS)                                           =
-       \
-+void HELPER(gvec_vmae##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             const void *v4, uint32_t desc)             =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 0; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        int##TBITS##_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v2, j);  \
-+        int##TBITS##_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v3, j);  \
-+        int##TBITS##_t c =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v4, j);  \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b + c);                =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMAE(8, 16)
-+DEF_VMAE(16, 32)
-+DEF_VMAE(32, 64)
++void HELPER(gvec_vgfma64)(void *v1, const void *v2, const void *v3,
++                          const void *v4, uint32_t desc)
++{
++    S390Vector tmp1, tmp2;
++    uint64_t a, b;
 +
-+#define DEF_VMALE(BITS, TBITS)                                          =
-       \
-+void HELPER(gvec_vmale##BITS)(void *v1, const void *v2, const void *v3, =
-       \
-+                              const void *v4, uint32_t desc)            =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 0; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        uint##TBITS##_t a =3D s390_vec_read_element##BITS(v2, j);       =
-         \
-+        uint##TBITS##_t b =3D s390_vec_read_element##BITS(v3, j);       =
-         \
-+        uint##TBITS##_t c =3D s390_vec_read_element##BITS(v4, j);       =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b + c);                =
-       \
-+    }                                                                   =
-       \
++    a =3D s390_vec_read_element64(v2, 0);
++    b =3D s390_vec_read_element64(v3, 0);
++    tmp1 =3D galois_multiply64(a, b);
++    a =3D s390_vec_read_element64(v2, 1);
++    b =3D s390_vec_read_element64(v3, 1);
++    tmp2 =3D galois_multiply64(a, b);
++    s390_vec_xor(&tmp1, &tmp1, &tmp2);
++    s390_vec_xor(v1, &tmp1, v4);
 +}
-+DEF_VMALE(8, 16)
-+DEF_VMALE(16, 32)
-+DEF_VMALE(32, 64)
-+
-+#define DEF_VMAO(BITS, TBITS)                                           =
-       \
-+void HELPER(gvec_vmao##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             const void *v4, uint32_t desc)             =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 1; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        int##TBITS##_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v2, j);  \
-+        int##TBITS##_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v3, j);  \
-+        int##TBITS##_t c =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v4, j);  \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b + c);                =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMAO(8, 16)
-+DEF_VMAO(16, 32)
-+DEF_VMAO(32, 64)
-+
-+#define DEF_VMALO(BITS, TBITS)                                          =
-       \
-+void HELPER(gvec_vmalo##BITS)(void *v1, const void *v2, const void *v3, =
-       \
-+                              const void *v4, uint32_t desc)            =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 1; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        uint##TBITS##_t a =3D s390_vec_read_element##BITS(v2, j);       =
-         \
-+        uint##TBITS##_t b =3D s390_vec_read_element##BITS(v3, j);       =
-         \
-+        uint##TBITS##_t c =3D s390_vec_read_element##BITS(v4, j);       =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b + c);                =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMALO(8, 16)
-+DEF_VMALO(16, 32)
-+DEF_VMALO(32, 64)
 --=20
 2.20.1
 
