@@ -6,58 +6,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD20C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CADAAC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:03:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCF142073F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:01:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF142073F
+	by mail.kernel.org (Postfix) with ESMTPS id 85CEC2073F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:03:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85CEC2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50296 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50329 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbCr-0002kd-UJ
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:01:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38997)
+	id 1hEbEh-0004Km-GD
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:03:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4c-0003Mn-Tm
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4n-0003WH-4o
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4Y-0000n3-RN
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51092)
+	(envelope-from <armbru@redhat.com>) id 1hEb4l-0000sa-3G
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hEb4V-0000jj-Cj; Thu, 11 Apr 2019 10:52:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hEb4d-0000mI-3a; Thu, 11 Apr 2019 10:53:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 688592DA9A4;
-	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 412FB307CB40;
+	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C6B5D719;
-	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 098825D9C8;
+	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id BF4341132BB6; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+	id F00ED113292F; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:42 +0200
-Message-Id: <20190411145256.8614-2-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:54 +0200
+Message-Id: <20190411145256.8614-14-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 11 Apr 2019 14:52:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 01/15] qemu-img: Use error_vreport() in
- error_exit()
+Subject: [Qemu-devel] [PATCH v2 13/15] blockdev: Make -drive format=help
+ print to stdout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,42 +77,62 @@ Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411145242.hjsm195h6wa0-2bXdvoQFYJcz5NUwpAsXqYmxTPCAQg@z>
+Message-ID: <20190411145254.unJk-v7Gof3Y-H5r4mZjKdij7hDOSlUxVLhWWKcqu_4@z>
 
-error_exit() uses low-level error_printf() to report errors.
-Modernize it to use error_vreport().
+Command line help explicitly requested by the user should be printed
+to stdout, not stderr.  We do elsewhere.  Adjust -drive to match: use
+qemu_printf() instead of error_printf().  Plain printf() would be
+wrong because we need to print to the current monitor for "drive_add
+... format=3Dhelp".
 
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- qemu-img.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ blockdev.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index aa6f81f1ea..55201fb913 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -85,13 +85,11 @@ static void QEMU_NORETURN GCC_FMT_ATTR(1, 2) error_exit(const char *fmt, ...)
+diff --git a/blockdev.c b/blockdev.c
+index 4775a07d93..79fbac8450 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -40,6 +40,7 @@
+ #include "monitor/monitor.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qemu/qemu-print.h"
+ #include "qemu/config-file.h"
+ #include "qapi/qapi-commands-block.h"
+ #include "qapi/qapi-commands-transaction.h"
+@@ -301,7 +302,7 @@ DriveInfo *drive_get_next(BlockInterfaceType type)
+=20
+ static void bdrv_format_print(void *opaque, const char *name)
  {
-     va_list ap;
- 
--    error_printf("qemu-img: ");
--
-     va_start(ap, fmt);
--    error_vprintf(fmt, ap);
-+    error_vreport(fmt, ap);
-     va_end(ap);
- 
--    error_printf("\nTry 'qemu-img --help' for more information\n");
-+    error_printf("Try 'qemu-img --help' for more information\n");
-     exit(EXIT_FAILURE);
+-    error_printf(" %s", name);
++    qemu_printf(" %s", name);
  }
- 
--- 
+=20
+ typedef struct {
+@@ -530,11 +531,11 @@ static BlockBackend *blockdev_init(const char *file=
+, QDict *bs_opts,
+=20
+     if ((buf =3D qemu_opt_get(opts, "format")) !=3D NULL) {
+         if (is_help_option(buf)) {
+-            error_printf("Supported formats:");
++            qemu_printf("Supported formats:");
+             bdrv_iterate_format(bdrv_format_print, NULL, false);
+-            error_printf("\nSupported formats (read-only):");
++            qemu_printf("\nSupported formats (read-only):");
+             bdrv_iterate_format(bdrv_format_print, NULL, true);
+-            error_printf("\n");
++            qemu_printf("\n");
+             goto early_err;
+         }
+=20
+--=20
 2.17.2
 
 
