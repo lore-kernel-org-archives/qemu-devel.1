@@ -6,77 +6,62 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BD2C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F2FC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBE32133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECD2C2133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 12:59:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="uhzPSrBB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBE32133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="EFLKP3qg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD2C2133D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48401 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48403 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEZID-0003s7-5G
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 08:59:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35907)
+	id 1hEZIW-00046L-6X
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 08:59:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEZGk-0002ks-GY
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:57:32 -0400
+	(envelope-from <berto@igalia.com>) id 1hEZGw-0002ua-8k
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEZ9p-000506-FA
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:50:22 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:57964)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEZ9p-0004yG-1C
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:50:21 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
-	[IPv6:2a02:6b8:0:1a2d::301])
-	by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id A5FAA2E0C6A;
-	Thu, 11 Apr 2019 15:50:17 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	T7mjSW9gCp-oHeapWXu; Thu, 11 Apr 2019 15:50:17 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1554987017; bh=sPsuSsWesL4ODd1/vC509ToFN+ZPqqR+kTgfrbxZ0oc=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=uhzPSrBBO+20KKbouiPrf9AHI45turQLpLANXj809hlwKM8w84+LLWKcCb8/uvzGZ
-	UiiiMc66mFRbwvZZ2jaeAwdFTLlIYwKZrSDtdoR58ijAEmObJQex5r9NbEES+6w00b
-	Wtr3yULIsSNHBRjHQRr9EOmuiTP08T9Hhowjdqhk=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1j.mail.yandex.net ([::1])
-	by mxbackcorp1j.mail.yandex.net with LMTP id M7bDSXXf
-	for <yury-kotov@yandex-team.ru>; Thu, 11 Apr 2019 15:50:12 +0300
-Received: by iva6-8a76e93b6298.qloud-c.yandex.net with HTTP;
-	Thu, 11 Apr 2019 15:50:11 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-In-Reply-To: <20190411123911.GR3641@redhat.com>
-References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-	<20190411120421.GP3641@redhat.com>
-	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190411123911.GR3641@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1hEZ4G-0000qI-6O
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 08:44:36 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:56904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>)
+	id 1hEZ4E-0000o0-R0; Thu, 11 Apr 2019 08:44:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; 
+	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+	bh=XejLSE1nut3zaBgZH1OLm5dpFZ/n16G22jV0sczcypY=; 
+	b=EFLKP3qgcuf9AqFJshhkP3aNXxA6VDf2ERcu5ctkjpqmJT/eGPs5hk3VRk2UkxANi70gzCcUovvKV6vgX/gG3Lw6s0gJVvlko+z+TD/tT9RMyS6IqhddRUXOq8O4vsAn9XuVu8cs4P2XBYgDMntKb3mNBqc6HV6jILl2HegZpkEk7JUmRgQW04NRmENNtLNC7fRFGhCOzzEfJI8+SET0PaM2/VzdQ6XGmsx0CKqlKgYTne2VqfW6sMChRlY1sPjCCPas68ERSxzN1J8hA55JktqNjJYk6ve28HYWxlDIgk85sRrDqRT+nKipcLIvvY5WJopV6Jsivm3q3J5tOnsl5Q==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+	by fanzine.igalia.com with esmtps 
+	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+	id 1hEZ4B-0003r8-1Q; Thu, 11 Apr 2019 14:44:31 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+	id 1hEZ4A-00044j-VF; Thu, 11 Apr 2019 14:44:30 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+In-Reply-To: <20190410162918.9343-1-mreitz@redhat.com>
+References: <20190410162918.9343-1-mreitz@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+	(i586-pc-linux-gnu)
+Date: Thu, 11 Apr 2019 14:44:30 +0200
+Message-ID: <w518swgvhht.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Thu, 11 Apr 2019 15:50:16 +0300
-Message-Id: <226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a02:6b8:0:1619::183
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+	timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: Re: [Qemu-devel] [PATCH] iotests: Let 245 pass on tmpfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,91 +70,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
-	Juan Quintela <quintela@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411125016.9QaJOncvzilkScuU7Au6-4HOPwz45B4lZhXmX8avztI@z>
+Message-ID: <20190411124430.0DrwEZxoH-jYjKcQzs4TyE9aZkhHTeCs04l6U0ncgZM@z>
 
-11.04.2019, 15:39, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
-> On Thu, Apr 11, 2019 at 03:31:43PM +0300, Yury Kotov wrote:
->> =C2=A011.04.2019, 15:04, "Daniel P. Berrang=C3=A9" <berrange@redhat.co=
-m>:
->> =C2=A0> On Wed, Apr 10, 2019 at 12:26:52PM +0300, Yury Kotov wrote:
->> =C2=A0>> =C2=A0Currently such case is possible for incoming:
->> =C2=A0>> =C2=A0QMP: add-fd (fdset =3D 0, fd of some file):
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0adds fd to fdset 0 and returns =
-QEMU's fd (e.g. 33)
->> =C2=A0>> =C2=A0QMP: migrate-incoming (uri =3D "fd:33"): fd is stored i=
-n QIOChannel *ioc
->> =C2=A0>> =C2=A0...
->> =C2=A0>> =C2=A0Incoming migration completes and unrefs ioc -> close(33=
-)
->> =C2=A0>> =C2=A0QMP: remove-fd (fdset =3D 0, fd =3D 33):
->> =C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0removes fd from fdset 0 and qem=
-u_close() -> close(33) =3D> double close
->> =C2=A0>
->> =C2=A0> IMHO this is user error.
->> =C2=A0>
->> =C2=A0> You've given the FD to QEMU and told it to use it for migratio=
-n.
->> =C2=A0>
->> =C2=A0> Once you've done that you should not be calling remove-fd.
->> =C2=A0>
->> =C2=A0> remove-fd should only be used in some error code path. ie if y=
-ou
->> =C2=A0> have called add-fd, and then some failure means you've decided=
- you
->> =C2=A0> can't invoke 'migrate-incoming'. Now you should call "remove-f=
-d".
->> =C2=A0>
->> =C2=A0> AFAIK, we have never documented that 'add-fd' must be paired
->> =C2=A0> with 'remove-fd'.
->> =C2=A0>
->> =C2=A0> IOW, I think this "fix" is in fact not a fix - it is instead
->> =C2=A0> changing the semantics of when "remove-fd" should be used.
->> =C2=A0>
->>
->> =C2=A0I think it might be user's error but fd is still in cur_mon->fds=
- (in getfd case)
->> =C2=A0or in mon_fdsets (in add-fd case). So if fd is still exists in t=
-he lists why
->> =C2=A0user can't close/remove it?
->>
->> =C2=A0So, there are 2 valid options:
->> =C2=A01) fd is still valid after migration (dup)
->
-> If we do this then existing mgmt apps using QEMU who don't expect to ne=
-ed
-> to call remove-fd are going to be leaking FDs forever.
->
+On Wed 10 Apr 2019 06:29:18 PM CEST, Max Reitz wrote:
+>      # Reopen an image several times changing some of its options
+>      def test_reopen(self):
+> +        # Check whether the filesystem supports O_DIRECT
+> +        if 'O_DIRECT' in qemu_io('-f', 'raw', '-t', 'none', '-c', 'quit', hd_path[0]):
+> +            supports_direct = False
+> +        else:
+> +            supports_direct = True
 
-Ok, so what do you think about modifying qemu_close to remove fd from the=
-se two
-lists? Currently it tryes to remove fd only from mon_fdsets->dup_fds.
+I don't see any other test needing this at the moment (at least none
+written in Python), but I wonder if this is something worth having in
+iotests.py.
 
-Regards,
-Yury
+The patch looks fine anyway.
 
->> =C2=A02) fd is closed but also removed from the appropriate list
->
-> monitor_get_fd currently leaves the FD on the list.
->
-> if all current users of that API are closing the FD
-> themselves, then we could change that method to remove
-> it from the list.
->
-> Either way the requirements in this area are pooly documented
-> both from QEMU's internal POV and from mgmt app public QMP pov.
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com -o- https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org -o- https://fstop138.berrange.com :|
-> |: https://entangle-photo.org -o- https://www.instagram.com/dberrange :=
-|
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
 
