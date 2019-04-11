@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32841)
+Received: from eggs.gnu.org ([209.51.188.92]:35810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEcI1-00044i-1t
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:11:02 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hEcTi-00082g-Nu
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEcHy-000539-NW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:11:01 -0400
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:39889)
+	(envelope-from <pagupta@redhat.com>) id 1hEcTh-0004cU-Bw
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:23:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEcHt-0004xN-GK
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:10:57 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.159.140])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5C5311BA3DE
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 18:10:45 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 11 Apr 2019 18:10:13 +0200
-Message-Id: <20190411161013.4514-4-clg@kaod.org>
-In-Reply-To: <20190411161013.4514-1-clg@kaod.org>
-References: <20190411161013.4514-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEcTg-0004c6-P3
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:23:05 -0400
+Date: Thu, 11 Apr 2019 12:23:00 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1150671088.21162726.1554999780030.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4gOPtgmVyk+zayRBtkbSivEvBNn1tyKL2ycT_q_nTHUUA@mail.gmail.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+	<1463291806.21158433.1554998258746.JavaMail.zimbra@redhat.com>
+	<CAPcyv4gOPtgmVyk+zayRBtkbSivEvBNn1tyKL2ycT_q_nTHUUA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] aspeed: use sysbus_init_child_obj() to
- initialize children
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>, Qemu Developers <qemu-devel@nongnu.org>, virtualization@lists.linux-foundation.org, Andreas Dilger <adilger.kernel@dilger.ca>, Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>, Dave Jiang <dave.jiang@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Vishal L Verma <vishal.l.verma@intel.com>, David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>, Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>, linux-ext4 <linux-ext4@vger.kernel.org>, Len Brown <lenb@kernel.org>, kilobyte@angband.pl, Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Theodore Ts'o <tytso@mit.edu>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Darrick J. Wong" <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/arm/aspeed_soc.c | 50 ++++++++++++++++++---------------------------
- 1 file changed, 20 insertions(+), 30 deletions(-)
 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 9b601709e93c..110956828c44 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -212,12 +212,11 @@ static void aspeed_soc_init(Object *obj)
-     AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
-     int i;
-=20
--    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
--    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-+    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
-+                            sc->info->cpu_type, &error_abort, NULL);
-=20
--    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
--    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
--    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-+                          TYPE_ASPEED_SCU);
-     qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-@@ -227,36 +226,29 @@ static void aspeed_soc_init(Object *obj)
-     object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-                               "hw-prot-key", &error_abort);
-=20
--    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
--    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
--    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-+                          TYPE_ASPEED_VIC);
-=20
--    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
-IMER);
--    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
-ULL);
-+    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-+                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-                                    OBJECT(&s->scu), &error_abort);
--    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
-=20
--    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
--    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
--    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-+                          TYPE_ASPEED_I2C);
-=20
--    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
--    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
--    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
-+                          sc->info->fmc_typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
-                               &error_abort);
-=20
-     for (i =3D 0; i < sc->info->spis_num; i++) {
--        object_initialize(&s->spi[i], sizeof(s->spi[i]),
--                          sc->info->spi_typename[i]);
--        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), NUL=
-L);
--        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-+                              sizeof(s->spi[i]), sc->info->spi_typename[=
-i]);
-     }
-=20
--    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
--    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
--    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc)=
-,
-+                          TYPE_ASPEED_SDMC);
-     qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-@@ -265,16 +257,14 @@ static void aspeed_soc_init(Object *obj)
-                               "max-ram-size", &error_abort);
-=20
-     for (i =3D 0; i < sc->info->wdts_num; i++) {
--        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT=
-);
--        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), NUL=
-L);
--        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-+                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-         qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
-                                     sc->info->silicon_rev);
-     }
-=20
--    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC10=
-0);
--    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100), N=
-ULL);
--    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-+                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
- }
-=20
- static void aspeed_soc_realize(DeviceState *dev, Error **errp)
---=20
-2.20.1
+> > > > This patch adds functionality to perform flush from guest
+> > > > to host over VIRTIO. We are registering a callback based
+> > > > on 'nd_region' type. virtio_pmem driver requires this special
+> > > > flush function. For rest of the region types we are registering
+> > > > existing flush function. Report error returned by host fsync
+> > > > failure to userspace.
+> > > >
+> > > > This also handles asynchronous flush requests from the block layer
+> > > > by creating a child bio and chaining it with parent bio.
+> > > >
+> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > ---bio_chain Dan williams
+> > > [..]
+> > > > diff --git a/drivers/nvdimm/region_devs.c
+> > > > b/drivers/nvdimm/region_devs.c
+> > > > index b4ef7d9ff22e..fb1041ab32a6 100644
+> > > > --- a/drivers/nvdimm/region_devs.c
+> > > > +++ b/drivers/nvdimm/region_devs.c
+> > > > @@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev,
+> > > > struct device_attribute *att
+> > > >                 return rc;
+> > > >         if (!flush)
+> > > >                 return -EINVAL;
+> > > > -       nvdimm_flush(nd_region);
+> > > > +       rc = nvdimm_flush(nd_region, NULL, false);
+> > > > +       if (rc)
+> > > > +               return rc;
+> > > >
+> > > >         return len;
+> > > >  }
+> > > > @@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct
+> > > > nvdimm_bus *nvdimm_bus,
+> > > >         dev->of_node = ndr_desc->of_node;
+> > > >         nd_region->ndr_size = resource_size(ndr_desc->res);
+> > > >         nd_region->ndr_start = ndr_desc->res->start;
+> > > > +       if (ndr_desc->flush)
+> > > > +               nd_region->flush = ndr_desc->flush;
+> > > > +       else
+> > > > +               nd_region->flush = generic_nvdimm_flush;
+> > > > +
+> > > >         nd_device_register(dev);
+> > > >
+> > > >         return nd_region;
+> > > > @@ -1125,11 +1132,36 @@ struct nd_region
+> > > > *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+> > > >
+> > > > +int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool
+> > > > async)
+> > > > +{
+> > >
+> > > I don't quite see the point of the 'async' argument. All the usages of
+> > > this routine are either
+> > >
+> > > nvdimm_flush(nd_region, bio, true)
+> > > ...or:
+> > > nvdimm_flush(nd_region, NULL, false)
+> >
+> > Agree.
+> >
+> > >
+> > > ...so why not gate async behavior on the presence of the 'bio' argument?
+> >
+> > Sure.
+> >
+> > >
+> > >
+> > > > +       int rc = 0;
+> > > > +
+> > > > +       /* Create child bio for asynchronous flush and chain with
+> > > > +        * parent bio. Otherwise directly call nd_region flush.
+> > > > +        */
+> > > > +       if (async && bio->bi_iter.bi_sector != -1) {
+> > > > +
+> > > > +               struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> > > > +
+> > > > +               if (!child)
+> > > > +                       return -ENOMEM;
+> > > > +               bio_copy_dev(child, bio);
+> > > > +               child->bi_opf = REQ_PREFLUSH;
+> > > > +               child->bi_iter.bi_sector = -1;
+> > > > +               bio_chain(child, bio);
+> > > > +               submit_bio(child);
+> > >
+> > > I understand how this works, but it's a bit too "magical" for my
+> > > taste. I would prefer that all flush implementations take an optional
+> > > 'bio' argument rather than rely on the make_request implementation to
+> > > stash the bio away on a driver specific list.
+> >
+> > I did this to make use of "bio_chain" for chaining child bio for async
+> > flush
+> > suggested [1]. Are you saying to remove this and just call "flush" based on
+> > bio argument? Or I implemented the 'bio_chain' request entirely wrong?
+> 
+> No, I think you implemented it correctly. I'm just asking for the
+> chaining to be performed internal to the ->flush() callback rather
+> than in the common nvdimm_flush() front-end.
+
+Sure. Perfect!
+
+Thank you very much for all the suggestions. 
+
+Best regards,
+Pankaj
+> 
