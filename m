@@ -2,80 +2,51 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AF4C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D59DC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:52:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17B9B2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:43:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ue+irlzV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B9B2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 145402082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:52:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145402082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52781 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52890 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEdjn-0007NA-0h
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:43:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54770)
+	id 1hEdsb-0001jX-D0
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:52:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hEdiO-0006OJ-Gi
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:42:21 -0400
+	(envelope-from <brogers@suse.com>) id 1hEdrh-0001QQ-VS
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hEdiN-00051O-LZ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:42:20 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hEdiN-00050w-Bu; Thu, 11 Apr 2019 13:42:19 -0400
-Received: by mail-lj1-x241.google.com with SMTP id h16so6291681ljg.11;
-	Thu, 11 Apr 2019 10:42:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=jIiUlaOr09GT6DH0wDyqFP+V6QkvuLkR+MdMEBfecDw=;
-	b=ue+irlzVCi1UcStS67djF4oOvsfiUXWOihv/6IxjZ8SEAf9p5fPmIYAbT4csUEDH3x
-	Wh7fVOHFMndGxN+YhNqIwB70nAA1KhDwsCQokxT8Qp8TCu3SbZR2n2efhDmpjMYVghJ5
-	I5ehac7s6w9pTSftiiXyMAFT4to6pU4ypDoo/VqUEMAo7fSEVt6FP0c23wFdNtlduOq4
-	fIaHetuhBgU6OG52a58Ob0sHE6OqzVIsHX16bFAqY3Z0TZXttBWe6cjN/dqHmmzLhxFe
-	HGJDjJ5sZRI1gxmOTZO9cWvHrdCR02AnWqMXQieXHffFvfWYEk9lCnEpPal0CPPpi+o3
-	pizw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=jIiUlaOr09GT6DH0wDyqFP+V6QkvuLkR+MdMEBfecDw=;
-	b=I179vo3Gq2zLkjcGZKc5oB27c6/TZESk7B5Sj3X+0pLuPlXAFjXI9LxhitfjS2J/20
-	BJwldAyQmkA2/Zi6bFUR2ylfdcYwKSpcxdMYmaanBVWePm1PHRZY8RMps1bXdF7vr7YC
-	m4TJyd9fILiF76/nnviv/p20hxZy8dyrRWztc5RzgHc1XybVW6RnR4J67L6ZiHKxV0Bq
-	Iw7LY3tewyKwLaDZuV77ef8S2coZCY7DKWF9AkGz+vZEn2lf+RLDfTA6toWe/IfCfK2p
-	RvJido+9WgZyHoLbFmkyrtAo403whizkaSqa8nnFtIHGxfRvdGRUXlTevrK4cJ6EuSSZ
-	Xc0A==
-X-Gm-Message-State: APjAAAVIL/QbTtY+exoZC8BRqHnL8IDQEFC1wi8yZolPJqgCHD4IJDce
-	rgY+qzOj1WzosAUinuAqw2/XjsM/+NCfe377tao=
-X-Google-Smtp-Source: APXvYqzndEK/OR+m99FpiC3sXYHV3S94hHQVl49EsP1mvBDLWZFDePeSdQ7spnrkLMsg1E+5JuSih544FIYkHNIRY9c=
-X-Received: by 2002:a2e:2a03:: with SMTP id q3mr27213305ljq.56.1555004537951; 
-	Thu, 11 Apr 2019 10:42:17 -0700 (PDT)
+	(envelope-from <brogers@suse.com>) id 1hEdrg-0005ke-1U
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:51:57 -0400
+Received: from inet-orm.provo.novell.com ([137.65.248.124]:48681
+	helo=mail.novell.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1hEdre-0005ZR-6X
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:51:54 -0400
+Received: from brogers1.provo.novell.com (brogers1.dnsdhcp.provo.novell.com
+	[137.65.133.7]) by mail.novell.com with ESMTP (NOT encrypted);
+	Thu, 11 Apr 2019 11:51:43 -0600
+From: Bruce Rogers <brogers@suse.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 11:51:38 -0600
+Message-Id: <20190411175138.12838-1-brogers@suse.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <CANnJOVF2gE3b-C5zSb85SGoP+9cD9xOQQ5Z4tmsGouagR3xo0Q@mail.gmail.com>
-In-Reply-To: <CANnJOVF2gE3b-C5zSb85SGoP+9cD9xOQQ5Z4tmsGouagR3xo0Q@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 11 Apr 2019 10:40:43 -0700
-Message-ID:
- <CAKmqyKO_hggjML2-0d3QCoEM=ByfSKuP-jdRqnhpVHrGmVVVxA@mail.gmail.com>
-To: Jonathan Behrens <fintelia@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v2] target/riscv: Remove unused include of
- riscv_htif.h for virt board riscv
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 137.65.248.124
+Subject: [Qemu-devel] [PATCH] hw/smbios: handle both file formats regardless
+ of machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,43 +58,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Bruce Rogers <brogers@suse.com>, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411174043.LqDZ4qbB6ujJ5Z9SNh-30f5UpQNAA6zM7nO1OfyJzmI@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411175138.tbW2i4VkqeVfPQESIm2POk-0qZsUT24PqTFT_pt1I5o@z>
 
-On Thu, Apr 11, 2019 at 8:10 AM Jonathan Behrens <fintelia@gmail.com> wrote:
->
-> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+It's easy enough to handle either per-spec or legacy smbios structures
+in the smbios file input without regard to the machine type used, by
+simply applying the basic smbios formatting rules. then depending on
+what is detected. terminal numm bytes are added or removed for machine
+type specific processing.
 
-Awesome! Thanks for the patch.
+Signed-off-by: Bruce Rogers <brogers@suse.com>
+---
+ hw/smbios/smbios.c | 43 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 4 deletions(-)
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 47be9071fa..d4b95ebc84 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -960,6 +960,7 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+         struct smbios_structure_header *header;
+         int size;
+         struct smbios_table *table; /* legacy mode only */
++        uint8_t *dbl_nulls, *orig_end;
+ 
+         qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
+         if (err) {
+@@ -974,11 +975,21 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+         }
+ 
+         /*
+-         * NOTE: standard double '\0' terminator expected, per smbios spec.
+-         * (except in legacy mode, where the second '\0' is implicit and
+-         *  will be inserted by the BIOS).
++         * NOTE: standard double '\0' terminator expected, per smbios spec,
++         * unless the data is formatted for legacy mode, which is used by
++         * pc-i440fx-2.0 and earlier machine types. Legacy mode structures
++         * without strings have no '\0' terminators, and those with strings
++         * also don't have an additional '\0' terminator at the end of the
++         * final string '\0' terminator. The BIOS will add the '\0' terminators
++         * to comply with the smbios spec.
++         * For greater compatibility, regardless of the machine type used,
++         * either format is accepted.
+          */
+-        smbios_tables = g_realloc(smbios_tables, smbios_tables_len + size);
++        smbios_tables = g_realloc(smbios_tables, smbios_tables_len + size + 2);
++        orig_end = smbios_tables + smbios_tables_len + size;
++        /* add extra null bytes to end in case of legacy file data */
++        *orig_end = '\0';
++        *(orig_end + 1) = '\0';
+         header = (struct smbios_structure_header *)(smbios_tables +
+                                                     smbios_tables_len);
+ 
+@@ -993,6 +1004,19 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+                        header->type);
+             return;
+         }
++        for (dbl_nulls = smbios_tables + smbios_tables_len + header->length;
++             dbl_nulls + 2 <= orig_end; dbl_nulls++) {
++            if (*dbl_nulls == '\0' && *(dbl_nulls + 1) == '\0') {
++                break;
++            }
++        }
++        if (dbl_nulls + 2  < orig_end) {
++            error_setg(errp, "SMBIOS file data malformed");
++            return;
++        }
++        /* increase size by how many extra nulls were actually needed */
++        size += dbl_nulls + 2 - orig_end;
++        smbios_tables = g_realloc(smbios_tables, smbios_tables_len + size);
+         set_bit(header->type, have_binfile_bitmap);
+ 
+         if (header->type == 4) {
+@@ -1013,6 +1037,17 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+          *       delete the one we don't need from smbios_set_defaults(),
+          *       once we know which machine version has been requested.
+          */
++        if (dbl_nulls + 2 == orig_end) {
++            /* chop off nulls to get legacy format */
++            if (header->length + 2 == size) {
++                size -= 2;
++            } else {
++                size -= 1;
++            }
++        } else {
++            /* undo conversion from legacy format to per-spec format */
++            size -= dbl_nulls + 2 - orig_end;
++        }
+         if (!smbios_entries) {
+             smbios_entries_len = sizeof(uint16_t);
+             smbios_entries = g_malloc0(smbios_entries_len);
+-- 
+2.21.0
 
-Alistair
-
-> ---
->  hw/riscv/virt.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index fc4c6b306e..3526463034 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -29,7 +29,6 @@
->  #include "hw/sysbus.h"
->  #include "hw/char/serial.h"
->  #include "target/riscv/cpu.h"
-> -#include "hw/riscv/riscv_htif.h"
->  #include "hw/riscv/riscv_hart.h"
->  #include "hw/riscv/sifive_plic.h"
->  #include "hw/riscv/sifive_clint.h"
-> --
-> 2.20.1
 
