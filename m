@@ -2,107 +2,99 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B57C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 419C9C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE9EB2084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECA52082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 17:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="pihZOPQA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE9EB2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mellanox.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RnOIOcSn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECA52082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52765 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52779 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEdhb-0005oV-4a
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:41:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54284)
+	id 1hEdj4-0006mT-7f
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 13:43:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgg@mellanox.com>) id 1hEdgg-0005V0-01
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:40:35 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEdhv-00066R-Bm
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgg@mellanox.com>) id 1hEdge-00046w-3I
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:40:33 -0400
-Received: from mail-eopbgr50071.outbound.protection.outlook.com
-	([40.107.5.71]:28435
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	(envelope-from <yuval.shaia@oracle.com>) id 1hEdhu-0004hz-8V
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:41:51 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:34860)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgg@mellanox.com>) id 1hEdgc-00044b-9F
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:40:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=cuz4jiABzAnoIVFPNtox2B44nsjSEC3YK4M3JUt7JSk=;
-	b=pihZOPQAjnTi4HNclUIdbys0XcfUXrjEcjEu1oerAzFHrOmmhPAzWqXANmKH23IzXyY9KWGPC0ziZ6KhOcQHaDCup8RNCO/dd68T4sVRvflB9h/QjP62lhDx2tROix6Sg5RUFHf92OoN1IILkq7TVP4b+N7HWxhqb87ADF4FWEU=
-Received: from AM6PR05MB4439.eurprd05.prod.outlook.com (52.135.162.148) by
-	AM6PR05MB4966.eurprd05.prod.outlook.com (20.177.36.15) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1771.21; Thu, 11 Apr 2019 17:40:27 +0000
-Received: from AM6PR05MB4439.eurprd05.prod.outlook.com
-	([fe80::24cd:a3f1:870b:bd92]) by
-	AM6PR05MB4439.eurprd05.prod.outlook.com
-	([fe80::24cd:a3f1:870b:bd92%5]) with mapi id 15.20.1792.009;
-	Thu, 11 Apr 2019 17:40:26 +0000
-From: Jason Gunthorpe <jgg@mellanox.com>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Thread-Topic: [RFC 0/3] VirtIO RDMA
-Thread-Index: AQHU8FYDv72twQKPxUOduVqaSCXjp6Y3L/SAgAAGFgCAAALgAIAAAbAA
-Date: Thu, 11 Apr 2019 17:40:26 +0000
-Message-ID: <20190411174022.GA26227@mellanox.com>
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hEdht-0004c1-Tg
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:41:50 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3BHdHIU049336; Thu, 11 Apr 2019 17:41:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	in-reply-to; s=corp-2018-07-02;
+	bh=JSKGjUgR3Pw6EoC2v0VQyAxOOaU8t6hae1lgzJhdl7o=;
+	b=RnOIOcSnYe/j5BMjJQQxv3oP+IQXebLWTrD97zjNnEIHYyDhgJlfde0Yi1ZUrYHr47hG
+	kVzMONmIgHoCrDwsSEsS/U+5KiruWky01p0T27ZKu2VMdkoN5HsrodAULfCrG7aafq5a
+	PdnP9ZedvYnJk5UiMaIBNCAfuc3CdcnUV/BSE988s1g/iq7AgW+q93WHKICbZsC+Vv1o
+	m7efDiSexhILBfdBq86zv9scJeE1U9cr/6vXg6+SaPjG8NaUHOYSupflDo/qs2Lnw09j
+	qdNOwMtLODkW2Xxdmrh+lofwXr8g0XuGScAOhby/C2uUzItlHUP9icmYqmck1q9vewub
+	yg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by aserp2130.oracle.com with ESMTP id 2rphmetjah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2019 17:41:32 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3BHdgEe054413; Thu, 11 Apr 2019 17:41:32 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by aserp3020.oracle.com with ESMTP id 2rpytcw954-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2019 17:41:32 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3BHfVlL026822;
+	Thu, 11 Apr 2019 17:41:31 GMT
+Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Thu, 11 Apr 2019 10:41:30 -0700
+Date: Thu, 11 Apr 2019 20:41:25 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Jason Gunthorpe <jgg@mellanox.com>
+Message-ID: <20190411174124.GA6428@lap1>
 References: <20190411110157.14252-1-yuval.shaia@oracle.com>
 	<20190411190215.2163572e.cohuck@redhat.com>
 	<20190411172402.GA14509@mellanox.com> <20190411173419.GB6259@lap1>
-In-Reply-To: <20190411173419.GB6259@lap1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: YQXPR0101CA0032.CANPRD01.PROD.OUTLOOK.COM
-	(2603:10b6:c00:15::45) To AM6PR05MB4439.eurprd05.prod.outlook.com
-	(2603:10a6:209:43::20)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=jgg@mellanox.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [156.34.49.251]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a5bcb945-895f-49c6-7033-08d6bea4c83a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(4618075)(2017052603328)(7193020);
-	SRVR:AM6PR05MB4966; 
-x-ms-traffictypediagnostic: AM6PR05MB4966:
-x-microsoft-antispam-prvs: <AM6PR05MB4966D0161CC33A34AFB635E2CF2F0@AM6PR05MB4966.eurprd05.prod.outlook.com>
-x-forefront-prvs: 00046D390F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10009020)(396003)(39860400002)(346002)(136003)(376002)(366004)(52314003)(189003)(199004)(6246003)(86362001)(76176011)(25786009)(54906003)(71190400001)(105586002)(71200400001)(1076003)(106356001)(6116002)(33656002)(36756003)(4326008)(3846002)(6436002)(186003)(26005)(52116002)(6506007)(316002)(102836004)(386003)(6486002)(305945005)(256004)(99286004)(8676002)(6512007)(2906002)(81156014)(229853002)(5660300002)(14444005)(7736002)(81166006)(93886005)(476003)(2616005)(11346002)(446003)(53936002)(6916009)(486006)(8936002)(97736004)(68736007)(66066001)(14454004)(478600001);
-	DIR:OUT; SFP:1101; SCL:1; SRVR:AM6PR05MB4966;
-	H:AM6PR05MB4439.eurprd05.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: mellanox.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: UEOrv6MGrZ/TGfhG5t5WtgLRX+YMYRvrBolpmdER8YeWUuYRjNxdWLROdHV7q/GOX5wdR5PdKSs0OMeo/0GFsSXy4g576269d2pyATjvNMyILS9sGk4rMKGNyc3ZgyeAUGfvaEnNJoMmoJPH+qUVrYGoI/C97Qm46HqPLUoSP1cjJP/0Dm5evX5I6QtN7SWN1rie2o9m5iVpkeni+eNhMD6Ap7bE2upUxR6Xi28rteS4aXsVHb4Zq27/BHbbq7qlBiSDFG5uVhbDJoEQ3KxBIrAmItW/b5Xlgxb9ImXd10TV+ugAtnnCI4ahHnOWnE6R5Y1Bt63KapWtymQQKK28b3RV6UJjgVUjAWq1VTxqGO+IOngwY5ovlPrYJrpmfiztW5Fzf70JpX4JPZ8KrGfwnL3E+m8s3+8k1oAULodQQb4=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <6242C05B658BD24198CF603E9E63C344@eurprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5bcb945-895f-49c6-7033-08d6bea4c83a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 17:40:26.8124 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR05MB4966
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.71
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190411173419.GB6259@lap1>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9224
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904110118
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9224
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904110118
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
 Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -115,79 +107,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
 	Cornelia Huck <cohuck@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
 	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>
+	<virtualization@lists.linux-foundation.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411174026.z2v9Uih1tQVAKnkF9PH5hiNiQJ_2Ilf7IY_Wo9-3YUc@z>
+Message-ID: <20190411174125.yIagZj-_9N3Zm20BDdkU33BNDPOIdSK81mkdWsgvtNU@z>
 
 On Thu, Apr 11, 2019 at 08:34:20PM +0300, Yuval Shaia wrote:
 > On Thu, Apr 11, 2019 at 05:24:08PM +0000, Jason Gunthorpe wrote:
 > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
 > > > On Thu, 11 Apr 2019 14:01:54 +0300
 > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > >=20
-> > > > Data center backends use more and more RDMA or RoCE devices and mor=
-e and
+> > > 
+> > > > Data center backends use more and more RDMA or RoCE devices and more and
 > > > > more software runs in virtualized environment.
-> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machi=
-nes.
-> > > >=20
-> > > > Virtio is the optimal solution since is the de-facto para-virtualiz=
-aton
+> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
+> > > > 
+> > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
 > > > > technology and also because the Virtio specification
-> > > > allows Hardware Vendors to support Virtio protocol natively in orde=
-r to
+> > > > allows Hardware Vendors to support Virtio protocol natively in order to
 > > > > achieve bare metal performance.
-> > > >=20
-> > > > This RFC is an effort to addresses challenges in defining the RDMA/=
-RoCE
+> > > > 
+> > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
 > > > > Virtio Specification and a look forward on possible implementation
 > > > > techniques.
-> > > >=20
+> > > > 
 > > > > Open issues/Todo list:
 > > > > List is huge, this is only start point of the project.
 > > > > Anyway, here is one example of item in the list:
-> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This me=
-ans that
-> > > >   in order to support for example 32K QPs we will need 64K VirtQ. N=
-ot sure
+> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+> > > >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
 > > > >   that this is reasonable so one option is to have one for all and
-> > > >   multiplex the traffic on it. This is not good approach as by desi=
-gn it
-> > > >   introducing an optional starvation. Another approach would be mul=
-ti
+> > > >   multiplex the traffic on it. This is not good approach as by design it
+> > > >   introducing an optional starvation. Another approach would be multi
 > > > >   queues and round-robin (for example) between them.
-> > > >=20
+> > > > 
 > > > > Expectations from this posting:
-> > > > In general, any comment is welcome, starting from hey, drop this as=
- it is a
+> > > > In general, any comment is welcome, starting from hey, drop this as it is a
 > > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > Idea here is that since it is not a minor effort i first want to kn=
-ow if
+> > > > Idea here is that since it is not a minor effort i first want to know if
 > > > > there is some sort interest in the community for such device.
-> > >=20
+> > > 
 > > > My first reaction is: Sounds sensible, but it would be good to have a
 > > > spec for this :)
-> >=20
+> > 
 > > I'm unclear why you'd want to have a virtio queue for anything other
 > > that some kind of command channel.
-> >=20
+> > 
 > > I'm not sure a QP or CQ benefits from this??
->=20
+> 
 > Virtqueue is a standard mechanism to pass data from guest to host. By
+
+And vice versa (CQ?)
+
 > saying that - it really sounds like QP send and recv rings. So my thought
-> is to use a standard way for rings. As i've learned this is how it is use=
-d
+> is to use a standard way for rings. As i've learned this is how it is used
 > by other virtio devices ex virtio-net.
-
-I doubt you can use virtio queues from userspace securely? Usually
-needs a dedicated page for each user space process
-
-Jason
+> 
+> > 
+> > Jason
+> 
 
