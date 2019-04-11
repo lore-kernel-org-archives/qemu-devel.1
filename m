@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54552)
+Received: from eggs.gnu.org ([209.51.188.92]:56838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsj-0002dl-Tj
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:35 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hEWxp-0008JH-48
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWdP-000767-3G
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:08:44 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 11 Apr 2019 12:07:56 +0200
-Message-Id: <20190411100836.646-2-david@redhat.com>
-In-Reply-To: <20190411100836.646-1-david@redhat.com>
-References: <20190411100836.646-1-david@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1hEWxn-0000Bx-AJ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:29:48 -0400
+Resent-Message-Id: <E1hEWxn-0000Bx-AJ@eggs.gnu.org>
+Message-ID: <155497852263.12882.17138118894178379111@76452e4e88f2>
+In-Reply-To: <20190411102025.22559-1-cohuck@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 01/41] tcg: Implement tcg_gen_gvec_3i()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 11 Apr 2019 03:28:46 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw: add compat machines for 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,252 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: cohuck@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, david@gibson.dropbear.id.au, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
-without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
-for now.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-gvec.h |  24 ++++++++
- 2 files changed, 163 insertions(+)
-
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 0996ef0812..f831adb4e7 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -663,6 +663,29 @@ static void expand_3_i32(uint32_t dofs, uint32_t aof=
-s,
-     tcg_temp_free_i32(t0);
- }
-=20
-+static void expand_3i_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                          uint32_t oprsz, int32_t c, bool load_dest,
-+                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, int3=
-2_t))
-+{
-+    TCGv_i32 t0 =3D tcg_temp_new_i32();
-+    TCGv_i32 t1 =3D tcg_temp_new_i32();
-+    TCGv_i32 t2 =3D tcg_temp_new_i32();
-+    uint32_t i;
-+
-+    for (i =3D 0; i < oprsz; i +=3D 4) {
-+        tcg_gen_ld_i32(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i32(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_i32(t2, cpu_env, dofs + i);
-+        }
-+        fni(t2, t0, t1, c);
-+        tcg_gen_st_i32(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t2);
-+}
-+
- /* Expand OPSZ bytes worth of three-operand operations using i32 element=
-s.  */
- static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                          uint32_t cofs, uint32_t oprsz, bool write_aofs,
-@@ -770,6 +793,29 @@ static void expand_3_i64(uint32_t dofs, uint32_t aof=
-s,
-     tcg_temp_free_i64(t0);
- }
-=20
-+static void expand_3i_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                          uint32_t oprsz, int64_t c, bool load_dest,
-+                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, int6=
-4_t))
-+{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint32_t i;
-+
-+    for (i =3D 0; i < oprsz; i +=3D 8) {
-+        tcg_gen_ld_i64(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i64(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_i64(t2, cpu_env, dofs + i);
-+        }
-+        fni(t2, t0, t1, c);
-+        tcg_gen_st_i64(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
- /* Expand OPSZ bytes worth of three-operand operations using i64 element=
-s.  */
- static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                          uint32_t cofs, uint32_t oprsz, bool write_aofs,
-@@ -883,6 +929,35 @@ static void expand_3_vec(unsigned vece, uint32_t dof=
-s, uint32_t aofs,
-     tcg_temp_free_vec(t0);
- }
-=20
-+/*
-+ * Expand OPSZ bytes worth of three-vector operands and an immediate ope=
-rand
-+ * using host vectors.
-+ */
-+static void expand_3i_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                          uint32_t bofs, uint32_t oprsz, uint32_t tysz,
-+                          TCGType type, int64_t c, bool load_dest,
-+                          void (*fni)(unsigned, TCGv_vec, TCGv_vec, TCGv=
-_vec,
-+                                      int64_t))
-+{
-+    TCGv_vec t0 =3D tcg_temp_new_vec(type);
-+    TCGv_vec t1 =3D tcg_temp_new_vec(type);
-+    TCGv_vec t2 =3D tcg_temp_new_vec(type);
-+    uint32_t i;
-+
-+    for (i =3D 0; i < oprsz; i +=3D tysz) {
-+        tcg_gen_ld_vec(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_vec(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_vec(t2, cpu_env, dofs + i);
-+        }
-+        fni(vece, t2, t0, t1, c);
-+        tcg_gen_st_vec(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_vec(t0);
-+    tcg_temp_free_vec(t1);
-+    tcg_temp_free_vec(t2);
-+}
-+
- /* Expand OPSZ bytes worth of four-operand operations using host vectors=
-.  */
- static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
-@@ -1174,6 +1249,70 @@ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, =
-uint32_t bofs,
-     }
- }
-=20
-+/* Expand a vector operation with three vectors and an immediate.  */
-+void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-+                     const GVecGen3i *g)
-+{
-+    TCGType type;
-+    uint32_t some;
-+
-+    check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-+    check_overlap_3(dofs, aofs, bofs, maxsz);
-+
-+    type =3D 0;
-+    if (g->fniv) {
-+        type =3D choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i6=
-4);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /*
-+         * Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some =3D QEMU_ALIGN_DOWN(oprsz, 32);
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, some, 32, TCG_TYPE_V256=
-,
-+                      c, g->load_dest, g->fniv);
-+        if (some =3D=3D oprsz) {
-+            break;
-+        }
-+        dofs +=3D some;
-+        aofs +=3D some;
-+        bofs +=3D some;
-+        oprsz -=3D some;
-+        maxsz -=3D some;
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 16, TCG_TYPE_V12=
-8,
-+                      c, g->load_dest, g->fniv);
-+        break;
-+    case TCG_TYPE_V64:
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 8, TCG_TYPE_V64,
-+                      c, g->load_dest, g->fniv);
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_3i_i64(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_3i_i32(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni4);
-+        } else {
-+            assert(g->fno !=3D NULL);
-+            tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, c, g->fno=
-);
-+            return;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    if (oprsz < maxsz) {
-+        expand_clr(dofs + oprsz, maxsz - oprsz);
-+    }
-+}
-+
- /* Expand a vector four-operand operation.  */
- void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen4 *g)
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index 850da32ded..c093243c4c 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -164,6 +164,27 @@ typedef struct {
-     bool load_dest;
- } GVecGen3;
-=20
-+typedef struct {
-+    /*
-+     * Expand inline as a 64-bit or 32-bit integer. Only one of these wi=
-ll be
-+     * non-NULL.
-+     */
-+    void (*fni8)(TCGv_i64, TCGv_i64, TCGv_i64, int64_t);
-+    void (*fni4)(TCGv_i32, TCGv_i32, TCGv_i32, int32_t);
-+    /* Expand inline with a host vector type.  */
-+    void (*fniv)(unsigned, TCGv_vec, TCGv_vec, TCGv_vec, int64_t);
-+    /* Expand out-of-line helper w/descriptor, data in descriptor.  */
-+    gen_helper_gvec_3 *fno;
-+    /* The opcode, if any, to which this corresponds.  */
-+    TCGOpcode opc;
-+    /* The vector element size, if applicable.  */
-+    uint8_t vece;
-+    /* Prefer i64 to v64.  */
-+    bool prefer_i64;
-+    /* Load dest as a 3rd source operand.  */
-+    bool load_dest;
-+} GVecGen3i;
-+
- typedef struct {
-     /* Expand inline as a 64-bit or 32-bit integer.
-        Only one of these will be non-NULL.  */
-@@ -193,6 +214,9 @@ void tcg_gen_gvec_2s(uint32_t dofs, uint32_t aofs, ui=
-nt32_t oprsz,
-                      uint32_t maxsz, TCGv_i64 c, const GVecGen2s *);
- void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen3 *);
-+void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-+                     const GVecGen3i *);
- void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen4 *);
-=20
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMTEwMjAyNS4yMjU1
+OS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTQuMV0gaHc6IGFkZCBjb21w
+YXQgbWFjaGluZXMgZm9yIDQuMQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
+NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0
+YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQtMS1yaWNo
+YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAzMTUwMzI2MjkuMjEyMzQt
+MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAg
+IHBhdGNoZXcvMjAxOTA0MTEwNjM0MDguMzk5OC0xLWNsZ0BrYW9kLm9yZyAtPiBwYXRjaGV3LzIw
+MTkwNDExMDYzNDA4LjM5OTgtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAg
+ICAgcGF0Y2hldy8yMDE5MDQxMTA3MTczOS4yMjg4OS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50
+ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MTEwNzE3MzkuMjI4ODktMS1yaWNoYXJkdy55YW5nQGxp
+bnV4LmludGVsLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDEx
+MTAyMDI1LjIyNTU5LTEtY29odWNrQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQxMTEwMjAy
+NS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKNTU3NDZkZGFlOCBodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4Old4
+VikKIzU4OiBGSUxFOiBody9pMzg2L3BjLmM6MTE4OgorR2xvYmFsUHJvcGVydHkgcGNfY29tcGF0
+XzRfMFtdID17fTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
+cnJvcnMsIDAgd2FybmluZ3MsIDE2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgNTU3NDZkZGFlOGI2
+IChodzogYWRkIGNvbXBhdCBtYWNoaW5lcyBmb3IgNC4xKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDE5MDQxMTEwMjAyNS4yMjU1OS0xLWNvaHVja0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRj
+aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
