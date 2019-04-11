@@ -2,48 +2,48 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD0FC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 05:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E8FC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 05:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EFC2217D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 05:15:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EFC2217D4
+	by mail.kernel.org (Postfix) with ESMTPS id 04F882133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 05:30:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F882133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41966 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42104 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hES3I-0004GI-Js
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 01:15:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45239)
+	id 1hESIa-00073c-U0
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 01:30:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hES2U-0003xT-PO
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1hESHg-0006g7-Qa
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:30:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hES2T-0002iP-SD
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34962)
+	(envelope-from <thuth@redhat.com>) id 1hESHf-0005gP-KF
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:30:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hES2T-0002hd-Iv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:17 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hESHf-0005fx-7d
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:29:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D14E3082E03;
-	Thu, 11 Apr 2019 05:14:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1879D3084294;
+	Thu, 11 Apr 2019 05:29:58 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 684511001E84;
-	Thu, 11 Apr 2019 05:14:14 +0000 (UTC)
-To: "Barajas, Felipe" <felipe.barajas@intel.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 25FF55D707;
+	Thu, 11 Apr 2019 05:29:56 +0000 (UTC)
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+References: <20190410194838.10123-1-sw@weilnetz.de>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -89,22 +89,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <62a249a3-f0ed-fa10-f1cc-4ba0cb2594f9@redhat.com>
-Date: Thu, 11 Apr 2019 07:14:13 +0200
+Message-ID: <a6cef4ba-026c-75e7-d63b-70bb79621583@redhat.com>
+Date: Thu, 11 Apr 2019 07:29:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
+In-Reply-To: <20190410194838.10123-1-sw@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 11 Apr 2019 05:14:16 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 11 Apr 2019 05:29:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] QEMU Logo question
+Subject: Re: [Qemu-devel] [PATCH] tci: Add implementation for
+ INDEX_op_ld16u_i64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,34 +117,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Benoit Canet <benoit@irqsave.net>,
-	=?UTF-8?Q?Beno=c3=aet_Canet?= <benoit.canet@nodalink.com>
+Cc: Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411051413.pfh-zVrLkCO-HpBnQc66Pgx3PvoqbE_gYDxxWbjyTnE@z>
+Message-ID: <20190411052956.uUOPaethpeT4waLOUsAitNmXcH1XwmYBwQ_Zo8Dw3fM@z>
 
-On 10/04/2019 19.51, Barajas, Felipe wrote:
-> Hi,
->=20
-> I am trying to understand who in the QEMU community can give me permiss=
-ion to use the QEMU logo in a whitepaper.
-> I am an application engineer at Intel and I have prepared some benchmar=
-ks using QEMU as a solution accelerated by Intel hardware (CPUs, SSDs, et=
-c)
-> I would like to use the QEMU logo in this white paper.
->=20
-> Do you know who in the community would have authority to give me such p=
-ermission ?
+On 10/04/2019 21.48, Stefan Weil wrote:
+> This fixes "make check-tcg" on a Debian x86_64 host.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  tcg/tci.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/tcg/tci.c b/tcg/tci.c
+> index 33edca1903..a6208653e8 100644
+> --- a/tcg/tci.c
+> +++ b/tcg/tci.c
+> @@ -127,6 +127,12 @@ static void tci_write_reg8(tcg_target_ulong *regs, TCGReg index, uint8_t value)
+>      tci_write_reg(regs, index, value);
+>  }
+>  
+> +static void
+> +tci_write_reg16(tcg_target_ulong *regs, TCGReg index, uint16_t value)
+> +{
+> +    tci_write_reg(regs, index, value);
+> +}
+> +
+>  static void
+>  tci_write_reg32(tcg_target_ulong *regs, TCGReg index, uint32_t value)
+>  {
+> @@ -585,6 +591,8 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+>              tci_write_reg8(regs, t0, *(uint8_t *)(t1 + t2));
+>              break;
+>          case INDEX_op_ld8s_i32:
+> +            TODO();
+> +            break;
+>          case INDEX_op_ld16u_i32:
+>              TODO();
+>              break;
+> @@ -854,7 +862,14 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+>              tci_write_reg8(regs, t0, *(uint8_t *)(t1 + t2));
+>              break;
+>          case INDEX_op_ld8s_i64:
+> +            TODO();
+> +            break;
+>          case INDEX_op_ld16u_i64:
+> +            t0 = *tb_ptr++;
+> +            t1 = tci_read_r(regs, &tb_ptr);
+> +            t2 = tci_read_s32(&tb_ptr);
+> +            tci_write_reg16(regs, t0, *(uint16_t *)(t1 + t2));
+> +            break;
+>          case INDEX_op_ld16s_i64:
+>              TODO();
+>              break;
+> 
 
-The logo has been designed by Beno=C3=AEt Canet, see:
+Works for me, too:
 
- http://lists.gnu.org/archive/html/qemu-devel/2012-02/msg02865.html
+ https://gitlab.com/huth/qemu/-/jobs/194622472
 
-It is licensed under the terms of CC BY 3.0 :
-
- http://creativecommons.org/licenses/by/3.0/
-
- HTH,
-  Thomas
+Tested-by: Thomas Huth <thuth@redhat.com>
 
