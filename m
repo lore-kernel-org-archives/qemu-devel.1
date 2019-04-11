@@ -6,69 +6,75 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1ECC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EEDC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:45:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A84E20693
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A84E20693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 865E22070D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:45:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 865E22070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53973 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54010 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEfcF-0005h1-AR
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:44:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58549)
+	id 1hEfdy-0006XH-P1
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:45:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfb3-0004lm-16
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEfdB-000625-2U
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfb2-00081H-3e
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:52 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:37057)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hEfaz-0007wb-Fo; Thu, 11 Apr 2019 15:42:49 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MjPYI-1gToRY0gzy-00ktOB; Thu, 11 Apr 2019 21:42:30 +0200
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org
-References: <20190304071631.27567-1-richardw.yang@linux.intel.com>
-	<20190304071631.27567-2-richardw.yang@linux.intel.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4cd402a1-4da3-dc2e-82ad-64249c5fddc0@vivier.eu>
-Date: Thu, 11 Apr 2019 21:42:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <philmd@redhat.com>) id 1hEfd9-0000cH-5s
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:05 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:35341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEfd5-0000ak-IN
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:45:01 -0400
+Received: by mail-wm1-f65.google.com with SMTP id y197so8116261wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:44:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=eXYNXIUDBz02ft5TYfBJasZetXxdXPyiPUATBW+pV4c=;
+	b=lW7o7TLbl2T9sBps0Fh2w3GZnhmsytbYLqGJ/ugBWK3zbzimApb1VVQztc3Pk5xDTB
+	utXcSB3VbyqM25MJNHBnrgcba80HOW9mD3Zb8g1kzTnaA8fNBChTmmz32Yl0V9abKz/8
+	LEGGDD+Qeq/siCwKbu6EAY06e0EQufRyD4F/PSq0hmIVhLJoWZPDLGSsoaXuUVmHAoU8
+	XJTUb3Q7UzGzwL3ekLxs1fJswbvtibs+vT2vVNVvKo7nXePJLM60UQHqESVM1q6E7bp0
+	dKeDlRlnzW4zM36lPybOT4j0UG5JbiVDxaoPOGQL43Mr5mYQdtLywMo0f1ns7FKwttMB
+	FZlA==
+X-Gm-Message-State: APjAAAVPGJor9UCfyJMWEzJPZJOB7yRdsxemm5a99n/aK2VC8qRQT/B+
+	8boptCqDjq0GLrOdC//tK9mhqg==
+X-Google-Smtp-Source: APXvYqzIOPmWhvpmpmXR613apa40YhfPmv5rBjIIZBbfDjrI4YE5lqPJlRI2tsRRJvL2wE0gvZzSpA==
+X-Received: by 2002:a1c:5543:: with SMTP id j64mr8049334wmb.37.1555011896848; 
+	Thu, 11 Apr 2019 12:44:56 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	f15sm50244371wru.21.2019.04.11.12.44.55
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 11 Apr 2019 12:44:56 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190411182240.5957-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <e869e7fd-26f1-6bac-9a48-f302e4095a5c@redhat.com>
+Date: Thu, 11 Apr 2019 21:44:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190304071631.27567-2-richardw.yang@linux.intel.com>
+In-Reply-To: <20190411182240.5957-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:DGvzF2MUh6/4IttUnWwEwhdKCoxVcHIfGD1tcJ6eGL2HHMnjpYw
-	QfqfGLUqXfww6rbkG5juDXjIgQF9EDe+d4P7S3vpTjY4KM9PNsrzetM+TsLNq/5oxknES9b
-	R3nV+SX5e5f4tJC54GypdOZLN3CcdSg3mzdm7OdGZTHVG5fpsTm1rMxjg5y7+AEmuXVZuvx
-	N5ksJ2rRYAYuRCnHas3vg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:G9LdzMCpeZs=:p+39jBTTEAoYyWJrKY4Hti
-	NrY3gUFee0EFPz/4xUL+WToE12mWsy1C0uaK8t+Gra7ut4pAuPF7LFq9NokIbVpJvKR2xBAwB
-	8jbOpQi2kk1R5hEavibFAu0ICsNlTNS8EZj5HFXpY5KubBwcdZmTkof5AEPVRV7pCapfOrgTQ
-	5JQqHeTplT1xGvr0sYIzBDhYb4PF1xDFme9vjEeuSGSXSn1ptYtIl7G/0tP6zobqSBWeym5nS
-	xu/tajB3Wcthqf86QNWAZXNJijidiqKMsKJOl/QyAWxpAqC2WaObnOCj1O0DaAc60cjn97xv0
-	22kP1l2SJvNFzNAKVsLICfuEGAIEmswPFDxqD36wk1ulIsezKgkO7AJb8FwsXzSxAI6NfzLr0
-	3lfj+b5Xfqi9MuXqu53J7RrIfYoKAh7r6k9CjIZ0w25/YIXbJ3uZglFICbNAsgCGIvQkqa3a7
-	hK4dm7bVqeRB6zQcceChYFGJ9bqAUMd5n4ItF/9FAnrW/ZflBa+xsddsRoBIR8EcsarsQMiS5
-	tFnsvBqXmmfhM6LcjKrazUngXTACcdPlItu/iHHmUn3H/d8q2ICeFq3a9XHz0Dg4sY7HQctPS
-	57paCaLe75Daz9FSFQQIBqXLhW8IGDGOHbhMFf39RHA3/bCagaCzkT+tOwJ2Bj70/5Rj5CaIS
-	GEYyacg1oNSCX9tKZAp85GZ1EDtrzV6fcAuxadchIP74R6KAxqeWSRkDGyzruleRuKehLS0dE
-	+L6FH9aqhLOpebYEW9tqr1Zi3DkqqAYv/3TaNYjGP42UxxWORzvuIwL+SpE=
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v6 1/2] CODING_STYLE:
- specify the indent rule for multiline code
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch
+ for the ps2.c file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,98 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mjt@tls.msk.ru, imammedo@redhat.com,
-	philmd@redhat.com, sgarzare@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411194226.kNokBLzZZU7PchE2lkACX9JXa99dJPlDdQ0lREgHOTE@z>
+Message-ID: <20190411194455.StxWbLIn66d-owqApNubAqqZ-1ySfjqoSKsi9a6Agow@z>
 
-On 04/03/2019 08:16, Wei Yang wrote:
-> We didn't specify the indent rule for multiline code here, which may
-> mislead users. And in current code, the code use various styles.
-> 
-> Add this rule in CODING_STYLE to make sure this is clear to every one.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> 
+On 4/11/19 8:22 PM, Thomas Huth wrote:
+> ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
+
+Hehe I have the same patch staged locally =)
+
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
-> v6:
->    * add ) for last example of function
-> v5:
->    * different rules -> various styles
->    * describe function variants separately
->    * take struct out
-> v4:
->    * widths -> width
->    * add an exception example for function
-> v3:
->    * misleading -> mislead
->    * add comma after arg2 in example
-> v2:
->    * rephrase changelog suggested by Eric Blake
->      - remove one redundant line
->      - fix some awkward grammar
->      - add { ; at the end of example
-> ---
->  CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
+>  hw/input/Kconfig       | 5 +++++
+>  hw/input/Makefile.objs | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/CODING_STYLE b/CODING_STYLE
-> index ec075dedc4..90321e9c28 100644
-> --- a/CODING_STYLE
-> +++ b/CODING_STYLE
-> @@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
+> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+> index e2e66f0858..316573f782 100644
+> --- a/hw/input/Kconfig
+> +++ b/hw/input/Kconfig
+> @@ -8,10 +8,15 @@ config LM832X
+>  config PCKBD
+>      bool
+>      default y
+> +    select PS2
+>      depends on ISA_BUS
 >  
->  Do not leave whitespace dangling off the ends of lines.
+>  config PL050
+>      bool
+> +    select PS2
+> +
+> +config PS2
+> +    bool
 >  
-> +1.1 Multiline Indent
-> +
-> +There are several places where indent is necessary:
-> +
-> + - if/else
-> + - while/for
-> + - function definition & call
-> +
-> +When breaking up a long line to fit within line width, we need a proper indent
-> +for the following lines.
-> +
-> +In case of if/else, while/for, align the secondary lines just after the
-> +opening parenthesis of the first.
-> +
-> +For example:
-> +
-> +    if (a == 1 &&
-> +        b == 2) {
-> +
-> +    while (a == 1 &&
-> +           b == 2) {
-> +
-> +In case of function, there are several variants:
-> +
-> +    * 4 spaces indent from the beginning
-> +    * align the secondary lines just after the opening parenthesis of the
-> +      first
-> +
-> +For example:
-> +
-> +    do_something(x, y,
-> +        z);
-> +
-> +    do_something(x, y,
-> +                 z);
-> +
-> +    do_something(x, do_another(y,
-> +                               z));
-> +
->  2. Line width
+>  config STELLARIS_INPUT
+>      bool
+> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+> index c8b00f71ec..6db5ee0e71 100644
+> --- a/hw/input/Makefile.objs
+> +++ b/hw/input/Makefile.objs
+> @@ -3,7 +3,7 @@ common-obj-y += hid.o
+>  common-obj-$(CONFIG_LM832X) += lm832x.o
+>  common-obj-$(CONFIG_PCKBD) += pckbd.o
+>  common-obj-$(CONFIG_PL050) += pl050.o
+> -common-obj-y += ps2.o
+> +common-obj-$(CONFIG_PS2) += ps2.o
+>  common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+>  common-obj-$(CONFIG_TSC2005) += tsc2005.o
 >  
->  Lines should be 80 characters; try not to make them longer.
 > 
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
 
