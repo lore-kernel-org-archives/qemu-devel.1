@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41621)
+Received: from eggs.gnu.org ([209.51.188.92]:45239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hERfi-00084a-17
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 00:50:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1hES2U-0003xT-PO
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hERfh-0004yP-0j
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 00:50:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44240)
+	(envelope-from <thuth@redhat.com>) id 1hES2T-0002iP-SD
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hERfg-0004x9-JX
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 00:50:44 -0400
-References: <20190407092314.11066-1-thuth@redhat.com>
-	<20190408134517.GA9047@richard>
-	<14147807-8723-adac-dffb-31b7bbd0fc3b@redhat.com>
-	<20190408212911.jiqdva62ddebndut@master>
-	<20190411015619.GA9198@richard>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hES2T-0002hd-Iv
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 01:14:17 -0400
+References: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8c0c99e1-3f9c-f852-aa0d-7a4a31856392@redhat.com>
-Date: Thu, 11 Apr 2019 06:50:38 +0200
+Message-ID: <62a249a3-f0ed-fa10-f1cc-4ba0cb2594f9@redhat.com>
+Date: Thu, 11 Apr 2019 07:14:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190411015619.GA9198@richard>
+In-Reply-To: <9733F0BD86F8654AA2F9754B852827E6072FB6EF@fmsmsx124.amr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] hw/i386/pc: Fix crash when
- hot-plugging nvdimm on older machine types
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU Logo question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, Wei Yang <richard.weiyang@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Barajas, Felipe" <felipe.barajas@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Beno=c3=aet_Canet?= <benoit.canet@nodalink.com>, Benoit Canet <benoit@irqsave.net>
 
- Hi,
+On 10/04/2019 19.51, Barajas, Felipe wrote:
+> Hi,
+>=20
+> I am trying to understand who in the QEMU community can give me permiss=
+ion to use the QEMU logo in a whitepaper.
+> I am an application engineer at Intel and I have prepared some benchmar=
+ks using QEMU as a solution accelerated by Intel hardware (CPUs, SSDs, et=
+c)
+> I would like to use the QEMU logo in this white paper.
+>=20
+> Do you know who in the community would have authority to give me such p=
+ermission ?
 
-On 11/04/2019 03.56, Wei Yang wrote:
-> On Mon, Apr 08, 2019 at 09:29:11PM +0000, Wei Yang wrote:
->>>>
->>>> Thomas,
->>>>
->>>> Thanks for pointing this out, while I have some different idea on how to fix
->>>> this.
->>>>
->>>> The reason of the core dump is errp already been set in
->>>> hotplug_handler_pre_plug(), and this function check acpi hotplug capability.
->>>> The order of this check is correct, while we should  return when errp is set
->>>> in hotplug_handler_pre_plug().
->>>>
->>>> I got a fix like this, which I have tested and looks good to me.
->>>>
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 6077d27361..b11f3b15c1 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -2091,6 +2091,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>      }
->>>>  
->>>>      hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
->>>> +    if (*errp) {
->>>> +        return;
->>>> +    }
->>>
->>> Not sure, but I think you can not rely on the fact that the caller set
->>> *errp = NULL already... that's why it is more common to use a local_err
->>> variable and error_propagate() for such cases (which is what I did in my
->>> patch).
->>>
->>
->> Ok, that's fine for me.
->>
->>> Also, why don't you want the "nvdimm is not enabled: missing 'nvdimm' in
->>> '-M'" check to be done first?
->>>
->>
->> Because this function pc_memory_pre_plug() will be called not only when
->> nvdimm is hot-plugged but also dimm is hot-plugged. And
->> hotplug_handler_pre_plug() here is to check the acpi(if it has) hot-plug
->> capability.
->>
->> So the check in pc_memory_pre_plug() is from generic to specific: 
->>    1. Do we have capability to hot-plug?
->>    2. If the device is nvdimm, do we enabled nvdimm?
->>
-> 
-> Thomas
-> 
-> Do you think this is a reasonable explanation?
+The logo has been designed by Beno=C3=AEt Canet, see:
 
-Fine for me, I don't mind either way as long as the crash is fixed. Feel
-free to send a patch that restores the desired order.
+ http://lists.gnu.org/archive/html/qemu-devel/2012-02/msg02865.html
 
- Thomas
+It is licensed under the terms of CC BY 3.0 :
+
+ http://creativecommons.org/licenses/by/3.0/
+
+ HTH,
+  Thomas
