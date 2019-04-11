@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51039)
+Received: from eggs.gnu.org ([209.51.188.92]:51920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEbiL-0004v1-D3
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEblT-0007s2-5p
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEbiK-0004pM-G9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:09 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEbiK-0004oY-52
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:34:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id y84so5248942oia.12
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:34:07 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hEblP-0006tP-De
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEblM-0006s6-Kq
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:37:17 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DC02C033499
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:37:15 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190411145256.8614-1-armbru@redhat.com>
+	<20190411145256.8614-4-armbru@redhat.com>
+	<0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com>
+Date: Thu, 11 Apr 2019 17:37:11 +0200
+In-Reply-To: <0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com> (Paolo
+	Bonzini's message of "Thu, 11 Apr 2019 17:22:20 +0200")
+Message-ID: <87tvf4v9i0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190409160219.19026-1-eric.auger@redhat.com>
-	<20190410001640.GA25214@xz-x1>
-In-Reply-To: <20190410001640.GA25214@xz-x1>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Apr 2019 16:33:55 +0100
-Message-ID: <CAFEAcA9LZ21fkGsvw_0+Pro64-JP33qKim8aRNcPnzg9mt16CA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/arm/smmuv3: Remove
- SMMUNotifierNode
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
+ redirected to" message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Wed, 10 Apr 2019 at 01:16, Peter Xu <peterx@redhat.com> wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 11/04/19 16:52, Markus Armbruster wrote:
+>> char_pty_open() prints a "char device redirected to PTY_NAME (label
+>> LABEL)" message to the current monitor or else to stderr.  No other
+>> ChardevClass::open() prints anything on success.  Drop the message.
+>>=20
+>> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  chardev/char-pty.c | 2 --
+>>  1 file changed, 2 deletions(-)
+>>=20
+>> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+>> index b034332edd..a48d3e5d20 100644
+>> --- a/chardev/char-pty.c
+>> +++ b/chardev/char-pty.c
+>> @@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
+>>      qemu_set_nonblock(master_fd);
+>>=20=20
+>>      chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+>> -    error_printf("char device redirected to %s (label %s)\n",
+>> -                 pty_name, chr->label);
+>>=20=20
+>>      s =3D PTY_CHARDEV(chr);
+>>      s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
 >
-> On Tue, Apr 09, 2019 at 06:02:19PM +0200, Eric Auger wrote:
-> > The SMMUNotifierNode struct is not necessary and brings extra
-> > complexity so let's remove it. We now directly track the SMMUDevices
-> > which have registered IOMMU MR notifiers.
-> >
-> > This is inspired from the same transformation on intel-iommu
-> > done in commit b4a4ba0d68f50f218ee3957b6638dbee32a5eeef
-> > ("intel-iommu: remove IntelIOMMUNotifierNode")
-> >
-> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> The reason for the message is that the char device is completely useless
+> until the user knows the /dev/pts/N path[1].  You can get it with "info
+> chardev" (aka query-chardev for QMP) but there's an interesting chicken
+> and egg problem if the pty is for your monitor...
 >
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Paolo
 
-Thanks; applied to target-arm.next for 4.1.
+During review of v1, I wrote:
 
--- PMM
+    If we should decide the message is still useful enough to be worth
+    keeping, I could direct it to stdout instead of dropping it.
+
+No clear conclusion emerged, so I did nothing for v2.  If we conclude to
+keep the message now, I'll gladly do that.
+
+> [1] once you know it, you can use the monitor's readline interface with
+> e.g. "socat STDIO,cfmakeraw FILE:/dev/pts/1"
+
+There's also
+
+    $ socat UNIX:/path/to/socket READLINE,history=3D$HOME/.hmp_history,prom=
+pt=3D'(qemu) '
+
+Lacks completion.  But then our very own reimplementation of readline
+lacks any number of other features.
