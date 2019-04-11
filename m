@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C45C282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9DBC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCCA22173C
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCCA22173C
+	by mail.kernel.org (Postfix) with ESMTPS id D4E172083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E172083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50807 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50809 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbhj-00044b-07
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:33:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48239)
+	id 1hEbhm-000484-U9
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:33:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZv-0005fA-Cv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEbZz-0005kp-3w
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZr-0006Uy-Fp
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57436)
+	(envelope-from <armbru@redhat.com>) id 1hEbZw-0006g6-0c
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZr-0006TU-3b
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZv-0006Vr-7G
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 541B9313C25F
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBF93305D468
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F06B96134A;
-	Thu, 11 Apr 2019 15:25:21 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 819D45C223;
+	Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 889441132B74; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
+	id A67B21132988; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 17:25:07 +0200
-Message-Id: <20190411152520.10061-5-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 17:25:14 +0200
+Message-Id: <20190411152520.10061-12-armbru@redhat.com>
 In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
 References: <20190411152520.10061-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 11 Apr 2019 15:25:22 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 04/17] tcg: Simplify how dump_exec_info() prints
+Subject: [Qemu-devel] [PATCH 11/17] target/i386: Simplify how
+ x86_cpu_dump_local_apic_state() prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,12 +74,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411152507.bfjE96BVit1zkg3uSYs5yGArS4wqX6bCOlXalmi2qhs@z>
+Message-ID: <20190411152514.tH8i-ZfbQMl2NJFoer9IzmcfG_NzHcrzueJpAP-kuQQ@z>
 
-dump_exec_info() takes an fprintf()-like callback and a FILE * to pass
-to it.
+x86_cpu_dump_local_apic_state() takes an fprintf()-like callback and a
+FILE * to pass to it, and so do its helper functions.
 
-Its only caller hmp_info_jit() passes monitor_fprintf() and the
+Its only caller hmp_info_local_apic() passes monitor_fprintf() and the
 current monitor cast to FILE *.  monitor_fprintf() casts it right
 back, and is otherwise identical to monitor_printf().  The
 type-punning is ugly.
@@ -87,257 +88,234 @@ Drop the callback, and call qemu_printf() instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- accel/tcg/translate-all.c | 45 ++++++++++++++++++++-------------------
- include/exec/cpu-all.h    |  2 +-
- monitor.c                 |  2 +-
- tcg/tcg.c                 | 41 ++++++++++++++++++-----------------
- tcg/tcg.h                 |  2 +-
- 5 files changed, 47 insertions(+), 45 deletions(-)
+ target/i386/cpu.h     |  3 +-
+ target/i386/helper.c  | 79 ++++++++++++++++++++-----------------------
+ target/i386/monitor.c |  3 +-
+ 3 files changed, 39 insertions(+), 46 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 85e80a1fad..75a6cf49f1 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -50,6 +50,7 @@
- #include "translate-all.h"
- #include "qemu/bitmap.h"
- #include "qemu/error-report.h"
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index b39327dcb7..139fe30960 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1924,8 +1924,7 @@ void enable_compat_apic_id_mode(void);
+ #define APIC_DEFAULT_ADDRESS 0xfee00000
+ #define APIC_SPACE_SIZE      0x100000
+ 
+-void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+-                                   fprintf_function cpu_fprintf, int flags);
++void x86_cpu_dump_local_apic_state(CPUState *cs, int flags);
+ 
+ /* cpu.c */
+ bool cpu_is_bsp(X86CPU *cpu);
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index e695f8ba7a..565391a9f6 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -20,6 +20,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
 +#include "qemu/qemu-print.h"
- #include "qemu/timer.h"
- #include "qemu/main-loop.h"
- #include "exec/log.h"
-@@ -2214,8 +2215,7 @@ void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
-     tb_jmp_cache_clear_page(cpu, addr);
+ #include "sysemu/kvm.h"
+ #include "kvm_i386.h"
+ #ifndef CONFIG_USER_ONLY
+@@ -231,12 +232,10 @@ static inline const char *dm2str(uint32_t dm)
+     return str[dm];
  }
  
--static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
--                                 struct qht_stats hst)
-+static void print_qht_statistics(struct qht_stats hst)
+-static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
+-                          const char *name, uint32_t lvt, bool is_timer)
++static void dump_apic_lvt(const char *name, uint32_t lvt, bool is_timer)
  {
-     uint32_t hgram_opts;
-     size_t hgram_bins;
-@@ -2224,7 +2224,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-     if (!hst.head_buckets) {
+     uint32_t dm = (lvt & APIC_LVT_DELIV_MOD) >> APIC_LVT_DELIV_MOD_SHIFT;
+-    cpu_fprintf(f,
+-                "%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
++    qemu_printf("%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
+                 name, lvt,
+                 lvt & APIC_LVT_INT_POLARITY ? "active-lo" : "active-hi",
+                 lvt & APIC_LVT_LEVEL_TRIGGER ? "level" : "edge",
+@@ -248,9 +247,9 @@ static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
+                                             "tsc-deadline" : "one-shot",
+                 dm2str(dm));
+     if (dm != APIC_DM_NMI) {
+-        cpu_fprintf(f, " (vec %u)\n", lvt & APIC_VECTOR_MASK);
++        qemu_printf(" (vec %u)\n", lvt & APIC_VECTOR_MASK);
+     } else {
+-        cpu_fprintf(f, "\n");
++        qemu_printf("\n");
+     }
+ }
+ 
+@@ -282,8 +281,7 @@ static inline void mask2str(char *str, uint32_t val, uint8_t size)
+ 
+ #define MAX_LOGICAL_APIC_ID_MASK_SIZE 16
+ 
+-static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+-                          APICCommonState *s, CPUX86State *env)
++static void dump_apic_icr(APICCommonState *s, CPUX86State *env)
+ {
+     uint32_t icr = s->icr[0], icr2 = s->icr[1];
+     uint8_t dest_shorthand = \
+@@ -293,16 +291,16 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+     uint32_t dest_field;
+     bool x2apic;
+ 
+-    cpu_fprintf(f, "ICR\t 0x%08x %s %s %s %s\n",
++    qemu_printf("ICR\t 0x%08x %s %s %s %s\n",
+                 icr,
+                 logical_mod ? "logical" : "physical",
+                 icr & APIC_ICR_TRIGGER_MOD ? "level" : "edge",
+                 icr & APIC_ICR_LEVEL ? "assert" : "de-assert",
+                 shorthand2str(dest_shorthand));
+ 
+-    cpu_fprintf(f, "ICR2\t 0x%08x", icr2);
++    qemu_printf("ICR2\t 0x%08x", icr2);
+     if (dest_shorthand != 0) {
+-        cpu_fprintf(f, "\n");
++        qemu_printf("\n");
          return;
      }
--    cpu_fprintf(f, "TB hash buckets     %zu/%zu (%0.2f%% head buckets used)\n",
-+    qemu_printf("TB hash buckets     %zu/%zu (%0.2f%% head buckets used)\n",
-                 hst.used_head_buckets, hst.head_buckets,
-                 (double)hst.used_head_buckets / hst.head_buckets * 100);
+     x2apic = env->features[FEAT_1_ECX] & CPUID_EXT_X2APIC;
+@@ -310,9 +308,9 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
  
-@@ -2234,7 +2234,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-         hgram_opts |= QDIST_PR_NODECIMAL;
+     if (!logical_mod) {
+         if (x2apic) {
+-            cpu_fprintf(f, " cpu %u (X2APIC ID)\n", dest_field);
++            qemu_printf(" cpu %u (X2APIC ID)\n", dest_field);
+         } else {
+-            cpu_fprintf(f, " cpu %u (APIC ID)\n",
++            qemu_printf(" cpu %u (APIC ID)\n",
+                         dest_field & APIC_LOGDEST_XAPIC_ID);
+         }
+         return;
+@@ -320,87 +318,84 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+ 
+     if (s->dest_mode == 0xf) { /* flat mode */
+         mask2str(apic_id_str, icr2 >> APIC_ICR_DEST_SHIFT, 8);
+-        cpu_fprintf(f, " mask %s (APIC ID)\n", apic_id_str);
++        qemu_printf(" mask %s (APIC ID)\n", apic_id_str);
+     } else if (s->dest_mode == 0) { /* cluster mode */
+         if (x2apic) {
+             mask2str(apic_id_str, dest_field & APIC_LOGDEST_X2APIC_ID, 16);
+-            cpu_fprintf(f, " cluster %u mask %s (X2APIC ID)\n",
++            qemu_printf(" cluster %u mask %s (X2APIC ID)\n",
+                         dest_field >> APIC_LOGDEST_X2APIC_SHIFT, apic_id_str);
+         } else {
+             mask2str(apic_id_str, dest_field & APIC_LOGDEST_XAPIC_ID, 4);
+-            cpu_fprintf(f, " cluster %u mask %s (APIC ID)\n",
++            qemu_printf(" cluster %u mask %s (APIC ID)\n",
+                         dest_field >> APIC_LOGDEST_XAPIC_SHIFT, apic_id_str);
+         }
      }
-     hgram = qdist_pr(&hst.occupancy, 10, hgram_opts);
--    cpu_fprintf(f, "TB hash occupancy   %0.2f%% avg chain occ. Histogram: %s\n",
-+    qemu_printf("TB hash occupancy   %0.2f%% avg chain occ. Histogram: %s\n",
-                 qdist_avg(&hst.occupancy) * 100, hgram);
-     g_free(hgram);
- 
-@@ -2247,7 +2247,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-         hgram_opts |= QDIST_PR_NODECIMAL | QDIST_PR_NOBINRANGE;
-     }
-     hgram = qdist_pr(&hst.chain, hgram_bins, hgram_opts);
--    cpu_fprintf(f, "TB hash avg chain   %0.3f buckets. Histogram: %s\n",
-+    qemu_printf("TB hash avg chain   %0.3f buckets. Histogram: %s\n",
-                 qdist_avg(&hst.chain), hgram);
-     g_free(hgram);
- }
-@@ -2285,7 +2285,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     return false;
  }
  
--void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-+void dump_exec_info(void)
+-static void dump_apic_interrupt(FILE *f, fprintf_function cpu_fprintf,
+-                                const char *name, uint32_t *ireg_tab,
++static void dump_apic_interrupt(const char *name, uint32_t *ireg_tab,
+                                 uint32_t *tmr_tab)
  {
-     struct tb_tree_stats tst = {};
-     struct qht_stats hst;
-@@ -2294,43 +2294,44 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     tcg_tb_foreach(tb_tree_stats_iter, &tst);
-     nb_tbs = tst.nb_tbs;
-     /* XXX: avoid using doubles ? */
--    cpu_fprintf(f, "Translation buffer state:\n");
-+    qemu_printf("Translation buffer state:\n");
-     /*
-      * Report total code size including the padding and TB structs;
-      * otherwise users might think "-tb-size" is not honoured.
-      * For avg host size we use the precise numbers from tb_tree_stats though.
-      */
--    cpu_fprintf(f, "gen code size       %zu/%zu\n",
-+    qemu_printf("gen code size       %zu/%zu\n",
-                 tcg_code_size(), tcg_code_capacity());
--    cpu_fprintf(f, "TB count            %zu\n", nb_tbs);
--    cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-+    qemu_printf("TB count            %zu\n", nb_tbs);
-+    qemu_printf("TB avg target size  %zu max=%zu bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-                 tst.max_target_size);
--    cpu_fprintf(f, "TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-+    qemu_printf("TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-                 nb_tbs ? tst.host_size / nb_tbs : 0,
-                 tst.target_size ? (double)tst.host_size / tst.target_size : 0);
--    cpu_fprintf(f, "cross page TB count %zu (%zu%%)\n", tst.cross_page,
--            nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
--    cpu_fprintf(f, "direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
-+    qemu_printf("cross page TB count %zu (%zu%%)\n", tst.cross_page,
-+                nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-+    qemu_printf("direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
-                 tst.direct_jmp_count,
-                 nb_tbs ? (tst.direct_jmp_count * 100) / nb_tbs : 0,
-                 tst.direct_jmp2_count,
-                 nb_tbs ? (tst.direct_jmp2_count * 100) / nb_tbs : 0);
+     int i, empty = true;
  
-     qht_statistics_init(&tb_ctx.htable, &hst);
--    print_qht_statistics(f, cpu_fprintf, hst);
-+    print_qht_statistics(hst);
-     qht_statistics_destroy(&hst);
- 
--    cpu_fprintf(f, "\nStatistics:\n");
--    cpu_fprintf(f, "TB flush count      %u\n",
-+    qemu_printf("\nStatistics:\n");
-+    qemu_printf("TB flush count      %u\n",
-                 atomic_read(&tb_ctx.tb_flush_count));
--    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_count());
-+    qemu_printf("TB invalidate count %zu\n",
-+                tcg_tb_phys_invalidate_count());
- 
-     tlb_flush_counts(&flush_full, &flush_part, &flush_elide);
--    cpu_fprintf(f, "TLB full flushes    %zu\n", flush_full);
--    cpu_fprintf(f, "TLB partial flushes %zu\n", flush_part);
--    cpu_fprintf(f, "TLB elided flushes  %zu\n", flush_elide);
--    tcg_dump_info(f, cpu_fprintf);
-+    qemu_printf("TLB full flushes    %zu\n", flush_full);
-+    qemu_printf("TLB partial flushes %zu\n", flush_part);
-+    qemu_printf("TLB elided flushes  %zu\n", flush_elide);
-+    tcg_dump_info();
+-    cpu_fprintf(f, "%s\t ", name);
++    qemu_printf("%s\t ", name);
+     for (i = 0; i < 256; i++) {
+         if (apic_get_bit(ireg_tab, i)) {
+-            cpu_fprintf(f, "%u%s ", i,
++            qemu_printf("%u%s ", i,
+                         apic_get_bit(tmr_tab, i) ? "(level)" : "");
+             empty = false;
+         }
+     }
+-    cpu_fprintf(f, "%s\n", empty ? "(none)" : "");
++    qemu_printf("%s\n", empty ? "(none)" : "");
  }
  
- void dump_opcount_info(void)
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 40f5edf4dc..da07ce311f 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -362,7 +362,7 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
-     return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
- }
- 
--void dump_exec_info(FILE *f, fprintf_function cpu_fprintf);
-+void dump_exec_info(void);
- void dump_opcount_info(void);
- #endif /* !CONFIG_USER_ONLY */
- 
-diff --git a/monitor.c b/monitor.c
-index 30a7ffe32b..24e4d49d11 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1318,7 +1318,7 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+-void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+-                                   fprintf_function cpu_fprintf, int flags)
++void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     APICCommonState *s = APIC_COMMON(cpu->apic_state);
+     if (!s) {
+-        cpu_fprintf(f, "local apic state not available\n");
++        qemu_printf("local apic state not available\n");
          return;
      }
+     uint32_t *lvt = s->lvt;
  
--    dump_exec_info((FILE *)mon, monitor_fprintf);
-+    dump_exec_info();
-     dump_drift_info((FILE *)mon, monitor_fprintf);
- }
+-    cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
++    qemu_printf("dumping local APIC state for CPU %-2u\n\n",
+                 CPU(cpu)->cpu_index);
+-    dump_apic_lvt(f, cpu_fprintf, "LVT0", lvt[APIC_LVT_LINT0], false);
+-    dump_apic_lvt(f, cpu_fprintf, "LVT1", lvt[APIC_LVT_LINT1], false);
+-    dump_apic_lvt(f, cpu_fprintf, "LVTPC", lvt[APIC_LVT_PERFORM], false);
+-    dump_apic_lvt(f, cpu_fprintf, "LVTERR", lvt[APIC_LVT_ERROR], false);
+-    dump_apic_lvt(f, cpu_fprintf, "LVTTHMR", lvt[APIC_LVT_THERMAL], false);
+-    dump_apic_lvt(f, cpu_fprintf, "LVTT", lvt[APIC_LVT_TIMER], true);
++    dump_apic_lvt("LVT0", lvt[APIC_LVT_LINT0], false);
++    dump_apic_lvt("LVT1", lvt[APIC_LVT_LINT1], false);
++    dump_apic_lvt("LVTPC", lvt[APIC_LVT_PERFORM], false);
++    dump_apic_lvt("LVTERR", lvt[APIC_LVT_ERROR], false);
++    dump_apic_lvt("LVTTHMR", lvt[APIC_LVT_THERMAL], false);
++    dump_apic_lvt("LVTT", lvt[APIC_LVT_TIMER], true);
  
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index cc5f4e2a03..6a22c8746c 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -4015,7 +4015,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- }
+-    cpu_fprintf(f, "Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
++    qemu_printf("Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
+                 s->divide_conf & APIC_DCR_MASK,
+                 divider_conf(s->divide_conf),
+                 s->initial_count);
  
- #ifdef CONFIG_PROFILER
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-+void tcg_dump_info(void)
- {
-     TCGProfile prof = {};
-     const TCGProfile *s;
-@@ -4029,52 +4029,53 @@ void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-     tb_div_count = tb_count ? tb_count : 1;
-     tot = s->interm_time + s->code_time;
+-    cpu_fprintf(f, "SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
++    qemu_printf("SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
+                 s->spurious_vec,
+                 s->spurious_vec & APIC_SPURIO_ENABLED ? "enabled" : "disabled",
+                 s->spurious_vec & APIC_SPURIO_FOCUS ? "on" : "off",
+                 s->spurious_vec & APIC_VECTOR_MASK);
  
--    cpu_fprintf(f, "JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
-+    qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
-                 tot, tot / 2.4e9);
--    cpu_fprintf(f, "translated TBs      %" PRId64 " (aborted=%" PRId64 " %0.1f%%)\n", 
-+    qemu_printf("translated TBs      %" PRId64 " (aborted=%" PRId64
-+                " %0.1f%%)\n",
-                 tb_count, s->tb_count1 - tb_count,
-                 (double)(s->tb_count1 - s->tb_count)
-                 / (s->tb_count1 ? s->tb_count1 : 1) * 100.0);
--    cpu_fprintf(f, "avg ops/TB          %0.1f max=%d\n", 
-+    qemu_printf("avg ops/TB          %0.1f max=%d\n",
-                 (double)s->op_count / tb_div_count, s->op_count_max);
--    cpu_fprintf(f, "deleted ops/TB      %0.2f\n",
-+    qemu_printf("deleted ops/TB      %0.2f\n",
-                 (double)s->del_op_count / tb_div_count);
--    cpu_fprintf(f, "avg temps/TB        %0.2f max=%d\n",
-+    qemu_printf("avg temps/TB        %0.2f max=%d\n",
-                 (double)s->temp_count / tb_div_count, s->temp_count_max);
--    cpu_fprintf(f, "avg host code/TB    %0.1f\n",
-+    qemu_printf("avg host code/TB    %0.1f\n",
-                 (double)s->code_out_len / tb_div_count);
--    cpu_fprintf(f, "avg search data/TB  %0.1f\n",
-+    qemu_printf("avg search data/TB  %0.1f\n",
-                 (double)s->search_out_len / tb_div_count);
-     
--    cpu_fprintf(f, "cycles/op           %0.1f\n", 
-+    qemu_printf("cycles/op           %0.1f\n",
-                 s->op_count ? (double)tot / s->op_count : 0);
--    cpu_fprintf(f, "cycles/in byte      %0.1f\n", 
-+    qemu_printf("cycles/in byte      %0.1f\n",
-                 s->code_in_len ? (double)tot / s->code_in_len : 0);
--    cpu_fprintf(f, "cycles/out byte     %0.1f\n", 
-+    qemu_printf("cycles/out byte     %0.1f\n",
-                 s->code_out_len ? (double)tot / s->code_out_len : 0);
--    cpu_fprintf(f, "cycles/search byte     %0.1f\n",
-+    qemu_printf("cycles/search byte     %0.1f\n",
-                 s->search_out_len ? (double)tot / s->search_out_len : 0);
-     if (tot == 0) {
-         tot = 1;
+-    dump_apic_icr(f, cpu_fprintf, s, &cpu->env);
++    dump_apic_icr(s, &cpu->env);
+ 
+-    cpu_fprintf(f, "ESR\t 0x%08x\n", s->esr);
++    qemu_printf("ESR\t 0x%08x\n", s->esr);
+ 
+-    dump_apic_interrupt(f, cpu_fprintf, "ISR", s->isr, s->tmr);
+-    dump_apic_interrupt(f, cpu_fprintf, "IRR", s->irr, s->tmr);
++    dump_apic_interrupt("ISR", s->isr, s->tmr);
++    dump_apic_interrupt("IRR", s->irr, s->tmr);
+ 
+-    cpu_fprintf(f, "\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
++    qemu_printf("\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
+                 s->arb_id, s->tpr, s->dest_mode, s->log_dest);
+     if (s->dest_mode == 0) {
+-        cpu_fprintf(f, "(cluster %u: id %u)",
++        qemu_printf("(cluster %u: id %u)",
+                     s->log_dest >> APIC_LOGDEST_XAPIC_SHIFT,
+                     s->log_dest & APIC_LOGDEST_XAPIC_ID);
      }
--    cpu_fprintf(f, "  gen_interm time   %0.1f%%\n", 
-+    qemu_printf("  gen_interm time   %0.1f%%\n",
-                 (double)s->interm_time / tot * 100.0);
--    cpu_fprintf(f, "  gen_code time     %0.1f%%\n", 
-+    qemu_printf("  gen_code time     %0.1f%%\n",
-                 (double)s->code_time / tot * 100.0);
--    cpu_fprintf(f, "optim./code time    %0.1f%%\n",
-+    qemu_printf("optim./code time    %0.1f%%\n",
-                 (double)s->opt_time / (s->code_time ? s->code_time : 1)
-                 * 100.0);
--    cpu_fprintf(f, "liveness/code time  %0.1f%%\n", 
-+    qemu_printf("liveness/code time  %0.1f%%\n",
-                 (double)s->la_time / (s->code_time ? s->code_time : 1) * 100.0);
--    cpu_fprintf(f, "cpu_restore count   %" PRId64 "\n",
-+    qemu_printf("cpu_restore count   %" PRId64 "\n",
-                 s->restore_count);
--    cpu_fprintf(f, "  avg cycles        %0.1f\n",
-+    qemu_printf("  avg cycles        %0.1f\n",
-                 s->restore_count ? (double)s->restore_time / s->restore_count : 0);
+-    cpu_fprintf(f, " PPR 0x%02x\n", apic_get_ppr(s));
++    qemu_printf(" PPR 0x%02x\n", apic_get_ppr(s));
  }
  #else
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-+void tcg_dump_info(void)
+-void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+-                                   fprintf_function cpu_fprintf, int flags)
++void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
  {
--    cpu_fprintf(f, "[TCG profiler not compiled]\n");
-+    qemu_printf("[TCG profiler not compiled]\n");
  }
- #endif
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 74a13c571b..56e2dbece7 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -664,8 +664,7 @@ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "No CPU available\n");
+         return;
+     }
+-    x86_cpu_dump_local_apic_state(cs, (FILE *)mon, monitor_fprintf,
+-                                  CPU_DUMP_FPU);
++    x86_cpu_dump_local_apic_state(cs, CPU_DUMP_FPU);
+ }
  
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 9f2b03f119..a394d78237 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -1017,7 +1017,7 @@ int tcg_check_temp_count(void);
- #endif
- 
- int64_t tcg_cpu_exec_time(void);
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf);
-+void tcg_dump_info(void);
- void tcg_dump_op_count(void);
- 
- #define TCG_CT_ALIAS  0x80
+ void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
 -- 
 2.17.2
 
