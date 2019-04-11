@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44368)
+Received: from eggs.gnu.org ([209.51.188.92]:47246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEZlj-0007ih-3g
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:29:31 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEZx7-00048S-9W
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEZli-0001kz-6Z
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:29:31 -0400
-Date: Thu, 11 Apr 2019 15:29:21 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190411132921.GC5694@linux.fritz.box>
-References: <20190410162918.9343-1-mreitz@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEZx6-0001C6-1K
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:41:17 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 13:40:51 +0000
+Message-ID: <4f9792a1-4702-62d0-cad4-4da1169baa3b@virtuozzo.com>
+References: <20190225152053.15976-1-kwolf@redhat.com>
+	<20190225152053.15976-17-kwolf@redhat.com>
+In-Reply-To: <20190225152053.15976-17-kwolf@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <49E7C8C8465B9949B978BAF007E59A4D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190410162918.9343-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Let 245 pass on tmpfs
+Subject: Re: [Qemu-devel] [PULL 16/71] nbd: Increase bs->in_flight during
+ AioContext switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,16 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>
+To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Am 10.04.2019 um 18:29 hat Max Reitz geschrieben:
-> tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
-> @direct if the filesystem does not support it.
-> 
-> Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-
-Thanks, applied to the block branch.
-
-Kevin
+MjUuMDIuMjAxOSAxODoxOSwgS2V2aW4gV29sZiB3cm90ZToNCj4gYmRydl9kcmFpbigpIG11c3Qg
+bm90IGxlYXZlIGNvbm5lY3Rpb25fY28gc2NoZWR1bGVkLCBzbyBicy0+aW5fZmxpZ2h0DQo+IG5l
+ZWRzIHRvIGJlIGluY3JlYXNlZCB3aGlsZSB0aGUgY29yb3V0aW5lIGlzIHdhaXRpbmcgdG8gYmUg
+c2NoZWR1bGVkDQo+IGluIHRoZSBuZXcgQWlvQ29udGV4dCBhZnRlciBuYmRfY2xpZW50X2F0dGFj
+aF9haW9fY29udGV4dCgpLg0KDQpIaSENCg0KSSBoYXZlIHNvbWUgcXVlc3Rpb25zLCBjb3VsZCB5
+b3UgZXhwbGFpbiwgcGxlYXNlPw0KDQoiYmRydl9kcmFpbigpIG11c3Qgbm90IGxlYXZlIGNvbm5l
+Y3Rpb25fY28gc2NoZWR1bGVkIiAtIGl0J3MgYmVjYXVzZSB3ZSB3YW50IHRvIGJlDQpzdXJlIHRo
+YXQgY29ubmVjdGlvbl9jbyB5aWVsZGVkIGZyb20gbmJkX3JlYWRfZW9mLCB5ZXM/DQoNCkJ1dCBp
+dCBpcyBndWFyYW50ZWVkIGJ5IGFpb193YWl0X2JoX29uZXNob3QuLiBXaHkgZG8gd2UgbmVlZCBh
+ZGRpdGlvaW5hbGx5IGluYy9kZWMNCmJzLT5pbl9mbGlnaHQgPw0KDQo+IA0KPiBTaWduZWQtb2Zm
+LWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9uYmQt
+Y2xpZW50LmMgfCAyMCArKysrKysrKysrKysrKysrKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAx
+OCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2Nr
+L25iZC1jbGllbnQuYyBiL2Jsb2NrL25iZC1jbGllbnQuYw0KPiBpbmRleCA2MGYzOGYwMzIwLi5i
+ZmJhZjdlYmU5IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9uYmQtY2xpZW50LmMNCj4gKysrIGIvYmxv
+Y2svbmJkLWNsaWVudC5jDQo+IEBAIC05NzcsMTQgKzk3NywzMCBAQCB2b2lkIG5iZF9jbGllbnRf
+ZGV0YWNoX2Fpb19jb250ZXh0KEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgICAgICBxaW9fY2hh
+bm5lbF9kZXRhY2hfYWlvX2NvbnRleHQoUUlPX0NIQU5ORUwoY2xpZW50LT5pb2MpKTsNCj4gICB9
+DQo+ICAgDQo+ICtzdGF0aWMgdm9pZCBuYmRfY2xpZW50X2F0dGFjaF9haW9fY29udGV4dF9iaCh2
+b2lkICpvcGFxdWUpDQo+ICt7DQo+ICsgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBvcGFxdWU7
+DQo+ICsgICAgTkJEQ2xpZW50U2Vzc2lvbiAqY2xpZW50ID0gbmJkX2dldF9jbGllbnRfc2Vzc2lv
+bihicyk7DQo+ICsNCj4gKyAgICAvKiBUaGUgbm9kZSBpcyBzdGlsbCBkcmFpbmVkLCBzbyB3ZSBr
+bm93IHRoZSBjb3JvdXRpbmUgaGFzIHlpZWxkZWQgaW4NCj4gKyAgICAgKiBuYmRfcmVhZF9lb2Yo
+KSwgdGhlIG9ubHkgcGxhY2Ugd2hlcmUgYnMtPmluX2ZsaWdodCBjYW4gcmVhY2ggMCwgb3IgaXQg
+aXMNCj4gKyAgICAgKiBlbnRlcmVkIGZvciB0aGUgZmlyc3QgdGltZS4gQm90aCBwbGFjZXMgYXJl
+IHNhZmUgZm9yIGVudGVyaW5nIHRoZQ0KPiArICAgICAqIGNvcm91dGluZS4qLw0KPiArICAgIHFl
+bXVfYWlvX2Nvcm91dGluZV9lbnRlcihicy0+YWlvX2NvbnRleHQsIGNsaWVudC0+Y29ubmVjdGlv
+bl9jbyk7DQo+ICsgICAgYmRydl9kZWNfaW5fZmxpZ2h0KGJzKTsNCj4gK30NCj4gKw0KPiAgIHZv
+aWQgbmJkX2NsaWVudF9hdHRhY2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBBaW9Db250ZXh0ICpuZXdfY29u
+dGV4dCkNCj4gICB7DQo+ICAgICAgIE5CRENsaWVudFNlc3Npb24gKmNsaWVudCA9IG5iZF9nZXRf
+Y2xpZW50X3Nlc3Npb24oYnMpOw0KPiAgICAgICBxaW9fY2hhbm5lbF9hdHRhY2hfYWlvX2NvbnRl
+eHQoUUlPX0NIQU5ORUwoY2xpZW50LT5pb2MpLCBuZXdfY29udGV4dCk7DQo+ICAgDQo+IC0gICAg
+LyogRklYTUUgUmVhbGx5IG5lZWQgYSBiZHJ2X2luY19pbl9mbGlnaHQoKSBoZXJlICovDQo+IC0g
+ICAgYWlvX2NvX3NjaGVkdWxlKG5ld19jb250ZXh0LCBjbGllbnQtPmNvbm5lY3Rpb25fY28pOw0K
+PiArICAgIGJkcnZfaW5jX2luX2ZsaWdodChicyk7DQo+ICsNCj4gKyAgICAvKiBOZWVkIHRvIHdh
+aXQgaGVyZSBmb3IgdGhlIEJIIHRvIHJ1biBiZWNhdXNlIHRoZSBCSCBtdXN0IHJ1biB3aGlsZSB0
+aGUNCj4gKyAgICAgKiBub2RlIGlzIHN0aWxsIGRyYWluZWQuICovDQo+ICsgICAgYWlvX3dhaXRf
+Ymhfb25lc2hvdChuZXdfY29udGV4dCwgbmJkX2NsaWVudF9hdHRhY2hfYWlvX2NvbnRleHRfYmgs
+IGJzKTsNCj4gICB9DQo+ICAgDQo+ICAgdm9pZCBuYmRfY2xpZW50X2Nsb3NlKEJsb2NrRHJpdmVy
+U3RhdGUgKmJzKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
