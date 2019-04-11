@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B661CC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF1AC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8819D20818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8819D20818
+	by mail.kernel.org (Postfix) with ESMTPS id 61BBB20818
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:07:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BBB20818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50393 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbH6-0006Na-Pq
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:06:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39147)
+	id 1hEbIK-0007LK-Mm
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:07:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4n-0003WG-4l
+	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vn-4n
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4l-0000sT-2O
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33072)
+	(envelope-from <armbru@redhat.com>) id 1hEb4i-0000rS-OJ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9535)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4i-0000oh-Tv
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4g-0000mf-Or
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 74CE931028C4
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D43B5D5F6
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C9E719C6F;
-	Thu, 11 Apr 2019 14:52:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 375291001E6E;
+	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D50D41132A03; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+	id 064351132783; Thu, 11 Apr 2019 16:52:57 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:48 +0200
-Message-Id: <20190411145256.8614-8-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:56 +0200
+Message-Id: <20190411145256.8614-16-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 11 Apr 2019 14:53:06 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 07/15] hpet: Report warnings with
- warn_report(), not error_printf()
+Subject: [Qemu-devel] [PATCH v2 15/15] monitor: Simplify how
+ -device/device_add print help
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,33 +69,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411145248.mynFdfIzaNQ2sYavcGVgEX-ADVNhuhxk1ZObPOy7SVw@z>
+Message-ID: <20190411145256.YdHUgknDV4EwqKxCOKaCMxYxxpLj0xpe_AKn-M9Sibc@z>
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Commit a95db58f210 added monitor_vfprintf() as an error_printf()
+generalized from stderr to arbitrary streams, then used it wrapped in
+helper out_printf() to print -device/device_add help to stdout.  Use
+qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
+
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/timer/hpet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/monitor/monitor.h |  3 ---
+ monitor.c                 | 16 ++++------------
+ qdev-monitor.c            | 36 ++++++++++++++----------------------
+ 3 files changed, 18 insertions(+), 37 deletions(-)
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index d97436bc7b..41024f39fb 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -744,7 +744,7 @@ static void hpet_realize(DeviceState *dev, Error **errp)
-     HPETTimer *timer;
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index e4c3717454..316a168c41 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int monitor_fdset_dup_fd_find(int dup_fd);
  
-     if (!s->intcap) {
--        error_printf("Hpet's intcap not initialized.\n");
-+        warn_report("Hpet's intcap not initialized");
+-int monitor_vfprintf(FILE *stream,
+-                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+-
+ #endif /* MONITOR_H */
+diff --git a/monitor.c b/monitor.c
+index 7b4a78d798..10be8bdb86 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
+     monitor_flush(opaque);
+ }
+ 
+-/*
+- * Print to current monitor if we have one, else to stream.
+- */
+-int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+-{
+-    if (cur_mon && !monitor_cur_is_qmp()) {
+-        return monitor_vprintf(cur_mon, fmt, ap);
+-    }
+-    return vfprintf(stream, fmt, ap);
+-}
+-
+ /*
+  * Print to current monitor if we have one, else to stderr.
+  */
+ int error_vprintf(const char *fmt, va_list ap)
+ {
+-    return monitor_vfprintf(stderr, fmt, ap);
++    if (cur_mon && !monitor_cur_is_qmp()) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vfprintf(stderr, fmt, ap);
+ }
+ 
+ int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index d4320986a2..373b9ad445 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -31,6 +31,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "qemu/option.h"
++#include "qemu/qemu-print.h"
+ #include "sysemu/block-backend.h"
+ #include "migration/misc.h"
+ 
+@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
+     return (qdev_class_get_alias(dc) != NULL);
+ }
+ 
+-static void out_printf(const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    monitor_vfprintf(stdout, fmt, ap);
+-    va_end(ap);
+-}
+-
+ static void qdev_print_devinfo(DeviceClass *dc)
+ {
+-    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
++    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
+     if (dc->bus_type) {
+-        out_printf(", bus %s", dc->bus_type);
++        qemu_printf(", bus %s", dc->bus_type);
      }
-     if (hpet_cfg.count == UINT8_MAX) {
-         /* first instance */
+     if (qdev_class_has_alias(dc)) {
+-        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
++        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
+     }
+     if (dc->desc) {
+-        out_printf(", desc \"%s\"", dc->desc);
++        qemu_printf(", desc \"%s\"", dc->desc);
+     }
+     if (!dc->user_creatable) {
+-        out_printf(", no-user");
++        qemu_printf(", no-user");
+     }
+-    out_printf("\n");
++    qemu_printf("\n");
+ }
+ 
+ static void qdev_print_devinfos(bool show_no_user)
+@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
+                 continue;
+             }
+             if (!cat_printed) {
+-                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
++                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
+                 cat_printed = true;
+             }
+             qdev_print_devinfo(dc);
+@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
+     }
+ 
+     if (prop_list) {
+-        out_printf("%s options:\n", driver);
++        qemu_printf("%s options:\n", driver);
+     } else {
+-        out_printf("There are no options for %s.\n", driver);
++        qemu_printf("There are no options for %s.\n", driver);
+     }
+     for (prop = prop_list; prop; prop = prop->next) {
+         int len;
+-        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
++        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
+         if (prop->value->has_description) {
+             if (len < 24) {
+-                out_printf("%*s", 24 - len, "");
++                qemu_printf("%*s", 24 - len, "");
+             }
+-            out_printf(" - %s\n", prop->value->description);
++            qemu_printf(" - %s\n", prop->value->description);
+         } else {
+-            out_printf("\n");
++            qemu_printf("\n");
+         }
+     }
+ 
 -- 
 2.17.2
 
