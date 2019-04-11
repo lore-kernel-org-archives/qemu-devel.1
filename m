@@ -1,45 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36526)
+Received: from eggs.gnu.org ([209.51.188.92]:38264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hEcWL-0000qe-W5
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:25:50 -0400
+	(envelope-from <groug@kaod.org>) id 1hEccu-00030n-7s
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hEcWL-0005lE-38
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:25:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42412)
+	(envelope-from <groug@kaod.org>) id 1hEccs-0005jk-Ns
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:32:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58024
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1hEcWK-0005kq-Nl
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:25:49 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3BGMXRV131551
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:25:46 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rt686k685-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hEccs-0005iy-CJ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:32:34 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3BGVGan024341
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:32:30 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rt964g29m-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:25:46 -0400
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 12:32:30 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Thu, 11 Apr 2019 17:25:44 +0100
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-2-cohuck@redhat.com>
-	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
-	<20190408190747.12e3618b.cohuck@redhat.com>
-	<20190410013434.7cea1971@oc2783563651>
-	<4a692c11-edb2-93f9-7d8e-96a73a7ecdae@linux.ibm.com>
-	<20190411175831.7be345f4@oc2783563651>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Thu, 11 Apr 2019 12:25:38 -0400
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 11 Apr 2019 17:32:28 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 11 Apr 2019 18:32:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190411175831.7be345f4@oc2783563651>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <72385d8c-a050-67e7-85cf-bc804f941137@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 1/6] vfio-ccw: make it safe
- to access channel programs
+Message-Id: <155500034416.646888.1307366522340665522.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH for-4.0] spapr_pci: Fix broken naming of PCI bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,69 +38,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-s390x@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+Recent commit 5cf0d326a0fe fixed a regression which was preventing the
+guest to access the extended config space of a PCIe device. This was
+done by introducing a new PCI bus subtype for PAPR. The original fix
+was causing PCI busses to be named "spapr-pci-host-bridge-root-bus.N"
+instead of "pci.N", which was making upper layers unhappy of course.
+This got worked around by hardcoding the PCI bus name to "pci.0", but
+this only works for the default PHB. And we're now hitting:
 
+# qemu-system-ppc64 \
+             -device spapr-pci-host-bridge,index=1 \
+             -device e1000e,bus=pci.0 \
+             -device e1000e,bus=pci.1
+qemu-system-ppc64: -device e1000e,bus=pci.1: Bus 'pci.1' not found
 
-On 4/11/19 11:58 AM, Halil Pasic wrote:
-> On Wed, 10 Apr 2019 22:59:41 -0400
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> r the next release :) It would be one thing less on my plate...
->>>>   
->>>
->>> Sorry I was not able to spend any significant amount of time on this
->>> lately.
->>>
->>> Gave the combined set (this + Farhans fio-ccw fixes for kernel
->>> stacktraces v2) it a bit of smoke testing after some minor adjustments
->>> to make it compile:
->>>
->>> --- a/drivers/s390/cio/vfio_ccw_ops.c
->>> +++ b/drivers/s390/cio/vfio_ccw_ops.c
->>> @@ -13,6 +13,7 @@
->>>    #include <linux/vfio.h>
->>>    #include <linux/mdev.h>
->>>    #include <linux/nospec.h>
->>> +#include <linux/slab.h>
->>>    
->>>    #include "vfio_ccw_private.h"
->>>
->>>    
->>
->> Hrm...  Taking today's master, and the two series you mention (slight
->> adjustment to apply patch 3 of Connie's series, because part of it was
->> split out a few weeks ago), and I don't encounter this.  Tried switching
->> between SLUB/SLAB, but still compiles fine.
-> 
-> Let me guess: you have CONFIG_PCI in our .config, right?
-> 
-> In arch/s390/include/asm/pci_io.h we have
-> 
-> #ifndef _ASM_S390_PCI_IO_H
-> #define _ASM_S390_PCI_IO_H
-> 
-> #ifdef CONFIG_PCI
-> 
-> #include <linux/kernel.h>
-> #include <linux/slab.h>
-> 
-> and pci_io.h comes in via
-> 
-> include/linux/vfio.h
-> include/linux/iommu.h
-> include/linux/scatterlist.h
-> arch/s390/include/asm/io.h
-> arch/s390/include/asm/pci_io.h
-> 
-> 
-> Figured it out with help from Farhan. Took me quite some time.
+David already posted some patches [1] to control PCI extended config
+space accesses with a new flag in the base PCI bus class instead of
+subtyping. These patches are a bit more intrusive though, and
+are targetted for 4.1.
 
-That would have been useful information up front.
+When no name is passed to pci_register_bus(), the core device code
+generates a lowercase name based on the QOM typename. The typename
+for the base PCI bus class is "PCI", hence the "pci.0", "pci.1"
+bus names. Rename the type of the PAPR PCI bus to "pci", so that
+the QOM code can generate proper names. This is a hack but it is
+enough to fix the regression. And all this will be reworked properly
+in 4.1.
 
-> 
-> Regards,
-> Halil
-> 
-> 
+[1] https://patchwork.ozlabs.org/project/qemu-devel/list/?series=100486
+
+Fixes: 5cf0d326a0fe
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_pci.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f0b6b23afc9b..f62e6833b8c9 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1652,7 +1652,7 @@ static void spapr_phb_root_bus_class_init(ObjectClass *klass, void *data)
+     pbc->allows_extended_config_space = spapr_phb_allows_extended_config_space;
+ }
+ 
+-#define TYPE_SPAPR_PHB_ROOT_BUS "spapr-pci-host-bridge-root-bus"
++#define TYPE_SPAPR_PHB_ROOT_BUS "pci"
+ 
+ static const TypeInfo spapr_phb_root_bus_info = {
+     .name = TYPE_SPAPR_PHB_ROOT_BUS,
+@@ -1761,7 +1761,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
+                                 &sphb->iowindow);
+ 
+-    bus = pci_register_root_bus(dev, "pci.0",
++    bus = pci_register_root_bus(dev, NULL,
+                                 pci_spapr_set_irq, pci_spapr_map_irq, sphb,
+                                 &sphb->memspace, &sphb->iospace,
+                                 PCI_DEVFN(0, 0), PCI_NUM_PINS,
