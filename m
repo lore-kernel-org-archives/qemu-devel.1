@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50434)
+Received: from eggs.gnu.org ([209.51.188.92]:50415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTn-0004ZI-4x
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:16 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bs-QB
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTm-0004ZF-Nu
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:15 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bQ-Mk
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:14 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 20:27:02 +0300
-Message-Id: <20190411172709.205032-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v6 0/7] NBD reconnect
+Date: Thu, 11 Apr 2019 20:27:03 +0300
+Message-Id: <20190411172709.205032-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-1-vsementsov@virtuozzo.com>
+References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v6 1/7] block/nbd-client: split connection_co
+ start out of nbd_client_connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +23,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Here is NBD reconnect. Previously, if connection failed all current
-and future requests will fail. After the series, nbd-client driver
-will try to reconnect unlimited times. During first @reconnect-delay
-seconds of reconnecting all requests will wait for the connection,
-and if it is established requests will be resent. After
-@reconnect-delay period all requests will be failed (until successful
-reconnect).
+nbd_client_connect is going to be used from connection_co, so, let's
+refactor nbd_client_connect in advance, leaving io channel
+configuration all in nbd_client_connect.
 
-v4->v6:
- (some preparing patches from v4 was merged as v5)
-01: new
-02: new
-03: - drop unused things
-       - future states
-       - future s/break/continue/
-04: - fix typos
-    - s/3.1/4.1/
-    - set 0 as default
-05: new
-06: - new states and s/break/continue/ moved here from 03
-    - drop NBDClientSession.receiving, as now in_flight
-      requests used instread
-    - add copyright
-    - go to NBD_CLIENT_CONNECTING_NOWAIT immediately if
-      reconnect_delay is 0 (so, reconnect_delay moved to
-      NBDClientSession)
-    - on close, do qemu_co_sleep_wake(client->connection_co),
-      to not wait for reconnect loop iteration
-    - handle state transition to QUIT during reconnect loop
-      (assert(nbd_client_connecting(s)) was bad idea)
-    - don't try to fail on protocol errors after
-      nbd_client_connect, as we can't distinguish them
-    - decrement in_flight around reconnect sleep to make
-      it possible to drain and exit during it
-      (v4 was based on something before in_flight logic
-       introduced into nbd-client)
-    - changed logic in nbd_client_attach_aio_context 
-07: - refactor, using log and qmp_log
-    - drop export name
-    - drop strange try/except
-    - add reconnect-delay option (as 0 is a default now)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/nbd-client.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-
-Vladimir Sementsov-Ogievskiy (7):
-  block/nbd-client: split connection_co start out of nbd_client_connect
-  block/nbd-client: use non-blocking io channel for nbd negotiation
-  block/nbd-client: move from quit to state
-  block/nbd: add cmdline and qapi parameter reconnect-delay
-  qemu-coroutine-sleep: introduce qemu_co_sleep_wake
-  block/nbd-client: nbd reconnect
-  iotests: test nbd reconnect
-
- qapi/block-core.json          |  12 +-
- block/nbd-client.h            |  15 +-
- include/block/nbd.h           |   3 +-
- include/qemu/coroutine.h      |   6 +
- block/nbd-client.c            | 416 +++++++++++++++++++++++++---------
- block/nbd.c                   |  16 +-
- nbd/client.c                  |  16 +-
- qemu-nbd.c                    |   2 +-
- util/qemu-coroutine-sleep.c   |  20 +-
- tests/qemu-iotests/249        |  63 +++++
- tests/qemu-iotests/249.out    |  10 +
- tests/qemu-iotests/group      |   1 +
- tests/qemu-iotests/iotests.py |   4 +
- 13 files changed, 468 insertions(+), 116 deletions(-)
- create mode 100755 tests/qemu-iotests/249
- create mode 100644 tests/qemu-iotests/249.out
-
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 790ecc1ee1..facf8f8099 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -1180,12 +1180,8 @@ static int nbd_client_connect(BlockDriverState *bs,
+         object_ref(OBJECT(client->ioc));
+     }
+ 
+-    /* Now that we're connected, set the socket to be non-blocking and
+-     * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
+-    bdrv_inc_in_flight(bs);
+-    nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
++    qio_channel_attach_aio_context(client->ioc, bdrv_get_aio_context(bs));
+ 
+     logout("Established connection with NBD server\n");
+     return 0;
+@@ -1215,12 +1211,22 @@ int nbd_client_init(BlockDriverState *bs,
+                     const char *x_dirty_bitmap,
+                     Error **errp)
+ {
++    int ret;
+     NBDClientSession *client = nbd_get_client_session(bs);
+ 
+     client->bs = bs;
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
+ 
+-    return nbd_client_connect(bs, saddr, export, tlscreds, hostname,
+-                              x_dirty_bitmap, errp);
++    ret = nbd_client_connect(bs, saddr, export, tlscreds, hostname,
++                             x_dirty_bitmap, errp);
++    if (ret < 0) {
++        return ret;
++    }
++
++    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
++    bdrv_inc_in_flight(bs);
++    aio_co_schedule(bdrv_get_aio_context(bs), client->connection_co);
++
++    return 0;
+ }
 -- 
 2.18.0
