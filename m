@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39148)
+Received: from eggs.gnu.org ([209.51.188.92]:39112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4n-0003WH-4o
+	(envelope-from <armbru@redhat.com>) id 1hEb4l-0003Vn-4n
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4l-0000sa-3G
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4i-0000rS-OJ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:9535)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4g-0000mf-Or
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D43B5D5F6
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 14:53:01 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 11 Apr 2019 16:52:54 +0200
-Message-Id: <20190411145256.8614-14-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:56 +0200
+Message-Id: <20190411145256.8614-16-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 13/15] blockdev: Make -drive format=help
- print to stdout
+Subject: [Qemu-devel] [PATCH v2 15/15] monitor: Simplify how
+ -device/device_add print help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +31,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Command line help explicitly requested by the user should be printed
-to stdout, not stderr.  We do elsewhere.  Adjust -drive to match: use
-qemu_printf() instead of error_printf().  Plain printf() would be
-wrong because we need to print to the current monitor for "drive_add
-... format=3Dhelp".
+Commit a95db58f210 added monitor_vfprintf() as an error_printf()
+generalized from stderr to arbitrary streams, then used it wrapped in
+helper out_printf() to print -device/device_add help to stdout.  Use
+qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- blockdev.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ include/monitor/monitor.h |  3 ---
+ monitor.c                 | 16 ++++------------
+ qdev-monitor.c            | 36 ++++++++++++++----------------------
+ 3 files changed, 18 insertions(+), 37 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 4775a07d93..79fbac8450 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -40,6 +40,7 @@
- #include "monitor/monitor.h"
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index e4c3717454..316a168c41 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int monitor_fdset_dup_fd_find(int dup_fd);
+ 
+-int monitor_vfprintf(FILE *stream,
+-                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+-
+ #endif /* MONITOR_H */
+diff --git a/monitor.c b/monitor.c
+index 7b4a78d798..10be8bdb86 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
+     monitor_flush(opaque);
+ }
+ 
+-/*
+- * Print to current monitor if we have one, else to stream.
+- */
+-int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+-{
+-    if (cur_mon && !monitor_cur_is_qmp()) {
+-        return monitor_vprintf(cur_mon, fmt, ap);
+-    }
+-    return vfprintf(stream, fmt, ap);
+-}
+-
+ /*
+  * Print to current monitor if we have one, else to stderr.
+  */
+ int error_vprintf(const char *fmt, va_list ap)
+ {
+-    return monitor_vfprintf(stderr, fmt, ap);
++    if (cur_mon && !monitor_cur_is_qmp()) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vfprintf(stderr, fmt, ap);
+ }
+ 
+ int error_vprintf_unless_qmp(const char *fmt, va_list ap)
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index d4320986a2..373b9ad445 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -31,6 +31,7 @@
  #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
  #include "qemu/option.h"
 +#include "qemu/qemu-print.h"
- #include "qemu/config-file.h"
- #include "qapi/qapi-commands-block.h"
- #include "qapi/qapi-commands-transaction.h"
-@@ -301,7 +302,7 @@ DriveInfo *drive_get_next(BlockInterfaceType type)
-=20
- static void bdrv_format_print(void *opaque, const char *name)
- {
--    error_printf(" %s", name);
-+    qemu_printf(" %s", name);
+ #include "sysemu/block-backend.h"
+ #include "migration/misc.h"
+ 
+@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
+     return (qdev_class_get_alias(dc) != NULL);
  }
-=20
- typedef struct {
-@@ -530,11 +531,11 @@ static BlockBackend *blockdev_init(const char *file=
-, QDict *bs_opts,
-=20
-     if ((buf =3D qemu_opt_get(opts, "format")) !=3D NULL) {
-         if (is_help_option(buf)) {
--            error_printf("Supported formats:");
-+            qemu_printf("Supported formats:");
-             bdrv_iterate_format(bdrv_format_print, NULL, false);
--            error_printf("\nSupported formats (read-only):");
-+            qemu_printf("\nSupported formats (read-only):");
-             bdrv_iterate_format(bdrv_format_print, NULL, true);
--            error_printf("\n");
+ 
+-static void out_printf(const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    monitor_vfprintf(stdout, fmt, ap);
+-    va_end(ap);
+-}
+-
+ static void qdev_print_devinfo(DeviceClass *dc)
+ {
+-    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
++    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
+     if (dc->bus_type) {
+-        out_printf(", bus %s", dc->bus_type);
++        qemu_printf(", bus %s", dc->bus_type);
+     }
+     if (qdev_class_has_alias(dc)) {
+-        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
++        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
+     }
+     if (dc->desc) {
+-        out_printf(", desc \"%s\"", dc->desc);
++        qemu_printf(", desc \"%s\"", dc->desc);
+     }
+     if (!dc->user_creatable) {
+-        out_printf(", no-user");
++        qemu_printf(", no-user");
+     }
+-    out_printf("\n");
++    qemu_printf("\n");
+ }
+ 
+ static void qdev_print_devinfos(bool show_no_user)
+@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
+                 continue;
+             }
+             if (!cat_printed) {
+-                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
++                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
+                 cat_printed = true;
+             }
+             qdev_print_devinfo(dc);
+@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
+     }
+ 
+     if (prop_list) {
+-        out_printf("%s options:\n", driver);
++        qemu_printf("%s options:\n", driver);
+     } else {
+-        out_printf("There are no options for %s.\n", driver);
++        qemu_printf("There are no options for %s.\n", driver);
+     }
+     for (prop = prop_list; prop; prop = prop->next) {
+         int len;
+-        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
++        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
+         if (prop->value->has_description) {
+             if (len < 24) {
+-                out_printf("%*s", 24 - len, "");
++                qemu_printf("%*s", 24 - len, "");
+             }
+-            out_printf(" - %s\n", prop->value->description);
++            qemu_printf(" - %s\n", prop->value->description);
+         } else {
+-            out_printf("\n");
 +            qemu_printf("\n");
-             goto early_err;
          }
-=20
---=20
+     }
+ 
+-- 
 2.17.2
