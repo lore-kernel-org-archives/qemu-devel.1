@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52531)
+Received: from eggs.gnu.org ([209.51.188.92]:52657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEbnR-00010m-MW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbnn-0001Iv-QA
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hEbnQ-00085Q-PP
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEbnQ-0007wx-9d
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:24 -0400
-Date: Thu, 11 Apr 2019 11:39:06 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <393821092.21153045.1554997146416.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-4-pagupta@redhat.com>
-	<CAPcyv4gXwE2k3JU94GPav0xn2LEgR6-7ZEVYyTHFRjCfTYjerw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hEbnm-0008Ef-Gv
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:47 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45226)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEbnm-0008E2-5w
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:39:46 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s15so7932348wra.12
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:39:45 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Apr 2019 16:39:42 +0100
+Message-Id: <20190411153942.4533-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libnvdimm: add dax_dev sync flag
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/arm: Implement NSACR gating of floating
+ point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +27,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Christoph Hellwig <hch@infradead.org>, Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, jmoyer <jmoyer@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval shaia <yuval.shaia@oracle.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+The NSACR register allows secure code to configure the FPU
+to be inaccessible to non-secure code. If the NSACR.CP10
+bit is set then:
+ * NS accesses to the FPU trap as UNDEF (ie to NS EL1 or EL2)
+ * CPACR.{CP10,CP11} behave as if RAZ/WI
+ * HCPTR.{TCP11,TCP10} behave as if RAO/WI
 
-Hi Dan,
+Note that we do not implement the NSACR.NSASEDIS bit which
+gates only access to Advanced SIMD, in the same way that
+we don't implement the equivalent CPACR.ASEDIS and HCPTR.TASE.
 
-Thank you for the review.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I noticed we were missing NSACR handling here while looking at
+M profile floating point, but it turns out that M profile NSACR
+isn't really the same, so the two don't share code. This patch
+fixes the A-profile NSACR handling. Note that this only affects
+CPUs with an AArch32 EL3.
 
-> >
-> > This patch adds 'DAXDEV_SYNC' flag which is set
-> > for nd_region doing synchronous flush. This later
-> > is used to disable MAP_SYNC functionality for
-> > ext4 & xfs filesystem for devices don't support
-> > synchronous flush.
-> >
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  drivers/dax/bus.c            |  2 +-
-> >  drivers/dax/super.c          | 13 ++++++++++++-
-> >  drivers/md/dm.c              |  2 +-
-> >  drivers/nvdimm/pmem.c        |  3 ++-
-> >  drivers/nvdimm/region_devs.c |  7 +++++++
-> >  include/linux/dax.h          |  9 +++++++--
-> >  include/linux/libnvdimm.h    |  1 +
-> >  7 files changed, 31 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
-> > index 2109cfe80219..431bf7d2a7f9 100644
-> > --- a/drivers/dax/bus.c
-> > +++ b/drivers/dax/bus.c
-> > @@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region
-> > *dax_region, int id,
-> >          * No 'host' or dax_operations since there is no access to this
-> >          * device outside of mmap of the resulting character device.
-> >          */
-> > -       dax_dev = alloc_dax(dev_dax, NULL, NULL);
-> > +       dax_dev = alloc_dax(dev_dax, NULL, NULL, true);
-> 
-> I find apis that take a boolean as unreadable. What does 'true' mean?
-> It wastes time to go look at the function definition vs something
-> like:
-> 
->     alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
+ target/arm/helper.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 73 insertions(+), 2 deletions(-)
 
-Agree. Will change as suggested.
-
-Best regards,
-Pankaj
-> 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index a0dd1f99974..26105f13e70 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -903,9 +903,36 @@ static void cpacr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+         }
+         value &= mask;
+     }
++
++    /*
++     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
++     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
++     */
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0xf << 20);
++        value |= env->cp15.cpacr_el1 & (0xf << 20);
++    }
++
+     env->cp15.cpacr_el1 = value;
+ }
+ 
++static uint64_t cpacr_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /*
++     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
++     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
++     */
++    uint64_t value = env->cp15.cpacr_el1;
++
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0xf << 20);
++    }
++    return value;
++}
++
++
+ static void cpacr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     /* Call cpacr_write() so that we reset with the correct RAO bits set
+@@ -971,7 +998,7 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
+     { .name = "CPACR", .state = ARM_CP_STATE_BOTH, .opc0 = 3,
+       .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 2, .accessfn = cpacr_access,
+       .access = PL1_RW, .fieldoffset = offsetof(CPUARMState, cp15.cpacr_el1),
+-      .resetfn = cpacr_reset, .writefn = cpacr_write },
++      .resetfn = cpacr_reset, .writefn = cpacr_write, .readfn = cpacr_read },
+     REGINFO_SENTINEL
+ };
+ 
+@@ -4656,6 +4683,36 @@ uint64_t arm_hcr_el2_eff(CPUARMState *env)
+     return ret;
+ }
+ 
++static void cptr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                           uint64_t value)
++{
++    /*
++     * For A-profile AArch32 EL3, if NSACR.CP10
++     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
++     */
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0x3 << 10);
++        value |= env->cp15.cptr_el[2] & (0x3 << 10);
++    }
++    env->cp15.cptr_el[2] = value;
++}
++
++static uint64_t cptr_el2_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /*
++     * For A-profile AArch32 EL3, if NSACR.CP10
++     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
++     */
++    uint64_t value = env->cp15.cptr_el[2];
++
++    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
++        value &= ~(0x3 << 10);
++    }
++    return value;
++}
++
+ static const ARMCPRegInfo el2_cp_reginfo[] = {
+     { .name = "HCR_EL2", .state = ARM_CP_STATE_AA64,
+       .type = ARM_CP_IO,
+@@ -4703,7 +4760,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+     { .name = "CPTR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 2,
+       .access = PL2_RW, .accessfn = cptr_access, .resetvalue = 0,
+-      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]) },
++      .fieldoffset = offsetof(CPUARMState, cp15.cptr_el[2]),
++      .readfn = cptr_el2_read, .writefn = cptr_el2_write },
+     { .name = "MAIR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 10, .crm = 2, .opc2 = 0,
+       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.mair_el[2]),
+@@ -12804,6 +12862,19 @@ int fp_exception_el(CPUARMState *env, int cur_el)
+         break;
+     }
+ 
++    /*
++     * The NSACR allows A-profile AArch32 EL3 and M-profile secure mode
++     * to control non-secure access to the FPU. It doesn't have any
++     * effect if EL3 is AArch64 or if EL3 doesn't exist at all.
++     */
++    if ((arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
++         cur_el <= 2 && !arm_is_secure_below_el3(env))) {
++        if (!extract32(env->cp15.nsacr, 10, 1)) {
++            /* FP insns act as UNDEF */
++            return cur_el == 2 ? 2 : 1;
++        }
++    }
++
+     /* For the CPTR registers we don't need to guard with an ARM_FEATURE
+      * check because zero bits in the registers mean "don't trap".
+      */
+-- 
+2.20.1
