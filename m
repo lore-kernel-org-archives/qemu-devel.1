@@ -3,60 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A7BC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C8BC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:37:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93F8320850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:36:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F8320850
+	by mail.kernel.org (Postfix) with ESMTPS id 55FEE2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:37:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55FEE2083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50868 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50874 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEbl0-00078U-NB
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:36:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48388)
+	id 1hEbm1-0007uY-Fq
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:37:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEba3-0005nF-2t
+	(envelope-from <armbru@redhat.com>) id 1hEba3-0005nD-0q
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEbZz-0006kf-7G
+	(envelope-from <armbru@redhat.com>) id 1hEbZz-0006ku-9X
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37758)
+Received: from mx1.redhat.com ([209.132.183.28]:57472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZx-0006Wg-87
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEbZx-0006aN-6v
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0AA0830A7C8D
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FEBA3134338
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6829919C65;
-	Thu, 11 Apr 2019 15:25:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D7C821347B;
+	Thu, 11 Apr 2019 15:25:24 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 9666911329CD; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
+	id C2C901132786; Thu, 11 Apr 2019 17:25:20 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 17:25:11 +0200
-Message-Id: <20190411152520.10061-9-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 17:25:19 +0200
+Message-Id: <20190411152520.10061-17-armbru@redhat.com>
 In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
 References: <20190411152520.10061-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Thu, 11 Apr 2019 15:25:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 11 Apr 2019 15:25:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 08/17] memory: Clean up how mtree_info() prints
+Subject: [Qemu-devel] [PATCH 16/17] disas: Rename include/disas/bfd.h back
+ to include/disas/dis-asm.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,493 +69,369 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411152511.wNJosO73tFZyJEZ1jgPNfX847hdsW7qfYjyuR8mozKU@z>
+Message-ID: <20190411152519.ufeilueqNnlG6QkOiHKkSGwcM0HdW6Zn2Z1xEkU0sWw@z>
 
-dump_drift_info() takes an fprintf()-like callback and a FILE * to
-pass to it, and so do its helper functions.  Passing around callback
-and argument is rather tiresome.
+Commit dc99065b5f9 (v0.1.0) added dis-asm.h from binutils.
 
-Its only caller hmp_info_mtree() passes monitor_printf() cast to
-fprintf_function and the current monitor cast to FILE *.
+Commit 43d4145a986 (v0.1.5) inlined bfd.h into dis-asm.h to remove the
+dependency on binutils.
 
-The type-punning is technically undefined behaviour, but works in
-practice.  Clean up: drop the callback, and call qemu_printf()
-instead.
+Commit 76cad71136b (v1.4.0) moved dis-asm.h to include/disas/bfd.h.
+The new name is confusing when you try to match against (pre GPLv3+)
+binutils.  Rename it back.  Keep it in the same directory, of course.
 
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- exec.c                         |  40 ++++-----
- include/exec/memory-internal.h |   3 +-
- include/exec/memory.h          |   3 +-
- memory.c                       | 156 ++++++++++++++++-----------------
- monitor.c                      |   3 +-
- 5 files changed, 98 insertions(+), 107 deletions(-)
+ disas.c                            | 2 +-
+ disas/alpha.c                      | 2 +-
+ disas/arm-a64.cc                   | 2 +-
+ disas/arm.c                        | 2 +-
+ disas/cris.c                       | 2 +-
+ disas/hppa.c                       | 2 +-
+ disas/i386.c                       | 2 +-
+ disas/lm32.c                       | 2 +-
+ disas/m68k.c                       | 2 +-
+ disas/microblaze.c                 | 2 +-
+ disas/mips.c                       | 2 +-
+ disas/moxie.c                      | 2 +-
+ disas/nanomips.cpp                 | 2 +-
+ disas/nios2.c                      | 2 +-
+ disas/ppc.c                        | 2 +-
+ disas/riscv.c                      | 2 +-
+ disas/s390.c                       | 2 +-
+ disas/sh4.c                        | 2 +-
+ disas/sparc.c                      | 2 +-
+ disas/tci.c                        | 2 +-
+ disas/xtensa.c                     | 2 +-
+ include/disas/{bfd.h => dis-asm.h} | 0
+ include/qom/cpu.h                  | 2 +-
+ target/openrisc/disas.c            | 2 +-
+ target/ppc/translate_init.inc.c    | 2 +-
+ 25 files changed, 24 insertions(+), 24 deletions(-)
+ rename include/disas/{bfd.h => dis-asm.h} (100%)
 
-diff --git a/exec.c b/exec.c
-index 6ab62f4eee..85d15606f1 100644
---- a/exec.c
-+++ b/exec.c
-@@ -35,6 +35,7 @@
- #include "qemu/timer.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
- #if defined(CONFIG_USER_ONLY)
- #include "qemu.h"
- #else /* !CONFIG_USER_ONLY */
-@@ -4117,42 +4118,41 @@ void page_size_init(void)
+diff --git a/disas.c b/disas.c
+index d15cceb863..41ad0102e2 100644
+--- a/disas.c
++++ b/disas.c
+@@ -1,7 +1,7 @@
+ /* General "disassemble this chunk" code.  Used for debugging. */
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "elf.h"
+ #include "qemu/qemu-print.h"
  
- #if !defined(CONFIG_USER_ONLY)
+diff --git a/disas/alpha.c b/disas/alpha.c
+index a0c9ecd49d..3db90fa665 100644
+--- a/disas/alpha.c
++++ b/disas/alpha.c
+@@ -20,7 +20,7 @@ along with this file; see the file COPYING.  If not, see
+ <http://www.gnu.org/licenses/>. */
  
--static void mtree_print_phys_entries(fprintf_function mon, void *f,
--                                     int start, int end, int skip, int ptr)
-+static void mtree_print_phys_entries(int start, int end, int skip, int ptr)
- {
-     if (start == end - 1) {
--        mon(f, "\t%3d      ", start);
-+        qemu_printf("\t%3d      ", start);
-     } else {
--        mon(f, "\t%3d..%-3d ", start, end - 1);
-+        qemu_printf("\t%3d..%-3d ", start, end - 1);
-     }
--    mon(f, " skip=%d ", skip);
-+    qemu_printf(" skip=%d ", skip);
-     if (ptr == PHYS_MAP_NODE_NIL) {
--        mon(f, " ptr=NIL");
-+        qemu_printf(" ptr=NIL");
-     } else if (!skip) {
--        mon(f, " ptr=#%d", ptr);
-+        qemu_printf(" ptr=#%d", ptr);
-     } else {
--        mon(f, " ptr=[%d]", ptr);
-+        qemu_printf(" ptr=[%d]", ptr);
-     }
--    mon(f, "\n");
-+    qemu_printf("\n");
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ /* MAX is redefined below, so remove any previous definition. */
+ #undef MAX
+diff --git a/disas/arm-a64.cc b/disas/arm-a64.cc
+index 9280950ce3..9fa779e175 100644
+--- a/disas/arm-a64.cc
++++ b/disas/arm-a64.cc
+@@ -19,7 +19,7 @@
+ 
+ extern "C" {
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
  }
  
- #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
-                            int128_sub((size), int128_one())) : 0)
+ #include "vixl/a64/disasm-a64.h"
+diff --git a/disas/arm.c b/disas/arm.c
+index 17ea120b44..7d940f2396 100644
+--- a/disas/arm.c
++++ b/disas/arm.c
+@@ -23,7 +23,7 @@
+    for things we don't care about.  */
  
--void mtree_print_dispatch(fprintf_function mon, void *f,
--                          AddressSpaceDispatch *d, MemoryRegion *root)
-+void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
- {
-     int i;
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
  
--    mon(f, "  Dispatch\n");
--    mon(f, "    Physical sections\n");
-+    qemu_printf("  Dispatch\n");
-+    qemu_printf("    Physical sections\n");
+ #define ARM_EXT_V1	 0
+ #define ARM_EXT_V2	 0
+diff --git a/disas/cris.c b/disas/cris.c
+index 2dd56deea4..bf9eafc415 100644
+--- a/disas/cris.c
++++ b/disas/cris.c
+@@ -20,7 +20,7 @@
  
-     for (i = 0; i < d->map.sections_nb; ++i) {
-         MemoryRegionSection *s = d->map.sections + i;
-         const char *names[] = { " [unassigned]", " [not dirty]",
-                                 " [ROM]", " [watch]" };
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "target/cris/opcode-cris.h"
  
--        mon(f, "      #%d @" TARGET_FMT_plx ".." TARGET_FMT_plx " %s%s%s%s%s",
-+        qemu_printf("      #%d @" TARGET_FMT_plx ".." TARGET_FMT_plx
-+                    " %s%s%s%s%s",
-             i,
-             s->offset_within_address_space,
-             s->offset_within_address_space + MR_SIZE(s->mr->size),
-@@ -4163,20 +4163,20 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-             s->mr->is_iommu ? " [iommu]" : "");
+ #define CONST_STRNEQ(STR1,STR2) (strncmp ((STR1), (STR2), sizeof (STR2) - 1) == 0)
+diff --git a/disas/hppa.c b/disas/hppa.c
+index a2d371fdb1..2dbd1fc445 100644
+--- a/disas/hppa.c
++++ b/disas/hppa.c
+@@ -19,7 +19,7 @@
+    along with this program; if not, see <http://www.gnu.org/licenses/>. */
  
-         if (s->mr->alias) {
--            mon(f, " alias=%s", s->mr->alias->name ?
-+            qemu_printf(" alias=%s", s->mr->alias->name ?
-                     s->mr->alias->name : "noname");
-         }
--        mon(f, "\n");
-+        qemu_printf("\n");
-     }
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
  
--    mon(f, "    Nodes (%d bits per level, %d levels) ptr=[%d] skip=%d\n",
-+    qemu_printf("    Nodes (%d bits per level, %d levels) ptr=[%d] skip=%d\n",
-                P_L2_BITS, P_L2_LEVELS, d->phys_map.ptr, d->phys_map.skip);
-     for (i = 0; i < d->map.nodes_nb; ++i) {
-         int j, jprev;
-         PhysPageEntry prev;
-         Node *n = d->map.nodes + i;
+ /* HP PA-RISC SOM object file format:  definitions internal to BFD.
+    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000,
+diff --git a/disas/i386.c b/disas/i386.c
+index fc03b9f06a..4c1f0f877b 100644
+--- a/disas/i386.c
++++ b/disas/i386.c
+@@ -32,7 +32,7 @@
+    the Intel manual for details.  */
  
--        mon(f, "      [%d]\n", i);
-+        qemu_printf("      [%d]\n", i);
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "qemu/cutils.h"
  
-         for (j = 0, jprev = 0, prev = *n[0]; j < ARRAY_SIZE(*n); ++j) {
-             PhysPageEntry *pe = *n + j;
-@@ -4185,14 +4185,14 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-                 continue;
-             }
- 
--            mtree_print_phys_entries(mon, f, jprev, j, prev.skip, prev.ptr);
-+            mtree_print_phys_entries(jprev, j, prev.skip, prev.ptr);
- 
-             jprev = j;
-             prev = *pe;
-         }
- 
-         if (jprev != ARRAY_SIZE(*n)) {
--            mtree_print_phys_entries(mon, f, jprev, j, prev.skip, prev.ptr);
-+            mtree_print_phys_entries(jprev, j, prev.skip, prev.ptr);
-         }
-     }
- }
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index bb08fa4d2f..d1a9dd1ec8 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -45,8 +45,7 @@ AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
- void address_space_dispatch_compact(AddressSpaceDispatch *d);
- void address_space_dispatch_free(AddressSpaceDispatch *d);
- 
--void mtree_print_dispatch(fprintf_function mon, void *f,
--                          struct AddressSpaceDispatch *d,
-+void mtree_print_dispatch(struct AddressSpaceDispatch *d,
-                           MemoryRegion *root);
- 
- struct page_collection;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 1625913f84..9144a47f57 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1720,8 +1720,7 @@ void memory_global_dirty_log_start(void);
+ /* include/opcode/i386.h r1.78 */
+diff --git a/disas/lm32.c b/disas/lm32.c
+index fcc2cde23d..c0ef8160fe 100644
+--- a/disas/lm32.c
++++ b/disas/lm32.c
+@@ -19,7 +19,7 @@
   */
- void memory_global_dirty_log_stop(void);
  
--void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
--                bool dispatch_tree, bool owner);
-+void mtree_info(bool flatview, bool dispatch_tree, bool owner);
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
  
- /**
-  * memory_region_dispatch_read: perform a read directly to the specified
-diff --git a/memory.c b/memory.c
-index 9fbca52e05..bb2b71ee38 100644
---- a/memory.c
-+++ b/memory.c
-@@ -22,6 +22,7 @@
- #include "qapi/visitor.h"
+ typedef enum {
+     LM32_OP_SRUI = 0, LM32_OP_NORI, LM32_OP_MULI, LM32_OP_SH, LM32_OP_LB,
+diff --git a/disas/m68k.c b/disas/m68k.c
+index e544c7137f..863409c67c 100644
+--- a/disas/m68k.c
++++ b/disas/m68k.c
+@@ -4,7 +4,7 @@
+ #include "qemu/osdep.h"
+ #include <math.h>
+ 
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ /* **** floatformat.h from sourceware.org CVS 2005-08-14.  */
+ /* IEEE floating point support declarations, for GDB, the GNU Debugger.
+diff --git a/disas/microblaze.c b/disas/microblaze.c
+index c23605043a..0b89b9c4fa 100644
+--- a/disas/microblaze.c
++++ b/disas/microblaze.c
+@@ -577,7 +577,7 @@ static const char pvr_register_prefix[] = "rpvr";
+ 
+ #endif /* MICROBLAZE_OPC */
+ 
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ #define get_field_rd(instr) get_field(instr, RD_MASK, RD_LOW)
+ #define get_field_r1(instr) get_field(instr, RA_MASK, RA_LOW)
+diff --git a/disas/mips.c b/disas/mips.c
+index 97f661a37e..dfefe5e589 100644
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
+ along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+ 
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ /* mips.h.  Mips opcode list for GDB, the GNU debugger.
+    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+diff --git a/disas/moxie.c b/disas/moxie.c
+index 70b49ed74b..e94ab4c33d 100644
+--- a/disas/moxie.c
++++ b/disas/moxie.c
+@@ -18,7 +18,7 @@
+ #define STATIC_TABLE
+ #define DEFINE_TABLE
+ 
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ static void *stream;
+ 
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index c8495b1a19..90e63b8367 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -29,7 +29,7 @@
+ 
+ extern "C" {
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ }
+ 
+ #include <cstring>
+diff --git a/disas/nios2.c b/disas/nios2.c
+index de11f04cc4..c3e82140c7 100644
+--- a/disas/nios2.c
++++ b/disas/nios2.c
+@@ -36,7 +36,7 @@
+ 
+ /*#include "bfd.h"*/
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ 
+ /****************************************************************************
+diff --git a/disas/ppc.c b/disas/ppc.c
+index da1140ba2b..a545437de9 100644
+--- a/disas/ppc.c
++++ b/disas/ppc.c
+@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
+ along with this file; see the file COPYING.  If not,
+ see <http://www.gnu.org/licenses/>.  */
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #define BFD_DEFAULT_TARGET_SIZE 64
+ 
+ /* ppc.h -- Header file for PowerPC opcode table
+diff --git a/disas/riscv.c b/disas/riscv.c
+index 27546dd790..59a9b0437a 100644
+--- a/disas/riscv.c
++++ b/disas/riscv.c
+@@ -18,7 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ 
+ /* types */
+diff --git a/disas/s390.c b/disas/s390.c
+index 6393860239..b1f4e2a0c1 100644
+--- a/disas/s390.c
++++ b/disas/s390.c
+@@ -22,7 +22,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ /* include/opcode/s390.h revision 1.9 */
+ /* s390.h -- Header file for S390 opcode table
+diff --git a/disas/sh4.c b/disas/sh4.c
+index 6b66176bed..55ef865a36 100644
+--- a/disas/sh4.c
++++ b/disas/sh4.c
+@@ -16,7 +16,7 @@
+    along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+ 
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ #define DEFINE_TABLE
+ 
+diff --git a/disas/sparc.c b/disas/sparc.c
+index f120f4e86d..5689533ce1 100644
+--- a/disas/sparc.c
++++ b/disas/sparc.c
+@@ -27,7 +27,7 @@
+    see <http://www.gnu.org/licenses/>.  */
+ 
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ 
+ /* The SPARC opcode table (and other related data) is defined in
+    the opcodes library in sparc-opc.c.  If you change anything here, make
+diff --git a/disas/tci.c b/disas/tci.c
+index 1cdf5eeafc..f1d6c6b469 100644
+--- a/disas/tci.c
++++ b/disas/tci.c
+@@ -19,7 +19,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "tcg/tcg.h"
+ 
+ /* Disassemble TCI bytecode. */
+diff --git a/disas/xtensa.c b/disas/xtensa.c
+index 5e3870b9ad..d7dda8c2d6 100644
+--- a/disas/xtensa.c
++++ b/disas/xtensa.c
+@@ -26,7 +26,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "hw/xtensa/xtensa-isa.h"
+ 
+ int print_insn_xtensa(bfd_vma memaddr, struct disassemble_info *info)
+diff --git a/include/disas/bfd.h b/include/disas/dis-asm.h
+similarity index 100%
+rename from include/disas/bfd.h
+rename to include/disas/dis-asm.h
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 9972e07786..e9bec3a5bc 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -21,7 +21,7 @@
+ #define QEMU_CPU_H
+ 
+ #include "hw/qdev-core.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "exec/hwaddr.h"
+ #include "exec/memattrs.h"
+ #include "qapi/qapi-types-run-state.h"
+diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
+index bc63093ee9..5923b2429e 100644
+--- a/target/openrisc/disas.c
++++ b/target/openrisc/disas.c
+@@ -19,7 +19,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
  #include "qemu/bitops.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
- #include "qom/object.h"
- #include "trace-root.h"
+ #include "cpu.h"
  
-@@ -2800,46 +2801,43 @@ typedef QTAILQ_HEAD(, MemoryRegionList) MemoryRegionListHead;
-                            int128_sub((size), int128_one())) : 0)
- #define MTREE_INDENT "  "
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 996356dd99..20a64f3b77 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -18,7 +18,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
  
--static void mtree_expand_owner(fprintf_function mon_printf, void *f,
--                               const char *label, Object *obj)
-+static void mtree_expand_owner(const char *label, Object *obj)
- {
-     DeviceState *dev = (DeviceState *) object_dynamic_cast(obj, TYPE_DEVICE);
- 
--    mon_printf(f, " %s:{%s", label, dev ? "dev" : "obj");
-+    qemu_printf(" %s:{%s", label, dev ? "dev" : "obj");
-     if (dev && dev->id) {
--        mon_printf(f, " id=%s", dev->id);
-+        qemu_printf(" id=%s", dev->id);
-     } else {
-         gchar *canonical_path = object_get_canonical_path(obj);
-         if (canonical_path) {
--            mon_printf(f, " path=%s", canonical_path);
-+            qemu_printf(" path=%s", canonical_path);
-             g_free(canonical_path);
-         } else {
--            mon_printf(f, " type=%s", object_get_typename(obj));
-+            qemu_printf(" type=%s", object_get_typename(obj));
-         }
-     }
--    mon_printf(f, "}");
-+    qemu_printf("}");
- }
- 
--static void mtree_print_mr_owner(fprintf_function mon_printf, void *f,
--                                 const MemoryRegion *mr)
-+static void mtree_print_mr_owner(const MemoryRegion *mr)
- {
-     Object *owner = mr->owner;
-     Object *parent = memory_region_owner((MemoryRegion *)mr);
- 
-     if (!owner && !parent) {
--        mon_printf(f, " orphan");
-+        qemu_printf(" orphan");
-         return;
-     }
-     if (owner) {
--        mtree_expand_owner(mon_printf, f, "owner", owner);
-+        mtree_expand_owner("owner", owner);
-     }
-     if (parent && parent != owner) {
--        mtree_expand_owner(mon_printf, f, "parent", parent);
-+        mtree_expand_owner("parent", parent);
-     }
- }
- 
--static void mtree_print_mr(fprintf_function mon_printf, void *f,
--                           const MemoryRegion *mr, unsigned int level,
-+static void mtree_print_mr(const MemoryRegion *mr, unsigned int level,
-                            hwaddr base,
-                            MemoryRegionListHead *alias_print_queue,
-                            bool owner)
-@@ -2855,7 +2853,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     }
- 
-     for (i = 0; i < level; i++) {
--        mon_printf(f, MTREE_INDENT);
-+        qemu_printf(MTREE_INDENT);
-     }
- 
-     cur_start = base + mr->addr;
-@@ -2867,7 +2865,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-      * user who is observing this.
-      */
-     if (cur_start < base || cur_end < cur_start) {
--        mon_printf(f, "[DETECTED OVERFLOW!] ");
-+        qemu_printf("[DETECTED OVERFLOW!] ");
-     }
- 
-     if (mr->alias) {
-@@ -2886,35 +2884,35 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-             ml->mr = mr->alias;
-             QTAILQ_INSERT_TAIL(alias_print_queue, ml, mrqueue);
-         }
--        mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
--                   " (prio %d, %s%s): alias %s @%s " TARGET_FMT_plx
--                   "-" TARGET_FMT_plx "%s",
--                   cur_start, cur_end,
--                   mr->priority,
--                   mr->nonvolatile ? "nv-" : "",
--                   memory_region_type((MemoryRegion *)mr),
--                   memory_region_name(mr),
--                   memory_region_name(mr->alias),
--                   mr->alias_offset,
--                   mr->alias_offset + MR_SIZE(mr->size),
--                   mr->enabled ? "" : " [disabled]");
-+        qemu_printf(TARGET_FMT_plx "-" TARGET_FMT_plx
-+                    " (prio %d, %s%s): alias %s @%s " TARGET_FMT_plx
-+                    "-" TARGET_FMT_plx "%s",
-+                    cur_start, cur_end,
-+                    mr->priority,
-+                    mr->nonvolatile ? "nv-" : "",
-+                    memory_region_type((MemoryRegion *)mr),
-+                    memory_region_name(mr),
-+                    memory_region_name(mr->alias),
-+                    mr->alias_offset,
-+                    mr->alias_offset + MR_SIZE(mr->size),
-+                    mr->enabled ? "" : " [disabled]");
-         if (owner) {
--            mtree_print_mr_owner(mon_printf, f, mr);
-+            mtree_print_mr_owner(mr);
-         }
-     } else {
--        mon_printf(f,
--                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s%s): %s%s",
--                   cur_start, cur_end,
--                   mr->priority,
--                   mr->nonvolatile ? "nv-" : "",
--                   memory_region_type((MemoryRegion *)mr),
--                   memory_region_name(mr),
--                   mr->enabled ? "" : " [disabled]");
-+        qemu_printf(TARGET_FMT_plx "-" TARGET_FMT_plx
-+                    " (prio %d, %s%s): %s%s",
-+                    cur_start, cur_end,
-+                    mr->priority,
-+                    mr->nonvolatile ? "nv-" : "",
-+                    memory_region_type((MemoryRegion *)mr),
-+                    memory_region_name(mr),
-+                    mr->enabled ? "" : " [disabled]");
-         if (owner) {
--            mtree_print_mr_owner(mon_printf, f, mr);
-+            mtree_print_mr_owner(mr);
-         }
-     }
--    mon_printf(f, "\n");
-+    qemu_printf("\n");
- 
-     QTAILQ_INIT(&submr_print_queue);
- 
-@@ -2936,7 +2934,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     }
- 
-     QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
--        mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
-+        mtree_print_mr(ml->mr, level + 1, cur_start,
-                        alias_print_queue, owner);
-     }
- 
-@@ -2946,8 +2944,6 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
- }
- 
- struct FlatViewInfo {
--    fprintf_function mon_printf;
--    void *f;
-     int counter;
-     bool dispatch_tree;
-     bool owner;
-@@ -2959,70 +2955,71 @@ static void mtree_print_flatview(gpointer key, gpointer value,
-     FlatView *view = key;
-     GArray *fv_address_spaces = value;
-     struct FlatViewInfo *fvi = user_data;
--    fprintf_function p = fvi->mon_printf;
--    void *f = fvi->f;
-     FlatRange *range = &view->ranges[0];
-     MemoryRegion *mr;
-     int n = view->nr;
-     int i;
-     AddressSpace *as;
- 
--    p(f, "FlatView #%d\n", fvi->counter);
-+    qemu_printf("FlatView #%d\n", fvi->counter);
-     ++fvi->counter;
- 
-     for (i = 0; i < fv_address_spaces->len; ++i) {
-         as = g_array_index(fv_address_spaces, AddressSpace*, i);
--        p(f, " AS \"%s\", root: %s", as->name, memory_region_name(as->root));
-+        qemu_printf(" AS \"%s\", root: %s",
-+                    as->name, memory_region_name(as->root));
-         if (as->root->alias) {
--            p(f, ", alias %s", memory_region_name(as->root->alias));
-+            qemu_printf(", alias %s", memory_region_name(as->root->alias));
-         }
--        p(f, "\n");
-+        qemu_printf("\n");
-     }
- 
--    p(f, " Root memory region: %s\n",
-+    qemu_printf(" Root memory region: %s\n",
-       view->root ? memory_region_name(view->root) : "(none)");
- 
-     if (n <= 0) {
--        p(f, MTREE_INDENT "No rendered FlatView\n\n");
-+        qemu_printf(MTREE_INDENT "No rendered FlatView\n\n");
-         return;
-     }
- 
-     while (n--) {
-         mr = range->mr;
-         if (range->offset_in_region) {
--            p(f, MTREE_INDENT TARGET_FMT_plx "-"
--              TARGET_FMT_plx " (prio %d, %s%s): %s @" TARGET_FMT_plx,
--              int128_get64(range->addr.start),
--              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
--              mr->priority,
--              range->nonvolatile ? "nv-" : "",
--              range->readonly ? "rom" : memory_region_type(mr),
--              memory_region_name(mr),
--              range->offset_in_region);
-+            qemu_printf(MTREE_INDENT TARGET_FMT_plx "-" TARGET_FMT_plx
-+                        " (prio %d, %s%s): %s @" TARGET_FMT_plx,
-+                        int128_get64(range->addr.start),
-+                        int128_get64(range->addr.start)
-+                        + MR_SIZE(range->addr.size),
-+                        mr->priority,
-+                        range->nonvolatile ? "nv-" : "",
-+                        range->readonly ? "rom" : memory_region_type(mr),
-+                        memory_region_name(mr),
-+                        range->offset_in_region);
-         } else {
--            p(f, MTREE_INDENT TARGET_FMT_plx "-"
--              TARGET_FMT_plx " (prio %d, %s%s): %s",
--              int128_get64(range->addr.start),
--              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
--              mr->priority,
--              range->nonvolatile ? "nv-" : "",
--              range->readonly ? "rom" : memory_region_type(mr),
--              memory_region_name(mr));
-+            qemu_printf(MTREE_INDENT TARGET_FMT_plx "-" TARGET_FMT_plx
-+                        " (prio %d, %s%s): %s",
-+                        int128_get64(range->addr.start),
-+                        int128_get64(range->addr.start)
-+                        + MR_SIZE(range->addr.size),
-+                        mr->priority,
-+                        range->nonvolatile ? "nv-" : "",
-+                        range->readonly ? "rom" : memory_region_type(mr),
-+                        memory_region_name(mr));
-         }
-         if (fvi->owner) {
--            mtree_print_mr_owner(p, f, mr);
-+            mtree_print_mr_owner(mr);
-         }
--        p(f, "\n");
-+        qemu_printf("\n");
-         range++;
-     }
- 
- #if !defined(CONFIG_USER_ONLY)
-     if (fvi->dispatch_tree && view->root) {
--        mtree_print_dispatch(p, f, view->dispatch, view->root);
-+        mtree_print_dispatch(view->dispatch, view->root);
-     }
- #endif
- 
--    p(f, "\n");
-+    qemu_printf("\n");
- }
- 
- static gboolean mtree_info_flatview_free(gpointer key, gpointer value,
-@@ -3037,8 +3034,7 @@ static gboolean mtree_info_flatview_free(gpointer key, gpointer value,
-     return true;
- }
- 
--void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
--                bool dispatch_tree, bool owner)
-+void mtree_info(bool flatview, bool dispatch_tree, bool owner)
- {
-     MemoryRegionListHead ml_head;
-     MemoryRegionList *ml, *ml2;
-@@ -3047,8 +3043,6 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-     if (flatview) {
-         FlatView *view;
-         struct FlatViewInfo fvi = {
--            .mon_printf = mon_printf,
--            .f = f,
-             .counter = 0,
-             .dispatch_tree = dispatch_tree,
-             .owner = owner,
-@@ -3082,16 +3076,16 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-     QTAILQ_INIT(&ml_head);
- 
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        mon_printf(f, "address-space: %s\n", as->name);
--        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head, owner);
--        mon_printf(f, "\n");
-+        qemu_printf("address-space: %s\n", as->name);
-+        mtree_print_mr(as->root, 1, 0, &ml_head, owner);
-+        qemu_printf("\n");
-     }
- 
-     /* print aliased regions */
-     QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
--        mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
--        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head, owner);
--        mon_printf(f, "\n");
-+        qemu_printf("memory-region: %s\n", memory_region_name(ml->mr));
-+        mtree_print_mr(ml->mr, 1, 0, &ml_head, owner);
-+        qemu_printf("\n");
-     }
- 
-     QTAILQ_FOREACH_SAFE(ml, &ml_head, mrqueue, ml2) {
-diff --git a/monitor.c b/monitor.c
-index 1650ceec3a..0819b99ef7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1907,8 +1907,7 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
-     bool dispatch_tree = qdict_get_try_bool(qdict, "dispatch_tree", false);
-     bool owner = qdict_get_try_bool(qdict, "owner", false);
- 
--    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch_tree,
--               owner);
-+    mtree_info(flatview, dispatch_tree, owner);
- }
- 
- static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+-#include "disas/bfd.h"
++#include "disas/dis-asm.h"
+ #include "exec/gdbstub.h"
+ #include "kvm_ppc.h"
+ #include "sysemu/arch_init.h"
 -- 
 2.17.2
 
