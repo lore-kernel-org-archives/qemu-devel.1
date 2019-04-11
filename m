@@ -1,43 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57930)
+Received: from eggs.gnu.org ([209.51.188.92]:59044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1hEc6h-0005Aa-TV
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:59:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEcA1-0007gt-6A
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1hEc6g-000661-Ub
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:59:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34768
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1hEc6g-0005oe-Iw
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:59:18 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3BFwbxd047440
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 11:58:59 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rt8ng86va-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 11:58:58 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Thu, 11 Apr 2019 16:58:37 +0100
-Date: Thu, 11 Apr 2019 17:58:31 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <4a692c11-edb2-93f9-7d8e-96a73a7ecdae@linux.ibm.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-2-cohuck@redhat.com>
-	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
-	<20190408190747.12e3618b.cohuck@redhat.com>
-	<20190410013434.7cea1971@oc2783563651>
-	<4a692c11-edb2-93f9-7d8e-96a73a7ecdae@linux.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEc9x-0000ST-B3
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 12:02:43 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 16:02:19 +0000
+Message-ID: <cfc22244-f796-746a-ce68-a372675dd9a3@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-11-vsementsov@virtuozzo.com>
+	<bc4780d7-dc96-e050-dfe0-1a47d99893d5@redhat.com>
+In-Reply-To: <bc4780d7-dc96-e050-dfe0-1a47d99893d5@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DCA56F1028E73F4FA807B4D79EA0C083@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190411175831.7be345f4@oc2783563651>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 1/6] vfio-ccw: make it safe
- to access channel programs
+Subject: Re: [Qemu-devel] [PATCH v4 10/10] iotests: test nbd reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,61 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-s390x@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Wed, 10 Apr 2019 22:59:41 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> r the next release :) It would be one thing less on my plate...
-> >>  
-> > 
-> > Sorry I was not able to spend any significant amount of time on this
-> > lately.
-> > 
-> > Gave the combined set (this + Farhans fio-ccw fixes for kernel
-> > stacktraces v2) it a bit of smoke testing after some minor adjustments
-> > to make it compile:
-> > 
-> > --- a/drivers/s390/cio/vfio_ccw_ops.c
-> > +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> > @@ -13,6 +13,7 @@
-> >   #include <linux/vfio.h>
-> >   #include <linux/mdev.h>
-> >   #include <linux/nospec.h>
-> > +#include <linux/slab.h>
-> >   
-> >   #include "vfio_ccw_private.h"
-> > 
-> >   
-> 
-> Hrm...  Taking today's master, and the two series you mention (slight 
-> adjustment to apply patch 3 of Connie's series, because part of it was 
-> split out a few weeks ago), and I don't encounter this.  Tried switching 
-> between SLUB/SLAB, but still compiles fine.
-
-Let me guess: you have CONFIG_PCI in our .config, right?
-
-In arch/s390/include/asm/pci_io.h we have
-
-#ifndef _ASM_S390_PCI_IO_H
-#define _ASM_S390_PCI_IO_H
-
-#ifdef CONFIG_PCI
-
-#include <linux/kernel.h>
-#include <linux/slab.h>
-
-and pci_io.h comes in via 
-
-include/linux/vfio.h
-include/linux/iommu.h
-include/linux/scatterlist.h
-arch/s390/include/asm/io.h
-arch/s390/include/asm/pci_io.h
-
-
-Figured it out with help from Farhan. Took me quite some time.
-
-Regards,
-Halil
+MTYuMDEuMjAxOSAyMDoxMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNy8zMS8xOCAxMjozMCBQ
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEFkZCB0ZXN0LCB3aGlj
+aCBzdGFydHMgYmFja3VwIHRvIG5iZCB0YXJnZXQgYW5kIHJlc3RhcnRzIG5iZCBzZXJ2ZXINCj4+
+IGR1cmluZyBiYWNrdXAuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292
+LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIHRlc3Rz
+L3FlbXUtaW90ZXN0cy8yMjAgICAgICAgIHwgNjcgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKw0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIwLm91dCAgICB8ICA3
+ICsrKysrDQo+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy9ncm91cCAgICAgIHwgIDEgKw0KPj4gICB0
+ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8ICA0ICsrKw0KPj4gICA0IGZpbGVzIGNoYW5n
+ZWQsIDc5IGluc2VydGlvbnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNzU1IHRlc3RzL3FlbXUt
+aW90ZXN0cy8yMjANCj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0cy8y
+MjAub3V0DQo+Pg0KPiANCj4gVGVzdCAyMjAgaGFzIGJlZW4gY3JlYXRlZCBpbiB0aGUgbWVhbnRp
+bWU7IHRoZSBvYnZpb3VzIHJlc29sdXRpb24gaXMgdG8NCj4gcGljayBhIG5ldyB0ZXN0IG51bWJl
+ci4NCj4gDQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMCBiL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy8yMjANCj4+IG5ldyBmaWxlIG1vZGUgMTAwNzU1DQo+PiBpbmRleCAwMDAwMDAw
+MDAwLi5jOTcwMmE3ZGFkDQo+PiAtLS0gL2Rldi9udWxsDQo+PiArKysgYi90ZXN0cy9xZW11LWlv
+dGVzdHMvMjIwDQo+PiBAQCAtMCwwICsxLDY3IEBADQo+PiArIyEvdXNyL2Jpbi9lbnYgcHl0aG9u
+DQo+IA0KPj4gKw0KPj4gK2ltcG9ydCBpb3Rlc3RzDQo+PiArZnJvbSBpb3Rlc3RzIGltcG9ydCBx
+ZW11X2ltZ19jcmVhdGUsIGZpbGVfcGF0aCwgcWVtdV9uYmRfcG9wZW4NCj4+ICsNCj4+ICtkaXNr
+X2EsIGRpc2tfYiwgbmJkX3NvY2sgPSBmaWxlX3BhdGgoJ2Rpc2tfYScsICdkaXNrX2InLCAnbmJk
+LXNvY2snKQ0KPj4gK25iZF91cmkgPSAnbmJkK3VuaXg6Ly8vZXhwP3NvY2tldD0nICsgbmJkX3Nv
+Y2sNCj4+ICsNCj4+ICtxZW11X2ltZ19jcmVhdGUoJy1mJywgaW90ZXN0cy5pbWdmbXQsIGRpc2tf
+YSwgJzVNJykNCj4+ICtxZW11X2ltZ19jcmVhdGUoJy1mJywgaW90ZXN0cy5pbWdmbXQsIGRpc2tf
+YiwgJzVNJykNCj4+ICtzcnYgPSBxZW11X25iZF9wb3BlbignLWsnLCBuYmRfc29jaywgJy14Jywg
+J2V4cCcsICctZicsIGlvdGVzdHMuaW1nZm10LCBkaXNrX2IpDQo+PiArdGltZS5zbGVlcCgxKQ0K
+Pj4gKw0KPj4gK3ZtID0gaW90ZXN0cy5WTSgpLmFkZF9kcml2ZShkaXNrX2EpDQo+PiArdm0ubGF1
+bmNoKCkNCj4+ICt2bS5obXBfcWVtdV9pbygnZHJpdmUwJywgJ3dyaXRlIDAgNU0nKQ0KPj4gKw0K
+Pj4gK3ByaW50ICdibG9ja2Rldi1hZGQ6Jywgdm0ucW1wKCdibG9ja2Rldi1hZGQnLCBub2RlX25h
+bWU9J2JhY2t1cDAnLCBkcml2ZXI9J3JhdycsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgZmlsZT17J2RyaXZlcic6J25iZCcsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgJ2V4cG9ydCc6ICdleHAnLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICdzZXJ2ZXInOiB7J3R5cGUnOiAndW5peCcsDQo+PiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAncGF0aCc6IG5iZF9zb2NrfX0pDQo+
+PiArcHJpbnQgJ2Jsb2NrZGV2LWJhY2t1cDonLCB2bS5xbXAoJ2Jsb2NrZGV2LWJhY2t1cCcsIGRl
+dmljZT0nZHJpdmUwJywNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzeW5j
+PSdmdWxsJywgdGFyZ2V0PSdiYWNrdXAwJykNCj4+ICsNCj4+ICt0aW1lLnNsZWVwKDEpDQo+PiAr
+cHJpbnQgJ0tpbGwgTkJEIHNlcnZlcicNCj4+ICtzcnYua2lsbCgpDQo+PiArDQo+PiAram9icyA9
+IHZtLnFtcCgncXVlcnktYmxvY2stam9icycpWydyZXR1cm4nXQ0KPj4gK2lmIGpvYnMgYW5kIGpv
+YnNbMF1bJ29mZnNldCddIDwgam9ic1swXVsnbGVuJ106DQo+PiArICAgIHByaW50ICdCYWNrdXAg
+am9iIGlzIHN0aWxsIGluIHByb2dyZXNzJw0KPj4gKw0KPj4gK3RpbWUuc2xlZXAoMSkNCj4gDQo+
+IFRoYXQncyBhIGxvdCBvZiBzbGVlcCgpcyBmb3IgYSB0ZXN0IG1hcmtlZCBxdWljay4gQXJlIHdl
+IHN1cmUgaXQgd29uJ3QNCj4gZmFpbCB1bmRlciBoZWF2eSBsb2FkPyBDYW4geW91IG1ha2UgdGhl
+IHRlc3QgbW9yZSByZWxpYWJsZSBieSBsb29raW5nDQo+IGZvciBzcGVjaWZpYyBldmVudHMgcmF0
+aGVyIHRoYW4ganVzdCBhIGZpeGVkLWxlbmd0aCBzbGVlcD8NCg0KSG1tLi4gMyBzZWNvbmRzIGlz
+IHN0aWxsIHF1aWNrIEkgdGhpbmsuDQoNCkZpcnN0bHkgSSB3YW50IG5iZCBzZXJ2ZXIgdG8gYmUg
+YWN0dWFsbHkgc3RhcnRlZCwgYnV0IGl0IGhhcyBubyBldmVudHMuIFRoZW4gSSB3YW50DQpiYWNr
+dXAgdG8gZG8gc29tZSBwcm9ncmVzcywgYWdhaW4sIG5vIGV2ZW50IGZvciBwcm9ncmVzcy4gQW5k
+IHRoZSBsYXN0IG9uZSBhY3R1YWwgc2VydmVyDQp1bmF2YWlsYWJsZSB0aW1lLi4gU28sIEkgZG9u
+J3QgaGF2ZSBiZXR0ZXIgaWRlYS4NCg0KPiANCj4+ICsNCj4+ICtwcmludCAnU3RhcnQgTkJEIHNl
+cnZlcicNCj4+ICtzcnYgPSBxZW11X25iZF9wb3BlbignLWsnLCBuYmRfc29jaywgJy14JywgJ2V4
+cCcsICctZicsIGlvdGVzdHMuaW1nZm10LCBkaXNrX2IpDQo+PiArDQo+PiArdHJ5Og0KPj4gKyAg
+ICBlID0gdm0uZXZlbnRfd2FpdCgnQkxPQ0tfSk9CX0NPTVBMRVRFRCcpDQo+PiArICAgIHByaW50
+IGVbJ2V2ZW50J10sICc6JywgZVsnZGF0YSddDQo+PiArZXhjZXB0Og0KPj4gKyAgICBwYXNzDQo+
+PiArDQo+PiArcHJpbnQgJ2Jsb2NrZGV2LWRlbDonLCB2bS5xbXAoJ2Jsb2NrZGV2LWRlbCcsIG5v
+ZGVfbmFtZT0nYmFja3VwMCcpDQo+PiArc3J2LmtpbGwoKQ0KPj4gK3ZtLnNodXRkb3duKCkNCj4+
+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvMjIwLm91dCBiL3Rlc3RzL3FlbXUtaW90
+ZXN0cy8yMjAub3V0DQo+PiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPj4gaW5kZXggMDAwMDAwMDAw
+MC4uZGFlMWE0OWQ5Zg0KPj4gLS0tIC9kZXYvbnVsbA0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rl
+c3RzLzIyMC5vdXQNCj4+IEBAIC0wLDAgKzEsNyBAQA0KPj4gK2Jsb2NrZGV2LWFkZDoge3UncmV0
+dXJuJzoge319DQo+PiArYmxvY2tkZXYtYmFja3VwOiB7dSdyZXR1cm4nOiB7fX0NCj4+ICtLaWxs
+IE5CRCBzZXJ2ZXINCj4+ICtCYWNrdXAgam9iIGlzIHN0aWxsIGluIHByb2dyZXNzDQo+PiArU3Rh
+cnQgTkJEIHNlcnZlcg0KPj4gK0JMT0NLX0pPQl9DT01QTEVURUQgOiB7dSdkZXZpY2UnOiB1J2Ry
+aXZlMCcsIHUndHlwZSc6IHUnYmFja3VwJywgdSdzcGVlZCc6IDAsIHUnbGVuJzogNTI0Mjg4MCwg
+dSdvZmZzZXQnOiA1MjQyODgwfQ0KPj4gK2Jsb2NrZGV2LWRlbDoge3UncmV0dXJuJzoge319DQo+
+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwIGIvdGVzdHMvcWVtdS1pb3Rl
+c3RzL2dyb3VwDQo+PiBpbmRleCBiOTczZGM4NDJkLi5lZTI0NzNjNmEzIDEwMDY0NA0KPj4gLS0t
+IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwDQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMv
+Z3JvdXANCj4+IEBAIC0yMTksNiArMjE5LDcgQEANCj4+ICAgMjE3IHJ3IGF1dG8gcXVpY2sNCj4+
+ICAgMjE4IHJ3IGF1dG8gcXVpY2sNCj4+ICAgMjE5IHJ3IGF1dG8NCj4+ICsyMjAgcncgYXV0byBx
+dWljaw0KPj4gICAyMjEgcncgYXV0byBxdWljaw0KPj4gICAyMjIgcncgYXV0byBxdWljaw0KPj4g
+ICAyMjMgcncgYXV0byBxdWljaw0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9p
+b3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4+IGluZGV4IDRlNjdm
+YmJlOTYuLjE3YmM4YzhlMzIgMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90
+ZXN0cy5weQ0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4+IEBAIC0x
+ODUsNiArMTg1LDEwIEBAIGRlZiBxZW11X25iZCgqYXJncyk6DQo+PiAgICAgICAnJydSdW4gcWVt
+dS1uYmQgaW4gZGFlbW9uIG1vZGUgYW5kIHJldHVybiB0aGUgcGFyZW50J3MgZXhpdCBjb2RlJycn
+DQo+PiAgICAgICByZXR1cm4gc3VicHJvY2Vzcy5jYWxsKHFlbXVfbmJkX2FyZ3MgKyBbJy0tZm9y
+ayddICsgbGlzdChhcmdzKSkNCj4+ICAgDQo+PiArZGVmIHFlbXVfbmJkX3BvcGVuKCphcmdzKToN
+Cj4+ICsgICAgJycnUnVuIHFlbXUtbmJkIGluIGRhZW1vbiBtb2RlIGFuZCByZXR1cm4gdGhlIHBh
+cmVudCdzIGV4aXQgY29kZScnJw0KPj4gKyAgICByZXR1cm4gc3VicHJvY2Vzcy5Qb3BlbihxZW11
+X25iZF9hcmdzICsgWyctLXBlcnNpc3RlbnQnXSArIGxpc3QoYXJncykpDQo+PiArDQo+PiAgIGRl
+ZiBjb21wYXJlX2ltYWdlcyhpbWcxLCBpbWcyLCBmbXQxPWltZ2ZtdCwgZm10Mj1pbWdmbXQpOg0K
+Pj4gICAgICAgJycnUmV0dXJuIFRydWUgaWYgdHdvIGltYWdlIGZpbGVzIGFyZSBpZGVudGljYWwn
+JycNCj4+ICAgICAgIHJldHVybiBxZW11X2ltZygnY29tcGFyZScsICctZicsIGZtdDEsDQo+Pg0K
+PiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
