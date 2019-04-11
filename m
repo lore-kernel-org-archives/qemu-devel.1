@@ -5,67 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A8EC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 325C8C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:42:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8128A2184B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:32:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8128A2184B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 04F082133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:42:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F082133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46964 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47152 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXwH-0000Uk-R6
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:32:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45100)
+	id 1hEY6S-00030k-99
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:42:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEXuy-0008J3-B9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:57 -0400
+	(envelope-from <slp@redhat.com>) id 1hEY5X-0002eW-68
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEXuw-0000ak-10
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56766)
+	(envelope-from <slp@redhat.com>) id 1hEY5V-0001b8-59
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:41:51 -0400
+Received: from mail-wr1-f47.google.com ([209.85.221.47]:34250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEXuv-0000YZ-Ll
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEXur-0003kK-RT
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 11:30:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 695D72E80D3
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 11:30:49 +0000 (UTC)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1hEY5S-0001aM-Q3
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:41:48 -0400
+Received: by mail-wr1-f47.google.com with SMTP id p10so6937870wrq.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 04:41:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version;
+	bh=2R7DMuyi6xYq2nswOZLbgokHaN1sZ+FwNvtx+iJQMAc=;
+	b=RMykoP4WBGp3NSU3DuhKXXSzL61X+TqBNVLH5dhH+7pyipdtSDu+vBeKsnU67tfdqd
+	jS0mv/M+0gJEYnHULt+4CPfUOrQwXuoUwEbALCpDyttVGAZLYi+0K6NO3gdMLk/wJS8+
+	+46CbZbP6HxMth2REJ8fWvaBX9D9wc5aQ6HdW+TBdtQTjqlyb/Frpm+Ro3oEpsZhgbvh
+	7qOR6Ryp3s7Evzg0REtgMGcPStP6H1yZVeAnJXGxajt0ix254dY6AURK936oiuHq1+s0
+	YZzmckxWs/jYNIA8M3BOJTq1akts3uv6E98HcxiYEp1FBVUWuyjVPB5WiL9poZG+sZnk
+	Cm0g==
+X-Gm-Message-State: APjAAAV6F9wiX+HJE+ATc8OoT+1hcjQgnulPykiNiXLG4iHlTe/oH97s
+	UNd89ydllX3Vz/+Jl+EE0SU8zA==
+X-Google-Smtp-Source: APXvYqyT7Mn164DMWBRaBwdbmoH8mYvZgwAtoTW3oqP4LU5z0vxl6FHdZ1s5bUeO/D+KoxkFOW6h6g==
+X-Received: by 2002:a5d:4b01:: with SMTP id v1mr29920819wrq.48.1554982905593; 
+	Thu, 11 Apr 2019 04:41:45 -0700 (PDT)
+Received: from dritchie.redhat.com (255.red-83-57-210.dynamicip.rima-tde.net.
+	[83.57.210.255])
+	by smtp.gmail.com with ESMTPSA id t76sm7586043wmt.8.2019.04.11.04.41.44
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 11 Apr 2019 04:41:44 -0700 (PDT)
+References: <87zhpxmkg9.fsf@redhat.com>
+	<20190315150036.GA11173@stefanha-x1.localdomain>
+	<87a7hwm9t4.fsf@redhat.com> <20190315155010.GG5368@linux.fritz.box>
+User-agent: mu4e 1.0; emacs 26.1
+From: Sergio Lopez <slp@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+In-reply-to: <20190315155010.GG5368@linux.fritz.box>
+Date: Thu, 11 Apr 2019 13:41:42 +0200
+Message-ID: <87pnps3h1l.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Apr 2019 11:16:20 -0000
-From: Chris Vesters <1824331@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: chrisvesters
-X-Launchpad-Bug-Reporter: Chris Vesters (chrisvesters)
-X-Launchpad-Bug-Modifier: Chris Vesters (chrisvesters)
-Message-Id:
- <155498138051.14327.16445763241902233861.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 9e2beeddbad2fe5907ec3d616285427b03ba434a
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824331] [NEW] Qemu Crashes
+	[fuzzy]
+X-Received-From: 209.85.221.47
+Subject: Re: [Qemu-devel] Combining synchronous and asynchronous IO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,202 +81,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824331 <1824331@bugs.launchpad.net>
+Cc: "fam@euphon.net" <fam@euphon.net>, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org, "mreitz@redhat.com" <mreitz@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, jusual@mail.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411111620.SnZ35gts3tCN02rsR9HA8kpyWUsttYsU2LIs39fESS8@z>
+Message-ID: <20190411114142.v9q--JYCje46rIKoCHe1_AR4jLuFTSfRtGV8_OHGrLU@z>
 
-Public bug reported:
-
-A high volume of communication (UDPv4) between the host and Qemu causes it =
-to crash.
-Qemu version: 2.11.1
-Ubuntu 18.04.1 LTS
-
-I attached GDB to the Qemu but wasn't able to get the debug symbols working.
-Some more assistance with how to get this working is appreciated (I am new =
-to all of this).
-
-I recorded two different situations where it happened. Both seem to be
-related to the network.
-
-#0  0x00007fa065fb6e97 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/un=
-ix/sysv/linux/raise.c:51
-#1  0x00007fa065fb8801 in __GI_abort () at abort.c:79
-#2  0x00007fa066001897 in __libc_message (action=3Daction@entry=3Ddo_abort,=
- fmt=3Dfmt@entry=3D0x7fa06612eb9a "%s\n") at ../sysdeps/posix/libc_fatal.c:=
-181
-#3  0x00007fa06600890a in malloc_printerr (str=3Dstr@entry=3D0x7fa06612ccba=
- "corrupted double-linked list") at malloc.c:5350
-#4  0x00007fa066008ac4 in malloc_consolidate (av=3Dav@entry=3D0x7fa04c00002=
-0) at malloc.c:4456
-#5  0x00007fa06600c7d8 in _int_malloc (av=3Dav@entry=3D0x7fa04c000020, byte=
-s=3Dbytes@entry=3D8192) at malloc.c:3703
-#6  0x00007fa06600f2ed in __GI___libc_malloc (bytes=3D8192) at malloc.c:3065
-#7  0x0000555c8d2edee8 in sbreserve ()
-#8  0x0000555c8d2f06f9 in tcp_input ()
-#9  0x0000555c8d2ec990 in slirp_input ()
-#10 0x0000555c8d2dc760 in  ()
-#11 0x0000555c8d2d453d in qemu_deliver_packet_iov ()
-#12 0x0000555c8d2d7392 in qemu_net_queue_send ()
-#13 0x0000555c8d2d46f6 in  ()
-#14 0x0000555c8d21e4e6 in  ()
-#15 0x0000555c8d21f7ab in  ()
-#16 0x0000555c8d21fc30 in  ()
-#17 0x0000555c8d056b68 in  ()
-#18 0x0000555c8d053ffe in  ()
-#19 0x0000555c8d058ae7 in memory_region_dispatch_write ()
-#20 0x0000555c8d014d3e in  ()
-#21 0x0000555c8d0677d8 in kvm_cpu_exec ()
-#22 0x0000555c8d044404 in  ()
-#23 0x00007fa0663706db in start_thread (arg=3D0x7fa056ffd700) at pthread_cr=
-eate.c:463
-#24 0x00007fa06609988f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
-ne.S:95
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
 
-#0  0x00007f6b3b8f4e97 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/un=
-ix/sysv/linux/raise.c:51
-#1  0x00007f6b3b8f6801 in __GI_abort () at abort.c:79
-#2  0x00007f6b3b93f897 in __libc_message (action=3Daction@entry=3Ddo_abort,=
- fmt=3Dfmt@entry=3D0x7f6b3ba6cb9a "%s\n") at ../sysdeps/posix/libc_fatal.c:=
-181
-#3  0x00007f6b3b94690a in malloc_printerr (str=3Dstr@entry=3D0x7f6b3ba6aed3=
- "realloc(): invalid next size") at malloc.c:5350
-#4  0x00007f6b3b94b9b4 in _int_realloc (av=3Dav@entry=3D0x7f6b1c000020, old=
-p=3Doldp@entry=3D0x7f6b1c03d8a0, oldsize=3Doldsize@entry=3D38560, nb=3Dnb@e=
-ntry=3D40032) at malloc.c:4534
-#5  0x00007f6b3b94ef9b in __GI___libc_realloc (oldmem=3D0x7f6b1c03d8b0, byt=
-es=3D40024) at malloc.c:3230
-#6  0x00007f6b3c6d5ae0 in g_realloc () at /usr/lib/x86_64-linux-gnu/libglib=
--2.0.so.0
-#7  0x000055dd0f5e6f50 in  ()
-#8  0x000055dd0f5e7238 in m_cat ()
-#9  0x000055dd0f5e44f1 in ip_input ()
-#10 0x000055dd0f5e6990 in slirp_input ()
-#11 0x000055dd0f5d6760 in  ()
-#12 0x000055dd0f5ce53d in qemu_deliver_packet_iov ()
-#13 0x000055dd0f5d1392 in qemu_net_queue_send ()
-#14 0x000055dd0f5ce6f6 in  ()
-#15 0x000055dd0f5184e6 in  ()
-#16 0x000055dd0f5197ab in  ()
-#17 0x000055dd0f519c30 in  ()
-#18 0x000055dd0f350b68 in  ()
-#19 0x000055dd0f34dffe in  ()
-#20 0x000055dd0f352ae7 in memory_region_dispatch_write ()
-#21 0x000055dd0f30ed3e in  ()
-#22 0x000055dd0f3617d8 in kvm_cpu_exec ()
-#23 0x000055dd0f33e404 in  ()
-#24 0x00007f6b3bcae6db in start_thread (arg=3D0x7f6b30f17700) at pthread_cr=
-eate.c:463
-#25 0x00007f6b3b9d788f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
-ne.S:95
+Kevin Wolf <kwolf@redhat.com> writes:
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> Am 15.03.2019 um 16:33 hat Sergio Lopez geschrieben:
+>>=20
+>> Stefan Hajnoczi writes:
+>>=20
+>> > On Thu, Mar 14, 2019 at 06:31:34PM +0100, Sergio Lopez wrote:
+>> >> Our current AIO path does a great job at unloading the work from the =
+VM,
+>> >> and combined with IOThreads provides a good performance in most
+>> >> scenarios. But it also comes with its costs, in both a longer executi=
+on
+>> >> path and the need of the intervention of the scheduler at various
+>> >> points.
+>> >>=20
+>> >> There's one particular workload that suffers from this cost, and that=
+'s
+>> >> when you have just 1 or 2 cores on the Guest issuing synchronous
+>> >> requests. This happens to be a pretty common workload for some DBs an=
+d,
+>> >> in a general sense, on small VMs.
+>> >>=20
+>> >> I did a quick'n'dirty implementation on top of virtio-blk to get some
+>> >> numbers. This comes from a VM with 4 CPUs running on an idle server,
+>> >> with a secondary virtio-blk disk backed by a null_blk device with a
+>> >> simulated latency of 30us.
+>> >
+>> > Can you describe the implementation in more detail?  Does "synchronous"
+>> > mean that hw/block/virtio_blk.c makes a blocking preadv()/pwritev() ca=
+ll
+>> > instead of calling blk_aio_preadv/pwritev()?  If so, then you are also
+>> > bypassing the QEMU block layer (coroutines, request tracking, etc) and
+>> > that might explain some of the latency.
+>>=20
+>> The first implementation, the one I've used for getting these numbers,
+>> it's just preadv/pwrite from virtio_blk.c, as you correctly guessed. I
+>> know it's unfair, but I wanted to take a look at the best possible
+>> scenario, and then measure the cost of the other layers.
+>>=20
+>> I'm working now on writing non-coroutine counterparts for
+>> blk_co_[preadv|pwrite], so we have SIO without bypassing the block layer.
+>
+> Maybe try to keep the change local to file-posix.c? I think you would
+> only have to modify raw_thread_pool_submit() so that it doesn't go
+> through the thread pool, but just calls func directly.
+>
+> I don't think avoiding coroutines is possible without bypassing the block
+> layer altogether because everything is really expecting to be run in
+> coroutine context.
 
--- =
+Turns out what I initially thought was a cost induced by the AIO nature
+of our block layer, it's actually a bug in which polling mode works
+against aio=3Dthreads, delaying the execution of the request completions.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824331
+This has been fixed by Paolo's "aio-posix: ensure poll mode is left when
+aio_notify is called":
 
-Title:
-  Qemu Crashes
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01426.html
 
-Status in QEMU:
-  New
+So we can throw away the idea of combining synchronous and asynchronous
+requests, as it doesn't provide a significant improvement that would
+justify the added complexity.
 
-Bug description:
-  A high volume of communication (UDPv4) between the host and Qemu causes i=
-t to crash.
-  Qemu version: 2.11.1
-  Ubuntu 18.04.1 LTS
+Thanks,
+Sergio.
 
-  I attached GDB to the Qemu but wasn't able to get the debug symbols worki=
-ng.
-  Some more assistance with how to get this working is appreciated (I am ne=
-w to all of this).
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  I recorded two different situations where it happened. Both seem to be
-  related to the network.
+-----BEGIN PGP SIGNATURE-----
 
-  #0  0x00007fa065fb6e97 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:51
-  #1  0x00007fa065fb8801 in __GI_abort () at abort.c:79
-  #2  0x00007fa066001897 in __libc_message (action=3Daction@entry=3Ddo_abor=
-t, fmt=3Dfmt@entry=3D0x7fa06612eb9a "%s\n") at ../sysdeps/posix/libc_fatal.=
-c:181
-  #3  0x00007fa06600890a in malloc_printerr (str=3Dstr@entry=3D0x7fa06612cc=
-ba "corrupted double-linked list") at malloc.c:5350
-  #4  0x00007fa066008ac4 in malloc_consolidate (av=3Dav@entry=3D0x7fa04c000=
-020) at malloc.c:4456
-  #5  0x00007fa06600c7d8 in _int_malloc (av=3Dav@entry=3D0x7fa04c000020, by=
-tes=3Dbytes@entry=3D8192) at malloc.c:3703
-  #6  0x00007fa06600f2ed in __GI___libc_malloc (bytes=3D8192) at malloc.c:3=
-065
-  #7  0x0000555c8d2edee8 in sbreserve ()
-  #8  0x0000555c8d2f06f9 in tcp_input ()
-  #9  0x0000555c8d2ec990 in slirp_input ()
-  #10 0x0000555c8d2dc760 in  ()
-  #11 0x0000555c8d2d453d in qemu_deliver_packet_iov ()
-  #12 0x0000555c8d2d7392 in qemu_net_queue_send ()
-  #13 0x0000555c8d2d46f6 in  ()
-  #14 0x0000555c8d21e4e6 in  ()
-  #15 0x0000555c8d21f7ab in  ()
-  #16 0x0000555c8d21fc30 in  ()
-  #17 0x0000555c8d056b68 in  ()
-  #18 0x0000555c8d053ffe in  ()
-  #19 0x0000555c8d058ae7 in memory_region_dispatch_write ()
-  #20 0x0000555c8d014d3e in  ()
-  #21 0x0000555c8d0677d8 in kvm_cpu_exec ()
-  #22 0x0000555c8d044404 in  ()
-  #23 0x00007fa0663706db in start_thread (arg=3D0x7fa056ffd700) at pthread_=
-create.c:463
-  #24 0x00007fa06609988f in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
-
-  =
-
-  #0  0x00007f6b3b8f4e97 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:51
-  #1  0x00007f6b3b8f6801 in __GI_abort () at abort.c:79
-  #2  0x00007f6b3b93f897 in __libc_message (action=3Daction@entry=3Ddo_abor=
-t, fmt=3Dfmt@entry=3D0x7f6b3ba6cb9a "%s\n") at ../sysdeps/posix/libc_fatal.=
-c:181
-  #3  0x00007f6b3b94690a in malloc_printerr (str=3Dstr@entry=3D0x7f6b3ba6ae=
-d3 "realloc(): invalid next size") at malloc.c:5350
-  #4  0x00007f6b3b94b9b4 in _int_realloc (av=3Dav@entry=3D0x7f6b1c000020, o=
-ldp=3Doldp@entry=3D0x7f6b1c03d8a0, oldsize=3Doldsize@entry=3D38560, nb=3Dnb=
-@entry=3D40032) at malloc.c:4534
-  #5  0x00007f6b3b94ef9b in __GI___libc_realloc (oldmem=3D0x7f6b1c03d8b0, b=
-ytes=3D40024) at malloc.c:3230
-  #6  0x00007f6b3c6d5ae0 in g_realloc () at /usr/lib/x86_64-linux-gnu/libgl=
-ib-2.0.so.0
-  #7  0x000055dd0f5e6f50 in  ()
-  #8  0x000055dd0f5e7238 in m_cat ()
-  #9  0x000055dd0f5e44f1 in ip_input ()
-  #10 0x000055dd0f5e6990 in slirp_input ()
-  #11 0x000055dd0f5d6760 in  ()
-  #12 0x000055dd0f5ce53d in qemu_deliver_packet_iov ()
-  #13 0x000055dd0f5d1392 in qemu_net_queue_send ()
-  #14 0x000055dd0f5ce6f6 in  ()
-  #15 0x000055dd0f5184e6 in  ()
-  #16 0x000055dd0f5197ab in  ()
-  #17 0x000055dd0f519c30 in  ()
-  #18 0x000055dd0f350b68 in  ()
-  #19 0x000055dd0f34dffe in  ()
-  #20 0x000055dd0f352ae7 in memory_region_dispatch_write ()
-  #21 0x000055dd0f30ed3e in  ()
-  #22 0x000055dd0f3617d8 in kvm_cpu_exec ()
-  #23 0x000055dd0f33e404 in  ()
-  #24 0x00007f6b3bcae6db in start_thread (arg=3D0x7f6b30f17700) at pthread_=
-create.c:463
-  #25 0x00007f6b3b9d788f in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824331/+subscriptions
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAlyvJ/YACgkQ9GknjS8M
+AjV7LA//aqoMbyfpVzzOJsXo8BOj7Z2L/xjyY23HNLcc/5uHKHr0k/vMiGWix5HA
+7yGXo8GEzmdlUzw0zggDPNXBRJVMhcift70lws4OAzcN32VGCjzvWJT/Dguicdkw
+eOad12domVPpEREvJK6ffO1CAToVOWaOPcTJ22tHoKD7ASeeh+GA90ev7xVNhBRK
+6nAU8BPNN9nIawKCoQi7cRjbK13qERskmQ3jD/8L0u4o0YW/2XX9ZlzxcfVvB3NR
++T0A6LGIFlQyXMBTzhY+jo9rsmiIQfyjP90QpXfk3YXxyecH86sQEXwJeO/lX7Ip
+O8s8NeKkcaDf9OgMntA3vkEaQ48+fypjvmUU5iQvuFecQlMIvLUk4UbmyYsf/qfm
+kLg1/1ZNa2t/lWBRNwb6H/9xHpnEHBXP12FdZNA7yzGZqqGldJJo34KJFbyVp8sc
+QKBb6nPg3/JzjmXQFMSCq/FsnFuTT8KohZkKVf3SB0IsMoYsiCYn3G8+UZjy4gdw
+JdZ/vA1f1nPBDXmGa7JHNvcEC+UfI7z/Eny37IuF1nyE4D+hAx6a2DivdIdEcY+k
+4UWY4VFJdGo2Ms2KoXbXfB8RqDAmV81NGR1tIjHIA2jc6iOBU3+MT8X6cVUvYzTh
+UoiLeN856WP3gxZlVZQN+Id26J1PZfRnV7A+4nVa7wXqFnWv8t0=
+=1cZj
+-----END PGP SIGNATURE-----
+--=-=-=--
 
