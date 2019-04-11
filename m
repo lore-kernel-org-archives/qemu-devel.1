@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38593C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA06DC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C3C12077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:55:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3C12077C
+	by mail.kernel.org (Postfix) with ESMTPS id BD8C4217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 14:57:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8C4217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50202 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50225 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEb7D-0005MC-78
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:55:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38964)
+	id 1hEb98-0007DR-Su
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 10:57:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kv-1Z
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1hEb4b-0003Kw-1b
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEb4X-0000lo-2o
+	(envelope-from <armbru@redhat.com>) id 1hEb4X-0000lu-42
 	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28361)
+Received: from mx1.redhat.com ([209.132.183.28]:32928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hEb4W-0000kx-OM; Thu, 11 Apr 2019 10:53:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hEb4W-0000l0-QP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 10:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0031A30B96F6;
+	by mx1.redhat.com (Postfix) with ESMTPS id 074A1307E051;
 	Thu, 11 Apr 2019 14:53:00 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C381018502;
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CC49F5D9C4;
 	Thu, 11 Apr 2019 14:52:59 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id DC08111329CF; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
+	id DF7D911329F5; Thu, 11 Apr 2019 16:52:56 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 16:52:50 +0200
-Message-Id: <20190411145256.8614-10-armbru@redhat.com>
+Date: Thu, 11 Apr 2019 16:52:51 +0200
+Message-Id: <20190411145256.8614-11-armbru@redhat.com>
 In-Reply-To: <20190411145256.8614-1-armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
+	(mx1.redhat.com [10.5.110.42]);
 	Thu, 11 Apr 2019 14:53:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 09/15] s390x/kvm: Report warnings with
- warn_report(), not error_printf()
+Subject: [Qemu-devel] [PATCH v2 10/15] vl: Make -machine $TYPE,
+ help and -accel help print to stdout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,47 +69,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411145250.h8CXwp_M4-6OQOdwXjxm9HQpnV0Koz7OXSuekstBz0E@z>
+Message-ID: <20190411145251.6HhUojl9dsY1MVSndt6vJ9f7LJ5LTNQOh-tzStrVQG0@z>
 
-kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
--ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
-ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
-failures.
+Command line help help explicitly requested by the user should be
+printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
+$TYPE,help and -accel help to match: use printf() instead of
+error_printf().
 
-kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
-in the latter failure mode.  Since this is obviously a warning, use
-warn_report().
-
-Perhaps the reporting should be left to the caller.  It could warn on
-failure other than -ENOSYS.
-
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- target/s390x/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ vl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 19530fb94e..2c6e35b5aa 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+diff --git a/vl.c b/vl.c
+index c696ad2a13..fdfa1c7453 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
+             continue;
+         }
  
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
-     if (ret < 0) {
--        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
-+        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
+-        error_printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
+-                     prop->name, prop->type);
++        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
++               prop->name, prop->type);
+         if (prop->description) {
+-            error_printf(" (%s)\n", prop->description);
++            printf(" (%s)\n", prop->description);
+         } else {
+-            error_printf("\n");
++            printf("\n");
+         }
      }
-     return ret;
- }
+ 
+@@ -3643,7 +3643,7 @@ int main(int argc, char **argv, char **envp)
+                                                      optarg, true);
+                 optarg = qemu_opt_get(accel_opts, "accel");
+                 if (!optarg || is_help_option(optarg)) {
+-                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
++                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
+                     exit(0);
+                 }
+                 opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
 -- 
 2.17.2
 
