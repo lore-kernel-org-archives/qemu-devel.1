@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48407)
+Received: from eggs.gnu.org ([209.51.188.92]:48574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEexD-0007Ye-E9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:44 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hEext-0007ro-0J
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEexC-0007Xr-Da
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hEexC-0007X0-6D
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:01:42 -0400
-From: Laszlo Ersek <lersek@redhat.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1hEexs-0007x6-1k
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:02:24 -0400
+Received: from mail-eopbgr680052.outbound.protection.outlook.com
+	([40.107.68.52]:53638
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hEexr-0007wo-MZ
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:02:23 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Thu, 11 Apr 2019 19:02:21 +0000
+Message-ID: <7d449ae2-6762-97c2-4930-358f34f3ef4b@amd.com>
 References: <20190411175931.29235-1-brijesh.singh@amd.com>
 	<61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
-Message-ID: <33d5a129-52d6-e9d6-6211-59e97aff975e@redhat.com>
-Date: Thu, 11 Apr 2019 21:01:38 +0200
-MIME-Version: 1.0
 In-Reply-To: <61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
-Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <05F7BBE3B9FD39438A1BB8145543B6B6@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
  field to 'query-sev-capabilities'
 List-Id: <qemu-devel.nongnu.org>
@@ -29,53 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Erik Skultety <eskultet@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Erik Skultety <eskultet@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/11/19 20:10, Laszlo Ersek wrote:
-> On 04/11/19 19:59, Singh, Brijesh wrote:
->> There are limited numbers of the SEV guests that can be run concurrent=
-ly.
->> A management applications may need to know this limit so that it can p=
-lace
->> SEV VMs on hosts which have suitable resources available.
->>
->> Currently, this limit is not exposed to the application. Add a new
->> 'sev-max-guest' field in the query-sev-capabilities to provide this
->> information.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: Eric Blake <eblake@redhat.com>
->> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> Cc: Laszlo Ersek <lersek@redhat.com>
->> Cc: Erik Skultety <eskultet@redhat.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  qapi/target.json  | 6 ++++--
->>  target/i386/sev.c | 6 ++++--
->>  2 files changed, 8 insertions(+), 4 deletions(-)
->>
->> diff --git a/qapi/target.json b/qapi/target.json
->> index 1d4d54b600..b45121d30b 100644
->> --- a/qapi/target.json
->> +++ b/qapi/target.json
->> @@ -183,7 +183,8 @@
->>    'data': { 'pdh': 'str',
->>              'cert-chain': 'str',
->>              'cbitpos': 'int',
->> -            'reduced-phys-bits': 'int'},
->> +            'reduced-phys-bits': 'int',
->> +            'sev-max-guests': 'int'},
->=20
-> Would it be useful to make this new field optional? E.g. if it was
-> missing, libvirtd could assume "no limit".
->=20
-> Again, not sure if that's useful, but it's not hard to introduce the
-> field as optional now. Removing mandatory fields later is impossible.
-
-On second thought, if we're sure the hardware / encryption engine will
-always have this kind of limitation, then mandatory looks fine.
-
-Thanks
-Laszlo
+DQoNCk9uIDQvMTEvMTkgMToxMCBQTSwgTGFzemxvIEVyc2VrIHdyb3RlOg0KPiBPbiAwNC8xMS8x
+OSAxOTo1OSwgU2luZ2gsIEJyaWplc2ggd3JvdGU6DQo+PiBUaGVyZSBhcmUgbGltaXRlZCBudW1i
+ZXJzIG9mIHRoZSBTRVYgZ3Vlc3RzIHRoYXQgY2FuIGJlIHJ1biBjb25jdXJyZW50bHkuDQo+PiBB
+IG1hbmFnZW1lbnQgYXBwbGljYXRpb25zIG1heSBuZWVkIHRvIGtub3cgdGhpcyBsaW1pdCBzbyB0
+aGF0IGl0IGNhbiBwbGFjZQ0KPj4gU0VWIFZNcyBvbiBob3N0cyB3aGljaCBoYXZlIHN1aXRhYmxl
+IHJlc291cmNlcyBhdmFpbGFibGUuDQo+Pg0KPj4gQ3VycmVudGx5LCB0aGlzIGxpbWl0IGlzIG5v
+dCBleHBvc2VkIHRvIHRoZSBhcHBsaWNhdGlvbi4gQWRkIGEgbmV3DQo+PiAnc2V2LW1heC1ndWVz
+dCcgZmllbGQgaW4gdGhlIHF1ZXJ5LXNldi1jYXBhYmlsaXRpZXMgdG8gcHJvdmlkZSB0aGlzDQo+
+PiBpbmZvcm1hdGlvbi4NCj4+DQo+PiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
+LmNvbT4NCj4+IENjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQo+PiBD
+YzogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+PiBDYzogRGFuaWVsIFAuIEJlcnJh
+bmfDqSA8YmVycmFuZ2VAcmVkaGF0LmNvbT4NCj4+IENjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0By
+ZWRoYXQuY29tPg0KPj4gQ2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQo+
+PiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQo+
+PiAtLS0NCj4+ICAgcWFwaS90YXJnZXQuanNvbiAgfCA2ICsrKystLQ0KPj4gICB0YXJnZXQvaTM4
+Ni9zZXYuYyB8IDYgKysrKy0tDQo+PiAgIDIgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+LCA0IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9xYXBpL3RhcmdldC5qc29uIGIv
+cWFwaS90YXJnZXQuanNvbg0KPj4gaW5kZXggMWQ0ZDU0YjYwMC4uYjQ1MTIxZDMwYiAxMDA2NDQN
+Cj4+IC0tLSBhL3FhcGkvdGFyZ2V0Lmpzb24NCj4+ICsrKyBiL3FhcGkvdGFyZ2V0Lmpzb24NCj4+
+IEBAIC0xODMsNyArMTgzLDggQEANCj4+ICAgICAnZGF0YSc6IHsgJ3BkaCc6ICdzdHInLA0KPj4g
+ICAgICAgICAgICAgICAnY2VydC1jaGFpbic6ICdzdHInLA0KPj4gICAgICAgICAgICAgICAnY2Jp
+dHBvcyc6ICdpbnQnLA0KPj4gLSAgICAgICAgICAgICdyZWR1Y2VkLXBoeXMtYml0cyc6ICdpbnQn
+fSwNCj4+ICsgICAgICAgICAgICAncmVkdWNlZC1waHlzLWJpdHMnOiAnaW50JywNCj4+ICsgICAg
+ICAgICAgICAnc2V2LW1heC1ndWVzdHMnOiAnaW50J30sDQo+IA0KPiBXb3VsZCBpdCBiZSB1c2Vm
+dWwgdG8gbWFrZSB0aGlzIG5ldyBmaWVsZCBvcHRpb25hbD8gRS5nLiBpZiBpdCB3YXMNCj4gbWlz
+c2luZywgbGlidmlydGQgY291bGQgYXNzdW1lICJubyBsaW1pdCIuDQo+IA0KDQpJIGFtIG5vdCBz
+dXJlIGlmIHdlIG5lZWQgdG8gbWFrZSB0aGlzIGZpZWxkIG9wdGlvbmFsIC0gbWFpbmx5IGJlY2F1
+c2UNCmluIFNFViBjb250ZXh0IGhhcmR3YXJlIHdpbGwgYWx3YXlzIGhhdmUgc29tZSBsaW1pdHMg
+KGF0IGxlYXN0IGluDQpmb3Jlc2VlYWJsZSBmdXR1cmUpLiBUaGUgYXJjaGl0ZWN0dXJlIHByb3Zp
+ZGVzIHVzIGEgQ1BVSUQgdG8gcXVlcnkNCnRoaXMgY2FwYWJpbGl0aWVzIHNvIEkgYW0gYXNzdW1p
+bmcgdGhhdCBmdXR1cmUgQ1BVcyB3aWxsIHBvcHVsYXRlDQpzb21lIHZhbHVlcyBpbiBpdC4NCg0K
+PiBBZ2Fpbiwgbm90IHN1cmUgaWYgdGhhdCdzIHVzZWZ1bCwgYnV0IGl0J3Mgbm90IGhhcmQgdG8g
+aW50cm9kdWNlIHRoZQ0KPiBmaWVsZCBhcyBvcHRpb25hbCBub3cuIFJlbW92aW5nIG1hbmRhdG9y
+eSBmaWVsZHMgbGF0ZXIgaXMgaW1wb3NzaWJsZS4NCj4gDQoNCg==
