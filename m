@@ -2,110 +2,59 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B19C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 593DBC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAEA820818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:19:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="GpooRmN1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAEA820818
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FBF42084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBF42084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53164 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53209 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEeIO-0004dg-2h
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:19:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37366)
+	id 1hEeMR-00069I-EV
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:23:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEeHR-0004Ek-04
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:18:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEeLa-0005l8-Mc
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEeHP-0004bU-0A
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:18:32 -0400
-Received: from mail-eopbgr730063.outbound.protection.outlook.com
-	([40.107.73.63]:3046
-	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hEeHM-0004WJ-0a
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:18:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=/xdNKks9bLwoXzFIonfPzk/msVbDTyZxouXTIW1hi5w=;
-	b=GpooRmN1n5NOoeam22wtg0gh1gr0XNrryAR0gAfPV5Zo++wLiBbpC6oDRLEzsna5uzj6YcVc5EIrtZEtNrLhP2LY3bKEd309/jksBIW5rQUIEDoVkuFu+EwONa5TbvTF4nGtjil1OjVk1EUOrpuorfX+StqqNpvc09FtQStiDdU=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
-	DM6PR12MB3467.namprd12.prod.outlook.com (20.178.199.10) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1792.14; Thu, 11 Apr 2019 18:18:17 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de]) by
-	DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de%3]) with mapi id 15.20.1771.021;
-	Thu, 11 Apr 2019 18:18:17 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Thread-Topic: [PATCH] target/i386: sev: add 'sev-max-guests' field to
-	'query-sev-capabilities'
-Thread-Index: AQHU8JBbMl53pn0tMEuZJLOOksDkdaY3QRoAgAADoAA=
-Date: Thu, 11 Apr 2019 18:18:17 +0000
-Message-ID: <41de8328-90c8-ce9a-b952-7694d2aa86c3@amd.com>
-References: <20190411175931.29235-1-brijesh.singh@amd.com>
-	<20190411180516.GJ3641@redhat.com>
-In-Reply-To: <20190411180516.GJ3641@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0201CA0006.namprd02.prod.outlook.com
-	(2603:10b6:803:2b::16) To DM6PR12MB2682.namprd12.prod.outlook.com
-	(2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 09d47edc-1d4b-4cdf-4b3a-08d6beaa119d
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(4618075)(2017052603328)(7193020);
-	SRVR:DM6PR12MB3467; 
-x-ms-traffictypediagnostic: DM6PR12MB3467:
-x-microsoft-antispam-prvs: <DM6PR12MB3467C88D643403DFC6240DFFE52F0@DM6PR12MB3467.namprd12.prod.outlook.com>
-x-forefront-prvs: 00046D390F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10009020)(366004)(396003)(346002)(136003)(39860400002)(376002)(189003)(199004)(97736004)(14454004)(102836004)(2906002)(31686004)(99286004)(8676002)(486006)(54906003)(8936002)(6512007)(81166006)(316002)(81156014)(86362001)(52116002)(68736007)(71190400001)(53936002)(31696002)(26005)(6486002)(186003)(6436002)(71200400001)(14444005)(106356001)(66066001)(305945005)(256004)(36756003)(4326008)(11346002)(229853002)(6246003)(5660300002)(446003)(478600001)(76176011)(3846002)(6916009)(7736002)(6116002)(6506007)(105586002)(53546011)(386003)(2616005)(25786009)(476003);
-	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3467;
-	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9sWIMOgkYUB+9FAZ2rybvp7nZPiHfLq6v+5mNVQyJdNihKJeU2eDMduYCUX9qDb8tFZ7alO2KToy4OGcuGjihZpFnmmThN05E/yVaQaNLrTxha7ljDcwyVTorJlO3ZqE0CrxpAgh0wLC+nHipNmO6czY045BG4hYM04ALANDUzS4Mfwz2S7p5EdWT7O+4+Tmaa1M8L0Cj64UkCVeMDv9Nw2VxkrhFSZi4k2XDkfRHQtoYCwImhQDTn1wNmycIR2kkQYbL3KXwe2zIq1U7iaXj6VKgjx/lck6VSgIuOfUf9nEEzLksPKsmIt2IRGgnlSlTXybF7gaYGyWtR7eG1s2c3eLT4pLtG8P4chInLQJixpoP8xpFNoS1RpZAgRRPWQHqP2Cym6eklXx3swjNEP4UZg69e3DZWLo+c9xMopVpec=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <5F6D71DAF4BE41428A0F9E85FD05F770@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1hEeLZ-0006yF-P9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:22:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37172)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hEeLZ-0006xp-HT
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:22:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 666FB300B915;
+	Thu, 11 Apr 2019 18:22:48 +0000 (UTC)
+Received: from thuth.com (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DC03F5C207;
+	Thu, 11 Apr 2019 18:22:44 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 11 Apr 2019 20:22:40 +0200
+Message-Id: <20190411182240.5957-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09d47edc-1d4b-4cdf-4b3a-08d6beaa119d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 18:18:17.1494 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3467
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.73.63
-Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 11 Apr 2019 18:22:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch for
+ the ps2.c file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,36 +66,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>,
-	Erik Skultety <eskultet@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411181817.UtjvHZcb5S-bepZsdX4D487tVYmc52tM81IAhAJNnCg@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190411182240.euk96_tfZPWxjtPyqJlq0nJNKz-Wrcj6O7zYXX0nKy4@z>
 
-DQoNCk9uIDQvMTEvMTkgMTowNSBQTSwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24g
-VGh1LCBBcHIgMTEsIDIwMTkgYXQgMDU6NTk6NTBQTSArMDAwMCwgU2luZ2gsIEJyaWplc2ggd3Jv
-dGU6DQo+PiBUaGVyZSBhcmUgbGltaXRlZCBudW1iZXJzIG9mIHRoZSBTRVYgZ3Vlc3RzIHRoYXQg
-Y2FuIGJlIHJ1biBjb25jdXJyZW50bHkuDQo+PiBBIG1hbmFnZW1lbnQgYXBwbGljYXRpb25zIG1h
-eSBuZWVkIHRvIGtub3cgdGhpcyBsaW1pdCBzbyB0aGF0IGl0IGNhbiBwbGFjZQ0KPj4gU0VWIFZN
-cyBvbiBob3N0cyB3aGljaCBoYXZlIHN1aXRhYmxlIHJlc291cmNlcyBhdmFpbGFibGUuDQo+Pg0K
-Pj4gQ3VycmVudGx5LCB0aGlzIGxpbWl0IGlzIG5vdCBleHBvc2VkIHRvIHRoZSBhcHBsaWNhdGlv
-bi4gQWRkIGEgbmV3DQo+PiAnc2V2LW1heC1ndWVzdCcgZmllbGQgaW4gdGhlIHF1ZXJ5LXNldi1j
-YXBhYmlsaXRpZXMgdG8gcHJvdmlkZSB0aGlzDQo+PiBpbmZvcm1hdGlvbi4NCj4+DQo+PiBDYzog
-UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4+IENjOiBNYXJrdXMgQXJtYnJ1
-c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQo+PiBDYzogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhh
-dC5jb20+DQo+PiBDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVycmFuZ2VAcmVkaGF0LmNvbT4N
-Cj4+IENjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0KPj4gQ2M6IEVyaWsgU2t1
-bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNp
-bmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQo+PiAtLS0NCj4+ICAgcWFwaS90YXJnZXQuanNv
-biAgfCA2ICsrKystLQ0KPj4gICB0YXJnZXQvaTM4Ni9zZXYuYyB8IDYgKysrKy0tDQo+PiAgIDIg
-ZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRp
-ZmYgLS1naXQgYS9xYXBpL3RhcmdldC5qc29uIGIvcWFwaS90YXJnZXQuanNvbg0KPj4gaW5kZXgg
-MWQ0ZDU0YjYwMC4uYjQ1MTIxZDMwYiAxMDA2NDQNCj4+IC0tLSBhL3FhcGkvdGFyZ2V0Lmpzb24N
-Cj4+ICsrKyBiL3FhcGkvdGFyZ2V0Lmpzb24NCj4+IEBAIC0xODMsNyArMTgzLDggQEANCj4gDQo+
-IEEgZmV3IGxpbmVzIGFib3ZlIGhlcmUgeW91IG5lZWQgdG8gZG9jdW1lbnQgdGhlIG5ldyBmaWVs
-ZA0KPiB3aXRoIChzaW5jZSA0LjEpIGFubm90YXRpb24uDQo+IA0KDQpub3RlZC4gdGhhbmtzDQo=
+ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/input/Kconfig       | 5 +++++
+ hw/input/Makefile.objs | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+index e2e66f0858..316573f782 100644
+--- a/hw/input/Kconfig
++++ b/hw/input/Kconfig
+@@ -8,10 +8,15 @@ config LM832X
+ config PCKBD
+     bool
+     default y
++    select PS2
+     depends on ISA_BUS
+=20
+ config PL050
+     bool
++    select PS2
++
++config PS2
++    bool
+=20
+ config STELLARIS_INPUT
+     bool
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index c8b00f71ec..6db5ee0e71 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -3,7 +3,7 @@ common-obj-y +=3D hid.o
+ common-obj-$(CONFIG_LM832X) +=3D lm832x.o
+ common-obj-$(CONFIG_PCKBD) +=3D pckbd.o
+ common-obj-$(CONFIG_PL050) +=3D pl050.o
+-common-obj-y +=3D ps2.o
++common-obj-$(CONFIG_PS2) +=3D ps2.o
+ common-obj-$(CONFIG_STELLARIS_INPUT) +=3D stellaris_input.o
+ common-obj-$(CONFIG_TSC2005) +=3D tsc2005.o
+=20
+--=20
+2.21.0
+
 
