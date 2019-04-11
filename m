@@ -2,71 +2,75 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09A6C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B56C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B12E420850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:11:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B12E420850
+	by mail.kernel.org (Postfix) with ESMTPS id B6DC620850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 20:16:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DC620850
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54383 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54439 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEg2d-0003Sw-1N
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:11:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37560)
+	id 1hEg7Y-0005KD-1r
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 16:16:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEg1k-0002VI-Oa
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:10:32 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEg6d-0004u2-P9
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:15:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEg1j-0005rS-N2
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:10:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:46849)
+	(envelope-from <laurent@vivier.eu>) id 1hEg6c-0000ZU-RY
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:15:31 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:34253)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hEg1j-0005pd-9f; Thu, 11 Apr 2019 16:10:27 -0400
+	id 1hEg6Z-0000QX-KP; Thu, 11 Apr 2019 16:15:27 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MdNTs-1gfLH43frU-00ZSKJ; Thu, 11 Apr 2019 22:10:23 +0200
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>
-References: <20190409053320.14612-1-sw@weilnetz.de>
+	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MqsL3-1gaeWf17Ev-00msZq; Thu, 11 Apr 2019 22:15:20 +0200
+To: Markus Armbruster <armbru@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+References: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
+	<CAFEAcA-k0KEsjb0VvbhhkpvTN7nFBDNtqKwx-Lai5uYbCkztJA@mail.gmail.com>
+	<CAH95U0j6rHGdZj4B8DK-Ty-SqZHMb3Kmg16w+j3jx5bdkeijLQ@mail.gmail.com>
+	<CAFEAcA9DSaZE-dsKV4321meT2hBEJRLmWBLF0U5o0jG=mzcmRA@mail.gmail.com>
+	<87d0lu4exq.fsf@dusky.pond.sub.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <38f6dcce-2122-0516-01f6-a549f11da87f@vivier.eu>
-Date: Thu, 11 Apr 2019 22:10:21 +0200
+Message-ID: <d18656fb-332b-5e01-cb86-efa692ff5daa@vivier.eu>
+Date: Thu, 11 Apr 2019 22:15:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190409053320.14612-1-sw@weilnetz.de>
+In-Reply-To: <87d0lu4exq.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:U3Ah2rNNRGktON+pkiuaivfx21iz6MSsTZgH2YrHBYoGcLte6tT
-	AvkNIKv6FoFfZTTg0uFtIeeqRHDJX1BNGRlmCaiCUijSIZbsPOimxusKupQ7bhbQdkI63wU
-	eI0Qn+gBOgihp0Kv/oy2OQNsy074mPUE5VhioM11xo4BT9YZ3ALw0VMuRKFgkcawjsCnFhO
-	C13LJHqqLdhzal2gwE+Vw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0OZISRCBkAM=:9wTzupUPhDvHg6lscAJzj6
-	XZtNrUn1bWTsAHxX+1nZXxEmxHD0BQ5b5MrmxYEDn+0r5m3/6WjVjBZ3JOZa1sXyWcwmif3sL
-	6gY+u1dJ0rCoG4KhpZnUNSah1NpTxeH5TSoyMyspY+R3w1Upu0qBMn7uI2yhRZ+4o9ymZ8EJe
-	35ZMdy7joa7IFivfLj10jsTZ3c8aURAV/ovjKkYykSDgJVrvSdXhfU4+L/nlyBSf95qp0eD57
-	WEJb70Q8ygEJiNmZ0BaaMZYYz7gF4RvkgYeNEja/HS64Fnp4u9UbZz05eQlCbn1EOX2utnflm
-	1iQdHL9JG6PbGydA9VLofEtP4dwMTtqHZozeY+UQNUpmI8mGYZjxXZ+xTX9utW0bPRYqGUOoY
-	gBsl5cF3fzeuZgGZZFmKRARDmy4JTGAOMqpWkToCgjd1F5P1W7qM3vkIhf7n/syfhU5eiC3uI
-	8nQzq0vhYcElZpFAKuu1b9JvDnIMTHf/6jhv1DoUO9aGqY6td4b/27wXi6EKf03FHHnWrA39l
-	Gs5qwQuK3If7ExYKwQvlHfnLPiYiyrsSyiO8c6thK0VrHFdQ0g1RbsFezyAoESNYVF2nBTjFK
-	PAjt2QbvGEpqe4c/FRS01mF3kWJ0fAxTYxV36Rd6fP7+m9a60JPb6YZpja6Uji9L30o3ycmcg
-	sFEtmu0E8MvyVJZaVrfIOsUEaXAqGXMacMW5twvuSRexwqCSg6CYojQxk3QO1fprzA9Li2iS6
-	WPZ3wxA0GC71srjuJfl24xKZ2WLcJpsmQZW1TDc46vPQ8ui8TUJHogBu2Lc=
+X-Provags-ID: V03:K1:YXUFUrL/cYKBtBP8NmnxLWyhNdSk1MT3oBQwm4vWZxfOCh8Rkey
+	S4EqonlHMfUmwjC8Gx5sbY5AtAAMbQ9kzDAFp8BUgEOkcARDA2CTYLaQZKNVcqkkthjaeBv
+	I2Hl62L33Rwa9w55/YfXdOTcTRPzkN1pFpabOc8Ib931Gx0gVe1PlPBVS/nBAjmb4YCPWO1
+	Ucb9kkI49a+0IBQb1+TdA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Mgbw+UZtIaQ=:AC/zdgt/QR1iEKG1nQX8PB
+	nYr71hqAMC6Zp4XYtF38n5j26kVb5px+8fPj0BX+M2py4uqLjE4kbtOjnHN+omJpWfIXQun/2
+	lP5yRRDu3VjWBoijuFg6/gKSWa54wiIA+FncQcf0wQVua+jXwpBhzuZU7FUssFztyKg2GQwkP
+	Tt1V1REWIycsX/bb35nA2Y+4LZJBnP8drfmCqKDTLWHBXdbF3UcKj5jLe83vPbCrBnqu4qVWr
+	/P25403RUDtQxBxQnGa3wTQVDS4u1Vgs5jRxm6GW/EeeUwA3I01/W6z1XfGI84DttlSvIUjRJ
+	hnyUYp5Khln3rr8/+HJfMqWHDM0KpBlLUyKwgn5g16eTKpG0l7JTJbh3/i87lsBmbCFzwHjoO
+	PI/2xAS+8/p6/gYpXMSApu1A0IIQumF0Xxn3klW+6Pzov5bSMYkpihezV3eQqI8uhGPqNt0LD
+	HZLmafpvv2qTleEkF+timQcuhTz9AaBhkS+wdaeBwt5f3YRnkoiamjKA1Pw4XYlJe/757TYFA
+	tTjbNcw1rQ8P5S0y/8BfVsIPGq/yljXqPMZh6IZ5ZHJ7NAu5zSC/CzpkjtgILEJvoh/+TeLzL
+	Z5USDj9Ji2ORBWsuVjsPimXPc9hrA94ZFCpRcRllWdeO9pRgsiI8i/tERa2zA1N1A5rZWM0GF
+	b4llOmnJrfCR/gLz4UpD+J50RFdveE5+ObURuGEEeuAvez6dRrAsuedPyLu/H7B2AXTLK0/hG
+	/RiJzofgoZWXAUFBOj6GFetVZpGUf0iqBhyGu8BeNJs+HuMqbjeBlAGyKV8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Update configure
+X-Received-From: 212.227.126.187
+Subject: Re: [Qemu-devel] [Qemu-trivial]  [PATCH 0/4] Header cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,32 +82,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>,
+	QEMU Trivial <qemu-trivial@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411201021.8Lnxdxg09wkoooDq8AwfFUDhgR5WlV4IuLm8benw7mE@z>
+Message-ID: <20190411201519.oEZ4-cUF_51-FJT7icOdLYclHUZ-mQ8ZrUeNhp8ViZM@z>
 
-On 09/04/2019 07:33, Stefan Weil wrote:
-> The last *.aml file was removed in commit 13b1881aacc7e5018773bd545bbaf8d5476699ee.
+On 10/04/2019 07:17, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 > 
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  configure | 1 -
->  1 file changed, 1 deletion(-)
+>> On Tue, 9 Apr 2019 at 17:42, Aruna Jayasena <aruna.15@cse.mrt.ac.lk> wrote:
+>>>
+>>> Yeah this is a stand alone patch.
+>>
+>> OK, thanks -- just wanted to check there wasn't a missing
+>> bit. I think this could go in via the qemu-trivial tree
+>> so I have cc'd them.
+>>
+>> We're in the middle of a release at the moment, but we
+>> should reopen for development in a couple of weeks. If
+>> this patch still hasn't gone anywhere by a week or so after
+>> that then please follow up with a 'ping' to check it hasn't
+>> been forgotten by accident.
 > 
-> diff --git a/configure b/configure
-> index 1c563a7027..9c5d9a8c96 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7886,7 +7886,6 @@ LINKS="$LINKS python"
->  for bios_file in \
->      $source_path/pc-bios/*.bin \
->      $source_path/pc-bios/*.lid \
-> -    $source_path/pc-bios/*.aml \
->      $source_path/pc-bios/*.rom \
->      $source_path/pc-bios/*.dtb \
->      $source_path/pc-bios/*.img \
+> Hopefully, qemu-trivial won't wait for the next development cycle to
+> begin just to queue patches for it.
+> 
+> Regardless, patch submitters should watch their patches and inquire when
+> they don't get up within a reasonable time frame.  Normally, waiting for
+> two weeks feels about right.  Perhaps give it an extra week or so when
+> the release circus is in town (like now).
 > 
 
 Applied to my trivial-patches branch.
