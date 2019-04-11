@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F902C282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20359C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E4332084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:31:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4332084D
+	by mail.kernel.org (Postfix) with ESMTPS id E59AE2084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59AE2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45818 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45820 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEWzn-0001au-C0
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:31:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54395)
+	id 1hEWzx-0001lh-3D
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:32:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsB-0002Xe-T0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:00 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsC-0002Us-NT
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWek-0007hl-0j
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:10:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54976)
+	(envelope-from <david@redhat.com>) id 1hEWeg-0007g9-Jw
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:10:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hEWej-0007hZ-L8; Thu, 11 Apr 2019 06:10:05 -0400
+	id 1hEWeg-0007ec-CX; Thu, 11 Apr 2019 06:10:02 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6298A77F;
-	Thu, 11 Apr 2019 10:10:04 +0000 (UTC)
-Received: from t460s.redhat.com (unknown [10.36.118.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DEA921001E71;
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A5BC8666E;
 	Thu, 11 Apr 2019 10:10:01 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8C6531001E71;
+	Thu, 11 Apr 2019 10:09:58 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:08:32 +0200
-Message-Id: <20190411100836.646-38-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:31 +0200
+Message-Id: <20190411100836.646-37-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 11 Apr 2019 10:10:04 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 11 Apr 2019 10:10:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 37/41] s390x/tcg: Implement VECTOR SUBTRACT
- WITH BORROW COMPUTE BORROW INDICATION
+Subject: [Qemu-devel] [PATCH v1 36/41] s390x/tcg: Implement VECTOR SUBTRACT
+ WITH BORROW INDICATION
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,98 +75,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411100832.CeT3lGCDsRqjWdPHNUzWYoaXdKIxDSu_rWlaIGrn_bs@z>
+Message-ID: <20190411100831.LVb5QXgOiweIXg3M5NdtyRD3gTX48Fjh0h--VelGwuE@z>
 
-Reuse s390_vec_sub() to perform two 128-bit subtraction, calculating the
-borrow.
+Fairly easy as only 128-bit handling is required. Simply perform the
+subtraction and then subtract the borrow.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  1 +
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 13 +++++++++++++
- target/s390x/vec_int_helper.c   | 16 ++++++++++++++++
- 4 files changed, 32 insertions(+)
+ target/s390x/translate_vx.inc.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 33e3e003f8..d040e4cd07 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -233,6 +233,7 @@ DEF_HELPER_FLAGS_4(gvec_vsrl, TCG_CALL_NO_RWG, void, =
-ptr, cptr, i64, i32)
- DEF_HELPER_FLAGS_4(gvec_vscbi8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
- DEF_HELPER_FLAGS_4(gvec_vscbi16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
- DEF_HELPER_FLAGS_4(gvec_vscbi128, TCG_CALL_NO_RWG, void, ptr, cptr, cptr=
-, i32)
-+DEF_HELPER_FLAGS_5(gvec_vsbcbi128, TCG_CALL_NO_RWG, void, ptr, cptr, cpt=
-r, cptr, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index a60d8531dc..a8d90517f6 100644
+index 94de3c9c7d..a60d8531dc 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1180,6 +1180,8 @@
+@@ -1178,6 +1178,8 @@
+     F(0xe7f7, VS,      VRR_c, V,   0, 0, 0, 0, vs, 0, IF_VEC)
+ /* VECTOR SUBTRACT COMPUTE BORROW INDICATION */
      F(0xe7f5, VSCBI,   VRR_c, V,   0, 0, 0, 0, vscbi, 0, IF_VEC)
- /* VECTOR SUBTRACT WITH BORROW INDICATION */
-     F(0xe7bf, VSBI,    VRR_d, V,   0, 0, 0, 0, vsbi, 0, IF_VEC)
-+/* VECTOR SUBTRACT WITH BORROW COMPUTE BORROW INDICATION */
-+    F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
++/* VECTOR SUBTRACT WITH BORROW INDICATION */
++    F(0xe7bf, VSBI,    VRR_d, V,   0, 0, 0, 0, vsbi, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 3f60b97654..fd232ba6c3 100644
+index 7770ca4101..3f60b97654 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -2212,3 +2212,16 @@ static DisasJumpType op_vsbi(DisasContext *s, Disa=
-sOps *o)
-                       get_field(s->fields, v4));
+@@ -2185,3 +2185,30 @@ static DisasJumpType op_vscbi(DisasContext *s, Dis=
+asOps *o)
+                get_field(s->fields, v3), &g[es]);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vsbcbi(DisasContext *s, DisasOps *o)
++static void gen_sbi2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al, TCGv_i64=
+ ah,
++                         TCGv_i64 bl, TCGv_i64 bh, TCGv_i64 cl, TCGv_i64=
+ ch)
++{
++    TCGv_i64 tl =3D tcg_temp_new_i64();
++    TCGv_i64 th =3D tcg_const_i64(0);
++
++    /* extract the borrow only */
++    tcg_gen_extract_i64(tl, cl, 0, 1);
++    tcg_gen_sub2_i64(dl, dh, al, ah, bl, bh);
++    tcg_gen_sub2_i64(dl, dh, dl, dh, tl, th);
++    tcg_temp_free_i64(tl);
++    tcg_temp_free_i64(th);
++}
++
++static DisasJumpType op_vsbi(DisasContext *s, DisasOps *o)
 +{
 +    if (get_field(s->fields, m5) !=3D ES_128) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
 +
-+    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
-+                   get_field(s->fields, v3), get_field(s->fields, v4), 0=
++    gen_gvec128_4_i64(gen_sbi2_i64, get_field(s->fields, v1),
++                      get_field(s->fields, v2), get_field(s->fields, v3)=
 ,
-+                   gen_helper_gvec_vsbcbi128);
++                      get_field(s->fields, v4));
 +    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
-c
-index 699b399a26..95686e79fd 100644
---- a/target/s390x/vec_int_helper.c
-+++ b/target/s390x/vec_int_helper.c
-@@ -803,3 +803,19 @@ void HELPER(gvec_vscbi128)(void *v1, const void *v2,=
- const void *v3,
-     dst->doubleword[0] =3D 0;
-     dst->doubleword[1] =3D s390_vec_sub(&tmp, v2, v3);
- }
-+
-+void HELPER(gvec_vsbcbi128)(void *v1, const void *v2, const void *v3,
-+                            const void *v4, uint32_t desc)
-+{
-+    const S390Vector old_borrow =3D {
-+        .doubleword[0] =3D 0,
-+        .doubleword[1] =3D ((S390Vector *)v4)->doubleword[1] & 1,
-+    };
-+    S390Vector tmp, *dst =3D v1;
-+    bool borrow;
-+
-+    borrow =3D s390_vec_sub(&tmp, v2, v3);
-+    borrow |=3D s390_vec_sub(&tmp, &tmp, &old_borrow);
-+    dst->doubleword[0] =3D 0;
-+    dst->doubleword[1] =3D borrow;
 +}
 --=20
 2.20.1
