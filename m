@@ -6,63 +6,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BDBC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1ECC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6070F206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:36:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6070F206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A84E20693
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 19:44:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A84E20693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53916 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53973 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEfUw-0002ax-MI
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:36:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55533)
+	id 1hEfcF-0005h1-AR
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 15:44:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEfTz-0001y2-V0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:35:38 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEfb3-0004lm-16
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEfTy-0003jl-Nu
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:35:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>)
-	id 1hEfTs-0003dc-VB; Thu, 11 Apr 2019 15:35:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A34BC309E9A7;
-	Thu, 11 Apr 2019 19:35:27 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-126-53.rdu2.redhat.com
-	[10.10.126.53])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C0BB95D6A9;
-	Thu, 11 Apr 2019 19:35:25 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190411135602.21725-1-armbru@redhat.com>
-	<20190411135602.21725-2-armbru@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0eea5ddb-1efb-8fdf-4a37-9bc2daf86e2b@redhat.com>
-Date: Thu, 11 Apr 2019 21:35:19 +0200
+	(envelope-from <laurent@vivier.eu>) id 1hEfb2-00081H-3e
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:42:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:37057)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hEfaz-0007wb-Fo; Thu, 11 Apr 2019 15:42:49 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MjPYI-1gToRY0gzy-00ktOB; Thu, 11 Apr 2019 21:42:30 +0200
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org,
+	qemu-trivial@nongnu.org
+References: <20190304071631.27567-1-richardw.yang@linux.intel.com>
+	<20190304071631.27567-2-richardw.yang@linux.intel.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4cd402a1-4da3-dc2e-82ad-64249c5fddc0@vivier.eu>
+Date: Thu, 11 Apr 2019 21:42:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190411135602.21725-2-armbru@redhat.com>
+In-Reply-To: <20190304071631.27567-2-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 11 Apr 2019 19:35:27 +0000 (UTC)
+X-Provags-ID: V03:K1:DGvzF2MUh6/4IttUnWwEwhdKCoxVcHIfGD1tcJ6eGL2HHMnjpYw
+	QfqfGLUqXfww6rbkG5juDXjIgQF9EDe+d4P7S3vpTjY4KM9PNsrzetM+TsLNq/5oxknES9b
+	R3nV+SX5e5f4tJC54GypdOZLN3CcdSg3mzdm7OdGZTHVG5fpsTm1rMxjg5y7+AEmuXVZuvx
+	N5ksJ2rRYAYuRCnHas3vg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:G9LdzMCpeZs=:p+39jBTTEAoYyWJrKY4Hti
+	NrY3gUFee0EFPz/4xUL+WToE12mWsy1C0uaK8t+Gra7ut4pAuPF7LFq9NokIbVpJvKR2xBAwB
+	8jbOpQi2kk1R5hEavibFAu0ICsNlTNS8EZj5HFXpY5KubBwcdZmTkof5AEPVRV7pCapfOrgTQ
+	5JQqHeTplT1xGvr0sYIzBDhYb4PF1xDFme9vjEeuSGSXSn1ptYtIl7G/0tP6zobqSBWeym5nS
+	xu/tajB3Wcthqf86QNWAZXNJijidiqKMsKJOl/QyAWxpAqC2WaObnOCj1O0DaAc60cjn97xv0
+	22kP1l2SJvNFzNAKVsLICfuEGAIEmswPFDxqD36wk1ulIsezKgkO7AJb8FwsXzSxAI6NfzLr0
+	3lfj+b5Xfqi9MuXqu53J7RrIfYoKAh7r6k9CjIZ0w25/YIXbJ3uZglFICbNAsgCGIvQkqa3a7
+	hK4dm7bVqeRB6zQcceChYFGJ9bqAUMd5n4ItF/9FAnrW/ZflBa+xsddsRoBIR8EcsarsQMiS5
+	tFnsvBqXmmfhM6LcjKrazUngXTACcdPlItu/iHHmUn3H/d8q2ICeFq3a9XHz0Dg4sY7HQctPS
+	57paCaLe75Daz9FSFQQIBqXLhW8IGDGOHbhMFf39RHA3/bCagaCzkT+tOwJ2Bj70/5Rj5CaIS
+	GEYyacg1oNSCX9tKZAp85GZ1EDtrzV6fcAuxadchIP74R6KAxqeWSRkDGyzruleRuKehLS0dE
+	+L6FH9aqhLOpebYEW9tqr1Zi3DkqqAYv/3TaNYjGP42UxxWORzvuIwL+SpE=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] pflash_cfi01: New
- pflash_cfi01_legacy_drive()
+X-Received-From: 212.227.126.187
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v6 1/2] CODING_STYLE:
+ specify the indent rule for multiline code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,190 +80,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
-	qemu-block@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, mjt@tls.msk.ru, imammedo@redhat.com,
+	philmd@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411193519.P9s7ba2u_ul-AOpGfysYMSkS8_bZVQwmRkVfOkWirAw@z>
+Message-ID: <20190411194226.kNokBLzZZU7PchE2lkACX9JXa99dJPlDdQ0lREgHOTE@z>
 
-On 04/11/19 15:56, Markus Armbruster wrote:
-> Factored out of pc_system_firmware_init() so the next commit can reuse
-> it in hw/arm/virt.c.
+On 04/03/2019 08:16, Wei Yang wrote:
+> We didn't specify the indent rule for multiline code here, which may
+> mislead users. And in current code, the code use various styles.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Add this rule in CODING_STYLE to make sure this is clear to every one.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> 
 > ---
->  hw/block/pflash_cfi01.c  | 30 ++++++++++++++++++++++++++++++
->  hw/i386/pc_sysfw.c       | 19 ++-----------------
->  include/hw/block/flash.h |  1 +
->  3 files changed, 33 insertions(+), 17 deletions(-)
+> v6:
+>    * add ) for last example of function
+> v5:
+>    * different rules -> various styles
+>    * describe function variants separately
+>    * take struct out
+> v4:
+>    * widths -> width
+>    * add an exception example for function
+> v3:
+>    * misleading -> mislead
+>    * add comma after arg2 in example
+> v2:
+>    * rephrase changelog suggested by Eric Blake
+>      - remove one redundant line
+>      - fix some awkward grammar
+>      - add { ; at the end of example
+> ---
+>  CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
 > 
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 16dfae14b8..eba01b1447 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -44,9 +44,12 @@
->  #include "qapi/error.h"
->  #include "qemu/timer.h"
->  #include "qemu/bitops.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/host-utils.h"
->  #include "qemu/log.h"
-> +#include "qemu/option.h"
->  #include "hw/sysbus.h"
-> +#include "sysemu/blockdev.h"
->  #include "sysemu/sysemu.h"
->  #include "trace.h"
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index ec075dedc4..90321e9c28 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
 >  
-> @@ -968,6 +971,33 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
->      return &fl->mem;
->  }
+>  Do not leave whitespace dangling off the ends of lines.
 >  
-> +/*
-> + * Handle -drive if=pflash for machines that use machine properties.
-
-(1) Can we improve readability with quotes? "-drive if=pflash"
-
-> + * Map unit#i (0 < i <= @ndev) to @dev[i]'s property "drive".
-
-(2) I think you meant (0 <= i < @ndev)
-
-> + */
-> +void pflash_cfi01_legacy_drive(PFlashCFI01 *dev[], int ndev)
-> +{
-> +    int i;
-
-(3) For utter pedantry, "ndev"  and "i" should have type "size_t" (in
-particular because we expect the caller to fill "ndev" with ARRAY_SIZE().
-
-But, this would go beyond refactoring -- the original "int"s have served
-us just fine, and we're usually counting up (exclusively) to the huge
-number... two. :)
-
-> +    DriveInfo *dinfo;
-> +    Location loc;
+> +1.1 Multiline Indent
 > +
-> +    for (i = 0; i < ndev; i++) {
-> +        dinfo = drive_get(IF_PFLASH, 0, i);
-> +        if (!dinfo) {
-> +            continue;
-> +        }
-> +        loc_push_none(&loc);
-> +        qemu_opts_loc_restore(dinfo->opts);
-> +        if (dev[i]->blk) {
-
-(4) Is this really identical to the code being removed? The above
-controlling expression amounts to:
-
-  pcms->flash[i]->blk
-
-but the original boils down to
-
-  pflash_cfi01_get_blk(pcms->flash[i])
-
-Hmm... looking at pflash_cfi01_get_blk(), they are the same. Is there a
-particular reason for not using the wrapper function any longer? As in:
-
-  pflash_cfi01_get_blk(dev[i])
-
-> +            error_report("clashes with -machine");
-> +            exit(1);
-> +        }
-> +        qdev_prop_set_drive(DEVICE(dev[i]), "drive",
-> +                            blk_by_legacy_dinfo(dinfo), &error_fatal);
-> +        loc_pop(&loc);
-> +    }
-> +}
+> +There are several places where indent is necessary:
 > +
->  static void postload_update_cb(void *opaque, int running, RunState state)
->  {
->      PFlashCFI01 *pfl = opaque;
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index c628540774..d58e47184c 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -269,32 +269,17 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  {
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->      int i;
-> -    DriveInfo *pflash_drv;
->      BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
-> -    Location loc;
->  
->      if (!pcmc->pci_enabled) {
->          old_pc_system_rom_init(rom_memory, true);
->          return;
->      }
->  
-> -    /* Map legacy -drive if=pflash to machine properties */
-> +    pflash_cfi01_legacy_drive(pcms->flash, ARRAY_SIZE(pcms->flash));
+> + - if/else
+> + - while/for
+> + - function definition & call
 > +
->      for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
->          pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
-> -        pflash_drv = drive_get(IF_PFLASH, 0, i);
-> -        if (!pflash_drv) {
-> -            continue;
-> -        }
-> -        loc_push_none(&loc);
-> -        qemu_opts_loc_restore(pflash_drv->opts);
-> -        if (pflash_blk[i]) {
-> -            error_report("clashes with -machine");
-> -            exit(1);
-> -        }
-> -        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-> -        qdev_prop_set_drive(DEVICE(pcms->flash[i]),
-> -                            "drive", pflash_blk[i], &error_fatal);
-> -        loc_pop(&loc);
->      }
+> +When breaking up a long line to fit within line width, we need a proper indent
+> +for the following lines.
+> +
+> +In case of if/else, while/for, align the secondary lines just after the
+> +opening parenthesis of the first.
+> +
+> +For example:
+> +
+> +    if (a == 1 &&
+> +        b == 2) {
+> +
+> +    while (a == 1 &&
+> +           b == 2) {
+> +
+> +In case of function, there are several variants:
+> +
+> +    * 4 spaces indent from the beginning
+> +    * align the secondary lines just after the opening parenthesis of the
+> +      first
+> +
+> +For example:
+> +
+> +    do_something(x, y,
+> +        z);
+> +
+> +    do_something(x, y,
+> +                 z);
+> +
+> +    do_something(x, do_another(y,
+> +                               z));
+> +
+>  2. Line width
+>  
+>  Lines should be 80 characters; try not to make them longer.
+> 
 
-(5) I think you deleted too much here. After this loop, post-patch, for
-all "i", we'll have
-
-  pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
-
-But pre-patch, for all "i" where the "continue" didn't fire, we'd end up
-with:
-
-  pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-
-IOW the original loop both verifies and *collects*, for the gap check
-that comes just below.
-
-IIRC, this allows for mixing "-drive if=pflash,unit=N" with the machine
-properties, as long as you have neither conflicts, nor gaps.
-
-Post-patch however, this kind of mixing would break, because we'd report
-gaps for the legacy ("-drive if=pflash") options.
-
-
-In addition, it could break the "use ROM mode" branch below, which is
-based on pflash_blk[0].
-
-I think we should extend pflash_cfi01_legacy_drive() to populate
-"pflash_blk[0..(ndev-1)]" on output (assuming pflash_blk is not NULL on
-input).
-
-(Because, I'm assuming that qdev_prop_set_drive() -- which now occurs in
-the factored-out loop *before* the loop that we preserve here -- has no
-effect on pflash_cfi01_get_blk(pcms->flash[i]).)
+Applied to my trivial-patches branch.
 
 Thanks,
-Laszlo
-
->  
->      /* Reject gaps */
-> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-> index a0f488732a..f6a68c2a4c 100644
-> --- a/include/hw/block/flash.h
-> +++ b/include/hw/block/flash.h
-> @@ -24,6 +24,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
->                                     int be);
->  BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
->  MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
-> +void pflash_cfi01_legacy_drive(PFlashCFI01 *dev[], int ndev);
->  
->  /* pflash_cfi02.c */
->  
-> 
-
+Laurent
 
