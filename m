@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8384C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F0CC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:43:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FC31217D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FC31217D4
+	by mail.kernel.org (Postfix) with ESMTPS id C79D3217D4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:43:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79D3217D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45986 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45997 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXA0-0002Us-Lz
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:42:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54395)
+	id 1hEXAk-00039o-1i
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:43:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsW-0002Xe-FC
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:22 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsY-0002dl-9n
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWe8-0007PX-DN
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60358)
+	(envelope-from <david@redhat.com>) id 1hEWe8-0007PE-0I
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hEWe7-0007OQ-Vj; Thu, 11 Apr 2019 06:09:28 -0400
+	id 1hEWe4-0007Lv-3m; Thu, 11 Apr 2019 06:09:26 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3EA130018C6;
-	Thu, 11 Apr 2019 10:09:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFBFE5AFF4;
+	Thu, 11 Apr 2019 10:09:21 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 629001001E82;
-	Thu, 11 Apr 2019 10:09:25 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E8C601001E82;
+	Thu, 11 Apr 2019 10:09:15 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:08:15 +0200
-Message-Id: <20190411100836.646-21-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:12 +0200
+Message-Id: <20190411100836.646-18-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 11 Apr 2019 10:09:26 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 11 Apr 2019 10:09:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 20/41] s390x/tcg: Implement VECTOR MULTIPLY *
+Subject: [Qemu-devel] [PATCH v1 17/41] s390x/tcg: Implement VECTOR LOAD
+ POSITIVE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,218 +75,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411100815.g3MofpURFVj-6eCuvL4GPuVf_-boZaFfZeGNMtXMaWo@z>
+Message-ID: <20190411100812.5dDgK9CInsTuGeqZxw778W2r3KuYqBCUF6TxDMpyud4@z>
 
-Yet another set of variants. Implement it similar to VECTOR MULTIPLY AND
-ADD *. At least for one variant we have a gvec helper we can reuse.
+Similar to VECTOR LOAD COMPLEMENT but unfortunately we don't have a
+gvec helper.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  16 +++++
- target/s390x/insn-data.def      |  14 +++++
- target/s390x/translate_vx.inc.c | 100 ++++++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 100 ++++++++++++++++++++++++++++++++
- 4 files changed, 230 insertions(+)
+ target/s390x/helper.h           |  2 ++
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 40 +++++++++++++++++++++++++++++++++
+ target/s390x/vec_int_helper.c   | 14 ++++++++++++
+ 4 files changed, 58 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index b73a35107e..a44cc462ae 100644
+index 18a3df6b07..065c4c6ea3 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -184,6 +184,22 @@ DEF_HELPER_FLAGS_5(gvec_vmao32, TCG_CALL_NO_RWG, voi=
-d, ptr, cptr, cptr, cptr, i3
- DEF_HELPER_FLAGS_5(gvec_vmalo8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
- DEF_HELPER_FLAGS_5(gvec_vmalo16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+@@ -164,6 +164,8 @@ DEF_HELPER_FLAGS_5(gvec_vgfma8, TCG_CALL_NO_RWG, void=
+, ptr, cptr, cptr, cptr, i3
+ DEF_HELPER_FLAGS_5(gvec_vgfma16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
  cptr, i32)
- DEF_HELPER_FLAGS_5(gvec_vmalo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ DEF_HELPER_FLAGS_5(gvec_vgfma32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
  cptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_vmh8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vmh16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmlh8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmlh16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
-+DEF_HELPER_FLAGS_4(gvec_vme8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vme16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vme32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmle8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmle16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
-+DEF_HELPER_FLAGS_4(gvec_vmle32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
-+DEF_HELPER_FLAGS_4(gvec_vmo8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vmo16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmlo8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vmlo16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
-+DEF_HELPER_FLAGS_4(gvec_vmlo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
+ DEF_HELPER_FLAGS_5(gvec_vgfma64, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vlp8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vlp16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 7ccec0544f..2c794a2744 100644
+index 07868ff082..fc8886ff42 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1120,6 +1120,20 @@
-     F(0xe7af, VMAO,    VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
- /* VECTOR MULTIPLY AND ADD LOGICAL ODD */
-     F(0xe7ad, VMALO,   VRR_d, V,   0, 0, 0, 0, vma, 0, IF_VEC)
-+/* VECTOR MULTIPLY HIGH */
-+    F(0xe7a3, VMH,     VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY LOGICAL HIGH */
-+    F(0xe7a1, VMLH,    VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY LOW */
-+    F(0xe7a2, VML,     VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY EVEN */
-+    F(0xe7a6, VME,     VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY LOGICAL EVEN */
-+    F(0xe7a4, VMLE,    VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY ODD */
-+    F(0xe7a7, VMO,     VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR MULTIPLY LOGICAL ODD */
-+    F(0xe7a5, VMLO,    VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
+@@ -1096,6 +1096,8 @@
+     F(0xe7bc, VGFMA,   VRR_d, V,   0, 0, 0, 0, vgfma, 0, IF_VEC)
+ /* VECTOR LOAD COMPLEMENT */
+     F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
++/* VECTOR LOAD POSITIVE */
++    F(0xe7df, VLP,     VRR_a, V,   0, 0, 0, 0, vlp, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 4967af6a07..53bbb4a2ce 100644
+index 28436cb01a..8cab3f876a 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1689,3 +1689,103 @@ static DisasJumpType op_vma(DisasContext *s, Disa=
-sOps *o)
-                get_field(s->fields, v3), get_field(s->fields, v4), fn);
+@@ -1496,3 +1496,43 @@ static DisasJumpType op_vlc(DisasContext *s, Disas=
+Ops *o)
+                   get_field(s->fields, v2));
      return DISAS_NEXT;
  }
 +
-+static void gen_mh_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++static void gen_lp_i32(TCGv_i32 d, TCGv_i32 a)
 +{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
++    TCGv_i32 zero =3D tcg_const_i32(0);
++    TCGv_i32 neg =3D tcg_temp_new_i32();
 +
-+    tcg_gen_ext_i32_i64(t0, a);
-+    tcg_gen_ext_i32_i64(t1, b);
-+    tcg_gen_mul_i64(t0, t0, t1);
-+    tcg_gen_extrh_i64_i32(d, t0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
++    tcg_gen_neg_i32(neg, a);
++    tcg_gen_movcond_i32(TCG_COND_LT, d, a, zero, neg, a);
++    tcg_temp_free_i32(neg);
++    tcg_temp_free_i32(zero);
 +}
 +
-+static void gen_mlh_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++static void gen_lp_i64(TCGv_i64 d, TCGv_i64 a)
 +{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
++    TCGv_i64 zero =3D tcg_const_i64(0);
++    TCGv_i64 neg =3D tcg_temp_new_i64();
 +
-+    tcg_gen_extu_i32_i64(t0, a);
-+    tcg_gen_extu_i32_i64(t1, b);
-+    tcg_gen_mul_i64(t0, t0, t1);
-+    tcg_gen_extrh_i64_i32(d, t0);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
++    tcg_gen_neg_i64(neg, a);
++    tcg_gen_movcond_i64(TCG_COND_LT, d, a, zero, neg, a);
++    tcg_temp_free_i64(neg);
++    tcg_temp_free_i64(zero);
 +}
 +
-+static DisasJumpType op_vm(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlp(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    static const GVecGen3 g_vmh[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmh8, },
-+        { .fno =3D gen_helper_gvec_vmh16, },
-+        { .fni4 =3D gen_mh_i32, },
++    const uint8_t es =3D get_field(s->fields, m3);
++    static const GVecGen2 g[4] =3D {
++        { .fno =3D gen_helper_gvec_vlp8, },
++        { .fno =3D gen_helper_gvec_vlp16, },
++        { .fni4 =3D gen_lp_i32, },
++        { .fni8 =3D gen_lp_i64, },
 +    };
-+    static const GVecGen3 g_vmlh[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmlh8, },
-+        { .fno =3D gen_helper_gvec_vmlh16, },
-+        { .fni4 =3D gen_mlh_i32, },
-+    };
-+    static const GVecGen3 g_vme[3] =3D {
-+        { .fno =3D gen_helper_gvec_vme8, },
-+        { .fno =3D gen_helper_gvec_vme16, },
-+        { .fno =3D gen_helper_gvec_vme32, },
-+    };
-+    static const GVecGen3 g_vmle[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmle8, },
-+        { .fno =3D gen_helper_gvec_vmle16, },
-+        { .fno =3D gen_helper_gvec_vmle32, },
-+    };
-+    static const GVecGen3 g_vmo[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmo8, },
-+        { .fno =3D gen_helper_gvec_vmo16, },
-+        { .fno =3D gen_helper_gvec_vmo32, },
-+    };
-+    static const GVecGen3 g_vmlo[3] =3D {
-+        { .fno =3D gen_helper_gvec_vmlo8, },
-+        { .fno =3D gen_helper_gvec_vmlo16, },
-+        { .fno =3D gen_helper_gvec_vmlo32, },
-+    };
-+    const GVecGen3 *fn;
 +
-+    if (es > ES_32) {
++    if (es > ES_64) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
 +    }
-+
-+    switch (s->fields->op2) {
-+    case 0xa2:
-+        gen_gvec_fn_3(mul, es, get_field(s->fields, v1),
-+                      get_field(s->fields, v2), get_field(s->fields, v3)=
-);
-+        return DISAS_NEXT;
-+    case 0xa3:
-+        fn =3D &g_vmh[es];
-+        break;
-+    case 0xa1:
-+        fn =3D &g_vmlh[es];
-+        break;
-+    case 0xa6:
-+        fn =3D &g_vme[es];
-+        break;
-+    case 0xa4:
-+        fn =3D &g_vmle[es];
-+        break;
-+    case 0xa7:
-+        fn =3D &g_vmo[es];
-+        break;
-+    case 0xa5:
-+        fn =3D &g_vmlo[es];
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
-+               get_field(s->fields, v3), fn);
++    gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
+]);
 +    return DISAS_NEXT;
 +}
 diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
 c
-index 424f248325..b818c513a9 100644
+index 99dd0653f6..574f707abf 100644
 --- a/target/s390x/vec_int_helper.c
 +++ b/target/s390x/vec_int_helper.c
-@@ -426,3 +426,103 @@ void HELPER(gvec_vmalo##BITS)(void *v1, const void =
-*v2, const void *v3,        \
- DEF_VMALO(8, 16)
- DEF_VMALO(16, 32)
- DEF_VMALO(32, 64)
+@@ -289,3 +289,17 @@ void HELPER(gvec_vgfma64)(void *v1, const void *v2, =
+const void *v3,
+     s390_vec_xor(&tmp1, &tmp1, &tmp2);
+     s390_vec_xor(v1, &tmp1, v4);
+ }
 +
-+#define DEF_VMH(BITS)                                                   =
++#define DEF_VLP(BITS)                                                   =
        \
-+void HELPER(gvec_vmh##BITS)(void *v1, const void *v2, const void *v3,   =
-       \
-+                            uint32_t desc)                              =
++void HELPER(gvec_vlp##BITS)(void *v1, const void *v2, uint32_t desc)    =
        \
 +{                                                                       =
        \
@@ -295,163 +192,17 @@ index 424f248325..b818c513a9 100644
        \
 +    for (i =3D 0; i < (128 / BITS); i++) {                              =
          \
-+        const int32_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(v=
-2, i);   \
-+        const int32_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(v=
-3, i);   \
++        const int##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);   =
+         \
 +                                                                        =
        \
-+        s390_vec_write_element##BITS(v1, i, (a * b) >> BITS);           =
++        s390_vec_write_element##BITS(v1, i, a < 0 ? -a : a);            =
        \
 +    }                                                                   =
        \
 +}
-+DEF_VMH(8)
-+DEF_VMH(16)
-+
-+#define DEF_VMLH(BITS)                                                  =
-       \
-+void HELPER(gvec_vmlh##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             uint32_t desc)                             =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
-         \
-+        const uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i);  =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, (a * b) >> BITS);           =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMLH(8)
-+DEF_VMLH(16)
-+
-+#define DEF_VME(BITS, TBITS)                                            =
-       \
-+void HELPER(gvec_vme##BITS)(void *v1, const void *v2, const void *v3,   =
-       \
-+                            uint32_t desc)                              =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 0; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        int##TBITS##_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v2, j);  \
-+        int##TBITS##_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v3, j);  \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b);                    =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VME(8, 16)
-+DEF_VME(16, 32)
-+DEF_VME(32, 64)
-+
-+#define DEF_VMLE(BITS, TBITS)                                           =
-       \
-+void HELPER(gvec_vmle##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             uint32_t desc)                             =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 0; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        const uint##TBITS##_t a =3D s390_vec_read_element##BITS(v2, j); =
-         \
-+        const uint##TBITS##_t b =3D s390_vec_read_element##BITS(v3, j); =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b);                    =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMLE(8, 16)
-+DEF_VMLE(16, 32)
-+DEF_VMLE(32, 64)
-+
-+#define DEF_VMO(BITS, TBITS)                                            =
-       \
-+void HELPER(gvec_vmo##BITS)(void *v1, const void *v2, const void *v3,   =
-       \
-+                            uint32_t desc)                              =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 1; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        int##TBITS##_t a =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v2, j);  \
-+        int##TBITS##_t b =3D (int##BITS##_t)s390_vec_read_element##BITS(=
-v3, j);  \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b);                    =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMO(8, 16)
-+DEF_VMO(16, 32)
-+DEF_VMO(32, 64)
-+
-+#define DEF_VMLO(BITS, TBITS)                                           =
-       \
-+void HELPER(gvec_vmlo##BITS)(void *v1, const void *v2, const void *v3,  =
-       \
-+                             uint32_t desc)                             =
-       \
-+{                                                                       =
-       \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0, j =3D 0; i < (128 / TBITS); i++, j +=3D 2) {          =
-             \
-+        const uint##TBITS##_t a =3D s390_vec_read_element##BITS(v2, j); =
-         \
-+        const uint##TBITS##_t b =3D s390_vec_read_element##BITS(v3, j); =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##TBITS(v1, i, a * b);                    =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VMLO(8, 16)
-+DEF_VMLO(16, 32)
-+DEF_VMLO(32, 64)
++DEF_VLP(8)
++DEF_VLP(16)
 --=20
 2.20.1
 
