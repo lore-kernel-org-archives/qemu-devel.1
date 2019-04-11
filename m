@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50420)
+Received: from eggs.gnu.org ([209.51.188.92]:50445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTm-0004ZG-Qe
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:16 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTn-0004ZL-Dd
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bH-Kw
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:14 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bz-Ra
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:15 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 20:27:06 +0300
-Message-Id: <20190411172709.205032-5-vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 20:27:09 +0300
+Message-Id: <20190411172709.205032-8-vsementsov@virtuozzo.com>
 In-Reply-To: <20190411172709.205032-1-vsementsov@virtuozzo.com>
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v6 4/7] block/nbd: add cmdline and qapi
- parameter reconnect-delay
+Subject: [Qemu-devel] [PATCH v6 7/7] iotests: test nbd reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +22,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Reconnect will be implemented in the following commit, so for now,
-in semantics below, disconnect itself is a "serious error".
+Add test, which starts backup to nbd target and restarts nbd server
+during backup.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json | 12 +++++++++++-
- block/nbd-client.h   |  1 +
- block/nbd-client.c   |  1 +
- block/nbd.c          | 16 +++++++++++++++-
- 4 files changed, 28 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/249        | 63 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out    | 10 ++++++
+ tests/qemu-iotests/group      |  1 +
+ tests/qemu-iotests/iotests.py |  4 +++
+ 4 files changed, 78 insertions(+)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7ccbfff9d0..815258bd89 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3798,13 +3798,23 @@
- #                  traditional "base:allocation" block status (see
- #                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol) (since 3.0)
- #
-+# @reconnect-delay: Reconnect delay. On unexpected disconnect, nbd client tries
-+#                   to connect again, until success or serious error. During
-+#                   first @reconnect-delay seconds of reconnecting loop all
-+#                   requests are paused and have a chance to rerun, if
-+#                   successful connect occurs during this time. After
-+#                   @reconnect-delay seconds all delayed requests are failed
-+#                   and all following requests will be failed too (until
-+#                   successful reconnect). Default 0 (Since 4.1)
+diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
+new file mode 100755
+index 0000000000..a29a276207
+--- /dev/null
++++ b/tests/qemu-iotests/249
+@@ -0,0 +1,63 @@
++#!/usr/bin/env python
 +#
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsNbd',
-   'data': { 'server': 'SocketAddress',
-             '*export': 'str',
-             '*tls-creds': 'str',
--            '*x-dirty-bitmap': 'str' } }
-+            '*x-dirty-bitmap': 'str',
-+            '*reconnect-delay': 'uint32' } }
++# Test nbd reconnect
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import time
++
++import iotests
++from iotests import qemu_img_create, file_path, qemu_nbd_popen, log
++
++disk_a, disk_b, nbd_sock = file_path('disk_a', 'disk_b', 'nbd-sock')
++
++qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
++qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
++srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
++time.sleep(1)
++
++vm = iotests.VM().add_drive(disk_a)
++vm.launch()
++vm.hmp_qemu_io('drive0', 'write 0 5M')
++
++vm.qmp_log('blockdev-add', filters=[iotests.filter_qmp_testfiles],
++           **{'node_name': 'backup0',
++              'driver': 'raw',
++              'file': {'driver': 'nbd',
++                       'server': {'type': 'unix', 'path': nbd_sock},
++                       'reconnect-delay': 10}})
++vm.qmp_log('blockdev-backup', device='drive0', sync='full', target='backup0')
++
++time.sleep(1)
++log('Kill NBD server')
++srv.kill()
++
++jobs = vm.qmp('query-block-jobs')['return']
++if jobs and jobs[0]['offset'] < jobs[0]['len']:
++    log('Backup job is still in progress')
++
++time.sleep(1)
++
++log('Start NBD server')
++srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
++
++e = vm.event_wait('BLOCK_JOB_COMPLETED')
++log('Backup completed: {}'.format(e['data']['offset']))
++
++vm.qmp_log('blockdev-del', node_name='backup0')
++srv.kill()
++vm.shutdown()
+diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
+new file mode 100644
+index 0000000000..15a82ddefb
+--- /dev/null
++++ b/tests/qemu-iotests/249.out
+@@ -0,0 +1,10 @@
++{"execute": "blockdev-add", "arguments": {"driver": "raw", "file": {"driver": "nbd", "reconnect-delay": 10, "server": {"path": "TEST_DIR/PID-nbd-sock", "type": "unix"}}, "node-name": "backup0"}}
++{"return": {}}
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "sync": "full", "target": "backup0"}}
++{"return": {}}
++Kill NBD server
++Backup job is still in progress
++Start NBD server
++Backup completed: 5242880
++{"execute": "blockdev-del", "arguments": {"node-name": "backup0"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718380..7ac9a5ea4a 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -248,3 +248,4 @@
+ 246 rw auto quick
+ 247 rw auto quick
+ 248 rw auto quick
++249 rw auto quick
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 997dc910cb..3a1f16dbfd 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -218,6 +218,10 @@ def qemu_nbd_pipe(*args):
+                           ' '.join(qemu_nbd_args + ['--fork'] + list(args))))
+     return exitcode, subp.communicate()[0]
  
- ##
- # @BlockdevOptionsRaw:
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index e45b7b0a14..91a6b32bdd 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -52,6 +52,7 @@ int nbd_client_init(BlockDriverState *bs,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *hostname,
-                     const char *x_dirty_bitmap,
-+                    uint32_t reconnect_delay,
-                     Error **errp);
- void nbd_client_close(BlockDriverState *bs);
- 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 9f5c86eaa3..1359aff162 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -1218,6 +1218,7 @@ int nbd_client_init(BlockDriverState *bs,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *hostname,
-                     const char *x_dirty_bitmap,
-+                    uint32_t reconnect_delay,
-                     Error **errp)
- {
-     int ret;
-diff --git a/block/nbd.c b/block/nbd.c
-index 208be59602..cffb2aee89 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -360,6 +360,18 @@ static QemuOptsList nbd_runtime_opts = {
-             .help = "experimental: expose named dirty bitmap in place of "
-                     "block status",
-         },
-+        {
-+            .name = "reconnect-delay",
-+            .type = QEMU_OPT_NUMBER,
-+            .help = "Reconnect delay. On unexpected disconnect, nbd client "
-+                    "tries to connect again, until success or serious error. "
-+                    "During first @reconnect-delay seconds of reconnecting "
-+                    "loop all requests are paused and have a chance to rerun, "
-+                    "if successful connect occurs during this time. After"
-+                    "@reconnect-delay seconds all delayed requests are failed"
-+                    "and all following requests will be failed too (until"
-+                    "successful reconnect). Default 0",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -411,7 +423,9 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     /* NBD handshake */
-     ret = nbd_client_init(bs, s->saddr, s->export, tlscreds, hostname,
--                          qemu_opt_get(opts, "x-dirty-bitmap"), errp);
-+                          qemu_opt_get(opts, "x-dirty-bitmap"),
-+                          qemu_opt_get_number(opts, "reconnect-delay", 0),
-+                          errp);
- 
-  error:
-     if (tlscreds) {
++def qemu_nbd_popen(*args):
++    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
++    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
++
+ def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
+     '''Return True if two image files are identical'''
+     return qemu_img('compare', '-f', fmt1,
 -- 
 2.18.0
