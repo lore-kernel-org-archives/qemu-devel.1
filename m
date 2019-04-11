@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35121)
+Received: from eggs.gnu.org ([209.51.188.92]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hEVUo-0006nA-Ho
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:55:47 -0400
+	(envelope-from <groug@kaod.org>) id 1hEVc7-00015i-BP
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hEVEl-0004va-S3
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:39:20 -0400
-Received: from mga11.intel.com ([192.55.52.93]:8266)
+	(envelope-from <groug@kaod.org>) id 1hEVc5-0003ul-RW
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:03:19 -0400
+Received: from 11.mo7.mail-out.ovh.net ([87.98.173.157]:56955)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hEVEk-0004ad-G2
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:39:11 -0400
-Date: Thu, 11 Apr 2019 16:38:27 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190411083827.GA24390@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190411071739.22889-1-richardw.yang@linux.intel.com>
-	<fc11042f-023f-3396-e68a-22dfd4ab0be7@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hEVc5-0003rS-Fl
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 05:03:17 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.143.246])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id B176010D7B5
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 11:03:08 +0200 (CEST)
+Date: Thu, 11 Apr 2019 11:02:59 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190411110259.3257499b@bahia.lan>
+In-Reply-To: <20190411063408.3998-1-clg@kaod.org>
+References: <20190411063408.3998-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc11042f-023f-3396-e68a-22dfd4ab0be7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: check apci hotplug capability
- before nvdimm's
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc/spapr: Add H_PROD and
+ H_CONFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>
 
-On Thu, Apr 11, 2019 at 10:32:39AM +0200, Thomas Huth wrote:
->On 11/04/2019 09.17, Wei Yang wrote:
->> pc_memory_pre_plug() is called during hotplug for both pc-dimm and
->> nvdimm. This is more proper to check apci hotplug capability before
->> check nvdimm specific capability.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  hw/i386/pc.c | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->> 
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index f2c15bf1f2..d48b6f9582 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -2091,17 +2091,17 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>          return;
->>      }
->>  
->> -    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->> -        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->> -        return;
->> -    }
->> -
->>      hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err);
->>      if (local_err) {
->>          error_propagate(errp, local_err);
->>          return;
->>      }
->>  
->> +    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
->> +        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->> +        return;
->> +    }
->> +
->>      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev),
->>                       pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
->>  }
->
->Works fine for me, too (i.e. no crash with older machine types).
->
->Tested-by: Thomas Huth <thuth@redhat.com>
->
+On Thu, 11 Apr 2019 08:34:08 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Thanks :-)
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=20
+> H_PROD should be fully functional, H_CEDE is modified to
+> ignore a proded CPU. H_CONFER is a stub to avoid returning
+> an error.
+>=20
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  target/ppc/cpu.h     |  3 +++
+>  hw/ppc/spapr_hcall.c | 37 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 40 insertions(+)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 42eadc4b7997..07cea7268c0c 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1141,6 +1141,9 @@ struct CPUPPCState {
+>       * sreset), so flag this here.
+>       */
+>      bool resume_as_sreset;
+> +
+> +    /* Used by SPAPR for H_CEDE/H_PROD */
+> +    bool prodded;
+>  #endif
+> =20
+>      /* Those resources are used only during code translation */
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8a736797b9bf..be8044a92f2f 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1057,6 +1057,11 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprM=
+achineState *spapr,
+> =20
+>      env->msr |=3D (1ULL << MSR_EE);
+>      hreg_compute_hflags(env);
+> +    if (env->prodded) {
+> +        env->prodded =3D false;
+> +        return H_SUCCESS;
+> +    }
+> +
 
--- 
-Wei Yang
-Help you, Help me
+The "H_CEDE is modified to ignore a proded CPU" sentence in the changelog
+is slightly inaccurate since the "prod" bit is reset, as described in
+LoPAPR v1.1 14.11.3.3 H_CEDE.
+
+Appart from that LGTM.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>      if (!cpu_has_work(cs)) {
+>          cs->halted =3D 1;
+>          cs->exception_index =3D EXCP_HLT;
+> @@ -1065,6 +1070,36 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprM=
+achineState *spapr,
+>      return H_SUCCESS;
+>  }
+> =20
+> +static void spapr_do_wakeup_on_cpu(CPUState *cs, run_on_cpu_data data)
+> +{
+> +    cs->halted =3D 0;
+> +    cs->exception_index =3D -1;
+> +}
+> +
+> +static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                           target_ulong opcode, target_ulong *args)
+> +{
+> +    target_ulong target =3D args[0];
+> +    CPUPPCState *env;
+> +
+> +    cpu =3D spapr_find_cpu(target);
+> +    if (cpu) {
+> +        env =3D &cpu->env;
+> +        env->prodded =3D true;
+> +        run_on_cpu(CPU(cpu), spapr_do_wakeup_on_cpu, RUN_ON_CPU_NULL);
+> +    } else {
+> +        return H_PARAMETER;
+> +    }
+> +    return H_SUCCESS;
+> +}
+> +
+> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                             target_ulong opcode, target_ulong *args)
+> +{
+> +    /* Do nothing (supposed to confer timeslice). */
+> +    return H_SUCCESS;
+> +}
+> +
+>  static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>                             target_ulong opcode, target_ulong *args)
+>  {
+> @@ -1860,6 +1895,8 @@ static void hypercall_register_types(void)
+>      /* hcall-splpar */
+>      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+>      spapr_register_hypercall(H_CEDE, h_cede);
+> +    spapr_register_hypercall(H_PROD, h_prod);
+> +    spapr_register_hypercall(H_CONFER, h_confer);
+>      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+> =20
+>      /* processor register resource access h-calls */
