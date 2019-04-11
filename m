@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB39C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5028C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B124D2073F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:45:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B124D2073F
+	by mail.kernel.org (Postfix) with ESMTPS id B73D22073F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 10:46:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73D22073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46058 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46062 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXDM-0005Rw-Si
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:45:52 -0400
+	id 1hEXDi-0005r3-P0
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 06:46:14 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:54953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWsa-0003CZ-8h
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:25 -0400
+	(envelope-from <david@redhat.com>) id 1hEWsY-0003CZ-AM
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hEWdp-0007GC-EQ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37634)
+	(envelope-from <david@redhat.com>) id 1hEWe6-0007N4-28
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 06:09:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hEWdp-0007Fw-6D; Thu, 11 Apr 2019 06:09:09 -0400
+	id 1hEWe4-0007MN-4D; Thu, 11 Apr 2019 06:09:25 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7ABE3C01EE87;
-	Thu, 11 Apr 2019 10:09:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 51178308CFAB;
+	Thu, 11 Apr 2019 10:09:23 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2C7F71001E71;
-	Thu, 11 Apr 2019 10:09:07 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 007C81001E82;
+	Thu, 11 Apr 2019 10:09:21 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 12:08:09 +0200
-Message-Id: <20190411100836.646-15-david@redhat.com>
+Date: Thu, 11 Apr 2019 12:08:13 +0200
+Message-Id: <20190411100836.646-19-david@redhat.com>
 In-Reply-To: <20190411100836.646-1-david@redhat.com>
 References: <20190411100836.646-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 11 Apr 2019 10:09:08 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 11 Apr 2019 10:09:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 14/41] s390x/tcg: Implement VECTOR EXCLUSIVE
- OR
+Subject: [Qemu-devel] [PATCH v1 18/41] s390x/tcg: Implement VECTOR
+ (MAXIMUM|MINIMUM) (LOGICAL)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,46 +75,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411100809.qbVV6a-s-HtAyLbgkwb0Xgy2NCjrqwwZl9Q4hBfIj_c@z>
+Message-ID: <20190411100813.WuzxwtcyBYzEfX7VHLq947t0bOijgEiFBH8dlhLreI0@z>
 
-Easy, we can reuse an existing gvec helper.
+Luckily, we already have gvec helpers for all four cases.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      | 2 ++
- target/s390x/translate_vx.inc.c | 7 +++++++
- 2 files changed, 9 insertions(+)
+ target/s390x/insn-data.def      |  8 ++++++++
+ target/s390x/translate_vx.inc.c | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index a355b7f62f..b8400c191a 100644
+index fc8886ff42..b22d9f0f6a 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1088,6 +1088,8 @@
-     F(0xe753, VCLZ,    VRR_a, V,   0, 0, 0, 0, vclz, 0, IF_VEC)
- /* VECTOR COUNT TRAILING ZEROS */
-     F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
-+/* VECTOR EXCLUSIVE OR */
-+    F(0xe76d, VX,      VRR_c, V,   0, 0, 0, 0, vx, 0, IF_VEC)
+@@ -1098,6 +1098,14 @@
+     F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
+ /* VECTOR LOAD POSITIVE */
+     F(0xe7df, VLP,     VRR_a, V,   0, 0, 0, 0, vlp, 0, IF_VEC)
++/* VECTOR MAXIMUM */
++    F(0xe7ff, VMX,     VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MAXIMUM LOGICAL */
++    F(0xe7fd, VMXL,    VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MINIMUM */
++    F(0xe7fe, VMN,     VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MINIMUM LOGICAL */
++    F(0xe7fc, VMNL,    VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 23d5870dc5..85a0f20b90 100644
+index 8cab3f876a..aae1ff107a 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1434,3 +1434,10 @@ static DisasJumpType op_vctz(DisasContext *s, Disa=
-sOps *o)
+@@ -1536,3 +1536,34 @@ static DisasJumpType op_vlp(DisasContext *s, Disas=
+Ops *o)
      gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
 ]);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vx(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vmx(DisasContext *s, DisasOps *o)
 +{
-+    gen_gvec_fn_3(xor, ES_8, get_field(s->fields, v1), get_field(s->fiel=
-ds, v2),
-+                 get_field(s->fields, v3));
++    const uint8_t v1 =3D get_field(s->fields, v1);
++    const uint8_t v2 =3D get_field(s->fields, v2);
++    const uint8_t v3 =3D get_field(s->fields, v3);
++    const uint8_t es =3D get_field(s->fields, m4);
++
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    switch (s->fields->op2) {
++    case 0xff:
++        gen_gvec_fn_3(smax, es, v1, v2, v3);
++        break;
++    case 0xfd:
++        gen_gvec_fn_3(umax, es, v1, v2, v3);
++        break;
++    case 0xfe:
++        gen_gvec_fn_3(smin, es, v1, v2, v3);
++        break;
++    case 0xfc:
++        gen_gvec_fn_3(umin, es, v1, v2, v3);
++        break;
++    default:
++        g_assert_not_reached();
++    }
 +    return DISAS_NEXT;
 +}
 --=20
