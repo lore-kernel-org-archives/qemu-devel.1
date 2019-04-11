@@ -2,109 +2,64 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B267FC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5740C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF4F20850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:01:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="HgOazl88"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF4F20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 931C520850
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:04:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 931C520850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52994 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53026 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEe0U-0005De-H2
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:01:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60998)
+	id 1hEe3w-0006YE-It
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:04:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEdzO-0004V7-UK
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:55 -0400
+	(envelope-from <berrange@redhat.com>) id 1hEe2q-0006C0-MB
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEdzN-0002gC-SP
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:54 -0400
-Received: from mail-eopbgr680045.outbound.protection.outlook.com
-	([40.107.68.45]:44014
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hEdzN-0002ff-HG
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:59:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=JetKE8+EhNKomFaTzxAxRSOXZce6sB2Yh8/1lE8CPfU=;
-	b=HgOazl88X1HR3/DV1fd6K6OFRzsFv0o+jLE80+ewqa3o9Hyq6HUK8Kj7TWA16LdblEUTDVZGtOixL4afPeViWfdf0QDzFgBmdmNKxkxJZEpAlPYBXrdByE/gcS1PidLyR9FyMHIr0JV9hqTy3b7TjWo8y0cCPScmkwxAsDf12Wc=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
-	DM6PR12MB2748.namprd12.prod.outlook.com (20.176.118.90) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1771.16; Thu, 11 Apr 2019 17:59:50 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de]) by
-	DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de%3]) with mapi id 15.20.1771.021;
-	Thu, 11 Apr 2019 17:59:50 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH] target/i386: sev: add 'sev-max-guests' field to
-	'query-sev-capabilities'
-Thread-Index: AQHU8JBbMl53pn0tMEuZJLOOksDkdQ==
-Date: Thu, 11 Apr 2019 17:59:50 +0000
-Message-ID: <20190411175931.29235-1-brijesh.singh@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN1PR12CA0084.namprd12.prod.outlook.com
-	(2603:10b6:802:21::19) To DM6PR12MB2682.namprd12.prod.outlook.com
-	(2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8e14c959-7925-4d80-d12c-08d6bea77e2d
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(4618075)(2017052603328)(7193020);
-	SRVR:DM6PR12MB2748; 
-x-ms-traffictypediagnostic: DM6PR12MB2748:
-x-microsoft-antispam-prvs: <DM6PR12MB2748038307C4121950519793E52F0@DM6PR12MB2748.namprd12.prod.outlook.com>
-x-forefront-prvs: 00046D390F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10009020)(366004)(346002)(396003)(136003)(376002)(39860400002)(189003)(199004)(478600001)(14454004)(71200400001)(6506007)(71190400001)(54906003)(99286004)(8676002)(186003)(97736004)(36756003)(52116002)(5660300002)(386003)(68736007)(256004)(14444005)(3846002)(6116002)(81166006)(81156014)(26005)(316002)(8936002)(50226002)(102836004)(2906002)(1076003)(86362001)(6512007)(106356001)(5640700003)(2351001)(476003)(2501003)(105586002)(305945005)(7736002)(2616005)(6916009)(4326008)(66066001)(53936002)(6486002)(6436002)(25786009)(486006);
-	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2748;
-	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: a12UTdO5jcAyHOJ3kQKIrANDdrWu6tknEwDcj/JxJL3b2MP0XV6Ab34dJr3LJ9Md/PPLVdA/z+3kBrP7juLQIQQJOAZzUiZQBUC7nginVT32YrBC1q9vVWEfzgsj/xtczvwRt/SlyFTolWqUoe2qpOgCpXPPAPr18gBGruuwe9r58/BRN+w8qr29qAeoYUmd5HxTAbCNHw7twcBZoKnyU5IewSY1m/R8H84A7JplR8SqBfBeHkcECjg7JTZCEqcXy03t3Z+3mHmILFrQqQLCURTI1PuE4x/p47dQ6lt0c94EEXRysfKX3c7EbgQszKE7TBBprV+L19trUp+QkfleABNz3Zi8hvAAY+0Zl0dyInkWqcZApJCr8CNriJSE1i1f8ytceRjTBjmNQjknmkzQ3kp0PCYpkxDXrpDjXPzWpu0=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <92061E548BE82E4A8C5B684CFD4CD405@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1hEe2o-0004aP-I8
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEe2o-0004Zv-9X
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:03:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3635E2CD7F8
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 18:03:25 +0000 (UTC)
+Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C38625C207;
+	Thu, 11 Apr 2019 18:03:17 +0000 (UTC)
+Date: Thu, 11 Apr 2019 19:03:14 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Message-ID: <20190411180314.GI3641@redhat.com>
+References: <20190411175345.19414-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e14c959-7925-4d80-d12c-08d6bea77e2d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 17:59:50.8483 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2748
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.68.45
-Subject: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests' field
- to 'query-sev-capabilities'
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190411175345.19414-1-thuth@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Thu, 11 Apr 2019 18:03:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [libvirt] [PATCH for-QEMU-4.1] Declare -realtime
+ as deprecated
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,59 +71,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Erik Skultety <eskultet@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, "Singh,
-	Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411175950.gl9iILcyDiUGWRAXoO9s-DFAAKPM8P30QNW1-pghPBo@z>
+Message-ID: <20190411180314.Y3lz6tcUvNjmMtK5XIGdkYcoSgru1grXfM-awQ2AHms@z>
 
-VGhlcmUgYXJlIGxpbWl0ZWQgbnVtYmVycyBvZiB0aGUgU0VWIGd1ZXN0cyB0aGF0IGNhbiBiZSBy
-dW4gY29uY3VycmVudGx5Lg0KQSBtYW5hZ2VtZW50IGFwcGxpY2F0aW9ucyBtYXkgbmVlZCB0byBr
-bm93IHRoaXMgbGltaXQgc28gdGhhdCBpdCBjYW4gcGxhY2UNClNFViBWTXMgb24gaG9zdHMgd2hp
-Y2ggaGF2ZSBzdWl0YWJsZSByZXNvdXJjZXMgYXZhaWxhYmxlLg0KDQpDdXJyZW50bHksIHRoaXMg
-bGltaXQgaXMgbm90IGV4cG9zZWQgdG8gdGhlIGFwcGxpY2F0aW9uLiBBZGQgYSBuZXcNCidzZXYt
-bWF4LWd1ZXN0JyBmaWVsZCBpbiB0aGUgcXVlcnktc2V2LWNhcGFiaWxpdGllcyB0byBwcm92aWRl
-IHRoaXMNCmluZm9ybWF0aW9uLg0KDQpDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
-LmNvbT4NCkNjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQpDYzogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQpDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVy
-cmFuZ2VAcmVkaGF0LmNvbT4NCkNjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0K
-Q2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQpTaWduZWQtb2ZmLWJ5OiBC
-cmlqZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQotLS0NCiBxYXBpL3RhcmdldC5q
-c29uICB8IDYgKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2LmMgfCA2ICsrKystLQ0KIDIgZmlsZXMg
-Y2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEv
-cWFwaS90YXJnZXQuanNvbiBiL3FhcGkvdGFyZ2V0Lmpzb24NCmluZGV4IDFkNGQ1NGI2MDAuLmI0
-NTEyMWQzMGIgMTAwNjQ0DQotLS0gYS9xYXBpL3RhcmdldC5qc29uDQorKysgYi9xYXBpL3Rhcmdl
-dC5qc29uDQpAQCAtMTgzLDcgKzE4Myw4IEBADQogICAnZGF0YSc6IHsgJ3BkaCc6ICdzdHInLA0K
-ICAgICAgICAgICAgICdjZXJ0LWNoYWluJzogJ3N0cicsDQogICAgICAgICAgICAgJ2NiaXRwb3Mn
-OiAnaW50JywNCi0gICAgICAgICAgICAncmVkdWNlZC1waHlzLWJpdHMnOiAnaW50J30sDQorICAg
-ICAgICAgICAgJ3JlZHVjZWQtcGh5cy1iaXRzJzogJ2ludCcsDQorICAgICAgICAgICAgJ3Nldi1t
-YXgtZ3Vlc3RzJzogJ2ludCd9LA0KICAgJ2lmJzogJ2RlZmluZWQoVEFSR0VUX0kzODYpJyB9DQog
-DQogIyMNCkBAIC0yMDAsNyArMjAxLDggQEANCiAjDQogIyAtPiB7ICJleGVjdXRlIjogInF1ZXJ5
-LXNldi1jYXBhYmlsaXRpZXMiIH0NCiAjIDwtIHsgInJldHVybiI6IHsgInBkaCI6ICI4Q0NERDhE
-REQiLCAiY2VydC1jaGFpbiI6ICI4ODhDQ0NERERFRSIsDQotIyAgICAgICAgICAgICAgICAgICJj
-Yml0cG9zIjogNDcsICJyZWR1Y2VkLXBoeXMtYml0cyI6IDV9fQ0KKyMgICAgICAgICAgICAgICAg
-ICAiY2JpdHBvcyI6IDQ3LCAicmVkdWNlZC1waHlzLWJpdHMiOiA1LA0KKyMgICAgICAgICAgICAg
-ICAgICAic2V2LW1heC1ndWVzdHMiIDogMTV9fQ0KICMNCiAjIw0KIHsgJ2NvbW1hbmQnOiAncXVl
-cnktc2V2LWNhcGFiaWxpdGllcycsICdyZXR1cm5zJzogJ1NldkNhcGFiaWxpdHknLA0KZGlmZiAt
-LWdpdCBhL3RhcmdldC9pMzg2L3Nldi5jIGIvdGFyZ2V0L2kzODYvc2V2LmMNCmluZGV4IGNkNzdm
-NmI1ZDQuLmJiMGNkNzlhY2QgMTAwNjQ0DQotLS0gYS90YXJnZXQvaTM4Ni9zZXYuYw0KKysrIGIv
-dGFyZ2V0L2kzODYvc2V2LmMNCkBAIC00ODgsNyArNDg4LDcgQEAgc2V2X2dldF9jYXBhYmlsaXRp
-ZXModm9pZCkNCiAgICAgZ3VjaGFyICpwZGhfZGF0YSA9IE5VTEw7DQogICAgIGd1Y2hhciAqY2Vy
-dF9jaGFpbl9kYXRhID0gTlVMTDsNCiAgICAgc2l6ZV90IHBkaF9sZW4gPSAwLCBjZXJ0X2NoYWlu
-X2xlbiA9IDA7DQotICAgIHVpbnQzMl90IGVieDsNCisgICAgdWludDMyX3QgZWJ4LCBlY3gsIGVk
-eDsNCiAgICAgaW50IGZkOw0KIA0KICAgICBmZCA9IG9wZW4oREVGQVVMVF9TRVZfREVWSUNFLCBP
-X1JEV1IpOw0KQEAgLTUwNyw3ICs1MDcsNyBAQCBzZXZfZ2V0X2NhcGFiaWxpdGllcyh2b2lkKQ0K
-ICAgICBjYXAtPnBkaCA9IGdfYmFzZTY0X2VuY29kZShwZGhfZGF0YSwgcGRoX2xlbik7DQogICAg
-IGNhcC0+Y2VydF9jaGFpbiA9IGdfYmFzZTY0X2VuY29kZShjZXJ0X2NoYWluX2RhdGEsIGNlcnRf
-Y2hhaW5fbGVuKTsNCiANCi0gICAgaG9zdF9jcHVpZCgweDgwMDAwMDFGLCAwLCBOVUxMLCAmZWJ4
-LCBOVUxMLCBOVUxMKTsNCisgICAgaG9zdF9jcHVpZCgweDgwMDAwMDFGLCAwLCBOVUxMLCAmZWJ4
-LCAmZWN4LCAmZWR4KTsNCiAgICAgY2FwLT5jYml0cG9zID0gZWJ4ICYgMHgzZjsNCiANCiAgICAg
-LyoNCkBAIC01MTYsNiArNTE2LDggQEAgc2V2X2dldF9jYXBhYmlsaXRpZXModm9pZCkNCiAgICAg
-ICovDQogICAgIGNhcC0+cmVkdWNlZF9waHlzX2JpdHMgPSAxOw0KIA0KKyAgICAvKiB0aGUgbWF4
-aW11bSBudW1iZXIgb2YgU0VWIGd1ZXN0cyB0aGF0IGNhbiBydW4gc2ltdWx0YW5lb3VzbHkgKi8N
-CisgICAgY2FwLT5zZXZfbWF4X2d1ZXN0cyA9IGVjeCAtIGVkeCArIDE7DQogb3V0Og0KICAgICBn
-X2ZyZWUocGRoX2RhdGEpOw0KICAgICBnX2ZyZWUoY2VydF9jaGFpbl9kYXRhKTsNCi0tIA0KMi4x
-Ny4xDQoNCg==
+On Thu, Apr 11, 2019 at 07:53:45PM +0200, Thomas Huth wrote:
+> The old -realtime mlock=on|off parameter does exactly the same as the
+> new -overcommit mem-lock=on|off parameter. Additionally, "-realtime"
+> does not activate any additional "realtime" capabilities as the name
+> might indicate. We should avoid to confuse the users this way, so
+> let's deprecate the old -realtime option.
+
+FYI libvirt currently uses  -realtime mlock=on so will need adapting
+to cope with this change.
+
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Deprecation has already been suggested last year:
+>   https://patchwork.kernel.org/patch/10480963/#22026215
+>  ... but apparently we forgot to really do it.
+> 
+>  qemu-deprecated.texi | 5 +++++
+>  vl.c                 | 2 ++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 2219386769..2c45204f3f 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -72,6 +72,11 @@ backend settings instead of environment variables.  To ease migration to
+>  the new format, the ``-audiodev-help'' option can be used to convert
+>  the current values of the environment variables to ``-audiodev'' options.
+>  
+> +@subsection -realtime (since 4.1)
+> +
+> +The @code{-realtime mlock=on|off} argument has been replaced by the
+> +@code{-overcommit mem-lock=on|off} argument.
+> +
+>  @section QEMU Machine Protocol (QMP) commands
+>  
+>  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+> diff --git a/vl.c b/vl.c
+> index c696ad2a13..d6a2779b70 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3912,6 +3912,8 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  break;
+>              case QEMU_OPTION_realtime:
+> +                warn_report("'-realtime mlock=...' is deprecated, please use "
+> +                             "'-overcommit mem-lock=...' instead");
+>                  opts = qemu_opts_parse_noisily(qemu_find_opts("realtime"),
+>                                                 optarg, false);
+>                  if (!opts) {
+> -- 
+> 2.21.0
+> 
+> --
+> libvir-list mailing list
+> libvir-list@redhat.com
+> https://www.redhat.com/mailman/listinfo/libvir-list
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
