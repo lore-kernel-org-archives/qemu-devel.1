@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36557)
+Received: from eggs.gnu.org ([209.51.188.92]:36749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hEOYQ-0003a3-3X
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hEOZU-00042o-Qc
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hEOYP-0007gv-2y
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hEOYO-0007gk-Tv
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:31:01 -0400
-Received: by mail-qk1-f195.google.com with SMTP id y5so2484433qkc.11
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:31:00 -0700 (PDT)
-Date: Wed, 10 Apr 2019 21:30:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190410213001-mutt-send-email-mst@kernel.org>
-References: <20190401111843.54528-1-ybettan@redhat.com>
-	<20190409131734.GE16944@stefanha-x1.localdomain>
-	<1871f593-ec5b-fede-7da5-a7ae78056249@redhat.com>
-	<CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1hEOZT-0008GU-UH
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:32:08 -0400
+References: <20190409210655.777-1-jsnow@redhat.com>
+	<87y34i2zbt.fsf@dusky.pond.sub.org>
+	<3d851b56-4f52-4c47-662d-bcbddf5db362@redhat.com>
+	<e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d36b8962-ed7d-f315-479b-d7de78d906e6@redhat.com>
+Date: Wed, 10 Apr 2019 21:32:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QVpPGKO_NH2CXpdYtQfLsMF+OjKx2QzjtKJVkOnnoBHdw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC-PATCH] Introducing virtio-example device.
+In-Reply-To: <e050a83f-4603-db8d-c869-53593027bf01@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Yoni Bettan <ybettan@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Amnon Ilan <ailan@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Apr 10, 2019 at 08:15:32PM +0100, Stefan Hajnoczi wrote:
-> On Wed, Apr 10, 2019 at 4:45 PM Yoni Bettan <ybettan@redhat.com> wrote:
-> > On 4/9/19 4:17 PM, Stefan Hajnoczi wrote:
-> > > On Mon, Apr 01, 2019 at 02:18:43PM +0300, Yoni Bettan wrote:
-> > The final purpose is to have:
-> >
-> > 1. device specification
-> >
-> > 2. device implementation
-> >
-> > 3. device driver
-> >
-> > 4. blog
-> >
-> > maybe I should have written it at the beginning, this is not the entire
-> > project but it is its start.
-> 
-> The way I'd design VIRTIO devices without prior knowledge is:
-> 
-> 1. Learn the VIRTIO device model.  Understand the concepts in VIRTIO.
-> <-- this is hard today, there's not much good documentation
 
-Best doc is still probably Rusty's whitepaper. It only covers 0.X
-spec so somewhat outdated but it does explain the concepts I think.
 
-> 2. Design an initial version of the device spec.  Mostly configuration
-> layout, virtqueues, and request structs.  Not much text is necessary
-> at this point, but it's critical for thinking through features before
-> implementation.
+On 4/10/19 2:22 PM, Eric Blake wrote:
+> On 4/10/19 12:37 PM, John Snow wrote:
+>>
+>>
+>> On 4/10/19 1:39 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> It turns out that having options listed in three places continues to be
+>>>> a bad idea. I'm still toying with the idea of an improved infrastructure
+>>>> here, but in the meantime, another bandaid.
+>>>>
 > 
-> 3. Implement guest driver and device emulation.
+>>>
+>>> Nice to have in 4.0.
+>>>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>>
+>>
+>> If it can go in for 4.0, who stages it? Kevin?
 > 
-> 4. Iterate on spec and implementation until it's functionally complete.
+> At this point, we've missed -rc3; the fix on its own is not a
+> release-blocker, but if something else comes up that requires -rc4 for
+> an actual release blocker, we can sort out someone sending a pull
+> request for this one at the same time. (I'm aware of a couple of iotest
+> fixups in the same boat... Guess it's time to start updating the wiki to
+> point to email threads where we document 'wish list' patches)
 > 
-> 5. Submit the spec to the VIRTIO Technical Committee.
-> 
-> 6. Submit driver and device emulation patches.  They can be merged
-> when the spec is approved/close to approved.
-> 
-> Are you jumping to #3?  This is likely to lead to poor quality
-> implementations and specs because the fundamental VIRTIO concepts
-> weren't understood.
-> 
-> If the point is to educate others and/or do it "the right way", then I
-> would really avoid hacking around without first doing the other steps.
-> 
-> Stefan
+
+OK. I also have... a pretty major bitmaps documentation rewrite which I
+probably won't have ready in time for a theoretical rc4 either, so I
+guess I'll need to include it for 4.0.1.
+
+I didn't realize how badly out of date the bitmaps.rst file had gotten.
+I'll keep hammering away at it.
+
+--js
