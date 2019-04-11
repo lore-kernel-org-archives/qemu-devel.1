@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59461)
+Received: from eggs.gnu.org ([209.51.188.92]:35743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hEO2X-0004DS-6R
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 20:58:06 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTZ-0002IE-0l
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hEO2V-0003ZA-7W
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 20:58:05 -0400
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:45713)
+	(envelope-from <catherine.hecx@gmail.com>) id 1hEOTX-0005jB-Kt
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:26:00 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hEO2T-0003Wc-7D
-	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 20:58:01 -0400
-Received: by mail-oi1-x22b.google.com with SMTP id y84so3435209oia.12
-	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 17:57:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hEOTX-0005j5-8L
+	for qemu-devel@nongnu.org; Wed, 10 Apr 2019 21:25:59 -0400
+Received: by mail-ot1-x342.google.com with SMTP id k21so3780884otf.1
+	for <qemu-devel@nongnu.org>; Wed, 10 Apr 2019 18:25:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <5CADFEB7.01C57B.25694@m12-14.163.com>
-	<e7a59573-5252-71b7-210b-5a8335f5a5c1@redhat.com>
-In-Reply-To: <e7a59573-5252-71b7-210b-5a8335f5a5c1@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 11 Apr 2019 08:57:22 +0800
-Message-ID: <CAKXe6S+w4A6YubgQib5H2QXE=eLFLWFQE-mOHYBM5PTXKaYAOA@mail.gmail.com>
+References: <1554689945-18619-1-git-send-email-catherine.hecx@gmail.com>
+	<20190408123542.1a4de426@redhat.com>
+	<CAEn6zmGHg_Tb1jsvurfrovQNB0R5WZT3mLT7r8R+BEt_4bPbhA@mail.gmail.com>
+	<20190410145908.GF2980@work-vm>
+	<CAEn6zmGGLLJb_7JCZzz-yWYpzkoGN7Vxd4aQ5_pvsMM+Sz8vPw@mail.gmail.com>
+	<20190410165736.GG2980@work-vm>
+In-Reply-To: <20190410165736.GG2980@work-vm>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Thu, 11 Apr 2019 09:25:46 +0800
+Message-ID: <CAEn6zmFTTYZwPtQ0UQZz=a8UnAWUDxz6VuZ1Lpdq860MZ6foYg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
-	=?utf-8?q?Questions_about_acpi_interrupt_link_devic?=
-	=?utf-8?b?ZSdzIOKAmF9QUlMnIGZpZWxk?=
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: warn when
+ memory-backend-file, share=on and in incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +34,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "liq3ea@gmail.com" <liq3ea@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8810=E6=
-=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8811:55=E5=86=99=E9=81=93=EF=BC=9A
+Hi Dr. David
 
-> On 10/04/19 16:33, Li Qiang wrote:
-> > Hi all,
+On Thu, 11 Apr 2019 at 00:57, Dr. David Alan Gilbert <dgilbert@redhat.com>
+wrote:
+
+> * Catherine Ho (catherine.hecx@gmail.com) wrote:
+> > Hi Dr. David
 > >
+> > On Wed, 10 Apr 2019 at 22:59, Dr. David Alan Gilbert <
+> dgilbert@redhat.com>
+> > wrote:
 > >
+> > > * Catherine Ho (catherine.hecx@gmail.com) wrote:
+> > > > Hi Igor
+> > > >
+> > > >
+> > > > On Mon, 8 Apr 2019 at 18:35, Igor Mammedov <imammedo@redhat.com>
+> wrote:
+> > > >
+> > > > > On Sun,  7 Apr 2019 22:19:05 -0400
+> > > > > Catherine Ho <catherine.hecx@gmail.com> wrote:
+> > > > >
+> > > > > > Currently it is not forbidden to use "-object
+> > > > > memory-backend-file,share=on"
+> > > > > > and together with "-incoming". But after incoming migration is
+> > > finished,
+> > > > > > the memory-backend-file will be definitely written if share=on.
+> So
+> > > the
+> > > > > > memory-backend-file can only be used once, but failed in the 2nd
+> time
+> > > > > > incoming.
+> > > > > >
+> > > > > > Thus it gives a warning and the users can run the qemu if they
+> really
+> > > > > > want to do it.
+> > > > >
+> > > > > Shouldn't we add a migration blocker in such a case instead of
+> warning
+> > > > > and letting qemu run wild?
+> > > > >
+> > > >
+> > > > IMO, it doesn't need to block this. With share=on and -incoming, the
+> user
+> > > > can
+> > > > still save the device memory state into memory-backend file again if
+> > > > ignore-shared
+> > > > capability is on.
+> > > >
+> > > > If we block this, the user can't use the ignore-shared capability in
+> > > > incoming
+> > > > migration.
+> > >
+> > > -incomign with share=on is a perfectly normal thing to do - it just
+> > > depends who you are sharing the file with and the lifetime of that
+> > > shared file.
+> > >
+> > > For example; if you're just running a qemu with vhost-user then you
+> > > use share=on - however wyou typically select the backend file as
+> > > a new file from /dev/shm - it's not a file that you previously migrated
+> > > to.
+> > >
+> > Thanks,
+> > but using a new file from /dev/shm means kernel will start from
+> > start_kernel or early? Is it different from the x-ignore-shared case?
+> > If we remove the share=on in incoming migration, all the writting
+> > of ram will not be flush into the memory backend file. Thus we
+> > can use the base memory backend file for ever.
+> > e.g.
+> > 1) save the vm like a snapshot, current ram state is "kernel
+> > has been started, systemd has been started"
+> > 2) restore it with -incoming and *no* share=on flag
+> > 3) restore it with -incoming and *no* share=on again...
+> > In contrary, if we use share=on, the base backend file will
+> > be written at once after 1st time incoming.
 > >
-> > I see the link device =E2=80=98_PRS=E2=80=99  uses irq line 5, 10, 11 i=
-n
-> > =E2=80=98build_link_dev=E2=80=99 function.
-> >
-> > But I never see the 5 lines uses in the guest, just uses 10 and 11.
-> >
-> > Why this happen?  Maybe related with the guest?
+> > So, IMO, no "share=on" is the proper usage of incoming migration
+> > when ignore-shared is on.
+> > Please correct me if sth is wrong, thanks:)
 >
-> Because the MADT table tells the guest to only use lines 10 and 11.  The
-> BIOS configures the chipset that way.
+> OK, I see what you're trying to do - you mean for the 'snapshotting'
+> case;  but that's not the only use.  Another use is for being able to
+> do a very quick upgrade of the running qemu to a new qemu binary
+> version; and in that case you want to be able to write to the shared
+> file so that you can repeatedly do the quick migrate.
 >
+> Dave
 >
-Hi Paolo,
+> Ah, that quick upgrade example makes sense to me. Thanks for the
+explanation.
 
-I read the MADT spec, and found that it may related with 'Entry Type 2 :
-Interrupt Source Override'.
-However, in build_madt function, I found following code when fill interrupt
-source overide.
-
-#define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
-        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
-            /* No need for a INT source override structure. */
-            continue;
-        }
-
-Seems the madt doesn't play a role?
-
-Also in the seabios code, I see the pci interrupt linking device is routed
-hard-coded by pci_irqs.
-So this means the seabios doesn't use the madt/dsdt table to configure PCI
-interrupt routing?
-
-Thanks,
-Li Qiang
-
-const u8 pci_irqs[4] =3D {
-    10, 10, 11, 11
-};
-
-static void piix_isa_bridge_setup(struct pci_device *pci, void *arg)
-{
-    int i, irq;
-    u8 elcr[2];
-
-    elcr[0] =3D 0x00;
-    elcr[1] =3D 0x00;
-    for (i =3D 0; i < 4; i++) {
-        irq =3D pci_irqs[i];
-        /* set to trigger level */
-        elcr[irq >> 3] |=3D (1 << (irq & 7));
-        /* activate irq remapping in PIIX */
-        pci_config_writeb(pci->bdf, 0x60 + i, irq);
-    }
-    outb(elcr[0], PIIX_PORT_ELCR1);
-    outb(elcr[1], PIIX_PORT_ELCR2);
-    dprintf(1, "PIIX3/PIIX4 init: elcr=3D%02x %02x\n", elcr[0], elcr[1]);
-}
-
-Paolo
->
->
+B.R.
+Catherine
