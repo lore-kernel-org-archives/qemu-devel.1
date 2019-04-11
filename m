@@ -2,69 +2,58 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28214C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FEEAC10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC2882082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC2882082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF5092133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 06:35:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5092133D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42482 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42590 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hET7D-0007U3-5a
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 02:23:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56603)
+	id 1hETJ2-0001FH-V7
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 02:35:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hET6M-00073Q-TV
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:22:24 -0400
+	(envelope-from <clg@kaod.org>) id 1hETI5-0000mL-Qz
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hET6L-0004yd-Mj
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:22:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43364)
+	(envelope-from <clg@kaod.org>) id 1hETI4-0003iG-MM
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:34:29 -0400
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:46678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hET6I-0004xZ-Qv; Thu, 11 Apr 2019 02:22:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C3E0230832CD;
-	Thu, 11 Apr 2019 06:22:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D3795D9CD;
-	Thu, 11 Apr 2019 06:22:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 050D41138648; Thu, 11 Apr 2019 08:22:13 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190410012413.31569-1-jsnow@redhat.com>
-	<20190410012413.31569-3-jsnow@redhat.com>
-	<87sguq2yn1.fsf@dusky.pond.sub.org>
-	<004289a6-9df9-ae99-53e6-56e555709434@redhat.com>
-Date: Thu, 11 Apr 2019 08:22:12 +0200
-In-Reply-To: <004289a6-9df9-ae99-53e6-56e555709434@redhat.com> (John Snow's
-	message of "Wed, 10 Apr 2019 13:55:33 -0400")
-Message-ID: <87a7gxukmj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hETI4-0003Xj-FE
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 02:34:28 -0400
+Received: from player746.ha.ovh.net (unknown [10.109.159.35])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id CBB6E167D15
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 08:34:18 +0200 (CEST)
+Received: from kaod.org (lfbn-tou-1-40-22.w86-201.abo.wanadoo.fr
+	[86.201.133.22]) (Authenticated sender: clg@kaod.org)
+	by player746.ha.ovh.net (Postfix) with ESMTPSA id 773AE4BDCF46;
+	Thu, 11 Apr 2019 06:34:12 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 11 Apr 2019 08:34:08 +0200
+Message-Id: <20190411063408.3998-1-clg@kaod.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 11 Apr 2019 06:22:16 +0000 (UTC)
+X-Ovh-Tracer-Id: 16134708617910062054
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudekgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] pxtool: Add new qemu-img command
- info generation tool
+X-Received-From: 46.105.76.26
+Subject: [Qemu-devel] [PATCH] ppc/spapr: Add H_PROD and H_CONFER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,123 +65,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411062212.NWg9ii3IeFaOa4vNY9Bq83GpJlvvxypQfFkmIu_SlyM@z>
+Message-ID: <20190411063408.wbLPHy8M4EbwrczXSLkNhARclwc80AHpjguSWqJk6lo@z>
 
-John Snow <jsnow@redhat.com> writes:
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-> On 4/10/19 1:54 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> Presently we use hxtool and a .hx format to generate a few things like
->>> the qemu_img subcommand dispatch table, the qemu_img help() display output,
->>> and a help output in qemu-img.texi.
->>>
->>> Unfortunately, this means that this information is duplicated in at least
->>> three places:
->>>
->>> (1) in qemu-img-cmds.hx as a human readable string
->>> (2) in qemu-img-cmds.hx as a texi string
->>> (3) in qemu-img.texi again, as a texi string
->>>
->>> We can do a little better, though: all of these sources can be generated
->>> from a single json file. Add a new small tool ("pxtool") that can do this.
->>>
->>> This tool can at least handle generating (1) and (2) from the same source
->>> without needing to reduplicate that information. Deduplicating (3) happens
->>> in the next patch.
->>>
->>> Notes:
->>>  - The json format was chosen to be very "stupid", and the command line
->>>    documentation is being kept one-per-line to make future diffs easier
->>>    to read.
->>>  - It's easy enough to generate the human-readable output from the texi
->>>    output by removing '@var{foo}' with 'foo'.
->>>  - The qemu-img command dispatch always calls img_cmdname, so we don't
->>>    need to store this information separately, either.
->>>  - The need for DEF() macros could be removed as well, but I left it in
->>>    to create a minimally disruptive patch.
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->> 
->> We got just five .hx:
->> 
->>     qemu-img.cmds.hx            killed off by this patch
->>     qemu-options.hx             CLI QAPIfication should kill this off
->>     hw/audio/pl041.hx           misnamed, not actually food for hxtool
->>     hmp-commands.hx             no exit strategy
->>     hmp-commands-info.hx            for these two, yet
->> 
->> CLI QAPIfication got stuck in the back-burner, and as long as that's the
->> case, it's not an alternative to your patches.
->> 
->
-> Good to know. I figure that at least while we wait on something more
-> comprehensive there's no real short term harm in tidying up.
->
-> Something I'd really like to do is define a python/json-esque
-> configuration file that allows you to specify some "common options" that
-> are shared between all of the sub-commands, and then define each command
-> in terms of both which common options it possesses, and then any local
-> command-specific options it has.
->
-> (Why the common options design? So that argument names and command
-> options can be encouraged to be identical and identically documented
-> between all subcommands that use them.)
+H_PROD should be fully functional, H_CEDE is modified to
+ignore a proded CPU. H_CONFER is a stub to avoid returning
+an error.
 
-In QAPI, you'd define a common base type.
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ target/ppc/cpu.h     |  3 +++
+ hw/ppc/spapr_hcall.c | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-> Then, from the configuration file, generate all of the necessary C
-> parsers (I have a protoype for this, it's not difficult to do in at
-> least the basic case) that can return boxed command arguments, and then
-> also generate the help strings from that metadata.
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 42eadc4b7997..07cea7268c0c 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1141,6 +1141,9 @@ struct CPUPPCState {
+      * sreset), so flag this here.
+      */
+     bool resume_as_sreset;
++
++    /* Used by SPAPR for H_CEDE/H_PROD */
++    bool prodded;
+ #endif
+=20
+     /* Those resources are used only during code translation */
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8a736797b9bf..be8044a92f2f 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1057,6 +1057,11 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprM=
+achineState *spapr,
+=20
+     env->msr |=3D (1ULL << MSR_EE);
+     hreg_compute_hflags(env);
++    if (env->prodded) {
++        env->prodded =3D false;
++        return H_SUCCESS;
++    }
++
+     if (!cpu_has_work(cs)) {
+         cs->halted =3D 1;
+         cs->exception_index =3D EXCP_HLT;
+@@ -1065,6 +1070,36 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprM=
+achineState *spapr,
+     return H_SUCCESS;
+ }
+=20
++static void spapr_do_wakeup_on_cpu(CPUState *cs, run_on_cpu_data data)
++{
++    cs->halted =3D 0;
++    cs->exception_index =3D -1;
++}
++
++static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_ulong target =3D args[0];
++    CPUPPCState *env;
++
++    cpu =3D spapr_find_cpu(target);
++    if (cpu) {
++        env =3D &cpu->env;
++        env->prodded =3D true;
++        run_on_cpu(CPU(cpu), spapr_do_wakeup_on_cpu, RUN_ON_CPU_NULL);
++    } else {
++        return H_PARAMETER;
++    }
++    return H_SUCCESS;
++}
++
++static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                             target_ulong opcode, target_ulong *args)
++{
++    /* Do nothing (supposed to confer timeslice). */
++    return H_SUCCESS;
++}
++
+ static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+@@ -1860,6 +1895,8 @@ static void hypercall_register_types(void)
+     /* hcall-splpar */
+     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+     spapr_register_hypercall(H_CEDE, h_cede);
++    spapr_register_hypercall(H_PROD, h_prod);
++    spapr_register_hypercall(H_CONFER, h_confer);
+     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+=20
+     /* processor register resource access h-calls */
+--=20
+2.20.1
 
-With QAPI, we generate reference documentation from the doc comments.
-
-My RFC patches for command line QAPIfication generate a CLI parser using
-getopt_long_only().
-
-They keep help texts in the QAPI schema.  Generating their formal part
-from the type definition should be feasible.  Generating it without
-regressing readability might turn out to be non-trivial.
-
-My patches generate *one* CLI parser.  We have many, and some of them
-want to share types.  There's more than one way to skin this cat, but
-it'll have to be skinned.
-
-> I suspect that work *IS* something that might brush up against / should
-> use (or extend) QAPI code.
-
-Seems likely.
-
-> Then, I'd like to find a way to split qemu-img.texi into sub-command
-> files and find a way to source the same "informative text" for both:
->
-> (1) The texi output, as per usual, and
-> (2) qemu-img subcommand --help
->
-> such that --help, when passed as an argument to the subcommand, prints
-> out help only relevant to the subcommand instead, e.g.
->
-> `qemu-img check --help`
->
-> might print the "common options" section only as it relates to commands
-> actually used by the check command, then prints the check section of the
-> texi as formatted for terminals.
->
-> This way, we can have manpages, html pages, and interactive help text
-> all derived from the same semi-automated sources, always up to date and
-> much easier to read/discover/parse by human eyeballs.
->
-> That's what I'd like to accomplish, ultimately.
->
-> For now, I think this RFC set is not harmful and won't bother anybody.
-> It's definitely not worse than what we have now, fragility of removing
-> @var{} tokens and all.
-
-Makes sense.  I just hope we can avoid duplicating work.
 
