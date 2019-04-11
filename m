@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47442)
+Received: from eggs.gnu.org ([209.51.188.92]:49206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEZxX-0004Ma-1i
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:41:43 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEa4b-0006dY-3C
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hEZxW-0001dR-3T
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:41:42 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-References: <cover.1551895813.git.berto@igalia.com>
-	<e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
-	<1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
-Date: Thu, 11 Apr 2019 15:41:38 +0200
-Message-ID: <w515zrkveul.fsf@maestria.local.igalia.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEa4a-0000Td-8B
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 09:49:01 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Apr 2019 13:48:53 +0000
+Message-ID: <955ec895-5b90-7294-d5e2-41829f56e529@virtuozzo.com>
+References: <20190410205715.2209-1-mreitz@redhat.com>
+	<20190410205715.2209-2-mreitz@redhat.com>
+In-Reply-To: <20190410205715.2209-2-mreitz@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <151E35536BC7B24C80A3FFAF4BFD4AE6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] qemu-iotests: Test the
- x-blockdev-reopen QMP command
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-img: Move quiet into
+ ImgConvertState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>
 
-On Wed 10 Apr 2019 07:03:50 PM CEST, Max Reitz wrote:
->> +        # hd0 has no backing file: we can omit the 'backing' option
->> +        self.reopen(opts)
->
-> [...]
->
->> +        # Detach hd2 from hd0.
->> +        self.reopen(opts, {'backing': None})
->> +        self.reopen(opts, {}, "backing is missing for 'hd0'")
->
-> I don=E2=80=99t understand the second test.  hd0 has no default backing f=
-ile
-> and it currently has no backing child attached to it.  Why would this
-> call fail now?
-
-I think there's a bug.
-
-Calling x-blockdev-reopen without 'backing' should only fail if
-
- a) the image has a backing file attached to it.
-    In this case it doesn't: we just detached it in the previous line.
-
- b) there's a default backing file written on the image header.
-    In this case there isn't (hd0 is created without one in setUp()).
-
-So it should not fail. I think the bug is that the test for condition
-(b) in bdrv_reopen_prepare() that returns "backing is missing..." is
-using backing_file but it should use (correct me if I'm wrong)
-auto_backing_file.
-
-Changing that and replacing the test line with self.reopen(opts) fixes
-it for me.
-
-Not directly related to this, but should bdrv_backing_detach() also
-clear backing_file ?
-
-Berto
+MTAuMDQuMjAxOSAyMzo1NywgTWF4IFJlaXR6IHdyb3RlOg0KPiBNb3ZlIGltZ19jb252ZXJ0KCkn
+cyBxdWlldCBmbGFnIGludG8gdGhlIEltZ0NvbnZlcnRTdGF0ZSBzbyBpdCBpcw0KPiBhY2Nlc3Np
+YmxlIGJ5IG5lc3RlZCBmdW5jdGlvbnMuICAtcSBkaWN0YXRlcyB0aGF0IGl0IHN1cHByZXNzZXMg
+YW55dGhpbmcNCj4gYnV0IGVycm9ycywgc28gaWYgdGhvc2UgZnVuY3Rpb25zIHdhbnQgdG8gZW1p
+dCB3YXJuaW5ncywgdGhleSBuZWVkIHRvDQo+IHF1ZXJ5IHRoaXMgZmxhZyBmaXJzdC4gIChUaGVy
+ZSBjdXJyZW50bHkgYXJlIG5vIHN1Y2ggd2FybmluZ3MsIGJ1dCB0aGVyZQ0KPiB3aWxsIGJlIGFz
+IG9mIHRoZSBuZXh0IHBhdGNoLikNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0eiA8bXJl
+aXR6QHJlZGhhdC5jb20+DQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0
+LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1l
+bnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
