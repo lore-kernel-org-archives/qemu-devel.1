@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48873)
+Received: from eggs.gnu.org ([209.51.188.92]:50420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdNI-0002Ee-EF
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:20:34 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTm-0004ZG-Qe
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdNH-0000tK-8S
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:20:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hEdTl-0003bH-Kw
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 13:27:14 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 11 Apr 2019 17:20:26 +0000
-Message-ID: <0b088cc0-6ea9-297d-6989-2d61e1c25075@virtuozzo.com>
-References: <20190225152053.15976-1-kwolf@redhat.com>
-	<20190225152053.15976-17-kwolf@redhat.com>
-	<4f9792a1-4702-62d0-cad4-4da1169baa3b@virtuozzo.com>
-	<20190411141548.GE5694@linux.fritz.box>
-	<1391b876-74ed-21f0-c41f-f2fb22d2eae7@virtuozzo.com>
-	<20190411164803.GF5694@linux.fritz.box>
-	<2558f6fa-03d5-9483-07ff-7ec0a4d37835@virtuozzo.com>
-In-Reply-To: <2558f6fa-03d5-9483-07ff-7ec0a4d37835@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <80EE4C91104FE04E81650F9AE3887801@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 16/71] nbd: Increase bs->in_flight during
- AioContext switch
+Date: Thu, 11 Apr 2019 20:27:06 +0300
+Message-Id: <20190411172709.205032-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-1-vsementsov@virtuozzo.com>
+References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v6 4/7] block/nbd: add cmdline and qapi
+ parameter reconnect-delay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +20,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-MTEuMDQuMjAxOSAyMDoxMywgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTEuMDQuMjAxOSAxOTo0OCwgS2V2aW4gV29sZiB3cm90ZToNCj4+IEFtIDExLjA0LjIwMTkgdW0g
-MTY6NDggaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+Pj4g
-MTEuMDQuMjAxOSAxNzoxNSwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4gQW0gMTEuMDQuMjAxOSB1
-bSAxNTo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+
-Pj4+IDI1LjAyLjIwMTkgMTg6MTksIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+Pj4gYmRydl9kcmFp
-bigpIG11c3Qgbm90IGxlYXZlIGNvbm5lY3Rpb25fY28gc2NoZWR1bGVkLCBzbyBicy0+aW5fZmxp
-Z2h0DQo+Pj4+Pj4gbmVlZHMgdG8gYmUgaW5jcmVhc2VkIHdoaWxlIHRoZSBjb3JvdXRpbmUgaXMg
-d2FpdGluZyB0byBiZSBzY2hlZHVsZWQNCj4+Pj4+PiBpbiB0aGUgbmV3IEFpb0NvbnRleHQgYWZ0
-ZXIgbmJkX2NsaWVudF9hdHRhY2hfYWlvX2NvbnRleHQoKS4NCj4+Pj4+DQo+Pj4+PiBIaSENCj4+
-Pj4+DQo+Pj4+PiBJIGhhdmUgc29tZSBxdWVzdGlvbnMsIGNvdWxkIHlvdSBleHBsYWluLCBwbGVh
-c2U/DQo+Pj4+Pg0KPj4+Pj4gImJkcnZfZHJhaW4oKSBtdXN0IG5vdCBsZWF2ZSBjb25uZWN0aW9u
-X2NvIHNjaGVkdWxlZCIgLSBpdCdzIGJlY2F1c2Ugd2Ugd2FudCB0byBiZQ0KPj4+Pj4gc3VyZSB0
-aGF0IGNvbm5lY3Rpb25fY28geWllbGRlZCBmcm9tIG5iZF9yZWFkX2VvZiwgeWVzPw0KPj4+Pj4N
-Cj4+Pj4+IEJ1dCBpdCBpcyBndWFyYW50ZWVkIGJ5IGFpb193YWl0X2JoX29uZXNob3QuLiBXaHkg
-ZG8gd2UgbmVlZCBhZGRpdGlvaW5hbGx5IGluYy9kZWMNCj4+Pj4+IGJzLT5pbl9mbGlnaHQgPw0K
-Pj4+Pg0KPj4+PiBXaXRob3V0IGluY3JlbWVudGluZyBicy0+aW5fZmxpZ2h0LCBub3RoaW5nIHdv
-dWxkIGd1YXJhbnRlZSB0aGF0DQo+Pj4+IGFpb19wb2xsKCkgaXMgY2FsbGVkIGFuZCB0aGUgQkgg
-aXMgYWN0dWFsbHkgZXhlY3V0ZWQgYmVmb3JlIGJkcnZfZHJhaW4oKQ0KPj4+PiByZXR1cm5zLg0K
-Pj4+DQo+Pj4gRG9uJ3QgZm9sbG93Li4gRG9uJ3Qgd2Ugd2FudCBleGFjdGx5IHRoaXMsIHdlIHdh
-bnQgQkggdG8gYmUgZXhlY3V0ZWQgd2hpbGUgbm9kZSBpcyBzdGlsbA0KPj4+IGRyYWluZWQsIGFz
-IHlvdSB3cml0ZSBpbiBjb21tZW50Pw0KPj4NCj4+IFllcywgZXhhY3RseS4gQnV0IGlmIGJzLT5p
-bl9mbGlnaHQgPT0gMCwgdGhlIEFJT19XQUlUX1dISUxFKCkgY29uZGl0aW9uDQo+PiBpbiB0aGUg
-ZHJhaW4gY29kZSBjb3VsZCBiZWNvbWUgZmFsc2UsIHNvIGFpb19wb2xsKCkgd291bGQgbm90IGJl
-IGNhbGxlZA0KPj4gYWdhaW4gYW5kIGRyYWluIHdvdWxkIHJldHVybiBldmVuIGlmIHRoZSBCSCBp
-cyBzdGlsbCBwZW5kaW5nLg0KPj4NCj4gDQo+IEFoLCBvb3BzLCBzb3JyeSBteSBFbmdsaXNoLCBJ
-IHJlYWQgaXQgbGlrZSAibm90aGluZyB3b3VsZCBwcmV2ZW50Ii4gVW5kZXJzdGFuZCBub3csIHRo
-YW5rcy4NCg0KT3Igbm90IGFnYWluLi4gV2Ugd2lsbCBub3QgcmV0dXJuIHRvIGRyYWluIGNvZGUs
-IGFzIHdlIHdpbGwgbG9vcCBpbiBhaW9fd2FpdF9iaF9vbmVzaG90LA0Kd2hpY2ggd2lsbCBub3Qg
-cmV0dXJuIHVudGlsIEJIIGhhbmRsZWQNCg0KPiANCj4+Pj4NCj4+Pj4+Pg0KPj4+Pj4+IFNpZ25l
-ZC1vZmYtYnk6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+DQo+Pj4+Pj4gLS0tDQo+Pj4+
-Pj4gwqDCoMKgIGJsb2NrL25iZC1jbGllbnQuYyB8IDIwICsrKysrKysrKysrKysrKysrKy0tDQo+
-Pj4+Pj4gwqDCoMKgIDEgZmlsZSBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9u
-cygtKQ0KPj4+Pj4+DQo+Pj4+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC1jbGllbnQuYyBiL2Js
-b2NrL25iZC1jbGllbnQuYw0KPj4+Pj4+IGluZGV4IDYwZjM4ZjAzMjAuLmJmYmFmN2ViZTkgMTAw
-NjQ0DQo+Pj4+Pj4gLS0tIGEvYmxvY2svbmJkLWNsaWVudC5jDQo+Pj4+Pj4gKysrIGIvYmxvY2sv
-bmJkLWNsaWVudC5jDQo+Pj4+Pj4gQEAgLTk3NywxNCArOTc3LDMwIEBAIHZvaWQgbmJkX2NsaWVu
-dF9kZXRhY2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4+Pj4gwqDCoMKg
-wqDCoMKgwqAgcWlvX2NoYW5uZWxfZGV0YWNoX2Fpb19jb250ZXh0KFFJT19DSEFOTkVMKGNsaWVu
-dC0+aW9jKSk7DQo+Pj4+Pj4gwqDCoMKgIH0NCj4+Pj4+PiArc3RhdGljIHZvaWQgbmJkX2NsaWVu
-dF9hdHRhY2hfYWlvX2NvbnRleHRfYmgodm9pZCAqb3BhcXVlKQ0KPj4+Pj4+ICt7DQo+Pj4+Pj4g
-K8KgwqDCoCBCbG9ja0RyaXZlclN0YXRlICpicyA9IG9wYXF1ZTsNCj4+Pj4+PiArwqDCoMKgIE5C
-RENsaWVudFNlc3Npb24gKmNsaWVudCA9IG5iZF9nZXRfY2xpZW50X3Nlc3Npb24oYnMpOw0KPj4+
-Pj4+ICsNCj4+Pj4+PiArwqDCoMKgIC8qIFRoZSBub2RlIGlzIHN0aWxsIGRyYWluZWQsIHNvIHdl
-IGtub3cgdGhlIGNvcm91dGluZSBoYXMgeWllbGRlZCBpbg0KPj4+Pj4+ICvCoMKgwqDCoCAqIG5i
-ZF9yZWFkX2VvZigpLCB0aGUgb25seSBwbGFjZSB3aGVyZSBicy0+aW5fZmxpZ2h0IGNhbiByZWFj
-aCAwLCBvciBpdCBpcw0KPj4+Pj4+ICvCoMKgwqDCoCAqIGVudGVyZWQgZm9yIHRoZSBmaXJzdCB0
-aW1lLiBCb3RoIHBsYWNlcyBhcmUgc2FmZSBmb3IgZW50ZXJpbmcgdGhlDQo+Pj4+Pj4gK8KgwqDC
-oMKgICogY29yb3V0aW5lLiovDQo+Pj4+Pj4gK8KgwqDCoCBxZW11X2Fpb19jb3JvdXRpbmVfZW50
-ZXIoYnMtPmFpb19jb250ZXh0LCBjbGllbnQtPmNvbm5lY3Rpb25fY28pOw0KPj4+Pj4+ICvCoMKg
-wqAgYmRydl9kZWNfaW5fZmxpZ2h0KGJzKTsNCj4+Pj4+PiArfQ0KPj4+Pj4+ICsNCj4+Pj4+PiDC
-oMKgwqAgdm9pZCBuYmRfY2xpZW50X2F0dGFjaF9haW9fY29udGV4dChCbG9ja0RyaXZlclN0YXRl
-ICpicywNCj4+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEFpb0NvbnRleHQgKm5ld19jb250ZXh0
-KQ0KPj4+Pj4+IMKgwqDCoCB7DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgwqAgTkJEQ2xpZW50U2Vzc2lv
-biAqY2xpZW50ID0gbmJkX2dldF9jbGllbnRfc2Vzc2lvbihicyk7DQo+Pj4+Pj4gwqDCoMKgwqDC
-oMKgwqAgcWlvX2NoYW5uZWxfYXR0YWNoX2Fpb19jb250ZXh0KFFJT19DSEFOTkVMKGNsaWVudC0+
-aW9jKSwgbmV3X2NvbnRleHQpOw0KPj4+Pj4+IC3CoMKgwqAgLyogRklYTUUgUmVhbGx5IG5lZWQg
-YSBiZHJ2X2luY19pbl9mbGlnaHQoKSBoZXJlICovDQo+Pj4+Pj4gLcKgwqDCoCBhaW9fY29fc2No
-ZWR1bGUobmV3X2NvbnRleHQsIGNsaWVudC0+Y29ubmVjdGlvbl9jbyk7DQo+Pj4+Pj4gK8KgwqDC
-oCBiZHJ2X2luY19pbl9mbGlnaHQoYnMpOw0KPj4+Pj4+ICsNCj4+Pj4+PiArwqDCoMKgIC8qIE5l
-ZWQgdG8gd2FpdCBoZXJlIGZvciB0aGUgQkggdG8gcnVuIGJlY2F1c2UgdGhlIEJIIG11c3QgcnVu
-IHdoaWxlIHRoZQ0KPj4+Pj4+ICvCoMKgwqDCoCAqIG5vZGUgaXMgc3RpbGwgZHJhaW5lZC4gKi8N
-Cj4+Pj4+PiArwqDCoMKgIGFpb193YWl0X2JoX29uZXNob3QobmV3X2NvbnRleHQsIG5iZF9jbGll
-bnRfYXR0YWNoX2Fpb19jb250ZXh0X2JoLCBicyk7DQo+Pj4+Pj4gwqDCoMKgIH0NCj4+Pj4+PiDC
-oMKgwqAgdm9pZCBuYmRfY2xpZW50X2Nsb3NlKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4+Pj4+
-DQo+Pj4+Pg0KPj4+Pj4NCj4+Pj4+IC0tIA0KPj4+Pj4gQmVzdCByZWdhcmRzLA0KPj4+Pj4gVmxh
-ZGltaXINCj4+Pg0KPj4+DQo+Pj4gLS0gDQo+Pj4gQmVzdCByZWdhcmRzLA0KPj4+IFZsYWRpbWly
-DQo+IA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Reconnect will be implemented in the following commit, so for now,
+in semantics below, disconnect itself is a "serious error".
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qapi/block-core.json | 12 +++++++++++-
+ block/nbd-client.h   |  1 +
+ block/nbd-client.c   |  1 +
+ block/nbd.c          | 16 +++++++++++++++-
+ 4 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ccbfff9d0..815258bd89 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3798,13 +3798,23 @@
+ #                  traditional "base:allocation" block status (see
+ #                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol) (since 3.0)
+ #
++# @reconnect-delay: Reconnect delay. On unexpected disconnect, nbd client tries
++#                   to connect again, until success or serious error. During
++#                   first @reconnect-delay seconds of reconnecting loop all
++#                   requests are paused and have a chance to rerun, if
++#                   successful connect occurs during this time. After
++#                   @reconnect-delay seconds all delayed requests are failed
++#                   and all following requests will be failed too (until
++#                   successful reconnect). Default 0 (Since 4.1)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsNbd',
+   'data': { 'server': 'SocketAddress',
+             '*export': 'str',
+             '*tls-creds': 'str',
+-            '*x-dirty-bitmap': 'str' } }
++            '*x-dirty-bitmap': 'str',
++            '*reconnect-delay': 'uint32' } }
+ 
+ ##
+ # @BlockdevOptionsRaw:
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index e45b7b0a14..91a6b32bdd 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -52,6 +52,7 @@ int nbd_client_init(BlockDriverState *bs,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
+                     const char *x_dirty_bitmap,
++                    uint32_t reconnect_delay,
+                     Error **errp);
+ void nbd_client_close(BlockDriverState *bs);
+ 
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 9f5c86eaa3..1359aff162 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -1218,6 +1218,7 @@ int nbd_client_init(BlockDriverState *bs,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
+                     const char *x_dirty_bitmap,
++                    uint32_t reconnect_delay,
+                     Error **errp)
+ {
+     int ret;
+diff --git a/block/nbd.c b/block/nbd.c
+index 208be59602..cffb2aee89 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -360,6 +360,18 @@ static QemuOptsList nbd_runtime_opts = {
+             .help = "experimental: expose named dirty bitmap in place of "
+                     "block status",
+         },
++        {
++            .name = "reconnect-delay",
++            .type = QEMU_OPT_NUMBER,
++            .help = "Reconnect delay. On unexpected disconnect, nbd client "
++                    "tries to connect again, until success or serious error. "
++                    "During first @reconnect-delay seconds of reconnecting "
++                    "loop all requests are paused and have a chance to rerun, "
++                    "if successful connect occurs during this time. After"
++                    "@reconnect-delay seconds all delayed requests are failed"
++                    "and all following requests will be failed too (until"
++                    "successful reconnect). Default 0",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -411,7 +423,9 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     /* NBD handshake */
+     ret = nbd_client_init(bs, s->saddr, s->export, tlscreds, hostname,
+-                          qemu_opt_get(opts, "x-dirty-bitmap"), errp);
++                          qemu_opt_get(opts, "x-dirty-bitmap"),
++                          qemu_opt_get_number(opts, "reconnect-delay", 0),
++                          errp);
+ 
+  error:
+     if (tlscreds) {
+-- 
+2.18.0
