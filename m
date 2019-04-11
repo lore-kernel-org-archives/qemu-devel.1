@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48434)
+Received: from eggs.gnu.org ([209.51.188.92]:48504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEUeA-0008N5-2o
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:23 -0400
+	(envelope-from <clg@kaod.org>) id 1hEUeR-0000AI-Se
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEUe8-0008Ny-0J
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:22 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:33211)
+	(envelope-from <clg@kaod.org>) id 1hEUeQ-00008F-G6
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:39 -0400
+Received: from 3.mo7.mail-out.ovh.net ([46.105.34.113]:43711)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEUe7-0008Mt-Hr
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:19 -0400
-Received: from player779.ha.ovh.net (unknown [10.109.159.152])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id C12104E3E3
-	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 10:01:16 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEUeN-0008Qu-T6
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 04:01:37 -0400
+Received: from player779.ha.ovh.net (unknown [10.109.143.146])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 8716710E81D
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 10:01:24 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 11 Apr 2019 10:00:03 +0200
-Message-Id: <20190411080004.8690-6-clg@kaod.org>
+Date: Thu, 11 Apr 2019 10:00:04 +0200
+Message-Id: <20190411080004.8690-7-clg@kaod.org>
 In-Reply-To: <20190411080004.8690-1-clg@kaod.org>
 References: <20190411080004.8690-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE updates
+Subject: [Qemu-devel] [PATCH 6/6] ppc: Fix radix RC updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,131 +34,159 @@ Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-d
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On some architectures, PTE updates for dirty and changed bits need
-to be performed atomically. This adds a couple of address_space_cmpxchg*
-helpers for that purpose.
+They should be atomic for MTTCG. Note: a real POWER9 core doesn't actuall=
+y
+implement atomic PTE updates, it always fault for SW to handle it. Only
+the nest MMU (used by some accelerator devices and GPUs) implements
+those HW updates.
+
+However, the architecture does allow the core to do it, and doing so
+in TCG is faster than letting the guest do it.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/exec/memory_ldst.inc.h |  6 +++
- memory_ldst.inc.c              | 80 ++++++++++++++++++++++++++++++++++
- 2 files changed, 86 insertions(+)
+ target/ppc/cpu.h         |  1 +
+ target/ppc/mmu-radix64.c | 70 +++++++++++++++++++++++++++++++++-------
+ 2 files changed, 60 insertions(+), 11 deletions(-)
 
-diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst.in=
-c.h
-index 272c20f02eae..f3cfa7e9a622 100644
---- a/include/exec/memory_ldst.inc.h
-+++ b/include/exec/memory_ldst.inc.h
-@@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq, SUFFIX)(ARG1_D=
-ECL,
-     hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
- extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
-+extern uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-+    MemTxResult *result);
-+extern uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-+    MemTxResult *result);
- extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
-     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
- extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index acf865b900d7..1d58d2fea67d 100644
---- a/memory_ldst.inc.c
-+++ b/memory_ldst.inc.c
-@@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_D=
-ECL,
-     RCU_READ_UNLOCK();
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index a4420636dde0..5b4249ebdcbf 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -503,6 +503,7 @@ typedef struct ppc_v3_pate_t {
+ #define DSISR_AMR                0x00200000
+ /* Unsupported Radix Tree Configuration */
+ #define DSISR_R_BADCONFIG        0x00080000
++#define DSISR_ATOMIC_RC          0x00040000
+=20
+ /* SRR1 error code fields */
+=20
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index cac076ee92d9..458085d79ee0 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -28,6 +28,15 @@
+ #include "mmu-radix64.h"
+ #include "mmu-book3s-v3.h"
+=20
++static inline bool ppc_radix64_hw_rc_updates(CPUPPCState *env)
++{
++#ifdef CONFIG_ATOMIC64
++    return true;
++#else
++    return !qemu_tcg_mttcg_enabled();
++#endif
++}
++
+ static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr=
+ eaddr,
+                                                  uint64_t *lpid, uint64_=
+t *pid)
+ {
+@@ -136,11 +145,19 @@ static bool ppc_radix64_check_prot(PowerPCCPU *cpu,=
+ int rwx, uint64_t pte,
+         return true;
+     }
+=20
++    /* Check RC bits if necessary */
++    if (!ppc_radix64_hw_rc_updates(env)) {
++        if (!(pte & R_PTE_R) || ((rwx =3D=3D 1) && !(pte & R_PTE_C))) {
++            *fault_cause |=3D DSISR_ATOMIC_RC;
++            return true;
++        }
++    }
++
+     return false;
  }
 =20
-+/* This is meant to be used for atomic PTE updates under MT-TCG */
-+uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-+    MemTxResult *result)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l =3D 4;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    uint8_t dirty_log_mask;
-+
-+    /* Must test result */
-+    assert(result);
-+
-+    RCU_READ_LOCK();
-+    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-+    if (l < 4 || !memory_access_is_direct(mr, true)) {
-+        r =3D MEMTX_ERROR;
-+    } else {
-+        uint32_t orig =3D old;
-+
-+        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-+        old =3D atomic_cmpxchg(ptr, orig, new);
-+
-+        if (old =3D=3D orig) {
-+            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-+            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-+            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
-dr(mr) +
-+                                                addr, 4, dirty_log_mask)=
-;
-+        }
-+        r =3D MEMTX_OK;
+-static void ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte,
+-                               hwaddr pte_addr, int *prot)
++static uint64_t ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pt=
+e,
++                                   hwaddr pte_addr)
+ {
+     CPUState *cs =3D CPU(cpu);
+     uint64_t npte;
+@@ -149,17 +166,39 @@ static void ppc_radix64_set_rc(PowerPCCPU *cpu, int=
+ rwx, uint64_t pte,
+=20
+     if (rwx =3D=3D 1) { /* Store/Write */
+         npte |=3D R_PTE_C; /* Set change bit */
+-    } else {
 +    }
-+    *result =3D r;
-+    RCU_READ_UNLOCK();
-+
-+    return old;
-+}
++    if (pte =3D=3D npte) {
++        return pte;
++    }
 +
 +#ifdef CONFIG_ATOMIC64
-+/* This is meant to be used for atomic PTE updates under MT-TCG */
-+uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-+    MemTxResult *result)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l =3D 8;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    uint8_t dirty_log_mask;
++    if (qemu_tcg_mttcg_enabled()) {
++        uint64_t old_be =3D cpu_to_be32(pte);
++        uint64_t new_be =3D cpu_to_be32(npte);
++        MemTxResult result;
++        uint64_t old_ret;
 +
-+    /* Must test result */
-+    assert(result);
-+
-+    RCU_READ_LOCK();
-+    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-+    if (l < 8 || !memory_access_is_direct(mr, true)) {
-+        r =3D MEMTX_ERROR;
-+    } else {
-+        uint32_t orig =3D old;
-+
-+        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-+        old =3D atomic_cmpxchg(ptr, orig, new);
-+
-+        if (old =3D=3D orig) {
-+            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-+            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-+            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
-dr(mr) +
-+                                                addr, 8, dirty_log_mask)=
-;
++        old_ret =3D address_space_cmpxchgq_notdirty(cs->as, pte_addr,
++                                                  old_be, new_be,
++                                                  MEMTXATTRS_UNSPECIFIED=
+,
++                                                  &result);
++        if (result =3D=3D MEMTX_OK) {
++            if (old_ret !=3D old_be && old_ret !=3D new_be) {
++                return 0;
++            }
++            return npte;
 +        }
-+        r =3D MEMTX_OK;
++
+         /*
+-         * Treat the page as read-only for now, so that a later write
+-         * will pass through this function again to set the C bit.
++         * Do we need to support this case where PTEs aren't in RAM ?
++         *
++         * For now fallback to non-atomic case
+          */
+-        *prot &=3D ~PAGE_WRITE;
+     }
++#endif
+=20
+-    if (pte ^ npte) { /* If pte has changed then write it back */
+-        stq_phys(cs->as, pte_addr, npte);
+-    }
++    stq_phys(cs->as, pte_addr, npte);
++    return npte;
+ }
+=20
+ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, vaddr eaddr,
+@@ -288,6 +327,7 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vad=
+dr eaddr, int rwx,
+=20
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size =3D PRTBE_R_GET_RTS(prtbe0);
++ restart:
+     pte =3D ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+                                 prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_=
+RPDS,
+                                 &raddr, &page_size, &fault_cause, &pte_a=
+ddr);
+@@ -298,8 +338,16 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr, int rwx,
+     }
+=20
+     /* Update Reference and Change Bits */
+-    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, &prot);
+-
++    if (ppc_radix64_hw_rc_updates(env)) {
++        pte =3D ppc_radix64_set_rc(cpu, rwx, pte, pte_addr);
++        if (!pte) {
++            goto restart;
++        }
 +    }
-+    *result =3D r;
-+    RCU_READ_UNLOCK();
-+
-+    return old;
-+}
-+#endif /* CONFIG_ATOMIC64 */
-+
- /* warning: addr must be aligned */
- static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
-     hwaddr addr, uint32_t val, MemTxAttrs attrs,
++    /* If the page doesn't have C, treat it as read only */
++    if (!(pte & R_PTE_C)) {
++        prot &=3D ~PAGE_WRITE;
++    }
+     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
+                  prot, mmu_idx, 1UL << page_size);
+     return 0;
 --=20
 2.20.1
