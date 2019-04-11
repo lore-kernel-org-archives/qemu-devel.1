@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34147)
+Received: from eggs.gnu.org ([209.51.188.92]:35254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfr7-0004pY-E9
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:59:30 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hEfuG-0006Sr-Op
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEfr6-0008LS-1x
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 15:59:29 -0400
-References: <20181126105125.30973-1-marcandre.lureau@redhat.com>
-	<7c5bc3fe-116e-f29c-977d-cac890bdfa93@redhat.com>
-	<1d019621-50b2-1118-a477-e7fffc8147ff@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6ee8f393-2760-9b06-cc7f-8d9e5ce48930@vivier.eu>
-Date: Thu, 11 Apr 2019 21:59:19 +0200
+	(envelope-from <jsnow@redhat.com>) id 1hEfuE-0001fV-7Y
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:02:44 -0400
+References: <20190410012413.31569-1-jsnow@redhat.com>
+	<20190410012413.31569-3-jsnow@redhat.com>
+	<87sguq2yn1.fsf@dusky.pond.sub.org>
+	<004289a6-9df9-ae99-53e6-56e555709434@redhat.com>
+	<87a7gxukmj.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <01d9a861-cc2a-38a0-c471-cfefa9dbbf3b@redhat.com>
+Date: Thu, 11 Apr 2019 16:02:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <1d019621-50b2-1118-a477-e7fffc8147ff@redhat.com>
+In-Reply-To: <87a7gxukmj.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] doc: fix the configuration
- path
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] pxtool: Add new qemu-img command
+ info generation tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 30/03/2019 17:30, Thomas Huth wrote:
-> On 07/02/2019 17.31, Philippe Mathieu-Daudé wrote:
->> On 11/26/18 11:51 AM, Marc-André Lureau wrote:
->>> Use a CONFDIR variable to show the configured sysconf path in the
->>> generated documentations (html, man pages etc).
+
+
+On 4/11/19 2:22 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 4/10/19 1:54 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
 >>>
->>> Related to:
->>> https://bugzilla.redhat.com/show_bug.cgi?id=1644985
+>>>> Presently we use hxtool and a .hx format to generate a few things like
+>>>> the qemu_img subcommand dispatch table, the qemu_img help() display output,
+>>>> and a help output in qemu-img.texi.
+>>>>
+>>>> Unfortunately, this means that this information is duplicated in at least
+>>>> three places:
+>>>>
+>>>> (1) in qemu-img-cmds.hx as a human readable string
+>>>> (2) in qemu-img-cmds.hx as a texi string
+>>>> (3) in qemu-img.texi again, as a texi string
+>>>>
+>>>> We can do a little better, though: all of these sources can be generated
+>>>> from a single json file. Add a new small tool ("pxtool") that can do this.
+>>>>
+>>>> This tool can at least handle generating (1) and (2) from the same source
+>>>> without needing to reduplicate that information. Deduplicating (3) happens
+>>>> in the next patch.
+>>>>
+>>>> Notes:
+>>>>  - The json format was chosen to be very "stupid", and the command line
+>>>>    documentation is being kept one-per-line to make future diffs easier
+>>>>    to read.
+>>>>  - It's easy enough to generate the human-readable output from the texi
+>>>>    output by removing '@var{foo}' with 'foo'.
+>>>>  - The qemu-img command dispatch always calls img_cmdname, so we don't
+>>>>    need to store this information separately, either.
+>>>>  - The need for DEF() macros could be removed as well, but I left it in
+>>>>    to create a minimally disruptive patch.
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
 >>>
->>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>> We got just five .hx:
+>>>
+>>>     qemu-img.cmds.hx            killed off by this patch
+>>>     qemu-options.hx             CLI QAPIfication should kill this off
+>>>     hw/audio/pl041.hx           misnamed, not actually food for hxtool
+>>>     hmp-commands.hx             no exit strategy
+>>>     hmp-commands-info.hx            for these two, yet
+>>>
+>>> CLI QAPIfication got stuck in the back-burner, and as long as that's the
+>>> case, it's not an alternative to your patches.
+>>>
 >>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Good to know. I figure that at least while we wait on something more
+>> comprehensive there's no real short term harm in tidying up.
 >>
->>> ---
->>>  Makefile     | 9 ++++++---
->>>  qemu-ga.texi | 4 ++--
->>>  2 files changed, 8 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index 9cc4dae1a6..a39c231d1c 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -932,11 +932,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
->>>  MAKEINFO=makeinfo
->>>  MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
->>>  MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
->>> -TEXI2PODFLAGS=$(MAKEINFOINCLUDES) "-DVERSION=$(VERSION)"
->>> +TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
->>>  TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
->>>  
->>> -docs/version.texi: $(SRC_PATH)/VERSION
->>> -	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
->>> +docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
->>> +	$(call quiet-command,(\
->>> +		echo "@set VERSION $(VERSION)" && \
->>> +		echo "@set CONFDIR $(qemu_confdir)" \
->>> +	)> $@,"GEN","$@")
->>>  
->>>  %.html: %.texi docs/version.texi
->>>  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
->>> diff --git a/qemu-ga.texi b/qemu-ga.texi
->>> index 4c7a8fd163..f00ad830f2 100644
->>> --- a/qemu-ga.texi
->>> +++ b/qemu-ga.texi
->>> @@ -30,7 +30,7 @@ set user's password
->>>  @end itemize
->>>  
->>>  qemu-ga will read a system configuration file on startup (located at
->>> -@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
->>> +@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
->>>  configuration options on the command line. For the same key, the last
->>>  option wins, but the lists accumulate (see below for configuration
->>>  file format).
->>> @@ -58,7 +58,7 @@ file format).
->>>    Enable fsfreeze hook. Accepts an optional argument that specifies
->>>    script to run on freeze/thaw. Script will be called with
->>>    'freeze'/'thaw' arguments accordingly (default is
->>> -  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
->>> +  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
->>>    not follow -F with a space (for example:
->>>    @samp{-F/var/run/fsfreezehook.sh}).
+>> Something I'd really like to do is define a python/json-esque
+>> configuration file that allows you to specify some "common options" that
+>> are shared between all of the sub-commands, and then define each command
+>> in terms of both which common options it possesses, and then any local
+>> command-specific options it has.
+>>
+>> (Why the common options design? So that argument names and command
+>> options can be encouraged to be identical and identically documented
+>> between all subcommands that use them.)
 > 
-> Ping^2
+> In QAPI, you'd define a common base type.
 > 
-> I think this could also go via qemu-trivial...?
+>> Then, from the configuration file, generate all of the necessary C
+>> parsers (I have a protoype for this, it's not difficult to do in at
+>> least the basic case) that can return boxed command arguments, and then
+>> also generate the help strings from that metadata.
 > 
->  Thomas
+> With QAPI, we generate reference documentation from the doc comments.
+> 
+> My RFC patches for command line QAPIfication generate a CLI parser using
+> getopt_long_only().
+> 
+> They keep help texts in the QAPI schema.  Generating their formal part
+> from the type definition should be feasible.  Generating it without
+> regressing readability might turn out to be non-trivial.
+> 
+> My patches generate *one* CLI parser.  We have many, and some of them
+> want to share types.  There's more than one way to skin this cat, but
+> it'll have to be skinned.
+> 
+>> I suspect that work *IS* something that might brush up against / should
+>> use (or extend) QAPI code.
+> 
+> Seems likely.
+> 
+>> Then, I'd like to find a way to split qemu-img.texi into sub-command
+>> files and find a way to source the same "informative text" for both:
+>>
+>> (1) The texi output, as per usual, and
+>> (2) qemu-img subcommand --help
+>>
+>> such that --help, when passed as an argument to the subcommand, prints
+>> out help only relevant to the subcommand instead, e.g.
+>>
+>> `qemu-img check --help`
+>>
+>> might print the "common options" section only as it relates to commands
+>> actually used by the check command, then prints the check section of the
+>> texi as formatted for terminals.
+>>
+>> This way, we can have manpages, html pages, and interactive help text
+>> all derived from the same semi-automated sources, always up to date and
+>> much easier to read/discover/parse by human eyeballs.
+>>
+>> That's what I'd like to accomplish, ultimately.
+>>
+>> For now, I think this RFC set is not harmful and won't bother anybody.
+>> It's definitely not worse than what we have now, fragility of removing
+>> @var{} tokens and all.
+> 
+> Makes sense.  I just hope we can avoid duplicating work.
 > 
 
-Applied to my trivial-patches branch.
+I'm not going to proceed any further than this RFC without us having a
+meeting to discuss the work. I'm willing to learn QAPI and do it a bit,
+it's a thread I'd rather like to pull, but I don't want to duplicate any
+work, no.
 
-Thanks,
-Laurent
+If that involves me reviewing patches when the tree opens, please CC me,
+and let's have a chat!
+
+In the meantime, what are your thoughts on patches 2-3 here?
+
+--js
