@@ -3,66 +3,115 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC9DC10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC50C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFD1520850
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:11:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD1520850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D81082084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 18:16:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81082084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53115 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53155 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEeAv-00023v-1K
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:11:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35927)
+	id 1hEeFO-00039S-TH
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 14:16:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEeAB-0001e4-SB
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:11:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEeEF-0002eX-EK
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEeAA-0000kt-LQ
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:11:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hEeAA-0000jt-9w
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:11:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30BCF330258;
-	Thu, 11 Apr 2019 18:11:00 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-126-53.rdu2.redhat.com
-	[10.10.126.53])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AB0995C8BC;
-	Thu, 11 Apr 2019 18:10:57 +0000 (UTC)
-To: "Singh, Brijesh" <brijesh.singh@amd.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190411175931.29235-1-brijesh.singh@amd.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
-Date: Thu, 11 Apr 2019 20:10:56 +0200
+	(envelope-from <laurent@vivier.eu>) id 1hEeEE-0002hH-LC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 14:15:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:59669)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hEeEC-0002f2-BG; Thu, 11 Apr 2019 14:15:12 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1N2mS2-1gkv8R21Oe-0134Vr; Thu, 11 Apr 2019 20:14:43 +0200
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+	Jason Wang <jasowang@redhat.com>
+References: <20190311102712.8572-1-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <bb6dd5eb-09d7-89bb-62f7-ecaed849cb79@vivier.eu>
+Date: Thu, 11 Apr 2019 20:14:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190411175931.29235-1-brijesh.singh@amd.com>
+In-Reply-To: <20190311102712.8572-1-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 11 Apr 2019 18:11:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:OdykfLsi7dwVQdrxUd8IGSOCWw0Ua07lpxW01X2M2xSZGpYbcFA
+	f0Gf9x42yMnMzoiqVN3CsEaaLkIXlQEAADOEaKYvoQbtr3d0bf+JTsTH8owK5iz822F8iho
+	Q+IZTDcEhYdzAyviGdIg+j9pbR+PgGEIiM/9PZGjsl/SpE7l5uvaUxB4sovqefNWm0rRisw
+	3x0RtBrenviW/yxV5ZF4Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KxK8CnguBC4=:my6vQtQy/d66/2/s8l+Bc/
+	nj7WjRUqTHzzMKc7YWeNjIArFjuzoJtElagE/ynmY3huRkAcGmCbH6mb/aTeSfcz6MSKvEUXr
+	n8cVXEAyJPtAdNGXDgkecIb4GP2LGxPMzo1P2XKCLWQCRNEe7VtnBCvvkM3RShPrd1ZbJaQkK
+	hhc21/QuXMgh5F0HazqA+lCWSOsM2J8inranpuFeE3cUTi1R4rSNjya2jo+p9eGeeBRHk0c4B
+	EyVYq5MB6UlCMNcs503EhgWJrZyFn8ZFpXYvSISxGVCzxogs4ffafbd+yPN1BQA3rZhgniNKA
+	SOwReE1Z0Pp6wogEXxadd4vZgGysBQ/0T68XOp/lQwa5cqs4dcKSpG8376t9EcLH5sPeJ2g17
+	nIvaw5WIUvtTG6K07fKWy0fslodHbsR17SWds9VFSZw9a8qMXcU56MFCiH+ipmPTFOZVifqtz
+	PXpjoI+Ws0pZQ89Ni9w+KQZ5NxnKuYLZBPCvAwmbXbN4lZtiY0VU+8f0lD50cCpxpzEeCwW10
+	8RNEdJGPecV4RLKypMsMtjQ4BPRZFJph3XFtIUH1I//NV+ceo7u0jlDWkCo0yfvgaQegIJdge
+	1ijb0Ky2v/yHCjXgk4X5sbOtJrU4zie+H/XOZr6dnbd21bEQvNmH3IyskN9/xt4+kRYeXAi0A
+	hVUImKScBNE7RTp+9tV/f0zF9/04gHG/0uAsto4ISoXOynZrHXF8TtCAiim3VjBZ/zHg3ISJ6
+	KX0Al6rBDqbjqEA/oiyMEWFB399LE+GTki4z26Acwnt1ZPx0zyUqz4jXKSg=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+X-Received-From: 212.227.17.13
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw/net/pcnet: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,102 +123,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	Erik Skultety <eskultet@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411181056.0523B4nMYTH0A9TjRq4D_nD5ryFleJX5jB6QImKmC8U@z>
+Message-ID: <20190411181441.rbH4LprDnC_nxKV5BupbxNnJ-PcVysCCyqZWGYEYjcs@z>
 
-On 04/11/19 19:59, Singh, Brijesh wrote:
-> There are limited numbers of the SEV guests that can be run concurrentl=
-y.
-> A management applications may need to know this limit so that it can pl=
-ace
-> SEV VMs on hosts which have suitable resources available.
->=20
-> Currently, this limit is not exposed to the application. Add a new
-> 'sev-max-guest' field in the query-sev-capabilities to provide this
-> information.
->=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Erik Skultety <eskultet@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On 11/03/2019 11:27, Philippe Mathieu-Daudé wrote:
+> Avoid to clutter stdout until explicitly requested
+> (with -d guest_errors):
+> 
+>   $ qemu-system-mips -M malta -m 512 -kernel vmlinux-3.2.0-4-4kc-malta
+>   Bad SWSTYLE=0x04
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  qapi/target.json  | 6 ++++--
->  target/i386/sev.c | 6 ++++--
->  2 files changed, 8 insertions(+), 4 deletions(-)
->=20
-> diff --git a/qapi/target.json b/qapi/target.json
-> index 1d4d54b600..b45121d30b 100644
-> --- a/qapi/target.json
-> +++ b/qapi/target.json
-> @@ -183,7 +183,8 @@
->    'data': { 'pdh': 'str',
->              'cert-chain': 'str',
->              'cbitpos': 'int',
-> -            'reduced-phys-bits': 'int'},
-> +            'reduced-phys-bits': 'int',
-> +            'sev-max-guests': 'int'},
+> Helge patch "pcnet: Avoid warning when switching back to 16bit mode"
+> remembered me I had this one somewhere.
+> ---
+>  hw/net/pcnet.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+> index d9ba04bdfc..16683091c9 100644
+> --- a/hw/net/pcnet.c
+> +++ b/hw/net/pcnet.c
+> @@ -36,6 +36,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "hw/qdev.h"
+>  #include "net/net.h"
+>  #include "net/eth.h"
+> @@ -1501,7 +1502,8 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_t rap, uint32_t val)
+>              val |= 0x0300;
+>              break;
+>          default:
+> -            printf("Bad SWSTYLE=0x%02x\n", val & 0xff);
+> +            qemu_log_mask(LOG_GUEST_ERROR, "pcnet: Bad SWSTYLE=0x%02x\n",
+> +                          val & 0xff);
+>              val = 0x0200;
+>              break;
+>          }
+> 
 
-Would it be useful to make this new field optional? E.g. if it was
-missing, libvirtd could assume "no limit".
+Applied to my trivial-patches branch.
 
-Again, not sure if that's useful, but it's not hard to introduce the
-field as optional now. Removing mandatory fields later is impossible.
-
-Thanks
-Laszlo
-
->    'if': 'defined(TARGET_I386)' }
-> =20
->  ##
-> @@ -200,7 +201,8 @@
->  #
->  # -> { "execute": "query-sev-capabilities" }
->  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
-> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
-> +#                  "cbitpos": 47, "reduced-phys-bits": 5,
-> +#                  "sev-max-guests" : 15}}
->  #
->  ##
->  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index cd77f6b5d4..bb0cd79acd 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -488,7 +488,7 @@ sev_get_capabilities(void)
->      guchar *pdh_data =3D NULL;
->      guchar *cert_chain_data =3D NULL;
->      size_t pdh_len =3D 0, cert_chain_len =3D 0;
-> -    uint32_t ebx;
-> +    uint32_t ebx, ecx, edx;
->      int fd;
-> =20
->      fd =3D open(DEFAULT_SEV_DEVICE, O_RDWR);
-> @@ -507,7 +507,7 @@ sev_get_capabilities(void)
->      cap->pdh =3D g_base64_encode(pdh_data, pdh_len);
->      cap->cert_chain =3D g_base64_encode(cert_chain_data, cert_chain_le=
-n);
-> =20
-> -    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-> +    host_cpuid(0x8000001F, 0, NULL, &ebx, &ecx, &edx);
->      cap->cbitpos =3D ebx & 0x3f;
-> =20
->      /*
-> @@ -516,6 +516,8 @@ sev_get_capabilities(void)
->       */
->      cap->reduced_phys_bits =3D 1;
-> =20
-> +    /* the maximum number of SEV guests that can run simultaneously */
-> +    cap->sev_max_guests =3D ecx - edx + 1;
->  out:
->      g_free(pdh_data);
->      g_free(cert_chain_data);
->=20
-
+Thanks,
+Laurent
 
