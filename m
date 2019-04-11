@@ -2,67 +2,72 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD87C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A059C10F13
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B74C20818
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:53:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B74C20818
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5207E2133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 15:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5207E2133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51154 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51248 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEc0v-00033n-Hc
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:53:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55769)
+	id 1hEc5w-0004pr-Ee
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 11:58:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEbxn-00010k-IS
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:09 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hEc58-0004Xn-LW
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:57:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEbxl-0006Ld-Ui
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:07 -0400
-Resent-Date: Thu, 11 Apr 2019 11:50:07 -0400
-Resent-Message-Id: <E1hEbxl-0006Ld-Ui@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hEbxl-0006KT-IO
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:50:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1554997772; cv=none; d=zoho.com; s=zohoarc; 
-	b=jBUVeT44NBTiCrLiP4uvj9rNbGP2mnw2qOO4WDY3uxp/l5+yqqvhGmoeoMJXN1JMgj4zyaojiLl9w1lhsljv4FchstdJX1XDWqWdz0voELhIHJk4tEynp4iUGwnWfW2ro8ydBjYJ4B3d8+2G2AvpJr+evDsiz+sY/5e/HqB6Cuc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1554997772;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=o2uNu2SHUSwCGS6givKxQQnBlzlNr7dgUVztVgM0EaQ=; 
-	b=MdwPpAssVA+W1AYzT2YXyKNsS5YJ9E1/suTFi+vjD4sI8sUBNLdsXszt6pUXjYIgRzmLnizDjG+67dlIXSGaqT7c/V5UqfTHybLrlG9+OwUmqj2kcvPo9tN0LdU/Lvy0PwRN8Cf3jfJNso1jzv0/9N8Ty8YBpiErltuStvs5D68=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1554997770172817.999063572373;
-	Thu, 11 Apr 2019 08:49:30 -0700 (PDT)
-Message-ID: <155499776897.12882.4547540276165132649@76452e4e88f2>
-In-Reply-To: <20190411152520.10061-1-armbru@redhat.com>
+	(envelope-from <pagupta@redhat.com>) id 1hEc57-0004gn-DK
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:57:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hEc56-0004gH-VE
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 11:57:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D429D30671F5;
+	Thu, 11 Apr 2019 15:57:39 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B249B69183;
+	Thu, 11 Apr 2019 15:57:39 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 17B693FB10;
+	Thu, 11 Apr 2019 15:57:39 +0000 (UTC)
+Date: Thu, 11 Apr 2019 11:57:38 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Message-ID: <1463291806.21158433.1554998258746.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Thu, 11 Apr 2019 08:49:30 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.71, 10.4.195.2]
+Thread-Topic: libnvdimm: nd_region flush callback support
+Thread-Index: GJ8qWIgyQ5yOMTJqnF06RrwSs6tgyQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 11 Apr 2019 15:57:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH 00/17] Clean up and simplify around
- fprintf_function
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,122 +79,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	virtualization@lists.linux-foundation.org,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	linux-nvdimm <linux-nvdimm@lists.01.org>,
+	Vishal L Verma <vishal.l.verma@intel.com>,
+	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
+	Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com,
+	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Xiao Guangrong <xiaoguangrong.eric@gmail.com>, cohuck@redhat.com,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-xfs <linux-xfs@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Darrick J. Wong" <darrick.wong@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411154930.UXb2pmefGM7WRXt8MQkLgIJcRYx3z-NhG0CoUAeZpRI@z>
+Message-ID: <20190411155738.AUjmT0UO9phwxpAj2x4ik2Uw5kkRzX__hR53apRI3zw@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMTE1MjUyMC4xMDA2
-MS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxMTE1MjUyMC4xMDA2MS0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTddIENsZWFuIHVwIGFuZCBz
-aW1wbGlmeSBhcm91bmQgZnByaW50Zl9mdW5jdGlvbgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTExNTI1MjAu
-MTAwNjEtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDExMTUyNTIwLjEwMDYx
-LTEtYXJtYnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
-MDE5MDQxMTE1Mzk0Mi40NTMzLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcv
-MjAxOTA0MTExNTM5NDIuNDUzMy0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM1N2JmNDA2ZTcgaW5jbHVkZTogTW92ZSBmcHJpbnRmX2Z1
-bmN0aW9uIHRvIGRpc2FzLwozZjQwZTMxZTYxIGRpc2FzOiBSZW5hbWUgaW5jbHVkZS9kaXNhcy9i
-ZmQuaCBiYWNrIHRvIGluY2x1ZGUvZGlzYXMvZGlzLWFzbS5oCmZjNDY3NTM1ZmUgbW9uaXRvcjog
-Q2xlYW4gdXAgaG93IG1vbml0b3JfZGlzYXMoKSBmdW5uZWxzIG91dHB1dCB0byBtb25pdG9yCjJm
-ZWUzMjJlNmMgcW9tL2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOmNwdV9kdW1wX3N0YXRlKCkg
-cHJpbnRzCjljYjAzMmFhNDEgcWVtdS1wcmludDogTmV3IHFlbXVfZnByaW50ZigpLCBxZW11X3Zm
-cHJpbnRmKCkKNjI2NmEyYWNiZCBxb20vY3B1OiBTaW1wbGlmeSBob3cgQ1BVQ2xhc3M6OmR1bXBf
-c3RhdGlzdGljcygpIHByaW50cwo0NjQ0NGQ2MmY4IHRhcmdldC9pMzg2OiBTaW1wbGlmeSBob3cg
-eDg2X2NwdV9kdW1wX2xvY2FsX2FwaWNfc3RhdGUoKSBwcmludHMKOTdkODNiYzlkMSB0YXJnZXQ6
-IENsZWFuIHVwIGhvdyB0aGUgZHVtcF9tbXUoKSBwcmludApjMjE4ZTM0OTZmIHRhcmdldDogU2lt
-cGxpZnkgaG93IHRoZSBUQVJHRVRfY3B1X2xpc3QoKSBwcmludApkZTRmYTQ1ZDFlIG1lbW9yeTog
-Q2xlYW4gdXAgaG93IG10cmVlX2luZm8oKSBwcmludHMKMTc3NmEzYmUxMCBibG9jay9xYXBpOiBD
-bGVhbiB1cCBob3cgd2UgcHJpbnQgdG8gbW9uaXRvciBvciBzdGRvdXQKN2FiNTk1ZDE5MyBxc3A6
-IFNpbXBsaWZ5IGhvdyBxc3BfcmVwb3J0KCkgcHJpbnRzCmUyMTUyN2IxNDMgdGNnOiBTaW1wbGlm
-eSBob3cgZHVtcF9kcmlmdF9pbmZvKCkgcHJpbnRzCjg2NmZjM2MyYjAgdGNnOiBTaW1wbGlmeSBo
-b3cgZHVtcF9leGVjX2luZm8oKSBwcmludHMKMmNiMzY2NWNkNSB0Y2c6IFNpbXBsaWZ5IGhvdyBk
-dW1wX29wY291bnRfaW5mbygpIHByaW50cwoyNTFiY2Y1N2IzIHRyYWNlOiBTaW1wbGlmeSBob3cg
-c3RfcHJpbnRfdHJhY2VfZmlsZV9zdGF0dXMoKSBwcmludHMKZDgxZmQ2MzAwYyBpbmNsdWRlOiBJ
-bmNsdWRlIGZwcmludGYtZm4uaCBvbmx5IHdoZXJlIG5lZWRlZAoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8xNyBDaGVja2luZyBjb21taXQgZDgxZmQ2MzAwYzQzIChpbmNsdWRlOiBJbmNsdWRlIGZw
-cmludGYtZm4uaCBvbmx5IHdoZXJlIG5lZWRlZCkKMi8xNyBDaGVja2luZyBjb21taXQgMjUxYmNm
-NTdiMzdhICh0cmFjZTogU2ltcGxpZnkgaG93IHN0X3ByaW50X3RyYWNlX2ZpbGVfc3RhdHVzKCkg
-cHJpbnRzKQozLzE3IENoZWNraW5nIGNvbW1pdCAyY2IzNjY1Y2Q1NmMgKHRjZzogU2ltcGxpZnkg
-aG93IGR1bXBfb3Bjb3VudF9pbmZvKCkgcHJpbnRzKQo0LzE3IENoZWNraW5nIGNvbW1pdCA4NjZm
-YzNjMmIwMzAgKHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZXhlY19pbmZvKCkgcHJpbnRzKQo1LzE3
-IENoZWNraW5nIGNvbW1pdCBlMjE1MjdiMTQzZTEgKHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZHJp
-ZnRfaW5mbygpIHByaW50cykKNi8xNyBDaGVja2luZyBjb21taXQgN2FiNTk1ZDE5MzJiIChxc3A6
-IFNpbXBsaWZ5IGhvdyBxc3BfcmVwb3J0KCkgcHJpbnRzKQo3LzE3IENoZWNraW5nIGNvbW1pdCAx
-Nzc2YTNiZTEwNGYgKGJsb2NrL3FhcGk6IENsZWFuIHVwIGhvdyB3ZSBwcmludCB0byBtb25pdG9y
-IG9yIHN0ZG91dCkKOC8xNyBDaGVja2luZyBjb21taXQgZGU0ZmE0NWQxZWJjIChtZW1vcnk6IENs
-ZWFuIHVwIGhvdyBtdHJlZV9pbmZvKCkgcHJpbnRzKQo5LzE3IENoZWNraW5nIGNvbW1pdCBjMjE4
-ZTM0OTZmYzEgKHRhcmdldDogU2ltcGxpZnkgaG93IHRoZSBUQVJHRVRfY3B1X2xpc3QoKSBwcmlu
-dCkKMTAvMTcgQ2hlY2tpbmcgY29tbWl0IDk3ZDgzYmM5ZDEzOSAodGFyZ2V0OiBDbGVhbiB1cCBo
-b3cgdGhlIGR1bXBfbW11KCkgcHJpbnQpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM5NDk6IEZJTEU6IHRhcmdldC94dGVuc2EvbW11X2hlbHBlci5jOjc4NDoKKyAgICAgICAgICAg
-ICAgICAgICAgcWVtdV9wcmludGYoIlx0VmFkZHIgICAgICAgUGFkZHIgICAgICAgQVNJRCAgQXR0
-ciBSV1ggQ2FjaGVcbiIKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODQ4IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEwLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzE3IENoZWNr
-aW5nIGNvbW1pdCA0NjQ0NGQ2MmY4M2QgKHRhcmdldC9pMzg2OiBTaW1wbGlmeSBob3cgeDg2X2Nw
-dV9kdW1wX2xvY2FsX2FwaWNfc3RhdGUoKSBwcmludHMpCjEyLzE3IENoZWNraW5nIGNvbW1pdCA2
-MjY2YTJhY2JkZGEgKHFvbS9jcHU6IFNpbXBsaWZ5IGhvdyBDUFVDbGFzczo6ZHVtcF9zdGF0aXN0
-aWNzKCkgcHJpbnRzKQoxMy8xNyBDaGVja2luZyBjb21taXQgOWNiMDMyYWE0MWY5IChxZW11LXBy
-aW50OiBOZXcgcWVtdV9mcHJpbnRmKCksIHFlbXVfdmZwcmludGYoKSkKMTQvMTcgQ2hlY2tpbmcg
-Y29tbWl0IDJmZWUzMjJlNmNiOCAocW9tL2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOmNwdV9k
-dW1wX3N0YXRlKCkgcHJpbnRzKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNzc6
-IEZJTEU6IHRhcmdldC9pMzg2L2hlbHBlci5jOjQxOToKKyAgICAgICAgcWVtdV9mcHJpbnRmKGYs
-ICJSQVg9JTAxNiIgUFJJeDY0ICIgUkJYPSUwMTYiIFBSSXg2NCAiIFJDWD0lMDE2IiBQUkl4NjQg
-IiBSRFg9JTAxNiIgUFJJeDY0ICJcbiIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-MTA3ODogRklMRTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDIwOgorICAgICAgICAgICAgICAgICAg
-ICAgIlJTST0lMDE2IiBQUkl4NjQgIiBSREk9JTAxNiIgUFJJeDY0ICIgUkJQPSUwMTYiIFBSSXg2
-NCAiIFJTUD0lMDE2IiBQUkl4NjQgIlxuIgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiMxMDc5OiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxwZXIuYzo0MjE6CisgICAgICAgICAgICAgICAg
-ICAgICAiUjggPSUwMTYiIFBSSXg2NCAiIFI5ID0lMDE2IiBQUkl4NjQgIiBSMTA9JTAxNiIgUFJJ
-eDY0ICIgUjExPSUwMTYiIFBSSXg2NCAiXG4iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzEwODA6IEZJTEU6IHRhcmdldC9pMzg2L2hlbHBlci5jOjQyMjoKKyAgICAgICAgICAgICAg
-ICAgICAgICJSMTI9JTAxNiIgUFJJeDY0ICIgUjEzPSUwMTYiIFBSSXg2NCAiIFIxND0lMDE2IiBQ
-Ukl4NjQgIiBSMTU9JTAxNiIgUFJJeDY0ICJcbiIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojMTA4MTogRklMRTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDIzOgorICAgICAgICAgICAg
-ICAgICAgICAgIlJJUD0lMDE2IiBQUkl4NjQgIiBSRkw9JTA4eCBbJWMlYyVjJWMlYyVjJWNdIENQ
-TD0lZCBJST0lZCBBMjA9JWQgU01NPSVkIEhMVD0lZFxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMxMTg5OiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxwZXIuYzo0OTQ6CisgICAg
-ICAgIHFlbXVfZnByaW50ZihmLCAiQ1IwPSUwOHggQ1IyPSUwMTYiIFBSSXg2NCAiIENSMz0lMDE2
-IiBQUkl4NjQgIiBDUjQ9JTA4eFxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMxNzkwOiBGSUxFOiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoyOTc5MToKKyAgICBxZW11X2Zw
-cmludGYoZiwgIkNQMCBTdGF0dXMgIDB4JTA4eCBDYXVzZSAgIDB4JTA4eCBFUEMgICAgMHgiIFRB
-UkdFVF9GTVRfbHggIlxuIiwKCnRvdGFsOiA1IGVycm9ycywgMiB3YXJuaW5ncywgMjU4MyBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAxNC8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTUvMTcg
-Q2hlY2tpbmcgY29tbWl0IGZjNDY3NTM1ZmU3YSAobW9uaXRvcjogQ2xlYW4gdXAgaG93IG1vbml0
-b3JfZGlzYXMoKSBmdW5uZWxzIG91dHB1dCB0byBtb25pdG9yKQoxNi8xNyBDaGVja2luZyBjb21t
-aXQgM2Y0MGUzMWU2MTRhIChkaXNhczogUmVuYW1lIGluY2x1ZGUvZGlzYXMvYmZkLmggYmFjayB0
-byBpbmNsdWRlL2Rpc2FzL2Rpcy1hc20uaCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk2OiAKcmVuYW1l
-IGZyb20gaW5jbHVkZS9kaXNhcy9iZmQuaAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
-OTIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTcvMTcgQ2hlY2tpbmcgY29tbWl0IGM1N2JmNDA2ZTcyNSAoaW5jbHVkZTogTW92ZSBmcHJpbnRm
-X2Z1bmN0aW9uIHRvIGRpc2FzLykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDQ6IApkZWxldGVkIGZpbGUg
-bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTcgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTcvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MTExNTI1MjAuMTAwNjEt
-MS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
 
+
+> >
+> > This patch adds functionality to perform flush from guest
+> > to host over VIRTIO. We are registering a callback based
+> > on 'nd_region' type. virtio_pmem driver requires this special
+> > flush function. For rest of the region types we are registering
+> > existing flush function. Report error returned by host fsync
+> > failure to userspace.
+> >
+> > This also handles asynchronous flush requests from the block layer
+> > by creating a child bio and chaining it with parent bio.
+> >
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---bio_chain Dan williams
+> [..]
+> > diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+> > index b4ef7d9ff22e..fb1041ab32a6 100644
+> > --- a/drivers/nvdimm/region_devs.c
+> > +++ b/drivers/nvdimm/region_devs.c
+> > @@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev,
+> > struct device_attribute *att
+> >                 return rc;
+> >         if (!flush)
+> >                 return -EINVAL;
+> > -       nvdimm_flush(nd_region);
+> > +       rc = nvdimm_flush(nd_region, NULL, false);
+> > +       if (rc)
+> > +               return rc;
+> >
+> >         return len;
+> >  }
+> > @@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct
+> > nvdimm_bus *nvdimm_bus,
+> >         dev->of_node = ndr_desc->of_node;
+> >         nd_region->ndr_size = resource_size(ndr_desc->res);
+> >         nd_region->ndr_start = ndr_desc->res->start;
+> > +       if (ndr_desc->flush)
+> > +               nd_region->flush = ndr_desc->flush;
+> > +       else
+> > +               nd_region->flush = generic_nvdimm_flush;
+> > +
+> >         nd_device_register(dev);
+> >
+> >         return nd_region;
+> > @@ -1125,11 +1132,36 @@ struct nd_region
+> > *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+> >  }
+> >  EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+> >
+> > +int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool async)
+> > +{
+> 
+> I don't quite see the point of the 'async' argument. All the usages of
+> this routine are either
+> 
+> nvdimm_flush(nd_region, bio, true)
+> ...or:
+> nvdimm_flush(nd_region, NULL, false)
+
+Agree.
+
+> 
+> ...so why not gate async behavior on the presence of the 'bio' argument?
+
+Sure.
+
+> 
+> 
+> > +       int rc = 0;
+> > +
+> > +       /* Create child bio for asynchronous flush and chain with
+> > +        * parent bio. Otherwise directly call nd_region flush.
+> > +        */
+> > +       if (async && bio->bi_iter.bi_sector != -1) {
+> > +
+> > +               struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> > +
+> > +               if (!child)
+> > +                       return -ENOMEM;
+> > +               bio_copy_dev(child, bio);
+> > +               child->bi_opf = REQ_PREFLUSH;
+> > +               child->bi_iter.bi_sector = -1;
+> > +               bio_chain(child, bio);
+> > +               submit_bio(child);
+> 
+> I understand how this works, but it's a bit too "magical" for my
+> taste. I would prefer that all flush implementations take an optional
+> 'bio' argument rather than rely on the make_request implementation to
+> stash the bio away on a driver specific list.
+
+I did this to make use of "bio_chain" for chaining child bio for async flush
+suggested [1]. Are you saying to remove this and just call "flush" based on 
+bio argument? Or I implemented the 'bio_chain' request entirely wrong?
+
+[1] https://lkml.org/lkml/2018/9/27/1028
+
+> 
+> > +       } else {
+> > +               if (nd_region->flush(nd_region))
+> > +                       rc = -EIO;
+> 
+> Given the common case wants to be fast and synchronous I think we
+> should try to avoid retpoline overhead by default. So something like
+> this:
+> 
+> if (nd_region->flush == generic_nvdimm_flush)
+>     rc = generic_nvdimm_flush(...);
+
+Sure.
+
+Thanks,
+Pankaj
+> 
+> 
 
