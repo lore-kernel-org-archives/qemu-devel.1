@@ -2,58 +2,61 @@ Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF49C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C3CC282CE
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:31:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE09E217D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:29:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE09E217D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D0DD2184B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 11:31:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0DD2184B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46773 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46956 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEXtN-00071K-8w
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:29:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43754)
+	id 1hEXvW-0008Q0-9j
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 07:31:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hEXsI-0006Rx-IA
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:28:11 -0400
+	(envelope-from <guoheyi@huawei.com>) id 1hEXuO-0007Ui-70
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hEXsH-0005qp-I0
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:28:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47254)
+	(envelope-from <guoheyi@huawei.com>) id 1hEXuN-00005W-49
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:20 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2202 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hEXsH-0005po-9X
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:28:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7AB073086258;
-	Thu, 11 Apr 2019 11:28:08 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0F2355D9C4;
-	Thu, 11 Apr 2019 11:27:58 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 11 Apr 2019 13:28:18 +0200
-Message-Id: <1554982098-336210-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 11 Apr 2019 11:28:08 +0000 (UTC)
+	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1hEXuM-0008TW-FC
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 07:30:19 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+	by Forcepoint Email with ESMTP id 47AB7BA3E20C7167B74D;
+	Thu, 11 Apr 2019 19:30:14 +0800 (CST)
+Received: from [127.0.0.1] (10.177.31.55) by DGGEMS410-HUB.china.huawei.com
+	(10.3.19.210) with Microsoft SMTP Server id 14.3.408.0; Thu, 11 Apr 2019
+	19:30:06 +0800
+To: Auger Eric <eric.auger@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <f3a469aa-4a18-a8be-3a37-8989401e2db7@huawei.com>
+	<20190403144550-mutt-send-email-mst@kernel.org>
+	<4c3d0235-f5b6-a3d7-89b9-2054f24f84f7@redhat.com>
+	<4f416cdc-4fd8-c815-b8d2-d4a1121d2981@huawei.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <c2d44853-4fdb-f1e5-4fe3-2a5553427eec@huawei.com>
+Date: Thu, 11 Apr 2019 19:30:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+	Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <4f416cdc-4fd8-c815-b8d2-d4a1121d2981@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.31.55]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] roms: assert if max rom size is less
- than the used size
+X-Received-From: 45.249.212.190
+Subject: Re: [Qemu-devel] Question: can we hot plug a PCIe switch on machine
+ "virt"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,43 +68,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, richard.henderson@linaro.org,
-	stefanha@redhat.com, pbonzini@redhat.com
+Cc: wanghaibin 00208455 <wanghaibin.wang@huawei.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190411112818.dplb-KM6c-IinqPElH28GHBVMiWh74v-0TXo03Gk2D8@z>
+Message-ID: <20190411113004.FOWC-ankvVj5_AotDWQh4xp3FlEx4b1xvKy-B2vGTso@z>
 
-It would ensure that we would notice attempt to write beyond
-the allocated buffer. In case of MemoryRegion backed ROM it's
-the host buffer and the guest RAM otherwise.
+Hi Eric,
 
-assert can be triggered with:
-  dd if=/dev/zero of=/tmp/blob bs=63k count=1
-  qemu-system-x86_64 `for  i in {1..33}; do echo -n " -acpitable /tmp/blob"; done`
+Could you help to confirm?
 
-Fixes: (a1666142db acpi-build: make ROMs RAM blocks resizeable)
+Thanks,
 
-Reported-by: Wei Yang <richardw.yang@linux.intel.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/core/loader.c | 1 +
- 1 file changed, 1 insertion(+)
+Heyi
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index fe5cb24..a097bbe 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1025,6 +1025,7 @@ MemoryRegion *rom_add_blob(const char *name, const void *blob, size_t len,
-     rom->addr     = addr;
-     rom->romsize  = max_len ? max_len : len;
-     rom->datasize = len;
-+    g_assert(rom->romsize >= rom->datasize);
-     rom->data     = g_malloc0(rom->datasize);
-     memcpy(rom->data, blob, len);
-     rom_insert(rom);
--- 
-2.7.4
+
+On 2019/4/7 9:59, Heyi Guo wrote:
+> Hi Eric,
+>
+> My real interesting is about the hotplug of PCIe switch, which means we don't need to provide lots of PCIe root ports or PCIe down stream ports at the beginning, but we can extend the capacity by hot adding PCIe switches which can provide more hot-pluggable slots for endpoint devices.
+>
+> The document docs/pcie.txt says "PCI Express Downstream Ports can't be hot-plugged into an existing PCI Express Upstream Port" which confuses me. Does it actually mean Downstream Ports can't be hot-plugged? For they can't be hot-plugged into an existing Upstream Port as the doc says, either they can't be hot-plugged into an non-existing Upstream Port or another place...
+>
+> Thanks,
+>
+> Heyi
+>
+>
+> On 2019/4/4 15:39, Auger Eric wrote:
+>> Hi Heyi,
+>>
+>> On 4/3/19 8:50 PM, Michael S. Tsirkin wrote:
+>>> On Wed, Apr 03, 2019 at 03:32:09PM +0800, Heyi Guo wrote:
+>>>> Hi folks,
+>>>>
+>>>> In physical world, a PCIe switch including one upstream port and several downstream ports is a single physical device, however we treat each port as a device in qemu world. In qemu docs/pcie.txt, we have below statements:
+>>>>
+>>>> Line 230: Be aware that PCI Express Downstream Ports can't be hot-plugged into
+>>>> Line 231: an existing PCI Express Upstream Port.
+>>>>
+>>>> To my understanding, it implies PCIe downstream ports *can* be hot-plugged into something which is not an existing upstream port. If it is true, how can we do that? AFAIK monitor command device_add can only add one device at a time.
+>>>>
+>>>> Please help to show the truth.
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Heyi
+>>>>
+>>> afaik they can only be plugged into upstearm ports with or without hotplug.
+>> Hotplug on upstream port does not look supported, as mentionned in the doc:
+>> (QEMU) device_add driver=xio3130-downstream id=down0 bus=upstream_port1
+>> {"error": {"class": "GenericError", "desc": "Bus 'upstream_port1' does
+>> not support hotplugging"}}
+>>
+>> Looks the std way to use the downstream port is the one documented in 2.2.3:
+>>
+>> 2.2.3 Plugging a PCI Express device into a Switch:
+>> -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]
+>> -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]
+>> -device
+>> xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]]
+>> -device <dev>,bus=downstream_port1
+>>
+>> For my curiosity why do you want to hotplug a downstream port in another
+>> place than an upstream port?
+>>
+>> Thanks
+>>
+>> Eric
+>>
+>>
+>> .
+>>
+>
+
 
 
