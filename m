@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37354)
+Received: from eggs.gnu.org ([209.51.188.92]:37560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hEg0a-0001pj-9k
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:17 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hEg1k-0002VI-Oa
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hEg0Y-00059d-NW
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:16 -0400
-Received: from mail-eopbgr770103.outbound.protection.outlook.com
-	([40.107.77.103]:61644
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hEg0Y-00058B-Ao
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:09:14 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 11 Apr 2019 20:09:09 +0000
-Message-ID: <BN6PR2201MB125112CE3BBE8E7DCA624750C62F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190405160938.27494-1-jbi.octave@gmail.com>,
-	<20190405160938.27494-3-jbi.octave@gmail.com>
-In-Reply-To: <20190405160938.27494-3-jbi.octave@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <laurent@vivier.eu>) id 1hEg1j-0005rS-N2
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 16:10:28 -0400
+References: <20190409053320.14612-1-sw@weilnetz.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <38f6dcce-2122-0516-01f6-a549f11da87f@vivier.eu>
+Date: Thu, 11 Apr 2019 22:10:21 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/mips: add or remove space to
- fix checkpatch errors
+In-Reply-To: <20190409053320.14612-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Update configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jules Irenge <jbi.octave@gmail.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-> From: Jules Irenge <jbi.octave@gmail.com>
-> Subject: [PATCH v3 2/4] target/mips: add or remove space to fix checkpatc=
-h errors
->
-> Add or remove space to fix errors issued by checkpatch.pl tool
-> "ERROR: spaces required around ..."
-> "ERROR: space required after that"
-> "ERROR: space required before the open parenthesis"
-> "ERROR: space prohibited between function name and open parenthesis"
-> within "target/mips/cpu.h" file.
->=20
-> Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+On 09/04/2019 07:33, Stefan Weil wrote:
+> The last *.aml file was removed in commit 13b1881aacc7e5018773bd545bbaf8d5476699ee.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
 > ---
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 1c563a7027..9c5d9a8c96 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7886,7 +7886,6 @@ LINKS="$LINKS python"
+>  for bios_file in \
+>      $source_path/pc-bios/*.bin \
+>      $source_path/pc-bios/*.lid \
+> -    $source_path/pc-bios/*.aml \
+>      $source_path/pc-bios/*.rom \
+>      $source_path/pc-bios/*.dtb \
+>      $source_path/pc-bios/*.img \
+> 
 
-Hi, Jules,
+Applied to my trivial-patches branch.
 
-I think if you merge this patch (2/4) and the next one (3/4), your series w=
-ould be good to go.
-
-Sincerely,
-Aleksandar
+Thanks,
+Laurent
