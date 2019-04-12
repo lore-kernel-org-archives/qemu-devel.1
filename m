@@ -2,84 +2,75 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB7EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC33C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C68520818
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:02:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KcdzSHkM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C68520818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF14020818
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:03:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF14020818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36323 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36337 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvot-0002Pt-0l
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:02:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42881)
+	id 1hEvq3-0003A2-1K
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:03:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEvRd-0006Vh-LN
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1hEvnl-0001nS-Qi
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEvRb-0003cK-RM
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:13 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43404)
+	(envelope-from <bounces@canonical.com>) id 1hEvng-0002Ja-RI
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEvRb-0003aU-3b
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:11 -0400
-Received: by mail-ot1-x342.google.com with SMTP id u15so8210420otq.10
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 05:38:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=nfNq1oSb3Eb6knzBx4QvvCh+2k15447pDUDGy4iIptI=;
-	b=KcdzSHkMJGpu4XEW1vw7SxcsDo7o7cPIAAp5Aly2gpeR4eZvO1LbOUA0Heyi4Am2nj
-	9yDD0Xk7Xm6h8IK6YLD6I50aXYzwC8moGJfuMjvNzJdzW10kmJ60d4lwh7h7HCkrTNvl
-	MkTmIOMA4RXRPjR+erxBksOrMhusDLwLdF+UOiclOCK2UqyyVIPN8USyGPJOPpHiH1hU
-	qYawBPgtn3iK5PAxzH5UX+KszGEKCJEgvXIRG6B/7FB0rGZv+KNmpA/4IzEC5tlYluiC
-	MWUPlcxHOV4Khon+z/2gwOnR9YCeul/SnFPpJJQzGMgg3RNeKsCot+V1WESPf7NZWbJ4
-	PFkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=nfNq1oSb3Eb6knzBx4QvvCh+2k15447pDUDGy4iIptI=;
-	b=NEaVlz6XK3djrE3RyX+8eaHmuh4+GAIJ0U9QrKlD2NmyB4BSarJGQDhMzNYw94c0Jk
-	QwKech6p6EY4CkTkzz/fInOqVEE6D4C3BlHUJg0juxQ1E4oD6J0nykZh50oTfX7ZcZ5W
-	r34dNwoJb2HpArOm6s3sg6Zk2OBjZemJJXbnlnQNKOXay293VBy5VPZMeotqacALdLbT
-	semXLoh3jbHxVP2h0xq34TuNO9POrgs4FWbX2Jp0GTp+h0u2gDrULXRfe1Np1WU7DpR8
-	mw8RPYzsedMqZSXGyQl0BVkltWgX59VMu7qzVzDUoJeIgIClbzLld79G2/HuYvJ0yGla
-	JWzA==
-X-Gm-Message-State: APjAAAXiUCXDJKPsR5puZwoOO966qv40LxdlLtX1XJUcwc5tyfK483ko
-	MHow8UG4PbY0m8wv13wk5SB/CDakf+i/hwYEasAtZQ==
-X-Google-Smtp-Source: APXvYqzZA0iPlQho5v9cZ4vfmkS2erkuqxOHOwQ7l2y7Iajkiu4bHvcLcHdf0T7+EKxt5P9UbvpwKMJR4hVUjTWIGMQ=
-X-Received: by 2002:a05:6830:1cb:: with SMTP id
-	r11mr31208781ota.302.1555072688583; 
-	Fri, 12 Apr 2019 05:38:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hEvnf-0002B4-Pw
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hEvnU-0006FP-0o
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 034E42E806F
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:48 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190402073018.17747-1-kraxel@redhat.com>
-In-Reply-To: <20190402073018.17747-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Apr 2019 13:37:56 +0100
-Message-ID:
- <CAFEAcA8L+qBhSG_6+L60VgA8_P+Eo_VuD1VEELJX2-pfUbFwrA@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH] curses: fix wchar_t printf warning
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Apr 2019 12:53:57 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
+References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
+Message-Id:
+ <155507363745.13466.16364046062417491659.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 3af0368bb49606c60c360b63335e01ec2eff5ccb
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
+ =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
+ =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
+ =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,41 +79,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412123756.B4khcJoqoQigfIUKDmJe1wTZH96-rOGHfLuD-cTi9-I@z>
+Message-ID: <20190412125357.Sj7NN70iw5vweeMvIMX6tpGRL66-l9lpt55vbgLlcjM@z>
 
-On Tue, 2 Apr 2019 at 08:34, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On some systems wchar_t is "long int", on others just "int".
-> So go cast to "long int" and adjust the printf format accordingly.
->
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/curses.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/ui/curses.c b/ui/curses.c
-> index cc6d6da68463..fb63945188b2 100644
-> --- a/ui/curses.c
-> +++ b/ui/curses.c
-> @@ -453,8 +453,8 @@ static uint16_t get_ucs(wchar_t wch, iconv_t conv)
->      swch = sizeof(wch);
->
->      if (iconv(conv, &pwch, &swch, &pch, &sch) == (size_t) -1) {
-> -        fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UCS-2: %s\n",
-> -                        wch, strerror(errno));
-> +        fprintf(stderr, "Could not convert 0x%02lx from WCHAR_T to UCS-2: %s\n",
-> +                (unsigned long)wch, strerror(errno));
->          return 0xFFFD;
->      }
->
+Tried to patch as below and it compiles fine, not sure if this is right
+fix though,
 
-Applied to master since we needed an rc4 for other reasons.
 
-thanks
--- PMM
+# git diff
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index ebf210f..7d512e5 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -231,7 +231,7 @@ typedef struct {
+     char date_modified[0]; /*unused*/
+     char keywords[0]; /*unused*/
+     /* string and other data follows */
+-} QEMU_PACKED ObjectInfo;
++} ObjectInfo;
+ =
+
+ #define TYPE_USB_MTP "usb-mtp"
+ #define USB_MTP(obj) OBJECT_CHECK(MTPState, (obj), TYPE_USB_MTP)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824528
+
+Title:
+  qemu fails to compile on gcc 9 `error: taking address of packed member
+  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
+r value
+  [-Werror=3Daddress-of-packed-member]`
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
+20190328)
+  repo: https://github.com/qemu/qemu.git
+  branch: master
+  commit e1be98540ee672ef93292b65a986055512237c35
+
+  =
+
+    CC      net/dump.o
+  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
+[-Werror=3Daddress-of-packed-member]
+   1708 |                             dataset->filename);
+        |                             ~~~~~~~^~~~~~~~~~
+  cc1: all warnings being treated as errors
+    CC      net/eth.o
+  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
+  make: *** Waiting for unfinished jobs....
+    CC      net/announce.o
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
 
