@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56658)
+Received: from eggs.gnu.org ([209.51.188.92]:57683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEuOr-00035S-V3
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:31:18 -0400
+	(envelope-from <otubo@redhat.com>) id 1hEuV4-0005GT-8V
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:37:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hEuOr-0007df-5O
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:31:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19304)
+	(envelope-from <otubo@redhat.com>) id 1hEuV3-0003Ln-3a
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:37:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hEuOq-0007d2-RX
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:31:17 -0400
-Date: Fri, 12 Apr 2019 13:31:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190412133111.028a9c6d.cohuck@redhat.com>
-In-Reply-To: <20190409155831.18764-1-eric.auger@redhat.com>
-References: <20190409155831.18764-1-eric.auger@redhat.com>
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1hEuV2-0003LP-Rn
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:37:41 -0400
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Fri, 12 Apr 2019 13:37:30 +0200
+Message-Id: <20190412113730.28828-2-otubo@redhat.com>
+In-Reply-To: <20190412113730.28828-1-otubo@redhat.com>
+References: <20190412113730.28828-1-otubo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1] vfio/common: Introduce
- vfio_set_irq_signaling helper
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/1] configure: Relax check for libseccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, aik@ozlabs.ru
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, deller@gmx.de, berrange@redhat.com, philmd@redhat.com
 
-On Tue,  9 Apr 2019 17:58:31 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+From: Helge Deller <deller@gmx.de>
 
-> The code used to assign an interrupt index/subindex to an
-> eventfd is duplicated many times. Let's introduce an helper that
-> allows to set/unset the signaling for an ACTION_TRIGGER or
-> ACTION_UNMASK action.
+All major distributions do support libseccomp version >=3D 2.3.0, so ther=
+e
+is no need to special-case on various architectures any longer.
 
-I like that, and it looks like ccw can use the new function as well. (I
-can do a patch on top.)
+Signed-off-by: Helge Deller <deller@gmx.de>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+---
+ configure | 28 ++++------------------------
+ 1 file changed, 4 insertions(+), 24 deletions(-)
 
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> This is a follow-up to
-> [PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
-> It looks to me that introducing vfio_set_irq_signaling() has more
-> benefits in term of code reduction and the helper abstraction
-> looks cleaner.
-> ---
->  hw/vfio/common.c              |  61 +++++++++
->  hw/vfio/pci.c                 | 224 ++++++++--------------------------
->  hw/vfio/platform.c            |  55 +++------
->  include/hw/vfio/vfio-common.h |   2 +
->  4 files changed, 134 insertions(+), 208 deletions(-)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/configure b/configure
+index 1c563a7027..fcc56aa979 100755
+--- a/configure
++++ b/configure
+@@ -2377,36 +2377,16 @@ fi
+ ##########################################
+ # libseccomp check
+=20
+-libseccomp_minver=3D"2.2.0"
+ if test "$seccomp" !=3D "no" ; then
+-    case "$cpu" in
+-    i386|x86_64|mips)
+-        ;;
+-    arm|aarch64)
+-        libseccomp_minver=3D"2.2.3"
+-        ;;
+-    ppc|ppc64|s390x)
+-        libseccomp_minver=3D"2.3.0"
+-        ;;
+-    *)
+-        libseccomp_minver=3D""
+-        ;;
+-    esac
+-
+-    if test "$libseccomp_minver" !=3D "" &&
+-       $pkg_config --atleast-version=3D$libseccomp_minver libseccomp ; t=
+hen
++    libseccomp_minver=3D"2.3.0"
++    if $pkg_config --atleast-version=3D$libseccomp_minver libseccomp ; t=
+hen
+         seccomp_cflags=3D"$($pkg_config --cflags libseccomp)"
+         seccomp_libs=3D"$($pkg_config --libs libseccomp)"
+         seccomp=3D"yes"
+     else
+         if test "$seccomp" =3D "yes" ; then
+-            if test "$libseccomp_minver" !=3D "" ; then
+-                feature_not_found "libseccomp" \
+-                    "Install libseccomp devel >=3D $libseccomp_minver"
+-            else
+-                feature_not_found "libseccomp" \
+-                    "libseccomp is not supported for host cpu $cpu"
+-            fi
++            feature_not_found "libseccomp" \
++                 "Install libseccomp devel >=3D $libseccomp_minver"
+         fi
+         seccomp=3D"no"
+     fi
+--=20
+2.17.2
