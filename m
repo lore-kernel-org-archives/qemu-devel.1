@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57650)
+Received: from eggs.gnu.org ([209.51.188.92]:59578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTd-0006UN-EF
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:06 -0400
+	(envelope-from <npiggin@gmail.com>) id 1hEsbh-0001dO-Cb
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTc-0002za-4A
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:05 -0400
-References: <87va06kvm6.fsf@dusky.pond.sub.org>
-	<59f100b4-f6e9-973d-532b-58fb172a7009@redhat.com>
-	<87imw5fv45.fsf@dusky.pond.sub.org>
-	<abe1d9cd-85bb-2ef8-630f-af28cae6378c@redhat.com>
-	<8736n9eb4s.fsf@dusky.pond.sub.org>
-	<bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
-	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
-	<b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
-	<a8144a1f-364e-cea5-b0a7-05342bdab936@redhat.com>
-	<87bm1fiuo8.fsf@dusky.pond.sub.org>
-	<20190409082852.GB6610@localhost.localdomain>
-	<c03c51a7-1bb0-b05b-9027-2364ab00517c@huawei.com>
-	<87ef693tci.fsf@dusky.pond.sub.org>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <1c7373b5-f6c2-ec3c-b07d-c8eb73a355af@huawei.com>
-Date: Fri, 12 Apr 2019 17:26:44 +0800
+	(envelope-from <npiggin@gmail.com>) id 1hEsbg-0000eH-BC
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:36:25 -0400
+From: Nicholas Piggin <npiggin@gmail.com>
+Date: Fri, 12 Apr 2019 19:36:03 +1000
+Message-Id: <20190412093603.18232-1-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87ef693tci.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
- flash device to save memory
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] spapr: add splpar hcalls H_JOIN, H_PROD,
+ H_CONFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +21,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU
-	Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com, Laszlo Ersek <lersek@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+These implementations have a few deficiencies that are noted, but are
+good enough for Linux to use.
 
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
 
-On 2019/4/11 15:15, Markus Armbruster wrote:
->> For some historical reasons such as compatibility and extensibility[2], we
->> restrict both their size to 64MB -- both UEFI and qemu have cold hard
->> constants.
-> These reasons aren't historical.  But they're valid, and that's all that
-> matters :)
-> 
->> This will consume a large amount of memory when running multiple VM
->> simultaneously (each guest needs 128MB).
-> Understood.
-> 
->> There are accepted ideas proposed by Markus and Laszlo from prior discussion[3]:
->>
->> 1) Getting flash memory size from a machine type or property.
->>
->> 2) Map the read-only part so it is shared among guests; Map the read-write
->> part normally.
->>
->> The first idea called explicit configuration which may break migration.
-> For any configuration that can break migration, the solution is to have
-> identical configuration on source and destination.
-> 
->> For the second idea, the only way I can imagine is using a file mapping to
->> read or write pflash devices so that we can allocate memory on demand. So I
->> tried to fit mmap() actions into the block layer[4]. However I am not sure
->> that maping image file whether can work fine for block layer.
-> It adds an odd special case to the block layer.  But then flash devices
-> are an odd user of the block layer.
-> 
-> Normal users use the block layer as a *block* layer: to read and write
-> blocks.
-> 
-> Our flash devices don't do that.  They are *memory* devices, not *block*
-> devices.  Pretty much the only thing the two have in common is
-> persistence of data.  The block layer provides persistence, and I figure
-> that's why it got pressed into service here.
-> 
-> What the flash devices do is keep the complete image contents in memory,
-> with changes written through to disk.
-> 
-> This is pretty much exactly what mmap() does, so using it suggests
-> itself.
-> 
-> It's very much *not* what the block layer does.  mmap() is not even
-> possible for anything but a file backend.
-> 
-> With mmap(), memory gets faulted in on demand, and sharing read-only
-> memory with other VMs should be feasible.  The question is how to use it
-> here.  Is there a sane way to use it without rewriting the flash devices
-> not to use the block layer?
+Cleaned up checkpatch warnings, sorry I didn't realise that exists.
 
-There are two important changes we may need to pay more attention to if we
-use mmap():
+ hw/ppc/spapr_hcall.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-1) Sync/Update flash content from guest memory to a file backend. With mmap()
-we might not have to do the extra sync/update as the block layer do in
-pflash_write().
-2) Live migration.
-
-> 
->> On the other hand, Laszlo had mentioned the features of QCOW2 and sparse
->> files which may be nice for pflash block backends. But I am not familiar with
->> it.
-> Offhand, two QCOW2 features come to mind:
-> 
-> 1. Sparse storage even when the storage substrate can't do sparse.  I
-> consider this one largely irrelevant.  Any decent file system can do
-> sparse.  Archival and network transfer can compress instead.
-> 
-> 2. Snapshots to go with disk snapshots.  *Live* snapshots (the ones that
-> include memory) already have the flash contents in the memory part, so
-> this sems only relevant for "dead" snapshots.
-> 
-> Anything else?
-> 
-
-No more, thanks.:D
-
-Kevin came up with a good idea which might solve my problem.
-See https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg01865.html
-
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8a736797b9..e985bb694d 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1065,6 +1065,90 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     return H_SUCCESS;
+ }
+ 
++static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    CPUPPCState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
++
++    if (env->msr & (1ULL << MSR_EE)) {
++        return H_BAD_MODE;
++    }
++
++    /*
++     * This should check for single-threaded mode. In practice, Linux
++     * does not try to H_JOIN all CPUs.
++     */
++
++    cs->halted = 1;
++    cs->exception_index = EXCP_HALTED;
++    cs->exit_request = 1;
++
++    return H_SUCCESS;
++}
++
++static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target = args[0];
++    CPUState *cs = CPU(cpu);
++
++    /*
++     * This does not do a targeted yield or confer, but check the parameter
++     * anyway. -1 means confer to all/any other CPUs.
++     */
++    if (target != -1 && !CPU(spapr_find_cpu(target))) {
++        return H_PARAMETER;
++    }
++
++    /*
++     * H_CONFER with target == this is not exactly the same as H_JOIN
++     * according to PAPR (e.g., MSR[EE] check and single threaded check
++     * is not done in this case), but unlikely to matter.
++     */
++    if (cpu == spapr_find_cpu(target)) {
++        return h_join(cpu, spapr, opcode, args);
++    }
++
++    /*
++     * This does not implement the dispatch sequence check that PAPR calls for,
++     * but PAPR also specifies a stronger implementation where the target must
++     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
++     * scheduling requirement implemented, there is no correctness reason to
++     * implement the dispatch sequence check.
++     */
++    cs->exception_index = EXCP_YIELD;
++    cpu_loop_exit(cs);
++
++    return H_SUCCESS;
++}
++
++/*
++ * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
++ * achievable running under KVM, although KVM already implements H_CONFER
++ * this way.
++ */
++static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target = args[0];
++    CPUState *cs;
++
++    /*
++     * Should set the prod flag in the VPA.
++     */
++
++    cs = CPU(spapr_find_cpu(target));
++    if (!cs) {
++        return H_PARAMETER;
++    }
++
++    cs->halted = 0;
++    qemu_cpu_kick(cs);
++
++    return H_SUCCESS;
++}
++
+ static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+@@ -1860,6 +1944,10 @@ static void hypercall_register_types(void)
+     /* hcall-splpar */
+     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+     spapr_register_hypercall(H_CEDE, h_cede);
++    spapr_register_hypercall(H_CONFER, h_confer);
++    spapr_register_hypercall(H_JOIN, h_join);
++    spapr_register_hypercall(H_PROD, h_prod);
++
+     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+ 
+     /* processor register resource access h-calls */
 -- 
-
-Thanks,
-Xiang
+2.20.1
