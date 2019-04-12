@@ -2,49 +2,49 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9ADC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 08:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB49C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 08:07:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B0C9206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 08:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B0C9206B7
+	by mail.kernel.org (Postfix) with ESMTPS id DB96B20651
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 08:07:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB96B20651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60576 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60589 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hErCO-0005eY-TE
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 04:06:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40249)
+	id 1hErDX-0006mC-6G
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 04:07:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hErBE-0004kx-1S
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hErBr-0005Hw-OM
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hErBD-00007P-2j
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:04:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49844)
+	(envelope-from <pbonzini@redhat.com>) id 1hErBp-0000Sh-Sj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hErBB-000065-78
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:04:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hErBk-0000PS-DK
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F1C03088B86;
-	Fri, 12 Apr 2019 08:04:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 357EA30842B2;
+	Fri, 12 Apr 2019 08:05:31 +0000 (UTC)
 Received: from [10.36.112.36] (ovpn-112-36.ams2.redhat.com [10.36.112.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BA2F10A33C1;
-	Fri, 12 Apr 2019 08:04:37 +0000 (UTC)
-To: Stefano Garzarella <sgarzare@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>
-References: <1554982098-336210-1-git-send-email-imammedo@redhat.com>
-	<20190412080249.x2b6utfnqh255msd@steredhat>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2128D22708;
+	Fri, 12 Apr 2019 08:05:25 +0000 (UTC)
+To: Laszlo Ersek <lersek@redhat.com>, "Singh, Brijesh"
+	<brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190411235456.12918-1-brijesh.singh@amd.com>
+	<74d884dd-3f3f-88d4-9f8b-62b696245fbc@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -102,23 +102,23 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
 	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
 	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
 	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <ed6c2780-302d-195a-42a0-d0c50152917a@redhat.com>
-Date: Fri, 12 Apr 2019 10:04:35 +0200
+Message-ID: <0db9a2c4-7153-6fb0-a15a-23e28c81669f@redhat.com>
+Date: Fri, 12 Apr 2019 10:05:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190412080249.x2b6utfnqh255msd@steredhat>
+In-Reply-To: <74d884dd-3f3f-88d4-9f8b-62b696245fbc@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 12 Apr 2019 08:04:51 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Fri, 12 Apr 2019 08:05:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] roms: assert if max rom size is
- less than the used size
+Subject: Re: [Qemu-devel] [PATCH v2] target/i386: sev: add 'sev-max-guests'
+ field to 'query-sev-capabilities'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -130,40 +130,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+	Markus Armbruster <armbru@redhat.com>, Erik Skultety <eskultet@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412080435.DD7UA02LPyVZd2YwkTOKUyfFoANwe6bASWMzYeDY_ik@z>
+Message-ID: <20190412080523.rg5C8TR-uVPImjX6eYORHPMdR0XzJYwCpc-0AXZ2MV4@z>
 
-On 12/04/19 10:02, Stefano Garzarella wrote:
-> On Thu, Apr 11, 2019 at 01:28:18PM +0200, Igor Mammedov wrote:
->> It would ensure that we would notice attempt to write beyond
->> the allocated buffer. In case of MemoryRegion backed ROM it's
->> the host buffer and the guest RAM otherwise.
+On 12/04/19 09:58, Laszlo Ersek wrote:
+> On 04/12/19 01:55, Singh, Brijesh wrote:
+>> There are limited numbers of the SEV guests that can be run concurrent=
+ly.
+>> A management applications may need to know this limit so that it can p=
+lace
+>> SEV VMs on hosts which have suitable resources available.
 >>
->> assert can be triggered with:
->>   dd if=/dev/zero of=/tmp/blob bs=63k count=1
->>   qemu-system-x86_64 `for  i in {1..33}; do echo -n " -acpitable /tmp/blob"; done`
+>> Currently, this limit is not exposed to the application. Add a new
+>> 'sev-max-guest' field in the query-sev-capabilities to provide this
+>> information.
 >>
->> Fixes: (a1666142db acpi-build: make ROMs RAM blocks resizeable)
->>
->> Reported-by: Wei Yang <richardw.yang@linux.intel.com>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> Cc: Laszlo Ersek <lersek@redhat.com>
+>> Cc: Erik Skultety <eskultet@redhat.com>
+>> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 >> ---
->>  hw/core/loader.c | 1 +
->>  1 file changed, 1 insertion(+)
 >>
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Tested-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Thanks,
-> Stefano
-> 
+>> changes since v1:
+>>  - document the new field and add (since 4.1) annotation.
+>>
+>>  qapi/target.json  | 9 +++++++--
+>>  target/i386/sev.c | 9 +++++++--
+>>  2 files changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/qapi/target.json b/qapi/target.json
+>> index 1d4d54b600..8cd4fc7919 100644
+>> --- a/qapi/target.json
+>> +++ b/qapi/target.json
+>> @@ -177,13 +177,17 @@
+>>  # @reduced-phys-bits: Number of physical Address bit reduction when S=
+EV is
+>>  #                     enabled
+>>  #
+>> +# @sev-max-guests: maximum number of concurrent SEV guest with SEV-ES=
+ disabled
+>> +#                  (since 4.1)
+>> +#
+>>  # Since: 2.12
+>>  ##
+>>  { 'struct': 'SevCapability',
+>>    'data': { 'pdh': 'str',
+>>              'cert-chain': 'str',
+>>              'cbitpos': 'int',
+>> -            'reduced-phys-bits': 'int'},
+>> +            'reduced-phys-bits': 'int',
+>> +            'sev-max-guests': 'int'},
+>>    'if': 'defined(TARGET_I386)' }
+>> =20
+>>  ##
+>> @@ -200,7 +204,8 @@
+>>  #
+>>  # -> { "execute": "query-sev-capabilities" }
+>>  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+>> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
+>> +#                  "cbitpos": 47, "reduced-phys-bits": 5,
+>> +#                  "sev-max-guests" : 15}}
+>=20
+> There seems to be a superfluous space character before the colon, but I
+> don't think it matters much.
+>=20
+>>  #
+>>  ##
+>>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index cd77f6b5d4..6829586fbe 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -488,7 +488,7 @@ sev_get_capabilities(void)
+>>      guchar *pdh_data =3D NULL;
+>>      guchar *cert_chain_data =3D NULL;
+>>      size_t pdh_len =3D 0, cert_chain_len =3D 0;
+>> -    uint32_t ebx;
+>> +    uint32_t ebx, ecx, edx;
+>>      int fd;
+>> =20
+>>      fd =3D open(DEFAULT_SEV_DEVICE, O_RDWR);
+>> @@ -507,7 +507,7 @@ sev_get_capabilities(void)
+>>      cap->pdh =3D g_base64_encode(pdh_data, pdh_len);
+>>      cap->cert_chain =3D g_base64_encode(cert_chain_data, cert_chain_l=
+en);
+>> =20
+>> -    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
+>> +    host_cpuid(0x8000001F, 0, NULL, &ebx, &ecx, &edx);
+>>      cap->cbitpos =3D ebx & 0x3f;
+>> =20
+>>      /*
+>> @@ -516,6 +516,11 @@ sev_get_capabilities(void)
+>>       */
+>>      cap->reduced_phys_bits =3D 1;
+>> =20
+>> +    /*
+>> +     * The maximum number of SEV guests with SEV-ES disabled that can=
+ run
+>> +     * simultaneously.
+>> +     */
+>> +    cap->sev_max_guests =3D ecx - edx + 1;
+>>  out:
+>>      g_free(pdh_data);
+>>      g_free(cert_chain_data);
+>>
+>=20
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Queued, thanks.
+As mentioned in v1, I don't think a management application should need
+to run QEMU in order to figure this out.
 
 Paolo
 
