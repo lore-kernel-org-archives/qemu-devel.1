@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51384)
+Received: from eggs.gnu.org ([209.51.188.92]:51404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3NX-0000QC-Fg
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:32 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1hF3Na-0000Sq-8Q
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3NV-00056g-Uz
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:31 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1hF3NY-000588-DY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:34 -0400
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 12 Apr 2019 23:06:16 +0200
-Message-Id: <1555103178-21894-3-git-send-email-atar4qemu@gmail.com>
+Date: Fri, 12 Apr 2019 23:06:17 +0200
+Message-Id: <1555103178-21894-4-git-send-email-atar4qemu@gmail.com>
 In-Reply-To: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
 References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PATCH 2/4] 40p and prep: implement PCI bus mastering
+Subject: [Qemu-devel] [PATCH 3/4] target/ppc: improve performance of large
+ BAT invalidations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,66 +21,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, hpoussin@reactos.org
-Cc: qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+
+Performing a complete flush is ~ 100 times faster than flushing
+256MiB of 4KiB pages. Set a limit of 1024 pages and perform a complete
+flush afterwards.
+
+This patch significantly speeds up AIX 5.1 and NetBSD-ofppc.
 
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- hw/pci-host/prep.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ target/ppc/mmu_helper.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 8b9e1fd..94b7465 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -62,6 +62,7 @@ typedef struct PRePPCIState {
-     AddressSpace pci_io_as;
-     MemoryRegion pci_io;
-     MemoryRegion pci_io_non_contiguous;
-+    MemoryRegion pci_io_system;
-     MemoryRegion pci_memory;
-     MemoryRegion pci_intack;
-     MemoryRegion bm;
-@@ -146,7 +147,7 @@ static uint64_t raven_io_read(void *opaque, hwaddr addr,
-     uint8_t buf[4];
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 4a6be4d..d7eed3a 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -1809,6 +1809,13 @@ static inline void do_invalidate_BAT(CPUPPCState *env, target_ulong BATu,
  
-     addr = raven_io_address(s, addr);
--    address_space_read(&s->pci_io_as, addr + 0x80000000,
-+    address_space_read(&s->pci_io_as, addr,
-                        MEMTXATTRS_UNSPECIFIED, buf, size);
- 
-     if (size == 1) {
-@@ -178,7 +179,7 @@ static void raven_io_write(void *opaque, hwaddr addr,
-         g_assert_not_reached();
-     }
- 
--    address_space_write(&s->pci_io_as, addr + 0x80000000,
-+    address_space_write(&s->pci_io_as, addr,
-                         MEMTXATTRS_UNSPECIFIED, buf, size);
- }
- 
-@@ -276,14 +277,21 @@ static void raven_pcihost_initfn(Object *obj)
-     MemoryRegion *address_space_mem = get_system_memory();
-     DeviceState *pci_dev;
- 
--    memory_region_init(&s->pci_io, obj, "pci-io", 0x3f800000);
-+    memory_region_init(&s->pci_io, obj, "pci-io", UINT32_MAX);
-     memory_region_init_io(&s->pci_io_non_contiguous, obj, &raven_io_ops, s,
-                           "pci-io-non-contiguous", 0x00800000);
-     memory_region_init(&s->pci_memory, obj, "pci-memory", 0x3f000000);
-     address_space_init(&s->pci_io_as, &s->pci_io, "raven-io");
- 
-     /* CPU address space */
--    memory_region_add_subregion(address_space_mem, 0x80000000, &s->pci_io);
-+    memory_region_add_subregion_overlap(address_space_mem, 0x0,
-+                                        &s->pci_io, -1);
-+
-+    memory_region_init_alias(&s->pci_io_system,  obj, "pci-io-system",
-+                             &s->pci_io, 0x0000000, 0x3f800000);
-+
-+    memory_region_add_subregion(address_space_mem, 0x80000000,
-+                                &s->pci_io_system);
-     memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
-                                         &s->pci_io_non_contiguous, 1);
-     memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci_memory);
+     base = BATu & ~0x0001FFFF;
+     end = base + mask + 0x00020000;
++    if (((end - base) >> TARGET_PAGE_BITS) > 1024) {
++        /* Flushing 1024 4K pages is slower than a complete flush */
++        LOG_BATS("Flush all BATs\n");
++        tlb_flush(CPU(cs));
++        LOG_BATS("Flush done\n");
++        return;
++    }
+     LOG_BATS("Flush BAT from " TARGET_FMT_lx " to " TARGET_FMT_lx " ("
+              TARGET_FMT_lx ")\n", base, end, mask);
+     for (page = base; page != end; page += TARGET_PAGE_SIZE) {
 -- 
 2.7.2
