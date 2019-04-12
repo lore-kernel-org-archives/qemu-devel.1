@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37010)
+Received: from eggs.gnu.org ([209.51.188.92]:37072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFd-0000im-3Q
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFi-0000nK-3v
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFb-0001rJ-14
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:01 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFg-0001tc-DR
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:06 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 12 Apr 2019 17:36:41 +0200
-Message-Id: <20190412153647.19027-8-marcandre.lureau@redhat.com>
+Date: Fri, 12 Apr 2019 17:36:42 +0200
+Message-Id: <20190412153647.19027-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 References: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 07/13] contrib: add vhost-user-input
+Subject: [Qemu-devel] [PATCH v5 08/13] vhost-user: add
+ vhost_user_gpu_set_socket()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,535 +26,395 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Add a vhost-user input backend example, based on virtio-input-host
-device. It takes an evdev path as argument, and can be associated with
-a vhost-user-input device via a UNIX socket:
+Add a new vhost-user message to give a unix socket to a vhost-user
+backend for GPU display updates.
 
-$ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+Back when I started that work, I added a new GPU channel because the
+vhost-user protocol wasn't bidirectional. Since then, there is a
+vhost-user-slave channel for the slave to send requests to the master.
+We could extend it with GPU messages. However, the GPU protocol is
+quite orthogonal to vhost-user, thus I chose to have a new dedicated
+channel.
 
-$ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
-  -device vhost-user-input-pci,chardev=3Dvuic
+See vhost-user-gpu.rst for the protocol details.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/vhost-user-input/main.c        | 427 +++++++++++++++++++++++++
- MAINTAINERS                            |   1 +
- Makefile                               |   3 +
- Makefile.objs                          |   1 +
- configure                              |   3 +
- contrib/vhost-user-input/Makefile.objs |   1 +
- 6 files changed, 436 insertions(+)
- create mode 100644 contrib/vhost-user-input/main.c
- create mode 100644 contrib/vhost-user-input/Makefile.objs
+ contrib/libvhost-user/libvhost-user.h |   1 +
+ include/hw/virtio/vhost-backend.h     |   2 +
+ contrib/libvhost-user/libvhost-user.c |   1 +
+ hw/virtio/vhost-user.c                |  11 ++
+ MAINTAINERS                           |   6 +
+ docs/interop/index.rst                |   2 +-
+ docs/interop/vhost-user-gpu.rst       | 238 ++++++++++++++++++++++++++
+ docs/interop/vhost-user.txt           |   9 +
+ 8 files changed, 269 insertions(+), 1 deletion(-)
+ create mode 100644 docs/interop/vhost-user-gpu.rst
 
-diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
-ain.c
-new file mode 100644
-index 0000000000..425056cd69
---- /dev/null
-+++ b/contrib/vhost-user-input/main.c
-@@ -0,0 +1,427 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 414ceb0a2f..eac5c120de 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -94,6 +94,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_END     =3D 30,
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
++    VHOST_USER_GPU_SET_SOCKET =3D 33,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
+backend.h
+index d6632a18e6..6f6670783f 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -170,4 +170,6 @@ int vhost_backend_invalidate_device_iotlb(struct vhos=
+t_dev *dev,
+ int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+                                           struct vhost_iotlb_msg *imsg);
+=20
++int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd);
 +
-+#include "qemu/osdep.h"
-+
-+#include <glib.h>
-+#include <linux/input.h>
-+
-+#include "qemu/iov.h"
-+#include "qemu/bswap.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "contrib/libvhost-user/libvhost-user-glib.h"
-+#include "standard-headers/linux/virtio_input.h"
-+#include "qapi/error.h"
-+
-+typedef struct virtio_input_event virtio_input_event;
-+typedef struct virtio_input_config virtio_input_config;
-+
-+typedef struct VuInput {
-+    VugDev dev;
-+    GSource *evsrc;
-+    int evdevfd;
-+    GArray *config;
-+    virtio_input_config *sel_config;
-+    struct {
-+        virtio_input_event event;
-+        VuVirtqElement *elem;
-+    } *queue;
-+    uint32_t qindex, qsize;
-+} VuInput;
-+
-+static void vi_input_send(VuInput *vi, struct virtio_input_event *event)
+ #endif /* VHOST_BACKEND_H */
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index e738f6ce88..c9823a1354 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -130,6 +130,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_POSTCOPY_END),
+         REQ(VHOST_USER_GET_INFLIGHT_FD),
+         REQ(VHOST_USER_SET_INFLIGHT_FD),
++        REQ(VHOST_USER_GPU_SET_SOCKET),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 553319c7ac..4ca5b2551e 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -96,6 +96,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_END     =3D 30,
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
++    VHOST_USER_GPU_SET_SOCKET =3D 33,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -353,6 +354,16 @@ static int vhost_user_write(struct vhost_dev *dev, V=
+hostUserMsg *msg,
+     return 0;
+ }
+=20
++int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd)
 +{
-+    VuDev *dev =3D &vi->dev.parent;
-+    VuVirtq *vq =3D vu_get_queue(dev, 0);
-+    VuVirtqElement *elem;
-+    int i, len;
++    VhostUserMsg msg =3D {
++        .hdr.request =3D VHOST_USER_GPU_SET_SOCKET,
++        .hdr.flags =3D VHOST_USER_VERSION,
++    };
 +
-+    /* queue up events ... */
-+    if (vi->qindex =3D=3D vi->qsize) {
-+        vi->qsize++;
-+        vi->queue =3D g_realloc_n(vi->queue, vi->qsize, sizeof(vi->queue=
-[0]));
-+    }
-+    vi->queue[vi->qindex++].event =3D *event;
-+
-+    /* ... until we see a report sync ... */
-+    if (event->type !=3D htole16(EV_SYN) ||
-+        event->code !=3D htole16(SYN_REPORT)) {
-+        return;
-+    }
-+
-+    /* ... then check available space ... */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            while (--i >=3D 0) {
-+                vu_queue_unpop(dev, vq, vi->queue[i].elem, 0);
-+            }
-+            vi->qindex =3D 0;
-+            g_warning("virtio-input queue full");
-+            return;
-+        }
-+        vi->queue[i].elem =3D elem;
-+    }
-+
-+    /* ... and finally pass them to the guest */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vi->queue[i].elem;
-+        len =3D iov_from_buf(elem->in_sg, elem->in_num,
-+                           0, &vi->queue[i].event, sizeof(virtio_input_e=
-vent));
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+    vi->qindex =3D 0;
++    return vhost_user_write(dev, &msg, &fd, 1);
 +}
 +
-+static void
-+vi_evdev_watch(VuDev *dev, int condition, void *data)
-+{
-+    VuInput *vi =3D data;
-+    int fd =3D vi->evdevfd;
-+
-+    g_debug("Got evdev condition %x", condition);
-+
-+    struct virtio_input_event virtio;
-+    struct input_event evdev;
-+    int rc;
-+
-+    for (;;) {
-+        rc =3D read(fd, &evdev, sizeof(evdev));
-+        if (rc !=3D sizeof(evdev)) {
-+            break;
-+        }
-+
-+        g_debug("input %d %d %d", evdev.type, evdev.code, evdev.value);
-+
-+        virtio.type  =3D htole16(evdev.type);
-+        virtio.code  =3D htole16(evdev.code);
-+        virtio.value =3D htole32(evdev.value);
-+        vi_input_send(vi, &virtio);
-+    }
-+}
-+
-+
-+static void vi_handle_status(VuInput *vi, virtio_input_event *event)
-+{
-+    struct input_event evdev;
-+    int rc;
-+
-+    if (gettimeofday(&evdev.time, NULL)) {
-+        perror("vi_handle_status: gettimeofday");
-+        return;
-+    }
-+
-+    evdev.type =3D le16toh(event->type);
-+    evdev.code =3D le16toh(event->code);
-+    evdev.value =3D le32toh(event->value);
-+
-+    rc =3D write(vi->evdevfd, &evdev, sizeof(evdev));
-+    if (rc =3D=3D -1) {
-+        perror("vi_host_handle_status: write");
-+    }
-+}
-+
-+static void vi_handle_sts(VuDev *dev, int qidx)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+    virtio_input_event event;
-+    VuVirtqElement *elem;
-+    int len;
-+
-+    g_debug("%s", G_STRFUNC);
-+
-+    for (;;) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            break;
-+        }
-+
-+        memset(&event, 0, sizeof(event));
-+        len =3D iov_to_buf(elem->out_sg, elem->out_num,
-+                         0, &event, sizeof(event));
-+        vi_handle_status(vi, &event);
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+}
-+
-+static void
-+vi_panic(VuDev *dev, const char *msg)
-+{
-+    g_critical("%s\n", msg);
-+    exit(EXIT_FAILURE);
-+}
-+
-+static void
-+vi_queue_set_started(VuDev *dev, int qidx, bool started)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+
-+    g_debug("queue started %d:%d", qidx, started);
-+
-+    if (qidx =3D=3D 1) {
-+        vu_set_queue_handler(dev, vq, started ? vi_handle_sts : NULL);
-+    }
-+
-+    started =3D vu_queue_started(dev, vu_get_queue(dev, 0)) &&
-+        vu_queue_started(dev, vu_get_queue(dev, 1));
-+
-+    if (started && !vi->evsrc) {
-+        vi->evsrc =3D vug_source_new(&vi->dev, vi->evdevfd,
-+                                   G_IO_IN, vi_evdev_watch, vi);
-+    }
-+
-+    if (!started && vi->evsrc) {
-+        g_source_destroy(vi->evsrc);
-+        vi->evsrc =3D NULL;
-+    }
-+}
-+
-+static virtio_input_config *
-+vi_find_config(VuInput *vi, uint8_t select, uint8_t subsel)
-+{
-+    virtio_input_config *cfg;
-+    int i;
-+
-+    for (i =3D 0; i < vi->config->len; i++) {
-+        cfg =3D &g_array_index(vi->config, virtio_input_config, i);
-+        if (select =3D=3D cfg->select && subsel =3D=3D cfg->subsel) {
-+            return cfg;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int vi_get_config(VuDev *dev, uint8_t *config, uint32_t len)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+
-+    g_return_val_if_fail(len <=3D sizeof(*vi->sel_config), -1);
-+
-+    if (vi->sel_config) {
-+        memcpy(config, vi->sel_config, len);
-+    } else {
-+        memset(config, 0, len);
-+    }
-+
-+    return 0;
-+}
-+
-+static int vi_set_config(VuDev *dev, const uint8_t *data,
-+                         uint32_t offset, uint32_t size,
-+                         uint32_t flags)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    virtio_input_config *config =3D (virtio_input_config *)data;
-+
-+    vi->sel_config =3D vi_find_config(vi, config->select, config->subsel=
-);
-+
-+    return 0;
-+}
-+
-+static const VuDevIface vuiface =3D {
-+    .queue_set_started =3D vi_queue_set_started,
-+    .get_config =3D vi_get_config,
-+    .set_config =3D vi_set_config,
-+};
-+
-+static void
-+vi_bits_config(VuInput *vi, int type, int count)
-+{
-+    virtio_input_config bits;
-+    int rc, i, size =3D 0;
-+
-+    memset(&bits, 0, sizeof(bits));
-+    rc =3D ioctl(vi->evdevfd, EVIOCGBIT(type, count / 8), bits.u.bitmap)=
-;
-+    if (rc < 0) {
-+        return;
-+    }
-+
-+    for (i =3D 0; i < count / 8; i++) {
-+        if (bits.u.bitmap[i]) {
-+            size =3D i + 1;
-+        }
-+    }
-+    if (size =3D=3D 0) {
-+        return;
-+    }
-+
-+    bits.select =3D VIRTIO_INPUT_CFG_EV_BITS;
-+    bits.subsel =3D type;
-+    bits.size   =3D size;
-+    g_array_append_val(vi->config, bits);
-+}
-+
-+static int unix_sock_new(char *path)
-+{
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
-+
-+    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <=3D 0) {
-+        perror("socket");
-+        return -1;
-+    }
-+
-+    un.sun_family =3D AF_UNIX;
-+    snprintf(un.sun_path, sizeof(un.sun_path), "%s", path);
-+    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
-+
-+    unlink(path);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
-+    }
-+
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
-+    }
-+
-+    return sock;
-+
-+fail:
-+    close(sock);
-+
-+    return -1;
-+}
-+
-+static char *opt_evdev;
-+static int opt_fdnum =3D -1;
-+static char *opt_socket_path;
-+static gboolean opt_nograb;
-+static gboolean opt_print_caps;
-+
-+static GOptionEntry entries[] =3D {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "no-grab", 'n', 0, G_OPTION_ARG_NONE, &opt_nograb,
-+      "Don't grab device", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    { "evdev-path", 'p', 0, G_OPTION_ARG_FILENAME, &opt_evdev,
-+      "evdev input device path", "PATH" },
-+    { NULL, }
-+};
-+
-+int
-+main(int argc, char *argv[])
-+{
-+    GMainLoop *loop =3D NULL;
-+    VuInput vi =3D { 0, };
-+    int rc, ver, fd;
-+    virtio_input_config id;
-+    struct input_id ids;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
-+
-+    context =3D g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"input\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"evdev-path\",\n");
-+        g_print("    \"no-grab\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+    if (!opt_evdev) {
-+        g_printerr("Please specify an evdev path\n");
-+        exit(EXIT_FAILURE);
-+    }
-+    if ((!!opt_socket_path + (opt_fdnum !=3D -1)) !=3D 1) {
-+        g_printerr("Please specify either --fd or --socket-path\n");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    vi.evdevfd =3D open(opt_evdev, O_RDWR);
-+    if (vi.evdevfd < 0) {
-+        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
-+    if (rc < 0) {
-+        g_printerr("%s: is not an evdev device\n", argv[1]);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (!opt_nograb) {
-+        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
-+        if (rc < 0) {
-+            g_printerr("Failed to grab device\n");
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
-;
-+    memset(&id, 0, sizeof(id));
-+    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
-+    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
-+    id.size =3D strlen(id.u.string);
-+    g_array_append_val(vi.config, id);
-+
-+    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
-+        memset(&id, 0, sizeof(id));
-+        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
-+        id.size =3D sizeof(struct virtio_input_devids);
-+        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
-+        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
-+        id.u.ids.product =3D cpu_to_le16(ids.product);
-+        id.u.ids.version =3D cpu_to_le16(ids.version);
-+        g_array_append_val(vi.config, id);
-+    }
-+
-+    vi_bits_config(&vi, EV_KEY, KEY_CNT);
-+    vi_bits_config(&vi, EV_REL, REL_CNT);
-+    vi_bits_config(&vi, EV_ABS, ABS_CNT);
-+    vi_bits_config(&vi, EV_MSC, MSC_CNT);
-+    vi_bits_config(&vi, EV_SW,  SW_CNT);
-+    g_debug("config length: %u", vi.config->len);
-+
-+    if (opt_socket_path) {
-+        int lsock =3D unix_sock_new(opt_socket_path);
-+        fd =3D accept(lsock, NULL, NULL);
-+        close(lsock);
-+    } else {
-+        fd =3D opt_fdnum;
-+    }
-+    if (fd =3D=3D -1) {
-+        g_printerr("Invalid socket");
-+        exit(EXIT_FAILURE);
-+    }
-+    vug_init(&vi.dev, fd, vi_panic, &vuiface);
-+
-+    loop =3D g_main_loop_new(NULL, FALSE);
-+    g_main_loop_run(loop);
-+    g_main_loop_unref(loop);
-+
-+    vug_deinit(&vi.dev);
-+
-+    if (vi.evsrc) {
-+        g_source_unref(vi.evsrc);
-+    }
-+    g_array_free(vi.config, TRUE);
-+    g_free(vi.queue);
-+    return 0;
-+}
+ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+                                    struct vhost_log *log)
+ {
 diff --git a/MAINTAINERS b/MAINTAINERS
-index b6e855ccf9..7e727299de 100644
+index 7e727299de..337eca10a3 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1515,6 +1515,7 @@ S: Maintained
- F: hw/input/vhost-user-input.c
- F: hw/input/virtio-input*.c
- F: include/hw/virtio/virtio-input.h
-+F: contrib/vhost-user-input/*
+@@ -1659,6 +1659,12 @@ F: hw/display/virtio-gpu*
+ F: hw/display/virtio-vga.c
+ F: include/hw/virtio/virtio-gpu.h
 =20
- virtio-serial
- M: Amit Shah <amit@kernel.org>
-diff --git a/Makefile b/Makefile
-index 04a0d45050..5fd26cfc97 100644
---- a/Makefile
-+++ b/Makefile
-@@ -402,6 +402,7 @@ dummy :=3D $(call unnest-vars,, \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-+                vhost-user-input-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -609,6 +610,8 @@ vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libv=
-host-user.a
- rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a lib=
-qemuutil.a
-+	$(call LINK, $^)
-=20
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index cf065de5ed..27502b7df1 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -122,6 +122,7 @@ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
- vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
- rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
-+vhost-user-input-obj-y =3D contrib/vhost-user-input/
-=20
- ######################################################################
- trace-events-subdirs =3D
-diff --git a/configure b/configure
-index 1c563a7027..140a294938 100755
---- a/configure
-+++ b/configure
-@@ -6044,6 +6044,9 @@ if test "$want_tools" =3D "yes" ; then
-   if [ "$curl" =3D "yes" ]; then
-       tools=3D"elf2dmp\$(EXESUF) $tools"
-   fi
-+  if [ "$vhost_user" =3D "yes" ] && [ "$linux" =3D "yes" ] ; then
-+    tools=3D"vhost-user-input\$(EXESUF) $tools"
-+  fi
- fi
- if test "$softmmu" =3D yes ; then
-   if test "$linux" =3D yes; then
-diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-=
-input/Makefile.objs
++vhost-user-gpu
++M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++M: Gerd Hoffmann <kraxel@redhat.com>
++S: Maintained
++F: docs/interop/vhost-user-gpu.rst
++
+ Cirrus VGA
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Odd Fixes
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+index 2df977dd52..28ead07466 100644
+--- a/docs/interop/index.rst
++++ b/docs/interop/index.rst
+@@ -15,4 +15,4 @@ Contents:
+    bitmaps
+    live-block-operations
+    pr-helper
+-
++   vhost-user-gpu
+diff --git a/docs/interop/vhost-user-gpu.rst b/docs/interop/vhost-user-gp=
+u.rst
 new file mode 100644
-index 0000000000..b1fad90d51
+index 0000000000..9cc1106b02
 --- /dev/null
-+++ b/contrib/vhost-user-input/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-input-obj-y =3D main.o
++++ b/docs/interop/vhost-user-gpu.rst
+@@ -0,0 +1,238 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++Vhost-user-gpu Protocol
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++:Licence: This work is licensed under the terms of the GNU GPL,
++          version 2 or later. See the COPYING file in the top-level
++          directory.
++
++.. contents:: Table of Contents
++
++Introduction
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The vhost-user-gpu protocol is aiming at sharing the rendering result
++of a virtio-gpu, done from a vhost-user slave process to a vhost-user
++master process (such as QEMU). It bears a resemblance to a display
++server protocol, if you consider QEMU as the display server and the
++slave as the client, but in a very limited way. Typically, it will
++work by setting a scanout/display configuration, before sending flush
++events for the display updates. It will also update the cursor shape
++and position.
++
++The protocol is sent over a UNIX domain stream socket, since it uses
++socket ancillary data to share opened file descriptors (DMABUF fds or
++shared memory). The socket is usually obtained via
++``VHOST_USER_GPU_SET_SOCKET``.
++
++Requests are sent by the *slave*, and the optional replies by the
++*master*.
++
++Wire format
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Unless specified differently, numbers are in the machine native byte
++order.
++
++A vhost-user-gpu request consists of 2 header fields and a payload.
++
+++---------+------+---------+
++| request | size | payload |
+++---------+------+---------+
++
++Header
++------
++
++:request: ``u32``, type of the request
++
++:size: ``u32``, size of the payload
++
++A reply consists only of a payload, whose content depends on the request=
+.
++
++Payload types
++-------------
++
++Depending on the request type, **payload** can be:
++
++VhostUserGpuCursorPos
++^^^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+
++| scanout-id | x | y |
+++------------+---+---+
++
++:scanout-id: ``u32``, the scanout where the cursor is located
++
++:x/y: ``u32``, the cursor postion
++
++VhostUserGpuCursorUpdate
++^^^^^^^^^^^^^^^^^^^^^^^^
++
+++-----+-------+-------+--------+
++| pos | hot_x | hot_y | cursor |
+++-----+-------+-------+--------+
++
++:pos: a ``VhostUserGpuCursorPos``, the cursor location
++
++:hot_x/hot_y: ``u32``, the cursor hot location
++
++:cursor: ``[u32; 64 * 64]``, 64x64 RGBA cursor data
++
++VhostUserGpuScanout
++^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+
++| scanout-id | w | h |
+++------------+---+---+
++
++:scanout-id: ``u32``, the scanout configuration to set
++
++:w/h: ``u32``, the scanout width/height size
++
++VhostUserGpuUpdate
++^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+---+---+------+
++| scanout-id | x | y | w | h | data |
+++------------+---+---+---+---+------+
++
++:scanout-id: ``u32``, the scanout content to update
++
++:x/y/w/h: ``u32``, region of the update
++
++:data: RGBA data (the size is computed based on the region size, and
++       the request type)
++
++VhostUserGpuDMABUFScanout
++^^^^^^^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+---+---+-----+-----+--------+-------+--------+
++| scanout-id | x | y | w | h | fdw | fwh | stride | flags | fourcc |
+++------------+---+---+---+---+-----+-----+--------+-------+--------+
++
++:scanout-id: ``u32``, the scanout configuration to set
++
++:x/y: ``u32``, the location of the scanout within the DMABUF
++
++:w/h: ``u32``, the scanout width/height size
++
++:fdw/fdh/stride/flags: ``u32``, the DMABUF width/height/stride/flags
++
++:fourcc: ``i32``, the DMABUF fourcc
++
++
++C structure
++-----------
++
++In QEMU the vhost-user-gpu message is implemented with the following str=
+uct:
++
++.. code:: c
++
++  typedef struct VhostUserGpuMsg {
++      uint32_t request; /* VhostUserGpuRequest */
++      uint32_t size; /* the following payload size */
++      union {
++          VhostUserGpuCursorPos cursor_pos;
++          VhostUserGpuCursorUpdate cursor_update;
++          VhostUserGpuScanout scanout;
++          VhostUserGpuUpdate update;
++          VhostUserGpuDMABUFScanout dmabuf_scanout;
++          uint64_t u64;
++      } payload;
++  } QEMU_PACKED VhostUserGpuMsg;
++
++Protocol features
++-----------------
++
++None yet.
++
++As the protocol may need to evolve, new messages and communication
++changes are negotiated thanks to preliminary
++``VHOST_USER_GPU_GET_PROTOCOL_FEATURES`` and
++``VHOST_USER_GPU_SET_PROTOCOL_FEATURES`` requests.
++
++Communication
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Message types
++-------------
++
++``VHOST_USER_GPU_GET_PROTOCOL_FEATURES``
++  :id: 1
++  :request payload: N/A
++  :reply payload: ``u64``
++
++  Get the supported protocol features bitmask.
++
++``VHOST_USER_GPU_SET_PROTOCOL_FEATURES``
++  :id: 2
++  :request payload: ``u64``
++  :reply payload: N/A
++
++  Enable protocol features using a bitmask.
++
++``VHOST_USER_GPU_GET_DISPLAY_INFO``
++  :id: 3
++  :request payload: N/A
++  :reply payload: ``struct virtio_gpu_resp_display_info`` (from virtio s=
+pecification)
++
++  Get the preferred display configuration.
++
++``VHOST_USER_GPU_CURSOR_POS``
++  :id: 4
++  :request payload: ``VhostUserGpuCursorPos``
++  :reply payload: N/A
++
++  Set/show the cursor position.
++
++``VHOST_USER_GPU_CURSOR_POS_HIDE``
++  :id: 5
++  :request payload: ``VhostUserGpuCursorPos``
++  :reply payload: N/A
++
++  Set/hide the cursor.
++
++``VHOST_USER_GPU_CURSOR_UPDATE``
++  :id: 6
++  :request payload: ``VhostUserGpuCursorUpdate``
++  :reply payload: N/A
++
++  Update the cursor shape and location.
++
++``VHOST_USER_GPU_SCANOUT``
++  :id: 7
++  :request payload: ``VhostUserGpuScanout``
++  :reply payload: N/A
++
++  Set the scanout resolution. To disable a scanout, the dimensions
++  width/height are set to 0.
++
++``VHOST_USER_GPU_UPDATE``
++  :id: 8
++  :request payload: ``VhostUserGpuUpdate``
++  :reply payload: N/A
++
++  Update the scanout content. The data payload contains the graphical bi=
+ts.
++  The display should be flushed and presented.
++
++``VHOST_USER_GPU_DMABUF_SCANOUT``
++  :id: 9
++  :request payload: ``VhostUserGpuDMABUFScanout``
++  :reply payload: N/A
++
++  Set the scanout resolution/configuration, and share a DMABUF file
++  descriptor for the scanout content, which is passed as ancillary
++  data. To disable a scanout, the dimensions width/height are set
++  to 0, there is no file descriptor passed.
++
++``VHOST_USER_GPU_DMABUF_UPDATE``
++  :id: 10
++  :request payload: ``VhostUserGpuUpdate``
++  :reply payload: ``u32``
++
++  The display should be flushed and presented according to updated
++  region from ``VhostUserGpuUpdate``.
++
++  Note: there is no data payload, since the scanout is shared thanks
++  to DMABUF, that must have been set previously with
++  ``VHOST_USER_GPU_DMABUF_SCANOUT``.
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index 4dbd530cb9..1be2c74cc7 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -1051,6 +1051,15 @@ Master message types
+       the shared inflight buffer back to slave so that slave could get
+       inflight I/O after a crash or restart.
+=20
++ * VHOST_USER_GPU_SET_SOCKET
++      Id: 33
++      Master payload: N/A
++      Slave payload: N/A
++
++      Sets the GPU protocol socket file descriptor, which is passed as
++      ancillary data. The GPU protocol is used to inform the master of
++      rendering state and updates. See vhost-user-gpu.rst for details.
++
+ Slave message types
+ -------------------
+=20
 --=20
 2.21.0.313.ge35b8cb8e2
