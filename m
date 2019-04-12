@@ -2,64 +2,65 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A36AFC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD1EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:52:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 630FE2086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:51:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630FE2086D
+	by mail.kernel.org (Postfix) with ESMTPS id C15822086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:52:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15822086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40722 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40724 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF0L0-00046K-Gg
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:51:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37439)
+	id 1hF0Lh-0004a9-2M
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:52:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0JZ-0002iz-6h
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hF0KL-0003qO-Mj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0JV-0005cl-Su
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46578)
+	(envelope-from <dgilbert@redhat.com>) id 1hF0KK-000681-CY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53546)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0JV-0005W2-5K
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0KK-00067b-1C
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D54F8307D85A
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:50:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 577393082E8F
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:50:59 +0000 (UTC)
 Received: from work-vm (unknown [10.36.117.255])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0179F5C219;
-	Fri, 12 Apr 2019 17:50:00 +0000 (UTC)
-Date: Fri, 12 Apr 2019 18:49:58 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A27421001E85;
+	Fri, 12 Apr 2019 17:50:58 +0000 (UTC)
+Date: Fri, 12 Apr 2019 18:50:56 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190412174958.GN2906@work-vm>
+Message-ID: <20190412175055.GO2906@work-vm>
 References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-12-armbru@redhat.com>
+	<20190411152520.10061-13-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190411152520.10061-12-armbru@redhat.com>
+In-Reply-To: <20190411152520.10061-13-armbru@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Fri, 12 Apr 2019 17:50:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 12 Apr 2019 17:50:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 11/17] target/i386: Simplify how
- x86_cpu_dump_local_apic_state() prints
+Subject: Re: [Qemu-devel] [PATCH 12/17] qom/cpu: Simplify how
+ CPUClass::dump_statistics() prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,16 +76,16 @@ Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412174958.tzEiZAeeoDWiVZja1u_O5BBWjVpVjirY8zAookuwvvc@z>
+Message-ID: <20190412175056.aMRP3Jz1d8CtumLGGSIGhFVYE96svwHP2t215rOLl_Q@z>
 
 * Markus Armbruster (armbru@redhat.com) wrote:
-> x86_cpu_dump_local_apic_state() takes an fprintf()-like callback and a
-> FILE * to pass to it, and so do its helper functions.
+> CPUClass method dump_statistics() takes an fprintf()-like callback and
+> a FILE * to pass to it.
 > 
-> Its only caller hmp_info_local_apic() passes monitor_fprintf() and the
-> current monitor cast to FILE *.  monitor_fprintf() casts it right
-> back, and is otherwise identical to monitor_printf().  The
-> type-punning is ugly.
+> Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
+> monitor_fprintf() and the current monitor cast to FILE *.
+> monitor_fprintf() casts it right back, and is otherwise identical to
+> monitor_printf().  The type-punning is ugly.
 > 
 > Drop the callback, and call qemu_printf() instead.
 > 
@@ -93,234 +94,133 @@ Message-ID: <20190412174958.tzEiZAeeoDWiVZja1u_O5BBWjVpVjirY8zAookuwvvc@z>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  target/i386/cpu.h     |  3 +-
->  target/i386/helper.c  | 79 ++++++++++++++++++++-----------------------
->  target/i386/monitor.c |  3 +-
->  3 files changed, 39 insertions(+), 46 deletions(-)
+>  include/qom/cpu.h      | 11 ++++-------
+>  monitor.c              |  2 +-
+>  qom/cpu.c              |  5 ++---
+>  target/ppc/cpu.h       |  3 +--
+>  target/ppc/translate.c |  9 ++++-----
+>  5 files changed, 12 insertions(+), 18 deletions(-)
 > 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index b39327dcb7..139fe30960 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1924,8 +1924,7 @@ void enable_compat_apic_id_mode(void);
->  #define APIC_DEFAULT_ADDRESS 0xfee00000
->  #define APIC_SPACE_SIZE      0x100000
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 1d6099e5d4..31bafee2b1 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -184,8 +184,7 @@ typedef struct CPUClass {
+>      void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+>                         int flags);
+>      GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+> -    void (*dump_statistics)(CPUState *cpu, FILE *f,
+> -                            fprintf_function cpu_fprintf, int flags);
+> +    void (*dump_statistics)(CPUState *cpu, int flags);
+>      int64_t (*get_arch_id)(CPUState *cpu);
+>      bool (*get_paging_enabled)(const CPUState *cpu);
+>      void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
+> @@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+>  /**
+>   * cpu_dump_statistics:
+>   * @cpu: The CPU whose state is to be dumped.
+> - * @f: File to dump to.
+> - * @cpu_fprintf: Function to dump with.
+>   * @flags: Flags what to dump.
+>   *
+> - * Dumps CPU statistics.
+> + * Dump CPU statistics to the current monitor if we have one, else to
+> + * stdout.
+>   */
+> -void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+> -                         int flags);
+> +void cpu_dump_statistics(CPUState *cpu, int flags);
 >  
-> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-> -                                   fprintf_function cpu_fprintf, int flags);
-> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags);
->  
->  /* cpu.c */
->  bool cpu_is_bsp(X86CPU *cpu);
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index e695f8ba7a..565391a9f6 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/osdep.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
-> +#include "qemu/qemu-print.h"
->  #include "sysemu/kvm.h"
->  #include "kvm_i386.h"
 >  #ifndef CONFIG_USER_ONLY
-> @@ -231,12 +232,10 @@ static inline const char *dm2str(uint32_t dm)
->      return str[dm];
->  }
->  
-> -static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
-> -                          const char *name, uint32_t lvt, bool is_timer)
-> +static void dump_apic_lvt(const char *name, uint32_t lvt, bool is_timer)
->  {
->      uint32_t dm = (lvt & APIC_LVT_DELIV_MOD) >> APIC_LVT_DELIV_MOD_SHIFT;
-> -    cpu_fprintf(f,
-> -                "%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
-> +    qemu_printf("%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
->                  name, lvt,
->                  lvt & APIC_LVT_INT_POLARITY ? "active-lo" : "active-hi",
->                  lvt & APIC_LVT_LEVEL_TRIGGER ? "level" : "edge",
-> @@ -248,9 +247,9 @@ static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
->                                              "tsc-deadline" : "one-shot",
->                  dm2str(dm));
->      if (dm != APIC_DM_NMI) {
-> -        cpu_fprintf(f, " (vec %u)\n", lvt & APIC_VECTOR_MASK);
-> +        qemu_printf(" (vec %u)\n", lvt & APIC_VECTOR_MASK);
->      } else {
-> -        cpu_fprintf(f, "\n");
-> +        qemu_printf("\n");
->      }
->  }
->  
-> @@ -282,8 +281,7 @@ static inline void mask2str(char *str, uint32_t val, uint8_t size)
->  
->  #define MAX_LOGICAL_APIC_ID_MASK_SIZE 16
->  
-> -static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
-> -                          APICCommonState *s, CPUX86State *env)
-> +static void dump_apic_icr(APICCommonState *s, CPUX86State *env)
->  {
->      uint32_t icr = s->icr[0], icr2 = s->icr[1];
->      uint8_t dest_shorthand = \
-> @@ -293,16 +291,16 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
->      uint32_t dest_field;
->      bool x2apic;
->  
-> -    cpu_fprintf(f, "ICR\t 0x%08x %s %s %s %s\n",
-> +    qemu_printf("ICR\t 0x%08x %s %s %s %s\n",
->                  icr,
->                  logical_mod ? "logical" : "physical",
->                  icr & APIC_ICR_TRIGGER_MOD ? "level" : "edge",
->                  icr & APIC_ICR_LEVEL ? "assert" : "de-assert",
->                  shorthand2str(dest_shorthand));
->  
-> -    cpu_fprintf(f, "ICR2\t 0x%08x", icr2);
-> +    qemu_printf("ICR2\t 0x%08x", icr2);
->      if (dest_shorthand != 0) {
-> -        cpu_fprintf(f, "\n");
-> +        qemu_printf("\n");
->          return;
->      }
->      x2apic = env->features[FEAT_1_ECX] & CPUID_EXT_X2APIC;
-> @@ -310,9 +308,9 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
->  
->      if (!logical_mod) {
->          if (x2apic) {
-> -            cpu_fprintf(f, " cpu %u (X2APIC ID)\n", dest_field);
-> +            qemu_printf(" cpu %u (X2APIC ID)\n", dest_field);
->          } else {
-> -            cpu_fprintf(f, " cpu %u (APIC ID)\n",
-> +            qemu_printf(" cpu %u (APIC ID)\n",
->                          dest_field & APIC_LOGDEST_XAPIC_ID);
->          }
->          return;
-> @@ -320,87 +318,84 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
->  
->      if (s->dest_mode == 0xf) { /* flat mode */
->          mask2str(apic_id_str, icr2 >> APIC_ICR_DEST_SHIFT, 8);
-> -        cpu_fprintf(f, " mask %s (APIC ID)\n", apic_id_str);
-> +        qemu_printf(" mask %s (APIC ID)\n", apic_id_str);
->      } else if (s->dest_mode == 0) { /* cluster mode */
->          if (x2apic) {
->              mask2str(apic_id_str, dest_field & APIC_LOGDEST_X2APIC_ID, 16);
-> -            cpu_fprintf(f, " cluster %u mask %s (X2APIC ID)\n",
-> +            qemu_printf(" cluster %u mask %s (X2APIC ID)\n",
->                          dest_field >> APIC_LOGDEST_X2APIC_SHIFT, apic_id_str);
->          } else {
->              mask2str(apic_id_str, dest_field & APIC_LOGDEST_XAPIC_ID, 4);
-> -            cpu_fprintf(f, " cluster %u mask %s (APIC ID)\n",
-> +            qemu_printf(" cluster %u mask %s (APIC ID)\n",
->                          dest_field >> APIC_LOGDEST_XAPIC_SHIFT, apic_id_str);
->          }
->      }
->  }
->  
-> -static void dump_apic_interrupt(FILE *f, fprintf_function cpu_fprintf,
-> -                                const char *name, uint32_t *ireg_tab,
-> +static void dump_apic_interrupt(const char *name, uint32_t *ireg_tab,
->                                  uint32_t *tmr_tab)
->  {
->      int i, empty = true;
->  
-> -    cpu_fprintf(f, "%s\t ", name);
-> +    qemu_printf("%s\t ", name);
->      for (i = 0; i < 256; i++) {
->          if (apic_get_bit(ireg_tab, i)) {
-> -            cpu_fprintf(f, "%u%s ", i,
-> +            qemu_printf("%u%s ", i,
->                          apic_get_bit(tmr_tab, i) ? "(level)" : "");
->              empty = false;
->          }
->      }
-> -    cpu_fprintf(f, "%s\n", empty ? "(none)" : "");
-> +    qemu_printf("%s\n", empty ? "(none)" : "");
->  }
->  
-> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-> -                                   fprintf_function cpu_fprintf, int flags)
-> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
->  {
->      X86CPU *cpu = X86_CPU(cs);
->      APICCommonState *s = APIC_COMMON(cpu->apic_state);
->      if (!s) {
-> -        cpu_fprintf(f, "local apic state not available\n");
-> +        qemu_printf("local apic state not available\n");
->          return;
->      }
->      uint32_t *lvt = s->lvt;
->  
-> -    cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
-> +    qemu_printf("dumping local APIC state for CPU %-2u\n\n",
->                  CPU(cpu)->cpu_index);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVT0", lvt[APIC_LVT_LINT0], false);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVT1", lvt[APIC_LVT_LINT1], false);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVTPC", lvt[APIC_LVT_PERFORM], false);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVTERR", lvt[APIC_LVT_ERROR], false);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVTTHMR", lvt[APIC_LVT_THERMAL], false);
-> -    dump_apic_lvt(f, cpu_fprintf, "LVTT", lvt[APIC_LVT_TIMER], true);
-> +    dump_apic_lvt("LVT0", lvt[APIC_LVT_LINT0], false);
-> +    dump_apic_lvt("LVT1", lvt[APIC_LVT_LINT1], false);
-> +    dump_apic_lvt("LVTPC", lvt[APIC_LVT_PERFORM], false);
-> +    dump_apic_lvt("LVTERR", lvt[APIC_LVT_ERROR], false);
-> +    dump_apic_lvt("LVTTHMR", lvt[APIC_LVT_THERMAL], false);
-> +    dump_apic_lvt("LVTT", lvt[APIC_LVT_TIMER], true);
->  
-> -    cpu_fprintf(f, "Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
-> +    qemu_printf("Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
->                  s->divide_conf & APIC_DCR_MASK,
->                  divider_conf(s->divide_conf),
->                  s->initial_count);
->  
-> -    cpu_fprintf(f, "SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
-> +    qemu_printf("SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
->                  s->spurious_vec,
->                  s->spurious_vec & APIC_SPURIO_ENABLED ? "enabled" : "disabled",
->                  s->spurious_vec & APIC_SPURIO_FOCUS ? "on" : "off",
->                  s->spurious_vec & APIC_VECTOR_MASK);
->  
-> -    dump_apic_icr(f, cpu_fprintf, s, &cpu->env);
-> +    dump_apic_icr(s, &cpu->env);
->  
-> -    cpu_fprintf(f, "ESR\t 0x%08x\n", s->esr);
-> +    qemu_printf("ESR\t 0x%08x\n", s->esr);
->  
-> -    dump_apic_interrupt(f, cpu_fprintf, "ISR", s->isr, s->tmr);
-> -    dump_apic_interrupt(f, cpu_fprintf, "IRR", s->irr, s->tmr);
-> +    dump_apic_interrupt("ISR", s->isr, s->tmr);
-> +    dump_apic_interrupt("IRR", s->irr, s->tmr);
->  
-> -    cpu_fprintf(f, "\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
-> +    qemu_printf("\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
->                  s->arb_id, s->tpr, s->dest_mode, s->log_dest);
->      if (s->dest_mode == 0) {
-> -        cpu_fprintf(f, "(cluster %u: id %u)",
-> +        qemu_printf("(cluster %u: id %u)",
->                      s->log_dest >> APIC_LOGDEST_XAPIC_SHIFT,
->                      s->log_dest & APIC_LOGDEST_XAPIC_ID);
->      }
-> -    cpu_fprintf(f, " PPR 0x%02x\n", apic_get_ppr(s));
-> +    qemu_printf(" PPR 0x%02x\n", apic_get_ppr(s));
->  }
->  #else
-> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-> -                                   fprintf_function cpu_fprintf, int flags)
-> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
->  {
->  }
->  #endif /* !CONFIG_USER_ONLY */
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 74a13c571b..56e2dbece7 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -664,8 +664,7 @@ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+>  /**
+> diff --git a/monitor.c b/monitor.c
+> index 0819b99ef7..fb5b681099 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
 >          monitor_printf(mon, "No CPU available\n");
 >          return;
 >      }
-> -    x86_cpu_dump_local_apic_state(cs, (FILE *)mon, monitor_fprintf,
-> -                                  CPU_DUMP_FPU);
-> +    x86_cpu_dump_local_apic_state(cs, CPU_DUMP_FPU);
+> -    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+> +    cpu_dump_statistics(cs, 0);
 >  }
 >  
->  void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
+>  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index a8d2958956..029e7fe9b0 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+>      }
+>  }
+>  
+> -void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+> -                         int flags)
+> +void cpu_dump_statistics(CPUState *cpu, int flags)
+>  {
+>      CPUClass *cc = CPU_GET_CLASS(cpu);
+>  
+>      if (cc->dump_statistics) {
+> -        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
+> +        cc->dump_statistics(cpu, flags);
+>      }
+>  }
+>  
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 8572241364..27a36b9605 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
+>  bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+>  void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+>                          int flags);
+> -void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
+> -                             fprintf_function cpu_fprintf, int flags);
+> +void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
+>  hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>  int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index badc1ae1a3..f99f27a134 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+>  #undef RFPL
+>  }
+>  
+> -void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+> -                             fprintf_function cpu_fprintf, int flags)
+> +void ppc_cpu_dump_statistics(CPUState *cs, int flags)
+>  {
+>  #if defined(DO_PPC_STATISTICS)
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+> @@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+>                          handler = t3[op3];
+>                          if (handler->count == 0)
+>                              continue;
+> -                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
+> +                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
+>                                      "%016" PRIx64 " %" PRId64 "\n",
+>                                      op1, op2, op3, op1, (op3 << 5) | op2,
+>                                      handler->oname,
+> @@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+>                  } else {
+>                      if (handler->count == 0)
+>                          continue;
+> -                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
+> +                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
+>                                  "%016" PRIx64 " %" PRId64 "\n",
+>                                  op1, op2, op1, op2, handler->oname,
+>                                  handler->count, handler->count);
+> @@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+>          } else {
+>              if (handler->count == 0)
+>                  continue;
+> -            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
+> +            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
+>                          " %" PRId64 "\n",
+>                          op1, op1, handler->oname,
+>                          handler->count, handler->count);
 > -- 
 > 2.17.2
 > 
