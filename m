@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42196)
+Received: from eggs.gnu.org ([209.51.188.92]:43356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hErKY-00005K-Mg
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:14:39 -0400
+	(envelope-from <eskultet@redhat.com>) id 1hErP6-0002Qv-Dz
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hErKX-000530-Et
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:14:38 -0400
-Date: Fri, 12 Apr 2019 10:14:30 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190412101430.05c80db5.cohuck@redhat.com>
-In-Reply-To: <571b9f8c-cfb0-704e-ded4-8661a8136876@linux.ibm.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-2-cohuck@redhat.com>
-	<9e81af36-ebd2-671b-5256-90e8efaad6f2@linux.ibm.com>
-	<20190408190747.12e3618b.cohuck@redhat.com>
-	<20190410013434.7cea1971@oc2783563651>
-	<4a692c11-edb2-93f9-7d8e-96a73a7ecdae@linux.ibm.com>
-	<571b9f8c-cfb0-704e-ded4-8661a8136876@linux.ibm.com>
+	(envelope-from <eskultet@redhat.com>) id 1hErP5-000856-F4
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:19:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1hErP5-00083p-4s
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:19:19 -0400
+Date: Fri, 12 Apr 2019 10:19:12 +0200
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20190412081912.GC16137@beluga.usersys.redhat.com>
+References: <20190411175931.29235-1-brijesh.singh@amd.com>
+	<61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
+	<7d449ae2-6762-97c2-4930-358f34f3ef4b@amd.com>
+	<869394fb-7b3d-cc01-7329-e931a260e73c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <869394fb-7b3d-cc01-7329-e931a260e73c@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] vfio-ccw: make it safe to access
- channel programs
+Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
+ field to 'query-sev-capabilities'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Laszlo Ersek <lersek@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, 11 Apr 2019 17:27:42 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On 4/10/19 10:59 PM, Eric Farman wrote:
-> >=20
-> >=20
-> > On 4/9/19 7:34 PM, Halil Pasic wrote: =20
-> >> On Mon, 8 Apr 2019 19:07:47 +0200 =20
->=20
-> ...snip...
->=20
-> >> I'm just running fio on a pass-through DASD and on some virto-blk disks
-> >> in parallel. My QEMU is today's vfio-ccw-caps from your repo.
+On Fri, Apr 12, 2019 at 09:45:02AM +0200, Paolo Bonzini wrote:
+> On 11/04/19 21:02, Singh, Brijesh wrote:
+> >
+> >
+> > On 4/11/19 1:10 PM, Laszlo Ersek wrote:
+> >> On 04/11/19 19:59, Singh, Brijesh wrote:
+> >>> There are limited numbers of the SEV guests that can be run concurr=
+ently.
+> >>> A management applications may need to know this limit so that it ca=
+n place
+> >>> SEV VMs on hosts which have suitable resources available.
+> >>>
+> >>> Currently, this limit is not exposed to the application. Add a new
+> >>> 'sev-max-guest' field in the query-sev-capabilities to provide this
+> >>> information.
+> >>>
+> >>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >>> Cc: Markus Armbruster <armbru@redhat.com>
+> >>> Cc: Eric Blake <eblake@redhat.com>
+> >>> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >>> Cc: Laszlo Ersek <lersek@redhat.com>
+> >>> Cc: Erik Skultety <eskultet@redhat.com>
+> >>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >>> ---
+> >>>   qapi/target.json  | 6 ++++--
+> >>>   target/i386/sev.c | 6 ++++--
+> >>>   2 files changed, 8 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/qapi/target.json b/qapi/target.json
+> >>> index 1d4d54b600..b45121d30b 100644
+> >>> --- a/qapi/target.json
+> >>> +++ b/qapi/target.json
+> >>> @@ -183,7 +183,8 @@
+> >>>     'data': { 'pdh': 'str',
+> >>>               'cert-chain': 'str',
+> >>>               'cbitpos': 'int',
+> >>> -            'reduced-phys-bits': 'int'},
+> >>> +            'reduced-phys-bits': 'int',
+> >>> +            'sev-max-guests': 'int'},
 > >>
-> >> I see stuff like this:
-> >> qemu-git: vfio-ccw: wirte I/O region failed with errno=3D16[1811/7332/=
-0=20
-> >> iops] [eta 26m:34s] =20
-> >=20
-> > Without knowing what the I/O was that failed, this is a guessing game.=
-=20
-> > But I encountered something similar just now running fio.
-> >=20
-> > qemu:
-> > 2019-04-11T02:06:09.524838Z qemu-system-s390x: vfio-ccw: wirte I/O=20
-> > region failed with errno=3D16 =20
->=20
-> ...snip...
->=20
-> >  From the associated I/O, I think this is fixed by a series I am nearly=
-=20
-> > ready to send for review.=C2=A0 I'll try again with those fixes on top =
-of the=20
-> > two series here, and report back. =20
->=20
-> So, I've run enough combinations to feel comfortable saying that the=20
-> error (EBUSY) I saw last night (and presumably the one Halil saw) exists=
-=20
-> in today's code and is not introduced by this series.  It also appears=20
-> to be addressed by one of the patches in a series I'm working on, but=20
-> which that series still has some further problems.  Sigh, there are too=20
-> many branches and too many interrupts.
+> >> Would it be useful to make this new field optional? E.g. if it was
+> >> missing, libvirtd could assume "no limit".
+> >>
+> >
+> > I am not sure if we need to make this field optional - mainly because
+> > in SEV context hardware will always have some limits (at least in
+> > foreseeable future). The architecture provides us a CPUID to query
+> > this capabilities so I am assuming that future CPUs will populate
+> > some values in it.
+>
+> Since this field is not specific to guest configuration, I don't think
+> it belongs in query-sev-capabilities; QEMU does not care about >1 guest=
+.
 
-Great, thanks for checking! I know that feeling of being tangled in too
-many branches...
+Neither pdh nor cert-chain are specific to the guest config. I see why th=
+is
+should be better suited for query-sev, the same goes for libvirt - I thin=
+k we
+shouldn't have gone with reporting the SEV platform caps in domain capabi=
+lities,
+we should have IMHO report it both in the host capabilities (platform spe=
+cific
+stuff) and in domain capabilities to indicate that both libvirt and QEMU
+support the SEV feature. Having said that, we have a precedent which I th=
+ink
+we might be better off with following rather than splitting the informati=
+on
+among multiple commands.
+
+Regards,
+Erik
