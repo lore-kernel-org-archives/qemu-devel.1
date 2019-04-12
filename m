@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37472)
+Received: from eggs.gnu.org ([209.51.188.92]:38615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEvBc-0006fT-0q
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:21:40 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hEvF2-0001Hr-KB
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEvBZ-0007PA-Pk
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:21:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hEvBZ-0007Or-I9
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:21:37 -0400
-Date: Fri, 12 Apr 2019 14:21:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190412122133.GG4522@linux.fritz.box>
-References: <f61645d0b3720a039423532d49dd65588d9bccd8.1554919328.git.crobinso@redhat.com>
-	<4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hEvF1-00020g-86
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:12 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] hmp: delvm: use hmp_handle_error
+References: <20190329111104.17223-1-berrange@redhat.com>
+	<20190329111104.17223-9-berrange@redhat.com>
+In-Reply-To: <20190329111104.17223-9-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 12 Apr 2019 14:24:55 +0200
+Message-ID: <CAJ+F1CKt2O22sG1rQO61CGVt0WGwvFZgfWLQT_AR+1eXHYjmOA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/14] qxl: avoid unaligned pointer
+ reads/writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +24,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, dgilbert@redhat.com
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Halil Pasic <pasic@linux.ibm.com>, Max Filippov <jcmvbkbc@gmail.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-Am 10.04.2019 um 20:27 hat Eric Blake geschrieben:
-> On 4/10/19 1:03 PM, Cole Robinson wrote:
-> > This gives us the consistent 'Error:' prefix added in 66363e9a43f,
-> > which helps users like libvirt who still need to scrape hmp error
-> > messages to detect failure.
-> > 
-> > Signed-off-by: Cole Robinson <crobinso@redhat.com>
-> > ---
-> >  hmp.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> Not enough to drive -rc4 on its own, but worth adding to our wishlist of
-> potential easy patches if we do have a release blocker surface.
+Hi
 
-As we are going to have an -rc4, I had a look at this.
+On Fri, Mar 29, 2019 at 12:20 PM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+>
+> The SPICE_RING_PROD_ITEM() macro is initializing a local
+> 'uint64_t *' variable to point to the 'el' field inside
+> the QXLReleaseRing struct. This uint64_t field is not
+> guaranteed aligned as the struct is packed.
+>
+> Code should not take the address of fields within a
+> packed struct. Changing the SPICE_RING_PROD_ITEM()
+> macro to avoid taking the address of the field is
+> impractical. It is clearer to just remove the macro
+> and inline its functionality in the three call sites
+> that need it.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Commit 66363e9a43f was in February and explicitly says "Note: Some
-places don't use hmp_handle_error". So this doesn't seem to be a
-regression and even if it's fixed, it's likely not the last place that
-doesn't use the "Error:" prefix. This would suggest that this isn't for
--rc4.
+I didn't notice your patch, I sent a different one which didn't inline
+as much code:
 
-Am I misunderstanding the situation?
+https://patchew.org/QEMU/20190408201203.28924-1-marcandre.lureau@redhat.com=
+/
 
-Kevin
+> ---
+>  hw/display/qxl.c | 55 +++++++++++++++++++++---------------------------
+>  1 file changed, 24 insertions(+), 31 deletions(-)
+>
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index c8ce5781e0..5c38e6e906 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -33,24 +33,6 @@
+>
+>  #include "qxl.h"
+>
+> -/*
+> - * NOTE: SPICE_RING_PROD_ITEM accesses memory on the pci bar and as
+> - * such can be changed by the guest, so to avoid a guest trigerrable
+> - * abort we just qxl_set_guest_bug and set the return to NULL. Still
+> - * it may happen as a result of emulator bug as well.
+> - */
+> -#undef SPICE_RING_PROD_ITEM
+> -#define SPICE_RING_PROD_ITEM(qxl, r, ret) {                             =
+\
+> -        uint32_t prod =3D (r)->prod & SPICE_RING_INDEX_MASK(r);         =
+  \
+> -        if (prod >=3D ARRAY_SIZE((r)->items)) {                         =
+  \
+> -            qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatc=
+h " \
+> -                          "%u >=3D %zu", prod, ARRAY_SIZE((r)->items)); =
+  \
+> -            ret =3D NULL;                                               =
+  \
+> -        } else {                                                        =
+\
+> -            ret =3D &(r)->items[prod].el;                               =
+  \
+> -        }                                                               =
+\
+> -    }
+> -
+>  #undef SPICE_RING_CONS_ITEM
+>  #define SPICE_RING_CONS_ITEM(qxl, r, ret) {                             =
+\
+>          uint32_t cons =3D (r)->cons & SPICE_RING_INDEX_MASK(r);         =
+  \
+> @@ -414,7 +396,8 @@ static void init_qxl_rom(PCIQXLDevice *d)
+>  static void init_qxl_ram(PCIQXLDevice *d)
+>  {
+>      uint8_t *buf;
+> -    uint64_t *item;
+> +    uint32_t prod;
+> +    QXLReleaseRing *ring;
+>
+>      buf =3D d->vga.vram_ptr;
+>      d->ram =3D (QXLRam *)(buf + le32_to_cpu(d->shadow_rom.ram_header_off=
+set));
+> @@ -426,9 +409,12 @@ static void init_qxl_ram(PCIQXLDevice *d)
+>      SPICE_RING_INIT(&d->ram->cmd_ring);
+>      SPICE_RING_INIT(&d->ram->cursor_ring);
+>      SPICE_RING_INIT(&d->ram->release_ring);
+> -    SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
+> -    assert(item);
+> -    *item =3D 0;
+> +
+> +    ring =3D &d->ram->release_ring;
+> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
+> +    assert(prod < ARRAY_SIZE(ring->items));
+> +    ring->items[prod].el =3D 0;
+> +
+>      qxl_ring_set_dirty(d);
+>  }
+>
+> @@ -732,7 +718,7 @@ static int interface_req_cmd_notification(QXLInstance=
+ *sin)
+>  static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
+>  {
+>      QXLReleaseRing *ring =3D &d->ram->release_ring;
+> -    uint64_t *item;
+> +    uint32_t prod;
+>      int notify;
+>
+>  #define QXL_FREE_BUNCH_SIZE 32
+> @@ -759,11 +745,15 @@ static inline void qxl_push_free_res(PCIQXLDevice *=
+d, int flush)
+>      if (notify) {
+>          qxl_send_events(d, QXL_INTERRUPT_DISPLAY);
+>      }
+> -    SPICE_RING_PROD_ITEM(d, ring, item);
+> -    if (!item) {
+> +
+> +    ring =3D &d->ram->release_ring;
+> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
+> +    if (prod >=3D ARRAY_SIZE(ring->items)) {
+> +        qxl_set_guest_bug(d, "SPICE_RING_PROD_ITEM indices mismatch "
+> +                          "%u >=3D %zu", prod, ARRAY_SIZE(ring->items));
+>          return;
+>      }
+> -    *item =3D 0;
+> +    ring->items[prod].el =3D 0;
+>      d->num_free_res =3D 0;
+>      d->last_release =3D NULL;
+>      qxl_ring_set_dirty(d);
+> @@ -775,7 +765,8 @@ static void interface_release_resource(QXLInstance *s=
+in,
+>  {
+>      PCIQXLDevice *qxl =3D container_of(sin, PCIQXLDevice, ssd.qxl);
+>      QXLReleaseRing *ring;
+> -    uint64_t *item, id;
+> +    uint32_t prod;
+> +    uint64_t id;
+>
+>      if (ext.group_id =3D=3D MEMSLOT_GROUP_HOST) {
+>          /* host group -> vga mode update request */
+> @@ -792,16 +783,18 @@ static void interface_release_resource(QXLInstance =
+*sin,
+>       * pci bar 0, $command.release_info
+>       */
+>      ring =3D &qxl->ram->release_ring;
+> -    SPICE_RING_PROD_ITEM(qxl, ring, item);
+> -    if (!item) {
+> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
+> +    if (prod >=3D ARRAY_SIZE(ring->items)) {
+> +        qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatch "
+> +                          "%u >=3D %zu", prod, ARRAY_SIZE(ring->items));
+>          return;
+>      }
+> -    if (*item =3D=3D 0) {
+> +    if (ring->items[prod].el =3D=3D 0) {
+>          /* stick head into the ring */
+>          id =3D ext.info->id;
+>          ext.info->next =3D 0;
+>          qxl_ram_set_dirty(qxl, &ext.info->next);
+> -        *item =3D id;
+> +        ring->items[prod].el =3D id;
+>          qxl_ring_set_dirty(qxl);
+>      } else {
+>          /* append item to the list */
+> --
+> 2.20.1
+>
+>
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> > 
-> > diff --git a/hmp.c b/hmp.c
-> > index 8eec768088..74a4bfc1f9 100644
-> > --- a/hmp.c
-> > +++ b/hmp.c
-> > @@ -1481,10 +1481,11 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
-> >      const char *name = qdict_get_str(qdict, "name");
-> >  
-> >      if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
-> > -        error_reportf_err(err,
-> > -                          "Error while deleting snapshot on device '%s': ",
-> > -                          bdrv_get_device_name(bs));
-> > +        error_prepend(&err,
-> > +                      "Error while deleting snapshot on device '%s': ",
-> 
-> Do we want to reword the message (maybe s/Error while //) to avoid the
-> word "Error" twice in the same line?
-> 
-> > +                      bdrv_get_device_name(bs));
-> >      }
-> > +    hmp_handle_error(mon, &err);
-> >  }
-> >  
-> >  void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
-> > 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
-> 
+
+--=20
+Marc-Andr=C3=A9 Lureau
