@@ -6,67 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55229C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 730B0C10F14
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 277642082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:40:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277642082E
+	by mail.kernel.org (Postfix) with ESMTPS id 46E572082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E572082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35858 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvU3-0008H6-Ao
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:40:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39222)
+	id 1hEvU9-0008PG-H5
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:40:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEvG2-00032q-Ft
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFp-0002SV-Ka
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hEvG1-0002jY-Aw
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50478)
+	(envelope-from <thuth@redhat.com>) id 1hEvFn-0002Ya-Fl
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hEvFs-0002dJ-G8; Fri, 12 Apr 2019 08:26:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hEvFn-0002Wu-55; Fri, 12 Apr 2019 08:25:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAAA23088B80;
-	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D3245D6A9;
-	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id E40EA1138648; Fri, 12 Apr 2019 14:26:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190411135602.21725-1-armbru@redhat.com>
-	<20190411135602.21725-2-armbru@redhat.com>
-	<0eea5ddb-1efb-8fdf-4a37-9bc2daf86e2b@redhat.com>
-	<03fb5b6f-7d95-3b9b-3172-e37825402036@redhat.com>
-	<8d6c1ced-1e7b-9e52-3afb-3fe1197f7a02@redhat.com>
-	<87bm1br788.fsf@dusky.pond.sub.org>
-Date: Fri, 12 Apr 2019 14:26:01 +0200
-In-Reply-To: <87bm1br788.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 12 Apr 2019 09:52:07 +0200")
-Message-ID: <87tvf3o1eu.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id 60A593DFCD;
+	Fri, 12 Apr 2019 12:25:58 +0000 (UTC)
+Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4977A5D9CC;
+	Fri, 12 Apr 2019 12:25:56 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: cohuck@redhat.com,
+	qemu-s390x@nongnu.org
+Date: Fri, 12 Apr 2019 14:25:16 +0200
+Message-Id: <20190412122523.24111-11-thuth@redhat.com>
+In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
+References: <20190412122523.24111-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 12 Apr 2019 12:25:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] pflash_cfi01: New
- pflash_cfi01_legacy_drive()
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 10/17] s390-bios: Extend
+ find_dev() for non-virtio devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,116 +69,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, mreitz@redhat.com, qemu-arm@nongnu.org,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412122601.eVEub-CvEynQCypBWFcuOoJ-7BWHe0sb5OjlguC2V4w@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190412122516.C-O4HybTjq2YyLdV0JKQRTab7H9znDCF_exNYdwAjzw@z>
 
-Markus Armbruster <armbru@redhat.com> writes:
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-> Laszlo Ersek <lersek@redhat.com> writes:
-[...]
->> In other words, we could have written the pre-patch (original) code like
->> this:
->>
->> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->> index c6285407748e..ed6e713d0982 100644
->> --- a/hw/i386/pc_sysfw.c
->> +++ b/hw/i386/pc_sysfw.c
->> @@ -291,9 +291,10 @@ void pc_system_firmware_init(PCMachineState *pcms,
->>              error_report("clashes with -machine");
->>              exit(1);
->>          }
->> -        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
->>          qdev_prop_set_drive(DEVICE(pcms->flash[i]),
->> -                            "drive", pflash_blk[i], &error_fatal);
->> +                            "drive", blk_by_legacy_dinfo(pflash_drv),
->> +                            &error_fatal);
->> +        pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
->>          loc_pop(&loc);
->>      }
->>
->> and the behavior would have been identical.
->>
->> For the sake of QOM / blk dummies like me, can you please split this
->> refactoring to a separate patch, before extracting the new function?
->
-> If you think a preparatory patch is called for, I'll create one.
->
-> I'd have difficulties coming up with a commit message for the one you
-> proposed.
->
-> I append a patch I can describe.  Would it work for you?
->
->
->
-> pc: Split pc_system_firmware_init()'s legacy -drive loop
->
-> The loop does two things: map legacy -drive to properties, and collect
-> all the backends for use after the loop.  The next patch will factor
-> out the former for reuse in hw/arm/virt.c.  To make that easier, do
-> each thing in its own loop.
+We need a method for finding the subchannel of a dasd device. Let's
+modify find_dev to handle this since it mostly does what we need. Up to
+this point find_dev has been specific to only virtio devices.
 
-Inserting here:
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <1554388475-18329-11-git-send-email-jjherne@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-  Note that the first loop updates pcms->flash[i]->blk for -drive
-  if=pflash with qdev_prop_set_drive().  The second loop gets the
-  (possibly updated) value from pflash_cfi01_get_blk().
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index e403b5f733..d04ea8972a 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -52,6 +52,12 @@ unsigned int get_loadparm_index(void)
+     return atoui(loadparm_str);
+ }
+=20
++/*
++ * Find the subchannel connected to the given device (dev_no) and fill i=
+n the
++ * subchannel information block (schib) with the connected subchannel's =
+info.
++ * NOTE: The global variable blk_schid is updated to contain the subchan=
+nel
++ * information.
++ */
+ static bool find_dev(Schib *schib, int dev_no)
+ {
+     int i, r;
+@@ -65,15 +71,15 @@ static bool find_dev(Schib *schib, int dev_no)
+         if (!schib->pmcw.dnv) {
+             continue;
+         }
+-        if (!virtio_is_supported(blk_schid)) {
+-            continue;
+-        }
++
+         /* Skip net devices since no IPLB is created and therefore no
+-         * no network bootloader has been loaded
++         * network bootloader has been loaded
+          */
+-        if (virtio_get_device_type() =3D=3D VIRTIO_ID_NET && dev_no < 0)=
+ {
++        if (virtio_is_supported(blk_schid) &&
++            virtio_get_device_type() =3D=3D VIRTIO_ID_NET && dev_no < 0)=
+ {
+             continue;
+         }
++
+         if ((dev_no < 0) || (schib->pmcw.dev =3D=3D dev_no)) {
+             return true;
+         }
+--=20
+2.21.0
 
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/i386/pc_sysfw.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index c628540774..90db9b57a4 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -269,6 +269,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  {
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->      int i;
-> +    BlockBackend *blk;
->      DriveInfo *pflash_drv;
->      BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
->      Location loc;
-> @@ -280,23 +281,26 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  
->      /* Map legacy -drive if=pflash to machine properties */
->      for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
-> -        pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
-> +        blk = pflash_cfi01_get_blk(pcms->flash[i]);
->          pflash_drv = drive_get(IF_PFLASH, 0, i);
->          if (!pflash_drv) {
->              continue;
->          }
->          loc_push_none(&loc);
->          qemu_opts_loc_restore(pflash_drv->opts);
-> -        if (pflash_blk[i]) {
-> +        if (blk) {
->              error_report("clashes with -machine");
->              exit(1);
->          }
-> -        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-> -        qdev_prop_set_drive(DEVICE(pcms->flash[i]),
-> -                            "drive", pflash_blk[i], &error_fatal);
-> +        qdev_prop_set_drive(DEVICE(pcms->flash[i]), "drive",
-> +                            blk_by_legacy_dinfo(pflash_drv), &error_fatal);
->          loc_pop(&loc);
->      }
->  
-> +    for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
-> +        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-
-Uh, this should be pflash_cfi01_get_blk(pcms->flash[i]) instead.
-
-> +    }
-> +
->      /* Reject gaps */
->      for (i = 1; i < ARRAY_SIZE(pcms->flash); i++) {
->          if (pflash_blk[i] && !pflash_blk[i - 1]) {
 
