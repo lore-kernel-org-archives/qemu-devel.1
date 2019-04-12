@@ -2,78 +2,65 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52299C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3207C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BACD20818
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:25:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="rfrB4rGU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BACD20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id C3D7A2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D7A2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35600 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35624 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvFP-0001HQ-9d
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:25:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37306)
+	id 1hEvHI-0004LI-01
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:27:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEvAv-000694-Sv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:20:58 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFR-0001dk-C5
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEvAr-00070C-Pv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:20:57 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:34508)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hEvAr-0006yy-7Z
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:20:53 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::119])
-	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id BEA302E1443;
-	Fri, 12 Apr 2019 15:20:50 +0300 (MSK)
-Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net
-	[2a02:6b8:0:1472:2741:0:8b6:10])
-	by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	huEYPqifM2-KoeCH6uD; Fri, 12 Apr 2019 15:20:50 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1555071650; bh=3T9khVU7szn5g8uyFhS4GSIxV4aHd8JjAMmP6K3BMvM=;
-	h=Message-Id:Date:Subject:To:From:Cc;
-	b=rfrB4rGUvlyMnuY6SRgj5EBeZFwmvwW+dzSD8B7BrL7iblOqW5Rr3fBl2E6sqxFyp
-	I/QDTsZ7ScJSvuXmz0+KIL0069VYK0RYEtthjEXtQHpT4IXecY2bL84zFLG2at6+aU
-	qgnDHWiXLvQ2y6s5hMbJzpT5WmKVDmYXXAJaCURU=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
-	[2a02:6b8:0:40c:3404:6cb5:5ab:ed68])
-	by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
-	m4LakqlT7Q-Ko0WxZsE; Fri, 12 Apr 2019 15:20:50 +0300
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-	(Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Juan Quintela <quintela@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Apr 2019 15:20:25 +0300
-Message-Id: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <thuth@redhat.com>) id 1hEvFQ-0002IQ-BL
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46448)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hEvFQ-0002II-3b; Fri, 12 Apr 2019 08:25:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 643E91555C;
+	Fri, 12 Apr 2019 12:25:35 +0000 (UTC)
+Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 431D85D9CC;
+	Fri, 12 Apr 2019 12:25:32 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: cohuck@redhat.com,
+	qemu-s390x@nongnu.org
+Date: Fri, 12 Apr 2019 14:25:08 +0200
+Message-Id: <20190412122523.24111-3-thuth@redhat.com>
+In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
+References: <20190412122523.24111-1-thuth@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 12 Apr 2019 12:25:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 77.88.29.217
-Subject: [Qemu-devel] [PATCH 0/3] Add 'inline-fd:' protocol for migration
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 02/17] s390-bios:
+ decouple cio setup from virtio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,59 +69,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
-	yc-core@yandex-team.ru
+Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412122025.fsn2lx61cWnGCsfLvPktNa6nzt03cw_SM3CotyvdE34@z>
+Message-ID: <20190412122508.tAoq52EtMnWvXkC_ffjc723x5hC2MllcTQj4mV4QAm4@z>
 
-Hi,
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-I've added 'inline-fd:' proto to simplify migration to/from fd.
-I thought about modifying the existing 'fd:' proto but I'm not sure it's =
-a
-good idea to change it's contract.
+Move channel i/o setup code out to a separate function. This decouples ci=
+o
+setup from the virtio code path and allows us to make use of it for booti=
+ng
+dasd devices.
 
-Existing 'fd:' proto works with previously added fd by getfd or add-fd co=
-mmands.
-If client doesn't want to work with this fd before or after migration the=
-n it's
-easier to send an fd with the migrate-* command. Also, client shouldn't m=
-aintain
-this fd.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <1554388475-18329-3-git-send-email-jjherne@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-Usage:
-{ 'execute': 'migrate', 'arguments': { 'uri': 'inline-fd:' } }
-{ 'execute': 'migrate-incoming', 'arguments': { 'uri': 'inline-fd:' } }
-
-Regards,
-Yury
-
-Yury Kotov (3):
-  monitor: Add monitor_recv_fd function to work with sent fds
-  migration: Add inline-fd protocol
-  migration-test: Add a test for inline_fd protocol
-
- include/monitor/monitor.h          |   1 +
- migration/Makefile.objs            |   2 +-
- migration/inline-fd.c              |  89 ++++++++++++++++++++++
- migration/inline-fd.h              |  22 ++++++
- migration/migration.c              |  15 ++++
- migration/trace-events             |   4 +
- monitor.c                          |  15 +++-
- tests/libqtest.c                   |  83 +++++++++++++++++++-
- tests/libqtest.h                   |  51 ++++++++++++-
- tests/migration-test.c             | 117 ++++++++++++++++++++++++++---
- tests/qemu-seccomp                 | Bin 0 -> 1266168 bytes
- tests/test-query-device-blockstats | Bin 0 -> 1272608 bytes
- 12 files changed, 379 insertions(+), 20 deletions(-)
- create mode 100644 migration/inline-fd.c
- create mode 100644 migration/inline-fd.h
- create mode 100755 tests/qemu-seccomp
- create mode 100755 tests/test-query-device-blockstats
-
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 544851d672..e82fe2ce23 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -99,6 +99,18 @@ static void menu_setup(void)
+     }
+ }
+=20
++/*
++ * Initialize the channel I/O subsystem so we can talk to our ipl/boot d=
+evice.
++ */
++static void css_setup(void)
++{
++    /*
++     * Unconditionally enable mss support. In every sane configuration t=
+his
++     * will succeed; and even if it doesn't, stsch_err() can handle it.
++     */
++    enable_mss_facility();
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+@@ -109,13 +121,6 @@ static void virtio_setup(void)
+     VDev *vdev =3D virtio_get_device();
+     QemuIplParameters *early_qipl =3D (QemuIplParameters *)QIPL_ADDRESS;
+=20
+-    /*
+-     * We unconditionally enable mss support. In every sane configuratio=
+n,
+-     * this will succeed; and even if it doesn't, stsch_err() can deal
+-     * with the consequences.
+-     */
+-    enable_mss_facility();
+-
+     sclp_get_loadparm_ascii(loadparm_str);
+     memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+     sclp_print(ldp);
+@@ -168,6 +173,7 @@ static void virtio_setup(void)
+ int main(void)
+ {
+     sclp_setup();
++    css_setup();
+     virtio_setup();
+=20
+     zipl_load(); /* no return */
 --=20
 2.21.0
 
