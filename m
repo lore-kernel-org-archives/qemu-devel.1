@@ -2,84 +2,60 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2ABC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E680C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D207220674
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:20:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D207220674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4919620674
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:21:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nFWHk9bE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4919620674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34468 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34509 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEuDy-0006ha-3p
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:20:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54357)
+	id 1hEuFk-00085H-JF
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:21:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEuCr-0006Eg-RU
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:18:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hEuEu-0007gC-EX
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEuCq-0008It-SF
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:18:53 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEuCq-0008Hs-Ju
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:18:52 -0400
-Received: by mail-wr1-f65.google.com with SMTP id j9so11442468wrn.6
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 04:18:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=A0JMccryKbAcz5l1AwiPmUzRKbvs8IeRaj2pQ8QTtOg=;
-	b=ghAI9TFNWyeGlHjOMjGXrOXVZnBMlNG/CCy+yqXCie3AvlaSrnqkMNH1d/ZKZ7n55A
-	7npC/mic7YbhSB05tcmBTyJL4O1n4bT0bFSfwr04SBGdgZpWWBQ+qJyeSYVbTbjcEdvJ
-	uB1eovu1vJlVruLmFA8No/EqSUFY+4ImltEv4OXXPFblCgQHEPZjb1z4o+hO60XLHpC+
-	oMajqGTuKO4ERXVSUjtSyyLzvqTBZe4FzF/6TtCn1T3wN8Zv8OXXojfPE2B/u3DdMRUX
-	hC+VN/JCTuDaY3oc/eUZFRpJwQnc3wjjxp1xqDT3zF6tBfao9TEx5MNRz8HnnzdtoBFv
-	n5rw==
-X-Gm-Message-State: APjAAAUxck0VNldsRwlv1EiNXfs8vTkBAjiPJ57RVp70RkTiCwzcwe1F
-	c/VcjpulNp4cJC+J86P6B40hnQ==
-X-Google-Smtp-Source: APXvYqx8Fdg+SeXMpaIYL98Ip9Nvn39gyha2MDVBdE/94hC0ljlKiipaHyZGCFgnlmKN+bFofc430A==
-X-Received: by 2002:adf:f80c:: with SMTP id s12mr27939601wrp.72.1555067931585; 
-	Fri, 12 Apr 2019 04:18:51 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	v14sm51504630wrr.20.2019.04.12.04.18.50
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 04:18:50 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-References: <20190411135602.21725-1-armbru@redhat.com>
-	<20190411135602.21725-2-armbru@redhat.com>
-	<0eea5ddb-1efb-8fdf-4a37-9bc2daf86e2b@redhat.com>
-	<03fb5b6f-7d95-3b9b-3172-e37825402036@redhat.com>
-	<8d6c1ced-1e7b-9e52-3afb-3fe1197f7a02@redhat.com>
-	<87bm1br788.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6dbb3173-b2e2-361e-9bfd-cdbcb308eb50@redhat.com>
-Date: Fri, 12 Apr 2019 13:18:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <dgibson@ozlabs.org>) id 1hEuEq-0001HO-ST
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:20:58 -0400
+Received: from ozlabs.org ([203.11.71.1]:45925)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hEuEm-0001Au-DV; Fri, 12 Apr 2019 07:20:54 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 44gb6l528Lz9s9y; Fri, 12 Apr 2019 21:20:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1555068047;
+	bh=uxOHtX70uw6UrGIGIWWT6Bc2UG05pFqcNPJm2NQAR/g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nFWHk9bEKRclQtrDGBhiW9vOy2Bw27DU7vFC1X8ULDJJBnB6xovYY+KrkD6BOatZY
+	VYcE5RYY9BGmUwWFc/+tL+kSy2HFNbHaHycXJxb0dbJ3d/QE5qrTlXs5WlltMtBIQt
+	Z2ttzhmzzuzY9uUWcNclKHzTAJf89xSWKqGQ9FEs=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Fri, 12 Apr 2019 21:20:44 +1000
+Message-Id: <20190412112044.15361-2-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190412112044.15361-1-david@gibson.dropbear.id.au>
+References: <20190412112044.15361-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <87bm1br788.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 1/2] pflash_cfi01: New
- pflash_cfi01_legacy_drive()
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 1/1] spapr_pci: Fix broken naming of PCI bus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,75 +67,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, mreitz@redhat.com, qemu-arm@nongnu.org
+Cc: lvivier@redhat.com, mst@redhat.com, clg@redhat.com, qemu-devel@nongnu.org,
+	groug@kaod.org, alex.williamson@redhat.com, spopovyc@redhat.com,
+	qemu-ppc@nongnu.org, marcel@redhat.com,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412111845.P1Jsi0PNmRhM2nIWBBwDITAdpMVV-yKWSBsdkH_Ks3c@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190412112044.jCDpiH-xvdImYCgugDG7O3KsL4pAF1JVrMKfKQQYOag@z>
 
-On 4/12/19 9:52 AM, Markus Armbruster wrote:
-> I append a patch I can describe.  Would it work for you?
-> 
-> 
-> 
-> pc: Split pc_system_firmware_init()'s legacy -drive loop
-> 
-> The loop does two things: map legacy -drive to properties, and collect
-> all the backends for use after the loop.  The next patch will factor
-> out the former for reuse in hw/arm/virt.c.  To make that easier, do
-> each thing in its own loop.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/i386/pc_sysfw.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index c628540774..90db9b57a4 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -269,6 +269,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  {
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->      int i;
-> +    BlockBackend *blk;
->      DriveInfo *pflash_drv;
->      BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
->      Location loc;
-> @@ -280,23 +281,26 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  
->      /* Map legacy -drive if=pflash to machine properties */
->      for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
-> -        pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
-> +        blk = pflash_cfi01_get_blk(pcms->flash[i]);
->          pflash_drv = drive_get(IF_PFLASH, 0, i);
->          if (!pflash_drv) {
->              continue;
->          }
->          loc_push_none(&loc);
->          qemu_opts_loc_restore(pflash_drv->opts);
-> -        if (pflash_blk[i]) {
-> +        if (blk) {
->              error_report("clashes with -machine");
->              exit(1);
->          }
-> -        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-> -        qdev_prop_set_drive(DEVICE(pcms->flash[i]),
-> -                            "drive", pflash_blk[i], &error_fatal);
-> +        qdev_prop_set_drive(DEVICE(pcms->flash[i]), "drive",
-> +                            blk_by_legacy_dinfo(pflash_drv), &error_fatal);
->          loc_pop(&loc);
->      }
->  
-> +    for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
-> +        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
-> +    }
-> +
->      /* Reject gaps */
->      for (i = 1; i < ARRAY_SIZE(pcms->flash); i++) {
->          if (pflash_blk[i] && !pflash_blk[i - 1]) {
-> -- 2.17.2
+From: Greg Kurz <groug@kaod.org>
 
-Works for me! Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Recent commit 5cf0d326a0fe fixed a regression which was preventing the
+guest to access the extended config space of a PCIe device. This was
+done by introducing a new PCI bus subtype for PAPR. The original fix
+was causing PCI busses to be named "spapr-pci-host-bridge-root-bus.N"
+instead of "pci.N", which was making upper layers unhappy of course.
+This got worked around by hardcoding the PCI bus name to "pci.0", but
+this only works for the default PHB. And we're now hitting:
+
+# qemu-system-ppc64 \
+             -device spapr-pci-host-bridge,index=3D1 \
+             -device e1000e,bus=3Dpci.0 \
+             -device e1000e,bus=3Dpci.1
+qemu-system-ppc64: -device e1000e,bus=3Dpci.1: Bus 'pci.1' not found
+
+David already posted some patches [1] to control PCI extended config
+space accesses with a new flag in the base PCI bus class instead of
+subtyping. These patches are a bit more intrusive though, and
+are targetted for 4.1.
+
+When no name is passed to pci_register_bus(), the core device code
+generates a lowercase name based on the QOM typename. The typename
+for the base PCI bus class is "PCI", hence the "pci.0", "pci.1"
+bus names. Rename the type of the PAPR PCI bus to "pci", so that
+the QOM code can generate proper names. This is a hack but it is
+enough to fix the regression. And all this will be reworked properly
+in 4.1.
+
+[1] https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D100486
+
+Fixes: 5cf0d326a0fe
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <155500034416.646888.1307366522340665522.stgit@bahia.lab.toul=
+ouse-stg.fr.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f0b6b23afc..f62e6833b8 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1652,7 +1652,7 @@ static void spapr_phb_root_bus_class_init(ObjectCla=
+ss *klass, void *data)
+     pbc->allows_extended_config_space =3D spapr_phb_allows_extended_conf=
+ig_space;
+ }
+=20
+-#define TYPE_SPAPR_PHB_ROOT_BUS "spapr-pci-host-bridge-root-bus"
++#define TYPE_SPAPR_PHB_ROOT_BUS "pci"
+=20
+ static const TypeInfo spapr_phb_root_bus_info =3D {
+     .name =3D TYPE_SPAPR_PHB_ROOT_BUS,
+@@ -1761,7 +1761,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+     memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
+                                 &sphb->iowindow);
+=20
+-    bus =3D pci_register_root_bus(dev, "pci.0",
++    bus =3D pci_register_root_bus(dev, NULL,
+                                 pci_spapr_set_irq, pci_spapr_map_irq, sp=
+hb,
+                                 &sphb->memspace, &sphb->iospace,
+                                 PCI_DEVFN(0, 0), PCI_NUM_PINS,
+--=20
+2.20.1
+
 
