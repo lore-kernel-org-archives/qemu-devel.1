@@ -2,66 +2,91 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B9CC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 04:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023B5C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 04:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E10A42084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 04:37:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E10A42084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A297220869
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 04:55:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iIUMATIj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A297220869
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58838 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58988 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEnwq-0003oL-5D
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 00:37:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34112)
+	id 1hEoEB-0007rq-Sx
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 00:55:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEnvz-0003Pk-JL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:04 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hEoDC-0007C4-Hg
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEnvy-00075a-A3
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:03 -0400
-Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:48950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEnvx-00073J-Vj
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:02 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.159.68])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 76B0F2070BE
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 06:36:59 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-40-22.w86-201.abo.wanadoo.fr
-	[86.201.133.22]) (Authenticated sender: clg@kaod.org)
-	by player799.ha.ovh.net (Postfix) with ESMTPSA id 06BBD4ADE0E4;
-	Fri, 12 Apr 2019 04:36:53 +0000 (UTC)
-To: Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
-References: <20190411161013.4514-1-clg@kaod.org>
-	<20190411161013.4514-3-clg@kaod.org>
-	<CACPK8XezRXPFFiiK7_xXLs-ipnfw9400E1dSRHN0XnF2cc4=vA@mail.gmail.com>
-	<c007d615-4dbf-4525-9fb0-6e4feb28c344@www.fastmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e9c90082-5312-5707-539b-3ab3c2e7d885@kaod.org>
-Date: Fri, 12 Apr 2019 06:36:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <joel.stan@gmail.com>) id 1hEoDB-00009T-4o
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:54:50 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+	id 1hEoD7-000080-R6; Fri, 12 Apr 2019 00:54:46 -0400
+Received: by mail-pl1-x642.google.com with SMTP id n8so4470830plp.10;
+	Thu, 11 Apr 2019 21:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=UtwwdswuQTVY78rOrnx+cZ0SUKEyn0jmcL9H2uyrBe0=;
+	b=iIUMATIjtGtpNcaWt1ZGv3S1QwmliPMi1ZUNNqyONLB53oBjUdDA5yqOAXnzp5kvAB
+	8MsZ4UfSzxcNjwsrgTAf6J2QihSc2tEnNJUvRdNk3eG0f/uLtv56f19iTEorC0uVMth/
+	/QroRXOjYbo5kV17hMunTaMsbP3BeYVp9K078d2zwF7vov9nTT4A3c0j3a7JaK82aGNM
+	Y9P08okE5Rypy/SQfLUktyEHF5CQNmW7fKguXaZs7y45W3qjGXlVkFP4jIRI7Y1ZgxmQ
+	fMWJuqMsqxA7rqtSBv8zRWP/OpF7vtorMsrUj6zIMmGFY1S68QtnfIGGJFdvo0VaqztO
+	thsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	:in-reply-to:references:mime-version:content-transfer-encoding;
+	bh=UtwwdswuQTVY78rOrnx+cZ0SUKEyn0jmcL9H2uyrBe0=;
+	b=b4/2kNe/w6oMsA7y+36rh3b2SSlT2bNJj4helnv79S5KWWdUbyBOBvAINIkwo5f3BW
+	FuaA/in2eKOx5mUhl/w7yBjWUnHze/NiZTTFIKXo/CKCJxkU/Y4yIOEu6eVMNkvP8ViK
+	1WKq1pKXZZwOHE8LToF4GzbIduyEcBhUMk13QlT6wzJxnhmmlVh41/b2Bc4+2yujSFYO
+	I1W03CCbANpApyw0D3NflRPFZw+vXeloeIlAwsh7mLD02by6bG0ZXytwxlK9Pfzl8oFg
+	lfBsCHbH/rp3Spnd3FQG/DDtG8HVhtVyrc7s/QgwK01PnlyJoGt0EIUQEzejZEDcbV+6
+	chkg==
+X-Gm-Message-State: APjAAAXeoSwC7KpD0vbO3p5iM1yIlUGhq4z4Ilxu81EaDoyVLxvsBIcx
+	nFNp1PlnCtY3NQ59YOkA1Q0=
+X-Google-Smtp-Source: APXvYqzzpyj2TAAhwzIv9TOL3bsW55cya1a3OWMPL0TyViw1C28S5bjEjjseSDrPFeUWC0o/DwtFvQ==
+X-Received: by 2002:a17:902:2c01:: with SMTP id
+	m1mr44834140plb.186.1555044884176; 
+	Thu, 11 Apr 2019 21:54:44 -0700 (PDT)
+Received: from voyager.jms.id.au ([36.255.48.244])
+	by smtp.gmail.com with ESMTPSA id
+	x16sm88515747pge.27.2019.04.11.21.54.40
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 11 Apr 2019 21:54:43 -0700 (PDT)
+Received: by voyager.jms.id.au (sSMTP sendmail emulation);
+	Fri, 12 Apr 2019 14:24:37 +0930
+From: Joel Stanley <joel@jms.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+	Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 12 Apr 2019 13:49:32 +0930
+Message-Id: <20190412041933.12264-2-joel@jms.id.au>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190412041933.12264-1-joel@jms.id.au>
+References: <20190412041933.12264-1-joel@jms.id.au>
 MIME-Version: 1.0
-In-Reply-To: <c007d615-4dbf-4525-9fb0-6e4feb28c344@www.fastmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1579356097962150720
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrvddtgdekfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.75.36
-Subject: Re: [Qemu-devel] [PATCH 2/3] aspeed: add a per SoC mapping for the
- memory space
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v2 1/2] hw: timer: Add ASPEED RTC device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,60 +98,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412043648.W3E1-Z4nr8Ctb03-a_D3KTBEbWWRtfqKLMvJMbepvLk@z>
+Message-ID: <20190412041932._m1jVw7eZIjRMW0ZL6tAiHKTFbHwRBNUH_IeUJs3ZHo@z>
 
-On 4/12/19 5:24 AM, Andrew Jeffery wrote:
->=20
->=20
-> On Fri, 12 Apr 2019, at 11:48, Joel Stanley wrote:
->> On Thu, 11 Apr 2019 at 16:10, C=C3=A9dric Le Goater <clg@kaod.org> wro=
-te:
->>>
->>> This will simplify the definition of new SoCs, like the AST2600 which
->>> should use a slightly different address space and have a different se=
-t
->>> of controllers.
->>>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>
->>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->>> index 5bbd1fb87d18..9b601709e93c 100644
->>> --- a/hw/arm/aspeed_soc.c
->>> +++ b/hw/arm/aspeed_soc.c
->>
->>> +static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
->>
->>> +static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
->>
->> Most of these arrays is common. And some of it will stay common in the
->> 2600. Any ideas how we could avoid duplication?
->=20
-> I dunno, I feel that any attempt to create some "common" layout concept=
- is
-> more distracting than having soc-specific, complete layouts described.
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+v2:
+ Use g_assert_not_reached
+ Add vmstate
+ Add reset callback
+ Annotate fall through cases
 
-yes. I rather duplicate some values and see in one glance the full=20
-address space.
+ hw/timer/Makefile.objs        |   2 +-
+ hw/timer/aspeed_rtc.c         | 180 ++++++++++++++++++++++++++++++++++
+ hw/timer/trace-events         |   4 +
+ include/hw/timer/aspeed_rtc.h |  31 ++++++
+ 4 files changed, 216 insertions(+), 1 deletion(-)
+ create mode 100644 hw/timer/aspeed_rtc.c
+ create mode 100644 include/hw/timer/aspeed_rtc.h
 
-Thanks,
-
-C.
- =20
->=20
-> There's no reason why they're common beyond coincidence (i.e. it's at
-> ASPEED's whim). I think this is fine.
->=20
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
->=20
->>
->> This is fine for now.
->>
->> Reviewed-by: Joel Stanley <joel@jms.id.au>
->>
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f848..123d92c9692c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -41,7 +41,7 @@ obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
+ obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
+ 
+ common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
++common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o aspeed_rtc.o
+ 
+ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+diff --git a/hw/timer/aspeed_rtc.c b/hw/timer/aspeed_rtc.c
+new file mode 100644
+index 000000000000..19f061c846e8
+--- /dev/null
++++ b/hw/timer/aspeed_rtc.c
+@@ -0,0 +1,180 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/timer/aspeed_rtc.h"
++#include "qemu/log.h"
++#include "qemu/timer.h"
++
++#include "trace.h"
++
++#define COUNTER1        (0x00 / 4)
++#define COUNTER2        (0x04 / 4)
++#define ALARM           (0x08 / 4)
++#define CONTROL         (0x10 / 4)
++#define ALARM_STATUS    (0x14 / 4)
++
++#define RTC_UNLOCKED    BIT(1)
++#define RTC_ENABLED     BIT(0)
++
++static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
++{
++    struct tm tm;
++    uint32_t year, cent;
++    uint32_t reg1 = rtc->reg[COUNTER1];
++    uint32_t reg2 = rtc->reg[COUNTER2];
++
++    tm.tm_mday = (reg1 >> 24) & 0x1f;
++    tm.tm_hour = (reg1 >> 16) & 0x1f;
++    tm.tm_min = (reg1 >> 8) & 0x3f;
++    tm.tm_sec = (reg1 >> 0) & 0x3f;
++
++    cent = (reg2 >> 16) & 0x1f;
++    year = (reg2 >> 8) & 0x7f;
++    tm.tm_mon = ((reg2 >>  0) & 0x0f) - 1;
++    tm.tm_year = year + (cent * 100) - 1900;
++
++    rtc->offset = qemu_timedate_diff(&tm);
++}
++
++static uint32_t aspeed_rtc_get_counter(AspeedRtcState *rtc, int r)
++{
++    uint32_t year, cent;
++    struct tm now;
++
++    qemu_get_timedate(&now, rtc->offset);
++
++    switch (r) {
++    case COUNTER1:
++        return (now.tm_mday << 24) | (now.tm_hour << 16) |
++            (now.tm_min << 8) | now.tm_sec;
++    case COUNTER2:
++        cent = (now.tm_year + 1900) / 100;
++        year = now.tm_year % 100;
++        return ((cent & 0x1f) << 16) | ((year & 0x7f) << 8) |
++            ((now.tm_mon + 1) & 0xf);
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static uint64_t aspeed_rtc_read(void *opaque, hwaddr addr,
++                                unsigned size)
++{
++    AspeedRtcState *rtc = opaque;
++    uint64_t val;
++    uint32_t r = addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (rtc->reg[CONTROL] & RTC_ENABLED) {
++            rtc->reg[r] = aspeed_rtc_get_counter(rtc, r);
++        }
++        /* fall through */
++    case CONTROL:
++        val = rtc->reg[r];
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, addr);
++        return 0;
++    }
++
++    trace_aspeed_rtc_read(addr, val);
++
++    return val;
++}
++
++static void aspeed_rtc_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
++{
++    AspeedRtcState *rtc = opaque;
++    uint32_t r = addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (!(rtc->reg[CONTROL] & RTC_UNLOCKED)) {
++            break;
++        }
++        /* fall through */
++    case CONTROL:
++        rtc->reg[r] = val;
++        aspeed_rtc_calc_offset(rtc);
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, addr);
++        break;
++    }
++    trace_aspeed_rtc_write(addr, val);
++}
++
++static void aspeed_rtc_reset(DeviceState *d)
++{
++    AspeedRtcState *rtc = ASPEED_RTC(d);
++
++    rtc->offset = 0;
++    memset(rtc->reg, 0, sizeof(rtc->reg));
++}
++
++static const MemoryRegionOps aspeed_rtc_ops = {
++    .read = aspeed_rtc_read,
++    .write = aspeed_rtc_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_aspeed_rtc = {
++    .name = TYPE_ASPEED_RTC,
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(reg, AspeedRtcState, 0x18),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void aspeed_rtc_realize(DeviceState *dev, Error **errp)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    AspeedRtcState *s = ASPEED_RTC(dev);
++
++    sysbus_init_irq(sbd, &s->irq);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_rtc_ops, s,
++                          "aspeed-rtc", 0x18ULL);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = aspeed_rtc_realize;
++    dc->vmsd = &vmstate_aspeed_rtc;
++    dc->reset = aspeed_rtc_reset;
++}
++
++static const TypeInfo aspeed_rtc_info = {
++    .name          = TYPE_ASPEED_RTC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AspeedRtcState),
++    .class_init    = aspeed_rtc_class_init,
++};
++
++static void aspeed_rtc_register_types(void)
++{
++    type_register_static(&aspeed_rtc_info);
++}
++
++type_init(aspeed_rtc_register_types)
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index dcaf3d6da6c8..db02a9142cda 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -66,6 +66,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+ 
++# hw/timer/aspeed-rtc.c
++aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
++aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
++
+ # sun4v-rtc.c
+ sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
+ sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
+diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/timer/aspeed_rtc.h
+new file mode 100644
+index 000000000000..1f1155a676c1
+--- /dev/null
++++ b/include/hw/timer/aspeed_rtc.h
+@@ -0,0 +1,31 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef ASPEED_RTC_H
++#define ASPEED_RTC_H
++
++#include <stdint.h>
++
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++
++typedef struct AspeedRtcState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    uint32_t reg[0x18];
++    int offset;
++
++} AspeedRtcState;
++
++#define TYPE_ASPEED_RTC "aspeed.rtc"
++#define ASPEED_RTC(obj) OBJECT_CHECK(AspeedRtcState, (obj), TYPE_ASPEED_RTC)
++
++#endif /* ASPEED_RTC_H */
+-- 
+2.20.1
 
 
