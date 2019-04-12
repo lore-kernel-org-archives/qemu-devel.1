@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D463C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 632BEC10F14
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C09F2083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:26:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C09F2083E
+	by mail.kernel.org (Postfix) with ESMTPS id 30F6A20850
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:27:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F6A20850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33897 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33911 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEtOC-0004dM-E6
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:26:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38813)
+	id 1hEtPE-0005gN-CS
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:27:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt55-0003Kr-OX
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:49 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt53-0003IU-Qj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt54-0005Qb-SD
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43526)
+	(envelope-from <eric.auger@redhat.com>) id 1hEt52-0005Ou-Jz
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hEt52-0005OJ-JR; Fri, 12 Apr 2019 06:06:44 -0400
+	id 1hEt4z-0005MP-La; Fri, 12 Apr 2019 06:06:41 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1489C062ED6;
-	Fri, 12 Apr 2019 10:06:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DA9C6308CF8F;
+	Fri, 12 Apr 2019 10:06:40 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3A72119C65;
-	Fri, 12 Apr 2019 10:06:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D35C019C65;
+	Fri, 12 Apr 2019 10:06:29 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Fri, 12 Apr 2019 12:03:50 +0200
-Message-Id: <20190412100354.6409-24-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:49 +0200
+Message-Id: <20190412100354.6409-23-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 12 Apr 2019 10:06:43 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Fri, 12 Apr 2019 10:06:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 23/27] memory: Introduce IOMMU Memory Region
- inject_faults API
+Subject: [Qemu-devel] [RFC v3 22/27] vfio-pci: Expose MSI stage 1 bindings
+ to the host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,87 +75,144 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412100350.YDRIRQKgUzsbizQTRSLbIBb6IhFCHw4IEgsMXW7uLjE@z>
+Message-ID: <20190412100349.FPKuy4Ti31vPHeAHXIxQhPxrXGvlgQlehvs_lg5qIeM@z>
 
-This new API allows to inject @count iommu_faults into
-the IOMMU memory region.
+When the guest is exposed with a virtual IOMMU that translates
+MSIs, the guest allocates an IOVA (gIOVA) that maps the virtual
+doorbell (gDB). In nested mode, when the MSI is setup, we pass
+this stage1 mapping to the host so that it can use this stage1
+binding to create a nested stage translating into the physical
+doorbell. Conversely, when the MSI setup os torn down, we
+unregister this binding.
+
+For registration, We directly use the iommu memory region
+translate() callback since the addr_mask is returned in the
+IOTLB entry. address_space_translate does not return this information.
+
+Now that we use a MAP notifier, let's remove warning against
+the usage of map notifiers (historically used along with Intel's
+caching mode).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- include/exec/memory.h | 26 ++++++++++++++++++++++++++
- memory.c              | 12 ++++++++++++
- 2 files changed, 38 insertions(+)
+ hw/arm/smmuv3.c      |  8 --------
+ hw/vfio/pci.c        | 48 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events |  2 ++
+ 3 files changed, 50 insertions(+), 8 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index aedebc8471..6262de1684 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -400,6 +400,20 @@ typedef struct IOMMUMemoryRegionClass {
-      * @iommu: the IOMMUMemoryRegion
-      */
-     int (*num_indexes)(IOMMUMemoryRegion *iommu);
-+
-+#ifdef CONFIG_LINUX
-+    /* Inject @count faults into the IOMMU memory region
-+     *
-+     * Optional method: if this method is not provided, then
-+     * memory_region_injection_faults() will return -ENOENT
-+     *
-+     * @iommu: the IOMMU memory region to inject the faults in
-+     * @count: number of faults to inject
-+     * @buf: fault buffer
-+     */
-+    int (*inject_faults)(IOMMUMemoryRegion *iommu, int count,
-+                         struct iommu_fault *buf);
-+#endif
- } IOMMUMemoryRegionClass;
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 2574989f2e..a7e48e7972 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1517,14 +1517,6 @@ static void smmuv3_notify_flag_changed(IOMMUMemory=
+Region *iommu,
+     SMMUv3State *s3 =3D sdev->smmu;
+     SMMUState *s =3D &(s3->smmu_state);
 =20
- typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-@@ -1216,6 +1230,18 @@ int memory_region_iommu_attrs_to_index(IOMMUMemory=
-Region *iommu_mr,
-  */
- int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
-=20
-+#ifdef CONFIG_LINUX
-+/**
-+ * memory_region_inject_faults : inject @count faults stored in @buf
-+ *
-+ * @iommu_mr: the IOMMU memory region
-+ * @count: number of faults to be injected
-+ * @buf: buffer containing the faults
-+ */
-+int memory_region_inject_faults(IOMMUMemoryRegion *iommu_mr, int count,
-+                                struct iommu_fault *buf);
-+#endif
-+
- /**
-  * memory_region_name: get a memory region's name
-  *
-diff --git a/memory.c b/memory.c
-index 8cd3c65872..2eac24cb80 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2037,6 +2037,18 @@ int memory_region_iommu_num_indexes(IOMMUMemoryReg=
-ion *iommu_mr)
-     return imrc->num_indexes(iommu_mr);
+-    if (new & IOMMU_NOTIFIER_IOTLB_MAP) {
+-        int bus_num =3D pci_bus_num(sdev->bus);
+-        PCIDevice *pcidev =3D pci_find_device(sdev->bus, bus_num, sdev->=
+devfn);
+-
+-        warn_report("SMMUv3 does not support notification on MAP: "
+-                     "device %s will not function properly", pcidev->nam=
+e);
+-    }
+-
+     if (old =3D=3D IOMMU_NOTIFIER_NONE) {
+         trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
+         QLIST_INSERT_HEAD(&s->devices_with_notifiers, sdev, next);
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index cd93ff6fa3..aeb4dfa388 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -402,6 +402,48 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, =
+bool msix)
+     return ret;
  }
 =20
-+#ifdef CONFIG_LINUX
-+int memory_region_inject_faults(IOMMUMemoryRegion *iommu_mr, int count,
-+                                struct iommu_fault *buf)
++static int vfio_register_msi_binding(VFIOPCIDevice *vdev, int vector_n)
 +{
-+    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(iommu=
-_mr);
-+    if (!imrc->inject_faults) {
++    PCIDevice *dev =3D &vdev->pdev;
++    AddressSpace *as =3D pci_device_iommu_address_space(dev);
++    MSIMessage msg =3D pci_get_msi_message(dev, vector_n);
++    IOMMUMemoryRegionClass *imrc;
++    IOMMUMemoryRegion *iommu_mr;
++    bool msi_translate =3D false, nested =3D false;;
++    IOMMUTLBEntry entry;
++
++    if (as =3D=3D &address_space_memory) {
++        return 0;
++    }
++
++    iommu_mr =3D IOMMU_MEMORY_REGION(as->root);
++    memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_MSI_TRANSLATE,
++                                 (void *)&msi_translate);
++    memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_VFIO_NESTED,
++                                 (void *)&nested);
++    imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
++
++    if (!nested || !msi_translate) {
++        return 0;
++    }
++
++    /* MSI doorbell address is translated by an IOMMU */
++
++    rcu_read_lock();
++    entry =3D imrc->translate(iommu_mr, msg.address, IOMMU_WO, 0);
++    rcu_read_unlock();
++
++    if (entry.perm =3D=3D IOMMU_NONE) {
 +        return -ENOENT;
 +    }
-+    return imrc->inject_faults(iommu_mr, count, buf);
-+}
-+#endif
 +
- void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
++    trace_vfio_register_msi_binding(vdev->vbasedev.name, vector_n,
++                                    msg.address, entry.translated_addr);
++
++    memory_region_iotlb_notify_iommu(iommu_mr, 0, entry);
++    return 0;
++}
++
+ static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *ve=
+ctor,
+                                   int vector_n, bool msix)
  {
-     uint8_t mask =3D 1 << client;
+@@ -487,6 +529,12 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, =
+unsigned int nr,
+         }
+     }
+=20
++    ret =3D vfio_register_msi_binding(vdev, nr);
++
++    if (ret) {
++        error_report("%s failed to register S1 MSI binding(%d)", __func_=
+_, ret);
++    }
++
+     /*
+      * We don't want to have the host allocate all possible MSI vectors
+      * for a device if they're not in use, so we shutdown and incrementa=
+lly
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 3c2cd15e3f..52b96ec196 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -111,6 +111,8 @@ vfio_region_sparse_mmap_header(const char *name, int =
+index, int nr_areas) "Devic
+ vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long =
+end) "sparse entry %d [0x%lx - 0x%lx]"
+ vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t=
+ subtype) "%s index %d, %08x/%0x8"
+ vfio_dma_unmap_overflow_workaround(void) ""
++vfio_register_msi_binding(const char *name, int vector, uint64_t giova, =
+uint64_t gdb) "%s: register vector %d gIOVA=3D0x%"PRIx64 "-> gDB=3D0x%"PR=
+Ix64" stage 1 mapping"
++vfio_unregister_msi_binding(const char *name, int vector, uint64_t giova=
+) "%s: unregister vector %d gIOVA=3D0x%"PRIx64 " stage 1 mapping"
+=20
+ # platform.c
+ vfio_platform_base_device_init(char *name, int groupid) "%s belongs to g=
+roup #%d"
 --=20
 2.20.1
 
