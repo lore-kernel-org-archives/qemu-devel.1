@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36768)
+Received: from eggs.gnu.org ([209.51.188.92]:36895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyF7-0000J5-4f
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:37:32 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFH-0000R4-4O
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyF5-0001Wh-DO
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:37:29 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFF-0001cW-Fs
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:37:39 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 12 Apr 2019 17:36:36 +0200
-Message-Id: <20190412153647.19027-3-marcandre.lureau@redhat.com>
+Date: Fri, 12 Apr 2019 17:36:39 +0200
+Message-Id: <20190412153647.19027-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 References: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 02/13] spapr_pci: Fix broken naming of PCI
- bus
+Subject: [Qemu-devel] [PATCH v5 05/13] Add vhost-user-input-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +23,326 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Greg Kurz <groug@kaod.org>
+Add a new virtio-input device, which connects to a vhost-user
+backend.
 
-Recent commit 5cf0d326a0fe fixed a regression which was preventing the
-guest to access the extended config space of a PCIe device. This was
-done by introducing a new PCI bus subtype for PAPR. The original fix
-was causing PCI busses to be named "spapr-pci-host-bridge-root-bus.N"
-instead of "pci.N", which was making upper layers unhappy of course.
-This got worked around by hardcoding the PCI bus name to "pci.0", but
-this only works for the default PHB. And we're now hitting:
+Instead of reading configuration directly from an input device /
+evdev (like virtio-input-host), it reads it over vhost-user protocol
+with {SET,GET}_CONFIG messages. The vhost-user-backend handles the
+queues & events setup.
 
-# qemu-system-ppc64 \
-             -device spapr-pci-host-bridge,index=3D1 \
-             -device e1000e,bus=3Dpci.0 \
-             -device e1000e,bus=3Dpci.1
-qemu-system-ppc64: -device e1000e,bus=3Dpci.1: Bus 'pci.1' not found
-
-David already posted some patches [1] to control PCI extended config
-space accesses with a new flag in the base PCI bus class instead of
-subtyping. These patches are a bit more intrusive though, and
-are targetted for 4.1.
-
-When no name is passed to pci_register_bus(), the core device code
-generates a lowercase name based on the QOM typename. The typename
-for the base PCI bus class is "PCI", hence the "pci.0", "pci.1"
-bus names. Rename the type of the PAPR PCI bus to "pci", so that
-the QOM code can generate proper names. This is a hack but it is
-enough to fix the regression. And all this will be reworked properly
-in 4.1.
-
-[1] https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D100486
-
-Fixes: 5cf0d326a0fe
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155500034416.646888.1307366522340665522.stgit@bahia.lab.toul=
-ouse-stg.fr.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/ppc/spapr_pci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/virtio/virtio-input.h |  14 ++++
+ hw/input/vhost-user-input.c      | 129 +++++++++++++++++++++++++++++++
+ hw/virtio/vhost-user-input-pci.c |  53 +++++++++++++
+ MAINTAINERS                      |   1 +
+ hw/input/Kconfig                 |   5 ++
+ hw/input/Makefile.objs           |   1 +
+ hw/virtio/Makefile.objs          |   1 +
+ 7 files changed, 204 insertions(+)
+ create mode 100644 hw/input/vhost-user-input.c
+ create mode 100644 hw/virtio/vhost-user-input-pci.c
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index f0b6b23afc..f62e6833b8 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1652,7 +1652,7 @@ static void spapr_phb_root_bus_class_init(ObjectCla=
-ss *klass, void *data)
-     pbc->allows_extended_config_space =3D spapr_phb_allows_extended_conf=
-ig_space;
- }
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 054c38836f..4fca03e796 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -2,6 +2,7 @@
+ #define QEMU_VIRTIO_INPUT_H
 =20
--#define TYPE_SPAPR_PHB_ROOT_BUS "spapr-pci-host-bridge-root-bus"
-+#define TYPE_SPAPR_PHB_ROOT_BUS "pci"
+ #include "ui/input.h"
++#include "sysemu/vhost-user-backend.h"
 =20
- static const TypeInfo spapr_phb_root_bus_info =3D {
-     .name =3D TYPE_SPAPR_PHB_ROOT_BUS,
-@@ -1761,7 +1761,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
-     memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
-                                 &sphb->iowindow);
+ /* ----------------------------------------------------------------- */
+ /* virtio input protocol                                             */
+@@ -42,11 +43,18 @@ typedef struct virtio_input_event virtio_input_event;
+ #define VIRTIO_INPUT_HOST_GET_PARENT_CLASS(obj) \
+         OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_INPUT_HOST)
 =20
--    bus =3D pci_register_root_bus(dev, "pci.0",
-+    bus =3D pci_register_root_bus(dev, NULL,
-                                 pci_spapr_set_irq, pci_spapr_map_irq, sp=
-hb,
-                                 &sphb->memspace, &sphb->iospace,
-                                 PCI_DEVFN(0, 0), PCI_NUM_PINS,
++#define TYPE_VHOST_USER_INPUT   "vhost-user-input"
++#define VHOST_USER_INPUT(obj)                              \
++    OBJECT_CHECK(VHostUserInput, (obj), TYPE_VHOST_USER_INPUT)
++#define VHOST_USER_INPUT_GET_PARENT_CLASS(obj)             \
++    OBJECT_GET_PARENT_CLASS(obj, TYPE_VHOST_USER_INPUT)
++
+ typedef struct VirtIOInput VirtIOInput;
+ typedef struct VirtIOInputClass VirtIOInputClass;
+ typedef struct VirtIOInputConfig VirtIOInputConfig;
+ typedef struct VirtIOInputHID VirtIOInputHID;
+ typedef struct VirtIOInputHost VirtIOInputHost;
++typedef struct VHostUserInput VHostUserInput;
+=20
+ struct VirtIOInputConfig {
+     virtio_input_config               config;
+@@ -98,6 +106,12 @@ struct VirtIOInputHost {
+     int                               fd;
+ };
+=20
++struct VHostUserInput {
++    VirtIOInput                       parent_obj;
++
++    VhostUserBackend                  *vhost;
++};
++
+ void virtio_input_send(VirtIOInput *vinput, virtio_input_event *event);
+ void virtio_input_init_config(VirtIOInput *vinput,
+                               virtio_input_config *config);
+diff --git a/hw/input/vhost-user-input.c b/hw/input/vhost-user-input.c
+new file mode 100644
+index 0000000000..6da497b1a8
+--- /dev/null
++++ b/hw/input/vhost-user-input.c
+@@ -0,0 +1,129 @@
++/*
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++
++#include "hw/qdev.h"
++#include "hw/virtio/virtio-input.h"
++
++static int vhost_input_config_change(struct vhost_dev *dev)
++{
++    error_report("vhost-user-input: unhandled backend config change");
++    return -1;
++}
++
++static const VhostDevConfigOps config_ops =3D {
++    .vhost_dev_config_notifier =3D vhost_input_config_change,
++};
++
++static void vhost_input_realize(DeviceState *dev, Error **errp)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(dev);
++    VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
++
++    vhost_dev_set_config_notifier(&vhi->vhost->dev, &config_ops);
++    vinput->cfg_size =3D sizeof_field(virtio_input_config, u);
++    if (vhost_user_backend_dev_init(vhi->vhost, vdev, 2, errp) =3D=3D -1=
+) {
++        return;
++    }
++}
++
++static void vhost_input_change_active(VirtIOInput *vinput)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(vinput);
++
++    if (vinput->active) {
++        vhost_user_backend_start(vhi->vhost);
++    } else {
++        vhost_user_backend_stop(vhi->vhost);
++    }
++}
++
++static void vhost_input_get_config(VirtIODevice *vdev, uint8_t *config_d=
+ata)
++{
++    VirtIOInput *vinput =3D VIRTIO_INPUT(vdev);
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
++    int ret;
++
++    memset(config_data, 0, vinput->cfg_size);
++
++    ret =3D vhost_dev_get_config(&vhi->vhost->dev, config_data, vinput->=
+cfg_size);
++    if (ret) {
++        error_report("vhost-user-input: get device config space failed")=
+;
++        return;
++    }
++}
++
++static void vhost_input_set_config(VirtIODevice *vdev,
++                                   const uint8_t *config_data)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
++    int ret;
++
++    ret =3D vhost_dev_set_config(&vhi->vhost->dev, config_data,
++                               0, sizeof(virtio_input_config),
++                               VHOST_SET_CONFIG_TYPE_MASTER);
++    if (ret) {
++        error_report("vhost-user-input: set device config space failed")=
+;
++        return;
++    }
++
++    virtio_notify_config(vdev);
++}
++
++static const VMStateDescription vmstate_vhost_input =3D {
++    .name =3D "vhost-user-input",
++    .unmigratable =3D 1,
++};
++
++static void vhost_input_class_init(ObjectClass *klass, void *data)
++{
++    VirtIOInputClass *vic =3D VIRTIO_INPUT_CLASS(klass);
++    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->vmsd =3D &vmstate_vhost_input;
++    vdc->get_config =3D vhost_input_get_config;
++    vdc->set_config =3D vhost_input_set_config;
++    vic->realize =3D vhost_input_realize;
++    vic->change_active =3D vhost_input_change_active;
++}
++
++static void vhost_input_init(Object *obj)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++
++    vhi->vhost =3D VHOST_USER_BACKEND(object_new(TYPE_VHOST_USER_BACKEND=
+));
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(vhi->vhost), "chardev", &error_abor=
+t);
++}
++
++static void vhost_input_finalize(Object *obj)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++
++    object_unref(OBJECT(vhi->vhost));
++}
++
++static const TypeInfo vhost_input_info =3D {
++    .name          =3D TYPE_VHOST_USER_INPUT,
++    .parent        =3D TYPE_VIRTIO_INPUT,
++    .instance_size =3D sizeof(VHostUserInput),
++    .instance_init =3D vhost_input_init,
++    .instance_finalize =3D vhost_input_finalize,
++    .class_init    =3D vhost_input_class_init,
++};
++
++static void vhost_input_register_types(void)
++{
++    type_register_static(&vhost_input_info);
++}
++
++type_init(vhost_input_register_types)
+diff --git a/hw/virtio/vhost-user-input-pci.c b/hw/virtio/vhost-user-inpu=
+t-pci.c
+new file mode 100644
+index 0000000000..3d1b7a85fd
+--- /dev/null
++++ b/hw/virtio/vhost-user-input-pci.c
+@@ -0,0 +1,53 @@
++/*
++ * This work is licensed under the terms of the GNU LGPL, version 2 or
++ * later.  See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-input.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "virtio-pci.h"
++
++typedef struct VHostUserInputPCI VHostUserInputPCI;
++
++#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci-base"
++
++#define VHOST_USER_INPUT_PCI(obj) \
++    OBJECT_CHECK(VHostUserInputPCI, (obj), TYPE_VHOST_USER_INPUT_PCI)
++
++struct VHostUserInputPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserInput vhi;
++};
++
++static void vhost_user_input_pci_instance_init(Object *obj)
++{
++    VHostUserInputPCI *dev =3D VHOST_USER_INPUT_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vhi, sizeof(dev->vhi),
++                                TYPE_VHOST_USER_INPUT);
++
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(&dev->vhi), "chardev",
++                              &error_abort);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info =3D {
++    .base_name =3D TYPE_VHOST_USER_INPUT_PCI,
++    .generic_name =3D "vhost-user-input-pci",
++    .transitional_name =3D "vhost-user-input-pci-transitional",
++    .non_transitional_name =3D "vhost-user-input-pci-non-transitional",
++    .parent =3D TYPE_VIRTIO_INPUT_PCI,
++    .instance_size =3D sizeof(VHostUserInputPCI),
++    .instance_init =3D vhost_user_input_pci_instance_init,
++};
++
++static void vhost_user_input_pci_register(void)
++{
++    virtio_pci_types_register(&vhost_user_input_pci_info);
++}
++
++type_init(vhost_user_input_pci_register)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e0f3f9c4bd..b6e855ccf9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1512,6 +1512,7 @@ L: qemu-s390x@nongnu.org
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Maintained
++F: hw/input/vhost-user-input.c
+ F: hw/input/virtio-input*.c
+ F: include/hw/virtio/virtio-input.h
+=20
+diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+index e2e66f0858..50e55e3538 100644
+--- a/hw/input/Kconfig
++++ b/hw/input/Kconfig
+@@ -29,5 +29,10 @@ config VIRTIO_INPUT_HOST
+     default y
+     depends on VIRTIO && LINUX
+=20
++config VHOST_USER_INPUT
++    bool
++    default y
++    depends on VIRTIO_INPUT && VHOST_USER
++
+ config TSC210X
+     bool
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index c8b00f71ec..9511e3102f 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -11,6 +11,7 @@ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input.o
+ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-hid.o
+ ifeq ($(CONFIG_LINUX),y)
+ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-host.o
++common-obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input.o
+ endif
+=20
+ obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index f2ab667a21..5570ea8df8 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -17,6 +17,7 @@ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock-pci.o
+ obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk-pci.o
++obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) +=3D vhost-user-scsi-pci.o
+ obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-host-pci.o
 --=20
 2.21.0.313.ge35b8cb8e2
