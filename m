@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40462)
+Received: from eggs.gnu.org ([209.51.188.92]:42184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hErBr-0005Hw-OM
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:40 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hErKT-0008Su-K6
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:14:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hErBp-0000Sh-Sj
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hErBk-0000PS-DK
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:05:34 -0400
-References: <20190411235456.12918-1-brijesh.singh@amd.com>
-	<74d884dd-3f3f-88d4-9f8b-62b696245fbc@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0db9a2c4-7153-6fb0-a15a-23e28c81669f@redhat.com>
-Date: Fri, 12 Apr 2019 10:05:23 +0200
+	(envelope-from <imammedo@redhat.com>) id 1hErKS-0004zw-9q
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 04:14:33 -0400
+Date: Fri, 12 Apr 2019 10:14:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190412101418.616f1b30@redhat.com>
+In-Reply-To: <20190412054407.GA5035@richard>
+References: <20190313044253.31988-1-richardw.yang@linux.intel.com>
+	<20190313044253.31988-4-richardw.yang@linux.intel.com>
+	<20190313132300.3f56a5ca@redhat.com>
+	<20190313133359.h2njohyijgvkcbtv@master>
+	<20190313170943.5384f5cf@redhat.com>
+	<20190402035343.GA6527@richard>
+	<20190402081512.6194a58f@redhat.com>
+	<20190405085529.GA24071@richard>
+	<20190409165415.2e5df0c6@redhat.com>
+	<20190412054407.GA5035@richard>
 MIME-Version: 1.0
-In-Reply-To: <74d884dd-3f3f-88d4-9f8b-62b696245fbc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] hw/acpi: Extract build_mcfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>, Erik Skultety <eskultet@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>, shannon.zhaosl@gmail.com, wei.w.wang@intel.com, qemu-arm@nongnu.org
 
-On 12/04/19 09:58, Laszlo Ersek wrote:
-> On 04/12/19 01:55, Singh, Brijesh wrote:
->> There are limited numbers of the SEV guests that can be run concurrent=
-ly.
->> A management applications may need to know this limit so that it can p=
-lace
->> SEV VMs on hosts which have suitable resources available.
->>
->> Currently, this limit is not exposed to the application. Add a new
->> 'sev-max-guest' field in the query-sev-capabilities to provide this
->> information.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: Eric Blake <eblake@redhat.com>
->> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> Cc: Laszlo Ersek <lersek@redhat.com>
->> Cc: Erik Skultety <eskultet@redhat.com>
->> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>
->> changes since v1:
->>  - document the new field and add (since 4.1) annotation.
->>
->>  qapi/target.json  | 9 +++++++--
->>  target/i386/sev.c | 9 +++++++--
->>  2 files changed, 14 insertions(+), 4 deletions(-)
->>
->> diff --git a/qapi/target.json b/qapi/target.json
->> index 1d4d54b600..8cd4fc7919 100644
->> --- a/qapi/target.json
->> +++ b/qapi/target.json
->> @@ -177,13 +177,17 @@
->>  # @reduced-phys-bits: Number of physical Address bit reduction when S=
-EV is
->>  #                     enabled
->>  #
->> +# @sev-max-guests: maximum number of concurrent SEV guest with SEV-ES=
- disabled
->> +#                  (since 4.1)
->> +#
->>  # Since: 2.12
->>  ##
->>  { 'struct': 'SevCapability',
->>    'data': { 'pdh': 'str',
->>              'cert-chain': 'str',
->>              'cbitpos': 'int',
->> -            'reduced-phys-bits': 'int'},
->> +            'reduced-phys-bits': 'int',
->> +            'sev-max-guests': 'int'},
->>    'if': 'defined(TARGET_I386)' }
->> =20
->>  ##
->> @@ -200,7 +204,8 @@
->>  #
->>  # -> { "execute": "query-sev-capabilities" }
->>  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
->> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
->> +#                  "cbitpos": 47, "reduced-phys-bits": 5,
->> +#                  "sev-max-guests" : 15}}
->=20
-> There seems to be a superfluous space character before the colon, but I
-> don't think it matters much.
->=20
->>  #
->>  ##
->>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index cd77f6b5d4..6829586fbe 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -488,7 +488,7 @@ sev_get_capabilities(void)
->>      guchar *pdh_data =3D NULL;
->>      guchar *cert_chain_data =3D NULL;
->>      size_t pdh_len =3D 0, cert_chain_len =3D 0;
->> -    uint32_t ebx;
->> +    uint32_t ebx, ecx, edx;
->>      int fd;
->> =20
->>      fd =3D open(DEFAULT_SEV_DEVICE, O_RDWR);
->> @@ -507,7 +507,7 @@ sev_get_capabilities(void)
->>      cap->pdh =3D g_base64_encode(pdh_data, pdh_len);
->>      cap->cert_chain =3D g_base64_encode(cert_chain_data, cert_chain_l=
-en);
->> =20
->> -    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
->> +    host_cpuid(0x8000001F, 0, NULL, &ebx, &ecx, &edx);
->>      cap->cbitpos =3D ebx & 0x3f;
->> =20
->>      /*
->> @@ -516,6 +516,11 @@ sev_get_capabilities(void)
->>       */
->>      cap->reduced_phys_bits =3D 1;
->> =20
->> +    /*
->> +     * The maximum number of SEV guests with SEV-ES disabled that can=
- run
->> +     * simultaneously.
->> +     */
->> +    cap->sev_max_guests =3D ecx - edx + 1;
->>  out:
->>      g_free(pdh_data);
->>      g_free(cert_chain_data);
->>
->=20
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+On Fri, 12 Apr 2019 13:44:07 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-As mentioned in v1, I don't think a management application should need
-to run QEMU in order to figure this out.
-
-Paolo
+> On Tue, Apr 09, 2019 at 04:54:15PM +0200, Igor Mammedov wrote:
+> >> 
+> >> Let's see a normal hotplug case first. 
+> >> 
+> >>     I did one test to see the how a guest with hot-plug cpu migrate to
+> >>     destination.  It looks the migration fails if I just do hot-plug at
+> >>     source. So I have to do hot-plug both at source and at destination. This
+> >>     will expand the table_mr both at source and destination.
+> >> 
+> >> Then let's see the effect of hotplug more devices to exceed original padded
+> >> size. There are two cases, before re-sizable MemoryRegion and after.
+> >> 
+> >> 1) Before re-sizable MemoryRegion introduced
+> >> 
+> >>     Before re-sizable MemoryRegion introduced, we just pad table_mr to 4K. And
+> >>     this size never gets bigger, if I am right. To be accurate, the table_blob
+> >>     would grow to next padded size if we hot-add more cpus/pci bridge, but we
+> >>     just copy the original size of MemoryRegion. Even without migration, the
+> >>     ACPI table is corrupted when we expand to next padded size.
+> >>     
+> >>     Is my understanding correct here?
+> >> 
+> >> 2) After re-sizable MemoryRegion introduced
+> >> 
+> >>     This time both tabl_blob and MemoryRegion grows when it expand to next
+> >>     padded size. Since we need to hot-add device at both side, ACPI table
+> >>     grows at the same pace.
+> >> 
+> >>     Every thing looks good, until one of it exceed the resizable
+> >>     MemoryRegion's max size. (Not sure this is possible in reality, while
+> >>     possible in theory). Actually, this looks like case 1) when resizable
+> >>     MemoryRegion is not introduced. The too big ACPI table get corrupted.
+> >> 
+> >> So if my understanding is correct, the procedure you mentioned "expand from
+> >> initial padded size to next padded size" only applies to two different max
+> >> size resizable MemoryRegion. For other cases, the procedure corrupt the ACPI
+> >> table itself.
+> >> 
+> >> Then when we look at
+> >> 
+> >>     commit 07fb61760cdea7c3f1b9c897513986945bca8e89
+> >>     Author: Paolo Bonzini <pbonzini@redhat.com>
+> >>     Date:   Mon Jul 28 17:34:15 2014 +0200
+> >>     
+> >>         pc: hack for migration compatibility from QEMU 2.0
+> >>     
+> >> This fix ACPI migration issue before resizable MemoryRegion is
+> >> introduced(introduced in 2015-01-08). This looks expand to next padded size
+> >> always corrupt ACPI table at that time. And it make me think expand to next
+> >> padded size is not the procedure we should do?
+> >> 
+> >> And my colleague Wei Wang(in cc) mentioned, to make migration succeed, the
+> >> MemoryRegion has to be the same size at both side. So I guess the problem
+> >> doesn't lie in hotplug but in "main table" size difference.  
+> >
+> >It's true only for pre-resizable MemoryRegion QEMU versions,
+> >after that size doesn't affect migration anymore.
+> >
+> >  
+> >> For example, we have two version of Qemu: v1 and v2. Their "main table" size
+> >> is:
+> >> 
+> >>     v1: 3990
+> >>     v2: 4020
+> >> 
+> >> At this point, their ACPI table all padded to 4k, which is the same.
+> >> 
+> >> Then we create a machine with 1 more vcpu by these two versions. This will
+> >> expand the table to:
+> >> 
+> >>     v1: 4095
+> >>     v2: 4125
+> >> 
+> >> After padding, v1's ACPI table size is still 4k but v2's is 8k. Now the
+> >> migration is broken.
+> >> 
+> >> If this analysis is correct, the relationship between migration failure and
+> >> ACPI table is "the change of ACPI table size". Any size change of any  
+> >you should make distinction between used_length and max_length here.
+> >Migration puts on wire used_length and that's what matter for keeping migration
+> >working.
+> >  
+> >> ACPI table would break migration. While of course, since we pad the table,
+> >> only some combinations of tables would result in a visible real size change in
+> >> MemoryRegion.
+> >> 
+> >> Then the principle for future ACPI development is to keep all ACPI table size
+> >> unchanged.  
+> >once again it applies only for QEMU (versions < 2.1) and that was
+> >the problem (i.e. there always would be configurations that would create
+> >differently sized tables regardless of arbitrary size we would preallocate)
+> >resizable MemoryRegions solved.
+> >   
+> >> Now let's back to mcfg table. As the comment mentioned, guest could
+> >> enable/disable MCFG, so the code here reserve table no matter it is enabled or
+> >> not. This behavior ensures ACPI table size not changed. So do we need to find
+> >> the machine type as you suggested before?  
+> >We should be able to drop mcgf 'padding' hack since machine version
+> >which was introduced in the QEMU version that introduced resizable MemoryRegion
+> >as well.
+> >
+> >I'll send a patch to address that  
+> 
+> Hi, Igor,
+> 
+> We have found the qemu version 2.1 which is with resizable MemoryRegion
+> enabled and q35 will stop support version before 2.3. The concern about ACPI
+> mcfg table breaking live migration is solved, right?
+> 
+> If so, I would prepare mcfg refactor patch based on your cleanup.
+yes, just base your patches on top of
+ "[PATCH for-4.1] q35: acpi: do not create dummy MCFG  table"
