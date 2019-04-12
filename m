@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51591)
+Received: from eggs.gnu.org ([209.51.188.92]:53405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF3OK-00017K-R7
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:21 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hF3W3-0007OU-Gf
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF3OI-0005UV-U4
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:20 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hF3OI-0005Tb-7V
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:18 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b3so5721606pfd.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:07:16 -0700 (PDT)
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-4-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
-Date: Fri, 12 Apr 2019 11:05:42 -1000
+	(envelope-from <fintelia@gmail.com>) id 1hF3Vw-0001eC-Is
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:15:14 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
- COMPUTE CARRY
+References: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
+	<CAKmqyKNVno+jR_PYxgnyqQOSQFCn_ai7GH+hYPgaO=fkqHDa6A@mail.gmail.com>
+In-Reply-To: <CAKmqyKNVno+jR_PYxgnyqQOSQFCn_ai7GH+hYPgaO=fkqHDa6A@mail.gmail.com>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Fri, 12 Apr 2019 17:14:40 -0400
+Message-ID: <CANnJOVHprai3DLd=PunsVDGUwaGvvA4ynou5_LhyGVztTf-tNQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Do not allow sfence.vma from
+ user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 4/11/19 12:07 AM, David Hildenbrand wrote:
-> +    static const GVecGen3 g[5] = {
-> +        { .fni8 = gen_acc8_i64, },
-> +        { .fni8 = gen_acc16_i64, },
-> +        { .fni8 = gen_acc32_i64, },
-> +        { .fni8 = gen_acc_i64, },
-> +        { .fno = gen_helper_gvec_vacc128, },
-> +    };
+Just to double check, nothing further on this is need from me, right? It is
+set to be merged onto the master branch once the 4.0 release is out?
 
-Vector versions of the first four are fairly simple too.
+Jonathan
 
-static void gen_acc_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-{
-    tcgv_vec t = tcg_temp_new_vec_matching(d);
+On Wed, Apr 3, 2019 at 7:11 PM Alistair Francis <alistair23@gmail.com>
+wrote:
 
-    tcg_gen_add_vec(vece, t, a, b);
-    tcg_gen_cmp_vec(TCG_COND_LTU, vece, d, r, a);  /* produces -1 for carry */
-    tcg_gen_neg_vec(vece, d, d);                 /* convert to +1 for carry */
-}
-
-  { .fni8 = gen_acc8_i64,
-    .fniv = gen_acc_vec,
-    .opc = INDEX_op_cmp_vec,
-    .vece = MO_8 },
-  ...
-
-
-I'm surprised that you're expanding the 128-bit addition out-of-line.
-One possible expansion is
-
-  tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
-  tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
-  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
-  /* carry out in th */
-
-
-r~
+> On Mon, Apr 1, 2019 at 1:39 PM Jonathan Behrens <fintelia@gmail.com>
+> wrote:
+> >
+> > The 'sfence.vma' instruction is privileged, and should only ever be
+> allowed
+> > when executing in supervisor mode or higher.
+> >
+> > Jonathan
+> >
+> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>
+> Alistair
+>
+> > ---
+> >  target/riscv/op_helper.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> > index b7dc18a41e..644d0fb35f 100644
+> > --- a/target/riscv/op_helper.c
+> > +++ b/target/riscv/op_helper.c
+> > @@ -145,9 +145,10 @@ void helper_tlb_flush(CPURISCVState *env)
+> >  {
+> >      RISCVCPU *cpu = riscv_env_get_cpu(env);
+> >      CPUState *cs = CPU(cpu);
+> > -    if (env->priv == PRV_S &&
+> > -        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > -        get_field(env->mstatus, MSTATUS_TVM)) {
+> > +    if (!(env->priv >= PRV_S) ||
+> > +        (env->priv == PRV_S &&
+> > +         env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > +         get_field(env->mstatus, MSTATUS_TVM))) {
+> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> >      } else {
+> >          tlb_flush(cs);
+> > --
+> > 2.20.1
+>
