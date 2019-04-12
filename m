@@ -2,81 +2,98 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFDEC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 03:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52875C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 03:26:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81E742083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 03:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13DF62083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 03:26:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="l7679q/q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E742083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="NPnRO1WJ";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="02d9UTIg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DF62083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58136 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58216 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEmie-0000O8-N3
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 23:19:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51110)
+	id 1hEmpD-0002jV-Ai
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 23:25:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hEmhS-0008J3-MI
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:17:59 -0400
+	(envelope-from <andrew@aj.id.au>) id 1hEmoM-0001sV-1G
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hEmhR-0000k4-Nz
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:17:58 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:41774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
-	id 1hEmhN-0000hO-FW; Thu, 11 Apr 2019 23:17:55 -0400
-Received: by mail-qk1-x742.google.com with SMTP id o129so4822703qke.8;
-	Thu, 11 Apr 2019 20:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=FITGN5swjy/EtOZE38wbT6LXFNI+WfrZjFaG31fVn8o=;
-	b=l7679q/qLMUsK7xqziDWk2TLx+lVzQjbTE9Shr5pyvIl8aqY/1gmj3H35EACvyArqh
-	qCvGBCoCdUbDkqqjoONR3uG7Az9sR7cugSvbfnF1A6e0dpl/WOKVTVgPbdCz+1yl+kkj
-	JJRWY3/QPfrI7RLXZgyPmWBHhqwC158MiQiMM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=FITGN5swjy/EtOZE38wbT6LXFNI+WfrZjFaG31fVn8o=;
-	b=sG63ybX8vFiyMztCkgjMy34N+OOVq35iB2LL5a6kIsYPWqMDQY/YujegCU0ugOFzud
-	gJgqIgYMLBSi3gCf0CiqbmGnNrEhVBOtRUFfL7y9M8pKKwCEfYJXUkzU7+djuTtNJB4W
-	KQlDpgpwxUzVHQdJT9S4P5g6N/SER6YhbWsxanefVAiWqEfzdmNoSO6G6kZDi5cjlDZs
-	NcEGqK/3jPdlvtANH1DfEivJUCHjV00Dn4Reca3XESZ/DMj+RD3dB6gRfcOh43W2ZoWk
-	FQzDDGUFT01ecFo7CuQde+7Kscu9qehE9X3VVvDJV45DqMfC+JAVrU+Sr4giHu9KZDuM
-	VMpA==
-X-Gm-Message-State: APjAAAVjuvAIVqr+53AzzD0zWmFwBkypdlKGNgiUQdYzkW9tU+wCiwJb
-	fNBW5GLmtopNaCE68h9dGRO9r1EC75dGz/ifyrg=
-X-Google-Smtp-Source: APXvYqwGYR09oRZ+qmeMJpSBhDfXgJj3Q/YP0sUX0AZC7seevw4cw3T9cuCKcco08q/uYIEX2q1LV1hn9I65BIZJQBE=
-X-Received: by 2002:a05:620a:16aa:: with SMTP id
-	s10mr40991424qkj.305.1555039072463; 
-	Thu, 11 Apr 2019 20:17:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190328062222.8409-1-joel@jms.id.au>
-	<20190328062222.8409-2-joel@jms.id.au>
-	<CAFEAcA_K1Rv1G-s=ndVYX6i_BvWME6ToShL6ZBpB4gnE3zdZdA@mail.gmail.com>
-	<89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
-In-Reply-To: <89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Fri, 12 Apr 2019 03:17:40 +0000
-Message-ID:
- <CACPK8Xc_WeP3xuimjTBFRArteecikin9Qj8ZoCW-J2qBY4C=5g@mail.gmail.com>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+	(envelope-from <andrew@aj.id.au>) id 1hEmoL-0004V5-6Q
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:25:06 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:41541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <andrew@aj.id.au>)
+	id 1hEmoD-0004RR-PD; Thu, 11 Apr 2019 23:24:57 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.nyi.internal (Postfix) with ESMTP id 68C1221FE5;
+	Thu, 11 Apr 2019 23:24:56 -0400 (EDT)
+Received: from imap2 ([10.202.2.52])
+	by compute4.internal (MEProxy); Thu, 11 Apr 2019 23:24:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
+	mime-version:message-id:in-reply-to:references:date:from:to:cc
+	:subject:content-type:content-transfer-encoding; s=fm2; bh=PCNys
+	LiKHb8gXJxsYRLbY1zjZ1t3f8jiZOl7tebbhq0=; b=NPnRO1WJU+RUejyXKITAF
+	Cr2Feye2tGe05qg70QkDBcg5MP8feKmKtFn9exEFB3DXxCxpoTv7EXwulnmEVAzm
+	Y7es5BMlpheTCkY/5j/3xKLIO5f5ea0Rp6svmwKY1Spk8mxSEByi8r/UAK4MBFZc
+	IH42d19shMTsVQy41REH9mu8AglIDW1scNsmCSsZpNwna3hTAsrQR6Y6saYlVAs5
+	61IfPA9eAMCu0n5/a9gHmk9juf7c5YB4R8+dgQXemyJf4VGFa5fd2rt4fULkKUoW
+	uUn1K5/le1OzOXzTId4HCyMwn9chOW3SAos2yGQKWP/lgbjQwFLtPnrB4ag5mo4Z
+	w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:from:in-reply-to:message-id:mime-version:references
+	:subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; bh=PCNysLiKHb8gXJxsYRLbY1zjZ1t3f8jiZOl7tebbh
+	q0=; b=02d9UTIgfzGojXk6T8v3NymqGEpHXW60p4l3bQxsy+r8QHOuv3gE8GBo8
+	fw31ITSjC7V26h9V8Mi6yyi9pBhCRnZXlF0riwZV5zv4xCcnIiMZok1NcO3pioiW
+	ld/PkzVxEPqGtDeYl5MYRkezKfwss1CJFrFpSx/gVJONwFuzeoNXoorU2yKNtTrT
+	UrUtdV+0IqExMYjaAdCv2cQYI2i8LqLEvMQ5slUhwqNSh3pXT4Af4WJuxjri25Rb
+	6XtWwaGMEwPNKM8JotIGSUPhhCfndmFgc/F4/J9J4zmOa5frW8K1RrwQe2eiv+mW
+	iSRqsjUZGqOEMyV61xGNSKU/iyPlA==
+X-ME-Sender: <xms:BwWwXLlZOq9GgSimlNOhcZsikVfT1z4wuzpG5GLIHSemh67WSvcDrg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddrvddtgdeijecutefuodetggdotefrodftvf
+	curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+	uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+	fjughrpefofgggkfgjfhffhffvufgtgfesthhqredtreerjeenucfhrhhomhepfdetnhgu
+	rhgvficulfgvfhhfvghrhidfuceorghnughrvgifsegrjhdrihgurdgruheqnecurfgrrh
+	grmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghjrdhiugdrrghunecuvehluhhsthgv
+	rhfuihiivgeptd
+X-ME-Proxy: <xmx:BwWwXMNBHon_kB65J70yWjBYPj599iyGxgx7pJ7s3-5wGMC132MfNA>
+	<xmx:BwWwXI-pvSMpWOfmvUBJgkfHJXfGfzW15mpIHoQf8oZ1vUA6pKjNQA>
+	<xmx:BwWwXOEUrINGJER_ZT-D8gKCmFHmp6Sa12uhmwR4rSy41MS3b1KYDQ>
+	<xmx:CAWwXLEuHBaK7yCppythJyVO16s8pq15yien6AqZZ_883AbDR-PGXw>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 18D397C132; Thu, 11 Apr 2019 23:24:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.1.6-329-gf4aae99-fmstable-20190329v1
+Mime-Version: 1.0
+X-Me-Personality: 52947553
+Message-Id: <c007d615-4dbf-4525-9fb0-6e4feb28c344@www.fastmail.com>
+In-Reply-To: <CACPK8XezRXPFFiiK7_xXLs-ipnfw9400E1dSRHN0XnF2cc4=vA@mail.gmail.com>
+References: <20190411161013.4514-1-clg@kaod.org>
+	<20190411161013.4514-3-clg@kaod.org>
+	<CACPK8XezRXPFFiiK7_xXLs-ipnfw9400E1dSRHN0XnF2cc4=vA@mail.gmail.com>
+Date: Thu, 11 Apr 2019 23:24:54 -0400
+From: "Andrew Jeffery" <andrew@aj.id.au>
+To: "Joel Stanley" <joel@jms.id.au>,
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw: timer: Add ASPEED RTC device
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 66.111.4.28
+Subject: Re: [Qemu-devel] [PATCH 2/3] aspeed: add a per SoC mapping for the
+ memory space
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,91 +105,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412031740.xe2OKsLQ6HAT_5iXc6uiF3bKVh7nQKW4l7OUH9i0ugk@z>
+Message-ID: <20190412032454.hI77XppjKmJD-JfaeE3VlGfsfx7RBtzjnO3ZaNi64V8@z>
 
-Thanks for the review Peter and Cedric.
 
-On Thu, 11 Apr 2019 at 15:30, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> On 4/11/19 5:25 PM, Peter Maydell wrote:
-> >> +
-> >> +#define COUNTER1        (0x00 / 4)
-> >> +#define COUNTER2        (0x04 / 4)
-> >> +#define ALARM           (0x08 / 4)
-> >> +#define CONTROL         (0x10 / 4)
-> >> +#define ALARM_STATUS    (0x14 / 4)
+
+On Fri, 12 Apr 2019, at 11:48, Joel Stanley wrote:
+> On Thu, 11 Apr 2019 at 16:10, C=C3=A9dric Le Goater <clg@kaod.org> wro=
+te:
 > >
-> > Not mandatory, but you might like the REG32() macro in
-> > hw/registerfields.h which defines A_FOO and R_FOO
-> > constants for you for the addresses and the indexes.
->
-> Yes. May be we should start using these macros in all our models.
-
-I don't like them as you can no longer jump between the definition and
-the use of the defines.
-
->
+> > This will simplify the definition of new SoCs, like the AST2600 whic=
+h
+> > should use a slightly different address space and have a different s=
+et
+> > of controllers.
 > >
-> >> +
-> >> +#define RTC_UNLOCKED    BIT(1)
-> >> +#define RTC_ENABLED     BIT(0)
-> >> +
-> >> +static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
-> >> +{
-> >> +    struct tm tm;
-> >> +    uint32_t year, cent;
-> >> +    uint32_t reg1 =3D rtc->reg[COUNTER1];
-> >> +    uint32_t reg2 =3D rtc->reg[COUNTER2];
-> >> +
-> >> +    tm.tm_mday =3D (reg1 >> 24) & 0x1f;
-> >> +    tm.tm_hour =3D (reg1 >> 16) & 0x1f;
-> >> +    tm.tm_min =3D (reg1 >> 8) & 0x3f;
-> >> +    tm.tm_sec =3D (reg1 >> 0) & 0x3f;
-> >
-> > Shift by zero ?
-> >
-> > Consider using extract32() rather than by-hand shift and mask.
+> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> > diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> > index 5bbd1fb87d18..9b601709e93c 100644
+> > --- a/hw/arm/aspeed_soc.c
+> > +++ b/hw/arm/aspeed_soc.c
+>=20
+> > +static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
+>=20
+> > +static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
+>=20
+> Most of these arrays is common. And some of it will stay common in the=
 
-I looked at these and found them more confusing than writing what was
-actually happening.
+> 2600. Any ideas how we could avoid duplication?
 
-This code came from the Linux kernel driver, which I wrote, so I know
-it's correct. The shift by zero is there to follow the pattern of the
-code proceeding it, again to stop mistakes.
+I dunno, I feel that any attempt to create some "common" layout concept =
+is
+more distracting than having soc-specific, complete layouts described.
 
-If we require using these helper macros then I can make the change. If
-it's optional then I would prefer to leave it as is.
+There's no reason why they're common beyond coincidence (i.e. it's at
+ASPEED's whim). I think this is fine.
 
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+
+>=20
+> This is fine for now.
+>=20
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
 >
-> What about the FIELD*() macros in hw/registerfields.h ?
->
-
-> >> +static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
-> >> +{
-> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >> +
-> >> +    dc->realize =3D aspeed_rtc_realize;
-> >
-> > This is missing a reset function and vmstate.
-
-Ok, I can add those.
-
-vmstate and migration is a foreign concept for the small ARM machines.
-As well as being a developer, I am an end user of Qemu for them (the
-aspeeds, microbit), and the use case is to boot up a firmware and
-check that it does correct thing. I've never considered saving the
-state and resming it, and can't think of a situation where that would
-be done.
-
-If we're adding it for consistency then I understand. I don't think it
-sees any testing though.
-
-Cheers,
-
-Joel
 
