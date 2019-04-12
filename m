@@ -2,63 +2,61 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E1FC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA745C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B97B206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:25:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B97B206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AA6E32084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:28:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA6E32084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37258 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37389 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEwBU-0004Pj-DU
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:25:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60635)
+	id 1hEwDz-0006Ho-0X
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:28:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEwAQ-00043O-IA
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:31 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hEwD7-0005n8-C6
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEwAP-0002oe-CF
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEwAP-0002oE-1c
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2070E8B12F;
-	Fri, 12 Apr 2019 13:24:28 +0000 (UTC)
-Received: from redhat.com (ovpn-112-27.ams2.redhat.com [10.36.112.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C2F495D706;
-	Fri, 12 Apr 2019 13:24:23 +0000 (UTC)
-Date: Fri, 12 Apr 2019 14:24:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Pu Wen <puwen@hygon.cn>
-Message-ID: <20190412132420.GM25308@redhat.com>
-References: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
-MIME-Version: 1.0
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hEwD5-0004NB-FE
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:27:17 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:58652)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hEwD3-0004K9-6M
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:27:13 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id B101A3D204;
+	Fri, 12 Apr 2019 22:27:08 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C2E8D240089; 
+	Fri, 12 Apr 2019 22:27:07 +0900 (JST)
+Date: Fri, 12 Apr 2019 22:27:04 +0900
+Message-ID: <87imvjpd5j.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+In-Reply-To: <655a45ed-cd6b-b8d8-72fa-d4ebca3dcd1a@redhat.com>
+References: <20190325090047.122981-1-ysato@users.sourceforge.jp>
+	<20190401140318.80498-1-ysato@users.sourceforge.jp>
+	<655a45ed-cd6b-b8d8-72fa-d4ebca3dcd1a@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Fri, 12 Apr 2019 13:24:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC] i386: Add new Hygon 'Dhyana' and
- 'Dhyana-IBPB' CPU models
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.15
+Subject: Re: [Qemu-devel] [PATCH RFC v6 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,40 +68,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, qemu-devel@nongnu.org,
-	ehabkost@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412132420.U-hQCzsHAqUGbGgOSGKSocU2tbLaTPBsxc3smiEJy1o@z>
+Message-ID: <20190412132704.Dqdi2nI_YhkfZJ5EVIfjZzLhvJYl3xPYAC6zWHL1yHw@z>
 
-On Fri, Apr 12, 2019 at 08:37:49PM +0800, Pu Wen wrote:
-> Add two new base CPU models called 'Dhyana' and 'Dhyana-IBPB' to model
-> processors from Hygon Dhyana (family 18h), which derived from AMD EPYC
-> (family 17h). 'Dhyana-IBPB' is a copy of the 'Dhyana' CPU model with
-> just CPUID_8000_0008_EBX_IBPB added.
+On Thu, 11 Apr 2019 19:15:59 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> Hi Yoshinori,
+>=20
+> On 4/1/19 4:03 PM, Yoshinori Sato wrote:
+> > Hello.
+> > This patch series is added Renesas RX target emulation.
+> >=20
+> > Update review comments.
+> >=20
+> > My git repository is bellow.
+> > git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git
+> >=20
+> > Testing binaries bellow.
+> > u-boot
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> >=20
+> > starting
+> > $ gzip -d u-boot.bin.gz
+> > $ qemu-system-rx -bios u-boot.bin
+> >=20
+> > linux and pico-root (only sash)
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+> >            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceT=
+ree)
+> >=20
+> > starting
+> > $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+> >=20
+> > Changes v5.
+> > Fix undocumented instruction behavior.
+> > (PUSHM/POPM/RTSD/MVFC/MVTC)
+> > More useful messages for invalid operands.
+> [...]
+> Please don't post your series iterations are as reply to previous
+> series, it makes harder to find them.
+>=20
+> FYI I use Thunderbird as email client, with mails grouped by thread.
+> Since you sent v4 as reply to v3, and similar v5 -> v4 and this v6 ->
+> v5, my client kept all subsequent activity folded under the "v3" cover.
+> Then I missed to review it.
 
-Do we really need to support both CPU variants ?
+Oh. sorry.
+Make a new thread when sending next time.
 
-The IBPB feature is the Spectre fix which dates from January 2018.
-Having both made (limited) sense for EPYC as EPYC CPUs existed
-already, so there would be a mix of EPYC CPUs with and without the
-microcode that adds IBPB.
+> Regards,
+>=20
+> Phil.
+>=20
 
-The Google results I see suggest that Dhyana CPUs started to become
-available in July 2018, so surely they would come with microcode
-that has the IBPB right from day 1 ?
-
-Am I missing anything that means there will be a compelling need
-to support Dhyana /without/ IBPB ?
-
-If not, then we only need 1 CPU model and that would include IBPB.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Yosinori Sato
 
