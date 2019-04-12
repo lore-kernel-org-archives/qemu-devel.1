@@ -2,73 +2,65 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-12.4 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02FC7C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D3BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD10D2084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:56:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD10D2084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id AD0EE2084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:56:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0EE2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36160 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36162 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvjF-0005gX-OH
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:56:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40088)
+	id 1hEvjQ-0005s9-Tg
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:56:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEvIj-00060J-5t
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:02 -0400
+	(envelope-from <otubo@redhat.com>) id 1hEvgU-0003qQ-Tp
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEvIi-0005Ms-7l
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:01 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:57669)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hEvIg-0005Ko-Av
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:28:59 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MIMXC-1h2s3z3spQ-00EKbu; Fri, 12 Apr 2019 14:28:44 +0200
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190412121626.19829-1-berrange@redhat.com>
-	<20190412121626.19829-2-berrange@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <301236a7-18f3-1b63-5785-eb8ec93ff583@vivier.eu>
-Date: Fri, 12 Apr 2019 14:28:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <otubo@redhat.com>) id 1hEvgT-00065G-Ec
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1hEvgS-00064T-NX
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8100F3001AC2;
+	Fri, 12 Apr 2019 12:53:26 +0000 (UTC)
+Received: from vader (ovpn-117-148.ams2.redhat.com [10.36.117.148])
+	by smtp.corp.redhat.com (Postfix) with SMTP id DC3AA5D9CD;
+	Fri, 12 Apr 2019 12:53:22 +0000 (UTC)
+Date: Fri, 12 Apr 2019 14:53:21 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190412125321.GC13589@vader>
+References: <20190412113730.28828-1-otubo@redhat.com>
+	<CAFEAcA9k=rnQtJXsQ7D4EM6HeSnpJEyBHMTRp4SFb0_G7r+7uA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190412121626.19829-2-berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:jZUzzMacHUt+fv0PmX21TLXLEwwMRsmHt7kDKfSbGOVDkJskZZQ
-	0ODVWuKBV8D9qWEx0R1iAiLZMfRNrbRqM9gYNk7uhzyUQxGhqLx5C822BVqRqcBZaX5quz2
-	89GAicpPh9PxUznhzVO0PRoD7S+zqHWqmPprEg9hhOZGVRg0TLckDEhZhLb+KjMQb7T30nP
-	ZPOIdGdpiaolMh6bC7HFQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0yFKuWneZ8Q=:r7iOU6f/GPGtL27H7detEo
-	vhcO0ylXaCbc2dNgJ2VDX7NUAnnwh5x0wAgpDw6iQ/vUjbPxrL3L5tbfA7EE/Q9yn8uhxN/xz
-	WT0JtMx5Ll2GA7WIaM+75wSgnQhWeKBOQzgK8vlJPYxVlvgp26N9hy3PCajYGvBZCsYBQjmzW
-	jiIevSCvcBnCA965duG8SXyrd1zlyYHv31ZCe4fKmlU2N+foefJWPXRA4thSevqfXtWWc3MA4
-	Mb0Vy5wByw9qQXCYAewIjRXn18WvIm6G0DLGvxTyGQwC0EHGgHhUY95BIDcuBiBAfwsBv8xW1
-	rKWOIdl6i0IA+yQz304STbtZIVLjkBfLMugC5zK7K6q+htBjH1brmggbfWdeCmLRB4K/jjGBf
-	+gsQdOY0tQMeVUnUOcYbd8MVwAstOPQNLmRP9psdWKFDCgzuoziWTOLerv9WlcN793h0aULg0
-	QiP/V4I4UQ5m1sLge40wMdS1e2ER1dWhi8cTJpl3VV4zVCHUNfs+Jpe831fX6SCw1T++tysIZ
-	rslUS97ZRV4CYS+MWskTP8V+9gLAHWeorI6xWG7ooCTA9YB9wTg4AQ0HBdbUI4NxofZ7iqbTl
-	2vkmjZluzV5+bo8O/9jjKNRiYJsPlcMefrhZvmbPiddKxN1I9oW6uO1i3yJ6JS6nZQcgNqK3L
-	aB57EliCR5ZUrn1MqtYNcIpr+gIeFiwv4S04HlXpyrT/2S0iXRCy2rdEOSfI0mtqz7Oi9T1Jw
-	gVhCaXU3cGZTtCMW5FgZ5O0MG4b6FZ2/reoqfCqZqN67l8LcUtCL3Ij9WqM=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="yVhtmJPUSI46BTXb"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9k=rnQtJXsQ7D4EM6HeSnpJEyBHMTRp4SFb0_G7r+7uA@mail.gmail.com>
+User-Agent: Mutt/1.8.3+47 (5f034395e53d) (2017-05-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 12 Apr 2019 12:53:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] linux-user: avoid string truncation
- warnings in uname field copying
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 0/1] seccomp branch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,46 +72,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Helge Deller <deller@gmx.de>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412122841.X2FBnkvr35E8X4ZqqsdiQCXzhrp94wIbJ8is8qyeaeM@z>
+Message-ID: <20190412125321.4d2FkO7S3S1b1NfQJU7v6cBNpjDVj8F5-aaXnIIergg@z>
 
-On 12/04/2019 14:16, Daniel P. Berrangé wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from linux-user/uname.c:20:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> We don't care where the NUL terminator in the original uname
-> field was. It suffices to copy the entire original field and
-> simply force a NUL terminator at the end of the new field.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->  linux-user/uname.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..3dff33effe 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
->        /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> +      memcpy((dest), (src), MIN(sizeof(src), __NEW_UTS_LEN));   \
 
-If we use sizeof(), I think we should use it for both:
+--yVhtmJPUSI46BTXb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  MIN(sizeof(dest), sizeof(src))
+On 12/04/2019 - 12:52:48, Peter Maydell wrote:
+> On Fri, 12 Apr 2019 at 12:37, Eduardo Otubo <otubo@redhat.com> wrote:
+> >
+> > The following changes since commit 532cc6da74ec25b5ba6893b5757c977d5458=
+2949:
+> >
+> >   Update version for v4.0.0-rc3 release (2019-04-10 15:38:59 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/otubo/qemu.git tags/pull-seccomp-20190412
+> >
+> > for you to fetch changes up to ee352b53b3e49ba9621149f9de7279a5cadd606c:
+> >
+> >   configure: Relax check for libseccomp (2019-04-12 13:30:40 +0200)
+> >
+> > ----------------------------------------------------------------
+> > pull-seccomp-20190412
+> >
+> > ----------------------------------------------------------------
+> > Helge Deller (1):
+> >       configure: Relax check for libseccomp
+>=20
+> Is this really release critical? If you're sending pull
+> requests for rc3/rc4 it is extremely helpful if you can
+> give the justification for why they need to go into this
+> release. (As it happens we're going to need an rc4, but
+> I want to keep the set of changes in it to a minimum.)
+>=20
 
-Thanks,
-Laurent
+This is not critical. I'll send again after the current release.
+
+--=20
+Eduardo Otubo
+
+Red Hat GmbH,http://www.de.redhat.com/, Sitz: Grasbrunn,
+Handelsregister: Amtsgericht M=C3=BCnchen, HRB 153243,
+Gesch=C3=A4ftsf=C3=BChrer: Charles Cachera, Michael O'Neill, Tom Savage, Er=
+ic Shander
+
+--yVhtmJPUSI46BTXb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcsIpBAAoJEN8y58Dw//mi+0sH/3TOgNWOCj3i1JbHytrWacf1
+Dk98rm/BMr//33tsKswdnQNMgRZZgkAb5HS620SpenbG3sBmUqZFq8j5Fnt+MSWg
+9GgmyXNnhoEO//5XP8lmtrtRK6ePQmVsj+6qGaaAHZv6naqMo9mQfu1v4/t2niW1
+f8wmeCpYrI8p4ZsaQ/xtXuKJXUa/Wh9/g0y5XphbY46v9WGVC7xx924wjIAXMwrY
+tPJUps1/DBGA+S6BB59TiLEQWuPm77cPvq2sHhBRZSfopBilqqmIwOpHFfywEqhh
+Cjll2h2czSr0LPBmkOKJHRpju8i0ArdIxt6TdbwfgzW78LuNl3XPexVk/URPnXM=
+=A+0+
+-----END PGP SIGNATURE-----
+
+--yVhtmJPUSI46BTXb--
 
