@@ -2,92 +2,121 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D19FEC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 07:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92525C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 07:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99E6D205ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 07:24:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nyKhp8zh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E6D205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4FDBB20850
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 07:42:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDBB20850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60176 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60335 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEqXd-00071P-RF
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 03:24:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33248)
+	id 1hEqpE-0003aS-CI
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 03:42:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hEqWs-0006fT-MD
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hEqoR-0003GK-1m
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hEqWr-0007cw-PQ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:18 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:38881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hEqWr-0007bO-8p
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:17 -0400
-Received: by mail-pl1-x629.google.com with SMTP id f36so4681774plb.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 00:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to;
-	bh=EbmI06CuURe6APyv/YtbAqvFD79LhcewZprmXpjAkNs=;
-	b=nyKhp8zhksAHK5fu+rYCYQIIGfFE1xTdby0l2OLCAHYSag/M6c3pcch++Ke3CI19e7
-	Tf5vLMeZjDhEcUKNdNhV7JwYCc5ARedmGVS7ZAhmtweAh8ylj15wg5QhiYO+7OriYfu4
-	keXb6Kuiv1FjwdpaKXg6nVd2zFqEU3LcH5yxlr4zKTPleVq1CfE//BjdeDiNzCmvUmrn
-	9ROSqkWhEUIrDilKQdme5TSthxko750rReIHlvTAiUODxxWr15YTivYK8VznonbVItfP
-	/5Q/om1qIif+qHFqXVPaUh687UT05/ELfYKBhb4PZyWlPPql2HFb8ncJJBK2PVKMwsPZ
-	Yd/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to;
-	bh=EbmI06CuURe6APyv/YtbAqvFD79LhcewZprmXpjAkNs=;
-	b=H8t8KiQl3MnjN5R/cpRaBi5rYg4k9yFcoYzPGquOWW26DZBMDNlFVd++aiUQ8pIcwZ
-	iD7DE84Q3ruVb0yH79mEfm4YPpQMeXWOD7h++yPp2UStKPPoMQcY0wSZEiUuPlLA0d04
-	yMvAkpDraJhQNmw/0ANbIR7bRWb+q+zAZ5V7s7eoH+eJhOUNNaZIkAlZ/maDq0MQc5FC
-	M7Cwa7Jtx4NDLM/d6gvhESd1bIcy3uLMSosSLfGcwkS2LL3WOJ6i/kihb+atkbZk2cEI
-	QysMc4cDZ3GBHoHNGN00iR8kCmIMIGvE5UzO9cCSnqncmFoiXBnfDH+oSfzFGZo7/A1p
-	08bA==
-X-Gm-Message-State: APjAAAXXwudyri0LjZzmqo/X2SE+vArgIVG+g40kNFmrmjLHjtxPOD8O
-	SsdYaxPRb88ik9y1IrVDgoHFkK+ne4g=
-X-Google-Smtp-Source: APXvYqzGLBURDNBZ+DoNAwECGS0AlLlBpUlF/vJFKZ4dN3HlIfk8Fz4CcSDOLA8+dJ7NTWGoWp0xew==
-X-Received: by 2002:a17:902:2865:: with SMTP id
-	e92mr33870119plb.269.1555053795024; 
-	Fri, 12 Apr 2019 00:23:15 -0700 (PDT)
-Received: from [192.168.3.43] (rrcs-173-197-98-123.west.biz.rr.com.
-	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
-	j16sm53873501pfi.58.2019.04.12.00.23.13
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 00:23:13 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190409065404.9853-1-richard.henderson@linaro.org>
-	<b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1hEqoQ-0002uO-1m
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hEqoP-0002te-MY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:25 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D46230821E0;
+	Fri, 12 Apr 2019 07:41:23 +0000 (UTC)
+Received: from [10.36.112.36] (ovpn-112-36.ams2.redhat.com [10.36.112.36])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D78A210694ED;
+	Fri, 12 Apr 2019 07:41:19 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190411182240.5957-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <ed3b8226-db25-dcf9-dac2-80a03b90c087@linaro.org>
-Date: Thu, 11 Apr 2019 21:23:02 -1000
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	mQHhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
+	CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
+	hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
+	DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
+	P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
+	Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
+	UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
+	tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
+	wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAbQj
+	UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT6JAg0EEwECACMFAlRCcBICGwMH
+	CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
+	11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
+	jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
+	VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
+	CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
+	SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
+	AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
+	AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
+	nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
+	bQ4tlFFuVjArBZcapSIe6NV8C4cEiSS5AQ0EVEJxcwEIAK+nUrsUz3aP2aBjIrX3a1+C+39R
+	nctpNIPcJjFJ/8WafRiwcEuLjbvJ/4kyM6K7pWUIQftl1P8Woxwb5nqL7zEFHh5I+hKS3haO
+	5pgco//V0tWBGMKinjqntpd4U4Dl299dMBZ4rRbPvmI8rr63sCENxTnHhTECyHdGFpqSzWzy
+	97rH68uqMpxbUeggVwYkYihZNd8xt1+lf7GWYNEO/QV8ar/qbRPG6PEfiPPHQd/sldGYavmd
+	//o6TQLSJsvJyJDt7KxulnNT8Q2X/OdEuVQsRT5glLaSAeVAABcLAEnNgmCIGkX7TnQF8a6w
+	gHGrZIR9ZCoKvDxAr7RP6mPeS9sAEQEAAYkDEgQYAQIACQUCVEJxcwIbAgEpCRB+FRAMzTZp
+	scBdIAQZAQIABgUCVEJxcwAKCRC/+9JfeMeug/SlCACl7QjRnwHo/VzENWD9G2VpUOd9eRnS
+	DZGQmPo6Mp3Wy8vL7snGFBfRseT9BevXBSkxvtOnUUV2YbyLmolAODqUGzUI8ViF339poOYN
+	i6Ffek0E19IMQ5+CilqJJ2d5ZvRfaq70LA/Ly9jmIwwX4auvXrWl99/2wCkqnWZI+PAepkcX
+	JRD4KY2fsvRi64/aoQmcxTiyyR7q3/52Sqd4EdMfj0niYJV0Xb9nt8G57Dp9v3Ox5JeWZKXS
+	krFqy1qyEIypIrqcMbtXM7LSmiQ8aJRM4ZHYbvgjChJKR4PsKNQZQlMWGUJO4nVFSkrixc9R
+	Z49uIqQK3b3ENB1QkcdMg9cxsB0Onih8zR+Wp1uDZXnz1ekto+EivLQLqvTjCCwLxxJafwKI
+	bqhQ+hGR9jF34EFur5eWt9jJGloEPVv0GgQflQaE+rRGe+3f5ZDgRe5Y/EJVNhBhKcafcbP8
+	MzmLRh3UDnYDwaeguYmxuSlMdjFL96YfhRBXs8tUw6SO9jtCgBvoOIBDCxxAJjShY4KIvEpK
+	b2hSNr8KxzelKKlSXMtB1bbHbQxiQcerAipYiChUHq1raFc3V0eOyCXK205rLtknJHhM5pfG
+	6taABGAMvJgm/MrVILIxvBuERj1FRgcgoXtiBmLEJSb7akcrRlqe3MoPTntSTNvNzAJmfWhd
+	SvP0G1WDLolqvX0OtKMppI91AWVu72f1kolJg43wbaKpRJg1GMkKEI3H+jrrlTBrNl/8e20m
+	TElPRDKzPiowmXeZqFSS1A6Azv0TJoo9as+lWF+P4zCXt40+Zhh5hdHO38EV7vFAVG3iuay6
+	7ToF8Uy7tgc3mdH98WQSmHcn/H5PFYk3xTP3KHB7b0FZPdFPQXBZb9+tJeZBi9gMqcjMch+Y
+	R8dmTcQRQX14bm5nXlBF7VpSOPZMR392LY7wzAvRdhz7aeIUkdO7VelaspFk2nT7wOj1Y6uL
+	nRxQlLkBDQRUQnHuAQgAx4dxXO6/Zun0eVYOnr5GRl76+2UrAAemVv9Yfn2PbDIbxXqLff7o
+	yVJIkw4WdhQIIvvtu5zH24iYjmdfbg8iWpP7NqxUQRUZJEWbx2CRwkMHtOmzQiQ2tSLjKh/c
+	HeyFH68xjeLcinR7jXMrHQK+UCEw6jqi1oeZzGvfmxarUmS0uRuffAb589AJW50kkQK9VD/9
+	QC2FJISSUDnRC0PawGSZDXhmvITJMdD4TjYrePYhSY4uuIV02v028TVAaYbIhxvDY0hUQE4r
+	8ZbGRLn52bEzaIPgl1p/adKfeOUeMReg/CkyzQpmyB1TSk8lDMxQzCYHXAzwnGi8WU9iuE1P
+	0wARAQABiQHzBBgBAgAJBQJUQnHuAhsMAAoJEH4VEAzNNmmxp1EOoJy0uZggJm7gZKeJ7iUp
+	eX4eqUtqelUw6gU2daz2hE/jsxsTbC/w5piHmk1H1VWDKEM4bQBTuiJ0bfo55SWsUNN+c9hh
+	IX+Y8LEe22izK3w7mRpvGcg+/ZRG4DEMHLP6JVsv5GMpoYwYOmHnplOzCXHvmdlW0i6SrMsB
+	Dl9rw4AtIa6bRwWLim1lQ6EM3PWifPrWSUPrPcw4OLSwFk0CPqC4HYv/7ZnASVkR5EERFF3+
+	6iaaVi5OgBd81F1TCvCX2BEyIDRZLJNvX3TOd5FEN+lIrl26xecz876SvcOb5SL5SKg9/rCB
+	ufdPSjojkGFWGziHiFaYhbuI2E+NfWLJtd+ZvWAAV+O0d8vFFSvriy9enJ8kxJwhC0ECbSKF
+	Y+W1eTIhMD3aeAKY90drozWEyHhENf4l/V+Ja5vOnW+gCDQkGt2Y1lJAPPSIqZKvHzGShdh8
+	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
+	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <ef726224-d07e-1e4a-2a63-222b68af560a@redhat.com>
+Date: Fri, 12 Apr 2019 09:41:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::629
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [RISU v2] i386: Add avx512 state to reginfo_t
+In-Reply-To: <20190411182240.5957-1-thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 12 Apr 2019 07:41:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch
+ for the ps2.c file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,65 +128,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412072302.E7qGjxSGeEBSOIYA8LQEhV9Tig8mcxMRwW-VuiVBkA0@z>
+Message-ID: <20190412074117.5vasidVJ5-6qnaHE7ReDa0n56OPMI2gL2Z_xqCVghZY@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI
-From: Richard Henderson <richard.henderson@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-Message-ID: <ed3b8226-db25-dcf9-dac2-80a03b90c087@linaro.org>
-Subject: Re: [RISU v2] i386: Add avx512 state to reginfo_t
-References: <20190409065404.9853-1-richard.henderson@linaro.org>
- <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-In-Reply-To: <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11/04/19 20:22, Thomas Huth wrote:
+> ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/input/Kconfig       | 5 +++++
+>  hw/input/Makefile.objs | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+> index e2e66f0858..316573f782 100644
+> --- a/hw/input/Kconfig
+> +++ b/hw/input/Kconfig
+> @@ -8,10 +8,15 @@ config LM832X
+>  config PCKBD
+>      bool
+>      default y
+> +    select PS2
+>      depends on ISA_BUS
+>  
+>  config PL050
+>      bool
+> +    select PS2
+> +
+> +config PS2
+> +    bool
+>  
+>  config STELLARIS_INPUT
+>      bool
+> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+> index c8b00f71ec..6db5ee0e71 100644
+> --- a/hw/input/Makefile.objs
+> +++ b/hw/input/Makefile.objs
+> @@ -3,7 +3,7 @@ common-obj-y += hid.o
+>  common-obj-$(CONFIG_LM832X) += lm832x.o
+>  common-obj-$(CONFIG_PCKBD) += pckbd.o
+>  common-obj-$(CONFIG_PL050) += pl050.o
+> -common-obj-y += ps2.o
+> +common-obj-$(CONFIG_PS2) += ps2.o
+>  common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+>  common-obj-$(CONFIG_TSC2005) += tsc2005.o
+>  
+> 
 
-On 4/11/19 4:05 PM, Jan Bobek wrote:
-> Looks fine to me. I suppose if I had written it, I would have included
-> more comments and/or #define's to make some bits more obvious (all the
-> magic constants look a bit scary until you read the Intel manual), but
-> nevermind that.
+Queued, thanks.  (Also, nice find :)).
 
-You're right that it absolutely cries for comments and constants.  I usua=
-lly
-don't know how to write those until I know what I am doing.  In this case=
- I
-really hadn't figured out what I wanted to do -- perhaps obvious for send=
-ing
-two different patches inside a couple of hours.
-
-
-> I guess the other remaining part now is extending risugen to actually
-> generate the test blobs.
-
-Yes.  I gave that a read and think that you should need only simple exten=
-sions
-to the current infrastructure.
-
-
-r~
-
-
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFEBAEBCgAuFiEEnLGN2vjoSa0q/BakrRJwzE3QJ5sFAlywPN4QHHJ0aEB0d2lk
-ZGxlLm5ldAAKCRCtEnDMTdAnm+2DB/0XDN0RUewIx3N4og/D0m3qZLD5+zQ+CKLR
-Fl/WEI0quFl6PRUoZu8VTAMrIxRiue3djWb7JBmTgV1FPMy3V7zQkvRf0t3eKG+x
-DIajcWV8Pj8lCtD7DVD4ilS5YWsitPMLzB+OOfBoJhzlzKv9e4ePu5/f5PNhN5ZY
-BHE5yXWYkPV4VxCP5BkAP4TNxXPblbtzAUMJrrFSeKEy9cCi0xinNqAMaU6rzL7U
-1LkZ89j8khNqHjEZVsrPf3avJBoz+zM9ScnBhdbX02gHSUmenX9SuZXQBun7T2jl
-x8w2TgcVaLfrvma2xVQ13jeSpwvtZrrr83nyYMvFxv54ejU+notr
-=ILxT
------END PGP SIGNATURE-----
-
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI--
+Paolo
 
