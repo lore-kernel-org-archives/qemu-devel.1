@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722A0C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 087CAC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 384552082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384552082E
+	by mail.kernel.org (Postfix) with ESMTPS id CE7BC2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE7BC2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40164 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40168 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEzZC-0007t9-94
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:02:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54289)
+	id 1hEzZZ-0008DT-Tx
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:02:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzRm-0000rt-O5
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:54:39 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEzSD-0001JG-R8
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzRk-0006j8-N8
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:54:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54942)
+	(envelope-from <philmd@redhat.com>) id 1hEzSA-0007ke-3h
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hEzRi-0006Uq-1u; Fri, 12 Apr 2019 12:54:34 -0400
+	id 1hEzS2-0007Rb-KH; Fri, 12 Apr 2019 12:54:56 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3B593082E5F;
-	Fri, 12 Apr 2019 16:54:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1662BDA334;
+	Fri, 12 Apr 2019 16:54:53 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-66.brq.redhat.com [10.40.204.66])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5250260BEC;
-	Fri, 12 Apr 2019 16:54:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 06D4460BEC;
+	Fri, 12 Apr 2019 16:54:49 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Date: Fri, 12 Apr 2019 18:54:07 +0200
-Message-Id: <20190412165416.7977-4-philmd@redhat.com>
+Date: Fri, 12 Apr 2019 18:54:13 +0200
+Message-Id: <20190412165416.7977-10-philmd@redhat.com>
 In-Reply-To: <20190412165416.7977-1-philmd@redhat.com>
 References: <20190412165416.7977-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 12 Apr 2019 16:54:32 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 12 Apr 2019 16:54:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 03/12] hw/display/tc6393xb: Remove unused
- functions
+Subject: [Qemu-devel] [PATCH v3 09/12] hw/devices: Move LAN9118 declarations
+ into a new header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,72 +73,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
 	Igor Mitsyanko <i.mitsyanko@gmail.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
+	Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org,
+	Jan Kiszka <jan.kiszka@web.de>, Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412165407.ZV7_EI6jIPPlexuMsxW47QIWBS-J2X-5CjFpDjpn0Ag@z>
+Message-ID: <20190412165413.auKROF12IX7B4SHoegIbfgHV_FdUyIOEI0gKzMnE7cQ@z>
 
-No code used the tc6393xb_gpio_in_get() and tc6393xb_gpio_out_set()
-functions since their introduction in commit 88d2c950b002. Time to
-remove them.
-
-Suggested-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/display/tc6393xb.c | 16 ----------------
- include/hw/devices.h  |  3 ---
- 2 files changed, 19 deletions(-)
+ hw/arm/kzm.c             |  2 +-
+ hw/arm/mps2.c            |  2 +-
+ hw/arm/realview.c        |  1 +
+ hw/arm/vexpress.c        |  2 +-
+ hw/net/lan9118.c         |  2 +-
+ include/hw/devices.h     |  3 ---
+ include/hw/net/lan9118.h | 19 +++++++++++++++++++
+ 7 files changed, 24 insertions(+), 7 deletions(-)
+ create mode 100644 include/hw/net/lan9118.h
 
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index e1b1e302f23..6d133d9a66c 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -137,11 +137,6 @@ struct TC6393xbState {
-              blanked : 1;
- };
+diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
+index 864c7bd4114..139934c4ecf 100644
+--- a/hw/arm/kzm.c
++++ b/hw/arm/kzm.c
+@@ -22,7 +22,7 @@
+ #include "qemu/error-report.h"
+ #include "exec/address-spaces.h"
+ #include "net/net.h"
+-#include "hw/devices.h"
++#include "hw/net/lan9118.h"
+ #include "hw/char/serial.h"
+ #include "sysemu/qtest.h"
 =20
--qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s)
--{
--    return s->gpio_in;
--}
--
- static void tc6393xb_gpio_set(void *opaque, int line, int level)
- {
- //    TC6393xbState *s =3D opaque;
-@@ -154,17 +149,6 @@ static void tc6393xb_gpio_set(void *opaque, int line=
-, int level)
-     // FIXME: how does the chip reflect the GPIO input level change?
- }
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index e3d698ba6c4..54b7395849f 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -36,7 +36,7 @@
+ #include "hw/timer/cmsdk-apb-timer.h"
+ #include "hw/timer/cmsdk-apb-dualtimer.h"
+ #include "hw/misc/mps2-scc.h"
+-#include "hw/devices.h"
++#include "hw/net/lan9118.h"
+ #include "net/net.h"
 =20
--void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
--                    qemu_irq handler)
--{
--    if (line >=3D TC6393XB_GPIOS) {
--        fprintf(stderr, "TC6393xb: no GPIO pin %d\n", line);
--        return;
--    }
--
--    s->handler[line] =3D handler;
--}
--
- static void tc6393xb_gpio_handler_update(TC6393xbState *s)
- {
-     uint32_t level, diff;
+ typedef enum MPS2FPGAType {
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index 242f5a87b6a..e9983c87639 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -15,6 +15,7 @@
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+ #include "hw/devices.h"
++#include "hw/net/lan9118.h"
+ #include "hw/pci/pci.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index f07134c4245..d8634f3dd29 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -28,7 +28,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+-#include "hw/devices.h"
++#include "hw/net/lan9118.h"
+ #include "hw/i2c/i2c.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
+index a6269d9463b..a428b16eda5 100644
+--- a/hw/net/lan9118.c
++++ b/hw/net/lan9118.c
+@@ -14,7 +14,7 @@
+ #include "hw/sysbus.h"
+ #include "net/net.h"
+ #include "net/eth.h"
+-#include "hw/devices.h"
++#include "hw/net/lan9118.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/ptimer.h"
+ #include "qemu/log.h"
 diff --git a/include/hw/devices.h b/include/hw/devices.h
-index 1ed5be32967..0850f697451 100644
+index ba9034050b4..ebc45c87997 100644
 --- a/include/hw/devices.h
 +++ b/include/hw/devices.h
-@@ -54,9 +54,6 @@ void retu_key_event(void *retu, int state);
- typedef struct TC6393xbState TC6393xbState;
- TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
-                              uint32_t base, qemu_irq irq);
--void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
--                    qemu_irq handler);
--qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
- qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
+@@ -8,7 +8,4 @@
+ /* smc91c111.c */
+ void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
 =20
+-/* lan9118.c */
+-void lan9118_init(NICInfo *, uint32_t, qemu_irq);
+-
  #endif
+diff --git a/include/hw/net/lan9118.h b/include/hw/net/lan9118.h
+new file mode 100644
+index 00000000000..d13d8cd3d22
+--- /dev/null
++++ b/include/hw/net/lan9118.h
+@@ -0,0 +1,19 @@
++/*
++ * SMSC LAN9118 Ethernet interface emulation
++ *
++ * Copyright (c) 2009 CodeSourcery, LLC.
++ * Written by Paul Brook
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_NET_LAN9118_H
++#define HW_NET_LAN9118_H
++
++#include "hw/irq.h"
++#include "net/net.h"
++
++void lan9118_init(NICInfo *, uint32_t, qemu_irq);
++
++#endif
 --=20
 2.20.1
 
