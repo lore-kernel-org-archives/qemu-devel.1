@@ -2,63 +2,63 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89F9C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB98C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A7E420652
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A7E420652
+	by mail.kernel.org (Postfix) with ESMTPS id EB6292077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:26:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6292077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40426 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40468 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEzuK-00036j-Kh
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:24:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60400)
+	id 1hEzx1-0004sI-33
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:26:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEztW-0002mL-S8
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:23:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEzw2-0004Eb-9z
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEztV-0004kv-Ft
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:23:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9162)
+	(envelope-from <dgilbert@redhat.com>) id 1hEzw1-0006QE-0W
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:25:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEztV-0004kb-7w
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:23:17 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEzw0-0006PR-M1
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:25:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 74C54811D5;
-	Fri, 12 Apr 2019 17:23:16 +0000 (UTC)
-Received: from redhat.com (ovpn-112-27.ams2.redhat.com [10.36.112.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CDA61001E81;
-	Fri, 12 Apr 2019 17:23:12 +0000 (UTC)
-Date: Fri, 12 Apr 2019 18:23:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190412172309.GF25308@redhat.com>
-References: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-	<fff20c68-d4db-3a56-ba39-dc487d6f80e5@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id B5F3F3088A75
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:25:51 +0000 (UTC)
+Received: from work-vm (unknown [10.36.117.255])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A78960BEC;
+	Fri, 12 Apr 2019 17:25:50 +0000 (UTC)
+Date: Fri, 12 Apr 2019 18:25:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190412172548.GL2906@work-vm>
+References: <20190411152520.10061-1-armbru@redhat.com>
+	<20190411152520.10061-7-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <fff20c68-d4db-3a56-ba39-dc487d6f80e5@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20190411152520.10061-7-armbru@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 12 Apr 2019 17:23:16 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 12 Apr 2019 17:25:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add 'inline-fd:' protocol for migration
+Subject: Re: [Qemu-devel] [PATCH 06/17] qsp: Simplify how qsp_report() prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,48 +70,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	"open list:All patches CC here" <qemu-devel@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Yury Kotov <yury-kotov@yandex-team.ru>, yc-core@yandex-team.ru,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412172309.Qey6-kBtb0SdehC4L0k2UoIyk80npTC-Y5_r2ZSfWoA@z>
+Message-ID: <20190412172548.KDhXSN1XbsdB1M4_gF6UI-UuKjEIWA7ChEe7ThVoHVM@z>
 
-On Fri, Apr 12, 2019 at 12:13:51PM -0500, Eric Blake wrote:
-> On 4/12/19 7:20 AM, Yury Kotov wrote:
-> > Hi,
-> > 
-> > I've added 'inline-fd:' proto to simplify migration to/from fd.
-> > I thought about modifying the existing 'fd:' proto but I'm not sure it's a
-> > good idea to change it's contract.
-> > 
-> > Existing 'fd:' proto works with previously added fd by getfd or add-fd commands.
-> > If client doesn't want to work with this fd before or after migration then it's
-> > easier to send an fd with the migrate-* command. Also, client shouldn't maintain
-> > this fd.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> qsp_report() takes an fprintf()-like callback and a FILE * to pass to
+> it.
 > 
-> While the sentiment of making it easier by having fewer QMP commands
-> might be worthwhile, I'm worried about whether this scales. Having just
-> a limited set of commands that take an fd over SCM rights, and every
-> other command wired to automagically work with existing named fds,
-> scales a lot easier than having to teach individual commands how to take
-> an fd inline.
+> Its only caller hmp_sync_profile() passes monitor_fprintf() and the
+> current monitor cast to FILE *.  monitor_fprintf() casts it right
+> back, and is otherwise identical to monitor_printf().  The
+> type-punning is ugly.
+> 
+> Drop the callback, and call qemu_printf() instead.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Yeah I tend to agree - we use FD passing extensively across QMP/HMP
-and all these commands are written to interact with "getfd". I think
-it would be a step backwards to introduce a special case with
-migration that doesn't use "getfd".
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  include/block/qapi.h |  1 +
+>  include/qemu/qsp.h   |  6 ++----
+>  monitor.c            |  2 +-
+>  util/qsp.c           | 21 +++++++++++----------
+>  4 files changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/block/qapi.h b/include/block/qapi.h
+> index 83bdb098bd..a891f43b9c 100644
+> --- a/include/block/qapi.h
+> +++ b/include/block/qapi.h
+> @@ -27,6 +27,7 @@
+>  
+>  #include "block/block.h"
+>  #include "block/snapshot.h"
+> +#include "qemu/fprintf-fn.h"
+>  
+>  BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>                                          BlockDriverState *bs, Error **errp);
+> diff --git a/include/qemu/qsp.h b/include/qemu/qsp.h
+> index a94c464f90..bf36aabfa8 100644
+> --- a/include/qemu/qsp.h
+> +++ b/include/qemu/qsp.h
+> @@ -11,15 +11,13 @@
+>  #ifndef QEMU_QSP_H
+>  #define QEMU_QSP_H
+>  
+> -#include "qemu/fprintf-fn.h"
+> -
+>  enum QSPSortBy {
+>      QSP_SORT_BY_TOTAL_WAIT_TIME,
+>      QSP_SORT_BY_AVG_WAIT_TIME,
+>  };
+>  
+> -void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+> -                enum QSPSortBy sort_by, bool callsite_coalesce);
+> +void qsp_report(size_t max, enum QSPSortBy sort_by,
+> +                bool callsite_coalesce);
+>  
+>  bool qsp_is_enabled(void);
+>  void qsp_enable(void);
+> diff --git a/monitor.c b/monitor.c
+> index 7573689585..1650ceec3a 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1336,7 +1336,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
+>      enum QSPSortBy sort_by;
+>  
+>      sort_by = mean ? QSP_SORT_BY_AVG_WAIT_TIME : QSP_SORT_BY_TOTAL_WAIT_TIME;
+> -    qsp_report((FILE *)mon, monitor_fprintf, max, sort_by, coalesce);
+> +    qsp_report(max, sort_by, coalesce);
+>  }
+>  
+>  static void hmp_info_history(Monitor *mon, const QDict *qdict)
+> diff --git a/util/qsp.c b/util/qsp.c
+> index 410f1ba004..5264c97342 100644
+> --- a/util/qsp.c
+> +++ b/util/qsp.c
+> @@ -56,7 +56,9 @@
+>   *   Critical-Section Execution to Improve the Performance of Multithreaded
+>   *   Applications", USENIX ATC'12.
+>   */
+> +
+>  #include "qemu/osdep.h"
+> +#include "qemu/qemu-print.h"
+>  #include "qemu/thread.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/qht.h"
+> @@ -678,8 +680,7 @@ static gboolean qsp_tree_report(gpointer key, gpointer value, gpointer udata)
+>      return FALSE;
+>  }
+>  
+> -static void
+> -pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+> +static void pr_report(const QSPReport *rep)
+>  {
+>      char *dashes;
+>      size_t max_len = 0;
+> @@ -702,15 +703,15 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+>      /* white space to leave to the right of "Call site" */
+>      callsite_rspace = callsite_len - strlen("Call site");
+>  
+> -    pr(f, "Type               Object  Call site%*s  Wait Time (s)  "
+> -       "       Count  Average (us)\n", callsite_rspace, "");
+> +    qemu_printf("Type               Object  Call site%*s  Wait Time (s)  "
+> +                "       Count  Average (us)\n", callsite_rspace, "");
+>  
+>      /* build a horizontal rule with dashes */
+>      n_dashes = 79 + callsite_rspace;
+>      dashes = g_malloc(n_dashes + 1);
+>      memset(dashes, '-', n_dashes);
+>      dashes[n_dashes] = '\0';
+> -    pr(f, "%s\n", dashes);
+> +    qemu_printf("%s\n", dashes);
+>  
+>      for (i = 0; i < rep->n_entries; i++) {
+>          const QSPReportEntry *e = &rep->entries[i];
+> @@ -726,11 +727,11 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+>                                 e->callsite_at,
+>                                 callsite_len - (int)strlen(e->callsite_at), "",
+>                                 e->time_s, e->n_acqs, e->ns_avg * 1e-3);
+> -        pr(f, "%s", s->str);
+> +        qemu_printf("%s", s->str);
+>          g_string_free(s, TRUE);
+>      }
+>  
+> -    pr(f, "%s\n", dashes);
+> +    qemu_printf("%s\n", dashes);
+>      g_free(dashes);
+>  }
+>  
+> @@ -746,8 +747,8 @@ static void report_destroy(QSPReport *rep)
+>      g_free(rep->entries);
+>  }
+>  
+> -void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+> -                enum QSPSortBy sort_by, bool callsite_coalesce)
+> +void qsp_report(size_t max, enum QSPSortBy sort_by,
+> +                bool callsite_coalesce)
+>  {
+>      GTree *tree = g_tree_new_full(qsp_tree_cmp, &sort_by, g_free, NULL);
+>      QSPReport rep;
+> @@ -762,7 +763,7 @@ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+>      g_tree_foreach(tree, qsp_tree_report, &rep);
+>      g_tree_destroy(tree);
+>  
+> -    pr_report(&rep, f, cpu_fprintf);
+> +    pr_report(&rep);
+>      report_destroy(&rep);
+>  }
+>  
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
