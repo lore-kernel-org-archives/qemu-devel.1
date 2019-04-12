@@ -2,80 +2,64 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C99DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 16:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C97C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 16:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F99120850
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 16:22:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F99120850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 527C720850
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 16:24:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527C720850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39662 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39675 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEyww-0004FE-8H
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 12:22:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47708)
+	id 1hEyyD-0005W8-JF
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 12:24:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEyw1-0003JY-Jv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hEyx0-0004VF-8S
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEyvz-0002Au-Le
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEyvw-00028t-5s
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:45 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s15so12670263wra.12
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 09:21:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=UCu8QWsD7L34HbO1/b+gpi3AWoEZGGUfVix5kEiHkwk=;
-	b=mh34vjAdGTIR3LOOpxWs5m7lFwK2nbB88fOfGCWaRm3RPV95bJoN1vubZg6konPXyD
-	PpKwpPv8olFrxFy34984zJRzne54i/HnY+aZs9XbNzx234u+HGGxFD2JclphhfXYVNA8
-	x9UHKzxztLYXwN5DS5on/zHFpsziXoNil6T/5Uc0gKrULETXd9o2sOy0Uvy5A8uW87nu
-	CK27kW4+tvvkEif72WVCdDbKAM924TiLcsl5mgC1rDLnFBw0j071MUL2pEjcw2kG90ZB
-	x62JVKja5h1v1FjUEYj8MrGZOFOxv+qrm326U2EhZ5LaDRfiErwfQyGgIq/mTB0HZyBZ
-	4Ygg==
-X-Gm-Message-State: APjAAAX/y4vXTXM8SmCnb79QDlgiusGlOdH3RM36pEeJfg1BRFz9JLbP
-	O0HRq0cNTyGZArKBq3pyDpWf0Q==
-X-Google-Smtp-Source: APXvYqzgHiQnPqg4DBDdSXNP910e2Hi910qj5jffNxNekOFJyxmSdFdMR3Igaau4x9FM/5RtnG+3Dg==
-X-Received: by 2002:adf:ce8c:: with SMTP id r12mr17403032wrn.60.1555086103129; 
-	Fri, 12 Apr 2019 09:21:43 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	n4sm42066694wrx.39.2019.04.12.09.21.42
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 09:21:42 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190412152619.23542-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2c7385cf-78ba-3331-53f0-1973408f0e4d@redhat.com>
-Date: Fri, 12 Apr 2019 18:21:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hEywy-0002Wt-IB
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:22:50 -0400
+Resent-Date: Fri, 12 Apr 2019 12:22:49 -0400
+Resent-Message-Id: <E1hEywy-0002Wt-IB@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hEywy-0002Ul-7a; Fri, 12 Apr 2019 12:22:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555086150; cv=none; d=zoho.com; s=zohoarc; 
+	b=DLx9hXgZ02Tvc4Twzjpne5rEwu+ZgHTy0FehFqWqIwFf/ZpS1EoFKuRQ3b+98ktUnQsiQEa4SehrzyaH0j3uHkTwF4peK9/7bioGcmT9xuc8PsyUgtH6jQcAQ0yEJ/LfP6pz+olZEb7q+T8q6ueHbe/REoKd1YKbYBSwXq2DwkQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555086150;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=J3h19ZVidT7NF+J6wJZgLOb5IRrOzfvBudQ2anZp9o8=; 
+	b=Og1wxWlb/o7HwX8FbtT073Z+/6bsa7t0fdnijnrtlM1VdqwzI8esodU8cUlvMtdd7ma1B/3gHqBuMV9A78et7Q4iDF80tFH7B/yA9kFuk4mg2b8/YWRQ6ITwqpqrUTHyqelD6YyDMT9KO6Y6+NNNCDJq9hrXsTUM39OzH9axyAY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1555086149490144.02467124688724;
+	Fri, 12 Apr 2019 09:22:29 -0700 (PDT)
+Message-ID: <155508614786.29694.6898774797090055516@76452e4e88f2>
+In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190412152619.23542-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Fri, 12 Apr 2019 09:22:29 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/arm/nseries: Deprecate the n800
- and n810 machines
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v5 00/13] vhost-user for input & GPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,60 +71,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+	kraxel@redhat.com, marcandre.lureau@redhat.com,
+	pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412162141.FjiXMJF-QailBxZOHMXpg_alxtmNPHtwH4UEJ5sQtVI@z>
+Message-ID: <20190412162229.4ietRRNEqZMDon9Sb2aZRnJWb1aoC1Fq6do4-9nWiUk@z>
 
-On 4/12/19 5:26 PM, Thomas Huth wrote:
-> These machines depend on the deprecated bluetooth subsystem. In case we
-> finally decide to remove the bluetooth subsystem, we likely need to
-> remove the n800 and n810 machines, too, so mark them now as deprecated.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/arm/nseries.c     | 3 +++
->  qemu-deprecated.texi | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-> index 906b7ca22d..66e50b850c 100644
-> --- a/hw/arm/nseries.c
-> +++ b/hw/arm/nseries.c
-> @@ -1309,6 +1309,9 @@ static void n8x0_init(MachineState *machine,
->      struct n800_s *s = (struct n800_s *) g_malloc0(sizeof(*s));
->      int sdram_size = binfo->ram_size;
->  
-> +    warn_report("The n800 and n810 machines are deprecated. Please use a "
-> +                "different Arm machine instead.");
-> +
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMjE1MzY0Ny4xOTAy
+Ny0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
+YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
+IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJH
+RVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zo
+b3N0LXVzZXItZ3B1L3ZpcmdsLmM6MTY6CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUt
+dGVzdC9zcmMvY29udHJpYi92aG9zdC11c2VyLWdwdS92aXJnbC5oOjE3OgpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2NvbnRyaWIvdmhvc3QtdXNlci1ncHUvdnVncHUu
+aDoyNToKL3RtcC9xZW11LXRlc3Qvc3JjL2NvbnRyaWIvdmhvc3QtdXNlci1ncHUvZHJtLmg6MTU6
+MTA6IGZhdGFsIGVycm9yOiAnaTkxNV9kcm0uaCcgZmlsZSBub3QgZm91bmQKI2luY2x1ZGUgPGk5
+MTVfZHJtLmg+CiAgICAgICAgIF5+fn5+fn5+fn5+fgogIENDICAgICAgYmxvY2tqb2IubwotLS0K
+bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0LXVzZXItZ3B1L21haW4uYzoy
+MToKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0
+LXVzZXItZ3B1L3Z1Z3B1Lmg6MjU6Ci90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0LXVz
+ZXItZ3B1L2RybS5oOjE1OjEwOiBmYXRhbCBlcnJvcjogJ2k5MTVfZHJtLmgnIGZpbGUgbm90IGZv
+dW5kCiNpbmNsdWRlIDxpOTE1X2RybS5oPgogICAgICAgICBefn5+fn5+fn5+fn4KL3RtcC9xZW11
+LXRlc3Qvc3JjL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmM6NTQ2OjMyOiBl
+cnJvcjogdGFraW5nIGFkZHJlc3Mgb2YgcGFja2VkIG1lbWJlciAncGF5bG9hZCcgb2YgY2xhc3Mg
+b3Igc3RydWN0dXJlICdWaG9zdFVzZXJNc2cnIG1heSByZXN1bHQgaW4gYW4gdW5hbGlnbmVkIHBv
+aW50ZXIgdmFsdWUgWy1XZXJyb3IsLVdhZGRyZXNzLW9mLXBhY2tlZC1tZW1iZXJdCiAgICBWaG9z
+dFVzZXJNZW1vcnkgKm1lbW9yeSA9ICZ2bXNnLT5wYXlsb2FkLm1lbW9yeTsKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy9jb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jOjY4ODozMjogZXJyb3I6IHRh
+a2luZyBhZGRyZXNzIG9mIHBhY2tlZCBtZW1iZXIgJ3BheWxvYWQnIG9mIGNsYXNzIG9yIHN0cnVj
+dHVyZSAnVmhvc3RVc2VyTXNnJyBtYXkgcmVzdWx0IGluIGFuIHVuYWxpZ25lZCBwb2ludGVyIHZh
+bHVlIFstV2Vycm9yLC1XYWRkcmVzcy1vZi1wYWNrZWQtbWVtYmVyXQogICAgVmhvc3RVc2VyTWVt
+b3J5ICptZW1vcnkgPSAmdm1zZy0+cGF5bG9hZC5tZW1vcnk7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvY29udHJp
+Yi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYzo4MTc6Mzc6IGVycm9yOiB0YWtpbmcgYWRk
+cmVzcyBvZiBwYWNrZWQgbWVtYmVyICdwYXlsb2FkJyBvZiBjbGFzcyBvciBzdHJ1Y3R1cmUgJ1Zo
+b3N0VXNlck1zZycgbWF5IHJlc3VsdCBpbiBhbiB1bmFsaWduZWQgcG9pbnRlciB2YWx1ZSBbLVdl
+cnJvciwtV2FkZHJlc3Mtb2YtcGFja2VkLW1lbWJlcl0KICAgIHN0cnVjdCB2aG9zdF92cmluZ19h
+ZGRyICp2cmEgPSAmdm1zZy0+cGF5bG9hZC5hZGRyOwogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn4KMyBlcnJvcnMgZ2VuZXJhdGVkLgoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MTIx
+NTM2NDcuMTkwMjctMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vdGVzdGluZy5hc2FuLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Unrelated to this patch, but can you add a similar warning in
-uart_hci_init() to make obvious that the bluetooth subsystem is now
-deprecated?
-
->      s->mpu = omap2420_mpu_init(sysmem, sdram_size, machine->cpu_type);
->  
->      /* Setup peripherals
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 2219386769..4de7452fac 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -145,6 +145,12 @@ This machine type uses an unmaintained firmware, broken in lots of ways,
->  and unable to start post-2004 operating systems. 40p machine type should be
->  used instead.
->  
-> +@subsection n800 and n810 (Arm) (since 4.1)
-> +
-> +These machines depend on the deprecated bluetooth subsystem. When the
-> +bluetooth subsystem will be removed, the n800 and n810 machines will be
-> +deleted, too. If possible, use a different Arm board instead.
-> +
->  @section Device options
->  
->  @subsection Block device options
-> 
 
