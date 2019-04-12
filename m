@@ -2,64 +2,63 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C0DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C82C10F14
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:04:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34DB62082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:02:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34DB62082E
+	by mail.kernel.org (Postfix) with ESMTPS id 723F920869
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723F920869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40172 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40188 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEzZo-0008ON-ED
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:02:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54709)
+	id 1hEzbX-0001P1-KB
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:04:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEzSU-0001Zp-Vn
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:24 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEzS4-0001CD-GM
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEzST-0008To-VO
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56372)
+	(envelope-from <philmd@redhat.com>) id 1hEzS2-0007UQ-Hj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:54:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEzST-0008SE-N9
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:21 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hEzRw-0007Cf-DS; Fri, 12 Apr 2019 12:54:50 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA752330255
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 16:55:20 +0000 (UTC)
-Received: from work-vm (unknown [10.36.117.255])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E79155D6A9;
-	Fri, 12 Apr 2019 16:55:19 +0000 (UTC)
-Date: Fri, 12 Apr 2019 17:55:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190412165516.GH2906@work-vm>
-References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-3-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B311C04FF86;
+	Fri, 12 Apr 2019 16:54:46 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-66.brq.redhat.com [10.40.204.66])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B02D60BEC;
+	Fri, 12 Apr 2019 16:54:43 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
+Date: Fri, 12 Apr 2019 18:54:11 +0200
+Message-Id: <20190412165416.7977-8-philmd@redhat.com>
+In-Reply-To: <20190412165416.7977-1-philmd@redhat.com>
+References: <20190412165416.7977-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190411152520.10061-3-armbru@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 12 Apr 2019 16:55:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 12 Apr 2019 16:54:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/17] trace: Simplify how
- st_print_trace_file_status() prints
+Subject: [Qemu-devel] [PATCH v3 07/12] hw/devices: Move Gamepad declarations
+ into a new header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,88 +70,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412165517.HC1GYKeBkicg0kEWhGOcfF8bQVwkNSrDJqpBlaFN8i0@z>
+Message-ID: <20190412165411.n6qh2IwVo0DwSRSsOxAZZbO3nrn8fyGM_AFy5WLobSM@z>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> st_print_trace_file_status() takes an fprintf()-like callback and a
-> FILE * to pass to it.
-> 
-> Its only caller hmp_trace_file() passes monitor_fprintf() and the
-> current monitor cast to FILE *.  monitor_fprintf() casts it right
-> back, and is otherwise identical to monitor_printf().  The
-> type-punning is ugly.
-> 
-> Drop the callback, and call qemu_printf() instead.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v3:
+ Drop "Gamepad devices that have nowhere better to go" comment (Markus)
+---
+ MAINTAINERS                |  1 +
+ hw/arm/stellaris.c         |  2 +-
+ hw/input/stellaris_input.c |  2 +-
+ include/hw/devices.h       |  3 ---
+ include/hw/input/gamepad.h | 19 +++++++++++++++++++
+ 5 files changed, 22 insertions(+), 5 deletions(-)
+ create mode 100644 include/hw/input/gamepad.h
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 041c939952f..e7c3d282a0a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -744,6 +744,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/*/stellaris*
++F: include/hw/input/gamepad.h
+=20
+ Versatile Express
+ M: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index 05f86749f40..5059aedbaa2 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -12,7 +12,6 @@
+ #include "hw/sysbus.h"
+ #include "hw/ssi/ssi.h"
+ #include "hw/arm/arm.h"
+-#include "hw/devices.h"
+ #include "qemu/timer.h"
+ #include "hw/i2c/i2c.h"
+ #include "net/net.h"
+@@ -22,6 +21,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/arm/armv7m.h"
+ #include "hw/char/pl011.h"
++#include "hw/input/gamepad.h"
+ #include "hw/watchdog/cmsdk-apb-watchdog.h"
+ #include "hw/misc/unimp.h"
+ #include "cpu.h"
+diff --git a/hw/input/stellaris_input.c b/hw/input/stellaris_input.c
+index 99168bfeef1..20c87d86f40 100644
+--- a/hw/input/stellaris_input.c
++++ b/hw/input/stellaris_input.c
+@@ -8,7 +8,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/devices.h"
++#include "hw/input/gamepad.h"
+ #include "ui/console.h"
+=20
+ typedef struct {
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+index e400f9eac09..7a630da47f7 100644
+--- a/include/hw/devices.h
++++ b/include/hw/devices.h
+@@ -26,7 +26,4 @@ void *tsc2005_init(qemu_irq pintdav);
+ uint32_t tsc2005_txrx(void *opaque, uint32_t value, int len);
+ void tsc2005_set_transform(void *opaque, MouseTransformInfo *info);
+=20
+-/* stellaris_input.c */
+-void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
+-
+ #endif
+diff --git a/include/hw/input/gamepad.h b/include/hw/input/gamepad.h
+new file mode 100644
+index 00000000000..e20211baef8
+--- /dev/null
++++ b/include/hw/input/gamepad.h
+@@ -0,0 +1,19 @@
++/*
++ * Gamepad style buttons connected to IRQ/GPIO lines
++ *
++ * Copyright (c) 2007 CodeSourcery.
++ * Written by Paul Brook
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_INPUT_GAMEPAD_H
++#define HW_INPUT_GAMEPAD_H
++
++#include "hw/irq.h"
++
++/* stellaris_input.c */
++void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
++
++#endif
+--=20
+2.20.1
 
-> ---
->  monitor.c      | 2 +-
->  trace/simple.c | 7 ++++---
->  trace/simple.h | 2 +-
->  3 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index 10be8bdb86..a3e66b7159 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1056,7 +1056,7 @@ static void hmp_trace_file(Monitor *mon, const QDict *qdict)
->      const char *arg = qdict_get_try_str(qdict, "arg");
->  
->      if (!op) {
-> -        st_print_trace_file_status((FILE *)mon, &monitor_fprintf);
-> +        st_print_trace_file_status();
->      } else if (!strcmp(op, "on")) {
->          st_set_trace_file_enabled(true);
->      } else if (!strcmp(op, "off")) {
-> diff --git a/trace/simple.c b/trace/simple.c
-> index ac904eca91..fc7106ec49 100644
-> --- a/trace/simple.c
-> +++ b/trace/simple.c
-> @@ -16,6 +16,7 @@
->  #include "trace/control.h"
->  #include "trace/simple.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/qemu-print.h"
->  
->  /** Trace file header event ID, picked to avoid conflict with real event IDs */
->  #define HEADER_EVENT_ID (~(uint64_t)0)
-> @@ -363,10 +364,10 @@ void st_set_trace_file(const char *file)
->      st_set_trace_file_enabled(true);
->  }
->  
-> -void st_print_trace_file_status(FILE *stream, int (*stream_printf)(FILE *stream, const char *fmt, ...))
-> +void st_print_trace_file_status(void)
->  {
-> -    stream_printf(stream, "Trace file \"%s\" %s.\n",
-> -                  trace_file_name, trace_fp ? "on" : "off");
-> +    qemu_printf("Trace file \"%s\" %s.\n",
-> +                trace_file_name, trace_fp ? "on" : "off");
->  }
->  
->  void st_flush_trace_buffer(void)
-> diff --git a/trace/simple.h b/trace/simple.h
-> index 9931808c05..5771a0634f 100644
-> --- a/trace/simple.h
-> +++ b/trace/simple.h
-> @@ -11,7 +11,7 @@
->  #ifndef TRACE_SIMPLE_H
->  #define TRACE_SIMPLE_H
->  
-> -void st_print_trace_file_status(FILE *stream, fprintf_function stream_printf);
-> +void st_print_trace_file_status(void);
->  void st_set_trace_file_enabled(bool enable);
->  void st_set_trace_file(const char *file);
->  bool st_init(void);
-> -- 
-> 2.17.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
