@@ -2,62 +2,65 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D78C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 091CCC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2B532084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B532084D
+	by mail.kernel.org (Postfix) with ESMTPS id 907E92084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:54:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 907E92084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36114 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36116 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvhK-0004Ce-65
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:54:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39252)
+	id 1hEvhV-0004OV-Jb
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:54:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvG4-0003BZ-Rb
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:17 -0400
+	(envelope-from <otubo@redhat.com>) id 1hEvfw-0003PI-ER
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvG3-0002lX-KD
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:7721)
+	(envelope-from <otubo@redhat.com>) id 1hEvfv-0005so-Ao
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hEvG3-0002kS-CT; Fri, 12 Apr 2019 08:26:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1hEvfv-0005sC-1Q
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:52:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5BF53007C2A;
-	Fri, 12 Apr 2019 12:26:14 +0000 (UTC)
-Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6174E5D9CC;
-	Fri, 12 Apr 2019 12:26:11 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: cohuck@redhat.com,
-	qemu-s390x@nongnu.org
-Date: Fri, 12 Apr 2019 14:25:20 +0200
-Message-Id: <20190412122523.24111-15-thuth@redhat.com>
-In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
-References: <20190412122523.24111-1-thuth@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 9342E308621C;
+	Fri, 12 Apr 2019 12:52:57 +0000 (UTC)
+Received: from vader (ovpn-117-148.ams2.redhat.com [10.36.117.148])
+	by smtp.corp.redhat.com (Postfix) with SMTP id DCC9A19C65;
+	Fri, 12 Apr 2019 12:52:53 +0000 (UTC)
+Date: Fri, 12 Apr 2019 14:52:52 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190412125252.GB13589@vader>
+References: <20190412113730.28828-1-otubo@redhat.com>
+	<20190412113730.28828-2-otubo@redhat.com>
+	<20190412114307.GK25308@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="aVD9QWMuhilNxW9f"
+Content-Disposition: inline
+In-Reply-To: <20190412114307.GK25308@redhat.com>
+User-Agent: Mutt/1.8.3+47 (5f034395e53d) (2017-05-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 12 Apr 2019 12:26:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 12 Apr 2019 12:52:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 14/17] s390-bios: Add
- channel command codes/structs needed for dasd-ipl
+Subject: Re: [Qemu-devel] [PULL 1/1] configure: Relax check for libseccomp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,82 +72,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, deller@gmx.de, philmd@redhat.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412122520.sOxZBiFT4LWnplDoX77j2yyV9bVMXwGW5Dm5iGltMoE@z>
+Message-ID: <20190412125252.91PEzb57CTNSBzAJ2yUZCHCDxPMi_s5OxflKfFVg53I@z>
 
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-The dasd IPL procedure needs to execute a few previously unused
-channel commands. Let's define them and their associated data
-structures.
+--aVD9QWMuhilNxW9f
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1554388475-18329-15-git-send-email-jjherne@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/cio.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+On 12/04/2019 - 12:43:07, Daniel P. Berrange wrote:
+> On Fri, Apr 12, 2019 at 01:37:30PM +0200, Eduardo Otubo wrote:
+> > From: Helge Deller <deller@gmx.de>
+> >=20
+> > All major distributions do support libseccomp version >=3D 2.3.0, so th=
+ere
+> > is no need to special-case on various architectures any longer.
+> >=20
+> > Signed-off-by: Helge Deller <deller@gmx.de>
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Acked-by: Eduardo Otubo <otubo@redhat.com>
+>=20
+> When sending pull requests the subsystem maintainer *must*
+> add their Signed-off-by as this is what has legal meaning
+> with respect to the developer certificate of origin.
+>=20
+> Acked-by is something that is used to give a different
+> subsystem maintainer permission to merge a patch that
+> would normally be your responsibility.
+>=20
+>=20
 
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index 1637e32070..aaa432dedd 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -200,11 +200,14 @@ typedef struct ccw1 {
- #define CCW_FLAG_IDA             0x04
- #define CCW_FLAG_SUSPEND         0x02
-=20
-+/* Common CCW commands */
-+#define CCW_CMD_READ_IPL         0x02
- #define CCW_CMD_NOOP             0x03
- #define CCW_CMD_BASIC_SENSE      0x04
- #define CCW_CMD_TIC              0x08
- #define CCW_CMD_SENSE_ID         0xe4
-=20
-+/* Virtio CCW commands */
- #define CCW_CMD_SET_VQ           0x13
- #define CCW_CMD_VDEV_RESET       0x33
- #define CCW_CMD_READ_FEAT        0x12
-@@ -216,6 +219,12 @@ typedef struct ccw1 {
- #define CCW_CMD_SET_CONF_IND     0x53
- #define CCW_CMD_READ_VQ_CONF     0x32
-=20
-+/* DASD CCW commands */
-+#define CCW_CMD_DASD_READ             0x06
-+#define CCW_CMD_DASD_SEEK             0x07
-+#define CCW_CMD_DASD_SEARCH_ID_EQ     0x31
-+#define CCW_CMD_DASD_READ_MT          0x86
-+
- /*
-  * Command-mode operation request block
-  */
-@@ -333,6 +342,20 @@ typedef struct irb {
-     __u32 emw[8];
- }  __attribute__ ((packed, aligned(4))) Irb;
-=20
-+/* Used for SEEK ccw commands */
-+typedef struct CcwSeekData {
-+    uint16_t reserved;
-+    uint16_t cyl;
-+    uint16_t head;
-+} __attribute__((packed)) CcwSeekData;
-+
-+/* Used for SEARCH ID ccw commands */
-+typedef struct CcwSearchIdData {
-+    uint16_t cyl;
-+    uint16_t head;
-+    uint8_t record;
-+} __attribute__((packed)) CcwSearchIdData;
-+
- int enable_mss_facility(void);
- void enable_subchannel(SubChannelId schid);
- uint16_t cu_type(SubChannelId schid);
+I think this issue was already raised by Peter on my last pull-request. My
+appologies, I fixed the last pull request my didn't fix my script :/
+
+Will send again after the release.
+Thanks for pointing that out.
+
 --=20
-2.21.0
+Eduardo Otubo
 
+Red Hat GmbH,http://www.de.redhat.com/, Sitz: Grasbrunn,
+Handelsregister: Amtsgericht M=C3=BCnchen, HRB 153243,
+Gesch=C3=A4ftsf=C3=BChrer: Charles Cachera, Michael O'Neill, Tom Savage, Er=
+ic Shander
+
+--aVD9QWMuhilNxW9f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcsIokAAoJEN8y58Dw//mid+IH/1Z2Fd6DOW3qBCX1vFpyPyUR
+iZH+5GsdbeIQ7CT36nMQStzBDSVtFk1wN03j4hEl4fuIjCQ62rc9OS4q4eeFZl1y
+cye3tJcnKWwzvfyKrq5lrG1wBYkF7JEb5t+PGv7GyMncP+fMX4J9famMv8h/q+v4
+gOsp+sC2pOCG1gULnu1GdXmSddLwOVGQO3aDoOy5QdpjKqVF2o3Q+NCrc0fSQrSZ
+o4pUZstNLPRBNVuEzf69ioS4C9OyfwtBEs+X0OfKWHGg8uSvXznsatAGNwsRWvcb
+N+VBZ2ZnuOyB63U6qF+cyPqtrRVDMoXY2OIRhultf1JRdJZgcIgMtg8Wk/v+Pgc=
+=rUoV
+-----END PGP SIGNATURE-----
+
+--aVD9QWMuhilNxW9f--
 
