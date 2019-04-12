@@ -2,71 +2,86 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E775C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 09:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77E6C282CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 09:37:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 376DE205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 09:29:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376DE205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id AEC99205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 09:37:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TUrcz/2J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC99205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33076 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33200 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEsUZ-0006tj-9W
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 05:29:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57650)
+	id 1hEscU-00021g-KB
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 05:37:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTd-0006UN-EF
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:06 -0400
+	(envelope-from <npiggin@gmail.com>) id 1hEsbh-0001dO-Cb
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTc-0002za-4A
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:05 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2263 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
-	id 1hEsTV-0002pQ-Oh; Fri, 12 Apr 2019 05:27:58 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-	by Forcepoint Email with ESMTP id 670DA43F41E2B1E8291D;
-	Fri, 12 Apr 2019 17:27:52 +0800 (CST)
-Received: from [127.0.0.1] (10.177.29.32) by DGGEMS408-HUB.china.huawei.com
-	(10.3.19.208) with Microsoft SMTP Server id 14.3.408.0; Fri, 12 Apr 2019
-	17:27:46 +0800
-To: Markus Armbruster <armbru@redhat.com>
-References: <87va06kvm6.fsf@dusky.pond.sub.org>
-	<59f100b4-f6e9-973d-532b-58fb172a7009@redhat.com>
-	<87imw5fv45.fsf@dusky.pond.sub.org>
-	<abe1d9cd-85bb-2ef8-630f-af28cae6378c@redhat.com>
-	<8736n9eb4s.fsf@dusky.pond.sub.org>
-	<bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
-	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
-	<b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
-	<a8144a1f-364e-cea5-b0a7-05342bdab936@redhat.com>
-	<87bm1fiuo8.fsf@dusky.pond.sub.org>
-	<20190409082852.GB6610@localhost.localdomain>
-	<c03c51a7-1bb0-b05b-9027-2364ab00517c@huawei.com>
-	<87ef693tci.fsf@dusky.pond.sub.org>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <1c7373b5-f6c2-ec3c-b07d-c8eb73a355af@huawei.com>
-Date: Fri, 12 Apr 2019 17:26:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
-	Thunderbird/64.0
+	(envelope-from <npiggin@gmail.com>) id 1hEsbg-0000eH-BC
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:36:25 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <npiggin@gmail.com>)
+	id 1hEsbd-0000cP-P5; Fri, 12 Apr 2019 05:36:22 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bf11so4829741plb.12;
+	Fri, 12 Apr 2019 02:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=e5Tq4xBFTNf7HAzlzjkJuHh48zYZ31dRiWs9tfjeC14=;
+	b=TUrcz/2J9NXRd8uFGOi21qS5BO7tVG6Pd7LPXjyUe7WBAr8ABQpbf46zH9K7Xs6CtO
+	xUe7HdxUZ2lZpDuX6YH7tC4Fld4aRt8p8eUdh+1dAchUowB1XKa7fXCudBHWboUY0HtR
+	8JXKuCoMwFkASmjiIEZoBEp/TSMheceAiX+QUmlMRorR49Tyn0nm9sxZYlZl6FJzMKnV
+	5ewdLwFJNynykh5J7vHJY8oq803Fnr/ZvAWz010E73lPTwv7R5crxtUutN6oX5Bjez/X
+	mR+GvKX7gEVs0Ys6kx8Diipylp1BNOyMpryJBQ6KsbE1Ze4qYynfI57wWDkAIKHzvqLH
+	nj7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=e5Tq4xBFTNf7HAzlzjkJuHh48zYZ31dRiWs9tfjeC14=;
+	b=bhDgCeqRF/Wr16KXXxTbZFwlzHnvtdoUfoUMtn4r2B6yV0zzDIk8s/H9zNrCSeQuY4
+	mDrTMS5Tu+JuJYvMjrvB0v4X4uzGC8Xog+7mhs8di/6Su+TrE6xWkz63Tyro/r6kD6cf
+	6W0nj5qDAtE8tLkZPGwa7eC7fWqibh6gxB92ouHDLOZ2/1qTLcNLJkK0OYOsszoxsb4v
+	1OqHG2AYuyeQL1Aq7I8dFs5EZRTdcd1wiy2NwbcnxUlCcH+MgNb3DXVCxfE23HW2tYbO
+	0UcGKjo+6ZXs12Wo2Pd73Z/uVMpsezerpGHkJaw6rnog9dM0Ry53vUqKiliqmXR3QOn8
+	umWA==
+X-Gm-Message-State: APjAAAW5mrktMm5cWgDPsziUMOj8Cjj7fsTaG9z6XaXCX9lcHgNdI87k
+	SyrdeIasPY8RBqHc0WUCQKY=
+X-Google-Smtp-Source: APXvYqxB+YxDJY9y6eAJJQKMVlrtV+K1NLXHP0DiEy6Fa9yNSPee9g5/mrKNCVuqIh1Cuu5CpvrKOQ==
+X-Received: by 2002:a17:902:7e05:: with SMTP id
+	b5mr56626496plm.127.1555061780333; 
+	Fri, 12 Apr 2019 02:36:20 -0700 (PDT)
+Received: from bobo.local0.net (115-64-237-195.tpgi.com.au. [115.64.237.195])
+	by smtp.gmail.com with ESMTPSA id
+	n82sm68564122pfi.63.2019.04.12.02.36.16
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 12 Apr 2019 02:36:19 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 12 Apr 2019 19:36:03 +1000
+Message-Id: <20190412093603.18232-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <87ef693tci.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.29.32]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
- flash device to save memory
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: [Qemu-devel] [PATCH v2] spapr: add splpar hcalls H_JOIN, H_PROD,
+ H_CONFER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,104 +93,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	qemu-block@nongnu.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU
-	Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
-	qemu-arm <qemu-arm@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412092644.GoklaW-vW3S7jFWq_tq8aspQcIzxTcC9csX7e55-d8E@z>
+Message-ID: <20190412093603.kGocNhQbgS4Lu8upJ2EwdbcOfbYHq8ktNeDTuUIB1qU@z>
 
+These implementations have a few deficiencies that are noted, but are
+good enough for Linux to use.
 
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
 
-On 2019/4/11 15:15, Markus Armbruster wrote:
->> For some historical reasons such as compatibility and extensibility[2], we
->> restrict both their size to 64MB -- both UEFI and qemu have cold hard
->> constants.
-> These reasons aren't historical.  But they're valid, and that's all that
-> matters :)
-> 
->> This will consume a large amount of memory when running multiple VM
->> simultaneously (each guest needs 128MB).
-> Understood.
-> 
->> There are accepted ideas proposed by Markus and Laszlo from prior discussion[3]:
->>
->> 1) Getting flash memory size from a machine type or property.
->>
->> 2) Map the read-only part so it is shared among guests; Map the read-write
->> part normally.
->>
->> The first idea called explicit configuration which may break migration.
-> For any configuration that can break migration, the solution is to have
-> identical configuration on source and destination.
-> 
->> For the second idea, the only way I can imagine is using a file mapping to
->> read or write pflash devices so that we can allocate memory on demand. So I
->> tried to fit mmap() actions into the block layer[4]. However I am not sure
->> that maping image file whether can work fine for block layer.
-> It adds an odd special case to the block layer.  But then flash devices
-> are an odd user of the block layer.
-> 
-> Normal users use the block layer as a *block* layer: to read and write
-> blocks.
-> 
-> Our flash devices don't do that.  They are *memory* devices, not *block*
-> devices.  Pretty much the only thing the two have in common is
-> persistence of data.  The block layer provides persistence, and I figure
-> that's why it got pressed into service here.
-> 
-> What the flash devices do is keep the complete image contents in memory,
-> with changes written through to disk.
-> 
-> This is pretty much exactly what mmap() does, so using it suggests
-> itself.
-> 
-> It's very much *not* what the block layer does.  mmap() is not even
-> possible for anything but a file backend.
-> 
-> With mmap(), memory gets faulted in on demand, and sharing read-only
-> memory with other VMs should be feasible.  The question is how to use it
-> here.  Is there a sane way to use it without rewriting the flash devices
-> not to use the block layer?
+Cleaned up checkpatch warnings, sorry I didn't realise that exists.
 
-There are two important changes we may need to pay more attention to if we
-use mmap():
+ hw/ppc/spapr_hcall.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-1) Sync/Update flash content from guest memory to a file backend. With mmap()
-we might not have to do the extra sync/update as the block layer do in
-pflash_write().
-2) Live migration.
-
-> 
->> On the other hand, Laszlo had mentioned the features of QCOW2 and sparse
->> files which may be nice for pflash block backends. But I am not familiar with
->> it.
-> Offhand, two QCOW2 features come to mind:
-> 
-> 1. Sparse storage even when the storage substrate can't do sparse.  I
-> consider this one largely irrelevant.  Any decent file system can do
-> sparse.  Archival and network transfer can compress instead.
-> 
-> 2. Snapshots to go with disk snapshots.  *Live* snapshots (the ones that
-> include memory) already have the flash contents in the memory part, so
-> this sems only relevant for "dead" snapshots.
-> 
-> Anything else?
-> 
-
-No more, thanks.:D
-
-Kevin came up with a good idea which might solve my problem.
-See https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg01865.html
-
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8a736797b9..e985bb694d 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1065,6 +1065,90 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     return H_SUCCESS;
+ }
+ 
++static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    CPUPPCState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
++
++    if (env->msr & (1ULL << MSR_EE)) {
++        return H_BAD_MODE;
++    }
++
++    /*
++     * This should check for single-threaded mode. In practice, Linux
++     * does not try to H_JOIN all CPUs.
++     */
++
++    cs->halted = 1;
++    cs->exception_index = EXCP_HALTED;
++    cs->exit_request = 1;
++
++    return H_SUCCESS;
++}
++
++static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target = args[0];
++    CPUState *cs = CPU(cpu);
++
++    /*
++     * This does not do a targeted yield or confer, but check the parameter
++     * anyway. -1 means confer to all/any other CPUs.
++     */
++    if (target != -1 && !CPU(spapr_find_cpu(target))) {
++        return H_PARAMETER;
++    }
++
++    /*
++     * H_CONFER with target == this is not exactly the same as H_JOIN
++     * according to PAPR (e.g., MSR[EE] check and single threaded check
++     * is not done in this case), but unlikely to matter.
++     */
++    if (cpu == spapr_find_cpu(target)) {
++        return h_join(cpu, spapr, opcode, args);
++    }
++
++    /*
++     * This does not implement the dispatch sequence check that PAPR calls for,
++     * but PAPR also specifies a stronger implementation where the target must
++     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
++     * scheduling requirement implemented, there is no correctness reason to
++     * implement the dispatch sequence check.
++     */
++    cs->exception_index = EXCP_YIELD;
++    cpu_loop_exit(cs);
++
++    return H_SUCCESS;
++}
++
++/*
++ * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
++ * achievable running under KVM, although KVM already implements H_CONFER
++ * this way.
++ */
++static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target = args[0];
++    CPUState *cs;
++
++    /*
++     * Should set the prod flag in the VPA.
++     */
++
++    cs = CPU(spapr_find_cpu(target));
++    if (!cs) {
++        return H_PARAMETER;
++    }
++
++    cs->halted = 0;
++    qemu_cpu_kick(cs);
++
++    return H_SUCCESS;
++}
++
+ static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+@@ -1860,6 +1944,10 @@ static void hypercall_register_types(void)
+     /* hcall-splpar */
+     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+     spapr_register_hypercall(H_CEDE, h_cede);
++    spapr_register_hypercall(H_CONFER, h_confer);
++    spapr_register_hypercall(H_JOIN, h_join);
++    spapr_register_hypercall(H_PROD, h_prod);
++
+     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+ 
+     /* processor register resource access h-calls */
 -- 
-
-Thanks,
-Xiang
-
+2.20.1
 
 
