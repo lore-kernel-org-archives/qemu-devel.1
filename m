@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38688)
+Received: from eggs.gnu.org ([209.51.188.92]:38791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4s-00035e-AL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:35 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt53-0003IU-Qj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4r-0005D9-4m
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:34 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt52-0005Ou-Jz
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:45 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 12 Apr 2019 12:03:48 +0200
-Message-Id: <20190412100354.6409-22-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:49 +0200
+Message-Id: <20190412100354.6409-23-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v3 21/27] hw/vfio/common: Register a MAP notifier
- for MSI binding
+Subject: [Qemu-devel] [RFC v3 22/27] vfio-pci: Expose MSI stage 1 bindings
+ to the host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +25,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com, peterx@redhat.com, yi.l.liu@intel.com, vincent.stehle@arm.com
 
-Instantiate a MAP notifier to register the MSI stage 1
-binding (gIOVA -> gDB) to the host. This allows the host
-to build a nested mapping towards the physical doorbell:
-guest IOVA -> guest Doorbell -> physical doorbell.
-          Stage1          Stage 2
+When the guest is exposed with a virtual IOMMU that translates
+MSIs, the guest allocates an IOVA (gIOVA) that maps the virtual
+doorbell (gDB). In nested mode, when the MSI is setup, we pass
+this stage1 mapping to the host so that it can use this stage1
+binding to create a nested stage translating into the physical
+doorbell. Conversely, when the MSI setup os torn down, we
+unregister this binding.
 
-The unregistration is done on VFIO container deallocation.
+For registration, We directly use the iommu memory region
+translate() callback since the addr_mask is returned in the
+IOTLB entry. address_space_translate does not return this information.
+
+Now that we use a MAP notifier, let's remove warning against
+the usage of map notifiers (historically used along with Intel's
+caching mode).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ hw/arm/smmuv3.c      |  8 --------
+ hw/vfio/pci.c        | 48 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events |  2 ++
+ 3 files changed, 50 insertions(+), 8 deletions(-)
 
-v2 -> v3:
-- only register the notifier if the IOMMU translates MSIs
-- record the msi bindings in a container list and unregister on
-  container release
----
- hw/vfio/common.c              | 69 +++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h |  8 ++++
- 2 files changed, 77 insertions(+)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index e9b729a503..051be723fd 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -489,6 +489,56 @@ static void vfio_iommu_unmap_notify(IOMMUNotifier *n=
-, IOMMUTLBEntry *iotlb)
-     }
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 2574989f2e..a7e48e7972 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1517,14 +1517,6 @@ static void smmuv3_notify_flag_changed(IOMMUMemory=
+Region *iommu,
+     SMMUv3State *s3 =3D sdev->smmu;
+     SMMUState *s =3D &(s3->smmu_state);
+=20
+-    if (new & IOMMU_NOTIFIER_IOTLB_MAP) {
+-        int bus_num =3D pci_bus_num(sdev->bus);
+-        PCIDevice *pcidev =3D pci_find_device(sdev->bus, bus_num, sdev->=
+devfn);
+-
+-        warn_report("SMMUv3 does not support notification on MAP: "
+-                     "device %s will not function properly", pcidev->nam=
+e);
+-    }
+-
+     if (old =3D=3D IOMMU_NOTIFIER_NONE) {
+         trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
+         QLIST_INSERT_HEAD(&s->devices_with_notifiers, sdev, next);
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index cd93ff6fa3..aeb4dfa388 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -402,6 +402,48 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, =
+bool msix)
+     return ret;
  }
 =20
-+static void vfio_iommu_msi_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *i=
-otlb)
++static int vfio_register_msi_binding(VFIOPCIDevice *vdev, int vector_n)
 +{
-+    VFIOGuestIOMMU *giommu =3D container_of(n, VFIOGuestIOMMU, n);
-+    VFIOContainer *container =3D giommu->container;
-+    int ret;
++    PCIDevice *dev =3D &vdev->pdev;
++    AddressSpace *as =3D pci_device_iommu_address_space(dev);
++    MSIMessage msg =3D pci_get_msi_message(dev, vector_n);
++    IOMMUMemoryRegionClass *imrc;
++    IOMMUMemoryRegion *iommu_mr;
++    bool msi_translate =3D false, nested =3D false;;
++    IOMMUTLBEntry entry;
 +
-+    struct vfio_iommu_type1_bind_msi ustruct;
-+    VFIOMSIBinding *binding;
-+
-+    QLIST_FOREACH(binding, &container->msibinding_list, next) {
-+        if (binding->iova =3D=3D iotlb->iova) {
-+            return;
-+        }
++    if (as =3D=3D &address_space_memory) {
++        return 0;
 +    }
-+    ustruct.argsz =3D sizeof(struct vfio_iommu_type1_bind_msi);
-+    ustruct.flags =3D 0;
 +
-+    ustruct.iova =3D iotlb->iova;
-+    ustruct.gpa =3D iotlb->translated_addr;
-+    ustruct.size =3D iotlb->addr_mask + 1;
-+    ret =3D ioctl(container->fd, VFIO_IOMMU_BIND_MSI , &ustruct);
-+    if (ret) {
-+        error_report("%s: failed to register the stage1 MSI binding (%d)=
-",
-+                     __func__, ret);
++    iommu_mr =3D IOMMU_MEMORY_REGION(as->root);
++    memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_MSI_TRANSLATE,
++                                 (void *)&msi_translate);
++    memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_VFIO_NESTED,
++                                 (void *)&nested);
++    imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
++
++    if (!nested || !msi_translate) {
++        return 0;
 +    }
-+    binding =3D  g_new0(VFIOMSIBinding, 1);
-+    binding->iova =3D ustruct.iova;
-+    binding->gpa =3D ustruct.gpa;
-+    binding->size =3D ustruct.size;
 +
-+    QLIST_INSERT_HEAD(&container->msibinding_list, binding, next);
++    /* MSI doorbell address is translated by an IOMMU */
++
++    rcu_read_lock();
++    entry =3D imrc->translate(iommu_mr, msg.address, IOMMU_WO, 0);
++    rcu_read_unlock();
++
++    if (entry.perm =3D=3D IOMMU_NONE) {
++        return -ENOENT;
++    }
++
++    trace_vfio_register_msi_binding(vdev->vbasedev.name, vector_n,
++                                    msg.address, entry.translated_addr);
++
++    memory_region_iotlb_notify_iommu(iommu_mr, 0, entry);
++    return 0;
 +}
 +
-+static void vfio_container_unbind_msis(VFIOContainer *container)
-+{
-+    VFIOMSIBinding *binding, *tmp;
-+
-+    QLIST_FOREACH_SAFE(binding, &container->msibinding_list, next, tmp) =
-{
-+        struct vfio_iommu_type1_unbind_msi ustruct;
-+
-+        /* the MSI doorbell is not used anymore, unregister it */
-+        ustruct.argsz =3D sizeof(struct vfio_iommu_type1_unbind_msi);
-+        ustruct.flags =3D 0;
-+        ustruct.iova =3D binding->iova;
-+        ioctl(container->fd, VFIO_IOMMU_UNBIND_MSI , &ustruct);
-+        QLIST_REMOVE(binding, next);
-+        g_free(binding);
-+    }
-+}
-+
- static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb=
-)
+ static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *ve=
+ctor,
+                                   int vector_n, bool msix)
  {
-     VFIOGuestIOMMU *giommu =3D container_of(n, VFIOGuestIOMMU, n);
-@@ -816,6 +866,8 @@ static void vfio_listener_region_add(MemoryListener *=
-listener,
-                                                        MEMTXATTRS_UNSPEC=
-IFIED);
-=20
-         if (container->iommu_type =3D=3D VFIO_TYPE1_NESTING_IOMMU) {
-+            bool translate_msi;
-+
-             /* Config notifier to propagate guest stage 1 config changes=
- */
-             giommu =3D vfio_alloc_guest_iommu(container, iommu_mr, offse=
-t);
-             iommu_config_notifier_init(&giommu->n, vfio_iommu_nested_not=
-ify,
-@@ -832,6 +884,21 @@ static void vfio_listener_region_add(MemoryListener =
-*listener,
-                                       iommu_idx);
-             QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_ne=
-xt);
-             memory_region_register_iommu_notifier(section->mr, &giommu->=
-n);
-+
-+            memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_MSI_TRANSL=
-ATE,
-+                                         (void *)&translate_msi);
-+            if (translate_msi) {
-+                giommu =3D vfio_alloc_guest_iommu(container, iommu_mr, o=
-ffset);
-+                iommu_iotlb_notifier_init(&giommu->n,
-+                                          vfio_iommu_msi_map_notify,
-+                                          IOMMU_NOTIFIER_IOTLB_MAP,
-+                                          section->offset_within_region,
-+                                          int128_get64(llend),
-+                                          iommu_idx);
-+                QLIST_INSERT_HEAD(&container->giommu_list, giommu,
-+                                  giommu_next);
-+                memory_region_register_iommu_notifier(section->mr, &giom=
-mu->n);
-+            }
-         } else {
-             /* MAP/UNMAP IOTLB notifier */
-             giommu =3D vfio_alloc_guest_iommu(container, iommu_mr, offse=
-t);
-@@ -1608,6 +1675,8 @@ static void vfio_disconnect_container(VFIOGroup *gr=
-oup)
-             g_free(giommu);
+@@ -487,6 +529,12 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, =
+unsigned int nr,
          }
+     }
 =20
-+        vfio_container_unbind_msis(container);
++    ret =3D vfio_register_msi_binding(vdev, nr);
 +
-         trace_vfio_disconnect_container(container->fd);
-         close(container->fd);
-         g_free(container);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index 686d99ff8c..c862d87725 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -64,6 +64,13 @@ typedef struct VFIOAddressSpace {
-     QLIST_ENTRY(VFIOAddressSpace) list;
- } VFIOAddressSpace;
-=20
-+typedef struct VFIOMSIBinding {
-+    hwaddr iova;
-+    hwaddr gpa;
-+    hwaddr size;
-+    QLIST_ENTRY(VFIOMSIBinding) next;
-+} VFIOMSIBinding;
++    if (ret) {
++        error_report("%s failed to register S1 MSI binding(%d)", __func_=
+_, ret);
++    }
 +
- struct VFIOGroup;
+     /*
+      * We don't want to have the host allocate all possible MSI vectors
+      * for a device if they're not in use, so we shutdown and incrementa=
+lly
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 3c2cd15e3f..52b96ec196 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -111,6 +111,8 @@ vfio_region_sparse_mmap_header(const char *name, int =
+index, int nr_areas) "Devic
+ vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long =
+end) "sparse entry %d [0x%lx - 0x%lx]"
+ vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t=
+ subtype) "%s index %d, %08x/%0x8"
+ vfio_dma_unmap_overflow_workaround(void) ""
++vfio_register_msi_binding(const char *name, int vector, uint64_t giova, =
+uint64_t gdb) "%s: register vector %d gIOVA=3D0x%"PRIx64 "-> gDB=3D0x%"PR=
+Ix64" stage 1 mapping"
++vfio_unregister_msi_binding(const char *name, int vector, uint64_t giova=
+) "%s: unregister vector %d gIOVA=3D0x%"PRIx64 " stage 1 mapping"
 =20
- typedef struct VFIOContainer {
-@@ -83,6 +90,7 @@ typedef struct VFIOContainer {
-     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-     QLIST_HEAD(, VFIOGroup) group_list;
-+    QLIST_HEAD(, VFIOMSIBinding) msibinding_list;
-     QLIST_ENTRY(VFIOContainer) next;
- } VFIOContainer;
-=20
+ # platform.c
+ vfio_platform_base_device_init(char *name, int groupid) "%s belongs to g=
+roup #%d"
 --=20
 2.20.1
