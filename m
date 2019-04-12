@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40088)
+Received: from eggs.gnu.org ([209.51.188.92]:40265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEvIj-00060J-5t
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:02 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1hEvJ8-0006P8-SI
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hEvIi-0005Ms-7l
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:01 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:57669)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hEvIg-0005Ko-Av
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:28:59 -0400
-References: <20190412121626.19829-1-berrange@redhat.com>
-	<20190412121626.19829-2-berrange@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <301236a7-18f3-1b63-5785-eb8ec93ff583@vivier.eu>
-Date: Fri, 12 Apr 2019 14:28:41 +0200
+	(envelope-from <mprivozn@redhat.com>) id 1hEvJ8-0005dc-0j
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48244)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1hEvJ7-0005ct-Oe
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:29:25 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E04DA3DFCD
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 12:29:23 +0000 (UTC)
+References: <20190411175345.19414-1-thuth@redhat.com>
+	<20190411180314.GI3641@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <f735d36a-4e78-2656-93d6-bba2e9006cdb@redhat.com>
+Date: Fri, 12 Apr 2019 14:29:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190412121626.19829-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] linux-user: avoid string truncation
- warnings in uname field copying
+In-Reply-To: <20190411180314.GI3641@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH for-QEMU-4.1] Declare -realtime
+ as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +35,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 12/04/2019 14:16, Daniel P. Berrangé wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from linux-user/uname.c:20:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> We don't care where the NUL terminator in the original uname
-> field was. It suffices to copy the entire original field and
-> simply force a NUL terminator at the end of the new field.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->  linux-user/uname.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..3dff33effe 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
->        /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> +      memcpy((dest), (src), MIN(sizeof(src), __NEW_UTS_LEN));   \
+On 4/11/19 8:03 PM, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Apr 11, 2019 at 07:53:45PM +0200, Thomas Huth wrote:
+>> The old -realtime mlock=3Don|off parameter does exactly the same as th=
+e
+>> new -overcommit mem-lock=3Don|off parameter. Additionally, "-realtime"
+>> does not activate any additional "realtime" capabilities as the name
+>> might indicate. We should avoid to confuse the users this way, so
+>> let's deprecate the old -realtime option.
+>=20
+> FYI libvirt currently uses  -realtime mlock=3Don so will need adapting
+> to cope with this change.
 
-If we use sizeof(), I think we should use it for both:
+Done:
 
-  MIN(sizeof(dest), sizeof(src))
+e8c2c8bd07 qemu_command: Prefer '-overcommit mem-lock' over -realtime mlo=
+ck'
+be51feff69 qemu_capabilities: Introduce QEMU_CAPS_OVERCOMMIT
+a08c4b3741 qemu: Always assume QEMU_CAPS_REALTIME_MLOCK
 
-Thanks,
-Laurent
+Therefore, from libvirt's POV this patch is okay to go in.
+
+Michal
