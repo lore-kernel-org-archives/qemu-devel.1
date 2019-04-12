@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42881)
+Received: from eggs.gnu.org ([209.51.188.92]:35023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEvRd-0006Vh-LN
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:14 -0400
+	(envelope-from <devesh.sharma@broadcom.com>) id 1hEsrM-0006cw-8z
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEvRb-0003cK-RM
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:13 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43404)
+	(envelope-from <devesh.sharma@broadcom.com>) id 1hEsrL-0004de-6e
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:36 -0400
+Received: from mail-it1-x136.google.com ([2607:f8b0:4864:20::136]:36833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEvRb-0003aU-3b
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:38:11 -0400
-Received: by mail-ot1-x342.google.com with SMTP id u15so8210420otq.10
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 05:38:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <devesh.sharma@broadcom.com>)
+	id 1hEsrK-0004cQ-U2
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:35 -0400
+Received: by mail-it1-x136.google.com with SMTP id y10so14527189itc.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 02:52:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190402073018.17747-1-kraxel@redhat.com>
-In-Reply-To: <20190402073018.17747-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Apr 2019 13:37:56 +0100
-Message-ID: <CAFEAcA8L+qBhSG_6+L60VgA8_P+Eo_VuD1VEELJX2-pfUbFwrA@mail.gmail.com>
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411190215.2163572e.cohuck@redhat.com>
+	<20190411172402.GA14509@mellanox.com>
+	<20190411173419.GB6259@lap1> <20190411174124.GA6428@lap1>
+In-Reply-To: <20190411174124.GA6428@lap1>
+From: Devesh Sharma <devesh.sharma@broadcom.com>
+Date: Fri, 12 Apr 2019 15:21:56 +0530
+Message-ID: <CANjDDBj0rqZEmHzMH+2461_DvjV5K4hT=hJ_usBuucV4Xwh84g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] curses: fix wchar_t printf warning
+Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Jason Gunthorpe <jgg@mellanox.com>, "mst@redhat.com" <mst@redhat.com>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>
 
-On Tue, 2 Apr 2019 at 08:34, Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Thu, Apr 11, 2019 at 11:11 PM Yuval Shaia <yuval.shaia@oracle.com> wrote:
 >
-> On some systems wchar_t is "long int", on others just "int".
-> So go cast to "long int" and adjust the printf format accordingly.
+> On Thu, Apr 11, 2019 at 08:34:20PM +0300, Yuval Shaia wrote:
+> > On Thu, Apr 11, 2019 at 05:24:08PM +0000, Jason Gunthorpe wrote:
+> > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
+> > > > On Thu, 11 Apr 2019 14:01:54 +0300
+> > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
+> > > >
+> > > > > Data center backends use more and more RDMA or RoCE devices and more and
+> > > > > more software runs in virtualized environment.
+> > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
+> > > > >
+> > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
+> > > > > technology and also because the Virtio specification
+> > > > > allows Hardware Vendors to support Virtio protocol natively in order to
+> > > > > achieve bare metal performance.
+> > > > >
+> > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
+> > > > > Virtio Specification and a look forward on possible implementation
+> > > > > techniques.
+> > > > >
+> > > > > Open issues/Todo list:
+> > > > > List is huge, this is only start point of the project.
+> > > > > Anyway, here is one example of item in the list:
+> > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+> > > > >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
+> > > > >   that this is reasonable so one option is to have one for all and
+> > > > >   multiplex the traffic on it. This is not good approach as by design it
+> > > > >   introducing an optional starvation. Another approach would be multi
+> > > > >   queues and round-robin (for example) between them.
+> > > > >
+> > > > > Expectations from this posting:
+> > > > > In general, any comment is welcome, starting from hey, drop this as it is a
+> > > > > very bad idea, to yeah, go ahead, we really want it.
+> > > > > Idea here is that since it is not a minor effort i first want to know if
+> > > > > there is some sort interest in the community for such device.
+> > > >
+> > > > My first reaction is: Sounds sensible, but it would be good to have a
+> > > > spec for this :)
+> > >
+> > > I'm unclear why you'd want to have a virtio queue for anything other
+> > > that some kind of command channel.
+> > >
+> > > I'm not sure a QP or CQ benefits from this??
+> >
+> > Virtqueue is a standard mechanism to pass data from guest to host. By
 >
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/curses.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> And vice versa (CQ?)
 >
-> diff --git a/ui/curses.c b/ui/curses.c
-> index cc6d6da68463..fb63945188b2 100644
-> --- a/ui/curses.c
-> +++ b/ui/curses.c
-> @@ -453,8 +453,8 @@ static uint16_t get_ucs(wchar_t wch, iconv_t conv)
->      swch = sizeof(wch);
->
->      if (iconv(conv, &pwch, &swch, &pch, &sch) == (size_t) -1) {
-> -        fprintf(stderr, "Could not convert 0x%02x from WCHAR_T to UCS-2: %s\n",
-> -                        wch, strerror(errno));
-> +        fprintf(stderr, "Could not convert 0x%02lx from WCHAR_T to UCS-2: %s\n",
-> +                (unsigned long)wch, strerror(errno));
->          return 0xFFFD;
->      }
->
+> > saying that - it really sounds like QP send and recv rings. So my thought
+> > is to use a standard way for rings. As i've learned this is how it is used
+> > by other virtio devices ex virtio-net.
+> >
+> > >
+> > > Jason
+> >
+I would like to ask more basic question, how virtio queue will glue
+with actual h/w qps? I may be to naive though.
 
-Applied to master since we needed an rc4 for other reasons.
-
-thanks
--- PMM
+-Regards
+Devesh
