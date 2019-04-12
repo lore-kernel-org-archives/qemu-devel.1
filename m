@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9901C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3523AC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C6722083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:20:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6722083E
+	by mail.kernel.org (Postfix) with ESMTPS id 085E721872
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:21:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085E721872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33795 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEtIo-0007So-O9
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:20:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38847)
+	id 1hEtJ1-0007my-93
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:21:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt59-0003NM-6d
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:54 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3o-0001bj-ND
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt58-0005Sn-6i
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54976)
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3n-0004LF-Mj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32879)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hEt55-0005Qh-HF; Fri, 12 Apr 2019 06:06:47 -0400
+	id 1hEt3k-0004H6-ME; Fri, 12 Apr 2019 06:05:24 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE2E53082E5F;
-	Fri, 12 Apr 2019 10:06:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E242753EB;
+	Fri, 12 Apr 2019 10:05:21 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 216D519C65;
-	Fri, 12 Apr 2019 10:06:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A8F0919C65;
+	Fri, 12 Apr 2019 10:05:16 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Fri, 12 Apr 2019 12:03:51 +0200
-Message-Id: <20190412100354.6409-25-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:39 +0200
+Message-Id: <20190412100354.6409-13-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 12 Apr 2019 10:06:46 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 12 Apr 2019 10:05:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 24/27] hw/arm/smmuv3: Implement fault injection
+Subject: [Qemu-devel] [RFC v3 12/27] hw/arm/smmuv3: Store the PASID table
+ GPA in the translation config
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,107 +75,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412100351.ibq0diNQ3tNIgbFIXaENketOWI9zxWR6gizgIHbO1h4@z>
+Message-ID: <20190412100339.LkULuQA2zDvHsNcZ2HBjmJsakO2N0a5bnyQuMLrVCzQ@z>
 
-We convert iommu_fault structs received from the kernel
-into the data struct used by the emulation code and record
-the evnts into the virtual event queue.
+For VFIO integration we will need to pass the Context Descriptor (CD)
+table GPA to the host. The CD table is also referred to as the PASID
+table. Its GPA corresponds to the s1ctrptr field of the Stream Table
+Entry. So let's decode and store it in the configuration structure.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-Exhaustive mapping remains to be done
----
- hw/arm/smmuv3.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ hw/arm/smmuv3.c              | 1 +
+ include/hw/arm/smmu-common.h | 1 +
+ 2 files changed, 2 insertions(+)
 
 diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index a7e48e7972..ddd6564001 100644
+index 1744874e72..96d4147533 100644
 --- a/hw/arm/smmuv3.c
 +++ b/hw/arm/smmuv3.c
-@@ -1545,6 +1545,70 @@ smmuv3_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNo=
-tifier *n)
- {
- }
+@@ -351,6 +351,7 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *c=
+fg,
+                       "SMMUv3 S1 stalling fault model not allowed yet\n"=
+);
+         goto bad_ste;
+     }
++    cfg->s1ctxptr =3D STE_CTXPTR(ste);
+     return 0;
 =20
-+static inline int
-+smmuv3_inject_faults(IOMMUMemoryRegion *iommu_mr, int count,
-+                     struct iommu_fault *buf)
-+{
-+    SMMUDevice *sdev =3D container_of(iommu_mr, SMMUDevice, iommu);
-+    SMMUv3State *s3 =3D sdev->smmu;
-+    uint32_t sid =3D smmu_get_sid(sdev);
-+    int i;
-+
-+    for (i =3D 0; i < count; i++) {
-+        SMMUEventInfo info =3D {};
-+        struct iommu_fault_unrecoverable *record;
-+
-+        if (buf[i].type !=3D IOMMU_FAULT_DMA_UNRECOV) {
-+            continue;
-+        }
-+
-+        info.sid =3D sid;
-+        record =3D &buf[i].event;
-+
-+        switch (record->reason) {
-+        case IOMMU_FAULT_REASON_PASID_INVALID:
-+            info.type =3D SMMU_EVT_C_BAD_SUBSTREAMID;
-+            /* TODO further fill info.u.c_bad_substream */
-+            break;
-+        case IOMMU_FAULT_REASON_PASID_FETCH:
-+            info.type =3D SMMU_EVT_F_CD_FETCH;
-+            break;
-+        case IOMMU_FAULT_REASON_BAD_PASID_ENTRY:
-+            info.type =3D SMMU_EVT_C_BAD_CD;
-+            /* TODO further fill info.u.c_bad_cd */
-+            break;
-+        case IOMMU_FAULT_REASON_WALK_EABT:
-+            info.type =3D SMMU_EVT_F_WALK_EABT;
-+            info.u.f_walk_eabt.addr =3D record->addr;
-+            info.u.f_walk_eabt.addr2 =3D record->fetch_addr;
-+            break;
-+        case IOMMU_FAULT_REASON_PTE_FETCH:
-+            info.type =3D SMMU_EVT_F_TRANSLATION;
-+            info.u.f_translation.addr =3D record->addr;
-+            break;
-+        case IOMMU_FAULT_REASON_OOR_ADDRESS:
-+            info.type =3D SMMU_EVT_F_ADDR_SIZE;
-+            info.u.f_addr_size.addr =3D record->addr;
-+            break;
-+        case IOMMU_FAULT_REASON_ACCESS:
-+            info.type =3D SMMU_EVT_F_ACCESS;
-+            info.u.f_access.addr =3D record->addr;
-+            break;
-+        case IOMMU_FAULT_REASON_PERMISSION:
-+            info.type =3D SMMU_EVT_F_PERMISSION;
-+            info.u.f_permission.addr =3D record->addr;
-+            break;
-+        default:
-+            warn_report("%s Unexpected fault reason received from host: =
-%d",
-+                        __func__, record->reason);
-+            continue;
-+        }
-+
-+        smmuv3_record_event(s3, &info);
-+    }
-+    return 0;
-+}
-+
- static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
-                                                   void *data)
- {
-@@ -1554,6 +1618,7 @@ static void smmuv3_iommu_memory_region_class_init(O=
-bjectClass *klass,
-     imrc->notify_flag_changed =3D smmuv3_notify_flag_changed;
-     imrc->get_attr =3D smmuv3_get_attr;
-     imrc->replay =3D smmuv3_replay;
-+    imrc->inject_faults =3D smmuv3_inject_faults;
- }
-=20
- static const TypeInfo smmuv3_type_info =3D {
+ bad_ste:
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 2c7fbf4202..a1020b638c 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -68,6 +68,7 @@ typedef struct SMMUTransCfg {
+     uint8_t tbi;               /* Top Byte Ignore */
+     uint16_t asid;
+     SMMUTransTableInfo tt[2];
++    dma_addr_t s1ctxptr;
+     uint32_t iotlb_hits;       /* counts IOTLB hits for this asid */
+     uint32_t iotlb_misses;     /* counts IOTLB misses for this asid */
+ } SMMUTransCfg;
 --=20
 2.20.1
 
