@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59562)
+Received: from eggs.gnu.org ([209.51.188.92]:60892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEqLE-00031U-Fd
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:11:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1hEqUQ-0005U9-0w
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEqLD-0007tZ-9z
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:11:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34510)
+	(envelope-from <bounces@canonical.com>) id 1hEqUO-0005GY-3Q
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:20:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEqLD-0007t0-1y
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:11:15 -0400
+	id 1hEqUM-0005EN-9r
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:20:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEqLB-0000el-AP
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:11:13 +0000
+	id 1hEqUK-0001pj-Au
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:20:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 411512E80CC
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:11:13 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 371C82E80C8
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:20:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Apr 2019 06:57:24 -0000
-From: Thomas Huth <1523246@bugs.launchpad.net>
-Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
+Date: Fri, 12 Apr 2019 07:06:30 -0000
+From: Thomas Huth <1486278@bugs.launchpad.net>
+Reply-To: Bug 1486278 <1486278@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
-Message-Id: <155505224494.13466.17362266628532802598.malone@gac.canonical.com>
+References: <20150818230718.18792.42543.malonedeb@wampee.canonical.com>
+Message-Id: <155505279030.7989.9154643681286899467.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
+Subject: [Qemu-devel] [Bug 1486278] Re: 'info vnc' monitor command does not
+ show websocket information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,43 +39,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The DISCARD feature has now been implemented in QEMU, too:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D37b06f8d46fe602e630e4
+I think this has been fixed in QEMU v2.10.0 with this commit here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D0a9667ecdb6d7da90a2ef=
+64
 
 ** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523246
+https://bugs.launchpad.net/bugs/1486278
 
 Title:
-  Virtio-blk does not support TRIM
+  'info vnc' monitor command does not show websocket information
 
 Status in QEMU:
-  Fix Committed
+  Fix Released
+Status in qemu package in Ubuntu:
+  Confirmed
 
 Bug description:
-  When model=3Dvirtio is used, TRIM is not supported.
+  Steps to reproduce^
+  1. run
+   qemu-system-x86_64  -vnc  0.0.0.0:1,websocket=3D5701 -nographic -monitor=
+ stdio
 
-  # mount -o discard /dev/vda4 /mnt
-  # mount | tail -1
-  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
-p_id=3D0,allow_other,blksize=3D4096)
-  # fstrim /mnt/
-  fstrim: /mnt/: the discard operation is not supported
+  2. then type =
 
-  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
+   (qemu) info vnc
+  3.  see
+       address: 0.0.0.0:5901
+          auth: none
+  Client: none
 
-  Full QEMU line:
-
-  qemu-system-x86_64 -enable-kvm -cpu host -bios
-  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
-  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
-  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
-=3Dvirtio
+  There is no information about websocket parameters, but 'netstat -nltp' s=
+hows me:
+   ...
+  tcp        0      0 0.0.0.0:5701            0.0.0.0:*               LISTE=
+N      27073/qemu-system-x
+  ....
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1486278/+subscriptions
