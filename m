@@ -2,80 +2,84 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A3BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EF2C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:56:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C229F2171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3D672171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:56:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ccAvwGbf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C229F2171F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FRvRSIPP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D672171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34769 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34812 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEum1-0002iQ-1L
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:55:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60098)
+	id 1hEunR-0004As-0u
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:56:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEukD-0001ls-HZ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:53:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEumR-00037P-GP
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hEukC-0007uY-GR
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:53:21 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:36182)
+	(envelope-from <peter.maydell@linaro.org>) id 1hEumP-0000he-IZ
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:55:39 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45237)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hEukB-0007tz-Px
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:53:20 -0400
-Received: by mail-oi1-x229.google.com with SMTP id l203so7711565oia.3
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 04:53:19 -0700 (PDT)
+	id 1hEumN-0000b4-75
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:55:35 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e5so8095985otk.12
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 04:55:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=knPjMhmQpbuUpLevbQU0h6hy4/mTpsUXZQSfj7TdMQ4=;
-	b=ccAvwGbfxBhUM+ZwWr00e+2jydJqMmMuJ8tA41eD/iqqlyeH2u5zjh/SRbw3foS9YN
-	to5Xh9e7/1OV4GSllfBEvKUcOJwurSWQDJbXySFham6dOjXeQbK1KuBnH7guRIuHLH7j
-	zeoSS99/IanEgCtcu7WCfXDTQ4ijLL0C5tYwzlAKvHNbDuH4yuiYlZkHa7VnI4ye/9z+
-	RRgwvKBU2Q++Fyrl91M5UjoVy8k26ihKA/UadoLzvKrTY0iTug+VlljRRM1KvaGoWnQ6
-	MxsvwPDualC8jFlrSq8yQ8iDJODjXkr7O/Nxx/zmN/XnMugR5Y34AU7KQdNoHr4p82Cb
-	Nhww==
+	:cc; bh=QSUhEcrMM6nXjWE7FcZiOeoP+fX/3itFG/b85YS5jwU=;
+	b=FRvRSIPPobww6sZaJX1IooydjG0274+F6Rw0ENgYb2LMe+uwfSg0Ge+xy0h8lFWPrN
+	1+5KAinNyr5t7o76uNxHsJbDXmxIsg2u7v6ED86RQd5FVLUR0kHhRJbEo2o+yDYNLK8Z
+	LGBLX7h0B115MSxH/4heEuaRolYka0jOZI4jhLYekv70s8iWjLzIeLOEFepkXC7gQDg/
+	OpekBqqE7632PyF8fnkSMj9Au3OeYG9McxHQ7vOkYSlvM6fknRPwKDFWzLZ2ZB+wNJwx
+	Wne0ibYGsyUmRAxf8TZYFMKjI+r24HlhG20XTqRfxdTwI6rXsv7QSoJNHVs7uEYx8neD
+	SM6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=knPjMhmQpbuUpLevbQU0h6hy4/mTpsUXZQSfj7TdMQ4=;
-	b=qS0xGTP5YyVqIjWm4jvdJ+UYmQwzRX09rA4gBJ/EF6B4/vSc2GEhLxPaEo7NDTMYas
-	rTvtzqjma2vBtzGk15x4e8NFhtk2tG+lybTzMKSQMlJzSKMzK2Rc9aXhiMrfist62SX9
-	7p1ID/e2Q4Jf0vrkuhPyF8R1Ar4HBOQ5NRtOxcywhS3LSUfi49snks0ogSC12CP/Aj9h
-	yJ+iy1y3evlsv4+p2nD1wIEsi7sNC6RG2nLOj8/EV3KAZRSqiuHB4cTgY8Bld8tXKOTy
-	Ha2SY+d2j0zyZ57R4DAibGrGIioZxl/fXkMEh3dOQtT8+PrTztwyLq27d63Gzl/5xWFP
-	86Yg==
-X-Gm-Message-State: APjAAAUaubrvXqdmnPZbOJ4Ex1I0tNJISvi69R66taqNTpTDyPX73uUJ
-	YrV8VdBC3kanlIOwHrKS3euAz7eHK8UltXKsdVYCRA==
-X-Google-Smtp-Source: APXvYqyEdEm53BzZpw4eoN5ThY3f1EUh6Vx+WCdxHx6Qs7t7yBPx9DWbjxnwzuEYnE33taapBRchJTYMsIr8jdYCCs8=
-X-Received: by 2002:aca:e054:: with SMTP id x81mr9577064oig.146.1555069998946; 
-	Fri, 12 Apr 2019 04:53:18 -0700 (PDT)
+	bh=QSUhEcrMM6nXjWE7FcZiOeoP+fX/3itFG/b85YS5jwU=;
+	b=IsDuqzny9VfCcIxR+6usrzNhH8uCvUVRGD/DbZCArctAi49YIIpwVcRtTL5rnmTF0m
+	c4HlLGnc468/zx/VkdhQZw/RTy9UUogrn5q5MSj3oUzaqiX+CaTryufQpE7huRtMeDUh
+	nGlIbf9yjBB+VRB1mn32YgjupVF2JMxQmqjt0APfqbrYqaA957XesuYQPbiwQhN+yV2J
+	eqiQFLeXhUk7DdJMB+RpvgwEYPtJpDd28dKdaeyzeXl2vI1Xfh/ssuCZjMgvazhY/TnM
+	9S+9JMrclfM+2JIYxn+B5JWIYtOXP27UUJA1loNheL9z+Px1ulypHs/7NFdkIe3ivBm2
+	31Hg==
+X-Gm-Message-State: APjAAAXSxcNm6jOq58m4yCGBcKJqrAO0k+Qanuwy1KyGyI3d3DoXp4gG
+	ybB2wnVNFl3tP0iYpyAJcSYqwvMsmgh+HOanSfqI9w==
+X-Google-Smtp-Source: APXvYqw10q9A1hJVVG0eyIHovUPzKjNwTFDI3HAA1ntNmpODjJxdwdIYfJ7/FtoouOeJZtqeIxu4KjR/qibg8Xv1Bh4=
+X-Received: by 2002:a05:6830:1497:: with SMTP id
+	s23mr33035642otq.236.1555070127971; 
+	Fri, 12 Apr 2019 04:55:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190412112044.15361-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190412112044.15361-1-david@gibson.dropbear.id.au>
+References: <20190328062222.8409-1-joel@jms.id.au>
+	<20190328062222.8409-2-joel@jms.id.au>
+	<CAFEAcA_K1Rv1G-s=ndVYX6i_BvWME6ToShL6ZBpB4gnE3zdZdA@mail.gmail.com>
+	<89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
+	<CACPK8Xc_WeP3xuimjTBFRArteecikin9Qj8ZoCW-J2qBY4C=5g@mail.gmail.com>
+In-Reply-To: <CACPK8Xc_WeP3xuimjTBFRArteecikin9Qj8ZoCW-J2qBY4C=5g@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Apr 2019 12:53:07 +0100
+Date: Fri, 12 Apr 2019 12:55:16 +0100
 Message-ID:
- <CAFEAcA8VEM=brDF-U=8-5sEPhmcjX2vPy7tBJuMSqviVXbAetg@mail.gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
+ <CAFEAcA9t+GUG8PK623gb4v6ZBEhDX_7coOPcgLHDnUXTsrcrvg@mail.gmail.com>
+To: Joel Stanley <joel@jms.id.au>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::229
-Subject: Re: [Qemu-devel] [PULL 0/1] ppc-for-4.0 queue 20190412
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw: timer: Add ASPEED RTC device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,48 +91,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	clg@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
-	Greg Kurz <groug@kaod.org>, Alex Williamson <alex.williamson@redhat.com>,
-	spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>,
-	Marcel Apfelbaum <marcel@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm <qemu-arm@nongnu.org>,
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412115307.GSVqJgrS0NBI4286DC9nb41KE-fgBDzZcmKf46OTxiQ@z>
+Message-ID: <20190412115516.zywRFM9zbQa99Zgtecuuz35kudB0nCBnIk-unIgh4hI@z>
 
-On Fri, 12 Apr 2019 at 12:20, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 532cc6da74ec25b5ba6893b5757c977d54582949:
->
->   Update version for v4.0.0-rc3 release (2019-04-10 15:38:59 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190412
->
-> for you to fetch changes up to 4560116e42a21989a4b6cf9551ce2f90b16c7238:
->
->   spapr_pci: Fix broken naming of PCI bus (2019-04-12 12:23:02 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue for 2018-04-12
->
-> Here's a last minute pull request for 4.0.  Turns out my last pull
-> request, to fix a regression in extended config space access for the
-> pseries machine didn't fix things hard enough.  This PR has a single
-> patch which improves the fix to work in more cases.
->
-> It's a ghastly, ghastly hack, but it's simple and localized.  I
-> already have patches almost ready to go in 4.1 that provides a simpler
-> and cleaner solution to all this.
->
-> ----------------------------------------------------------------
+On Fri, 12 Apr 2019 at 04:17, Joel Stanley <joel@jms.id.au> wrote:
+> vmstate and migration is a foreign concept for the small ARM machines.
+> As well as being a developer, I am an end user of Qemu for them (the
+> aspeeds, microbit), and the use case is to boot up a firmware and
+> check that it does correct thing. I've never considered saving the
+> state and resming it, and can't think of a situation where that would
+> be done.
 
-Applied, thanks.
+It's a really useful debugging tool:
+ https://translatedcode.wordpress.com/2015/07/06/tricks-for-debugging-qemu-savevm-snapshots/
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
+thanks
 -- PMM
 
