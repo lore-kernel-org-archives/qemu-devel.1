@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53605)
+Received: from eggs.gnu.org ([209.51.188.92]:53895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hExOo-0004Wa-Oe
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:43:27 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hExQL-0005Nh-8I
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:45:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hExOm-0003MC-Qw
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:43:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hExOk-0003KH-Qs
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:43:24 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <87d0mwatbu.fsf@dusky.pond.sub.org>
-	<CAAdtpL6VCiXLbTWyJo4cbCNLjOCPr6KrH8KTqEq1V=CTMYKubQ@mail.gmail.com>
-	<6fe1a987-c3c5-3af5-74a4-fc4cd08d2380@redhat.com>
-	<2056cff2-78f8-1079-8d05-e758971d73ec@redhat.com>
-	<045d5528-116e-c71d-c29b-c070b7f660e3@redhat.com>
-Message-ID: <72abd5d6-86ce-3f8f-cbda-69250f4a0292@redhat.com>
-Date: Fri, 12 Apr 2019 16:42:43 +0200
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hExQH-0004S2-JT
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:44:59 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:34466)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1hExQH-0004P2-9K
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:44:57 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id p10so12328696wrq.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:44:54 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
+	<20190412132420.GM25308@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e5f6cbe5-5c60-9c5e-5218-63913f5ce616@redhat.com>
+Date: Fri, 12 Apr 2019 16:44:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <045d5528-116e-c71d-c29b-c070b7f660e3@redhat.com>
+In-Reply-To: <20190412132420.GM25308@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Maintainers,
- please tell us how to boot your machines!
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RFC] i386: Add new Hygon 'Dhyana' and
+ 'Dhyana-IBPB' CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
-Cc: Paul Burton <pburton@wavecomp.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Jia Liu <proljc@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Fabien Chouteau <chouteau@adacore.com>, Beniamino Galvani <b.galvani@gmail.com>, Paul Durrant <paul.durrant@citrix.com>, Jan Kiszka <jan.kiszka@web.de>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Aleksandar Rikalo <arikalo@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Andrey Smirnov <andrew.smirnov@gmail.com>, Michael Walle <michael@walle.cc>, Thomas Huth <huth@tuxfamily.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Cornelia Huck <cohuck@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Pu Wen <puwen@hygon.cn>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, rth@twiddle.net
 
-On 12/04/2019 14.12, Thomas Huth wrote:
-> On 12/04/2019 13.28, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 4/12/19 1:11 PM, Thomas Huth wrote:
->>> On 13/03/2019 02.06, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> '
->>>> On Tue, Mar 12, 2019 at 6:44 PM Markus Armbruster <armbru@redhat.com=
-> wrote:
->>> [...]
->>>>>     =3D hw/arm/nseries.c =3D
->>>>>     Andrzej Zaborowski <balrogg@gmail.com> (odd fixer:nSeries)
->>>>>     Peter Maydell <peter.maydell@linaro.org> (odd fixer:nSeries)
->>>>>     qemu-arm@nongnu.org (open list:nSeries)
->>>>
->>>> images:
->>>> http://stskeeps.subnetmask.net/meego-n8x0/
->>>>
->>>> $ qemu-system-arm -M n810 -kernel
->>>> meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0
->>>> -append "root=3D/dev/mmcblk0p1 console=3DttyS0 printk.time=3D0 rootw=
-ait" -m
->>>> 130 -sd meego-arm-n8x0-1.0.80.20100712.1431-sda.raw -serial stdio
->>>
->>> That does not work for me - I only get a white screen that turns to
->>> black after half a second, and no output (also not on the serial
->>> console). Does it still work for you with the latest QEMU master bran=
-ch?
->>
->> It is broken since a long time. I guess rememember some irc chat about
->> it previous to v2.9.0, then I added this line to my TODO "this command
->> used to work, see what's wrong here". I never bisected to figure out
->> since when it got bitroted.
->=20
-> Ok, thanks, good to know. I was just thinking about deprecating this
-> machine, since it uses the already deprecated bluetooth subsystem, and
-> we likely can not remove bluetooth without removing this machine, too.
-> So if it is already broken, that's another reason for really deprecatin=
-g
-> this machine now.
+On 12/04/19 15:24, Daniel P. Berrangé wrote:
+>> Add two new base CPU models called 'Dhyana' and 'Dhyana-IBPB' to model
+>> processors from Hygon Dhyana (family 18h), which derived from AMD EPYC
+>> (family 17h). 'Dhyana-IBPB' is a copy of the 'Dhyana' CPU model with
+>> just CPUID_8000_0008_EBX_IBPB added.
+> 
+> Do we really need to support both CPU variants ?
 
-Ah, well, the kernel still boots if I remove the "console=3DttyS0" from
-the argument list... so it is not completely broken yet.
+Also, I think the compatibility properties are not needed for Dhyana chips.
 
- Thomas
+Paolo
