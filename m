@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36180)
+Received: from eggs.gnu.org ([209.51.188.92]:36348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEqrM-0004AD-Pe
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:44:29 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hEqs2-0004ZJ-Pc
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hEqrL-0004QU-Pp
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:44:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37120)
+	(envelope-from <pbonzini@redhat.com>) id 1hEqs1-0004kf-Nb
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:45:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hEqrL-0004QG-It
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:44:27 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hEqs1-0004kG-Dt
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:45:09 -0400
 References: <20190411175931.29235-1-brijesh.singh@amd.com>
 	<61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
 	<7d449ae2-6762-97c2-4930-358f34f3ef4b@amd.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <dbfe34c7-ef89-5d79-8a26-4483c9bf6ee7@redhat.com>
-Date: Fri, 12 Apr 2019 09:44:22 +0200
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <869394fb-7b3d-cc01-7329-e931a260e73c@redhat.com>
+Date: Fri, 12 Apr 2019 09:45:02 +0200
 MIME-Version: 1.0
 In-Reply-To: <7d449ae2-6762-97c2-4930-358f34f3ef4b@amd.com>
 Content-Type: text/plain; charset=utf-8
@@ -30,10 +30,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>, Erik Skultety <eskultet@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>, Laszlo Ersek <lersek@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Erik Skultety <eskultet@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 04/11/19 21:02, Singh, Brijesh wrote:
+On 11/04/19 21:02, Singh, Brijesh wrote:
 >=20
 >=20
 > On 4/11/19 1:10 PM, Laszlo Ersek wrote:
@@ -82,15 +82,7 @@ place
 > this capabilities so I am assuming that future CPUs will populate
 > some values in it.
 
-Yup, sounds reasonable. Please resubmit with Daniel's request addressed
-and I'll be happy to R-b.
+Since this field is not specific to guest configuration, I don't think
+it belongs in query-sev-capabilities; QEMU does not care about >1 guest.
 
-Erik: can you please ACK too?
-
-Thanks!
-Laszlo
-
->> Again, not sure if that's useful, but it's not hard to introduce the
->> field as optional now. Removing mandatory fields later is impossible.
->>
->=20
+Paolo
