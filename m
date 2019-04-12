@@ -2,81 +2,71 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A32ACC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7002C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71C0A2083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:04:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C0A2083E
+	by mail.kernel.org (Postfix) with ESMTPS id 97A422083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:08:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A422083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38419 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38471 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hExjM-0004CU-EK
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:04:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57378)
+	id 1hExnA-0006PN-Su
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:08:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hExiR-0003rC-EL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:03:44 -0400
+	(envelope-from <berrange@redhat.com>) id 1hExlw-0005ji-3T
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:07:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hExiO-0005tE-0w
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:03:43 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hExiN-0005sy-OT
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:03:39 -0400
-Received: by mail-wm1-f65.google.com with SMTP id c1so11647864wml.4
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 08:03:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=tbLu4+nyl85/OB5JMk8qbuK5dp2rYy9x9rtOSqfF9B4=;
-	b=mq49MlNWawoVeC9E8wbeIQC8VQaqVV1PRTSGJAM7hfaWMS0SD9A4SPxcg5+vxYZQGK
-	C/pK9OQuIx8dB5Q21SHKPLO/WNhqBRF52kRQ4rvOkh2HPpYWQg0w4Fg0IJ+DWAZpd6sb
-	Pv3/Hb8pEqC0ubOEnTNit6Rr94vnPvN7ME0CXOn6gDXrkKGref1Q2ekKw3hlm9Gs0BO6
-	XSfTHbUqsdyLj/lAqvLWx92UrbzsqoHdyf91faZhPkK7VJiXzDcH9qGYFk2DXLigfQQL
-	JCOv0lMRACFA8IXwc5/KgOW2jHH7soMOOOrFLs0wZovkES+qPU6/1QjO9ml9ZiGmHMLc
-	sxrw==
-X-Gm-Message-State: APjAAAV7O69U3HB0MxKWsIKmeWYpW3WCr2VY4eit0orWmL1zjX6iQc9T
-	+Vdd8NEQ9a2p5P9WhgG0Akofyw==
-X-Google-Smtp-Source: APXvYqw13py5w1kEj9NJyDjBGtUaWt2J1YuJntBDNA/bOncG+n+il6hLSmORt/eYlsOTR/sKcbaS5A==
-X-Received: by 2002:a1c:730c:: with SMTP id d12mr11865657wmb.10.1555081418509; 
-	Fri, 12 Apr 2019 08:03:38 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	q8sm11706097wmq.35.2019.04.12.08.03.37
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 08:03:37 -0700 (PDT)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190317002259.25994-1-philmd@redhat.com>
-	<20190317002259.25994-5-philmd@redhat.com>
-	<20190319152830.4e7771be@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <536060c6-8243-f157-7f83-74eb04517032@redhat.com>
-Date: Fri, 12 Apr 2019 17:03:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <berrange@redhat.com>) id 1hExls-0007op-9X
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:07:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>)
+	id 1hExlr-0007oI-U0; Fri, 12 Apr 2019 11:07:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC85A3088B89;
+	Fri, 12 Apr 2019 15:07:13 +0000 (UTC)
+Received: from redhat.com (ovpn-112-27.ams2.redhat.com [10.36.112.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D9705D6A9;
+	Fri, 12 Apr 2019 15:07:10 +0000 (UTC)
+Date: Fri, 12 Apr 2019 16:07:07 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190412150707.GD25308@redhat.com>
+References: <20190327204102.20925-1-maxiwell@linux.ibm.com>
+	<20190328142151.7b0e00dd@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190328183923.lcd3p6fpy4qvvxoo@maxibm>
+	<20190329132951.451d4ef0@bahia.lan>
+	<20190401145858.lw7v3xt7fqanp6nc@maxibm>
+	<20190402122807.1a141e37@bahia.lan>
+	<20190408042747.GI16627@umbus.fritz.box>
+	<fb1fe659eb80b99b9696ff4b128cd070c4e0dabc.camel@redhat.com>
+	<20190412165701.44079175@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20190319152830.4e7771be@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20190412165701.44079175@bahia.lan>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 12 Apr 2019 15:07:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 4/8] hw/isa/southbridge: Rename
- ACPI_X86_ICH to ACPI_ICH9
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 0/2] spapr-rtas: add ibm,
+ get-vpd RTAS interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,113 +78,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Paul Burton <paul.burton@imgtec.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Artyom Tarasenko <atar4qemu@gmail.com>,
-	Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+	Andrea Bolognani <abologna@redhat.com>,
+	"Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412150336.vgOrvWLu0KpD6VkGFzVfH9jVijXGNn1TQS92op9RIdo@z>
+Message-ID: <20190412150707.OSDvPCB1slgro_Er4kLx4QfjRxHJ0mhGSZ1KqJSCgvA@z>
 
-On 3/19/19 3:28 PM, Igor Mammedov wrote:
-> On Sun, 17 Mar 2019 01:22:55 +0100
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+On Fri, Apr 12, 2019 at 04:57:01PM +0200, Greg Kurz wrote:
+> On Tue, 09 Apr 2019 18:24:07 +0200
+> Andrea Bolognani <abologna@redhat.com> wrote:
 > 
->> The ICH9 chipset is a generic southbridge and can be used by
->> non-X86 hardware. Rename it to make this more obvious.
-> Is it actually used by anything else in QEMU beside Q35 board?
-
-Yes, the MIPS Boston board (hw/mips/boston.c:520):
-
-    ahci =
-pci_create_simple_multifunction(&PCI_BRIDGE(&pcie2->root)->sec_bus,
-                                           PCI_DEVFN(0, 0),
-                                           true, TYPE_ICH9_AHCI);
-
-See:
-
-commit df1d8a1f29f567567b9d20be685a4241282e7005
-Author: Paul Burton <paul.burton@imgtec.com>
-Date:   Thu Sep 8 15:51:58 2016 +0100
-
- hw/mips: MIPS Boston board support
-
- Introduce support for emulating the MIPS Boston development board. The
- Boston board is built around an FPGA & 3 PCIe controllers, one of which
- is connected to an Intel EG20T Platform Controller Hub. It is used
- during the development & debug of new CPUs and the software intended to
- run on them, and is essentially the successor to the older MIPS Malta
- board.
-
- This patch does not implement the EG20T, instead connecting an already
- supported ICH-9 AHCI controller. Whilst this isn't accurate it's enough
- for typical stock Boston software (eg. Linux kernels) to work with hard
- disks given that both the ICH-9 & EG20T implement the AHCI
- specification.
-
-
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/acpi/Kconfig       | 2 +-
->>  hw/acpi/Makefile.objs | 2 +-
->>  hw/i2c/Makefile.objs  | 2 +-
->>  hw/isa/Kconfig        | 2 +-
->>  4 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->> index eca3beed75..e24c895772 100644
->> --- a/hw/acpi/Kconfig
->> +++ b/hw/acpi/Kconfig
->> @@ -8,7 +8,7 @@ config ACPI_X86
->>      select ACPI_CPU_HOTPLUG
->>      select ACPI_MEMORY_HOTPLUG
->>  
->> -config ACPI_X86_ICH
->> +config ACPI_ICH9
->>      bool
->>      select ACPI_X86
->>  
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index c86edfbed9..dff94d35e7 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
->> -common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
->> +common-obj-$(CONFIG_ACPI_ICH9) += ich9.o tco.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
->>  common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->> diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
->> index a98c786918..b632461513 100644
->> --- a/hw/i2c/Makefile.objs
->> +++ b/hw/i2c/Makefile.objs
->> @@ -3,7 +3,7 @@ common-obj-$(CONFIG_SMBUS) += smbus_slave.o smbus_master.o
->>  common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
->>  common-obj-$(CONFIG_DDC) += i2c-ddc.o
->>  common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
->> -common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
->> +common-obj-$(CONFIG_ACPI_ICH9) += smbus_ich9.o
->>  common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
->>  common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
->>  common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
->> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
->> index 57e09a0cb8..19101d349f 100644
->> --- a/hw/isa/Kconfig
->> +++ b/hw/isa/Kconfig
->> @@ -50,4 +50,4 @@ config LPC_ICH9
->>      # for ICH9.
->>      select ISA_BUS
->>      select ACPI_SMBUS
->> -    select ACPI_X86_ICH
->> +    select ACPI_ICH9
+> > Apologies for taking this long to respond.
+> > 
 > 
+> No problem :)
+> 
+> > On Mon, 2019-04-08 at 14:27 +1000, David Gibson wrote:
+> > > On Tue, Apr 02, 2019 at 12:28:07PM +0200, Greg Kurz wrote:  
+> > > > The recent fixes around "host-serial" and "host-model" simply moved
+> > > > the decision to expose host data to the upper layer, ie. libvirt
+> > > > which should be involved in this discussion.  
+> > > 
+> > > Right, that's deliberate.  Note that roughly-equivalent information on
+> > > x86 is currently supplied via the SMBIOS.  OpenStack Nova sets that,
+> > > rather than qemu, and I'd like to move towards a common configuration
+> > > model with x86, though it's a fairly long path to there.
+> > > 
+> > > OpenStack had an equivalent security problem to our one, which it
+> > > addressed by taking the host serial from /etc/machine-id if present
+> > > rather than the real host info.  
+> > 
+> > IIUC the situation is a bit different between x86 and ppc64, because
+> > while for the latter SPAPR defines a way for the guest to access
+> > information about the host it's running on, that's not the case for
+> > the former, at least to the best of my knowledge.
+> > 
+> > What OpenStack is doing is reading the machine-id (if explicitly
+> > configured to do so: the default is to use the guest's own UUID[1])
+> > and exposing that as the *guest* serial, not as the *host* serial.
+> > 
+> 
+> Hmm... are you sure ? Daniel seems to be saying the opposite here:
+> 
+> https://bugs.launchpad.net/nova/+bug/1337349/comments/9
+
+Note my comment is from 2014, where as Andrea is describing OpenStack's
+impl in 2019 :-)
+
+Originally Nova would populate guest SMBIOS with a UUID taken
+from Host SMBIOS
+
+My fix for the security problem made it use host /etc/machine-id
+instead of Host SMBIOS when /etc/machine-id is available.
+
+In Nova 2018, Nova was changed to use the guest instance UUID
+instead of /etc/machine-id by default.
+
+Anyway the key factor is to *never* expose and UUID you get
+from the host hardware as vendors frequently treat these as
+semi-secret keys.
+
+If you need a UUID, it has to be software generated from
+somewhere and not otherwise need to be kept private.
+
+As long as QEMU lets this be configurable, libvirt can plumb
+it into its sysinfo XML and thus we can ultimately delegate
+the decision to the mgmt app like OpenStack.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
