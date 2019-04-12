@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38615)
+Received: from eggs.gnu.org ([209.51.188.92]:38693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEvF2-0001Hr-KB
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFM-0001ZC-CO
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEvF1-00020g-86
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFL-0002Fd-6C
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:32 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 12 Apr 2019 14:25:06 +0200
+Message-Id: <20190412122523.24111-1-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20190329111104.17223-1-berrange@redhat.com>
-	<20190329111104.17223-9-berrange@redhat.com>
-In-Reply-To: <20190329111104.17223-9-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Apr 2019 14:24:55 +0200
-Message-ID: <CAJ+F1CKt2O22sG1rQO61CGVt0WGwvFZgfWLQT_AR+1eXHYjmOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/14] qxl: avoid unaligned pointer
- reads/writes
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 00/17] vfio-ccw dasd ipl
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,175 +20,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Halil Pasic <pasic@linux.ibm.com>, Max Filippov <jcmvbkbc@gmail.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: cohuck@redhat.com, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com
 
-Hi
+This pull request is not for master.
 
-On Fri, Mar 29, 2019 at 12:20 PM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
->
-> The SPICE_RING_PROD_ITEM() macro is initializing a local
-> 'uint64_t *' variable to point to the 'el' field inside
-> the QXLReleaseRing struct. This uint64_t field is not
-> guaranteed aligned as the struct is packed.
->
-> Code should not take the address of fields within a
-> packed struct. Changing the SPICE_RING_PROD_ITEM()
-> macro to avoid taking the address of the field is
-> impractical. It is clearer to just remove the macro
-> and inline its functionality in the three call sites
-> that need it.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+ Hi Cornelia,
 
-I didn't notice your patch, I sent a different one which didn't inline
-as much code:
+the following changes since commit 532cc6da74ec25b5ba6893b5757c977d545829=
+49:
 
-https://patchew.org/QEMU/20190408201203.28924-1-marcandre.lureau@redhat.com=
-/
+  Update version for v4.0.0-rc3 release (2019-04-10 15:38:59 +0100)
 
-> ---
->  hw/display/qxl.c | 55 +++++++++++++++++++++---------------------------
->  1 file changed, 24 insertions(+), 31 deletions(-)
->
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index c8ce5781e0..5c38e6e906 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -33,24 +33,6 @@
->
->  #include "qxl.h"
->
-> -/*
-> - * NOTE: SPICE_RING_PROD_ITEM accesses memory on the pci bar and as
-> - * such can be changed by the guest, so to avoid a guest trigerrable
-> - * abort we just qxl_set_guest_bug and set the return to NULL. Still
-> - * it may happen as a result of emulator bug as well.
-> - */
-> -#undef SPICE_RING_PROD_ITEM
-> -#define SPICE_RING_PROD_ITEM(qxl, r, ret) {                             =
-\
-> -        uint32_t prod =3D (r)->prod & SPICE_RING_INDEX_MASK(r);         =
-  \
-> -        if (prod >=3D ARRAY_SIZE((r)->items)) {                         =
-  \
-> -            qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatc=
-h " \
-> -                          "%u >=3D %zu", prod, ARRAY_SIZE((r)->items)); =
-  \
-> -            ret =3D NULL;                                               =
-  \
-> -        } else {                                                        =
-\
-> -            ret =3D &(r)->items[prod].el;                               =
-  \
-> -        }                                                               =
-\
-> -    }
-> -
->  #undef SPICE_RING_CONS_ITEM
->  #define SPICE_RING_CONS_ITEM(qxl, r, ret) {                             =
-\
->          uint32_t cons =3D (r)->cons & SPICE_RING_INDEX_MASK(r);         =
-  \
-> @@ -414,7 +396,8 @@ static void init_qxl_rom(PCIQXLDevice *d)
->  static void init_qxl_ram(PCIQXLDevice *d)
->  {
->      uint8_t *buf;
-> -    uint64_t *item;
-> +    uint32_t prod;
-> +    QXLReleaseRing *ring;
->
->      buf =3D d->vga.vram_ptr;
->      d->ram =3D (QXLRam *)(buf + le32_to_cpu(d->shadow_rom.ram_header_off=
-set));
-> @@ -426,9 +409,12 @@ static void init_qxl_ram(PCIQXLDevice *d)
->      SPICE_RING_INIT(&d->ram->cmd_ring);
->      SPICE_RING_INIT(&d->ram->cursor_ring);
->      SPICE_RING_INIT(&d->ram->release_ring);
-> -    SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
-> -    assert(item);
-> -    *item =3D 0;
-> +
-> +    ring =3D &d->ram->release_ring;
-> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
-> +    assert(prod < ARRAY_SIZE(ring->items));
-> +    ring->items[prod].el =3D 0;
-> +
->      qxl_ring_set_dirty(d);
->  }
->
-> @@ -732,7 +718,7 @@ static int interface_req_cmd_notification(QXLInstance=
- *sin)
->  static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
->  {
->      QXLReleaseRing *ring =3D &d->ram->release_ring;
-> -    uint64_t *item;
-> +    uint32_t prod;
->      int notify;
->
->  #define QXL_FREE_BUNCH_SIZE 32
-> @@ -759,11 +745,15 @@ static inline void qxl_push_free_res(PCIQXLDevice *=
-d, int flush)
->      if (notify) {
->          qxl_send_events(d, QXL_INTERRUPT_DISPLAY);
->      }
-> -    SPICE_RING_PROD_ITEM(d, ring, item);
-> -    if (!item) {
-> +
-> +    ring =3D &d->ram->release_ring;
-> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
-> +    if (prod >=3D ARRAY_SIZE(ring->items)) {
-> +        qxl_set_guest_bug(d, "SPICE_RING_PROD_ITEM indices mismatch "
-> +                          "%u >=3D %zu", prod, ARRAY_SIZE(ring->items));
->          return;
->      }
-> -    *item =3D 0;
-> +    ring->items[prod].el =3D 0;
->      d->num_free_res =3D 0;
->      d->last_release =3D NULL;
->      qxl_ring_set_dirty(d);
-> @@ -775,7 +765,8 @@ static void interface_release_resource(QXLInstance *s=
-in,
->  {
->      PCIQXLDevice *qxl =3D container_of(sin, PCIQXLDevice, ssd.qxl);
->      QXLReleaseRing *ring;
-> -    uint64_t *item, id;
-> +    uint32_t prod;
-> +    uint64_t id;
->
->      if (ext.group_id =3D=3D MEMSLOT_GROUP_HOST) {
->          /* host group -> vga mode update request */
-> @@ -792,16 +783,18 @@ static void interface_release_resource(QXLInstance =
-*sin,
->       * pci bar 0, $command.release_info
->       */
->      ring =3D &qxl->ram->release_ring;
-> -    SPICE_RING_PROD_ITEM(qxl, ring, item);
-> -    if (!item) {
-> +    prod =3D ring->prod & SPICE_RING_INDEX_MASK(ring);
-> +    if (prod >=3D ARRAY_SIZE(ring->items)) {
-> +        qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatch "
-> +                          "%u >=3D %zu", prod, ARRAY_SIZE(ring->items));
->          return;
->      }
-> -    if (*item =3D=3D 0) {
-> +    if (ring->items[prod].el =3D=3D 0) {
->          /* stick head into the ring */
->          id =3D ext.info->id;
->          ext.info->next =3D 0;
->          qxl_ram_set_dirty(qxl, &ext.info->next);
-> -        *item =3D id;
-> +        ring->items[prod].el =3D id;
->          qxl_ring_set_dirty(qxl);
->      } else {
->          /* append item to the list */
-> --
-> 2.20.1
->
->
+are available in the Git repository at:
 
+  https://gitlab.com/huth/qemu.git tags/s390-ccw-bios-2019-04-12
 
---=20
-Marc-Andr=C3=A9 Lureau
+for you to fetch changes up to 4a33fac54665558b7f7a68135c4a4c602eceb72f:
+
+  pc-bios/s390: Update firmware images (2019-04-12 12:40:35 +0200)
+
+----------------------------------------------------------------
+Support for booting from a vfio-ccw passthrough dasd device
+----------------------------------------------------------------
+
+Jason J. Herne (16):
+      s390 vfio-ccw: Add bootindex property and IPLB data
+      s390-bios: decouple cio setup from virtio
+      s390-bios: decouple common boot logic from virtio
+      s390-bios: Clean up cio.h
+      s390-bios: Decouple channel i/o logic from virtio
+      s390-bios: Map low core memory
+      s390-bios: ptr2u32 and u32toptr
+      s390-bios: Support for running format-0/1 channel programs
+      s390-bios: cio error handling
+      s390-bios: Extend find_dev() for non-virtio devices
+      s390-bios: Factor finding boot device out of virtio code path
+      s390-bios: Refactor virtio to run channel programs via cio
+      s390-bios: Use control unit type to determine boot method
+      s390-bios: Add channel command codes/structs needed for dasd-ipl
+      s390-bios: Support booting from real dasd device
+      s390-bios: Use control unit type to find bootable devices
+
+Thomas Huth (1):
+      pc-bios/s390: Update firmware images
+
+ MAINTAINERS                  |   2 +
+ docs/devel/s390-dasd-ipl.txt | 133 ++++++++++++++
+ hw/s390x/ipl.c               |  61 +++++--
+ hw/s390x/s390-ccw.c          |   9 +
+ hw/vfio/ccw.c                |   6 +-
+ include/hw/s390x/s390-ccw.h  |   1 +
+ include/hw/s390x/vfio-ccw.h  |  28 +++
+ pc-bios/s390-ccw.img         | Bin 34568 -> 42608 bytes
+ pc-bios/s390-ccw/Makefile    |   2 +-
+ pc-bios/s390-ccw/cio.c       | 423 +++++++++++++++++++++++++++++++++++++=
+++++++
+ pc-bios/s390-ccw/cio.h       | 270 +++++++++++++++++++++------
+ pc-bios/s390-ccw/dasd-ipl.c  | 235 ++++++++++++++++++++++++
+ pc-bios/s390-ccw/dasd-ipl.h  |  16 ++
+ pc-bios/s390-ccw/helper.h    |  31 ++++
+ pc-bios/s390-ccw/libc.h      |  11 ++
+ pc-bios/s390-ccw/main.c      | 190 +++++++++++++------
+ pc-bios/s390-ccw/netboot.mak |   2 +-
+ pc-bios/s390-ccw/netmain.c   |   2 +
+ pc-bios/s390-ccw/s390-arch.h | 103 +++++++++++
+ pc-bios/s390-ccw/s390-ccw.h  |  10 +-
+ pc-bios/s390-ccw/start.S     |  29 +++
+ pc-bios/s390-ccw/virtio.c    |  81 +++------
+ pc-bios/s390-netboot.img     | Bin 54944 -> 67232 bytes
+ tests/boot-serial-test.c     |   2 +-
+ 24 files changed, 1446 insertions(+), 201 deletions(-)
+ create mode 100644 docs/devel/s390-dasd-ipl.txt
+ create mode 100644 include/hw/s390x/vfio-ccw.h
+ create mode 100644 pc-bios/s390-ccw/cio.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+ create mode 100644 pc-bios/s390-ccw/helper.h
+ create mode 100644 pc-bios/s390-ccw/s390-arch.h
