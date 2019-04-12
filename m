@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 711E6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13537C10F14
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:08:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36C3E20869
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:08:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C3E20869
+	by mail.kernel.org (Postfix) with ESMTPS id DCD1420869
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD1420869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40261 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40263 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEzfS-00052d-Di
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:08:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54627)
+	id 1hEzfU-00053r-3h
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:08:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzSL-0001QX-Tw
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:14 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEzSN-0001SA-L0
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzSK-000859-Lg
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45774)
+	(envelope-from <philmd@redhat.com>) id 1hEzSM-00089n-FG
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hEzSD-0007na-WF; Fri, 12 Apr 2019 12:55:07 -0400
+	id 1hEzSJ-00081h-Jo; Fri, 12 Apr 2019 12:55:11 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 442ED3099FD3;
-	Fri, 12 Apr 2019 16:55:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C718F59463;
+	Fri, 12 Apr 2019 16:55:10 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-66.brq.redhat.com [10.40.204.66])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8726D60BEC;
-	Fri, 12 Apr 2019 16:54:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C393C60BEC;
+	Fri, 12 Apr 2019 16:55:03 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Date: Fri, 12 Apr 2019 18:54:15 +0200
-Message-Id: <20190412165416.7977-12-philmd@redhat.com>
+Date: Fri, 12 Apr 2019 18:54:16 +0200
+Message-Id: <20190412165416.7977-13-philmd@redhat.com>
 In-Reply-To: <20190412165416.7977-1-philmd@redhat.com>
 References: <20190412165416.7977-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 12 Apr 2019 16:55:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 12 Apr 2019 16:55:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 11/12] hw/net/lan9118: Export TYPE_LAN9118
- and use it instead of hardcoded string
+Subject: [Qemu-devel] [PATCH v3 12/12] hw/devices: Move SMSC 91C111
+ declaration into a new header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,91 +73,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
 	Igor Mitsyanko <i.mitsyanko@gmail.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org,
-	Jan Kiszka <jan.kiszka@web.de>
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+	qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412165415.NC0ctqrSg2hYavHdevqMYA_qTLYCVVPEDkd79S5CzlM@z>
+Message-ID: <20190412165416._oga-fFo-8z99Ykmo3WH6NiFQthKGfQrzZTEQIxzCfA@z>
+
+This commit finally deletes "hw/devices.h".
 
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/exynos4_boards.c  | 3 ++-
- hw/arm/mps2-tz.c         | 3 ++-
- hw/net/lan9118.c         | 1 -
- include/hw/net/lan9118.h | 2 ++
- 4 files changed, 6 insertions(+), 3 deletions(-)
+ hw/arm/gumstix.c           |  2 +-
+ hw/arm/integratorcp.c      |  2 +-
+ hw/arm/mainstone.c         |  2 +-
+ hw/arm/realview.c          |  2 +-
+ hw/arm/versatilepb.c       |  2 +-
+ hw/net/smc91c111.c         |  2 +-
+ include/hw/devices.h       | 11 -----------
+ include/hw/net/smc91c111.h | 19 +++++++++++++++++++
+ 8 files changed, 25 insertions(+), 17 deletions(-)
+ delete mode 100644 include/hw/devices.h
+ create mode 100644 include/hw/net/smc91c111.h
 
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index 750162cc95a..ea8100f65a8 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -32,6 +32,7 @@
- #include "hw/arm/arm.h"
- #include "exec/address-spaces.h"
- #include "hw/arm/exynos4210.h"
-+#include "hw/net/lan9118.h"
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index 79886ce3787..343cbfd7da8 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -40,7 +40,7 @@
+ #include "hw/arm/pxa.h"
+ #include "net/net.h"
+ #include "hw/block/flash.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
  #include "hw/boards.h"
-=20
- #undef DEBUG
-@@ -92,7 +93,7 @@ static void lan9215_init(uint32_t base, qemu_irq irq)
-     /* This should be a 9215 but the 9118 is close enough */
-     if (nd_table[0].used) {
-         qemu_check_nic_model(&nd_table[0], "lan9118");
--        dev =3D qdev_create(NULL, "lan9118");
-+        dev =3D qdev_create(NULL, TYPE_LAN9118);
-         qdev_set_nic_properties(dev, &nd_table[0]);
-         qdev_prop_set_uint32(dev, "mode_16bit", 1);
-         qdev_init_nofail(dev);
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index f79f090a4ac..7832408bb70 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -56,6 +56,7 @@
- #include "hw/arm/armsse.h"
- #include "hw/dma/pl080.h"
- #include "hw/ssi/pl022.h"
-+#include "hw/net/lan9118.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index 4eceebb9ea7..0b6f24465e4 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -12,10 +12,10 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+-#include "hw/devices.h"
+ #include "hw/boards.h"
+ #include "hw/arm/arm.h"
+ #include "hw/misc/arm_integrator_debug.h"
++#include "hw/net/smc91c111.h"
  #include "net/net.h"
- #include "hw/core/split-irq.h"
-=20
-@@ -244,7 +245,7 @@ static MemoryRegion *make_eth_dev(MPS2TZMachineState =
-*mms, void *opaque,
-      * except that it doesn't support the checksum-offload feature.
-      */
-     qemu_check_nic_model(nd, "lan9118");
--    mms->lan9118 =3D qdev_create(NULL, "lan9118");
-+    mms->lan9118 =3D qdev_create(NULL, TYPE_LAN9118);
-     qdev_set_nic_properties(mms->lan9118, nd);
-     qdev_init_nofail(mms->lan9118);
-=20
-diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
-index a428b16eda5..b29e3fee49f 100644
---- a/hw/net/lan9118.c
-+++ b/hw/net/lan9118.c
-@@ -175,7 +175,6 @@ static const VMStateDescription vmstate_lan9118_packe=
-t =3D {
-     }
- };
-=20
--#define TYPE_LAN9118 "lan9118"
- #define LAN9118(obj) OBJECT_CHECK(lan9118_state, (obj), TYPE_LAN9118)
-=20
- typedef struct {
-diff --git a/include/hw/net/lan9118.h b/include/hw/net/lan9118.h
-index d13d8cd3d22..500acb4c143 100644
---- a/include/hw/net/lan9118.h
-+++ b/include/hw/net/lan9118.h
-@@ -14,6 +14,8 @@
- #include "hw/irq.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+index e96738ad267..c1cec590379 100644
+--- a/hw/arm/mainstone.c
++++ b/hw/arm/mainstone.c
+@@ -18,7 +18,7 @@
+ #include "hw/arm/pxa.h"
+ #include "hw/arm/arm.h"
  #include "net/net.h"
-=20
-+#define TYPE_LAN9118 "lan9118"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "hw/boards.h"
+ #include "hw/block/flash.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index e9983c87639..05a244df255 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -14,8 +14,8 @@
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+-#include "hw/devices.h"
+ #include "hw/net/lan9118.h"
++#include "hw/net/smc91c111.h"
+ #include "hw/pci/pci.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index d67181810a6..25166e15171 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -13,7 +13,7 @@
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/pci/pci.h"
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index 99da2d92973..d19ea0750d3 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -10,7 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
+ #include "net/net.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "qemu/log.h"
+ /* For crc32 */
+ #include <zlib.h>
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+deleted file mode 100644
+index ebc45c87997..00000000000
+--- a/include/hw/devices.h
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#ifndef QEMU_DEVICES_H
+-#define QEMU_DEVICES_H
+-
+-/* Devices that have nowhere better to go.  */
+-
+-#include "hw/hw.h"
+-
+-/* smc91c111.c */
+-void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
+-
+-#endif
+diff --git a/include/hw/net/smc91c111.h b/include/hw/net/smc91c111.h
+new file mode 100644
+index 00000000000..a66ba4112f8
+--- /dev/null
++++ b/include/hw/net/smc91c111.h
+@@ -0,0 +1,19 @@
++/*
++ * SMSC 91C111 Ethernet interface emulation
++ *
++ * Copyright (c) 2005 CodeSourcery, LLC.
++ * Written by Paul Brook
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
- void lan9118_init(NICInfo *, uint32_t, qemu_irq);
-=20
- #endif
++#ifndef HW_NET_SMC91C111_H
++#define HW_NET_SMC91C111_H
++
++#include "hw/irq.h"
++#include "net/net.h"
++
++void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
++
++#endif
 --=20
 2.20.1
 
