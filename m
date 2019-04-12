@@ -2,68 +2,91 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6487BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C2EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3375420818
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:27:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3375420818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05E0C20818
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:29:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OWQeU9mD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E0C20818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41057 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41063 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF0tp-0007jo-HM
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 14:27:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43504)
+	id 1hF0vq-0008OE-8s
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 14:29:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hF0rn-0006BB-4j
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:25:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF0v1-00086b-9R
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hF0rk-0005KK-VY
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:25:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hF0rf-0005Ds-GT
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:25:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 11D2E81224
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 18:25:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2282E1001E85;
-	Fri, 12 Apr 2019 18:25:18 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id AD7781138648; Fri, 12 Apr 2019 20:25:16 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-9-armbru@redhat.com>
-	<20190412174441.GM2906@work-vm>
-Date: Fri, 12 Apr 2019 20:25:16 +0200
-In-Reply-To: <20190412174441.GM2906@work-vm> (David Alan Gilbert's message of
-	"Fri, 12 Apr 2019 18:44:42 +0100")
-Message-ID: <878swfjd2r.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF0uz-0007lO-Rq
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:28:55 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hF0uy-0007jQ-8J
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:28:52 -0400
+Received: by mail-pf1-x441.google.com with SMTP id i17so5536118pfo.6
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 11:28:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=u22TI8aGE201MHP/OXllpFEp709nPk7U1TNnoCoADKc=;
+	b=OWQeU9mDrSJFyQqq6v756nVY5Cx6u9zSh3hLVxxJctxo1ceSg7qC9SlbVaBuTj/Ynz
+	Nl7Na8Pkz+CO4Yr5F6RDv0loGBV0BgUZwo8KPgYM9FqbZbF+O75gT2+PuuvzxpDq8zul
+	8ohN+8aQZpbMJnFppBFjuvR9G9fEbIewkXGdb9kWmnZe4x7YC2uhlLFhK0QX7hE158k9
+	zflv3bdWmN7qXBEpj7tPHq/WMFsPS98D2m5cy8RCbFsN90xAAuvZt18D1kphdl5gBtkP
+	z3Y4LNbF77Y6P9IUGsyt1Gw9mzejmH6ajcy+d9a8hYDrt4Bd+oGokxMJ0pqViJWteItQ
+	g8Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=u22TI8aGE201MHP/OXllpFEp709nPk7U1TNnoCoADKc=;
+	b=KJLOl4fWFE6ISEQnGU0PE22Jo/b0fGdYWL1ZZ83em3pbxI7VTFrkYZmRh+5FStTGYq
+	AmJEysJ5C1E1qMVF6159wiou0b/7C95CDY0PaOam4kD9b9etQL/KzH1Zk381t/sjS2Je
+	/2az737sFUXUX0yMbTnonnwG+pnXTWMfQ8yZnRD36r+A8HwKHmrvN1NqLpw8SELP0qtA
+	Y1vUaG/d5wxkqX2TfZk4kdup/Vn3Ip8xHy7jYy+Zudw4gt2frzuJSr4e8L5Uwnoz/TTD
+	XTHg9stXDm47loTd94zbZvggj4NeFdMy/GCkEMLGxZCpaiAcFWIoz4+UBMvtOHSbAMVX
+	tnAw==
+X-Gm-Message-State: APjAAAWNSS1N9op6s9+OBMGHqvwhi2lxpiOAnSyXLdqyk3bHy+kH4MwN
+	6ycz3HQKmd9a//bBDI1mzFzNpw==
+X-Google-Smtp-Source: APXvYqywWud8DZHg5/saFB14ka+dSA0RhHm5aZSEAudQdGVtQlh0muVjwmPt9IxpAQ/Dlt7On7J/Qg==
+X-Received: by 2002:a63:1a42:: with SMTP id a2mr52577290pgm.358.1555093730726; 
+	Fri, 12 Apr 2019 11:28:50 -0700 (PDT)
+Received: from [192.168.3.43] (rrcs-173-197-98-123.west.biz.rr.com.
+	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
+	g64sm99069416pfg.13.2019.04.12.11.28.48
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 12 Apr 2019 11:28:50 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-3-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <5b6300d8-7a3b-7325-e79c-c2821a3b282c@linaro.org>
+Date: Fri, 12 Apr 2019 08:28:45 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190411100836.646-3-david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 12 Apr 2019 18:25:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 08/17] memory: Clean up how mtree_info()
- prints
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1 02/41] s390x/tcg: Implement VECTOR ADD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,37 +98,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412182516.y4CeKsdwlNfoQvR-8_tHyg-IXXURnYqvY4_yUEjhURk@z>
+Message-ID: <20190412182845.jhZAwBjNRTyZPO2TDPx7j7j8iWcB9hXbX5iJKvlDRzc@z>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On 4/11/19 12:07 AM, David Hildenbrand wrote:
+> Introduce two types of fancy new helpers that will be reused a couple of
+> times
+> 
+> 1. gen_gvec_fn_3: Call an existing tcg_gen_gvec_X function with 3
+>    parameters, simplifying parameter passing
+> 2. gen_gvec128_3_i64: Call a function that performs 128 bit calculations
+>    using two 64 bit values per vector.
+> 
+> Luckily, for VECTOR ADD we already have everything we need.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  5 ++++
+>  target/s390x/translate_vx.inc.c | 52 +++++++++++++++++++++++++++++++++
+>  2 files changed, 57 insertions(+)
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> dump_drift_info() takes an fprintf()-like callback and a FILE * to
->
-> ^^^^^^^^^^^^^^^^^^^ looks like the wrong function for this patch?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Pasto, will fix.
 
->> pass to it, and so do its helper functions.  Passing around callback
->> and argument is rather tiresome.
->> 
->> Its only caller hmp_info_mtree() passes monitor_printf() cast to
->> fprintf_function and the current monitor cast to FILE *.
->> 
->> The type-punning is technically undefined behaviour, but works in
->> practice.  Clean up: drop the callback, and call qemu_printf()
->> instead.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> Other than the function name above,
->
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
+r~
 
