@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36219)
+Received: from eggs.gnu.org ([209.51.188.92]:36252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEv6p-0002mH-2p
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:44 -0400
+	(envelope-from <berrange@redhat.com>) id 1hEv6s-0002o6-Eg
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEv6n-0004Yv-Vp
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50832)
+	(envelope-from <berrange@redhat.com>) id 1hEv6r-0004bs-Hv
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEv6n-0004Yg-NB
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:41 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEv6r-0004bU-BG
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:45 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 12 Apr 2019 13:16:24 +0100
-Message-Id: <20190412121626.19829-4-berrange@redhat.com>
+Date: Fri, 12 Apr 2019 13:16:25 +0100
+Message-Id: <20190412121626.19829-5-berrange@redhat.com>
 In-Reply-To: <20190412121626.19829-1-berrange@redhat.com>
 References: <20190412121626.19829-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/5] sockets: avoid string truncation
- warnings when copying UNIX path
+Subject: [Qemu-devel] [PATCH v2 4/5] hw/usb: avoid format truncation warning
+ when formatting port name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +30,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-In file included from /usr/include/string.h:494,
-                 from include/qemu/osdep.h:101,
-                 from util/qemu-sockets.c:18:
-In function =E2=80=98strncpy=E2=80=99,
-    inlined from =E2=80=98unix_connect_saddr.isra.0=E2=80=99 at util/qemu=
--sockets.c:925:5:
-/usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringop-=
-truncation]
-  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
-dest));
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-In function =E2=80=98strncpy=E2=80=99,
-    inlined from =E2=80=98unix_listen_saddr.isra.0=E2=80=99 at util/qemu-=
-sockets.c:880:5:
-/usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringop-=
-truncation]
-  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
-dest));
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+hw/usb/hcd-xhci.c: In function =E2=80=98usb_xhci_realize=E2=80=99:
+hw/usb/hcd-xhci.c:3339:66: warning: =E2=80=98%d=E2=80=99 directive output=
+ may be truncated writing between 1 and 10 bytes into a region of size 5 =
+[-Wformat-trunca\
+tion=3D]
+ 3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #=
+%d", i+1);
+      |                                                                  =
+^~
+hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147=
+483647]
+ 3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #=
+%d", i+1);
+      |                                                      ^~~~~~~~~~~~=
+~~~
 
-We are already validating the UNIX socket path length earlier in
-the functions. If we save this string length when we first check
-it, then we can simply use memcpy instead of strcpy later, avoiding
-the gcc truncation warnings.
+The xhci code formats the port name into a fixed length
+buffer which is only large enough to hold port numbers
+upto 5 digits in decimal representation. We're never
+going to have a port number that large, so aserting the
+port number is sensible is sufficient to tell GCC the
+formatted string won't be truncated.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- util/qemu-sockets.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ hw/usb/hcd-xhci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 9705051690..ba6335e71a 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -830,6 +830,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
-,
-     int sock, fd;
-     char *pathbuf =3D NULL;
-     const char *path;
-+    size_t pathlen;
-=20
-     sock =3D qemu_socket(PF_UNIX, SOCK_STREAM, 0);
-     if (sock < 0) {
-@@ -845,7 +846,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
-,
-         path =3D pathbuf =3D g_strdup_printf("%s/qemu-socket-XXXXXX", tm=
-pdir);
-     }
-=20
--    if (strlen(path) > sizeof(un.sun_path)) {
-+    pathlen =3D strlen(path);
-+    if (pathlen > sizeof(un.sun_path)) {
-         error_setg(errp, "UNIX socket path '%s' is too long", path);
-         error_append_hint(errp, "Path must be less than %zu bytes\n",
-                           sizeof(un.sun_path));
-@@ -877,7 +879,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
-,
-=20
-     memset(&un, 0, sizeof(un));
-     un.sun_family =3D AF_UNIX;
--    strncpy(un.sun_path, path, sizeof(un.sun_path));
-+    memcpy(un.sun_path, path, pathlen);
-=20
-     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
-         error_setg_errno(errp, errno, "Failed to bind socket to %s", pat=
-h);
-@@ -901,6 +903,7 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
-r, Error **errp)
- {
-     struct sockaddr_un un;
-     int sock, rc;
-+    size_t pathlen;
-=20
-     if (saddr->path =3D=3D NULL) {
-         error_setg(errp, "unix connect: no path specified");
-@@ -913,7 +916,8 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
-r, Error **errp)
-         return -1;
-     }
-=20
--    if (strlen(saddr->path) > sizeof(un.sun_path)) {
-+    pathlen =3D strlen(saddr->path);
-+    if (pathlen > sizeof(un.sun_path)) {
-         error_setg(errp, "UNIX socket path '%s' is too long", saddr->pat=
-h);
-         error_append_hint(errp, "Path must be less than %zu bytes\n",
-                           sizeof(un.sun_path));
-@@ -922,7 +926,7 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
-r, Error **errp)
-=20
-     memset(&un, 0, sizeof(un));
-     un.sun_family =3D AF_UNIX;
--    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
-+    memcpy(un.sun_path, saddr->path, pathlen);
-=20
-     /* connect to peer */
-     do {
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index ec28bee319..7222f9b1af 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3336,6 +3336,7 @@ static void usb_xhci_init(XHCIState *xhci)
+                 USB_SPEED_MASK_LOW  |
+                 USB_SPEED_MASK_FULL |
+                 USB_SPEED_MASK_HIGH;
++            assert(i < MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+=
+1);
+             speedmask |=3D port->speedmask;
+         }
+@@ -3349,6 +3350,7 @@ static void usb_xhci_init(XHCIState *xhci)
+             }
+             port->uport =3D &xhci->uports[i];
+             port->speedmask =3D USB_SPEED_MASK_SUPER;
++            assert(i < MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb3 port #%d", i+=
+1);
+             speedmask |=3D port->speedmask;
+         }
 --=20
 2.20.1
