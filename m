@@ -2,75 +2,66 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EC6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E1FC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1351D2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:21:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1351D2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4B97B206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:25:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B97B206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37025 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEw7Z-00037N-Tb
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:21:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59029)
+	id 1hEwBU-0004Pj-DU
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:25:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEw6i-0002is-Ca
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1hEwAQ-00043O-IA
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEw6h-00075W-7t
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEw6g-00074y-Vt
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEw6g-0002Vt-5R
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 263F02E8055
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:20:38 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1hEwAP-0002oe-CF
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEwAP-0002oE-1c
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:24:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2070E8B12F;
+	Fri, 12 Apr 2019 13:24:28 +0000 (UTC)
+Received: from redhat.com (ovpn-112-27.ams2.redhat.com [10.36.112.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C2F495D706;
+	Fri, 12 Apr 2019 13:24:23 +0000 (UTC)
+Date: Fri, 12 Apr 2019 14:24:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Pu Wen <puwen@hygon.cn>
+Message-ID: <20190412132420.GM25308@redhat.com>
+References: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Apr 2019 13:05:50 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange pmaydell sathnaga
-X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
-Message-Id:
- <155507435071.21199.7681837677035503882.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: f373adc9a014e59e3f27dfb02af892d258c97f84
+Content-Disposition: inline
+In-Reply-To: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 12 Apr 2019 13:24:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
- =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
- =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
- =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH RFC] i386: Add new Hygon 'Dhyana' and
+ 'Dhyana-IBPB' CPU models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,55 +70,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, qemu-devel@nongnu.org,
+	ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412130550.V7n9PgqKQqTtJQ0DYXtSGgUjXEFeFfcHfnanxdI1b4A@z>
+Message-ID: <20190412132420.U-hQCzsHAqUGbGgOSGKSocU2tbLaTPBsxc3smiEJy1o@z>
 
-As a workaround, the simplest thing is to configure with --disable-
-werror, which will reduce these from errors to warnings. (This is the
-default if you're building from one of our release tarballs, but for
-builds from git we default to making all warnings into errors so we
-catch and fix them quickly.)
+On Fri, Apr 12, 2019 at 08:37:49PM +0800, Pu Wen wrote:
+> Add two new base CPU models called 'Dhyana' and 'Dhyana-IBPB' to model
+> processors from Hygon Dhyana (family 18h), which derived from AMD EPYC
+> (family 17h). 'Dhyana-IBPB' is a copy of the 'Dhyana' CPU model with
+> just CPUID_8000_0008_EBX_IBPB added.
 
--- =
+Do we really need to support both CPU variants ?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824528
+The IBPB feature is the Spectre fix which dates from January 2018.
+Having both made (limited) sense for EPYC as EPYC CPUs existed
+already, so there would be a mix of EPYC CPUs with and without the
+microcode that adds IBPB.
 
-Title:
-  qemu fails to compile on gcc 9 `error: taking address of packed member
-  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
-r value
-  [-Werror=3Daddress-of-packed-member]`
+The Google results I see suggest that Dhyana CPUs started to become
+available in July 2018, so surely they would come with microcode
+that has the IBPB right from day 1 ?
 
-Status in QEMU:
-  New
+Am I missing anything that means there will be a compelling need
+to support Dhyana /without/ IBPB ?
 
-Bug description:
-  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
-20190328)
-  repo: https://github.com/qemu/qemu.git
-  branch: master
-  commit e1be98540ee672ef93292b65a986055512237c35
+If not, then we only need 1 CPU model and that would include IBPB.
 
-  =
-
-    CC      net/dump.o
-  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
-  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
-=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
-[-Werror=3Daddress-of-packed-member]
-   1708 |                             dataset->filename);
-        |                             ~~~~~~~^~~~~~~~~~
-  cc1: all warnings being treated as errors
-    CC      net/eth.o
-  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
-  make: *** Waiting for unfinished jobs....
-    CC      net/announce.o
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
