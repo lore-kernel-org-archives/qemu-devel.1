@@ -2,72 +2,75 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA58C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EC6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2CEE2082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:13:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2CEE2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1351D2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:21:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1351D2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36613 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37025 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEw0E-00016o-7E
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:13:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56083)
+	id 1hEw7Z-00037N-Tb
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:21:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jmoyer@redhat.com>) id 1hEvzS-0000jL-7m
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:13:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1hEw6i-0002is-Ca
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jmoyer@redhat.com>) id 1hEvzI-0002Cp-4u
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:13:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jmoyer@redhat.com>) id 1hEvzD-00027r-TQ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:12:56 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83CB5C05681F;
-	Fri, 12 Apr 2019 13:12:26 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com
-	(segfault.boston.devel.redhat.com [10.19.60.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 537D519C6F;
-	Fri, 12 Apr 2019 13:12:11 +0000 (UTC)
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Jan Kara <jack@suse.cz>
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-2-pagupta@redhat.com>
-	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
-	<20190412083230.GA29850@quack2.suse.cz>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date: Fri, 12 Apr 2019 09:12:10 -0400
-In-Reply-To: <20190412083230.GA29850@quack2.suse.cz> (Jan Kara's message of
-	"Fri, 12 Apr 2019 10:32:30 +0200")
-Message-ID: <x494l73z7th.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <bounces@canonical.com>) id 1hEw6h-00075W-7t
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hEw6g-00074y-Vt
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:20:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hEw6g-0002Vt-5R
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 263F02E8055
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:20:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Fri, 12 Apr 2019 13:12:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Apr 2019 13:05:50 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange pmaydell sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
+Message-Id:
+ <155507435071.21199.7681837677035503882.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: f373adc9a014e59e3f27dfb02af892d258c97f84
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
- support
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
+ =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
+ =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
+ =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,58 +79,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pagupta@redhat.com>, cohuck@redhat.com,
-	KVM list <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	virtualization@lists.linux-foundation.org,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>,
-	Vishal L Verma <vishal.l.verma@intel.com>,
-	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
-	Rik van Riel <riel@surriel.com>, yuval.shaia@oracle.com,
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Dan Williams <dan.j.williams@intel.com>, lcapitulino@redhat.com,
-	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Darrick J.
-	Wong" <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-xfs <linux-xfs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Igor Mammedov <imammedo@redhat.com>
+Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412131210.eNAKXcgeAqwRdQWzpvo14Y6IUpsGWxemnN_gFSKaMjY@z>
+Message-ID: <20190412130550.V7n9PgqKQqTtJQ0DYXtSGgUjXEFeFfcHfnanxdI1b4A@z>
 
-Jan Kara <jack@suse.cz> writes:
+As a workaround, the simplest thing is to configure with --disable-
+werror, which will reduce these from errors to warnings. (This is the
+default if you're building from one of our release tarballs, but for
+builds from git we default to making all warnings into errors so we
+catch and fix them quickly.)
 
-> On Thu 11-04-19 07:51:48, Dan Williams wrote:
->> On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
->> > +       } else {
->> > +               if (nd_region->flush(nd_region))
->> > +                       rc = -EIO;
->> 
->> Given the common case wants to be fast and synchronous I think we
->> should try to avoid retpoline overhead by default. So something like
->> this:
->> 
->> if (nd_region->flush == generic_nvdimm_flush)
->>     rc = generic_nvdimm_flush(...);
->
-> I'd either add a comment about avoiding retpoline overhead here or just
-> make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
-> get confused by the code.
+-- =
 
-Isn't this premature optimization?  I really don't like adding things
-like this without some numbers to show it's worth it.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824528
 
--Jeff
+Title:
+  qemu fails to compile on gcc 9 `error: taking address of packed member
+  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
+r value
+  [-Werror=3Daddress-of-packed-member]`
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
+20190328)
+  repo: https://github.com/qemu/qemu.git
+  branch: master
+  commit e1be98540ee672ef93292b65a986055512237c35
+
+  =
+
+    CC      net/dump.o
+  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
+[-Werror=3Daddress-of-packed-member]
+   1708 |                             dataset->filename);
+        |                             ~~~~~~~^~~~~~~~~~
+  cc1: all warnings being treated as errors
+    CC      net/eth.o
+  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
+  make: *** Waiting for unfinished jobs....
+    CC      net/announce.o
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
 
