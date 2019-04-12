@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33059)
+Received: from eggs.gnu.org ([209.51.188.92]:33189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF4CN-00034G-WE
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:04 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4D2-0003LY-33
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF4CN-0004ez-0e
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:03 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40005)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4D1-00054S-3h
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:44 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:44352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hF4CM-0004eJ-Cc
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:02 -0400
-Received: by mail-pg1-x541.google.com with SMTP id d31so5801992pgl.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:59:02 -0700 (PDT)
+	id 1hF4D0-00053k-Mr
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:43 -0400
+Received: by mail-pg1-x533.google.com with SMTP id i2so5794243pgj.11
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:59:42 -0700 (PDT)
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-6-david@redhat.com>
+	<20190411100836.646-7-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fed7735f-6d51-f84d-8160-6967ffec2338@linaro.org>
-Date: Fri, 12 Apr 2019 11:58:56 -1000
+Message-ID: <36247480-36e1-e1ea-c58e-93fe9c472a20@linaro.org>
+Date: Fri, 12 Apr 2019 11:59:37 -1000
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-6-david@redhat.com>
+In-Reply-To: <20190411100836.646-7-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 05/41] s390x/tcg: Implement VECTOR ADD
- WITH CARRY COMPUTE CARRY
+Subject: Re: [Qemu-devel] [PATCH v1 06/41] s390x/tcg: Implement VECTOR AND
+ (WITH COMPLEMENT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +36,15 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 On 4/11/19 12:08 AM, David Hildenbrand wrote:
-> +static DisasJumpType op_vaccc(DisasContext *s, DisasOps *o)
-> +{
-> +    if (get_field(s->fields, m5) != ES_128) {
-> +        gen_program_exception(s, PGM_SPECIFICATION);
-> +        return DISAS_NORETURN;
-> +    }
-> +
-> +    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
-> +                   get_field(s->fields, v3), get_field(s->fields, v4), 0,
-> +                   gen_helper_gvec_vaccc128);
-> +    return DISAS_NEXT;
-> +}
+> Easy, as we can reuse existing gvec helpers.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/insn-data.def      |  4 ++++
+>  target/s390x/translate_vx.inc.c | 14 ++++++++++++++
+>  2 files changed, 18 insertions(+)
 
-An inline expansion could be
-
-One possible expansion is
-
-  tcg_gen_andi_i64(tl, cl, 1);
-  tcg_gen_add2_i64(tl, th, tl, zero, al, zero);
-  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
-  tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
-  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
-  /* carry out in th */
-
-This is 8 insns for the addition vs the hw optimal 6, but we're not exactly an
-optimizing compiler either.  ;-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
