@@ -2,64 +2,67 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46241C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6761C10F14
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5E02171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:02:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5E02171F
+	by mail.kernel.org (Postfix) with ESMTPS id 7AF962077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 18:13:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF962077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40830 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40916 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF0VS-0008OZ-F6
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 14:02:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39924)
+	id 1hF0ft-0002wB-9J
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 14:13:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0UW-00080z-HM
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:01:33 -0400
+	(envelope-from <crobinso@redhat.com>) id 1hF0f7-0002d4-DF
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0UV-0003pp-HO
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:01:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58354)
+	(envelope-from <crobinso@redhat.com>) id 1hF0f5-0006cC-IV
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:12:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56004)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0UV-0003pJ-AW
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:01:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1hF0f3-0006YP-Jm
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 14:12:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A21B13082E5F
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 18:01:30 +0000 (UTC)
-Received: from work-vm (unknown [10.36.117.255])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EBFDF60BEC;
-	Fri, 12 Apr 2019 18:01:29 +0000 (UTC)
-Date: Fri, 12 Apr 2019 19:01:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190412180127.GR2906@work-vm>
-References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-16-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 779FA307D913;
+	Fri, 12 Apr 2019 18:12:22 +0000 (UTC)
+Received: from [10.10.124.235] (ovpn-124-235.rdu2.redhat.com [10.10.124.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BCA53608E1;
+	Fri, 12 Apr 2019 18:12:21 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <f61645d0b3720a039423532d49dd65588d9bccd8.1554919328.git.crobinso@redhat.com>
+	<4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
+	<20190412122133.GG4522@linux.fritz.box>
+	<663b6339-d82d-17a8-8351-0cd10ed4fad7@redhat.com>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <7567f598-d3c6-5db1-5bac-11d71b2356be@redhat.com>
+Date: Fri, 12 Apr 2019 14:12:21 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <663b6339-d82d-17a8-8351-0cd10ed4fad7@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190411152520.10061-16-armbru@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 12 Apr 2019 18:01:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 12 Apr 2019 18:12:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 15/17] monitor: Clean up how
- monitor_disas() funnels output to monitor
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] hmp: delvm: use hmp_handle_error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,91 +74,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412180127._g4WI4YTXhMTG8qlqohLTclOZQFODMYt3r9lBc66ZDg@z>
+Message-ID: <20190412181221.vsV75A5Cs2f1UlQ1m5KJC_7T5u9_wnPKM3QaqwIYPTI@z>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> INIT_DISASSEMBLE_INFO() takes an fprintf()-like callback and a FILE *
-> to pass to it.  monitor_disas() passes monitor_fprintf() and the
-> current monitor cast to FILE *.  monitor_fprintf() casts it right
-> back, and is otherwise identical to monitor_printf().  The
-> type-pinning is ugly.
+On 4/12/19 10:55 AM, Eric Blake wrote:
+> On 4/12/19 7:21 AM, Kevin Wolf wrote:
+>> Am 10.04.2019 um 20:27 hat Eric Blake geschrieben:
+>>> On 4/10/19 1:03 PM, Cole Robinson wrote:
+>>>> This gives us the consistent 'Error:' prefix added in 66363e9a43f,
+>>>> which helps users like libvirt who still need to scrape hmp error
+>>>> messages to detect failure.
+>>>>
+>>>> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+>>>> ---
+>>>>  hmp.c | 7 ++++---
+>>>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>>
+>>> Not enough to drive -rc4 on its own, but worth adding to our wishlist of
+>>> potential easy patches if we do have a release blocker surface.
+>>
+>> As we are going to have an -rc4, I had a look at this.
+>>
+>> Commit 66363e9a43f was in February and explicitly says "Note: Some
+>> places don't use hmp_handle_error". So this doesn't seem to be a
+>> regression and even if it's fixed, it's likely not the last place that
+>> doesn't use the "Error:" prefix. This would suggest that this isn't for
+>> -rc4.
+>>
+>> Am I misunderstanding the situation?
 > 
-> Pass qemu_fprintf() and NULL instead.
-> 
-> monitor_fprintf() is now unused; delete it.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> No, I think your read is accurate, and delaying this to 4.1 is okay.
+>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Yup, this isn't really fixing any specific thing in libvirt, just a bit
+of future proofing
 
-> ---
->  disas.c                   |  3 ++-
->  include/monitor/monitor.h |  1 -
->  monitor.c                 | 11 -----------
->  3 files changed, 2 insertions(+), 13 deletions(-)
 > 
-> diff --git a/disas.c b/disas.c
-> index d9aa713a40..d15cceb863 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -3,6 +3,7 @@
->  #include "qemu-common.h"
->  #include "disas/bfd.h"
->  #include "elf.h"
-> +#include "qemu/qemu-print.h"
->  
->  #include "cpu.h"
->  #include "disas/disas.h"
-> @@ -609,7 +610,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
->      int count, i;
->      CPUDebug s;
->  
-> -    INIT_DISASSEMBLE_INFO(s.info, (FILE *)mon, monitor_fprintf);
-> +    INIT_DISASSEMBLE_INFO(s.info, NULL, qemu_fprintf);
->  
->      s.cpu = cpu;
->      s.info.read_memory_func
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index 316a168c41..86656297f1 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -31,7 +31,6 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp);
->  int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
->      GCC_FMT_ATTR(2, 0);
->  int monitor_printf(Monitor *mon, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-> -int monitor_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
->  void monitor_flush(Monitor *mon);
->  int monitor_set_cpu(int cpu_index);
->  int monitor_get_cpu_index(void);
-> diff --git a/monitor.c b/monitor.c
-> index ad6cec54a1..9b5f10b475 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -480,17 +480,6 @@ int monitor_printf(Monitor *mon, const char *fmt, ...)
->      return ret;
->  }
->  
-> -int monitor_fprintf(FILE *stream, const char *fmt, ...)
-> -{
-> -    int ret;
-> -
-> -    va_list ap;
-> -    va_start(ap, fmt);
-> -    ret = monitor_vprintf((Monitor *)stream, fmt, ap);
-> -    va_end(ap);
-> -    return ret;
-> -}
-> -
->  static void qmp_send_response(Monitor *mon, const QDict *rsp)
->  {
->      const QObject *data = QOBJECT(rsp);
-> -- 
-> 2.17.2
+>>>> +        error_prepend(&err,
+>>>> +                      "Error while deleting snapshot on device '%s': ",
+>>>
+>>> Do we want to reword the message (maybe s/Error while //) to avoid the
+>>> word "Error" twice in the same line?
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> especially since we still would want this resolved via a v2, rather than
+> taking this patch as-is.
+> 
+> 
+
+I'll send a v2 after 4.0 is out
+
+Thanks,
+Cole
 
