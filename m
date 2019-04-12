@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60869)
+Received: from eggs.gnu.org ([209.51.188.92]:35774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s.vogel@ewerk.com>) id 1hEunM-0004Gu-8l
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:56:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEv3O-00016Q-VZ
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s.vogel@ewerk.com>) id 1hEunI-0001D0-TL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:56:36 -0400
-Received: from gate5.ewerk.com ([212.122.40.189]:50841 helo=mail.ewerk.com)
+	(envelope-from <thuth@redhat.com>) id 1hEv3N-0003BH-Pa
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:13:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s.vogel@ewerk.com>) id 1hEunI-0001Bm-D2
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:56:32 -0400
-From: Sven Vogel <S.Vogel@ewerk.com>
-Date: Fri, 12 Apr 2019 11:56:20 +0000
-Message-ID: <B08130C1-0F79-48FD-B5A7-E3824D20C9FC@ewerk.com>
-Content-Language: de-DE
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hEv3M-0003Ax-Oz
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:13:09 -0400
+References: <87d0mwatbu.fsf@dusky.pond.sub.org>
+	<CAAdtpL6VCiXLbTWyJo4cbCNLjOCPr6KrH8KTqEq1V=CTMYKubQ@mail.gmail.com>
+	<6fe1a987-c3c5-3af5-74a4-fc4cd08d2380@redhat.com>
+	<2056cff2-78f8-1079-8d05-e758971d73ec@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <045d5528-116e-c71d-c29b-c070b7f660e3@redhat.com>
+Date: Fri, 12 Apr 2019 14:12:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] CentOS | OpenvSwitch problem with local bridge
+In-Reply-To: <2056cff2-78f8-1079-8d05-e758971d73ec@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Maintainers,
+ please tell us how to boot your machines!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>, Chris Wulff <crwulff@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Jia Liu <proljc@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Alistair Francis <alistair@alistair23.me>, Fabien Chouteau <chouteau@adacore.com>, Beniamino Galvani <b.galvani@gmail.com>, Paul Durrant <paul.durrant@citrix.com>, Peter Chubb <peter.chubb@nicta.com.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Stafford Horne <shorne@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Richard Henderson <rth@twiddle.net>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Cornelia Huck <cohuck@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Michael Walle <michael@walle.cc>, Thomas Huth <huth@tuxfamily.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGkgRGV2cywNCg0KV2UgdXNlIFJIRUwvQ2VudE9TIGFuZCBzaW5jZSBRRU1VIFZlcnNpb24gMi4x
-Mi4wIHdlIGhhdmUgcHJvYmxlbXMgd2l0aCBPcGVudlN3aXRjaCBhbmQgYSBsb2NhbCBicmlkZ2Uu
-DQoNCk5ldyBWZXJzaW9uOg0KLS0tLS0tLS0tLS0tLS0tLS0NCk9TIHZlcnNpb246ICAgICAgICAg
-ICAgIDcuNi4xODEwDQprZXJuZWwgdmVyc2lvbjogICAgICAgICAzLjEwLjAtOTU3LjUuMS5lbDcu
-eDg2XzY0DQpxZW11IHZlcnNpb246ICAgICAgICAgICAyLjEyLjANCmxpYnZpcnRkIHZlcnNpb246
-ICAgICAgIDUuMC4wDQpvcGVudnN3aXRjaCB2ZXJzaW9uOiAgICAyLjEwLjENCm9wZW52c3dpdGNo
-IGRiIHZlcnNpb246IDcuMTYuMQ0KDQpPbGQgVmVyc2lvbjoNCi0tLS0tLS0tLS0tLS0tLS0NCk9T
-IHZlcnNpb246IDcuNi4xODEwDQprZXJuZWwgdmVyc2lvbjogMy4xMC4wLTk1Ny41LjEuZWw3Lng4
-Nl82NA0KcWVtdSB2ZXJzaW9uOiAyLjEwLjAtMjEuZWw3XzUuNy4xDQpsaWJ2aXJ0ZCB2ZXJzaW9u
-OiA1LjAuMA0Kb3BlbnZzd2l0Y2ggdmVyc2lvbjogMi4xMC4xDQpvcGVudnN3aXRjaCBkYiB2ZXJz
-aW9uOiA3LjE2LjENCg0KV2UgdXNlIENsb3Vkc3RhY2sgYW5kIHRoZSB2aXJ0dWFsIHJvdXRlciB3
-aWxsIGNyZWF0ZSBhIHZuZXQgZm9yIGludGVybmFsIGNvbW11bmljYXRpb24gb24gYSBsb2NhbCBi
-cmlkZ2UgbmFtZWQgY2xvdWQwLiBUaGV5IHVzZSBhcGlwYSBhZGRyZXNzZXMuDQoNCkUuZy4gaG9z
-dCBhZGRyZXNzIG9uIHRoZSBsb2NhbCBjbG91ZDAgYnJpZGdlIGFyZSAxNjkuMjU0LjAuMSBhbmQg
-dGhlIHZpcnR1YWwgcm91dGVyIHRyeSB0byBjcmVhdGUgYSB2bmV0IDE2OS4yNTQuMC4yNTEgZm9y
-IGNvbW11bmljYXRpb24uDQoNCjIwMTktMDQtMDkgMTQ6Mjg6MjksOTc5IERFQlVHIFtrdm0ucmVz
-b3VyY2UuTGlidmlydENvbXB1dGluZ1Jlc291cmNlXSAoYWdlbnRSZXF1ZXN0LUhhbmRsZXItMTpu
-dWxsKSAobG9naWQ6ZWQ3YzVkMmEpIEV4ZWN1dGluZyB3aGlsZSB3aXRoIHRpbWVvdXQgOiA1MDAw
-DQoyMDE5LTA0LTA5IDE0OjI4OjMwLDAwNyBERUJVRyBba3ZtLnJlc291cmNlLkxpYnZpcnRDb21w
-dXRpbmdSZXNvdXJjZV0gKGFnZW50UmVxdWVzdC1IYW5kbGVyLTE6bnVsbCkgKGxvZ2lkOmVkN2M1
-ZDJhKSBFeGVjdXRpb24gaXMgc3VjY2Vzc2Z1bC4NCjIwMTktMDQtMDkgMTQ6Mjg6MzAsMDA3IERF
-QlVHIFtyZXNvdXJjZS52aXJ0dWFsbmV0d29yay5WaXJ0dWFsUm91dGluZ1Jlc291cmNlXSAoYWdl
-bnRSZXF1ZXN0LUhhbmRsZXItMTpudWxsKSAobG9naWQ6ZWQ3YzVkMmEpIFRyeWluZyB0byBjb25u
-ZWN0IHRvIDE2OS4yNTQuMC4yNTENCjIwMTktMDQtMDkgMTQ6Mjg6MzMsMDEzIERFQlVHIFtyZXNv
-dXJjZS52aXJ0dWFsbmV0d29yay5WaXJ0dWFsUm91dGluZ1Jlc291cmNlXSAoYWdlbnRSZXF1ZXN0
-LUhhbmRsZXItMTpudWxsKSAobG9naWQ6ZWQ3YzVkMmEpIENvdWxkIG5vdCBjb25uZWN0IHRvIDE2
-OS4yNTQuMC4yNTENCjIwMTktMDQtMDkgMTQ6Mjg6MzgsMDEzIERFQlVHIFtyZXNvdXJjZS52aXJ0
-dWFsbmV0d29yay5WaXJ0dWFsUm91dGluZ1Jlc291cmNlXSAoYWdlbnRSZXF1ZXN0LUhhbmRsZXIt
-MTpudWxsKSAobG9naWQ6ZWQ3YzVkMmEpIFRyeWluZyB0byBjb25uZWN0IHRvIDE2OS4yNTQuMC4y
-NTENCjIwMTktMDQtMDkgMTQ6Mjg6NDEsMDIwIERFQlVHIFtyZXNvdXJjZS52aXJ0dWFsbmV0d29y
-ay5WaXJ0dWFsUm91dGluZ1Jlc291cmNlXSAoYWdlbnRSZXF1ZXN0LUhhbmRsZXItMTpudWxsKSAo
-bG9naWQ6ZWQ3YzVkMmEpIENvdWxkIG5vdCBjb25uZWN0IHRvIDE2OS4yNTQuMC4yNTENCg0KSXQg
-c2VlbXMgdGhlIGludGVyZmFjZSB3aWxsIG5vdCBjb21lIHVwIGlmIHdlIHVzZSBlbXUgMi4xMi4w
-LiBpZiB3ZSB1c2UgdGhlIG9sZGVyIHZlcnNpb24gMi4xMC4wIHdlIGRvbuKAmXQgaGF2ZSB0aGUg
-cHJvYmxlbS4NCg0KSXMgdGhlcmUgYW55IGNoYW5nZSBpbiB0aGUgbmV3IHZlcnNpb24/IEkgaG9w
-ZSB0aGVyZSBpcyBzb21lb25lIHdobyBjYW4gc2F5IHRoZXJlIGlzIGEgd29ya2Fyb3VuZOKApg0K
-DQp0aGFua3MNCg0KU3Zlbg0KDQpfXw0KDQpTdmVuIFZvZ2VsDQpUZWFtbGVhZCBQbGF0Zm9ybQ0K
-DQpFV0VSSyBSWiBHbWJIDQpCcsO8aGwgMjQsIEQtMDQxMDkgTGVpcHppZw0KUCArNDkgMzQxIDQy
-NjQ5IC0gMTENCkYgKzQ5IDM0MSA0MjY0OSAtIDE4DQpTLlZvZ2VsQGV3ZXJrLmNvbQ0Kd3d3LmV3
-ZXJrLmNvbQ0KDQpHZXNjaMOkZnRzZsO8aHJlcjoNCkRyLiBFcmlrIFdlbmRlLCBIZW5kcmlrIFNj
-aHViZXJ0LCBGcmFuayBSaWNodGVyLCBHZXJoYXJkIEhveWVyDQpSZWdpc3RlcmdlcmljaHQ6IExl
-aXB6aWcgSFJCIDE3MDIzDQoNClplcnRpZml6aWVydCBuYWNoOg0KSVNPL0lFQyAyNzAwMToyMDEz
-DQpESU4gRU4gSVNPIDkwMDE6MjAxNQ0KRElOIElTTy9JRUMgMjAwMDAtMToyMDExDQoNCkVXRVJL
-LUJsb2c8aHR0cHM6Ly9ibG9nLmV3ZXJrLmNvbS8+IHwgTGlua2VkSW48aHR0cHM6Ly93d3cubGlu
-a2VkaW4uY29tL2NvbXBhbnkvZXdlcmstZ3JvdXA+IHwgWGluZzxodHRwczovL3d3dy54aW5nLmNv
-bS9jb21wYW55L2V3ZXJrPiB8IFR3aXR0ZXI8aHR0cHM6Ly90d2l0dGVyLmNvbS9FV0VSS19Hcm91
-cD4gfCBGYWNlYm9vazxodHRwczovL2RlLWRlLmZhY2Vib29rLmNvbS9FV0VSSy5JVC8+DQoNCkF1
-c2vDvG5mdGUgdW5kIEFuZ2Vib3RlIHBlciBNYWlsIHNpbmQgZnJlaWJsZWliZW5kIHVuZCB1bnZl
-cmJpbmRsaWNoLg0KDQpEaXNjbGFpbWVyIFByaXZhY3k6DQpEZXIgSW5oYWx0IGRpZXNlciBFLU1h
-aWwgKGVpbnNjaGxpZcOfbGljaCBldHdhaWdlciBiZWlnZWbDvGd0ZXIgRGF0ZWllbikgaXN0IHZl
-cnRyYXVsaWNoIHVuZCBudXIgZsO8ciBkZW4gRW1wZsOkbmdlciBiZXN0aW1tdC4gU29sbHRlbiBT
-aWUgbmljaHQgZGVyIGJlc3RpbW11bmdzZ2Vtw6TDn2UgRW1wZsOkbmdlciBzZWluLCBpc3QgSWhu
-ZW4gamVnbGljaGUgT2ZmZW5sZWd1bmcsIFZlcnZpZWxmw6RsdGlndW5nLCBXZWl0ZXJnYWJlIG9k
-ZXIgTnV0enVuZyBkZXMgSW5oYWx0cyB1bnRlcnNhZ3QuIEJpdHRlIGluZm9ybWllcmVuIFNpZSBp
-biBkaWVzZW0gRmFsbCB1bnZlcnrDvGdsaWNoIGRlbiBBYnNlbmRlciB1bmQgbMO2c2NoZW4gU2ll
-IGRpZSBFLU1haWwgKGVpbnNjaGxpZcOfbGljaCBldHdhaWdlciBiZWlnZWbDvGd0ZXIgRGF0ZWll
-bikgdm9uIElocmVtIFN5c3RlbS4gVmllbGVuIERhbmsuDQoNClRoZSBjb250ZW50cyBvZiB0aGlz
-IGUtbWFpbCAoaW5jbHVkaW5nIGFueSBhdHRhY2htZW50cykgYXJlIGNvbmZpZGVudGlhbCBhbmQg
-bWF5IGJlIGxlZ2FsbHkgcHJpdmlsZWdlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJl
-Y2lwaWVudCBvZiB0aGlzIGUtbWFpbCwgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1
-dGlvbiBvciB1c2Ugb2YgaXRzIGNvbnRlbnRzIGlzIHN0cmljdGx5IHByb2hpYml0ZWQsIGFuZCB5
-b3Ugc2hvdWxkIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgdGhlbiBk
-ZWxldGUgaXQgKGluY2x1ZGluZyBhbnkgYXR0YWNobWVudHMpIGZyb20geW91ciBzeXN0ZW0uIFRo
-YW5rIHlvdS4NCg==
+On 12/04/2019 13.28, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/12/19 1:11 PM, Thomas Huth wrote:
+>> On 13/03/2019 02.06, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> '
+>>> On Tue, Mar 12, 2019 at 6:44 PM Markus Armbruster <armbru@redhat.com>=
+ wrote:
+>> [...]
+>>>>     =3D hw/arm/nseries.c =3D
+>>>>     Andrzej Zaborowski <balrogg@gmail.com> (odd fixer:nSeries)
+>>>>     Peter Maydell <peter.maydell@linaro.org> (odd fixer:nSeries)
+>>>>     qemu-arm@nongnu.org (open list:nSeries)
+>>>
+>>> images:
+>>> http://stskeeps.subnetmask.net/meego-n8x0/
+>>>
+>>> $ qemu-system-arm -M n810 -kernel
+>>> meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0
+>>> -append "root=3D/dev/mmcblk0p1 console=3DttyS0 printk.time=3D0 rootwa=
+it" -m
+>>> 130 -sd meego-arm-n8x0-1.0.80.20100712.1431-sda.raw -serial stdio
+>>
+>> That does not work for me - I only get a white screen that turns to
+>> black after half a second, and no output (also not on the serial
+>> console). Does it still work for you with the latest QEMU master branc=
+h?
+>=20
+> It is broken since a long time. I guess rememember some irc chat about
+> it previous to v2.9.0, then I added this line to my TODO "this command
+> used to work, see what's wrong here". I never bisected to figure out
+> since when it got bitroted.
+
+Ok, thanks, good to know. I was just thinking about deprecating this
+machine, since it uses the already deprecated bluetooth subsystem, and
+we likely can not remove bluetooth without removing this machine, too.
+So if it is already broken, that's another reason for really deprecating
+this machine now.
+
+ Thomas
