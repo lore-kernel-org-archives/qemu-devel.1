@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33248)
+Received: from eggs.gnu.org ([209.51.188.92]:35723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hEqWs-0006fT-MD
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hEqoR-0003GK-1m
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hEqWr-0007cw-PQ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:18 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:38881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hEqWr-0007bO-8p
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:23:17 -0400
-Received: by mail-pl1-x629.google.com with SMTP id f36so4681774plb.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 00:23:16 -0700 (PDT)
-References: <20190409065404.9853-1-richard.henderson@linaro.org>
-	<b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ed3b8226-db25-dcf9-dac2-80a03b90c087@linaro.org>
-Date: Thu, 11 Apr 2019 21:23:02 -1000
+	(envelope-from <pbonzini@redhat.com>) id 1hEqoQ-0002uO-1m
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hEqoP-0002te-MY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 03:41:25 -0400
+References: <20190411182240.5957-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ef726224-d07e-1e4a-2a63-222b68af560a@redhat.com>
+Date: Fri, 12 Apr 2019 09:41:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI"
-Subject: Re: [Qemu-devel] [RISU v2] i386: Add avx512 state to reginfo_t
+In-Reply-To: <20190411182240.5957-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/input: Add a CONFIG_PS2 switch
+ for the ps2.c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI
-From: Richard Henderson <richard.henderson@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-Message-ID: <ed3b8226-db25-dcf9-dac2-80a03b90c087@linaro.org>
-Subject: Re: [RISU v2] i386: Add avx512 state to reginfo_t
-References: <20190409065404.9853-1-richard.henderson@linaro.org>
- <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-In-Reply-To: <b7a11825-3100-ab81-586d-29fa68113844@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11/04/19 20:22, Thomas Huth wrote:
+> ps2.c only needs to be compiled if we are building pckbd.c or pl050.c.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/input/Kconfig       | 5 +++++
+>  hw/input/Makefile.objs | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+> index e2e66f0858..316573f782 100644
+> --- a/hw/input/Kconfig
+> +++ b/hw/input/Kconfig
+> @@ -8,10 +8,15 @@ config LM832X
+>  config PCKBD
+>      bool
+>      default y
+> +    select PS2
+>      depends on ISA_BUS
+>  
+>  config PL050
+>      bool
+> +    select PS2
+> +
+> +config PS2
+> +    bool
+>  
+>  config STELLARIS_INPUT
+>      bool
+> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+> index c8b00f71ec..6db5ee0e71 100644
+> --- a/hw/input/Makefile.objs
+> +++ b/hw/input/Makefile.objs
+> @@ -3,7 +3,7 @@ common-obj-y += hid.o
+>  common-obj-$(CONFIG_LM832X) += lm832x.o
+>  common-obj-$(CONFIG_PCKBD) += pckbd.o
+>  common-obj-$(CONFIG_PL050) += pl050.o
+> -common-obj-y += ps2.o
+> +common-obj-$(CONFIG_PS2) += ps2.o
+>  common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+>  common-obj-$(CONFIG_TSC2005) += tsc2005.o
+>  
+> 
 
-On 4/11/19 4:05 PM, Jan Bobek wrote:
-> Looks fine to me. I suppose if I had written it, I would have included
-> more comments and/or #define's to make some bits more obvious (all the
-> magic constants look a bit scary until you read the Intel manual), but
-> nevermind that.
+Queued, thanks.  (Also, nice find :)).
 
-You're right that it absolutely cries for comments and constants.  I usua=
-lly
-don't know how to write those until I know what I am doing.  In this case=
- I
-really hadn't figured out what I wanted to do -- perhaps obvious for send=
-ing
-two different patches inside a couple of hours.
-
-
-> I guess the other remaining part now is extending risugen to actually
-> generate the test blobs.
-
-Yes.  I gave that a read and think that you should need only simple exten=
-sions
-to the current infrastructure.
-
-
-r~
-
-
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFEBAEBCgAuFiEEnLGN2vjoSa0q/BakrRJwzE3QJ5sFAlywPN4QHHJ0aEB0d2lk
-ZGxlLm5ldAAKCRCtEnDMTdAnm+2DB/0XDN0RUewIx3N4og/D0m3qZLD5+zQ+CKLR
-Fl/WEI0quFl6PRUoZu8VTAMrIxRiue3djWb7JBmTgV1FPMy3V7zQkvRf0t3eKG+x
-DIajcWV8Pj8lCtD7DVD4ilS5YWsitPMLzB+OOfBoJhzlzKv9e4ePu5/f5PNhN5ZY
-BHE5yXWYkPV4VxCP5BkAP4TNxXPblbtzAUMJrrFSeKEy9cCi0xinNqAMaU6rzL7U
-1LkZ89j8khNqHjEZVsrPf3avJBoz+zM9ScnBhdbX02gHSUmenX9SuZXQBun7T2jl
-x8w2TgcVaLfrvma2xVQ13jeSpwvtZrrr83nyYMvFxv54ejU+notr
-=ILxT
------END PGP SIGNATURE-----
-
---3z0J6psRAKuaQpBWDuDCpogbZ13i4YFwI--
+Paolo
