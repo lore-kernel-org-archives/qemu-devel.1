@@ -2,85 +2,68 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EABEC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 05:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75872C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 05:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3E0D20818
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 05:43:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxlKKcDD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E0D20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F40320818
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 05:46:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F40320818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59311 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEoy8-0001g8-8E
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 01:43:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43668)
+	id 1hEp1P-00039S-Eh
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 01:46:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hEoxJ-0001Jb-7b
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:30 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEp0P-0002P3-Ex
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hEoxI-0008S1-47
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:29 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:34534)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <npiggin@gmail.com>)
-	id 1hEoxF-00083X-AS; Fri, 12 Apr 2019 01:42:25 -0400
-Received: by mail-pg1-x533.google.com with SMTP id v12so4649332pgq.1;
-	Thu, 11 Apr 2019 22:42:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=vJm4r0hEPk2pdOBu4EwWQ8tV2fCXs9DtfzB9HdAk1oY=;
-	b=SxlKKcDDnaoRDXpeXMrw755eD1jOlW7wzSyL6CBxd9JpUnmJcuxCaotnU4XB+sDcLh
-	WwrwbK4FCGjHoGwiKcVo/bOmAQQ6HPDyliKKQMXLYd7Z13rTpU67IA/FISFSBktNML59
-	Xg+ZTgZ4lkfFQrHxBjAV0ak9mJ4sB94x8IECbMuRuRKcWkopLGZ1URmKs6ndZb3R2Uq6
-	KuB+KJdm5BBc7F+UcuPrB9spSyI72p57dxkDuNQlcdaGlNAdqAqjL256gmEKiqPVM4Vk
-	UvbvdyHDxUYGk7eqyOJKcLjEGRI3bvipGHTuEoehUgvluYxCZ5pNW3bG8VD4DFHLdycY
-	wC3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=vJm4r0hEPk2pdOBu4EwWQ8tV2fCXs9DtfzB9HdAk1oY=;
-	b=sqZtK9JYzVc56uWKL4W0Nrum4ES9TQZgBqtVVUHHqCU2iyXe699a0iMTwwb2rnABDu
-	OtjLlLazJ1ZMBLvcRHpd7Ovs0AZV2qNVlvQcKcUUebyn64lAdqKsKhrFBo5133EJkB6L
-	b/A1qMC5LbIRZJUqNQUTy1ALm13UGYrH7lTfw79h4lTM/Ucftl7x1S84LCZxaOC4hSgq
-	ArKhhpReXLrBW25NCjXJ7w+uqJLKO1kx75dY48b+4Xa5UcRKa15Zw2rYV4fnuyRQiiI3
-	uKrtoXi7fWksSct6ovHZCkwuJEHvqEIW4mYZodHfdhivoT0RZBii8Lcu+i0ptJu02XS9
-	vHVg==
-X-Gm-Message-State: APjAAAXf6S4o3vrw7ulA9FcWrZRQqeKj7iA0PAjb/d0gNmx68VJIOksh
-	cmk5fLrujoWymxdd/SBwOcw=
-X-Google-Smtp-Source: APXvYqyrEZg0YH1En+sjmejnNgFpBondU4SyyTue2dT+Up8Dp3lyJpvwvlTsUbJE+jzPRIF0kjVK+Q==
-X-Received: by 2002:aa7:8719:: with SMTP id b25mr54387685pfo.90.1555047743944; 
-	Thu, 11 Apr 2019 22:42:23 -0700 (PDT)
-Received: from bobo.local0.net (115-64-237-195.tpgi.com.au. [115.64.237.195])
-	by smtp.gmail.com with ESMTPSA id
-	n21sm64237682pfb.42.2019.04.11.22.42.20
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 11 Apr 2019 22:42:23 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 12 Apr 2019 15:42:13 +1000
-Message-Id: <20190412054214.707-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEp0O-0007cP-7o
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:45:41 -0400
+Received: from mga17.intel.com ([192.55.52.151]:53628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hEp0L-0006Mb-3B; Fri, 12 Apr 2019 01:45:37 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+	by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	11 Apr 2019 22:44:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,340,1549958400"; d="scan'208";a="142117065"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga003.jf.intel.com with ESMTP; 11 Apr 2019 22:44:26 -0700
+Date: Fri, 12 Apr 2019 13:44:07 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190412054407.GA5035@richard>
+References: <20190313044253.31988-1-richardw.yang@linux.intel.com>
+	<20190313044253.31988-4-richardw.yang@linux.intel.com>
+	<20190313132300.3f56a5ca@redhat.com>
+	<20190313133359.h2njohyijgvkcbtv@master>
+	<20190313170943.5384f5cf@redhat.com>
+	<20190402035343.GA6527@richard>
+	<20190402081512.6194a58f@redhat.com>
+	<20190405085529.GA24071@richard>
+	<20190409165415.2e5df0c6@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20190409165415.2e5df0c6@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: [Qemu-devel] [PATCH] spapr: add splpar hcalls H_JOIN, H_PROD,
- H_CONFER
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] hw/acpi: Extract build_mcfg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,132 +75,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com,
+	qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>,
+	shannon.zhaosl@gmail.com, wei.w.wang@intel.com,
+	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412054213.HNjRdHxcekRENvnfiyX1AcHTTKPKrfQllTUOzfEEQhU@z>
+Message-ID: <20190412054407.FA5UUHhntHsUOXFAUyxapLCOub_7ZsEtBGiJYO708Ak@z>
 
-These implementations have a few deficiencies that are noted, but are
-good enough for Linux to use.
+On Tue, Apr 09, 2019 at 04:54:15PM +0200, Igor Mammedov wrote:
+>> 
+>> Let's see a normal hotplug case first. 
+>> 
+>>     I did one test to see the how a guest with hot-plug cpu migrate to
+>>     destination.  It looks the migration fails if I just do hot-plug at
+>>     source. So I have to do hot-plug both at source and at destination. This
+>>     will expand the table_mr both at source and destination.
+>> 
+>> Then let's see the effect of hotplug more devices to exceed original padded
+>> size. There are two cases, before re-sizable MemoryRegion and after.
+>> 
+>> 1) Before re-sizable MemoryRegion introduced
+>> 
+>>     Before re-sizable MemoryRegion introduced, we just pad table_mr to 4K. And
+>>     this size never gets bigger, if I am right. To be accurate, the table_blob
+>>     would grow to next padded size if we hot-add more cpus/pci bridge, but we
+>>     just copy the original size of MemoryRegion. Even without migration, the
+>>     ACPI table is corrupted when we expand to next padded size.
+>>     
+>>     Is my understanding correct here?
+>> 
+>> 2) After re-sizable MemoryRegion introduced
+>> 
+>>     This time both tabl_blob and MemoryRegion grows when it expand to next
+>>     padded size. Since we need to hot-add device at both side, ACPI table
+>>     grows at the same pace.
+>> 
+>>     Every thing looks good, until one of it exceed the resizable
+>>     MemoryRegion's max size. (Not sure this is possible in reality, while
+>>     possible in theory). Actually, this looks like case 1) when resizable
+>>     MemoryRegion is not introduced. The too big ACPI table get corrupted.
+>> 
+>> So if my understanding is correct, the procedure you mentioned "expand from
+>> initial padded size to next padded size" only applies to two different max
+>> size resizable MemoryRegion. For other cases, the procedure corrupt the ACPI
+>> table itself.
+>> 
+>> Then when we look at
+>> 
+>>     commit 07fb61760cdea7c3f1b9c897513986945bca8e89
+>>     Author: Paolo Bonzini <pbonzini@redhat.com>
+>>     Date:   Mon Jul 28 17:34:15 2014 +0200
+>>     
+>>         pc: hack for migration compatibility from QEMU 2.0
+>>     
+>> This fix ACPI migration issue before resizable MemoryRegion is
+>> introduced(introduced in 2015-01-08). This looks expand to next padded size
+>> always corrupt ACPI table at that time. And it make me think expand to next
+>> padded size is not the procedure we should do?
+>> 
+>> And my colleague Wei Wang(in cc) mentioned, to make migration succeed, the
+>> MemoryRegion has to be the same size at both side. So I guess the problem
+>> doesn't lie in hotplug but in "main table" size difference.
+>
+>It's true only for pre-resizable MemoryRegion QEMU versions,
+>after that size doesn't affect migration anymore.
+>
+>
+>> For example, we have two version of Qemu: v1 and v2. Their "main table" size
+>> is:
+>> 
+>>     v1: 3990
+>>     v2: 4020
+>> 
+>> At this point, their ACPI table all padded to 4k, which is the same.
+>> 
+>> Then we create a machine with 1 more vcpu by these two versions. This will
+>> expand the table to:
+>> 
+>>     v1: 4095
+>>     v2: 4125
+>> 
+>> After padding, v1's ACPI table size is still 4k but v2's is 8k. Now the
+>> migration is broken.
+>> 
+>> If this analysis is correct, the relationship between migration failure and
+>> ACPI table is "the change of ACPI table size". Any size change of any
+>you should make distinction between used_length and max_length here.
+>Migration puts on wire used_length and that's what matter for keeping migration
+>working.
+>
+>> ACPI table would break migration. While of course, since we pad the table,
+>> only some combinations of tables would result in a visible real size change in
+>> MemoryRegion.
+>> 
+>> Then the principle for future ACPI development is to keep all ACPI table size
+>> unchanged.
+>once again it applies only for QEMU (versions < 2.1) and that was
+>the problem (i.e. there always would be configurations that would create
+>differently sized tables regardless of arbitrary size we would preallocate)
+>resizable MemoryRegions solved.
+> 
+>> Now let's back to mcfg table. As the comment mentioned, guest could
+>> enable/disable MCFG, so the code here reserve table no matter it is enabled or
+>> not. This behavior ensures ACPI table size not changed. So do we need to find
+>> the machine type as you suggested before?
+>We should be able to drop mcgf 'padding' hack since machine version
+>which was introduced in the QEMU version that introduced resizable MemoryRegion
+>as well.
+>
+>I'll send a patch to address that
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Hi, Igor,
 
----
-This has been tested with TCG with some Linux hacks to use H_JOIN/H_PROD
-for suspend and CPU unplug (plus an implementation of ibm,suspend-me to
-do the suspend). Not sure if KVM might need some more work to support
-H_JOIN properly, but right now Linux only uses it on PowerVM.
+We have found the qemu version 2.1 which is with resizable MemoryRegion
+enabled and q35 will stop support version before 2.3. The concern about ACPI
+mcfg table breaking live migration is solved, right?
 
+If so, I would prepare mcfg refactor patch based on your cleanup.
 
- hw/ppc/spapr_hcall.c | 84 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 8a736797b9..6829cadcd3 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1065,6 +1065,86 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    CPUPPCState *env = &cpu->env;
-+    CPUState *cs = CPU(cpu);
-+
-+    if (env->msr & (1ULL << MSR_EE))
-+        return H_BAD_MODE;
-+
-+    /*
-+     * This should check for single-threaded mode. In practice, Linux
-+     * does not try to H_JOIN all CPUs.
-+     */
-+
-+    cs->halted = 1;
-+    cs->exception_index = EXCP_HALTED;
-+    cs->exit_request = 1;
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs = CPU(cpu);
-+
-+    /*
-+     * This does not do a targeted yield or confer, but check the parameter
-+     * anyway. -1 means confer to all/any other CPUs.
-+     */
-+    if (target != -1 && !CPU(spapr_find_cpu(target)))
-+        return H_PARAMETER;
-+
-+    /*
-+     * H_CONFER with target == this is not exactly the same as H_JOIN
-+     * according to PAPR (e.g., MSR[EE] check and single threaded check
-+     * is not done in this case), but unlikely to matter.
-+     */
-+    if (cpu == spapr_find_cpu(target))
-+        return h_join(cpu, spapr, opcode, args);
-+
-+    /*
-+     * This does not implement the dispatch sequence check that PAPR calls for,
-+     * but PAPR also specifies a stronger implementation where the target must
-+     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
-+     * scheduling requirement implemented, there is no correctness reason to
-+     * implement the dispatch sequence check.
-+     */
-+    cs->exception_index = EXCP_YIELD;
-+    cpu_loop_exit(cs);
-+
-+    return H_SUCCESS;
-+}
-+
-+/*
-+ * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
-+ * achievable running under KVM, although KVM already implements H_CONFER
-+ * this way.
-+ */
-+static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs;
-+
-+    /*
-+     * This does not maintain a prod flag for the vCPU that PAPR asks for.
-+     */
-+
-+    cs = CPU(spapr_find_cpu(target));
-+    if (!cs)
-+        return H_PARAMETER;
-+
-+    cs->halted = 0;
-+    qemu_cpu_kick(cs);
-+
-+    return H_SUCCESS;
-+}
-+
- static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
-@@ -1860,6 +1940,10 @@ static void hypercall_register_types(void)
-     /* hcall-splpar */
-     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
-     spapr_register_hypercall(H_CEDE, h_cede);
-+    spapr_register_hypercall(H_CONFER, h_confer);
-+    spapr_register_hypercall(H_JOIN, h_join);
-+    spapr_register_hypercall(H_PROD, h_prod);
-+
-     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
- 
-     /* processor register resource access h-calls */
 -- 
-2.20.1
-
+Wei Yang
+Help you, Help me
 
