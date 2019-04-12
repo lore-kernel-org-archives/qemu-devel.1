@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36196)
+Received: from eggs.gnu.org ([209.51.188.92]:36219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEv6l-0002he-Gd
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1hEv6p-0002mH-2p
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hEv6k-0004WN-JR
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37740)
+	(envelope-from <berrange@redhat.com>) id 1hEv6n-0004Yv-Vp
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEv6k-0004W7-Cp
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:38 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hEv6n-0004Yg-NB
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:16:41 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 12 Apr 2019 13:16:23 +0100
-Message-Id: <20190412121626.19829-3-berrange@redhat.com>
+Date: Fri, 12 Apr 2019 13:16:24 +0100
+Message-Id: <20190412121626.19829-4-berrange@redhat.com>
 In-Reply-To: <20190412121626.19829-1-berrange@redhat.com>
 References: <20190412121626.19829-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/5] linux-user: avoid string truncation
- warnings in elf field copying
+Subject: [Qemu-devel] [PATCH v2 3/5] sockets: avoid string truncation
+ warnings when copying UNIX path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +32,103 @@ Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Gerd H
 
 In file included from /usr/include/string.h:494,
                  from include/qemu/osdep.h:101,
-                 from linux-user/elfload.c:2:
+                 from util/qemu-sockets.c:18:
 In function =E2=80=98strncpy=E2=80=99,
-    inlined from =E2=80=98fill_psinfo=E2=80=99 at linux-user/elfload.c:32=
-08:12,
-    inlined from =E2=80=98fill_note_info=E2=80=99 at linux-user/elfload.c=
-:3390:5,
-    inlined from =E2=80=98elf_core_dump=E2=80=99 at linux-user/elfload.c:=
-3539:9:
+    inlined from =E2=80=98unix_connect_saddr.isra.0=E2=80=99 at util/qemu=
+-sockets.c:925:5:
 /usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 16 equals destination size [-Wstringop-t=
-runcation]
+strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringop-=
+truncation]
   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
 dest));
       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
 ~~~~~~
+In function =E2=80=98strncpy=E2=80=99,
+    inlined from =E2=80=98unix_listen_saddr.isra.0=E2=80=99 at util/qemu-=
+sockets.c:880:5:
+/usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builtin_=
+strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringop-=
+truncation]
+  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
+dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We don't require the field to be NUL terminated, so can just
-copy the lower of the string length and the target field size
-using memcpy.
+We are already validating the UNIX socket path length earlier in
+the functions. If we save this string length when we first check
+it, then we can simply use memcpy instead of strcpy later, avoiding
+the gcc truncation warnings.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- linux-user/elfload.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ util/qemu-sockets.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c1a26021f8..caa060f7b7 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -3180,6 +3180,7 @@ static int fill_psinfo(struct target_elf_prpsinfo *=
-psinfo, const TaskState *ts)
- {
-     char *base_filename;
-     unsigned int i, len;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 9705051690..ba6335e71a 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -830,6 +830,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
+,
+     int sock, fd;
+     char *pathbuf =3D NULL;
+     const char *path;
 +    size_t pathlen;
 =20
-     (void) memset(psinfo, 0, sizeof (*psinfo));
+     sock =3D qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+     if (sock < 0) {
+@@ -845,7 +846,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
+,
+         path =3D pathbuf =3D g_strdup_printf("%s/qemu-socket-XXXXXX", tm=
+pdir);
+     }
 =20
-@@ -3201,12 +3202,9 @@ static int fill_psinfo(struct target_elf_prpsinfo =
-*psinfo, const TaskState *ts)
-     psinfo->pr_gid =3D getgid();
+-    if (strlen(path) > sizeof(un.sun_path)) {
++    pathlen =3D strlen(path);
++    if (pathlen > sizeof(un.sun_path)) {
+         error_setg(errp, "UNIX socket path '%s' is too long", path);
+         error_append_hint(errp, "Path must be less than %zu bytes\n",
+                           sizeof(un.sun_path));
+@@ -877,7 +879,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
+,
 =20
-     base_filename =3D g_path_get_basename(ts->bprm->filename);
--    /*
--     * Using strncpy here is fine: at max-length,
--     * this field is not NUL-terminated.
--     */
--    (void) strncpy(psinfo->pr_fname, base_filename,
--                   sizeof(psinfo->pr_fname));
-+    pathlen =3D strlen(base_filename) + 1;
-+    pathlen =3D MIN(pathlen, sizeof(psinfo->pr_fname));
-+    memcpy(psinfo->pr_fname, base_filename, pathlen);
+     memset(&un, 0, sizeof(un));
+     un.sun_family =3D AF_UNIX;
+-    strncpy(un.sun_path, path, sizeof(un.sun_path));
++    memcpy(un.sun_path, path, pathlen);
 =20
-     g_free(base_filename);
-     bswap_psinfo(psinfo);
+     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+         error_setg_errno(errp, errno, "Failed to bind socket to %s", pat=
+h);
+@@ -901,6 +903,7 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
+r, Error **errp)
+ {
+     struct sockaddr_un un;
+     int sock, rc;
++    size_t pathlen;
+=20
+     if (saddr->path =3D=3D NULL) {
+         error_setg(errp, "unix connect: no path specified");
+@@ -913,7 +916,8 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
+r, Error **errp)
+         return -1;
+     }
+=20
+-    if (strlen(saddr->path) > sizeof(un.sun_path)) {
++    pathlen =3D strlen(saddr->path);
++    if (pathlen > sizeof(un.sun_path)) {
+         error_setg(errp, "UNIX socket path '%s' is too long", saddr->pat=
+h);
+         error_append_hint(errp, "Path must be less than %zu bytes\n",
+                           sizeof(un.sun_path));
+@@ -922,7 +926,7 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
+r, Error **errp)
+=20
+     memset(&un, 0, sizeof(un));
+     un.sun_family =3D AF_UNIX;
+-    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
++    memcpy(un.sun_path, saddr->path, pathlen);
+=20
+     /* connect to peer */
+     do {
 --=20
 2.20.1
