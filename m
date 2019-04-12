@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47708)
+Received: from eggs.gnu.org ([209.51.188.92]:47886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEyw1-0003JY-Jv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hEyx0-0004VF-8S
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEyvz-0002Au-Le
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEyvw-00028t-5s
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:21:45 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s15so12670263wra.12
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 09:21:44 -0700 (PDT)
-References: <20190412152619.23542-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2c7385cf-78ba-3331-53f0-1973408f0e4d@redhat.com>
-Date: Fri, 12 Apr 2019 18:21:41 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hEywy-0002Wt-IB
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:22:50 -0400
+Resent-Message-Id: <E1hEywy-0002Wt-IB@eggs.gnu.org>
+Message-ID: <155508614786.29694.6898774797090055516@76452e4e88f2>
+In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190412152619.23542-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/arm/nseries: Deprecate the n800
- and n810 machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 12 Apr 2019 09:22:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 00/13] vhost-user for input & GPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: marcandre.lureau@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mst@redhat.com, qemu-ppc@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On 4/12/19 5:26 PM, Thomas Huth wrote:
-> These machines depend on the deprecated bluetooth subsystem. In case we
-> finally decide to remove the bluetooth subsystem, we likely need to
-> remove the n800 and n810 machines, too, so mark them now as deprecated.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/arm/nseries.c     | 3 +++
->  qemu-deprecated.texi | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-> index 906b7ca22d..66e50b850c 100644
-> --- a/hw/arm/nseries.c
-> +++ b/hw/arm/nseries.c
-> @@ -1309,6 +1309,9 @@ static void n8x0_init(MachineState *machine,
->      struct n800_s *s = (struct n800_s *) g_malloc0(sizeof(*s));
->      int sdram_size = binfo->ram_size;
->  
-> +    warn_report("The n800 and n810 machines are deprecated. Please use a "
-> +                "different Arm machine instead.");
-> +
-
-Unrelated to this patch, but can you add a similar warning in
-uart_hci_init() to make obvious that the bluetooth subsystem is now
-deprecated?
-
->      s->mpu = omap2420_mpu_init(sysmem, sdram_size, machine->cpu_type);
->  
->      /* Setup peripherals
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 2219386769..4de7452fac 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -145,6 +145,12 @@ This machine type uses an unmaintained firmware, broken in lots of ways,
->  and unable to start post-2004 operating systems. 40p machine type should be
->  used instead.
->  
-> +@subsection n800 and n810 (Arm) (since 4.1)
-> +
-> +These machines depend on the deprecated bluetooth subsystem. When the
-> +bluetooth subsystem will be removed, the n800 and n810 machines will be
-> +deleted, too. If possible, use a different Arm board instead.
-> +
->  @section Device options
->  
->  @subsection Block device options
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMjE1MzY0Ny4xOTAy
+Ny0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
+YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
+IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJH
+RVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zo
+b3N0LXVzZXItZ3B1L3ZpcmdsLmM6MTY6CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUt
+dGVzdC9zcmMvY29udHJpYi92aG9zdC11c2VyLWdwdS92aXJnbC5oOjE3OgpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2NvbnRyaWIvdmhvc3QtdXNlci1ncHUvdnVncHUu
+aDoyNToKL3RtcC9xZW11LXRlc3Qvc3JjL2NvbnRyaWIvdmhvc3QtdXNlci1ncHUvZHJtLmg6MTU6
+MTA6IGZhdGFsIGVycm9yOiAnaTkxNV9kcm0uaCcgZmlsZSBub3QgZm91bmQKI2luY2x1ZGUgPGk5
+MTVfZHJtLmg+CiAgICAgICAgIF5+fn5+fn5+fn5+fgogIENDICAgICAgYmxvY2tqb2IubwotLS0K
+bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0LXVzZXItZ3B1L21haW4uYzoy
+MToKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0
+LXVzZXItZ3B1L3Z1Z3B1Lmg6MjU6Ci90bXAvcWVtdS10ZXN0L3NyYy9jb250cmliL3Zob3N0LXVz
+ZXItZ3B1L2RybS5oOjE1OjEwOiBmYXRhbCBlcnJvcjogJ2k5MTVfZHJtLmgnIGZpbGUgbm90IGZv
+dW5kCiNpbmNsdWRlIDxpOTE1X2RybS5oPgogICAgICAgICBefn5+fn5+fn5+fn4KL3RtcC9xZW11
+LXRlc3Qvc3JjL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmM6NTQ2OjMyOiBl
+cnJvcjogdGFraW5nIGFkZHJlc3Mgb2YgcGFja2VkIG1lbWJlciAncGF5bG9hZCcgb2YgY2xhc3Mg
+b3Igc3RydWN0dXJlICdWaG9zdFVzZXJNc2cnIG1heSByZXN1bHQgaW4gYW4gdW5hbGlnbmVkIHBv
+aW50ZXIgdmFsdWUgWy1XZXJyb3IsLVdhZGRyZXNzLW9mLXBhY2tlZC1tZW1iZXJdCiAgICBWaG9z
+dFVzZXJNZW1vcnkgKm1lbW9yeSA9ICZ2bXNnLT5wYXlsb2FkLm1lbW9yeTsKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy9jb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jOjY4ODozMjogZXJyb3I6IHRh
+a2luZyBhZGRyZXNzIG9mIHBhY2tlZCBtZW1iZXIgJ3BheWxvYWQnIG9mIGNsYXNzIG9yIHN0cnVj
+dHVyZSAnVmhvc3RVc2VyTXNnJyBtYXkgcmVzdWx0IGluIGFuIHVuYWxpZ25lZCBwb2ludGVyIHZh
+bHVlIFstV2Vycm9yLC1XYWRkcmVzcy1vZi1wYWNrZWQtbWVtYmVyXQogICAgVmhvc3RVc2VyTWVt
+b3J5ICptZW1vcnkgPSAmdm1zZy0+cGF5bG9hZC5tZW1vcnk7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvY29udHJp
+Yi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYzo4MTc6Mzc6IGVycm9yOiB0YWtpbmcgYWRk
+cmVzcyBvZiBwYWNrZWQgbWVtYmVyICdwYXlsb2FkJyBvZiBjbGFzcyBvciBzdHJ1Y3R1cmUgJ1Zo
+b3N0VXNlck1zZycgbWF5IHJlc3VsdCBpbiBhbiB1bmFsaWduZWQgcG9pbnRlciB2YWx1ZSBbLVdl
+cnJvciwtV2FkZHJlc3Mtb2YtcGFja2VkLW1lbWJlcl0KICAgIHN0cnVjdCB2aG9zdF92cmluZ19h
+ZGRyICp2cmEgPSAmdm1zZy0+cGF5bG9hZC5hZGRyOwogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn4KMyBlcnJvcnMgZ2VuZXJhdGVkLgoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MTIx
+NTM2NDcuMTkwMjctMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vdGVzdGluZy5hc2FuLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
