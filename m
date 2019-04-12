@@ -2,62 +2,63 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4109C282CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DF3C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:09:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 617D02084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:09:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617D02084D
+	by mail.kernel.org (Postfix) with ESMTPS id B419F2084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:09:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B419F2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33564 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEt7V-00054n-IC
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:09:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37695)
+	id 1hEt82-0005X2-SV
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:09:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt2t-0000n7-JP
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:04:36 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt38-0000x2-UV
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:04:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt2q-0003Xc-UR
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:04:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59020)
+	(envelope-from <eric.auger@redhat.com>) id 1hEt37-0003he-Ah
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:04:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hEt2m-0003Ts-9T; Fri, 12 Apr 2019 06:04:24 -0400
+	id 1hEt30-0003ce-9j; Fri, 12 Apr 2019 06:04:39 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7720E3DBDF;
-	Fri, 12 Apr 2019 10:04:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 058A83088B82;
+	Fri, 12 Apr 2019 10:04:37 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C831219750;
-	Fri, 12 Apr 2019 10:04:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6550519C65;
+	Fri, 12 Apr 2019 10:04:34 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Fri, 12 Apr 2019 12:03:29 +0200
-Message-Id: <20190412100354.6409-3-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:31 +0200
+Message-Id: <20190412100354.6409-5-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 12 Apr 2019 10:04:23 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 12 Apr 2019 10:04:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 02/27] vfio/common: Introduce
- vfio_set_irq_signaling helper
+Subject: [Qemu-devel] [RFC v3 04/27] header update against 5.1-rc3 and
+ IOMMU/VFIO nested stage APIs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,574 +76,268 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412100329.v75QMp9LBPmsiF6guZ-Art6Cz_doT9TMKBSn8wbB7FA@z>
+Message-ID: <20190412100331.p7R_tsJg8q2xp5FQ92NmBeHL0peiM_yabEI3pUYs6_c@z>
 
-The code used to assign an interrupt index/subindex to an
-eventfd is duplicated many times. Let's introduce an helper that
-allows to set/unset the signaling for an ACTION_TRIGGER or
-ACTION_UNMASK action.
+This is an update against the following development branch:
+https://github.com/eauger/linux/tree/v5.1-rc3-2stage-v7.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ linux-headers/linux/iommu.h | 240 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 240 insertions(+)
+ create mode 100644 linux-headers/linux/iommu.h
 
-This is a follow-up to
-[PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
-It looks to me that introducing vfio_set_irq_signaling() has more
-benefits in term of code reduction and the helper abstraction
-looks cleaner.
----
- hw/vfio/common.c              |  61 +++++++++
- hw/vfio/pci.c                 | 224 ++++++++--------------------------
- hw/vfio/platform.c            |  55 +++------
- include/hw/vfio/vfio-common.h |   2 +
- 4 files changed, 134 insertions(+), 208 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 4374cc6176..f88fd10ca3 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -95,6 +95,67 @@ void vfio_mask_single_irqindex(VFIODevice *vbasedev, i=
-nt index)
-     ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
- }
-=20
-+static inline const char *action_to_str(int action)
-+{
-+    switch (action) {
-+    case VFIO_IRQ_SET_ACTION_MASK:
-+        return "MASK";
-+    case VFIO_IRQ_SET_ACTION_UNMASK:
-+        return "UNMASK";
-+    case VFIO_IRQ_SET_ACTION_TRIGGER:
-+        return "TRIGGER";
-+    default:
-+        return "UNKNOWN ACTION";
-+    }
-+}
+diff --git a/linux-headers/linux/iommu.h b/linux-headers/linux/iommu.h
+new file mode 100644
+index 0000000000..558f3095b9
+--- /dev/null
++++ b/linux-headers/linux/iommu.h
+@@ -0,0 +1,240 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * IOMMU user API definitions
++ */
 +
-+int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex=
-,
-+                           int action, int fd, Error **errp)
-+{
-+    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
-+                                      .index =3D index };
-+    struct vfio_irq_set *irq_set;
-+    int argsz, ret =3D 0;
-+    int32_t *pfd;
++#ifndef _IOMMU_H
++#define _IOMMU_H
 +
-+    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
-+    if (ret < 0) {
-+        error_setg_errno(errp, errno, "index %d does not exist", index);
-+        goto error;
-+    }
-+    if (irq_info.count < subindex + 1) {
-+        error_setg_errno(errp, errno, "subindex %d does not exist", subi=
-ndex);
-+        goto error;
-+    }
++#include <linux/types.h>
 +
-+    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
++#define IOMMU_FAULT_PERM_WRITE	(1 << 0) /* write */
++#define IOMMU_FAULT_PERM_EXEC	(1 << 1) /* exec */
++#define IOMMU_FAULT_PERM_PRIV	(1 << 2) /* privileged */
 +
-+    irq_set =3D g_malloc0(argsz);
-+    irq_set->argsz =3D argsz;
-+    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | action;
-+    irq_set->index =3D index;
-+    irq_set->start =3D subindex;
-+    irq_set->count =3D 1;
-+    pfd =3D (int32_t *)&irq_set->data;
-+    *pfd =3D fd;
++/*  Generic fault types, can be expanded IRQ remapping fault */
++enum iommu_fault_type {
++	IOMMU_FAULT_DMA_UNRECOV =3D 1,	/* unrecoverable fault */
++	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
++};
 +
-+    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
++enum iommu_fault_reason {
++	IOMMU_FAULT_REASON_UNKNOWN =3D 0,
 +
-+    g_free(irq_set);
++	/* Could not access the PASID table (fetch caused external abort) */
++	IOMMU_FAULT_REASON_PASID_FETCH,
 +
-+    if (ret) {
-+        error_setg_errno(errp, -ret, "VFIO_DEVICE_SET_IRQS failure");
-+        goto error;
-+    }
-+    return 0;
-+error:
-+    error_prepend(errp,
-+                  "Failed to %s %s eventfd signaling for interrupt [%d,%=
-d]: ",
-+                  fd < 0 ? "tear down" : "set up", action_to_str(action)=
-,
-+                  index, subindex);
-+    return ret;
-+}
++	/* pasid entry is invalid or has configuration errors */
++	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
 +
- /*
-  * IO Port/MMIO - Beware of the endians, VFIO is always little endian
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 504019c458..cd93ff6fa3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -113,9 +113,7 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev,=
- Error **errp)
-         .gsi =3D vdev->intx.route.irq,
-         .flags =3D KVM_IRQFD_FLAG_RESAMPLE,
-     };
--    struct vfio_irq_set *irq_set;
--    int ret, argsz;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-=20
-     if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
-         vdev->intx.route.mode !=3D PCI_INTX_ENABLED ||
-@@ -143,22 +141,10 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vde=
-v, Error **errp)
-         goto fail_irqfd;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_U=
-NMASK;
--    irq_set->index =3D VFIO_PCI_INTX_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D irqfd.resamplefd;
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    g_free(irq_set);
--    if (ret) {
--        error_setg_errno(errp, -ret, "failed to setup INTx unmask fd");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX,=
- 0,
-+                               VFIO_IRQ_SET_ACTION_UNMASK,
-+                               irqfd.resamplefd, &err)) {
-+        error_propagate(errp, err);
-         goto fail_vfio;
-     }
-=20
-@@ -262,10 +248,10 @@ static void vfio_intx_update(PCIDevice *pdev)
- static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
- {
-     uint8_t pin =3D vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN,=
- 1);
--    int ret, argsz, retval =3D 0;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-     Error *err =3D NULL;
-+    int32_t fd;
-+    int ret;
++	/*
++	 * PASID is out of range (e.g. exceeds the maximum PASID
++	 * supported by the IOMMU) or disabled.
++	 */
++	IOMMU_FAULT_REASON_PASID_INVALID,
 +
-=20
-     if (!pin) {
-         return 0;
-@@ -292,27 +278,15 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Er=
-ror **errp)
-         error_setg_errno(errp, -ret, "event_notifier_init failed");
-         return ret;
-     }
-+    fd =3D event_notifier_get_fd(&vdev->intx.interrupt);
-+    qemu_set_fd_handler(fd, vfio_intx_interrupt, NULL, vdev);
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_T=
-RIGGER;
--    irq_set->index =3D VFIO_PCI_INTX_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->intx.interrupt);
--    qemu_set_fd_handler(*pfd, vfio_intx_interrupt, NULL, vdev);
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_setg_errno(errp, -ret, "failed to setup INTx fd");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX,=
- 0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_propagate(errp, err);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->intx.interrupt);
--        retval =3D -errno;
--        goto cleanup;
-+        return -errno;
-     }
-=20
-     vfio_intx_enable_kvm(vdev, &err);
-@@ -323,11 +297,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Err=
-or **errp)
-     vdev->interrupt =3D VFIO_INT_INTx;
-=20
-     trace_vfio_intx_enable(vdev->vbasedev.name);
--
--cleanup:
--    g_free(irq_set);
--
--    return retval;
-+    return 0;
- }
-=20
- static void vfio_intx_disable(VFIOPCIDevice *vdev)
-@@ -530,31 +500,19 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev,=
- unsigned int nr,
-             error_report("vfio: failed to enable vectors, %d", ret);
-         }
-     } else {
--        int argsz;
--        struct vfio_irq_set *irq_set;
--        int32_t *pfd;
--
--        argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--        irq_set =3D g_malloc0(argsz);
--        irq_set->argsz =3D argsz;
--        irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                         VFIO_IRQ_SET_ACTION_TRIGGER;
--        irq_set->index =3D VFIO_PCI_MSIX_IRQ_INDEX;
--        irq_set->start =3D nr;
--        irq_set->count =3D 1;
--        pfd =3D (int32_t *)&irq_set->data;
-+        Error *err =3D NULL;
-+        int32_t fd;
-=20
-         if (vector->virq >=3D 0) {
--            *pfd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-+            fd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-         } else {
--            *pfd =3D event_notifier_get_fd(&vector->interrupt);
-+            fd =3D event_notifier_get_fd(&vector->interrupt);
-         }
-=20
--        ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--        g_free(irq_set);
--        if (ret) {
--            error_report("vfio: failed to modify vector, %d", ret);
-+        if (vfio_set_irq_signaling(&vdev->vbasedev,
-+                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
-+                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &e=
-rr)) {
-+            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
-;
-         }
-     }
-=20
-@@ -591,26 +549,10 @@ static void vfio_msix_vector_release(PCIDevice *pde=
-v, unsigned int nr)
-      * be re-asserted on unmask.  Nothing to do if already using QEMU mo=
-de.
-      */
-     if (vector->virq >=3D 0) {
--        int argsz;
--        struct vfio_irq_set *irq_set;
--        int32_t *pfd;
-+        int32_t fd =3D event_notifier_get_fd(&vector->interrupt);
-=20
--        argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--        irq_set =3D g_malloc0(argsz);
--        irq_set->argsz =3D argsz;
--        irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                         VFIO_IRQ_SET_ACTION_TRIGGER;
--        irq_set->index =3D VFIO_PCI_MSIX_IRQ_INDEX;
--        irq_set->start =3D nr;
--        irq_set->count =3D 1;
--        pfd =3D (int32_t *)&irq_set->data;
--
--        *pfd =3D event_notifier_get_fd(&vector->interrupt);
--
--        ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--
--        g_free(irq_set);
-+        vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX,=
- nr,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, NULL);
-     }
- }
-=20
-@@ -2629,10 +2571,8 @@ static void vfio_err_notifier_handler(void *opaque=
-)
-  */
- static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
- {
--    int ret;
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int32_t fd;
-=20
-     if (!vdev->pci_aer) {
-         return;
-@@ -2644,58 +2584,30 @@ static void vfio_register_err_notifier(VFIOPCIDev=
-ice *vdev)
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+    fd =3D event_notifier_get_fd(&vdev->err_notifier);
-+    qemu_set_fd_handler(fd, vfio_err_notifier_handler, NULL, vdev);
-=20
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->err_notifier);
--    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to set up error notification");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->err_notifier);
-         vdev->pci_aer =3D false;
-     }
--    g_free(irq_set);
- }
-=20
- static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
- {
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--    int ret;
-+    Error *err =3D NULL;
-=20
-     if (!vdev->pci_aer) {
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to de-assign error fd: %m");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-     }
--    g_free(irq_set);
-     qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
-                         NULL, NULL, vdev);
-     event_notifier_cleanup(&vdev->err_notifier);
-@@ -2718,77 +2630,43 @@ static void vfio_req_notifier_handler(void *opaqu=
-e)
-=20
- static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
- {
--    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
--                                      .index =3D VFIO_PCI_REQ_IRQ_INDEX =
-};
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int32_t fd;
-=20
-     if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
-         return;
-     }
-=20
--    if (ioctl(vdev->vbasedev.fd,
--              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count=
- < 1) {
--        return;
--    }
--
-     if (event_notifier_init(&vdev->req_notifier, 0)) {
-         error_report("vfio: Unable to init event notifier for device req=
-uest");
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+    fd =3D event_notifier_get_fd(&vdev->req_notifier);
-+    qemu_set_fd_handler(fd, vfio_req_notifier_handler, NULL, vdev);
-=20
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->req_notifier);
--    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to set up device request notification=
-");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, =
-0,
-+                           VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-         event_notifier_cleanup(&vdev->req_notifier);
-     } else {
-         vdev->req_enabled =3D true;
-     }
--
--    g_free(irq_set);
- }
-=20
- static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
- {
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-=20
-     if (!vdev->req_enabled) {
-         return;
-     }
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to de-assign device request fd: %m");
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, =
-0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-     }
--    g_free(irq_set);
-     qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
-                         NULL, NULL, vdev);
-     event_notifier_cleanup(&vdev->req_notifier);
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index 398db38f14..d60f391439 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -106,26 +106,19 @@ static int vfio_set_trigger_eventfd(VFIOINTp *intp,
-                                     eventfd_user_side_handler_t handler)
- {
-     VFIODevice *vbasedev =3D &intp->vdev->vbasedev;
--    struct vfio_irq_set *irq_set;
--    int argsz, ret;
--    int32_t *pfd;
-+    int32_t fd =3D event_notifier_get_fd(intp->interrupt);
-+    Error *err =3D NULL;
-+    int ret;
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_T=
-RIGGER;
--    irq_set->index =3D intp->pin;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D event_notifier_get_fd(intp->interrupt);
--    qemu_set_fd_handler(*pfd, (IOHandler *)handler, NULL, intp);
--    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret < 0) {
--        error_report("vfio: Failed to set trigger eventfd: %m");
--        qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
-+    qemu_set_fd_handler(fd, (IOHandler *)handler, NULL, intp);
++	/*
++	 * An external abort occurred fetching (or updating) a translation
++	 * table descriptor
++	 */
++	IOMMU_FAULT_REASON_WALK_EABT,
 +
-+    ret =3D vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-+                                 VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err);
-+    if (ret) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
-+        qemu_set_fd_handler(fd, NULL, NULL, NULL);
-     }
--    g_free(irq_set);
++	/*
++	 * Could not access the page table entry (Bad address),
++	 * actual translation fault
++	 */
++	IOMMU_FAULT_REASON_PTE_FETCH,
 +
-     return ret;
- }
-=20
-@@ -361,26 +354,18 @@ static void vfio_start_eventfd_injection(SysBusDevi=
-ce *sbdev, qemu_irq irq)
-  */
- static int vfio_set_resample_eventfd(VFIOINTp *intp)
- {
-+    int32_t fd =3D event_notifier_get_fd(intp->unmask);
-     VFIODevice *vbasedev =3D &intp->vdev->vbasedev;
--    struct vfio_irq_set *irq_set;
--    int argsz, ret;
--    int32_t *pfd;
-+    Error *err =3D NULL;
-+    int ret;
-=20
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_U=
-NMASK;
--    irq_set->index =3D intp->pin;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D event_notifier_get_fd(intp->unmask);
--    qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
--    ret =3D ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    g_free(irq_set);
--    if (ret < 0) {
--        error_report("vfio: Failed to set resample eventfd: %m");
-+    qemu_set_fd_handler(fd, NULL, NULL, NULL);
-+    ret =3D vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-+                                 VFIO_IRQ_SET_ACTION_UNMASK, fd, &err);
-+    if (ret) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
-     }
++	/* Protection flag check failed */
++	IOMMU_FAULT_REASON_PERMISSION,
 +
-     return ret;
- }
-=20
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index 1155b79678..686d99ff8c 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -167,6 +167,8 @@ void vfio_put_base_device(VFIODevice *vbasedev);
- void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
- void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
- void vfio_mask_single_irqindex(VFIODevice *vbasedev, int index);
-+int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex=
-,
-+                           int action, int fd, Error **errp);
- void vfio_region_write(void *opaque, hwaddr addr,
-                            uint64_t data, unsigned size);
- uint64_t vfio_region_read(void *opaque,
++	/* access flag check failed */
++	IOMMU_FAULT_REASON_ACCESS,
++
++	/* Output address of a translation stage caused Address Size fault */
++	IOMMU_FAULT_REASON_OOR_ADDRESS,
++};
++
++/**
++ * Unrecoverable fault data
++ * @reason: reason of the fault
++ * @addr: offending page address
++ * @fetch_addr: address that caused a fetch abort, if any
++ * @pasid: contains process address space ID, used in shared virtual mem=
+ory
++ * @perm: Requested permission access using by the incoming transaction
++ * (IOMMU_FAULT_PERM_* values)
++ */
++struct iommu_fault_unrecoverable {
++	__u32	reason; /* enum iommu_fault_reason */
++#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
++#define IOMMU_FAULT_UNRECOV_PERM_VALID		(1 << 1)
++#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 2)
++#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 3)
++	__u32	flags;
++	__u32	pasid;
++	__u32	perm;
++	__u64	addr;
++	__u64	fetch_addr;
++};
++
++/*
++ * Page Request data (aka. recoverable fault data)
++ * @flags : encodes whether the pasid is valid and whether this
++ * is the last page in group
++ * @pasid: pasid
++ * @grpid: page request group index
++ * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
++ * @addr: page address
++ */
++struct iommu_fault_page_request {
++#define IOMMU_FAULT_PAGE_REQUEST_PASID_VALID	(1 << 0)
++#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
++#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
++	__u32   flags;
++	__u32	pasid;
++	__u32	grpid;
++	__u32	perm;
++	__u64	addr;
++	__u64	private_data[2];
++};
++
++/**
++ * struct iommu_fault - Generic fault data
++ *
++ * @type contains fault type
++ */
++
++struct iommu_fault {
++	__u32	type;   /* enum iommu_fault_type */
++	__u32	reserved;
++	union {
++		struct iommu_fault_unrecoverable event;
++		struct iommu_fault_page_request prm;
++	};
++};
++
++/**
++ * SMMUv3 Stream Table Entry stage 1 related information
++ * The PASID table is referred to as the context descriptor (CD) table.
++ *
++ * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
++   or 2-level table)
++ * @s1dss: STE s1dss (specifies the behavior when pasid_bits !=3D 0
++   and no pasid is passed along with the incoming transaction)
++ * Please refer to the smmu 3.x spec (ARM IHI 0070A) for full details
++ */
++struct iommu_pasid_smmuv3 {
++#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
++	__u32	version;
++	__u8 s1fmt;
++	__u8 s1dss;
++	__u8 padding[2];
++};
++
++/**
++ * PASID table data used to bind guest PASID table to the host IOMMU
++ * Note PASID table corresponds to the Context Table on ARM SMMUv3.
++ *
++ * @version: API version to prepare for future extensions
++ * @format: format of the PASID table
++ * @base_ptr: guest physical address of the PASID table
++ * @pasid_bits: number of PASID bits used in the PASID table
++ * @config: indicates whether the guest translation stage must
++ * be translated, bypassed or aborted.
++ */
++struct iommu_pasid_table_config {
++#define PASID_TABLE_CFG_VERSION_1 1
++	__u32	version;
++#define IOMMU_PASID_FORMAT_SMMUV3	1
++	__u32	format;
++	__u64	base_ptr;
++	__u8	pasid_bits;
++#define IOMMU_PASID_CONFIG_TRANSLATE	1
++#define IOMMU_PASID_CONFIG_BYPASS	2
++#define IOMMU_PASID_CONFIG_ABORT	3
++	__u8	config;
++	__u8    padding[6];
++	union {
++		struct iommu_pasid_smmuv3 smmuv3;
++	};
++};
++
++/* defines the granularity of the invalidation */
++enum iommu_inv_granularity {
++	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
++	IOMMU_INV_GRANU_PASID,	/* pasid-selective invalidation */
++	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
++};
++
++/**
++ * Address Selective Invalidation Structure
++ *
++ * @flags indicates the granularity of the address-selective invalidatio=
+n
++ * - if PASID bit is set, @pasid field is populated and the invalidation
++ *   relates to cache entries tagged with this PASID and matching the
++ *   address range.
++ * - if ARCHID bit is set, @archid is populated and the invalidation rel=
+ates
++ *   to cache entries tagged with this architecture specific id and matc=
+hing
++ *   the address range.
++ * - Both PASID and ARCHID can be set as they may tag different caches.
++ * - if neither PASID or ARCHID is set, global addr invalidation applies
++ * - LEAF flag indicates whether only the leaf PTE caching needs to be
++ *   invalidated and other paging structure caches can be preserved.
++ * @pasid: process address space id
++ * @archid: architecture-specific id
++ * @addr: first stage/level input address
++ * @granule_size: page/block size of the mapping in bytes
++ * @nb_granules: number of contiguous granules to be invalidated
++ */
++struct iommu_inv_addr_info {
++#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
++#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
++#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
++	__u32	flags;
++	__u32	archid;
++	__u64	pasid;
++	__u64	addr;
++	__u64	granule_size;
++	__u64	nb_granules;
++};
++
++/**
++ * First level/stage invalidation information
++ * @cache: bitfield that allows to select which caches to invalidate
++ * @granularity: defines the lowest granularity used for the invalidatio=
+n:
++ *     domain > pasid > addr
++ *
++ * Not all the combinations of cache/granularity make sense:
++ *
++ *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
++ * granularity	|		|		|      cache	|
++ * -------------+---------------+---------------+---------------+
++ * DOMAIN	|	N/A	|       Y	|	Y	|
++ * PASID	|	Y	|       Y	|	Y	|
++ * ADDR		|       Y	|       Y	|	N/A	|
++ *
++ * Invalidations by %IOMMU_INV_GRANU_ADDR use field @addr_info.
++ * Invalidations by %IOMMU_INV_GRANU_PASID use field @pasid.
++ * Invalidations by %IOMMU_INV_GRANU_DOMAIN don't take any argument.
++ *
++ * If multiple cache types are invalidated simultaneously, they all
++ * must support the used granularity.
++ */
++struct iommu_cache_invalidate_info {
++#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
++	__u32	version;
++/* IOMMU paging structure cache */
++#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
++#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
++#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
++	__u8	cache;
++	__u8	granularity;
++	__u8	padding[2];
++	union {
++		__u64	pasid;
++		struct iommu_inv_addr_info addr_info;
++	};
++};
++
++
++#endif /* _IOMMU_H */
 --=20
 2.20.1
 
