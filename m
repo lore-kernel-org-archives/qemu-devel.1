@@ -2,68 +2,64 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14346C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36AFC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75C362086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C362086D
+	by mail.kernel.org (Postfix) with ESMTPS id 630FE2086D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:51:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630FE2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40712 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40722 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF0Jt-0002iB-Ev
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:50:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37280)
+	id 1hF0L0-00046K-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:51:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hF0Ir-0002Hy-D6
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:49:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hF0JZ-0002iz-6h
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hF0Io-0005BX-L8
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:49:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38564)
+	(envelope-from <dgilbert@redhat.com>) id 1hF0JV-0005cl-Su
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hF0IZ-00050P-TE; Fri, 12 Apr 2019 13:49:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0JV-0005W2-5K
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:50:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F93531028D9;
-	Fri, 12 Apr 2019 17:49:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 70BA65D9C5;
-	Fri, 12 Apr 2019 17:49:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 031F81138648; Fri, 12 Apr 2019 19:49:04 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-References: <20190411135602.21725-1-armbru@redhat.com>
-	<20190411135602.21725-3-armbru@redhat.com>
-	<710ff1e9-14f9-8510-93ad-1930f21cc768@redhat.com>
-Date: Fri, 12 Apr 2019 19:49:04 +0200
-In-Reply-To: <710ff1e9-14f9-8510-93ad-1930f21cc768@redhat.com> (Laszlo Ersek's
-	message of "Fri, 12 Apr 2019 13:00:45 +0200")
-Message-ID: <871s27ktbj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id D54F8307D85A
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:50:01 +0000 (UTC)
+Received: from work-vm (unknown [10.36.117.255])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0179F5C219;
+	Fri, 12 Apr 2019 17:50:00 +0000 (UTC)
+Date: Fri, 12 Apr 2019 18:49:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190412174958.GN2906@work-vm>
+References: <20190411152520.10061-1-armbru@redhat.com>
+	<20190411152520.10061-12-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Disposition: inline
+In-Reply-To: <20190411152520.10061-12-armbru@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 12 Apr 2019 17:49:07 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 12 Apr 2019 17:50:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/virt: Support firmware
- configuration with -blockdev
+Subject: Re: [Qemu-devel] [PATCH 11/17] target/i386: Simplify how
+ x86_cpu_dump_local_apic_state() prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,615 +71,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, mreitz@redhat.com, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412174904.LLPGWnUw6u5lFYZ6FBiXjyW8CWdv0Va1M28lUuStX8A@z>
+Message-ID: <20190412174958.tzEiZAeeoDWiVZja1u_O5BBWjVpVjirY8zAookuwvvc@z>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> x86_cpu_dump_local_apic_state() takes an fprintf()-like callback and a
+> FILE * to pass to it, and so do its helper functions.
+> 
+> Its only caller hmp_info_local_apic() passes monitor_fprintf() and the
+> current monitor cast to FILE *.  monitor_fprintf() casts it right
+> back, and is otherwise identical to monitor_printf().  The
+> type-punning is ugly.
+> 
+> Drop the callback, and call qemu_printf() instead.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> On 04/11/19 15:56, Markus Armbruster wrote:
->> The ARM virt machines put firmware in flash memory.  To configure it,
->> you use -drive if=pflash,unit=0,... and optionally -drive
->> if=pflash,unit=1,...
->> 
->> Why two -drive?  This permits setting up one part of the flash memory
->> read-only, and the other part read/write.  It also makes upgrading
->> firmware on the host easier.  Below the hood, we get two separate
->> flash devices, because we were too lazy to improve our flash device
->> models to support sector protection.
->> 
->> The problem at hand is to do the same with -blockdev somehow, as one
->> more step towards deprecating -drive.
->> 
->> We recently solved this problem for x86 PC machines, in commit
->> ebc29e1beab.  See the commit message for design rationale.
->> 
->> This commit solves it for ARM virt basically the same way: new machine
->> properties pflash0, pflash1 forward to the onboard flash devices'
->> properties.  Requires creating the onboard devices in the
->> .instance_init() method virt_instance_init().  The existing code to
->> pick up drives defined with -drive if=pflash is replaced by code to
->> desugar into the machine properties.
->> 
->> There are a few behavioral differences, though:
->> 
->> * The flash devices are always present (x86: only present if
->>   configured)
->> 
->> * Flash base addresses and sizes are fixed (x86: sizes depend on
->>   images, mapped back to back below a fixed address)
->> 
->> * -bios configures contents of first pflash (x86: -bios configures ROM
->>    contents)
->> 
->> * -bios is rejected when first pflash is also configured with -machine
->>    pflash0=... (x86: bios is silently ignored then)
->> 
->> * -machine pflash1=... does not require -machine pflash0=... (x86: it
->>    does).
->> 
->> The actual code is a bit simpler than for x86 mostly due to the first
->> two differences.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/arm/virt.c         | 192 +++++++++++++++++++++++++++---------------
->>  include/hw/arm/virt.h |   2 +
->>  2 files changed, 124 insertions(+), 70 deletions(-)
->
-> I tried to review this patch, but I can't follow it.
->
-> I'm not saying it's wrong; in fact it *looks* right to me, but I can't
-> follow it. It does so many things at once that I can't keep them all in
-> mind.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Happens.  I'll try to explain, and then we can talk about improving the
-patch.
-
-Did you follow "See the commit message [of ebc29e1beab] for design
-rationale" reference?
-
-> I started with:
->
->   virt_instance_init()
->     virt_flash_create()
->       virt_pflash_create1()
->
-> and then I got confused by the object_property_add_*() calls, which
-> don't exist in the original code:
->
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index ce2664a30b..8ce7ecca80 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -30,6 +30,7 @@
->>  
->>  #include "qemu/osdep.h"
->>  #include "qemu/units.h"
->> +#include "qemu/option.h"
->>  #include "qapi/error.h"
->>  #include "hw/sysbus.h"
->>  #include "hw/arm/arm.h"
->> @@ -871,25 +872,19 @@ static void create_virtio_devices(const VirtMachineState *vms, qemu_irq *pic)
->>      }
->>  }
->>  
->> -static void create_one_flash(const char *name, hwaddr flashbase,
->> -                             hwaddr flashsize, const char *file,
->> -                             MemoryRegion *sysmem)
->> +#define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
->> +
->> +static PFlashCFI01 *virt_pflash_create1(VirtMachineState *vms,
->> +                                        const char *name,
->> +                                        const char *alias_prop_name)
->>  {
->> -    /* Create and map a single flash device. We use the same
->> -     * parameters as the flash devices on the Versatile Express board.
->> +    /*
->> +     * Create a single flash device.  We use the same parameters as
->> +     * the flash devices on the Versatile Express board.
->>       */
->> -    DriveInfo *dinfo = drive_get_next(IF_PFLASH);
->>      DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
->> -    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
->> -    const uint64_t sectorlength = 256 * 1024;
->>  
->> -    if (dinfo) {
->> -        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
->> -                            &error_abort);
->> -    }
->> -
->> -    qdev_prop_set_uint32(dev, "num-blocks", flashsize / sectorlength);
->> -    qdev_prop_set_uint64(dev, "sector-length", sectorlength);
->> +    qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
->>      qdev_prop_set_uint8(dev, "width", 4);
->>      qdev_prop_set_uint8(dev, "device-width", 2);
->>      qdev_prop_set_bit(dev, "big-endian", false);
->> @@ -898,41 +893,41 @@ static void create_one_flash(const char *name, hwaddr flashbase,
->>      qdev_prop_set_uint16(dev, "id2", 0x00);
->>      qdev_prop_set_uint16(dev, "id3", 0x00);
->>      qdev_prop_set_string(dev, "name", name);
->> +    object_property_add_child(OBJECT(vms), name, OBJECT(dev),
->> +                              &error_abort);
->
-> I guess this links the pflash device as a child under the
-> VirtMachineState object
-
-Yes.
-
->                         -- but why wasn't that necessary before?
-
-For better or worse, a qdev device without a parent gets adopted on
-realize by container object "/machine/unattached".  See
-device_set_realized() under if (!obj->parent).
-
-Example to illustrate, feel free to skip ahead to "End of example".
-
-Here's the contents of "/machine/unattached" for a pretty minimal ARM
-virt machine (I use scripts/qmp/qom-fuse to mount the QOM tree to
-qom-fuse/ for easy examination):
-
-    $ ls qom-fuse/machine/unattached/
-    'device[0]'   'device[19]'  'device[28]'  'device[37]'  'device[7]'
-    'device[10]'  'device[1]'   'device[29]'  'device[38]'  'device[8]'
-    'device[11]'  'device[20]'  'device[2]'   'device[39]'  'device[9]'
-    'device[12]'  'device[21]'  'device[30]'  'device[3]'   'io[0]'
-    'device[13]'  'device[22]'  'device[31]'  'device[40]'  'mach-virt.ram[0]'
-    'device[14]'  'device[23]'  'device[32]'  'device[41]'  'platform bus[0]'
-    'device[15]'  'device[24]'  'device[33]'  'device[42]'   sysbus
-    'device[16]'  'device[25]'  'device[34]'  'device[4]'   'system[0]'
-    'device[17]'  'device[26]'  'device[35]'  'device[5]'    type
-    'device[18]'  'device[27]'  'device[36]'  'device[6]'
-
-The device* are the adopted qdevs.  Let's look for pflash:
-
-    $ grep -a cfi qom-fuse/machine/unattached/device*/type
-    qom-fuse/machine/unattached/device[1]/type:cfi.pflash01
-    qom-fuse/machine/unattached/device[2]/type:cfi.pflash01
-
-Here are the children of /machine:
-
-    $ ls qom-fuse/machine/
-    accel                   fw_cfg        kernel             secure
-    append                  gic-version   kernel-irqchip     suppress-vmdesc
-    dt-compatible           graphics      kvm-shadow-mem     type
-    dtb                     highmem       mem-merge          unattached
-    dump-guest-core         igd-passthru  memory-encryption  usb
-    dumpdtb                 initrd        peripheral         virtualization
-    enforce-config-section  iommu         peripheral-anon
-    firmware                its           phandle-start
-
-This was before this patch.  Afterwards:
-
-    $ ls qom-fuse/machine/unattached/
-    'device[0]'   'device[19]'  'device[28]'  'device[37]'  'device[9]'
-    'device[10]'  'device[1]'   'device[29]'  'device[38]'  'io[0]'
-    'device[11]'  'device[20]'  'device[2]'   'device[39]'  'mach-virt.ram[0]'
-    'device[12]'  'device[21]'  'device[30]'  'device[3]'   'platform bus[0]'
-    'device[13]'  'device[22]'  'device[31]'  'device[40]'   sysbus
-    'device[14]'  'device[23]'  'device[32]'  'device[4]'   'system[0]'
-    'device[15]'  'device[24]'  'device[33]'  'device[5]'    type
-    'device[16]'  'device[25]'  'device[34]'  'device[6]'
-    'device[17]'  'device[26]'  'device[35]'  'device[7]'
-    'device[18]'  'device[27]'  'device[36]'  'device[8]'
-
-Two fewer device*.
-
-    $ ls qom-fuse/machine/
-    accel                   gic-version     kvm-shadow-mem     suppress-vmdesc
-    append                  graphics        mem-merge          type
-    dt-compatible           highmem         memory-encryption  unattached
-    dtb                     igd-passthru    peripheral         usb
-    dump-guest-core         initrd          peripheral-anon    virt.flash0
-    dumpdtb                 iommu           pflash0            virt.flash1
-    enforce-config-section  its             pflash1            virtualization
-    firmware                kernel          phandle-start
-    fw_cfg                  kernel-irqchip  secure
-
-Note new virt.flash0 and virt.flash1.
-
-    $ cat qom-fuse/machine/virt.flash*/type
-    cfi.pflash01
-    cfi.pflash01
-
-That's where the two went.
-
-End of example.
-
-Now I'm actually read to answer your question "why wasn't that necessary
-before?", or rather "why is it necessary now?"
-
-It wasn't necessary before because orphans get adopted.
-
-It might not even be necessary now, but I feel (strongly!) that an alias
-property should redirect to a child's property, not some random
-unrelated object's property (see right below).
-
-Regardless, I feel onboard devices should be proper children of the
-machine anyway, not stuffed into its unattached/ grabbag.
-
->> +    object_property_add_alias(OBJECT(vms), alias_prop_name,
->> +                              OBJECT(dev), "drive", &error_abort);
->
-> What is this good for? Does this make the pflash0 / pflash1 properties
-> of the machine refer to the "drive" property of the pflash device?
-
-Correct!
-
-With object.h and a crystal ball, you should be able to work that out
-for yourself:
-
-/**
- * object_property_add_alias:
- * @obj: the object to add a property to
- * @name: the name of the property
- * @target_obj: the object to forward property access to
- * @target_name: the name of the property on the forwarded object
- * @errp: if an error occurs, a pointer to an area to store the error
- *
- * Add an alias for a property on an object.  This function will add a property
- * of the same type as the forwarded property.
- *
- * The caller must ensure that <code>@target_obj</code> stays alive as long as
- * this property exists.  In the case of a child object or an alias on the same
- * object this will be the case.  For aliases to other objects the caller is
- * responsible for taking a reference.
- */
-
-Oh, no crystal ball?  Then it's spelunking through object.c, I guess.
-
-> Can we have a comment about that, or is that obvious for people that are
-> used to QOM code?
-
-If there are any, please speak up, so we can appoint you QOM maintainer.
-
-In my (weak) defense, I mentioned the property forwarding in my commit
-message ("new machine properties pflash0, pflash1 forward to the onboard
-flash devices' properties"), and I did point to commit ebc29e1beab for
-design rationale.  It has this paragraph:
-
-    More seriously, the properties do not belong to the machine, they
-    belong to the onboard flash devices.  Adding them to the machine would
-    then require bad magic to somehow transfer them to the flash devices.
-    Fortunately, QOM provides the means to handle exactly this case: add
-    alias properties to the machine that forward to the onboard devices'
-    properties.
-
-> ... So anyway, this is where I come to an almost complete halt. I
-> understand one more bit (in isolation only):
->
->> +    return PFLASH_CFI01(dev);
->> +}
->> +
->> +static void virt_flash_create(VirtMachineState *vms)
->> +{
->> +    vms->flash[0] = virt_pflash_create1(vms, "virt.flash0", "pflash0");
->> +    vms->flash[1] = virt_pflash_create1(vms, "virt.flash1", "pflash1");
->> +}
->> +
->> +static void virt_flash_map1(PFlashCFI01 *flash,
->> +                            hwaddr base, hwaddr size,
->> +                            MemoryRegion *sysmem)
->> +{
->> +    DeviceState *dev = DEVICE(flash);
->> +
->> +    assert(size % VIRT_FLASH_SECTOR_SIZE == 0);
->> +    assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
->> +    qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
->>      qdev_init_nofail(dev);
->>  
->> -    memory_region_add_subregion(sysmem, flashbase,
->> -                                sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
->> -
->> -    if (file) {
->> -        char *fn;
->> -        int image_size;
->> -
->> -        if (drive_get(IF_PFLASH, 0, 0)) {
->> -            error_report("The contents of the first flash device may be "
->> -                         "specified with -bios or with -drive if=pflash... "
->> -                         "but you cannot use both options at once");
->> -            exit(1);
->> -        }
->> -        fn = qemu_find_file(QEMU_FILE_TYPE_BIOS, file);
->> -        if (!fn) {
->> -            error_report("Could not find ROM image '%s'", file);
->> -            exit(1);
->> -        }
->> -        image_size = load_image_mr(fn, sysbus_mmio_get_region(sbd, 0));
->> -        g_free(fn);
->> -        if (image_size < 0) {
->> -            error_report("Could not load ROM image '%s'", file);
->> -            exit(1);
->> -        }
->> -    }
->> +    memory_region_add_subregion(sysmem, base,
->> +                                sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
->> +                                                       0));
->>  }
->>  
->> -static void create_flash(const VirtMachineState *vms,
->> -                         MemoryRegion *sysmem,
->> -                         MemoryRegion *secure_sysmem)
->> +static void virt_flash_map(VirtMachineState *vms,
->> +                           MemoryRegion *sysmem,
->> +                           MemoryRegion *secure_sysmem)
->>  {
->> -    /* Create two flash devices to fill the VIRT_FLASH space in the memmap.
->> -     * Any file passed via -bios goes in the first of these.
->> +    /*
->> +     * Map two flash devices to fill the VIRT_FLASH space in the memmap.
->>       * sysmem is the system memory space. secure_sysmem is the secure view
->>       * of the system, and the first flash device should be made visible only
->>       * there. The second flash device is visible to both secure and nonsecure.
->> @@ -941,13 +936,21 @@ static void create_flash(const VirtMachineState *vms,
->>       */
->>      hwaddr flashsize = vms->memmap[VIRT_FLASH].size / 2;
->>      hwaddr flashbase = vms->memmap[VIRT_FLASH].base;
->> +
->> +    virt_flash_map1(vms->flash[0], flashbase, flashsize,
->> +                    secure_sysmem);
->> +    virt_flash_map1(vms->flash[1], flashbase + flashsize, flashsize,
->> +                    sysmem);
->> +}
->> +
->> +static void virt_flash_fdt(VirtMachineState *vms,
->> +                           MemoryRegion *sysmem,
->> +                           MemoryRegion *secure_sysmem)
->> +{
->> +    hwaddr flashsize = vms->memmap[VIRT_FLASH].size / 2;
->> +    hwaddr flashbase = vms->memmap[VIRT_FLASH].base;
->>      char *nodename;
->>  
->> -    create_one_flash("virt.flash0", flashbase, flashsize,
->> -                     bios_name, secure_sysmem);
->> -    create_one_flash("virt.flash1", flashbase + flashsize, flashsize,
->> -                     NULL, sysmem);
->> -
->>      if (sysmem == secure_sysmem) {
->>          /* Report both flash devices as a single node in the DT */
->>          nodename = g_strdup_printf("/flash@%" PRIx64, flashbase);
->> @@ -959,7 +962,8 @@ static void create_flash(const VirtMachineState *vms,
->>          qemu_fdt_setprop_cell(vms->fdt, nodename, "bank-width", 4);
->>          g_free(nodename);
->>      } else {
->> -        /* Report the devices as separate nodes so we can mark one as
->> +        /*
->> +         * Report the devices as separate nodes so we can mark one as
->>           * only visible to the secure world.
->>           */
->>          nodename = g_strdup_printf("/secflash@%" PRIx64, flashbase);
->> @@ -982,6 +986,48 @@ static void create_flash(const VirtMachineState *vms,
->>      }
->>  }
->>  
->> +static bool virt_firmware_init(VirtMachineState *vms,
->> +                               MemoryRegion *sysmem,
->> +                               MemoryRegion *secure_sysmem)
->> +{
->> +    BlockBackend *pflash_blk0;
->> +
->> +    pflash_cfi01_legacy_drive(vms->flash, ARRAY_SIZE(vms->flash));
->> +    virt_flash_map(vms, sysmem, secure_sysmem);
->> +
->> +    pflash_blk0 = pflash_cfi01_get_blk(vms->flash[0]);
->> +
->> +    if (bios_name) {
->> +        char *fname;
->> +        MemoryRegion *mr;
->> +        int image_size;
->> +
->> +        if (pflash_blk0) {
->> +            error_report("The contents of the first flash device may be "
->> +                         "specified with -bios or with -drive if=pflash... "
->> +                         "but you cannot use both options at once");
->> +            exit(1);
->> +        }
->> +
->> +        /* Fall back to -bios */
->> +
->> +        fname = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->> +        if (!fname) {
->> +            error_report("Could not find ROM image '%s'", bios_name);
->> +            exit(1);
->> +        }
->> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(vms->flash[0]), 0);
->> +        image_size = load_image_mr(fname, mr);
->> +        g_free(fname);
->> +        if (image_size < 0) {
->> +            error_report("Could not load ROM image '%s'", bios_name);
->> +            exit(1);
->> +        }
->> +    }
->> +
->> +    return pflash_blk0 || bios_name;
->> +}
->> +
->>  static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
->>  {
->>      hwaddr base = vms->memmap[VIRT_FW_CFG].base;
->> @@ -1421,7 +1467,7 @@ static void machvirt_init(MachineState *machine)
->>      MemoryRegion *secure_sysmem = NULL;
->>      int n, virt_max_cpus;
->>      MemoryRegion *ram = g_new(MemoryRegion, 1);
->> -    bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->> +    bool firmware_loaded;
->>      bool aarch64 = true;
->>  
->>      /*
->> @@ -1460,6 +1506,27 @@ static void machvirt_init(MachineState *machine)
->>          exit(1);
->>      }
->>  
->> +    if (vms->secure) {
->> +        if (kvm_enabled()) {
->> +            error_report("mach-virt: KVM does not support Security extensions");
->> +            exit(1);
->> +        }
->> +
->> +        /*
->> +         * The Secure view of the world is the same as the NonSecure,
->> +         * but with a few extra devices. Create it as a container region
->> +         * containing the system memory at low priority; any secure-only
->> +         * devices go in at higher priority and take precedence.
->> +         */
->> +        secure_sysmem = g_new(MemoryRegion, 1);
->> +        memory_region_init(secure_sysmem, OBJECT(machine), "secure-memory",
->> +                           UINT64_MAX);
->> +        memory_region_add_subregion_overlap(secure_sysmem, 0, sysmem, -1);
->> +    }
->> +
->> +    firmware_loaded = virt_firmware_init(vms, sysmem,
->> +                                         secure_sysmem ?: sysmem);
->> +
->>      /* If we have an EL3 boot ROM then the assumption is that it will
->>       * implement PSCI itself, so disable QEMU's internal implementation
->>       * so it doesn't get in the way. Instead of starting secondary
->
-> Namely, at this point, I seem to understand that we have to hoist this
-> "vms->secure" block here, because:
->
-> - below (not seen in the context), we have a condition on "firmware_loaded",
-
-Correct.
-
-> - "firmware_loaded" *now* depends on "secure_sysmem" (it used not to,
-> before)
-
-Correct again.
-
-Before the patch, we have
-
-    bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-
-which really means "-bios or -drive if=pflash,unit=0 given".  If true,
-create_flash() below will surely put firmware into the first flash chip.
-
-Afterwards, predicting "will put firmware" is more complex.  Instead of
-coding up a prediction of what create_flash()'s replacement
-virt_firmware_init() is going to do, I have virt_firmware_init() return
-what it did:
-
-        firmware_loaded = virt_firmware_init(vms, sysmem,
-                                             secure_sysmem ?: sysmem);
-
-Naturally, I have to do this before firmware_loaded is used.  So
-create_flash()'s replacement virt_firmware_init() moves up right before
-the first use of firmware_loaded.  On its way, ...
-
-> - and "secure_sysmem" depends on the "vms->secure" block that we're
-> moving up here.
-
-... it bumps into the computation of secure_sysmem, and pushes it up,
-too.
-
-> And that's where I grind to a halt, because I don't understand what the
-> old functions are responsible for exactly, and how the responsibilities
-> are now re-distributed, between the new functions.
->
-> I tried to look at this patch with full function context, and I also
-> tried to look at the full file (pre vs. post) through a colorized
-> side-by-side diff. To no use.
->
-> Now, I'm not saying this is a fault with the patch. It's entirely
-> possible that the goal can only be achieved with such a "rewrite". I
-> think it plausible that the patch cannot be done in multiple smaller
-> patches, especially if we consider bisectability a requirement. (Maybe
-> splitting the patch to smaller logical steps would be possible if we
-> accepted halfway constructed and/or orphan objects, mid-series, that
-> build and cause no issues at runtime. I don't know.)
-
-Maybe it's possible, period.
-
-> So it's *my* fault -- it's like the code is sliced into small bits and
-> then reshuffled to a new story, and I can't follow the bits' dance.
->
-> Can you add two high-level call trees, side-by-side, to the commit
-> message, not just with function names but also with responsibilities?
->
-> I guess I won't ask for arrows from the left to the right :) I'll try to
-> draw them myself.
-
-Before the patch:
-
-    main()
-        machine_run_board_init()
-            machvirt_init() [method .init()]
-                create_flash()
-                    create_one_flash() for flash[0]
-                        create
-                        configure
-                            includes obeying -drive if=pflash,unit=0
-                        realize
-                        map
-                        fall back to -bios
-                    create_one_flash() for flash[1]
-                        create
-                        configure
-                            includes obeying -drive if=pflash,unit=1
-                        realize
-                        map
-                    update FDT
-
-All the action is in create_flash().
-
-Creating onboard devices in the machine's .init() method is common, but
-that doesn't make it right.  By the time .init() runs, we're long done
-with setting properties.  So anything we create that late cannot expose
-properties.  The proper place to create onboard devices is
-.instance_init().  This is why I need to split up create_flash().
-
-After the patch:
-
-    main()
-        current_machine = object_new()
-            ...
-                virt_instance_init() [method .instance_init()]
-                    virt_flash_create()
-                        virt_flash_create1() for flash[0]
-                            create
-                            configure: set defaults
-                            become child of machine
-                            add machine prop pflash0 as alias for drive
-                        virt_flash_create1() for flash[1]
-                            create
-                            configure: set defaults
-                            become child of machine [NEW]
-                            add machine prop pflash1 as alias for drive [NEW]
-        for all machine props: machine_set_property()
-            ...
-                property_set_alias() for machine props pflash0, pflash1
-                    ...
-                        set_drive() for cfi.pflash01 prop drive
-                            this is how -machine pflash0=... etc set
-        machine_run_board_init(current_machine);
-            virt_firmware_init()
-                pflash_cfi01_legacy_drive()
-                    legacy -drive if=pflash,unit=0 and =1 [NEW]
-                virt_flash_map()
-                    virt_flash_map1() for flash[0]
-                        configure: num-blocks
-                        realize
-                        map
-                    virt_flash_map1() for flash[1]
-                        configure: num-blocks
-                        realize
-                        map
-                fall back to -bios
-            virt_flash_fdt()
-                update FDT
-
-Hope this helps!
-
-> To re-state: I'm not complaining about the patch, just saying that I've
-> failed to understand it. I don't insist on understanding it (I'm fine if
-> others understand it and approve it), but if I'm expected to ACK, I'll
-> need more explanation. A lot more. :) Preferably captured within the series.
->
-> Thanks (and I apologize)
-
-No problem.
+> ---
+>  target/i386/cpu.h     |  3 +-
+>  target/i386/helper.c  | 79 ++++++++++++++++++++-----------------------
+>  target/i386/monitor.c |  3 +-
+>  3 files changed, 39 insertions(+), 46 deletions(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index b39327dcb7..139fe30960 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1924,8 +1924,7 @@ void enable_compat_apic_id_mode(void);
+>  #define APIC_DEFAULT_ADDRESS 0xfee00000
+>  #define APIC_SPACE_SIZE      0x100000
+>  
+> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+> -                                   fprintf_function cpu_fprintf, int flags);
+> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags);
+>  
+>  /* cpu.c */
+>  bool cpu_is_bsp(X86CPU *cpu);
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index e695f8ba7a..565391a9f6 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+> +#include "qemu/qemu-print.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_i386.h"
+>  #ifndef CONFIG_USER_ONLY
+> @@ -231,12 +232,10 @@ static inline const char *dm2str(uint32_t dm)
+>      return str[dm];
+>  }
+>  
+> -static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
+> -                          const char *name, uint32_t lvt, bool is_timer)
+> +static void dump_apic_lvt(const char *name, uint32_t lvt, bool is_timer)
+>  {
+>      uint32_t dm = (lvt & APIC_LVT_DELIV_MOD) >> APIC_LVT_DELIV_MOD_SHIFT;
+> -    cpu_fprintf(f,
+> -                "%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
+> +    qemu_printf("%s\t 0x%08x %s %-5s %-6s %-7s %-12s %-6s",
+>                  name, lvt,
+>                  lvt & APIC_LVT_INT_POLARITY ? "active-lo" : "active-hi",
+>                  lvt & APIC_LVT_LEVEL_TRIGGER ? "level" : "edge",
+> @@ -248,9 +247,9 @@ static void dump_apic_lvt(FILE *f, fprintf_function cpu_fprintf,
+>                                              "tsc-deadline" : "one-shot",
+>                  dm2str(dm));
+>      if (dm != APIC_DM_NMI) {
+> -        cpu_fprintf(f, " (vec %u)\n", lvt & APIC_VECTOR_MASK);
+> +        qemu_printf(" (vec %u)\n", lvt & APIC_VECTOR_MASK);
+>      } else {
+> -        cpu_fprintf(f, "\n");
+> +        qemu_printf("\n");
+>      }
+>  }
+>  
+> @@ -282,8 +281,7 @@ static inline void mask2str(char *str, uint32_t val, uint8_t size)
+>  
+>  #define MAX_LOGICAL_APIC_ID_MASK_SIZE 16
+>  
+> -static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+> -                          APICCommonState *s, CPUX86State *env)
+> +static void dump_apic_icr(APICCommonState *s, CPUX86State *env)
+>  {
+>      uint32_t icr = s->icr[0], icr2 = s->icr[1];
+>      uint8_t dest_shorthand = \
+> @@ -293,16 +291,16 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+>      uint32_t dest_field;
+>      bool x2apic;
+>  
+> -    cpu_fprintf(f, "ICR\t 0x%08x %s %s %s %s\n",
+> +    qemu_printf("ICR\t 0x%08x %s %s %s %s\n",
+>                  icr,
+>                  logical_mod ? "logical" : "physical",
+>                  icr & APIC_ICR_TRIGGER_MOD ? "level" : "edge",
+>                  icr & APIC_ICR_LEVEL ? "assert" : "de-assert",
+>                  shorthand2str(dest_shorthand));
+>  
+> -    cpu_fprintf(f, "ICR2\t 0x%08x", icr2);
+> +    qemu_printf("ICR2\t 0x%08x", icr2);
+>      if (dest_shorthand != 0) {
+> -        cpu_fprintf(f, "\n");
+> +        qemu_printf("\n");
+>          return;
+>      }
+>      x2apic = env->features[FEAT_1_ECX] & CPUID_EXT_X2APIC;
+> @@ -310,9 +308,9 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+>  
+>      if (!logical_mod) {
+>          if (x2apic) {
+> -            cpu_fprintf(f, " cpu %u (X2APIC ID)\n", dest_field);
+> +            qemu_printf(" cpu %u (X2APIC ID)\n", dest_field);
+>          } else {
+> -            cpu_fprintf(f, " cpu %u (APIC ID)\n",
+> +            qemu_printf(" cpu %u (APIC ID)\n",
+>                          dest_field & APIC_LOGDEST_XAPIC_ID);
+>          }
+>          return;
+> @@ -320,87 +318,84 @@ static void dump_apic_icr(FILE *f, fprintf_function cpu_fprintf,
+>  
+>      if (s->dest_mode == 0xf) { /* flat mode */
+>          mask2str(apic_id_str, icr2 >> APIC_ICR_DEST_SHIFT, 8);
+> -        cpu_fprintf(f, " mask %s (APIC ID)\n", apic_id_str);
+> +        qemu_printf(" mask %s (APIC ID)\n", apic_id_str);
+>      } else if (s->dest_mode == 0) { /* cluster mode */
+>          if (x2apic) {
+>              mask2str(apic_id_str, dest_field & APIC_LOGDEST_X2APIC_ID, 16);
+> -            cpu_fprintf(f, " cluster %u mask %s (X2APIC ID)\n",
+> +            qemu_printf(" cluster %u mask %s (X2APIC ID)\n",
+>                          dest_field >> APIC_LOGDEST_X2APIC_SHIFT, apic_id_str);
+>          } else {
+>              mask2str(apic_id_str, dest_field & APIC_LOGDEST_XAPIC_ID, 4);
+> -            cpu_fprintf(f, " cluster %u mask %s (APIC ID)\n",
+> +            qemu_printf(" cluster %u mask %s (APIC ID)\n",
+>                          dest_field >> APIC_LOGDEST_XAPIC_SHIFT, apic_id_str);
+>          }
+>      }
+>  }
+>  
+> -static void dump_apic_interrupt(FILE *f, fprintf_function cpu_fprintf,
+> -                                const char *name, uint32_t *ireg_tab,
+> +static void dump_apic_interrupt(const char *name, uint32_t *ireg_tab,
+>                                  uint32_t *tmr_tab)
+>  {
+>      int i, empty = true;
+>  
+> -    cpu_fprintf(f, "%s\t ", name);
+> +    qemu_printf("%s\t ", name);
+>      for (i = 0; i < 256; i++) {
+>          if (apic_get_bit(ireg_tab, i)) {
+> -            cpu_fprintf(f, "%u%s ", i,
+> +            qemu_printf("%u%s ", i,
+>                          apic_get_bit(tmr_tab, i) ? "(level)" : "");
+>              empty = false;
+>          }
+>      }
+> -    cpu_fprintf(f, "%s\n", empty ? "(none)" : "");
+> +    qemu_printf("%s\n", empty ? "(none)" : "");
+>  }
+>  
+> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+> -                                   fprintf_function cpu_fprintf, int flags)
+> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
+>  {
+>      X86CPU *cpu = X86_CPU(cs);
+>      APICCommonState *s = APIC_COMMON(cpu->apic_state);
+>      if (!s) {
+> -        cpu_fprintf(f, "local apic state not available\n");
+> +        qemu_printf("local apic state not available\n");
+>          return;
+>      }
+>      uint32_t *lvt = s->lvt;
+>  
+> -    cpu_fprintf(f, "dumping local APIC state for CPU %-2u\n\n",
+> +    qemu_printf("dumping local APIC state for CPU %-2u\n\n",
+>                  CPU(cpu)->cpu_index);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVT0", lvt[APIC_LVT_LINT0], false);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVT1", lvt[APIC_LVT_LINT1], false);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVTPC", lvt[APIC_LVT_PERFORM], false);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVTERR", lvt[APIC_LVT_ERROR], false);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVTTHMR", lvt[APIC_LVT_THERMAL], false);
+> -    dump_apic_lvt(f, cpu_fprintf, "LVTT", lvt[APIC_LVT_TIMER], true);
+> +    dump_apic_lvt("LVT0", lvt[APIC_LVT_LINT0], false);
+> +    dump_apic_lvt("LVT1", lvt[APIC_LVT_LINT1], false);
+> +    dump_apic_lvt("LVTPC", lvt[APIC_LVT_PERFORM], false);
+> +    dump_apic_lvt("LVTERR", lvt[APIC_LVT_ERROR], false);
+> +    dump_apic_lvt("LVTTHMR", lvt[APIC_LVT_THERMAL], false);
+> +    dump_apic_lvt("LVTT", lvt[APIC_LVT_TIMER], true);
+>  
+> -    cpu_fprintf(f, "Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
+> +    qemu_printf("Timer\t DCR=0x%x (divide by %u) initial_count = %u\n",
+>                  s->divide_conf & APIC_DCR_MASK,
+>                  divider_conf(s->divide_conf),
+>                  s->initial_count);
+>  
+> -    cpu_fprintf(f, "SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
+> +    qemu_printf("SPIV\t 0x%08x APIC %s, focus=%s, spurious vec %u\n",
+>                  s->spurious_vec,
+>                  s->spurious_vec & APIC_SPURIO_ENABLED ? "enabled" : "disabled",
+>                  s->spurious_vec & APIC_SPURIO_FOCUS ? "on" : "off",
+>                  s->spurious_vec & APIC_VECTOR_MASK);
+>  
+> -    dump_apic_icr(f, cpu_fprintf, s, &cpu->env);
+> +    dump_apic_icr(s, &cpu->env);
+>  
+> -    cpu_fprintf(f, "ESR\t 0x%08x\n", s->esr);
+> +    qemu_printf("ESR\t 0x%08x\n", s->esr);
+>  
+> -    dump_apic_interrupt(f, cpu_fprintf, "ISR", s->isr, s->tmr);
+> -    dump_apic_interrupt(f, cpu_fprintf, "IRR", s->irr, s->tmr);
+> +    dump_apic_interrupt("ISR", s->isr, s->tmr);
+> +    dump_apic_interrupt("IRR", s->irr, s->tmr);
+>  
+> -    cpu_fprintf(f, "\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
+> +    qemu_printf("\nAPR 0x%02x TPR 0x%02x DFR 0x%02x LDR 0x%02x",
+>                  s->arb_id, s->tpr, s->dest_mode, s->log_dest);
+>      if (s->dest_mode == 0) {
+> -        cpu_fprintf(f, "(cluster %u: id %u)",
+> +        qemu_printf("(cluster %u: id %u)",
+>                      s->log_dest >> APIC_LOGDEST_XAPIC_SHIFT,
+>                      s->log_dest & APIC_LOGDEST_XAPIC_ID);
+>      }
+> -    cpu_fprintf(f, " PPR 0x%02x\n", apic_get_ppr(s));
+> +    qemu_printf(" PPR 0x%02x\n", apic_get_ppr(s));
+>  }
+>  #else
+> -void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
+> -                                   fprintf_function cpu_fprintf, int flags)
+> +void x86_cpu_dump_local_apic_state(CPUState *cs, int flags)
+>  {
+>  }
+>  #endif /* !CONFIG_USER_ONLY */
+> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+> index 74a13c571b..56e2dbece7 100644
+> --- a/target/i386/monitor.c
+> +++ b/target/i386/monitor.c
+> @@ -664,8 +664,7 @@ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "No CPU available\n");
+>          return;
+>      }
+> -    x86_cpu_dump_local_apic_state(cs, (FILE *)mon, monitor_fprintf,
+> -                                  CPU_DUMP_FPU);
+> +    x86_cpu_dump_local_apic_state(cs, CPU_DUMP_FPU);
+>  }
+>  
+>  void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
