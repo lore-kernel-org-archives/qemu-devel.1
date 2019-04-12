@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43668)
+Received: from eggs.gnu.org ([209.51.188.92]:44350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hEoxJ-0001Jb-7b
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:30 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEp0P-0002P3-Ex
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hEoxI-0008S1-47
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:29 -0400
-From: Nicholas Piggin <npiggin@gmail.com>
-Date: Fri, 12 Apr 2019 15:42:13 +1000
-Message-Id: <20190412054214.707-1-npiggin@gmail.com>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hEp0O-0007cP-7o
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:45:41 -0400
+Date: Fri, 12 Apr 2019 13:44:07 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190412054407.GA5035@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190313044253.31988-1-richardw.yang@linux.intel.com>
+	<20190313044253.31988-4-richardw.yang@linux.intel.com>
+	<20190313132300.3f56a5ca@redhat.com>
+	<20190313133359.h2njohyijgvkcbtv@master>
+	<20190313170943.5384f5cf@redhat.com>
+	<20190402035343.GA6527@richard>
+	<20190402081512.6194a58f@redhat.com>
+	<20190405085529.GA24071@richard>
+	<20190409165415.2e5df0c6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] spapr: add splpar hcalls H_JOIN, H_PROD,
- H_CONFER
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190409165415.2e5df0c6@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] hw/acpi: Extract build_mcfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,125 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>, shannon.zhaosl@gmail.com, wei.w.wang@intel.com, qemu-arm@nongnu.org
 
-These implementations have a few deficiencies that are noted, but are
-good enough for Linux to use.
+On Tue, Apr 09, 2019 at 04:54:15PM +0200, Igor Mammedov wrote:
+>> 
+>> Let's see a normal hotplug case first. 
+>> 
+>>     I did one test to see the how a guest with hot-plug cpu migrate to
+>>     destination.  It looks the migration fails if I just do hot-plug at
+>>     source. So I have to do hot-plug both at source and at destination. This
+>>     will expand the table_mr both at source and destination.
+>> 
+>> Then let's see the effect of hotplug more devices to exceed original padded
+>> size. There are two cases, before re-sizable MemoryRegion and after.
+>> 
+>> 1) Before re-sizable MemoryRegion introduced
+>> 
+>>     Before re-sizable MemoryRegion introduced, we just pad table_mr to 4K. And
+>>     this size never gets bigger, if I am right. To be accurate, the table_blob
+>>     would grow to next padded size if we hot-add more cpus/pci bridge, but we
+>>     just copy the original size of MemoryRegion. Even without migration, the
+>>     ACPI table is corrupted when we expand to next padded size.
+>>     
+>>     Is my understanding correct here?
+>> 
+>> 2) After re-sizable MemoryRegion introduced
+>> 
+>>     This time both tabl_blob and MemoryRegion grows when it expand to next
+>>     padded size. Since we need to hot-add device at both side, ACPI table
+>>     grows at the same pace.
+>> 
+>>     Every thing looks good, until one of it exceed the resizable
+>>     MemoryRegion's max size. (Not sure this is possible in reality, while
+>>     possible in theory). Actually, this looks like case 1) when resizable
+>>     MemoryRegion is not introduced. The too big ACPI table get corrupted.
+>> 
+>> So if my understanding is correct, the procedure you mentioned "expand from
+>> initial padded size to next padded size" only applies to two different max
+>> size resizable MemoryRegion. For other cases, the procedure corrupt the ACPI
+>> table itself.
+>> 
+>> Then when we look at
+>> 
+>>     commit 07fb61760cdea7c3f1b9c897513986945bca8e89
+>>     Author: Paolo Bonzini <pbonzini@redhat.com>
+>>     Date:   Mon Jul 28 17:34:15 2014 +0200
+>>     
+>>         pc: hack for migration compatibility from QEMU 2.0
+>>     
+>> This fix ACPI migration issue before resizable MemoryRegion is
+>> introduced(introduced in 2015-01-08). This looks expand to next padded size
+>> always corrupt ACPI table at that time. And it make me think expand to next
+>> padded size is not the procedure we should do?
+>> 
+>> And my colleague Wei Wang(in cc) mentioned, to make migration succeed, the
+>> MemoryRegion has to be the same size at both side. So I guess the problem
+>> doesn't lie in hotplug but in "main table" size difference.
+>
+>It's true only for pre-resizable MemoryRegion QEMU versions,
+>after that size doesn't affect migration anymore.
+>
+>
+>> For example, we have two version of Qemu: v1 and v2. Their "main table" size
+>> is:
+>> 
+>>     v1: 3990
+>>     v2: 4020
+>> 
+>> At this point, their ACPI table all padded to 4k, which is the same.
+>> 
+>> Then we create a machine with 1 more vcpu by these two versions. This will
+>> expand the table to:
+>> 
+>>     v1: 4095
+>>     v2: 4125
+>> 
+>> After padding, v1's ACPI table size is still 4k but v2's is 8k. Now the
+>> migration is broken.
+>> 
+>> If this analysis is correct, the relationship between migration failure and
+>> ACPI table is "the change of ACPI table size". Any size change of any
+>you should make distinction between used_length and max_length here.
+>Migration puts on wire used_length and that's what matter for keeping migration
+>working.
+>
+>> ACPI table would break migration. While of course, since we pad the table,
+>> only some combinations of tables would result in a visible real size change in
+>> MemoryRegion.
+>> 
+>> Then the principle for future ACPI development is to keep all ACPI table size
+>> unchanged.
+>once again it applies only for QEMU (versions < 2.1) and that was
+>the problem (i.e. there always would be configurations that would create
+>differently sized tables regardless of arbitrary size we would preallocate)
+>resizable MemoryRegions solved.
+> 
+>> Now let's back to mcfg table. As the comment mentioned, guest could
+>> enable/disable MCFG, so the code here reserve table no matter it is enabled or
+>> not. This behavior ensures ACPI table size not changed. So do we need to find
+>> the machine type as you suggested before?
+>We should be able to drop mcgf 'padding' hack since machine version
+>which was introduced in the QEMU version that introduced resizable MemoryRegion
+>as well.
+>
+>I'll send a patch to address that
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Hi, Igor,
 
----
-This has been tested with TCG with some Linux hacks to use H_JOIN/H_PROD
-for suspend and CPU unplug (plus an implementation of ibm,suspend-me to
-do the suspend). Not sure if KVM might need some more work to support
-H_JOIN properly, but right now Linux only uses it on PowerVM.
+We have found the qemu version 2.1 which is with resizable MemoryRegion
+enabled and q35 will stop support version before 2.3. The concern about ACPI
+mcfg table breaking live migration is solved, right?
 
+If so, I would prepare mcfg refactor patch based on your cleanup.
 
- hw/ppc/spapr_hcall.c | 84 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 8a736797b9..6829cadcd3 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1065,6 +1065,86 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    CPUPPCState *env = &cpu->env;
-+    CPUState *cs = CPU(cpu);
-+
-+    if (env->msr & (1ULL << MSR_EE))
-+        return H_BAD_MODE;
-+
-+    /*
-+     * This should check for single-threaded mode. In practice, Linux
-+     * does not try to H_JOIN all CPUs.
-+     */
-+
-+    cs->halted = 1;
-+    cs->exception_index = EXCP_HALTED;
-+    cs->exit_request = 1;
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs = CPU(cpu);
-+
-+    /*
-+     * This does not do a targeted yield or confer, but check the parameter
-+     * anyway. -1 means confer to all/any other CPUs.
-+     */
-+    if (target != -1 && !CPU(spapr_find_cpu(target)))
-+        return H_PARAMETER;
-+
-+    /*
-+     * H_CONFER with target == this is not exactly the same as H_JOIN
-+     * according to PAPR (e.g., MSR[EE] check and single threaded check
-+     * is not done in this case), but unlikely to matter.
-+     */
-+    if (cpu == spapr_find_cpu(target))
-+        return h_join(cpu, spapr, opcode, args);
-+
-+    /*
-+     * This does not implement the dispatch sequence check that PAPR calls for,
-+     * but PAPR also specifies a stronger implementation where the target must
-+     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
-+     * scheduling requirement implemented, there is no correctness reason to
-+     * implement the dispatch sequence check.
-+     */
-+    cs->exception_index = EXCP_YIELD;
-+    cpu_loop_exit(cs);
-+
-+    return H_SUCCESS;
-+}
-+
-+/*
-+ * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
-+ * achievable running under KVM, although KVM already implements H_CONFER
-+ * this way.
-+ */
-+static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs;
-+
-+    /*
-+     * This does not maintain a prod flag for the vCPU that PAPR asks for.
-+     */
-+
-+    cs = CPU(spapr_find_cpu(target));
-+    if (!cs)
-+        return H_PARAMETER;
-+
-+    cs->halted = 0;
-+    qemu_cpu_kick(cs);
-+
-+    return H_SUCCESS;
-+}
-+
- static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
-@@ -1860,6 +1940,10 @@ static void hypercall_register_types(void)
-     /* hcall-splpar */
-     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
-     spapr_register_hypercall(H_CEDE, h_cede);
-+    spapr_register_hypercall(H_CONFER, h_confer);
-+    spapr_register_hypercall(H_JOIN, h_join);
-+    spapr_register_hypercall(H_PROD, h_prod);
-+
-     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
- 
-     /* processor register resource access h-calls */
 -- 
-2.20.1
+Wei Yang
+Help you, Help me
