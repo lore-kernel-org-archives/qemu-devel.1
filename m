@@ -3,61 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2594CC282CE
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020C0C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF04121872
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF04121872
+	by mail.kernel.org (Postfix) with ESMTPS id B801C2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B801C2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35790 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35794 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvR0-0005XE-3e
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:37:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39148)
+	id 1hEvRD-0005jC-0K
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:37:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvFu-0002ZN-6K
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFb-00024Y-Ge
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvFs-0002eA-Tt
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33176)
+	(envelope-from <thuth@redhat.com>) id 1hEvFZ-0002Pw-NX
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:25:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hEvFs-0002dM-IJ; Fri, 12 Apr 2019 08:26:04 -0400
+	id 1hEvFY-0002OJ-FI; Fri, 12 Apr 2019 08:25:45 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C96EAC062ED8;
-	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 525AA3082129;
+	Fri, 12 Apr 2019 12:25:43 +0000 (UTC)
 Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B522A5D9CC;
-	Fri, 12 Apr 2019 12:26:01 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8ACA05D9CC;
+	Fri, 12 Apr 2019 12:25:41 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: cohuck@redhat.com,
 	qemu-s390x@nongnu.org
-Date: Fri, 12 Apr 2019 14:25:18 +0200
-Message-Id: <20190412122523.24111-13-thuth@redhat.com>
+Date: Fri, 12 Apr 2019 14:25:11 +0200
+Message-Id: <20190412122523.24111-6-thuth@redhat.com>
 In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
 References: <20190412122523.24111-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 12 Apr 2019 12:25:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 12/17] s390-bios:
- Refactor virtio to run channel programs via cio
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 05/17] s390-bios:
+ Decouple channel i/o logic from virtio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,164 +74,222 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412122518.pIu-IBAnO94xDBKzsKK98J2OIrAOcBWAlCf8nZqgZCM@z>
+Message-ID: <20190412122511.m4AITkpcRgKlzk14l2EBbutsbVjO_P4BdtxCwHaaNCU@z>
 
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Now that we have a Channel I/O library let's modify virtio boot code to
-make use of it for running channel programs.
+Create a separate library for channel i/o related code. This decouples
+channel i/o operations from virtio and allows us to make use of them for
+the real dasd boot path.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1554388475-18329-13-git-send-email-jjherne@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1554388475-18329-6-git-send-email-jjherne@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/virtio.c | 57 +++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 30 deletions(-)
+ pc-bios/s390-ccw/Makefile    |  2 +-
+ pc-bios/s390-ccw/cio.c       | 44 ++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/cio.h       |  3 +++
+ pc-bios/s390-ccw/main.c      |  1 +
+ pc-bios/s390-ccw/netboot.mak |  2 +-
+ pc-bios/s390-ccw/netmain.c   |  1 +
+ pc-bios/s390-ccw/s390-ccw.h  |  1 -
+ pc-bios/s390-ccw/virtio.c    | 27 ++--------------------
+ 8 files changed, 53 insertions(+), 28 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/cio.c
 
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 1eb316b02f..12ad9c1d58 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -10,7 +10,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+ .PHONY : all clean build-all
+=20
+ OBJECTS =3D start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
+-	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
++	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o cio.o
+=20
+ QEMU_CFLAGS :=3D $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS +=3D -ffreestanding -fno-delete-null-pointer-checks -msoft-f=
+loat
+diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+new file mode 100644
+index 0000000000..87c6b34e88
+--- /dev/null
++++ b/pc-bios/s390-ccw/cio.c
+@@ -0,0 +1,44 @@
++/*
++ * S390 Channel I/O
++ *
++ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
++ * Copyright (c) 2019 IBM Corp.
++ *
++ * Author(s): Jason J. Herne <jjherne@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include "libc.h"
++#include "s390-ccw.h"
++#include "cio.h"
++
++static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)))=
+;
++
++int enable_mss_facility(void)
++{
++    int ret;
++    ChscAreaSda *sda_area =3D (ChscAreaSda *) chsc_page;
++
++    memset(sda_area, 0, PAGE_SIZE);
++    sda_area->request.length =3D 0x0400;
++    sda_area->request.code =3D 0x0031;
++    sda_area->operation_code =3D 0x2;
++
++    ret =3D chsc(sda_area);
++    if ((ret =3D=3D 0) && (sda_area->response.code =3D=3D 0x0001)) {
++        return 0;
++    }
++    return -EIO;
++}
++
++void enable_subchannel(SubChannelId schid)
++{
++    Schib schib;
++
++    stsch_err(schid, &schib);
++    schib.pmcw.ena =3D 1;
++    msch(schid, &schib);
++}
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index ed5b2cbf72..218fd96ea3 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -213,6 +213,9 @@ typedef struct irb {
+     __u32 emw[8];
+ }  __attribute__ ((packed, aligned(4))) Irb;
+=20
++int enable_mss_facility(void);
++void enable_subchannel(SubChannelId schid);
++
+ /*
+  * Some S390 specific IO instructions as inline
+  */
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 67df42191b..10f04c6906 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -10,6 +10,7 @@
+=20
+ #include "libc.h"
+ #include "s390-ccw.h"
++#include "cio.h"
+ #include "virtio.h"
+=20
+ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+index 14e96b2aa6..5eefb7c289 100644
+--- a/pc-bios/s390-ccw/netboot.mak
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -1,7 +1,7 @@
+=20
+ SLOF_DIR :=3D $(SRC_PATH)/roms/SLOF
+=20
+-NETOBJS :=3D start.o sclp.o virtio.o virtio-net.o jump2ipl.o netmain.o \
++NETOBJS :=3D start.o sclp.o cio.o virtio.o virtio-net.o jump2ipl.o netma=
+in.o \
+ 	   libnet.a libc.a
+=20
+ LIBC_INC :=3D -nostdinc -I$(SLOF_DIR)/lib/libc/include
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+index 0392131c27..5189c0fc39 100644
+--- a/pc-bios/s390-ccw/netmain.c
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -33,6 +33,7 @@
+ #include <pxelinux.h>
+=20
+ #include "s390-ccw.h"
++#include "cio.h"
+ #include "virtio.h"
+=20
+ #define DEFAULT_BOOT_RETRIES 10
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 241c6d0b69..b39ee5d323 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -72,7 +72,6 @@ unsigned long virtio_load_direct(ulong rec_list1, ulong=
+ rec_list2,
+ bool virtio_is_supported(SubChannelId schid);
+ void virtio_blk_setup_device(SubChannelId schid);
+ int virtio_read(ulong sector, void *load_addr);
+-int enable_mss_facility(void);
+ u64 get_clock(void);
+ ulong get_second(void);
+=20
 diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index aa9da7253f..35278eaee1 100644
+index cdb66f459e..aa9da7253f 100644
 --- a/pc-bios/s390-ccw/virtio.c
 +++ b/pc-bios/s390-ccw/virtio.c
-@@ -14,6 +14,7 @@
+@@ -10,6 +10,7 @@
+=20
+ #include "libc.h"
+ #include "s390-ccw.h"
++#include "cio.h"
  #include "virtio.h"
  #include "virtio-scsi.h"
  #include "bswap.h"
-+#include "helper.h"
+@@ -20,8 +21,6 @@ static VRing block[VIRTIO_MAX_VQS];
+ static char ring_area[VIRTIO_RING_SIZE * VIRTIO_MAX_VQS]
+                      __attribute__((__aligned__(PAGE_SIZE)));
 =20
- #define VRING_WAIT_REPLY_TIMEOUT 30
-=20
-@@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
-     }
- }
-=20
--static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
-+static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
+-static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)))=
+;
+-
+ static VDev vdev =3D {
+     .nr_vqs =3D 1,
+     .vrings =3D block,
+@@ -94,14 +93,9 @@ static int run_ccw(VDev *vdev, int cmd, void *ptr, int=
+ len)
  {
      Ccw1 ccw =3D {};
--    CmdOrb orb =3D {};
--    int r;
--
--    enable_subchannel(vdev->schid);
--
--    /* start subchannel command */
--    orb.fmt =3D 1;
--    orb.cpa =3D (u32)(long)&ccw;
--    orb.lpm =3D 0x80;
+     CmdOrb orb =3D {};
+-    Schib schib;
+     int r;
 =20
-     ccw.cmd_code =3D cmd;
-     ccw.cda =3D (long)ptr;
-     ccw.count =3D len;
-=20
--    r =3D ssch(vdev->schid, &orb);
--    /*
--     * XXX Wait until device is done processing the CCW. For now we can
--     *     assume that a simple tsch will have finished the CCW processi=
-ng,
--     *     but the architecture allows for asynchronous operation
--     */
--    if (!r) {
--        r =3D drain_irqs(vdev->schid);
-+    if (sli) {
-+        ccw.flags |=3D CCW_FLAG_SLI;
-     }
--    return r;
-+
+-    /* start command processing */
+-    stsch_err(vdev->schid, &schib);
+-    /* enable the subchannel for IPL device */
+-    schib.pmcw.ena =3D 1;
+-    msch(vdev->schid, &schib);
 +    enable_subchannel(vdev->schid);
-+    return do_cio(vdev->schid, vdev->senseid.cu_type, ptr2u32(&ccw), CCW=
-_FMT1);
+=20
+     /* start subchannel command */
+     orb.fmt =3D 1;
+@@ -343,20 +337,3 @@ bool virtio_is_supported(SubChannelId schid)
+     }
+     return false;
  }
-=20
- static void vring_init(VRing *vr, VqInfo *info)
-@@ -257,7 +245,7 @@ void virtio_setup_ccw(VDev *vdev)
-     vdev->config.blk.blk_size =3D 0; /* mark "illegal" - setup started..=
-. */
-     vdev->guessed_disk_nature =3D VIRTIO_GDN_NONE;
-=20
--    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
-+    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0, false);
-=20
-     switch (vdev->senseid.cu_model) {
-     case VIRTIO_ID_NET:
-@@ -278,18 +266,19 @@ void virtio_setup_ccw(VDev *vdev)
-     default:
-         panic("Unsupported virtio device\n");
-     }
--    IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size)=
- =3D=3D 0,
--               "Could not get block device configuration");
-+    IPL_assert(
-+        run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size, false)=
- =3D=3D 0,
-+       "Could not get block device configuration");
-=20
-     /* Feature negotiation */
-     for (i =3D 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
-         feats.features =3D 0;
-         feats.index =3D i;
--        rc =3D run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
-+        rc =3D run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats), f=
-alse);
-         IPL_assert(rc =3D=3D 0, "Could not get features bits");
-         vdev->guest_features[i] &=3D bswap32(feats.features);
-         feats.features =3D bswap32(vdev->guest_features[i]);
--        rc =3D run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
-+        rc =3D run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats), =
-false);
-         IPL_assert(rc =3D=3D 0, "Could not set features bits");
-     }
-=20
-@@ -306,16 +295,17 @@ void virtio_setup_ccw(VDev *vdev)
-         };
-=20
-         IPL_assert(
--            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config))=
- =3D=3D 0,
-+            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config),=
- false) =3D=3D 0,
-             "Could not get block device VQ configuration");
-         info.num =3D config.num;
-         vring_init(&vdev->vrings[i], &info);
-         vdev->vrings[i].schid =3D vdev->schid;
--        IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) =3D=
-=3D 0,
--                   "Cannot set VQ info");
-+        IPL_assert(
-+            run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info), false) =3D=
-=3D 0,
-+            "Cannot set VQ info");
-     }
-     IPL_assert(
--        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) =3D=
-=3D 0,
-+        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status), fal=
-se) =3D=3D 0,
-         "Could not write status to host");
- }
-=20
-@@ -323,8 +313,15 @@ bool virtio_is_supported(SubChannelId schid)
- {
-     vdev.schid =3D schid;
-     memset(&vdev.senseid, 0, sizeof(vdev.senseid));
--    /* run sense id command */
--    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.sens=
-eid))) {
-+
-+    /*
-+     * Run sense id command.
-+     * The size of the senseid data differs between devices (notably,
-+     * between virtio devices and dasds), so specify the largest possibl=
-e
-+     * size and suppress the incorrect length indication for smaller siz=
-es.
-+     */
-+    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.sens=
-eid),
-+                true)) {
-         return false;
-     }
-     if (vdev.senseid.cu_type =3D=3D 0x3832) {
+-
+-int enable_mss_facility(void)
+-{
+-    int ret;
+-    ChscAreaSda *sda_area =3D (ChscAreaSda *) chsc_page;
+-
+-    memset(sda_area, 0, PAGE_SIZE);
+-    sda_area->request.length =3D 0x0400;
+-    sda_area->request.code =3D 0x0031;
+-    sda_area->operation_code =3D 0x2;
+-
+-    ret =3D chsc(sda_area);
+-    if ((ret =3D=3D 0) && (sda_area->response.code =3D=3D 0x0001)) {
+-        return 0;
+-    }
+-    return -EIO;
+-}
 --=20
 2.21.0
 
