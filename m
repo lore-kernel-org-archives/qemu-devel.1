@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38473)
+Received: from eggs.gnu.org ([209.51.188.92]:38846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF4ka-0003AN-LJ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:34:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4mD-0003xq-Mt
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF4kZ-0000pQ-Ok
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:34:24 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44367)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4mC-0001yH-PM
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:36:05 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45636)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hF4kZ-0000oa-6Y
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:34:23 -0400
-Received: by mail-pf1-x441.google.com with SMTP id y13so5778093pfm.11
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 15:34:23 -0700 (PDT)
+	id 1hF4mC-0001xa-DN
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 18:36:04 -0400
+Received: by mail-pl1-x641.google.com with SMTP id bf11so5758612plb.12
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 15:36:04 -0700 (PDT)
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-8-david@redhat.com>
+	<20190411100836.646-9-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0c0c45f1-0721-78a8-fb46-f32e7701da0e@linaro.org>
-Date: Fri, 12 Apr 2019 12:34:11 -1000
+Message-ID: <60923e15-5529-04fa-125c-0c2adabbaf87@linaro.org>
+Date: Fri, 12 Apr 2019 12:35:59 -1000
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-8-david@redhat.com>
+In-Reply-To: <20190411100836.646-9-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 07/41] s390x/tcg: Implement VECTOR
- AVERAGE
+Subject: Re: [Qemu-devel] [PATCH v1 08/41] s390x/tcg: Implement VECTOR
+ AVERAGE LOGICAL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +36,19 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 On 4/11/19 12:08 AM, David Hildenbrand wrote:
-> +}
-> +static DisasJumpType op_vavg(DisasContext *s, DisasOps *o)
-> +{
+> Similar to VECTOR AVERAGE but without sign extension.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/helper.h           |  2 ++
+>  target/s390x/insn-data.def      |  2 ++
+>  target/s390x/translate_vx.inc.c | 48 +++++++++++++++++++++++++++++++++
+>  target/s390x/vec_int_helper.c   | 16 +++++++++++
+>  4 files changed, 68 insertions(+)
 
-Watch your spacing.
+The vector expansion for vavg applies here too, except with shri instead of
+sari.  And of course you code is correct as-is.
 
-
-> +    static const GVecGen3 g[4] = {
-> +        { .fno = gen_helper_gvec_vavg8, },
-> +        { .fno = gen_helper_gvec_vavg16, },
-> +        { .fni4 = gen_avg_i32, },
-> +        { .fni8 = gen_avg_i64, },
-> +    };
-
-Pondering possible vector expansions.  I think one possibility is
-
-  t1 = (a >> 1) + (b >> 1);
-
-We still have the two "0.5 bits" to add back in, plus we round up by adding
-another 0.5.  This means if either lsb is set, then we have carry in to the 1's
-bit.  So:
-
-  t1 = t1 + ((a | b) & 1);
-
-Which leads to
-
-  tcg_gen_sari_vec(vece, t0, a, 1);
-  tcg_gen_sari_vec(vece, t1, b, 1);
-  tcg_gen_or_vec(vece, t2, a, b);
-  tcg_gen_add_vec(vece, t0, t0, t1);
-  tcg_gen_dupi_vec(vece, t1, 1);
-  tcg_gen_and_vec(vece, t2, t2, t1);
-  tcg_gen_add_vec(vece, t0, t0, t2);
-
-  { .fnv = gen_avg_vec,
-    .fno = gen_helper_gvec_vavg8,
-    .opc = INDEX_op_sari_vec },
-
-But what you have here is correct and the above is mere optimization so,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
