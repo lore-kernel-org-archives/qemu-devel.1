@@ -2,84 +2,82 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98143C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F12DC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:16:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F0022070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F3712171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:16:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZM1E61Lb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F0022070D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dd6O+qMn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F3712171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42720 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42805 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF3S7-0004Dj-K7
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 17:11:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51404)
+	id 1hF3X1-0007to-77
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 17:16:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3Na-0000Sq-8Q
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:35 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hF3W3-0007OU-Gf
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3NY-000588-DY
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:34 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36476)
+	(envelope-from <fintelia@gmail.com>) id 1hF3Vw-0001eC-Is
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:15:14 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:36592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
-	id 1hF3NY-00057U-3w; Fri, 12 Apr 2019 17:06:32 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y13so13630090wrd.3;
-	Fri, 12 Apr 2019 14:06:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
+	id 1hF3Vu-0001cI-9Z; Fri, 12 Apr 2019 17:15:10 -0400
+Received: by mail-lf1-x144.google.com with SMTP id u17so8540884lfi.3;
+	Fri, 12 Apr 2019 14:15:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=W8ixuwHDYIWc5mB7FPo87JyNHztypB+6NDXzbL76bL0=;
-	b=ZM1E61LbF+Qmgd0WaBSvEy4wzNZQ1iF8EAYddbHs/hvxO/Fpo0Pe11GN5LfAMhJK58
-	ajufquT10aDK6jklTeUcCg/s2dZMsSOqPII0lKcBEgYUnp4AJv3iWCJyZCymLcVO942B
-	voQQhWzMu3BtbMftVw8lM3wN+j7iOhwwdsoacguKtYFMWQRLSxOoU2fWMGRuu+u5WK6U
-	JX2pvkvZiB7p4eX8FKb0oEmAsxTjhyWHiDOo1021xpwMLELbgAIY/yRJd/olOJ2JBpR5
-	RUFynkCpU2+F/ijIdLZQ6mca7rSo3aZPYWyzTxAbgiP6YD95sTf0FDkjzBEiL5/a62qB
-	KIzg==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=MfyNgsgC4DlTdcjLD+NXILuSu1rvA1GabN0BxqymjlE=;
+	b=Dd6O+qMn29ykF9RgdxoZLjFwEklNBSyHs2w8qkEbjS64i2E8cweCU594HmHDvRbVu0
+	gv3WcPifTDmY8z0h/Xt1vdUjdRoA2C2fYlTzphXJKQCy9KKGb3LNBfF7C4WiPrK1S2eL
+	qDgNtUo4aEDMohWzqoKDtJ5vjU1yxohRmc6NaCJKPl4+Lh4tqRTBJhIU9aaUHJlPZ1xw
+	SswdAujUILRke9EyCqkVOUL0shRO8Bp6zjdsh69xjNgScBRpn+N1NlwvbaG1kWyX007c
+	z6W6OblYVgKcbPTenYgyBRofg8V7u+ENXiMc/RMGOd/GHfDEuZGTswFc7YU1n9g+wZBF
+	e/pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=W8ixuwHDYIWc5mB7FPo87JyNHztypB+6NDXzbL76bL0=;
-	b=V4uzRthwuQZqR4MCONKDChJ+nc/6e/G93bVZNa2F1DsPdeuUDrmyvT4mjTZ4xN4MPY
-	sluwqqKkrhpLpCPWo5PE2Ktgo9JvuOFJOIBN+t/REyNbIPqan3+cSBbVw3qD81qBjQXH
-	b4sZjrfhtIUSuNhgTJc96nT32DhQP/NE8dGefciiAcr2K8BdxHdUoxBwhnavLGkYaTq7
-	JdYXRxFNtvS7vFfQXiqNOFSYpN8GvqQb9ApFqaCCv6O4qU5byY5GyFGr7XX950QOQL/3
-	D/btHV5+diY8kV+rSoSe4Xsx1Hhu/ca5iomLKr3i5jObcyboUqzeJv8BM3lj1o64XRiz
-	3QdQ==
-X-Gm-Message-State: APjAAAWkrMUlkLui4XEToGpxL4ABH+QTpKWvFebo9nP5YP96VfA5HZjf
-	MC6+X29BMJEq/eQJ2BudqQBAfk2h
-X-Google-Smtp-Source: APXvYqza9vkplNe1zHbdZHGFLAvua4bSEJpXPn24l3mVX6p3UWp68eSZV0wjREN4YbdQE1ur70H1mA==
-X-Received: by 2002:adf:f803:: with SMTP id s3mr18286487wrp.54.1555103190708; 
-	Fri, 12 Apr 2019 14:06:30 -0700 (PDT)
-Received: from localhost (x4d0c5397.dyn.telefonica.de. [77.12.83.151])
-	by smtp.gmail.com with ESMTPSA id
-	h12sm40804140wrq.95.2019.04.12.14.06.29
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 14:06:30 -0700 (PDT)
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-To: qemu-devel@nongnu.org,
-	hpoussin@reactos.org
-Date: Fri, 12 Apr 2019 23:06:17 +0200
-Message-Id: <1555103178-21894-4-git-send-email-atar4qemu@gmail.com>
-X-Mailer: git-send-email 2.7.2
-In-Reply-To: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
-References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=MfyNgsgC4DlTdcjLD+NXILuSu1rvA1GabN0BxqymjlE=;
+	b=k3EZVyb84m8QWLYKLEYL3SQUK9GhtfL9DHDsV+2+TSIT+fqA7W0g6X7p0eVv0EKrIR
+	sfRKb/3Nu1kwbQ/KPtIRyLQyPrDuVPxmzojzMK7vUBEnIK28N7xspGXf68R7GU4erVuv
+	6RfsKzzOCr63I0hDxsI0soiCkBamLkSXRSkkbMjpK5lAsb1ZlSwv8HFZJJXigbj7DD2J
+	Gha/i5Umg9xLrmojrFcISpsLAZVxul2RDOmpyflFvNcYUMdOvJhTtZFa3jVdcnPANQ77
+	WN6tB0/N3x2d7rJVYv4kWw0gv8o1NQ1nkydkMdqXJhP0BHVCjSO2cEwICAa2eBf26lED
+	se6w==
+X-Gm-Message-State: APjAAAVI/cebVHR7XWWCXXE/ILU2HSie6VAgZmR66V+HRy2tz6erlJul
+	xZk1Gf2sQmHzf11I5BsUpFq63jA7PKdh/8HCK10=
+X-Google-Smtp-Source: APXvYqwsVJSb5yC1aQjQmEfi/t19RPQYYJpGuEbK+iLf/U7mkxKebrpkCmjB7QcOc5WscwBpD5BpCnwJhp7upZdwS6I=
+X-Received: by 2002:ac2:485a:: with SMTP id 26mr5827018lfy.128.1555103707107; 
+	Fri, 12 Apr 2019 14:15:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <CANnJOVHadZt5Vho5sy6FGVgUW_yvYZg7BGDiGJFtRBCquyOXZA@mail.gmail.com>
+	<CAKmqyKNVno+jR_PYxgnyqQOSQFCn_ai7GH+hYPgaO=fkqHDa6A@mail.gmail.com>
+In-Reply-To: <CAKmqyKNVno+jR_PYxgnyqQOSQFCn_ai7GH+hYPgaO=fkqHDa6A@mail.gmail.com>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Fri, 12 Apr 2019 17:14:40 -0400
+Message-ID:
+ <CANnJOVHprai3DLd=PunsVDGUwaGvvA4ynou5_LhyGVztTf-tNQ@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 3/4] target/ppc: improve performance of large
- BAT invalidations
+X-Received-From: 2a00:1450:4864:20::144
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Do not allow sfence.vma from
+ user mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,44 +89,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412210617.xzRv6RkihDfEcxwbyIDJEtiMpbSaE5OQL3XvBvUFQU8@z>
+Message-ID: <20190412211440.n7-hMZflZo4yFyg_FQd53QkMwYjyURQ0X83q7GaKVyM@z>
 
-Performing a complete flush is ~ 100 times faster than flushing
-256MiB of 4KiB pages. Set a limit of 1024 pages and perform a complete
-flush afterwards.
+Just to double check, nothing further on this is need from me, right? It is
+set to be merged onto the master branch once the 4.0 release is out?
 
-This patch significantly speeds up AIX 5.1 and NetBSD-ofppc.
+Jonathan
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
----
- target/ppc/mmu_helper.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Wed, Apr 3, 2019 at 7:11 PM Alistair Francis <alistair23@gmail.com>
+wrote:
 
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 4a6be4d..d7eed3a 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1809,6 +1809,13 @@ static inline void do_invalidate_BAT(CPUPPCState *env, target_ulong BATu,
- 
-     base = BATu & ~0x0001FFFF;
-     end = base + mask + 0x00020000;
-+    if (((end - base) >> TARGET_PAGE_BITS) > 1024) {
-+        /* Flushing 1024 4K pages is slower than a complete flush */
-+        LOG_BATS("Flush all BATs\n");
-+        tlb_flush(CPU(cs));
-+        LOG_BATS("Flush done\n");
-+        return;
-+    }
-     LOG_BATS("Flush BAT from " TARGET_FMT_lx " to " TARGET_FMT_lx " ("
-              TARGET_FMT_lx ")\n", base, end, mask);
-     for (page = base; page != end; page += TARGET_PAGE_SIZE) {
--- 
-2.7.2
-
-
+> On Mon, Apr 1, 2019 at 1:39 PM Jonathan Behrens <fintelia@gmail.com>
+> wrote:
+> >
+> > The 'sfence.vma' instruction is privileged, and should only ever be
+> allowed
+> > when executing in supervisor mode or higher.
+> >
+> > Jonathan
+> >
+> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>
+> Alistair
+>
+> > ---
+> >  target/riscv/op_helper.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> > index b7dc18a41e..644d0fb35f 100644
+> > --- a/target/riscv/op_helper.c
+> > +++ b/target/riscv/op_helper.c
+> > @@ -145,9 +145,10 @@ void helper_tlb_flush(CPURISCVState *env)
+> >  {
+> >      RISCVCPU *cpu = riscv_env_get_cpu(env);
+> >      CPUState *cs = CPU(cpu);
+> > -    if (env->priv == PRV_S &&
+> > -        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > -        get_field(env->mstatus, MSTATUS_TVM)) {
+> > +    if (!(env->priv >= PRV_S) ||
+> > +        (env->priv == PRV_S &&
+> > +         env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > +         get_field(env->mstatus, MSTATUS_TVM))) {
+> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> >      } else {
+> >          tlb_flush(cs);
+> > --
+> > 2.20.1
+>
