@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB1AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E14C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E592083E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:17:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E592083E
+	by mail.kernel.org (Postfix) with ESMTPS id 3238C2083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 10:18:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3238C2083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33731 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33737 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEtFP-0004cN-WF
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:17:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38481)
+	id 1hEtGG-0005OQ-9r
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 06:18:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4W-0002Rc-FZ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:13 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3k-0001Y4-Gu
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4V-0004u6-0E
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60124)
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3h-0004H1-Hl
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hEt4P-0004pz-KL; Fri, 12 Apr 2019 06:06:07 -0400
+	id 1hEt3a-0004DV-8G; Fri, 12 Apr 2019 06:05:14 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31EC13086236;
-	Fri, 12 Apr 2019 10:06:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6F9E17EBC4;
+	Fri, 12 Apr 2019 10:05:13 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4C919C65;
-	Fri, 12 Apr 2019 10:06:01 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D4D4C19C65;
+	Fri, 12 Apr 2019 10:05:03 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Fri, 12 Apr 2019 12:03:46 +0200
-Message-Id: <20190412100354.6409-20-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:37 +0200
+Message-Id: <20190412100354.6409-11-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 12 Apr 2019 10:06:04 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Fri, 12 Apr 2019 10:05:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 19/27] hw/vfio/common: Introduce helpers to
- DMA map/unap a RAM section
+Subject: [Qemu-devel] [RFC v3 10/27] memory: Add IOMMUConfigNotifier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,279 +74,242 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412100346.yc4PeQEP11H7-peH__7eBcezVi_Flg1ChN68WKQ7zS0@z>
+Message-ID: <20190412100337.eY5vt_jUP2RBrZP-QKUILS-AP4Ltrvw8F1-LJDPHvP8@z>
 
-Let's introduce two helpers that allow to DMA map/unmap a RAM
-section. Those helpers will be called for nested stage setup in
-another call site. Also the vfio_listener_region_add/del()
-structure may be clearer.
+With this patch, an IOMMUNotifier can now be either
+an IOTLB notifier or a config notifier. A config notifier
+is supposed to be called on guest translation config change.
+This gives host a chance to update the physical IOMMU
+configuration so that is consistent with the guest view.
+
+The notifier is passed an IOMMUConfig. The first type of
+configuration introduced here consists in the PASID
+configuration.
+
+We introduce the associated helpers, iommu_config_notifier_init,
+memory_region_config_notify_iommu
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
 ---
- hw/vfio/common.c     | 178 ++++++++++++++++++++++++++-----------------
- hw/vfio/trace-events |   4 +-
- 2 files changed, 109 insertions(+), 73 deletions(-)
+
+v1 -> v2:
+- use pasid_table config
+- pass IOMMUNotifierFlag flags to iommu_config_notifier_init
+  to prepare for other config flags
+- Introduce IOMMUConfig
+- s/IOMMU_NOTIFIER_S1_CFG/IOMMU_NOTIFIER_PASID_CFG
+- remove unused IOMMUStage1ConfigType
+---
+ hw/vfio/common.c      | 15 ++++++++-----
+ include/exec/memory.h | 52 ++++++++++++++++++++++++++++++++++++++++++-
+ memory.c              | 25 +++++++++++++++++++++
+ 3 files changed, 86 insertions(+), 6 deletions(-)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 785d9c191c..cb541330d7 100644
+index a9004b6d20..0853c8c376 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -507,13 +507,116 @@ hostwin_from_range(VFIOContainer *container, hwadd=
-r iova, hwaddr end)
-     return NULL;
+@@ -703,11 +703,16 @@ static void vfio_listener_region_del(MemoryListener=
+ *listener,
+         VFIOGuestIOMMU *giommu;
+=20
+         QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+-            if (MEMORY_REGION(giommu->iommu) =3D=3D section->mr &&
+-                is_iommu_iotlb_notifier(&giommu->n) &&
+-                giommu->n.iotlb_notifier.start =3D=3D section->offset_wi=
+thin_region) {
+-                memory_region_unregister_iommu_notifier(section->mr,
+-                                                        &giommu->n);
++            if (MEMORY_REGION(giommu->iommu) =3D=3D section->mr) {
++                if (is_iommu_iotlb_notifier(&giommu->n) &&
++                    giommu->n.iotlb_notifier.start =3D=3D
++                        section->offset_within_region) {
++                    memory_region_unregister_iommu_notifier(section->mr,
++                                                            &giommu->n);
++                } else {
++                    memory_region_unregister_iommu_notifier(section->mr,
++                                                            &giommu->n);
++                }
+                 QLIST_REMOVE(giommu, giommu_next);
+                 g_free(giommu);
+                 break;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 3918352a17..f54052e9b3 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -26,6 +26,9 @@
+ #include "qom/object.h"
+ #include "qemu/rcu.h"
+ #include "hw/qdev-core.h"
++#ifdef CONFIG_LINUX
++#include <linux/iommu.h>
++#endif
+=20
+ #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+=20
+@@ -74,6 +77,14 @@ struct IOMMUTLBEntry {
+     IOMMUAccessFlags perm;
+ };
+=20
++typedef struct IOMMUConfig {
++    union {
++#ifdef __linux__
++        struct iommu_pasid_table_config pasid_cfg;
++#endif
++          };
++} IOMMUConfig;
++
+ /*
+  * Bitmap for different IOMMUNotifier capabilities. Each notifier can
+  * register with one or multiple IOMMU Notifier capability bit(s).
+@@ -84,13 +95,18 @@ typedef enum {
+     IOMMU_NOTIFIER_IOTLB_UNMAP =3D 0x1,
+     /* Notify entry changes (newly created entries) */
+     IOMMU_NOTIFIER_IOTLB_MAP =3D 0x2,
++    /* Notify stage 1 config changes */
++    IOMMU_NOTIFIER_CONFIG_PASID =3D 0x4,
+ } IOMMUNotifierFlag;
+=20
+ #define IOMMU_NOTIFIER_IOTLB_ALL (IOMMU_NOTIFIER_IOTLB_MAP | IOMMU_NOTIF=
+IER_IOTLB_UNMAP)
++#define IOMMU_NOTIFIER_CONFIG_ALL (IOMMU_NOTIFIER_CONFIG_PASID)
+=20
+ struct IOMMUNotifier;
+ typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+                             IOMMUTLBEntry *data);
++typedef void (*IOMMUConfigNotify)(struct IOMMUNotifier *notifier,
++                                  IOMMUConfig *cfg);
+=20
+ typedef struct IOMMUIOLTBNotifier {
+     IOMMUNotify notify;
+@@ -99,10 +115,15 @@ typedef struct IOMMUIOLTBNotifier {
+     hwaddr end;
+ } IOMMUIOLTBNotifier;
+=20
++typedef struct IOMMUConfigNotifier {
++    IOMMUConfigNotify notify;
++} IOMMUConfigNotifier;
++
+ struct IOMMUNotifier {
+     IOMMUNotifierFlag notifier_flags;
+     union {
+         IOMMUIOLTBNotifier iotlb_notifier;
++        IOMMUConfigNotifier config_notifier;
+     };
+     int iommu_idx;
+     QLIST_ENTRY(IOMMUNotifier) node;
+@@ -147,6 +168,16 @@ static inline void iommu_iotlb_notifier_init(IOMMUNo=
+tifier *n, IOMMUNotify fn,
+     n->iommu_idx =3D iommu_idx;
  }
 =20
-+static int vfio_dma_map_ram_section(VFIOContainer *container,
-+                                    MemoryRegionSection *section)
++static inline void iommu_config_notifier_init(IOMMUNotifier *n,
++                                              IOMMUConfigNotify fn,
++                                              IOMMUNotifierFlag flags,
++                                              int iommu_idx)
 +{
-+    VFIOHostDMAWindow *hostwin;
-+    Int128 llend, llsize;
-+    hwaddr iova, end;
-+    void *vaddr;
-+    int ret;
-+
-+    assert(memory_region_is_ram(section->mr));
-+
-+    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
-+    llend =3D int128_make64(section->offset_within_address_space);
-+    llend =3D int128_add(llend, section->size);
-+    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
-+    end =3D int128_get64(int128_sub(llend, int128_one()));
-+
-+    vaddr =3D memory_region_get_ram_ptr(section->mr) +
-+            section->offset_within_region +
-+            (iova - section->offset_within_address_space);
-+
-+    hostwin =3D hostwin_from_range(container, iova, end);
-+    if (!hostwin) {
-+        error_report("vfio: IOMMU container %p can't map guest IOVA regi=
-on"
-+                     " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx,
-+                     container, iova, end);
-+        return -EFAULT;
-+    }
-+
-+    trace_vfio_dma_map_ram(iova, end, vaddr);
-+
-+    llsize =3D int128_sub(llend, int128_make64(iova));
-+
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+
-+        if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
-+            trace_vfio_listener_region_add_no_dma_map(
-+                memory_region_name(section->mr),
-+                section->offset_within_address_space,
-+                int128_getlo(section->size),
-+                pgmask + 1);
-+            return 0;
-+        }
-+    }
-+
-+    ret =3D vfio_dma_map(container, iova, int128_get64(llsize),
-+                       vaddr, section->readonly);
-+    if (ret) {
-+        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-+                     "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
-+                     container, iova, int128_get64(llsize), vaddr, ret);
-+        if (memory_region_is_ram_device(section->mr)) {
-+            /* Allow unexpected mappings not to be fatal for RAM devices=
- */
-+            return 0;
-+        }
-+        return ret;
-+    }
-+    return 0;
++    n->notifier_flags =3D flags;
++    n->iommu_idx =3D iommu_idx;
++    n->config_notifier.notify =3D fn;
 +}
 +
-+static void vfio_dma_unmap_ram_section(VFIOContainer *container,
-+                                       MemoryRegionSection *section)
+ /*
+  * Memory region callbacks
+  */
+@@ -647,6 +678,12 @@ static inline bool is_iommu_iotlb_notifier(IOMMUNoti=
+fier *n)
+ {
+     return n->notifier_flags & IOMMU_NOTIFIER_IOTLB_ALL;
+ }
++
++static inline bool is_iommu_config_notifier(IOMMUNotifier *n)
 +{
-+    Int128 llend, llsize;
-+    hwaddr iova, end;
-+    bool try_unmap =3D true;
-+    int ret;
++    return n->notifier_flags & IOMMU_NOTIFIER_CONFIG_ALL;
++}
 +
-+    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
-+    llend =3D int128_make64(section->offset_within_address_space);
-+    llend =3D int128_add(llend, section->size);
-+    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
+ #ifdef CONFIG_POSIX
+=20
+ /**
+@@ -1054,6 +1091,19 @@ void memory_region_iotlb_notify_iommu(IOMMUMemoryR=
+egion *iommu_mr,
+                                       int iommu_idx,
+                                       IOMMUTLBEntry entry);
+=20
++/**
++ * memory_region_config_notify_iommu: notify a change in a translation
++ * configuration structure.
++ * @iommu_mr: the memory region that was changed
++ * @iommu_idx: the IOMMU index for the translation table which has chang=
+ed
++ * @flag: config change type
++ * @config: new guest config
++ */
++void memory_region_config_notify_iommu(IOMMUMemoryRegion *iommu_mr,
++                                       int iommu_idx,
++                                       IOMMUNotifierFlag flag,
++                                       IOMMUConfig *config);
 +
-+    if (int128_ge(int128_make64(iova), llend)) {
-+        return;
-+    }
-+    end =3D int128_get64(int128_sub(llend, int128_one()));
+ /**
+  * memory_region_iotlb_notify_one: notify a change in an IOMMU translati=
+on
+  *                                 entry to a single notifier
+@@ -1071,7 +1121,7 @@ void memory_region_iotlb_notify_one(IOMMUNotifier *=
+notifier,
+=20
+ /**
+  * memory_region_register_iommu_notifier: register a notifier for change=
+s to
+- * IOMMU translation entries.
++ * IOMMU translation entries or translation config settings.
+  *
+  * @mr: the memory region to observe
+  * @n: the IOMMUNotifier to be added; the notify callback receives a
+diff --git a/memory.c b/memory.c
+index bd9f425f0d..8cd3c65872 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1934,6 +1934,13 @@ void memory_region_unregister_iommu_notifier(Memor=
+yRegion *mr,
+     memory_region_update_iommu_notify_flags(iommu_mr);
+ }
+=20
++static void
++memory_region_config_notify_one(IOMMUNotifier *notifier,
++                                IOMMUConfig *cfg)
++{
++    notifier->config_notifier.notify(notifier, cfg);
++}
 +
-+    llsize =3D int128_sub(llend, int128_make64(iova));
+ void memory_region_iotlb_notify_one(IOMMUNotifier *notifier,
+                                     IOMMUTLBEntry *entry)
+ {
+@@ -1976,6 +1983,24 @@ void memory_region_iotlb_notify_iommu(IOMMUMemoryR=
+egion *iommu_mr,
+     }
+ }
+=20
++void memory_region_config_notify_iommu(IOMMUMemoryRegion *iommu_mr,
++                                       int iommu_idx,
++                                       IOMMUNotifierFlag flag,
++                                       IOMMUConfig *config)
++{
++    IOMMUNotifier *iommu_notifier;
 +
-+    trace_vfio_dma_unmap_ram(iova, end);
++    assert(memory_region_is_iommu(MEMORY_REGION(iommu_mr)));
 +
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask;
-+        VFIOHostDMAWindow *hostwin =3D
-+            hostwin_from_range(container, iova, end);
-+
-+        assert(hostwin); /* or region_add() would have failed */
-+
-+        pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+        try_unmap =3D !((iova & pgmask) || (int128_get64(llsize) & pgmas=
-k));
-+    }
-+
-+    if (try_unmap) {
-+        ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        if (ret) {
-+            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-+                         "0x%"HWADDR_PRIx") =3D %d (%m)",
-+                         container, iova, int128_get64(llsize), ret);
++    IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
++        if (iommu_notifier->iommu_idx =3D=3D iommu_idx &&
++            is_iommu_config_notifier(iommu_notifier) &&
++            iommu_notifier->notifier_flags =3D=3D flag) {
++            memory_region_config_notify_one(iommu_notifier, config);
 +        }
 +    }
 +}
 +
- static void vfio_listener_region_add(MemoryListener *listener,
-                                      MemoryRegionSection *section)
- {
-     VFIOContainer *container =3D container_of(listener, VFIOContainer, l=
-istener);
-     hwaddr iova, end;
--    Int128 llend, llsize;
--    void *vaddr;
-+    Int128 llend;
-     int ret;
-     VFIOHostDMAWindow *hostwin;
-=20
-@@ -640,41 +743,10 @@ static void vfio_listener_region_add(MemoryListener=
- *listener,
-     }
-=20
-     /* Here we assume that memory_region_is_ram(section->mr)=3D=3Dtrue *=
-/
--
--    vaddr =3D memory_region_get_ram_ptr(section->mr) +
--            section->offset_within_region +
--            (iova - section->offset_within_address_space);
--
--    trace_vfio_listener_region_add_ram(iova, end, vaddr);
--
--    llsize =3D int128_sub(llend, int128_make64(iova));
--
--    if (memory_region_is_ram_device(section->mr)) {
--        hwaddr pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
--
--        if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
--            trace_vfio_listener_region_add_no_dma_map(
--                memory_region_name(section->mr),
--                section->offset_within_address_space,
--                int128_getlo(section->size),
--                pgmask + 1);
--            return;
--        }
--    }
--
--    ret =3D vfio_dma_map(container, iova, int128_get64(llsize),
--                       vaddr, section->readonly);
-+    ret =3D vfio_dma_map_ram_section(container, section);
-     if (ret) {
--        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
--                     "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
--                     container, iova, int128_get64(llsize), vaddr, ret);
--        if (memory_region_is_ram_device(section->mr)) {
--            /* Allow unexpected mappings not to be fatal for RAM devices=
- */
--            return;
--        }
-         goto fail;
-     }
--
-     return;
-=20
- fail:
-@@ -700,10 +772,6 @@ static void vfio_listener_region_del(MemoryListener =
-*listener,
-                                      MemoryRegionSection *section)
- {
-     VFIOContainer *container =3D container_of(listener, VFIOContainer, l=
-istener);
--    hwaddr iova, end;
--    Int128 llend, llsize;
--    int ret;
--    bool try_unmap =3D true;
-=20
-     if (vfio_listener_skipped_section(section)) {
-         trace_vfio_listener_region_del_skip(
-@@ -748,39 +816,7 @@ static void vfio_listener_region_del(MemoryListener =
-*listener,
-          */
-     }
-=20
--    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
--    llend =3D int128_make64(section->offset_within_address_space);
--    llend =3D int128_add(llend, section->size);
--    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
--
--    if (int128_ge(int128_make64(iova), llend)) {
--        return;
--    }
--    end =3D int128_get64(int128_sub(llend, int128_one()));
--
--    llsize =3D int128_sub(llend, int128_make64(iova));
--
--    trace_vfio_listener_region_del(iova, end);
--
--    if (memory_region_is_ram_device(section->mr)) {
--        hwaddr pgmask;
--        VFIOHostDMAWindow *hostwin =3D
--            hostwin_from_range(container, iova, end);
--
--        assert(hostwin); /* or region_add() would have failed */
--
--        pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
--        try_unmap =3D !((iova & pgmask) || (int128_get64(llsize) & pgmas=
-k));
--    }
--
--    if (try_unmap) {
--        ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
--        if (ret) {
--            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
--                         "0x%"HWADDR_PRIx") =3D %d (%m)",
--                         container, iova, int128_get64(llsize), ret);
--        }
--    }
-+    vfio_dma_unmap_ram_section(container, section);
-=20
-     memory_region_unref(section->mr);
-=20
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index eb589930a5..3c2cd15e3f 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -93,10 +93,10 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_s=
-tart, uint64_t iova_end) "i
- vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING re=
-gion_add 0x%"PRIx64" - 0x%"PRIx64
- vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d t=
-o liobn fd %d"
- vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add=
- [iommu] 0x%"PRIx64" - 0x%"PRIx64
--vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, voi=
-d *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
-+vfio_dma_map_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "r=
-egion_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
- vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uin=
-t64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=3D0x%"PRI=
-x64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
- vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING re=
-gion_del 0x%"PRIx64" - 0x%"PRIx64
--vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"P=
-RIx64" - 0x%"PRIx64
-+vfio_dma_unmap_ram(uint64_t start, uint64_t end) "region_del 0x%"PRIx64"=
- - 0x%"PRIx64
- vfio_disconnect_container(int fd) "close container->fd=3D%d"
- vfio_put_group(int fd) "close group->fd=3D%d"
- vfio_get_device(const char * name, unsigned int flags, unsigned int num_=
-regions, unsigned int num_irqs) "Device %s flags: %u, regions: %u, irqs: =
-%u"
+ int memory_region_iommu_get_attr(IOMMUMemoryRegion *iommu_mr,
+                                  enum IOMMUMemoryRegionAttr attr,
+                                  void *data)
 --=20
 2.20.1
 
