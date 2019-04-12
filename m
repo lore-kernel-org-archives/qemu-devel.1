@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49412)
+Received: from eggs.gnu.org ([209.51.188.92]:49413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEvnl-0001nS-Qi
+	(envelope-from <bounces@canonical.com>) id 1hEvnl-0001nT-Qi
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEvng-0002Ja-RI
+	(envelope-from <bounces@canonical.com>) id 1hEvng-0002KF-W4
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44722)
+Received: from indium.canonical.com ([91.189.90.7]:44702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEvnf-0002B4-Pw
+	id 1hEvnf-0002AT-Pl
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:01:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEvnU-0006FP-0o
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:48 +0000
+	id 1hEvnS-0006EW-Pj
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 034E42E806F
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BFE162E806F
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:00:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Apr 2019 12:53:57 -0000
+Date: Fri, 12 Apr 2019 12:52:25 -0000
 From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
-Message-Id: <155507363745.13466.16364046062417491659.malone@gac.canonical.com>
+Message-Id: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
- =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
- =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
- =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_=5BNEW=5D_qemu_fails_to_?=
+ =?utf-8?q?compile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of?=
+ =?utf-8?q?_=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unal?=
+ =?utf-8?q?igned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,25 +40,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tried to patch as below and it compiles fine, not sure if this is right
-fix though,
+Public bug reported:
+
+Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 20=
+190328)
+repo: https://github.com/qemu/qemu.git
+branch: master
+commit e1be98540ee672ef93292b65a986055512237c35
 
 
-# git diff
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index ebf210f..7d512e5 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -231,7 +231,7 @@ typedef struct {
-     char date_modified[0]; /*unused*/
-     char keywords[0]; /*unused*/
-     /* string and other data follows */
--} QEMU_PACKED ObjectInfo;
-+} ObjectInfo;
- =
+  CC      net/dump.o
+hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=80=
+=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value [-W=
+error=3Daddress-of-packed-member]
+ 1708 |                             dataset->filename);
+      |                             ~~~~~~~^~~~~~~~~~
+cc1: all warnings being treated as errors
+  CC      net/eth.o
+make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
+make: *** Waiting for unfinished jobs....
+  CC      net/announce.o
 
- #define TYPE_USB_MTP "usb-mtp"
- #define USB_MTP(obj) OBJECT_CHECK(MTPState, (obj), TYPE_USB_MTP)
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
