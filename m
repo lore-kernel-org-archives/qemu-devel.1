@@ -6,89 +6,88 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703E2C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 23:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5B2C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 23:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A7182086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 23:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4D232084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 23:15:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GtwOpjK7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7182086D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aOFZc2q0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D232084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43790 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43885 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF5CO-0002ta-7s
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 19:03:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43363)
+	id 1hF5O8-0005Nn-Mk
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 19:15:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF5BK-0002Hz-Se
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:02:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF5NL-00053j-Nv
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF5BI-00014W-TC
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:02:02 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33969)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF5NK-0000zw-U9
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:14:27 -0400
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:38554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hF5BH-00013D-05
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:01:59 -0400
-Received: by mail-pl1-x644.google.com with SMTP id y6so5817795plt.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 16:01:57 -0700 (PDT)
+	id 1hF5NK-0000zV-Am
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 19:14:26 -0400
+Received: by mail-pf1-x42a.google.com with SMTP id 10so5828231pfo.5
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 16:14:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=y6xglqBzl3ykR+IauwBTmLxunY4B4fvOLG5aGqjuhwg=;
-	b=GtwOpjK7YgGOimCIFy8gprDiCrv1TvVi67ckPSiFbtja8UhLdIyVCc52XxLfxK08JW
-	XuK5yFzV2M+qrJyAzVkDm+cOYnefv3w7U84Q73gYtFL5Y5Pg6k6y8FCPXSRezn2cXYZc
-	Yn5wIBP9iju3TGipZp5aF7eKHoADxYjkH0c7TMVhPAZqawyqaL1uDXXWyT6s2glgI2nI
-	AXLsGbqeE/rby+LJpQoOBQWyuq9UDR24LF77iSmtbvTep/atDjHqBr4gOSP24uc4jieD
-	DRwEE6HcVT/YDxXszsPZGMaH/1C+oWby1HPGQ6jDF7Vgl7SG4UwloGF9zC2ua0F/h+77
-	J97w==
+	bh=YrJdTXredF/8RifWp1j1k4VYGitaqZetvqiWzpn20EA=;
+	b=aOFZc2q0nn+tGhRD6/NFeS67YH4EEcQ5XIQoRenOw8moGCgnlDsgv+FCkM70b7XK2F
+	lRPRiZnkb8ml/UmIvSJdoGKGuzK2pW0HpszSoLuVG9a5r5UWXnZ7dTBDSSWyMAWJ67Po
+	r69a/DKETkLA4NzdLGD/7KgUyUqCADIMa/LoFwVeIBhWczsiuEWdgeUX2JaJVLC7s8hu
+	OnISUygowbYzTUvus0ZlfTwsBrHSYinBtKmJF7EItRuJHL+IIy98+kalRnOQO9WH5+fF
+	XwiZUd+t8Bu9fA2OkEVi2VpMDDqW/PJ80QJncbLu52z3PbVq1N34xP3gKSgX+YVak2a2
+	mGNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=y6xglqBzl3ykR+IauwBTmLxunY4B4fvOLG5aGqjuhwg=;
-	b=fxcq5gcG5HATUesFBNTJdWWFBYEn4HjAYchu7CpS1IDC+utRk6SbP+MWtg0pcsuC8o
-	LDcCdiOj0+2HUH3SVX5pXZ+rgvrupRgo7KDbo88XaYbykym59OssrywZnZcJ9sKCRCBK
-	OGuTJpWCooaVYhgWfeSjdSWcUuIk1snX/ZqeozYvCFrHBiK/wO4q0ZF/sph7htj2DCVx
-	NqliQSheeC5L0n5Q2U5Ht/yRdmsVMH9UrYtQ1R1YtTikevVybVdMKOQBnyxW63Pc+EhY
-	BcQ446jpVohBmZiadadxwzs3ptZtoTQX43dxE5kWtGgcm+49Jd6goqeWdZWvxrMf6GFR
-	kLGg==
-X-Gm-Message-State: APjAAAXIVtUw8L89VqhMNF+F5Y+sKQQscPyMgDS56C1/xnB5tKHAXO6h
-	0zds0w8yF22z+gJ45T3zlwUhOw==
-X-Google-Smtp-Source: APXvYqzXDhsTzSJlgagKFPzeeJBJ7W8fSDhFLcvftAkfXLTxSfJUjjAreVTVr1KNzsley8Ovf+PrrQ==
-X-Received: by 2002:a17:902:e091:: with SMTP id
-	cb17mr61292188plb.222.1555110116297; 
-	Fri, 12 Apr 2019 16:01:56 -0700 (PDT)
+	bh=YrJdTXredF/8RifWp1j1k4VYGitaqZetvqiWzpn20EA=;
+	b=hoNmi9rM//4fLNoLGAqS5Rd4W1Byv613jGEA/VYEijF68lYKMjAoOSOjNvkDwE8nWB
+	lqVp7Euyz5eN6x3V+4H9V8rdSNtX5cynnXTNZ83BfwlMKCijVPVnYpfeQdbUI8xGd23Q
+	5+FEPp5j+21nG1e/soTO2G0u/cju2o+N8BDtlqIzcSAdnkZqhm74/4VXsxR0ZxNK9CHI
+	Yjz7/bgjfbUha2vnKMA4TrXj9YNsKddb2xOmZw+co8aXzTeykV2Rj1h+zCkjiXxB1Q0N
+	C8pVEj7F9DowAHX6ykkvBht+xVGSfA/XghYaNz9dAioEQaaiJtsRx0rF/N7AAX5C/J+D
+	fBOg==
+X-Gm-Message-State: APjAAAVNxJbZo/uqoAZX3VbLnEG0OH4LZAetfLiPW69+1Io9fFClnevt
+	CrI75KQzQXZ4h9QzSqyBhcMLnQ==
+X-Google-Smtp-Source: APXvYqz2GZklFDBVV+p2DtuueLEANlyuqPkppQsptE/JfzVo4xLbbmTX0pBn1lrCBHu5ydZ/rble0A==
+X-Received: by 2002:a63:d250:: with SMTP id t16mr55020515pgi.288.1555110864835;
+	Fri, 12 Apr 2019 16:14:24 -0700 (PDT)
 Received: from [172.20.98.58] (rrcs-173-197-98-123.west.biz.rr.com.
 	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
-	p66sm61982454pfb.4.2019.04.12.16.01.54
+	l26sm64664804pfb.20.2019.04.12.16.14.22
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 16:01:55 -0700 (PDT)
+	Fri, 12 Apr 2019 16:14:23 -0700 (PDT)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-10-david@redhat.com>
+	<20190411100836.646-11-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <71ce854d-da00-565e-0b36-9458a7bc9183@linaro.org>
-Date: Fri, 12 Apr 2019 13:01:51 -1000
+Message-ID: <59b43a53-8c25-53ea-c5a8-1cd33b4011e5@linaro.org>
+Date: Fri, 12 Apr 2019 13:14:19 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-10-david@redhat.com>
+In-Reply-To: <20190411100836.646-11-david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH v1 09/41] s390x/tcg: Implement VECTOR
- CHECKSUM
+X-Received-From: 2607:f8b0:4864:20::42a
+Subject: Re: [Qemu-devel] [PATCH v1 10/41] s390x/tcg: Implement VECTOR
+ ELEMENT COMPARE *
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,32 +104,23 @@ Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412230151.VlAL3-D9IHln605A4oq0QucsI0aea5sbP2AMFfz5rW0@z>
+Message-ID: <20190412231419.M1Li1V9_XfAUWVkN7xUg3iAIvD7DHHwkOktnOc_HcN8@z>
 
 On 4/11/19 12:08 AM, David Hildenbrand wrote:
-> +    read_vec_element_i32(sum, get_field(s->fields, v3), 1, ES_32);
-> +    for (i = 0; i < 4; i++) {
-> +        read_vec_element_i32(tmp, get_field(s->fields, v2), i, ES_32);
-> +        tcg_gen_add_i32(sum, sum, tmp);
-> +        tcg_gen_setcond_i32(TCG_COND_LTU, tmp, sum, tmp);
-> +        tcg_gen_add_i32(sum, sum, tmp);
-> +    }
-> +    zero_vec(get_field(s->fields, v1));
-> +    write_vec_element_i32(sum, get_field(s->fields, v1), 1, ES_32);
+> +                         es | logical ? 0 : MO_SIGN);
 
-It seems like it should be possible to implement this with i64, and fold the
-carry around at the end -- 2 insns instead of 12 for managing carry.  But I
-can't quite tell if that produces the same results.
+Incorrect operator precedence.  You need:
 
-You could use
+  es | (logical ? 0 : MO_SIGN)
 
-  tcg_gen_add2_i32(sum, tmp, sum, zero, tmp, zero);
-  tcg_gen_add_i32(sum, sum, tmp);
+or
 
-instead of computing carry manually with setcond.
+  logical ? es : es | MO_SIGN
 
-That said, your code exactly matches the language in the manual, so
+And perhaps cse this expression into a temporary
+and not replicate it between the two reads.
 
+Otherwise,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
