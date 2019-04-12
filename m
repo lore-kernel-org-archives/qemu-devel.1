@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53130)
+Received: from eggs.gnu.org ([209.51.188.92]:53893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEzNV-0006B3-6c
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:50:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEzQW-0008PW-MZ
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:53:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEzNU-00020q-B3
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:50:13 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hEzNU-0001zw-0n
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:50:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k17so8135634wrx.10
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 09:50:11 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hEzQV-0003r6-Ni
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:53:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEzQV-0003p6-Fa
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:53:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EA0881E15
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 16:53:18 +0000 (UTC)
+Date: Fri, 12 Apr 2019 17:53:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190412165314.GG2906@work-vm>
+References: <20190411152520.10061-1-armbru@redhat.com>
+	<20190411152520.10061-2-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20190412163706.3878-1-philmd@redhat.com>
-In-Reply-To: <20190412163706.3878-1-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Apr 2019 18:49:58 +0200
-Message-ID: <CAJ+F1CLOO=cSAnGsR1vXToEhYCtVSUXypJ4fMmoO-T6yp9NNkw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl: Add missing descriptions to the VGA
- adapters list
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190411152520.10061-2-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/17] include: Include fprintf-fn.h only
+ where needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-On Fri, Apr 12, 2019 at 6:37 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Some VGA adapters do not contain an helpful description,
-> this can be confusing:
->
->   $ qemu-system-arm -M virt -vga help
->   none
->   std                  standard VGA
->   cirrus               Cirrus VGA (default)
->   vmware               VMWare SVGA
->   xenfb
->
-> Add a description to the missing adapters:
->
->   $ qemu-system-arm -M virt -vga help
->   none                 no graphic card
->   std                  standard VGA
->   cirrus               Cirrus VGA (default)
->   vmware               VMWare SVGA
->   xenfb                Xen paravirtualized framebuffer
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Based-on: <20190412152713.16018-1-marcandre.lureau@redhat.com>
-
-nice follow up, thanks
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  vl.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/vl.c b/vl.c
-> index 840c45c00fa..dfeda8bd7fc 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2029,6 +2029,7 @@ typedef struct VGAInterfaceInfo {
->  static const VGAInterfaceInfo vga_interfaces[VGA_TYPE_MAX] =3D {
->      [VGA_NONE] =3D {
->          .opt_name =3D "none",
-> +        .name =3D "no graphic card",
->      },
->      [VGA_STD] =3D {
->          .opt_name =3D "std",
-> @@ -2067,6 +2068,7 @@ static const VGAInterfaceInfo vga_interfaces[VGA_TY=
-PE_MAX] =3D {
->      },
->      [VGA_XENFB] =3D {
->          .opt_name =3D "xenfb",
-> +        .name =3D "Xen paravirtualized framebuffer",
->      },
->  };
->
-> --
-> 2.20.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>  include/qemu-common.h | 2 --
+>  include/qemu/cutils.h | 2 --
+>  include/sysemu/cpus.h | 1 +
+>  3 files changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index a102245519..f891e05e7e 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -12,8 +12,6 @@
+>  #ifndef QEMU_COMMON_H
+>  #define QEMU_COMMON_H
+>  
+> -#include "qemu/fprintf-fn.h"
+> -
+>  #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
+>  
+>  /* Copyright string for -version arguments, About dialogs, etc */
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index d2dad3057c..12301340a4 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -1,8 +1,6 @@
+>  #ifndef QEMU_CUTILS_H
+>  #define QEMU_CUTILS_H
+>  
+> -#include "qemu/fprintf-fn.h"
+> -
+>  /**
+>   * pstrcpy:
+>   * @buf: buffer to copy string into
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 731756d948..eea0010b53 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -1,6 +1,7 @@
+>  #ifndef QEMU_CPUS_H
+>  #define QEMU_CPUS_H
+>  
+> +#include "qemu/fprintf-fn.h"
+>  #include "qemu/timer.h"
+>  
+>  /* cpus.c */
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
