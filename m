@@ -2,59 +2,82 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5254AC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B69ECC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BB4F20674
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:23:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="l7eewguW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB4F20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 7DFD92084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 11:29:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DFD92084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34515 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEuGr-0000Id-98
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:23:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54769)
+	id 1hEuMq-0002AL-Px
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 07:29:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hEuEx-0007gW-NA
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:21:04 -0400
+	(envelope-from <philmd@redhat.com>) id 1hEuM7-0001rM-AS
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hEuEs-0001IU-G0
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:21:00 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:40487)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hEuEr-0001Ak-0J; Fri, 12 Apr 2019 07:20:57 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44gb6l44CQz9sBp; Fri, 12 Apr 2019 21:20:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1555068047;
-	bh=7OZZJTnz7NNaFnZuQScRhbRUmvkDH3WbxDZLt7pIQSI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=l7eewguWSICdk/UKSfWAA4uFvCAognNxjjoBacKfSEZGaiKOv0KlBbiIDw7Hrce+2
-	1FAwDz6lY0ohB+UmHpHCdSrGgIwchpx5cWFAIXzrHD77Gzd8N7GQ+fo2gr9UBpFQG+
-	81lZGknk1uEqoczfVMwT7DUFVaYRUdwfEEnb65oY=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Fri, 12 Apr 2019 21:20:43 +1000
-Message-Id: <20190412112044.15361-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <philmd@redhat.com>) id 1hEuM6-0005v8-6A
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:28:27 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hEuM5-0005uA-Tb
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:28:26 -0400
+Received: by mail-wr1-f67.google.com with SMTP id y7so11445027wrn.11
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 04:28:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=oC6gUOqbj8+vvIO+XENlH40EKqrILfP0V9FiVPjGLI0=;
+	b=nU4xHwNK+exF3+9bC28LGlEyk5BgtwLvlCxgkdv0u6vh0LLsmXcLUlhiM39yeC1LzK
+	fNVfysGqqQOVQIds7W3q29VoMjAKzttixDzjMv3NnUGIOf+eCk1xx8+48z+vrNrFYIey
+	B9aplV9vxSVEhtNEBZTLEO9dOboqNnORkhzxCvWgYMrCnd2aE+yEvH3LYAchcjBYo5TD
+	SNgUbIJVSqHTGO1YWIQZ5z0lVwtch4+BdedyacSbNUnrZGOHMdtXAseSAsid9muTsnKI
+	TW9sdNMx3Wn833m2ByuTb+ntfpqN+Kgjz+Elg1+X61B/PrXmIjcYpD6m9H6ys0U49TF1
+	34Mw==
+X-Gm-Message-State: APjAAAWLBU/lM+p4EduFQlGIPPwp06pXEiZTz2N7zA7Mg1QxG8wQ3RlM
+	8wHEcUu0WRF5L9EbdUXzymBaGg==
+X-Google-Smtp-Source: APXvYqxqQ3eYHLfl31AnXM73jR06h1lsKlCSpzKm0BGdSxOP94FrNt9xtfhUN5WOU9476GPYyc8jlw==
+X-Received: by 2002:adf:db0c:: with SMTP id s12mr35487884wri.184.1555068503446;
+	Fri, 12 Apr 2019 04:28:23 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	v17sm7273270wmc.30.2019.04.12.04.28.20
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 12 Apr 2019 04:28:22 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+	<f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+References: <87d0mwatbu.fsf@dusky.pond.sub.org>
+	<CAAdtpL6VCiXLbTWyJo4cbCNLjOCPr6KrH8KTqEq1V=CTMYKubQ@mail.gmail.com>
+	<6fe1a987-c3c5-3af5-74a4-fc4cd08d2380@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <2056cff2-78f8-1079-8d05-e758971d73ec@redhat.com>
+Date: Fri, 12 Apr 2019 13:28:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 0/1] ppc-for-4.0 queue 20190412
+In-Reply-To: <6fe1a987-c3c5-3af5-74a4-fc4cd08d2380@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] Maintainers,
+ please tell us how to boot your machines!
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,45 +89,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, mst@redhat.com, clg@redhat.com, qemu-devel@nongnu.org,
-	groug@kaod.org, alex.williamson@redhat.com, spopovyc@redhat.com,
-	qemu-ppc@nongnu.org, marcel@redhat.com,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Paul Burton <pburton@wavecomp.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>,
+	Jia Liu <proljc@gmail.com>, Peter Maydell <peter.maydell@linaro.org>,
+	Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
+	Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Richard Henderson <rth@twiddle.net>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Fabien Chouteau <chouteau@adacore.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Paul Durrant <paul.durrant@citrix.com>, Jan Kiszka <jan.kiszka@web.de>,
+	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Chris Wulff <crwulff@gmail.com>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Michael Walle <michael@walle.cc>, Thomas Huth <huth@tuxfamily.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cornelia Huck <cohuck@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412112043.t21jr07Q0tCRpSjJt5JfPKd3f6GpZn7euHVTIZrgkJE@z>
+Message-ID: <20190412112814.coLdXtl9ICsA3ZJxiPfzHA5ILJRBtqkPce3Nu1mBws4@z>
 
-The following changes since commit 532cc6da74ec25b5ba6893b5757c977d545829=
-49:
+On 4/12/19 1:11 PM, Thomas Huth wrote:
+> On 13/03/2019 02.06, Philippe Mathieu-Daudé wrote:
+>> '
+>> On Tue, Mar 12, 2019 at 6:44 PM Markus Armbruster <armbru@redhat.com> wrote:
+> [...]
+>>>     = hw/arm/nseries.c =
+>>>     Andrzej Zaborowski <balrogg@gmail.com> (odd fixer:nSeries)
+>>>     Peter Maydell <peter.maydell@linaro.org> (odd fixer:nSeries)
+>>>     qemu-arm@nongnu.org (open list:nSeries)
+>>
+>> images:
+>> http://stskeeps.subnetmask.net/meego-n8x0/
+>>
+>> $ qemu-system-arm -M n810 -kernel
+>> meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0
+>> -append "root=/dev/mmcblk0p1 console=ttyS0 printk.time=0 rootwait" -m
+>> 130 -sd meego-arm-n8x0-1.0.80.20100712.1431-sda.raw -serial stdio
+> 
+> That does not work for me - I only get a white screen that turns to
+> black after half a second, and no output (also not on the serial
+> console). Does it still work for you with the latest QEMU master branch?
 
-  Update version for v4.0.0-rc3 release (2019-04-10 15:38:59 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190412
-
-for you to fetch changes up to 4560116e42a21989a4b6cf9551ce2f90b16c7238:
-
-  spapr_pci: Fix broken naming of PCI bus (2019-04-12 12:23:02 +1000)
-
-----------------------------------------------------------------
-ppc patch queue for 2018-04-12
-
-Here's a last minute pull request for 4.0.  Turns out my last pull
-request, to fix a regression in extended config space access for the
-pseries machine didn't fix things hard enough.  This PR has a single
-patch which improves the fix to work in more cases.
-
-It's a ghastly, ghastly hack, but it's simple and localized.  I
-already have patches almost ready to go in 4.1 that provides a simpler
-and cleaner solution to all this.
-
-----------------------------------------------------------------
-Greg Kurz (1):
-      spapr_pci: Fix broken naming of PCI bus
-
- hw/ppc/spapr_pci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It is broken since a long time. I guess rememember some irc chat about
+it previous to v2.9.0, then I added this line to my TODO "this command
+used to work, see what's wrong here". I never bisected to figure out
+since when it got bitroted.
 
