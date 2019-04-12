@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53107)
+Received: from eggs.gnu.org ([209.51.188.92]:53123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hEplc-0005LO-U5
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hEplf-0005Nr-A7
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hEplX-0000q5-Uj
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:27 -0400
-Date: Fri, 12 Apr 2019 16:10:44 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1hEplb-0000rA-J9
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:30 -0400
+Date: Fri, 12 Apr 2019 15:55:12 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190412061044.GC8005@umbus.fritz.box>
-References: <20190411080004.8690-1-clg@kaod.org>
-	<20190411080004.8690-2-clg@kaod.org>
+Message-ID: <20190412055512.GB8005@umbus.fritz.box>
+References: <20190411102025.22559-1-cohuck@redhat.com>
+	<20190411212405.407918b8@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Y5rl02BVI9TCfPar"
+	protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
 Content-Disposition: inline
-In-Reply-To: <20190411080004.8690-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 1/6] target/ppc: Don't check UPRT in radix
- mode when in HV real mode
+In-Reply-To: <20190411212405.407918b8@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-4.1] hw: add compat machines
+ for 4.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---Y5rl02BVI9TCfPar
-Content-Type: text/plain; charset=iso-8859-1
+--gatW/ieO32f1wygP
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2019 at 09:59:59AM +0200, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+On Thu, Apr 11, 2019 at 09:24:05PM +0200, Greg Kurz wrote:
+> On Thu, 11 Apr 2019 12:20:25 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 >=20
-> It appears that during kexec, we run for a while in hypervisor
-> real mode with LPCR:HR set and LPCR:UPRT clear, which trips
-> the assertion in ppc_radix64_handle_mmu_fault().
+> > Add 4.1 machine types for arm/i440fx/q35/s390x/spapr.
+> >=20
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >=20
 >=20
-> First this shouldn't be an assertion, it's a guest error.
+> For spapr part:
 >=20
-> Then we shouldn't be checking these things in hypervisor real
-> mode (or in virtual hypervisor guest real mode which is similar)
-> as the real HW won't use those LPCR bits in those cases anyway,
-> so technically it's ok to have this discrepancy.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Acked-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc-for-4.1, thanks.
+and
 
-> ---
->  target/ppc/mmu-radix64.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index ca1fb2673f93..cac076ee92d9 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -228,10 +228,10 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, v=
-addr eaddr, int rwx,
->      ppc_v3_pate_t pate;
-> =20
->      assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
-> -    assert(ppc64_use_proc_tbl(cpu));
-> =20
-> -    /* Real Mode Access */
-> -    if (((rwx =3D=3D 2) && (msr_ir =3D=3D 0)) || ((rwx !=3D 2) && (msr_d=
-r =3D=3D 0))) {
-> +    /* HV or virtual hypervisor Real Mode Access */
-> +    if ((msr_hv || cpu->vhyp) &&
-> +        (((rwx =3D=3D 2) && (msr_ir =3D=3D 0)) || ((rwx !=3D 2) && (msr_=
-dr =3D=3D 0)))) {
-
-Hrm.. this looks like a different bug fix.  Were we preivously
-incorrectly handling guest real mode when running powernv?
-
->          /* In real mode top 4 effective addr bits (mostly) ignored */
->          raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
-> =20
-> @@ -241,6 +241,16 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr, int rwx,
->          return 0;
->      }
-> =20
-> +    /*
-> +     * Check UPRT (we avoid the check in real mode to deal with
-> +     * transitional states during kexec.
-> +     */
-> +    if (!ppc64_use_proc_tbl(cpu)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "LPCR:UPRT not set in radix mode ! LPCR=3D%016lx\n=
-",
-> +                      env->spr[SPR_LPCR]);
-> +    }
-> +
->      /* Virtual Mode Access - get the fully qualified address */
->      if (!ppc_radix64_get_fully_qualified_addr(env, eaddr, &lpid, &pid)) {
->          ppc_radix64_raise_segi(cpu, rwx, eaddr);
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -108,24 +58,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Y5rl02BVI9TCfPar
+--gatW/ieO32f1wygP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlywK+EACgkQbDjKyiDZ
-s5LHbBAAx0fcB2MeWFKDmKNS0G4EG2DmNF1fJERuWPlBZll9JUZZdDcPBtrplHvt
-6Qrum/sddTruQ6ti0LSwXLY8IkOTTgwA6vvf4kIEFuVuXFhCjfMEZG4ua8/AOSM+
-1GbSdcZYxq6C86dF+vgz5oA+hwnbc/JY6SApS3D/bv+KuJ/oF/jKXHn568yt93BC
-zG63mYSJZRzCqsieHjjcVTgOV5FCBTFxvL1KQAv2CVEk/+jlboMFvZZaEoiHw/T3
-Dp8PzDj0eyck03GGLzIzbIZnYVSeocn7//9osFgJjHKZ+De2bamN9xUVbOaoS59T
-xlvuxdEak/Qqj+cZ9hzUDGNQthD2/x+HkksEOqohIs/NtGJkXuyq9EvrMa3ziMZO
-347/WJM2JNV217KyU68jURppK4CHtFNrt5SDX+s4CNxsDuh9WzEqh5eNFcVHIeGi
-U9N0vkR23xviGS8oLZwWNCmgMcKLsASeuCnZo57Ag7zhBZ01P3hjoP5aSE2sHcN5
-Gh80ekFmEbvULCYPXXj8WIYEn1s8/0Ff0XVQVkqjZke1o2ofcO8dtpFeYef7SD0V
-8Omeu8NuO7AeiChlgwKCyLQ8khjALAUJ839dGJ3y3VcqmRKpLwWZLOJ2PHPXRihz
-ycgDLF1h+3xIF6bqTL6DHXpkYAOhmaXYBVIdmAq0IVTnIHikEU4=
-=ZOsX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlywKD4ACgkQbDjKyiDZ
+s5IC8Q/+MMOIOiDJkyqN1x+qrWTjqUigmYmOrDKEZQYUmjpqTMQWn328JHBhYU/c
+BCC2mrGljioeOo4vzkF+2J+aJuy5eeX/+JIH4AUnuuEUT+kG5DnUvVWO5PVoW4vG
+fTAZ8vQs6LIJ9enqTbqepkNwfC58u0LwmUPO5pjYZKMrLNgL+x035r3FNX8gkNOj
+0xlUm541BDxxYfznTNEePvgHYaA8sI0PbCzu8PTcOO/4TUTzTFQTu2ZBbYBL5qCI
+S6MGs3aCdehGHda4B/0OnsyTDhgjLFhE37bRpqd4Us9Oicsy18WXEok9GkiD7/CS
+unjL3wkTyiHVCtVLpPASm8MmnIdE4zIBGho2NBzADB4K5Tm+uJTrTmf2Vj+7BpYF
+VdoLyZvyP6vjOpQSia8ixLnx3zgL914/3XInKo9Nr8RIi5C7WNbCx41PF9dwUWJ8
+1PDaPXiud0YZV+6bd7A8OHmZab6AXKxCJXTZQLsGW9gCFIkopVG02Bz8FqOgjOGl
+eW5v/VDNPBSPgkGWxn88fekHdrgckZs3IQpBYfGMtKQJASQnulEGjOKthIDwEWqJ
+eb60nA1ExQMyDj7z0ds3v1bVrsHdhJCJG0U1eE2xruSj7yEku6O16AH/S+QzXA6y
+X9yZN6nWZSBAkz0pNqRX0Vp3zf4i6d2UWrk1x96Ue+X/gYC2Vew=
+=3SX5
 -----END PGP SIGNATURE-----
 
---Y5rl02BVI9TCfPar--
+--gatW/ieO32f1wygP--
