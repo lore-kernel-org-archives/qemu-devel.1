@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55109)
+Received: from eggs.gnu.org ([209.51.188.92]:56083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEvx6-0007XZ-Bv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:10:50 -0400
+	(envelope-from <jmoyer@redhat.com>) id 1hEvzS-0000jL-7m
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hEvx5-0001JZ-04
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:10:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hEvx4-0001J7-N4
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:10:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hEvx3-00080c-IF
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:10:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 870672E800F
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 13:10:41 +0000 (UTC)
+	(envelope-from <jmoyer@redhat.com>) id 1hEvzI-0002Cp-4u
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:13:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38490)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jmoyer@redhat.com>) id 1hEvzD-00027r-TQ
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:12:56 -0400
+From: Jeff Moyer <jmoyer@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+	<20190412083230.GA29850@quack2.suse.cz>
+Date: Fri, 12 Apr 2019 09:12:10 -0400
+In-Reply-To: <20190412083230.GA29850@quack2.suse.cz> (Jan Kara's message of
+	"Fri, 12 Apr 2019 10:32:30 +0200")
+Message-ID: <x494l73z7th.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Apr 2019 13:04:34 -0000
-From: Daniel Berrange <1824528@bugs.launchpad.net>
-Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
-Message-Id: <155507427425.20665.15580600000411411041.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
- =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
- =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
- =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>, Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Christoph Hellwig <hch@infradead.org>, Len Brown <lenb@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J.
+	Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval.shaia@oracle.com
 
-This struct represents the MTP protocol wire format so *must* be marked
-packed.
+Jan Kara <jack@suse.cz> writes:
 
-There unfortunately quite a few flaws in this MTP code area, so fixing
-the gcc warning is not straightforward.
+> On Thu 11-04-19 07:51:48, Dan Williams wrote:
+>> On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>> > +       } else {
+>> > +               if (nd_region->flush(nd_region))
+>> > +                       rc = -EIO;
+>> 
+>> Given the common case wants to be fast and synchronous I think we
+>> should try to avoid retpoline overhead by default. So something like
+>> this:
+>> 
+>> if (nd_region->flush == generic_nvdimm_flush)
+>>     rc = generic_nvdimm_flush(...);
+>
+> I'd either add a comment about avoiding retpoline overhead here or just
+> make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
+> get confused by the code.
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.html
+Isn't this premature optimization?  I really don't like adding things
+like this without some numbers to show it's worth it.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824528
-
-Title:
-  qemu fails to compile on gcc 9 `error: taking address of packed member
-  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
-r value
-  [-Werror=3Daddress-of-packed-member]`
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
-20190328)
-  repo: https://github.com/qemu/qemu.git
-  branch: master
-  commit e1be98540ee672ef93292b65a986055512237c35
-
-  =
-
-    CC      net/dump.o
-  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
-  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
-=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
-[-Werror=3Daddress-of-packed-member]
-   1708 |                             dataset->filename);
-        |                             ~~~~~~~^~~~~~~~~~
-  cc1: all warnings being treated as errors
-    CC      net/eth.o
-  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
-  make: *** Waiting for unfinished jobs....
-    CC      net/announce.o
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
+-Jeff
