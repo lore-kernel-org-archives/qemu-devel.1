@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59048)
+Received: from eggs.gnu.org ([209.51.188.92]:59682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEzkT-0000MM-FM
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:13:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEzoo-0001iv-Od
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hEzkS-0000b9-DV
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:13:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36562)
+	(envelope-from <dgilbert@redhat.com>) id 1hEzon-0002ZP-QY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:18:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hEzkR-0000aX-Vl
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:13:56 -0400
-References: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fff20c68-d4db-3a56-ba39-dc487d6f80e5@redhat.com>
-Date: Fri, 12 Apr 2019 12:13:51 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEzon-0002ZD-GO
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:18:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C2F459463
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:18:24 +0000 (UTC)
+Date: Fri, 12 Apr 2019 18:18:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190412171820.GK2906@work-vm>
+References: <20190411152520.10061-1-armbru@redhat.com>
+	<20190411152520.10061-6-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aNGdSx2vlWp2KcadxrjHTUOQ7UHvoFIAD"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add 'inline-fd:' protocol for migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190411152520.10061-6-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] tcg: Simplify how dump_drift_info()
+ prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +34,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>, yc-core@yandex-team.ru
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aNGdSx2vlWp2KcadxrjHTUOQ7UHvoFIAD
-From: Eric Blake <eblake@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
- yc-core@yandex-team.ru
-Message-ID: <fff20c68-d4db-3a56-ba39-dc487d6f80e5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add 'inline-fd:' protocol for migration
-References: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-In-Reply-To: <20190412122028.7067-1-yury-kotov@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Markus Armbruster (armbru@redhat.com) wrote:
+> dump_drift_info() takes an fprintf()-like callback and a FILE * to pass
+> to it.
 
-On 4/12/19 7:20 AM, Yury Kotov wrote:
-> Hi,
->=20
-> I've added 'inline-fd:' proto to simplify migration to/from fd.
-> I thought about modifying the existing 'fd:' proto but I'm not sure it'=
-s a
-> good idea to change it's contract.
->=20
-> Existing 'fd:' proto works with previously added fd by getfd or add-fd =
-commands.
-> If client doesn't want to work with this fd before or after migration t=
-hen it's
-> easier to send an fd with the migrate-* command. Also, client shouldn't=
- maintain
-> this fd.
+Me thinks there's a pattern here....
 
-While the sentiment of making it easier by having fewer QMP commands
-might be worthwhile, I'm worried about whether this scales. Having just
-a limited set of commands that take an fd over SCM rights, and every
-other command wired to automagically work with existing named fds,
-scales a lot easier than having to teach individual commands how to take
-an fd inline.
+> Its only caller hmp_info_jit() passes monitor_fprintf() and a Monitor
+> * cast to FILE *.  monitor_fprintf() casts it right back, and is
+> otherwise identical to monitor_printf().  The type-punning is ugly.
+> 
+> Drop the callback, and call qemu_printf() instead.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-At the very least, if we DO decide we like this, then I'd at least hope
-that you made this addition introspectible (how can management learn
-whether the 'inline-fd:' protocol is supported, and even more
-importantly, which commands require an inline fd via SCM rights to be a
-valid command based, especially if accepting or rejecting an inline fd
-is conditional on other arguments to the command).
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->=20
-> Usage:
-> { 'execute': 'migrate', 'arguments': { 'uri': 'inline-fd:' } }
-> { 'execute': 'migrate-incoming', 'arguments': { 'uri': 'inline-fd:' } }=
-
->=20
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---aNGdSx2vlWp2KcadxrjHTUOQ7UHvoFIAD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlywx08ACgkQp6FrSiUn
-Q2odIAf/WcKPhy1fIDf2yroe9aBtCw6P0OVX96MqPlSbT+uJdoODnE+aSv7SajVY
-4N5BjAf9gvHkThK9odFssaLNgipDevtM96oHk1MavoCDz3z3ItiWWVuiKFf3fVDn
-Oq7Py/Nmk06RKc3s9fUxcjaMBTRK8HJLD4IpbqbHq5bpRIvIQN3t1/V9ZtwZui3D
-8ozH6h1ycRsZBfSl3qZ45hKZPbnfMFW3TJv/3I+30MbMGqfhggTpTm/jDqcFkBf4
-Qzzb3ROmNDJBww9yVnJTWop/a9OkG+G2eLTuALfUkUjYlWQ6f0U9ngN0jk9ijc7O
-aQdBjVkOEVQLtXLI7fBYFrpr59lQlQ==
-=A25u
------END PGP SIGNATURE-----
-
---aNGdSx2vlWp2KcadxrjHTUOQ7UHvoFIAD--
+> ---
+>  cpus.c                | 15 +++++++++------
+>  include/sysemu/cpus.h |  2 +-
+>  monitor.c             |  2 +-
+>  3 files changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index e83f72b48b..684aa9679a 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -31,6 +31,7 @@
+>  #include "qapi/qapi-events-run-state.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/qemu-print.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/block-backend.h"
+>  #include "exec/gdbstub.h"
+> @@ -2454,19 +2455,21 @@ void qmp_inject_nmi(Error **errp)
+>      nmi_monitor_handle(monitor_get_cpu_index(), errp);
+>  }
+>  
+> -void dump_drift_info(FILE *f, fprintf_function cpu_fprintf)
+> +void dump_drift_info(void)
+>  {
+>      if (!use_icount) {
+>          return;
+>      }
+>  
+> -    cpu_fprintf(f, "Host - Guest clock  %"PRIi64" ms\n",
+> +    qemu_printf("Host - Guest clock  %"PRIi64" ms\n",
+>                  (cpu_get_clock() - cpu_get_icount())/SCALE_MS);
+>      if (icount_align_option) {
+> -        cpu_fprintf(f, "Max guest delay     %"PRIi64" ms\n", -max_delay/SCALE_MS);
+> -        cpu_fprintf(f, "Max guest advance   %"PRIi64" ms\n", max_advance/SCALE_MS);
+> +        qemu_printf("Max guest delay     %"PRIi64" ms\n",
+> +                    -max_delay / SCALE_MS);
+> +        qemu_printf("Max guest advance   %"PRIi64" ms\n",
+> +                    max_advance / SCALE_MS);
+>      } else {
+> -        cpu_fprintf(f, "Max guest delay     NA\n");
+> -        cpu_fprintf(f, "Max guest advance   NA\n");
+> +        qemu_printf("Max guest delay     NA\n");
+> +        qemu_printf("Max guest advance   NA\n");
+>      }
+>  }
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index eea0010b53..ef13a120cc 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -19,7 +19,7 @@ extern int icount_align_option;
+>  /* drift information for info jit command */
+>  extern int64_t max_delay;
+>  extern int64_t max_advance;
+> -void dump_drift_info(FILE *f, fprintf_function cpu_fprintf);
+> +void dump_drift_info(void);
+>  
+>  /* Unblock cpu */
+>  void qemu_cpu_kick_self(void);
+> diff --git a/monitor.c b/monitor.c
+> index 24e4d49d11..7573689585 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1319,7 +1319,7 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+>      }
+>  
+>      dump_exec_info();
+> -    dump_drift_info((FILE *)mon, monitor_fprintf);
+> +    dump_drift_info();
+>  }
+>  
+>  static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
