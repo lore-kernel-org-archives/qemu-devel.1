@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59477)
+Received: from eggs.gnu.org ([209.51.188.92]:33059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hF41q-0000YE-PI
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:48:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4CN-00034G-WE
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hF41p-0005Ov-OU
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:48:10 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40134)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF4CN-0004ez-0e
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:03 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40005)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hF41p-0005Nm-Dw
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:48:09 -0400
-Received: by mail-pf1-x443.google.com with SMTP id c207so5748618pfc.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:48:08 -0700 (PDT)
-Date: Fri, 12 Apr 2019 14:48:06 -0700 (PDT)
-In-Reply-To: <CAKmqyKOSujRkv+JkgmP79FHVPZabg0QTki3c+BeFMTZpMFSYxA@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-fe62b897-1d18-47aa-8dc1-ab08cad65092@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/riscv: Do not allow sfence.vma from
- user mode
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hF4CM-0004eJ-Cc
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:59:02 -0400
+Received: by mail-pg1-x541.google.com with SMTP id d31so5801992pgl.7
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:59:02 -0700 (PDT)
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-6-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fed7735f-6d51-f84d-8160-6967ffec2338@linaro.org>
+Date: Fri, 12 Apr 2019 11:58:56 -1000
+MIME-Version: 1.0
+In-Reply-To: <20190411100836.646-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 05/41] s390x/tcg: Implement VECTOR ADD
+ WITH CARRY COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: fintelia@gmail.com, qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-I actually missed this.  I just added it to for-next on 
-github.com/palmer-dabbelt.
+On 4/11/19 12:08 AM, David Hildenbrand wrote:
+> +static DisasJumpType op_vaccc(DisasContext *s, DisasOps *o)
+> +{
+> +    if (get_field(s->fields, m5) != ES_128) {
+> +        gen_program_exception(s, PGM_SPECIFICATION);
+> +        return DISAS_NORETURN;
+> +    }
+> +
+> +    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
+> +                   get_field(s->fields, v3), get_field(s->fields, v4), 0,
+> +                   gen_helper_gvec_vaccc128);
+> +    return DISAS_NEXT;
+> +}
 
-Thanks for the ping!
+An inline expansion could be
 
-On Fri, 12 Apr 2019 14:23:42 PDT (-0700), alistair23@gmail.com wrote:
-> On Fri, Apr 12, 2019 at 2:15 PM Jonathan Behrens <fintelia@gmail.com> wrote:
->>
->> Just to double check, nothing further on this is need from me, right? It is set to be merged onto the master branch once the 4.0 release is out?
->
-> Thanks for checking!
->
-> Yep you don't need to do anything, Palmer will merge it in the next
-> RISC-V PR after 4.0.
->
-> Alistair
->
->>
->> Jonathan
->>
->> On Wed, Apr 3, 2019 at 7:11 PM Alistair Francis <alistair23@gmail.com> wrote:
->>>
->>> On Mon, Apr 1, 2019 at 1:39 PM Jonathan Behrens <fintelia@gmail.com> wrote:
->>> >
->>> > The 'sfence.vma' instruction is privileged, and should only ever be allowed
->>> > when executing in supervisor mode or higher.
->>> >
->>> > Jonathan
->>> >
->>> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
->>>
->>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>>
->>> Alistair
->>>
->>> > ---
->>> >  target/riscv/op_helper.c | 7 ++++---
->>> >  1 file changed, 4 insertions(+), 3 deletions(-)
->>> >
->>> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
->>> > index b7dc18a41e..644d0fb35f 100644
->>> > --- a/target/riscv/op_helper.c
->>> > +++ b/target/riscv/op_helper.c
->>> > @@ -145,9 +145,10 @@ void helper_tlb_flush(CPURISCVState *env)
->>> >  {
->>> >      RISCVCPU *cpu = riscv_env_get_cpu(env);
->>> >      CPUState *cs = CPU(cpu);
->>> > -    if (env->priv == PRV_S &&
->>> > -        env->priv_ver >= PRIV_VERSION_1_10_0 &&
->>> > -        get_field(env->mstatus, MSTATUS_TVM)) {
->>> > +    if (!(env->priv >= PRV_S) ||
->>> > +        (env->priv == PRV_S &&
->>> > +         env->priv_ver >= PRIV_VERSION_1_10_0 &&
->>> > +         get_field(env->mstatus, MSTATUS_TVM))) {
->>> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
->>> >      } else {
->>> >          tlb_flush(cs);
->>> > --
->>> > 2.20.1
+One possible expansion is
+
+  tcg_gen_andi_i64(tl, cl, 1);
+  tcg_gen_add2_i64(tl, th, tl, zero, al, zero);
+  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+  tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
+  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+  /* carry out in th */
+
+This is 8 insns for the addition vs the hw optimal 6, but we're not exactly an
+optimizing compiler either.  ;-)
+
+
+r~
