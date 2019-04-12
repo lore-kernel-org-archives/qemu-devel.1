@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36421)
+Received: from eggs.gnu.org ([209.51.188.92]:43668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hEoDC-0007C4-Hg
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:54:51 -0400
+	(envelope-from <npiggin@gmail.com>) id 1hEoxJ-0001Jb-7b
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hEoDB-00009T-4o
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:54:50 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Fri, 12 Apr 2019 13:49:32 +0930
-Message-Id: <20190412041933.12264-2-joel@jms.id.au>
-In-Reply-To: <20190412041933.12264-1-joel@jms.id.au>
-References: <20190412041933.12264-1-joel@jms.id.au>
+	(envelope-from <npiggin@gmail.com>) id 1hEoxI-0008S1-47
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:42:29 -0400
+From: Nicholas Piggin <npiggin@gmail.com>
+Date: Fri, 12 Apr 2019 15:42:13 +1000
+Message-Id: <20190412054214.707-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/2] hw: timer: Add ASPEED RTC device
+Subject: [Qemu-devel] [PATCH] spapr: add splpar hcalls H_JOIN, H_PROD,
+ H_CONFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,276 +21,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+These implementations have a few deficiencies that are noted, but are
+good enough for Linux to use.
+
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
 ---
-v2:
- Use g_assert_not_reached
- Add vmstate
- Add reset callback
- Annotate fall through cases
+This has been tested with TCG with some Linux hacks to use H_JOIN/H_PROD
+for suspend and CPU unplug (plus an implementation of ibm,suspend-me to
+do the suspend). Not sure if KVM might need some more work to support
+H_JOIN properly, but right now Linux only uses it on PowerVM.
 
- hw/timer/Makefile.objs        |   2 +-
- hw/timer/aspeed_rtc.c         | 180 ++++++++++++++++++++++++++++++++++
- hw/timer/trace-events         |   4 +
- include/hw/timer/aspeed_rtc.h |  31 ++++++
- 4 files changed, 216 insertions(+), 1 deletion(-)
- create mode 100644 hw/timer/aspeed_rtc.c
- create mode 100644 include/hw/timer/aspeed_rtc.h
 
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 0e9a4530f848..123d92c9692c 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -41,7 +41,7 @@ obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
+ hw/ppc/spapr_hcall.c | 84 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8a736797b9..6829cadcd3 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1065,6 +1065,86 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     return H_SUCCESS;
+ }
  
- common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
-+common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o aspeed_rtc.o
- 
- common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
-diff --git a/hw/timer/aspeed_rtc.c b/hw/timer/aspeed_rtc.c
-new file mode 100644
-index 000000000000..19f061c846e8
---- /dev/null
-+++ b/hw/timer/aspeed_rtc.c
-@@ -0,0 +1,180 @@
++static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    CPUPPCState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
++
++    if (env->msr & (1ULL << MSR_EE))
++        return H_BAD_MODE;
++
++    /*
++     * This should check for single-threaded mode. In practice, Linux
++     * does not try to H_JOIN all CPUs.
++     */
++
++    cs->halted = 1;
++    cs->exception_index = EXCP_HALTED;
++    cs->exit_request = 1;
++
++    return H_SUCCESS;
++}
++
++static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target = args[0];
++    CPUState *cs = CPU(cpu);
++
++    /*
++     * This does not do a targeted yield or confer, but check the parameter
++     * anyway. -1 means confer to all/any other CPUs.
++     */
++    if (target != -1 && !CPU(spapr_find_cpu(target)))
++        return H_PARAMETER;
++
++    /*
++     * H_CONFER with target == this is not exactly the same as H_JOIN
++     * according to PAPR (e.g., MSR[EE] check and single threaded check
++     * is not done in this case), but unlikely to matter.
++     */
++    if (cpu == spapr_find_cpu(target))
++        return h_join(cpu, spapr, opcode, args);
++
++    /*
++     * This does not implement the dispatch sequence check that PAPR calls for,
++     * but PAPR also specifies a stronger implementation where the target must
++     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
++     * scheduling requirement implemented, there is no correctness reason to
++     * implement the dispatch sequence check.
++     */
++    cs->exception_index = EXCP_YIELD;
++    cpu_loop_exit(cs);
++
++    return H_SUCCESS;
++}
++
 +/*
-+ * ASPEED Real Time Clock
-+ * Joel Stanley <joel@jms.id.au>
-+ *
-+ * Copyright 2019 IBM Corp
-+ * SPDX-License-Identifier: GPL-2.0-or-later
++ * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
++ * achievable running under KVM, although KVM already implements H_CONFER
++ * this way.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/timer/aspeed_rtc.h"
-+#include "qemu/log.h"
-+#include "qemu/timer.h"
-+
-+#include "trace.h"
-+
-+#define COUNTER1        (0x00 / 4)
-+#define COUNTER2        (0x04 / 4)
-+#define ALARM           (0x08 / 4)
-+#define CONTROL         (0x10 / 4)
-+#define ALARM_STATUS    (0x14 / 4)
-+
-+#define RTC_UNLOCKED    BIT(1)
-+#define RTC_ENABLED     BIT(0)
-+
-+static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
++static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
 +{
-+    struct tm tm;
-+    uint32_t year, cent;
-+    uint32_t reg1 = rtc->reg[COUNTER1];
-+    uint32_t reg2 = rtc->reg[COUNTER2];
++    target_long target = args[0];
++    CPUState *cs;
 +
-+    tm.tm_mday = (reg1 >> 24) & 0x1f;
-+    tm.tm_hour = (reg1 >> 16) & 0x1f;
-+    tm.tm_min = (reg1 >> 8) & 0x3f;
-+    tm.tm_sec = (reg1 >> 0) & 0x3f;
++    /*
++     * This does not maintain a prod flag for the vCPU that PAPR asks for.
++     */
 +
-+    cent = (reg2 >> 16) & 0x1f;
-+    year = (reg2 >> 8) & 0x7f;
-+    tm.tm_mon = ((reg2 >>  0) & 0x0f) - 1;
-+    tm.tm_year = year + (cent * 100) - 1900;
++    cs = CPU(spapr_find_cpu(target));
++    if (!cs)
++        return H_PARAMETER;
 +
-+    rtc->offset = qemu_timedate_diff(&tm);
++    cs->halted = 0;
++    qemu_cpu_kick(cs);
++
++    return H_SUCCESS;
 +}
 +
-+static uint32_t aspeed_rtc_get_counter(AspeedRtcState *rtc, int r)
-+{
-+    uint32_t year, cent;
-+    struct tm now;
+ static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+@@ -1860,6 +1940,10 @@ static void hypercall_register_types(void)
+     /* hcall-splpar */
+     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+     spapr_register_hypercall(H_CEDE, h_cede);
++    spapr_register_hypercall(H_CONFER, h_confer);
++    spapr_register_hypercall(H_JOIN, h_join);
++    spapr_register_hypercall(H_PROD, h_prod);
 +
-+    qemu_get_timedate(&now, rtc->offset);
-+
-+    switch (r) {
-+    case COUNTER1:
-+        return (now.tm_mday << 24) | (now.tm_hour << 16) |
-+            (now.tm_min << 8) | now.tm_sec;
-+    case COUNTER2:
-+        cent = (now.tm_year + 1900) / 100;
-+        year = now.tm_year % 100;
-+        return ((cent & 0x1f) << 16) | ((year & 0x7f) << 8) |
-+            ((now.tm_mon + 1) & 0xf);
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static uint64_t aspeed_rtc_read(void *opaque, hwaddr addr,
-+                                unsigned size)
-+{
-+    AspeedRtcState *rtc = opaque;
-+    uint64_t val;
-+    uint32_t r = addr >> 2;
-+
-+    switch (r) {
-+    case COUNTER1:
-+    case COUNTER2:
-+        if (rtc->reg[CONTROL] & RTC_ENABLED) {
-+            rtc->reg[r] = aspeed_rtc_get_counter(rtc, r);
-+        }
-+        /* fall through */
-+    case CONTROL:
-+        val = rtc->reg[r];
-+        break;
-+    case ALARM:
-+    case ALARM_STATUS:
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, addr);
-+        return 0;
-+    }
-+
-+    trace_aspeed_rtc_read(addr, val);
-+
-+    return val;
-+}
-+
-+static void aspeed_rtc_write(void *opaque, hwaddr addr,
-+                             uint64_t val, unsigned size)
-+{
-+    AspeedRtcState *rtc = opaque;
-+    uint32_t r = addr >> 2;
-+
-+    switch (r) {
-+    case COUNTER1:
-+    case COUNTER2:
-+        if (!(rtc->reg[CONTROL] & RTC_UNLOCKED)) {
-+            break;
-+        }
-+        /* fall through */
-+    case CONTROL:
-+        rtc->reg[r] = val;
-+        aspeed_rtc_calc_offset(rtc);
-+        break;
-+    case ALARM:
-+    case ALARM_STATUS:
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, addr);
-+        break;
-+    }
-+    trace_aspeed_rtc_write(addr, val);
-+}
-+
-+static void aspeed_rtc_reset(DeviceState *d)
-+{
-+    AspeedRtcState *rtc = ASPEED_RTC(d);
-+
-+    rtc->offset = 0;
-+    memset(rtc->reg, 0, sizeof(rtc->reg));
-+}
-+
-+static const MemoryRegionOps aspeed_rtc_ops = {
-+    .read = aspeed_rtc_read,
-+    .write = aspeed_rtc_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static const VMStateDescription vmstate_aspeed_rtc = {
-+    .name = TYPE_ASPEED_RTC,
-+    .version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(reg, AspeedRtcState, 0x18),
-+        VMSTATE_INT32(offset, AspeedRtcState),
-+        VMSTATE_INT32(offset, AspeedRtcState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void aspeed_rtc_realize(DeviceState *dev, Error **errp)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    AspeedRtcState *s = ASPEED_RTC(dev);
-+
-+    sysbus_init_irq(sbd, &s->irq);
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_rtc_ops, s,
-+                          "aspeed-rtc", 0x18ULL);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = aspeed_rtc_realize;
-+    dc->vmsd = &vmstate_aspeed_rtc;
-+    dc->reset = aspeed_rtc_reset;
-+}
-+
-+static const TypeInfo aspeed_rtc_info = {
-+    .name          = TYPE_ASPEED_RTC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AspeedRtcState),
-+    .class_init    = aspeed_rtc_class_init,
-+};
-+
-+static void aspeed_rtc_register_types(void)
-+{
-+    type_register_static(&aspeed_rtc_info);
-+}
-+
-+type_init(aspeed_rtc_register_types)
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index dcaf3d6da6c8..db02a9142cda 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -66,6 +66,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK A
- cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
  
-+# hw/timer/aspeed-rtc.c
-+aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
-+aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
-+
- # sun4v-rtc.c
- sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
- sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
-diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/timer/aspeed_rtc.h
-new file mode 100644
-index 000000000000..1f1155a676c1
---- /dev/null
-+++ b/include/hw/timer/aspeed_rtc.h
-@@ -0,0 +1,31 @@
-+/*
-+ * ASPEED Real Time Clock
-+ * Joel Stanley <joel@jms.id.au>
-+ *
-+ * Copyright 2019 IBM Corp
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#ifndef ASPEED_RTC_H
-+#define ASPEED_RTC_H
-+
-+#include <stdint.h>
-+
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+
-+typedef struct AspeedRtcState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    qemu_irq irq;
-+
-+    uint32_t reg[0x18];
-+    int offset;
-+
-+} AspeedRtcState;
-+
-+#define TYPE_ASPEED_RTC "aspeed.rtc"
-+#define ASPEED_RTC(obj) OBJECT_CHECK(AspeedRtcState, (obj), TYPE_ASPEED_RTC)
-+
-+#endif /* ASPEED_RTC_H */
+     /* processor register resource access h-calls */
 -- 
 2.20.1
