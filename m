@@ -2,66 +2,79 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E890EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F77C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9BDA2084D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 13:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BDA2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F080C20850
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:14:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YAYoT2Gu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F080C20850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37618 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37891 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEwWR-00053F-Oo
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 09:47:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37472)
+	id 1hEwwc-0004j7-Tf
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 10:14:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hEwVM-0004Rr-Mz
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:46:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hEwvl-0004L3-Om
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hEwVL-0007o4-Pq
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 09:46:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hEwVH-0007MY-OQ; Fri, 12 Apr 2019 09:46:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDB3E300358C;
-	Fri, 12 Apr 2019 13:45:57 +0000 (UTC)
-Received: from localhost (ovpn-117-48.ams2.redhat.com [10.36.117.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8D8D55D9E2;
-	Fri, 12 Apr 2019 13:45:51 +0000 (UTC)
-Date: Fri, 12 Apr 2019 14:45:49 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190412134549.GA30090@stefanha-x1.localdomain>
-References: <20190402121908.44081-1-slp@redhat.com>
-	<20190409112608.GD16944@stefanha-x1.localdomain>
-	<87bm1diz23.fsf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hEwvh-0004xf-D9
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:13:22 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hEwvh-0004vm-4V
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:13:21 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id v10so8076175oib.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=JcFdkz3OomT3s0WksD79wpmBlehqbTgG/2YPrQwbvbA=;
+	b=YAYoT2GuK2mgfJt9lnYfx8S5wOBOI/KNz/VC0us4y5zA0KKUM8SupDSxvqcNRMFvgq
+	xpncFi/8awSuF7r8ER/PhDiJr1mF4qnjc7XbuFqNfgik1c31xOaRaj/gI9gUWs5+UDdU
+	5wEY1zpvZgziKY0uvdRnuovIzLwFAPejpc7SNDDg79o8a5cKEukNRQ0ldiT5fJKWlEYZ
+	+wiEcOeNAQzInZCh75o9U341GWPLEMTqbx+ntqvmy2KX2FALx6Yg0Ntkd1lbFq2JLCvQ
+	333nGTa+bNnyqn8n9VAuHrgWaxIObHgxAGVVyzWmpEKQ7KC7sN/FkisypyRUlJprqrM8
+	6QvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=JcFdkz3OomT3s0WksD79wpmBlehqbTgG/2YPrQwbvbA=;
+	b=Y7SozpuMdN9FIS51XmxdGl2J5pSQr6MAGIbwDnOtqgwaxxaIYcLUASiGf+Zdr6Ln3Q
+	0z/ZGMJRC+GYD/jk599f+W2epPTDgoSkRBwneON1CTK8cczlTzJuNdOq/9VL4oTXG1sR
+	j+IVq/xorZ+mNxyzjrmMMrDhPF5b+S0LZkLrWOKEAuFdiRFEr+pW97gRMevR5Nq4qMOP
+	5//F2l2YUgkONxp8vRs+Knw4iflF4C0FHnG0sDdGBPOZXsOa7ktzYS2MC1ldGIGecrVK
+	uzc0u9NGvHeq41MGZK4d6qhrOKO6TKAjtNj395+34avIRtZ2e8aeDF8A/TjZ58pOayE3
+	CNJw==
+X-Gm-Message-State: APjAAAVncLBNmDa+thoEUV4bna+cDg6uDX3f0weyTBH5SoG9/TcABGng
+	7qFad3q+ELl1CeoNWmHqm/5VrF49WkdzX9/IL9NTcQ==
+X-Google-Smtp-Source: APXvYqxMFUXf+GBBAoaFGrgudGmDKbClNebX0Gg3KJ+kfocRhj4HwbfQ7mGENP8FtVONOoaSbGla7ZFTcCB4hP+TlrQ=
+X-Received: by 2002:aca:c7d3:: with SMTP id x202mr9515492oif.48.1555078399817; 
+	Fri, 12 Apr 2019 07:13:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Content-Disposition: inline
-In-Reply-To: <87bm1diz23.fsf@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 12 Apr 2019 13:45:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] aio: Add a knob to always
- poll if there are in-flight requests
+References: <20190409210655.777-1-jsnow@redhat.com>
+In-Reply-To: <20190409210655.777-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Apr 2019 15:13:08 +0100
+Message-ID:
+ <CAFEAcA8_V6p3BPZ8VKOCFzBoKKU-S2bsBamOXxy3CJGnwFWA1g@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::22f
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix .hx and .texi disparity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,48 +86,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
-	Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
-	mreitz@redhat.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+	Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412134549.8-Re7Z9lTRZKcWzNrdQoRRuMAURxwiJ7YaaFRN464j8@z>
+Message-ID: <20190412141308.s5vA1eO-mXppliZ7TQnMxCU4oJwY5V62FGl4XoBIp0E@z>
 
+On Tue, 9 Apr 2019 at 22:08, John Snow <jsnow@redhat.com> wrote:
+>
+> It turns out that having options listed in three places continues to be
+> a bad idea. I'm still toying with the idea of an improved infrastructure
+> here, but in the meantime, another bandaid.
+>
+> There are three locations:
+> (1) .hx file, formatted as texi
+> (2) .hx file, formatted as human readable.
+> (3) .texi file, as section headers, formatted as texi.
+>
+> You can compare the two summaries within the .hx file like so:
+>
+> Human-readable command summaries:
+> `./qemu-img --help | grep 'Command syntax' -A14`
+> Detokenized texi command summaries:
+> `grep "@item" qemu-img-cmds.hx | sed -E 's|@var\{([^\}]*?)\}|\1|g'`
+>
+> You can compare the two separate texi summaries like so:
+>
+> Texi command summaries:
+> `grep "@item" qemu-img-cmds.hx"`
+> Texi command headers:
+> grep -E "@item.*@var" qemu-img.texi | tail -14
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  qemu-img.texi    | 4 ++--
+>  qemu-img-cmds.hx | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied to master for rc4, since we needed an rc4 anyway and
+this is a safe docs change.
 
-On Wed, Apr 10, 2019 at 06:51:16PM +0200, Sergio Lopez wrote:
-> Perhaps it'd be worth doing a simple PoC outside QEMU, using the
-> vhost-user-blk example server to avoid the block layer complexity and
-> evaluate the raw benefits with different kinds of backends and
-> workloads.
-
-Sure, it's worth experimenting with.
-
-libvirt is on top of QEMU.  oVirt or OpenStack is on top of libvirt.
-It's hard for the user or management tools to set low-level tuning
-options like this.  We either need smart defaults or self-tuning - knobs
-are mostly useful for benchmarking and for a very small number of expert
-users.
-
-Stefan
-
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcsJaNAAoJEJykq7OBq3PIM7cH/RiaZqwn9jCm38GW2PZ1Sdx4
-Vjb0DZTStSoaPwJSKpBxC+UCoabCOV6lDC2iw9WCMXb1mFgsavayaeeMM+EIDwpp
-LOyKmL/KOO8JWduYVP4NzMu32dcBAREeblocsJGfqLg6y7kcJ5RzvNZw6ExVA9NA
-Xk8JvicEaGpnmSirAbovPXWWhJ1765dzXtkdKHIRJKEdPNU0bbW7zAfqIa3l00Mx
-+nEZrR4//i0op+9PhPLTwHfTVPMm4A3pwbCCwxRxGzGQI+1vPZA8vtkjuO3NO9Ko
-XxjOwkTCxthX20oYfufLkCLW1hfk5N0OKcHkuW6Ik4BVHPPyWD+DfuBnelkZ9kE=
-=Ul9J
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
+thanks
+-- PMM
 
