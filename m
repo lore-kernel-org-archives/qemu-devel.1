@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35023)
+Received: from eggs.gnu.org ([209.51.188.92]:46765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <devesh.sharma@broadcom.com>) id 1hEsrM-0006cw-8z
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:37 -0400
+	(envelope-from <otubo@redhat.com>) id 1hEvfw-0003PI-ER
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <devesh.sharma@broadcom.com>) id 1hEsrL-0004de-6e
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:36 -0400
-Received: from mail-it1-x136.google.com ([2607:f8b0:4864:20::136]:36833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <devesh.sharma@broadcom.com>)
-	id 1hEsrK-0004cQ-U2
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:52:35 -0400
-Received: by mail-it1-x136.google.com with SMTP id y10so14527189itc.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 02:52:33 -0700 (PDT)
+	(envelope-from <otubo@redhat.com>) id 1hEvfv-0005so-Ao
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:53:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33180)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1hEvfv-0005sC-1Q
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:52:59 -0400
+Date: Fri, 12 Apr 2019 14:52:52 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20190412125252.GB13589@vader>
+References: <20190412113730.28828-1-otubo@redhat.com>
+	<20190412113730.28828-2-otubo@redhat.com>
+	<20190412114307.GK25308@redhat.com>
 MIME-Version: 1.0
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190411172402.GA14509@mellanox.com>
-	<20190411173419.GB6259@lap1> <20190411174124.GA6428@lap1>
-In-Reply-To: <20190411174124.GA6428@lap1>
-From: Devesh Sharma <devesh.sharma@broadcom.com>
-Date: Fri, 12 Apr 2019 15:21:56 +0530
-Message-ID: <CANjDDBj0rqZEmHzMH+2461_DvjV5K4hT=hJ_usBuucV4Xwh84g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="aVD9QWMuhilNxW9f"
+Content-Disposition: inline
+In-Reply-To: <20190412114307.GK25308@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 1/1] configure: Relax check for libseccomp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Jason Gunthorpe <jgg@mellanox.com>, "mst@redhat.com" <mst@redhat.com>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, deller@gmx.de, philmd@redhat.com
 
-On Thu, Apr 11, 2019 at 11:11 PM Yuval Shaia <yuval.shaia@oracle.com> wrote:
->
-> On Thu, Apr 11, 2019 at 08:34:20PM +0300, Yuval Shaia wrote:
-> > On Thu, Apr 11, 2019 at 05:24:08PM +0000, Jason Gunthorpe wrote:
-> > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > >
-> > > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > > more software runs in virtualized environment.
-> > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > >
-> > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > > technology and also because the Virtio specification
-> > > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > > achieve bare metal performance.
-> > > > >
-> > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > > Virtio Specification and a look forward on possible implementation
-> > > > > techniques.
-> > > > >
-> > > > > Open issues/Todo list:
-> > > > > List is huge, this is only start point of the project.
-> > > > > Anyway, here is one example of item in the list:
-> > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > > >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > > >   that this is reasonable so one option is to have one for all and
-> > > > >   multiplex the traffic on it. This is not good approach as by design it
-> > > > >   introducing an optional starvation. Another approach would be multi
-> > > > >   queues and round-robin (for example) between them.
-> > > > >
-> > > > > Expectations from this posting:
-> > > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > > there is some sort interest in the community for such device.
-> > > >
-> > > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > > spec for this :)
-> > >
-> > > I'm unclear why you'd want to have a virtio queue for anything other
-> > > that some kind of command channel.
-> > >
-> > > I'm not sure a QP or CQ benefits from this??
-> >
-> > Virtqueue is a standard mechanism to pass data from guest to host. By
->
-> And vice versa (CQ?)
->
-> > saying that - it really sounds like QP send and recv rings. So my thought
-> > is to use a standard way for rings. As i've learned this is how it is used
-> > by other virtio devices ex virtio-net.
-> >
-> > >
-> > > Jason
-> >
-I would like to ask more basic question, how virtio queue will glue
-with actual h/w qps? I may be to naive though.
 
--Regards
-Devesh
+--aVD9QWMuhilNxW9f
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 12/04/2019 - 12:43:07, Daniel P. Berrange wrote:
+> On Fri, Apr 12, 2019 at 01:37:30PM +0200, Eduardo Otubo wrote:
+> > From: Helge Deller <deller@gmx.de>
+> >=20
+> > All major distributions do support libseccomp version >=3D 2.3.0, so th=
+ere
+> > is no need to special-case on various architectures any longer.
+> >=20
+> > Signed-off-by: Helge Deller <deller@gmx.de>
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Acked-by: Eduardo Otubo <otubo@redhat.com>
+>=20
+> When sending pull requests the subsystem maintainer *must*
+> add their Signed-off-by as this is what has legal meaning
+> with respect to the developer certificate of origin.
+>=20
+> Acked-by is something that is used to give a different
+> subsystem maintainer permission to merge a patch that
+> would normally be your responsibility.
+>=20
+>=20
+
+I think this issue was already raised by Peter on my last pull-request. My
+appologies, I fixed the last pull request my didn't fix my script :/
+
+Will send again after the release.
+Thanks for pointing that out.
+
+--=20
+Eduardo Otubo
+
+Red Hat GmbH,http://www.de.redhat.com/, Sitz: Grasbrunn,
+Handelsregister: Amtsgericht M=C3=BCnchen, HRB 153243,
+Gesch=C3=A4ftsf=C3=BChrer: Charles Cachera, Michael O'Neill, Tom Savage, Er=
+ic Shander
+
+--aVD9QWMuhilNxW9f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcsIokAAoJEN8y58Dw//mid+IH/1Z2Fd6DOW3qBCX1vFpyPyUR
+iZH+5GsdbeIQ7CT36nMQStzBDSVtFk1wN03j4hEl4fuIjCQ62rc9OS4q4eeFZl1y
+cye3tJcnKWwzvfyKrq5lrG1wBYkF7JEb5t+PGv7GyMncP+fMX4J9famMv8h/q+v4
+gOsp+sC2pOCG1gULnu1GdXmSddLwOVGQO3aDoOy5QdpjKqVF2o3Q+NCrc0fSQrSZ
+o4pUZstNLPRBNVuEzf69ioS4C9OyfwtBEs+X0OfKWHGg8uSvXznsatAGNwsRWvcb
+N+VBZ2ZnuOyB63U6qF+cyPqtrRVDMoXY2OIRhultf1JRdJZgcIgMtg8Wk/v+Pgc=
+=rUoV
+-----END PGP SIGNATURE-----
+
+--aVD9QWMuhilNxW9f--
