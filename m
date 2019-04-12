@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33183)
+Received: from eggs.gnu.org ([209.51.188.92]:34112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEnpx-0001l6-9c
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:30:54 -0400
+	(envelope-from <clg@kaod.org>) id 1hEnvz-0003Pk-JL
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hEnpw-0001pe-6X
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:30:49 -0400
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:51826)
+	(envelope-from <clg@kaod.org>) id 1hEnvy-00075a-A3
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:03 -0400
+Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:48950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEnpv-0001n6-Sc
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:30:48 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.160.39])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7CACFEEB4E
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 06:30:45 +0200 (CEST)
-References: <20190411063408.3998-1-clg@kaod.org>
-	<1555039552.i5y8oxfv9m.astroid@bobo.none>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hEnvx-00073J-Vj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 00:37:02 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.159.68])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 76B0F2070BE
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 06:36:59 +0200 (CEST)
+References: <20190411161013.4514-1-clg@kaod.org>
+	<20190411161013.4514-3-clg@kaod.org>
+	<CACPK8XezRXPFFiiK7_xXLs-ipnfw9400E1dSRHN0XnF2cc4=vA@mail.gmail.com>
+	<c007d615-4dbf-4525-9fb0-6e4feb28c344@www.fastmail.com>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f8492fdf-bccf-2852-accd-7ee5b18dc28f@kaod.org>
-Date: Fri, 12 Apr 2019 06:30:36 +0200
+Message-ID: <e9c90082-5312-5707-539b-3ab3c2e7d885@kaod.org>
+Date: Fri, 12 Apr 2019 06:36:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <1555039552.i5y8oxfv9m.astroid@bobo.none>
+In-Reply-To: <c007d615-4dbf-4525-9fb0-6e4feb28c344@www.fastmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: Add H_PROD and H_CONFER
+Subject: Re: [Qemu-devel] [PATCH 2/3] aspeed: add a per SoC mapping for the
+ memory space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nicholas Piggin <npiggin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 4/12/19 5:28 AM, Nicholas Piggin wrote:
-> C=C3=A9dric Le Goater's on April 11, 2019 4:34 pm:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>
->> H_PROD should be fully functional, H_CEDE is modified to
->> ignore a proded CPU. H_CONFER is a stub to avoid returning
->> an error.
+On 4/12/19 5:24 AM, Andrew Jeffery wrote:
 >=20
-> Huh, I just implemented these a couple of days ago to test pseries
-> suspend, also H_JOIN.
+>=20
+> On Fri, 12 Apr 2019, at 11:48, Joel Stanley wrote:
+>> On Thu, 11 Apr 2019 at 16:10, C=C3=A9dric Le Goater <clg@kaod.org> wro=
+te:
+>>>
+>>> This will simplify the definition of new SoCs, like the AST2600 which
+>>> should use a slightly different address space and have a different se=
+t
+>>> of controllers.
+>>>
+>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>
+>>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+>>> index 5bbd1fb87d18..9b601709e93c 100644
+>>> --- a/hw/arm/aspeed_soc.c
+>>> +++ b/hw/arm/aspeed_soc.c
+>>
+>>> +static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
+>>
+>>> +static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
+>>
+>> Most of these arrays is common. And some of it will stay common in the
+>> 2600. Any ideas how we could avoid duplication?
+>=20
+> I dunno, I feel that any attempt to create some "common" layout concept=
+ is
+> more distracting than having soc-specific, complete layouts described.
 
-Cool. Can you send your version instead ?
+yes. I rather duplicate some values and see in one glance the full=20
+address space.
 
 Thanks,
 
 C.
-
+ =20
 >=20
-> ---
->  hw/ppc/spapr_hcall.c | 79 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 79 insertions(+)
+> There's no reason why they're common beyond coincidence (i.e. it's at
+> ASPEED's whim). I think this is fine.
 >=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 8a736797b9..47ee933333 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1065,6 +1065,81 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
->      return H_SUCCESS;
->  }
-> =20
-> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> +                           target_ulong opcode, target_ulong *args)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +    CPUState *cs =3D CPU(cpu);
-> +
-> +    if (env->msr & (1ULL << MSR_EE))
-> +        return H_BAD_MODE;
-> +
-> +    /*
-> +     * This should check for single-threaded mode. In practice, Linux
-> +     * does not try to H_JOIN all CPUs.
-> +     */
-> +
-> +    cs->halted =3D 1;
-> +    cs->exception_index =3D EXCP_HALTED;
-> +    cs->exit_request =3D 1;
-> +
-> +    return H_SUCCESS;
-> +}
-> +
-> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr=
-,
-> +                           target_ulong opcode, target_ulong *args)
-> +{
-> +    target_long target =3D args[0];
-> +    CPUState *cs =3D CPU(cpu);
-> +
-> +    /*
-> +     * This does not do a targeted yield, but check the parameter anyw=
-ay.
-> +     */
-> +    if (target !=3D -1 && !CPU(spapr_find_cpu(target)))
-> +        return H_PARAMETER;
-> +
-> +    /*
-> +     * H_CONFER with target =3D=3D this is not exactly the same as H_J=
-OIN
-> +     * according to PAPR (e.g., MSR[EE] check and single threaded chec=
-k
-> +     * is not done in this case), but unlikely to matter.
-> +     */
-> +    if (cpu =3D=3D spapr_find_cpu(target))
-> +        return h_join(cpu, spapr, opcode, args);
-> +
-> +    /*
-> +     * This does not implement the dispatch sequence check.
-> +     */
-> +    cs->exception_index =3D EXCP_YIELD;
-> +    cpu_loop_exit(cs);
-> +
-> +    return H_SUCCESS;
-> +}
-> +
-> +/*
-> + * H_PROD and H_CONFER are specified to only modify GPR r3, which is n=
-ot
-> + * achievable running under KVM, although KVM already implements H_CON=
-FER
-> + * this way.
-> + */
-> +static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> +                           target_ulong opcode, target_ulong *args)
-> +{
-> +    target_long target =3D args[0];
-> +    CPUState *cs;
-> +
-> +    /*
-> +     * Should set the prod flag in the VPA.
-> +     */
-> +
-> +    cs =3D CPU(spapr_find_cpu(target));
-> +    if (!cs)
-> +        return H_PARAMETER;
-> +
-> +    cs->halted =3D 0;
-> +    qemu_cpu_kick(cs);
-> +
-> +    return H_SUCCESS;
-> +}
-> +
->  static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
->                             target_ulong opcode, target_ulong *args)
->  {
-> @@ -1860,6 +1935,10 @@ static void hypercall_register_types(void)
->      /* hcall-splpar */
->      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
->      spapr_register_hypercall(H_CEDE, h_cede);
-> +    spapr_register_hypercall(H_CONFER, h_confer);
-> +    spapr_register_hypercall(H_JOIN, h_join);
-> +    spapr_register_hypercall(H_PROD, h_prod);
-> +
->      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
-> =20
->      /* processor register resource access h-calls */
+> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 >=20
+>>
+>> This is fine for now.
+>>
+>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>>
