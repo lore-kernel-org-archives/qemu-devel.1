@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53089)
+Received: from eggs.gnu.org ([209.51.188.92]:53217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEu5a-0003h7-JL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:11:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEu64-0003z8-7B
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEu5Y-0004Ua-B9
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:11:21 -0400
-Date: Fri, 12 Apr 2019 13:11:13 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190412111113.GE4522@linux.fritz.box>
-References: <20190225152053.15976-1-kwolf@redhat.com>
-	<20190225152053.15976-17-kwolf@redhat.com>
-	<4f9792a1-4702-62d0-cad4-4da1169baa3b@virtuozzo.com>
-	<20190411141548.GE5694@linux.fritz.box>
-	<1391b876-74ed-21f0-c41f-f2fb22d2eae7@virtuozzo.com>
-	<20190411164803.GF5694@linux.fritz.box>
-	<2558f6fa-03d5-9483-07ff-7ec0a4d37835@virtuozzo.com>
-	<0b088cc0-6ea9-297d-6989-2d61e1c25075@virtuozzo.com>
+	(envelope-from <thuth@redhat.com>) id 1hEu62-0004lh-Ah
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:11:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hEu60-0004l0-Jg
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 07:11:49 -0400
+References: <87d0mwatbu.fsf@dusky.pond.sub.org>
+	<CAAdtpL6VCiXLbTWyJo4cbCNLjOCPr6KrH8KTqEq1V=CTMYKubQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6fe1a987-c3c5-3af5-74a4-fc4cd08d2380@redhat.com>
+Date: Fri, 12 Apr 2019 13:11:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b088cc0-6ea9-297d-6989-2d61e1c25075@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PULL 16/71] nbd: Increase bs->in_flight during
- AioContext switch
+In-Reply-To: <CAAdtpL6VCiXLbTWyJo4cbCNLjOCPr6KrH8KTqEq1V=CTMYKubQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Maintainers,
+ please tell us how to boot your machines!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Chubb <peter.chubb@nicta.com.au>, Marek Vasut <marex@denx.de>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Jia Liu <proljc@gmail.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Joel Stanley <joel@jms.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Fabien Chouteau <chouteau@adacore.com>, Beniamino Galvani <b.galvani@gmail.com>, Paul Durrant <paul.durrant@citrix.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Andrey Smirnov <andrew.smirnov@gmail.com>, Michael Walle <michael@walle.cc>, Thomas Huth <huth@tuxfamily.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Jan Kiszka <jan.kiszka@web.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-Am 11.04.2019 um 19:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 11.04.2019 20:13, Vladimir Sementsov-Ogievskiy wrote:
-> > 11.04.2019 19:48, Kevin Wolf wrote:
-> >> Am 11.04.2019 um 16:48 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>> 11.04.2019 17:15, Kevin Wolf wrote:
-> >>>> Am 11.04.2019 um 15:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>> 25.02.2019 18:19, Kevin Wolf wrote:
-> >>>>>> bdrv_drain() must not leave connection_co scheduled, so bs->in_flight
-> >>>>>> needs to be increased while the coroutine is waiting to be scheduled
-> >>>>>> in the new AioContext after nbd_client_attach_aio_context().
-> >>>>>
-> >>>>> Hi!
-> >>>>>
-> >>>>> I have some questions, could you explain, please?
-> >>>>>
-> >>>>> "bdrv_drain() must not leave connection_co scheduled" - it's because we want to be
-> >>>>> sure that connection_co yielded from nbd_read_eof, yes?
-> >>>>>
-> >>>>> But it is guaranteed by aio_wait_bh_oneshot.. Why do we need additioinally inc/dec
-> >>>>> bs->in_flight ?
-> >>>>
-> >>>> Without incrementing bs->in_flight, nothing would guarantee that
-> >>>> aio_poll() is called and the BH is actually executed before bdrv_drain()
-> >>>> returns.
-> >>>
-> >>> Don't follow.. Don't we want exactly this, we want BH to be executed while node is still
-> >>> drained, as you write in comment?
-> >>
-> >> Yes, exactly. But if bs->in_flight == 0, the AIO_WAIT_WHILE() condition
-> >> in the drain code could become false, so aio_poll() would not be called
-> >> again and drain would return even if the BH is still pending.
-> >>
-> > 
-> > Ah, oops, sorry my English, I read it like "nothing would prevent". Understand now, thanks.
-> 
-> Or not again.. We will not return to drain code, as we will loop in aio_wait_bh_oneshot,
-> which will not return until BH handled
+On 13/03/2019 02.06, Philippe Mathieu-Daud=C3=A9 wrote:
+> '
+> On Tue, Mar 12, 2019 at 6:44 PM Markus Armbruster <armbru@redhat.com> w=
+rote:
+[...]
+>>     =3D hw/arm/nseries.c =3D
+>>     Andrzej Zaborowski <balrogg@gmail.com> (odd fixer:nSeries)
+>>     Peter Maydell <peter.maydell@linaro.org> (odd fixer:nSeries)
+>>     qemu-arm@nongnu.org (open list:nSeries)
+>=20
+> images:
+> http://stskeeps.subnetmask.net/meego-n8x0/
+>=20
+> $ qemu-system-arm -M n810 -kernel
+> meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0
+> -append "root=3D/dev/mmcblk0p1 console=3DttyS0 printk.time=3D0 rootwait=
+" -m
+> 130 -sd meego-arm-n8x0-1.0.80.20100712.1431-sda.raw -serial stdio
 
-Oh, hm, good point, it's not just aio_bh_schedule_oneshot(), but the
-waiting version.
+That does not work for me - I only get a white screen that turns to
+black after half a second, and no output (also not on the serial
+console). Does it still work for you with the latest QEMU master branch?
 
-I think I added the aio_wait_bh_oneshot() only later to address a review
-comment, so maybe increasing bs->in_flight isn't needed any more now.
-
-But it can't hurt at least...
-
-Kevin
+ Thomas
