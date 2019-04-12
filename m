@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25811C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2594CC282CE
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC7202082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:36:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7202082E
+	by mail.kernel.org (Postfix) with ESMTPS id DF04121872
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 12:37:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF04121872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35782 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35790 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEvPX-0003gD-55
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:36:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39092)
+	id 1hEvR0-0005XE-3e
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 08:37:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvFr-0002Vy-S5
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEvFu-0002ZN-6K
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEvFq-0002bo-BE
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40910)
+	(envelope-from <thuth@redhat.com>) id 1hEvFs-0002eA-Tt
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 08:26:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hEvFp-0002af-VV; Fri, 12 Apr 2019 08:26:02 -0400
+	id 1hEvFs-0002dM-IJ; Fri, 12 Apr 2019 08:26:04 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CF3388AA1;
-	Fri, 12 Apr 2019 12:26:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C96EAC062ED8;
+	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
 Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EE7735D9CC;
-	Fri, 12 Apr 2019 12:25:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B522A5D9CC;
+	Fri, 12 Apr 2019 12:26:01 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: cohuck@redhat.com,
 	qemu-s390x@nongnu.org
-Date: Fri, 12 Apr 2019 14:25:17 +0200
-Message-Id: <20190412122523.24111-12-thuth@redhat.com>
+Date: Fri, 12 Apr 2019 14:25:18 +0200
+Message-Id: <20190412122523.24111-13-thuth@redhat.com>
 In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
 References: <20190412122523.24111-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Fri, 12 Apr 2019 12:26:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 12 Apr 2019 12:26:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 11/17] s390-bios: Factor
- finding boot device out of virtio code path
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 12/17] s390-bios:
+ Refactor virtio to run channel programs via cio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,186 +74,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412122517.4kekjowmz6I8j7m6qtQ1EUPzVCxmaXOwSGNVt3uvoOU@z>
+Message-ID: <20190412122518.pIu-IBAnO94xDBKzsKK98J2OIrAOcBWAlCf8nZqgZCM@z>
 
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Make a new routine find_boot_device to locate the boot device for all
-cases, not just virtio.
-
-The error message for the case where no boot device has been specified
-and a suitable boot device cannot be auto detected was specific to
-virtio devices. We update this message to remove virtio specific wording.
+Now that we have a Channel I/O library let's modify virtio boot code to
+make use of it for running channel programs.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <1554388475-18329-12-git-send-email-jjherne@linux.ibm.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1554388475-18329-13-git-send-email-jjherne@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++------------------
- tests/boot-serial-test.c |  2 +-
- 2 files changed, 47 insertions(+), 40 deletions(-)
+ pc-bios/s390-ccw/virtio.c | 57 +++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 30 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index d04ea8972a..d3a161c685 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -58,17 +58,18 @@ unsigned int get_loadparm_index(void)
-  * NOTE: The global variable blk_schid is updated to contain the subchan=
-nel
-  * information.
-  */
--static bool find_dev(Schib *schib, int dev_no)
-+static bool find_subch(int dev_no)
- {
-+    Schib schib;
-     int i, r;
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index aa9da7253f..35278eaee1 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -14,6 +14,7 @@
+ #include "virtio.h"
+ #include "virtio-scsi.h"
+ #include "bswap.h"
++#include "helper.h"
 =20
-     for (i =3D 0; i < 0x10000; i++) {
-         blk_schid.sch_no =3D i;
--        r =3D stsch_err(blk_schid, schib);
-+        r =3D stsch_err(blk_schid, &schib);
-         if ((r =3D=3D 3) || (r =3D=3D -EIO)) {
-             break;
-         }
--        if (!schib->pmcw.dnv) {
-+        if (!schib.pmcw.dnv) {
-             continue;
-         }
+ #define VRING_WAIT_REPLY_TIMEOUT 30
 =20
-@@ -80,7 +81,7 @@ static bool find_dev(Schib *schib, int dev_no)
-             continue;
-         }
-=20
--        if ((dev_no < 0) || (schib->pmcw.dev =3D=3D dev_no)) {
-+        if ((dev_no < 0) || (schib.pmcw.dev =3D=3D dev_no)) {
-             return true;
-         }
-     }
-@@ -136,56 +137,61 @@ static void boot_setup(void)
-     have_iplb =3D store_iplb(&iplb);
- }
-=20
--static void virtio_setup(void)
-+static void find_boot_device(void)
- {
--    Schib schib;
--    int ssid;
--    bool found =3D false;
--    uint16_t dev_no;
-     VDev *vdev =3D virtio_get_device();
--    QemuIplParameters *early_qipl =3D (QemuIplParameters *)QIPL_ADDRESS;
--
--    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+    int ssid;
-+    bool found;
-=20
--    if (have_iplb) {
--        switch (iplb.pbt) {
--        case S390_IPL_TYPE_CCW:
--            dev_no =3D iplb.ccw.devno;
--            debug_print_int("device no. ", dev_no);
--            blk_schid.ssid =3D iplb.ccw.ssid & 0x3;
--            debug_print_int("ssid ", blk_schid.ssid);
--            found =3D find_dev(&schib, dev_no);
--            break;
--        case S390_IPL_TYPE_QEMU_SCSI:
--            vdev->scsi_device_selected =3D true;
--            vdev->selected_scsi_device.channel =3D iplb.scsi.channel;
--            vdev->selected_scsi_device.target =3D iplb.scsi.target;
--            vdev->selected_scsi_device.lun =3D iplb.scsi.lun;
--            blk_schid.ssid =3D iplb.scsi.ssid & 0x3;
--            found =3D find_dev(&schib, iplb.scsi.devno);
--            break;
--        default:
--            panic("List-directed IPL not supported yet!\n");
--        }
--        menu_setup();
--    } else {
-+    if (!have_iplb) {
-         for (ssid =3D 0; ssid < 0x3; ssid++) {
-             blk_schid.ssid =3D ssid;
--            found =3D find_dev(&schib, -1);
-+            found =3D find_subch(-1);
-             if (found) {
--                break;
-+                return;
-             }
-         }
-+        panic("Could not find a suitable boot device (none specified)\n"=
-);
-+    }
-+
-+    switch (iplb.pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        debug_print_int("device no. ", iplb.ccw.devno);
-+        blk_schid.ssid =3D iplb.ccw.ssid & 0x3;
-+        debug_print_int("ssid ", blk_schid.ssid);
-+        found =3D find_subch(iplb.ccw.devno);
-+        break;
-+    case S390_IPL_TYPE_QEMU_SCSI:
-+        vdev->scsi_device_selected =3D true;
-+        vdev->selected_scsi_device.channel =3D iplb.scsi.channel;
-+        vdev->selected_scsi_device.target =3D iplb.scsi.target;
-+        vdev->selected_scsi_device.lun =3D iplb.scsi.lun;
-+        blk_schid.ssid =3D iplb.scsi.ssid & 0x3;
-+        found =3D find_subch(iplb.scsi.devno);
-+        break;
-+    default:
-+        panic("List-directed IPL not supported yet!\n");
-     }
-=20
--    IPL_assert(found, "No virtio device found");
-+    IPL_assert(found, "Boot device not found\n");
-+}
-+
-+static void virtio_setup(void)
-+{
-+    VDev *vdev =3D virtio_get_device();
-+    QemuIplParameters *early_qipl =3D (QemuIplParameters *)QIPL_ADDRESS;
-+
-+    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+
-+    if (have_iplb) {
-+        menu_setup();
-+    }
-=20
-     if (virtio_get_device_type() =3D=3D VIRTIO_ID_NET) {
-         sclp_print("Network boot device detected\n");
-         vdev->netboot_start_addr =3D qipl.netboot_start_addr;
-     } else {
-         virtio_blk_setup_device(blk_schid);
--
-         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device dete=
-cted");
+@@ -89,33 +90,20 @@ int drain_irqs(SubChannelId schid)
      }
  }
-@@ -195,8 +201,9 @@ int main(void)
-     sclp_setup();
-     css_setup();
-     boot_setup();
--    virtio_setup();
-+    find_boot_device();
 =20
-+    virtio_setup();
-     zipl_load(); /* no return */
+-static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
++static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
+ {
+     Ccw1 ccw =3D {};
+-    CmdOrb orb =3D {};
+-    int r;
+-
+-    enable_subchannel(vdev->schid);
+-
+-    /* start subchannel command */
+-    orb.fmt =3D 1;
+-    orb.cpa =3D (u32)(long)&ccw;
+-    orb.lpm =3D 0x80;
 =20
-     panic("Failed to load OS from hard disk\n");
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index c591748aaf..24852d4c7d 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -114,7 +114,7 @@ static testdef_t tests[] =3D {
-     { "sparc", "SS-4", "", "MB86904" },
-     { "sparc", "SS-600MP", "", "TMS390Z55" },
-     { "sparc64", "sun4u", "", "UltraSPARC" },
--    { "s390x", "s390-ccw-virtio", "", "virtio device" },
-+    { "s390x", "s390-ccw-virtio", "", "device" },
-     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf=
-5208 },
-     { "microblaze", "petalogix-s3adsp1800", "", "TT",
-       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
+     ccw.cmd_code =3D cmd;
+     ccw.cda =3D (long)ptr;
+     ccw.count =3D len;
+=20
+-    r =3D ssch(vdev->schid, &orb);
+-    /*
+-     * XXX Wait until device is done processing the CCW. For now we can
+-     *     assume that a simple tsch will have finished the CCW processi=
+ng,
+-     *     but the architecture allows for asynchronous operation
+-     */
+-    if (!r) {
+-        r =3D drain_irqs(vdev->schid);
++    if (sli) {
++        ccw.flags |=3D CCW_FLAG_SLI;
+     }
+-    return r;
++
++    enable_subchannel(vdev->schid);
++    return do_cio(vdev->schid, vdev->senseid.cu_type, ptr2u32(&ccw), CCW=
+_FMT1);
+ }
+=20
+ static void vring_init(VRing *vr, VqInfo *info)
+@@ -257,7 +245,7 @@ void virtio_setup_ccw(VDev *vdev)
+     vdev->config.blk.blk_size =3D 0; /* mark "illegal" - setup started..=
+. */
+     vdev->guessed_disk_nature =3D VIRTIO_GDN_NONE;
+=20
+-    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
++    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0, false);
+=20
+     switch (vdev->senseid.cu_model) {
+     case VIRTIO_ID_NET:
+@@ -278,18 +266,19 @@ void virtio_setup_ccw(VDev *vdev)
+     default:
+         panic("Unsupported virtio device\n");
+     }
+-    IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size)=
+ =3D=3D 0,
+-               "Could not get block device configuration");
++    IPL_assert(
++        run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size, false)=
+ =3D=3D 0,
++       "Could not get block device configuration");
+=20
+     /* Feature negotiation */
+     for (i =3D 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
+         feats.features =3D 0;
+         feats.index =3D i;
+-        rc =3D run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
++        rc =3D run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats), f=
+alse);
+         IPL_assert(rc =3D=3D 0, "Could not get features bits");
+         vdev->guest_features[i] &=3D bswap32(feats.features);
+         feats.features =3D bswap32(vdev->guest_features[i]);
+-        rc =3D run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
++        rc =3D run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats), =
+false);
+         IPL_assert(rc =3D=3D 0, "Could not set features bits");
+     }
+=20
+@@ -306,16 +295,17 @@ void virtio_setup_ccw(VDev *vdev)
+         };
+=20
+         IPL_assert(
+-            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config))=
+ =3D=3D 0,
++            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config),=
+ false) =3D=3D 0,
+             "Could not get block device VQ configuration");
+         info.num =3D config.num;
+         vring_init(&vdev->vrings[i], &info);
+         vdev->vrings[i].schid =3D vdev->schid;
+-        IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) =3D=
+=3D 0,
+-                   "Cannot set VQ info");
++        IPL_assert(
++            run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info), false) =3D=
+=3D 0,
++            "Cannot set VQ info");
+     }
+     IPL_assert(
+-        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) =3D=
+=3D 0,
++        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status), fal=
+se) =3D=3D 0,
+         "Could not write status to host");
+ }
+=20
+@@ -323,8 +313,15 @@ bool virtio_is_supported(SubChannelId schid)
+ {
+     vdev.schid =3D schid;
+     memset(&vdev.senseid, 0, sizeof(vdev.senseid));
+-    /* run sense id command */
+-    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.sens=
+eid))) {
++
++    /*
++     * Run sense id command.
++     * The size of the senseid data differs between devices (notably,
++     * between virtio devices and dasds), so specify the largest possibl=
+e
++     * size and suppress the incorrect length indication for smaller siz=
+es.
++     */
++    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.sens=
+eid),
++                true)) {
+         return false;
+     }
+     if (vdev.senseid.cu_type =3D=3D 0x3832) {
 --=20
 2.21.0
 
