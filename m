@@ -3,59 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70000C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 588BCC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41BE720850
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41BE720850
+	by mail.kernel.org (Postfix) with ESMTPS id 280D52063F
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:29:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 280D52063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38677 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38687 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEy5m-00040I-8K
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:27:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33675)
+	id 1hEy6w-0004vO-B7
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:29:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEy4X-0003Td-R6
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:26:34 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEy53-0003jI-Be
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hEy4W-0004Ps-Vc
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:26:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38656)
+	(envelope-from <dgilbert@redhat.com>) id 1hEy52-0004tA-AN
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hEy4U-0004Ny-AD; Fri, 12 Apr 2019 11:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEy51-0004qA-Vk
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:04 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 87AD020269;
-	Fri, 12 Apr 2019 15:26:29 +0000 (UTC)
-Received: from thuth.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DEA431001E7A;
-	Fri, 12 Apr 2019 15:26:24 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-arm@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Apr 2019 17:26:19 +0200
-Message-Id: <20190412152619.23542-1-thuth@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 350B2316E915
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 15:26:57 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.117.255])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EAFD95C206;
+	Fri, 12 Apr 2019 15:26:54 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	pbonzini@redhat.com
+Date: Fri, 12 Apr 2019 16:26:52 +0100
+Message-Id: <20190412152652.827-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 12 Apr 2019 15:26:29 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 12 Apr 2019 15:26:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.1] hw/arm/nseries: Deprecate the n800 and
- n810 machines
+Subject: [Qemu-devel] [PATCH] hmp: gva2gpa debug command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,59 +66,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel@nongnu.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412152619.oZ3M-StJA5424bbZU1aser63zRg8_CHzyhJXFqF2b_g@z>
+Message-ID: <20190412152652.JR5l-wIa3rgPRa7ZS2aVhf-IJCJrPxq5vj4q2nM8izg@z>
 
-These machines depend on the deprecated bluetooth subsystem. In case we
-finally decide to remove the bluetooth subsystem, we likely need to
-remove the n800 and n810 machines, too, so mark them now as deprecated.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Add a gva2gpa command purely for debug which performs
+address translation on the gva, the existing gpa2hva
+command can then also be used to find it in the qemu
+userspace; e.g.
+
+(qemu) info registers
+.... RSP=3Dffffffff81c03e98
+....
+(qemu) gva2gpa 0xffffffff81c03e98
+gpa: 0x1c03e98
+(qemu) gpa2hva 0x1c03e98
+Host virtual address for 0x1c03e98 (pc.ram) is 0x7f0599a03e98
+(qemu) x/10x 0xffffffff81c03e98
+ffffffff81c03e98: 0x81c03eb8 0xffffffff 0x8101ea3f 0xffffffff
+ffffffff81c03ea8: 0x81d27b00 0xffffffff 0x00000000 0x00000000
+ffffffff81c03eb8: 0x81c03ec8 0xffffffff
+
+gdb -p ...qemu...
+(gdb) x/10x 0x7f0599a03e98
+0x7f0599a03e98:	0x81c03eb8	0xffffffff	0x8101ea3f	0xffffffff
+0x7f0599a03ea8:	0x81d27b00	0xffffffff	0x00000000	0x00000000
+0x7f0599a03eb8:	0x81c03ec8	0xffffffff
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/arm/nseries.c     | 3 +++
- qemu-deprecated.texi | 6 ++++++
- 2 files changed, 9 insertions(+)
+ hmp-commands.hx  | 15 +++++++++++++++
+ monitor.c        | 22 ++++++++++++++++++++++
+ tests/test-hmp.c |  1 +
+ 3 files changed, 38 insertions(+)
 
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 906b7ca22d..66e50b850c 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -1309,6 +1309,9 @@ static void n8x0_init(MachineState *machine,
-     struct n800_s *s =3D (struct n800_s *) g_malloc0(sizeof(*s));
-     int sdram_size =3D binfo->ram_size;
-=20
-+    warn_report("The n800 and n810 machines are deprecated. Please use a=
- "
-+                "different Arm machine instead.");
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index d3bad2fc27..ba4690b9ac 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -585,6 +585,21 @@ STEXI
+ @findex gpa2hpa
+ Print the host physical address at which the guest's physical address @v=
+ar{addr}
+ is mapped.
++ETEXI
 +
-     s->mpu =3D omap2420_mpu_init(sysmem, sdram_size, machine->cpu_type);
-=20
-     /* Setup peripherals
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 2219386769..4de7452fac 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -145,6 +145,12 @@ This machine type uses an unmaintained firmware, bro=
-ken in lots of ways,
- and unable to start post-2004 operating systems. 40p machine type should=
- be
- used instead.
-=20
-+@subsection n800 and n810 (Arm) (since 4.1)
++    {
++        .name       =3D "gva2gpa",
++        .args_type  =3D "addr:l",
++        .params     =3D "addr",
++        .help       =3D "print the guest physical address corresponding =
+to a guest virtual address",
++        .cmd        =3D hmp_gva2gpa,
++    },
 +
-+These machines depend on the deprecated bluetooth subsystem. When the
-+bluetooth subsystem will be removed, the n800 and n810 machines will be
-+deleted, too. If possible, use a different Arm board instead.
-+
- @section Device options
++STEXI
++@item gpa2hpa @var{addr}
++@findex gpa2hpa
++Print the guest physical address at which the guest's virtual address @v=
+ar{addr}
++is mapped based on the mapping for the current CPU.
+ ETEXI
 =20
- @subsection Block device options
+     {
+diff --git a/monitor.c b/monitor.c
+index 4807bbe811..2b6017b621 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1676,6 +1676,28 @@ static void hmp_gpa2hva(Monitor *mon, const QDict =
+*qdict)
+     memory_region_unref(mr);
+ }
+=20
++static void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
++{
++    target_ulong addr =3D qdict_get_int(qdict, "addr");
++    MemTxAttrs attrs;
++    CPUState *cs =3D mon_get_cpu();
++    hwaddr gpa;
++
++    if (!cs) {
++        monitor_printf(mon, "No cpu\n");
++        return;
++    }
++
++    gpa  =3D cpu_get_phys_page_attrs_debug(mon_get_cpu(),
++                                         addr & TARGET_PAGE_MASK, &attrs=
+);
++    if (gpa =3D=3D -1) {
++        monitor_printf(mon, "Unmapped\n");
++    } else {
++        monitor_printf(mon, "gpa: %#" HWADDR_PRIx "\n",
++                       gpa + (addr & ~TARGET_PAGE_MASK));
++    }
++}
++
+ #ifdef CONFIG_LINUX
+ static uint64_t vtop(void *ptr, Error **errp)
+ {
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 54a01824dc..e344947f7c 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -39,6 +39,7 @@ static const char *hmp_cmds[] =3D {
+     "dump-guest-memory /dev/null 0 4096",
+     "dump-guest-memory /dev/null",
+     "gdbserver",
++    "gva2gpa 0",
+     "hostfwd_add tcp::43210-:43210",
+     "hostfwd_remove tcp::43210-:43210",
+     "i /w 0",
 --=20
 2.21.0
 
