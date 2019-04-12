@@ -2,81 +2,73 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DABC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1CAC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:55:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7364B20693
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:52:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbEWcKZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7364B20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F2F82077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:55:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2F82077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39085 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEyTO-0004gK-KZ
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:52:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38010)
+	id 1hEyWT-0006es-Pd
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:55:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEyIn-0003ou-Kc
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:41:18 -0400
+	(envelope-from <puwen@hygon.cn>) id 1hEyMk-0007dp-Av
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hEyIm-0003MI-HJ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:41:17 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hEyIm-0003M4-8f; Fri, 12 Apr 2019 11:41:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k17so7872285wrx.10;
-	Fri, 12 Apr 2019 08:41:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=Xl4hP0iyH6w/MGh0/Ar8italcnchSSvgPrZKCRA9YmM=;
-	b=ZbEWcKZfFzXgE7y0a5ZxX/AhsLqa1mwqExqmi+pIogcmw0MFMBaInSWJyL15H9E+DY
-	tLwiOIzBOzB/HRxyUs76xKVDmHIZwBlG8fRWQ2ogP4ojoSIUyjWiC6p38R/h8MqDaf9Z
-	WzmvIgc9qmTrfStM1jhFyFH4V0ndIOw5vj1x4ntwPo9hBQrNvB8Zhgi+B9ydroNAtlxQ
-	6cuQqcXQH891BFwuNiOE6xiKINssErlgiuivel5I0kMfTwatSVpQySw9jxGaMewhkNoQ
-	4A6voIa8bV0Wy3dTLF6UqGYiNLgIWaISRFcIfgM7T/2C2acTrhz9z+CcA/vlzmNumX8V
-	pxfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=Xl4hP0iyH6w/MGh0/Ar8italcnchSSvgPrZKCRA9YmM=;
-	b=QmqU29CTa+3f/r+fPSaGEgcLvLTb2gPiQPWQizZ/As7RQ5SBGE/D+ybFhVJR/EcRkB
-	onjkGElGrFMthnU197TYAAAwGwkci5SThOG1nH6EoiAkPLLquU+dr41sLpBw4BMZ2SQL
-	3rBB1mIUN/J7oQUiUJ+I1FT5ib8SnaVHQGocRV2mJYU8NSbDuyv67q8krhu1gZ9/0x4L
-	ApHslaqv81eZPhjIyE78vFU2ZkYDoVump/FUp09ctw9gO35VVV2XEiQGV+RMiZcX2RqV
-	18xogpIq3ceKopm0mdNj+5RqJm2uVX/uvzqZSt5esjwkhSqX6cWZy+DC/xlhK/ORmI64
-	O4AQ==
-X-Gm-Message-State: APjAAAXn3/jWhAta9lSoJT3n7op0zo1G4UG4mPFrlFt0DAvAoWw3avWw
-	O98CvONn3vkr2OawC1PIVyGz0SiRvXtWaHNfSWG8HyLU
-X-Google-Smtp-Source: APXvYqxQVO4tfJ4v2fguNB/uSVpdZ+KcxXU4TGadj8ySwzscNj6pbCx+/xwXH5yjrHRFIi6u51KyF5O7EfntXUpZic8=
-X-Received: by 2002:adf:cc85:: with SMTP id p5mr33199289wrj.101.1555083674889; 
-	Fri, 12 Apr 2019 08:41:14 -0700 (PDT)
+	(envelope-from <puwen@hygon.cn>) id 1hEyMj-0005UB-DB
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:45:22 -0400
+Received: from [110.188.70.11] (port=23279 helo=spam2.hygon.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <puwen@hygon.cn>) id 1hEyMh-0005OI-QN
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:45:21 -0400
+Received: from MK-DB.hygon.cn ([172.23.18.60])
+	by spam2.hygon.cn with ESMTP id x3CFj3Xo024216;
+	Fri, 12 Apr 2019 23:45:03 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from cncheex02.Hygon.cn ([172.23.18.12])
+	by MK-DB.hygon.cn with ESMTP id x3CFixWO006419;
+	Fri, 12 Apr 2019 23:44:59 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from [192.168.1.193] (172.23.18.44) by cncheex02.Hygon.cn
+	(172.23.18.12) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3;
+	Fri, 12 Apr 2019 23:44:59 +0800
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+	<berrange@redhat.com>
+References: <1555072669-20441-1-git-send-email-puwen@hygon.cn>
+	<20190412132420.GM25308@redhat.com>
+	<e5f6cbe5-5c60-9c5e-5218-63913f5ce616@redhat.com>
+From: Pu Wen <puwen@hygon.cn>
+Message-ID: <8d9b07c1-2bfa-d973-9d5d-f86ee7c14ade@hygon.cn>
+Date: Fri, 12 Apr 2019 23:44:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190412153647.19027-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Apr 2019 17:41:03 +0200
-Message-ID:
- <CAJ+F1CKDLkpWAA4W1auMdvQ1Pm0FdRT+UvTCfyn0VoRKk+W6Jg@mail.gmail.com>
-To: QEMU <qemu-devel@nongnu.org>
+In-Reply-To: <e5f6cbe5-5c60-9c5e-5218-63913f5ce616@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Originating-IP: [172.23.18.44]
+X-ClientProxiedBy: cncheex01.Hygon.cn (172.23.18.10) To cncheex02.Hygon.cn
+	(172.23.18.12)
+X-MAIL: spam2.hygon.cn x3CFj3Xo024216
+X-DNSRBL: 
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v5 00/13] vhost-user for input & GPU
+X-MIME-Autoconverted: from 8bit to quoted-printable by spam2.hygon.cn id
+	x3CFj3Xo024216
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 110.188.70.11
+Subject: Re: [Qemu-devel] [PATCH RFC] i386: Add new Hygon 'Dhyana' and
+ 'Dhyana-IBPB' CPU models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,73 +80,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	"open list:sPAPR pseries" <qemu-ppc@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "rth@twiddle.net" <rth@twiddle.net>, "mst@redhat.com" <mst@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412154103.adZ-eHU3ccrMJ7lKjxptNQh-0ZK0tpRRbtbsY51ghEk@z>
+Message-ID: <20190412154458.fLKBpTwDlj2dGhFPi_6GGAtBWSWFhyVA5jqA1CC6Hek@z>
 
-Hi
+On 2019/4/12 22:45, Paolo Bonzini wrote:
+> On 12/04/19 15:24, Daniel P. Berrang=C3=A9 wrote:
+>>> Add two new base CPU models called 'Dhyana' and 'Dhyana-IBPB' to mode=
+l
+>>> processors from Hygon Dhyana (family 18h), which derived from AMD EPY=
+C
+>>> (family 17h). 'Dhyana-IBPB' is a copy of the 'Dhyana' CPU model with
+>>> just CPUID_8000_0008_EBX_IBPB added.
+>>
+>> Do we really need to support both CPU variants ?
+>=20
+> Also, I think the compatibility properties are not needed for Dhyana ch=
+ips.
+=20
+Will only keep one CPU model with IBPB feature by using the name 'Dhyana'.
 
-On Fri, Apr 12, 2019 at 5:38 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi,
->
-> vhost-user allows to drive a virtio device in a seperate
-> process. After vhost-user-net, we have seen
-> vhost-user-{scsi,blk,crypto} added more recently.
->
-> This series, initially proposed ~3 years ago, time flies
-> (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
-> contributes with vhost-user-input and vhost-user-gpu.
->
-> You may start a vhost-user-gpu with virgl rendering in a separate
-> process like this:
->
-> $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> $ qemu...
->   -chardev socket,id=3Dchr,path=3Dvgpu.sock
->   -device vhost-user-vga,chardev=3Dchr
->
-> v5:
->  - remove user-creatable version of vhost-user-backend
->  - remove optinal management of sub-process in vhost-user-backend
->  - removed daemonize/pid code
->  - drop introduction of new input & gpu messages for PCI config space
->    handling, instead use VHOST_USER_PROTOCOL_F_CONFIG
->  - plain mem & udmabuf fallback for 2d rendering
->  - rebased, kconfig-ify, rst-ify
->
-> Gerd Hoffmann (1):
->   curses: fix wchar_t printf warning
->
-> Greg Kurz (1):
->   spapr_pci: Fix broken naming of PCI bus
->
-> Marc-Andr=C3=A9 Lureau (10):
->   Add vhost-user-backend
->   Add vhost-user-input-pci
->   libvhost-user: add PROTOCOL_F_CONFIG if {set,get}_config
->   contrib: add vhost-user-input
->   vhost-user: add vhost_user_gpu_set_socket()
->   virtio: add virtio-gpu bswap helpers header
->   contrib: add vhost-user-gpu
->   virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
->   virtio-gpu: split virtio-gpu-pci & virtio-vga
->   hw/display: add vhost-user-vga & gpu-pci
->
-> Peter Maydell (1):
->   Update version for v4.0.0-rc3 release
->
-
-oops, some bonus patches :) my bad, please ignore
-
-
+Thx.
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Regards,
+Pu Wen
 
