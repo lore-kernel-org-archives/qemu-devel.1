@@ -3,58 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 588BCC10F0E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECEAC10F14
 	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 280D52063F
+	by mail.kernel.org (Postfix) with ESMTPS id 4F02C2075B
 	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:29:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 280D52063F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F02C2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38687 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38685 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEy6w-0004vO-B7
+	id 1hEy6w-0004ug-HL
 	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:29:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33828)
+Received: from eggs.gnu.org ([209.51.188.92]:33924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEy53-0003jI-Be
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:06 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEy5P-000407-4k
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hEy52-0004tA-AN
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36144)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEy5O-00052A-7E
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEy51-0004qA-Vk
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hEy5N-00051F-WD
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:27:26 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 350B2316E915
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 15:26:57 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.117.255])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EAFD95C206;
-	Fri, 12 Apr 2019 15:26:54 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	pbonzini@redhat.com
-Date: Fri, 12 Apr 2019 16:26:52 +0100
-Message-Id: <20190412152652.827-1-dgilbert@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0775E5946F
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 15:27:24 +0000 (UTC)
+Received: from localhost (ovpn-112-59.ams2.redhat.com [10.36.112.59])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D2136013A;
+	Fri, 12 Apr 2019 15:27:21 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 12 Apr 2019 17:27:12 +0200
+Message-Id: <20190412152713.16018-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190412152713.16018-1-marcandre.lureau@redhat.com>
+References: <20190412152713.16018-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 12 Apr 2019 15:26:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 12 Apr 2019 15:27:24 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] hmp: gva2gpa debug command
+Subject: [Qemu-devel] [PATCH 1/2] vl: constify VGAInterfaceInfo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,122 +69,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412152652.JR5l-wIa3rgPRa7ZS2aVhf-IJCJrPxq5vj4q2nM8izg@z>
+Message-ID: <20190412152712.-rPcwdmEPGaFDPdoMV618Fh9UhOxCGW77OsNSTMHd3A@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-
-Add a gva2gpa command purely for debug which performs
-address translation on the gva, the existing gpa2hva
-command can then also be used to find it in the qemu
-userspace; e.g.
-
-(qemu) info registers
-.... RSP=3Dffffffff81c03e98
-....
-(qemu) gva2gpa 0xffffffff81c03e98
-gpa: 0x1c03e98
-(qemu) gpa2hva 0x1c03e98
-Host virtual address for 0x1c03e98 (pc.ram) is 0x7f0599a03e98
-(qemu) x/10x 0xffffffff81c03e98
-ffffffff81c03e98: 0x81c03eb8 0xffffffff 0x8101ea3f 0xffffffff
-ffffffff81c03ea8: 0x81d27b00 0xffffffff 0x00000000 0x00000000
-ffffffff81c03eb8: 0x81c03ec8 0xffffffff
-
-gdb -p ...qemu...
-(gdb) x/10x 0x7f0599a03e98
-0x7f0599a03e98:	0x81c03eb8	0xffffffff	0x8101ea3f	0xffffffff
-0x7f0599a03ea8:	0x81d27b00	0xffffffff	0x00000000	0x00000000
-0x7f0599a03eb8:	0x81c03ec8	0xffffffff
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hmp-commands.hx  | 15 +++++++++++++++
- monitor.c        | 22 ++++++++++++++++++++++
- tests/test-hmp.c |  1 +
- 3 files changed, 38 insertions(+)
+ vl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index d3bad2fc27..ba4690b9ac 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -585,6 +585,21 @@ STEXI
- @findex gpa2hpa
- Print the host physical address at which the guest's physical address @v=
-ar{addr}
- is mapped.
-+ETEXI
-+
-+    {
-+        .name       =3D "gva2gpa",
-+        .args_type  =3D "addr:l",
-+        .params     =3D "addr",
-+        .help       =3D "print the guest physical address corresponding =
-to a guest virtual address",
-+        .cmd        =3D hmp_gva2gpa,
-+    },
-+
-+STEXI
-+@item gpa2hpa @var{addr}
-+@findex gpa2hpa
-+Print the guest physical address at which the guest's virtual address @v=
-ar{addr}
-+is mapped based on the mapping for the current CPU.
- ETEXI
+diff --git a/vl.c b/vl.c
+index c696ad2a13..0a96232e95 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2026,7 +2026,7 @@ typedef struct VGAInterfaceInfo {
+     const char *class_names[2];
+ } VGAInterfaceInfo;
 =20
-     {
-diff --git a/monitor.c b/monitor.c
-index 4807bbe811..2b6017b621 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1676,6 +1676,28 @@ static void hmp_gpa2hva(Monitor *mon, const QDict =
-*qdict)
-     memory_region_unref(mr);
- }
+-static VGAInterfaceInfo vga_interfaces[VGA_TYPE_MAX] =3D {
++static const VGAInterfaceInfo vga_interfaces[VGA_TYPE_MAX] =3D {
+     [VGA_NONE] =3D {
+         .opt_name =3D "none",
+     },
+@@ -2072,7 +2072,7 @@ static VGAInterfaceInfo vga_interfaces[VGA_TYPE_MAX=
+] =3D {
 =20
-+static void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
-+{
-+    target_ulong addr =3D qdict_get_int(qdict, "addr");
-+    MemTxAttrs attrs;
-+    CPUState *cs =3D mon_get_cpu();
-+    hwaddr gpa;
-+
-+    if (!cs) {
-+        monitor_printf(mon, "No cpu\n");
-+        return;
-+    }
-+
-+    gpa  =3D cpu_get_phys_page_attrs_debug(mon_get_cpu(),
-+                                         addr & TARGET_PAGE_MASK, &attrs=
-);
-+    if (gpa =3D=3D -1) {
-+        monitor_printf(mon, "Unmapped\n");
-+    } else {
-+        monitor_printf(mon, "gpa: %#" HWADDR_PRIx "\n",
-+                       gpa + (addr & ~TARGET_PAGE_MASK));
-+    }
-+}
-+
- #ifdef CONFIG_LINUX
- static uint64_t vtop(void *ptr, Error **errp)
+ static bool vga_interface_available(VGAInterfaceType t)
  {
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 54a01824dc..e344947f7c 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -39,6 +39,7 @@ static const char *hmp_cmds[] =3D {
-     "dump-guest-memory /dev/null 0 4096",
-     "dump-guest-memory /dev/null",
-     "gdbserver",
-+    "gva2gpa 0",
-     "hostfwd_add tcp::43210-:43210",
-     "hostfwd_remove tcp::43210-:43210",
-     "i /w 0",
+-    VGAInterfaceInfo *ti =3D &vga_interfaces[t];
++    const VGAInterfaceInfo *ti =3D &vga_interfaces[t];
+=20
+     assert(t < VGA_TYPE_MAX);
+     return !ti->class_names[0] ||
+@@ -2087,7 +2087,7 @@ static void select_vgahw(const char *p)
+=20
+     assert(vga_interface_type =3D=3D VGA_NONE);
+     for (t =3D 0; t < VGA_TYPE_MAX; t++) {
+-        VGAInterfaceInfo *ti =3D &vga_interfaces[t];
++        const VGAInterfaceInfo *ti =3D &vga_interfaces[t];
+         if (ti->opt_name && strstart(p, ti->opt_name, &opts)) {
+             if (!vga_interface_available(t)) {
+                 error_report("%s not available", ti->name);
 --=20
-2.21.0
+2.21.0.313.ge35b8cb8e2
 
 
