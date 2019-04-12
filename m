@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38099)
+Received: from eggs.gnu.org ([209.51.188.92]:38131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt3o-0001bc-LQ
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:29 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3r-0001f7-KO
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt3m-0004KG-KS
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt3p-0004Mu-Lq
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:05:31 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 12 Apr 2019 12:03:38 +0200
-Message-Id: <20190412100354.6409-12-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:40 +0200
+Message-Id: <20190412100354.6409-14-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v3 11/27] memory: Add arch_id and leaf fields in
- IOTLBEntry
+Subject: [Qemu-devel] [RFC v3 13/27] hw/arm/smmuv3: Implement dummy replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +24,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com, peterx@redhat.com, yi.l.liu@intel.com, vincent.stehle@arm.com
 
-TLB entries are usually tagged with some ids such as the asid
-or pasid. When propagating an invalidation command from the
-guest to the host, we need to pass this id.
-
-Also we add a leaf field which indicates, in case of invalidation
-notification whether only cache entries for the last level of
-translation are required to be invalidated.
+The default implementation of memory_region_iommu_replay() shall
+not be used as it forces the translation of the whole RAM range.
+The purpose of this function is to update the shadow page tables.
+However in case of nested stage, there is no shadow page table so
+we can simply return.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- include/exec/memory.h | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ hw/arm/smmuv3.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index f54052e9b3..aedebc8471 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -69,12 +69,30 @@ typedef enum {
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 96d4147533..8db605adab 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1507,6 +1507,11 @@ static int smmuv3_get_attr(IOMMUMemoryRegion *iomm=
+u,
+     return -EINVAL;
+ }
 =20
- #define IOMMU_ACCESS_FLAG(r, w) (((r) ? IOMMU_RO : 0) | ((w) ? IOMMU_WO =
-: 0))
++static inline void
++smmuv3_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
++{
++}
++
+ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+                                                   void *data)
+ {
+@@ -1515,6 +1520,7 @@ static void smmuv3_iommu_memory_region_class_init(O=
+bjectClass *klass,
+     imrc->translate =3D smmuv3_translate;
+     imrc->notify_flag_changed =3D smmuv3_notify_flag_changed;
+     imrc->get_attr =3D smmuv3_get_attr;
++    imrc->replay =3D smmuv3_replay;
+ }
 =20
-+/**
-+ * IOMMUTLBEntry - IOMMU TLB entry
-+ *
-+ * Structure used when performing a translation or when notifying MAP or
-+ * UNMAP (invalidation) events
-+ *
-+ * @target_as: target address space
-+ * @iova: IO virtual address (input)
-+ * @translated_addr: translated address (output)
-+ * @addr_mask: address mask (0xfff means 4K binding), must be multiple o=
-f 2
-+ * @perm: permission flag of the mapping (NONE encodes no mapping or
-+ * invalidation notification)
-+ * @arch_id: architecture specific ID tagging the TLB
-+ * @leaf: when @perm is NONE, indicates whether only caches for the last
-+ * level of translation need to be invalidated.
-+ */
- struct IOMMUTLBEntry {
-     AddressSpace    *target_as;
-     hwaddr           iova;
-     hwaddr           translated_addr;
--    hwaddr           addr_mask;  /* 0xfff =3D 4k translation */
-+    hwaddr           addr_mask;
-     IOMMUAccessFlags perm;
-+    uint32_t         arch_id;
-+    bool             leaf;
- };
-=20
- typedef struct IOMMUConfig {
+ static const TypeInfo smmuv3_type_info =3D {
 --=20
 2.20.1
