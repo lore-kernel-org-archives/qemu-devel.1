@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44774)
+Received: from eggs.gnu.org ([209.51.188.92]:53055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEp2d-0003ZQ-JU
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:48:01 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hEplX-0005Jn-Uw
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hEp2b-0000hk-86
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 01:47:59 -0400
-Resent-Message-Id: <E1hEp2b-0000hk-86@eggs.gnu.org>
-Message-ID: <155504800039.12882.2733649343895002792@76452e4e88f2>
-In-Reply-To: <20190412054214.707-1-npiggin@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1hEplU-0000nK-JF
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 02:34:22 -0400
+Date: Fri, 12 Apr 2019 16:21:31 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190412062131.GF8005@umbus.fritz.box>
+References: <20190411080004.8690-1-clg@kaod.org>
+	<20190411080004.8690-5-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 11 Apr 2019 22:46:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] spapr: add splpar hcalls H_JOIN, H_PROD,
- H_CONFER
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qftxBdZWiueWNAVY"
+Content-Disposition: inline
+In-Reply-To: <20190411080004.8690-5-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] ppc/hash32: Rework R and C bit updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +24,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: npiggin@gmail.com
-Cc: fam@euphon.net, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxMjA1NDIxNC43MDct
-MS1ucGlnZ2luQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MTIwNTQyMTQuNzA3LTEtbnBpZ2dpbkBnbWFpbC5j
-b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gc3BhcHI6IGFkZCBzcGxwYXIgaGNhbGxz
-IEhfSk9JTiwgSF9QUk9ELCBIX0NPTkZFUgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTU1NDgyMjAzNy0zMjk4MzgtMS1n
-aXQtc2VuZC1lbWFpbC1pbWFtbWVkb0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTU1NDgyMjAzNy0z
-Mjk4MzgtMS1naXQtc2VuZC1lbWFpbC1pbWFtbWVkb0ByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRl
-XSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTExNjEwMTMuNDUxNC0xLWNsZ0BrYW9kLm9yZyAt
-PiBwYXRjaGV3LzIwMTkwNDExMTYxMDEzLjQ1MTQtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQxMjA1NDIxNC43MDctMS1ucGlnZ2luQGdtYWls
-LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDEyMDU0MjE0LjcwNy0xLW5waWdnaW5AZ21haWwuY29tClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmY3M2NiMGE4MCBzcGFwcjogYWRkIHNwbHBh
-ciBoY2FsbHMgSF9KT0lOLCBIX1BST0QsIEhfQ09ORkVSCgo9PT0gT1VUUFVUIEJFR0lOID09PQpF
-UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
-ZW50CiMyODogRklMRTogaHcvcHBjL3NwYXByX2hjYWxsLmM6MTA3NDoKKyAgICBpZiAoZW52LT5t
-c3IgJiAoMVVMTCA8PCBNU1JfRUUpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNz
-YXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTM6IEZJTEU6IGh3L3BwYy9zcGFw
-cl9oY2FsbC5jOjEwOTk6CisgICAgaWYgKHRhcmdldCAhPSAtMSAmJiAhQ1BVKHNwYXByX2ZpbmRf
-Y3B1KHRhcmdldCkpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
-bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjE6IEZJTEU6IGh3L3BwYy9zcGFwcl9oY2FsbC5j
-OjExMDc6CisgICAgaWYgKGNwdSA9PSBzcGFwcl9maW5kX2NwdSh0YXJnZXQpKQpbLi4uXQoKRVJS
-T1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVu
-dAojOTM6IEZJTEU6IGh3L3BwYy9zcGFwcl9oY2FsbC5jOjExMzk6CisgICAgaWYgKCFjcykKWy4u
-Ll0KCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgOTYgbGluZXMgY2hlY2tlZAoKQ29tbWl0
-IDJmNzNjYjBhODBhMSAoc3BhcHI6IGFkZCBzcGxwYXIgaGNhbGxzIEhfSk9JTiwgSF9QUk9ELCBI
-X0NPTkZFUikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MTIwNTQyMTQuNzA3LTEtbnBpZ2dp
-bkBnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+--qftxBdZWiueWNAVY
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 11, 2019 at 10:00:02AM +0200, C=E9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=20
+> With MT-TCG, we are now running translation in a racy way, thus
+> we need to mimic hardware when it comes to updating the R and
+> C bits, by doing byte stores.
+>=20
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied, thanks.
+
+> ---
+>  target/ppc/mmu-hash32.c | 45 ++++++++++++++++++++++++++++-------------
+>  1 file changed, 31 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
+> index 3f4dee835e2d..55cf156a0b49 100644
+> --- a/target/ppc/mmu-hash32.c
+> +++ b/target/ppc/mmu-hash32.c
+> @@ -345,6 +345,24 @@ static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu=
+, hwaddr pteg_off,
+>      return -1;
+>  }
+> =20
+> +static void ppc_hash32_set_r(PowerPCCPU *cpu, hwaddr pte_offset, uint32_=
+t pte1)
+> +{
+> +    target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> +    hwaddr offset =3D pte_offset + 6;
+> +
+> +    /* The HW performs a non-atomic byte update */
+> +    stb_phys(CPU(cpu)->as, base + offset, ((pte1 >> 8) & 0xff) | 0x01);
+> +}
+> +
+> +static void ppc_hash32_set_c(PowerPCCPU *cpu, hwaddr pte_offset, uint64_=
+t pte1)
+> +{
+> +    target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> +    hwaddr offset =3D pte_offset + 7;
+> +
+> +    /* The HW performs a non-atomic byte update */
+> +    stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
+> +}
+> +
+>  static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu,
+>                                       target_ulong sr, target_ulong eaddr,
+>                                       ppc_hash_pte32_t *pte)
+> @@ -403,7 +421,6 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr, int rwx,
+>      hwaddr pte_offset;
+>      ppc_hash_pte32_t pte;
+>      int prot;
+> -    uint32_t new_pte1;
+>      const int need_prot[] =3D {PAGE_READ, PAGE_WRITE, PAGE_EXEC};
+>      hwaddr raddr;
+> =20
+> @@ -519,20 +536,20 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr, int rwx,
+> =20
+>      /* 8. Update PTE referenced and changed bits if necessary */
+> =20
+> -    new_pte1 =3D pte.pte1 | HPTE32_R_R; /* set referenced bit */
+> -    if (rwx =3D=3D 1) {
+> -        new_pte1 |=3D HPTE32_R_C; /* set changed (dirty) bit */
+> -    } else {
+> -        /*
+> -         * Treat the page as read-only for now, so that a later write
+> -         * will pass through this function again to set the C bit
+> -         */
+> -        prot &=3D ~PAGE_WRITE;
+> -    }
+> -
+> -    if (new_pte1 !=3D pte.pte1) {
+> -        ppc_hash32_store_hpte1(cpu, pte_offset, new_pte1);
+> +    if (!(pte.pte1 & HPTE32_R_R)) {
+> +        ppc_hash32_set_r(cpu, pte_offset, pte.pte1);
+>      }
+> +    if (!(pte.pte1 & HPTE32_R_C)) {
+> +        if (rwx =3D=3D 1) {
+> +            ppc_hash32_set_c(cpu, pte_offset, pte.pte1);
+> +        } else {
+> +            /*
+> +             * Treat the page as read-only for now, so that a later write
+> +             * will pass through this function again to set the C bit
+> +             */
+> +            prot &=3D ~PAGE_WRITE;
+> +        }
+> +     }
+> =20
+>      /* 9. Determine the real address from the PTE */
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qftxBdZWiueWNAVY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlywLmsACgkQbDjKyiDZ
+s5JzOQ/7BAcar/0MgvngS9ZY43x9HaPpC387DXfh9Z/x+Tq29+BqiBDQeOGMbpAf
+Tfek55RIt7WMB9RmM0VynwqCbEsYjZEKt/5p0ArS+8rNshXZPkN/SNBFqEsMRyFy
+JPPWgLgl1AP27eho5aWStvZJtKcfxA8Td+rYYZqEQn4WjFpg/os2pM9TJ8aVpyMi
+Gmy1gmrlOUrlG2qfDARTVB/gv7ZZl+4jlhhr//8++cIQ80gz3j0lEezAz/OPnn6B
+LjPMcvG8NHY/+VHStjYa2TcGwPIjgWpX45rLmfB/wT3mIicH6qFc4XZxZr3XttUD
+/3pMyXR3xc3ObXJw6aIDi9Nq04EUKWmV2rr+hShLTtcsj/Kh/HRBUxDj3FnHhW5I
+J0iF82QaOQld8+FvCYwh49ZdNO5eaIybyV8Z1Kqtarn7DuGFPokHpaMOpcOQL50L
+eEcKVbHEbas1CYq3I/uclT8zGuCn6PghwRu0VU1KEQ6cVx7/CwIn+eWB3L/z01sz
+4TYeXNs7YuPO3yT88rpupC1HM0iwD975XHnbNFxIRPO0NPB2Ka/zN9EHoe+BgWe9
+QCzugeqwzRD1rwnZ+O+5m6+fcx0xlNBtHPAhYVkrWVWeGRSxV1Jn27a+5AODIt8E
+o5/6J4dhFGxZ199NiZslsnb/b4ZwBBI4jFtwA07hTuMDgHpg6m4=
+=1jkU
+-----END PGP SIGNATURE-----
+
+--qftxBdZWiueWNAVY--
