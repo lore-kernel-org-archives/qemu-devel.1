@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54653)
+Received: from eggs.gnu.org ([209.51.188.92]:54709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzSN-0001SA-L0
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hEzSU-0001Zp-Vn
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hEzSM-00089n-FG
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:15 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 12 Apr 2019 18:54:16 +0200
-Message-Id: <20190412165416.7977-13-philmd@redhat.com>
-In-Reply-To: <20190412165416.7977-1-philmd@redhat.com>
-References: <20190412165416.7977-1-philmd@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1hEzST-0008To-VO
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hEzST-0008SE-N9
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:55:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA752330255
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 16:55:20 +0000 (UTC)
+Date: Fri, 12 Apr 2019 17:55:17 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190412165516.GH2906@work-vm>
+References: <20190411152520.10061-1-armbru@redhat.com>
+	<20190411152520.10061-3-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/12] hw/devices: Move SMSC 91C111
- declaration into a new header
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190411152520.10061-3-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/17] trace: Simplify how
+ st_print_trace_file_status() prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,150 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jason Wang <jasowang@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This commit finally deletes "hw/devices.h".
+* Markus Armbruster (armbru@redhat.com) wrote:
+> st_print_trace_file_status() takes an fprintf()-like callback and a
+> FILE * to pass to it.
+> 
+> Its only caller hmp_trace_file() passes monitor_fprintf() and the
+> current monitor cast to FILE *.  monitor_fprintf() casts it right
+> back, and is otherwise identical to monitor_printf().  The
+> type-punning is ugly.
+> 
+> Drop the callback, and call qemu_printf() instead.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/arm/gumstix.c           |  2 +-
- hw/arm/integratorcp.c      |  2 +-
- hw/arm/mainstone.c         |  2 +-
- hw/arm/realview.c          |  2 +-
- hw/arm/versatilepb.c       |  2 +-
- hw/net/smc91c111.c         |  2 +-
- include/hw/devices.h       | 11 -----------
- include/hw/net/smc91c111.h | 19 +++++++++++++++++++
- 8 files changed, 25 insertions(+), 17 deletions(-)
- delete mode 100644 include/hw/devices.h
- create mode 100644 include/hw/net/smc91c111.h
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
-index 79886ce3787..343cbfd7da8 100644
---- a/hw/arm/gumstix.c
-+++ b/hw/arm/gumstix.c
-@@ -40,7 +40,7 @@
- #include "hw/arm/pxa.h"
- #include "net/net.h"
- #include "hw/block/flash.h"
--#include "hw/devices.h"
-+#include "hw/net/smc91c111.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
-index 4eceebb9ea7..0b6f24465e4 100644
---- a/hw/arm/integratorcp.c
-+++ b/hw/arm/integratorcp.c
-@@ -12,10 +12,10 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/devices.h"
- #include "hw/boards.h"
- #include "hw/arm/arm.h"
- #include "hw/misc/arm_integrator_debug.h"
-+#include "hw/net/smc91c111.h"
- #include "net/net.h"
- #include "exec/address-spaces.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index e96738ad267..c1cec590379 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -18,7 +18,7 @@
- #include "hw/arm/pxa.h"
- #include "hw/arm/arm.h"
- #include "net/net.h"
--#include "hw/devices.h"
-+#include "hw/net/smc91c111.h"
- #include "hw/boards.h"
- #include "hw/block/flash.h"
- #include "hw/sysbus.h"
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index e9983c87639..05a244df255 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -14,8 +14,8 @@
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
--#include "hw/devices.h"
- #include "hw/net/lan9118.h"
-+#include "hw/net/smc91c111.h"
- #include "hw/pci/pci.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index d67181810a6..25166e15171 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -13,7 +13,7 @@
- #include "cpu.h"
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
--#include "hw/devices.h"
-+#include "hw/net/smc91c111.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
-diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-index 99da2d92973..d19ea0750d3 100644
---- a/hw/net/smc91c111.c
-+++ b/hw/net/smc91c111.c
-@@ -10,7 +10,7 @@
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
- #include "net/net.h"
--#include "hw/devices.h"
-+#include "hw/net/smc91c111.h"
- #include "qemu/log.h"
- /* For crc32 */
- #include <zlib.h>
-diff --git a/include/hw/devices.h b/include/hw/devices.h
-deleted file mode 100644
-index ebc45c87997..00000000000
---- a/include/hw/devices.h
-+++ /dev/null
-@@ -1,11 +0,0 @@
--#ifndef QEMU_DEVICES_H
--#define QEMU_DEVICES_H
--
--/* Devices that have nowhere better to go.  */
--
--#include "hw/hw.h"
--
--/* smc91c111.c */
--void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
--
--#endif
-diff --git a/include/hw/net/smc91c111.h b/include/hw/net/smc91c111.h
-new file mode 100644
-index 00000000000..a66ba4112f8
---- /dev/null
-+++ b/include/hw/net/smc91c111.h
-@@ -0,0 +1,19 @@
-+/*
-+ * SMSC 91C111 Ethernet interface emulation
-+ *
-+ * Copyright (c) 2005 CodeSourcery, LLC.
-+ * Written by Paul Brook
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_NET_SMC91C111_H
-+#define HW_NET_SMC91C111_H
-+
-+#include "hw/irq.h"
-+#include "net/net.h"
-+
-+void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
-+
-+#endif
---=20
-2.20.1
+> ---
+>  monitor.c      | 2 +-
+>  trace/simple.c | 7 ++++---
+>  trace/simple.h | 2 +-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 10be8bdb86..a3e66b7159 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1056,7 +1056,7 @@ static void hmp_trace_file(Monitor *mon, const QDict *qdict)
+>      const char *arg = qdict_get_try_str(qdict, "arg");
+>  
+>      if (!op) {
+> -        st_print_trace_file_status((FILE *)mon, &monitor_fprintf);
+> +        st_print_trace_file_status();
+>      } else if (!strcmp(op, "on")) {
+>          st_set_trace_file_enabled(true);
+>      } else if (!strcmp(op, "off")) {
+> diff --git a/trace/simple.c b/trace/simple.c
+> index ac904eca91..fc7106ec49 100644
+> --- a/trace/simple.c
+> +++ b/trace/simple.c
+> @@ -16,6 +16,7 @@
+>  #include "trace/control.h"
+>  #include "trace/simple.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/qemu-print.h"
+>  
+>  /** Trace file header event ID, picked to avoid conflict with real event IDs */
+>  #define HEADER_EVENT_ID (~(uint64_t)0)
+> @@ -363,10 +364,10 @@ void st_set_trace_file(const char *file)
+>      st_set_trace_file_enabled(true);
+>  }
+>  
+> -void st_print_trace_file_status(FILE *stream, int (*stream_printf)(FILE *stream, const char *fmt, ...))
+> +void st_print_trace_file_status(void)
+>  {
+> -    stream_printf(stream, "Trace file \"%s\" %s.\n",
+> -                  trace_file_name, trace_fp ? "on" : "off");
+> +    qemu_printf("Trace file \"%s\" %s.\n",
+> +                trace_file_name, trace_fp ? "on" : "off");
+>  }
+>  
+>  void st_flush_trace_buffer(void)
+> diff --git a/trace/simple.h b/trace/simple.h
+> index 9931808c05..5771a0634f 100644
+> --- a/trace/simple.h
+> +++ b/trace/simple.h
+> @@ -11,7 +11,7 @@
+>  #ifndef TRACE_SIMPLE_H
+>  #define TRACE_SIMPLE_H
+>  
+> -void st_print_trace_file_status(FILE *stream, fprintf_function stream_printf);
+> +void st_print_trace_file_status(void);
+>  void st_set_trace_file_enabled(bool enable);
+>  void st_set_trace_file(const char *file);
+>  bool st_init(void);
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
