@@ -1,110 +1,167 @@
-Return-Path: <SRS0=7PPA=SN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 635D5C10F13
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 23:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D3DC10F13
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 01:44:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18F0B20869
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Apr 2019 23:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B1A42186A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 01:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="Uq2uBbgY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18F0B20869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvmZW32J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B1A42186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56496 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57312 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEjYe-0004b0-1n
-	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 19:56:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51700)
+	id 1hElFD-0007bt-90
+	for qemu-devel@archiver.kernel.org; Thu, 11 Apr 2019 21:44:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEjXc-0003dL-La
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:37 -0400
+	(envelope-from <jan.bobek@gmail.com>) id 1hElEP-0007Iz-7Q
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEjXV-0001pw-3l
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:32 -0400
-Received: from mail-eopbgr750079.outbound.protection.outlook.com
-	([40.107.75.79]:25504
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hEjXL-0001hc-SY
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=uLFzkXtQvhuNsfGT8YKqAYrpa4OelBWt3GM164npqjU=;
-	b=Uq2uBbgYARw62ZIYiOn4kJNo7FczX7xmaviOP4jDXXDumMaPzDbht80R9wyhZEzYGx1hTR//wrvK6inQ9wQDKhN6YAI9DAzIAEOLxANZOVKPqWEOlS98gQEqJLudahbjuA0YQr2XSCfGlEh2uTVf429EpsiO79m6RwDFz4Ikytg=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
-	DM6PR12MB2826.namprd12.prod.outlook.com (20.177.221.161) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1771.15; Thu, 11 Apr 2019 23:55:15 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de]) by
-	DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9d54:69c5:d057:80de%3]) with mapi id 15.20.1771.021;
-	Thu, 11 Apr 2019 23:55:15 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v2] target/i386: sev: add 'sev-max-guests' field to
-	'query-sev-capabilities'
-Thread-Index: AQHU8MICSdEfZ1Yulk67b7vJ+MjSjg==
-Date: Thu, 11 Apr 2019 23:55:15 +0000
-Message-ID: <20190411235456.12918-1-brijesh.singh@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR2101CA0029.namprd21.prod.outlook.com
-	(2603:10b6:805:106::39) To DM6PR12MB2682.namprd12.prod.outlook.com
-	(2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2bd5e49b-323d-42fe-344e-08d6bed92492
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(4618075)(2017052603328)(7193020);
-	SRVR:DM6PR12MB2826; 
-x-ms-traffictypediagnostic: DM6PR12MB2826:
-x-microsoft-antispam-prvs: <DM6PR12MB282697435F2A109C08645B8EE52F0@DM6PR12MB2826.namprd12.prod.outlook.com>
-x-forefront-prvs: 00046D390F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10009020)(396003)(136003)(376002)(346002)(39860400002)(366004)(189003)(199004)(97736004)(102836004)(52116002)(25786009)(2616005)(186003)(14444005)(2501003)(1076003)(256004)(386003)(99286004)(7736002)(68736007)(6486002)(8936002)(50226002)(71200400001)(54906003)(26005)(6916009)(71190400001)(6506007)(6436002)(305945005)(316002)(6116002)(8676002)(81166006)(3846002)(2906002)(106356001)(36756003)(476003)(81156014)(86362001)(105586002)(14454004)(66066001)(5660300002)(486006)(6512007)(5640700003)(53936002)(478600001)(2351001)(4326008);
-	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2826;
-	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Nodjwer2n06y7HweUoJO0bhbVX9A3TvOnT1yOTev2OtRqFpn/FlhvRgSw2tWLvGxAFo6y8a4jvJHvgQ9D7gPQXb9iZnC4uUUSNgYC5bFzZj8NkFe7lZ76cIXQHPG/RBnaySc9goOQjglTDN7y5PxahEESxcvW8V0w8km+M0MVJlBKaIaGuU4wZu/+e+X9X1oL1mOU/V+JDw94oz63+sZsumYILHcsHF1lF6vlvIHxezlpELGA9ar+3SS93gufJwa4aaTZF+a7wkAawWVtKR/mW9/qxgaCk4IN0q1jJ1ADlMG3xAMffQc95C5uFYoMVVqCu+ohRD454sJmVTQ9bysljgywiYPUApcmh1J61qn/15VggbvOx29lXmwxY36ifg/OdJLa9NxlxnhJFwzJEH6b1TIL9jfprfpLTDdUS4I+2E=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <8CE87D8491C0CC43A0A6F806EDDF16D7@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jan.bobek@gmail.com>) id 1hElEO-0007NJ-86
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:53 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:44105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hElEN-0007Mc-Rt
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:52 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id u187so3004062ybg.11
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 18:43:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+	:user-agent:mime-version:in-reply-to;
+	bh=r+ZU9p9Dti2cRo+bqAkYueviWbcPyCNjOgmuZ7Z3sIA=;
+	b=FvmZW32JL317w1I69ixLYbSQbX6MJ9uscZS9Cwtcxe54og6bLEUPe1U4+X/FsoGDK6
+	Ngvuga3DmaSA73Hy9eKjEL47iqONqCX3CbufxYz1vHQFsjNjvgY6AhDvd8Mh6Lo804hA
+	MHtaYx4j3A8qLnxzBXQKfXLrD2odPPWGj2ndLpJL8kczqiov+2nieh8vMPX7M34zNIDf
+	co4FDT8G1wOAXNM787DO/SGce8+ajMbjIuLJa6L7nMHb8UsDvcdfuk1ongug6aPibUJC
+	MxdKc/sn6Na7BXDeINqpO0iBrRC4e8lWIrUOwn6V/Buw5XsOiTSyRcIiQrNyOVe5TX1S
+	Sf9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+	:message-id:date:user-agent:mime-version:in-reply-to;
+	bh=r+ZU9p9Dti2cRo+bqAkYueviWbcPyCNjOgmuZ7Z3sIA=;
+	b=Wd8AnNsoE7jcyq9RE+Z7YVzQDMYQR8wX86HTi4WWTuxlkz6SpuokO6Vj0nH6kabAtG
+	zOyom3lQc9NQhrPseD89/vlUFhgB3yUe3ZPfTvUS7DqCWhsSbHrts1RbdXfA3hpybMdO
+	qyT/XEM5eP3y0eRpKLXIjTaN4QsGNnvjGa0OwSZnF7vm59Zsa9IOkgqtaXfw+3RcX2ql
+	MrZ8mEFl1D7YE9g2dwZ60jcoC4SXIpqJ9namiajMcN+P/76+QOkhnkh8thiIpvJl9V//
+	biF8LwNtQgTJNkQjcj69ps+FLlhm3Oxv247qAcXM2xE92qIOD2W0hnTrINNjLhXNNcAF
+	9pRA==
+X-Gm-Message-State: APjAAAXWjFewRn8SgGYgOHh3GR4oqvINJPY0gO+hxivZM/L4swVI/uRX
+	Vh0/te20h62vyXgJzVeiqOs=
+X-Google-Smtp-Source: APXvYqyQzbHrhGWvRM5KGij55MUBL3KmSDOj9atM3OGbG60jRZ9HGTZx6F7WZEK8zIeh6KA5vOrChQ==
+X-Received: by 2002:a25:6e86:: with SMTP id
+	j128mr22507513ybc.134.1555033430511; 
+	Thu, 11 Apr 2019 18:43:50 -0700 (PDT)
+Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
+	[69.222.133.165]) by smtp.googlemail.com with ESMTPSA id
+	x16sm26556019ywx.74.2019.04.11.18.43.49
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 11 Apr 2019 18:43:49 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190408182748.1238-1-jan.bobek@gmail.com>
+	<e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+From: Jan Bobek <jan.bobek@gmail.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <a82ec99d-8b5e-6898-c0a7-a3de8e2be07f@gmail.com>
+Date: Thu, 11 Apr 2019 21:43:37 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.5.1
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2bd5e49b-323d-42fe-344e-08d6bed92492
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2019 23:55:15.6920 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2826
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.75.79
-Subject: [Qemu-devel] [PATCH v2] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+In-Reply-To: <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b41
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [RISU PATCH 0/5] Fix RISU build for i386
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,68 +173,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-	Erik Skultety <eskultet@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, "Singh,
-	Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190411235515.ym6I6oEa4Rv8BTQf1gJ03dxAqDAwb2z-5A1J8tZDO8o@z>
+Message-ID: <20190412014337.AQ9wKLbVfhnlqpz8FDMgQ_wIC_U25CPnOjkDoolOer8@z>
 
-VGhlcmUgYXJlIGxpbWl0ZWQgbnVtYmVycyBvZiB0aGUgU0VWIGd1ZXN0cyB0aGF0IGNhbiBiZSBy
-dW4gY29uY3VycmVudGx5Lg0KQSBtYW5hZ2VtZW50IGFwcGxpY2F0aW9ucyBtYXkgbmVlZCB0byBr
-bm93IHRoaXMgbGltaXQgc28gdGhhdCBpdCBjYW4gcGxhY2UNClNFViBWTXMgb24gaG9zdHMgd2hp
-Y2ggaGF2ZSBzdWl0YWJsZSByZXNvdXJjZXMgYXZhaWxhYmxlLg0KDQpDdXJyZW50bHksIHRoaXMg
-bGltaXQgaXMgbm90IGV4cG9zZWQgdG8gdGhlIGFwcGxpY2F0aW9uLiBBZGQgYSBuZXcNCidzZXYt
-bWF4LWd1ZXN0JyBmaWVsZCBpbiB0aGUgcXVlcnktc2V2LWNhcGFiaWxpdGllcyB0byBwcm92aWRl
-IHRoaXMNCmluZm9ybWF0aW9uLg0KDQpDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
-LmNvbT4NCkNjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQpDYzogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQpDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVy
-cmFuZ2VAcmVkaGF0LmNvbT4NCkNjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0K
-Q2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQpDYzogVG9tIExlbmRhY2t5
-IDxUaG9tYXMuTGVuZGFja3lAYW1kLmNvbT4NClNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2gg
-PGJyaWplc2guc2luZ2hAYW1kLmNvbT4NCi0tLQ0KDQpjaGFuZ2VzIHNpbmNlIHYxOg0KIC0gZG9j
-dW1lbnQgdGhlIG5ldyBmaWVsZCBhbmQgYWRkIChzaW5jZSA0LjEpIGFubm90YXRpb24uDQoNCiBx
-YXBpL3RhcmdldC5qc29uICB8IDkgKysrKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2LmMgfCA5ICsr
-KysrKystLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMo
-LSkNCg0KZGlmZiAtLWdpdCBhL3FhcGkvdGFyZ2V0Lmpzb24gYi9xYXBpL3RhcmdldC5qc29uDQpp
-bmRleCAxZDRkNTRiNjAwLi44Y2Q0ZmM3OTE5IDEwMDY0NA0KLS0tIGEvcWFwaS90YXJnZXQuanNv
-bg0KKysrIGIvcWFwaS90YXJnZXQuanNvbg0KQEAgLTE3NywxMyArMTc3LDE3IEBADQogIyBAcmVk
-dWNlZC1waHlzLWJpdHM6IE51bWJlciBvZiBwaHlzaWNhbCBBZGRyZXNzIGJpdCByZWR1Y3Rpb24g
-d2hlbiBTRVYgaXMNCiAjICAgICAgICAgICAgICAgICAgICAgZW5hYmxlZA0KICMNCisjIEBzZXYt
-bWF4LWd1ZXN0czogbWF4aW11bSBudW1iZXIgb2YgY29uY3VycmVudCBTRVYgZ3Vlc3Qgd2l0aCBT
-RVYtRVMgZGlzYWJsZWQNCisjICAgICAgICAgICAgICAgICAgKHNpbmNlIDQuMSkNCisjDQogIyBT
-aW5jZTogMi4xMg0KICMjDQogeyAnc3RydWN0JzogJ1NldkNhcGFiaWxpdHknLA0KICAgJ2RhdGEn
-OiB7ICdwZGgnOiAnc3RyJywNCiAgICAgICAgICAgICAnY2VydC1jaGFpbic6ICdzdHInLA0KICAg
-ICAgICAgICAgICdjYml0cG9zJzogJ2ludCcsDQotICAgICAgICAgICAgJ3JlZHVjZWQtcGh5cy1i
-aXRzJzogJ2ludCd9LA0KKyAgICAgICAgICAgICdyZWR1Y2VkLXBoeXMtYml0cyc6ICdpbnQnLA0K
-KyAgICAgICAgICAgICdzZXYtbWF4LWd1ZXN0cyc6ICdpbnQnfSwNCiAgICdpZic6ICdkZWZpbmVk
-KFRBUkdFVF9JMzg2KScgfQ0KIA0KICMjDQpAQCAtMjAwLDcgKzIwNCw4IEBADQogIw0KICMgLT4g
-eyAiZXhlY3V0ZSI6ICJxdWVyeS1zZXYtY2FwYWJpbGl0aWVzIiB9DQogIyA8LSB7ICJyZXR1cm4i
-OiB7ICJwZGgiOiAiOENDREQ4REREIiwgImNlcnQtY2hhaW4iOiAiODg4Q0NDRERERUUiLA0KLSMg
-ICAgICAgICAgICAgICAgICAiY2JpdHBvcyI6IDQ3LCAicmVkdWNlZC1waHlzLWJpdHMiOiA1fX0N
-CisjICAgICAgICAgICAgICAgICAgImNiaXRwb3MiOiA0NywgInJlZHVjZWQtcGh5cy1iaXRzIjog
-NSwNCisjICAgICAgICAgICAgICAgICAgInNldi1tYXgtZ3Vlc3RzIiA6IDE1fX0NCiAjDQogIyMN
-CiB7ICdjb21tYW5kJzogJ3F1ZXJ5LXNldi1jYXBhYmlsaXRpZXMnLCAncmV0dXJucyc6ICdTZXZD
-YXBhYmlsaXR5JywNCmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9zZXYuYyBiL3RhcmdldC9pMzg2
-L3Nldi5jDQppbmRleCBjZDc3ZjZiNWQ0Li42ODI5NTg2ZmJlIDEwMDY0NA0KLS0tIGEvdGFyZ2V0
-L2kzODYvc2V2LmMNCisrKyBiL3RhcmdldC9pMzg2L3Nldi5jDQpAQCAtNDg4LDcgKzQ4OCw3IEBA
-IHNldl9nZXRfY2FwYWJpbGl0aWVzKHZvaWQpDQogICAgIGd1Y2hhciAqcGRoX2RhdGEgPSBOVUxM
-Ow0KICAgICBndWNoYXIgKmNlcnRfY2hhaW5fZGF0YSA9IE5VTEw7DQogICAgIHNpemVfdCBwZGhf
-bGVuID0gMCwgY2VydF9jaGFpbl9sZW4gPSAwOw0KLSAgICB1aW50MzJfdCBlYng7DQorICAgIHVp
-bnQzMl90IGVieCwgZWN4LCBlZHg7DQogICAgIGludCBmZDsNCiANCiAgICAgZmQgPSBvcGVuKERF
-RkFVTFRfU0VWX0RFVklDRSwgT19SRFdSKTsNCkBAIC01MDcsNyArNTA3LDcgQEAgc2V2X2dldF9j
-YXBhYmlsaXRpZXModm9pZCkNCiAgICAgY2FwLT5wZGggPSBnX2Jhc2U2NF9lbmNvZGUocGRoX2Rh
-dGEsIHBkaF9sZW4pOw0KICAgICBjYXAtPmNlcnRfY2hhaW4gPSBnX2Jhc2U2NF9lbmNvZGUoY2Vy
-dF9jaGFpbl9kYXRhLCBjZXJ0X2NoYWluX2xlbik7DQogDQotICAgIGhvc3RfY3B1aWQoMHg4MDAw
-MDAxRiwgMCwgTlVMTCwgJmVieCwgTlVMTCwgTlVMTCk7DQorICAgIGhvc3RfY3B1aWQoMHg4MDAw
-MDAxRiwgMCwgTlVMTCwgJmVieCwgJmVjeCwgJmVkeCk7DQogICAgIGNhcC0+Y2JpdHBvcyA9IGVi
-eCAmIDB4M2Y7DQogDQogICAgIC8qDQpAQCAtNTE2LDYgKzUxNiwxMSBAQCBzZXZfZ2V0X2NhcGFi
-aWxpdGllcyh2b2lkKQ0KICAgICAgKi8NCiAgICAgY2FwLT5yZWR1Y2VkX3BoeXNfYml0cyA9IDE7
-DQogDQorICAgIC8qDQorICAgICAqIFRoZSBtYXhpbXVtIG51bWJlciBvZiBTRVYgZ3Vlc3RzIHdp
-dGggU0VWLUVTIGRpc2FibGVkIHRoYXQgY2FuIHJ1bg0KKyAgICAgKiBzaW11bHRhbmVvdXNseS4N
-CisgICAgICovDQorICAgIGNhcC0+c2V2X21heF9ndWVzdHMgPSBlY3ggLSBlZHggKyAxOw0KIG91
-dDoNCiAgICAgZ19mcmVlKHBkaF9kYXRhKTsNCiAgICAgZ19mcmVlKGNlcnRfY2hhaW5fZGF0YSk7
-DQotLSANCjIuMTcuMQ0KDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ
+From: Jan Bobek <jan.bobek@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <a82ec99d-8b5e-6898-c0a7-a3de8e2be07f@gmail.com>
+Subject: Re: [RISU PATCH 0/5] Fix RISU build for i386
+References: <20190408182748.1238-1-jan.bobek@gmail.com>
+ <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+In-Reply-To: <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Sorry for the delayed reply, the U.S. tax deadline has caught up with
+me, so I spent the last two evenings doing my taxes. (Yuck!)
+
+Anyway...
+
+On 4/8/19 6:18 PM, Richard Henderson wrote:
+> On 4/8/19 8:27 AM, Jan Bobek wrote:
+>> 2. Note the '-std=3Dc99' switch in the command-line above; without it,=
+
+>>    GCC defines the symbol 'i386' to 1 and the preprocessor magic for
+>>    including arch-specific headers in risu.h breaks. Does anyone have
+>>    an idea how to fix this in a more robust way?
+>=20
+> Adding -U$(ARCH) to the command line is probably as good a fix as any.
+
+I didn't know about -U, nice!
+
+>> 3. gas (the GNU assembler) chokes on the syntax of test_i386.s; that's=
+
+>>    why I'm using nasm as the assembler above. Is that intentional? I
+>>    haven't found the nasm dependency mentioned anywhere.
+>=20
+> I think rewriting to not require nasm is better.
+
+Agreed.
+
+>>    Also, nasm will happily emit the UD1 opcode (0F B9) with no
+>>    operands (see test_i386.s). That's a bit surprising to me, since
+>>    Intel's Software Developer's Manual says UD1 has two operands; I'd
+>>    expect at least a follow-up ModR/M byte. gas refuses to assemble
+>>    UD1 with no operands, and gdb's disassembler gets confused when I
+>>    load up the nasm's binary into risu. Is there something obvious
+>>    that I'm missing?
+>=20
+> You are not missing anything -- ud1 should require a modrm byte.
+>=20
+> My suggestion is to use only UD1 as the "break" insn, with the differen=
+t OP_*
+> codes encoded into the modrm byte.
+
+I had to laugh when I read this; this is *exactly* what I had in mind,
+but then I found out there was no ModR/M byte.
+
+>> P.S. This is my first time using git send-email, so please bear with
+>>      me if something goes wrong and/or let me know how I can improve
+>>      my future submissions. Thank you!
+>=20
+> You've done well with git send-email.  ;-)
+
+Thanks a lot! :)
+
+-Jan
+
+
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAlyv7UoACgkQZeg2ldrj
+Ns8oUw//ZFBOn8+Wq3jnR0e7j/WjQ/MsWrQpmY3N0dnvtnm4O8nxYbbcusyLztr1
+ImHrSMu9KL17O6i6hwbGDqrBhoaZdNGMwUPVRi1fGaA0mkacHxOBUnQInPxgMpgB
+Wz7pl0zfMBcMhJhuJ0AHqU0FOBbdPY2cd0+zSOC20KDlmN8tN+4SAM7oW/OaHC1Q
+XNzIlgX3GQHYUPzfQAA2TNya0dH8A3RN4QvHItl5PrIWhtw9gFTsJCsyzAQmRhx/
+xt5FFeGJ+63W3PMR7jR4uWtjPPbSstjbZFDxjB++nqNSagu3UyeOMMNMxe0Wq7aB
+hxLx7PSy6ju7kmV/nXbHDNzbNwyrJ1TVip4bC6y0nnayoduh6BrbSUfsocGzlHxD
+XZdz2t3LggGODuIiY6LacnSdYJhKCEjexq7b5rfLJyzqcEngTdmTbhiq8g21fSo4
+vGIXXU6OLJee3ifHw+94oTj8+1FM40LAi365+TXWKsVkGsrtLeimQjZSOCjt/1lc
+NR7G3Gf1FLyAmK7XnpW/z0w9hMmX06Vc4bLBGB6pqo64zrP3Ieo6eeP8OLSi8MFf
+aTPY3J2pwqbWGHrpc7lETWxo1U1u1IKhw4BNJmGnJIojaui7jwITmDu3FR4hDajG
+yEjk54WN1nGI77nIIS6awT4irqOMPAkQRXPiXukWBQU87/MNr70=
+=/PBZ
+-----END PGP SIGNATURE-----
+
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ--
 
