@@ -3,60 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28658C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8795DC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:43:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D77A62082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77A62082E
+	by mail.kernel.org (Postfix) with ESMTPS id 3A4272082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 15:43:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A4272082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38883 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hEyKI-0004yU-Uw
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:42:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37010)
+	id 1hEyLD-0005pk-Bu
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 11:43:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFd-0000im-3Q
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyGU-0001Rg-Jj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyFb-0001rJ-14
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50430)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hEyGR-0002C0-Mg
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 11:38:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hEyFa-0001qQ-M9; Fri, 12 Apr 2019 11:37:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hEyGP-0002B6-OU; Fri, 12 Apr 2019 11:38:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F25B23082E5F;
-	Fri, 12 Apr 2019 15:37:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5A6AC7CA9;
+	Fri, 12 Apr 2019 15:38:48 +0000 (UTC)
 Received: from localhost (ovpn-112-59.ams2.redhat.com [10.36.112.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C23225C206;
-	Fri, 12 Apr 2019 15:37:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2722319738;
+	Fri, 12 Apr 2019 15:38:40 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 12 Apr 2019 17:36:41 +0200
-Message-Id: <20190412153647.19027-8-marcandre.lureau@redhat.com>
+Date: Fri, 12 Apr 2019 17:36:47 +0200
+Message-Id: <20190412153647.19027-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 References: <20190412153647.19027-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 12 Apr 2019 15:37:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 12 Apr 2019 15:38:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 07/13] contrib: add vhost-user-input
+Subject: [Qemu-devel] [PATCH v5 13/13] hw/display: add vhost-user-vga &
+ gpu-pci
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,538 +76,937 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412153641.b6ZFwivrZqbk5uYiXIMHj__Ac8MRphtTxLWr_8AgRjI@z>
+Message-ID: <20190412153647.Msdu0f8RuvxcFLyEDrZzm7nIfpu2mOPNb2stLxb3iDU@z>
 
-Add a vhost-user input backend example, based on virtio-input-host
-device. It takes an evdev path as argument, and can be associated with
-a vhost-user-input device via a UNIX socket:
+Add new virtio-gpu devices with a "vhost-user" property. The
+associated vhost-user backend is used to handle the virtio rings and
+provide rendering results thanks to the vhost-user-gpu protocol.
 
-$ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
-
-$ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
-  -device vhost-user-input-pci,chardev=3Dvuic
+Example usage:
+-object vhost-user-backend,id=3Dvug,cmd=3D"./vhost-user-gpu"
+-device vhost-user-vga,vhost-user=3Dvug
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/vhost-user-input/main.c        | 427 +++++++++++++++++++++++++
- MAINTAINERS                            |   1 +
- Makefile                               |   3 +
- Makefile.objs                          |   1 +
- configure                              |   3 +
- contrib/vhost-user-input/Makefile.objs |   1 +
- 6 files changed, 436 insertions(+)
- create mode 100644 contrib/vhost-user-input/main.c
- create mode 100644 contrib/vhost-user-input/Makefile.objs
+ hw/display/virtio-vga.h            |   2 +-
+ include/hw/virtio/virtio-gpu-pci.h |  40 ++
+ include/hw/virtio/virtio-gpu.h     |  19 +-
+ hw/display/vhost-user-gpu-pci.c    |  51 +++
+ hw/display/vhost-user-gpu.c        | 572 +++++++++++++++++++++++++++++
+ hw/display/vhost-user-vga.c        |  52 +++
+ hw/display/virtio-gpu-pci.c        |  17 +-
+ vl.c                               |   1 +
+ hw/display/Kconfig                 |  10 +
+ hw/display/Makefile.objs           |   3 +
+ 10 files changed, 744 insertions(+), 23 deletions(-)
+ create mode 100644 include/hw/virtio/virtio-gpu-pci.h
+ create mode 100644 hw/display/vhost-user-gpu-pci.c
+ create mode 100644 hw/display/vhost-user-gpu.c
+ create mode 100644 hw/display/vhost-user-vga.c
 
-diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
-ain.c
+diff --git a/hw/display/virtio-vga.h b/hw/display/virtio-vga.h
+index f03e1ba619..c10bf390aa 100644
+--- a/hw/display/virtio-vga.h
++++ b/hw/display/virtio-vga.h
+@@ -1,7 +1,7 @@
+ #ifndef VIRTIO_VGA_H_
+ #define VIRTIO_VGA_H_
+=20
+-#include "hw/virtio/virtio-pci.h"
++#include "hw/virtio/virtio-gpu-pci.h"
+ #include "vga_int.h"
+=20
+ /*
+diff --git a/include/hw/virtio/virtio-gpu-pci.h b/include/hw/virtio/virti=
+o-gpu-pci.h
 new file mode 100644
-index 0000000000..425056cd69
+index 0000000000..2f69b5a9cc
 --- /dev/null
-+++ b/contrib/vhost-user-input/main.c
-@@ -0,0 +1,427 @@
++++ b/include/hw/virtio/virtio-gpu-pci.h
+@@ -0,0 +1,40 @@
 +/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
++ * Virtio GPU PCI Device
++ *
++ * Copyright Red Hat, Inc. 2013-2014
++ *
++ * Authors:
++ *     Dave Airlie <airlied@redhat.com>
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_VIRTIO_GPU_PCI_H
++#define HW_VIRTIO_GPU_PCI_H
++
++#include "hw/virtio/virtio-pci.h"
++#include "hw/virtio/virtio-gpu.h"
++
++typedef struct VirtIOGPUPCIBase VirtIOGPUPCIBase;
++
++/*
++ * virtio-gpu-pci-base: This extends VirtioPCIProxy.
++ */
++#define TYPE_VIRTIO_GPU_PCI_BASE "virtio-gpu-pci-base"
++#define VIRTIO_GPU_PCI_BASE(obj)                                    \
++    OBJECT_CHECK(VirtIOGPUPCIBase, (obj), TYPE_VIRTIO_GPU_PCI_BASE)
++
++struct VirtIOGPUPCIBase {
++    VirtIOPCIProxy parent_obj;
++    VirtIOGPUBase *vgpu;
++};
++
++/* to share between PCI and VGA */
++#define DEFINE_VIRTIO_GPU_PCI_PROPERTIES(_state)                \
++    DEFINE_PROP_BIT("ioeventfd", _state, flags,                 \
++                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, false),  \
++        DEFINE_PROP_UINT32("vectors", _state, nvectors, 3)
++
++#endif /* HW_VIRTIO_GPU_PCI_H */
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
+u.h
+index d0d8d7b246..8ecac1987a 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -19,6 +19,7 @@
+ #include "ui/console.h"
+ #include "hw/virtio/virtio.h"
+ #include "qemu/log.h"
++#include "sysemu/vhost-user-backend.h"
+=20
+ #include "standard-headers/linux/virtio_gpu.h"
+=20
+@@ -34,6 +35,8 @@
+ #define VIRTIO_GPU(obj)                                        \
+         OBJECT_CHECK(VirtIOGPU, (obj), TYPE_VIRTIO_GPU)
+=20
++#define TYPE_VHOST_USER_GPU "vhost-user-gpu"
++
+ #define VIRTIO_ID_GPU 16
+=20
+ struct virtio_gpu_simple_resource {
+@@ -157,13 +160,17 @@ typedef struct VirtIOGPU {
+     } stats;
+ } VirtIOGPU;
+=20
+-extern const GraphicHwOps virtio_gpu_ops;
++typedef struct VhostUserGPU {
++    VirtIOGPUBase parent_obj;
+=20
+-/* to share between PCI and VGA */
+-#define DEFINE_VIRTIO_GPU_PCI_PROPERTIES(_state)               \
+-    DEFINE_PROP_BIT("ioeventfd", _state, flags,                \
+-                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, false), \
+-    DEFINE_PROP_UINT32("vectors", _state, nvectors, 3)
++    VhostUserBackend *vhost;
++    int vhost_gpu_fd; /* closed by the chardev */
++    CharBackend vhost_chr;
++    QemuDmaBuf dmabuf[VIRTIO_GPU_MAX_SCANOUTS];
++    bool backend_blocked;
++} VhostUserGPU;
++
++extern const GraphicHwOps virtio_gpu_ops;
+=20
+ #define VIRTIO_GPU_FILL_CMD(out) do {                                   =
+\
+         size_t s;                                                       =
+\
+diff --git a/hw/display/vhost-user-gpu-pci.c b/hw/display/vhost-user-gpu-=
+pci.c
+new file mode 100644
+index 0000000000..7d9b1f5a8c
+--- /dev/null
++++ b/hw/display/vhost-user-gpu-pci.c
+@@ -0,0 +1,51 @@
++/*
++ * vhost-user GPU PCI device
++ *
++ * Copyright Red Hat, Inc. 2018
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
 + */
 +
 +#include "qemu/osdep.h"
-+
-+#include <glib.h>
-+#include <linux/input.h>
-+
-+#include "qemu/iov.h"
-+#include "qemu/bswap.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "contrib/libvhost-user/libvhost-user-glib.h"
-+#include "standard-headers/linux/virtio_input.h"
 +#include "qapi/error.h"
++#include "hw/virtio/virtio-gpu-pci.h"
 +
-+typedef struct virtio_input_event virtio_input_event;
-+typedef struct virtio_input_config virtio_input_config;
++#define TYPE_VHOST_USER_GPU_PCI "vhost-user-gpu-pci"
++#define VHOST_USER_GPU_PCI(obj)                                     \
++    OBJECT_CHECK(VhostUserGPUPCI, (obj), TYPE_VHOST_USER_GPU_PCI)
 +
-+typedef struct VuInput {
-+    VugDev dev;
-+    GSource *evsrc;
-+    int evdevfd;
-+    GArray *config;
-+    virtio_input_config *sel_config;
-+    struct {
-+        virtio_input_event event;
-+        VuVirtqElement *elem;
-+    } *queue;
-+    uint32_t qindex, qsize;
-+} VuInput;
++typedef struct VhostUserGPUPCI {
++    VirtIOGPUPCIBase parent_obj;
 +
-+static void vi_input_send(VuInput *vi, struct virtio_input_event *event)
++    VhostUserGPU vdev;
++} VhostUserGPUPCI;
++
++static void vhost_user_gpu_pci_initfn(Object *obj)
 +{
-+    VuDev *dev =3D &vi->dev.parent;
-+    VuVirtq *vq =3D vu_get_queue(dev, 0);
-+    VuVirtqElement *elem;
-+    int i, len;
++    VhostUserGPUPCI *dev =3D VHOST_USER_GPU_PCI(obj);
 +
-+    /* queue up events ... */
-+    if (vi->qindex =3D=3D vi->qsize) {
-+        vi->qsize++;
-+        vi->queue =3D g_realloc_n(vi->queue, vi->qsize, sizeof(vi->queue=
-[0]));
-+    }
-+    vi->queue[vi->qindex++].event =3D *event;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_GPU);
 +
-+    /* ... until we see a report sync ... */
-+    if (event->type !=3D htole16(EV_SYN) ||
-+        event->code !=3D htole16(SYN_REPORT)) {
-+        return;
-+    }
++    VIRTIO_GPU_PCI_BASE(obj)->vgpu =3D VIRTIO_GPU_BASE(&dev->vdev);
 +
-+    /* ... then check available space ... */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            while (--i >=3D 0) {
-+                vu_queue_unpop(dev, vq, vi->queue[i].elem, 0);
-+            }
-+            vi->qindex =3D 0;
-+            g_warning("virtio-input queue full");
-+            return;
-+        }
-+        vi->queue[i].elem =3D elem;
-+    }
-+
-+    /* ... and finally pass them to the guest */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vi->queue[i].elem;
-+        len =3D iov_from_buf(elem->in_sg, elem->in_num,
-+                           0, &vi->queue[i].event, sizeof(virtio_input_e=
-vent));
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+    vi->qindex =3D 0;
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(&dev->vdev), "chardev",
++                              &error_abort);
 +}
 +
-+static void
-+vi_evdev_watch(VuDev *dev, int condition, void *data)
-+{
-+    VuInput *vi =3D data;
-+    int fd =3D vi->evdevfd;
-+
-+    g_debug("Got evdev condition %x", condition);
-+
-+    struct virtio_input_event virtio;
-+    struct input_event evdev;
-+    int rc;
-+
-+    for (;;) {
-+        rc =3D read(fd, &evdev, sizeof(evdev));
-+        if (rc !=3D sizeof(evdev)) {
-+            break;
-+        }
-+
-+        g_debug("input %d %d %d", evdev.type, evdev.code, evdev.value);
-+
-+        virtio.type  =3D htole16(evdev.type);
-+        virtio.code  =3D htole16(evdev.code);
-+        virtio.value =3D htole32(evdev.value);
-+        vi_input_send(vi, &virtio);
-+    }
-+}
-+
-+
-+static void vi_handle_status(VuInput *vi, virtio_input_event *event)
-+{
-+    struct input_event evdev;
-+    int rc;
-+
-+    if (gettimeofday(&evdev.time, NULL)) {
-+        perror("vi_handle_status: gettimeofday");
-+        return;
-+    }
-+
-+    evdev.type =3D le16toh(event->type);
-+    evdev.code =3D le16toh(event->code);
-+    evdev.value =3D le32toh(event->value);
-+
-+    rc =3D write(vi->evdevfd, &evdev, sizeof(evdev));
-+    if (rc =3D=3D -1) {
-+        perror("vi_host_handle_status: write");
-+    }
-+}
-+
-+static void vi_handle_sts(VuDev *dev, int qidx)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+    virtio_input_event event;
-+    VuVirtqElement *elem;
-+    int len;
-+
-+    g_debug("%s", G_STRFUNC);
-+
-+    for (;;) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            break;
-+        }
-+
-+        memset(&event, 0, sizeof(event));
-+        len =3D iov_to_buf(elem->out_sg, elem->out_num,
-+                         0, &event, sizeof(event));
-+        vi_handle_status(vi, &event);
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+}
-+
-+static void
-+vi_panic(VuDev *dev, const char *msg)
-+{
-+    g_critical("%s\n", msg);
-+    exit(EXIT_FAILURE);
-+}
-+
-+static void
-+vi_queue_set_started(VuDev *dev, int qidx, bool started)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+
-+    g_debug("queue started %d:%d", qidx, started);
-+
-+    if (qidx =3D=3D 1) {
-+        vu_set_queue_handler(dev, vq, started ? vi_handle_sts : NULL);
-+    }
-+
-+    started =3D vu_queue_started(dev, vu_get_queue(dev, 0)) &&
-+        vu_queue_started(dev, vu_get_queue(dev, 1));
-+
-+    if (started && !vi->evsrc) {
-+        vi->evsrc =3D vug_source_new(&vi->dev, vi->evdevfd,
-+                                   G_IO_IN, vi_evdev_watch, vi);
-+    }
-+
-+    if (!started && vi->evsrc) {
-+        g_source_destroy(vi->evsrc);
-+        vi->evsrc =3D NULL;
-+    }
-+}
-+
-+static virtio_input_config *
-+vi_find_config(VuInput *vi, uint8_t select, uint8_t subsel)
-+{
-+    virtio_input_config *cfg;
-+    int i;
-+
-+    for (i =3D 0; i < vi->config->len; i++) {
-+        cfg =3D &g_array_index(vi->config, virtio_input_config, i);
-+        if (select =3D=3D cfg->select && subsel =3D=3D cfg->subsel) {
-+            return cfg;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int vi_get_config(VuDev *dev, uint8_t *config, uint32_t len)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+
-+    g_return_val_if_fail(len <=3D sizeof(*vi->sel_config), -1);
-+
-+    if (vi->sel_config) {
-+        memcpy(config, vi->sel_config, len);
-+    } else {
-+        memset(config, 0, len);
-+    }
-+
-+    return 0;
-+}
-+
-+static int vi_set_config(VuDev *dev, const uint8_t *data,
-+                         uint32_t offset, uint32_t size,
-+                         uint32_t flags)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    virtio_input_config *config =3D (virtio_input_config *)data;
-+
-+    vi->sel_config =3D vi_find_config(vi, config->select, config->subsel=
-);
-+
-+    return 0;
-+}
-+
-+static const VuDevIface vuiface =3D {
-+    .queue_set_started =3D vi_queue_set_started,
-+    .get_config =3D vi_get_config,
-+    .set_config =3D vi_set_config,
++static const VirtioPCIDeviceTypeInfo vhost_user_gpu_pci_info =3D {
++    .generic_name =3D TYPE_VHOST_USER_GPU_PCI,
++    .parent =3D TYPE_VIRTIO_GPU_PCI_BASE,
++    .instance_size =3D sizeof(VhostUserGPUPCI),
++    .instance_init =3D vhost_user_gpu_pci_initfn,
 +};
 +
-+static void
-+vi_bits_config(VuInput *vi, int type, int count)
++static void vhost_user_gpu_pci_register_types(void)
 +{
-+    virtio_input_config bits;
-+    int rc, i, size =3D 0;
-+
-+    memset(&bits, 0, sizeof(bits));
-+    rc =3D ioctl(vi->evdevfd, EVIOCGBIT(type, count / 8), bits.u.bitmap)=
-;
-+    if (rc < 0) {
-+        return;
-+    }
-+
-+    for (i =3D 0; i < count / 8; i++) {
-+        if (bits.u.bitmap[i]) {
-+            size =3D i + 1;
-+        }
-+    }
-+    if (size =3D=3D 0) {
-+        return;
-+    }
-+
-+    bits.select =3D VIRTIO_INPUT_CFG_EV_BITS;
-+    bits.subsel =3D type;
-+    bits.size   =3D size;
-+    g_array_append_val(vi->config, bits);
++    virtio_pci_types_register(&vhost_user_gpu_pci_info);
 +}
 +
-+static int unix_sock_new(char *path)
++type_init(vhost_user_gpu_pci_register_types)
+diff --git a/hw/display/vhost-user-gpu.c b/hw/display/vhost-user-gpu.c
+new file mode 100644
+index 0000000000..3509d2b45a
+--- /dev/null
++++ b/hw/display/vhost-user-gpu.c
+@@ -0,0 +1,572 @@
++/*
++ * vhost-user GPU Device
++ *
++ * Copyright Red Hat, Inc. 2018
++ *
++ * Authors:
++ *     Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/virtio/virtio-gpu.h"
++#include "chardev/char-fe.h"
++#include "qapi/error.h"
++#include "migration/blocker.h"
++
++#define VHOST_USER_GPU(obj)                                    \
++    OBJECT_CHECK(VhostUserGPU, (obj), TYPE_VHOST_USER_GPU)
++
++typedef enum VhostUserGpuRequest {
++    VHOST_USER_GPU_NONE =3D 0,
++    VHOST_USER_GPU_GET_PROTOCOL_FEATURES,
++    VHOST_USER_GPU_SET_PROTOCOL_FEATURES,
++    VHOST_USER_GPU_GET_DISPLAY_INFO,
++    VHOST_USER_GPU_CURSOR_POS,
++    VHOST_USER_GPU_CURSOR_POS_HIDE,
++    VHOST_USER_GPU_CURSOR_UPDATE,
++    VHOST_USER_GPU_SCANOUT,
++    VHOST_USER_GPU_UPDATE,
++    VHOST_USER_GPU_DMABUF_SCANOUT,
++    VHOST_USER_GPU_DMABUF_UPDATE,
++} VhostUserGpuRequest;
++
++typedef struct VhostUserGpuDisplayInfoReply {
++    struct virtio_gpu_resp_display_info info;
++} VhostUserGpuDisplayInfoReply;
++
++typedef struct VhostUserGpuCursorPos {
++    uint32_t scanout_id;
++    uint32_t x;
++    uint32_t y;
++} QEMU_PACKED VhostUserGpuCursorPos;
++
++typedef struct VhostUserGpuCursorUpdate {
++    VhostUserGpuCursorPos pos;
++    uint32_t hot_x;
++    uint32_t hot_y;
++    uint32_t data[64 * 64];
++} QEMU_PACKED VhostUserGpuCursorUpdate;
++
++typedef struct VhostUserGpuScanout {
++    uint32_t scanout_id;
++    uint32_t width;
++    uint32_t height;
++} QEMU_PACKED VhostUserGpuScanout;
++
++typedef struct VhostUserGpuUpdate {
++    uint32_t scanout_id;
++    uint32_t x;
++    uint32_t y;
++    uint32_t width;
++    uint32_t height;
++    uint8_t data[];
++} QEMU_PACKED VhostUserGpuUpdate;
++
++typedef struct VhostUserGpuDMABUFScanout {
++    uint32_t scanout_id;
++    uint32_t x;
++    uint32_t y;
++    uint32_t width;
++    uint32_t height;
++    uint32_t fd_width;
++    uint32_t fd_height;
++    uint32_t fd_stride;
++    uint32_t fd_flags;
++    int fd_drm_fourcc;
++} QEMU_PACKED VhostUserGpuDMABUFScanout;
++
++typedef struct VhostUserGpuMsg {
++    uint32_t request; /* VhostUserGpuRequest */
++    uint32_t size; /* the following payload size */
++    union {
++        VhostUserGpuCursorPos cursor_pos;
++        VhostUserGpuCursorUpdate cursor_update;
++        VhostUserGpuScanout scanout;
++        VhostUserGpuUpdate update;
++        VhostUserGpuDMABUFScanout dmabuf_scanout;
++        uint64_t u64;
++    } payload;
++} QEMU_PACKED VhostUserGpuMsg;
++
++static VhostUserGpuMsg m __attribute__ ((unused));
++#define VHOST_USER_GPU_HDR_SIZE (sizeof(m.request) + sizeof(m.size))
++
++static void vhost_user_gpu_update_blocked(VhostUserGPU *g, bool blocked)=
+;
++
++static void
++vhost_user_gpu_handle_cursor(VhostUserGPU *g, VhostUserGpuMsg *msg)
 +{
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
++    VhostUserGpuCursorPos *pos =3D &msg->payload.cursor_pos;
++    struct virtio_gpu_scanout *s;
 +
-+    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <=3D 0) {
-+        perror("socket");
-+        return -1;
++    if (pos->scanout_id >=3D g->parent_obj.conf.max_outputs) {
++        return;
++    }
++    s =3D &g->parent_obj.scanout[pos->scanout_id];
++
++    if (msg->request =3D=3D VHOST_USER_GPU_CURSOR_UPDATE) {
++        VhostUserGpuCursorUpdate *up =3D &msg->payload.cursor_update;
++        if (!s->current_cursor) {
++            s->current_cursor =3D cursor_alloc(64, 64);
++        }
++
++        s->current_cursor->hot_x =3D up->hot_x;
++        s->current_cursor->hot_y =3D up->hot_y;
++
++        memcpy(s->current_cursor->data, up->data,
++               64 * 64 * sizeof(uint32_t));
++
++        dpy_cursor_define(s->con, s->current_cursor);
 +    }
 +
-+    un.sun_family =3D AF_UNIX;
-+    snprintf(un.sun_path, sizeof(un.sun_path), "%s", path);
-+    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
++    dpy_mouse_set(s->con, pos->x, pos->y,
++                  msg->request !=3D VHOST_USER_GPU_CURSOR_POS_HIDE);
++}
 +
-+    unlink(path);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
++static void
++vhost_user_gpu_unblock(VhostUserGPU *g)
++{
++    uint32_t ok;
++
++    qemu_chr_fe_write(&g->vhost_chr, (uint8_t *)&ok, sizeof(ok));
++
++}
++static void
++vhost_user_gpu_handle_display(VhostUserGPU *g, VhostUserGpuMsg *msg)
++{
++    QemuConsole *con =3D NULL;
++    struct virtio_gpu_scanout *s;
++
++    switch (msg->request) {
++    case VHOST_USER_GPU_GET_PROTOCOL_FEATURES: {
++        uint64_t u64 =3D 0;
++        qemu_chr_fe_write(&g->vhost_chr, (uint8_t *)&u64, sizeof(u64));
++        break;
++    }
++    case VHOST_USER_GPU_SET_PROTOCOL_FEATURES: {
++        break;
++    }
++    case VHOST_USER_GPU_GET_DISPLAY_INFO: {
++        struct virtio_gpu_resp_display_info display_info =3D { 0, };
++        display_info.hdr.type =3D VIRTIO_GPU_RESP_OK_DISPLAY_INFO;
++        virtio_gpu_base_fill_display_info(VIRTIO_GPU_BASE(g), &display_i=
+nfo);
++        qemu_chr_fe_write(&g->vhost_chr,
++                          (uint8_t *)&display_info, sizeof(display_info)=
+);
++        break;
++    }
++    case VHOST_USER_GPU_SCANOUT: {
++        VhostUserGpuScanout *m =3D &msg->payload.scanout;
++
++        if (m->scanout_id >=3D g->parent_obj.conf.max_outputs) {
++            return;
++        }
++
++        g->parent_obj.enable =3D 1;
++        s =3D &g->parent_obj.scanout[m->scanout_id];
++        con =3D s->con;
++
++        if (m->scanout_id =3D=3D 0 && m->width =3D=3D 0) {
++            s->ds =3D qemu_create_message_surface(640, 480,
++                                                "Guest disabled display.=
+");
++            dpy_gfx_replace_surface(con, s->ds);
++        } else {
++            s->ds =3D qemu_create_displaysurface(m->width, m->height);
++            /* replace surface on next update */
++        }
++
++        break;
++    }
++    case VHOST_USER_GPU_DMABUF_SCANOUT: {
++        VhostUserGpuDMABUFScanout *m =3D &msg->payload.dmabuf_scanout;
++        int fd =3D qemu_chr_fe_get_msgfd(&g->vhost_chr);
++        QemuDmaBuf *dmabuf;
++
++        if (m->scanout_id >=3D g->parent_obj.conf.max_outputs) {
++            error_report("invalid scanout: %d", m->scanout_id);
++            if (fd >=3D 0) {
++                close(fd);
++            }
++            break;
++        }
++
++        g->parent_obj.enable =3D 1;
++        con =3D g->parent_obj.scanout[m->scanout_id].con;
++        dmabuf =3D &g->dmabuf[m->scanout_id];
++        if (dmabuf->fd >=3D 0) {
++            close(dmabuf->fd);
++            dmabuf->fd =3D -1;
++        }
++        if (!console_has_gl_dmabuf(con)) {
++            /* it would be nice to report that error earlier */
++            error_report("console doesn't support dmabuf!");
++            break;
++        }
++        dpy_gl_release_dmabuf(con, dmabuf);
++        if (fd =3D=3D -1) {
++            dpy_gl_scanout_disable(con);
++            break;
++        }
++        *dmabuf =3D (QemuDmaBuf) {
++            .fd =3D fd,
++            .width =3D m->fd_width,
++            .height =3D m->fd_height,
++            .stride =3D m->fd_stride,
++            .fourcc =3D m->fd_drm_fourcc,
++            .y0_top =3D m->fd_flags & VIRTIO_GPU_RESOURCE_FLAG_Y_0_TOP,
++        };
++        dpy_gl_scanout_dmabuf(con, dmabuf);
++        break;
++    }
++    case VHOST_USER_GPU_DMABUF_UPDATE: {
++        VhostUserGpuUpdate *m =3D &msg->payload.update;
++
++        if (m->scanout_id >=3D g->parent_obj.conf.max_outputs ||
++            !g->parent_obj.scanout[m->scanout_id].con) {
++            error_report("invalid scanout update: %d", m->scanout_id);
++            vhost_user_gpu_unblock(g);
++            break;
++        }
++
++        con =3D g->parent_obj.scanout[m->scanout_id].con;
++        if (!console_has_gl(con)) {
++            error_report("console doesn't support GL!");
++            vhost_user_gpu_unblock(g);
++            break;
++        }
++        dpy_gl_update(con, m->x, m->y, m->width, m->height);
++        g->backend_blocked =3D true;
++        break;
++    }
++    case VHOST_USER_GPU_UPDATE: {
++        VhostUserGpuUpdate *m =3D &msg->payload.update;
++
++        if (m->scanout_id >=3D g->parent_obj.conf.max_outputs) {
++            break;
++        }
++        s =3D &g->parent_obj.scanout[m->scanout_id];
++        con =3D s->con;
++        pixman_image_t *image =3D
++            pixman_image_create_bits(PIXMAN_x8r8g8b8,
++                                     m->width,
++                                     m->height,
++                                     (uint32_t *)m->data,
++                                     m->width * 4);
++
++        pixman_image_composite(PIXMAN_OP_SRC,
++                               image, NULL, s->ds->image,
++                               0, 0, 0, 0, m->x, m->y, m->width, m->heig=
+ht);
++
++        pixman_image_unref(image);
++        if (qemu_console_surface(con) !=3D s->ds) {
++            dpy_gfx_replace_surface(con, s->ds);
++        } else {
++            dpy_gfx_update(con, m->x, m->y, m->width, m->height);
++        }
++        break;
++    }
++    default:
++        g_warning("unhandled message %d %d", msg->request, msg->size);
 +    }
 +
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
++    if (con && qemu_console_is_gl_blocked(con)) {
++        vhost_user_gpu_update_blocked(g, true);
++    }
++}
++
++static void
++vhost_user_gpu_chr_read(void *opaque)
++{
++    VhostUserGPU *g =3D opaque;
++    VhostUserGpuMsg *msg =3D NULL;
++    VhostUserGpuRequest request;
++    uint32_t size;
++    int r;
++
++    r =3D qemu_chr_fe_read_all(&g->vhost_chr,
++                             (uint8_t *)&request, sizeof(uint32_t));
++    if (r !=3D sizeof(uint32_t)) {
++        error_report("failed to read msg header: %d, %d", r, errno);
++        goto end;
 +    }
 +
-+    return sock;
++    r =3D qemu_chr_fe_read_all(&g->vhost_chr,
++                             (uint8_t *)&size, sizeof(uint32_t));
++    if (r !=3D sizeof(uint32_t)) {
++        error_report("failed to read msg size");
++        goto end;
++    }
 +
-+fail:
-+    close(sock);
++    msg =3D g_malloc(VHOST_USER_GPU_HDR_SIZE + size);
++    g_return_if_fail(msg !=3D NULL);
 +
++    r =3D qemu_chr_fe_read_all(&g->vhost_chr,
++                             (uint8_t *)&msg->payload, size);
++    if (r !=3D size) {
++        error_report("failed to read msg payload %d !=3D %d", r, size);
++        goto end;
++    }
++
++    msg->request =3D request;
++    msg->size =3D size;
++
++    if (request =3D=3D VHOST_USER_GPU_CURSOR_UPDATE ||
++        request =3D=3D VHOST_USER_GPU_CURSOR_POS ||
++        request =3D=3D VHOST_USER_GPU_CURSOR_POS_HIDE) {
++        vhost_user_gpu_handle_cursor(g, msg);
++    } else {
++        vhost_user_gpu_handle_display(g, msg);
++    }
++
++end:
++    g_free(msg);
++}
++
++static void
++vhost_user_gpu_update_blocked(VhostUserGPU *g, bool blocked)
++{
++    qemu_set_fd_handler(g->vhost_gpu_fd,
++                        blocked ? NULL : vhost_user_gpu_chr_read, NULL, =
+g);
++}
++
++static void
++vhost_user_gpu_gl_unblock(VirtIOGPUBase *b)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(b);
++
++    if (g->backend_blocked) {
++        vhost_user_gpu_unblock(VHOST_USER_GPU(g));
++        g->backend_blocked =3D false;
++    }
++
++    vhost_user_gpu_update_blocked(VHOST_USER_GPU(g), false);
++}
++
++static bool
++vhost_user_gpu_do_set_socket(VhostUserGPU *g, Error **errp)
++{
++    Chardev *chr;
++    int sv[2];
++
++    if (socketpair(PF_UNIX, SOCK_STREAM, 0, sv) =3D=3D -1) {
++        error_setg_errno(errp, errno, "socketpair() failed");
++        return false;
++    }
++
++    chr =3D CHARDEV(object_new(TYPE_CHARDEV_SOCKET));
++    if (!chr || qemu_chr_add_client(chr, sv[0]) =3D=3D -1) {
++        error_setg(errp, "Failed to make socket chardev");
++        goto err;
++    }
++    if (!qemu_chr_fe_init(&g->vhost_chr, chr, errp)) {
++        goto err;
++    }
++    if (vhost_user_gpu_set_socket(&g->vhost->dev, sv[1]) < 0) {
++        error_setg(errp, "Failed to set vhost-user-gpu socket");
++        qemu_chr_fe_deinit(&g->vhost_chr, false);
++        goto err;
++    }
++
++    g->vhost_gpu_fd =3D sv[0];
++    vhost_user_gpu_update_blocked(g, false);
++    close(sv[1]);
++    return true;
++
++err:
++    close(sv[0]);
++    close(sv[1]);
++    if (chr) {
++        object_unref(OBJECT(chr));
++    }
++    return false;
++}
++
++static void
++vhost_user_gpu_get_config(VirtIODevice *vdev, uint8_t *config_data)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++    VirtIOGPUBase *b =3D VIRTIO_GPU_BASE(vdev);
++    struct virtio_gpu_config *vgconfig =3D
++        (struct virtio_gpu_config *)config_data;
++    int ret;
++
++    memset(config_data, 0, sizeof(struct virtio_gpu_config));
++
++    ret =3D vhost_dev_get_config(&g->vhost->dev,
++                               config_data, sizeof(struct virtio_gpu_con=
+fig));
++    if (ret) {
++        error_report("vhost-user-gpu: get device config space failed");
++        return;
++    }
++
++    /* those fields are managed by qemu */
++    vgconfig->num_scanouts =3D b->virtio_config.num_scanouts;
++    vgconfig->events_read =3D b->virtio_config.events_read;
++    vgconfig->events_clear =3D b->virtio_config.events_clear;
++}
++
++static void
++vhost_user_gpu_set_config(VirtIODevice *vdev,
++                          const uint8_t *config_data)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++    VirtIOGPUBase *b =3D VIRTIO_GPU_BASE(vdev);
++    const struct virtio_gpu_config *vgconfig =3D
++        (const struct virtio_gpu_config *)config_data;
++    int ret;
++
++    if (vgconfig->events_clear) {
++        b->virtio_config.events_read &=3D ~vgconfig->events_clear;
++    }
++
++    ret =3D vhost_dev_set_config(&g->vhost->dev, config_data,
++                               0, sizeof(struct virtio_gpu_config),
++                               VHOST_SET_CONFIG_TYPE_MASTER);
++    if (ret) {
++        error_report("vhost-user-input: set device config space failed")=
+;
++        return;
++    }
++}
++
++static void
++vhost_user_gpu_set_status(VirtIODevice *vdev, uint8_t val)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++    Error *err =3D NULL;
++
++    if (val & VIRTIO_CONFIG_S_DRIVER_OK && vdev->vm_running) {
++        if (!vhost_user_gpu_do_set_socket(g, &err)) {
++            error_report_err(err);
++            return;
++        }
++        vhost_user_backend_start(g->vhost);
++    } else {
++        /* unblock any wait and stop processing */
++        if (g->vhost_gpu_fd !=3D -1) {
++            vhost_user_gpu_update_blocked(g, true);
++            qemu_chr_fe_deinit(&g->vhost_chr, true);
++            g->vhost_gpu_fd =3D -1;
++        }
++        vhost_user_backend_stop(g->vhost);
++    }
++}
++
++static bool
++vhost_user_gpu_guest_notifier_pending(VirtIODevice *vdev, int idx)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++
++    return vhost_virtqueue_pending(&g->vhost->dev, idx);
++}
++
++static void
++vhost_user_gpu_guest_notifier_mask(VirtIODevice *vdev, int idx, bool mas=
+k)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++
++    vhost_virtqueue_mask(&g->vhost->dev, vdev, idx, mask);
++}
++
++static void
++vhost_user_gpu_instance_init(Object *obj)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(obj);
++
++    g->vhost =3D VHOST_USER_BACKEND(object_new(TYPE_VHOST_USER_BACKEND))=
+;
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(g->vhost), "chardev", &error_abort)=
+;
++}
++
++static void
++vhost_user_gpu_instance_finalize(Object *obj)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(obj);
++
++    object_unref(OBJECT(g->vhost));
++}
++
++static void
++vhost_user_gpu_reset(VirtIODevice *vdev)
++{
++    VhostUserGPU *g =3D VHOST_USER_GPU(vdev);
++
++    virtio_gpu_base_reset(VIRTIO_GPU_BASE(vdev));
++
++    vhost_user_backend_stop(g->vhost);
++}
++
++static int
++vhost_user_gpu_config_change(struct vhost_dev *dev)
++{
++    error_report("vhost-user-gpu: unhandled backend config change");
 +    return -1;
 +}
 +
-+static char *opt_evdev;
-+static int opt_fdnum =3D -1;
-+static char *opt_socket_path;
-+static gboolean opt_nograb;
-+static gboolean opt_print_caps;
-+
-+static GOptionEntry entries[] =3D {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "no-grab", 'n', 0, G_OPTION_ARG_NONE, &opt_nograb,
-+      "Don't grab device", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    { "evdev-path", 'p', 0, G_OPTION_ARG_FILENAME, &opt_evdev,
-+      "evdev input device path", "PATH" },
-+    { NULL, }
++static const VhostDevConfigOps config_ops =3D {
++    .vhost_dev_config_notifier =3D vhost_user_gpu_config_change,
 +};
 +
-+int
-+main(int argc, char *argv[])
++static void
++vhost_user_gpu_device_realize(DeviceState *qdev, Error **errp)
 +{
-+    GMainLoop *loop =3D NULL;
-+    VuInput vi =3D { 0, };
-+    int rc, ver, fd;
-+    virtio_input_config id;
-+    struct input_id ids;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
++    VhostUserGPU *g =3D VHOST_USER_GPU(qdev);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(g);
 +
-+    context =3D g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"input\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"evdev-path\",\n");
-+        g_print("    \"no-grab\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+    if (!opt_evdev) {
-+        g_printerr("Please specify an evdev path\n");
-+        exit(EXIT_FAILURE);
-+    }
-+    if ((!!opt_socket_path + (opt_fdnum !=3D -1)) !=3D 1) {
-+        g_printerr("Please specify either --fd or --socket-path\n");
-+        exit(EXIT_FAILURE);
++    vhost_dev_set_config_notifier(&g->vhost->dev, &config_ops);
++    if (vhost_user_backend_dev_init(g->vhost, vdev, 2, errp) < 0) {
++        return;
 +    }
 +
-+    vi.evdevfd =3D open(opt_evdev, O_RDWR);
-+    if (vi.evdevfd < 0) {
-+        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
-+    if (rc < 0) {
-+        g_printerr("%s: is not an evdev device\n", argv[1]);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (!opt_nograb) {
-+        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
-+        if (rc < 0) {
-+            g_printerr("Failed to grab device\n");
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
++    if (virtio_has_feature(g->vhost->dev.features, VIRTIO_GPU_F_VIRGL)) =
+{
++        g->parent_obj.conf.flags |=3D 1 << VIRTIO_GPU_FLAG_VIRGL_ENABLED=
 ;
-+    memset(&id, 0, sizeof(id));
-+    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
-+    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
-+    id.size =3D strlen(id.u.string);
-+    g_array_append_val(vi.config, id);
-+
-+    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
-+        memset(&id, 0, sizeof(id));
-+        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
-+        id.size =3D sizeof(struct virtio_input_devids);
-+        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
-+        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
-+        id.u.ids.product =3D cpu_to_le16(ids.product);
-+        id.u.ids.version =3D cpu_to_le16(ids.version);
-+        g_array_append_val(vi.config, id);
 +    }
 +
-+    vi_bits_config(&vi, EV_KEY, KEY_CNT);
-+    vi_bits_config(&vi, EV_REL, REL_CNT);
-+    vi_bits_config(&vi, EV_ABS, ABS_CNT);
-+    vi_bits_config(&vi, EV_MSC, MSC_CNT);
-+    vi_bits_config(&vi, EV_SW,  SW_CNT);
-+    g_debug("config length: %u", vi.config->len);
-+
-+    if (opt_socket_path) {
-+        int lsock =3D unix_sock_new(opt_socket_path);
-+        fd =3D accept(lsock, NULL, NULL);
-+        close(lsock);
-+    } else {
-+        fd =3D opt_fdnum;
++    if (!virtio_gpu_base_device_realize(qdev, NULL, NULL, errp)) {
++        return;
 +    }
-+    if (fd =3D=3D -1) {
-+        g_printerr("Invalid socket");
-+        exit(EXIT_FAILURE);
-+    }
-+    vug_init(&vi.dev, fd, vi_panic, &vuiface);
 +
-+    loop =3D g_main_loop_new(NULL, FALSE);
-+    g_main_loop_run(loop);
-+    g_main_loop_unref(loop);
-+
-+    vug_deinit(&vi.dev);
-+
-+    if (vi.evsrc) {
-+        g_source_unref(vi.evsrc);
-+    }
-+    g_array_free(vi.config, TRUE);
-+    g_free(vi.queue);
-+    return 0;
++    g->vhost_gpu_fd =3D -1;
 +}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b6e855ccf9..7e727299de 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1515,6 +1515,7 @@ S: Maintained
- F: hw/input/vhost-user-input.c
- F: hw/input/virtio-input*.c
- F: include/hw/virtio/virtio-input.h
-+F: contrib/vhost-user-input/*
-=20
- virtio-serial
- M: Amit Shah <amit@kernel.org>
-diff --git a/Makefile b/Makefile
-index 04a0d45050..5fd26cfc97 100644
---- a/Makefile
-+++ b/Makefile
-@@ -402,6 +402,7 @@ dummy :=3D $(call unnest-vars,, \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-+                vhost-user-input-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -609,6 +610,8 @@ vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libv=
-host-user.a
- rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a lib=
-qemuutil.a
-+	$(call LINK, $^)
-=20
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index cf065de5ed..27502b7df1 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -122,6 +122,7 @@ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
- vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
- rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
-+vhost-user-input-obj-y =3D contrib/vhost-user-input/
-=20
- ######################################################################
- trace-events-subdirs =3D
-diff --git a/configure b/configure
-index 1c563a7027..140a294938 100755
---- a/configure
-+++ b/configure
-@@ -6044,6 +6044,9 @@ if test "$want_tools" =3D "yes" ; then
-   if [ "$curl" =3D "yes" ]; then
-       tools=3D"elf2dmp\$(EXESUF) $tools"
-   fi
-+  if [ "$vhost_user" =3D "yes" ] && [ "$linux" =3D "yes" ] ; then
-+    tools=3D"vhost-user-input\$(EXESUF) $tools"
-+  fi
- fi
- if test "$softmmu" =3D yes ; then
-   if test "$linux" =3D yes; then
-diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-=
-input/Makefile.objs
++
++static Property vhost_user_gpu_properties[] =3D {
++    VIRTIO_GPU_BASE_PROPERTIES(VhostUserGPU, parent_obj.conf),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void
++vhost_user_gpu_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
++    VirtIOGPUBaseClass *vgc =3D VIRTIO_GPU_BASE_CLASS(klass);
++
++    vgc->gl_unblock =3D vhost_user_gpu_gl_unblock;
++
++    vdc->realize =3D vhost_user_gpu_device_realize;
++    vdc->reset =3D vhost_user_gpu_reset;
++    vdc->set_status   =3D vhost_user_gpu_set_status;
++    vdc->guest_notifier_mask =3D vhost_user_gpu_guest_notifier_mask;
++    vdc->guest_notifier_pending =3D vhost_user_gpu_guest_notifier_pendin=
+g;
++    vdc->get_config =3D vhost_user_gpu_get_config;
++    vdc->set_config =3D vhost_user_gpu_set_config;
++
++    dc->props =3D vhost_user_gpu_properties;
++}
++
++static const TypeInfo vhost_user_gpu_info =3D {
++    .name =3D TYPE_VHOST_USER_GPU,
++    .parent =3D TYPE_VIRTIO_GPU_BASE,
++    .instance_size =3D sizeof(VhostUserGPU),
++    .instance_init =3D vhost_user_gpu_instance_init,
++    .instance_finalize =3D vhost_user_gpu_instance_finalize,
++    .class_init =3D vhost_user_gpu_class_init,
++};
++
++static void vhost_user_gpu_register_types(void)
++{
++    type_register_static(&vhost_user_gpu_info);
++}
++
++type_init(vhost_user_gpu_register_types)
+diff --git a/hw/display/vhost-user-vga.c b/hw/display/vhost-user-vga.c
 new file mode 100644
-index 0000000000..b1fad90d51
+index 0000000000..a7195276d9
 --- /dev/null
-+++ b/contrib/vhost-user-input/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-input-obj-y =3D main.o
++++ b/hw/display/vhost-user-vga.c
+@@ -0,0 +1,52 @@
++/*
++ * vhost-user VGA device
++ *
++ * Copyright Red Hat, Inc. 2018
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "virtio-vga.h"
++
++#define TYPE_VHOST_USER_VGA "vhost-user-vga"
++
++#define VHOST_USER_VGA(obj)                                \
++    OBJECT_CHECK(VhostUserVGA, (obj), TYPE_VHOST_USER_VGA)
++
++typedef struct VhostUserVGA {
++    VirtIOVGABase parent_obj;
++
++    VhostUserGPU vdev;
++} VhostUserVGA;
++
++static void vhost_user_vga_inst_initfn(Object *obj)
++{
++    VhostUserVGA *dev =3D VHOST_USER_VGA(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_GPU);
++
++    VIRTIO_VGA_BASE(dev)->vgpu =3D VIRTIO_GPU_BASE(&dev->vdev);
++
++    object_property_add_alias(obj, "chardev",
++                              OBJECT(&dev->vdev), "chardev",
++                              &error_abort);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_vga_info =3D {
++    .generic_name  =3D TYPE_VHOST_USER_VGA,
++    .parent        =3D TYPE_VIRTIO_VGA_BASE,
++    .instance_size =3D sizeof(struct VhostUserVGA),
++    .instance_init =3D vhost_user_vga_inst_initfn,
++};
++
++static void vhost_user_vga_register_types(void)
++{
++    virtio_pci_types_register(&vhost_user_vga_info);
++}
++
++type_init(vhost_user_vga_register_types)
+diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
+index 3b88bf4d1f..ef8d6ecb49 100644
+--- a/hw/display/virtio-gpu-pci.c
++++ b/hw/display/virtio-gpu-pci.c
+@@ -16,22 +16,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-bus.h"
+-#include "hw/virtio/virtio-pci.h"
+-#include "hw/virtio/virtio-gpu.h"
+-
+-typedef struct VirtIOGPUPCIBase VirtIOGPUPCIBase;
+-
+-/*
+- * virtio-gpu-pci-base: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VIRTIO_GPU_PCI_BASE "virtio-gpu-pci-base"
+-#define VIRTIO_GPU_PCI_BASE(obj) \
+-        OBJECT_CHECK(VirtIOGPUPCIBase, (obj), TYPE_VIRTIO_GPU_PCI_BASE)
+-
+-struct VirtIOGPUPCIBase {
+-    VirtIOPCIProxy parent_obj;
+-    VirtIOGPUBase *vgpu;
+-};
++#include "hw/virtio/virtio-gpu-pci.h"
+=20
+ static Property virtio_gpu_pci_base_properties[] =3D {
+     DEFINE_VIRTIO_GPU_PCI_PROPERTIES(VirtIOPCIProxy),
+diff --git a/vl.c b/vl.c
+index c696ad2a13..b06458070f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -238,6 +238,7 @@ static struct {
+     { .driver =3D "qxl-vga",              .flag =3D &default_vga       }=
+,
+     { .driver =3D "virtio-vga",           .flag =3D &default_vga       }=
+,
+     { .driver =3D "ati-vga",              .flag =3D &default_vga       }=
+,
++    { .driver =3D "vhost-user-vga",       .flag =3D &default_vga       }=
+,
+ };
+=20
+ static QemuOptsList qemu_rtc_opts =3D {
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 72be57a403..492ea35104 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -104,6 +104,16 @@ config VIRTIO_VGA
+     depends on VIRTIO_PCI
+     select VGA
+=20
++config VHOST_USER_GPU
++    bool
++    default y
++    depends on VIRTIO_GPU && VHOST_USER
++
++config VHOST_USER_VGA
++    bool
++    default y
++    depends on VIRTIO_VGA && VHOST_USER_GPU
++
+ config DPCD
+     bool
+=20
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index f1c46b8e3e..9c342eef41 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -43,8 +43,11 @@ obj-$(CONFIG_VGA) +=3D vga.o
+ common-obj-$(CONFIG_QXL) +=3D qxl.o qxl-logger.o qxl-render.o
+=20
+ obj-$(CONFIG_VIRTIO_GPU) +=3D virtio-gpu-base.o virtio-gpu.o virtio-gpu-=
+3d.o
++obj-$(CONFIG_VHOST_USER_GPU) +=3D vhost-user-gpu.o
+ obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) +=3D virtio-g=
+pu-pci.o
++obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) +=3D vhos=
+t-user-gpu-pci.o
+ obj-$(CONFIG_VIRTIO_VGA) +=3D virtio-vga.o
++obj-$(CONFIG_VHOST_USER_VGA) +=3D vhost-user-vga.o
+ virtio-gpu.o-cflags :=3D $(VIRGL_CFLAGS)
+ virtio-gpu.o-libs +=3D $(VIRGL_LIBS)
+ virtio-gpu-3d.o-cflags :=3D $(VIRGL_CFLAGS)
 --=20
 2.21.0.313.ge35b8cb8e2
 
