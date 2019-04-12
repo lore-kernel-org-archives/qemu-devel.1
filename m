@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44061)
+Received: from eggs.gnu.org ([209.51.188.92]:44059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEyg3-0004f4-6k
+	(envelope-from <kwolf@redhat.com>) id 1hEyg3-0004f2-66
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hEyg1-0002IR-NH
+	(envelope-from <kwolf@redhat.com>) id 1hEyg1-0002IM-Ly
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 12:05:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 12 Apr 2019 18:04:58 +0200
-Message-Id: <20190412160458.23920-3-kwolf@redhat.com>
+Date: Fri, 12 Apr 2019 18:04:57 +0200
+Message-Id: <20190412160458.23920-2-kwolf@redhat.com>
 In-Reply-To: <20190412160458.23920-1-kwolf@redhat.com>
 References: <20190412160458.23920-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/2] iotest: Fix 241 to run in generic directory
+Subject: [Qemu-devel] [PULL 1/2] iotests: Let 245 pass on tmpfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +24,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Filter the qemu-nbd server output to get rid of a direct reference
-to my build directory.
+tmpfs does not support O_DIRECT.  Detect this case, and skip flipping
+@direct if the filesystem does not support it.
 
-Fixes: e9dce9cb
-Reported-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Fixes: bf3e50f6239090e63a8ffaaec971671e66d88e07
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/241     | 4 +++-
- tests/qemu-iotests/241.out | 6 +++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/245 | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/241 b/tests/qemu-iotests/241
-index 4b19685738..017a736aab 100755
---- a/tests/qemu-iotests/241
-+++ b/tests/qemu-iotests/241
-@@ -28,6 +28,7 @@ nbd_unix_socket=3D$TEST_DIR/test_qemu_nbd_socket
- _cleanup()
- {
-     _cleanup_test_img
-+    rm -f "$TEST_DIR/server.log"
-     nbd_server_stop
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-@@ -69,12 +70,13 @@ echo
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index 7891a210c1..a04c6235c1 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -209,6 +209,12 @@ class TestBlockdevReopen(iotests.QMPTestCase):
 =20
- # Intentionally omit '-f' to force image probing, which in turn forces
- # sector alignment, here at the server.
--nbd_server_start_unix_socket "$TEST_IMG_FILE"
-+nbd_server_start_unix_socket "$TEST_IMG_FILE" 2> "$TEST_DIR/server.log"
+     # Reopen an image several times changing some of its options
+     def test_reopen(self):
++        # Check whether the filesystem supports O_DIRECT
++        if 'O_DIRECT' in qemu_io('-f', 'raw', '-t', 'none', '-c', 'quit'=
+, hd_path[0]):
++            supports_direct =3D False
++        else:
++            supports_direct =3D True
++
+         # Open the hd1 image passing all backing options
+         opts =3D hd_opts(1)
+         opts['backing'] =3D hd_opts(0)
+@@ -231,9 +237,9 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+         self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
+         self.assert_qmp(self.get_node('hd1'), 'cache/direct', False)
+         self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', False)
+-        self.reopen(opts, {'cache': { 'direct': True, 'no-flush': True }=
+})
++        self.reopen(opts, {'cache': { 'direct': supports_direct, 'no-flu=
+sh': True }})
+         self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
+-        self.assert_qmp(self.get_node('hd1'), 'cache/direct', True)
++        self.assert_qmp(self.get_node('hd1'), 'cache/direct', supports_d=
+irect)
+         self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', True)
 =20
- $QEMU_NBD_PROG --list -k $nbd_unix_socket | grep '\(size\|min\)'
- $QEMU_IMG map -f raw --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
- $QEMU_IO -f raw -c map "$TEST_IMG"
- nbd_server_stop
-+cat "$TEST_DIR/server.log" | _filter_testdir
-=20
- echo
- echo "=3D=3D=3D Exporting unaligned raw image, forced client sector alig=
-nment =3D=3D=3D"
-diff --git a/tests/qemu-iotests/241.out b/tests/qemu-iotests/241.out
-index f481074a02..75f9f465e5 100644
---- a/tests/qemu-iotests/241.out
-+++ b/tests/qemu-iotests/241.out
-@@ -10,13 +10,13 @@ QA output created by 241
-=20
- =3D=3D=3D Exporting unaligned raw image, forced server sector alignment =
-=3D=3D=3D
-=20
--WARNING: Image format was not specified for '/home/eblake/qemu/tests/qem=
-u-iotests/scratch/t.raw' and probing guessed raw.
--         Automatically detecting the format is dangerous for raw images,=
- write operations on block 0 will be restricted.
--         Specify the 'raw' format explicitly to remove the restrictions.
-   size:  1024
-   min block: 512
- [{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, =
-"offset": OFFSET}]
- 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
-+WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing=
- guessed raw.
-+         Automatically detecting the format is dangerous for raw images,=
- write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-=20
- =3D=3D=3D Exporting unaligned raw image, forced client sector alignment =
-=3D=3D=3D
-=20
+         # Reopen again with the original options
 --=20
 2.20.1
