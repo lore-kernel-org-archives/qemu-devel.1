@@ -2,81 +2,91 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE298C10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF70C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:56:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68F7320850
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:54:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68F7320850
+	by mail.kernel.org (Postfix) with ESMTPS id 2D6EB2171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 14:56:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D6EB2171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38294 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38333 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hExZs-0008Nq-H0
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 10:54:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55505)
+	id 1hExbK-0001It-Et
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 10:56:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hExZ1-00084S-Dv
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:54:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1hExa9-0000EE-Iz
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hExZ0-0000Ps-4V
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:53:59 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40557)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hExYz-0000PA-RO
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:53:58 -0400
-Received: by mail-wr1-f67.google.com with SMTP id h4so12330371wre.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 07:53:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=F+Yy1GcYKfDnAYZk40/5uuHKXTNoD/lEcBcVKgW1npQ=;
-	b=X0ISxyJF4XbSC0kj5SnalSq/DV+X4lXdjDRjGchIyb7pYG4AhM+1wfRlELcpH/d6oD
-	aHMw0Kw/ehI10cfMIEsYhfIdtN+QrOyvD1tZOX1lRG/tV7yONuyRuvCdZvGA9pUWxvtU
-	Hj4rWfbHczbXu8bRRrTfTf6sWhn+FAK1JzdV/+MazH0u1+Mxh5isBTj7ESl2dL058SNO
-	3J0m05/8jErNkGy1Ml7pjjF0FD0Fq822QqKoTdsywNGhasRb0nWV8/8WNVMuUo/adrBx
-	nfrd8CF6HgXu6/CuMUnOHaY7FTgqMmjDRCwNDMIH5gqlsbmN17iyyWaPSUU4ZcjttNXT
-	vT2A==
-X-Gm-Message-State: APjAAAXb1TYl5vp2sP+RQzBkDdhVY72vvT6Q2smddd03EiUYrEo5ZRHn
-	h3M/H+7UaP18sqRijsSW+xENSQ==
-X-Google-Smtp-Source: APXvYqyaGiwfSuyU3r2NwuGfIgfR5SHvh9fAFYm8HL7i3jfHMc8W/W2Y16xeZ/X2qXDZJy0Q0U9Akw==
-X-Received: by 2002:a5d:4987:: with SMTP id r7mr18315560wrq.280.1555080836901; 
-	Fri, 12 Apr 2019 07:53:56 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id b9sm14178924wmc.9.2019.04.12.07.53.55
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 07:53:56 -0700 (PDT)
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20190317002259.25994-1-philmd@redhat.com>
-	<20190317002259.25994-2-philmd@redhat.com>
-	<alpine.BSF.2.21.9999.1903170254400.9264@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <34b2dd6e-8c40-f639-8cb9-59d37f4ce9fd@redhat.com>
-Date: Fri, 12 Apr 2019 16:53:50 +0200
+	(envelope-from <eblake@redhat.com>) id 1hExa8-0001NM-IY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:55:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hExa8-0001Ma-2O
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 10:55:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5ACAB30833A3;
+	Fri, 12 Apr 2019 14:55:07 +0000 (UTC)
+Received: from [10.3.117.110] (ovpn-117-110.phx2.redhat.com [10.3.117.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 109C55D71A;
+	Fri, 12 Apr 2019 14:55:02 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <f61645d0b3720a039423532d49dd65588d9bccd8.1554919328.git.crobinso@redhat.com>
+	<4aee66fd-1cfa-a935-daa6-6f221af42095@redhat.com>
+	<20190412122133.GG4522@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <663b6339-d82d-17a8-8351-0cd10ed4fad7@redhat.com>
+Date: Fri, 12 Apr 2019 09:55:02 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1903170254400.9264@zero.eik.bme.hu>
+In-Reply-To: <20190412122133.GG4522@linux.fritz.box>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Fri, 12 Apr 2019 14:55:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 1/8] hw/input/Kconfig: Rename the 8042 PS/2
- Keyboard Controller
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] hmp: delvm: use hmp_handle_error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,158 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Artyom Tarasenko <atar4qemu@gmail.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	dgilbert@redhat.com, Cole Robinson <crobinso@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412145350.K25JsYRncP4Yq8rIT6F7x1tuKygvmTa755K_ZjbvYrY@z>
+Message-ID: <20190412145502.bZEN9HUtkpAjSNd8xAJYR1XUSphFBaguX-kFaiw46d0@z>
 
-On 3/17/19 3:05 AM, BALATON Zoltan wrote:
-> On Sun, 17 Mar 2019, Philippe Mathieu-Daudé wrote:
->> The Intel 8042 chipset also includes some functions unrelated to
->> the keyboard, such the A20-Gate. Rename it using the chipset name.
+On 4/12/19 7:21 AM, Kevin Wolf wrote:
+> Am 10.04.2019 um 20:27 hat Eric Blake geschrieben:
+>> On 4/10/19 1:03 PM, Cole Robinson wrote:
+>>> This gives us the consistent 'Error:' prefix added in 66363e9a43f,
+>>> which helps users like libvirt who still need to scrape hmp error
+>>> messages to detect failure.
+>>>
+>>> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+>>> ---
+>>>  hmp.c | 7 ++++---
+>>>  1 file changed, 4 insertions(+), 3 deletions(-)
 >>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> default-configs/mips-softmmu-common.mak | 2 +-
->> hw/alpha/Kconfig                        | 2 +-
->> hw/i386/Kconfig                         | 2 +-
->> hw/input/Kconfig                        | 2 +-
->> hw/input/Makefile.objs                  | 2 +-
->> hw/sparc64/Kconfig                      | 2 +-
->> hw/unicore32/Kconfig                    | 2 +-
->> 7 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/default-configs/mips-softmmu-common.mak
->> b/default-configs/mips-softmmu-common.mak
->> index 0795d522db..bad7ee3360 100644
->> --- a/default-configs/mips-softmmu-common.mak
->> +++ b/default-configs/mips-softmmu-common.mak
->> @@ -13,7 +13,7 @@ CONFIG_SERIAL_ISA=y
->> CONFIG_PARALLEL=y
->> CONFIG_I8254=y
->> CONFIG_PCSPK=y
->> -CONFIG_PCKBD=y
->> +CONFIG_I8042=y
->> CONFIG_FDC=y
->> CONFIG_ACPI=y
->> CONFIG_ACPI_X86=y
->> diff --git a/hw/alpha/Kconfig b/hw/alpha/Kconfig
->> index 22cefd9577..eb99765123 100644
->> --- a/hw/alpha/Kconfig
->> +++ b/hw/alpha/Kconfig
->> @@ -8,5 +8,5 @@ config DP264
->>     select IDE_CMD646
->>     select MC146818RTC
->>     select PCI
->> -    select PCKBD
->> +    select I8042
->>     select SMC37C669
->> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
->> index 78fd70396a..7fa5395894 100644
->> --- a/hw/i386/Kconfig
->> +++ b/hw/i386/Kconfig
->> @@ -20,7 +20,7 @@ config PC
->>     select FDC
->>     select I8259
->>     select I8254
->> -    select PCKBD
->> +    select I8042
->>     select PCSPK
->>     select I82374
->>     select I8257
->> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
->> index e2e66f0858..14e76c5df4 100644
->> --- a/hw/input/Kconfig
->> +++ b/hw/input/Kconfig
->> @@ -5,7 +5,7 @@ config LM832X
->>     bool
->>     depends on I2C
->>
->> -config PCKBD
->> +config I8042
->>     bool
->>     default y
->>     depends on ISA_BUS
->> diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
->> index c8b00f71ec..6e4c3389be 100644
->> --- a/hw/input/Makefile.objs
->> +++ b/hw/input/Makefile.objs
->> @@ -1,7 +1,7 @@
->> common-obj-$(CONFIG_ADB) += adb.o adb-mouse.o adb-kbd.o
->> common-obj-y += hid.o
->> common-obj-$(CONFIG_LM832X) += lm832x.o
->> -common-obj-$(CONFIG_PCKBD) += pckbd.o
->> +common-obj-$(CONFIG_I8042) += pckbd.o
+>> Not enough to drive -rc4 on its own, but worth adding to our wishlist of
+>> potential easy patches if we do have a release blocker surface.
 > 
-> This makes config option different from the filename so I wonder if it's
-> worth changing it or better to keep it same as its file like the others?
-> A20 gate is controlled by AT keyboard controller but that's probably a
-> hack made by the designers of that machine, it's still used mainly as a
-> keyboard controller so just to avoid changes we could live with the
-> PCKBD name as well (which might even be simpler to understand for people
-> not familiar with chip numbers).
-
-Regarding Kconfig, when we model a machine, I find clearer to name the
-chipset used by their name. Now when it is about optional feature, I
-don't mind.
-
-The other Intel chipset are named similarly:
-
-$ ls -1 hw/*/i[0-9]*c
-hw/dma/i82374.c
-hw/dma/i8257.c
-hw/i2c/i2c-ddc.c
-hw/intc/i8259.c
-hw/intc/i8259_common.c
-hw/isa/i82378.c
-hw/timer/i8254.c
-hw/timer/i8254_common.c
-
-I'm happy to rename the file as i8042.c as you suggested, however I'll
-do it in another patch previous to this one.
-
-Thanks,
-
-Phil.
-
-> Regards,
-> BALATON Zoltan
+> As we are going to have an -rc4, I had a look at this.
 > 
->> common-obj-$(CONFIG_PL050) += pl050.o
->> common-obj-y += ps2.o
->> common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
->> diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
->> index 4a8166ebb7..24ccb11c87 100644
->> --- a/hw/sparc64/Kconfig
->> +++ b/hw/sparc64/Kconfig
->> @@ -10,7 +10,7 @@ config SUN4U
->>     select PCI_SABRE
->>     select IDE_CMD646
->>     select PARALLEL
->> -    select PCKBD
->> +    select I8042
->>     select SIMBA
+> Commit 66363e9a43f was in February and explicitly says "Note: Some
+> places don't use hmp_handle_error". So this doesn't seem to be a
+> regression and even if it's fixed, it's likely not the last place that
+> doesn't use the "Error:" prefix. This would suggest that this isn't for
+> -rc4.
+> 
+> Am I misunderstanding the situation?
+
+No, I think your read is accurate, and delaying this to 4.1 is okay.
+
+
+>>> +        error_prepend(&err,
+>>> +                      "Error while deleting snapshot on device '%s': ",
 >>
->> config NIAGARA
->> diff --git a/hw/unicore32/Kconfig b/hw/unicore32/Kconfig
->> index 4443a29dd2..67f4c867c1 100644
->> --- a/hw/unicore32/Kconfig
->> +++ b/hw/unicore32/Kconfig
->> @@ -1,5 +1,5 @@
->> config PUV3
->>     bool
->>     select ISA_BUS
->> -    select PCKBD
->> +    select I8042
->>     select PTIMER
->>
+>> Do we want to reword the message (maybe s/Error while //) to avoid the
+>> word "Error" twice in the same line?
+
+especially since we still would want this resolved via a v2, rather than
+taking this patch as-is.
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
