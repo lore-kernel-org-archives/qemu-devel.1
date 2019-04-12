@@ -2,65 +2,64 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD1EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D392FC10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:54:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C15822086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:52:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15822086D
+	by mail.kernel.org (Postfix) with ESMTPS id 9725520818
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 17:54:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9725520818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40724 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40738 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF0Lh-0004a9-2M
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:52:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37737)
+	id 1hF0Nw-0005SY-TO
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 13:54:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0KL-0003qO-Mj
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hF0N9-00059P-IY
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hF0KK-000681-CY
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53546)
+	(envelope-from <dgilbert@redhat.com>) id 1hF0N7-0007ma-Hx
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:53:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0KK-00067b-1C
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:51:00 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hF0N7-0007ln-A3
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 13:53:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 577393082E8F
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:50:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8AEDA3B77F
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:53:51 +0000 (UTC)
 Received: from work-vm (unknown [10.36.117.255])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A27421001E85;
-	Fri, 12 Apr 2019 17:50:58 +0000 (UTC)
-Date: Fri, 12 Apr 2019 18:50:56 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D83BE19C65;
+	Fri, 12 Apr 2019 17:53:50 +0000 (UTC)
+Date: Fri, 12 Apr 2019 18:53:48 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190412175055.GO2906@work-vm>
+Message-ID: <20190412175347.GP2906@work-vm>
 References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-13-armbru@redhat.com>
+	<20190411152520.10061-14-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190411152520.10061-13-armbru@redhat.com>
+In-Reply-To: <20190411152520.10061-14-armbru@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 12 Apr 2019 17:50:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 12 Apr 2019 17:53:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 12/17] qom/cpu: Simplify how
- CPUClass::dump_statistics() prints
+Subject: Re: [Qemu-devel] [PATCH 13/17] qemu-print: New qemu_fprintf(),
+ qemu_vfprintf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,151 +75,78 @@ Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190412175056.aMRP3Jz1d8CtumLGGSIGhFVYE96svwHP2t215rOLl_Q@z>
+Message-ID: <20190412175348.V7Lrb6lD-cj7GcZxJFnaNWDn-7BmrlMc1evAVGrOv3A@z>
 
 * Markus Armbruster (armbru@redhat.com) wrote:
-> CPUClass method dump_statistics() takes an fprintf()-like callback and
-> a FILE * to pass to it.
-> 
-> Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
-> monitor_fprintf() and the current monitor cast to FILE *.
+> Code that doesn't want to know about current monitor vs. stdout
+> vs. stderr takes an fprintf_function callback and a FILE * argument to
+> pass to it.  Actual arguments are either fprintf() and stdout or
+> stderr, or monitor_fprintf() and the current monitor cast to FILE *.
 > monitor_fprintf() casts it right back, and is otherwise identical to
 > monitor_printf().  The type-punning is ugly.
 > 
-> Drop the callback, and call qemu_printf() instead.
+> New qemu_fprintf() and qemu_vprintf() address this need without type
+> punning: they are like fprintf() and vfprintf(), except they print to
+> the current monitor when passed a null FILE *.  The next commits will
+> put them to use.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  include/qom/cpu.h      | 11 ++++-------
->  monitor.c              |  2 +-
->  qom/cpu.c              |  5 ++---
->  target/ppc/cpu.h       |  3 +--
->  target/ppc/translate.c |  9 ++++-----
->  5 files changed, 12 insertions(+), 18 deletions(-)
+>  include/qemu/qemu-print.h |  4 ++++
+>  util/qemu-print.c         | 27 +++++++++++++++++++++++++++
+>  2 files changed, 31 insertions(+)
 > 
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 1d6099e5d4..31bafee2b1 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -184,8 +184,7 @@ typedef struct CPUClass {
->      void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
->                         int flags);
->      GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
-> -    void (*dump_statistics)(CPUState *cpu, FILE *f,
-> -                            fprintf_function cpu_fprintf, int flags);
-> +    void (*dump_statistics)(CPUState *cpu, int flags);
->      int64_t (*get_arch_id)(CPUState *cpu);
->      bool (*get_paging_enabled)(const CPUState *cpu);
->      void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
-> @@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
->  /**
->   * cpu_dump_statistics:
->   * @cpu: The CPU whose state is to be dumped.
-> - * @f: File to dump to.
-> - * @cpu_fprintf: Function to dump with.
->   * @flags: Flags what to dump.
->   *
-> - * Dumps CPU statistics.
-> + * Dump CPU statistics to the current monitor if we have one, else to
-> + * stdout.
->   */
-> -void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-> -                         int flags);
-> +void cpu_dump_statistics(CPUState *cpu, int flags);
+> diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+> index 8fed32bf42..40b596262f 100644
+> --- a/include/qemu/qemu-print.h
+> +++ b/include/qemu/qemu-print.h
+> @@ -16,4 +16,8 @@
+>  int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+>  int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 >  
->  #ifndef CONFIG_USER_ONLY
->  /**
-> diff --git a/monitor.c b/monitor.c
-> index 0819b99ef7..fb5b681099 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, "No CPU available\n");
->          return;
->      }
-> -    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
-> +    cpu_dump_statistics(cs, 0);
+> +int qemu_vfprintf(FILE *stream, const char *fmt, va_list ap)
+> +    GCC_FMT_ATTR(2, 0);
+> +int qemu_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+> +
+>  #endif
+> diff --git a/util/qemu-print.c b/util/qemu-print.c
+> index 86f9417af8..e79d6b8396 100644
+> --- a/util/qemu-print.c
+> +++ b/util/qemu-print.c
+> @@ -40,3 +40,30 @@ int qemu_printf(const char *fmt, ...)
+>      va_end(ap);
+>      return ret;
 >  }
->  
->  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index a8d2958956..029e7fe9b0 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
->      }
->  }
->  
-> -void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-> -                         int flags)
-> +void cpu_dump_statistics(CPUState *cpu, int flags)
->  {
->      CPUClass *cc = CPU_GET_CLASS(cpu);
->  
->      if (cc->dump_statistics) {
-> -        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
-> +        cc->dump_statistics(cpu, flags);
->      }
->  }
->  
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 8572241364..27a36b9605 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
->  bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
->  void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
->                          int flags);
-> -void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
-> -                             fprintf_function cpu_fprintf, int flags);
-> +void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
->  hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->  int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->  int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index badc1ae1a3..f99f27a134 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
->  #undef RFPL
->  }
->  
-> -void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
-> -                             fprintf_function cpu_fprintf, int flags)
-> +void ppc_cpu_dump_statistics(CPUState *cs, int flags)
->  {
->  #if defined(DO_PPC_STATISTICS)
->      PowerPCCPU *cpu = POWERPC_CPU(cs);
-> @@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
->                          handler = t3[op3];
->                          if (handler->count == 0)
->                              continue;
-> -                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
-> +                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
->                                      "%016" PRIx64 " %" PRId64 "\n",
->                                      op1, op2, op3, op1, (op3 << 5) | op2,
->                                      handler->oname,
-> @@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
->                  } else {
->                      if (handler->count == 0)
->                          continue;
-> -                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
-> +                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
->                                  "%016" PRIx64 " %" PRId64 "\n",
->                                  op1, op2, op1, op2, handler->oname,
->                                  handler->count, handler->count);
-> @@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
->          } else {
->              if (handler->count == 0)
->                  continue;
-> -            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
-> +            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
->                          " %" PRId64 "\n",
->                          op1, op1, handler->oname,
->                          handler->count, handler->count);
+> +
+> +/*
+> + * Print like vfprintf()
+> + * Print to @stream if non-null, else to current monitor.
+> + */
+> +int qemu_vfprintf(FILE *stream, const char *fmt, va_list ap)
+> +{
+> +    if (!stream) {
+> +        return monitor_vprintf(cur_mon, fmt, ap);
+> +    }
+> +    return vfprintf(stream, fmt, ap);
+> +}
+> +
+> +/*
+> + * Print like fprintf().
+> + * Print to @stream if non-null, else to current monitor.
+> + */
+> +int qemu_fprintf(FILE *stream, const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    int ret;
+> +
+> +    va_start(ap, fmt);
+> +    ret = qemu_vfprintf(stream, fmt, ap);
+> +    va_end(ap);
+> +    return ret;
+> +}
 > -- 
 > 2.17.2
 > 
