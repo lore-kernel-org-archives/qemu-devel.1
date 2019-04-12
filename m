@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51700)
+Received: from eggs.gnu.org ([209.51.188.92]:38346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEjXc-0003dL-La
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:37 -0400
+	(envelope-from <jan.bobek@gmail.com>) id 1hElEP-0007Iz-7Q
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hEjXV-0001pw-3l
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:32 -0400
-Received: from mail-eopbgr750079.outbound.protection.outlook.com
-	([40.107.75.79]:25504
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hEjXL-0001hc-SY
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 19:55:22 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Thu, 11 Apr 2019 23:55:15 +0000
-Message-ID: <20190411235456.12918-1-brijesh.singh@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8CE87D8491C0CC43A0A6F806EDDF16D7@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jan.bobek@gmail.com>) id 1hElEO-0007NJ-86
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:53 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:44105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hElEN-0007Mc-Rt
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 21:43:52 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id u187so3004062ybg.11
+	for <qemu-devel@nongnu.org>; Thu, 11 Apr 2019 18:43:51 -0700 (PDT)
+References: <20190408182748.1238-1-jan.bobek@gmail.com>
+	<e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+From: Jan Bobek <jan.bobek@gmail.com>
+Message-ID: <a82ec99d-8b5e-6898-c0a7-a3de8e2be07f@gmail.com>
+Date: Thu, 11 Apr 2019 21:43:37 -0400
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+In-Reply-To: <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ"
+Subject: Re: [Qemu-devel] [RISU PATCH 0/5] Fix RISU build for i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Erik Skultety <eskultet@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-VGhlcmUgYXJlIGxpbWl0ZWQgbnVtYmVycyBvZiB0aGUgU0VWIGd1ZXN0cyB0aGF0IGNhbiBiZSBy
-dW4gY29uY3VycmVudGx5Lg0KQSBtYW5hZ2VtZW50IGFwcGxpY2F0aW9ucyBtYXkgbmVlZCB0byBr
-bm93IHRoaXMgbGltaXQgc28gdGhhdCBpdCBjYW4gcGxhY2UNClNFViBWTXMgb24gaG9zdHMgd2hp
-Y2ggaGF2ZSBzdWl0YWJsZSByZXNvdXJjZXMgYXZhaWxhYmxlLg0KDQpDdXJyZW50bHksIHRoaXMg
-bGltaXQgaXMgbm90IGV4cG9zZWQgdG8gdGhlIGFwcGxpY2F0aW9uLiBBZGQgYSBuZXcNCidzZXYt
-bWF4LWd1ZXN0JyBmaWVsZCBpbiB0aGUgcXVlcnktc2V2LWNhcGFiaWxpdGllcyB0byBwcm92aWRl
-IHRoaXMNCmluZm9ybWF0aW9uLg0KDQpDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0
-LmNvbT4NCkNjOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQpDYzogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQpDYzogRGFuaWVsIFAuIEJlcnJhbmfDqSA8YmVy
-cmFuZ2VAcmVkaGF0LmNvbT4NCkNjOiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPg0K
-Q2M6IEVyaWsgU2t1bHRldHkgPGVza3VsdGV0QHJlZGhhdC5jb20+DQpDYzogVG9tIExlbmRhY2t5
-IDxUaG9tYXMuTGVuZGFja3lAYW1kLmNvbT4NClNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2gg
-PGJyaWplc2guc2luZ2hAYW1kLmNvbT4NCi0tLQ0KDQpjaGFuZ2VzIHNpbmNlIHYxOg0KIC0gZG9j
-dW1lbnQgdGhlIG5ldyBmaWVsZCBhbmQgYWRkIChzaW5jZSA0LjEpIGFubm90YXRpb24uDQoNCiBx
-YXBpL3RhcmdldC5qc29uICB8IDkgKysrKysrKy0tDQogdGFyZ2V0L2kzODYvc2V2LmMgfCA5ICsr
-KysrKystLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMo
-LSkNCg0KZGlmZiAtLWdpdCBhL3FhcGkvdGFyZ2V0Lmpzb24gYi9xYXBpL3RhcmdldC5qc29uDQpp
-bmRleCAxZDRkNTRiNjAwLi44Y2Q0ZmM3OTE5IDEwMDY0NA0KLS0tIGEvcWFwaS90YXJnZXQuanNv
-bg0KKysrIGIvcWFwaS90YXJnZXQuanNvbg0KQEAgLTE3NywxMyArMTc3LDE3IEBADQogIyBAcmVk
-dWNlZC1waHlzLWJpdHM6IE51bWJlciBvZiBwaHlzaWNhbCBBZGRyZXNzIGJpdCByZWR1Y3Rpb24g
-d2hlbiBTRVYgaXMNCiAjICAgICAgICAgICAgICAgICAgICAgZW5hYmxlZA0KICMNCisjIEBzZXYt
-bWF4LWd1ZXN0czogbWF4aW11bSBudW1iZXIgb2YgY29uY3VycmVudCBTRVYgZ3Vlc3Qgd2l0aCBT
-RVYtRVMgZGlzYWJsZWQNCisjICAgICAgICAgICAgICAgICAgKHNpbmNlIDQuMSkNCisjDQogIyBT
-aW5jZTogMi4xMg0KICMjDQogeyAnc3RydWN0JzogJ1NldkNhcGFiaWxpdHknLA0KICAgJ2RhdGEn
-OiB7ICdwZGgnOiAnc3RyJywNCiAgICAgICAgICAgICAnY2VydC1jaGFpbic6ICdzdHInLA0KICAg
-ICAgICAgICAgICdjYml0cG9zJzogJ2ludCcsDQotICAgICAgICAgICAgJ3JlZHVjZWQtcGh5cy1i
-aXRzJzogJ2ludCd9LA0KKyAgICAgICAgICAgICdyZWR1Y2VkLXBoeXMtYml0cyc6ICdpbnQnLA0K
-KyAgICAgICAgICAgICdzZXYtbWF4LWd1ZXN0cyc6ICdpbnQnfSwNCiAgICdpZic6ICdkZWZpbmVk
-KFRBUkdFVF9JMzg2KScgfQ0KIA0KICMjDQpAQCAtMjAwLDcgKzIwNCw4IEBADQogIw0KICMgLT4g
-eyAiZXhlY3V0ZSI6ICJxdWVyeS1zZXYtY2FwYWJpbGl0aWVzIiB9DQogIyA8LSB7ICJyZXR1cm4i
-OiB7ICJwZGgiOiAiOENDREQ4REREIiwgImNlcnQtY2hhaW4iOiAiODg4Q0NDRERERUUiLA0KLSMg
-ICAgICAgICAgICAgICAgICAiY2JpdHBvcyI6IDQ3LCAicmVkdWNlZC1waHlzLWJpdHMiOiA1fX0N
-CisjICAgICAgICAgICAgICAgICAgImNiaXRwb3MiOiA0NywgInJlZHVjZWQtcGh5cy1iaXRzIjog
-NSwNCisjICAgICAgICAgICAgICAgICAgInNldi1tYXgtZ3Vlc3RzIiA6IDE1fX0NCiAjDQogIyMN
-CiB7ICdjb21tYW5kJzogJ3F1ZXJ5LXNldi1jYXBhYmlsaXRpZXMnLCAncmV0dXJucyc6ICdTZXZD
-YXBhYmlsaXR5JywNCmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9zZXYuYyBiL3RhcmdldC9pMzg2
-L3Nldi5jDQppbmRleCBjZDc3ZjZiNWQ0Li42ODI5NTg2ZmJlIDEwMDY0NA0KLS0tIGEvdGFyZ2V0
-L2kzODYvc2V2LmMNCisrKyBiL3RhcmdldC9pMzg2L3Nldi5jDQpAQCAtNDg4LDcgKzQ4OCw3IEBA
-IHNldl9nZXRfY2FwYWJpbGl0aWVzKHZvaWQpDQogICAgIGd1Y2hhciAqcGRoX2RhdGEgPSBOVUxM
-Ow0KICAgICBndWNoYXIgKmNlcnRfY2hhaW5fZGF0YSA9IE5VTEw7DQogICAgIHNpemVfdCBwZGhf
-bGVuID0gMCwgY2VydF9jaGFpbl9sZW4gPSAwOw0KLSAgICB1aW50MzJfdCBlYng7DQorICAgIHVp
-bnQzMl90IGVieCwgZWN4LCBlZHg7DQogICAgIGludCBmZDsNCiANCiAgICAgZmQgPSBvcGVuKERF
-RkFVTFRfU0VWX0RFVklDRSwgT19SRFdSKTsNCkBAIC01MDcsNyArNTA3LDcgQEAgc2V2X2dldF9j
-YXBhYmlsaXRpZXModm9pZCkNCiAgICAgY2FwLT5wZGggPSBnX2Jhc2U2NF9lbmNvZGUocGRoX2Rh
-dGEsIHBkaF9sZW4pOw0KICAgICBjYXAtPmNlcnRfY2hhaW4gPSBnX2Jhc2U2NF9lbmNvZGUoY2Vy
-dF9jaGFpbl9kYXRhLCBjZXJ0X2NoYWluX2xlbik7DQogDQotICAgIGhvc3RfY3B1aWQoMHg4MDAw
-MDAxRiwgMCwgTlVMTCwgJmVieCwgTlVMTCwgTlVMTCk7DQorICAgIGhvc3RfY3B1aWQoMHg4MDAw
-MDAxRiwgMCwgTlVMTCwgJmVieCwgJmVjeCwgJmVkeCk7DQogICAgIGNhcC0+Y2JpdHBvcyA9IGVi
-eCAmIDB4M2Y7DQogDQogICAgIC8qDQpAQCAtNTE2LDYgKzUxNiwxMSBAQCBzZXZfZ2V0X2NhcGFi
-aWxpdGllcyh2b2lkKQ0KICAgICAgKi8NCiAgICAgY2FwLT5yZWR1Y2VkX3BoeXNfYml0cyA9IDE7
-DQogDQorICAgIC8qDQorICAgICAqIFRoZSBtYXhpbXVtIG51bWJlciBvZiBTRVYgZ3Vlc3RzIHdp
-dGggU0VWLUVTIGRpc2FibGVkIHRoYXQgY2FuIHJ1bg0KKyAgICAgKiBzaW11bHRhbmVvdXNseS4N
-CisgICAgICovDQorICAgIGNhcC0+c2V2X21heF9ndWVzdHMgPSBlY3ggLSBlZHggKyAxOw0KIG91
-dDoNCiAgICAgZ19mcmVlKHBkaF9kYXRhKTsNCiAgICAgZ19mcmVlKGNlcnRfY2hhaW5fZGF0YSk7
-DQotLSANCjIuMTcuMQ0KDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ
+From: Jan Bobek <jan.bobek@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <a82ec99d-8b5e-6898-c0a7-a3de8e2be07f@gmail.com>
+Subject: Re: [RISU PATCH 0/5] Fix RISU build for i386
+References: <20190408182748.1238-1-jan.bobek@gmail.com>
+ <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+In-Reply-To: <e38bf007-440c-9d6d-c837-e1e52b661075@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Sorry for the delayed reply, the U.S. tax deadline has caught up with
+me, so I spent the last two evenings doing my taxes. (Yuck!)
+
+Anyway...
+
+On 4/8/19 6:18 PM, Richard Henderson wrote:
+> On 4/8/19 8:27 AM, Jan Bobek wrote:
+>> 2. Note the '-std=3Dc99' switch in the command-line above; without it,=
+
+>>    GCC defines the symbol 'i386' to 1 and the preprocessor magic for
+>>    including arch-specific headers in risu.h breaks. Does anyone have
+>>    an idea how to fix this in a more robust way?
+>=20
+> Adding -U$(ARCH) to the command line is probably as good a fix as any.
+
+I didn't know about -U, nice!
+
+>> 3. gas (the GNU assembler) chokes on the syntax of test_i386.s; that's=
+
+>>    why I'm using nasm as the assembler above. Is that intentional? I
+>>    haven't found the nasm dependency mentioned anywhere.
+>=20
+> I think rewriting to not require nasm is better.
+
+Agreed.
+
+>>    Also, nasm will happily emit the UD1 opcode (0F B9) with no
+>>    operands (see test_i386.s). That's a bit surprising to me, since
+>>    Intel's Software Developer's Manual says UD1 has two operands; I'd
+>>    expect at least a follow-up ModR/M byte. gas refuses to assemble
+>>    UD1 with no operands, and gdb's disassembler gets confused when I
+>>    load up the nasm's binary into risu. Is there something obvious
+>>    that I'm missing?
+>=20
+> You are not missing anything -- ud1 should require a modrm byte.
+>=20
+> My suggestion is to use only UD1 as the "break" insn, with the differen=
+t OP_*
+> codes encoded into the modrm byte.
+
+I had to laugh when I read this; this is *exactly* what I had in mind,
+but then I found out there was no ModR/M byte.
+
+>> P.S. This is my first time using git send-email, so please bear with
+>>      me if something goes wrong and/or let me know how I can improve
+>>      my future submissions. Thank you!
+>=20
+> You've done well with git send-email.  ;-)
+
+Thanks a lot! :)
+
+-Jan
+
+
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAlyv7UoACgkQZeg2ldrj
+Ns8oUw//ZFBOn8+Wq3jnR0e7j/WjQ/MsWrQpmY3N0dnvtnm4O8nxYbbcusyLztr1
+ImHrSMu9KL17O6i6hwbGDqrBhoaZdNGMwUPVRi1fGaA0mkacHxOBUnQInPxgMpgB
+Wz7pl0zfMBcMhJhuJ0AHqU0FOBbdPY2cd0+zSOC20KDlmN8tN+4SAM7oW/OaHC1Q
+XNzIlgX3GQHYUPzfQAA2TNya0dH8A3RN4QvHItl5PrIWhtw9gFTsJCsyzAQmRhx/
+xt5FFeGJ+63W3PMR7jR4uWtjPPbSstjbZFDxjB++nqNSagu3UyeOMMNMxe0Wq7aB
+hxLx7PSy6ju7kmV/nXbHDNzbNwyrJ1TVip4bC6y0nnayoduh6BrbSUfsocGzlHxD
+XZdz2t3LggGODuIiY6LacnSdYJhKCEjexq7b5rfLJyzqcEngTdmTbhiq8g21fSo4
+vGIXXU6OLJee3ifHw+94oTj8+1FM40LAi365+TXWKsVkGsrtLeimQjZSOCjt/1lc
+NR7G3Gf1FLyAmK7XnpW/z0w9hMmX06Vc4bLBGB6pqo64zrP3Ieo6eeP8OLSi8MFf
+aTPY3J2pwqbWGHrpc7lETWxo1U1u1IKhw4BNJmGnJIojaui7jwITmDu3FR4hDajG
+yEjk54WN1nGI77nIIS6awT4irqOMPAkQRXPiXukWBQU87/MNr70=
+=/PBZ
+-----END PGP SIGNATURE-----
+
+--5J3APSNVcDpwGuNTMrRsTGN2nMU98mdUJ--
