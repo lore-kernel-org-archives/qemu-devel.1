@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54599)
+Received: from eggs.gnu.org ([209.51.188.92]:57650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1hEsFZ-0002rp-3k
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:13:33 -0400
+	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTd-0006UN-EF
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1hEsFX-0003Wi-Ha
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:13:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:10815)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1hEsFX-0003WA-89
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:13:31 -0400
-Date: Fri, 12 Apr 2019 11:13:26 +0200
-From: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20190412091326.GE16137@beluga.usersys.redhat.com>
-References: <20190411175931.29235-1-brijesh.singh@amd.com>
-	<61c415de-ac47-9818-2b06-b9e46445833f@redhat.com>
-	<7d449ae2-6762-97c2-4930-358f34f3ef4b@amd.com>
-	<869394fb-7b3d-cc01-7329-e931a260e73c@redhat.com>
-	<20190412081912.GC16137@beluga.usersys.redhat.com>
-	<77338015-015c-aaef-d522-11cabbba4214@redhat.com>
+	(envelope-from <zhengxiang9@huawei.com>) id 1hEsTc-0002za-4A
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 05:28:05 -0400
+References: <87va06kvm6.fsf@dusky.pond.sub.org>
+	<59f100b4-f6e9-973d-532b-58fb172a7009@redhat.com>
+	<87imw5fv45.fsf@dusky.pond.sub.org>
+	<abe1d9cd-85bb-2ef8-630f-af28cae6378c@redhat.com>
+	<8736n9eb4s.fsf@dusky.pond.sub.org>
+	<bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
+	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
+	<b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
+	<a8144a1f-364e-cea5-b0a7-05342bdab936@redhat.com>
+	<87bm1fiuo8.fsf@dusky.pond.sub.org>
+	<20190409082852.GB6610@localhost.localdomain>
+	<c03c51a7-1bb0-b05b-9027-2364ab00517c@huawei.com>
+	<87ef693tci.fsf@dusky.pond.sub.org>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <1c7373b5-f6c2-ec3c-b07d-c8eb73a355af@huawei.com>
+Date: Fri, 12 Apr 2019 17:26:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <77338015-015c-aaef-d522-11cabbba4214@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] target/i386: sev: add 'sev-max-guests'
- field to 'query-sev-capabilities'
+In-Reply-To: <87ef693tci.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
+ flash device to save memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +36,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, Laszlo Ersek <lersek@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU
+	Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com, Laszlo Ersek <lersek@redhat.com>
 
-On Fri, Apr 12, 2019 at 10:26:45AM +0200, Paolo Bonzini wrote:
-> On 12/04/19 10:19, Erik Skultety wrote:
-> >> Since this field is not specific to guest configuration, I don't think
-> >> it belongs in query-sev-capabilities; QEMU does not care about >1 guest.
-> > Neither pdh nor cert-chain are specific to the guest config.
->
-> Sort of, they are required to start a guest, aren't they?  But the
 
-Unless you're interested in the measurement, aka attestation, I don't think
-those are required in any way.
 
-Erik
+On 2019/4/11 15:15, Markus Armbruster wrote:
+>> For some historical reasons such as compatibility and extensibility[2], we
+>> restrict both their size to 64MB -- both UEFI and qemu have cold hard
+>> constants.
+> These reasons aren't historical.  But they're valid, and that's all that
+> matters :)
+> 
+>> This will consume a large amount of memory when running multiple VM
+>> simultaneously (each guest needs 128MB).
+> Understood.
+> 
+>> There are accepted ideas proposed by Markus and Laszlo from prior discussion[3]:
+>>
+>> 1) Getting flash memory size from a machine type or property.
+>>
+>> 2) Map the read-only part so it is shared among guests; Map the read-write
+>> part normally.
+>>
+>> The first idea called explicit configuration which may break migration.
+> For any configuration that can break migration, the solution is to have
+> identical configuration on source and destination.
+> 
+>> For the second idea, the only way I can imagine is using a file mapping to
+>> read or write pflash devices so that we can allocate memory on demand. So I
+>> tried to fit mmap() actions into the block layer[4]. However I am not sure
+>> that maping image file whether can work fine for block layer.
+> It adds an odd special case to the block layer.  But then flash devices
+> are an odd user of the block layer.
+> 
+> Normal users use the block layer as a *block* layer: to read and write
+> blocks.
+> 
+> Our flash devices don't do that.  They are *memory* devices, not *block*
+> devices.  Pretty much the only thing the two have in common is
+> persistence of data.  The block layer provides persistence, and I figure
+> that's why it got pressed into service here.
+> 
+> What the flash devices do is keep the complete image contents in memory,
+> with changes written through to disk.
+> 
+> This is pretty much exactly what mmap() does, so using it suggests
+> itself.
+> 
+> It's very much *not* what the block layer does.  mmap() is not even
+> possible for anything but a file backend.
+> 
+> With mmap(), memory gets faulted in on demand, and sharing read-only
+> memory with other VMs should be feasible.  The question is how to use it
+> here.  Is there a sane way to use it without rewriting the flash devices
+> not to use the block layer?
 
-> number of guests is irrelevant.
->
-> > I see why this
-> > should be better suited for query-sev, the same goes for libvirt - I think we
-> > shouldn't have gone with reporting the SEV platform caps in domain capabilities,
-> > we should have IMHO report it both in the host capabilities (platform specific
-> > stuff) and in domain capabilities to indicate that both libvirt and QEMU
-> > support the SEV feature. Having said that, we have a precedent which I think
-> > we might be better off with following rather than splitting the information
-> > among multiple commands.
->
-> For Libvirt, sure.  But I think this doesn't belong in QEMU at all.
-> Libvirt should just use CPUID.
->
-> Paolo
+There are two important changes we may need to pay more attention to if we
+use mmap():
+
+1) Sync/Update flash content from guest memory to a file backend. With mmap()
+we might not have to do the extra sync/update as the block layer do in
+pflash_write().
+2) Live migration.
+
+> 
+>> On the other hand, Laszlo had mentioned the features of QCOW2 and sparse
+>> files which may be nice for pflash block backends. But I am not familiar with
+>> it.
+> Offhand, two QCOW2 features come to mind:
+> 
+> 1. Sparse storage even when the storage substrate can't do sparse.  I
+> consider this one largely irrelevant.  Any decent file system can do
+> sparse.  Archival and network transfer can compress instead.
+> 
+> 2. Snapshots to go with disk snapshots.  *Live* snapshots (the ones that
+> include memory) already have the flash contents in the memory part, so
+> this sems only relevant for "dead" snapshots.
+> 
+> Anything else?
+> 
+
+No more, thanks.:D
+
+Kevin came up with a good idea which might solve my problem.
+See https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg01865.html
+
+-- 
+
+Thanks,
+Xiang
