@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38448)
+Received: from eggs.gnu.org ([209.51.188.92]:38481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4T-0002P2-QH
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:10 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt4W-0002Rc-FZ
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt4S-0004si-PW
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hEt4V-0004u6-0E
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:06:12 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 12 Apr 2019 12:03:45 +0200
-Message-Id: <20190412100354.6409-19-eric.auger@redhat.com>
+Date: Fri, 12 Apr 2019 12:03:46 +0200
+Message-Id: <20190412100354.6409-20-eric.auger@redhat.com>
 In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
 References: <20190412100354.6409-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v3 18/27] hw/vfio/common: Introduce
- hostwin_from_range helper
+Subject: [Qemu-devel] [RFC v3 19/27] hw/vfio/common: Introduce helpers to
+ DMA map/unap a RAM section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com, peterx@redhat.com, yi.l.liu@intel.com, vincent.stehle@arm.com
 
-Let's introduce a hostwin_from_range() helper that returns the
-hostwin encapsulating an IOVA range or NULL if non is found.
-
-This improves the readibility of callers and removes the usage
-of hostwin_found.
+Let's introduce two helpers that allow to DMA map/unmap a RAM
+section. Those helpers will be called for nested stage setup in
+another call site. Also the vfio_listener_region_add/del()
+structure may be clearer.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/vfio/common.c | 37 ++++++++++++++++++-------------------
- 1 file changed, 18 insertions(+), 19 deletions(-)
+ hw/vfio/common.c     | 178 ++++++++++++++++++++++++++-----------------
+ hw/vfio/trace-events |   4 +-
+ 2 files changed, 109 insertions(+), 73 deletions(-)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index cf876d5264..785d9c191c 100644
+index 785d9c191c..cb541330d7 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -494,6 +494,19 @@ static VFIOGuestIOMMU *vfio_alloc_guest_iommu(VFIOCo=
-ntainer *container,
-     return giommu;
+@@ -507,13 +507,116 @@ hostwin_from_range(VFIOContainer *container, hwadd=
+r iova, hwaddr end)
+     return NULL;
  }
 =20
-+static VFIOHostDMAWindow *
-+hostwin_from_range(VFIOContainer *container, hwaddr iova, hwaddr end)
++static int vfio_dma_map_ram_section(VFIOContainer *container,
++                                    MemoryRegionSection *section)
 +{
 +    VFIOHostDMAWindow *hostwin;
++    Int128 llend, llsize;
++    hwaddr iova, end;
++    void *vaddr;
++    int ret;
 +
-+    QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
-+        if (hostwin->min_iova <=3D iova && end <=3D hostwin->max_iova) {
-+            return hostwin;
++    assert(memory_region_is_ram(section->mr));
++
++    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
++    llend =3D int128_make64(section->offset_within_address_space);
++    llend =3D int128_add(llend, section->size);
++    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
++    end =3D int128_get64(int128_sub(llend, int128_one()));
++
++    vaddr =3D memory_region_get_ram_ptr(section->mr) +
++            section->offset_within_region +
++            (iova - section->offset_within_address_space);
++
++    hostwin =3D hostwin_from_range(container, iova, end);
++    if (!hostwin) {
++        error_report("vfio: IOMMU container %p can't map guest IOVA regi=
+on"
++                     " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx,
++                     container, iova, end);
++        return -EFAULT;
++    }
++
++    trace_vfio_dma_map_ram(iova, end, vaddr);
++
++    llsize =3D int128_sub(llend, int128_make64(iova));
++
++    if (memory_region_is_ram_device(section->mr)) {
++        hwaddr pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
++
++        if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
++            trace_vfio_listener_region_add_no_dma_map(
++                memory_region_name(section->mr),
++                section->offset_within_address_space,
++                int128_getlo(section->size),
++                pgmask + 1);
++            return 0;
 +        }
 +    }
-+    return NULL;
++
++    ret =3D vfio_dma_map(container, iova, int128_get64(llsize),
++                       vaddr, section->readonly);
++    if (ret) {
++        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
++                     "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
++                     container, iova, int128_get64(llsize), vaddr, ret);
++        if (memory_region_is_ram_device(section->mr)) {
++            /* Allow unexpected mappings not to be fatal for RAM devices=
+ */
++            return 0;
++        }
++        return ret;
++    }
++    return 0;
++}
++
++static void vfio_dma_unmap_ram_section(VFIOContainer *container,
++                                       MemoryRegionSection *section)
++{
++    Int128 llend, llsize;
++    hwaddr iova, end;
++    bool try_unmap =3D true;
++    int ret;
++
++    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
++    llend =3D int128_make64(section->offset_within_address_space);
++    llend =3D int128_add(llend, section->size);
++    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
++
++    if (int128_ge(int128_make64(iova), llend)) {
++        return;
++    }
++    end =3D int128_get64(int128_sub(llend, int128_one()));
++
++    llsize =3D int128_sub(llend, int128_make64(iova));
++
++    trace_vfio_dma_unmap_ram(iova, end);
++
++    if (memory_region_is_ram_device(section->mr)) {
++        hwaddr pgmask;
++        VFIOHostDMAWindow *hostwin =3D
++            hostwin_from_range(container, iova, end);
++
++        assert(hostwin); /* or region_add() would have failed */
++
++        pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
++        try_unmap =3D !((iova & pgmask) || (int128_get64(llsize) & pgmas=
+k));
++    }
++
++    if (try_unmap) {
++        ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
++        if (ret) {
++            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
++                         "0x%"HWADDR_PRIx") =3D %d (%m)",
++                         container, iova, int128_get64(llsize), ret);
++        }
++    }
 +}
 +
  static void vfio_listener_region_add(MemoryListener *listener,
                                       MemoryRegionSection *section)
  {
-@@ -503,7 +516,6 @@ static void vfio_listener_region_add(MemoryListener *=
-listener,
-     void *vaddr;
+     VFIOContainer *container =3D container_of(listener, VFIOContainer, l=
+istener);
+     hwaddr iova, end;
+-    Int128 llend, llsize;
+-    void *vaddr;
++    Int128 llend;
      int ret;
      VFIOHostDMAWindow *hostwin;
--    bool hostwin_found;
 =20
-     if (vfio_listener_skipped_section(section)) {
-         trace_vfio_listener_region_add_skip(
-@@ -580,15 +592,8 @@ static void vfio_listener_region_add(MemoryListener =
-*listener,
- #endif
+@@ -640,41 +743,10 @@ static void vfio_listener_region_add(MemoryListener=
+ *listener,
      }
 =20
--    hostwin_found =3D false;
--    QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
--        if (hostwin->min_iova <=3D iova && end <=3D hostwin->max_iova) {
--            hostwin_found =3D true;
--            break;
+     /* Here we assume that memory_region_is_ram(section->mr)=3D=3Dtrue *=
+/
+-
+-    vaddr =3D memory_region_get_ram_ptr(section->mr) +
+-            section->offset_within_region +
+-            (iova - section->offset_within_address_space);
+-
+-    trace_vfio_listener_region_add_ram(iova, end, vaddr);
+-
+-    llsize =3D int128_sub(llend, int128_make64(iova));
+-
+-    if (memory_region_is_ram_device(section->mr)) {
+-        hwaddr pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+-
+-        if ((iova & pgmask) || (int128_get64(llsize) & pgmask)) {
+-            trace_vfio_listener_region_add_no_dma_map(
+-                memory_region_name(section->mr),
+-                section->offset_within_address_space,
+-                int128_getlo(section->size),
+-                pgmask + 1);
+-            return;
 -        }
 -    }
 -
--    if (!hostwin_found) {
-+    hostwin =3D hostwin_from_range(container, iova, end);
-+    if (!hostwin) {
-         error_report("vfio: IOMMU container %p can't map guest IOVA regi=
-on"
-                      " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx,
-                      container, iova, end);
-@@ -759,16 +764,10 @@ static void vfio_listener_region_del(MemoryListener=
- *listener,
-=20
-     if (memory_region_is_ram_device(section->mr)) {
-         hwaddr pgmask;
--        VFIOHostDMAWindow *hostwin;
--        bool hostwin_found =3D false;
-+        VFIOHostDMAWindow *hostwin =3D
-+            hostwin_from_range(container, iova, end);
-=20
--        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
--            if (hostwin->min_iova <=3D iova && end <=3D hostwin->max_iov=
-a) {
--                hostwin_found =3D true;
--                break;
--            }
+-    ret =3D vfio_dma_map(container, iova, int128_get64(llsize),
+-                       vaddr, section->readonly);
++    ret =3D vfio_dma_map_ram_section(container, section);
+     if (ret) {
+-        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+-                     "0x%"HWADDR_PRIx", %p) =3D %d (%m)",
+-                     container, iova, int128_get64(llsize), vaddr, ret);
+-        if (memory_region_is_ram_device(section->mr)) {
+-            /* Allow unexpected mappings not to be fatal for RAM devices=
+ */
+-            return;
 -        }
--        assert(hostwin_found); /* or region_add() would have failed */
-+        assert(hostwin); /* or region_add() would have failed */
+         goto fail;
+     }
+-
+     return;
 =20
-         pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-         try_unmap =3D !((iova & pgmask) || (int128_get64(llsize) & pgmas=
+ fail:
+@@ -700,10 +772,6 @@ static void vfio_listener_region_del(MemoryListener =
+*listener,
+                                      MemoryRegionSection *section)
+ {
+     VFIOContainer *container =3D container_of(listener, VFIOContainer, l=
+istener);
+-    hwaddr iova, end;
+-    Int128 llend, llsize;
+-    int ret;
+-    bool try_unmap =3D true;
+=20
+     if (vfio_listener_skipped_section(section)) {
+         trace_vfio_listener_region_del_skip(
+@@ -748,39 +816,7 @@ static void vfio_listener_region_del(MemoryListener =
+*listener,
+          */
+     }
+=20
+-    iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_space);
+-    llend =3D int128_make64(section->offset_within_address_space);
+-    llend =3D int128_add(llend, section->size);
+-    llend =3D int128_and(llend, int128_exts64(TARGET_PAGE_MASK));
+-
+-    if (int128_ge(int128_make64(iova), llend)) {
+-        return;
+-    }
+-    end =3D int128_get64(int128_sub(llend, int128_one()));
+-
+-    llsize =3D int128_sub(llend, int128_make64(iova));
+-
+-    trace_vfio_listener_region_del(iova, end);
+-
+-    if (memory_region_is_ram_device(section->mr)) {
+-        hwaddr pgmask;
+-        VFIOHostDMAWindow *hostwin =3D
+-            hostwin_from_range(container, iova, end);
+-
+-        assert(hostwin); /* or region_add() would have failed */
+-
+-        pgmask =3D (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+-        try_unmap =3D !((iova & pgmask) || (int128_get64(llsize) & pgmas=
 k));
+-    }
+-
+-    if (try_unmap) {
+-        ret =3D vfio_dma_unmap(container, iova, int128_get64(llsize));
+-        if (ret) {
+-            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+-                         "0x%"HWADDR_PRIx") =3D %d (%m)",
+-                         container, iova, int128_get64(llsize), ret);
+-        }
+-    }
++    vfio_dma_unmap_ram_section(container, section);
+=20
+     memory_region_unref(section->mr);
+=20
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index eb589930a5..3c2cd15e3f 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -93,10 +93,10 @@ vfio_iommu_map_notify(const char *op, uint64_t iova_s=
+tart, uint64_t iova_end) "i
+ vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING re=
+gion_add 0x%"PRIx64" - 0x%"PRIx64
+ vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d t=
+o liobn fd %d"
+ vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add=
+ [iommu] 0x%"PRIx64" - 0x%"PRIx64
+-vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, voi=
+d *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
++vfio_dma_map_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "r=
+egion_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
+ vfio_listener_region_add_no_dma_map(const char *name, uint64_t iova, uin=
+t64_t size, uint64_t page_size) "Region \"%s\" 0x%"PRIx64" size=3D0x%"PRI=
+x64" is not aligned to 0x%"PRIx64" and cannot be mapped for DMA"
+ vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING re=
+gion_del 0x%"PRIx64" - 0x%"PRIx64
+-vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"P=
+RIx64" - 0x%"PRIx64
++vfio_dma_unmap_ram(uint64_t start, uint64_t end) "region_del 0x%"PRIx64"=
+ - 0x%"PRIx64
+ vfio_disconnect_container(int fd) "close container->fd=3D%d"
+ vfio_put_group(int fd) "close group->fd=3D%d"
+ vfio_get_device(const char * name, unsigned int flags, unsigned int num_=
+regions, unsigned int num_irqs) "Device %s flags: %u, regions: %u, irqs: =
+%u"
 --=20
 2.20.1
