@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38991)
+Received: from eggs.gnu.org ([209.51.188.92]:46947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt5T-0003df-TV
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:07:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1hEtZo-0001U7-3s
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hEt5S-0005n7-Rw
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:07:11 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 12 Apr 2019 12:03:54 +0200
-Message-Id: <20190412100354.6409-28-eric.auger@redhat.com>
-In-Reply-To: <20190412100354.6409-1-eric.auger@redhat.com>
-References: <20190412100354.6409-1-eric.auger@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hEtZm-0004oS-UM
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 06:38:32 -0400
+References: <1554388475-18329-1-git-send-email-jjherne@linux.ibm.com>
+	<1554388475-18329-2-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f70b7eea-c72c-e8d4-8a91-ec999c45ee09@redhat.com>
+Date: Fri, 12 Apr 2019 12:38:25 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v3 27/27] vfio-pci: Implement the DMA fault
- handler
+In-Reply-To: <1554388475-18329-2-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 01/16] s390 vfio-ccw: Add bootindex
+ property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com, peterx@redhat.com, yi.l.liu@intel.com, vincent.stehle@arm.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Whenever the eventfd is triggered, we retrieve the DMA faults
-from the mmapped fault region and inject them in the iommu
-memory region.
+On 04/04/2019 16.34, Jason J. Herne wrote:
+> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
+> forward boot information into the bios for vfio-ccw devices.
+> 
+> Refactor s390_get_ccw_device() to return device type. This prevents us from
+> having to use messy casting logic in several places.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+[...]
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 9246729..507d513 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -21,11 +21,11 @@
+>  #include "hw/vfio/vfio.h"
+>  #include "hw/vfio/vfio-common.h"
+>  #include "hw/s390x/s390-ccw.h"
+> +#include "hw/s390x/vfio-ccw.h"
+>  #include "hw/s390x/ccw-device.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+>  
+> -#define TYPE_VFIO_CCW "vfio-ccw"
+>  typedef struct VFIOCCWDevice {
+>      S390CCWDevice cdev;
+>      VFIODevice vdev;
+> diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
+> index 7d15a1a..901d805 100644
+> --- a/include/hw/s390x/s390-ccw.h
+> +++ b/include/hw/s390x/s390-ccw.h
+> @@ -27,6 +27,7 @@ typedef struct S390CCWDevice {
+>      CcwDevice parent_obj;
+>      CssDevId hostid;
+>      char *mdevid;
+> +    int32_t bootindex;
+>  } S390CCWDevice;
+>  
+>  typedef struct S390CCWDeviceClass {
+> diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
+> new file mode 100644
+> index 0000000..ee5250d
+> --- /dev/null
+> +++ b/include/hw/s390x/vfio-ccw.h
+> @@ -0,0 +1,28 @@
+> +/*
+> + * vfio based subchannel assignment support
+> + *
+> + * Copyright 2017, 2019 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef HW_VFIO_CCW_H
+> +#define HW_VFIO_CCW_H
+> +
+> +#include "hw/vfio/vfio-common.h"
+> +#include "hw/s390x/s390-ccw.h"
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +#define VFIO_CCW(obj) \
+> +        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
+> +
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +typedef struct VFIOCCWDevice VFIOCCWDevice;
+> +
+> +#endif
+> 
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/vfio/pci.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.h |  1 +
- 2 files changed, 54 insertions(+)
+This causes a build failure with clang:
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 89399a290f..fcbb92cf27 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2820,10 +2820,63 @@ static void vfio_unregister_req_notifier(VFIOPCID=
-evice *vdev)
- static void vfio_dma_fault_notifier_handler(void *opaque)
- {
-     VFIOPCIDevice *vdev =3D opaque;
-+    PCIDevice *pdev =3D &vdev->pdev;
-+    AddressSpace *as =3D pci_device_iommu_address_space(pdev);
-+    IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(as->root);
-+    struct vfio_region_fault_prod header;
-+    struct iommu_fault *queue;
-+    char *queue_buffer =3D NULL;
-+    ssize_t bytes;
-=20
-     if (!event_notifier_test_and_clear(&vdev->dma_fault_notifier)) {
-         return;
-     }
-+
-+    if (!vdev->fault_prod_region.size || !vdev->fault_cons_region.size) =
-{
-+        return;
-+    }
-+
-+    bytes =3D pread(vdev->vbasedev.fd, &header, sizeof(header),
-+                  vdev->fault_prod_region.fd_offset);
-+    if (bytes !=3D sizeof(header)) {
-+        error_report("%s unable to read the fault region header (0x%lx)"=
-,
-+                     __func__, bytes);
-+        return;
-+    }
-+
-+    /* Normally the fault queue is mmapped */
-+    queue =3D (struct iommu_fault *)vdev->fault_prod_region.mmaps[0].mma=
-p;
-+    if (!queue) {
-+        size_t queue_size =3D header.nb_entries * header.entry_size;
-+
-+        error_report("%s: fault queue not mmapped: slower fault handling=
-",
-+                     vdev->vbasedev.name);
-+
-+        queue_buffer =3D g_malloc(queue_size);
-+        bytes =3D  pread(vdev->vbasedev.fd, queue_buffer, queue_size,
-+                       vdev->fault_prod_region.fd_offset + header.offset=
-);
-+        if (bytes !=3D queue_size) {
-+            error_report("%s unable to read the fault queue (0x%lx)",
-+                         __func__, bytes);
-+            return;
-+        }
-+
-+        queue =3D (struct iommu_fault *)queue_buffer;
-+    }
-+
-+    while (vdev->fault_cons_index !=3D header.prod) {
-+        memory_region_inject_faults(iommu_mr, 1,
-+                                    &queue[vdev->fault_cons_index]);
-+        vdev->fault_cons_index =3D
-+            (vdev->fault_cons_index + 1) % header.nb_entries;
-+    }
-+    bytes =3D pwrite(vdev->vbasedev.fd, &vdev->fault_cons_index, 4,
-+                   vdev->fault_cons_region.fd_offset + 4);
-+    if (bytes !=3D 4) {
-+        error_report("%s unable to write the fault region cons index (0x=
-%lx)",
-+                     __func__, bytes);
-+    }
-+    g_free(queue_buffer);
- }
-=20
- static void vfio_register_dma_fault_notifier(VFIOPCIDevice *vdev)
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 24ec43ac81..aef69c4487 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -138,6 +138,7 @@ typedef struct VFIOPCIDevice {
-     EventNotifier dma_fault_notifier;
-     VFIORegion fault_prod_region;
-     VFIORegion fault_cons_region;
-+    uint32_t fault_cons_index;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-     uint32_t device_id;
---=20
-2.20.1
+ https://gitlab.com/huth/qemu/-/jobs/195530081
+
+I'll squash the following patch to fix this issue:
+
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index e6ac21d006..31dd3a2a87 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -26,7 +26,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+
+-typedef struct VFIOCCWDevice {
++struct VFIOCCWDevice {
+     S390CCWDevice cdev;
+     VFIODevice vdev;
+     uint64_t io_region_size;
+@@ -35,7 +35,7 @@ typedef struct VFIOCCWDevice {
+     EventNotifier io_notifier;
+     bool force_orb_pfch;
+     bool warned_orb_pfch;
+-} VFIOCCWDevice;
++};
+
+
+ Thomas
