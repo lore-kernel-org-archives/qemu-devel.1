@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50854)
+Received: from eggs.gnu.org ([209.51.188.92]:51110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1hEmg1-0007eg-BT
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:16:33 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hEmhS-0008J3-MI
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1hEmg0-00005I-73
-	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:16:29 -0400
-Mime-Version: 1.0
-Message-Id: <17c56d46-117c-4b8b-a60f-ea7d1725dfc8@www.fastmail.com>
-In-Reply-To: <20190411161013.4514-4-clg@kaod.org>
-References: <20190411161013.4514-1-clg@kaod.org>
-	<20190411161013.4514-4-clg@kaod.org>
-Date: Thu, 11 Apr 2019 23:16:22 -0400
-From: "Andrew Jeffery" <andrew@aj.id.au>
-Content-Type: text/plain;charset=utf-8
+	(envelope-from <joel.stan@gmail.com>) id 1hEmhR-0000k4-Nz
+	for qemu-devel@nongnu.org; Thu, 11 Apr 2019 23:17:58 -0400
+MIME-Version: 1.0
+References: <20190328062222.8409-1-joel@jms.id.au>
+	<20190328062222.8409-2-joel@jms.id.au>
+	<CAFEAcA_K1Rv1G-s=ndVYX6i_BvWME6ToShL6ZBpB4gnE3zdZdA@mail.gmail.com>
+	<89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
+In-Reply-To: <89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri, 12 Apr 2019 03:17:40 +0000
+Message-ID: <CACPK8Xc_WeP3xuimjTBFRArteecikin9Qj8ZoCW-J2qBY4C=5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_3/3=5D_aspeed=3A_use_sysbus=5Fin?=
- =?utf-8?q?it=5Fchild=5Fobj=28=29_to_initialize_children?=
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw: timer: Add ASPEED RTC device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+Thanks for the review Peter and Cedric.
 
-
-On Fri, 12 Apr 2019, at 01:40, C=C3=A9dric Le Goater wrote:
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-
-> ---
->  hw/arm/aspeed_soc.c | 50 ++++++++++++++++++--------------------------=
--
->  1 file changed, 20 insertions(+), 30 deletions(-)
->=20
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index 9b601709e93c..110956828c44 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -212,12 +212,11 @@ static void aspeed_soc_init(Object *obj)
->      AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
->      int i;
-> =20
-> -    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
-> -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-> +    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cp=
-u),
-> +                            sc->info->cpu_type, &error_abort, NULL);
-> =20
-> -    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
-> -    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu)=
-,
-> +                          TYPE_ASPEED_SCU);
->      qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-> @@ -227,36 +226,29 @@ static void aspeed_soc_init(Object *obj)
->      object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
->                                "hw-prot-key", &error_abort);
-> =20
-> -    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
-> -    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic)=
-,
-> +                          TYPE_ASPEED_VIC);
-> =20
-> -    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEE=
-D_TIMER);
-> -    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl)=
-, NULL);
-> +    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-> +                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
->      object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
->                                     OBJECT(&s->scu), &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());=
-
-> =20
-> -    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
-> -    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c)=
-,
-> +                          TYPE_ASPEED_I2C);
-> =20
-> -    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename=
-);
-> -    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc)=
-,
-> +                          sc->info->fmc_typename);
->      object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs=
-",
->                                &error_abort);
-> =20
->      for (i =3D 0; i < sc->info->spis_num; i++) {
-> -        object_initialize(&s->spi[i], sizeof(s->spi[i]),
-> -                          sc->info->spi_typename[i]);
-> -        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), =
-NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default())=
-;
-> +        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-> +                              sizeof(s->spi[i]), sc->info->spi_typena=
-me[i]);
->      }
-> =20
-> -    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
-> -    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sd=
-mc),
-> +                          TYPE_ASPEED_SDMC);
->      qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-> @@ -265,16 +257,14 @@ static void aspeed_soc_init(Object *obj)
->                                "max-ram-size", &error_abort);
-> =20
->      for (i =3D 0; i < sc->info->wdts_num; i++) {
-> -        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_=
-WDT);
-> -        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), =
-NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default())=
-;
-> +        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-> +                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
->          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
->                                      sc->info->silicon_rev);
->      }
-> =20
-> -    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMA=
-C100);
-> -    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100)=
-, NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());=
-
-> +    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-> +                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
->  }
-> =20
->  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-> --=20
-> 2.20.1
->=20
+On Thu, 11 Apr 2019 at 15:30, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
+> On 4/11/19 5:25 PM, Peter Maydell wrote:
+> >> +
+> >> +#define COUNTER1        (0x00 / 4)
+> >> +#define COUNTER2        (0x04 / 4)
+> >> +#define ALARM           (0x08 / 4)
+> >> +#define CONTROL         (0x10 / 4)
+> >> +#define ALARM_STATUS    (0x14 / 4)
+> >
+> > Not mandatory, but you might like the REG32() macro in
+> > hw/registerfields.h which defines A_FOO and R_FOO
+> > constants for you for the addresses and the indexes.
+>
+> Yes. May be we should start using these macros in all our models.
+
+I don't like them as you can no longer jump between the definition and
+the use of the defines.
+
+>
+> >
+> >> +
+> >> +#define RTC_UNLOCKED    BIT(1)
+> >> +#define RTC_ENABLED     BIT(0)
+> >> +
+> >> +static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
+> >> +{
+> >> +    struct tm tm;
+> >> +    uint32_t year, cent;
+> >> +    uint32_t reg1 =3D rtc->reg[COUNTER1];
+> >> +    uint32_t reg2 =3D rtc->reg[COUNTER2];
+> >> +
+> >> +    tm.tm_mday =3D (reg1 >> 24) & 0x1f;
+> >> +    tm.tm_hour =3D (reg1 >> 16) & 0x1f;
+> >> +    tm.tm_min =3D (reg1 >> 8) & 0x3f;
+> >> +    tm.tm_sec =3D (reg1 >> 0) & 0x3f;
+> >
+> > Shift by zero ?
+> >
+> > Consider using extract32() rather than by-hand shift and mask.
+
+I looked at these and found them more confusing than writing what was
+actually happening.
+
+This code came from the Linux kernel driver, which I wrote, so I know
+it's correct. The shift by zero is there to follow the pattern of the
+code proceeding it, again to stop mistakes.
+
+If we require using these helper macros then I can make the change. If
+it's optional then I would prefer to leave it as is.
+
+>
+> What about the FIELD*() macros in hw/registerfields.h ?
+>
+
+> >> +static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
+> >> +{
+> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >> +
+> >> +    dc->realize =3D aspeed_rtc_realize;
+> >
+> > This is missing a reset function and vmstate.
+
+Ok, I can add those.
+
+vmstate and migration is a foreign concept for the small ARM machines.
+As well as being a developer, I am an end user of Qemu for them (the
+aspeeds, microbit), and the use case is to boot up a firmware and
+check that it does correct thing. I've never considered saving the
+state and resming it, and can't think of a situation where that would
+be done.
+
+If we're adding it for consistency then I understand. I don't think it
+sees any testing though.
+
+Cheers,
+
+Joel
