@@ -2,83 +2,92 @@ Return-Path: <SRS0=wsBa=SO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D885BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33352C10F0E
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1479218A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBD6B2070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Apr 2019 21:09:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVBkuDZD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1479218A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pp+2YiGv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD6B2070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42665 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42667 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF3PP-0001iL-Rd
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 17:08:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51384)
+	id 1hF3QF-0002NZ-5W
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 17:09:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3NX-0000QC-Fg
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hF3OK-00017K-R7
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hF3NV-00056g-Uz
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:06:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36983)
+	(envelope-from <richard.henderson@linaro.org>) id 1hF3OI-0005UV-U4
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:20 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34369)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
-	id 1hF3NV-000566-Nu; Fri, 12 Apr 2019 17:06:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w10so13620305wrm.4;
-	Fri, 12 Apr 2019 14:06:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=P2WQNyUSQ57RzW0BhUh2sYxUZ68LvhtaLDPgKczx1Dc=;
-	b=GVBkuDZDoUch2S5UyFd7UTdIlLalrfLmBCuWEDUwkc/I2fy0TidiF5VfL0OCn20R13
-	H24ExyRdCWHDBZJdjhzh2qHRJQqhvaktJf0mJBk7w6mwpzFDHnkhHeRGtJIjTMhE83J0
-	pCHZRAtdHAPEyA/+2jFfCsyhGDmxQDEkPHg7Lwc8O3ncPgcFkkd2xf6ntkyFjAb/rSEt
-	V3HA67MZ6VQSWOI2pCdlVJ0+f9qeSZlN+0sJWSSQZEoP0TphV6C2Yq36Lx6pzMvaFonM
-	lx1a7ZW4WWW1T/V6C6Z9dFbY6pzZD8NBJmxblm81npSzofclv9nxmpJ+4SsuiQZEU743
-	+2dg==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hF3OI-0005Tb-7V
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 17:07:18 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b3so5721606pfd.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 14:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=/fpdNSrmAlv56hbSOunonEnKPski+/RXwm7yB/Vi4b8=;
+	b=Pp+2YiGvpmkS73x/Ou0a/6hZssS5PsieH0VUkzTVULZIQCttGPUcFcsTYxFv5+Y2Pa
+	sMVv/IBeAkRnE3lNAOeHPrmL9F7l53bwLNBuj57ZNOqps3TQTccrnkjlhTX9iDxO+ioT
+	haGPE5u/tRPxZJbBH0N2R+Yl4L2Tza8tnIN3AGxUMybQCboL1m5VbxfooORYcPzQdxIM
+	uRW2ZCmHagmlJMJxT+quLHa5TMHArwRtBReELl1T4o9um/J+hZF9HdfKfhkz+hTVF1hq
+	3vyXmW5JER6yONurrvlj1DZr2jK/73LphoI0XFZU/RLQbh4dn6lC3qMxcWi1MsONHuN6
+	9yhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=P2WQNyUSQ57RzW0BhUh2sYxUZ68LvhtaLDPgKczx1Dc=;
-	b=SeW1hsGsqfWqxGPIRd4cfKkVCvZ92p01Fhn1YL2FSlKoFho3hi97phoikZ7Nn8Tg0W
-	wZ2YBFYZ8rmNcjy1S7IP2pq7W50s2IHjjCAG3J/auuRbgba5dmMjGW56xmKKaw65eQwy
-	gdGo1+l94yv5gH8Hjj/YXlzFVdVAAwVa1KOeb7cZ4X3R5VB8Gksygr+4IWKZVlheKTxP
-	oC53mqXjsxHSWBjux6ytjLUoGWeNzc6J64NkV5tj0/+gnDsmKVHXK5Uo0zpZd8c7TYKa
-	5Wtlx927FGdF3XBpCHE7MB2pqv6gI1Jvz9piAijCDzMIpn0qMmql/IIfu3JfPwS9ji9B
-	vLwQ==
-X-Gm-Message-State: APjAAAXXqpBGXlXEjaWSdqzC/dhAjyNOUySmsWl0gr5VDklEhMBG13Hz
-	y8/SGpGg2V/J0LaSxmhDm0oo/wmp
-X-Google-Smtp-Source: APXvYqxZHdOcVzCKdMRMZusPFErQ49Fk0N5AuDFiiLb2SqStf4MwMpDNrgL5S+2N0KXC5nOGCBcFqg==
-X-Received: by 2002:a5d:4750:: with SMTP id o16mr34046381wrs.206.1555103188614;
-	Fri, 12 Apr 2019 14:06:28 -0700 (PDT)
-Received: from localhost (x4d0c5397.dyn.telefonica.de. [77.12.83.151])
-	by smtp.gmail.com with ESMTPSA id
-	c16sm11723251wme.31.2019.04.12.14.06.27
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/fpdNSrmAlv56hbSOunonEnKPski+/RXwm7yB/Vi4b8=;
+	b=dgMrv+Lls020ueaIWA+N+9lTUdc7Ajzi/s7dgzLo8R83kwktFdX4hTpIVw9kZbKNA/
+	VDUjK3FdV3gIU3uwK3QQAGEYmaw1Tl9u8nSrcvzSxOH9wBPxJuzGXD+nm/DFitNPQXXs
+	vFmSKQPpBsn0ICyPdCf9yWAhI7KrA5HUErrXb8eOnv/kkvd4HzCsJRzo8HWw2wYNxwRi
+	Hcli/+vqP9FaXeCl2UIW2QR6yHOS7O1+K12CfJBLGgPc9WwnO0kC+kIdkqnXDroI3zM1
+	zjBVbwkoX4EcFnsP4QhVDP2ER5Qkh9/Ejn8cGjsPaCOeTrM6krnAplVqfCnhTh0Lgvj8
+	YBAw==
+X-Gm-Message-State: APjAAAXjx+Deacl8B2oWiATTz6HOSw5Xsf6tUDooN5ykSxwJXIy0Y7Jk
+	H4yFWwLrrKN3sUphb6mZmFSofQ==
+X-Google-Smtp-Source: APXvYqz+JPpyfoAs8VBABEaZ8LXJbRn6rCCFU2ZO77GGnQWG7d5mi5iOg0/DciqgrDlG7QaP6H23qg==
+X-Received: by 2002:a63:7943:: with SMTP id u64mr55117260pgc.91.1555103233996; 
+	Fri, 12 Apr 2019 14:07:13 -0700 (PDT)
+Received: from [172.20.98.58] (rrcs-173-197-98-123.west.biz.rr.com.
+	[173.197.98.123]) by smtp.gmail.com with ESMTPSA id
+	129sm40462316pgc.24.2019.04.12.14.07.11
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 Apr 2019 14:06:27 -0700 (PDT)
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-To: qemu-devel@nongnu.org,
-	hpoussin@reactos.org
-Date: Fri, 12 Apr 2019 23:06:16 +0200
-Message-Id: <1555103178-21894-3-git-send-email-atar4qemu@gmail.com>
-X-Mailer: git-send-email 2.7.2
-In-Reply-To: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
-References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	Fri, 12 Apr 2019 14:07:12 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-4-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
+Date: Fri, 12 Apr 2019 11:05:42 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190411100836.646-4-david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 2/4] 40p and prep: implement PCI bus mastering
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,73 +99,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190412210616.FKyxAX2yvatF87Fruqag1_du8CPwxaRASJoFpKh-4MA@z>
+Message-ID: <20190412210542.hy8dRUKy1pFr8GTE0EZ93A6Lu7j-6AJYaQLBy4LuHvI@z>
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
----
- hw/pci-host/prep.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+On 4/11/19 12:07 AM, David Hildenbrand wrote:
+> +    static const GVecGen3 g[5] = {
+> +        { .fni8 = gen_acc8_i64, },
+> +        { .fni8 = gen_acc16_i64, },
+> +        { .fni8 = gen_acc32_i64, },
+> +        { .fni8 = gen_acc_i64, },
+> +        { .fno = gen_helper_gvec_vacc128, },
+> +    };
 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 8b9e1fd..94b7465 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -62,6 +62,7 @@ typedef struct PRePPCIState {
-     AddressSpace pci_io_as;
-     MemoryRegion pci_io;
-     MemoryRegion pci_io_non_contiguous;
-+    MemoryRegion pci_io_system;
-     MemoryRegion pci_memory;
-     MemoryRegion pci_intack;
-     MemoryRegion bm;
-@@ -146,7 +147,7 @@ static uint64_t raven_io_read(void *opaque, hwaddr addr,
-     uint8_t buf[4];
- 
-     addr = raven_io_address(s, addr);
--    address_space_read(&s->pci_io_as, addr + 0x80000000,
-+    address_space_read(&s->pci_io_as, addr,
-                        MEMTXATTRS_UNSPECIFIED, buf, size);
- 
-     if (size == 1) {
-@@ -178,7 +179,7 @@ static void raven_io_write(void *opaque, hwaddr addr,
-         g_assert_not_reached();
-     }
- 
--    address_space_write(&s->pci_io_as, addr + 0x80000000,
-+    address_space_write(&s->pci_io_as, addr,
-                         MEMTXATTRS_UNSPECIFIED, buf, size);
- }
- 
-@@ -276,14 +277,21 @@ static void raven_pcihost_initfn(Object *obj)
-     MemoryRegion *address_space_mem = get_system_memory();
-     DeviceState *pci_dev;
- 
--    memory_region_init(&s->pci_io, obj, "pci-io", 0x3f800000);
-+    memory_region_init(&s->pci_io, obj, "pci-io", UINT32_MAX);
-     memory_region_init_io(&s->pci_io_non_contiguous, obj, &raven_io_ops, s,
-                           "pci-io-non-contiguous", 0x00800000);
-     memory_region_init(&s->pci_memory, obj, "pci-memory", 0x3f000000);
-     address_space_init(&s->pci_io_as, &s->pci_io, "raven-io");
- 
-     /* CPU address space */
--    memory_region_add_subregion(address_space_mem, 0x80000000, &s->pci_io);
-+    memory_region_add_subregion_overlap(address_space_mem, 0x0,
-+                                        &s->pci_io, -1);
-+
-+    memory_region_init_alias(&s->pci_io_system,  obj, "pci-io-system",
-+                             &s->pci_io, 0x0000000, 0x3f800000);
-+
-+    memory_region_add_subregion(address_space_mem, 0x80000000,
-+                                &s->pci_io_system);
-     memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
-                                         &s->pci_io_non_contiguous, 1);
-     memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci_memory);
--- 
-2.7.2
+Vector versions of the first four are fairly simple too.
 
+static void gen_acc_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+{
+    tcgv_vec t = tcg_temp_new_vec_matching(d);
+
+    tcg_gen_add_vec(vece, t, a, b);
+    tcg_gen_cmp_vec(TCG_COND_LTU, vece, d, r, a);  /* produces -1 for carry */
+    tcg_gen_neg_vec(vece, d, d);                 /* convert to +1 for carry */
+}
+
+  { .fni8 = gen_acc8_i64,
+    .fniv = gen_acc_vec,
+    .opc = INDEX_op_cmp_vec,
+    .vece = MO_8 },
+  ...
+
+
+I'm surprised that you're expanding the 128-bit addition out-of-line.
+One possible expansion is
+
+  tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
+  tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
+  tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+  /* carry out in th */
+
+
+r~
 
