@@ -2,78 +2,78 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D1FC10F0E
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 01:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 039A3C10F0E
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 01:16:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56DB7218C3
+	by mail.kernel.org (Postfix) with ESMTPS id AF0BD2084E
 	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 01:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I06EI0pi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56DB7218C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EkwMKK8b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0BD2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44991 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44993 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF7Gx-0001Aj-Gx
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 21:15:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36717)
+	id 1hF7Gy-0001Ao-0J
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 21:16:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hF7Ey-0008Ri-1N
+	(envelope-from <jbi.octave@gmail.com>) id 1hF7Ey-0008Rj-Lm
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hF7Ew-0000ib-CT
+	(envelope-from <jbi.octave@gmail.com>) id 1hF7Ex-0000jV-Hg
 	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:13:56 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37867)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54478)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
-	id 1hF7Eu-0000h9-9g
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:13:54 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v14so12982742wmf.2
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 18:13:51 -0700 (PDT)
+	id 1hF7Ex-0000is-7f
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:13:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id c1so13291451wml.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 18:13:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=FeXe8RFIVGBeVpBLaXWlnd5FFTp3tZwvMuAxPZUccqw=;
-	b=I06EI0piQdj2rjxRt9bF7uvs/UAshtxhBmtT7b6Y6DIVJC3hfc2EaVk/M1bss7AcTY
-	xSfLpQ8ObfQkx4591tZA6QUjFshwlJxRvb51aYF0AzOVq03AOxsXXCMQ7wmT1vtuv8af
-	RSKJXHthFInt9h9KIVB7NVZ24BnT5kaXJvfcSm88fwRmLSDur+jzForK2WOyqNT2qBsX
-	kG0bK280GbxVZPn7PfALfy+/bOEPHQ35UMqw5iQ66pxnSliaDh7xrDwOjoZmRfghtC0c
-	7J259gQQyL7d7orxR/Za+etoWhZ62pcTwv545ukx8K5ZjuB+ryf401UBP56VDZ8/oSWE
-	cRWw==
+	bh=Jl7grZRlcRQRHYnUtEAgI42E5FYoB/4xEw8V0mnj7jQ=;
+	b=EkwMKK8b4RrwPIGW42asFdqaWveLVgO3w7MX4pBc9fhs1DA7rV01A/sa4jsT0zXb1O
+	KtuRhO3qa84a4ArOL0PMy3CM+gMpCMxUrSjMTMnm7CBrxS7OfkT+bAH+93uQA13pGWyB
+	apg0whG7+xbIRgqyTTqaxv1IFGlCIk5SBzLvo+CRzhSLSk1DmQUqOVKZjNfcxS2wLOH/
+	72Rxi9gcx0YJDJ7Fa0U2gkikoFIuDepq15AIwhiK4tVVAB8pKeSjlfeyTmNjanNdSLBS
+	yiEz68Y4rnTL2tUaGxQFOcHrqmw/5B/S+HcXHto2djGGXidNHy8PsMvDpt05wGVTMlaA
+	2B6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=FeXe8RFIVGBeVpBLaXWlnd5FFTp3tZwvMuAxPZUccqw=;
-	b=VKfl4Ta3Ct28uwtNE+Pl+V7hFj2A/agkZ4wBIUpa3JXG+bJmy5y7tFH9Q6cUESCGPQ
-	d2YDGVXWBoTmF98YNXzLsSChe59MWPdWpcVm1EsJ58CbDilhqem65MA8+UNMCzjd1St+
-	OcabzQ99ikSCuUJ3EAgjWwSvgd3gvcMjMO6EBb6zub4UI3/9w1IhOdS9Ofcgs+YGB05D
-	BH/JZFFrh07mgGlKAhJYC43zD5s3/Fx332WiuxUJWIVkE5sDmBpWlO2NgZYcqcK9gG4g
-	0aILhr3giHkvt52qxW9l8pEjN6z7+ueamT67x2v+plegb/OxE/dHIivH0Kv5mmEnQPqr
-	BzFQ==
-X-Gm-Message-State: APjAAAVb8EpP/gKArLW23dvgOKu9aBXtzxo3kmN5YVWfOiBKzX2HHx9z
-	cgjzmJBVipPLrH75y1756CPhnm/876GE
-X-Google-Smtp-Source: APXvYqz54MWqjpzvXzEwnC1HbdkyhNwAdeJlR/vZJDPBdZ3oGCefYAKODgEMLUXb/M/9FJNVX9ERdQ==
-X-Received: by 2002:a1c:d7:: with SMTP id 206mr12605541wma.69.1555118030683;
-	Fri, 12 Apr 2019 18:13:50 -0700 (PDT)
+	bh=Jl7grZRlcRQRHYnUtEAgI42E5FYoB/4xEw8V0mnj7jQ=;
+	b=hTL/EDfIl3Y2O+W2KgozzlWXXHeOnZaVg2BAvrKVQvCbOfui5Oh8nTqxcjDBU0g8nt
+	yocwkyRUCYGz9K1RBJTcplFfacEmFvgP1xcwBI5HjEFCMi6SN64F36avqnpIFsJOP6rA
+	R9a1isyA50j1oGsV94SYloU7YSJjGXLvkcHVQs+n3rc0qtAjaas3XojLZPPBJfvXy9n/
+	C7wGCBUh9WgoFnR0IWtzerM6x+1Ged5rGHqzPpdUP4Wduz0WV6U91qyyX3DRd2Dshoe0
+	27zXLRjPzIA5/QCX0Fs5nuetTQ6QE67Otv8Jbom6dDCpJ+R3bvxcL1iDoFmHWfacu/t0
+	O1EQ==
+X-Gm-Message-State: APjAAAW2HHJ4L+JBPxQoD6RUXKZdPLLvLiZr+atEOr0SKNmnO3zRzymI
+	c80AH/pEgy/6rnxABvSAmjprHMeW7Mmc
+X-Google-Smtp-Source: APXvYqyByGpOFF1U8ssc+Ww/MV71A50kGa4wa6r8LvtVcBbLMmIuNH9J0PIWltJLkc8cfK/uNl7HeA==
+X-Received: by 2002:a1c:2109:: with SMTP id h9mr13869692wmh.68.1555118033879; 
+	Fri, 12 Apr 2019 18:13:53 -0700 (PDT)
 Received: from ninjahub.lan (host-2-103-80-5.as13285.net. [2.103.80.5])
 	by smtp.gmail.com with ESMTPSA id
-	g13sm7398293wmh.11.2019.04.12.18.13.49
+	g13sm7398293wmh.11.2019.04.12.18.13.53
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 12 Apr 2019 18:13:50 -0700 (PDT)
+	Fri, 12 Apr 2019 18:13:53 -0700 (PDT)
 From: Jules Irenge <jbi.octave@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 13 Apr 2019 02:13:00 +0100
-Message-Id: <20190413011302.6610-2-jbi.octave@gmail.com>
+Date: Sat, 13 Apr 2019 02:13:01 +0100
+Message-Id: <20190413011302.6610-3-jbi.octave@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190413011302.6610-1-jbi.octave@gmail.com>
 References: <20190413011302.6610-1-jbi.octave@gmail.com>
@@ -81,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v4 1/3] target/mips: add or remove space to fix
- checkpatch errors
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v4 2/3] target/mips: realign comments to fix
+ checkpatch warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,264 +101,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190413011300.qXvRgNwpWCoNO-jk67dYD3suO3pBP-HD8b9dGosRnkc@z>
+Message-ID: <20190413011301.rO0VnthZNyIkY7bDVMABCRKv0EaRex8e6RdUq8DsZPs@z>
 
-Add or remove space to fix errors issued by checkpatch.pl tool
-"ERROR: spaces required around that..."
-"ERROR: space required after that..."
-"ERROR: space required before the open parenthesis"
-"ERROR: space required after that..."
-"ERROR: space prohibited between function name and open parenthesis"
-"ERROR: code indent should never use tabs"
+Realign comments to fix warnings issued by checkpatc.pl tool
+"WARNING: Block comments use a leading /* on a separate line"
 within "target/mips/cpu.h" file.
 
 Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
 ---
- target/mips/cpu.h | 162 +++++++++++++++++++++++-----------------------
- 1 file changed, 81 insertions(+), 81 deletions(-)
+ target/mips/cpu.h | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index a10eeb0de3..4bfa24bda0 100644
+index 4bfa24bda0..57af560e34 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -22,10 +22,10 @@ typedef struct CPUMIPSTLBContext CPUMIPSTLBContext;
- 
- typedef union wr_t wr_t;
- union wr_t {
--    int8_t  b[MSA_WRLEN/8];
--    int16_t h[MSA_WRLEN/16];
--    int32_t w[MSA_WRLEN/32];
--    int64_t d[MSA_WRLEN/64];
-+    int8_t  b[MSA_WRLEN / 8];
-+    int16_t h[MSA_WRLEN / 16];
-+    int32_t w[MSA_WRLEN / 32];
-+    int64_t d[MSA_WRLEN / 64];
+@@ -37,7 +37,8 @@ union fpr_t {
+ /* FPU/MSA register mapping is not tested on big-endian hosts. */
+     wr_t     wr;   /* vector data */
  };
- 
- typedef union fpr_t fpr_t;
-@@ -71,16 +71,16 @@ struct CPUMIPSFPUContext {
- #define FCR31_FS 24
- #define FCR31_ABS2008 19
- #define FCR31_NAN2008 18
--#define SET_FP_COND(num,env)     do { ((env).fcr31) |= ((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
--#define CLEAR_FP_COND(num,env)   do { ((env).fcr31) &= ~((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
-+#define SET_FP_COND(num, env)     do { ((env).fcr31) |= ((num) ? (1 << ((num) + 24)) : (1 << 23)); } while (0)
-+#define CLEAR_FP_COND(num, env)   do { ((env).fcr31) &= ~((num) ? (1 << ((num) + 24)) : (1 << 23)); } while (0)
- #define GET_FP_COND(env)         ((((env).fcr31 >> 24) & 0xfe) | (((env).fcr31 >> 23) & 0x1))
- #define GET_FP_CAUSE(reg)        (((reg) >> 12) & 0x3f)
- #define GET_FP_ENABLE(reg)       (((reg) >>  7) & 0x1f)
- #define GET_FP_FLAGS(reg)        (((reg) >>  2) & 0x1f)
--#define SET_FP_CAUSE(reg,v)      do { (reg) = ((reg) & ~(0x3f << 12)) | ((v & 0x3f) << 12); } while(0)
--#define SET_FP_ENABLE(reg,v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | ((v & 0x1f) << 7); } while(0)
--#define SET_FP_FLAGS(reg,v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | ((v & 0x1f) << 2); } while(0)
--#define UPDATE_FP_FLAGS(reg,v)   do { (reg) |= ((v & 0x1f) << 2); } while(0)
-+#define SET_FP_CAUSE(reg, v)      do { (reg) = ((reg) & ~(0x3f << 12)) | ((v & 0x3f) << 12); } while (0)
-+#define SET_FP_ENABLE(reg, v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | ((v & 0x1f) << 7); } while (0)
-+#define SET_FP_FLAGS(reg, v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | ((v & 0x1f) << 2); } while (0)
-+#define UPDATE_FP_FLAGS(reg, v)   do { (reg) |= ((v & 0x1f) << 2); } while (0)
- #define FP_INEXACT        1
- #define FP_UNDERFLOW      2
- #define FP_OVERFLOW       4
-@@ -95,25 +95,25 @@ struct CPUMIPSFPUContext {
- typedef struct CPUMIPSMVPContext CPUMIPSMVPContext;
- struct CPUMIPSMVPContext {
-     int32_t CP0_MVPControl;
--#define CP0MVPCo_CPA	3
--#define CP0MVPCo_STLB	2
--#define CP0MVPCo_VPC	1
--#define CP0MVPCo_EVP	0
-+#define CP0MVPCo_CPA    3
-+#define CP0MVPCo_STLB   2
-+#define CP0MVPCo_VPC    1
-+#define CP0MVPCo_EVP    0
-     int32_t CP0_MVPConf0;
--#define CP0MVPC0_M	31
--#define CP0MVPC0_TLBS	29
--#define CP0MVPC0_GS	28
--#define CP0MVPC0_PCP	27
--#define CP0MVPC0_PTLBE	16
--#define CP0MVPC0_TCA	15
--#define CP0MVPC0_PVPE	10
--#define CP0MVPC0_PTC	0
-+#define CP0MVPC0_M      31
-+#define CP0MVPC0_TLBS   29
-+#define CP0MVPC0_GS     28
-+#define CP0MVPC0_PCP    27
-+#define CP0MVPC0_PTLBE  16
-+#define CP0MVPC0_TCA    15
-+#define CP0MVPC0_PVPE   10
-+#define CP0MVPC0_PTC    0
-     int32_t CP0_MVPConf1;
--#define CP0MVPC1_CIM	31
--#define CP0MVPC1_CIF	30
--#define CP0MVPC1_PCX	20
--#define CP0MVPC1_PCP2	10
--#define CP0MVPC1_PCP1	0
-+#define CP0MVPC1_CIM    31
-+#define CP0MVPC1_CIF    30
-+#define CP0MVPC1_PCX    20
-+#define CP0MVPC1_PCP2   10
-+#define CP0MVPC1_PCP1   0
- };
- 
- typedef struct mips_def_t mips_def_t;
-@@ -481,44 +481,44 @@ struct CPUMIPSState {
+-/* define FP_ENDIAN_IDX to access the same location
++/*
++ *define FP_ENDIAN_IDX to access the same location
+  * in the fpr_t union regardless of the host endianness
   */
-     int32_t CP0_Random;
-     int32_t CP0_VPEControl;
--#define CP0VPECo_YSI	21
--#define CP0VPECo_GSI	20
--#define CP0VPECo_EXCPT	16
--#define CP0VPECo_TE	15
--#define CP0VPECo_TargTC	0
-+#define CP0VPECo_YSI    21
-+#define CP0VPECo_GSI    20
-+#define CP0VPECo_EXCPT  16
-+#define CP0VPECo_TE     15
-+#define CP0VPECo_TargTC 0
-     int32_t CP0_VPEConf0;
--#define CP0VPEC0_M	31
--#define CP0VPEC0_XTC	21
--#define CP0VPEC0_TCS	19
--#define CP0VPEC0_SCS	18
--#define CP0VPEC0_DSC	17
--#define CP0VPEC0_ICS	16
--#define CP0VPEC0_MVP	1
--#define CP0VPEC0_VPA	0
-+#define CP0VPEC0_M      31
-+#define CP0VPEC0_XTC    21
-+#define CP0VPEC0_TCS    19
-+#define CP0VPEC0_SCS    18
-+#define CP0VPEC0_DSC    17
-+#define CP0VPEC0_ICS    16
-+#define CP0VPEC0_MVP    1
-+#define CP0VPEC0_VPA    0
-     int32_t CP0_VPEConf1;
--#define CP0VPEC1_NCX	20
--#define CP0VPEC1_NCP2	10
--#define CP0VPEC1_NCP1	0
-+#define CP0VPEC1_NCX    20
-+#define CP0VPEC1_NCP2   10
-+#define CP0VPEC1_NCP1   0
-     target_ulong CP0_YQMask;
-     target_ulong CP0_VPESchedule;
-     target_ulong CP0_VPEScheFBack;
-     int32_t CP0_VPEOpt;
--#define CP0VPEOpt_IWX7	15
--#define CP0VPEOpt_IWX6	14
--#define CP0VPEOpt_IWX5	13
--#define CP0VPEOpt_IWX4	12
--#define CP0VPEOpt_IWX3	11
--#define CP0VPEOpt_IWX2	10
--#define CP0VPEOpt_IWX1	9
--#define CP0VPEOpt_IWX0	8
--#define CP0VPEOpt_DWX7	7
--#define CP0VPEOpt_DWX6	6
--#define CP0VPEOpt_DWX5	5
--#define CP0VPEOpt_DWX4	4
--#define CP0VPEOpt_DWX3	3
--#define CP0VPEOpt_DWX2	2
--#define CP0VPEOpt_DWX1	1
--#define CP0VPEOpt_DWX0	0
-+#define CP0VPEOpt_IWX7  15
-+#define CP0VPEOpt_IWX6  14
-+#define CP0VPEOpt_IWX5  13
-+#define CP0VPEOpt_IWX4  12
-+#define CP0VPEOpt_IWX3  11
-+#define CP0VPEOpt_IWX2  10
-+#define CP0VPEOpt_IWX1  9
-+#define CP0VPEOpt_IWX0  8
-+#define CP0VPEOpt_DWX7  7
-+#define CP0VPEOpt_DWX6  6
-+#define CP0VPEOpt_DWX5  5
-+#define CP0VPEOpt_DWX4  4
-+#define CP0VPEOpt_DWX3  3
-+#define CP0VPEOpt_DWX2  2
-+#define CP0VPEOpt_DWX1  1
-+#define CP0VPEOpt_DWX0  0
- /*
-  * CP0 Register 2
+ #if defined(HOST_WORDS_BIGENDIAN)
+@@ -963,9 +964,11 @@ struct CPUMIPSState {
+     /* TMASK defines different execution modes */
+ #define MIPS_HFLAG_TMASK  0x1F5807FF
+ #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
+-    /* The KSU flags must be the lowest bits in hflags. The flag order
+-       must be the same as defined for CP0 Status. This allows to use
+-       the bits as the value of mmu_idx. */
++    /*
++     *  The KSU flags must be the lowest bits in hflags. The flag order
++     *  must be the same as defined for CP0 Status. This allows to use
++     *  the bits as the value of mmu_idx.
++     */
+ #define MIPS_HFLAG_KSU    0x00003 /* kernel/supervisor/user mode mask   */
+ #define MIPS_HFLAG_UM     0x00002 /* user mode flag                     */
+ #define MIPS_HFLAG_SM     0x00001 /* supervisor mode flag               */
+@@ -975,18 +978,22 @@ struct CPUMIPSState {
+ #define MIPS_HFLAG_CP0    0x00010 /* CP0 enabled                        */
+ #define MIPS_HFLAG_FPU    0x00020 /* FPU enabled                        */
+ #define MIPS_HFLAG_F64    0x00040 /* 64-bit FPU enabled                 */
+-    /* True if the MIPS IV COP1X instructions can be used.  This also
+-       controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
+-       and RSQRT.D.  */
++    /*
++     * True if the MIPS IV COP1X instructions can be used.  This also
++     * controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
++     * and RSQRT.D.
++     */
+ #define MIPS_HFLAG_COP1X  0x00080 /* COP1X instructions enabled         */
+ #define MIPS_HFLAG_RE     0x00100 /* Reversed endianness                */
+ #define MIPS_HFLAG_AWRAP  0x00200 /* 32-bit compatibility address wrapping */
+ #define MIPS_HFLAG_M16    0x00400 /* MIPS16 mode flag                   */
+ #define MIPS_HFLAG_M16_SHIFT 10
+-    /* If translation is interrupted between the branch instruction and
++    /*
++     * If translation is interrupted between the branch instruction and
+      * the delay slot, record what type of branch it is so that we can
+      * resume translation properly.  It might be possible to reduce
+-     * this from three bits to two.  */
++     * this from three bits to two.
++     */
+ #define MIPS_HFLAG_BMASK_BASE  0x803800
+ #define MIPS_HFLAG_B      0x00800 /* Unconditional branch               */
+ #define MIPS_HFLAG_BC     0x01000 /* Conditional branch                 */
+@@ -1073,8 +1080,10 @@ void mips_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ extern void cpu_wrdsp(uint32_t rs, uint32_t mask_num, CPUMIPSState *env);
+ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
+ 
+-/* MMU modes definitions. We carefully match the indices with our
+-   hflags layout. */
++/*
++ * MMU modes definitions. We carefully match the indices with our
++ * hflags layout.
++ */
+ #define MMU_MODE0_SUFFIX _kernel
+ #define MMU_MODE1_SUFFIX _super
+ #define MMU_MODE2_SUFFIX _user
+@@ -1097,7 +1106,8 @@ static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
+ 
+ #include "exec/cpu-all.h"
+ 
+-/* Memory access type :
++/*
++ * Memory access type :
+  * may be needed for precise access rights control and precise exceptions.
   */
-@@ -625,33 +625,33 @@ struct CPUMIPSState {
- #define CP0PC_PSN       0     /*  5..0  */
-     int32_t CP0_SRSConf0_rw_bitmask;
-     int32_t CP0_SRSConf0;
--#define CP0SRSC0_M	31
--#define CP0SRSC0_SRS3	20
--#define CP0SRSC0_SRS2	10
--#define CP0SRSC0_SRS1	0
-+#define CP0SRSC0_M      31
-+#define CP0SRSC0_SRS3   20
-+#define CP0SRSC0_SRS2   10
-+#define CP0SRSC0_SRS1   0
-     int32_t CP0_SRSConf1_rw_bitmask;
-     int32_t CP0_SRSConf1;
--#define CP0SRSC1_M	31
--#define CP0SRSC1_SRS6	20
--#define CP0SRSC1_SRS5	10
--#define CP0SRSC1_SRS4	0
-+#define CP0SRSC1_M      31
-+#define CP0SRSC1_SRS6   20
-+#define CP0SRSC1_SRS5   10
-+#define CP0SRSC1_SRS4   0
-     int32_t CP0_SRSConf2_rw_bitmask;
-     int32_t CP0_SRSConf2;
--#define CP0SRSC2_M	31
--#define CP0SRSC2_SRS9	20
--#define CP0SRSC2_SRS8	10
--#define CP0SRSC2_SRS7	0
-+#define CP0SRSC2_M      31
-+#define CP0SRSC2_SRS9   20
-+#define CP0SRSC2_SRS8   10
-+#define CP0SRSC2_SRS7   0
-     int32_t CP0_SRSConf3_rw_bitmask;
-     int32_t CP0_SRSConf3;
--#define CP0SRSC3_M	31
--#define CP0SRSC3_SRS12	20
--#define CP0SRSC3_SRS11	10
--#define CP0SRSC3_SRS10	0
-+#define CP0SRSC3_M      31
-+#define CP0SRSC3_SRS12  20
-+#define CP0SRSC3_SRS11  10
-+#define CP0SRSC3_SRS10  0
-     int32_t CP0_SRSConf4_rw_bitmask;
-     int32_t CP0_SRSConf4;
--#define CP0SRSC4_SRS15	20
--#define CP0SRSC4_SRS14	10
--#define CP0SRSC4_SRS13	0
-+#define CP0SRSC4_SRS15  20
-+#define CP0SRSC4_SRS14  10
-+#define CP0SRSC4_SRS13  0
- /*
-  * CP0 Register 7
-  */
-@@ -1065,7 +1065,7 @@ static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
- 
- #define ENV_OFFSET offsetof(MIPSCPU, env)
- 
--void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf);
-+void mips_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- 
- #define cpu_signal_handler cpu_mips_signal_handler
- #define cpu_list mips_cpu_list
-@@ -1090,7 +1090,7 @@ static inline int hflags_mmu_index(uint32_t hflags)
-     }
- }
- 
--static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
-+static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
- {
-     return hflags_mmu_index(env->hflags);
- }
-@@ -1182,7 +1182,7 @@ void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
- void itc_reconfigure(struct MIPSITUState *tag);
- 
- /* helper.c */
--target_ulong exception_resume_pc (CPUMIPSState *env);
-+target_ulong exception_resume_pc(CPUMIPSState *env);
- 
- static inline void restore_snan_bit_mode(CPUMIPSState *env)
- {
+ enum {
 -- 
 2.20.1
 
