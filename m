@@ -3,60 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D892C10F11
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A88DC10F11
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 17:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAD3B2082E
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:59:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD3B2082E
+	by mail.kernel.org (Postfix) with ESMTPS id C9D822082E
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 17:00:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D822082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53891 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53929 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFM02-0003Kc-4e
-	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 12:59:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57921)
+	id 1hFM1C-00042V-5r
+	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 13:00:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLuk-0007DO-Gl
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hFLup-0007IF-Ed
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLuj-0002oH-K6
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33996)
+	(envelope-from <mreitz@redhat.com>) id 1hFLun-0002qt-Nm
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hFLuh-0002lQ-B7; Sat, 13 Apr 2019 12:53:59 -0400
+	id 1hFLuj-0002o6-Vl; Sat, 13 Apr 2019 12:54:02 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C4BD821C6;
-	Sat, 13 Apr 2019 16:53:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4191D30842A9;
+	Sat, 13 Apr 2019 16:54:01 +0000 (UTC)
 Received: from localhost (ovpn-204-66.brq.redhat.com [10.40.204.66])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 04BA9600C8;
-	Sat, 13 Apr 2019 16:53:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 94881600C8;
+	Sat, 13 Apr 2019 16:54:00 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Sat, 13 Apr 2019 18:53:41 +0200
-Message-Id: <20190413165343.9018-6-mreitz@redhat.com>
+Date: Sat, 13 Apr 2019 18:53:42 +0200
+Message-Id: <20190413165343.9018-7-mreitz@redhat.com>
 In-Reply-To: <20190413165343.9018-1-mreitz@redhat.com>
 References: <20190413165343.9018-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Sat, 13 Apr 2019 16:53:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Sat, 13 Apr 2019 16:54:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 5/7] blkdebug: Inject errors on
- .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH v3 6/7] iotests: Test qemu-img convert --salvage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,56 +76,264 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190413165341.XZJPldZ_CM_agHINIlhgChVBDIXkUPdPp60krewvZO8@z>
+Message-ID: <20190413165342.pPtU4IbgD-YtYKVd39hi4vc7vDgQER5GwKEJ0K9RQus@z>
+
+This test converts a simple image to another, but blkdebug injects
+block_status and read faults at some offsets.  The resulting image
+should be the same as the input image, except that sectors that could
+not be read have to be 0.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/block-core.json | 5 ++++-
- block/blkdebug.c     | 8 ++++++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/249     | 163 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out |  43 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 207 insertions(+)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 717b13f7f5..2aa675a192 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3252,10 +3252,13 @@
- #
- # @flush: .bdrv_co_flush_to_disk()
- #
-+# @block-status: .bdrv_co_block_status()
+diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
+new file mode 100755
+index 0000000000..d3883d75f3
+--- /dev/null
++++ b/tests/qemu-iotests/249
+@@ -0,0 +1,163 @@
++#!/bin/bash
 +#
- # Since: 4.1
- ##
- { 'enum': 'BlkdebugIOType',
--  'data': [ 'read', 'write', 'write-zeroes', 'discard', 'flush' ] }
-+  'data': [ 'read', 'write', 'write-zeroes', 'discard', 'flush',
-+            'block-status' ] }
-=20
- ##
- # @BlkdebugInjectErrorOptions:
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 69c608be6f..df9c8b1673 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -670,7 +670,15 @@ static int coroutine_fn blkdebug_co_block_status(Blo=
-ckDriverState *bs,
-                                                  int64_t *map,
-                                                  BlockDriverState **file=
-)
- {
-+    int err;
++# Test qemu-img convert --salvage
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
++# creator
++owner=3Dmreitz@redhat.com
 +
-+    err =3D rule_check(bs, offset, bytes, BLKDEBUGIO_TYPE_BLOCK_STATUS);
-+    if (err) {
-+        return err;
-+    }
++seq=3D$(basename $0)
++echo "QA output created by $seq"
 +
-     return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
-                                           pnum, map, file);
- }
++here=3D$PWD
++status=3D1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt generic
++_supported_proto file
++_supported_os Linux
++
++
++TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
++
++$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
++
++
++sector_size=3D512
++
++# Offsets on which to fail block-status.  Keep in ascending order so
++# the indexing done by _filter_offsets will appear in ascending order
++# in the output as well.
++status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
++                     $((33 * 1024 * 1024 + 512))"
++
++# Offsets on which to fail reads.  Keep in ascending order for the
++# same reason.
++# Element 1 is shared with $status_fail_offsets on purpose.
++# Elements 2 and later test what happens when a continuous range of
++# sectors is inaccessible.
++read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
++                   $((33 * 1024 * 1024 + 512))
++                   $(seq $((34 * 1024 * 1024)) $sector_size \
++                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
++
++
++# blkdebug must be above the format layer so it can intercept all
++# block-status events
++source_img=3D"json:{'driver': 'blkdebug',
++                  'image': {
++                      'driver': '$IMGFMT',
++                      'file': {
++                          'driver': 'file',
++                          'filename': '$TEST_IMG.orig'
++                      }
++                  },
++                  'inject-error': ["
++
++for ofs in $status_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'block-status',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++for ofs in $read_fail_offsets
++do
++    source_img+=3D"{ 'event': 'none',
++                   'iotype': 'read',
++                   'errno': 5,
++                   'sector': $((ofs / sector_size)) },"
++done
++
++# Remove the trailing comma and terminate @inject-error and json:{}
++source_img=3D"${source_img%,} ] }"
++
++
++echo
++
++
++_filter_offsets() {
++    filters=3D
++
++    index=3D0
++    for ofs in $2
++    do
++        filters+=3D" -e s/$(printf "$1" $ofs)/status_fail_offset_$index/=
+"
++        index=3D$((index + 1))
++    done
++
++    index=3D0
++    for ofs in $3
++    do
++        filters+=3D" -e s/$(printf "$1" $ofs)/read_fail_offset_$index/"
++        index=3D$((index + 1))
++    done
++
++    sed $filters
++}
++
++# While determining the number of allocated sectors in the input
++# image, we should see one block status warning per element of
++# $status_fail_offsets.
++#
++# Then, the image is read.  Since the block status is queried in
++# basically the same way, the same warnings as in the previous step
++# should reappear.  Interleaved with those we should see a read
++# warning per element of $read_fail_offsets.
++# Note that $read_fail_offsets and $status_fail_offsets share an
++# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
++# "status_fail_offset_1" in the output is the same as
++# "read_fail_offset_1".
++$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
++    | _filter_offsets '%i' "$status_fail_offsets" "$read_fail_offsets"
++
++echo
++
++# The offsets where the block status could not be determined should
++# have been treated as containing data and thus should be correct in
++# the output image.
++# The offsets where reading failed altogether should be 0.  Make them
++# 0 in the input image, too, so we can compare both images.
++for ofs in $read_fail_offsets
++do
++    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
++        | _filter_qemu_io \
++        | _filter_offsets '%i' '' "$read_fail_offsets"
++done
++
++echo
++
++# These should be equal now.
++$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
+new file mode 100644
+index 0000000000..9213d3e450
+--- /dev/null
++++ b/tests/qemu-iotests/249.out
+@@ -0,0 +1,43 @@
++QA output created by 249
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
++wrote 67108864/67108864 bytes at offset 0
++64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_0: Input/output error
++qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
+output error
++qemu-img: warning: error while reading block status at offset status_fai=
+l_offset_1: Input/output error
++qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
+t/output error
++qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
+output error
++qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
+output error
++
++wrote 512/512 bytes at offset read_fail_offset_0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_1
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_2
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_3
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_4
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_5
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_6
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_7
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_8
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset read_fail_offset_9
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718380..a2e2f507e8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -248,3 +248,4 @@
+ 246 rw auto quick
+ 247 rw auto quick
+ 248 rw auto quick
++249 auto quick
 --=20
 2.20.1
 
