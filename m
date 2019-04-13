@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37834)
+Received: from eggs.gnu.org ([209.51.188.92]:59406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hFMqI-0000PS-7O
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:31 -0400
+	(envelope-from <jbi.octave@gmail.com>) id 1hFPGj-0003DH-Tl
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hFMqH-0000Og-92
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:30 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
-References: <cover.1554992449.git.berto@igalia.com>
-	<6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
-	<w51zhoufg2l.fsf@maestria.local.igalia.com>
-	<b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
-Date: Sat, 13 Apr 2019 19:53:25 +0200
-Message-ID: <w51zhotu6zu.fsf@maestria.local.igalia.com>
+	(envelope-from <jbi.octave@gmail.com>) id 1hFPGi-0000LU-0g
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:57 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
+	id 1hFPGg-0000HL-Av
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:54 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r186so3009843wmf.1
+	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 13:28:52 -0700 (PDT)
+From: Jules Irenge <jbi.octave@gmail.com>
+Date: Sat, 13 Apr 2019 21:28:16 +0100
+Message-Id: <20190413202818.13622-1-jbi.octave@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
- files in bdrv_reopen_prepare()
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 0/2] target/mips: Errors amd warnings
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +27,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net, Jules Irenge <jbi.octave@gmail.com>
 
-On Sat 13 Apr 2019 05:48:11 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
->> Ok, you can leave out the second patch then. The first one should
->> still be correct, right?
->
-> I just think it=E2=80=99s unnecessary because as of my series both
-> backing_file and auto_backing_file serve the purpose.
+This v5 series combines patch v4 2/3 into patch v4 1/3 hence the number
+of patches to two.
 
-Ok then!
+Jules Irenge (2):
+  target/mips: add or remove space to fix checkpatch errors
+  target/mips: realign comments to fix checkpatch warnings
 
-Berto
+ target/mips/cpu.h | 211 +++++++++++++++++++++++++---------------------
+ 1 file changed, 117 insertions(+), 94 deletions(-)
+
+-- 
+2.20.1
