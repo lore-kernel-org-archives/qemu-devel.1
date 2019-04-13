@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50579)
+Received: from eggs.gnu.org ([209.51.188.92]:50713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLBs-0007ch-Ag
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:07:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLCR-00082N-K0
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLBr-0002Ss-IK
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:07:40 -0400
-Received: from relay.sw.ru ([185.231.240.75]:34450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hFLBr-0002Qp-A1
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:07:39 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLCQ-00030N-Jo
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:08:15 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 13 Apr 2019 19:07:32 +0300
-Message-Id: <20190413160732.55505-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] util/error: do not free error on error_abort
+Date: Sat, 13 Apr 2019 16:08:09 +0000
+Message-ID: <2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-8-vsementsov@virtuozzo.com>
+	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
+In-Reply-To: <5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9A6443B0D937D74FA7ED1C44307DBA43@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
+ filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, vsementsov@virtuozzo.com
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-It would be nice to have Error object not freed away when debugging a
-coredump.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- util/error.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/util/error.c b/util/error.c
-index 934a78e1b1..f9180c0f30 100644
---- a/util/error.c
-+++ b/util/error.c
-@@ -32,9 +32,11 @@ Error *error_fatal;
- static void error_handle_fatal(Error **errp, Error *err)
- {
-     if (errp == &error_abort) {
--        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
--                err->func, err->src, err->line);
--        error_report_err(err);
-+        error_report("Unexpected error in %s() at %s:%d: %s",
-+                     err->func, err->src, err->line, error_get_pretty(err));
-+        if (err->hint) {
-+            error_printf_unless_qmp("%s", err->hint->str);
-+        }
-         abort();
-     }
-     if (errp == &error_fatal) {
--- 
-2.18.0
+MTYuMDEuMjAxOSAxOTowMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEJhY2t1cC10b3AgZmlsdGVy
+IGRvZXMgY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0aW9uLiBJdCBzaG91bGQgYmUNCj4+IGluc2Vy
+dGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQgbm9kZSBmb3IgQ0JXLCBsaWtl
+IHRoZQ0KPj4gZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgKy0tLS0tLS0rDQo+PiAgICAgIHwgR3Vl
+c3QgfA0KPj4gICAgICArLS0tKy0tLSsNCj4+ICAgICAgICAgIHxyLHcNCj4+ICAgICAgICAgIHYN
+Cj4+ICAgICAgKy0tLSstLS0tLS0tLS0tLSsgIHRhcmdldCAgICstLS0tLS0tLS0tLS0tLS0rDQo+
+PiAgICAgIHwgYmFja3VwX3RvcCAgICB8LS0tLS0tLS0tLT58IHRhcmdldChxY293MikgfA0KPj4g
+ICAgICArLS0tKy0tLS0tLS0tLS0tKyAgIENCVyAgICAgKy0tLSstLS0tLS0tLS0tLSsNCj4+ICAg
+ICAgICAgIHwNCj4+IGJhY2tpbmcgfHIsdw0KPj4gICAgICAgICAgdg0KPj4gICAgICArLS0tKy0t
+LS0tLS0tLSsNCj4+ICAgICAgfCBBY3RpdmUgZGlzayB8DQo+PiAgICAgICstLS0tLS0tLS0tLS0t
+Kw0KPj4NCj4+IFRoZSBkcml2ZXIgd2lsbCBiZSB1c2VkIGluIGJhY2t1cCBpbnN0ZWFkIG9mIHdy
+aXRlLW5vdGlmaWVycy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
+T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2sv
+YmFja3VwLXRvcC5oICB8ICA0MyArKysrKysrDQo+PiAgIGJsb2NrL2JhY2t1cC10b3AuYyAgfCAz
+MDYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+ICAgYmxv
+Y2svTWFrZWZpbGUub2JqcyB8ICAgMiArDQo+PiAgIDMgZmlsZXMgY2hhbmdlZCwgMzUxIGluc2Vy
+dGlvbnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuaA0KPj4g
+ICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5jDQo+IA0KDQpbLi5dDQoNCj4+
+ICtCbG9ja0RyaXZlclN0YXRlICpiZHJ2X2JhY2t1cF90b3BfYXBwZW5kKEJsb2NrRHJpdmVyU3Rh
+dGUgKnNvdXJjZSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IEJsb2NrRHJpdmVyU3RhdGUgKnRhcmdldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIEhCaXRtYXAgKmNvcHlfYml0bWFwLA0KPj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4gK3sNCj4+ICsgICAg
+RXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQo+PiArICAgIEJEUlZCYWNrdXBUb3BTdGF0ZSAqc3Rh
+dGU7DQo+PiArICAgIEJsb2NrRHJpdmVyU3RhdGUgKnRvcCA9IGJkcnZfbmV3X29wZW5fZHJpdmVy
+KCZiZHJ2X2JhY2t1cF90b3BfZmlsdGVyLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBOVUxMLCBCRFJWX09fUkRXUiwgZXJycCk7DQo+PiArDQo+
+PiArICAgIGlmICghdG9wKSB7DQo+PiArICAgICAgICByZXR1cm4gTlVMTDsNCj4+ICsgICAgfQ0K
+Pj4gKw0KPj4gKyAgICB0b3AtPmltcGxpY2l0ID0gdHJ1ZTsNCj4+ICsgICAgdG9wLT50b3RhbF9z
+ZWN0b3JzID0gc291cmNlLT50b3RhbF9zZWN0b3JzOw0KPj4gKyAgICB0b3AtPm9wYXF1ZSA9IHN0
+YXRlID0gZ19uZXcwKEJEUlZCYWNrdXBUb3BTdGF0ZSwgMSk7DQo+PiArICAgIHN0YXRlLT5jb3B5
+X2JpdG1hcCA9IGNvcHlfYml0bWFwOw0KPj4gKw0KPj4gKyAgICBiZHJ2X3JlZih0YXJnZXQpOw0K
+Pj4gKyAgICBzdGF0ZS0+dGFyZ2V0ID0gYmRydl9hdHRhY2hfY2hpbGQodG9wLCB0YXJnZXQsICJ0
+YXJnZXQiLCAmY2hpbGRfZmlsZSwgZXJycCk7DQo+PiArICAgIGlmICghc3RhdGUtPnRhcmdldCkg
+ew0KPj4gKyAgICAgICAgYmRydl91bnJlZih0YXJnZXQpOw0KPj4gKyAgICAgICAgYmRydl91bnJl
+Zih0b3ApOw0KPj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsg
+ICAgYmRydl9zZXRfYWlvX2NvbnRleHQodG9wLCBiZHJ2X2dldF9haW9fY29udGV4dChzb3VyY2Up
+KTsNCj4+ICsgICAgYmRydl9zZXRfYWlvX2NvbnRleHQodGFyZ2V0LCBiZHJ2X2dldF9haW9fY29u
+dGV4dChzb3VyY2UpKTsNCj4+ICsNCj4+ICsgICAgYmRydl9kcmFpbmVkX2JlZ2luKHNvdXJjZSk7
+DQo+PiArDQo+PiArICAgIGJkcnZfcmVmKHRvcCk7DQo+PiArICAgIGJkcnZfYXBwZW5kKHRvcCwg
+c291cmNlLCAmbG9jYWxfZXJyKTsNCj4+ICsNCj4+ICsgICAgaWYgKGxvY2FsX2Vycikgew0KPj4g
+KyAgICAgICAgYmRydl91bnJlZih0b3ApOw0KPiANCj4gVGhpcyBpcyBkb25lIGF1dG9tYXRpY2Fs
+bHkgYnkgYmRydl9hcHBlbmQoKS4NCj4gDQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgYmRydl9k
+cmFpbmVkX2VuZChzb3VyY2UpOw0KPj4gKw0KPj4gKyAgICBpZiAobG9jYWxfZXJyKSB7DQo+PiAr
+ICAgICAgICBiZHJ2X3VucmVmX2NoaWxkKHRvcCwgc3RhdGUtPnRhcmdldCk7DQo+PiArICAgICAg
+ICBiZHJ2X3VucmVmKHRvcCk7DQo+PiArICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgbG9j
+YWxfZXJyKTsNCj4+ICsgICAgICAgIHJldHVybiBOVUxMOw0KPj4gKyAgICB9DQo+PiArDQo+PiAr
+ICAgIHJldHVybiB0b3A7DQo+PiArfQ0KPj4gKw0KPj4gK3ZvaWQgYmRydl9iYWNrdXBfdG9wX2Ry
+b3AoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+PiArew0KPj4gKyAgICBCRFJWQmFja3VwVG9wU3Rh
+dGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gKw0KPj4gKyAgICBBaW9Db250ZXh0ICphaW9fY29udGV4
+dCA9IGJkcnZfZ2V0X2Fpb19jb250ZXh0KGJzKTsNCj4+ICsNCj4+ICsgICAgYWlvX2NvbnRleHRf
+YWNxdWlyZShhaW9fY29udGV4dCk7DQo+PiArDQo+PiArICAgIGJkcnZfZHJhaW5lZF9iZWdpbihi
+cyk7DQo+PiArDQo+PiArICAgIGJkcnZfY2hpbGRfdHJ5X3NldF9wZXJtKGJzLT5iYWNraW5nLCAw
+LCBCTEtfUEVSTV9BTEwsICZlcnJvcl9hYm9ydCk7DQo+PiArICAgIGJkcnZfcmVwbGFjZV9ub2Rl
+KGJzLCBiYWNraW5nX2JzKGJzKSwgJmVycm9yX2Fib3J0KTsNCj4+ICsgICAgYmRydl9zZXRfYmFj
+a2luZ19oZChicywgTlVMTCwgJmVycm9yX2Fib3J0KTsNCj4gDQo+IFRoaXMgaXMgZG9uZSBhdXRv
+bWF0aWNhbGx5IGluIGJkcnZfY2xvc2UoKSwgYW5kIGFmdGVyIGJzIGhhcyBiZWVuDQo+IHJlcGxh
+Y2VkIGJ5IGJhY2tpbmdfYnMoYnMpLCBJIGRvbid0IHRoaW5rIG5ldyByZXF1ZXN0cyBzaG91bGQg
+Y29tZSBpbiwNCj4gc28gSSBkb24ndCB0aGluayB0aGlzIG5lZWRzIHRvIGJlIGRvbmUgaGVyZS4N
+Cg0KRm9sbG93aW5nIG1vdmVtZW50IG9mIGJhY2t1cF90b3AgYmFjayB0byBqb2ItPmJsayBiZWNv
+bWVzIGltcG9zc2libGUgdGhlbiwNCmlmIHdlIGRvbid0IHNoYXJlIFdSSVRFIG9uIHNvdXJjZSBp
+biBiYWNrdXBfdG9wX2NoaWxkX3Blcm0uDQoNCkFuZCBJIHRoaW5rLCB0aGlzIGZ1bmN0aW9uIHNo
+b3VsZCBkcm9wIGFsbCByZWxhdGlvbnMgY3JlYXRlZCBieQ0KYmRydl9iYWNrdXBfdG9wX2FwcGVu
+ZC4NCg0KPiANCj4+ICsNCj4+ICsgICAgYmRydl9kcmFpbmVkX2VuZChicyk7DQo+PiArDQo+PiAr
+ICAgIGlmIChzLT50YXJnZXQpIHsNCj4+ICsgICAgICAgIGJkcnZfdW5yZWZfY2hpbGQoYnMsIHMt
+PnRhcmdldCk7DQo+PiArICAgIH0NCj4gDQo+IEFuZCB0aGlzIHNob3VsZCBiZSBkb25lIGluIGEg
+LmJkcnZfY2xvc2UoKSBpbXBsZW1lbnRhdGlvbiwgSSB0aGluay4NCj4gDQo+IE1heA0KPiANCj4+
+ICsgICAgYmRydl91bnJlZihicyk7DQo+PiArDQo+PiArICAgIGFpb19jb250ZXh0X3JlbGVhc2Uo
+YWlvX2NvbnRleHQpOw0KPj4gK30NCj4+ICsNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
