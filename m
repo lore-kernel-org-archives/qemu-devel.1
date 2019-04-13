@@ -2,48 +2,51 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA36DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 00:58:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A4BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 01:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B56BA218AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 00:58:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56BA218AF
+	by mail.kernel.org (Postfix) with ESMTPS id 9F1B3218AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 01:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F1B3218AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44824 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44882 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF6zd-0004hB-Vx
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 20:58:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34448)
+	id 1hF74T-0006OX-Vf
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 21:03:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hF6yo-0004M0-Fj
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:57:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hF73Q-00061p-3D
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hF6yh-0000mH-6E
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:57:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33154)
+	(envelope-from <mreitz@redhat.com>) id 1hF73O-0003Hi-UO
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 21:02:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60040)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hF6yb-0000Q7-6B; Fri, 12 Apr 2019 20:57:01 -0400
+	id 1hF73M-0003GF-9J; Fri, 12 Apr 2019 21:01:56 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48B0981F19;
-	Sat, 13 Apr 2019 00:57:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37A9E2D7F5;
+	Sat, 13 Apr 2019 01:01:55 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-22.brq.redhat.com
 	[10.40.204.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E89405D9C5;
-	Sat, 13 Apr 2019 00:56:58 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1554992449.git.berto@igalia.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 344CB5D9CD;
+	Sat, 13 Apr 2019 01:01:52 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190410205715.2209-1-mreitz@redhat.com>
+	<20190410205715.2209-3-mreitz@redhat.com>
+	<acb069c8-5207-368e-e972-baa2ba44d850@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,24 +73,24 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
-Date: Sat, 13 Apr 2019 02:56:57 +0200
+Message-ID: <c2ff2802-7093-ca78-da7e-2c68bd0ac91c@redhat.com>
+Date: Sat, 13 Apr 2019 03:01:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <cover.1554992449.git.berto@igalia.com>
+In-Reply-To: <acb069c8-5207-368e-e972-baa2ba44d850@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp"
+	boundary="NV1sfjUkXs4Z42FfYS1cNIR3NHWXgp8vF"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Sat, 13 Apr 2019 00:57:00 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Sat, 13 Apr 2019 01:01:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
- files in bdrv_reopen_prepare()
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qemu-img: Add salvaging mode to
+ convert
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,70 +102,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190413005657.qpH44diDdvg9RXL5MEjB4udXTck5EeGfRjv9jjMbO4o@z>
+Message-ID: <20190413010151.S29XSFZKIx2fNT0H6cUNLP0r33uO7lKH-G5AThMNjNw@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp
+--NV1sfjUkXs4Z42FfYS1cNIR3NHWXgp8vF
 From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
-Subject: Re: [PATCH for-4.1 0/2] Fix check for default backing files in
- bdrv_reopen_prepare()
-References: <cover.1554992449.git.berto@igalia.com>
-In-Reply-To: <cover.1554992449.git.berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>
+Message-ID: <c2ff2802-7093-ca78-da7e-2c68bd0ac91c@redhat.com>
+Subject: Re: [PATCH v2 2/6] qemu-img: Add salvaging mode to convert
+References: <20190410205715.2209-1-mreitz@redhat.com>
+ <20190410205715.2209-3-mreitz@redhat.com>
+ <acb069c8-5207-368e-e972-baa2ba44d850@virtuozzo.com>
+In-Reply-To: <acb069c8-5207-368e-e972-baa2ba44d850@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 11.04.19 16:23, Alberto Garcia wrote:
-> Hi,
+On 11.04.19 16:33, Vladimir Sementsov-Ogievskiy wrote:
+> 10.04.2019 23:57, Max Reitz wrote:
+>> This adds a salvaging mode (--salvage) to qemu-img convert which ignor=
+es
+>> read errors and treats the respective areas as containing only zeroes.=
+
+>> This can be used for instance to at least partially recover the data
+>> from terminally corrupted qcow2 images.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
 >=20
-> Patch 1 is the fix for the bug reported by Max here:
+> [..]
 >=20
->    https://lists.gnu.org/archive/html/qemu-block/2019-04/msg00293.html
+>> --- a/qemu-img.texi
+>> +++ b/qemu-img.texi
+>> @@ -175,6 +175,11 @@ improve performance if the data is remote, such a=
+s with NFS or iSCSI backends,
+>>   but will not automatically sparsify zero sectors, and may result in =
+a fully
+>>   allocated target image depending on the host support for getting all=
+ocation
+>>   information.
+>> +@item --salvage
+>> +Try to ignore I/O errors when reading.  Unless in quiet mode (@code{-=
+q}), errors
+>> +will still be printed.  Areas that cannot be read from the source wil=
+l be
+>> +treated as containing only zeroes.  This option has no effect in copy=
+ offloading
+>> +mode (@code{-C}).
 >=20
-> Patch 2 fixes a different (but slightly related) issue that I found
-> while preparing the first patch.
+> Isn't it better to restrict such it, instead of creating meaningless co=
+mbination?
+> And drop the restriction if we support it in future, instead of silent =
+move from
+> noop to the feature?
 
-I think the real problem is that bs->backing_file is not a cache for
-bs->backing->bs->filename.
+You=E2=80=99re right, I should do that.
 
-In fact, every user of bs->backing_file expects it to be something
-different.  Some expect it to be a cache for bs->backing->bs->filename,
-some expect it to be what the image header says (i.e., it if=E2=80=99s a
-relative path, it=E2=80=99s relative to the overlay), some expect it to b=
-e what
-the image header says, but relative paths to be translated so they are
-relative to qemu=E2=80=99s CWD.
+> Otherwise, looks OK for me. I dislike mixing byte-based and sector-base=
+d logic, but it
+> is not about the series, we should move to byte-based like in other pla=
+ces, and it may
+> be done later.
 
-All of this should be cleaned up and this is what patch 7 in my "block:
-Deal with filters" series does:
-
-http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00308.html
+Thanks for having a look!
 
 Max
 
 
---S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp
+--NV1sfjUkXs4Z42FfYS1cNIR3NHWXgp8vF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyxM9kACgkQ9AfbAGHV
-z0A5fgf/WD/6zyV0HTg8MluSe1wc6yhqC138nscCnbbnP/UBfQLelZnhAnHxRaFO
-HxN40qoDUZz8FVfcffplpEoWQc8bzh+gr3xY56jWl2bVbtFDtVcN+J7xX5ym1Lzj
-w5LPNxqFFBEg+hf3Rgs4kH/8gc8SPJQUFabL2JS5Ojl4aWzjl7AxeGElgiEYkQcY
-24Ok9SWOjpphzFlvJZdJzpTWzsx7Y+xf6jOSJQSu6xrZxgfSCTjPUMQBtcQ8QY+v
-d0FEspW00tZYnC3rjJAfnzQyMlndVkS7dxxMnB2YBrjxWKFhL1i86nfd5RydZxQ6
-fLq5h99EQLnPE6F/t3Vr2GiAk4S4YQ==
-=OFWO
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyxNP8ACgkQ9AfbAGHV
+z0B34Qf/Tu+v9qW4JyWhvQi6GRXe1UFi86d3EaXIwXiXjkDYpQu3QSR6fQlOxaeg
+Y2DUexQggJzmk6AsoxQww0g6vAbK3ZmMjJsRTYkIrmr1RZcfG2gXVp8qxxZex56O
+iDRW5bsLWvTSV6+DbmVh4ZvzUL+njZyivhT/WVxx47IjN2Pb76DMLqq0AWyncXMD
+V22ZWvESAbGAQSLk6g1TMHRtvunHRjdvCYHvIYKwq1XIZO8ZkPCAjdr7g8J1XxKR
+0EX/r/DSq/CZIRiF1xml/c0/d4LTyyB0EfIJxNGb6j2aCW4e4AEazZr4NrTMEW4B
+OJvxefxb6rxTeBbc0SnmNZlAz9LQQg==
+=xhYB
 -----END PGP SIGNATURE-----
 
---S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp--
+--NV1sfjUkXs4Z42FfYS1cNIR3NHWXgp8vF--
 
