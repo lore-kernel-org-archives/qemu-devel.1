@@ -2,92 +2,61 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F94C10F11
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 652CBC10F11
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69546208E3
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69546208E3
+	by mail.kernel.org (Postfix) with ESMTPS id 38B0E218D2
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 16:55:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38B0E218D2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53562 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53843 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFLVP-00081d-Gb
-	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 12:27:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53800)
+	id 1hFLwN-0008FU-9X
+	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 12:55:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLUB-0007HQ-3Z
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:26:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hFLua-00074M-Mw
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLU9-0004sN-6u
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:26:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60492)
+	(envelope-from <mreitz@redhat.com>) id 1hFLuZ-0002fx-M1
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:53:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hFLU3-0004jl-VO; Sat, 13 Apr 2019 12:26:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hFLuX-0002cP-5H; Sat, 13 Apr 2019 12:53:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D3C33082B44;
-	Sat, 13 Apr 2019 16:26:26 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-66.brq.redhat.com
-	[10.40.204.66])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F0EC5D70A;
-	Sat, 13 Apr 2019 16:26:25 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190225190828.17726-1-mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7271FC05D266;
+	Sat, 13 Apr 2019 16:53:48 +0000 (UTC)
+Received: from localhost (ovpn-204-66.brq.redhat.com [10.40.204.66])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 099BF60C18;
+	Sat, 13 Apr 2019 16:53:47 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <81125c59-c2c8-6774-2daa-2a56ef204dbf@redhat.com>
-Date: Sat, 13 Apr 2019 18:26:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+To: qemu-block@nongnu.org
+Date: Sat, 13 Apr 2019 18:53:37 +0200
+Message-Id: <20190413165343.9018-2-mreitz@redhat.com>
+In-Reply-To: <20190413165343.9018-1-mreitz@redhat.com>
+References: <20190413165343.9018-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190225190828.17726-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="O573Ha1YQuJYFFPA3vsiOdyvNYwJ5ntUs"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Sat, 13 Apr 2019 16:26:26 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Sat, 13 Apr 2019 16:53:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block/ssh: Implement
- .bdrv_refresh_filename()
+Subject: [Qemu-devel] [PATCH v3 1/7] qemu-img: Move quiet into
+ ImgConvertState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,68 +68,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	"Richard W . M . Jones" <rjones@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+	"Denis V . Lunev" <den@openvz.org>,
+	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190413162623.df9GUiOeq-a6b0PQrAEaS2p6V9vnxSKdEbPAJYP5b1o@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190413165337.UWbPaY3aJh8Zz_xT6yoO-uoB8aCJFOV_p9-RYkJ4HUU@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---O573Ha1YQuJYFFPA3vsiOdyvNYwJ5ntUs
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <81125c59-c2c8-6774-2daa-2a56ef204dbf@redhat.com>
-Subject: Re: [PATCH v3 0/2] block/ssh: Implement .bdrv_refresh_filename()
-References: <20190225190828.17726-1-mreitz@redhat.com>
-In-Reply-To: <20190225190828.17726-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Move img_convert()'s quiet flag into the ImgConvertState so it is
+accessible by nested functions.  -q dictates that it suppresses anything
+but errors, so if those functions want to emit warnings, they need to
+query this flag first.  (There currently are no such warnings, but there
+will be as of the next patch.)
 
-On 25.02.19 20:08, Max Reitz wrote:
-> This series implements .bdrv_refresh_filename() for the ssh block
-> driver, along with an appropriate .bdrv_dirname() so we don't chop off
-> query strings for backing files with relative filenames.
->=20
->=20
-> v3:
-> - Keep iotests 104 and 207 working
->=20
->=20
-> Max Reitz (2):
->   block/ssh: Implement .bdrv_refresh_filename()
->   block/ssh: Implement .bdrv_dirname()
->=20
->  block/ssh.c                   | 73 ++++++++++++++++++++++++++++++++---=
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qemu-img.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
->  tests/qemu-iotests/207        | 10 ++---
->  tests/qemu-iotests/207.out    | 10 ++---
->  tests/qemu-iotests/common.rc  |  2 +-
->  tests/qemu-iotests/iotests.py |  2 +-
->  5 files changed, 80 insertions(+), 17 deletions(-)
-Applied to my block-next branch.
+diff --git a/qemu-img.c b/qemu-img.c
+index aa6f81f1ea..c53666aa41 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1569,6 +1569,7 @@ typedef struct ImgConvertState {
+     int64_t target_backing_sectors; /* negative if unknown */
+     bool wr_in_order;
+     bool copy_range;
++    bool quiet;
+     int min_sparse;
+     int alignment;
+     size_t cluster_sectors;
+@@ -2005,7 +2006,7 @@ static int img_convert(int argc, char **argv)
+     QDict *open_opts =3D NULL;
+     char *options =3D NULL;
+     Error *local_err =3D NULL;
+-    bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
+ false,
++    bool writethrough, src_writethrough, image_opts =3D false,
+          skip_create =3D false, progress =3D false, tgt_image_opts =3D f=
+alse;
+     int64_t ret =3D -EINVAL;
+     bool force_share =3D false;
+@@ -2113,7 +2114,7 @@ static int img_convert(int argc, char **argv)
+             src_cache =3D optarg;
+             break;
+         case 'q':
+-            quiet =3D true;
++            s.quiet =3D true;
+             break;
+         case 'n':
+             skip_create =3D true;
+@@ -2202,7 +2203,7 @@ static int img_convert(int argc, char **argv)
+     }
+=20
+     /* Initialize before goto out */
+-    if (quiet) {
++    if (s.quiet) {
+         progress =3D false;
+     }
+     qemu_progress_init(progress, 1.0);
+@@ -2213,7 +2214,7 @@ static int img_convert(int argc, char **argv)
+=20
+     for (bs_i =3D 0; bs_i < s.src_num; bs_i++) {
+         s.src[bs_i] =3D img_open(image_opts, argv[optind + bs_i],
+-                               fmt, src_flags, src_writethrough, quiet,
++                               fmt, src_flags, src_writethrough, s.quiet=
+,
+                                force_share);
+         if (!s.src[bs_i]) {
+             ret =3D -1;
+@@ -2376,7 +2377,7 @@ static int img_convert(int argc, char **argv)
+=20
+     if (skip_create) {
+         s.target =3D img_open(tgt_image_opts, out_filename, out_fmt,
+-                            flags, writethrough, quiet, false);
++                            flags, writethrough, s.quiet, false);
+     } else {
+         /* TODO ultimately we should allow --target-image-opts
+          * to be used even when -n is not given.
+@@ -2384,7 +2385,7 @@ static int img_convert(int argc, char **argv)
+          * to allow filenames in option syntax
+          */
+         s.target =3D img_open_file(out_filename, open_opts, out_fmt,
+-                                 flags, writethrough, quiet, false);
++                                 flags, writethrough, s.quiet, false);
+         open_opts =3D NULL; /* blk_new_open will have freed it */
+     }
+     if (!s.target) {
+--=20
+2.20.1
 
-Max
-
-
---O573Ha1YQuJYFFPA3vsiOdyvNYwJ5ntUs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyyDa8ACgkQ9AfbAGHV
-z0Db/Qf/ZmNJdDWgoofwmBxSbLl8T6bO7vemx3HnSMwOdWnqK71xC9bGd6HN6Qu5
-eO5q5Ddvm7MT7X0EZLzVK76EBzl7WfEa6ROgtSjaEkC74/ItTj8MTGZeZkgRpXZt
-U7wgaDll7eCDQT0jpfFjU+LPZMtSLEbOt8mcv+pSeARTXXwne0m+w/sIGZPka2os
-QjuQ+GwSjUXmIjdvOA46UfTvFg50DxX1US+SJ7UyjyseO7GzhzS9I27ELb8pgCVa
-IDCznO3SoTP8wMesAATsIlGrmhb/rkF8sgo+gKetTzJ095LnTEScmcOCzQKmoGRA
-gi8KLeRGxOObatqWEyyZ/uXixxCdvQ==
-=DH5A
------END PGP SIGNATURE-----
-
---O573Ha1YQuJYFFPA3vsiOdyvNYwJ5ntUs--
 
