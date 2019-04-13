@@ -2,73 +2,67 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8ABC10F0E
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 02:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2B0C10F0E
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 02:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB1E12084E
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 02:11:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB1E12084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7E74F2083E
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 02:56:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E74F2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45406 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45776 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hF88l-0005Wj-TJ
-	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 22:11:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44031)
+	id 1hF8qa-0006AW-KB
+	for qemu-devel@archiver.kernel.org; Fri, 12 Apr 2019 22:56:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hF87y-0004rO-DY
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:10:47 -0400
+	(envelope-from <puwen@hygon.cn>) id 1hF8pj-0005md-0F
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:56:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hF87x-0008Ts-9h
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:10:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33542)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hF87w-0008S3-Vh
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:10:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hF87v-0006IW-Ij
-	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 02:10:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8026E2E8055
-	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 02:10:43 +0000 (UTC)
+	(envelope-from <puwen@hygon.cn>) id 1hF8pg-0003VX-E6
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:55:58 -0400
+Received: from [110.188.70.11] (port=6142 helo=spam2.hygon.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <puwen@hygon.cn>) id 1hF8pc-0003Qf-MN
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 22:55:54 -0400
+Received: from MK-DB.hygon.cn ([172.23.18.60])
+	by spam2.hygon.cn with ESMTP id x3D2t58X079040;
+	Sat, 13 Apr 2019 10:55:05 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from cncheex02.Hygon.cn ([172.23.18.12])
+	by MK-DB.hygon.cn with ESMTP id x3D2t2U5096218;
+	Sat, 13 Apr 2019 10:55:02 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from pw-vbox.hygon.cn (172.23.18.44) by cncheex02.Hygon.cn
+	(172.23.18.12) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3;
+	Sat, 13 Apr 2019 10:55:03 +0800
+From: Pu Wen <puwen@hygon.cn>
+To: <qemu-devel@nongnu.org>
+Date: Sat, 13 Apr 2019 10:54:40 +0800
+Message-ID: <1555124080-27089-1-git-send-email-puwen@hygon.cn>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Apr 2019 02:04:01 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1824053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lizhengui
-X-Launchpad-Bug-Reporter: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-X-Launchpad-Bug-Modifier: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155512104169.20376.12640593667293574727.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 16a6e869d48bb09a58d36c651b824e72cc814c35
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
- on aarch64 host with low probability
+X-Originating-IP: [172.23.18.44]
+X-ClientProxiedBy: cncheex02.Hygon.cn (172.23.18.12) To cncheex02.Hygon.cn
+	(172.23.18.12)
+X-MAIL: spam2.hygon.cn x3D2t58X079040
+X-DNSRBL: 
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 110.188.70.11
+Subject: [Qemu-devel] [PATCH v2] i386: Add new Hygon 'Dhyana' CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,78 +71,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, Pu Wen <puwen@hygon.cn>,
+	pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190413020401.dUsepvQtcG2-BqN7LC85B1vHM16VJ3cGkqH1K7EwMGY@z>
+Message-ID: <20190413025440.2_l3zlydgHDVp58dqj4ONywuhWbQJLMt8rFHIKOuNxk@z>
 
-Anyone else has a similar problem?
+Add a new base CPU model called 'Dhyana' to model processors from Hygon
+Dhyana(family 18h), which derived from AMD EPYC(family 17h).
 
--- =
+The following features bits have been removed compare to AMD EPYC:
+aes, pclmulqdq, sha_ni
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824053
+The Hygon Dhyana support to KVM in Linux is already accepted upstream[1].
+So add Hygon Dhyana support to Qemu is necessary to create Hygon's own
+CPU model.
 
-Title:
-  Qemu-img convert appears to be stuck on aarch64 host with low
-  probability
+Reference:
+[1] https://git.kernel.org/tip/fec98069fb72fb656304a3e52265e0c2fc9adf87
 
-Status in QEMU:
-  New
+Signed-off-by: Pu Wen <puwen@hygon.cn>
+---
+v1->v2:
+  - Remove CPU model 'Dhyana' and rename the CPU model 'Dhyana-IBPB' to
+    'Dhyana' because Dhyana CPUs already have the IBPB feature.
 
-Bug description:
-  Hi,  I found a problem that qemu-img convert appears to be stuck on
-  aarch64 host with low probability.
+ hw/i386/pc.c      |  3 +++
+ target/i386/cpu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h |  2 ++
+ 3 files changed, 55 insertions(+)
 
-  The convert command  line is  "qemu-img convert -f qcow2 -O raw
-  disk.qcow2 disk.raw ".
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f2c15bf..551bec9 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -128,6 +128,8 @@ GlobalProperty pc_compat_3_1[] = {
+     { "EPYC" "-" TYPE_X86_CPU, "nrip-save", "off" },
+     { "EPYC-IBPB" "-" TYPE_X86_CPU, "npt", "off" },
+     { "EPYC-IBPB" "-" TYPE_X86_CPU, "nrip-save", "off" },
++    { "Dhyana" "-" TYPE_X86_CPU, "npt", "off" },
++    { "Dhyana" "-" TYPE_X86_CPU, "nrip-save", "off" },
+     { "Skylake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+     { "Skylake-Client-IBRS" "-" TYPE_X86_CPU, "mpx", "on" },
+     { "Skylake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+@@ -152,6 +154,7 @@ GlobalProperty pc_compat_2_12[] = {
+     { TYPE_X86_CPU, "topoext", "off" },
+     { "EPYC-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+     { "EPYC-IBPB-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
++    { "Dhyana-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+ };
+ const size_t pc_compat_2_12_len = G_N_ELEMENTS(pc_compat_2_12);
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d6bb57d..d314c5f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2934,6 +2934,56 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .model_id = "AMD EPYC Processor (with IBPB)",
+         .cache_info = &epyc_cache_info,
+     },
++    {
++        .name = "Dhyana",
++        .level = 0xd,
++        .vendor = CPUID_VENDOR_HYGON,
++        .family = 24,
++        .model = 0,
++        .stepping = 1,
++        .features[FEAT_1_EDX] =
++            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
++            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
++            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
++            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
++            CPUID_VME | CPUID_FP87,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
++            CPUID_EXT_XSAVE | CPUID_EXT_POPCNT |
++            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
++            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
++            CPUID_EXT_MONITOR | CPUID_EXT_SSE3,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
++            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
++            CPUID_EXT2_SYSCALL,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
++            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
++        .features[FEAT_8000_0008_EBX] =
++            CPUID_8000_0008_EBX_IBPB,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
++            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
++            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT,
++        /*
++         * Missing: XSAVES (not supported by some Linux versions,
++         * including v4.1 to v4.12).
++         * KVM doesn't yet expose any XSAVES state save component.
++         */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .features[FEAT_SVM] =
++            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
++        .xlevel = 0x8000001E,
++        .model_id = "Hygon Dhyana Processor",
++        .cache_info = &epyc_cache_info,
++    },
+ };
+ 
+ typedef struct PropValue {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 83fb522..553dbe7 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -726,6 +726,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ 
+ #define CPUID_VENDOR_VIA   "CentaurHauls"
+ 
++#define CPUID_VENDOR_HYGON    "HygonGenuine"
++
+ #define CPUID_MWAIT_IBE     (1U << 1) /* Interrupts can exit capability */
+ #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
+ 
+-- 
+2.7.4
 
-  The bt is below:
-
-  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
-  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
-  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
-  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
-l/compatfd.c:37
-  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
-163b90) at util/qemu_thread_posix.c:496
-  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
-  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
-
-  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
-  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
-  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
-=3D<optimized out>) at qemu_timer.c:391
-  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
-t>) at main_loop.c:272
-  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
-at main_loop.c:534
-  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
-g.c:1923
-  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
-timized out>) at qemu-img.c:2414
-  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:5305
-
-  =
-
-  The problem seems to be very similar to the phenomenon described by this =
-patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
-otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
-
-
-  which force main loop wakeup with SIGIO.  But this patch was reverted
-  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
-  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
-
-  The problem still seems to exist in aarch64 host. The qemu version I used=
- is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
-   Do you have any solutions to fix it?  Thanks for your reply !
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
 
