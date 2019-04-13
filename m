@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57958)
+Received: from eggs.gnu.org ([209.51.188.92]:60200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLup-0007IF-Ed
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFM4I-00062g-Ps
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFLun-0002qt-Nm
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:54:07 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 13 Apr 2019 18:53:42 +0200
-Message-Id: <20190413165343.9018-7-mreitz@redhat.com>
-In-Reply-To: <20190413165343.9018-1-mreitz@redhat.com>
-References: <20190413165343.9018-1-mreitz@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFM4H-0003s1-Jj
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:03:54 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Sat, 13 Apr 2019 17:03:49 +0000
+Message-ID: <4a64d8dd-34ad-5a6c-7249-0c2fb202777f@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-8-vsementsov@virtuozzo.com>
+	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
+	<2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
+In-Reply-To: <2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <924C1E5E16C85E4FB0B6B8CE67A9C73F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 6/7] iotests: Test qemu-img convert --salvage
+Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
+ filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,264 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-This test converts a simple image to another, but blkdebug injects
-block_status and read faults at some offsets.  The resulting image
-should be the same as the input image, except that sectors that could
-not be read have to be 0.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/249     | 163 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/249.out |  43 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 207 insertions(+)
- create mode 100755 tests/qemu-iotests/249
- create mode 100644 tests/qemu-iotests/249.out
-
-diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
-new file mode 100755
-index 0000000000..d3883d75f3
---- /dev/null
-+++ b/tests/qemu-iotests/249
-@@ -0,0 +1,163 @@
-+#!/bin/bash
-+#
-+# Test qemu-img convert --salvage
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmreitz@redhat.com
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=3D$PWD
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
-+
-+$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
-+
-+
-+sector_size=3D512
-+
-+# Offsets on which to fail block-status.  Keep in ascending order so
-+# the indexing done by _filter_offsets will appear in ascending order
-+# in the output as well.
-+status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
-+                     $((33 * 1024 * 1024 + 512))"
-+
-+# Offsets on which to fail reads.  Keep in ascending order for the
-+# same reason.
-+# Element 1 is shared with $status_fail_offsets on purpose.
-+# Elements 2 and later test what happens when a continuous range of
-+# sectors is inaccessible.
-+read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
-+                   $((33 * 1024 * 1024 + 512))
-+                   $(seq $((34 * 1024 * 1024)) $sector_size \
-+                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
-+
-+
-+# blkdebug must be above the format layer so it can intercept all
-+# block-status events
-+source_img=3D"json:{'driver': 'blkdebug',
-+                  'image': {
-+                      'driver': '$IMGFMT',
-+                      'file': {
-+                          'driver': 'file',
-+                          'filename': '$TEST_IMG.orig'
-+                      }
-+                  },
-+                  'inject-error': ["
-+
-+for ofs in $status_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'block-status',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+for ofs in $read_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'read',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+# Remove the trailing comma and terminate @inject-error and json:{}
-+source_img=3D"${source_img%,} ] }"
-+
-+
-+echo
-+
-+
-+_filter_offsets() {
-+    filters=3D
-+
-+    index=3D0
-+    for ofs in $2
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/status_fail_offset_$index/=
-"
-+        index=3D$((index + 1))
-+    done
-+
-+    index=3D0
-+    for ofs in $3
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/read_fail_offset_$index/"
-+        index=3D$((index + 1))
-+    done
-+
-+    sed $filters
-+}
-+
-+# While determining the number of allocated sectors in the input
-+# image, we should see one block status warning per element of
-+# $status_fail_offsets.
-+#
-+# Then, the image is read.  Since the block status is queried in
-+# basically the same way, the same warnings as in the previous step
-+# should reappear.  Interleaved with those we should see a read
-+# warning per element of $read_fail_offsets.
-+# Note that $read_fail_offsets and $status_fail_offsets share an
-+# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
-+# "status_fail_offset_1" in the output is the same as
-+# "read_fail_offset_1".
-+$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
-+    | _filter_offsets '%i' "$status_fail_offsets" "$read_fail_offsets"
-+
-+echo
-+
-+# The offsets where the block status could not be determined should
-+# have been treated as containing data and thus should be correct in
-+# the output image.
-+# The offsets where reading failed altogether should be 0.  Make them
-+# 0 in the input image, too, so we can compare both images.
-+for ofs in $read_fail_offsets
-+do
-+    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
-+        | _filter_qemu_io \
-+        | _filter_offsets '%i' '' "$read_fail_offsets"
-+done
-+
-+echo
-+
-+# These should be equal now.
-+$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
-new file mode 100644
-index 0000000000..9213d3e450
---- /dev/null
-+++ b/tests/qemu-iotests/249.out
-@@ -0,0 +1,43 @@
-+QA output created by 249
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
-+wrote 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
-output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
-t/output error
-+qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
-output error
-+
-+wrote 512/512 bytes at offset read_fail_offset_0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_1
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_2
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_3
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_4
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_5
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_6
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_7
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_8
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_9
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index bae7718380..a2e2f507e8 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -248,3 +248,4 @@
- 246 rw auto quick
- 247 rw auto quick
- 248 rw auto quick
-+249 auto quick
---=20
-2.20.1
+MTMuMDQuMjAxOSAxOTowOCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTYuMDEuMjAxOSAxOTowMiwgTWF4IFJlaXR6IHdyb3RlOg0KPj4gT24gMjkuMTIuMTggMTM6MjAs
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gQmFja3VwLXRvcCBmaWx0
+ZXIgZG9lcyBjb3B5LWJlZm9yZS13cml0ZSBvcGVyYXRpb24uIEl0IHNob3VsZCBiZQ0KPj4+IGlu
+c2VydGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQgbm9kZSBmb3IgQ0JXLCBs
+aWtlIHRoZQ0KPj4+IGZvbGxvd2luZzoNCj4+Pg0KPj4+IMKgwqDCoMKgICstLS0tLS0tKw0KPj4+
+IMKgwqDCoMKgIHwgR3Vlc3QgfA0KPj4+IMKgwqDCoMKgICstLS0rLS0tKw0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqAgfHIsdw0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgdg0KPj4+IMKgwqDCoMKgICstLS0r
+LS0tLS0tLS0tLS0rwqAgdGFyZ2V0wqDCoCArLS0tLS0tLS0tLS0tLS0tKw0KPj4+IMKgwqDCoMKg
+IHwgYmFja3VwX3RvcMKgwqDCoCB8LS0tLS0tLS0tLT58IHRhcmdldChxY293MikgfA0KPj4+IMKg
+wqDCoMKgICstLS0rLS0tLS0tLS0tLS0rwqDCoCBDQlfCoMKgwqDCoCArLS0tKy0tLS0tLS0tLS0t
+Kw0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgfA0KPj4+IGJhY2tpbmcgfHIsdw0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqAgdg0KPj4+IMKgwqDCoMKgICstLS0rLS0tLS0tLS0tKw0KPj4+IMKgwqDCoMKgIHwg
+QWN0aXZlIGRpc2sgfA0KPj4+IMKgwqDCoMKgICstLS0tLS0tLS0tLS0tKw0KPj4+DQo+Pj4gVGhl
+IGRyaXZlciB3aWxsIGJlIHVzZWQgaW4gYmFja3VwIGluc3RlYWQgb2Ygd3JpdGUtbm90aWZpZXJz
+Lg0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
+dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+IC0tLQ0KPj4+IMKgIGJsb2NrL2JhY2t1cC10
+b3AuaMKgIHzCoCA0MyArKysrKysrDQo+Pj4gwqAgYmxvY2svYmFja3VwLXRvcC5jwqAgfCAzMDYg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+PiDCoCBibG9j
+ay9NYWtlZmlsZS5vYmpzIHzCoMKgIDIgKw0KPj4+IMKgIDMgZmlsZXMgY2hhbmdlZCwgMzUxIGlu
+c2VydGlvbnMoKykNCj4+PiDCoCBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5o
+DQo+Pj4gwqAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuYw0KPj4NCj4gDQo+
+IFsuLl0NCj4gDQo+Pj4gK0Jsb2NrRHJpdmVyU3RhdGUgKmJkcnZfYmFja3VwX3RvcF9hcHBlbmQo
+QmxvY2tEcml2ZXJTdGF0ZSAqc291cmNlLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBC
+bG9ja0RyaXZlclN0YXRlICp0YXJnZXQsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEhC
+aXRtYXAgKmNvcHlfYml0bWFwLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAq
+KmVycnApDQo+Pj4gK3sNCj4+PiArwqDCoMKgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+
+ICvCoMKgwqAgQkRSVkJhY2t1cFRvcFN0YXRlICpzdGF0ZTsNCj4+PiArwqDCoMKgIEJsb2NrRHJp
+dmVyU3RhdGUgKnRvcCA9IGJkcnZfbmV3X29wZW5fZHJpdmVyKCZiZHJ2X2JhY2t1cF90b3BfZmls
+dGVyLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTlVMTCwg
+QkRSVl9PX1JEV1IsIGVycnApOw0KPj4+ICsNCj4+PiArwqDCoMKgIGlmICghdG9wKSB7DQo+Pj4g
+K8KgwqDCoMKgwqDCoMKgIHJldHVybiBOVUxMOw0KPj4+ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiAr
+wqDCoMKgIHRvcC0+aW1wbGljaXQgPSB0cnVlOw0KPj4+ICvCoMKgwqAgdG9wLT50b3RhbF9zZWN0
+b3JzID0gc291cmNlLT50b3RhbF9zZWN0b3JzOw0KPj4+ICvCoMKgwqAgdG9wLT5vcGFxdWUgPSBz
+dGF0ZSA9IGdfbmV3MChCRFJWQmFja3VwVG9wU3RhdGUsIDEpOw0KPj4+ICvCoMKgwqAgc3RhdGUt
+PmNvcHlfYml0bWFwID0gY29weV9iaXRtYXA7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9yZWYo
+dGFyZ2V0KTsNCj4+PiArwqDCoMKgIHN0YXRlLT50YXJnZXQgPSBiZHJ2X2F0dGFjaF9jaGlsZCh0
+b3AsIHRhcmdldCwgInRhcmdldCIsICZjaGlsZF9maWxlLCBlcnJwKTsNCj4+PiArwqDCoMKgIGlm
+ICghc3RhdGUtPnRhcmdldCkgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBiZHJ2X3VucmVmKHRhcmdl
+dCk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGJkcnZfdW5yZWYodG9wKTsNCj4+PiArwqDCoMKgwqDC
+oMKgwqAgcmV0dXJuIE5VTEw7DQo+Pj4gK8KgwqDCoCB9DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRy
+dl9zZXRfYWlvX2NvbnRleHQodG9wLCBiZHJ2X2dldF9haW9fY29udGV4dChzb3VyY2UpKTsNCj4+
+PiArwqDCoMKgIGJkcnZfc2V0X2Fpb19jb250ZXh0KHRhcmdldCwgYmRydl9nZXRfYWlvX2NvbnRl
+eHQoc291cmNlKSk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9kcmFpbmVkX2JlZ2luKHNvdXJj
+ZSk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9yZWYodG9wKTsNCj4+PiArwqDCoMKgIGJkcnZf
+YXBwZW5kKHRvcCwgc291cmNlLCAmbG9jYWxfZXJyKTsNCj4+PiArDQo+Pj4gK8KgwqDCoCBpZiAo
+bG9jYWxfZXJyKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGJkcnZfdW5yZWYodG9wKTsNCj4+DQo+
+PiBUaGlzIGlzIGRvbmUgYXV0b21hdGljYWxseSBieSBiZHJ2X2FwcGVuZCgpLg0KPj4NCj4+PiAr
+wqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCBiZHJ2X2RyYWluZWRfZW5kKHNvdXJjZSk7DQo+
+Pj4gKw0KPj4+ICvCoMKgwqAgaWYgKGxvY2FsX2Vycikgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBi
+ZHJ2X3VucmVmX2NoaWxkKHRvcCwgc3RhdGUtPnRhcmdldCk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKg
+IGJkcnZfdW5yZWYodG9wKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgZXJyb3JfcHJvcGFnYXRlKGVy
+cnAsIGxvY2FsX2Vycik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiBOVUxMOw0KPj4+ICvC
+oMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKgIHJldHVybiB0b3A7DQo+Pj4gK30NCj4+PiArDQo+
+Pj4gK3ZvaWQgYmRydl9iYWNrdXBfdG9wX2Ryb3AoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4g
+K3sNCj4+PiArwqDCoMKgIEJEUlZCYWNrdXBUb3BTdGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+Pj4g
+Kw0KPj4+ICvCoMKgwqAgQWlvQ29udGV4dCAqYWlvX2NvbnRleHQgPSBiZHJ2X2dldF9haW9fY29u
+dGV4dChicyk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYWlvX2NvbnRleHRfYWNxdWlyZShhaW9fY29u
+dGV4dCk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9kcmFpbmVkX2JlZ2luKGJzKTsNCj4+PiAr
+DQo+Pj4gK8KgwqDCoCBiZHJ2X2NoaWxkX3RyeV9zZXRfcGVybShicy0+YmFja2luZywgMCwgQkxL
+X1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4+ICvCoMKgwqAgYmRydl9yZXBsYWNlX25vZGUo
+YnMsIGJhY2tpbmdfYnMoYnMpLCAmZXJyb3JfYWJvcnQpOw0KPj4+ICvCoMKgwqAgYmRydl9zZXRf
+YmFja2luZ19oZChicywgTlVMTCwgJmVycm9yX2Fib3J0KTsNCj4+DQo+PiBUaGlzIGlzIGRvbmUg
+YXV0b21hdGljYWxseSBpbiBiZHJ2X2Nsb3NlKCksIGFuZCBhZnRlciBicyBoYXMgYmVlbg0KPj4g
+cmVwbGFjZWQgYnkgYmFja2luZ19icyhicyksIEkgZG9uJ3QgdGhpbmsgbmV3IHJlcXVlc3RzIHNo
+b3VsZCBjb21lIGluLA0KPj4gc28gSSBkb24ndCB0aGluayB0aGlzIG5lZWRzIHRvIGJlIGRvbmUg
+aGVyZS4NCj4gDQo+IEZvbGxvd2luZyBtb3ZlbWVudCBvZiBiYWNrdXBfdG9wIGJhY2sgdG8gam9i
+LT5ibGsgYmVjb21lcyBpbXBvc3NpYmxlIHRoZW4sDQo+IGlmIHdlIGRvbid0IHNoYXJlIFdSSVRF
+IG9uIHNvdXJjZSBpbiBiYWNrdXBfdG9wX2NoaWxkX3Blcm0uDQo+IA0KPiBBbmQgSSB0aGluaywg
+dGhpcyBmdW5jdGlvbiBzaG91bGQgZHJvcCBhbGwgcmVsYXRpb25zIGNyZWF0ZWQgYnkNCj4gYmRy
+dl9iYWNrdXBfdG9wX2FwcGVuZC4NCj4gDQo+Pg0KPj4+ICsNCj4+PiArwqDCoMKgIGJkcnZfZHJh
+aW5lZF9lbmQoYnMpOw0KPj4+ICsNCj4+PiArwqDCoMKgIGlmIChzLT50YXJnZXQpIHsNCj4+PiAr
+wqDCoMKgwqDCoMKgwqAgYmRydl91bnJlZl9jaGlsZChicywgcy0+dGFyZ2V0KTsNCj4+PiArwqDC
+oMKgIH0NCj4+DQo+PiBBbmQgdGhpcyBzaG91bGQgYmUgZG9uZSBpbiBhIC5iZHJ2X2Nsb3NlKCkg
+aW1wbGVtZW50YXRpb24sIEkgdGhpbmsuDQo+Pg0KDQphbmQgdGhlcmVmb3JlIHRoaXMgb25lIHRv
+by4gV2UgZG9uJ3QgaGF2ZSAuYmRydl9vcGVuLCBzbyBJJ2QgcHJlZmVyIG5vdA0KaGF2ZSBiZHJ2
+X2Nsb3NlLiBXZSBjcmVhdGUgdGhpcyBjaGlsZCBpbiBfdG9wX2FwcGVuZCwgc2VlbXMgbG9naWNh
+bCB0bw0KdW5yZWYgaXQgaW4gX3RvcF9kcm9wLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
