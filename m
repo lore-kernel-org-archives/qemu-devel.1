@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35664)
+Received: from eggs.gnu.org ([209.51.188.92]:36526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hFAl3-00033a-FD
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 00:59:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1hFApa-0004YI-CX
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 01:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hFAl2-00036c-IL
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 00:59:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hFAl2-00035d-9Y
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 00:59:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2A47E8666A
-	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 04:59:15 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1hFApZ-0006KW-40
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 01:03:58 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-18-armbru@redhat.com>
-	<20190412183946.GS2906@work-vm>
-Date: Sat, 13 Apr 2019 06:59:13 +0200
-In-Reply-To: <20190412183946.GS2906@work-vm> (David Alan Gilbert's message of
-	"Fri, 12 Apr 2019 19:39:47 +0100")
-Message-ID: <87wojyh55q.fsf@dusky.pond.sub.org>
+References: <20190412152619.23542-1-thuth@redhat.com>
+	<CAFEAcA9kXdUH3vkGLfEe+CFuD=S9XFEaWGNETre7gYOx5epFpQ@mail.gmail.com>
+	<7d2fc749-e6ac-7646-8e37-3399d42b6822@redhat.com>
+Date: Sat, 13 Apr 2019 07:03:52 +0200
+In-Reply-To: <7d2fc749-e6ac-7646-8e37-3399d42b6822@redhat.com> (Thomas Huth's
+	message of "Fri, 12 Apr 2019 20:59:12 +0200")
+Message-ID: <87sgumh4xz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 17/17] include: Move fprintf_function to
- disas/
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/arm/nseries: Deprecate the n800
+ and n810 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> The previous commits have eliminated fprintf_function outside
->> disassemblers, simplifying code and cleaning up the ugly type-punning
->> fprintf_function seems to attract.  Move fprintf_function to
->> include/disas/dis-asm.h to reduce the temptation to abuse it.
+> On 12/04/2019 18.02, Peter Maydell wrote:
+>> On Fri, 12 Apr 2019 at 16:26, Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>> These machines depend on the deprecated bluetooth subsystem. In case we
+>>> finally decide to remove the bluetooth subsystem, we likely need to
+>>> remove the n800 and n810 machines, too, so mark them now as deprecated.
 >> 
->> I considered renaming it to fprintf_ftype (reverting that part of
->> commit 6e2d864edf5, v0.14.0) to get us closer to binutils, but I
->> figure the fork is too distant to make this worthwhile.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ...we could just remove the bluetooth devices from the boards?
 >
-> I'm OKish with this - although it's the only place we currently
-> use it, it's a fairly common concept, so I'm not sure it's worth
-> banishing.
+> Maybe we could. But do we really want to spent time to work on boards
+> that likely nobody uses anymore? Or do you know anybody using it?
+> (at least Guenter does not seem to use it, according to his list, see
+> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06125.html )
 
-I found 15 uses, ranging from questionable to outright bad.  I
-eliminated 14, and cleaned up one.  I guess that has made me skeptical
-on the chances of this type getting used sanely.
+I think we're far too willing to drag along code of dubious utility.
 
-Banishing the type to where it came from reduces the temptation.
-
-Perhaps that's not actually necessary now we've gotten rid of the bad
-examples.
-
-Should a sane use come up, we can simply revert this patch.
-
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
+Deprecation is not a death sentence.  It's a formal notice to users "we
+intend to drop this, and now is the time to argue for keeping it".
