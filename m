@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50713)
+Received: from eggs.gnu.org ([209.51.188.92]:50997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLCR-00082N-K0
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:08:16 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hFLDP-0000Ke-4o
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFLCQ-00030N-Jo
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:08:15 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 13 Apr 2019 16:08:09 +0000
-Message-ID: <2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-8-vsementsov@virtuozzo.com>
-	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-In-Reply-To: <5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9A6443B0D937D74FA7ED1C44307DBA43@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hFLDN-00048e-GG
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:09:15 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43728)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hFLDN-00047T-7y
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 12:09:13 -0400
+Received: by mail-ot1-x341.google.com with SMTP id u15so10992537otq.10
+	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 09:09:13 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
- filter driver
+References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554383690-28338-2-git-send-email-mateja.marjanovic@rt-rk.com>
+In-Reply-To: <1554383690-28338-2-git-send-email-mateja.marjanovic@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 13 Apr 2019 18:09:01 +0200
+Message-ID: <CAL1e-=g5civoFYYx8xD+RsPKjBZUdQd0R7HAq8enqqGmwqzCkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] target/mips: Optimize
+ ILVOD.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +31,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-MTYuMDEuMjAxOSAxOTowMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEJhY2t1cC10b3AgZmlsdGVy
-IGRvZXMgY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0aW9uLiBJdCBzaG91bGQgYmUNCj4+IGluc2Vy
-dGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQgbm9kZSBmb3IgQ0JXLCBsaWtl
-IHRoZQ0KPj4gZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgKy0tLS0tLS0rDQo+PiAgICAgIHwgR3Vl
-c3QgfA0KPj4gICAgICArLS0tKy0tLSsNCj4+ICAgICAgICAgIHxyLHcNCj4+ICAgICAgICAgIHYN
-Cj4+ICAgICAgKy0tLSstLS0tLS0tLS0tLSsgIHRhcmdldCAgICstLS0tLS0tLS0tLS0tLS0rDQo+
-PiAgICAgIHwgYmFja3VwX3RvcCAgICB8LS0tLS0tLS0tLT58IHRhcmdldChxY293MikgfA0KPj4g
-ICAgICArLS0tKy0tLS0tLS0tLS0tKyAgIENCVyAgICAgKy0tLSstLS0tLS0tLS0tLSsNCj4+ICAg
-ICAgICAgIHwNCj4+IGJhY2tpbmcgfHIsdw0KPj4gICAgICAgICAgdg0KPj4gICAgICArLS0tKy0t
-LS0tLS0tLSsNCj4+ICAgICAgfCBBY3RpdmUgZGlzayB8DQo+PiAgICAgICstLS0tLS0tLS0tLS0t
-Kw0KPj4NCj4+IFRoZSBkcml2ZXIgd2lsbCBiZSB1c2VkIGluIGJhY2t1cCBpbnN0ZWFkIG9mIHdy
-aXRlLW5vdGlmaWVycy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2sv
-YmFja3VwLXRvcC5oICB8ICA0MyArKysrKysrDQo+PiAgIGJsb2NrL2JhY2t1cC10b3AuYyAgfCAz
-MDYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+ICAgYmxv
-Y2svTWFrZWZpbGUub2JqcyB8ICAgMiArDQo+PiAgIDMgZmlsZXMgY2hhbmdlZCwgMzUxIGluc2Vy
-dGlvbnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuaA0KPj4g
-ICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5jDQo+IA0KDQpbLi5dDQoNCj4+
-ICtCbG9ja0RyaXZlclN0YXRlICpiZHJ2X2JhY2t1cF90b3BfYXBwZW5kKEJsb2NrRHJpdmVyU3Rh
-dGUgKnNvdXJjZSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IEJsb2NrRHJpdmVyU3RhdGUgKnRhcmdldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIEhCaXRtYXAgKmNvcHlfYml0bWFwLA0KPj4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4gK3sNCj4+ICsgICAg
-RXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQo+PiArICAgIEJEUlZCYWNrdXBUb3BTdGF0ZSAqc3Rh
-dGU7DQo+PiArICAgIEJsb2NrRHJpdmVyU3RhdGUgKnRvcCA9IGJkcnZfbmV3X29wZW5fZHJpdmVy
-KCZiZHJ2X2JhY2t1cF90b3BfZmlsdGVyLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBOVUxMLCBCRFJWX09fUkRXUiwgZXJycCk7DQo+PiArDQo+
-PiArICAgIGlmICghdG9wKSB7DQo+PiArICAgICAgICByZXR1cm4gTlVMTDsNCj4+ICsgICAgfQ0K
-Pj4gKw0KPj4gKyAgICB0b3AtPmltcGxpY2l0ID0gdHJ1ZTsNCj4+ICsgICAgdG9wLT50b3RhbF9z
-ZWN0b3JzID0gc291cmNlLT50b3RhbF9zZWN0b3JzOw0KPj4gKyAgICB0b3AtPm9wYXF1ZSA9IHN0
-YXRlID0gZ19uZXcwKEJEUlZCYWNrdXBUb3BTdGF0ZSwgMSk7DQo+PiArICAgIHN0YXRlLT5jb3B5
-X2JpdG1hcCA9IGNvcHlfYml0bWFwOw0KPj4gKw0KPj4gKyAgICBiZHJ2X3JlZih0YXJnZXQpOw0K
-Pj4gKyAgICBzdGF0ZS0+dGFyZ2V0ID0gYmRydl9hdHRhY2hfY2hpbGQodG9wLCB0YXJnZXQsICJ0
-YXJnZXQiLCAmY2hpbGRfZmlsZSwgZXJycCk7DQo+PiArICAgIGlmICghc3RhdGUtPnRhcmdldCkg
-ew0KPj4gKyAgICAgICAgYmRydl91bnJlZih0YXJnZXQpOw0KPj4gKyAgICAgICAgYmRydl91bnJl
-Zih0b3ApOw0KPj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsg
-ICAgYmRydl9zZXRfYWlvX2NvbnRleHQodG9wLCBiZHJ2X2dldF9haW9fY29udGV4dChzb3VyY2Up
-KTsNCj4+ICsgICAgYmRydl9zZXRfYWlvX2NvbnRleHQodGFyZ2V0LCBiZHJ2X2dldF9haW9fY29u
-dGV4dChzb3VyY2UpKTsNCj4+ICsNCj4+ICsgICAgYmRydl9kcmFpbmVkX2JlZ2luKHNvdXJjZSk7
-DQo+PiArDQo+PiArICAgIGJkcnZfcmVmKHRvcCk7DQo+PiArICAgIGJkcnZfYXBwZW5kKHRvcCwg
-c291cmNlLCAmbG9jYWxfZXJyKTsNCj4+ICsNCj4+ICsgICAgaWYgKGxvY2FsX2Vycikgew0KPj4g
-KyAgICAgICAgYmRydl91bnJlZih0b3ApOw0KPiANCj4gVGhpcyBpcyBkb25lIGF1dG9tYXRpY2Fs
-bHkgYnkgYmRydl9hcHBlbmQoKS4NCj4gDQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgYmRydl9k
-cmFpbmVkX2VuZChzb3VyY2UpOw0KPj4gKw0KPj4gKyAgICBpZiAobG9jYWxfZXJyKSB7DQo+PiAr
-ICAgICAgICBiZHJ2X3VucmVmX2NoaWxkKHRvcCwgc3RhdGUtPnRhcmdldCk7DQo+PiArICAgICAg
-ICBiZHJ2X3VucmVmKHRvcCk7DQo+PiArICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgbG9j
-YWxfZXJyKTsNCj4+ICsgICAgICAgIHJldHVybiBOVUxMOw0KPj4gKyAgICB9DQo+PiArDQo+PiAr
-ICAgIHJldHVybiB0b3A7DQo+PiArfQ0KPj4gKw0KPj4gK3ZvaWQgYmRydl9iYWNrdXBfdG9wX2Ry
-b3AoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+PiArew0KPj4gKyAgICBCRFJWQmFja3VwVG9wU3Rh
-dGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gKw0KPj4gKyAgICBBaW9Db250ZXh0ICphaW9fY29udGV4
-dCA9IGJkcnZfZ2V0X2Fpb19jb250ZXh0KGJzKTsNCj4+ICsNCj4+ICsgICAgYWlvX2NvbnRleHRf
-YWNxdWlyZShhaW9fY29udGV4dCk7DQo+PiArDQo+PiArICAgIGJkcnZfZHJhaW5lZF9iZWdpbihi
-cyk7DQo+PiArDQo+PiArICAgIGJkcnZfY2hpbGRfdHJ5X3NldF9wZXJtKGJzLT5iYWNraW5nLCAw
-LCBCTEtfUEVSTV9BTEwsICZlcnJvcl9hYm9ydCk7DQo+PiArICAgIGJkcnZfcmVwbGFjZV9ub2Rl
-KGJzLCBiYWNraW5nX2JzKGJzKSwgJmVycm9yX2Fib3J0KTsNCj4+ICsgICAgYmRydl9zZXRfYmFj
-a2luZ19oZChicywgTlVMTCwgJmVycm9yX2Fib3J0KTsNCj4gDQo+IFRoaXMgaXMgZG9uZSBhdXRv
-bWF0aWNhbGx5IGluIGJkcnZfY2xvc2UoKSwgYW5kIGFmdGVyIGJzIGhhcyBiZWVuDQo+IHJlcGxh
-Y2VkIGJ5IGJhY2tpbmdfYnMoYnMpLCBJIGRvbid0IHRoaW5rIG5ldyByZXF1ZXN0cyBzaG91bGQg
-Y29tZSBpbiwNCj4gc28gSSBkb24ndCB0aGluayB0aGlzIG5lZWRzIHRvIGJlIGRvbmUgaGVyZS4N
-Cg0KRm9sbG93aW5nIG1vdmVtZW50IG9mIGJhY2t1cF90b3AgYmFjayB0byBqb2ItPmJsayBiZWNv
-bWVzIGltcG9zc2libGUgdGhlbiwNCmlmIHdlIGRvbid0IHNoYXJlIFdSSVRFIG9uIHNvdXJjZSBp
-biBiYWNrdXBfdG9wX2NoaWxkX3Blcm0uDQoNCkFuZCBJIHRoaW5rLCB0aGlzIGZ1bmN0aW9uIHNo
-b3VsZCBkcm9wIGFsbCByZWxhdGlvbnMgY3JlYXRlZCBieQ0KYmRydl9iYWNrdXBfdG9wX2FwcGVu
-ZC4NCg0KPiANCj4+ICsNCj4+ICsgICAgYmRydl9kcmFpbmVkX2VuZChicyk7DQo+PiArDQo+PiAr
-ICAgIGlmIChzLT50YXJnZXQpIHsNCj4+ICsgICAgICAgIGJkcnZfdW5yZWZfY2hpbGQoYnMsIHMt
-PnRhcmdldCk7DQo+PiArICAgIH0NCj4gDQo+IEFuZCB0aGlzIHNob3VsZCBiZSBkb25lIGluIGEg
-LmJkcnZfY2xvc2UoKSBpbXBsZW1lbnRhdGlvbiwgSSB0aGluay4NCj4gDQo+IE1heA0KPiANCj4+
-ICsgICAgYmRydl91bnJlZihicyk7DQo+PiArDQo+PiArICAgIGFpb19jb250ZXh0X3JlbGVhc2Uo
-YWlvX2NvbnRleHQpOw0KPj4gK30NCj4+ICsNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
-bWlyDQo=
+On Thu, Apr 4, 2019 at 3:16 PM Mateja Marjanovic
+<mateja.marjanovic@rt-rk.com> wrote:
+>
+> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>
+> Optimize set of MSA instructions ILVOD.<B|H|W|D>, using
+> directly tcg registers and performing logic on them instead
+> of using helpers.
+>
+
+Please see my comments for ILVEV.D.
+
+Thanks,
+Aleksandar
+
+> In the following table, the first column is the performance
+> before this patch. The second represents the performance,
+> after converting from helpers to tcg, but without using
+> tcg_gen_deposit function. The third one is the solution
+> which is implemented in this patch.
+>
+> Performance measurement is done by executing the
+> instructions a large number of times on a computer
+> with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> || instr    ||   before    || no-deposit || with-deposit  ||
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> || ilvod.b  ||  117.50 ms  ||  24.13 ms  ||   23.71 ms    ||
+> || ilvod.h  ||   93.16 ms  ||  24.21 ms  ||   23.45 ms    ||
+> || ilvod.w  ||  119.90 ms  ||  24.15 ms  ||   22.91 ms    ||
+> || ilvod.d  ||   43.01 ms  ||  21.17 ms  ||   20.53 ms    ||
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> No-deposit column and with-deposit column have the
+> same statistical values in every row, except ILVOD.W,
+> which is the only function which uses the deposit
+> function.
+>
+> No-deposit version of the ILVOD.W implementation:
+>
+> static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
+>                                uint32_t ws, uint32_t wt)
+> {
+>     TCGv_i64 t1 =3D tcg_temp_new_i64();
+>     TCGv_i64 t2 =3D tcg_temp_new_i64();
+>     TCGv_i64 mask =3D tcg_const_i64(0xffffffff00000000ULL);
+>
+>     tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+>     tcg_gen_shri_i64(t1, t1, 32);
+>     tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+>     tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+>
+>     tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+>     tcg_gen_shri_i64(t1, t1, 32);
+>     tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+>     tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+>
+>     tcg_temp_free_i64(mask);
+>     tcg_temp_free_i64(t1);
+>     tcg_temp_free_i64(t2);
+> }
+>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+> ---
+>  target/mips/helper.h     |   1 -
+>  target/mips/msa_helper.c |   7 ----
+>  target/mips/translate.c  | 106 +++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  3 files changed, 105 insertions(+), 9 deletions(-)
+>
+> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> index 2863f60..02e16c7 100644
+> --- a/target/mips/helper.h
+> +++ b/target/mips/helper.h
+> @@ -865,7 +865,6 @@ DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, =
+i32)
+>  DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+> -DEF_HELPER_5(msa_ilvod_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+>  DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+> index 6c57281..a7ea6aa 100644
+> --- a/target/mips/msa_helper.c
+> +++ b/target/mips/msa_helper.c
+> @@ -1206,13 +1206,6 @@ MSA_FN_DF(ilvr_df)
+>  MSA_FN_DF(ilvev_df)
+>  #undef MSA_DO
+>
+> -#define MSA_DO(DF)                          \
+> -    do {                                    \
+> -        pwx->DF[2*i]   =3D pwt->DF[2*i+1];    \
+> -        pwx->DF[2*i+1] =3D pws->DF[2*i+1];    \
+> -    } while (0)
+> -MSA_FN_DF(ilvod_df)
+> -#undef MSA_DO
+>  #undef MSA_LOOP_COND
+>
+>  #define MSA_LOOP_COND(DF) \
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index bba8b6c..df685e4 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -28884,6 +28884,95 @@ static void gen_msa_bit(CPUMIPSState *env, Disas=
+Context *ctx)
+>      tcg_temp_free_i32(tws);
+>  }
+>
+> +/*
+> + * [MSA] ILVOD.B wd, ws, wt
+> + *
+> + *   Vector Interleave Odd (byte data elements)
+> + *
+> + */
+> +static inline void gen_ilvod_b(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> +    TCGv_i64 mask =3D tcg_const_i64(0xff00ff00ff00ff00ULL);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_shri_i64(t1, t1, 8);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_shri_i64(t1, t1, 8);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+> +    tcg_temp_free_i64(mask);
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+> +}
+> +
+> +/*
+> + * [MSA] ILVOD.H wd, ws, wt
+> + *
+> + *   Vector Interleave Odd (halfword data elements)
+> + *
+> + */
+> +static inline void gen_ilvod_h(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+> +    TCGv_i64 mask =3D tcg_const_i64(0xffff0000ffff0000ULL);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+> +    tcg_gen_shri_i64(t1, t1, 16);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+> +
+> +    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+> +    tcg_gen_shri_i64(t1, t1, 16);
+> +    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+> +    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+> +
+> +    tcg_temp_free_i64(mask);
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+> +}
+> +
+> +/*
+> + * [MSA] ILVOD.W wd, ws, wt
+> + *
+> + *   Vector Interleave Odd (word data elements)
+> + *
+> + */
+> +static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> +
+> +    tcg_gen_shri_i64(t1, msa_wr_d[wt * 2], 32);
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[ws * 2], t1, 0, 32);
+> +
+> +    tcg_gen_shri_i64(t1, msa_wr_d[wt * 2 + 1], 32);
+> +    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1], t1, =
+0, 32);
+> +
+> +    tcg_temp_free_i64(t1);
+> +}
+> +
+> +/*
+> + * [MSA] ILVOD.D wd, ws, wt
+> + *
+> + *   Vector Interleave Odd (doubleword data elements)
+> + *
+> + */
+> +static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
+> +                               uint32_t ws, uint32_t wt)
+> +{
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2 + 1]);
+> +    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+> +}
+> +
+>  static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+>  {
+>  #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+> @@ -29055,7 +29144,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
+ontext *ctx)
+>          gen_helper_msa_mod_u_df(cpu_env, tdf, twd, tws, twt);
+>          break;
+>      case OPC_ILVOD_df:
+> -        gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
+> +        switch (df) {
+> +        case DF_BYTE:
+> +            gen_ilvod_b(env, wd, ws, wt);
+> +            break;
+> +        case DF_HALF:
+> +            gen_ilvod_h(env, wd, ws, wt);
+> +            break;
+> +        case DF_WORD:
+> +            gen_ilvod_w(env, wd, ws, wt);
+> +            break;
+> +        case DF_DOUBLE:
+> +            gen_ilvod_d(env, wd, ws, wt);
+> +            break;
+> +        default:
+> +            assert(0);
+> +        }
+>          break;
+>
+>      case OPC_DOTP_S_df:
+> --
+> 2.7.4
+>
+>
