@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51150)
+Received: from eggs.gnu.org ([209.51.188.92]:54495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFCOi-0006A0-LW
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:44:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hFClY-0003Nd-UZ
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 03:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFCOh-0008Ik-RM
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:44:20 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36377)
+	(envelope-from <richard.henderson@linaro.org>) id 1hFClX-0004Kp-Qw
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 03:07:56 -0400
+Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:38417)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hFCOh-0008I7-As
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:44:19 -0400
-Received: by mail-pl1-x644.google.com with SMTP id ck15so6156454plb.3
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 23:44:18 -0700 (PDT)
-References: <20190315032629.21234-1-richard.henderson@linaro.org>
-	<20190315032629.21234-13-richard.henderson@linaro.org>
-	<6ea1d95e-f5c7-7b14-04c7-07699e9d564a@redhat.com>
+	id 1hFClW-0004KA-TB
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 03:07:55 -0400
+Received: by mail-pg1-x534.google.com with SMTP id j26so6220148pgl.5
+	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 00:07:54 -0700 (PDT)
+References: <20190411153942.4533-1-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
-Date: Fri, 12 Apr 2019 20:44:12 -1000
+Message-ID: <53930e87-3bb1-fdd5-a8fe-8603c0adecc2@linaro.org>
+Date: Fri, 12 Apr 2019 21:07:48 -1000
 MIME-Version: 1.0
-In-Reply-To: <6ea1d95e-f5c7-7b14-04c7-07699e9d564a@redhat.com>
+In-Reply-To: <20190411153942.4533-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/23] linux-user: Call qcrypto_init if
- not using -seed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement NSACR gating of
+ floating point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 4/10/19 11:49 PM, Philippe Mathieu-Daudé wrote:
->> -    if (seed_optarg != NULL) {
->> -        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
->> +    {
-> Since 7be41675f7c we use gnu99 C, so this extra block indentation can be
-> removed.
-> 
->> +        Error *err = NULL;
->> +        if (seed_optarg != NULL) {
->> +            qemu_guest_random_seed_main(seed_optarg, &err);
->> +        } else {
->> +            /* ??? Assumes qcrypto is only used by qemu_guest_getrandom.  */
->> +            qcrypto_init(&err);
->> +        }
->> +        if (err) {
->> +            error_reportf_err(err, "cannot initialize crypto: ");
->> +            exit(1);
->> +        }
->>      }
+On 4/11/19 5:39 AM, Peter Maydell wrote:
+> +static uint64_t cptr_el2_read(CPUARMState *env, const ARMCPRegInfo *ri)
+> +{
+> +    /*
+> +     * For A-profile AArch32 EL3, if NSACR.CP10
+> +     * is 0 then HCPTR.{TCP11,TCP10} ignore writes and read as 1.
+> +     */
+> +    uint64_t value = env->cp15.cptr_el[2];
+> +
+> +    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
+> +        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
+> +        value &= ~(0x3 << 10);
 
-I could, but it also limits the scope, which is of more importance to variables
-who have their address taken.  It means that their storage could (in theory) be
-shared with objects not overlapping in scope.
+Read as 1, and yet you're clearing the value?  Cut-n-paste error from CPACR?
+Surely better to do nothing on read, but set on write (to either HCPTR or NSACR).
+
+> +static uint64_t cpacr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+> +{
+> +    /*
+> +     * For A-profile AArch32 EL3 (but not M-profile secure mode), if NSACR.CP10
+> +     * is 0 then CPACR.{CP11,CP10} ignore writes and read as 0b00.
+> +     */
+> +    uint64_t value = env->cp15.cpacr_el1;
+> +
+> +    if (arm_feature(env, ARM_FEATURE_EL3) && !arm_el_is_aa64(env, 3) &&
+> +        !arm_is_secure(env) && !extract32(env->cp15.nsacr, 10, 1)) {
+> +        value &= ~(0xf << 20);
+> +    }
+
+This one does do the right thing, but better to clear the bits on write to
+NSACR.  This lets you avoid the change to fp_exception_el, and the missing
+change to sve_exception_el.
 
 
 r~
