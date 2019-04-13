@@ -2,68 +2,85 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A2FC10F11
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 17:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C28C10F11
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 20:30:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C19A5206B7
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 17:54:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2FBF20870
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 20:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="oBlrtRfd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C19A5206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r+HiKKSc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FBF20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54316 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55667 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFMrA-0000lL-K9
-	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 13:54:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37834)
+	id 1hFPIG-00040n-Ki
+	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 16:30:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hFMqI-0000PS-7O
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:31 -0400
+	(envelope-from <jbi.octave@gmail.com>) id 1hFPGj-0003DH-Tl
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hFMqH-0000Og-92
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:30 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:33089)
+	(envelope-from <jbi.octave@gmail.com>) id 1hFPGi-0000LU-0g
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:57 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34006)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hFMqG-0000NC-LD; Sat, 13 Apr 2019 13:53:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=45ifwiIzlE4cIrJYo5KkZTWldnMSQLRiIRmjoS8vlwc=; 
-	b=oBlrtRfd817GGHP77fNYteLILSXTJSXJy8t6XO5XbJ80unuCnOOpxeaP6KFiwt5igf2KB0L3a/T0nZli/J4psKHFJAZZZ9osAHQ7yjDsg9r8hHHQy+Cm5l4U4mLQNBzrU2ghWHLbnU8tWqg6pXImiWZrLu+opsqWBjAYZ1i6qKiTLSmojJVWyfyxU8Oouyaf0RPBIWgoEbJ7LDA6ya5NSDdrQs2cOYFaMJOtg3Xj9jy2c3yg2DcWCGZvAA8tlS9iJRGRe2HkkwIiAGjhpz/AQ4Gtyu2kJ/uXk/6FZXuRXaWIepz9YcvmzpVG7ZXjckwkimpLHFPJeIMBC9Lz6sNthA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hFMqE-0007Vd-99; Sat, 13 Apr 2019 19:53:26 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hFMqE-0003Hg-6R; Sat, 13 Apr 2019 19:53:26 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-In-Reply-To: <b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
-References: <cover.1554992449.git.berto@igalia.com>
-	<6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
-	<w51zhoufg2l.fsf@maestria.local.igalia.com>
-	<b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Sat, 13 Apr 2019 19:53:25 +0200
-Message-ID: <w51zhotu6zu.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
+	id 1hFPGg-0000HL-Av
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 16:28:54 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r186so3009843wmf.1
+	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 13:28:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=SEKRy7aHQXuSEfpbZ0pa8gjX4vlmHg5KV7kK/N9lB/0=;
+	b=r+HiKKScyQXsy/vEoia3PBstuHxKIa6HXmWUT08EzINH+yunNh2f6Q+fphEqYRF5bL
+	jRXEmaEMHZsFGIhJUzFkQ7A/E7Y2Tw0u3qQ/z6USHoJTlY7jGRsKy7cZx+KQZZj0n2fe
+	z8VMVa3x9F037Xug0ye9VJmJKHIjiIVucM0dN5PnQGwTmg8SJhn1TUo1dcF/o6U8PTx5
+	YS8V1jbiayKzwkxRMXICRdbRXM9nMSrRnKGhufj6qm4iHYCniLz/Wgkl7JncNIdmYusL
+	EAnPlHWht8vSt63JWbeFn6cCEkwBgRtti90/Iil00y8DgnxfjJYqikw4nQiYYIE6Gi4C
+	U6UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=SEKRy7aHQXuSEfpbZ0pa8gjX4vlmHg5KV7kK/N9lB/0=;
+	b=bqfNh2aHe+qmFrwyem+nHoY8swwziyLIYQ2y7SCsrRwTumGGzRfivYYPitvQEiBJKL
+	rsbkL9s/vIXxusePdj0+eyECQjJF9dL48lYd66DKMpRbeqp/d89AElTJqYIN0sIXYpuO
+	stScxsN+yypOg0pyr0x5q1+JNdRjWDcwstKGrUO2TKd8q3bJFPx63dN8DN6o5rLlOsho
+	qewdGSAwbkkgpkUy+ubzGiLHPLGb73xQXJofxDfcJbHthUiemgY6ZQ2cMGYMJ3X1kiac
+	AW14cmIPh6LMedmxYPgl6vs/3qEiY/8DA0J7lwdrPkNYSMpic78RSWag4nTtULGFHuBQ
+	LaXQ==
+X-Gm-Message-State: APjAAAXn+XJnDnYHPW4AQtcqFU/ledc07XJd/V9ZIDhsF3mVvzCbd3wz
+	Zh2pJm9SpoOo2YfRsg2T8jo9vjj7/w==
+X-Google-Smtp-Source: APXvYqzK5ctX0akepn0We4WxytzhJi9fxTC1no5BS8EKq3yya/4ly1tjW0EJqAkq28zOiiHa0vyO/w==
+X-Received: by 2002:a1c:cf46:: with SMTP id f67mr15554768wmg.98.1555187331563; 
+	Sat, 13 Apr 2019 13:28:51 -0700 (PDT)
+Received: from ninjahub.lan (host-2-103-80-5.as13285.net. [2.103.80.5])
+	by smtp.gmail.com with ESMTPSA id
+	7sm153212361wrc.81.2019.04.13.13.28.50
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 13 Apr 2019 13:28:50 -0700 (PDT)
+From: Jules Irenge <jbi.octave@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Sat, 13 Apr 2019 21:28:16 +0100
+Message-Id: <20190413202818.13622-1-jbi.octave@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
- files in bdrv_reopen_prepare()
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v5 0/2] target/mips: Errors amd warnings
+ cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,20 +92,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: arikalo@wavecomp.com, Jules Irenge <jbi.octave@gmail.com>,
+	aurelien@aurel32.net, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190413175325.6vlLR9lRQe3nex5FQutJBqVMueqrqIMisgh1YC-Rq-s@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190413202816.fkEyNEJrxAC5m1Yjm3t5fGOLEuupelsUSAi30gG0IEM@z>
 
-On Sat 13 Apr 2019 05:48:11 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
->> Ok, you can leave out the second patch then. The first one should
->> still be correct, right?
->
-> I just think it=E2=80=99s unnecessary because as of my series both
-> backing_file and auto_backing_file serve the purpose.
+This v5 series combines patch v4 2/3 into patch v4 1/3 hence the number
+of patches to two.
 
-Ok then!
+Jules Irenge (2):
+  target/mips: add or remove space to fix checkpatch errors
+  target/mips: realign comments to fix checkpatch warnings
 
-Berto
+ target/mips/cpu.h | 211 +++++++++++++++++++++++++---------------------
+ 1 file changed, 117 insertions(+), 94 deletions(-)
+
+-- 
+2.20.1
+
 
