@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43371)
+Received: from eggs.gnu.org ([209.51.188.92]:44506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFKSW-0006fb-H5
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 11:20:49 -0400
+	(envelope-from <jo@durchholz.org>) id 1hFKYt-0001vM-HE
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 11:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hFKSV-0000cY-G4
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 11:20:48 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 13 Apr 2019 17:20:37 +0200
-Message-Id: <20190413152037.6817-3-mreitz@redhat.com>
-In-Reply-To: <20190413152037.6817-1-mreitz@redhat.com>
-References: <20190413152037.6817-1-mreitz@redhat.com>
+	(envelope-from <jo@durchholz.org>) id 1hFKYr-0005oY-Ex
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 11:27:23 -0400
+Received: from 5.itsy.de ([188.40.84.14]:44206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hFKYo-0005j6-FG
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 11:27:19 -0400
+Received: from [192.168.178.32] (unknown [195.48.33.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by 5.itsy.de (Postfix) with ESMTPSA id 9AA14658AE
+	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 17:27:14 +0200 (CEST)
+From: Joachim Durchholz <jo@durchholz.org>
+Message-ID: <91dddf37-77fe-79c6-59f5-4e60d45c3c7e@durchholz.org>
+Date: Sat, 13 Apr 2019 17:27:14 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-next 2/2] qemu-img: Make create hint at
- protocol options
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] How to I trigger a rebuild?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,110 +30,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-qemu-img create allows giving just a format and "-o help" to get a list
-of the options supported by that format.  Users may not realize that the
-protocol level may offer even more options, which they only get to see
-by specifying a filename.
+Hi all,
 
-This patch adds a note to hint at that fact.
+I did the usual ./configure; make dance.
+Then modified a source file (ui/curses.c), called make again, but didn't 
+see curses.c recompiled, and the change was indeed ineffective.
+make clean; make didn't help either.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c                 | 13 ++++++++++++-
- tests/qemu-iotests/082.out | 20 ++++++++++++++++----
- 2 files changed, 28 insertions(+), 5 deletions(-)
+Is there a list of make targets anywhere?
+I looked in a few places in the source directories but nothing presented 
+itself.
 
-diff --git a/qemu-img.c b/qemu-img.c
-index aa6f81f1ea..0016e24efe 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -269,9 +269,20 @@ static int print_block_option_help(const char *filen=
-ame, const char *fmt)
-         create_opts =3D qemu_opts_append(create_opts, proto_drv->create_=
-opts);
-     }
-=20
--    printf("Supported options:\n");
-+    if (filename) {
-+        printf("Supported options:\n");
-+    } else {
-+        printf("Supported %s options:\n", fmt);
-+    }
-     qemu_opts_print_help(create_opts, false);
-     qemu_opts_free(create_opts);
-+
-+    if (!filename) {
-+        printf("\n"
-+               "The protocol level may support further options.\n"
-+               "Specify the target filename to include those options.\n"=
-);
-+    }
-+
-     return 0;
- }
-=20
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index 9a23b68511..7e25706813 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -242,7 +242,7 @@ Testing: create -f qcow2 -o backing_file=3DTEST_DIR/t=
-.qcow2 -o ,, -o help TEST_DIR
- qemu-img: Invalid option list: ,,
-=20
- Testing: create -f qcow2 -o help
--Supported options:
-+Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-@@ -263,10 +263,16 @@ Supported options:
-   refcount_bits=3D<num>    - Width of a reference count entry in bits
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: create -o help
--Supported options:
-+Supported raw options:
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: create -f bochs -o help
- qemu-img: Format driver 'bochs' does not support image creation
-=20
-@@ -516,7 +522,7 @@ Testing: convert -O qcow2 -o backing_file=3DTEST_DIR/=
-t.qcow2 -o ,, -o help TEST_DI
- qemu-img: Invalid option list: ,,
-=20
- Testing: convert -O qcow2 -o help
--Supported options:
-+Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-@@ -537,10 +543,16 @@ Supported options:
-   refcount_bits=3D<num>    - Width of a reference count entry in bits
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: convert -o help
--Supported options:
-+Supported raw options:
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: convert -O bochs -o help
- qemu-img: Format driver 'bochs' does not support image creation
-=20
---=20
-2.20.1
+Regards,
+Jo
