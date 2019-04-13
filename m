@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36893)
+Received: from eggs.gnu.org ([209.51.188.92]:36908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hFXsv-0006Dl-TW
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:40:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1hFXt0-0006GG-9b
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hFXsu-0000CO-AK
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:40:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33300)
+	(envelope-from <bounces@canonical.com>) id 1hFXsz-0000Dn-1t
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:41:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hFXsu-0000C4-1s
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:40:56 -0400
+	id 1hFXsx-0000D6-4A
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 01:40:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hFXss-0007Uz-2j
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 05:40:54 +0000
+	id 1hFXsv-0007aW-RU
+	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 05:40:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0AF0A2E80C8
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 05:40:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CEFF52E8055
+	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 05:40:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 14 Apr 2019 05:30:54 -0000
-From: Bug Watch Updater <1815889@bugs.launchpad.net>
+Date: Sat, 13 Apr 2019 13:50:57 -0000
+From: Ahzo <1815889@bugs.launchpad.net>
 Reply-To: Bug 1815889 <1815889@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155014036044.634.15252078016929169795.malonedeb@gac.canonical.com>
-Message-Id: <155521985596.2368.12568118498060925685.launchpad@loganberry.canonical.com>
+Message-Id: <155521985990.2368.8181599678738717580.launchpad@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815889] Re: qemu-system-x86_64 crashed with
- signal 31 in __pthread_setaffinity_new()
+Subject: [Qemu-devel] [Bug 1815889]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,8 +38,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: mesa
-       Status: Confirmed =3D> Won't Fix
+This problem was solved by qemu [1], so this mesa bug can be closed.
+
+[1]
+https://git.qemu.org/git/qemu.git/?a=3Dcommitdiff;h=3D9a1565a03b79d80b236bc=
+7cc2dbce52a2ef3a1b8
 
 -- =
 
