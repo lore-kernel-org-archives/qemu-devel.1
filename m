@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47538)
+Received: from eggs.gnu.org ([209.51.188.92]:48727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFC0N-0007wn-7B
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:19:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hFC9y-0001p4-0N
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFC0M-0002eW-B1
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:19:11 -0400
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:33851)
+	(envelope-from <richard.henderson@linaro.org>) id 1hFC9x-0008Oi-2y
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:29:05 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hFC0L-0002dw-Ug
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:19:10 -0400
-Received: by mail-pf1-x42d.google.com with SMTP id b3so6155981pfd.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 23:19:09 -0700 (PDT)
+	id 1hFC9w-0008OA-Mn
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 02:29:05 -0400
+Received: by mail-pl1-x642.google.com with SMTP id g12so6116778pll.11
+	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 23:29:04 -0700 (PDT)
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-41-david@redhat.com>
+	<20190411100836.646-42-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d1a4039a-2bdf-8fdf-63db-80ba699523cf@linaro.org>
-Date: Fri, 12 Apr 2019 20:19:04 -1000
+Message-ID: <0871b6f8-6073-4311-78a5-4772817a009e@linaro.org>
+Date: Fri, 12 Apr 2019 20:28:53 -1000
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-41-david@redhat.com>
+In-Reply-To: <20190411100836.646-42-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 40/41] s390x/tcg: Implement VECTOR SUM
- ACROSS WORD
+Subject: Re: [Qemu-devel] [PATCH v1 41/41] s390x/tcg: Implement VECTOR TEST
+ UNDER MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,15 +36,49 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 On 4/11/19 12:08 AM, David Hildenbrand wrote:
-> Similar to VECTOR SUM ACROSS DOUBLEWORD.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate_vx.inc.c | 29 +++++++++++++++++++++++++++++
->  2 files changed, 31 insertions(+)
+> +void HELPER(gvec_vtm)(void *v1, const void *v2, CPUS390XState *env,
+> +                      uint32_t desc)
+> +{
+> +    S390Vector tmp;
+> +
+> +    s390_vec_and(&tmp, v1, v2);
+> +    if (s390_vec_is_zero(&tmp)) {
+> +        /* Selected bits all zeros; or all mask bits zero */
+> +        env->cc_op = 0;
+> +    } else if (s390_vec_equal(&tmp, v2)) {
+> +        /* Selected bits all ones */
+> +        env->cc_op = 3;
+> +    } else {
+> +        /* Selected bits a mix of zeros and ones */
+> +        env->cc_op = 1;
+> +    }
+> +}
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+However, if you return this value, then you can do
+
+DEF_HELPER_FLAGS_4(gvec_vtm, TCG_CALL_NO_RWG_SE, i32, cptr, cptr)
+
+static DisasJumpType op_vtm(DisasContext *s, DisasOps *o)
+{
+    TCGv_ptr p1 = tcg_temp_new_ptr();
+    TCGv_ptr p2 = tcg_temp_new_ptr();
+
+    tcg_gen_addi_ptr(p1, cpu_env,
+        vec_full_reg_offset(get_field(s->fields, v1)));
+    tcg_gen_addi_ptr(p2, cpu_env,
+        vec_full_reg_offset(get_field(s->fields, v2)));
+    gen_helper_gvec_vtm(cc_op, p1, p2);
+    tcg_temp_free_ptr(p1);
+    tcg_temp_free_ptr(p2);
+    set_cc_static(s);
+    return DISAS_NEXT;
+}
+
+Perhaps it doesn't matter though, since use of vtm probably implies a jump,
+which implies end of TB, which means that registers are going to get saved to
+backing store anyway.
 
 
 r~
