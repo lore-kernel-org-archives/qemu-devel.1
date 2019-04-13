@@ -2,72 +2,69 @@ Return-Path: <SRS0=HErD=SP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D71C282CE
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 08:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A07DC10F11
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 08:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73AF22084D
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 08:42:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73AF22084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=durchholz.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF05A2084D
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Apr 2019 08:48:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="C1hOqbwc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF05A2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48589 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48637 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFEFN-0002kN-Ne
-	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 04:42:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40617)
+	id 1hFEKS-0003ub-55
+	for qemu-devel@archiver.kernel.org; Sat, 13 Apr 2019 04:48:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hFEDQ-0001hr-9b
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 04:40:49 -0400
+	(envelope-from <berto@igalia.com>) id 1hFEJE-0003Tp-98
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 04:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hFEDP-0007Dx-9N
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 04:40:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47834)
+	(envelope-from <berto@igalia.com>) id 1hFEJB-0002PU-E4
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 04:46:48 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:51285)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hFEDP-0007DO-0r
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 04:40:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hFEDN-0001gC-Mf
-	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 08:40:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A42AB2E804E
-	for <qemu-devel@nongnu.org>; Sat, 13 Apr 2019 08:40:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <berto@igalia.com>)
+	id 1hFEJA-0002FT-Om; Sat, 13 Apr 2019 04:46:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; 
+	h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+	bh=EjNRL3a620Vn8jmgGxel+Z3rIvVuLJPo8qJcxtRNH1M=; 
+	b=C1hOqbwckKNQPe2qp0Ruf4grimiF/PxI7RPQzUH7rNBf1xHLz1v48yTF1CrEkIPFVe5PP7BGM6e885egkG5QcAPcGSWEG0iGwc38js9dLciMXppbR/gRi9SWaKjxfWO45XkhrB+vJhC1xl5yxDEtjXkYAdjEpgAjLLeeZe26ouutOCOCTvD8Z+c0Qjr22ykGQ/f1fuaYYybCK2cFl7C8ljKgqgn01qoRZMmOf1fW0cGp/VcxqJysUZmMNfL1RfTUL6FNFX3uUd0gwb+RXJl1C52/k62HY1wk+Xw1fXFRTN/djjerD2wdUNU31Ndh4IgwrW/iU80+spUWamX/Ec1yRw==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+	by fanzine.igalia.com with esmtps 
+	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+	id 1hFEIs-0001cE-NY; Sat, 13 Apr 2019 10:46:26 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+	id 1hFEIs-0003mH-KZ; Sat, 13 Apr 2019 10:46:26 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+In-Reply-To: <6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
+References: <cover.1554992449.git.berto@igalia.com>
+	<6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+	(i586-pc-linux-gnu)
+Date: Sat, 13 Apr 2019 10:46:26 +0200
+Message-ID: <w51zhoufg2l.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Apr 2019 08:31:03 -0000
-From: Joachim Durchholz <jo@durchholz.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jo-durchholz
-X-Launchpad-Bug-Reporter: Joachim Durchholz (jo-durchholz)
-X-Launchpad-Bug-Modifier: Joachim Durchholz (jo-durchholz)
-Message-Id:
- <155514426371.20376.231958396525560199.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 66dd56c72ed07fc9bdf5fa593f9a03a9831143ec
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824616] [NEW] Build succeeds despite flex/bison
- missing
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+	timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
+ files in bdrv_reopen_prepare()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,47 +73,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824616 <1824616@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190413083103.IBzvKBTjgpbSCSc91JSA3FY7HOsIca1w0BYiMb2kGts@z>
+Message-ID: <20190413084626.oSNelosS2Qdln_5YU_KNZ5wEhzjsEnkRXX6t21Ll0aM@z>
 
-Public bug reported:
+On Sat 13 Apr 2019 02:56:57 AM CEST, Max Reitz wrote:
+>> Patch 2 fixes a different (but slightly related) issue that I found
+>> while preparing the first patch.
+>
+> I think the real problem is that bs->backing_file is not a cache for
+> bs->backing->bs->filename.
+>
+> In fact, every user of bs->backing_file expects it to be something
+> different.  Some expect it to be a cache for
+> bs->backing->bs->filename, some expect it to be what the image header
+> says (i.e., it if=E2=80=99s a relative path, it=E2=80=99s relative to the=
+ overlay),
+> some expect it to be what the image header says, but relative paths to
+> be translated so they are relative to qemu=E2=80=99s CWD.
+>
+> All of this should be cleaned up and this is what patch 7 in my "block:
+> Deal with filters" series does:
+>
+> http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00308.html
 
-I just built qemu using a fresh install, and "make" would report success
-despite messages of "flex: command not found" and "bison: command not
-found".
+Ok, you can leave out the second patch then. The first one should still
+be correct, right?
 
-I didn't notice any errors, but I don't know whether that's because
-there's a workaround in case the tools aren't there, or because I didn't
-exercize the code paths that would fail.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824616
-
-Title:
-  Build succeeds despite flex/bison missing
-
-Status in QEMU:
-  New
-
-Bug description:
-  I just built qemu using a fresh install, and "make" would report
-  success despite messages of "flex: command not found" and "bison:
-  command not found".
-
-  I didn't notice any errors, but I don't know whether that's because
-  there's a workaround in case the tools aren't there, or because I
-  didn't exercize the code paths that would fail.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824616/+subscriptions
+Berto
 
