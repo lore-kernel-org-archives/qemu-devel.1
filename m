@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60200)
+Received: from eggs.gnu.org ([209.51.188.92]:37834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFM4I-00062g-Ps
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:03:55 -0400
+	(envelope-from <berto@igalia.com>) id 1hFMqI-0000PS-7O
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFM4H-0003s1-Jj
-	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:03:54 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 13 Apr 2019 17:03:49 +0000
-Message-ID: <4a64d8dd-34ad-5a6c-7249-0c2fb202777f@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-8-vsementsov@virtuozzo.com>
-	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-	<2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
-In-Reply-To: <2e0ab90c-7f62-4660-1eff-c9d8a2b6dd57@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <924C1E5E16C85E4FB0B6B8CE67A9C73F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berto@igalia.com>) id 1hFMqH-0000Og-92
+	for qemu-devel@nongnu.org; Sat, 13 Apr 2019 13:53:30 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
+References: <cover.1554992449.git.berto@igalia.com>
+	<6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
+	<w51zhoufg2l.fsf@maestria.local.igalia.com>
+	<b30d2279-2311-5b3e-6108-e93577bc7255@redhat.com>
+Date: Sat, 13 Apr 2019 19:53:25 +0200
+Message-ID: <w51zhotu6zu.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
- filter driver
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
+ files in bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-MTMuMDQuMjAxOSAxOTowOCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTYuMDEuMjAxOSAxOTowMiwgTWF4IFJlaXR6IHdyb3RlOg0KPj4gT24gMjkuMTIuMTggMTM6MjAs
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gQmFja3VwLXRvcCBmaWx0
-ZXIgZG9lcyBjb3B5LWJlZm9yZS13cml0ZSBvcGVyYXRpb24uIEl0IHNob3VsZCBiZQ0KPj4+IGlu
-c2VydGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQgbm9kZSBmb3IgQ0JXLCBs
-aWtlIHRoZQ0KPj4+IGZvbGxvd2luZzoNCj4+Pg0KPj4+IMKgwqDCoMKgICstLS0tLS0tKw0KPj4+
-IMKgwqDCoMKgIHwgR3Vlc3QgfA0KPj4+IMKgwqDCoMKgICstLS0rLS0tKw0KPj4+IMKgwqDCoMKg
-wqDCoMKgwqAgfHIsdw0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgdg0KPj4+IMKgwqDCoMKgICstLS0r
-LS0tLS0tLS0tLS0rwqAgdGFyZ2V0wqDCoCArLS0tLS0tLS0tLS0tLS0tKw0KPj4+IMKgwqDCoMKg
-IHwgYmFja3VwX3RvcMKgwqDCoCB8LS0tLS0tLS0tLT58IHRhcmdldChxY293MikgfA0KPj4+IMKg
-wqDCoMKgICstLS0rLS0tLS0tLS0tLS0rwqDCoCBDQlfCoMKgwqDCoCArLS0tKy0tLS0tLS0tLS0t
-Kw0KPj4+IMKgwqDCoMKgwqDCoMKgwqAgfA0KPj4+IGJhY2tpbmcgfHIsdw0KPj4+IMKgwqDCoMKg
-wqDCoMKgwqAgdg0KPj4+IMKgwqDCoMKgICstLS0rLS0tLS0tLS0tKw0KPj4+IMKgwqDCoMKgIHwg
-QWN0aXZlIGRpc2sgfA0KPj4+IMKgwqDCoMKgICstLS0tLS0tLS0tLS0tKw0KPj4+DQo+Pj4gVGhl
-IGRyaXZlciB3aWxsIGJlIHVzZWQgaW4gYmFja3VwIGluc3RlYWQgb2Ygd3JpdGUtbm90aWZpZXJz
-Lg0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
-dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+IC0tLQ0KPj4+IMKgIGJsb2NrL2JhY2t1cC10
-b3AuaMKgIHzCoCA0MyArKysrKysrDQo+Pj4gwqAgYmxvY2svYmFja3VwLXRvcC5jwqAgfCAzMDYg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+PiDCoCBibG9j
-ay9NYWtlZmlsZS5vYmpzIHzCoMKgIDIgKw0KPj4+IMKgIDMgZmlsZXMgY2hhbmdlZCwgMzUxIGlu
-c2VydGlvbnMoKykNCj4+PiDCoCBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5o
-DQo+Pj4gwqAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuYw0KPj4NCj4gDQo+
-IFsuLl0NCj4gDQo+Pj4gK0Jsb2NrRHJpdmVyU3RhdGUgKmJkcnZfYmFja3VwX3RvcF9hcHBlbmQo
-QmxvY2tEcml2ZXJTdGF0ZSAqc291cmNlLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBC
-bG9ja0RyaXZlclN0YXRlICp0YXJnZXQsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEhC
-aXRtYXAgKmNvcHlfYml0bWFwLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAq
-KmVycnApDQo+Pj4gK3sNCj4+PiArwqDCoMKgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+
-ICvCoMKgwqAgQkRSVkJhY2t1cFRvcFN0YXRlICpzdGF0ZTsNCj4+PiArwqDCoMKgIEJsb2NrRHJp
-dmVyU3RhdGUgKnRvcCA9IGJkcnZfbmV3X29wZW5fZHJpdmVyKCZiZHJ2X2JhY2t1cF90b3BfZmls
-dGVyLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTlVMTCwg
-QkRSVl9PX1JEV1IsIGVycnApOw0KPj4+ICsNCj4+PiArwqDCoMKgIGlmICghdG9wKSB7DQo+Pj4g
-K8KgwqDCoMKgwqDCoMKgIHJldHVybiBOVUxMOw0KPj4+ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiAr
-wqDCoMKgIHRvcC0+aW1wbGljaXQgPSB0cnVlOw0KPj4+ICvCoMKgwqAgdG9wLT50b3RhbF9zZWN0
-b3JzID0gc291cmNlLT50b3RhbF9zZWN0b3JzOw0KPj4+ICvCoMKgwqAgdG9wLT5vcGFxdWUgPSBz
-dGF0ZSA9IGdfbmV3MChCRFJWQmFja3VwVG9wU3RhdGUsIDEpOw0KPj4+ICvCoMKgwqAgc3RhdGUt
-PmNvcHlfYml0bWFwID0gY29weV9iaXRtYXA7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9yZWYo
-dGFyZ2V0KTsNCj4+PiArwqDCoMKgIHN0YXRlLT50YXJnZXQgPSBiZHJ2X2F0dGFjaF9jaGlsZCh0
-b3AsIHRhcmdldCwgInRhcmdldCIsICZjaGlsZF9maWxlLCBlcnJwKTsNCj4+PiArwqDCoMKgIGlm
-ICghc3RhdGUtPnRhcmdldCkgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBiZHJ2X3VucmVmKHRhcmdl
-dCk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGJkcnZfdW5yZWYodG9wKTsNCj4+PiArwqDCoMKgwqDC
-oMKgwqAgcmV0dXJuIE5VTEw7DQo+Pj4gK8KgwqDCoCB9DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRy
-dl9zZXRfYWlvX2NvbnRleHQodG9wLCBiZHJ2X2dldF9haW9fY29udGV4dChzb3VyY2UpKTsNCj4+
-PiArwqDCoMKgIGJkcnZfc2V0X2Fpb19jb250ZXh0KHRhcmdldCwgYmRydl9nZXRfYWlvX2NvbnRl
-eHQoc291cmNlKSk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9kcmFpbmVkX2JlZ2luKHNvdXJj
-ZSk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9yZWYodG9wKTsNCj4+PiArwqDCoMKgIGJkcnZf
-YXBwZW5kKHRvcCwgc291cmNlLCAmbG9jYWxfZXJyKTsNCj4+PiArDQo+Pj4gK8KgwqDCoCBpZiAo
-bG9jYWxfZXJyKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGJkcnZfdW5yZWYodG9wKTsNCj4+DQo+
-PiBUaGlzIGlzIGRvbmUgYXV0b21hdGljYWxseSBieSBiZHJ2X2FwcGVuZCgpLg0KPj4NCj4+PiAr
-wqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCBiZHJ2X2RyYWluZWRfZW5kKHNvdXJjZSk7DQo+
-Pj4gKw0KPj4+ICvCoMKgwqAgaWYgKGxvY2FsX2Vycikgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBi
-ZHJ2X3VucmVmX2NoaWxkKHRvcCwgc3RhdGUtPnRhcmdldCk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKg
-IGJkcnZfdW5yZWYodG9wKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgZXJyb3JfcHJvcGFnYXRlKGVy
-cnAsIGxvY2FsX2Vycik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiBOVUxMOw0KPj4+ICvC
-oMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKgIHJldHVybiB0b3A7DQo+Pj4gK30NCj4+PiArDQo+
-Pj4gK3ZvaWQgYmRydl9iYWNrdXBfdG9wX2Ryb3AoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4g
-K3sNCj4+PiArwqDCoMKgIEJEUlZCYWNrdXBUb3BTdGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+Pj4g
-Kw0KPj4+ICvCoMKgwqAgQWlvQ29udGV4dCAqYWlvX2NvbnRleHQgPSBiZHJ2X2dldF9haW9fY29u
-dGV4dChicyk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYWlvX2NvbnRleHRfYWNxdWlyZShhaW9fY29u
-dGV4dCk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgYmRydl9kcmFpbmVkX2JlZ2luKGJzKTsNCj4+PiAr
-DQo+Pj4gK8KgwqDCoCBiZHJ2X2NoaWxkX3RyeV9zZXRfcGVybShicy0+YmFja2luZywgMCwgQkxL
-X1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4+ICvCoMKgwqAgYmRydl9yZXBsYWNlX25vZGUo
-YnMsIGJhY2tpbmdfYnMoYnMpLCAmZXJyb3JfYWJvcnQpOw0KPj4+ICvCoMKgwqAgYmRydl9zZXRf
-YmFja2luZ19oZChicywgTlVMTCwgJmVycm9yX2Fib3J0KTsNCj4+DQo+PiBUaGlzIGlzIGRvbmUg
-YXV0b21hdGljYWxseSBpbiBiZHJ2X2Nsb3NlKCksIGFuZCBhZnRlciBicyBoYXMgYmVlbg0KPj4g
-cmVwbGFjZWQgYnkgYmFja2luZ19icyhicyksIEkgZG9uJ3QgdGhpbmsgbmV3IHJlcXVlc3RzIHNo
-b3VsZCBjb21lIGluLA0KPj4gc28gSSBkb24ndCB0aGluayB0aGlzIG5lZWRzIHRvIGJlIGRvbmUg
-aGVyZS4NCj4gDQo+IEZvbGxvd2luZyBtb3ZlbWVudCBvZiBiYWNrdXBfdG9wIGJhY2sgdG8gam9i
-LT5ibGsgYmVjb21lcyBpbXBvc3NpYmxlIHRoZW4sDQo+IGlmIHdlIGRvbid0IHNoYXJlIFdSSVRF
-IG9uIHNvdXJjZSBpbiBiYWNrdXBfdG9wX2NoaWxkX3Blcm0uDQo+IA0KPiBBbmQgSSB0aGluaywg
-dGhpcyBmdW5jdGlvbiBzaG91bGQgZHJvcCBhbGwgcmVsYXRpb25zIGNyZWF0ZWQgYnkNCj4gYmRy
-dl9iYWNrdXBfdG9wX2FwcGVuZC4NCj4gDQo+Pg0KPj4+ICsNCj4+PiArwqDCoMKgIGJkcnZfZHJh
-aW5lZF9lbmQoYnMpOw0KPj4+ICsNCj4+PiArwqDCoMKgIGlmIChzLT50YXJnZXQpIHsNCj4+PiAr
-wqDCoMKgwqDCoMKgwqAgYmRydl91bnJlZl9jaGlsZChicywgcy0+dGFyZ2V0KTsNCj4+PiArwqDC
-oMKgIH0NCj4+DQo+PiBBbmQgdGhpcyBzaG91bGQgYmUgZG9uZSBpbiBhIC5iZHJ2X2Nsb3NlKCkg
-aW1wbGVtZW50YXRpb24sIEkgdGhpbmsuDQo+Pg0KDQphbmQgdGhlcmVmb3JlIHRoaXMgb25lIHRv
-by4gV2UgZG9uJ3QgaGF2ZSAuYmRydl9vcGVuLCBzbyBJJ2QgcHJlZmVyIG5vdA0KaGF2ZSBiZHJ2
-X2Nsb3NlLiBXZSBjcmVhdGUgdGhpcyBjaGlsZCBpbiBfdG9wX2FwcGVuZCwgc2VlbXMgbG9naWNh
-bCB0bw0KdW5yZWYgaXQgaW4gX3RvcF9kcm9wLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
-ZGltaXINCg==
+On Sat 13 Apr 2019 05:48:11 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
+>> Ok, you can leave out the second patch then. The first one should
+>> still be correct, right?
+>
+> I just think it=E2=80=99s unnecessary because as of my series both
+> backing_file and auto_backing_file serve the purpose.
+
+Ok then!
+
+Berto
