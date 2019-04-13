@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33978)
+Received: from eggs.gnu.org ([209.51.188.92]:34448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF6wk-0002vS-7E
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:55:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hF6yo-0004M0-Fj
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hF6wj-0004xN-9E
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:55:06 -0400
-Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:35901)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hF6wi-0004uj-DL
-	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:55:05 -0400
-Received: by mail-pf1-x42f.google.com with SMTP id z5so5908763pfn.3
-	for <qemu-devel@nongnu.org>; Fri, 12 Apr 2019 17:55:04 -0700 (PDT)
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-32-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
-Date: Fri, 12 Apr 2019 14:54:57 -1000
+	(envelope-from <mreitz@redhat.com>) id 1hF6yh-0000mH-6E
+	for qemu-devel@nongnu.org; Fri, 12 Apr 2019 20:57:09 -0400
+References: <cover.1554992449.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
+Date: Sat, 13 Apr 2019 02:56:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190411100836.646-32-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 31/41] s390x/tcg: Implement VECTOR SHIFT
- LEFT DOUBLE BY BYTE
+In-Reply-To: <cover.1554992449.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp"
+Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] Fix check for default backing
+ files in bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 4/11/19 12:08 AM, David Hildenbrand wrote:
-> +static DisasJumpType op_vsldb(DisasContext *s, DisasOps *o)
-> +{
-> +    int src_idx = get_field(s->fields, i4) & 0xf;
-> +
-> +    if (src_idx == 0) {
-> +        gen_gvec_mov(get_field(s->fields, v1), get_field(s->fields, v2));
-> +    } else {
-> +        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2),
-> +                       get_field(s->fields, v3), src_idx,
-> +                       gen_helper_gvec_vsldb);
-> +        return DISAS_NEXT;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <6c17d784-c5e4-9a3c-c38c-19940352ea35@redhat.com>
+Subject: Re: [PATCH for-4.1 0/2] Fix check for default backing files in
+ bdrv_reopen_prepare()
+References: <cover.1554992449.git.berto@igalia.com>
+In-Reply-To: <cover.1554992449.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You could also expand this inline using your new extract2 primitive.
+On 11.04.19 16:23, Alberto Garcia wrote:
+> Hi,
+>=20
+> Patch 1 is the fix for the bug reported by Max here:
+>=20
+>    https://lists.gnu.org/archive/html/qemu-block/2019-04/msg00293.html
+>=20
+> Patch 2 fixes a different (but slightly related) issue that I found
+> while preparing the first patch.
 
-  int i4 = get_field(s->fields, i4);
-  int left_shift, right_shift;
+I think the real problem is that bs->backing_file is not a cache for
+bs->backing->bs->filename.
 
-  left_shift = (i4 & 7) * 8;
-  right_shift = 64 - left_shift;
+In fact, every user of bs->backing_file expects it to be something
+different.  Some expect it to be a cache for bs->backing->bs->filename,
+some expect it to be what the image header says (i.e., it if=E2=80=99s a
+relative path, it=E2=80=99s relative to the overlay), some expect it to b=
+e what
+the image header says, but relative paths to be translated so they are
+relative to qemu=E2=80=99s CWD.
 
-  if ((i4 & 8) == 0) {
-      read_vec_element_i64(t0, get_field(s->fields, v2), 0, ES_64);
-      read_vec_element_i64(t1, get_field(s->fields, v2), 1, ES_64);
-      read_vec_element_i64(t2, get_field(s->fields, v3), 0, ES_64);
-  } else {
-      read_vec_element_i64(t0, get_field(s->fields, v2), 1, ES_64);
-      read_vec_element_i64(t1, get_field(s->fields, v3), 0, ES_64);
-      read_vec_element_i64(t2, get_field(s->fields, v3), 1, ES_64);
-  }
-  tcg_gen_extract2_i64(t0, t1, t0, right_shift);
-  tcg_gen_extract2_i64(t1, t2, t1, right_shift);
-  write_vec_element_i64(t0, get_field(s->fields, v1), 0, ES_64);
-  write_vec_element_i64(t1, get_field(s->fields, v1), 1, ES_64);
+All of this should be cleaned up and this is what patch 7 in my "block:
+Deal with filters" series does:
+
+http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00308.html
+
+Max
 
 
-r~
+--S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlyxM9kACgkQ9AfbAGHV
+z0A5fgf/WD/6zyV0HTg8MluSe1wc6yhqC138nscCnbbnP/UBfQLelZnhAnHxRaFO
+HxN40qoDUZz8FVfcffplpEoWQc8bzh+gr3xY56jWl2bVbtFDtVcN+J7xX5ym1Lzj
+w5LPNxqFFBEg+hf3Rgs4kH/8gc8SPJQUFabL2JS5Ojl4aWzjl7AxeGElgiEYkQcY
+24Ok9SWOjpphzFlvJZdJzpTWzsx7Y+xf6jOSJQSu6xrZxgfSCTjPUMQBtcQ8QY+v
+d0FEspW00tZYnC3rjJAfnzQyMlndVkS7dxxMnB2YBrjxWKFhL1i86nfd5RydZxQ6
+fLq5h99EQLnPE6F/t3Vr2GiAk4S4YQ==
+=OFWO
+-----END PGP SIGNATURE-----
+
+--S1FvTWEbNxoaWTWVtF8d4vDWDByYZSRRp--
