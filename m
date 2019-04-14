@@ -2,59 +2,80 @@ Return-Path: <SRS0=wjfX=SQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1664EC10F13
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A90C10F13
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:19:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E606820870
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:15:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E606820870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=durchholz.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B7192082E
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:19:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ew02Ddjg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7192082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39175 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39205 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFkbT-0005XK-7c
-	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 15:15:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58676)
+	id 1hFkeu-0007Lu-Fl
+	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 15:19:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hFkaW-00059Z-0o
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hFkd5-0006U4-2V
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hFkaU-0005L8-AM
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:47 -0400
-Received: from 5.itsy.de ([188.40.84.14]:56021)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hFkaS-000577-8P
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:46 -0400
-Received: from [192.168.178.32] (unknown [195.48.33.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by 5.itsy.de (Postfix) with ESMTPSA id D614C643C8
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 21:14:31 +0200 (CEST)
-To: qemu-devel@nongnu.org
-References: <91dddf37-77fe-79c6-59f5-4e60d45c3c7e@durchholz.org>
-	<CAMo8BfLEEF2_FVU88ydBWVmcRbCJ9T0ULrDEKRa-+hmCYo9cmg@mail.gmail.com>
-	<0492144e-fcd1-c013-2211-fbc31a17ce2f@durchholz.org>
-	<CAFEAcA8vUhuEbtLnmOxui3K_UW8eOET3xbWap3E23EWeGzqv7w@mail.gmail.com>
-From: Joachim Durchholz <jo@durchholz.org>
-Message-ID: <5daf8566-fe07-fa64-89e4-5c18676e2f1b@durchholz.org>
-Date: Sun, 14 Apr 2019 21:14:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hFkd3-0007m2-TN
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:17:27 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:44477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hFkd3-0007lD-FX
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:17:25 -0400
+Received: by mail-oi1-x234.google.com with SMTP id i21so11996931oib.11
+	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 12:17:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=kLQPFnZGSmAsTBl9G6pKn8pNyEkWCNn2t1wFDPSChF8=;
+	b=ew02Ddjg1wahRsyNy1BkDzGjPKKfFAqT1EfdTG2G1NcEIm6qaq050s9HQ+dLvXmq6Z
+	olUUy2nC/XvHQina53WsUaCZjE2Dzr+zTiHuP98zCFn5UGHQ1IlOxadbNk+sv9ovsH0m
+	B5TcqDnmcQICWkEfu5YsPC12inEQfWUJlFSRFBhSTNwT89fTdBqPV38Dz7DWH9zb4Xv0
+	Uirt60YPW539eB3vbjEQZX9hjCECLp3uZEgrFUqQyxjS8aDCNNqSFTfoUMuL4J0LeADU
+	WxKd9B/8Cap39zIvaekCoZSPnH1e13IwRaMnOvigf8gghawnCK8qop4Mge4JNYYQKZ85
+	jrcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=kLQPFnZGSmAsTBl9G6pKn8pNyEkWCNn2t1wFDPSChF8=;
+	b=L2PsLKO/6Ef8QvP46y/1bVjvLRD/+vjuQeJA3SXc4HfAmMV0iRSYTa9FUCrJFfOl8M
+	g4mpdo9ML5+qx+RgOJ0oGuIKbZd/xu/Sto7Rafui3OAaURhzUvgBT5yTFFEnAchEF4fa
+	lFM0iKTvuBNxE5CzB04VHJZIeeZxsp1JeMQ/ZMWjLaif+/c1GUmol3tva1PZ/rpX5IMP
+	MSQ+TgXS367Ayty1I+K5qPadXugddZj+MkMd3beNxQbd54h7OcXUsbn/Yn7plehcfXsI
+	mzLSwn7ZUHv7h7C35fNAxV4wds/y/w9jXvLyy2oadhhENMNSs5Y74Pu4oRirPjKa0BAL
+	YHkQ==
+X-Gm-Message-State: APjAAAUB9l0ZlY0kHozNikjsey9b/uMbEtcBiLa1CQ3pdx3Q6Pe4Ryls
+	qMRsEsP6nbF38MtaG7MArp3GYxmy8PemkOXDL9kzKg==
+X-Google-Smtp-Source: APXvYqw/HlOUsbiWtmPZ/vRdBLmXOdU/t39QIKEN/ZWl2KYECAGB8KSJmytV9QCcQpLkQiRmhcV236+r78AwnRzUqHk=
+X-Received: by 2002:aca:c7d3:: with SMTP id x202mr15729493oif.48.1555269444292;
+	Sun, 14 Apr 2019 12:17:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8vUhuEbtLnmOxui3K_UW8eOET3xbWap3E23EWeGzqv7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.40.84.14
-Subject: Re: [Qemu-devel] How to I trigger a rebuild?
+References: <20190412160458.23920-1-kwolf@redhat.com>
+In-Reply-To: <20190412160458.23920-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 14 Apr 2019 20:17:13 +0100
+Message-ID:
+ <CAFEAcA-xcQW1mkyFL=e922oOEoukHRqCWkRukVmfpbR00avemw@mail.gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::234
+Subject: Re: [Qemu-devel] [PULL 0/2] Block layer patches for 4.0-rc4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,71 +87,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190414191431.bV61wEFFkdRr5n-BLVOYpaamUVFuWwxmoiB-LmRhsDI@z>
+Message-ID: <20190414191713.YmpNxLdOD32W7uVLit8AdtVIsHk9tkzzRnqHx8_Km-g@z>
 
-Am 14.04.19 um 20:12 schrieb Peter Maydell:
-> On Sun, 14 Apr 2019 at 17:08, Joachim Durchholz <jo@durchholz.org> wrote:
->>
->> Am 14.04.19 um 03:15 schrieb Max Filippov:
->>> On Sat, Apr 13, 2019 at 8:28 AM Joachim Durchholz <jo@durchholz.org> wrote:
->>>> I did the usual ./configure; make dance.
->>>> Then modified a source file (ui/curses.c), called make again, but didn't
->>>> see curses.c recompiled, and the change was indeed ineffective.
->>>> make clean; make didn't help either.
->>>
->>> Perhaps you don't have CONFIG_CURSES enabled?
->>> Did you call configure with --enable-curses ?
->>
->> Strange. "make help" tells me that everything is enabled by default if
->> possible, and I didn't tell configure to do anything specific.
->>
->> But I find that curses is disabled indeed.
->> Heh. An explicit --enable-curses tells me it was missing the dev version
->> of ncurses.
-> 
-> Configure's default behaviour is "enable everything that we can
-> enable, but don't complain about not enabling optional features
-> which we can't build (eg because of missing -dev libraries)".
-> For "insist that foo is built and error out if it can't be done",
-> use "--enable-foo". For "definitely don't build foo even if we
-> could", use --disable-foo.
+On Fri, 12 Apr 2019 at 17:05, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit 13c24edaa742181af8d9c6b027ee366b04de1ea1:
+>
+>   qemu-img: fix .hx and .texi disparity (2019-04-12 14:17:10 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 9749636b005d118259810afb92482df2fe0ae2ad:
+>
+>   iotest: Fix 241 to run in generic directory (2019-04-12 18:03:01 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - iotests fixes
 
-Well, that's what I guessed after the fact... it didn't occur to me that 
-"what's possible" was defined as "what libraries are available".
-Now that I know this, I know what to watch out for.
+Applied, thanks.
 
->> However... even with curses enabled, "make" does not do anything  after
->> modifying ui/curses.c.
->> In fact, just "make" tell's me I should have run ./config (WTF I did??),
->> and "make all"
->> But after ./configure is recompiles everything... nothing of this is
->> something that "make" should do, so I'm pretty confused.
-> 
-> This sounds like maybe you got confused somewhere along the line
-> about whether you'd (re-)run configure or not (or didn't
-> do a 'make clean' after running configure with the curses
-> support enabled).
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Actually I got confused about where I was building.
-I had set up things for an out-of-tree build but accidentally hit "make" 
-in the source tree.
-
-> The other thing that might confuse you is that make will try
-> to spot when it needs to rerun configure and will rerun it
-> for you.
-
-Oh dear. That didn't happen to me, but I see the trap-in-waiting.
-
-> I recommend doing builds only in a separate directory, by the way:
->   mkdir build
->   (cd build && ../configure [configure args])
->   make -C build -j8
-
-Yep, doing that already.
-
-Regards,
-Jo
+-- PMM
 
