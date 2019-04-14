@@ -2,73 +2,72 @@ Return-Path: <SRS0=wjfX=SQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678B2C10F13
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 15:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 143E1C10F13
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 15:45:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 322DB2084E
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 15:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322DB2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C939A20880
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 15:45:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=reactos.org header.i=@reactos.org header.b="fMRa5Y4v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C939A20880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=reactos.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36776 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37075 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFgs1-0001nP-8G
-	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 11:16:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52924)
+	id 1hFhJd-0000gw-Gq
+	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 11:45:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hFgqY-0000v1-BM
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 11:15:07 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1hFhIP-0008Rw-73
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 11:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hFgqX-0003m2-68
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 11:15:06 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36005)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hFgqW-0003ku-RN
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 11:15:05 -0400
-Received: by mail-ed1-f66.google.com with SMTP id u57so11750637edm.3
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 08:15:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-	:from:date:message-id:subject:to:cc;
-	bh=6ahkj+NtfJxT8lE3LLPL9Cp26HGaUyHLRb80IETSV7s=;
-	b=dB3PpHvXQIa8Ie6xVcGrD5RMZ+o7IHMMqMXG6dy8NJzwMG0xW5HwoVlynPREXh/+gO
-	YYA8Y3MeCbss22ulaKSv3Kl/BiVp88e8GevJ7ax/ulyNGCqo2O9g+/J5mTU+NDinxdfI
-	A7N0K8IzmYCpCehLR/uQPD+zUMbOaiQTuZWFxuZheikprYVlP+lYfWAH6fsgAd3noOkG
-	q/kHS0Dc8zeDJif+L99en5GYGWqXCpq8EjzEXHVfWtXdcyvT3cjKa2x+/bZ2HgJxIauF
-	mfhsTHp77Oo1LXFW6z7kAaJ/5hUSFYrGl9IKeJfHTOVnfFcsyFXE1EmSbZ5C819DUCk/
-	4k+A==
-X-Gm-Message-State: APjAAAUoarJ2WsKbghwDRjJrelhJKarnoyC9oU4qMprtFTyrbzxuU2IN
-	AKSeNpHr3ZirxJ21g0vKS53PSTH9lD2p+YoGKJ/9JQ==
-X-Google-Smtp-Source: APXvYqzPMbk42ToVuWRfD1tlcBvnJ4QK8NZBIbvJqd62gl3QSWH5/8hVvOYpFufsUmseFosi2UWSgxrVi4tJIFE2k6U=
-X-Received: by 2002:a17:906:3612:: with SMTP id
-	q18mr37648354ejb.147.1555254902568; 
-	Sun, 14 Apr 2019 08:15:02 -0700 (PDT)
+	(envelope-from <hpoussin@reactos.org>) id 1hFhIO-0002gQ-Ci
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 11:43:53 -0400
+Received: from iserv.reactos.org ([2a01:4f8:1c17:5ae1::1]:59490)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1hFhIM-0002dY-83; Sun, 14 Apr 2019 11:43:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=reactos.org
+	; s=25047;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:
+	Date:Message-ID:From:References:Cc:To:Subject:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=8QzUlWe2M479X01Oe3/rkTnFvlEtNc1x8Zg4j65hh/k=;
+	b=fMRa5Y4vj0/tsoH2sx4clnYdjo
+	HKAkI+nwQ/pdrA1ZhBk82psQ6CVZRB/0RY0ZoMn15VwAWWqgj5+1hiRzpvQppGFqkUIW53OmbMVfX
+	qVFkrStCdxgycscd+NFrIxqiAXoj1I3gpdvspoupZBlFsol4gNkCrKGW1Et1x3DlEiZI=; 
+Received: from rob92-5-82-227-227-196.fbx.proxad.net ([82.227.227.196]
+	helo=[192.168.0.35]) by iserv.reactos.org with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <hpoussin@reactos.org>)
+	id 1hFhIL-00064C-6F; Sun, 14 Apr 2019 15:43:49 +0000
+To: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org
+References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	<1555103178-21894-3-git-send-email-atar4qemu@gmail.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <840bd92e-096e-406c-0c48-2067ac9f5b0f@reactos.org>
+Date: Sun, 14 Apr 2019 17:43:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.5.1
 MIME-Version: 1.0
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
-	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
-	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
-	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
-	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-In-Reply-To: <20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Sun, 14 Apr 2019 11:14:49 -0400
-Message-ID:
- <CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.208.66
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+In-Reply-To: <1555103178-21894-3-git-send-email-atar4qemu@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a01:4f8:1c17:5ae1::1
+Subject: Re: [Qemu-devel] [PATCH 2/4] 40p and prep: implement PCI bus
+ mastering
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,66 +79,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>, dillaman <dillaman@redhat.com>
+Cc: qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190414151449.jqYhuY5NfmNwdazRfebEIpQvlh3WWEwPaIvP-CoLW_M@z>
+Message-ID: <20190414154348.p0lzNX8SdKVlYZfX9obHUl_3zCTHrSBcQUKxPjcZh-I@z>
 
-On Sun, Apr 14, 2019 at 9:20 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Thu, Apr 11, 2019 at 01:06:49PM -0400, Jason Dillaman wrote:
-> > On Thu, Apr 11, 2019 at 9:02 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > >
-> > > On Thu, Apr 11, 2019 at 08:35:44AM -0400, Jason Dillaman wrote:
-> > > > On Thu, Apr 11, 2019 at 7:00 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > > >
-> > > > > RBD APIs don't allow us to write more than the size set with rbd_create()
-> > > > > or rbd_resize().
-> > > > > In order to support growing images (eg. qcow2), we resize the image
-> > > > > before RW operations that exceed the current size.
-> > > >
-> > > > What's the use-case for storing qcow2 images within a RBD image? RBD
-> > > > images are already thinly provisioned, they support snapshots, they
-> > > > can form a parent/child linked image hierarchy.
-> > > >
-> > >
-> > > Hi Jason,
-> > > I understand your point of view, maybe one use case could be if you have
-> > > a qcow2 image and you want to put it in the rdb pool without convert it.
-> > >
-> > > I'm going through this BZ [1] and I'll ask if they have other
-> > > use cases in mind.
-> >
-> > Assuming no good use-cases, perhaps it would just be better to make
-> > the qemu-img error messages more clear.
-> >
->
-> Hi Jason,
-> I asked about use-cases and they want to use qcow2 on rbd in order to
-> take advantage of these qcow2 features [1]: external snapshots,
-> Copy-on-write, and optional compression and encryption.
->
-> Maybe the more interesting are external snapshots and Copy-on-write,
+Le 12/04/2019 à 23:06, Artyom Tarasenko a écrit :
+> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> ---
+>   hw/pci-host/prep.c | 16 ++++++++++++----
+>   1 file changed, 12 insertions(+), 4 deletions(-)
 
-Copy-on-write is natively supported by RBD. The concept of external
-snapshots seems similar to just automating the process of creating a
-new copy-on-write image. Compression is also supported by Ceph on the
-cluster side by recent releases.
-
-> since encryption can be achieved with LUKS and rbd should support
-> compression for a specified pool.
->
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1171007#c13
->
-> Cheers,
-> Stefano
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 
 
-
--- 
-Jason
 
