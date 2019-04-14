@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32833)
+Received: from eggs.gnu.org ([209.51.188.92]:40310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hFhfE-0001GX-2T
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 12:07:28 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1hFiVR-0005Uc-RB
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 13:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hFhfD-0003KN-7h
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 12:07:28 -0400
-Received: from 5.itsy.de ([188.40.84.14]:51798)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hFhfC-0003IN-TH
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 12:07:27 -0400
-Received: from [192.168.178.32] (unknown [195.48.33.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by 5.itsy.de (Postfix) with ESMTPSA id 0C98364478
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 18:07:23 +0200 (CEST)
-References: <91dddf37-77fe-79c6-59f5-4e60d45c3c7e@durchholz.org>
-	<CAMo8BfLEEF2_FVU88ydBWVmcRbCJ9T0ULrDEKRa-+hmCYo9cmg@mail.gmail.com>
-From: Joachim Durchholz <jo@durchholz.org>
-Message-ID: <0492144e-fcd1-c013-2211-fbc31a17ce2f@durchholz.org>
-Date: Sun, 14 Apr 2019 18:07:23 +0200
+	(envelope-from <hpoussin@reactos.org>) id 1hFiVQ-0001Fb-Qh
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 13:01:25 -0400
+References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	<1555103178-21894-5-git-send-email-atar4qemu@gmail.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <29f79530-fd9e-ea60-8cf3-df593b855f10@reactos.org>
+Date: Sun, 14 Apr 2019 19:01:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAMo8BfLEEF2_FVU88ydBWVmcRbCJ9T0ULrDEKRa-+hmCYo9cmg@mail.gmail.com>
+In-Reply-To: <1555103178-21894-5-git-send-email-atar4qemu@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] How to I trigger a rebuild?
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/isa/i82378.c: use 1900 as a base
+ year
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org
 
-Am 14.04.19 um 03:15 schrieb Max Filippov:
-> On Sat, Apr 13, 2019 at 8:28 AM Joachim Durchholz <jo@durchholz.org> wrote:
->> I did the usual ./configure; make dance.
->> Then modified a source file (ui/curses.c), called make again, but didn't
->> see curses.c recompiled, and the change was indeed ineffective.
->> make clean; make didn't help either.
+Le 12/04/2019 à 23:06, Artyom Tarasenko a écrit :
+> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
 > 
-> Perhaps you don't have CONFIG_CURSES enabled?
-> Did you call configure with --enable-curses ?
+> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> ---
+>   hw/isa/i82378.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+> index a5d67bc..546c928 100644
+> --- a/hw/isa/i82378.c
+> +++ b/hw/isa/i82378.c
+> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+>       isa = isa_create_simple(isabus, "i82374");
+>   
+>       /* timer */
+> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
+> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
+> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
+> +    qdev_init_nofail(DEVICE(isa));
 
-Strange. "make help" tells me that everything is enabled by default if 
-possible, and I didn't tell configure to do anything specific.
+I am not sure the base_year should be hardcoded in i82378. I can assume other machines with a i82378 can have another base_year.
+Maybe you can you add a base_year property to i82378, and forward it to mc146818 with object_property_add_alias?
+Then, change 40p machine to set it to 1900, without changing it for prep machine.
 
-But I find that curses is disabled indeed.
-Heh. An explicit --enable-curses tells me it was missing the dev version 
-of ncurses.
+>   }
+>   
+>   static void i82378_init(Object *obj)
+> 
 
-However... even with curses enabled, "make" does not do anything  after 
-modifying ui/curses.c.
-In fact, just "make" tell's me I should have run ./config (WTF I did??), 
-and "make all"
-But after ./configure is recompiles everything... nothing of this is 
-something that "make" should do, so I'm pretty confused.
-
-Regards,
-Jo
+Hervé
