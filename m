@@ -2,93 +2,60 @@ Return-Path: <SRS0=wjfX=SQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E18EC10F13
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDB5C10F13
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 20:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E8182073F
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:41:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XeBCraSs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8182073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 748832082E
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 20:31:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748832082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39830 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40648 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFl0X-0003Ed-EW
-	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 15:41:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35593)
+	id 1hFlmj-0007tI-N3
+	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 16:31:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFkzd-0002oI-Hm
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:46 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1hFllu-00074o-TR
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFkzZ-0004Ew-KQ
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:45 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:36820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hFkzW-0004Cr-BL
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:39 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id 85so7535174pgc.3
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 12:40:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=nGHobgXK2oi3BhhWYP+ReBEL0ebOMtubngBseljgzDk=;
-	b=XeBCraSscpXKDC9V9CxmS5wLjl+saNVuGrIwZL8T6b26bPjc5aFLRxe1CXW/gDuuiz
-	jXnFRS4FY6tzQSm9wWXdwzLdtGt13lUuPIuNbNwwBaJZi5unGEe83qd0r7TwKNqQr8ml
-	ZccIwK4mJ5fIkMEfJJjIPQn+x/DIBJReoUDupqeBifKxMMUZPwWtfBxd/Lg1UJfcnGso
-	e3zpIWsGUXI1TPFm/EPp0/dsa35mMJif9sGjPt7tXmRKnWX1WhGQY0OFQ0ET1hw1yxQ+
-	CFLxC2cCEmTkVfm6Xivl3M74hzP5xRD1+WirOOlOHu7nmHCLQ45hR4HPdaW2j0j4YWvk
-	zJWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=nGHobgXK2oi3BhhWYP+ReBEL0ebOMtubngBseljgzDk=;
-	b=tlgz9YA9VtSyduJBoYhhUr1zndV8OeP7XTFYeVrycAdGS5n/q3EiglaUHHALUC6i7d
-	9khXGl9TRRlyMO7r+lYdH43rsPda1Ho6jTNL1/4id0GigSIadW2y+iP6krk0QbVBAxk7
-	j4+xXqnLQYXtQh9S7TlBf60+CudpP5OzBHr1JmcD8PsuDwZM/TnQXfMiyIsl93n/H8wl
-	Fnrvznw8CWq9KDZanqBXPheKPTi+TFPpYyS/ceJFOfoDaQBzUEOMrOPkqwiRM0fVWDf6
-	K60pctbP+35G7mQgC3ONhg9/Ixtf1PDFcJ/FYo21iM7/6nS2cX4QawireGGwtmVZ+88z
-	xu/A==
-X-Gm-Message-State: APjAAAXKn9awrERUe4F4cO0SqMjYjkHn6DAXYpfGQNrdq337zNLR+127
-	dkCHRJyp9CRcQFyipX5gY8CrHt202fA=
-X-Google-Smtp-Source: APXvYqx9LOrGqHjwphQ5qVujMFcqlAIn2tdpHCiX2N6HUlSt3nUZDL/jqOXuegJ2lr5YNssP3J+4LA==
-X-Received: by 2002:aa7:83d1:: with SMTP id j17mr71864621pfn.78.1555270835027; 
-	Sun, 14 Apr 2019 12:40:35 -0700 (PDT)
-Received: from [100.68.67.33] (rrcs-76-81-86-38.west.biz.rr.com. [76.81.86.38])
-	by smtp.gmail.com with ESMTPSA id
-	i135sm63493969pgd.41.2019.04.14.12.40.33
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 14 Apr 2019 12:40:34 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190411153942.4533-1-peter.maydell@linaro.org>
-	<53930e87-3bb1-fdd5-a8fe-8603c0adecc2@linaro.org>
-	<CAFEAcA-dbGvhgTrBKEtx-CPS7f2NJO5X+dj=mdcm+NrkF=uynQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0ee4fdc6-c782-d5f5-ec40-9e25c1c9dd1f@linaro.org>
-Date: Sun, 14 Apr 2019 09:40:30 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <balaton@eik.bme.hu>) id 1hFllt-00044E-Ue
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:38 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hFllt-00041T-IS
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:37 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+	by localhost (Postfix) with SMTP id 645D9746396;
+	Sun, 14 Apr 2019 22:30:25 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+	id 448D7746395; Sun, 14 Apr 2019 22:30:25 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id 439EE746392;
+	Sun, 14 Apr 2019 22:30:25 +0200 (CEST)
+Date: Sun, 14 Apr 2019 22:30:25 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+In-Reply-To: <08d40ec6-be36-f2e1-d216-6dd9deb5c1e0@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1904142227580.56442@zero.eik.bme.hu>
+References: <20190409110732.5C5FF7465DB@zero.eik.bme.hu>
+	<08d40ec6-be36-f2e1-d216-6dd9deb5c1e0@redhat.com>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-dbGvhgTrBKEtx-CPS7f2NJO5X+dj=mdcm+NrkF=uynQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::52d
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement NSACR gating of
- floating point
+X-Received-From: 2001:738:2001:2001::2001
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] ati-vga: Fix check for blt outside vram
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,25 +67,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Andrew Randrianasulu <randrianasulu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190414194030.1B2x5C7iTpHfE17pXieyRDFC44Co9RpFcZ7VIQIOL1M@z>
+Message-ID: <20190414203025.9hde2iETu2Tmje-3fjyGRXyODkAMnLyxD3PFb7Q6GUo@z>
 
-On 4/14/19 8:02 AM, Peter Maydell wrote:
-> There's similar wording for the effect of NSACR on CPACR, so
-> again I think we need to actually make the bits RAZ/WI
-> regardless of their underlying value, not just force them
-> to 0.
+On Tue, 9 Apr 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> This patch looks 4.0 worthwhile.
 
-I don't see that language for CPACR, just "the corresponding bits in the CPACR
-ignore writes and read as 0b00".  I'm willing to believe the manual is sloppy
-on this point though, and the "correct" language appears only once, somewhere.
+Now that it seems we'll have another rc, will this get in? Gerd, I think=20
+you have to send a pull request with it for that.
 
-You might want to something akin to arm_hcr_el2_eff so that you don't have to
-replicate the NSACR logic in too many places...
+Regards,
+BALATON Zoltan
 
-
-r~
-
+> On 4/9/19 12:56 PM, BALATON Zoltan wrote:
+>> Fix the check preventing calling pixman functions that would access
+>> memory outside allocated vram. The r128 X driver sometimes seem to try
+>> blits that span outside vram, this check prevents crashing QEMU in
+>> that case. (The r128 X driver may have problems even on real hardware
+>> so I'm not sure if it's a client bug or emulation problem but at least
+>> QEMU should survive.)
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+>> ---
+>>  hw/display/ati_2d.c | 12 ++++++------
+>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
+>> index bc98ba6eeb..fe3ae14864 100644
+>> --- a/hw/display/ati_2d.c
+>> +++ b/hw/display/ati_2d.c
+>> @@ -79,10 +79,10 @@ void ati_2d_blt(ATIVGAState *s)
+>>                  s->regs.dst_width, s->regs.dst_height);
+>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>          if (src_bits >=3D end || dst_bits >=3D end ||
+>> -            src_bits + (s->regs.src_y + s->regs.dst_height) * src_str=
+ide +
+>> -            s->regs.src_x >=3D end ||
+>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_str=
+ide +
+>> -            s->regs.dst_x >=3D end) {
+>> +            src_bits + s->regs.src_x + (s->regs.src_y + s->regs.dst_h=
+eight) *
+>> +            src_stride * sizeof(uint32_t) >=3D end ||
+>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_h=
+eight) *
+>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not implemente=
+d\n");
+>>              return;
+>>          }
+>> @@ -140,8 +140,8 @@ void ati_2d_blt(ATIVGAState *s)
+>>                  filler);
+>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>          if (dst_bits >=3D end ||
+>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_str=
+ide +
+>> -            s->regs.dst_x >=3D end) {
+>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_h=
+eight) *
+>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not implemente=
+d\n");
+>>              return;
+>>          }
+>>
+>
+>
