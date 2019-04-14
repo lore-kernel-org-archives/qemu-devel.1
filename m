@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35593)
+Received: from eggs.gnu.org ([209.51.188.92]:43868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFkzd-0002oI-Hm
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:46 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1hFllu-00074o-TR
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hFkzZ-0004Ew-KQ
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:45 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:36820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hFkzW-0004Cr-BL
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:40:39 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id 85so7535174pgc.3
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 12:40:36 -0700 (PDT)
-References: <20190411153942.4533-1-peter.maydell@linaro.org>
-	<53930e87-3bb1-fdd5-a8fe-8603c0adecc2@linaro.org>
-	<CAFEAcA-dbGvhgTrBKEtx-CPS7f2NJO5X+dj=mdcm+NrkF=uynQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ee4fdc6-c782-d5f5-ec40-9e25c1c9dd1f@linaro.org>
-Date: Sun, 14 Apr 2019 09:40:30 -1000
+	(envelope-from <balaton@eik.bme.hu>) id 1hFllt-00044E-Ue
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:38 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hFllt-00041T-IS
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 16:30:37 -0400
+Date: Sun, 14 Apr 2019 22:30:25 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <08d40ec6-be36-f2e1-d216-6dd9deb5c1e0@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1904142227580.56442@zero.eik.bme.hu>
+References: <20190409110732.5C5FF7465DB@zero.eik.bme.hu>
+	<08d40ec6-be36-f2e1-d216-6dd9deb5c1e0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-dbGvhgTrBKEtx-CPS7f2NJO5X+dj=mdcm+NrkF=uynQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement NSACR gating of
- floating point
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ati-vga: Fix check for blt outside vram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,21 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Andrew Randrianasulu <randrianasulu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 4/14/19 8:02 AM, Peter Maydell wrote:
-> There's similar wording for the effect of NSACR on CPACR, so
-> again I think we need to actually make the bits RAZ/WI
-> regardless of their underlying value, not just force them
-> to 0.
+On Tue, 9 Apr 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> This patch looks 4.0 worthwhile.
 
-I don't see that language for CPACR, just "the corresponding bits in the CPACR
-ignore writes and read as 0b00".  I'm willing to believe the manual is sloppy
-on this point though, and the "correct" language appears only once, somewhere.
+Now that it seems we'll have another rc, will this get in? Gerd, I think=20
+you have to send a pull request with it for that.
 
-You might want to something akin to arm_hcr_el2_eff so that you don't have to
-replicate the NSACR logic in too many places...
+Regards,
+BALATON Zoltan
 
-
-r~
+> On 4/9/19 12:56 PM, BALATON Zoltan wrote:
+>> Fix the check preventing calling pixman functions that would access
+>> memory outside allocated vram. The r128 X driver sometimes seem to try
+>> blits that span outside vram, this check prevents crashing QEMU in
+>> that case. (The r128 X driver may have problems even on real hardware
+>> so I'm not sure if it's a client bug or emulation problem but at least
+>> QEMU should survive.)
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+>> ---
+>>  hw/display/ati_2d.c | 12 ++++++------
+>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
+>> index bc98ba6eeb..fe3ae14864 100644
+>> --- a/hw/display/ati_2d.c
+>> +++ b/hw/display/ati_2d.c
+>> @@ -79,10 +79,10 @@ void ati_2d_blt(ATIVGAState *s)
+>>                  s->regs.dst_width, s->regs.dst_height);
+>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>          if (src_bits >=3D end || dst_bits >=3D end ||
+>> -            src_bits + (s->regs.src_y + s->regs.dst_height) * src_str=
+ide +
+>> -            s->regs.src_x >=3D end ||
+>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_str=
+ide +
+>> -            s->regs.dst_x >=3D end) {
+>> +            src_bits + s->regs.src_x + (s->regs.src_y + s->regs.dst_h=
+eight) *
+>> +            src_stride * sizeof(uint32_t) >=3D end ||
+>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_h=
+eight) *
+>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not implemente=
+d\n");
+>>              return;
+>>          }
+>> @@ -140,8 +140,8 @@ void ati_2d_blt(ATIVGAState *s)
+>>                  filler);
+>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>          if (dst_bits >=3D end ||
+>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_str=
+ide +
+>> -            s->regs.dst_x >=3D end) {
+>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y + s->regs.dst_h=
+eight) *
+>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not implemente=
+d\n");
+>>              return;
+>>          }
+>>
+>
+>
