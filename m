@@ -2,82 +2,84 @@ Return-Path: <SRS0=wjfX=SQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B1AC10F13
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B68C10F13
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCFA0206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A46E02075B
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:38:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ua5ArwJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCFA0206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VH2Iw4Uu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A46E02075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38613 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38869 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFjeM-0000Wh-24
-	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 14:14:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50269)
+	id 1hFk0w-00060W-Tp
+	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 14:38:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hFjcZ-0007rP-L1
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:12:52 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1hFk0B-0005ji-BF
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hFjcY-0003bx-H9
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:12:51 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:47058)
+	(envelope-from <atar4qemu@gmail.com>) id 1hFk0A-0000Bb-4v
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:37:15 -0400
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:35129)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hFjcY-0003bL-A0
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:12:50 -0400
-Received: by mail-ot1-x341.google.com with SMTP id s24so12540190otk.13
-	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 11:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
+	id 1hFk09-0000Ah-4A; Sun, 14 Apr 2019 14:37:14 -0400
+Received: by mail-it1-x142.google.com with SMTP id w15so23376332itc.0;
+	Sun, 14 Apr 2019 11:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=qfFArth8MuA38PJT7ObzDekzJhUIbFwv4ir1LVT9OLY=;
-	b=Ua5ArwJEyRA6QQeZjHjM3Vh+63AYsoR2xYxL6GZZG6QOwrY5v0ZPA0UZxMMIxgdhkQ
-	EpBcchgQv+w4ZbEpbH/H6XpFS2XRXBdUmUYtHZ9FJBOLlGDWhVE6k70WCJcsrlKEstH0
-	nzlGWreOTiMa6dnmNhjCxsi/+oVTDqqMuwhkl/brUuGazC2+d6v2qzszYtThs+/PeNRK
-	jWANJNGySNop/0SdFLfrwd5D6ahgLHYdXw/nukzxInu7009C24yESU7Xl7vEzP8sdC2V
-	MP1838yWs71zpbHmH1Gp6ktycHZAyGOA/oNI7omdKPikfucIeyGsVUb9tHpYeo4ztykx
-	KFYw==
+	:cc:content-transfer-encoding;
+	bh=JACJijrx95YH4bKmOE0XIDrE2ZLNd6oKoyino7gk5wA=;
+	b=VH2Iw4UuCziDRlboJMCJ/hSdcyY3ylW5wdF4IkGToi7MzQb1xHvGAyR50iJBVu0c9S
+	Vp/+55ZLilb57GskN+E+cacVueJYeKQKOmNqxbSR3baVhmlrc32xk882qMfmMzSiMWiV
+	qjeLmYKI1063I8VhUkwCTMlh/QNuD4Xc+BIBn39JnWyCAOoSr6SSFg7Lu5VvUrTiwrBD
+	jpcO79biUhrKMbQmb0x4vSkNtndStx8DxvLHBpGOvRENim6fyXIogPQ7rW2Ns2Uy+PWb
+	/qfAZaO94nltOK+qH45NG/BgRCBAb1VjZ3TWKJ/IX5RrereQCxO2S7W8c9wrSL5LTeMG
+	ShSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=qfFArth8MuA38PJT7ObzDekzJhUIbFwv4ir1LVT9OLY=;
-	b=NwfGoNMCny38VA3xPn3X3mwqCRZRytBROrh8DRD6mIhBrIOP5RVCOMPc3CvgzyWm4d
-	4Gif1VJyW6eO1ChGn36hZteDcDu40iu7g5imi9tOK3/kLEC9FNKz/zHc6UbY9+uiTbUV
-	ac1/lF0Ygs4/H5zRH77DjMG9DJ0ZCE0rC0JYtIjAa96a9/bQCF8ym/0lx+ymcpzm5DSg
-	RsbpJ7qjlpLtUxLNY6Gu0wbCLPsvzhWqvnBIvxEI0qjby8cunLdsbR7fu3c/9v2o6sIT
-	7/tWefG/DaUOQvm+kQSIW5QNMYvM5p1rEzSyF2C1Avv/ZYTX95s0AVqXNGl5yTgsChC1
-	4fjw==
-X-Gm-Message-State: APjAAAUojLfhI2i134OyHSt8F34LxAYvrgzvWP6kPkgQWUWimKOEr9YT
-	hVOVwNg7TJYnThLEOXq78jpXQXaIecVo8WkDu90qJQ==
-X-Google-Smtp-Source: APXvYqxIULwGaLQ3Ia0ybMjYnHxzIrU5YTmv7gnTjeklCTjNNhDY46YLugu0nmXyNzINrGGixw9s5s3DkeggwUqw4nw=
-X-Received: by 2002:a05:6830:164a:: with SMTP id
-	h10mr45679550otr.323.1555265568961; 
-	Sun, 14 Apr 2019 11:12:48 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=JACJijrx95YH4bKmOE0XIDrE2ZLNd6oKoyino7gk5wA=;
+	b=NZKzbV6vlNY7/6zrnJXxykCWuBvpfHWcsqmkCmV1ye5zgT+X/mbJkfhX/Ja/991oe3
+	wyyaRoc8r+DtdkO1xdeMBlCb0BtpYfSPZd2+10Flm5SVTfMoMmD24LL9XuIs+zR6qFya
+	YUMGfuhAsEvJfQeGbROAzl1cM8qeTLxir7UOHSbeyasqiqIZaxXXKQ4RsyokQ1DMpf+v
+	7z8YMyGoD+EFvq2uBqm30bh6yOmQBdgaGqHE5BRe7PMNYIKfQeeScsRj+J8qyRl6EC57
+	rxFLutZnxqp0jxFHz8QkZ5U+7QMFKpyp1HOYDRebAxFP1cyUyr2/1rcwAY5GUUMD+FG0
+	wmsw==
+X-Gm-Message-State: APjAAAULAFkRKY3idXj9+ywmvFp8yE6pTWK0r0/ZmjyhTDzi9pkJUkCz
+	/XrWLwhdiJMgzfBJB5LyfS8Cah/iJZSs3lpdP6Y=
+X-Google-Smtp-Source: APXvYqwCeLeugRUnHUMwLnczk42UFMjItoPwrCcYfzLWcL11r8Ns6MEhQzMwfmtep2dOtaNyHzdCMDxkXBaUjUpiS/k=
+X-Received: by 2002:a02:2b1d:: with SMTP id h29mr50742597jaa.76.1555267030106; 
+	Sun, 14 Apr 2019 11:37:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <91dddf37-77fe-79c6-59f5-4e60d45c3c7e@durchholz.org>
-	<CAMo8BfLEEF2_FVU88ydBWVmcRbCJ9T0ULrDEKRa-+hmCYo9cmg@mail.gmail.com>
-	<0492144e-fcd1-c013-2211-fbc31a17ce2f@durchholz.org>
-In-Reply-To: <0492144e-fcd1-c013-2211-fbc31a17ce2f@durchholz.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 14 Apr 2019 19:12:37 +0100
+References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	<1555103178-21894-2-git-send-email-atar4qemu@gmail.com>
+	<e9e9724c-4a8f-e374-8ddf-4e9d4586fa40@reactos.org>
+In-Reply-To: <e9e9724c-4a8f-e374-8ddf-4e9d4586fa40@reactos.org>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Sun, 14 Apr 2019 20:36:59 +0200
 Message-ID:
- <CAFEAcA8vUhuEbtLnmOxui3K_UW8eOET3xbWap3E23EWeGzqv7w@mail.gmail.com>
-To: Joachim Durchholz <jo@durchholz.org>
+ <CACXAS8BFciYO3MsAgfX+OLy0wGf=hZYdbph4U_LQ6PiMOwtRAQ@mail.gmail.com>
+To: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] How to I trigger a rebuild?
+X-Received-From: 2607:f8b0:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH 1/4] lsi53c895a: hide 53c895a registers in
+ 53c810
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,67 +91,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+	"open list:PReP" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190414181237.83PB_y3-jf1XtFrrG7_u1JdmODKa5Wdu_w79k1S8gXU@z>
+Message-ID: <20190414183659.fesqgFqzzUyR_ecXevJ6Mu3jqEh5POQyNqTEdbwAHrk@z>
 
-On Sun, 14 Apr 2019 at 17:08, Joachim Durchholz <jo@durchholz.org> wrote:
+On Sun, Apr 14, 2019 at 5:43 PM Herv=C3=A9 Poussineau <hpoussin@reactos.org=
+> wrote:
 >
-> Am 14.04.19 um 03:15 schrieb Max Filippov:
-> > On Sat, Apr 13, 2019 at 8:28 AM Joachim Durchholz <jo@durchholz.org> wrote:
-> >> I did the usual ./configure; make dance.
-> >> Then modified a source file (ui/curses.c), called make again, but didn't
-> >> see curses.c recompiled, and the change was indeed ineffective.
-> >> make clean; make didn't help either.
+> Le 12/04/2019 =C3=A0 23:06, Artyom Tarasenko a =C3=A9crit :
+> > AIX/PReP does access to the aliased IO registers of 53810.
+> > Implement aliasing to make the AIX driver work.
 > >
-> > Perhaps you don't have CONFIG_CURSES enabled?
-> > Did you call configure with --enable-curses ?
+> > Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> > ---
+> >   hw/scsi/lsi53c895a.c | 31 ++++++++++++++++++++++++++-----
+> >   1 file changed, 26 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> > index da7239d..08841e0 100644
+> > --- a/hw/scsi/lsi53c895a.c
+> > +++ b/hw/scsi/lsi53c895a.c
+> > @@ -2266,11 +2266,13 @@ static const struct SCSIBusInfo lsi_scsi_info =
+=3D {
+> >       .cancel =3D lsi_request_cancelled
+> >   };
+> >
+> > -static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+> > +static void lsi_scsi_realize_8xx(PCIDevice *dev, Error **errp, uint16_=
+t type)
 >
-> Strange. "make help" tells me that everything is enabled by default if
-> possible, and I didn't tell configure to do anything specific.
+> You can probably remove this change, and replace it by
+> uint16_t type =3D PCI_DEVICE_GET_CLASS(dev)->device_id;
+
+Brilliant! Will do in V2, thainks.
+
+Regards,
+Artyom
+> >   {
+> >       LSIState *s =3D LSI53C895A(dev);
+> >       DeviceState *d =3D DEVICE(dev);
+> >       uint8_t *pci_conf;
+> > +    uint64_t mmio_size;
+> > +    MemoryRegion *mr;
+> >
+> >       pci_conf =3D dev->config;
+> >
+> > @@ -2279,13 +2281,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Er=
+ror **errp)
+> >       /* Interrupt pin A */
+> >       pci_conf[PCI_INTERRUPT_PIN] =3D 0x01;
+> >
+> > -    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
+> > -                          "lsi-mmio", 0x400);
+> >       memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
+> >                             "lsi-ram", 0x2000);
+> >       memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
+> >                             "lsi-io", 256);
+> > -
+> > +    if (type =3D=3D PCI_DEVICE_ID_LSI_53C895A) {
+> > +        mmio_size =3D 0x400;
+> > +    } else {
+> > +        mr =3D g_new(MemoryRegion, 1);
+> > +        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io=
+_io,
+> > +                                 0, 0x80);
+> > +        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
+> > +        mmio_size =3D 0x80;
+> > +    }
+> > +    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
+> > +                          "lsi-mmio", mmio_size);
+> >       address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi=
+-pci-io");
+> >       qdev_init_gpio_out(d, &s->ext_irq, 1);
+> >
+> > @@ -2297,6 +2307,16 @@ static void lsi_scsi_realize(PCIDevice *dev, Err=
+or **errp)
+> >       scsi_bus_new(&s->bus, sizeof(s->bus), d, &lsi_scsi_info, NULL);
+> >   }
+> >
+> > +static void lsi_scsi_realize_895A(PCIDevice *dev, Error **errp)
+> > +{
+> > +    lsi_scsi_realize_8xx(dev, errp, PCI_DEVICE_ID_LSI_53C895A);
+> > +}
+> > +
+> > +static void lsi_scsi_realize_810(PCIDevice *dev, Error **errp)
+> > +{
+> > +    lsi_scsi_realize_8xx(dev, errp, PCI_DEVICE_ID_LSI_53C810);
+> > +}
 >
-> But I find that curses is disabled indeed.
-> Heh. An explicit --enable-curses tells me it was missing the dev version
-> of ncurses.
+> ... so you can also remove these functions
+> > +
+> >   static void lsi_scsi_unrealize(DeviceState *dev, Error **errp)
+> >   {
+> >       LSIState *s =3D LSI53C895A(dev);
+> > @@ -2309,7 +2329,7 @@ static void lsi_class_init(ObjectClass *klass, vo=
+id *data)
+> >       DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >       PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+> >
+> > -    k->realize =3D lsi_scsi_realize;
+> > +    k->realize =3D lsi_scsi_realize_895A;
+>
+> ... so you can also remove this change
+> >       k->vendor_id =3D PCI_VENDOR_ID_LSI_LOGIC;
+> >       k->device_id =3D PCI_DEVICE_ID_LSI_53C895A;
+> >       k->class_id =3D PCI_CLASS_STORAGE_SCSI;
+> > @@ -2335,6 +2355,7 @@ static void lsi53c810_class_init(ObjectClass *kla=
+ss, void *data)
+> >   {
+> >       PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+> >
+> > +    k->realize =3D lsi_scsi_realize_810;
+> ... and this one.
+>
+> >       k->device_id =3D PCI_DEVICE_ID_LSI_53C810;
+> >   }
+> >
+> >
+>
+> Herv=C3=A9
 
-Configure's default behaviour is "enable everything that we can
-enable, but don't complain about not enabling optional features
-which we can't build (eg because of missing -dev libraries)".
-For "insist that foo is built and error out if it can't be done",
-use "--enable-foo". For "definitely don't build foo even if we
-could", use --disable-foo.
 
-> However... even with curses enabled, "make" does not do anything  after
-> modifying ui/curses.c.
-> In fact, just "make" tell's me I should have run ./config (WTF I did??),
-> and "make all"
-> But after ./configure is recompiles everything... nothing of this is
-> something that "make" should do, so I'm pretty confused.
 
-This sounds like maybe you got confused somewhere along the line
-about whether you'd (re-)run configure or not (or didn't
-do a 'make clean' after running configure with the curses
-support enabled).
+--=20
+Regards,
+Artyom Tarasenko
 
-The other thing that might confuse you is that make will try
-to spot when it needs to rerun configure and will rerun it
-for you.
-
-I recommend doing builds only in a separate directory, by the way:
- mkdir build
- (cd build && ../configure [configure args])
- make -C build -j8
-
-Then you can always just rm -rf the build dir and it doesn't
-leave stuff lying around in the source tree. You can also
-do multiple different builds with different configure
-setups without having to do a complete build from clean.
-(If you've previously done an in-source-directory build
-you'll need to 'make distclean' it before doing out of tree
-builds.)
-
-thanks
--- PMM
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
 
