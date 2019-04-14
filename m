@@ -2,84 +2,59 @@ Return-Path: <SRS0=wjfX=SQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A32C10F13
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1664EC10F13
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:15:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0568C20850
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 18:55:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2bb2fbF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0568C20850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E606820870
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Apr 2019 19:15:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E606820870
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=durchholz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38994 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39175 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFkHO-0000tq-47
-	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 14:55:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56482)
+	id 1hFkbT-0005XK-7c
+	for qemu-devel@archiver.kernel.org; Sun, 14 Apr 2019 15:15:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hFkGU-0000Yf-HU
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:54:07 -0400
+	(envelope-from <jo@durchholz.org>) id 1hFkaW-00059Z-0o
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hFkGQ-0002Nw-Jz
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 14:54:04 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:54083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
-	id 1hFkGN-0002E8-NL; Sun, 14 Apr 2019 14:54:00 -0400
-Received: by mail-it1-x143.google.com with SMTP id y204so23684847itf.3;
-	Sun, 14 Apr 2019 11:53:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=U6JYYJtDcFUR2lci3Z9YTCspBToy3x2dQwOLVF5zitM=;
-	b=X2bb2fbFzeTW40HYujTfW/bdod3isscSKEIigydknJXZiDY95Utv39iu4vgm6HXxCq
-	L6/+FKYYEDyHefwR2coMblK7Q+VnuKJDbLk9zx78S5TKZ+UZ6cpuZrK1h5RVduhbW05n
-	GRO/txh9LKOI9tejxKDs0ydLQJ5Jc9D5l0fG1SELFh8edRsfSNYRDUNnLvzcNMBC0Jx2
-	EspLDk2Y5DJfXPlyh0zU/dGRqxXg1kJ3xkQeCP2DdPBN4qyIhD/MfjLOn2RJSCpz+k1i
-	NNemEfQv9vsI3plboNxIsCzG66RyEgGQHsJxUr/CmkPjH/7GcsQriBdDwj2gsYF2op7/
-	EiUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=U6JYYJtDcFUR2lci3Z9YTCspBToy3x2dQwOLVF5zitM=;
-	b=FrAWyxOw3aGFe8XgRYjlFgQAGd09ItixrfG3ikay+4ldNOeL0bMixEWM11f+u7/9Ix
-	0HzdTCpT5LKIA9VkzX4Qetc6mfiVQMjIybxclXDUiIV5+5neOXqhrz+Bf1NUDFoi74rG
-	N+rhbXRlCyfDcVQ7/uW+GNdu0I0agaWHIv5JENmQK0v0zPcV4+z1IgnKDGSWpwae4ls3
-	+YHxj3Vp9ULZMDyoCI5hru9I2BB9Q7gQdbL2Ga6c1+ooeJdg08rdU3cV/sPN2atH78Gw
-	rV7jbaJ7UD2sUfbvAFhRRi13dNFVaD7T0xl4YJ2byh+YPOMraAgqVPIhbutXEdu6ij5W
-	CHOw==
-X-Gm-Message-State: APjAAAVZgBQ8p8J3pkW1wNJ+u98hXA4IJD17q/Z9/m7ELcBv8NI0xG+5
-	Dex1bLjNWVTughA2pZSceFfQl69+3fbHsdLZTnI=
-X-Google-Smtp-Source: APXvYqziWOkhHD6E226yHYl2ihMTc3MnlCqCHFXBvFYSbhNIBQ3nR/4fNZ2mcgDZZ311qBgSnol+GnhF2XksHZUCYM8=
-X-Received: by 2002:a24:2846:: with SMTP id h67mr23014224ith.138.1555268025736;
-	Sun, 14 Apr 2019 11:53:45 -0700 (PDT)
+	(envelope-from <jo@durchholz.org>) id 1hFkaU-0005L8-AM
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:47 -0400
+Received: from 5.itsy.de ([188.40.84.14]:56021)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hFkaS-000577-8P
+	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 15:14:46 -0400
+Received: from [192.168.178.32] (unknown [195.48.33.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by 5.itsy.de (Postfix) with ESMTPSA id D614C643C8
+	for <qemu-devel@nongnu.org>; Sun, 14 Apr 2019 21:14:31 +0200 (CEST)
+To: qemu-devel@nongnu.org
+References: <91dddf37-77fe-79c6-59f5-4e60d45c3c7e@durchholz.org>
+	<CAMo8BfLEEF2_FVU88ydBWVmcRbCJ9T0ULrDEKRa-+hmCYo9cmg@mail.gmail.com>
+	<0492144e-fcd1-c013-2211-fbc31a17ce2f@durchholz.org>
+	<CAFEAcA8vUhuEbtLnmOxui3K_UW8eOET3xbWap3E23EWeGzqv7w@mail.gmail.com>
+From: Joachim Durchholz <jo@durchholz.org>
+Message-ID: <5daf8566-fe07-fa64-89e4-5c18676e2f1b@durchholz.org>
+Date: Sun, 14 Apr 2019 21:14:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
-	<1555103178-21894-5-git-send-email-atar4qemu@gmail.com>
-	<29f79530-fd9e-ea60-8cf3-df593b855f10@reactos.org>
-In-Reply-To: <29f79530-fd9e-ea60-8cf3-df593b855f10@reactos.org>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Sun, 14 Apr 2019 20:53:34 +0200
-Message-ID:
- <CACXAS8De=OS0O4O2=Q721KCUc9RuQryOGNfedejM+yzWcX9aOg@mail.gmail.com>
-To: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH 4/4] hw/isa/i82378.c: use 1900 as a base
- year
+In-Reply-To: <CAFEAcA8vUhuEbtLnmOxui3K_UW8eOET3xbWap3E23EWeGzqv7w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 188.40.84.14
+Subject: Re: [Qemu-devel] How to I trigger a rebuild?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,76 +66,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:PReP" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190414185334.lY5TYRG80MuskoJDHgrv_guH9rSwTAK4I6wWOLwBgLg@z>
+Message-ID: <20190414191431.bV61wEFFkdRr5n-BLVOYpaamUVFuWwxmoiB-LmRhsDI@z>
 
-On Sun, Apr 14, 2019 at 7:01 PM Herv=C3=A9 Poussineau <hpoussin@reactos.org=
-> wrote:
->
-> Le 12/04/2019 =C3=A0 23:06, Artyom Tarasenko a =C3=A9crit :
-> > AIX 5.1 expects the base year to be 1900. Adjust accordingly.
-> >
-> > Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-> > ---
-> >   hw/isa/i82378.c | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-> > index a5d67bc..546c928 100644
-> > --- a/hw/isa/i82378.c
-> > +++ b/hw/isa/i82378.c
-> > @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **=
-errp)
-> >       isa =3D isa_create_simple(isabus, "i82374");
-> >
-> >       /* timer */
-> > -    isa_create_simple(isabus, TYPE_MC146818_RTC);
-> > +    isa =3D isa_create(isabus, TYPE_MC146818_RTC);
-> > +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
-> > +    qdev_init_nofail(DEVICE(isa));
->
-> I am not sure the base_year should be hardcoded in i82378. I can assume o=
-ther machines with a i82378 can have another base_year.
+Am 14.04.19 um 20:12 schrieb Peter Maydell:
+> On Sun, 14 Apr 2019 at 17:08, Joachim Durchholz <jo@durchholz.org> wrote:
+>>
+>> Am 14.04.19 um 03:15 schrieb Max Filippov:
+>>> On Sat, Apr 13, 2019 at 8:28 AM Joachim Durchholz <jo@durchholz.org> wrote:
+>>>> I did the usual ./configure; make dance.
+>>>> Then modified a source file (ui/curses.c), called make again, but didn't
+>>>> see curses.c recompiled, and the change was indeed ineffective.
+>>>> make clean; make didn't help either.
+>>>
+>>> Perhaps you don't have CONFIG_CURSES enabled?
+>>> Did you call configure with --enable-curses ?
+>>
+>> Strange. "make help" tells me that everything is enabled by default if
+>> possible, and I didn't tell configure to do anything specific.
+>>
+>> But I find that curses is disabled indeed.
+>> Heh. An explicit --enable-curses tells me it was missing the dev version
+>> of ncurses.
+> 
+> Configure's default behaviour is "enable everything that we can
+> enable, but don't complain about not enabling optional features
+> which we can't build (eg because of missing -dev libraries)".
+> For "insist that foo is built and error out if it can't be done",
+> use "--enable-foo". For "definitely don't build foo even if we
+> could", use --disable-foo.
 
-I doubt it to be honest. How would it work in the hardware? Is there a
-pin which would switch a year?
-I do believe the different i823xx may have the different base years though.
+Well, that's what I guessed after the fact... it didn't occur to me that 
+"what's possible" was defined as "what libraries are available".
+Now that I know this, I know what to watch out for.
 
-> Maybe you can you add a base_year property to i82378, and forward it to m=
-c146818 with object_property_add_alias?
-> Then, change 40p machine to set it to 1900, without changing it for prep =
-machine.
+>> However... even with curses enabled, "make" does not do anything  after
+>> modifying ui/curses.c.
+>> In fact, just "make" tell's me I should have run ./config (WTF I did??),
+>> and "make all"
+>> But after ./configure is recompiles everything... nothing of this is
+>> something that "make" should do, so I'm pretty confused.
+> 
+> This sounds like maybe you got confused somewhere along the line
+> about whether you'd (re-)run configure or not (or didn't
+> do a 'make clean' after running configure with the curses
+> support enabled).
 
-Were you not going to drop the -M prep ? Because I sort of dropped the
-support for it in OFW.
-I had a branch were I added some registers to -M prep  enough that it
-would be able to turn itself out as a PowerStack II Utah,
-but then again I couldn't find any advantage of having two PReP machines.
-AFAIK, the only OS which can run on Powerstack, but not on 40p is Motorola =
-AIX.
-But since we can have IBM AIX, I don't see why would we want to keep -M pre=
-p.
+Actually I got confused about where I was building.
+I had set up things for an out-of-tree build but accidentally hit "make" 
+in the source tree.
 
-On the other hand, if you plan to revive it, I'll think about adding
-the support for it to OFW.
-PowerStack had a Cirrus VGA which we already have.
+> The other thing that might confuse you is that make will try
+> to spot when it needs to rerun configure and will rerun it
+> for you.
 
-> >   }
-> >
-> >   static void i82378_init(Object *obj)
-> >
->
-> Herv=C3=A9
+Oh dear. That didn't happen to me, but I see the trap-in-waiting.
 
+> I recommend doing builds only in a separate directory, by the way:
+>   mkdir build
+>   (cd build && ../configure [configure args])
+>   make -C build -j8
 
+Yep, doing that already.
 
---=20
 Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+Jo
 
