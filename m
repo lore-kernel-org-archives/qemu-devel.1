@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42666)
+Received: from eggs.gnu.org ([209.51.188.92]:42786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1ds-0004jE-Tp
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:25 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1e0-0004rt-B8
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1dr-00055i-4r
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:24 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1dy-00059s-Ew
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:32 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 15 Apr 2019 15:27:21 +0200
-Message-Id: <1555334842-195718-5-git-send-email-imammedo@redhat.com>
+Date: Mon, 15 Apr 2019 15:27:22 +0200
+Message-Id: <1555334842-195718-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
 References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 4/5] memory: make MemoryRegion alias
- migratable
+Subject: [Qemu-devel] [PATCH v1 5/5] s390: do not call
+ memory_region_allocate_system_memory() multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Helge Deller <deller@gmx.de>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-use qemu_ram_alloc_from_ptr() to create aliased RAMBlock
-to the part of original memory region.
+s390 was trying to solve limited memslot size issue by abusing
+memory_region_allocate_system_memory(), which breaks API contract
+where the function might be called only once.
+
+s390 should have used memory aliases to fragment inital memory into
+smaller chunks to satisfy KVM's memslot limitation. But its a bit
+late now, since allocated pieces are transfered in migration stream
+separately, so it's not possible to just replace broken layout with
+correct one. Previous patch made MemoryRegion alases migratable and
+this patch switches to use them to split big initial RAM chunk into
+smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
+for migration.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- exec.c   | 7 ++++---
- memory.c | 5 +++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
+A don't have access to a suitable system to test it, so I've simulated
+it with smaller chunks on x84 host. Ping-pong migration between old
+and new QEMU worked fine.  KVM part should be fine as memslots
+using mapped MemoryRegions (in this case it would be aliases) as
+far as I know but is someone could test it on big enough host it
+would be nice.
+---
+ hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 6ab62f4..0fc10d1 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2255,7 +2255,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
-                                         new_block->used_length,
-                                         DIRTY_CLIENTS_ALL);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d11069b..12ca3a9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     ram_addr_t chunk, offset = 0;
+     unsigned int number = 0;
+     gchar *name;
  
--    if (new_block->host) {
-+    if (new_block->host && !new_block->mr->alias) {
-         qemu_ram_setup_dump(new_block->host, new_block->max_length);
-         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
-         /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
-@@ -2613,7 +2613,8 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+     /* allocate RAM for core */
++    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
++    /*
++     * memory_region_allocate_system_memory() registers allocated RAM for
++     * migration, however for compat reasons the RAM should be passed over
++     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
++     * allocated RAM so it won't be migrated directly. Aliases will take
++     * of segmenting RAM into legacy chunks.
++     */
++    vmstate_unregister_ram(ram, NULL);
+     name = g_strdup_printf("s390.ram");
+     while (mem_size) {
+-        MemoryRegion *ram = g_new(MemoryRegion, 1);
+-        uint64_t size = mem_size;
++        MemoryRegion *alias = g_new(MemoryRegion, 1);
  
-     rcu_read_lock();
-     block = atomic_rcu_read(&ram_list.mru_block);
--    if (block && block->host && host - block->host < block->max_length) {
-+    if (block && !block->mr->alias && block->host &&
-+        host - block->host < block->max_length) {
-         goto found;
-     }
- 
-@@ -2622,7 +2623,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-         if (block->host == NULL) {
-             continue;
-         }
--        if (host - block->host < block->max_length) {
-+        if (!block->mr->alias && host - block->host < block->max_length) {
-             goto found;
-         }
-     }
-diff --git a/memory.c b/memory.c
-index 9fbca52..687a147 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1672,6 +1672,11 @@ void memory_region_init_alias(MemoryRegion *mr,
-     memory_region_init(mr, owner, name, size);
-     mr->alias = orig;
-     mr->alias_offset = offset;
-+    if (orig->ram_block && size) {
-+        mr->ram_block = qemu_ram_alloc_from_ptr(size,
-+                                                orig->ram_block->host + offset,
-+                                                mr, &error_fatal);
-+    }
- }
- 
- void memory_region_init_rom_nomigrate(MemoryRegion *mr,
+         /* KVM does not allow memslots >= 8 TB */
+-        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+-        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+-        memory_region_add_subregion(sysmem, offset, ram);
++        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
++        vmstate_register_ram_global(alias);
++        memory_region_add_subregion(sysmem, offset, alias);
+         mem_size -= chunk;
+         offset += chunk;
+         g_free(name);
 -- 
 2.7.4
