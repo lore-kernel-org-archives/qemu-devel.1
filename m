@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43076)
+Received: from eggs.gnu.org ([209.51.188.92]:46773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hFzIJ-0006s7-Hj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:57:00 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hFza3-0000ok-Fj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hFzII-0008Vz-PQ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:56:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42912)
+	(envelope-from <dgilbert@redhat.com>) id 1hFza2-0008I8-AM
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:15:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hFzII-0008VQ-Eo
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:56:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D1E459454
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 10:56:57 +0000 (UTC)
-References: <20190411175345.19414-1-thuth@redhat.com>
-	<20190412183628.GA31999@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <092afc3f-68fc-7a08-a9a4-e1b9f5a482ec@redhat.com>
-Date: Mon, 15 Apr 2019 12:56:48 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hFza2-0008Hv-12
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:15:18 -0400
+Date: Mon, 15 Apr 2019 12:15:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190415111511.GG2852@work-vm>
+References: <20190411120421.GP3641@redhat.com>
+	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415101101.GF5718@redhat.com>
+	<251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415102520.GG5718@redhat.com>
+	<259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415104725.GI5718@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190412183628.GA31999@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1] Declare -realtime as
- deprecated
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190415104725.GI5718@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +36,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Yury Kotov <yury-kotov@yandex-team.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-On 12/04/19 20:36, Eduardo Habkost wrote:
->> let's deprecate the old -realtime option.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Paolo, do you want to queue this, or should I do it through the
-> machine queue?
-> 
-> -- Eduardo
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Mon, Apr 15, 2019 at 01:33:21PM +0300, Yury Kotov wrote:
+> > 15.04.2019, 13:25, "Daniel P. Berrang=E9" <berrange@redhat.com>:
+> > > On Mon, Apr 15, 2019 at 01:17:06PM +0300, Yury Kotov wrote:
+> > >> =A015.04.2019, 13:11, "Daniel P. Berrang=E9" <berrange@redhat.com>=
+:
+> > >> =A0> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
+> > >> =A0>> =A0Hi,
+> > >> =A0>>
+> > >> =A0>> =A0Just to clarify. I see two possible solutions:
+> > >> =A0>>
+> > >> =A0>> =A01) Since the migration code doesn't receive fd, it isn't =
+responsible for
+> > >> =A0>> =A0closing it. So, it may be better to use migrate_fd_param =
+for both
+> > >> =A0>> =A0incoming/outgoing and add dupping for migrate_fd_param. T=
+hus, clients must
+> > >> =A0>> =A0close the fd themselves. But existing clients will have a=
+ leak.
+> > >> =A0>
+> > >> =A0> We can't break existing clients in this way as they are corre=
+ctly
+> > >> =A0> using the monitor with its current semantics.
+> > >> =A0>
+> > >> =A0>> =A02) If we don't duplicate fd, then at least we should remo=
+ve fd from
+> > >> =A0>> =A0the corresponding list. Therefore, the solution is to fix=
+ qemu_close to find
+> > >> =A0>> =A0the list and remove fd from it. But qemu_close is current=
+ly consistent with
+> > >> =A0>> =A0qemu_open (which opens/dups fd), so adding additional log=
+ic might not be
+> > >> =A0>> =A0a very good idea.
+> > >> =A0>
+> > >> =A0> qemu_close is not appropriate place to deal with something sp=
+eciifc
+> > >> =A0> to the montor.
+> > >> =A0>
+> > >> =A0>> =A0I don't see any other solution, but I might miss somethin=
+g.
+> > >> =A0>> =A0What do you think?
+> > >> =A0>
+> > >> =A0> All callers of monitor_get_fd() will close() the FD they get =
+back.
+> > >> =A0> Thus monitor_get_fd() should remove it from the list when it =
+returns
+> > >> =A0> it, and we should add API docs to monitor_get_fd() to explain=
+ this.
+> > >> =A0>
+> > >> =A0Ok, it sounds reasonable. But monitor_get_fd is only about outg=
+oing migration.
+> > >> =A0But what about the incoming migration? It doesn't use monitor_g=
+et_fd but just
+> > >> =A0converts input string to int and use it as fd.
+> > >
+> > > The incoming migration expects the FD to be passed into QEMU by the=
+ mgmt
+> > > app when it is exec'ing the QEMU binary. It doesn't interact with t=
+he
+> > > monitor at all AFAIR.
+> > >
+> >=20
+> > Oh, sorry. This use case is not obvious. We used add-fd to pass fd fo=
+r
+> > migrate-incoming and such way has described problems.
+>=20
+> That's a bug in your usage of QEMU IMHO, as the incoming code is not
+> designed to use add-fd.
 
-I have just queued it.
+Hmm, that's true - although:
+  a) It's very non-obvious
+  b) Unfortunate, since it would go well with -incoming defer
 
-Paolo
+Dave
+
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
