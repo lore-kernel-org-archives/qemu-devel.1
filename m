@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45662)
+Received: from eggs.gnu.org ([209.51.188.92]:42593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hFxJx-0001wd-P1
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:34 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1dm-0004eJ-Pw
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hFxJv-0002yP-VA
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:33 -0400
-Received: from mail-it1-x12f.google.com ([2607:f8b0:4864:20::12f]:37350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fengyd81@gmail.com>) id 1hFxJu-0002uv-Co
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:30 -0400
-Received: by mail-it1-x12f.google.com with SMTP id u65so25409208itc.2
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 01:50:28 -0700 (PDT)
-MIME-Version: 1.0
-From: fengyd <fengyd81@gmail.com>
-Date: Mon, 15 Apr 2019 16:50:16 +0800
-Message-ID: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] How live migration work for vhost-user
+	(envelope-from <imammedo@redhat.com>) id 1hG1dk-00052s-T0
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:18 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 15 Apr 2019 15:27:18 +0200
+Message-Id: <1555334842-195718-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
+References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 1/5] sparc64: use
+ memory_region_allocate_system_memory() only for '-m' specified RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +21,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Helge Deller <deller@gmx.de>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-Hi,
+memory_region_allocate_system_memory() was designed to be called for
+allocating inital RAM. Using it mutiple times within one board is not
+supported and could fail if -mem-path with non hugepage path is used.
 
-During live migration,  the folloing log can see in nova-compute.log in my
-environment:
- ERROR nova.virt.libvirt.driver [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
-0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e - default
-default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live Migration
-failure: internal error: qemu unexpectedly closed the monitor:
-2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
-size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+Keep using memory_region_allocate_system_memory() only for initial
+RAM and use memory_region_init_ram() for the rest fixed size regions.
 
-It's OK for standard Linux VM, but not OK for our VM where virtio is
-implemented by ourself.
-KVM version as follow:
-qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
-qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
-libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/sparc64/niagara.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-Do you know what's the difference between virtio and vhost-user during
-migration?
-The function virtio_load in Qemu is called for virtio and vhost-user during
-migration.
-For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
-responsible for updating their values accordingly
-For vhost-user, last_avail_idx  and used_idx are stored in vhost-user app,
-eg. DPDK, not in Qemu?
-How does migration work for vhost-user?
-
-Thanks in advance
-Yafeng
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index f8a856f..39a4522 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -37,6 +37,7 @@
+ #include "sysemu/block-backend.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
++#include "qapi/error.h"
+ 
+ 
+ typedef struct NiagaraBoardState {
+@@ -108,8 +109,8 @@ static void niagara_init(MachineState *machine)
+     /* init CPUs */
+     sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
+     /* set up devices */
+-    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+-                                         NIAGARA_HV_RAM_SIZE);
++    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
++                           NIAGARA_HV_RAM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+ 
+     memory_region_allocate_system_memory(&s->partition_ram, NULL,
+@@ -118,17 +119,17 @@ static void niagara_init(MachineState *machine)
+     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
+                                 &s->partition_ram);
+ 
+-    memory_region_allocate_system_memory(&s->nvram, NULL,
+-                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
++    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
+-    memory_region_allocate_system_memory(&s->md_rom, NULL,
+-                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
++    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
++                           NIAGARA_MD_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
+-    memory_region_allocate_system_memory(&s->hv_rom, NULL,
+-                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
++    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
++                           NIAGARA_HV_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
+-    memory_region_allocate_system_memory(&s->prom, NULL,
+-                                         "sun4v.prom", PROM_SIZE_MAX);
++    memory_region_init_ram(&s->prom, NULL, "sun4v.prom", PROM_SIZE_MAX,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
+ 
+     add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
+@@ -145,8 +146,8 @@ static void niagara_init(MachineState *machine)
+         BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+         int size = blk_getlength(blk);
+         if (size > 0) {
+-            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
+-                                                 "sun4v_vdisk.ram", size);
++            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
++                                   &error_fatal);
+             memory_region_add_subregion(get_system_memory(),
+                                         NIAGARA_VDISK_BASE, &s->vdisk_ram);
+             dinfo->is_default = 1;
+-- 
+2.7.4
