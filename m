@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39422)
+Received: from eggs.gnu.org ([209.51.188.92]:39441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG3UA-0002mc-Ji
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:25:31 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1hG3UB-0002nu-Hx
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:25:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG3U9-0004ZX-H2
+	(envelope-from <alifm@linux.ibm.com>) id 1hG3UA-0004b8-K1
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:25:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38244
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hG3UA-0004Zr-5U
 	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:25:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hG3U7-0004NI-9I
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:25:29 -0400
-References: <20190415141547.15444-1-berrange@redhat.com>
-	<CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
-Date: Mon, 15 Apr 2019 10:25:03 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3FFOd1a138786
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:25:28 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2rvuk0kcy2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:25:28 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Mon, 15 Apr 2019 16:25:27 +0100
+References: <20190301093902.27799-1-cohuck@redhat.com>
+	<20190301093902.27799-7-cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Mon, 15 Apr 2019 11:25:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rmunhz8EBV5AIIGBA8utpeR5o9Z9RxV3D"
-Subject: Re: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for
- all code
+In-Reply-To: <20190301093902.27799-7-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <0820ad60-9654-b031-a953-658abff6d6f8@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] vfio-ccw: add handling for async
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +43,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paolo Bonzini <pbonzini@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rmunhz8EBV5AIIGBA8utpeR5o9Z9RxV3D
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for all
- code
-References: <20190415141547.15444-1-berrange@redhat.com>
- <CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/15/19 9:25 AM, Peter Maydell wrote:
-> On Mon, 15 Apr 2019 at 15:17, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
->>
-
-> A few typo nits below...
-
-Also:
-
->=20
->>
->> +    /*
->> +     * Ideally we would set LC_ALL, but QEMU currently isn't able to =
-cope
->> +     * with arbitrary localization settings. In particular there are =
-two
->> +     * known problems
-
-"two known problems" but...
-
->> +     *
->> +     *   - The QMP monitor needs to use the C locale rules for numeri=
-c
->> +     *     formatting. This would need a double/int -> string formatt=
-er
->> +     *     that is locale independant.
->=20
-> "independent"
->=20
->> +     *
->> +     *   - The QMP monitor needs to encode all data as UTF-8. This ne=
-eds
->> +     *     to be updated to use iconv(3) to explicitly convert the cu=
-rrent
->> +     *     locale's charset into utf-8
->> +     *
->> +     *   - Lots of codes uses is{upper,lower,alnum,...} functions, ex=
-pecting
->=20
-> "code"
->=20
->> +     *     C locale sorting behaviour. Most QEMU usage should likely =
-be
->> +     *     changed to g_ascii_is{upper,lower,alnum...} to match code
->> +     *     assumptions, without being broken by locale settnigs.
->=20
-> "settings"
-
-=2E..three bullet points.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 
---rmunhz8EBV5AIIGBA8utpeR5o9Z9RxV3D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 03/01/2019 04:39 AM, Cornelia Huck wrote:
+> Add a region to the vfio-ccw device that can be used to submit
+> asynchronous I/O instructions. ssch continues to be handled by the
+> existing I/O region; the new region handles hsch and csch.
+> 
+> Interrupt status continues to be reported through the same channels
+> as for ssch.
+> 
+> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0ok8ACgkQp6FrSiUn
-Q2p4XQf/QiH2f8maq7m0AN1EAZL3r4p8DpBsx2TW54RWHdQLBWyGoP1PHAiqOK+I
-5+zTjCTDcN6eqA7OCc/Vi9IyNKCoX03I8ZfDQdKR5U2e6cAUTix0G2QH75Ke7l8n
-CX77qthfAubJ4cv0weBbuUheYwXJNU5mmUSvPSX4RI+M6SXDzVySkX/th5Odilwa
-g9NPxoTYQPpBlw4eElV9a7JZn172xGmC3PPAMtjbL9jbsTHAxiNttJYxof796emV
-gpdMJavPRe2FZuiwBP9GMCds9iWW/ciBGOkpuMQC7B6pll3OuTJyN+uuoKhW3Q7k
-4SZ/fQLvvHHQKwpjvlAFOLC/YDJS/g==
-=33Gy
------END PGP SIGNATURE-----
-
---rmunhz8EBV5AIIGBA8utpeR5o9Z9RxV3D--
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
