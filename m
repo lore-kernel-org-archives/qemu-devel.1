@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58350)
+Received: from eggs.gnu.org ([209.51.188.92]:58354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hG2vo-0005Ub-Ut
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:50:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hG2vo-0005Uf-V5
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hG2vk-0005SB-1H
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hG2vj-0005Rn-OO
 	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:49:59 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 15 Apr 2019 17:49:47 +0300
-Message-Id: <20190415144948.78568-5-vsementsov@virtuozzo.com>
+Date: Mon, 15 Apr 2019 17:49:46 +0300
+Message-Id: <20190415144948.78568-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20190415144948.78568-1-vsementsov@virtuozzo.com>
 References: <20190415144948.78568-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v6 4/5] block/backup: unify different modes
- code path
+Subject: [Qemu-devel] [PATCH v6 3/5] block/backup: refactor and tolerate
+ unallocated cluster skipping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,90 +23,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Do full, top and incremental mode copying all in one place. This
-unifies the code path and helps further improvements.
+Split allocation checking to separate function and reduce nesting.
+Consider bdrv_is_allocated() fail as allocated area, as copying more
+than needed is not wrong (and we do it anyway) and seems better than
+fail the whole job. And, most probably we will fail on the next read,
+if there are real problem with source.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/backup.c | 43 ++++++++++---------------------------------
- 1 file changed, 10 insertions(+), 33 deletions(-)
+ block/backup.c | 60 +++++++++++++++++++-------------------------------
+ 1 file changed, 23 insertions(+), 37 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index 298e85f1a9..b54386b699 100644
+index 510fc54f98..298e85f1a9 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -393,15 +393,23 @@ static bool bdrv_is_unallocated_range(BlockDriverState *bs,
-     return offset >= end;
+@@ -377,6 +377,22 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+     return false;
  }
  
--static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-+static int coroutine_fn backup_loop(BackupBlockJob *job)
++static bool bdrv_is_unallocated_range(BlockDriverState *bs,
++                                      int64_t offset, int64_t bytes)
++{
++    int64_t end = offset + bytes;
++
++    while (offset < end && !bdrv_is_allocated(bs, offset, bytes, &bytes)) {
++        if (bytes == 0) {
++            return true;
++        }
++        offset += bytes;
++        bytes = end - offset;
++    }
++
++    return offset >= end;
++}
++
+ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
  {
      int ret;
-     bool error_is_read;
-     int64_t offset;
-     HBitmapIter hbi;
-+    BlockDriverState *bs = blk_bs(job->common.blk);
+@@ -462,49 +478,19 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
+         for (offset = 0; offset < s->len;
+              offset += s->cluster_size) {
+             bool error_is_read;
+-            int alloced = 0;
  
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
-     while ((offset = hbitmap_iter_next(&hbi)) != -1) {
-+        if (job->sync_mode == MIRROR_SYNC_MODE_TOP &&
-+            bdrv_is_unallocated_range(bs, offset, job->cluster_size))
-+        {
-+            hbitmap_reset(job->copy_bitmap, offset, job->cluster_size);
-+            continue;
-+        }
-+
-         do {
-             if (yield_and_check(job)) {
-                 return 0;
-@@ -446,7 +454,6 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
- {
-     BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-     BlockDriverState *bs = blk_bs(s->common.blk);
--    int64_t offset;
-     int ret = 0;
+             if (yield_and_check(s)) {
+                 break;
+             }
  
-     QLIST_INIT(&s->inflight_reqs);
-@@ -471,38 +478,8 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-              * notify callback service CoW requests. */
-             job_yield(job);
-         }
--    } else if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
--        ret = backup_run_incremental(s);
-     } else {
--        /* Both FULL and TOP SYNC_MODE's require copying.. */
--        for (offset = 0; offset < s->len;
--             offset += s->cluster_size) {
--            bool error_is_read;
+-            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
+-                int i;
+-                int64_t n;
 -
--            if (yield_and_check(s)) {
--                break;
--            }
+-                /* Check to see if these blocks are already in the
+-                 * backing file. */
 -
--            if (s->sync_mode == MIRROR_SYNC_MODE_TOP &&
--                bdrv_is_unallocated_range(bs, offset, s->cluster_size))
--            {
--                continue;
--            }
+-                for (i = 0; i < s->cluster_size;) {
+-                    /* bdrv_is_allocated() only returns true/false based
+-                     * on the first set of sectors it comes across that
+-                     * are are all in the same state.
+-                     * For that reason we must verify each sector in the
+-                     * backup cluster length.  We end up copying more than
+-                     * needed but at some point that is always the case. */
+-                    alloced =
+-                        bdrv_is_allocated(bs, offset + i,
+-                                          s->cluster_size - i, &n);
+-                    i += n;
 -
--            ret = backup_do_cow(s, offset, s->cluster_size,
--                                &error_is_read, false);
--            if (ret < 0) {
--                /* Depending on error action, fail now or retry cluster */
--                BlockErrorAction action =
--                    backup_error_action(s, error_is_read, -ret);
--                if (action == BLOCK_ERROR_ACTION_REPORT) {
--                    break;
--                } else {
--                    offset -= s->cluster_size;
+-                    if (alloced || n == 0) {
+-                        break;
+-                    }
+-                }
+-
+-                /* If the above loop never found any sectors that are in
+-                 * the topmost image, skip this backup. */
+-                if (alloced == 0) {
 -                    continue;
 -                }
 -            }
--        }
-+        ret = backup_loop(s);
-     }
- 
-     notifier_with_return_remove(&s->before_write);
+-            /* FULL sync mode we copy the whole drive. */
+-            if (alloced < 0) {
+-                ret = alloced;
+-            } else {
+-                ret = backup_do_cow(s, offset, s->cluster_size,
+-                                    &error_is_read, false);
++            if (s->sync_mode == MIRROR_SYNC_MODE_TOP &&
++                bdrv_is_unallocated_range(bs, offset, s->cluster_size))
++            {
++                continue;
+             }
++
++            ret = backup_do_cow(s, offset, s->cluster_size,
++                                &error_is_read, false);
+             if (ret < 0) {
+                 /* Depending on error action, fail now or retry cluster */
+                 BlockErrorAction action =
 -- 
 2.18.0
