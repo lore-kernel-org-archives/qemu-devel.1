@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58234)
+Received: from eggs.gnu.org ([209.51.188.92]:58870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hFyBZ-0001kk-BA
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:45:58 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFp-0002dh-9R
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hFyBY-0001hH-9r
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:45:57 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:34990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hFyBX-0001gS-Vj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:45:56 -0400
-Received: by mail-wm1-x335.google.com with SMTP id y197so7703552wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 02:45:55 -0700 (PDT)
-Date: Mon, 15 Apr 2019 10:45:52 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190415094552.GC29134@stefanha-x1.localdomain>
-References: <20190412152652.827-1-dgilbert@redhat.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFn-0004Wm-Iz
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:21 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:53474)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFj-0004VC-VL
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:17 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+	<20190411120421.GP3641@redhat.com>
+	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dkEUBIird37B8yKS"
-Content-Disposition: inline
-In-Reply-To: <20190412152652.827-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hmp: gva2gpa debug command
+Date: Mon, 15 Apr 2019 12:50:08 +0300
+Message-Id: <243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
+Hi,
 
---dkEUBIird37B8yKS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Just to clarify. I see two possible solutions:
 
-On Fri, Apr 12, 2019 at 04:26:52PM +0100, Dr. David Alan Gilbert (git) wrote:
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index d3bad2fc27..ba4690b9ac 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -585,6 +585,21 @@ STEXI
->  @findex gpa2hpa
->  Print the host physical address at which the guest's physical address @var{addr}
->  is mapped.
-> +ETEXI
-> +
-> +    {
-> +        .name       = "gva2gpa",
-> +        .args_type  = "addr:l",
-> +        .params     = "addr",
-> +        .help       = "print the guest physical address corresponding to a guest virtual address",
-> +        .cmd        = hmp_gva2gpa,
-> +    },
-> +
-> +STEXI
-> +@item gpa2hpa @var{addr}
-> +@findex gpa2hpa
+1) Since the migration code doesn't receive fd, it isn't responsible for
+closing it. So, it may be better to use migrate_fd_param for both
+incoming/outgoing and add dupping for migrate_fd_param. Thus, clients mus=
+t
+close the fd themselves. But existing clients will have a leak.
 
-s/gpa2hpa/gva2gpa/
+2) If we don't duplicate fd, then at least we should remove fd from
+the corresponding list. Therefore, the solution is to fix qemu_close to f=
+ind
+the list and remove fd from it. But qemu_close is currently consistent wi=
+th
+qemu_open (which opens/dups fd), so adding additional logic might not be
+a very good idea.
 
-Aside from this:
+I don't see any other solution, but I might miss something.
+What do you think?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Regards,
+Yury
 
---dkEUBIird37B8yKS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJctFLQAAoJEJykq7OBq3PIAx4H/2Jqy65fbr9jEnv2uddXwZ2k
-b4oveNjiw6XfLmH+K/NllFbHCj76EpxYQv6jDZ7otKUTeOxJzRi4zN8UtBhVY1Hb
-2qh3bsyenANAeCnJUNUZAKHmohYGFHMMBQh1EAHXecQLkNTVLdaJWn8OIri/kD2+
-Ewy+DCs03WBN16DZV/BDnP0XWtjs3xN/Buohi19ULioXT6kNcudum2gOdRcFZL32
-NXa5f7QThgrnZmkXoSDPUlQqwEupdv2nAVhImQ0J5GOkvOwa+gBCR2NVBGJ+EgnL
-EZyfDmohXRwrcyyXTCFQwheBWTQR+7N/kjz3xs8Fu+YoTKg2OayNa3MAowAMReE=
-=Ad1y
------END PGP SIGNATURE-----
-
---dkEUBIird37B8yKS--
+11.04.2019, 15:58, "Yury Kotov" <yury-kotov@yandex-team.ru>:
+> 11.04.2019, 15:39, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
+>> =C2=A0On Thu, Apr 11, 2019 at 03:31:43PM +0300, Yury Kotov wrote:
+>>> =C2=A0=C2=A011.04.2019, 15:04, "Daniel P. Berrang=C3=A9" <berrange@re=
+dhat.com>:
+>>> =C2=A0=C2=A0> On Wed, Apr 10, 2019 at 12:26:52PM +0300, Yury Kotov wr=
+ote:
+>>> =C2=A0=C2=A0>> =C2=A0Currently such case is possible for incoming:
+>>> =C2=A0=C2=A0>> =C2=A0QMP: add-fd (fdset =3D 0, fd of some file):
+>>> =C2=A0=C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0adds fd to fdset 0 and r=
+eturns QEMU's fd (e.g. 33)
+>>> =C2=A0=C2=A0>> =C2=A0QMP: migrate-incoming (uri =3D "fd:33"): fd is s=
+tored in QIOChannel *ioc
+>>> =C2=A0=C2=A0>> =C2=A0...
+>>> =C2=A0=C2=A0>> =C2=A0Incoming migration completes and unrefs ioc -> c=
+lose(33)
+>>> =C2=A0=C2=A0>> =C2=A0QMP: remove-fd (fdset =3D 0, fd =3D 33):
+>>> =C2=A0=C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0removes fd from fdset 0 =
+and qemu_close() -> close(33) =3D> double close
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> IMHO this is user error.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> You've given the FD to QEMU and told it to use it for m=
+igration.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> Once you've done that you should not be calling remove-=
+fd.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> remove-fd should only be used in some error code path. =
+ie if you
+>>> =C2=A0=C2=A0> have called add-fd, and then some failure means you've =
+decided you
+>>> =C2=A0=C2=A0> can't invoke 'migrate-incoming'. Now you should call "r=
+emove-fd".
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> AFAIK, we have never documented that 'add-fd' must be p=
+aired
+>>> =C2=A0=C2=A0> with 'remove-fd'.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> IOW, I think this "fix" is in fact not a fix - it is in=
+stead
+>>> =C2=A0=C2=A0> changing the semantics of when "remove-fd" should be us=
+ed.
+>>> =C2=A0=C2=A0>
+>>>
+>>> =C2=A0=C2=A0I think it might be user's error but fd is still in cur_m=
+on->fds (in getfd case)
+>>> =C2=A0=C2=A0or in mon_fdsets (in add-fd case). So if fd is still exis=
+ts in the lists why
+>>> =C2=A0=C2=A0user can't close/remove it?
+>>>
+>>> =C2=A0=C2=A0So, there are 2 valid options:
+>>> =C2=A0=C2=A01) fd is still valid after migration (dup)
+>>
+>> =C2=A0If we do this then existing mgmt apps using QEMU who don't expec=
+t to need
+>> =C2=A0to call remove-fd are going to be leaking FDs forever.
+>
+> Ok, so what do you think about modifying qemu_close to remove fd from t=
+hese two
+> lists? Currently it tryes to remove fd only from mon_fdsets->dup_fds.
+>
+> Regards,
+> Yury
+>
+>>> =C2=A0=C2=A02) fd is closed but also removed from the appropriate lis=
+t
+>>
+>> =C2=A0monitor_get_fd currently leaves the FD on the list.
+>>
+>> =C2=A0if all current users of that API are closing the FD
+>> =C2=A0themselves, then we could change that method to remove
+>> =C2=A0it from the list.
+>>
+>> =C2=A0Either way the requirements in this area are pooly documented
+>> =C2=A0both from QEMU's internal POV and from mgmt app public QMP pov.
+>>
+>> =C2=A0Regards,
+>> =C2=A0Daniel
+>> =C2=A0--
+>> =C2=A0|: https://berrange.com -o- https://www.flickr.com/photos/dberra=
+nge :|
+>> =C2=A0|: https://libvirt.org -o- https://fstop138.berrange.com :|
+>> =C2=A0|: https://entangle-photo.org -o- https://www.instagram.com/dber=
+range :|
