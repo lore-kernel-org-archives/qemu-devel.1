@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48499)
+Received: from eggs.gnu.org ([209.51.188.92]:49180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27e-0005EY-1q
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:11 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG2AF-0007Pq-18
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27c-00082H-Ua
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:10 -0400
-From: Maxim Levitsky <mlevitsk@redhat.com>
-Date: Mon, 15 Apr 2019 16:57:46 +0300
-Message-Id: <20190415135746.7571-6-mlevitsk@redhat.com>
-In-Reply-To: <20190415135746.7571-1-mlevitsk@redhat.com>
-References: <20190415135746.7571-1-mlevitsk@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] block/nvme: add support for discard
+	(envelope-from <imammedo@redhat.com>) id 1hG2AA-0000tA-7k
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:00:50 -0400
+Date: Mon, 15 Apr 2019 16:00:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190415160036.53bed360@Igors-MacBook-Pro.local>
+In-Reply-To: <20190415070307.13668-3-richardw.yang@linux.intel.com>
+References: <20190415070307.13668-1-richardw.yang@linux.intel.com>
+	<20190415070307.13668-3-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] i386,
+ acpi: remove mcfg_ prefix in AcpiMcfgInfo members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,140 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, mst@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, marcel.apfelbaum@gmail.com, yang.zhong@intel.com
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c       | 81 ++++++++++++++++++++++++++++++++++++++++++++++
- block/trace-events |  2 ++
- 2 files changed, 83 insertions(+)
+On Mon, 15 Apr 2019 15:03:05 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 5121e809f0..386c2508b7 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -110,6 +110,7 @@ typedef struct {
-     bool plugged;
- 
-     bool supports_write_zeros;
-+    bool supports_discard;
- 
-     CoMutex dma_map_lock;
-     CoQueue dma_flush_queue;
-@@ -462,6 +463,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
- 
- 
-     s->supports_write_zeros = (idctrl->oncs & NVME_ONCS_WRITE_ZEROS) != 0;
-+    s->supports_discard = (idctrl->oncs & NVME_ONCS_DSM) != 0;
- 
-     memset(resp, 0, 4096);
- 
-@@ -1144,6 +1146,83 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- 
-+static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-+        int64_t offset, int bytes)
-+{
-+    BDRVNVMeState *s = bs->opaque;
-+    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeRequest *req;
-+    NvmeDsmRange *buf;
-+    QEMUIOVector local_qiov;
-+    int r;
-+
-+    NvmeCmd cmd = {
-+        .opcode = NVME_CMD_DSM,
-+        .nsid = cpu_to_le32(s->nsid),
-+        .cdw10 = 0, /*number of ranges - 0 based*/
-+        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
-+    };
-+
-+    NVMeCoData data = {
-+        .ctx = bdrv_get_aio_context(bs),
-+        .ret = -EINPROGRESS,
-+    };
-+
-+    if (!s->supports_discard) {
-+        return -ENOTSUP;
-+    }
-+
-+    assert(s->nr_queues > 1);
-+
-+    buf = qemu_try_blockalign0(bs, 4096);
-+    if (!buf) {
-+            return -ENOMEM;
-+    }
-+
-+    buf->nlb = bytes >> s->blkshift;
-+    buf->slba = offset >> s->blkshift;
-+    buf->cattr = 0;
-+
-+    qemu_iovec_init(&local_qiov, 1);
-+    qemu_iovec_add(&local_qiov, buf, 4096);
-+
-+    req = nvme_get_free_req(ioq);
-+    assert(req);
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    r = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+
-+    if (r) {
-+        req->busy = false;
-+        return r;
-+    }
-+
-+    trace_nvme_dsm(s, offset, bytes);
-+
-+    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
-+
-+    data.co = qemu_coroutine_self();
-+    while (data.ret == -EINPROGRESS) {
-+        qemu_coroutine_yield();
-+    }
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    r = nvme_cmd_unmap_qiov(bs, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+    if (r) {
-+        return r;
-+    }
-+
-+    trace_nvme_dsm_done(s, offset, bytes, data.ret);
-+
-+    qemu_iovec_destroy(&local_qiov);
-+    qemu_vfree(buf);
-+    return data.ret;
-+
-+}
-+
-+
- static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-                                BlockReopenQueue *queue, Error **errp)
- {
-@@ -1250,6 +1329,8 @@ static BlockDriver bdrv_nvme = {
-     .bdrv_co_pwritev          = nvme_co_pwritev,
- 
-     .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard         = nvme_co_pdiscard,
-+
- 
-     .bdrv_co_flush_to_disk    = nvme_co_flush,
-     .bdrv_reopen_prepare      = nvme_reopen_prepare,
-diff --git a/block/trace-events b/block/trace-events
-index 943a58569f..e55ac5c40b 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -148,6 +148,8 @@ nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offs
- nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
- nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
- nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-+nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
-+nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
- nvme_dma_map_flush(void *s) "s %p"
- nvme_free_req_queue_wait(void *q) "q %p"
- nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
--- 
-2.17.2
+> This is obvious the member in AcpiMcfgInfo describe MCFG's property.
+> 
+> Remove the mcfg_ prefix.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/i386/acpi-build.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index d009176072..f0d27bffd6 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -87,8 +87,8 @@
+>  #define ACPI_BUILD_IOAPIC_ID 0x0
+>  
+>  typedef struct AcpiMcfgInfo {
+> -    uint64_t mcfg_base;
+> -    uint32_t mcfg_size;
+> +    uint64_t base;
+> +    uint32_t size;
+>  } AcpiMcfgInfo;
+>  
+>  typedef struct AcpiPmInfo {
+> @@ -2404,11 +2404,11 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>      int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+>  
+>      mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
+> +    mcfg->allocation[0].address = cpu_to_le64(info->base);
+>      /* Only a single allocation so no need to play with segments */
+>      mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>      mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+> +    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+>  
+>      build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+>  }
+> @@ -2577,15 +2577,15 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>      if (!o) {
+>          return false;
+>      }
+> -    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+> +    mcfg->base = qnum_get_uint(qobject_to(QNum, o));
+>      qobject_unref(o);
+> -    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+> +    if (mcfg->base == PCIE_BASE_ADDR_UNMAPPED) {
+>          return false;
+>      }
+>  
+>      o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+>      assert(o);
+> -    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
+> +    mcfg->size = qnum_get_uint(qobject_to(QNum, o));
+>      qobject_unref(o);
+>      return true;
+>  }
