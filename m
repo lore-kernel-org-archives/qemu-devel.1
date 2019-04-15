@@ -2,67 +2,81 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E65C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9EDC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1660D2064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1660D2064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A812920818
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:59:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A812920818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49772 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49782 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG1BQ-0001qd-E0
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 08:58:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36210)
+	id 1hG1CQ-0002SX-1r
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 08:59:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hG1Ab-0001XG-Kt
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:57:10 -0400
+	(envelope-from <philmd@redhat.com>) id 1hG1BQ-0001wP-Ds
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hG1AZ-0000HO-Vk
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:57:09 -0400
-Resent-Date: Mon, 15 Apr 2019 08:57:09 -0400
-Resent-Message-Id: <E1hG1AZ-0000HO-Vk@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hG1AW-0000Dw-Dn
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:57:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1555330264; cv=none; d=zoho.com; s=zohoarc; 
-	b=Ef21G9GuAjjthAn0OYB8TwLhRSt1WDRikiLxqMFYVWFfZRWAsdYMX4qkQfVyWqQzXBPxSYx4WdPufL8Tv2fWSIHAQvObnReguUNyc8dltptxVLuFGXXiTxmzUUiPJ9qrVB63LwW4t1ejvTyAQWvjmTwa6jckImMCa7vFN1nTdOU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1555330264;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=3d3rqAUeyUfL2gLXOZbBKjOjxKFVb/YxEMulNuBfRes=; 
-	b=YsemKAPBbkPcQ3WlV68cjOmKhZvRMFZe0AoOH42gG9ZmwRdQQOUccOBRHJ46AhhYb8a5dNt11ZVAnFik/8mDIjGgqJJ9VwqBe/S2EJ63z9S97zQjR9ZHpw1u8/VgrfoX0BOr2IvmN10aW2NvBVDJOVibsJPbIQhUA9yYAKC18o8=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1555330263863154.0304838000842;
-	Mon, 15 Apr 2019 05:11:03 -0700 (PDT)
-Message-ID: <155533026233.29694.9877995192838414039@76452e4e88f2>
-In-Reply-To: <20190415113431.12060-1-berrange@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hG1BJ-0000vl-Vb
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:57:56 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hG1BF-0000q5-75
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:57:50 -0400
+Received: by mail-wr1-f65.google.com with SMTP id w10so21861280wrm.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 05:57:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Ie3dcgbZmad4NfdsVQJ6EJmNCEjH+dnCiV4OnLDwi/Y=;
+	b=G20Y8TOLvCpWAlCNqF/TdhU63fg4s84+8gJtXRJ5Mw4B8em1vWCOJ/H/eeejU5kUAL
+	jBOQSAHdsu1hYqzAjzXcDbts9dUvEYWNRTrsCNGWWgVPlDlH2w+TUzQ6rwjpEs/pOCJn
+	Z9qunQ6Oberj2KsPEH6JUD7Vll86sY2CPwxlZkw0uoEDRJoA5r2T+Ls912/IaU9iVz53
+	KubFh1X0Tw/EV15PvSYEVPX0oowS60MFJDHxUNOUAoHhZGmRGPKNK3ft8P/o9ICetUOh
+	g7B6lCh7+SorN5KiBBSW84VyqoNng5NUo2FZNRTvXblvccS8AxgjZE6NVGNK3lYuYDcL
+	N0hA==
+X-Gm-Message-State: APjAAAUZ3FpUv40yd8vpykANOW1xevQ4TTTsAsZZXxDCC2C2mcfuixR6
+	0BO4/ILnnV/T0+g2Q2bWrfKkwQ==
+X-Google-Smtp-Source: APXvYqyfvu4s+bv+wvqkBnZmHgdp4uSoRNeiVVsL4i6qblvzVOv8jJH55Ep9i0UPQFnC81ADg/n24A==
+X-Received: by 2002:adf:9c91:: with SMTP id d17mr45375707wre.285.1555333067934;
+	Mon, 15 Apr 2019 05:57:47 -0700 (PDT)
+Received: from [10.1.5.6] (206.red-80-28-210.staticip.rima-tde.net.
+	[80.28.210.206]) by smtp.gmail.com with ESMTPSA id
+	f15sm62114321wru.21.2019.04.15.05.57.46
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 15 Apr 2019 05:57:47 -0700 (PDT)
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+References: <20190415070307.13668-1-richardw.yang@linux.intel.com>
+	<20190415070307.13668-3-richardw.yang@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <24e41c8f-2d5e-b29a-d957-e3ed26a44291@redhat.com>
+Date: Mon, 15 Apr 2019 14:57:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190415070307.13668-3-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: berrange@redhat.com
-Date: Mon, 15 Apr 2019 05:11:03 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH] vl: set LC_MESSAGES and LC_CTYPE in main
- for all code
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] i386,
+ acpi: remove mcfg_ prefix in AcpiMcfgInfo members
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,31 +88,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, armbru@redhat.com, bsd@redhat.com,
-	kraxel@redhat.com, samuel.thibault@ens-lyon.org, pbonzini@redhat.com
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, imammedo@redhat.com,
+	shannon.zhaosl@gmail.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415121103.3yyiep0rJO-ZjnQRSkyD3PtilIp7cd_C4wFlxgy6V2c@z>
+Message-ID: <20190415125746.IT8run9LvrSmioeO33hO0paSFFS7yFXw1l6ZSwI3lQs@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxNTExMzQzMS4xMjA2
-MC0xLWJlcnJhbmdlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
-cmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGh3L2kyYy92ZXJzYXRpbGVfaTJjLm8KICBDQyAgICAgIGh3L2kyYy9zbWJ1c19pY2g5
-Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL3ZsLmM6IEluIGZ1bmN0aW9uICdxZW11X21haW4nOgovdG1w
-L3FlbXUtdGVzdC9zcmMvdmwuYzozMDU4OjE1OiBlcnJvcjogJ0xDX01FU1NBR0VTJyB1bmRlY2xh
-cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiAnTENTX0dNX0lN
-QUdFUyc/CiAgICAgc2V0bG9jYWxlKExDX01FU1NBR0VTLCAiIik7CiAgICAgICAgICAgICAgIF5+
-fn5+fn5+fn5+CiAgICAgICAgICAgICAgIExDU19HTV9JTUFHRVMKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNDE1MTEzNDMxLjEyMDYw
-LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On 4/15/19 9:03 AM, Wei Yang wrote:
+> This is obvious the member in AcpiMcfgInfo describe MCFG's property.
+> 
+> Remove the mcfg_ prefix.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index d009176072..f0d27bffd6 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -87,8 +87,8 @@
+>  #define ACPI_BUILD_IOAPIC_ID 0x0
+>  
+>  typedef struct AcpiMcfgInfo {
+> -    uint64_t mcfg_base;
+> -    uint32_t mcfg_size;
+> +    uint64_t base;
+> +    uint32_t size;
+>  } AcpiMcfgInfo;
+>  
+>  typedef struct AcpiPmInfo {
+> @@ -2404,11 +2404,11 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>      int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+>  
+>      mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
+> +    mcfg->allocation[0].address = cpu_to_le64(info->base);
+>      /* Only a single allocation so no need to play with segments */
+>      mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>      mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+> +    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+>  
+>      build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+>  }
+> @@ -2577,15 +2577,15 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>      if (!o) {
+>          return false;
+>      }
+> -    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+> +    mcfg->base = qnum_get_uint(qobject_to(QNum, o));
+>      qobject_unref(o);
+> -    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+> +    if (mcfg->base == PCIE_BASE_ADDR_UNMAPPED) {
+>          return false;
+>      }
+>  
+>      o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+>      assert(o);
+> -    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
+> +    mcfg->size = qnum_get_uint(qobject_to(QNum, o));
+>      qobject_unref(o);
+>      return true;
+>  }
+> 
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
