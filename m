@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40952)
+Received: from eggs.gnu.org ([209.51.188.92]:40956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG5I2-0000Dt-8W
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 13:21:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1hG5I2-0000Dv-Ew
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 13:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG5I0-0000pb-PE
+	(envelope-from <bounces@canonical.com>) id 1hG5I1-0000q4-2I
 	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 13:21:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57838)
+Received: from indium.canonical.com ([91.189.90.7]:57886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hG5Hx-0000hb-VW
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 13:21:03 -0400
+	id 1hG5I0-0000hz-PU
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 13:21:04 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hG5Ht-0001wh-Og
+	id 1hG5Hu-00020C-7p
 	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 17:20:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E92562E80EA
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 17:20:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 560F02E818B
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 17:20:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Apr 2019 17:07:49 -0000
+Date: Mon, 15 Apr 2019 17:09:12 -0000
 From: Roman Zhuykov <1824853@bugs.launchpad.net>
 Reply-To: Bug 1824853 <1824853@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
+References: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
+Message-Id: <155534815218.21104.10563502143308924600.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1824853] [NEW] 4.0.0-rc3 crashes with
+Subject: [Qemu-devel] [Bug 1824853] Re: 4.0.0-rc3 crashes with
  tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] ==
  off' failed
 List-Id: <qemu-devel.nongnu.org>
@@ -39,80 +40,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+Also attaching static-compiled executable "s2.exe".
 
-I tried to bootstrap and regtested gcc trunk (gcc svn rev 270278,
-datestamp 20190411) inside my arm64-gentoo installation under qemu-
-system-aarch64.
-
-Qemu version was 4.0.0-rc3 and -cpu cortex-a57. Qemu configured with
-only --target-list=3Daarch64-softmmu,aarch64-linux-user and compiled using
-gcc "version 5.5.0 20171010 (Ubuntu 5.5.0-12ubuntu1~16.04)".
-
-Executable created from gcc/testsuite/gcc.target/aarch64/advsimd-
-intrinsics/vldX.c compiled with -O2 crashed the whole qemu-system.
-
-To investigate a bit I also manually run
-~/gcc/inst/trunk/bin/gcc ~/gcc/src/trunk/gcc/testsuite/gcc.target/aarch64/a=
-dvsimd-intrinsics/vldX.c
-with different options like:
--O0 -lm -o d0.exe
--O1 -lm -o d1.exe
--O2 -lm -o d2.exe
--O0 -static -lm -o s0.exe
--O1 -static -lm -o s1.exe
--O2 -static -lm -o s2.exe
-
-So, now I have 6 different arm64 executables created with different optimiz=
-ation levels. O0 and O1 versions run ok.
-Three sN.exe static executables I've also tried in qemu user mode (with sam=
-e -cpu), no issue in user mode.
-
-And inside qemu-system I can see that
-running "d2.exe" (attached) gives:
-tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] =3D=
-=3D off' failed.
-
-And running "s2.exe" gives:
-tcg/tcg.c:320: set_jmp_reset_offset: Assertion `s->tb_jmp_reset_offset[whic=
-h] =3D=3D off' failed.
-
-It seems like this test is an counter-example for logic that
-"tcg_ctx->nb_ops < 4000" implies tcg will fit into 16-bit signed size
-(see tcg_op_buf_full comments).
-
-Richard's changes in abebf92597186 and 9f754620651d were not enough, transl=
-ation block must be smaller, or we have to find some proper way to bail out=
- when buffer overflows.
-I don't know why this situation is not caught by code_gen_highwater logic i=
-n tcg.c
-
-I've also tried this "bail out" patch
-
-diff --git a/tcg/tcg.c b/tcg/tcg.c
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -3949,7 +3949,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-                 size_t off =3D tcg_current_code_size(s);
-                 s->gen_insn_end_off[num_insns] =3D off;
-                 /* Assert that we do not overflow our stored offset.  */
--                assert(s->gen_insn_end_off[num_insns] =3D=3D off);
-+                if (s->gen_insn_end_off[num_insns] !=3D off)
-+                  return -1;
-             }
-             num_insns++;
-             for (i =3D 0; i < TARGET_INSN_START_WORDS; ++i) {
-
-But then running "d2.exe" just hangs the whole qemu-system. It seems
-that when tcg_gen_code return -1 (like in highwater logic mentioned
-before), we just re-call it again and again.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "d2.exe"
-   https://bugs.launchpad.net/bugs/1824853/+attachment/5255996/+files/d2.exe
+** Attachment added: "s2.exe"
+   https://bugs.launchpad.net/qemu/+bug/1824853/+attachment/5256000/+files/=
+s2.exe
 
 -- =
 
