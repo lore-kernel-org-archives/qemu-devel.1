@@ -2,104 +2,58 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9D6C10F12
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 15:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4310C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 15:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0EF32075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 15:28:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EF32075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6536120880
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 15:42:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6536120880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51741 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51914 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG3Wy-0004NL-88
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 11:28:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40005)
+	id 1hG3l2-0007LC-5n
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 11:42:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hG3WD-000464-Pa
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hG3jk-0006mq-Vm
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hG3W8-0006Mw-RQ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59118
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hG3W6-0006Kn-UZ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:32 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3FFRPnW117197
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:27:29 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rvt3c7qsu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:27:26 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Mon, 15 Apr 2019 16:24:45 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-	by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 15 Apr 2019 16:24:42 +0100
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
-	[9.57.199.108])
-	by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x3FFOf6g26345676
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 15 Apr 2019 15:24:41 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2FD7AB205F;
-	Mon, 15 Apr 2019 15:24:41 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 206DAB2065;
-	Mon, 15 Apr 2019 15:24:41 +0000 (GMT)
-Received: from [9.56.58.129] (unknown [9.56.58.129])
-	by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-	Mon, 15 Apr 2019 15:24:41 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-5-cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 15 Apr 2019 11:24:41 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.4.0
+	(envelope-from <mreitz@redhat.com>) id 1hG3jj-0004uv-T3
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:41:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hG3jh-0004r7-AW; Mon, 15 Apr 2019 11:41:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A4EE53092648;
+	Mon, 15 Apr 2019 15:41:31 +0000 (UTC)
+Received: from localhost (unknown [10.40.206.18])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0795060BF3;
+	Mon, 15 Apr 2019 15:41:30 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 15 Apr 2019 17:41:29 +0200
+Message-Id: <20190415154129.31021-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190301093902.27799-5-cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19041515-0052-0000-0000-000003AC5674
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00010932; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000284; SDB=6.01189479; UDB=6.00623229;
-	IPR=6.00970266; 
-	MB=3.00026453; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-15 15:24:44
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19041515-0053-0000-0000-000060824A0E
-Message-Id: <75256da4-2e3a-b3f1-d29b-1986b4bcdf79@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-15_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=725 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904150106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] vfio-ccw: add capabilities chain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 15 Apr 2019 15:41:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC] iotests: Fix iotests 110 and 126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -111,27 +65,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: linux-s390@vger.kernel.org, qemu-s390x@nongnu.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+	arbel.moshe@oracle.com, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>, liran.alon@oracle.com,
+	yoav.elnekave@oracle.com, Sam Eiderman <shmuel.eiderman@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415152441.OpgtEqoaws-InkC2VmG4XuqHAQbRjcT2e7-0miOQ89w@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190415154129.szntK44YGZiVrkn8caUdHG0hv8pHKpLGdY8KNJniCYY@z>
 
+A recent patch results in qemu-img reporting the backing file format of
+vmdk images as vmdk.  This broke iotests 110 and 126.
 
+Fixes: "vmdk: Set vmdk parent backing_format to vmdk"
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+RFC because:
+(1) I'd prefer for this patch to be squashed into the patch mentioned
+    above so we avoid broken iotests.
+(2) Otherwise, I'd like for the "Fixes" line to contain a commit ID,
+    which isn't stable yet, though.
 
-On 03/01/2019 04:39 AM, Cornelia Huck wrote:
-> Allow to extend the regions used by vfio-ccw. The first user will be
-> handling of halt and clear subchannel.
-> 
-> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
-> ---
->   drivers/s390/cio/vfio_ccw_ops.c     | 186 ++++++++++++++++++++++++----
->   drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
->   include/uapi/linux/vfio.h           |   2 +
->   3 files changed, 200 insertions(+), 26 deletions(-)
+I'd like to mention that these aren't the only broken iotests on
+block-next; 059 (with vmdk) is broken, too.  I won't send a patch for
+that, though, because to me the whole patch doesn't seem quite right
+when compiling qemu with -m32.
+---
+ tests/qemu-iotests/110 | 10 +++++++---
+ tests/qemu-iotests/126 | 10 +++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index fad672c1ae..33b169ffd4 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -53,8 +53,12 @@ TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
+ _make_test_img -b "$TEST_IMG_REL.base" 64M
+ # qemu should be able to reconstruct the filename, so relative backing n=
+ames
+ # should work
++# (We have to filter the backing file format because vmdk always
++# reports it (as vmdk), whereas other image formats would do so only
++# with the backing_fmt creation option, which neither vmdk nor qcow
++# support)
+ TEST_IMG=3D"json:{'driver':'$IMGFMT','file':{'driver':'file','filename':=
+'$TEST_IMG'}}" \
+-    _img_info | _filter_img_info
++    _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+ echo
+ echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
+@@ -78,7 +82,7 @@ TEST_IMG=3D"json:{
+             }
+         ]
+     }
+-}" _img_info | _filter_img_info
++}" _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+ echo
+ echo '=3D=3D=3D Backing name is always relative to the backed image =3D=3D=
+=3D'
+@@ -110,7 +114,7 @@ TEST_IMG=3D"json:{
+             }
+         ]
+     }
+-}" _img_info | _filter_img_info
++}" _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+=20
+ # success, all done
+diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+index 96dc048d59..e3ee65c606 100755
+--- a/tests/qemu-iotests/126
++++ b/tests/qemu-iotests/126
+@@ -62,8 +62,12 @@ TOP_IMG=3D"$TEST_DIR/image:top.$IMGFMT"
+ TEST_IMG=3D$BASE_IMG _make_test_img 64M
+ TEST_IMG=3D$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
+=20
+-# The default cluster size depends on the image format
+-TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
++# (1) The default cluster size depends on the image format
++# (2) vmdk only supports vmdk backing files, so it always reports the
++#     format of its backing file as such (but neither it nor qcow
++#     support the backing_fmt creation option, so we cannot use that to
++#     harmonize the output across all image formats this test supports)
++TEST_IMG=3D$TOP_IMG _img_info | grep -ve 'cluster_size' -e 'backing file=
+ format'
+=20
+ _rm_test_img "$BASE_IMG"
+ _rm_test_img "$TOP_IMG"
+@@ -79,7 +83,7 @@ TOP_IMG=3D"file:image:top.$IMGFMT"
+ TEST_IMG=3D$BASE_IMG _make_test_img 64M
+ TEST_IMG=3D$TOP_IMG _make_test_img -b "$BASE_IMG"
+=20
+-TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
++TEST_IMG=3D$TOP_IMG _img_info | grep -ve 'cluster_size' -e 'backing file=
+ format'
+=20
+ _rm_test_img "$BASE_IMG"
+ _rm_test_img "image:top.$IMGFMT"
+--=20
+2.20.1
 
 
