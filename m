@@ -1,39 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40005)
+Received: from eggs.gnu.org ([209.51.188.92]:43113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hG3WD-000464-Pa
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hG3jk-0006mq-Vm
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1hG3W8-0006Mw-RQ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59118
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1hG3W6-0006Kn-UZ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:27:32 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3FFRPnW117197
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:27:29 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2rvt3c7qsu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 11:27:26 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Mon, 15 Apr 2019 16:24:45 +0100
-References: <20190301093902.27799-1-cohuck@redhat.com>
-	<20190301093902.27799-5-cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 15 Apr 2019 11:24:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hG3jj-0004uv-T3
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:41:36 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 15 Apr 2019 17:41:29 +0200
+Message-Id: <20190415154129.31021-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190301093902.27799-5-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <75256da4-2e3a-b3f1-d29b-1986b4bcdf79@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] vfio-ccw: add capabilities chain
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC] iotests: Fix iotests 110 and 126
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,20 +19,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>, arbel.moshe@oracle.com, liran.alon@oracle.com, yoav.elnekave@oracle.com, mark.kanda@oracle.com, Fam Zheng <fam@euphon.net>
 
+A recent patch results in qemu-img reporting the backing file format of
+vmdk images as vmdk.  This broke iotests 110 and 126.
 
+Fixes: "vmdk: Set vmdk parent backing_format to vmdk"
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+RFC because:
+(1) I'd prefer for this patch to be squashed into the patch mentioned
+    above so we avoid broken iotests.
+(2) Otherwise, I'd like for the "Fixes" line to contain a commit ID,
+    which isn't stable yet, though.
 
-On 03/01/2019 04:39 AM, Cornelia Huck wrote:
-> Allow to extend the regions used by vfio-ccw. The first user will be
-> handling of halt and clear subchannel.
-> 
-> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
-> ---
->   drivers/s390/cio/vfio_ccw_ops.c     | 186 ++++++++++++++++++++++++----
->   drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
->   include/uapi/linux/vfio.h           |   2 +
->   3 files changed, 200 insertions(+), 26 deletions(-)
+I'd like to mention that these aren't the only broken iotests on
+block-next; 059 (with vmdk) is broken, too.  I won't send a patch for
+that, though, because to me the whole patch doesn't seem quite right
+when compiling qemu with -m32.
+---
+ tests/qemu-iotests/110 | 10 +++++++---
+ tests/qemu-iotests/126 | 10 +++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index fad672c1ae..33b169ffd4 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -53,8 +53,12 @@ TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
+ _make_test_img -b "$TEST_IMG_REL.base" 64M
+ # qemu should be able to reconstruct the filename, so relative backing n=
+ames
+ # should work
++# (We have to filter the backing file format because vmdk always
++# reports it (as vmdk), whereas other image formats would do so only
++# with the backing_fmt creation option, which neither vmdk nor qcow
++# support)
+ TEST_IMG=3D"json:{'driver':'$IMGFMT','file':{'driver':'file','filename':=
+'$TEST_IMG'}}" \
+-    _img_info | _filter_img_info
++    _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+ echo
+ echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
+@@ -78,7 +82,7 @@ TEST_IMG=3D"json:{
+             }
+         ]
+     }
+-}" _img_info | _filter_img_info
++}" _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+ echo
+ echo '=3D=3D=3D Backing name is always relative to the backed image =3D=3D=
+=3D'
+@@ -110,7 +114,7 @@ TEST_IMG=3D"json:{
+             }
+         ]
+     }
+-}" _img_info | _filter_img_info
++}" _img_info | _filter_img_info | grep -v 'backing file format'
+=20
+=20
+ # success, all done
+diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+index 96dc048d59..e3ee65c606 100755
+--- a/tests/qemu-iotests/126
++++ b/tests/qemu-iotests/126
+@@ -62,8 +62,12 @@ TOP_IMG=3D"$TEST_DIR/image:top.$IMGFMT"
+ TEST_IMG=3D$BASE_IMG _make_test_img 64M
+ TEST_IMG=3D$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
+=20
+-# The default cluster size depends on the image format
+-TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
++# (1) The default cluster size depends on the image format
++# (2) vmdk only supports vmdk backing files, so it always reports the
++#     format of its backing file as such (but neither it nor qcow
++#     support the backing_fmt creation option, so we cannot use that to
++#     harmonize the output across all image formats this test supports)
++TEST_IMG=3D$TOP_IMG _img_info | grep -ve 'cluster_size' -e 'backing file=
+ format'
+=20
+ _rm_test_img "$BASE_IMG"
+ _rm_test_img "$TOP_IMG"
+@@ -79,7 +83,7 @@ TOP_IMG=3D"file:image:top.$IMGFMT"
+ TEST_IMG=3D$BASE_IMG _make_test_img 64M
+ TEST_IMG=3D$TOP_IMG _make_test_img -b "$BASE_IMG"
+=20
+-TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
++TEST_IMG=3D$TOP_IMG _img_info | grep -ve 'cluster_size' -e 'backing file=
+ format'
+=20
+ _rm_test_img "$BASE_IMG"
+ _rm_test_img "image:top.$IMGFMT"
+--=20
+2.20.1
