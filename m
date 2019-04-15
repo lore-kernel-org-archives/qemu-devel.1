@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43473)
+Received: from eggs.gnu.org ([209.51.188.92]:44389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hFx8H-00088V-7i
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:38:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hFxCb-0000dP-HC
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hFx8F-0006f7-Dj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:38:29 -0400
-Date: Mon, 15 Apr 2019 10:38:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190415103815.35f45e99@Igors-MacBook-Pro.local>
-In-Reply-To: <CAKmqyKOFs8Pv4np+BXyVYGRFwLKn9N-H7q=7JN+nBprAjHBYCQ@mail.gmail.com>
-References: <cover.1554937288.git.alistair.francis@wdc.com>
-	<efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
-	<20190411141848.119ee969@redhat.com>
-	<CAKmqyKOQ9a5Q8c83ufCgQgsa_RdQv01dDFCLFGmiSC8mkTw0LQ@mail.gmail.com>
-	<20190412103558.7be8383d@redhat.com>
-	<CAKmqyKOFs8Pv4np+BXyVYGRFwLKn9N-H7q=7JN+nBprAjHBYCQ@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1hFxCa-0000A1-CV
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:42:57 -0400
+Date: Mon, 15 Apr 2019 09:42:49 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190415084249.GA29134@stefanha-x1.localdomain>
+References: <20190408151617.13025-1-paul.durrant@citrix.com>
+	<20190408151617.13025-3-paul.durrant@citrix.com>
+	<20190410125708.GE1435@perard.uk.xensource.com>
+	<582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 2/6] target/riscv: Fall back to
- generating a RISC-V CPU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PEIAKu/WMn1b1Hv9"
+Content-Disposition: inline
+In-Reply-To: <582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/3] xen-bus: allow AioContext
+ to be specified for each event channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,301 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "palmer@sifive.com" <palmer@sifive.com>, "ijc@hellion.org.uk" <ijc@hellion.org.uk>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Fri, 12 Apr 2019 14:19:16 -0700
-Alistair Francis <alistair23@gmail.com> wrote:
 
-> On Fri, Apr 12, 2019 at 1:36 AM Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > On Thu, 11 Apr 2019 13:42:20 -0700
-> > Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > > On Thu, Apr 11, 2019 at 5:18 AM Igor Mammedov <imammedo@redhat.com> wrote:
-> > > >
-> > > > On Wed, 10 Apr 2019 23:10:25 +0000
-> > > > Alistair Francis <Alistair.Francis@wdc.com> wrote:
-> > > >
-> > > > > If a user specifies a CPU that we don't understand then we want to fall
-> > > > > back to a CPU generated from the ISA string.
-> > > > It might look like a nice thing to do at the beginning, but
-> > > > fallbacks become a source of pain in future and get in the way
-> > > > of refactorings if there is a promise to maintain defaults (fallbacks)
-> > > > stable.
-> > > >
-> > > > I suggest do not fallback to anything, just fail cleanly
-> > > > with informative error telling users what is wrong and let user
-> > > > fix their invalid CLI in the first place.
+--PEIAKu/WMn1b1Hv9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 10, 2019 at 03:20:05PM +0000, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > Sent: 10 April 2019 13:57
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-devel@lists.xenpr=
+oject.org; Stefano Stabellini
+> > <sstabellini@kernel.org>; Stefan Hajnoczi <stefanha@redhat.com>; Kevin =
+Wolf <kwolf@redhat.com>; Max
+> > Reitz <mreitz@redhat.com>
+> > Subject: Re: [PATCH 2/3] xen-bus: allow AioContext to be specified for =
+each event channel
+> >=20
+> > On Mon, Apr 08, 2019 at 04:16:16PM +0100, Paul Durrant wrote:
+> > > This patch adds an AioContext parameter to xen_device_bind_event_chan=
+nel()
+> > > and then uses aio_set_fd_handler() to set the callback rather than
+> > > qemu_set_fd_handler().
 > > >
-> > > Maybe fall back isn't the right word then, as this is the goal of this
-> > > series. Here is what I want to happen:
+> > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > ---
+> > > @@ -943,6 +944,7 @@ static void xen_device_event(void *opaque)
+> > >  }
 > > >
-> > > User runs QEMU RISC-V without -cpu option:
-> > >     The user gets a CPU that supports "standard" ISA extensions, as
-> > > what happens now
+> > >  XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
+> > > +                                               AioContext *ctx,
+> > >                                                 unsigned int port,
+> > >                                                 XenEventHandler handl=
+er,
+> > >                                                 void *opaque, Error *=
+*errp)
+> > > @@ -968,8 +970,9 @@ XenEventChannel *xen_device_bind_event_channel(Xe=
+nDevice *xendev,
+> > >      channel->handler =3D handler;
+> > >      channel->opaque =3D opaque;
 > > >
-> > > User runs QEMU RISC-V with a CPU model that is hard coded in cpu.h
-> > > (such as TYPE_RISCV_CPU_SIFIVE_U54):
-> > >     The user gets a CPU that matches that hard coded CPU string/init
-> > >
-> > > User runs QEMU RISC-V with a RISC-V ISA string that isn't hardcoded
-> > > (for example rv64gcsuh):
-> > >     QEMU will dynamically create a CPU based on the specified bit
-> > > length (rv32/rv64) and the ISA extensions supported
-> > >     The goal of this is to allow new extensions to be enabled and
-> > > disabled as required. For example when we add a new extension maybe we
-> > > don't want it on by default but we want an option to enable it. Or
-> > > maybe a user wants to test their code on a model without compressed
-> > > instruction (c extension) support.
-> >
-> > From commit message I"g read it as fallback, so as far as user gets
-> > deterministic (always the same) CPU according to what they asked on CLI
-> > it's fine. In that case commit message probably should be rephrased.
-> >
-> > more bellow
-> > > Alistair
-> > >
-> > > >
-> > > >
-> > > > > At the moment the generated CPU is assumed to be a privledge spec
-> > > > > version 1.10 CPU with an MMU. This can be changed in the future.
-> > > > >
-> > > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > > > > ---
-> > > > > v3:
-> > > > >  - Ensure a minimal length so we don't run off the end of the string.
-> > > > >  - Don't parse the rv32/rv64 in the loop
-> > > > >  target/riscv/cpu.c | 101 ++++++++++++++++++++++++++++++++++++++++++++-
-> > > > >  target/riscv/cpu.h |   2 +
-> > > > >  2 files changed, 102 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> > > > > index d61bce6d55..27be9e412a 100644
-> > > > > --- a/target/riscv/cpu.c
-> > > > > +++ b/target/riscv/cpu.c
-> > > > > @@ -19,6 +19,7 @@
-> > > > >
-> > > > >  #include "qemu/osdep.h"
-> > > > >  #include "qemu/log.h"
-> > > > > +#include "qemu/error-report.h"
-> > > > >  #include "cpu.h"
-> > > > >  #include "exec/exec-all.h"
-> > > > >  #include "qapi/error.h"
-> > > > > @@ -103,6 +104,99 @@ static void set_resetvec(CPURISCVState *env, int resetvec)
-> > > > >  #endif
-> > > > >  }
-> > > > >
-> > > > > +static void riscv_generate_cpu_init(Object *obj)
-> > > > > +{
-> > > > > +    RISCVCPU *cpu = RISCV_CPU(obj);
-> > > > > +    CPURISCVState *env = &cpu->env;
-> > > > > +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
-> > > > > +    const char *riscv_cpu = mcc->isa_str;
-> > > > > +    target_ulong target_misa = 0;
-> > > > > +    target_ulong rvxlen = 0;
-> > > > > +    int i;
-> > > > > +    bool valid = false;
-> > > > > +
-> > > > > +    /*
-> > > > > +     * We need at least 5 charecters for the string to be valid. Check that
-> > > > > +     * now so we can be lazier later.
-> > > > > +     */
-> > > > > +    if (strlen(riscv_cpu) < 5) {
-> > > > > +        error_report("'%s' does not appear to be a valid RISC-V ISA string",
-> > > > > +                     riscv_cpu);
-> > > > > +        exit(1);
-> >
-> > if it's programming error it should be assert
-> > but in general instance_init()  should never fail.
-> 
-> We are checking for a user specified CPU string, not a programming
-> error so an assert() isn't correct here.
-> 
-> If *init() can't fail how should this be handled?
-typical flow for device object is
+> > > -    qemu_set_fd_handler(xenevtchn_fd(channel->xeh), xen_device_event=
+, NULL,
+> > > -                        channel);
+> > > +    channel->ctx =3D ctx;
+> > > +    aio_set_fd_handler(channel->ctx, xenevtchn_fd(channel->xeh), fal=
+se,
+> > > +                       xen_device_event, NULL, NULL, channel);
+> >=20
+> > I wonder if the `'is_external' parameter of aio_set_fd_handler shoud be
+> > `true' here, instead. That flag seems to be used when making a snapshot
+> > of a blockdev, for example.
+> >=20
+> > That was introduced by:
+> > dca21ef23ba48f6f1428c59f295a857e5dc203c8^..c07bc2c1658fffeee08eb46402b2=
+f66d55b07586
+> >=20
+> > What do you think?
+>=20
+> Interesting. I admit I was merely transcribing what qemu_set_fd_handler()=
+ passes without really looking into the values. Looking at the arguments th=
+at virtio-blk passes to aio_set_event_notifier() though, and what 'is_exter=
+nal' means, it would appear that setting it to true is probably the right t=
+hing to do. Do you want me to send a v2 of the series or can you fix it up?
 
- object_new(foo) -> foo_init_fn()
- set properties on foo
- set 'realize' property to 'true' -> foo_realize_fn()
+Hi,
+Handlers are invoked by the aio_poll() event loop.  Some handlers are
+considered "external" in the sense that they submit new I/O requests
+=66rom the guest or outside world.  Others are considered "internal" in
+the sense that they are part of the block layer and not an entry point
+into the block layer.
 
-all checks should be performed in realize() or during property setting.
+There are points where the block layer wants to run the event loop but
+new requests must not be submitted.  In this case aio_disable_external()
+will be called so that "external" handlers are not processed.
 
-> > the same applies to errors or warnings within this function.
-> >
-> > > > > +    }
-> > > > > +
-> > > > > +    if (riscv_cpu[0] == 'r' && riscv_cpu[1] == 'v') {
-> > > > > +        /* Starts with "rv" */
-> > > > > +        if (riscv_cpu[2] == '3' && riscv_cpu[3] == '2') {
-> > > > > +            valid = true;
-> > > > > +            rvxlen = RV32;
-> > > > > +        }
-> > > > > +        if (riscv_cpu[2] == '6' && riscv_cpu[3] == '4') {
-> > > > > +            valid = true;
-> > > > > +            rvxlen = RV64;
-> > > > > +        }
-> > > > > +    }
-> > > > > +
-> > > > > +    if (!valid) {
-> > > > > +        error_report("'%s' does not appear to be a valid RISC-V CPU",
-> > > > > +                     riscv_cpu);
-> > > > > +        exit(1);
-> > > > > +    }
-> > > > > +
-> > > > > +    for (i = 4; i < strlen(riscv_cpu); i++) {
-> > > > > +        switch (riscv_cpu[i]) {
-> > > > > +        case 'i':
-> > > > > +            if (target_misa & RVE) {
-> > > > > +                error_report("I and E extensions are incompatible");
-> > > > > +                exit(1);
-> > > > > +            }
-> > > > > +            target_misa |= RVI;
-> > > > > +            continue;
-> > > > > +        case 'e':
-> > > > > +            if (target_misa & RVI) {
-> > > > > +                error_report("I and E extensions are incompatible");
-> > > > > +                exit(1);
-> > > > > +            }
-> > > > > +            target_misa |= RVE;
-> > > > > +            continue;
-> > > > > +        case 'g':
-> > > > > +            target_misa |= RVI | RVM | RVA | RVF | RVD;
-> > > > > +            continue;
-> > > > > +        case 'm':
-> > > > > +            target_misa |= RVM;
-> > > > > +            continue;
-> > > > > +        case 'a':
-> > > > > +            target_misa |= RVA;
-> > > > > +            continue;
-> > > > > +        case 'f':
-> > > > > +            target_misa |= RVF;
-> > > > > +            continue;
-> > > > > +        case 'd':
-> > > > > +            target_misa |= RVD;
-> > > > > +            continue;
-> > > > > +        case 'c':
-> > > > > +            target_misa |= RVC;
-> > > > > +            continue;
-> > > > > +        case 's':
-> > > > > +            target_misa |= RVS;
-> > > > > +            continue;
-> > > > > +        case 'u':
-> > > > > +            target_misa |= RVU;
-> > > > > +            continue;
-> > > > > +        default:
-> > > > > +            warn_report("QEMU does not support the %c extension",
-> > > > > +                        riscv_cpu[i]);
-> > that's what looks to me like fallback, and what makes
-> > CPU features for this CPU type non deterministic.
-> 
-> What do you mean? QEMU will always parse the specified CPU string and
-> create a CPU based on the features specified by the user. For each
-> version of QEMU it will always result in the same outcome for the same
-> user supplied command line argument.
+For example, see virtio's virtio_queue_aio_set_host_notifier_handler().
+This is the virtqueue kick ioeventfd and it shouldn't be processed when
+aio_disable_external() has been called.
 
-I've meant that here you would print warning and happily continue parsing
-user input ignoring input error. One should error out instead and make
-user fix error.
+Stefan
 
-> 
-> Newer QEMU versions will support more features though, so they will
-> accept different options.
-> 
-> > I'm not sure what you are trying to achieve here, but it look like
-> > you are trying to verify MachineClass field in object constructor
-> > along with other things.
-> 
-> I'm just trying to parse the -cpu string option.
-> 
-> >
-> > I'd put all MachineClass checks in class_init and abort on error
-> > since invalid mcc->isa_str is codding error.
-> 
-> No, it's a user error.
+--PEIAKu/WMn1b1Hv9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Parsing -cpu by assigning to class members user input looks unusual.
+-----BEGIN PGP SIGNATURE-----
 
-We had a custom parsing for x86 & sparc cpus, but that was factored out
-into compat utilities and we shouldn't do it anywhere else without very
-compelling reason.
+iQEcBAEBAgAGBQJctEQJAAoJEJykq7OBq3PIu0sH/j33XBML1ks0HDKmv3/DT/bM
+RTx2pqg/l3kxLGJo6fB7nrtfgjMjlR066YVR3XTC2NigraF1YD/lJkdOHOUOcKXP
+abr/QnY5IrHIY+n4+xapM5uozs4K+thrSmKK6CGFh+KkZdBGy5FT9csPUie7198N
+oXf0fhVGjxTwJc+hMvbzJrryWFKOlH+AIUR/Hb9E1ExbssvddXh63jyetSnk48f6
+Orjl6O8ddKDdSs7yoJVcuVhJ+0ZtcmaYvwbhcdUSoOQ6lFMezkihsrxb8VmGG86T
+wMjjhmVPIv5IiU61AiVCkCNT0OlKCeUf3eEwdn8GfWWyJpmNz+BTblUfQ1ecPVA=
+=0fKF
+-----END PGP SIGNATURE-----
 
-Currently it's preferred to use canonical form for cpu properties, like:
-
-  -cpu foo,prop1=x,prop2=y,...
-
-and let the generic parser to do the job. For it to work you would need
-to create a property per a cpu feature.
-
-This way it will work fine with -cpu and -device/device_add without any
-custom parsing involved.
-
-> Alistair
-> 
-> > If you can make some checks compile time it would be even better.
-> >
-> >
-> > > > > +            continue;
-> > > > > +        }
-> > > > > +    }
-> > > > > +
-> > > > > +    set_misa(env, rvxlen | target_misa);
-> > > > > +    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-> > > > > +    set_resetvec(env, DEFAULT_RSTVEC);
-> > > > > +    set_feature(env, RISCV_FEATURE_MMU);
-> > > > > +    set_feature(env, RISCV_FEATURE_PMP);
-> > > > > +}
-> > > > > +
-> > > > >  static void riscv_any_cpu_init(Object *obj)
-> > > > >  {
-> > > > >      CPURISCVState *env = &RISCV_CPU(obj)->env;
-> > > > > @@ -178,6 +272,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
-> > > > >  static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
-> > > > >  {
-> > > > >      ObjectClass *oc;
-> > > > > +    RISCVCPUClass *mcc;
-> > > > >      char *typename;
-> > > > >      char **cpuname;
-> > > > >
-> > > > > @@ -188,7 +283,10 @@ static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
-> > > > >      g_free(typename);
-> > > > >      if (!oc || !object_class_dynamic_cast(oc, TYPE_RISCV_CPU) ||
-> > > > >          object_class_is_abstract(oc)) {
-> > > > > -        return NULL;
-> > > > > +        /* No CPU found, try the generic CPU and pass in the ISA string */
-> > > > > +        oc = object_class_by_name(TYPE_RISCV_CPU_GEN);
-> > > > > +        mcc = RISCV_CPU_CLASS(oc);
-> > > > > +        mcc->isa_str = g_strdup(cpu_model);
-> > > > >      }
-> > > > >      return oc;
-> > > > >  }
-> > > > > @@ -440,6 +538,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
-> > > > >          .class_init = riscv_cpu_class_init,
-> > > > >      },
-> > > > >      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
-> > > > > +    DEFINE_CPU(TYPE_RISCV_CPU_GEN,              riscv_generate_cpu_init),
-> > > > >  #if defined(TARGET_RISCV32)
-> > > > >      DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
-> > > > >      DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init),
-> > > > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > > > > index 20bce8742e..453108a855 100644
-> > > > > --- a/target/riscv/cpu.h
-> > > > > +++ b/target/riscv/cpu.h
-> > > > > @@ -48,6 +48,7 @@
-> > > > >  #define CPU_RESOLVING_TYPE TYPE_RISCV_CPU
-> > > > >
-> > > > >  #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
-> > > > > +#define TYPE_RISCV_CPU_GEN              RISCV_CPU_TYPE_NAME("rv*")
-> > > > >  #define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
-> > > > >  #define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
-> > > > >  #define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
-> > > > > @@ -211,6 +212,7 @@ typedef struct RISCVCPUClass {
-> > > > >      /*< public >*/
-> > > > >      DeviceRealize parent_realize;
-> > > > >      void (*parent_reset)(CPUState *cpu);
-> > > > > +    const char *isa_str;
-> > > > >  } RISCVCPUClass;
-> > > > >
-> > > > >  /**
-> > > >
-> >
+--PEIAKu/WMn1b1Hv9--
