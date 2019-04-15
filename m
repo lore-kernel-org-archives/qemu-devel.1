@@ -2,85 +2,83 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E6EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DBEC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E5692075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:18:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="FNQlqO1Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5692075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id A649220652
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:24:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A649220652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47756 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47808 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFygl-0002Gs-Mh
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:18:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35779)
+	id 1hFymm-0003Rw-SS
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:24:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfn-0001we-Vx
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:12 -0400
+	(envelope-from <philmd@redhat.com>) id 1hFylo-00035H-Vs
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfn-00024x-0w
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:11 -0400
-Received: from forwardcorp1p.mail.yandex.net
-	([2a02:6b8:0:1472:2741:0:8b6:217]:54254)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfm-00022f-FL
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:10 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
-	[IPv6:2a02:6b8:0:1a2d::301])
-	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 9AC7F2E1496;
-	Mon, 15 Apr 2019 13:17:07 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	2AqKBt4n2I-H7ea79j8; Mon, 15 Apr 2019 13:17:07 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1555323427; bh=9yvuk7EMCBzKyv1Eak4izaCX1knNEpiUYLnXOMNnpu4=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=FNQlqO1Zd6pmT/JvP95pGERgjhcYFJUXTeQAxnd7/tArkBQhc1EijgUni2Z7AxRR/
-	GtCi1gPRjwkEVjZrU7/RmqR6OuDJQRb35InuypE+UHqAt7fEB/PSpItHfQNEBUTlrN
-	iB05KJw34nOkozHxOUrzs3PlNWnd9nQCaCdqY8qs=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp2j.mail.yandex.net ([::1])
-	by mxbackcorp2j.mail.yandex.net with LMTP id 8TRl72Bk
-	for <yury-kotov@yandex-team.ru>; Mon, 15 Apr 2019 13:17:02 +0300
-Received: by vla1-1374b6242101.qloud-c.yandex.net with HTTP;
-	Mon, 15 Apr 2019 13:17:01 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-In-Reply-To: <20190415101101.GF5718@redhat.com>
-References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-	<20190411120421.GP3641@redhat.com>
-	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190411123911.GR3641@redhat.com>
-	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
-	<20190415101101.GF5718@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hFylo-0000Au-4g
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:24 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hFyln-00005e-Th
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:24 -0400
+Received: by mail-wm1-f66.google.com with SMTP id z24so19794067wmi.5
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 03:23:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=5+TmwN8zoF1KI5lQ8pDNX8kg6DV3fp8rpxzNaqHlBKk=;
+	b=KbIbfJaZGk96DfCy6gz4/mIqTpxpRolqhPLnI1W/DtJbMJKX3QSHPVJibmBm5KBVZj
+	kUVQMRc8xOhYzB2+0jGSeZrQlfBhjUJTDKRNUTlbUyTbBS3H/NRrkZLPtjH7ZMlZ17qR
+	+fA5GvcihzQgctqvVIWM+WW7ly8wQywEadeq4K8VBx1P1qklYdKZ23Lex8IUAKkkLiXn
+	TbU7C2Rz6qa2EoG+Gs6bjslK9rUdnf18vGmZHC9Kl5t+5VsNYZO0zHWIcj5H5m4pC9C/
+	DZ+IGEroA3G1qKRfh+rhaRDKzxY3wLgWLD3bYqU3XVU1FqOAf+d48GecE0qDG84NATPV
+	a1uA==
+X-Gm-Message-State: APjAAAWqIl/eOvfxkYV4blrrzNFyfhIu/CxZOTZ2BeCn/eweZnQB6t3C
+	PrHlHxvwayo8wso3bfvfNeUHBw==
+X-Google-Smtp-Source: APXvYqy4WcC0lTzJQn6gFoqUB5XL6I0th+Iss7Db7M9PCwH6psNJiA6BYOHHD1MhxHqAdVPKA6dzRg==
+X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr20692586wmj.62.1555323801616; 
+	Mon, 15 Apr 2019 03:23:21 -0700 (PDT)
+Received: from [10.115.78.87] ([46.31.59.59]) by smtp.gmail.com with ESMTPSA id
+	i18sm44125476wrm.7.2019.04.15.03.23.19
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 15 Apr 2019 03:23:20 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190315032629.21234-1-richard.henderson@linaro.org>
+	<20190315032629.21234-13-richard.henderson@linaro.org>
+	<6ea1d95e-f5c7-7b14-04c7-07699e9d564a@redhat.com>
+	<66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <bed878ef-0ce1-1081-a4cb-88b7775d1433@redhat.com>
+Date: Mon, 15 Apr 2019 12:23:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 15 Apr 2019 13:17:06 +0300
-Message-Id: <251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+In-Reply-To: <66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v3 12/23] linux-user: Call qcrypto_init if
+ not using -seed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,59 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415101706.8NhXQwW_0gefVyuLjdOsBLMjmq_Qtc-oFj4ly2uAmlE@z>
+Message-ID: <20190415102318.qWmGzbPoheoyKk87JQblh_d6qD4An66XR9FhMgw4fmI@z>
 
-15.04.2019, 13:11, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
-> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
->> =C2=A0Hi,
+On 4/13/19 8:44 AM, Richard Henderson wrote:
+> On 4/10/19 11:49 PM, Philippe Mathieu-Daudé wrote:
+>>> -    if (seed_optarg != NULL) {
+>>> -        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
+>>> +    {
+>> Since 7be41675f7c we use gnu99 C, so this extra block indentation can be
+>> removed.
 >>
->> =C2=A0Just to clarify. I see two possible solutions:
->>
->> =C2=A01) Since the migration code doesn't receive fd, it isn't respons=
-ible for
->> =C2=A0closing it. So, it may be better to use migrate_fd_param for bot=
-h
->> =C2=A0incoming/outgoing and add dupping for migrate_fd_param. Thus, cl=
-ients must
->> =C2=A0close the fd themselves. But existing clients will have a leak.
->
-> We can't break existing clients in this way as they are correctly
-> using the monitor with its current semantics.
->
->> =C2=A02) If we don't duplicate fd, then at least we should remove fd f=
-rom
->> =C2=A0the corresponding list. Therefore, the solution is to fix qemu_c=
-lose to find
->> =C2=A0the list and remove fd from it. But qemu_close is currently cons=
-istent with
->> =C2=A0qemu_open (which opens/dups fd), so adding additional logic migh=
-t not be
->> =C2=A0a very good idea.
->
-> qemu_close is not appropriate place to deal with something speciifc
-> to the montor.
->
->> =C2=A0I don't see any other solution, but I might miss something.
->> =C2=A0What do you think?
->
-> All callers of monitor_get_fd() will close() the FD they get back.
-> Thus monitor_get_fd() should remove it from the list when it returns
-> it, and we should add API docs to monitor_get_fd() to explain this.
->
-Ok, it sounds reasonable. But monitor_get_fd is only about outgoing migra=
-tion.
-But what about the incoming migration? It doesn't use monitor_get_fd but =
-just
-converts input string to int and use it as fd.
+>>> +        Error *err = NULL;
+>>> +        if (seed_optarg != NULL) {
+>>> +            qemu_guest_random_seed_main(seed_optarg, &err);
+>>> +        } else {
+>>> +            /* ??? Assumes qcrypto is only used by qemu_guest_getrandom.  */
+>>> +            qcrypto_init(&err);
+>>> +        }
+>>> +        if (err) {
+>>> +            error_reportf_err(err, "cannot initialize crypto: ");
+>>> +            exit(1);
+>>> +        }
+>>>      }
+> 
+> I could, but it also limits the scope, which is of more importance to variables
+> who have their address taken.  It means that their storage could (in theory) be
+> shared with objects not overlapping in scope.
 
-Regards,
-Yury
+Fine then.
 
+I think your '???' comment is appropriate but I'd rather let Daniel
+opinate. Except that comment, for the rest:
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
