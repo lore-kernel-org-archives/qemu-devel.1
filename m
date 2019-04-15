@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38449)
+Received: from eggs.gnu.org ([209.51.188.92]:38497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHT-0001LK-QA
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:50 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHV-0001Lg-9t
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHR-0003Un-23
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:47 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:37743)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHR-0003Vl-VR
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:49 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:38133)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHQ-0003Ts-FT
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:44 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHR-0003Uk-Iy
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:45 -0400
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
-Date: Mon, 15 Apr 2019 14:35:21 +0900
-Message-Id: <20190415053531.77264-4-ysato@users.sourceforge.jp>
+Date: Mon, 15 Apr 2019 14:35:26 +0900
+Message-Id: <20190415053531.77264-9-ysato@users.sourceforge.jp>
 In-Reply-To: <20190415053531.77264-1-ysato@users.sourceforge.jp>
 References: <20190415053531.77264-1-ysato@users.sourceforge.jp>
-Subject: [Qemu-devel] [PATCH RFC v7 03/12] target/rx: CPU definition
+Subject: [Qemu-devel] [PATCH RFC v7 08/12] hw/char: RX62N serical
+ communication interface (SCI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,285 +27,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Yoshinori Sato <ysato@users.sourceforge.jp>, peter.maydell@linaro.org, richard.henderson@linaro.org
 
+This module supported only non FIFO type.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
+
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- target/rx/cpu-qom.h |  52 ++++++++++++
- target/rx/cpu.h     | 197 ++++++++++++++++++++++++++++++++++++++++++++
- target/rx/cpu.c     | 232 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 481 insertions(+)
- create mode 100644 target/rx/cpu-qom.h
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/cpu.c
+ include/hw/char/renesas_sci.h |  45 ++++++
+ hw/char/renesas_sci.c         | 341 ++++++++++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   2 +-
+ 4 files changed, 390 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
 new file mode 100644
-index 0000000000..bad6d2c75d
+index 0000000000..50d1336944
 --- /dev/null
-+++ b/target/rx/cpu-qom.h
-@@ -0,0 +1,52 @@
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
 +/*
-+ * QEMU RX CPU
++ * Renesas Serial Communication Interface
 + *
-+ * Copyright (c) 2019 Yoshinori Sato
++ * Copyright (c) 2018 Yoshinori Sato
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
++ * This code is licensed under the GPL version 2 or later.
 + *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef QEMU_RX_CPU_QOM_H
-+#define QEMU_RX_CPU_QOM_H
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
 +
-+#include "qom/cpu.h"
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
 +
-+#define TYPE_RXCPU "rxcpu"
-+
-+#define RXCPU_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
-+#define RXCPU(obj) \
-+    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
-+#define RXCPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
-+
-+/*
-+ * RXCPUClass:
-+ * @parent_realize: The parent class' realize handler.
-+ * @parent_reset: The parent class' reset handler.
-+ *
-+ * A RX CPU model.
-+ */
-+typedef struct RXCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+
-+} RXCPUClass;
-+
-+typedef struct RXCPU RXCPU;
-+
-+#endif
-diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-new file mode 100644
-index 0000000000..2140cd4936
---- /dev/null
-+++ b/target/rx/cpu.h
-@@ -0,0 +1,197 @@
-+/*
-+ *  RX emulation definition
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_H
-+#define RX_CPU_H
-+
-+#include "qemu/bitops.h"
-+#include "qemu-common.h"
-+#include "hw/registerfields.h"
-+#include "cpu-qom.h"
-+
-+#define TARGET_LONG_BITS 32
-+#define TARGET_PAGE_BITS 12
-+
-+#define CPUArchState struct CPURXState
-+
-+#include "exec/cpu-defs.h"
-+
-+#define TARGET_PHYS_ADDR_SPACE_BITS 32
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+
-+/* PSW define */
-+REG32(PSW, 0)
-+FIELD(PSW, C, 0, 1)
-+FIELD(PSW, Z, 1, 1)
-+FIELD(PSW, S, 2, 1)
-+FIELD(PSW, O, 3, 1)
-+FIELD(PSW, I, 16, 1)
-+FIELD(PSW, U, 17, 1)
-+FIELD(PSW, PM, 20, 1)
-+FIELD(PSW, IPL, 24, 4)
-+
-+/* FPSW define */
-+REG32(FPSW, 0)
-+FIELD(FPSW, RM, 0, 2)
-+FIELD(FPSW, CV, 2, 1)
-+FIELD(FPSW, CO, 3, 1)
-+FIELD(FPSW, CZ, 4, 1)
-+FIELD(FPSW, CU, 5, 1)
-+FIELD(FPSW, CX, 6, 1)
-+FIELD(FPSW, CE, 7, 1)
-+FIELD(FPSW, CAUSE, 2, 6)
-+FIELD(FPSW, DN, 8, 1)
-+FIELD(FPSW, EV, 10, 1)
-+FIELD(FPSW, EO, 11, 1)
-+FIELD(FPSW, EZ, 12, 1)
-+FIELD(FPSW, EU, 13, 1)
-+FIELD(FPSW, EX, 14, 1)
-+FIELD(FPSW, ENABLE, 10, 5)
-+FIELD(FPSW, FV, 26, 1)
-+FIELD(FPSW, FO, 27, 1)
-+FIELD(FPSW, FZ, 28, 1)
-+FIELD(FPSW, FU, 29, 1)
-+FIELD(FPSW, FX, 30, 1)
-+FIELD(FPSW, FLAGS, 26, 4)
-+FIELD(FPSW, FS, 31, 1)
-+
-+#define NB_MMU_MODES 1
-+#define MMU_MODE0_SUFFIX _all
-+
-+typedef struct CPURXState {
-+    /* CPU registers */
-+    uint32_t regs[16];          /* general registers */
-+    uint32_t psw_o;             /* O bit of status register */
-+    uint32_t psw_s;             /* S bit of status register */
-+    uint32_t psw_z;             /* Z bit of status register */
-+    uint32_t psw_c;             /* C bit of status register */
-+    uint32_t psw_u;
-+    uint32_t psw_i;
-+    uint32_t psw_pm;
-+    uint32_t psw_ipl;
-+    uint32_t bpsw;              /* backup status */
-+    uint32_t bpc;               /* backup pc */
-+    uint32_t isp;               /* global base register */
-+    uint32_t usp;               /* vector base register */
-+    uint32_t pc;                /* program counter */
-+    uint32_t intb;              /* interrupt vector */
-+    uint32_t fintv;
-+    uint32_t fpsw;
-+    uint64_t acc;
-+
-+    /* Internal use */
-+    uint32_t in_sleep;
-+    uint32_t req_irq;           /* Requested interrupt no (hard) */
-+    uint32_t req_ipl;           /* Requested interrupt level */
-+    uint32_t ack_irq;           /* execute irq */
-+    uint32_t ack_ipl;           /* execute ipl */
-+    float_status fp_status;
-+
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-+    CPU_COMMON
-+
-+    void *ack;
-+} CPURXState;
-+
-+/*
-+ * RXCPU:
-+ * @env: #CPURXState
-+ *
-+ * A RX CPU
-+ */
-+struct RXCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPURXState env;
++enum {
++    ERI = 0,
++    RXI = 1,
++    TXI = 2,
++    TEI = 3,
++    SCI_NR_IRQ = 4,
 +};
 +
-+static inline RXCPU *rx_env_get_cpu(CPURXState *env)
-+{
-+    return container_of(env, RXCPU, env);
-+}
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion memory;
 +
-+#define ENV_GET_CPU(e) CPU(rx_env_get_cpu(e))
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
 +
-+#define ENV_OFFSET offsetof(RXCPU, env)
-+
-+#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
-+#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_RXCPU
-+
-+extern const char rx_crname[][6];
-+
-+void rx_cpu_do_interrupt(CPUState *cpu);
-+bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+void rx_cpu_dump_state(CPUState *cpu, FILE *f,
-+                           fprintf_function cpu_fprintf, int flags);
-+int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
-+void rx_translate_init(void);
-+int cpu_rx_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+
-+void rx_cpu_list(FILE *f, fprintf_function cpu_fprintf);
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size);
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-+
-+#define cpu_signal_handler cpu_rx_signal_handler
-+#define cpu_list rx_cpu_list
-+
-+#include "exec/cpu-all.h"
-+
-+#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-+#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-+
-+#define RX_CPU_IRQ 0
-+#define RX_CPU_FIR 1
-+
-+static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *pc,
-+                                        target_ulong *cs_base, uint32_t *flags)
-+{
-+    *pc = env->pc;
-+    *cs_base = 0;
-+    *flags = FIELD_DP32(*flags, PSW, PM, env->psw_pm);
-+}
-+
-+static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-+{
-+    return 0;
-+}
-+
-+static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-+{
-+    uint32_t psw = 0;
-+    psw = FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-+    psw = FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-+    psw = FIELD_DP32(psw, PSW, U,   env->psw_u);
-+    psw = FIELD_DP32(psw, PSW, I,   env->psw_i);
-+    psw = FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-+    psw = FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-+    psw = FIELD_DP32(psw, PSW, Z,   env->psw_z == 0);
-+    psw = FIELD_DP32(psw, PSW, C,   env->psw_c);
-+    return psw;
-+}
-+
-+#endif /* RX_CPU_H */
-diff --git a/target/rx/cpu.c b/target/rx/cpu.c
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
 new file mode 100644
-index 0000000000..66b28322fb
+index 0000000000..719fa2f938
 --- /dev/null
-+++ b/target/rx/cpu.c
-@@ -0,0 +1,232 @@
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,341 @@
 +/*
-+ * QEMU RX CPU
++ * Renesas Serial Communication Interface
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
 + *
 + * Copyright (c) 2019 Yoshinori Sato
 + *
@@ -322,218 +120,348 @@ index 0000000000..66b28322fb
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
 +#include "qapi/error.h"
-+#include "cpu.h"
 +#include "qemu-common.h"
-+#include "migration/vmstate.h"
-+#include "exec/exec-all.h"
-+#include "hw/loader.h"
-+#include "fpu/softfloat.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/char/renesas_sci.h"
++#include "qemu/error-report.h"
 +
-+static void rx_cpu_set_pc(CPUState *cs, vaddr value)
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
++
++static int can_receive(void *opaque)
 +{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = value;
-+}
-+
-+static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = tb->pc;
-+}
-+
-+static bool rx_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request &
-+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-+}
-+
-+static void rx_cpu_reset(CPUState *s)
-+{
-+    RXCPU *cpu = RXCPU(s);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(cpu);
-+    CPURXState *env = &cpu->env;
-+    uint32_t *resetvec;
-+
-+    rcc->parent_reset(s);
-+
-+    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-+
-+    resetvec = rom_ptr(0xfffffffc, 4);
-+    if (resetvec) {
-+        /* In the case of kernel, it is ignored because it is not set. */
-+        env->pc = ldl_p(resetvec);
-+    }
-+    rx_cpu_unpack_psw(env, 0, 1);
-+    env->regs[0] = env->isp = env->usp = 0;
-+    env->fpsw = 0;
-+    set_flush_to_zero(1, &env->fp_status);
-+    set_flush_inputs_to_zero(1, &env->fp_status);
-+}
-+
-+typedef struct RXCPUListState {
-+    fprintf_function cpu_fprintf;
-+    FILE *file;
-+} RXCPUListState;
-+
-+static void rx_cpu_list_entry(gpointer data, gpointer user_data)
-+{
-+    RXCPUListState *s = user_data;
-+    const char *typename = object_class_get_name(OBJECT_CLASS(data));
-+    int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
-+
-+    (*s->cpu_fprintf)(s->file, "%.*s\n", len, typename);
-+}
-+
-+void rx_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-+{
-+    RXCPUListState s = {
-+        .cpu_fprintf = cpu_fprintf,
-+        .file = f,
-+    };
-+    GSList *list;
-+
-+    list = object_class_get_list_sorted(TYPE_RXCPU, false);
-+    g_slist_foreach(list, rx_cpu_list_entry, &s);
-+    g_slist_free(list);
-+}
-+
-+static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+    char *typename = NULL;
-+
-+    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
-+    oc = object_class_by_name(typename);
-+    if (oc != NULL && object_class_is_abstract(oc)) {
-+        oc = NULL;
-+    }
-+
-+    g_free(typename);
-+    return oc;
-+}
-+
-+static void rx_cpu_realize(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs = CPU(dev);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(dev);
-+    Error *local_err = NULL;
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    cpu_reset(cs);
-+    qemu_init_vcpu(cs);
-+
-+    rcc->parent_realize(dev, errp);
-+}
-+
-+static void rx_cpu_set_irq(void *opaque, int no, int request)
-+{
-+    RXCPU *cpu = opaque;
-+    CPUState *cs = CPU(cpu);
-+    int irq = request & 0xff;
-+
-+    static const int mask[] = {
-+        [RX_CPU_IRQ] = CPU_INTERRUPT_HARD,
-+        [RX_CPU_FIR] = CPU_INTERRUPT_FIR,
-+    };
-+    if (irq) {
-+        cpu->env.req_irq = irq;
-+        cpu->env.req_ipl = (request >> 8) & 0x0f;
-+        cpu_interrupt(cs, mask[no]);
++    RSCIState *sci = RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
 +    } else {
-+        cpu_reset_interrupt(cs, mask[no]);
++        return FIELD_EX8(sci->scr, SCR, RE);
 +    }
 +}
 +
-+static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
++static void receive(void *opaque, const uint8_t *buf, int size)
 +{
-+    info->mach = bfd_mach_rx;
-+    info->print_insn = print_insn_rx;
++    RSCIState *sci = RSCI(opaque);
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    } else {
++        sci->rdr = buf[0];
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
++    }
 +}
 +
-+static void rx_cpu_init(Object *obj)
++static void send_byte(RSCIState *sci)
 +{
-+    CPUState *cs = CPU(obj);
-+    RXCPU *cpu = RXCPU(obj);
-+    CPURXState *env = &cpu->env;
-+
-+    cs->env_ptr = env;
-+    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
 +}
 +
-+static void rxcpu_class_init(ObjectClass *klass, void *data)
++static void txend(void *opaque)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    CPUClass *cc = CPU_CLASS(klass);
-+    RXCPUClass *rcc = RXCPU_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, rx_cpu_realize,
-+                                    &rcc->parent_realize);
-+
-+    rcc->parent_reset = cc->reset;
-+    cc->reset = rx_cpu_reset;
-+
-+    cc->class_by_name = rx_cpu_class_by_name;
-+    cc->has_work = rx_cpu_has_work;
-+    cc->do_interrupt = rx_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt = rx_cpu_exec_interrupt;
-+    cc->dump_state = rx_cpu_dump_state;
-+    cc->set_pc = rx_cpu_set_pc;
-+    cc->synchronize_from_tb = rx_cpu_synchronize_from_tb;
-+    cc->gdb_read_register = rx_cpu_gdb_read_register;
-+    cc->gdb_write_register = rx_cpu_gdb_write_register;
-+    cc->get_phys_page_debug = rx_cpu_get_phys_page_debug;
-+    cc->disas_set_info = rx_cpu_disas_set_info;
-+    cc->tcg_initialize = rx_translate_init;
-+
-+    cc->gdb_num_core_regs = 26;
++    RSCIState *sci = RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
 +}
 +
-+static const TypeInfo rxcpu_info = {
-+    .name = TYPE_RXCPU,
-+    .parent = TYPE_CPU,
-+    .instance_size = sizeof(RXCPU),
-+    .instance_init = rx_cpu_init,
-+    .abstract = false,
-+    .class_size = sizeof(RXCPUClass),
-+    .class_init = rxcpu_class_init,
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime = 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *= 32 * sci->brr;
++    sci->trtime *= 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *= NANOSECONDS_PER_SECOND;
++    sci->trtime /= sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr = val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr = val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) == 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
++        break;
++    case A_SCMR:
++        sci->scmr = val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr = val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                      "renesas_sci: Register %08lx not implemented\n", offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr = sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                      "renesas_sci: Register %08lx not implemented.\n", offset);
++    }
++    return -1;
++}
++
++static const MemoryRegionOps sci_ops = {
++    .write = sci_write,
++    .read  = sci_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .max_access_size = 1,
++    },
 +};
 +
-+static void rxcpu_register_types(void)
++static void rsci_reset(DeviceState *dev)
 +{
-+    type_register_static(&rxcpu_info);
++    RSCIState *sci = RSCI(dev);
++    sci->smr = sci->scr = 0x00;
++    sci->brr = 0xff;
++    sci->tdr = 0xff;
++    sci->rdr = 0x00;
++    sci->ssr = 0x84;
++    sci->scmr = 0x00;
++    sci->semr = 0x00;
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 +}
 +
-+type_init(rxcpu_register_types)
-+
-+static uint32_t extable[32];
-+
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size)
++static void sci_event(void *opaque, int event)
 +{
-+    long kernel_size;
++    RSCIState *sci = RSCI(opaque);
++    if (event == CHR_EVENT_BREAK) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, FER, 1);
++        printf("ssr %s %d %02x\n", __func__, __LINE__, sci->ssr);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    }
++}
++
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci = RSCI(dev);
++
++    if (sci->input_freq == 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
++{
++    SysBusDevice *d = SYS_BUS_DEVICE(obj);
++    RSCIState *sci = RSCI(obj);
 +    int i;
 +
-+    kernel_size = load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
-+    }
-+    cpu->env.pc = start;
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
 +
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i = 0; i < 32; i++) {
-+        extable[i] = cpu_to_le32(0x10 + i * 4);
++    for (i = 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
 +    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
++    sci->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
 +}
++
++static const VMStateDescription vmstate_rcmt = {
++    .name = "renesas-sci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rsci_properties[] = {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rsci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = rsci_realize;
++    dc->props = rsci_properties;
++    dc->vmsd = &vmstate_rcmt;
++    dc->reset = rsci_reset;
++}
++
++static const TypeInfo rsci_info = {
++    .name       = TYPE_RENESAS_SCI,
++    .parent     = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(RSCIState),
++    .instance_init = rsci_init,
++    .class_init = rsci_class_init,
++};
++
++static void rsci_register_types(void)
++{
++    type_register_static(&rsci_info);
++}
++
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 6360c9fffa..10c24ca87f 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -40,3 +40,6 @@ config SCLPCONSOLE
+ 
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index cf086e7114..7567e89a49 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -15,7 +15,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+ obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
+ obj-$(CONFIG_COLDFIRE) += mcf_uart.o
+ obj-$(CONFIG_OMAP) += omap_uart.o
+-obj-$(CONFIG_SH4) += sh_serial.o
++obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
+ obj-$(CONFIG_PSERIES) += spapr_vty.o
+ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
 -- 
 2.11.0
