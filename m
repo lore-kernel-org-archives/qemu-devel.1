@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51248)
+Received: from eggs.gnu.org ([209.51.188.92]:53485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1hFvSQ-0006UT-VG
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:51:11 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hFveu-0008EI-1q
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 03:04:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1hFvSO-0005Xm-Bq
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:51:09 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:6492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wang.yi59@zte.com.cn>)
-	id 1hFvSM-0005Qf-Fi
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:51:08 -0400
-From: Yi Wang <wang.yi59@zte.com.cn>
-Date: Mon, 15 Apr 2019 14:51:29 +0800
-Message-Id: <1555311089-18610-1-git-send-email-wang.yi59@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] migration: update comments of migration bitmap
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hFver-0004H3-TM
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 03:04:03 -0400
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Mon, 15 Apr 2019 15:03:03 +0800
+Message-Id: <20190415070307.13668-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/4] Extract build_mcfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,38 +19,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, Yi Wang <wang.yi59@zte.com.cn>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, marcel.apfelbaum@gmail.com, yang.zhong@intel.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Since the ram bitmap and the unsent bitmap are split by RAMBlock
-in commit 6b6712e, it's better to update the comments about them.
+This patch set tries to generalize MCFG table build process.
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- migration/ram.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Wei Yang (4):
+  hw/arm/virt-acpi-build: remove unnecessary variable mcfg_start
+  i386, acpi: remove mcfg_ prefix in AcpiMcfgInfo members
+  hw/arm/virt-acpi-build: pass AcpiMcfgInfo to build_mcfg()
+  hw/acpi: Extract build_mcfg to pci.c
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 1ca9ba7..24ab23d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1630,8 +1630,6 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
- /**
-  * migration_bitmap_find_dirty: find the next dirty page from start
-  *
-- * Called with rcu_read_lock() to protect migration_bitmap
-- *
-  * Returns the byte offset within memory region of the start of a dirty page
-  *
-  * @rs: current RAM state
-@@ -2681,7 +2679,7 @@ static void ram_save_cleanup(void *opaque)
-     RAMBlock *block;
- 
-     /* caller have hold iothread lock or is in a bh, so there is
--     * no writing race against this migration_bitmap
-+     * no writing race against the migration bitmap
-      */
-     memory_global_dirty_log_stop();
- 
+ default-configs/arm-softmmu.mak  |  1 +
+ default-configs/i386-softmmu.mak |  1 +
+ hw/acpi/Kconfig                  |  4 +++
+ hw/acpi/Makefile.objs            |  1 +
+ hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c         | 31 ++++++---------------
+ hw/i386/acpi-build.c             | 30 ++++-----------------
+ include/hw/acpi/aml-build.h      |  5 ++++
+ include/hw/acpi/pci.h            |  5 ++++
+ 9 files changed, 76 insertions(+), 48 deletions(-)
+ create mode 100644 hw/acpi/pci.c
+ create mode 100644 include/hw/acpi/pci.h
+
 -- 
-1.8.3.1
+2.19.1
