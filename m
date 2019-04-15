@@ -2,80 +2,88 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DBEC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C399EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:25:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A649220652
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A649220652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A44C2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:25:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s/lsn/ai"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A44C2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47808 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47815 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFymm-0003Rw-SS
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:24:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36918)
+	id 1hFyno-00046h-NL
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:25:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hFylo-00035H-Vs
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:25 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hFymJ-0003K6-SY
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hFylo-0000Au-4g
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:24 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40604)
+	(envelope-from <programmingkidx@gmail.com>) id 1hFymI-0000Y9-Ui
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:55 -0400
+Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:39071)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hFyln-00005e-Th
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:24 -0400
-Received: by mail-wm1-f66.google.com with SMTP id z24so19794067wmi.5
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 03:23:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hFymI-0000XS-M5
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:23:54 -0400
+Received: by mail-io1-xd31.google.com with SMTP id e13so14090916ioq.6
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 03:23:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=so3z31DIMMDStPDkde9XJL6darEkDyzB1FPgOxg5dno=;
+	b=s/lsn/aisBD8UkMxVnJoqQGtip9+QotmtFdvD0shqkN/8qzcEJHOCYj0ZazCR21A44
+	Wx8l4DEJ1I43UkkAoxCztn2MahUeblICynKrdjzNxmHKtFHXIuzkgljHG93Hd0blcQtV
+	yLOHVDRGqVPYwbUxT/OIpsqhg6qXm6ksz+WxiJl9F85Y+XDWihNnkMvVunt3l0QRJTJn
+	tvCIThynyJ0aXGLSQ3864CNlHvUSANRhI2kbzgtDvB32HYZxGnqddwehZMahqpypu22B
+	1ON8Q12Nrf3NiBVVva+gJl5pyKPGjsfEHEMvBGYanZCwWnMuWLeza2q55GIW+MOGVOEh
+	SkTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=5+TmwN8zoF1KI5lQ8pDNX8kg6DV3fp8rpxzNaqHlBKk=;
-	b=KbIbfJaZGk96DfCy6gz4/mIqTpxpRolqhPLnI1W/DtJbMJKX3QSHPVJibmBm5KBVZj
-	kUVQMRc8xOhYzB2+0jGSeZrQlfBhjUJTDKRNUTlbUyTbBS3H/NRrkZLPtjH7ZMlZ17qR
-	+fA5GvcihzQgctqvVIWM+WW7ly8wQywEadeq4K8VBx1P1qklYdKZ23Lex8IUAKkkLiXn
-	TbU7C2Rz6qa2EoG+Gs6bjslK9rUdnf18vGmZHC9Kl5t+5VsNYZO0zHWIcj5H5m4pC9C/
-	DZ+IGEroA3G1qKRfh+rhaRDKzxY3wLgWLD3bYqU3XVU1FqOAf+d48GecE0qDG84NATPV
-	a1uA==
-X-Gm-Message-State: APjAAAWqIl/eOvfxkYV4blrrzNFyfhIu/CxZOTZ2BeCn/eweZnQB6t3C
-	PrHlHxvwayo8wso3bfvfNeUHBw==
-X-Google-Smtp-Source: APXvYqy4WcC0lTzJQn6gFoqUB5XL6I0th+Iss7Db7M9PCwH6psNJiA6BYOHHD1MhxHqAdVPKA6dzRg==
-X-Received: by 2002:a7b:c3d7:: with SMTP id t23mr20692586wmj.62.1555323801616; 
-	Mon, 15 Apr 2019 03:23:21 -0700 (PDT)
-Received: from [10.115.78.87] ([46.31.59.59]) by smtp.gmail.com with ESMTPSA id
-	i18sm44125476wrm.7.2019.04.15.03.23.19
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 15 Apr 2019 03:23:20 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190315032629.21234-1-richard.henderson@linaro.org>
-	<20190315032629.21234-13-richard.henderson@linaro.org>
-	<6ea1d95e-f5c7-7b14-04c7-07699e9d564a@redhat.com>
-	<66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <bed878ef-0ce1-1081-a4cb-88b7775d1433@redhat.com>
-Date: Mon, 15 Apr 2019 12:23:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
+	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=so3z31DIMMDStPDkde9XJL6darEkDyzB1FPgOxg5dno=;
+	b=HSYBJJOQJ1mW26GjcIZIskUGXuBpaukVojPpGTwEDw+bJpoHcjwYpdcRmXMO8yKdx2
+	xru5DYVCfiYcRr0ncX03waYfidDIrCyKeJ/82vx1S2WMxH7WXl4ZVYR09In5reIYzz2N
+	EaonPNxt3HWMErrTp8m7nqBYm+iGIMzq5UPJFg+Wm2Y5f0cJa1mCAzpjjpZOXhAy1OLI
+	7ItsHQZ3a7pbYsGXJIctM2PoTNmCYmTEgOunKChpEKpm11EdawMRGEfUd3W9ZjpWwuMA
+	SBpWBMzcVQfEFvNRHv33pjDbMh8FkSsxCML0D+sP8cwWwYm+s14niZ5l9fLO+I8iZDUl
+	sj/g==
+X-Gm-Message-State: APjAAAXqVjx6NqfmIzZADc09Ibg17JKCN8ERaJ4UAYZ3oP5fLMda5Eus
+	dHF/PEiOS11dXSRqmDqRJZ8=
+X-Google-Smtp-Source: APXvYqzglMBuNldWz+nZUiYGn4ISX8QqCx4Lo9a50iGcx0F86iN7ilnkgyeumavSyf9vFurJEjiChw==
+X-Received: by 2002:a5d:8d93:: with SMTP id b19mr9386391ioj.54.1555323833838; 
+	Mon, 15 Apr 2019 03:23:53 -0700 (PDT)
+Received: from [192.168.0.2] (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20])
+	by smtp.gmail.com with ESMTPSA id 79sm7904667itw.18.2019.04.15.03.23.52
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 15 Apr 2019 03:23:53 -0700 (PDT)
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v3 12/23] linux-user: Call qcrypto_init if
- not using -seed
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20190415095400.GD29134@stefanha-x1.localdomain>
+Date: Mon, 15 Apr 2019 06:23:51 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <97D57A26-6DB4-45AA-BC68-27BBEDEEBE74@gmail.com>
+References: <839EC771-5973-4B05-BC76-D6CC5EE63A43@gmail.com>
+	<20190415095400.GD29134@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::d31
+Subject: Re: [Qemu-devel] Booting from a Bootcamp partition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,41 +95,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415102318.qWmGzbPoheoyKk87JQblh_d6qD4An66XR9FhMgw4fmI@z>
+Message-ID: <20190415102351.UeVy4OCBrw2YWU57vG05rAaCy__FrjIonC9YrOEC87Y@z>
 
-On 4/13/19 8:44 AM, Richard Henderson wrote:
-> On 4/10/19 11:49 PM, Philippe Mathieu-Daudé wrote:
->>> -    if (seed_optarg != NULL) {
->>> -        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
->>> +    {
->> Since 7be41675f7c we use gnu99 C, so this extra block indentation can be
->> removed.
->>
->>> +        Error *err = NULL;
->>> +        if (seed_optarg != NULL) {
->>> +            qemu_guest_random_seed_main(seed_optarg, &err);
->>> +        } else {
->>> +            /* ??? Assumes qcrypto is only used by qemu_guest_getrandom.  */
->>> +            qcrypto_init(&err);
->>> +        }
->>> +        if (err) {
->>> +            error_reportf_err(err, "cannot initialize crypto: ");
->>> +            exit(1);
->>> +        }
->>>      }
-> 
-> I could, but it also limits the scope, which is of more importance to variables
-> who have their address taken.  It means that their storage could (in theory) be
-> shared with objects not overlapping in scope.
 
-Fine then.
+> On Apr 15, 2019, at 5:54 AM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
+>=20
+> On Sun, Apr 14, 2019 at 07:33:17PM -0400, Programmingkid wrote:
+>> Hi I was wondering if anyone has been able to boot from a bootcamp =
+partition inside of QEMU. I know this partition can be used in QEMU but =
+my own attempts at booting Windows 7 on my bootcamp partition did not =
+work. I always see "A disk read error occurred". Has anyone else been =
+successful at this?=20
+>=20
+> Hi,
+> It's difficult to help without more information:
+> 1. What is your QEMU command-line?
 
-I think your '???' comment is appropriate but I'd rather let Daniel
-opinate. Except that comment, for the rest:
+sudo qemu-system-x86_64 -name "Windows 7" -hda "/dev/disk0s4" -boot "c" =
+-m 3000=20
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 2. What is the partition table on the disk?
+
+The bootcamp partition is this: /dev/disk0s4
+
+> General problems with booting Windows are usually caused by a guest
+> configuration that doesn't match the hardware configuration that =
+Windows
+> was installed under.  Can you check that the AHCI bus address of the
+> disk and partition numbering matches what Windows expected?
+
+How would someone do this?
+
+> It may also be useful to enable tracing (see docs/devel/tracing.txt) =
+to
+> see what the ahci_* trace event log says.  I have CCed John Snow, one =
+of
+> the few people who can read this log :).
+
+I'm guessing you believe the problem is the partition can't be read in =
+QEMU. I know for sure it can. I attached this partition to another QEMU =
+VM and was able to see it on the Desktop.=20
+
+My guess is the computer is using an EFI firmware and QEMU uses the =
+traditional BIOS firmware (SeaBIOS).  So I think trying UEFI in QEMU =
+might work.=
 
