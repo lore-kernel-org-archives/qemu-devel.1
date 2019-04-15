@@ -3,57 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4BCC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8283C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:00:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CCD12087C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:59:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCD12087C
+	by mail.kernel.org (Postfix) with ESMTPS id B9AA92087C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:00:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9AA92087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50624 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50626 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG29O-0006QY-MY
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 09:59:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48499)
+	id 1hG29a-0006Z4-0C
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 10:00:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27e-0005EY-1q
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:11 -0400
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-00055h-Vd
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27c-00082H-Ua
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59416)
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-0007xV-38
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:57:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
-	id 1hG27a-00081B-E4; Mon, 15 Apr 2019 09:58:06 -0400
+	id 1hG27P-0007tR-9A; Mon, 15 Apr 2019 09:57:55 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A56AE19CBF7;
-	Mon, 15 Apr 2019 13:58:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C817D3082E1F;
+	Mon, 15 Apr 2019 13:57:52 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 323701001E85;
-	Mon, 15 Apr 2019 13:57:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2D12A1001DE8;
+	Mon, 15 Apr 2019 13:57:50 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 15 Apr 2019 16:57:46 +0300
-Message-Id: <20190415135746.7571-6-mlevitsk@redhat.com>
+Date: Mon, 15 Apr 2019 16:57:42 +0300
+Message-Id: <20190415135746.7571-2-mlevitsk@redhat.com>
 In-Reply-To: <20190415135746.7571-1-mlevitsk@redhat.com>
 References: <20190415135746.7571-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 15 Apr 2019 13:58:05 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 15 Apr 2019 13:57:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 5/5] block/nvme: add support for discard
+Subject: [Qemu-devel] [PATCH 1/5] block/nvme: don't flip CQ phase bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,140 +72,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190415135746.HEP6oJ4mx2xKXCQNpt3O6tW3eDV7ryT_busNSAVY1wQ@z>
+Message-ID: <20190415135742.qDLJ0l7ZIx1Q6jktUC5YflA4HCNhJE5Jtdlg3_OA-Xs@z>
+
+Phase bits are only set by the hardware to indicate new completions
+and not by the device driver.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- block/nvme.c       | 81 ++++++++++++++++++++++++++++++++++++++++++++++
- block/trace-events |  2 ++
- 2 files changed, 83 insertions(+)
+ block/nvme.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 5121e809f0..386c2508b7 100644
+index 0684bbd077..2d208000df 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -110,6 +110,7 @@ typedef struct {
-     bool plugged;
- 
-     bool supports_write_zeros;
-+    bool supports_discard;
- 
-     CoMutex dma_map_lock;
-     CoQueue dma_flush_queue;
-@@ -462,6 +463,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
- 
- 
-     s->supports_write_zeros = (idctrl->oncs & NVME_ONCS_WRITE_ZEROS) != 0;
-+    s->supports_discard = (idctrl->oncs & NVME_ONCS_DSM) != 0;
- 
-     memset(resp, 0, 4096);
- 
-@@ -1144,6 +1146,83 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- 
-+static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-+        int64_t offset, int bytes)
-+{
-+    BDRVNVMeState *s = bs->opaque;
-+    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeRequest *req;
-+    NvmeDsmRange *buf;
-+    QEMUIOVector local_qiov;
-+    int r;
-+
-+    NvmeCmd cmd = {
-+        .opcode = NVME_CMD_DSM,
-+        .nsid = cpu_to_le32(s->nsid),
-+        .cdw10 = 0, /*number of ranges - 0 based*/
-+        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
-+    };
-+
-+    NVMeCoData data = {
-+        .ctx = bdrv_get_aio_context(bs),
-+        .ret = -EINPROGRESS,
-+    };
-+
-+    if (!s->supports_discard) {
-+        return -ENOTSUP;
-+    }
-+
-+    assert(s->nr_queues > 1);
-+
-+    buf = qemu_try_blockalign0(bs, 4096);
-+    if (!buf) {
-+            return -ENOMEM;
-+    }
-+
-+    buf->nlb = bytes >> s->blkshift;
-+    buf->slba = offset >> s->blkshift;
-+    buf->cattr = 0;
-+
-+    qemu_iovec_init(&local_qiov, 1);
-+    qemu_iovec_add(&local_qiov, buf, 4096);
-+
-+    req = nvme_get_free_req(ioq);
-+    assert(req);
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    r = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+
-+    if (r) {
-+        req->busy = false;
-+        return r;
-+    }
-+
-+    trace_nvme_dsm(s, offset, bytes);
-+
-+    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
-+
-+    data.co = qemu_coroutine_self();
-+    while (data.ret == -EINPROGRESS) {
-+        qemu_coroutine_yield();
-+    }
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    r = nvme_cmd_unmap_qiov(bs, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+    if (r) {
-+        return r;
-+    }
-+
-+    trace_nvme_dsm_done(s, offset, bytes, data.ret);
-+
-+    qemu_iovec_destroy(&local_qiov);
-+    qemu_vfree(buf);
-+    return data.ret;
-+
-+}
-+
-+
- static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-                                BlockReopenQueue *queue, Error **errp)
- {
-@@ -1250,6 +1329,8 @@ static BlockDriver bdrv_nvme = {
-     .bdrv_co_pwritev          = nvme_co_pwritev,
- 
-     .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard         = nvme_co_pdiscard,
-+
- 
-     .bdrv_co_flush_to_disk    = nvme_co_flush,
-     .bdrv_reopen_prepare      = nvme_reopen_prepare,
-diff --git a/block/trace-events b/block/trace-events
-index 943a58569f..e55ac5c40b 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -148,6 +148,8 @@ nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offs
- nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
- nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
- nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-+nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
-+nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
- nvme_dma_map_flush(void *s) "s %p"
- nvme_free_req_queue_wait(void *q) "q %p"
- nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
+@@ -340,8 +340,6 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
+         qemu_mutex_lock(&q->lock);
+         c->cid = cpu_to_le16(0);
+         q->inflight--;
+-        /* Flip Phase Tag bit. */
+-        c->status = cpu_to_le16(le16_to_cpu(c->status) ^ 0x1);
+         progress = true;
+     }
+     if (progress) {
 -- 
 2.17.2
 
