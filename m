@@ -6,67 +6,86 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2688EC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 19:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CA7C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 19:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDB1B20880
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 19:17:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB1B20880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0078E20651
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 19:36:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0078E20651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54562 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54755 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG76E-0004Pd-8d
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 15:17:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36221)
+	id 1hG7P7-0007iR-3q
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 15:36:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG755-00043p-Rm
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:15:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hG7OJ-0007OO-NA
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG754-000607-I4
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:15:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47552)
+	(envelope-from <bounces@canonical.com>) id 1hG7OH-0000iW-It
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:35:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55718)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hG754-0005zQ-99
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:15:50 -0400
+	id 1hG7OH-0000ga-7Q
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 15:35:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hG752-0000qx-41
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:15:48 +0000
+	id 1hG7OF-0004di-L3
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:35:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D2BF2E80CD
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:15:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9CFAC2E8070
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:35:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Apr 2019 19:02:49 -0000
-From: John Snow <1824053@bugs.launchpad.net>
+Date: Mon, 15 Apr 2019 19:26:22 -0000
+From: Dan Streetman <dan.streetman@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+	status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
+	component=main; status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
+	component=main; status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+	component=main; status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
+	component=main; status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+	component=main; status=In Progress; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow lizhengui
-X-Launchpad-Bug-Reporter: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Bug-Commenters: ddstreet
+X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
+X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
+References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
 Message-Id:
- <155535496933.14286.17057704772140867563.malone@gac.canonical.com>
+ <155535638329.21149.10975838319152101462.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18920";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 44fd6742e8a17bd71e8d9e8b526b35e8d8597838
+X-Launchpad-Hash: 48f56c29a75bf559c77e9c74a1e597764b31f242
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
- on aarch64 host with low probability
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,89 +96,357 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
+Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415190249.FzSMq0sloAlZCqCnDXIQ9QQaBMwRiBN0lXdxw4KpppM@z>
+Message-ID: <20190415192622.eUxRPPZAhxrnqPcvKozdPgxgXv_rWQgedzjvPnpXb7U@z>
 
-Hi, unfortunately a lot has changed from 2.8 and it might be hard to
-identify a single individual fix that may be responsible for this; there
-are aio_context fixes that go in nearly every version.
+** Description changed:
 
-It may be quickest (unfortunately) to start git-bisecting the problem to
-see if you can identify which build alleviates the behavior to see if it
-isn't something you can backport directly -- but you might find that
-this particular fix has a lot of requisites and you might find it
-difficult to backport to 2.8.1.
+  [impact]
+  =
 
-Best of luck,
---js
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
+  =
+
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+  =
+
+  [test case]
+  =
+
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall configuration
+  of the guest as well as how exactly it's shut down - specifically, its
+  vhost user net must be closed from the host side at a specific time
+  during qemu shutdown.
+  =
+
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me to
+  reproduce so I have relied on their reproduction and testing to debug
+  and craft the patch for this.
+  =
+
+  [regression potential]
+  =
+
+- the change adds flags to prevent repeated calls to both vhost_net_stop()
+- and vhost_net_cleanup() (really, prevents repeated calls to
+- vhost_dev_cleanup(), but vhost_net_cleanup() does nothing else).  Any
+- regression would be seen when stopping and/or cleaning up a vhost net.
+- Regressions might include failure to hot-remove a vhost net from a
+- guest, or failure to cleanup (i.e. mem leak), or crashes during cleanup
+- or stopping a vhost net.
+- =
+
+- However, the flags are very unintrusive, and only in the shutdown path
+- (of a vhost_dev or vhost_net), and are unlikely to cause any
+- regressions.
++ the change adds a flag to prevent repeated calls to vhost_net_stop().
++ This also prevents any calls to vhost_net_cleanup() from
++ net_vhost_user_event().  Any regression would be seen when stopping
++ and/or cleaning up a vhost net.  Regressions might include failure to
++ hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
++ leak), or crashes during cleanup or stopping a vhost net.
+  =
+
+  [other info]
+  =
+
+  this was originally seen in the 2.5 version of qemu - specifically, the
+  UCA version in trusty-mitaka (which uses the xenial qemu codebase).
+  However, this appears to still apply upstream, and I am sending a patch
+  to the qemu list to patch upstream as well.
+  =
+
+  The specific race condition for this (in the qemu 2.5 code version) is:
+  =
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+  =
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+  =
+
+  in this function, code gets to an if-else check for (!n->vhost_started),
+  which is false (i.e. vhost_started is true) and enters the else code
+  block, which calls vhost_net_stop() and then sets n->vhost_started to
+  false.
+  =
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+  =
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+  =
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows the
+  same path that thread A followed, and enters vhost_net_stop().
+  =
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+  =
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its call
+  to qmp_set_link() returns:
+  =
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+  =
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+  =
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+- already cleaned up.
++ already cleaned up.  Additionally, if thread B's call to
++ vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
++ then that will call vhost_dev_stop() and vhost_disable_notifiers() which
++ both try to access things that have been freed/cleared/disabled by
++ vhost_dev_cleanup().
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824053
+https://bugs.launchpad.net/bugs/1823458
 
 Title:
-  Qemu-img convert appears to be stuck on aarch64 host with low
-  probability
+  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
+  crashes qemu
 
 Status in QEMU:
-  New
+  In Progress
+Status in qemu package in Ubuntu:
+  In Progress
+Status in qemu source package in Trusty:
+  In Progress
+Status in qemu source package in Xenial:
+  In Progress
+Status in qemu source package in Bionic:
+  In Progress
+Status in qemu source package in Cosmic:
+  In Progress
+Status in qemu source package in Disco:
+  In Progress
 
 Bug description:
-  Hi,  I found a problem that qemu-img convert appears to be stuck on
-  aarch64 host with low probability.
+  [impact]
 
-  The convert command  line is  "qemu-img convert -f qcow2 -O raw
-  disk.qcow2 disk.raw ".
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
 
-  The bt is below:
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
 
-  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
-  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
-  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
-  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
-l/compatfd.c:37
-  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
-163b90) at util/qemu_thread_posix.c:496
-  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
-  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
+  [test case]
 
-  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
-  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
-  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
-=3D<optimized out>) at qemu_timer.c:391
-  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
-t>) at main_loop.c:272
-  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
-at main_loop.c:534
-  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
-g.c:1923
-  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
-timized out>) at qemu-img.c:2414
-  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:5305
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall
+  configuration of the guest as well as how exactly it's shut down -
+  specifically, its vhost user net must be closed from the host side at
+  a specific time during qemu shutdown.
 
-  =
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me
+  to reproduce so I have relied on their reproduction and testing to
+  debug and craft the patch for this.
 
-  The problem seems to be very similar to the phenomenon described by this =
-patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
-otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
+  [regression potential]
 
+  the change adds a flag to prevent repeated calls to vhost_net_stop().
+  This also prevents any calls to vhost_net_cleanup() from
+  net_vhost_user_event().  Any regression would be seen when stopping
+  and/or cleaning up a vhost net.  Regressions might include failure to
+  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
+  leak), or crashes during cleanup or stopping a vhost net.
 
-  which force main loop wakeup with SIGIO.  But this patch was reverted
-  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
-  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
+  [other info]
 
-  The problem still seems to exist in aarch64 host. The qemu version I used=
- is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
-   Do you have any solutions to fix it?  Thanks for your reply !
+  this was originally seen in the 2.5 version of qemu - specifically,
+  the UCA version in trusty-mitaka (which uses the xenial qemu
+  codebase).  However, this appears to still apply upstream, and I am
+  sending a patch to the qemu list to patch upstream as well.
+
+  The specific race condition for this (in the qemu 2.5 code version)
+  is:
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  in this function, code gets to an if-else check for
+  (!n->vhost_started), which is false (i.e. vhost_started is true) and
+  enters the else code block, which calls vhost_net_stop() and then sets
+  n->vhost_started to false.
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows
+  the same path that thread A followed, and enters vhost_net_stop().
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its
+  call to qmp_set_link() returns:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+  already cleaned up.  Additionally, if thread B's call to
+  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
+  then that will call vhost_dev_stop() and vhost_disable_notifiers()
+  which both try to access things that have been freed/cleared/disabled
+  by vhost_dev_cleanup().
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
 
