@@ -2,64 +2,61 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BE5C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 11:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A1BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:03:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23A612073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 11:52:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23A612073F
+	by mail.kernel.org (Postfix) with ESMTPS id 0AE72206BA
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 12:03:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE72206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48757 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49281 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG0AE-0002Mx-GO
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 07:52:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52817)
+	id 1hG0Kh-0004Rz-8X
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 08:03:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG09L-000253-LD
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:51:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hG0JV-0003z7-LE
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG09K-0003fN-5z
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:51:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45986)
+	(envelope-from <dgilbert@redhat.com>) id 1hG0JU-00036E-MI
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hG09J-0003a1-Pf; Mon, 15 Apr 2019 07:51:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hG0JU-00035h-H9
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 73C3C66979;
-	Mon, 15 Apr 2019 11:51:35 +0000 (UTC)
-Received: from gondolin (unknown [10.40.205.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B96FE5C1B4;
-	Mon, 15 Apr 2019 11:51:30 +0000 (UTC)
-Date: Mon, 15 Apr 2019 13:51:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
-	Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <20190415135126.2fa9b12b.cohuck@redhat.com>
-In-Reply-To: <20190301093902.27799-1-cohuck@redhat.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B10A308222E;
+	Mon, 15 Apr 2019 12:02:09 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-222.ams2.redhat.com
+	[10.36.117.222])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C38F360F9B;
+	Mon, 15 Apr 2019 12:02:07 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	samuel.thibault@gnu.org,
+	jan.kiszka@siemens.com
+Date: Mon, 15 Apr 2019 13:02:05 +0100
+Message-Id: <20190415120205.2221-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 15 Apr 2019 11:51:40 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Mon, 15 Apr 2019 12:02:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] vfio-ccw: support hsch/csch (kernel
- part)
+Subject: [Qemu-devel] [PATCH v2] slirp: Gcc 9 -O3 fix
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,35 +68,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: linux-s390@vger.kernel.org, qemu-s390x@nongnu.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415115126.zf3pb7PLNSbmpgqmHOD0qIvx2M7EvO4w0dLid7lQFOs@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190415120205.QuyJw6GSNotwwg-eE8Acr-nnQELrAfxK_Z0YUWlmer4@z>
 
-On Fri,  1 Mar 2019 10:38:56 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> [This is the Linux kernel part, git tree is available at
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
-> 
-> The companion QEMU patches are available at
-> https://github.com/cohuck/qemu vfio-ccw-caps]
-> 
-> Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
-> device. This tends to work well for the most common 'good path' scenarios;
-> however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
-> clearing pending requests at the device is currently not supported.
-> This may be a problem for e.g. error recovery.
-> 
-> This patch series introduces capabilities (similar to what vfio-pci uses)
-> and exposes a new async region for handling hsch/csch.
+Gcc 9 needs some convincing that sopreprbuf really is going to fill
+in iov in the call from soreadbuf, even though the failure case
+shouldn't happen.
 
-One more gentle ping for an ack/r-b for patches 4 and 6.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ slirp/src/socket.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I could go ahead and merge patches 1-3 and then patches 1+3 of Farhan's
-series, but I'd really like to merge patches 4-6 as well so I can later
-merge the QEMU part after a headers update to 5.2-rc...
+diff --git a/slirp/src/socket.c b/slirp/src/socket.c
+index 4a3c935e25..beb8517f1c 100644
+--- a/slirp/src/socket.c
++++ b/slirp/src/socket.c
+@@ -181,7 +181,7 @@ soread(struct socket *so)
+ 	 * No need to check if there's enough room to read.
+ 	 * soread wouldn't have been called if there weren't
+ 	 */
+-	sopreprbuf(so, iov, &n);
++	assert(sopreprbuf(so, iov, &n) !=3D 0);
+=20
+ 	nn =3D recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+ 	if (nn <=3D 0) {
+@@ -257,6 +257,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
+ size)
+ 	 * No need to check if there's enough room to read.
+ 	 * soread wouldn't have been called if there weren't
+ 	 */
++	assert(size > 0);
+ 	if (sopreprbuf(so, iov, &n) < size)
+         goto err;
+=20
+--=20
+2.21.0
+
 
