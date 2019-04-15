@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33429)
+Received: from eggs.gnu.org ([209.51.188.92]:34087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyTq-0006Lx-2O
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:04:51 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFyXa-0007KK-2r
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyTn-00028V-PY
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:04:49 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:33352)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hFyXZ-0004H9-3D
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:42 -0400
+Received: from mail-eopbgr60116.outbound.protection.outlook.com
+	([40.107.6.116]:57653
+	helo=EUR04-DB3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hFyTj-00022G-P8
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:04:45 -0400
-Date: Mon, 15 Apr 2019 13:04:22 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190415100421.GA6145@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190411172402.GA14509@mellanox.com> <20190411173419.GB6259@lap1>
-	<20190411174022.GA26227@mellanox.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hFyXY-0004Ff-Fr
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:41 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 15 Apr 2019 10:08:37 +0000
+Message-ID: <3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
+References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
+	<87zhorbytu.fsf@dusky.pond.sub.org>
+In-Reply-To: <87zhorbytu.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7774EB8D66BDF24F991100838D37B379@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190411174022.GA26227@mellanox.com>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
+ error_abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Gunthorpe <jgg@mellanox.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu, Apr 11, 2019 at 05:40:26PM +0000, Jason Gunthorpe wrote:
-> On Thu, Apr 11, 2019 at 08:34:20PM +0300, Yuval Shaia wrote:
-> > On Thu, Apr 11, 2019 at 05:24:08PM +0000, Jason Gunthorpe wrote:
-> > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > > 
-> > > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > > more software runs in virtualized environment.
-> > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > > 
-> > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > > technology and also because the Virtio specification
-> > > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > > achieve bare metal performance.
-> > > > > 
-> > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > > Virtio Specification and a look forward on possible implementation
-> > > > > techniques.
-> > > > > 
-> > > > > Open issues/Todo list:
-> > > > > List is huge, this is only start point of the project.
-> > > > > Anyway, here is one example of item in the list:
-> > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > > >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > > >   that this is reasonable so one option is to have one for all and
-> > > > >   multiplex the traffic on it. This is not good approach as by design it
-> > > > >   introducing an optional starvation. Another approach would be multi
-> > > > >   queues and round-robin (for example) between them.
-> > > > > 
-> > > > > Expectations from this posting:
-> > > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > > there is some sort interest in the community for such device.
-> > > > 
-> > > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > > spec for this :)
-> > > 
-> > > I'm unclear why you'd want to have a virtio queue for anything other
-> > > that some kind of command channel.
-> > > 
-> > > I'm not sure a QP or CQ benefits from this??
-> > 
-> > Virtqueue is a standard mechanism to pass data from guest to host. By
-> > saying that - it really sounds like QP send and recv rings. So my thought
-> > is to use a standard way for rings. As i've learned this is how it is used
-> > by other virtio devices ex virtio-net.
-> 
-> I doubt you can use virtio queues from userspace securely? Usually
-> needs a dedicated page for each user space process
-
-Not yet started to do any work on datapath, i guess you are right but need
-further work on this area.
-Thanks for raising the concern.
-
-As i said, there are many open issues at this stage.
-
-> 
-> Jason
+MTUuMDQuMjAxOSA4OjUxLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gVmxhZGltaXIgU2Vt
+ZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+IA0K
+Pj4gSXQgd291bGQgYmUgbmljZSB0byBoYXZlIEVycm9yIG9iamVjdCBub3QgZnJlZWQgYXdheSB3
+aGVuIGRlYnVnZ2luZyBhDQo+PiBjb3JlZHVtcC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFk
+aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAt
+LS0NCj4+ICAgdXRpbC9lcnJvci5jIHwgOCArKysrKy0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwg
+NSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS91dGls
+L2Vycm9yLmMgYi91dGlsL2Vycm9yLmMNCj4+IGluZGV4IDkzNGE3OGUxYjEuLmY5MTgwYzBmMzAg
+MTAwNjQ0DQo+PiAtLS0gYS91dGlsL2Vycm9yLmMNCj4+ICsrKyBiL3V0aWwvZXJyb3IuYw0KPj4g
+QEAgLTMyLDkgKzMyLDExIEBAIEVycm9yICplcnJvcl9mYXRhbDsNCj4+ICAgc3RhdGljIHZvaWQg
+ZXJyb3JfaGFuZGxlX2ZhdGFsKEVycm9yICoqZXJycCwgRXJyb3IgKmVycikNCj4+ICAgew0KPj4g
+ICAgICAgaWYgKGVycnAgPT0gJmVycm9yX2Fib3J0KSB7DQo+PiAtICAgICAgICBmcHJpbnRmKHN0
+ZGVyciwgIlVuZXhwZWN0ZWQgZXJyb3IgaW4gJXMoKSBhdCAlczolZDpcbiIsDQo+PiAtICAgICAg
+ICAgICAgICAgIGVyci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSk7DQo+PiAtICAgICAgICBl
+cnJvcl9yZXBvcnRfZXJyKGVycik7DQo+PiArICAgICAgICBlcnJvcl9yZXBvcnQoIlVuZXhwZWN0
+ZWQgZXJyb3IgaW4gJXMoKSBhdCAlczolZDogJXMiLA0KPj4gKyAgICAgICAgICAgICAgICAgICAg
+IGVyci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSwgZXJyb3JfZ2V0X3ByZXR0eShlcnIpKTsN
+Cj4+ICsgICAgICAgIGlmIChlcnItPmhpbnQpIHsNCj4+ICsgICAgICAgICAgICBlcnJvcl9wcmlu
+dGZfdW5sZXNzX3FtcCgiJXMiLCBlcnItPmhpbnQtPnN0cik7DQo+PiArICAgICAgICB9DQo+PiAg
+ICAgICAgICAgYWJvcnQoKTsNCj4+ICAgICAgIH0NCj4+ICAgICAgIGlmIChlcnJwID09ICZlcnJv
+cl9mYXRhbCkgew0KPiANCj4gTm8gb2JqZWN0aW9ucyB0byBub3QgZnJlZWluZyB0aGUgZXJyb3Ig
+b2JqZWN0IG9uIHRoZSBwYXRoIHRvIGFib3J0KCkuDQo+IA0KPiBZb3UgYWxzbyBmb3JtYXQgdGhl
+IGVycm9yIG1lc3NhZ2UgZGlmZmVyZW50bHkuICBDb21taXQgMWU5YjY1YmIxYmEncw0KPiBleGFt
+cGxlDQo+IA0KPiAgICAgICAgICBVbmV4cGVjdGVkIGVycm9yIGluIHBhcnNlX2Jsb2NrX2Vycm9y
+X2FjdGlvbigpIGF0IC4uLi9xZW11L2Jsb2NrZGV2LmM6MzIyOg0KPiAgICAgICAgICBxZW11LXN5
+c3RlbS14ODZfNjQ6IC1kcml2ZSBpZj1ub25lLHdlcnJvcj1mb286ICdmb28nIGludmFsaWQgd3Jp
+dGUgZXJyb3IgYWN0aW9uDQo+ICAgICAgICAgIEFib3J0ZWQgKGNvcmUgZHVtcGVkKQ0KPiANCj4g
+Y2hhbmdlcyB0byAoZ3Vlc3N3b3JrLCBub3QgdGVzdGVkKToNCj4gDQo+ICAgICAgICAgIHFlbXUt
+c3lzdGVtLXg4Nl82NDogLWRyaXZlIGlmPW5vbmUsd2Vycm9yPWZvbzogVW5leHBlY3RlZCBlcnJv
+ciBpbiBwYXJzZV9ibG9ja19lcnJvcl9hY3Rpb24oKSBhdCAuLi4vcWVtdS9ibG9ja2Rldi5jOjMy
+MjogJ2ZvbycgaW52YWxpZCB3cml0ZSBlcnJvciBhY3Rpb24NCj4gICAgICAgICAgQWJvcnRlZCAo
+Y29yZSBkdW1wZWQpDQoNCmhtLiBjaGVja3BhdGNoIGRvbid0IGFsbG93IHRvIHB1dCBcbiBpbnRv
+IGVycm9yX3JlcG9ydC4gU28sIHNob3VsZCBJIGNhbGwgZXJyb3JfcmVwb3J0IHR3aWNlPw0KDQpU
+cmFuc2l0aW9uIGZyb20gZnByaW50ZiB0byBlcnJvcl9yZXBvcnQgaXMgT0sgZm9yIHlvdT8NCg0K
+PiANCj4gSW50ZW50aW9uYWw/ICBJdCBtYWtlcyBzZW5zZSBhcyBhbiBlcnJvciBtZXNzYWdlLCBi
+dXQgcmVhZGFiaWxpdHkNCj4gc3VmZmVycyBkdWUgdG8gdGhlIGxvbmcgbGluZS4gIElmIHdlIGRl
+Y2lkZSB3ZSB3YW50IHRoaXMgY2hhbmdlLCBpdA0KPiBuZWVkcyB0byBiZSBtZW50aW9uZWQgaW4g
+dGhlIGNvbW1pdCBtZXNzYWdlLg0KPiANCj4gT3Blbi1jb2RpbmcgZXJyb3JfcmVwb3J0X2Vycigp
+IGhlcmUgc28geW91IGNhbiBkZWxldGUgdGhlIGVycm9yX2ZyZWUoKQ0KPiBhbmQgYSBuZXdsaW5l
+IGlzIGEgYml0IHVnbHksIGJ1dCBmYWN0b3Jpbmcgb3V0IHRoZSBjb21tb24gcGFydCBkb2Vzbid0
+DQo+IHNlZW0gd29ydGh3aGlsZS4NCj4gDQo+IEhtbSwgcGVyaGFwcyBmYWN0b3Jpbmcgb3V0DQo+
+IA0KPiAgICAgICAgICBpZiAoZXJyLT5oaW50KSB7DQo+ICAgICAgICAgICAgICBlcnJvcl9wcmlu
+dGZfdW5sZXNzX3FtcCgiJXMiLCBlcnItPmhpbnQtPnN0cik7DQo+ICAgICAgICAgIH0NCj4gDQo+
+IGludG8gYSBzdGF0aWMgaGVscGVyIHdvdWxkIGJlIHdvcnRod2hpbGUuICBXZSBhbHJlYWR5IGhh
+dmUgdHdvIGNvcGllcy4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
