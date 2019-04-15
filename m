@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34395)
+Received: from eggs.gnu.org ([209.51.188.92]:38417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1hFtvb-0005SW-KO
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:13:12 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHS-0001LG-7Q
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1hFtva-0008Ix-C4
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:13:11 -0400
-Message-ID: <6b177677d32eff4d3969b6601b13de2c97324812.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Mon, 15 Apr 2019 15:12:48 +1000
-In-Reply-To: <20190415033836.GD32705@umbus.fritz.box>
-References: <20190411080004.8690-1-clg@kaod.org>
-	<20190411080004.8690-6-clg@kaod.org>
-	<20190415033836.GD32705@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE
- updates
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHQ-0003UX-RQ
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:46 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:37440)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hFuHQ-0003Tr-FU
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:35:44 -0400
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Date: Mon, 15 Apr 2019 14:35:18 +0900
+Message-Id: <20190415053531.77264-1-ysato@users.sourceforge.jp>
+Subject: [Qemu-devel] [PATCH RFC v7 00/12] Add RX archtecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +21,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>, peter.maydell@linaro.org, richard.henderson@linaro.org
 
-On Mon, 2019-04-15 at 13:38 +1000, David Gibson wrote:
-> On Thu, Apr 11, 2019 at 10:00:03AM +0200, C=C3=A9dric Le Goater wrote:
-> > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> >=20
-> > On some architectures, PTE updates for dirty and changed bits need
-> > to be performed atomically. This adds a couple of
-> > address_space_cmpxchg*
-> > helpers for that purpose.
-> >=20
-> > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> But I think this needs to go past Paolo for review as memory
-> subsystem maintainer.
+Hello.
+This patch series is added Renesas RX target emulation.
 
-This needs to go to rth and Peter. They were talking about a change in
-the abstraction to do these more cleanly... that said, it might be
-worthwhile merging the fixes first.
+It was corrected because the correspondence to registerfield was insufficient.
 
-Cheers,
-Ben.
+My git repository is bellow.
+git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git
 
->=20
-> > ---
-> >  include/exec/memory_ldst.inc.h |  6 +++
-> >  memory_ldst.inc.c              | 80
-> > ++++++++++++++++++++++++++++++++++
-> >  2 files changed, 86 insertions(+)
-> >=20
-> > diff --git a/include/exec/memory_ldst.inc.h
-> > b/include/exec/memory_ldst.inc.h
-> > index 272c20f02eae..f3cfa7e9a622 100644
-> > --- a/include/exec/memory_ldst.inc.h
-> > +++ b/include/exec/memory_ldst.inc.h
-> > @@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq,
-> > SUFFIX)(ARG1_DECL,
-> >      hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
-> >  extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-> >      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult
-> > *result);
-> > +extern uint32_t glue(address_space_cmpxchgl_notdirty,
-> > SUFFIX)(ARG1_DECL,
-> > +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-> > +    MemTxResult *result);
-> > +extern uint32_t glue(address_space_cmpxchgq_notdirty,
-> > SUFFIX)(ARG1_DECL,
-> > +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-> > +    MemTxResult *result);
-> >  extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
-> >      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult
-> > *result);
-> >  extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
-> > diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-> > index acf865b900d7..1d58d2fea67d 100644
-> > --- a/memory_ldst.inc.c
-> > +++ b/memory_ldst.inc.c
-> > @@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty,
-> > SUFFIX)(ARG1_DECL,
-> >      RCU_READ_UNLOCK();
-> >  }
-> > =20
-> > +/* This is meant to be used for atomic PTE updates under MT-TCG */
-> > +uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
-> > +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-> > +    MemTxResult *result)
-> > +{
-> > +    uint8_t *ptr;
-> > +    MemoryRegion *mr;
-> > +    hwaddr l =3D 4;
-> > +    hwaddr addr1;
-> > +    MemTxResult r;
-> > +    uint8_t dirty_log_mask;
-> > +
-> > +    /* Must test result */
-> > +    assert(result);
-> > +
-> > +    RCU_READ_LOCK();
-> > +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-> > +    if (l < 4 || !memory_access_is_direct(mr, true)) {
-> > +        r =3D MEMTX_ERROR;
-> > +    } else {
-> > +        uint32_t orig =3D old;
-> > +
-> > +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-> > +        old =3D atomic_cmpxchg(ptr, orig, new);
-> > +
-> > +        if (old =3D=3D orig) {
-> > +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-> > +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-> > +            cpu_physical_memory_set_dirty_range(memory_region_get_
-> > ram_addr(mr) +
-> > +                                                addr, 4,
-> > dirty_log_mask);
-> > +        }
-> > +        r =3D MEMTX_OK;
-> > +    }
-> > +    *result =3D r;
-> > +    RCU_READ_UNLOCK();
-> > +
-> > +    return old;
-> > +}
-> > +
-> > +#ifdef CONFIG_ATOMIC64
-> > +/* This is meant to be used for atomic PTE updates under MT-TCG */
-> > +uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
-> > +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-> > +    MemTxResult *result)
-> > +{
-> > +    uint8_t *ptr;
-> > +    MemoryRegion *mr;
-> > +    hwaddr l =3D 8;
-> > +    hwaddr addr1;
-> > +    MemTxResult r;
-> > +    uint8_t dirty_log_mask;
-> > +
-> > +    /* Must test result */
-> > +    assert(result);
-> > +
-> > +    RCU_READ_LOCK();
-> > +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-> > +    if (l < 8 || !memory_access_is_direct(mr, true)) {
-> > +        r =3D MEMTX_ERROR;
-> > +    } else {
-> > +        uint32_t orig =3D old;
-> > +
-> > +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-> > +        old =3D atomic_cmpxchg(ptr, orig, new);
-> > +
-> > +        if (old =3D=3D orig) {
-> > +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-> > +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-> > +            cpu_physical_memory_set_dirty_range(memory_region_get_
-> > ram_addr(mr) +
-> > +                                                addr, 8,
-> > dirty_log_mask);
-> > +        }
-> > +        r =3D MEMTX_OK;
-> > +    }
-> > +    *result =3D r;
-> > +    RCU_READ_UNLOCK();
-> > +
-> > +    return old;
-> > +}
-> > +#endif /* CONFIG_ATOMIC64 */
-> > +
-> >  /* warning: addr must be aligned */
-> >  static inline void glue(address_space_stl_internal,
-> > SUFFIX)(ARG1_DECL,
-> >      hwaddr addr, uint32_t val, MemTxAttrs attrs,
->=20
->=20
+Testing binaries bellow.
+u-boot
+Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+
+starting
+$ gzip -d u-boot.bin.gz
+$ qemu-system-rx -bios u-boot.bin
+
+linux and pico-root (only sash)
+Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+           https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
+
+starting
+$ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+
+Changes v6.
+Add FIELD_DP8 and FIELD_DP16 to hw/registerfields.h.
+Fixed registerfield support in timer and serial emulation.
+
+Yoshinori Sato (12):
+  target/rx: TCG translation
+  target/rx: TCG helper
+  target/rx: CPU definition
+  target/rx: RX disassembler
+  target/rx: Miscellaneous files
+  hw/intc: RX62N interrupt controller (ICUa)
+  hw/timer: RX62N internal timer modules
+  hw/char: RX62N serical communication interface (SCI)
+  hw/rx: RX Target hardware definition
+  Add rx-softmmu
+  MAINTAINERS: Add RX
+  hw/registerfields.h: Add 8bit and 16bit register macros.
+
+ configure                      |    8 +
+ default-configs/rx-softmmu.mak |    7 +
+ include/disas/bfd.h            |    5 +
+ include/hw/char/renesas_sci.h  |   45 +
+ include/hw/intc/rx_icu.h       |   49 +
+ include/hw/registerfields.h    |   28 +-
+ include/hw/rx/rx.h             |    7 +
+ include/hw/rx/rx62n.h          |   54 +
+ include/hw/timer/renesas_cmt.h |   33 +
+ include/hw/timer/renesas_tmr.h |   46 +
+ include/sysemu/arch_init.h     |    1 +
+ target/rx/cpu-qom.h            |   52 +
+ target/rx/cpu.h                |  197 ++++
+ target/rx/helper.h             |   31 +
+ arch_init.c                    |    2 +
+ hw/char/renesas_sci.c          |  341 ++++++
+ hw/intc/rx_icu.c               |  373 ++++++
+ hw/rx/rx62n.c                  |  226 ++++
+ hw/rx/rxqemu.c                 |  100 ++
+ hw/timer/renesas_cmt.c         |  277 +++++
+ hw/timer/renesas_tmr.c         |  458 ++++++++
+ target/rx/cpu.c                |  232 ++++
+ target/rx/disas.c              | 1481 ++++++++++++++++++++++++
+ target/rx/gdbstub.c            |  112 ++
+ target/rx/helper.c             |  148 +++
+ target/rx/monitor.c            |   38 +
+ target/rx/op_helper.c          |  481 ++++++++
+ target/rx/translate.c          | 2433 ++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                    |   19 +
+ hw/Kconfig                     |    1 +
+ hw/char/Kconfig                |    3 +
+ hw/char/Makefile.objs          |    2 +-
+ hw/intc/Makefile.objs          |    1 +
+ hw/rx/Kconfig                  |    2 +
+ hw/rx/Makefile.objs            |    1 +
+ hw/timer/Kconfig               |    6 +
+ hw/timer/Makefile.objs         |    3 +
+ target/rx/Makefile.objs        |   11 +
+ target/rx/insns.decode         |  617 ++++++++++
+ 39 files changed, 7929 insertions(+), 2 deletions(-)
+ create mode 100644 default-configs/rx-softmmu.mak
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 include/hw/intc/rx_icu.h
+ create mode 100644 include/hw/rx/rx.h
+ create mode 100644 include/hw/rx/rx62n.h
+ create mode 100644 include/hw/timer/renesas_cmt.h
+ create mode 100644 include/hw/timer/renesas_tmr.h
+ create mode 100644 target/rx/cpu-qom.h
+ create mode 100644 target/rx/cpu.h
+ create mode 100644 target/rx/helper.h
+ create mode 100644 hw/char/renesas_sci.c
+ create mode 100644 hw/intc/rx_icu.c
+ create mode 100644 hw/rx/rx62n.c
+ create mode 100644 hw/rx/rxqemu.c
+ create mode 100644 hw/timer/renesas_cmt.c
+ create mode 100644 hw/timer/renesas_tmr.c
+ create mode 100644 target/rx/cpu.c
+ create mode 100644 target/rx/disas.c
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/monitor.c
+ create mode 100644 target/rx/op_helper.c
+ create mode 100644 target/rx/translate.c
+ create mode 100644 hw/rx/Kconfig
+ create mode 100644 hw/rx/Makefile.objs
+ create mode 100644 target/rx/Makefile.objs
+ create mode 100644 target/rx/insns.decode
+
+-- 
+2.11.0
