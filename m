@@ -2,48 +2,48 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8B8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 16:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E31C10F12
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 16:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C40662075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 16:21:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C40662075B
+	by mail.kernel.org (Postfix) with ESMTPS id 284D92075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 16:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 284D92075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52875 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG4Ly-0005z3-QU
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 12:21:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55745)
+	id 1hG4Ns-0007CH-BL
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 12:23:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Kc-0005F5-9o
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1hG4Lv-00068s-2V
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Kb-00033I-CV
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50034)
+	(envelope-from <eblake@redhat.com>) id 1hG4Lu-0005CL-1D
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hG4Ka-00031x-UF
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hG4Lr-00053L-MW; Mon, 15 Apr 2019 12:21:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3ECC9369CA;
-	Mon, 15 Apr 2019 16:19:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B081B3086226;
+	Mon, 15 Apr 2019 16:20:58 +0000 (UTC)
 Received: from [10.3.117.110] (ovpn-117-110.phx2.redhat.com [10.3.117.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 821F6608C1;
-	Mon, 15 Apr 2019 16:19:37 +0000 (UTC)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B18D5C1A1;
+	Mon, 15 Apr 2019 16:20:58 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190415155452.5115-1-kwolf@redhat.com>
+	<20190415155452.5115-4-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,24 +70,23 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <86b16e27-781b-d298-a1c8-afd27972f000@redhat.com>
-Date: Mon, 15 Apr 2019 11:19:36 -0500
+Message-ID: <110a72ca-eab8-9879-868d-47416c29a404@redhat.com>
+Date: Mon, 15 Apr 2019 11:20:57 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190415155452.5115-4-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+	boundary="uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 15 Apr 2019 16:19:40 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Mon, 15 Apr 2019 16:20:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] socket: allow wait=false for
- client socket
+Subject: Re: [Qemu-devel] [PATCH 3/4] qcow2: Add errp to preallocate_co()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,64 +98,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415161936.TsykqHaGNsDdDH3LhGwLFbtMVIiHE1H9AB0jjUFFl_o@z>
+Message-ID: <20190415162057.nt6W9aiyWWHkRHm5vL16Phh-DOFI2olFbWmZtzrlE34@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB
+--uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <86b16e27-781b-d298-a1c8-afd27972f000@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] socket: allow wait=false for client
- socket
-References: <20190415154906.14621-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <110a72ca-eab8-9879-868d-47416c29a404@redhat.com>
+Subject: Re: [PATCH 3/4] qcow2: Add errp to preallocate_co()
+References: <20190415155452.5115-1-kwolf@redhat.com>
+ <20190415155452.5115-4-kwolf@redhat.com>
+In-Reply-To: <20190415155452.5115-4-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 4/15/19 10:49 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
-> is a bit too strict. Current libvirt always set wait=3Dfalse, and will
-> thus fail to add client chardev.
+On 4/15/19 10:54 AM, Kevin Wolf wrote:
+> We'll add a bdrv_co_truncate() call in the next patch which can return
+> an Error that we don't want to discard. So add an errp parameter to
+> preallocate_co().
 >=20
-> Make the code more permissive, allowing wait=3Dfalse with client socket=
-
-> chardevs.
->=20
-> Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  chardev/char-socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-According to Fixes, this is a regression in 4.0. Is it worth having this
-fix in -rc4?
-
+>  block/qcow2.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 3916505d67..2ad9c9eea5 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -1262,7 +1262,7 @@ static bool qmp_chardev_validate_socket(ChardevSo=
-cket *sock,
->              error_setg(errp, "%s", "Websocket client is not implemente=
-d");
->              return false;
->          }
-> -        if (sock->has_wait) {
-> +        if (sock->has_wait && sock->wait) {
->              error_setg(errp, "%s",
->                         "'wait' option is incompatible with "
->                         "socket in client connect mode");
->=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -164,22 +136,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB
+--uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0rxgACgkQp6FrSiUn
-Q2pdmwf7Br/xHtQLfu3jN9Yb0MD6vkz4P+KBYwQ7iCXaRR+4PKnUxWcvpOktlJJM
-/+4p3MC1l5naP1zJ6Ls3LJC3iirdahMmH0U0wLG/1WV9s5IMAlDCw/57Vu5TQ8AF
-Sp0VATl/bpMQ64D+uVFe+R1wridVlYRYKmC/2vq1A2fTl1xKNhYvYBKmQnnDHeVL
-tX51/adCTqdOIa4tqPtG/5hexPk7mLtNgG5uvqfrP1KNrmHAVMRnEjYgaaxElhP2
-WeJsz3x1Ohgl6btqX7Bwnpyuhauw8AeuLVIrQNtspwT0u+oBgP1O+uXQwC7TGo8t
-JeIEyrzk6g4Wl7eWkLAt+BR4Z8AjQQ==
-=+2DL
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0r2kACgkQp6FrSiUn
+Q2ozeAgAh3biQhs4LnSt79eobttIx/gJf8bRlna/i+uyJr+DTPAr9WEQT+a+EYiF
+CrNXeau3Xc9yNA7MGCHu3rOo5OsVk3FnPTEGUZnUc1SMf6prjrpP6kBhG+rlYWV2
+TPsCvXyHKue6xLZPG107jTuDDWM4lhHF5xxpnSw2yybwZn9AOI01azTIkxMXbR7K
+JwufCzjibPnfzDjr0EjLlBg3JERMIDgWZEWKpNHnboG/qJjIKDt9EuAsyU5huDQj
+4SjNBX0ulqai5zMPJ8lgO0V1zDeDLGe0dfDdgtnaGPRSesZFCaQSn0iqthElMRfO
+UYZr8xCVf0VOV+D3w9Si62AtWjjyoA==
+=VYFn
 -----END PGP SIGNATURE-----
 
---iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB--
+--uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL--
 
