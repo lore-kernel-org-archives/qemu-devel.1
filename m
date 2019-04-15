@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48404)
+Received: from eggs.gnu.org ([209.51.188.92]:48415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-00055h-Vd
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:00 -0400
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27U-000562-FG
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-0007xV-38
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:57:59 -0400
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-0007xv-Jr
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:00 -0400
 From: Maxim Levitsky <mlevitsk@redhat.com>
-Date: Mon, 15 Apr 2019 16:57:42 +0300
-Message-Id: <20190415135746.7571-2-mlevitsk@redhat.com>
-In-Reply-To: <20190415135746.7571-1-mlevitsk@redhat.com>
-References: <20190415135746.7571-1-mlevitsk@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] block/nvme: don't flip CQ phase bits
+Date: Mon, 15 Apr 2019 16:57:41 +0300
+Message-Id: <20190415135746.7571-1-mlevitsk@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] Few fixes for userspace NVME driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,26 +20,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 
-Phase bits are only set by the hardware to indicate new completions
-and not by the device driver.
+CC: Fam Zheng <fam@euphon.net>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: qemu-devel@nongnu.org
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 0684bbd077..2d208000df 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -340,8 +340,6 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
-         qemu_mutex_lock(&q->lock);
-         c->cid = cpu_to_le16(0);
-         q->inflight--;
--        /* Flip Phase Tag bit. */
--        c->status = cpu_to_le16(le16_to_cpu(c->status) ^ 0x1);
-         progress = true;
-     }
-     if (progress) {
+Hi!
+These are few assorted fixes and features for the userspace
+nvme driver.
+
+Tested that on my laptop with my Samsung X5 thunderbolt drive, which
+happens to have 4K sectors, support for discard and write zeros.
+
+Also bunch of fixes sitting in my queue from the period when I developed
+the nvme-mdev driver.
+
+Best regards,
+	Maxim Levitsky
+
+Maxim Levitsky (5):
+  block/nvme: don't flip CQ phase bits
+  block/nvme: fix doorbell stride
+  block/nvme: support larger that 512 bytes sector devices
+  block/nvme: add support for write zeros
+  block/nvme: add support for discard
+
+ block/nvme.c         | 194 +++++++++++++++++++++++++++++++++++++++++--
+ block/trace-events   |   3 +
+ include/block/nvme.h |  17 +++-
+ 3 files changed, 204 insertions(+), 10 deletions(-)
+
 -- 
 2.17.2
