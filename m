@@ -1,43 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34921)
+Received: from eggs.gnu.org ([209.51.188.92]:35779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hFybj-0000qO-DY
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:13:00 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfn-0001we-Vx
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hFybi-0007C5-4O
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:12:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hFybh-0007BA-C9
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:12:57 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3FA9jVg075140
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 06:12:53 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rvnckr5k1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 06:12:53 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Mon, 15 Apr 2019 11:12:52 +0100
-References: <155323635511.18748.18133954505098138975.stgit@aravinda>
-	<155323645659.18748.12592305605497011547.stgit@aravinda>
-	<20190325063205.GQ29295@umbus>
-	<9da8a51d-106c-410e-fa88-d37dceb0c9e1@linux.vnet.ibm.com>
-	<20190325233319.GD9393@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Mon, 15 Apr 2019 15:42:46 +0530
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfn-00024x-0w
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:11 -0400
+Received: from forwardcorp1p.mail.yandex.net
+	([2a02:6b8:0:1472:2741:0:8b6:217]:54254)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyfm-00022f-FL
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:17:10 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190415101101.GF5718@redhat.com>
+References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+	<20190411120421.GP3641@redhat.com>
+	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415101101.GF5718@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190325233319.GD9393@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <93ee6877-b487-1733-a368-3887f105f5a3@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v7 5/6] ppc: spapr: Enable FWNMI
- capability
+Date: Mon, 15 Apr 2019 13:17:06 +0300
+Message-Id: <251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,119 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, aik@au1.ibm.com, qemu-devel@nongnu.org, mahesh@linux.vnet.ibm.com
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-
-
-On Tuesday 26 March 2019 05:03 AM, David Gibson wrote:
-> On Mon, Mar 25, 2019 at 02:27:45PM +0530, Aravinda Prasad wrote:
+15.04.2019, 13:11, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
+> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
+>> =C2=A0Hi,
 >>
+>> =C2=A0Just to clarify. I see two possible solutions:
 >>
->> On Monday 25 March 2019 12:02 PM, David Gibson wrote:
->>> On Fri, Mar 22, 2019 at 12:04:16PM +0530, Aravinda Prasad wrote:
->>>> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
->>>> the KVM causes guest exit with NMI as exit reason
->>>> when it encounters a machine check exception on the
->>>> address belonging to a guest. Without this capability
->>>> enabled, KVM redirects machine check exceptions to
->>>> guest's 0x200 vector.
->>>>
->>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>> ---
->>>>  hw/ppc/spapr_rtas.c  |   15 +++++++++++++++
->>>>  target/ppc/kvm.c     |   14 ++++++++++++++
->>>>  target/ppc/kvm_ppc.h |    6 ++++++
->>>>  3 files changed, 35 insertions(+)
->>>>
->>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->>>> index fb594a4..939f428 100644
->>>> --- a/hw/ppc/spapr_rtas.c
->>>> +++ b/hw/ppc/spapr_rtas.c
->>>> @@ -49,6 +49,7 @@
->>>>  #include "hw/ppc/fdt.h"
->>>>  #include "target/ppc/mmu-hash64.h"
->>>>  #include "target/ppc/mmu-book3s-v3.h"
->>>> +#include "kvm_ppc.h"
->>>>  
->>>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>>>                                     uint32_t token, uint32_t nargs,
->>>> @@ -354,6 +355,20 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->>>>                                    target_ulong args,
->>>>                                    uint32_t nret, target_ulong rets)
->>>>  {
->>>> +    int ret;
->>>> +
->>>> +    ret = kvmppc_fwnmi_enable(cpu);
->>>> +
->>>> +    if (ret == 1) {
->>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->>>
->>> Urgh, we're here making a guest visible different to the environment
->>> depending on a host (KVM) capability.  What happens if you start a
->>> guest and it registers fwnmi support, then migrate it to a host that
->>> lacks the necessary KVM support?
->>
->> I just checked how such scenarios are handled for other KVM
->> capabilities. Should I need to add an Spapr cap for this?
-> 
-> Yes, I think that's what we'll need to do.
+>> =C2=A01) Since the migration code doesn't receive fd, it isn't respons=
+ible for
+>> =C2=A0closing it. So, it may be better to use migrate_fd_param for bot=
+h
+>> =C2=A0incoming/outgoing and add dupping for migrate_fd_param. Thus, cl=
+ients must
+>> =C2=A0close the fd themselves. But existing clients will have a leak.
+>
+> We can't break existing clients in this way as they are correctly
+> using the monitor with its current semantics.
+>
+>> =C2=A02) If we don't duplicate fd, then at least we should remove fd f=
+rom
+>> =C2=A0the corresponding list. Therefore, the solution is to fix qemu_c=
+lose to find
+>> =C2=A0the list and remove fd from it. But qemu_close is currently cons=
+istent with
+>> =C2=A0qemu_open (which opens/dups fd), so adding additional logic migh=
+t not be
+>> =C2=A0a very good idea.
+>
+> qemu_close is not appropriate place to deal with something speciifc
+> to the montor.
+>
+>> =C2=A0I don't see any other solution, but I might miss something.
+>> =C2=A0What do you think?
+>
+> All callers of monitor_get_fd() will close() the FD they get back.
+> Thus monitor_get_fd() should remove it from the list when it returns
+> it, and we should add API docs to monitor_get_fd() to explain this.
+>
+Ok, it sounds reasonable. But monitor_get_fd is only about outgoing migra=
+tion.
+But what about the incoming migration? It doesn't use monitor_get_fd but =
+just
+converts input string to int and use it as fd.
 
-I was looking into SPAPR Cap, and I am not sure that the following code
-will help in handling the migration. I need some help here.
-
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index edc5ed0..ef96192 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -473,6 +473,15 @@ static void cap_ccf_assist_apply(SpaprMachineState
-*spapr, uint8_t val,
-     }
- }
-
-+static void cap_machine_check_apply(SpaprMachineState *spapr, uint8_t val,
-+                                    Error **errp)
-+{
-+    if (kvm_enabled()) {
-+        if (kvmppc_fwnmi_enable(cpu)) {
-+            error_setg(errp, "Unable to enable fwnmi capability");
-+    }
-+}
-+
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-         .name = "htm",
-@@ -571,6 +580,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "bool",
-         .apply = cap_ccf_assist_apply,
-     },
-+    [SPAPR_CAP_MACHINE_CHECK] = {
-+        .name = "machine-check",
-+        .description = "Handle machine check exceptions",
-+        .index = SPAPR_CAP_MACHINE_CHECK,
-+        .get = spapr_cap_get_bool,
-+        .set = spapr_cap_set_bool,
-+        .type = "bool",
-+        .apply = cap_machine_check_apply,
-+    },
- };
-
- static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-@@ -706,6 +724,7 @@ SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
- SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
- SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
- SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-+SPAPR_CAP_MIG_STATE(mce, SPAPR_CAP_MACHINE_CHECK);
-
- void spapr_caps_init(SpaprMachineState *spapr)
- {
-
-
-Or is it that just adding SPAPR_CAP_MIG_STATE(mce,
-SPAPR_CAP_MACHINE_CHECK); is enough as it is checking or cap values?
-
-> 
-
--- 
 Regards,
-Aravinda
+Yury
