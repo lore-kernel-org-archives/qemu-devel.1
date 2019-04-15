@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52817)
+Received: from eggs.gnu.org ([209.51.188.92]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG09L-000253-LD
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:51:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hG0JV-0003z7-LE
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG09K-0003fN-5z
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 07:51:47 -0400
-Date: Mon, 15 Apr 2019 13:51:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190415135126.2fa9b12b.cohuck@redhat.com>
-In-Reply-To: <20190301093902.27799-1-cohuck@redhat.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1hG0JU-00036E-MI
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hG0JU-00035h-H9
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:02:16 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 15 Apr 2019 13:02:05 +0100
+Message-Id: <20190415120205.2221-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] vfio-ccw: support hsch/csch (kernel
- part)
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] slirp: Gcc 9 -O3 fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org, samuel.thibault@gnu.org, jan.kiszka@siemens.com
 
-On Fri,  1 Mar 2019 10:38:56 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> [This is the Linux kernel part, git tree is available at
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
-> 
-> The companion QEMU patches are available at
-> https://github.com/cohuck/qemu vfio-ccw-caps]
-> 
-> Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
-> device. This tends to work well for the most common 'good path' scenarios;
-> however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
-> clearing pending requests at the device is currently not supported.
-> This may be a problem for e.g. error recovery.
-> 
-> This patch series introduces capabilities (similar to what vfio-pci uses)
-> and exposes a new async region for handling hsch/csch.
+Gcc 9 needs some convincing that sopreprbuf really is going to fill
+in iov in the call from soreadbuf, even though the failure case
+shouldn't happen.
 
-One more gentle ping for an ack/r-b for patches 4 and 6.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ slirp/src/socket.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I could go ahead and merge patches 1-3 and then patches 1+3 of Farhan's
-series, but I'd really like to merge patches 4-6 as well so I can later
-merge the QEMU part after a headers update to 5.2-rc...
+diff --git a/slirp/src/socket.c b/slirp/src/socket.c
+index 4a3c935e25..beb8517f1c 100644
+--- a/slirp/src/socket.c
++++ b/slirp/src/socket.c
+@@ -181,7 +181,7 @@ soread(struct socket *so)
+ 	 * No need to check if there's enough room to read.
+ 	 * soread wouldn't have been called if there weren't
+ 	 */
+-	sopreprbuf(so, iov, &n);
++	assert(sopreprbuf(so, iov, &n) !=3D 0);
+=20
+ 	nn =3D recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+ 	if (nn <=3D 0) {
+@@ -257,6 +257,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
+ size)
+ 	 * No need to check if there's enough room to read.
+ 	 * soread wouldn't have been called if there weren't
+ 	 */
++	assert(size > 0);
+ 	if (sopreprbuf(so, iov, &n) < size)
+         goto err;
+=20
+--=20
+2.21.0
