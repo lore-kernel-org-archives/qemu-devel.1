@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34087)
+Received: from eggs.gnu.org ([209.51.188.92]:34458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFyXa-0007KK-2r
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1hFya1-00087z-OW
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hFyXZ-0004H9-3D
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:42 -0400
-Received: from mail-eopbgr60116.outbound.protection.outlook.com
-	([40.107.6.116]:57653
-	helo=EUR04-DB3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hFyXY-0004Ff-Fr
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:08:41 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 15 Apr 2019 10:08:37 +0000
-Message-ID: <3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
-References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
-	<87zhorbytu.fsf@dusky.pond.sub.org>
-In-Reply-To: <87zhorbytu.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7774EB8D66BDF24F991100838D37B379@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1hFya0-00063g-65
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:11:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hFyZz-00062O-0d
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:11:11 -0400
+Date: Mon, 15 Apr 2019 11:11:01 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190415101101.GF5718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
+	<20190411120421.GP3641@redhat.com>
+	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
- error_abort
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-MTUuMDQuMjAxOSA4OjUxLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gVmxhZGltaXIgU2Vt
-ZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+IA0K
-Pj4gSXQgd291bGQgYmUgbmljZSB0byBoYXZlIEVycm9yIG9iamVjdCBub3QgZnJlZWQgYXdheSB3
-aGVuIGRlYnVnZ2luZyBhDQo+PiBjb3JlZHVtcC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAt
-LS0NCj4+ICAgdXRpbC9lcnJvci5jIHwgOCArKysrKy0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwg
-NSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS91dGls
-L2Vycm9yLmMgYi91dGlsL2Vycm9yLmMNCj4+IGluZGV4IDkzNGE3OGUxYjEuLmY5MTgwYzBmMzAg
-MTAwNjQ0DQo+PiAtLS0gYS91dGlsL2Vycm9yLmMNCj4+ICsrKyBiL3V0aWwvZXJyb3IuYw0KPj4g
-QEAgLTMyLDkgKzMyLDExIEBAIEVycm9yICplcnJvcl9mYXRhbDsNCj4+ICAgc3RhdGljIHZvaWQg
-ZXJyb3JfaGFuZGxlX2ZhdGFsKEVycm9yICoqZXJycCwgRXJyb3IgKmVycikNCj4+ICAgew0KPj4g
-ICAgICAgaWYgKGVycnAgPT0gJmVycm9yX2Fib3J0KSB7DQo+PiAtICAgICAgICBmcHJpbnRmKHN0
-ZGVyciwgIlVuZXhwZWN0ZWQgZXJyb3IgaW4gJXMoKSBhdCAlczolZDpcbiIsDQo+PiAtICAgICAg
-ICAgICAgICAgIGVyci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSk7DQo+PiAtICAgICAgICBl
-cnJvcl9yZXBvcnRfZXJyKGVycik7DQo+PiArICAgICAgICBlcnJvcl9yZXBvcnQoIlVuZXhwZWN0
-ZWQgZXJyb3IgaW4gJXMoKSBhdCAlczolZDogJXMiLA0KPj4gKyAgICAgICAgICAgICAgICAgICAg
-IGVyci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSwgZXJyb3JfZ2V0X3ByZXR0eShlcnIpKTsN
-Cj4+ICsgICAgICAgIGlmIChlcnItPmhpbnQpIHsNCj4+ICsgICAgICAgICAgICBlcnJvcl9wcmlu
-dGZfdW5sZXNzX3FtcCgiJXMiLCBlcnItPmhpbnQtPnN0cik7DQo+PiArICAgICAgICB9DQo+PiAg
-ICAgICAgICAgYWJvcnQoKTsNCj4+ICAgICAgIH0NCj4+ICAgICAgIGlmIChlcnJwID09ICZlcnJv
-cl9mYXRhbCkgew0KPiANCj4gTm8gb2JqZWN0aW9ucyB0byBub3QgZnJlZWluZyB0aGUgZXJyb3Ig
-b2JqZWN0IG9uIHRoZSBwYXRoIHRvIGFib3J0KCkuDQo+IA0KPiBZb3UgYWxzbyBmb3JtYXQgdGhl
-IGVycm9yIG1lc3NhZ2UgZGlmZmVyZW50bHkuICBDb21taXQgMWU5YjY1YmIxYmEncw0KPiBleGFt
-cGxlDQo+IA0KPiAgICAgICAgICBVbmV4cGVjdGVkIGVycm9yIGluIHBhcnNlX2Jsb2NrX2Vycm9y
-X2FjdGlvbigpIGF0IC4uLi9xZW11L2Jsb2NrZGV2LmM6MzIyOg0KPiAgICAgICAgICBxZW11LXN5
-c3RlbS14ODZfNjQ6IC1kcml2ZSBpZj1ub25lLHdlcnJvcj1mb286ICdmb28nIGludmFsaWQgd3Jp
-dGUgZXJyb3IgYWN0aW9uDQo+ICAgICAgICAgIEFib3J0ZWQgKGNvcmUgZHVtcGVkKQ0KPiANCj4g
-Y2hhbmdlcyB0byAoZ3Vlc3N3b3JrLCBub3QgdGVzdGVkKToNCj4gDQo+ICAgICAgICAgIHFlbXUt
-c3lzdGVtLXg4Nl82NDogLWRyaXZlIGlmPW5vbmUsd2Vycm9yPWZvbzogVW5leHBlY3RlZCBlcnJv
-ciBpbiBwYXJzZV9ibG9ja19lcnJvcl9hY3Rpb24oKSBhdCAuLi4vcWVtdS9ibG9ja2Rldi5jOjMy
-MjogJ2ZvbycgaW52YWxpZCB3cml0ZSBlcnJvciBhY3Rpb24NCj4gICAgICAgICAgQWJvcnRlZCAo
-Y29yZSBkdW1wZWQpDQoNCmhtLiBjaGVja3BhdGNoIGRvbid0IGFsbG93IHRvIHB1dCBcbiBpbnRv
-IGVycm9yX3JlcG9ydC4gU28sIHNob3VsZCBJIGNhbGwgZXJyb3JfcmVwb3J0IHR3aWNlPw0KDQpU
-cmFuc2l0aW9uIGZyb20gZnByaW50ZiB0byBlcnJvcl9yZXBvcnQgaXMgT0sgZm9yIHlvdT8NCg0K
-PiANCj4gSW50ZW50aW9uYWw/ICBJdCBtYWtlcyBzZW5zZSBhcyBhbiBlcnJvciBtZXNzYWdlLCBi
-dXQgcmVhZGFiaWxpdHkNCj4gc3VmZmVycyBkdWUgdG8gdGhlIGxvbmcgbGluZS4gIElmIHdlIGRl
-Y2lkZSB3ZSB3YW50IHRoaXMgY2hhbmdlLCBpdA0KPiBuZWVkcyB0byBiZSBtZW50aW9uZWQgaW4g
-dGhlIGNvbW1pdCBtZXNzYWdlLg0KPiANCj4gT3Blbi1jb2RpbmcgZXJyb3JfcmVwb3J0X2Vycigp
-IGhlcmUgc28geW91IGNhbiBkZWxldGUgdGhlIGVycm9yX2ZyZWUoKQ0KPiBhbmQgYSBuZXdsaW5l
-IGlzIGEgYml0IHVnbHksIGJ1dCBmYWN0b3Jpbmcgb3V0IHRoZSBjb21tb24gcGFydCBkb2Vzbid0
-DQo+IHNlZW0gd29ydGh3aGlsZS4NCj4gDQo+IEhtbSwgcGVyaGFwcyBmYWN0b3Jpbmcgb3V0DQo+
-IA0KPiAgICAgICAgICBpZiAoZXJyLT5oaW50KSB7DQo+ICAgICAgICAgICAgICBlcnJvcl9wcmlu
-dGZfdW5sZXNzX3FtcCgiJXMiLCBlcnItPmhpbnQtPnN0cik7DQo+ICAgICAgICAgIH0NCj4gDQo+
-IGludG8gYSBzdGF0aWMgaGVscGVyIHdvdWxkIGJlIHdvcnRod2hpbGUuICBXZSBhbHJlYWR5IGhh
-dmUgdHdvIGNvcGllcy4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
+> Hi,
+> 
+> Just to clarify. I see two possible solutions:
+> 
+> 1) Since the migration code doesn't receive fd, it isn't responsible for
+> closing it. So, it may be better to use migrate_fd_param for both
+> incoming/outgoing and add dupping for migrate_fd_param. Thus, clients must
+> close the fd themselves. But existing clients will have a leak.
+
+We can't break existing clients in this way as they are correctly
+using the monitor with its current semantics.
+
+> 2) If we don't duplicate fd, then at least we should remove fd from
+> the corresponding list. Therefore, the solution is to fix qemu_close to find
+> the list and remove fd from it. But qemu_close is currently consistent with
+> qemu_open (which opens/dups fd), so adding additional logic might not be
+> a very good idea.
+
+qemu_close is not appropriate place to deal with something speciifc
+to the montor.
+
+> I don't see any other solution, but I might miss something.
+> What do you think?
+
+All callers of monitor_get_fd() will close() the FD they get back.
+Thus monitor_get_fd() should remove it from the list when it returns
+it, and we should add API docs to monitor_get_fd() to explain this.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
