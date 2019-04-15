@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38437)
+Received: from eggs.gnu.org ([209.51.188.92]:38996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG1J0-0005gD-8f
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:05:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1hG1Lt-0006Su-Pa
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG1Iu-0007eg-Hc
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:05:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53762)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hG1Iu-0007be-8f
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:05:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hG1Is-0007hg-LY
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 13:05:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9B8802E8058
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 13:05:42 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1hG1Ls-0001Vh-Nk
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:08:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hG1Ls-0001V0-DJ
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:08:48 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
+	<87zhorbytu.fsf@dusky.pond.sub.org>
+	<3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
+Date: Mon, 15 Apr 2019 15:08:44 +0200
+In-Reply-To: <3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com> (Vladimir
+	Sementsov-Ogievskiy's message of "Mon, 15 Apr 2019 10:08:37 +0000")
+Message-ID: <874l6za00z.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Apr 2019 12:59:20 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1805256@bugs.launchpad.net>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <155533316061.20414.16005295920588400536.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
- ARM system
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
+ error_abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,95 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi, I also found a problem that qemu-img convert hands in ARM.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-The convert command line is "qemu-img convert -f qcow2 -O raw disk.qcow2
-disk.raw ".
+> 15.04.2019 8:51, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>> 
+>>> It would be nice to have Error object not freed away when debugging a
+>>> coredump.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   util/error.c | 8 +++++---
+>>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/util/error.c b/util/error.c
+>>> index 934a78e1b1..f9180c0f30 100644
+>>> --- a/util/error.c
+>>> +++ b/util/error.c
+>>> @@ -32,9 +32,11 @@ Error *error_fatal;
+>>>   static void error_handle_fatal(Error **errp, Error *err)
+>>>   {
+>>>       if (errp == &error_abort) {
+>>> -        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
+>>> -                err->func, err->src, err->line);
+>>> -        error_report_err(err);
+>>> +        error_report("Unexpected error in %s() at %s:%d: %s",
+>>> +                     err->func, err->src, err->line, error_get_pretty(err));
+>>> +        if (err->hint) {
+>>> +            error_printf_unless_qmp("%s", err->hint->str);
+>>> +        }
+>>>           abort();
+>>>       }
+>>>       if (errp == &error_fatal) {
+>> 
+>> No objections to not freeing the error object on the path to abort().
+>> 
+>> You also format the error message differently.  Commit 1e9b65bb1ba's
+>> example
+>> 
+>>          Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322:
+>>          qemu-system-x86_64: -drive if=none,werror=foo: 'foo' invalid write error action
+>>          Aborted (core dumped)
+>> 
+>> changes to (guesswork, not tested):
+>> 
+>>          qemu-system-x86_64: -drive if=none,werror=foo: Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322: 'foo' invalid write error action
+>>          Aborted (core dumped)
+>
+> hm. checkpatch don't allow to put \n into error_report. So, should I call error_report twice?
+>
+> Transition from fprintf to error_report is OK for you?
 
-The bt is below:
+Let's simply not mess with the formatting at all.  Something like:
 
-Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
-#0 0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
-#1 0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
-#2 0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at util/c=
-ompatfd.c:37
-#3 0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5163=
-b90) at util/qemu_thread_posix.c:496
-#4 0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
-#5 0x000040000a492b2c in thread_start () from /lib64/libc.so.6
+(1) Inline error_report_err(), delete the error_free()
 
-Thread 1 (Thread 0x40000b573370 (LWP 27214)):
-#0 0x000040000a489020 in ppoll () from /lib64/libc.so.6
-#1 0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<opti=
-mized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
-#2 qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=3D<=
-optimized out>) at qemu_timer.c:391
-#3 0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized out>)=
- at main_loop.c:272
-#4 0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) at =
-main_loop.c:534
-#5 0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-img.c=
-:1923
-#6 0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<optim=
-ized out>) at qemu-img.c:2414
-#7 0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu-im=
-g.c:5305
+(2) Optional: replace fprintf() by error_printf()
 
+(3) Optional: clean up the additional copy of
 
-Do you find the cause of the problem and fix it? Thanks for your reply!
+        if (err->hint) {
+            error_printf_unless_qmp("%s", err->hint->str);
+        }
 
--- =
+(3a) Either create a helper function, replacing all three copies,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on high core count ARM system
-
-Status in QEMU:
-  New
-
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+(3b) Or simply delete the new copy from the path leading to abort(),
+     since the hint is unlikely to be useful there.
