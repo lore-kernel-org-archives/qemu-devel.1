@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58653)
+Received: from eggs.gnu.org ([209.51.188.92]:59459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG2x8-0006kG-Qi
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:51:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hG2zm-0000Ui-P8
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG2x7-0006IU-MI
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:51:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hG2x7-0006CN-Df
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:51:21 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hG2x5-0007cw-KL
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 14:51:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 98C182E80C8
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 14:51:19 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1hG2zl-0007oI-Gx
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:54:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hG2zj-0007nI-H3
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:54:03 -0400
+Date: Mon, 15 Apr 2019 15:53:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190415145358.GA2893@work-vm>
+References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Apr 2019 14:37:48 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1805256@bugs.launchpad.net>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <155533906888.20945.8956440137997885649.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
- ARM system
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
+Subject: Re: [Qemu-devel] How live migration work for vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: fengyd <fengyd81@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-sorry, I make a spelling mistake here=EF=BC=88"Hi, I also found a problem t=
-hat
-qemu-img convert hands in ARM."=EF=BC=89.The right is "I also found a probl=
-em
-that qemu-img convert hangs in ARM".
+* fengyd (fengyd81@gmail.com) wrote:
+> Hi,
+> 
+> During live migration,  the folloing log can see in nova-compute.log in my
+> environment:
+>  ERROR nova.virt.libvirt.driver [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
+> 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e - default
+> default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live Migration
+> failure: internal error: qemu unexpectedly closed the monitor:
+> 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
+> size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+> 
+> It's OK for standard Linux VM, but not OK for our VM where virtio is
+> implemented by ourself.
+> KVM version as follow:
+> qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
+> qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
+> libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+> 
+> Do you know what's the difference between virtio and vhost-user during
+> migration?
+> The function virtio_load in Qemu is called for virtio and vhost-user during
+> migration.
+> For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
+> responsible for updating their values accordingly
+> For vhost-user, last_avail_idx  and used_idx are stored in vhost-user app,
+> eg. DPDK, not in Qemu?
+> How does migration work for vhost-user?
 
--- =
+I don't know the details, but my understanding is that vhost-user
+tells the vhost-user client about an area of 'log' memory, where the
+vhost-user client must mark pages as dirty.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+In the qemu source, see docs/interop/vhost-user.txt and see
+the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
 
-Title:
-  qemu-img hangs on high core count ARM system
+If the client correctly marks the areas as dirty, then qemu
+should resend those pages across.
 
-Status in QEMU:
-  New
 
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
+Dave
 
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+> Thanks in advance
+> Yafeng
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
