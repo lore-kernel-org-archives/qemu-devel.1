@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55671)
+Received: from eggs.gnu.org ([209.51.188.92]:55745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hG4KU-0005BM-SI
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1hG4Kc-0005F5-9o
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hG4KP-0002mF-Pl
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39922)
+	(envelope-from <eblake@redhat.com>) id 1hG4Kb-00033I-CV
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hG4KJ-0002VE-M2
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:27 -0400
-Date: Mon, 15 Apr 2019 17:19:13 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190415161913.GQ5718@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190415160609.24240-1-marcandre.lureau@redhat.com>
-	<20190415160809.GP5718@redhat.com>
-	<CAJ+F1CJwW-20YWbYgcHGhtBDZnHGAHSrj-OHht0hFb5O8ndsFQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hG4Ka-00031x-UF
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:41 -0400
+References: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <86b16e27-781b-d298-a1c8-afd27972f000@redhat.com>
+Date: Mon, 15 Apr 2019 11:19:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJwW-20YWbYgcHGhtBDZnHGAHSrj-OHht0hFb5O8ndsFQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] socket: allow wait=false for client
- socket
+In-Reply-To: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB"
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] socket: allow wait=false for
+ client socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Apr 15, 2019 at 06:16:33PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> On Mon, Apr 15, 2019 at 6:08 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > On Mon, Apr 15, 2019 at 06:06:09PM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > Commit 767abe7 ("chardev: forbid 'wait' option with client sockets"=
-)
-> > > is a bit too strict. Current libvirt always set wait=3Dfalse, and w=
-ill
-> > > thus fail to add client chardev.
-> > >
-> > > Make the code more permissive, allowing wait=3Dfalse with client so=
-cket
-> > > chardevs.
-> > >
-> > > Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
-> > > Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  chardev/char-socket.c | 10 +++++++---
-> > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > > index 3916505d67..ebc1adb83e 100644
-> > > --- a/chardev/char-socket.c
-> > > +++ b/chardev/char-socket.c
-> > > @@ -1263,9 +1263,13 @@ static bool qmp_chardev_validate_socket(Char=
-devSocket *sock,
-> > >              return false;
-> > >          }
-> > >          if (sock->has_wait) {
-> > > -            error_setg(errp, "%s",
-> > > -                       "'wait' option is incompatible with "
-> > > -                       "socket in client connect mode");
-> > > +            warn_report("'wait' option is deprecated with "
-> > > +                        "socket in client connect mode");
-> > > +            if (sock->wait) {
-> > > +                error_setg(errp, "%s",
-> > > +                           "'wait' option is incompatible with "
-> > > +                           "socket in client connect mode");
-> > > +            }
-> > >              return false;
-> > >          }
-> > >      }
-> >
-> > NB, it should also update qemu-deprecated.texi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <86b16e27-781b-d298-a1c8-afd27972f000@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] socket: allow wait=false for client
+ socket
+References: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190415154906.14621-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/15/19 10:49 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
+> is a bit too strict. Current libvirt always set wait=3Dfalse, and will
+> thus fail to add client chardev.
 >=20
-> Is that clear enough?
+> Make the code more permissive, allowing wait=3Dfalse with client socket=
+
+> chardevs.
 >=20
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 2219386769..0f53d1c228 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -105,6 +105,12 @@ details.
->  The ``query-events'' command has been superseded by the more powerful
->  and accurate ``query-qmp-schema'' command.
+> Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char-socket.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+According to Fixes, this is a regression in 4.0. Is it worth having this
+fix in -rc4?
+
 >=20
-> +@subsection chardev client socket with 'wait' option (since 4.0)
-> +
-> +The ``chardev-add'' and ``chardev-change'' should not be used to
-> +create client sockets with a ``wait'' field, which is reserved for
-> +server sockets only.
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 3916505d67..2ad9c9eea5 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -1262,7 +1262,7 @@ static bool qmp_chardev_validate_socket(ChardevSo=
+cket *sock,
+>              error_setg(errp, "%s", "Websocket client is not implemente=
+d");
+>              return false;
+>          }
+> -        if (sock->has_wait) {
+> +        if (sock->has_wait && sock->wait) {
+>              error_setg(errp, "%s",
+>                         "'wait' option is incompatible with "
+>                         "socket in client connect mode");
+>=20
 
-It applies to command line syntax too, so I would just generalize that
-a little to
-
- "Character devices creating sockets in client mode should not
-  specify the 'wait' field, which is only applicable to sockets
-  in server mode"
-
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0rxgACgkQp6FrSiUn
+Q2pdmwf7Br/xHtQLfu3jN9Yb0MD6vkz4P+KBYwQ7iCXaRR+4PKnUxWcvpOktlJJM
+/+4p3MC1l5naP1zJ6Ls3LJC3iirdahMmH0U0wLG/1WV9s5IMAlDCw/57Vu5TQ8AF
+Sp0VATl/bpMQ64D+uVFe+R1wridVlYRYKmC/2vq1A2fTl1xKNhYvYBKmQnnDHeVL
+tX51/adCTqdOIa4tqPtG/5hexPk7mLtNgG5uvqfrP1KNrmHAVMRnEjYgaaxElhP2
+WeJsz3x1Ohgl6btqX7Bwnpyuhauw8AeuLVIrQNtspwT0u+oBgP1O+uXQwC7TGo8t
+JeIEyrzk6g4Wl7eWkLAt+BR4Z8AjQQ==
+=+2DL
+-----END PGP SIGNATURE-----
+
+--iFdUrPtVr1DKGQXpaa6M0wHa7v8rkKZrB--
