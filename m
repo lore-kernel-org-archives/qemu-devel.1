@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27DE6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 04:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B84E7C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 04:15:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A0C20825
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 04:07:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65B3C2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 04:15:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PZ5Pjwet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A0C20825
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mHa6LBoi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B3C2075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44335 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44379 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFstn-0004SR-MB
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 00:07:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53674)
+	id 1hFt1M-0005fO-ID
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 00:15:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hFsss-000456-TS
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:06:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hFt0V-0005KZ-Hx
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hFssr-0005T9-G4
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:06:18 -0400
-Received: from ozlabs.org ([203.11.71.1]:36327)
+	(envelope-from <dgibson@ozlabs.org>) id 1hFt0U-00023c-Bo
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:14:11 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41125 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hFsso-0005MP-Ox; Mon, 15 Apr 2019 00:06:17 -0400
+	id 1hFt0T-00022v-K7; Mon, 15 Apr 2019 00:14:10 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44jFKq6Thcz9s55; Mon, 15 Apr 2019 14:06:07 +1000 (AEST)
+	id 44jFW06Sdcz9s55; Mon, 15 Apr 2019 14:14:04 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1555301167;
-	bh=RprUIPcxamsEw+t7nNOxd9VNXohKcjWZ8VWEYOJ00Vc=;
+	d=gibson.dropbear.id.au; s=201602; t=1555301644;
+	bh=Kq1YhRnw+B1M8UhZGeVaZpUlyfKqWV/Z9DZFLD6YDcU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PZ5PjwetfRrvIow5NyyeXcEJFKo++hyZg5uQOjjm3RkHmeYgBYEjMh6ri0whFofWm
-	2sw3uhJ/CRR+LRJCCeMRrFQSkvPhxDxxc7RpksETaPGzxXmjUAHcVGwpteXGhTppqb
-	OR5mM+wX3Hz2wKQMqZl1ZBI+Wa+IlQBAKQAvDzsw=
-Date: Mon, 15 Apr 2019 13:38:36 +1000
+	b=mHa6LBoinycTUfT38gq3cxwLM9v+3bWB0H81vYyHFMDOVdZ9db4HBnWps4sZThmyh
+	k7jv0Gaf6yDbWIS45n0yD9CeUAaKP7knferEGARv191yNCgYOehelbaTR4j0PdgmvP
+	odNUHEwcYXNAALxyEuSJBi9tRP0DvOdTF4//c6jk=
+Date: Mon, 15 Apr 2019 14:13:59 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190415033836.GD32705@umbus.fritz.box>
-References: <20190411080004.8690-1-clg@kaod.org>
-	<20190411080004.8690-6-clg@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Message-ID: <20190415041359.GE32705@umbus.fritz.box>
+References: <20190412093603.18232-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="T7mxYSe680VjQnyC"
+	protocol="application/pgp-signature"; boundary="CGDBiGfvSTbxKZlW"
 Content-Disposition: inline
-In-Reply-To: <20190411080004.8690-6-clg@kaod.org>
+In-Reply-To: <20190412093603.18232-1-npiggin@gmail.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE
- updates
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: add splpar hcalls H_JOIN, H_PROD,
+ H_CONFER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,151 +70,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415033836._11xA7EVZmuwKHqGUZtNPOd7AP4Qm3Q4wnQmymRqezk@z>
+Message-ID: <20190415041359.scWLPvkqM7c5ioDd1GoeZwp5dXWgcXhKeDitB93pn_g@z>
 
 
---T7mxYSe680VjQnyC
-Content-Type: text/plain; charset=iso-8859-1
+--CGDBiGfvSTbxKZlW
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2019 at 10:00:03AM +0200, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+On Fri, Apr 12, 2019 at 07:36:03PM +1000, Nicholas Piggin wrote:
+> These implementations have a few deficiencies that are noted, but are
+> good enough for Linux to use.
 >=20
-> On some architectures, PTE updates for dirty and changed bits need
-> to be performed atomically. This adds a couple of address_space_cmpxchg*
-> helpers for that purpose.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-But I think this needs to go past Paolo for review as memory subsystem main=
-tainer.
-
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  include/exec/memory_ldst.inc.h |  6 +++
->  memory_ldst.inc.c              | 80 ++++++++++++++++++++++++++++++++++
->  2 files changed, 86 insertions(+)
 >=20
-> diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst.in=
-c.h
-> index 272c20f02eae..f3cfa7e9a622 100644
-> --- a/include/exec/memory_ldst.inc.h
-> +++ b/include/exec/memory_ldst.inc.h
-> @@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq, SUFFIX)(ARG1_D=
-ECL,
->      hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
->  extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
->      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
-> +extern uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
-> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-> +    MemTxResult *result);
-> +extern uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
-> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-> +    MemTxResult *result);
->  extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
->      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
->  extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
-> diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-> index acf865b900d7..1d58d2fea67d 100644
-> --- a/memory_ldst.inc.c
-> +++ b/memory_ldst.inc.c
-> @@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_D=
-ECL,
->      RCU_READ_UNLOCK();
+> Cleaned up checkpatch warnings, sorry I didn't realise that exists.
+>=20
+>  hw/ppc/spapr_hcall.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 88 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8a736797b9..e985bb694d 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1065,6 +1065,90 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprM=
+achineState *spapr,
+>      return H_SUCCESS;
 >  }
 > =20
-> +/* This is meant to be used for atomic PTE updates under MT-TCG */
-> +uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
-> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
-> +    MemTxResult *result)
+> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                           target_ulong opcode, target_ulong *args)
 > +{
-> +    uint8_t *ptr;
-> +    MemoryRegion *mr;
-> +    hwaddr l =3D 4;
-> +    hwaddr addr1;
-> +    MemTxResult r;
-> +    uint8_t dirty_log_mask;
+> +    CPUPPCState *env =3D &cpu->env;
+> +    CPUState *cs =3D CPU(cpu);
 > +
-> +    /* Must test result */
-> +    assert(result);
-> +
-> +    RCU_READ_LOCK();
-> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-> +    if (l < 4 || !memory_access_is_direct(mr, true)) {
-> +        r =3D MEMTX_ERROR;
-> +    } else {
-> +        uint32_t orig =3D old;
-> +
-> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-> +        old =3D atomic_cmpxchg(ptr, orig, new);
-> +
-> +        if (old =3D=3D orig) {
-> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
-dr(mr) +
-> +                                                addr, 4, dirty_log_mask);
-> +        }
-> +        r =3D MEMTX_OK;
+> +    if (env->msr & (1ULL << MSR_EE)) {
+> +        return H_BAD_MODE;
 > +    }
-> +    *result =3D r;
-> +    RCU_READ_UNLOCK();
 > +
-> +    return old;
+> +    /*
+> +     * This should check for single-threaded mode. In practice, Linux
+> +     * does not try to H_JOIN all CPUs.
+> +     */
+> +
+> +    cs->halted =3D 1;
+> +    cs->exception_index =3D EXCP_HALTED;
+> +    cs->exit_request =3D 1;
+> +
+> +    return H_SUCCESS;
 > +}
 > +
-> +#ifdef CONFIG_ATOMIC64
-> +/* This is meant to be used for atomic PTE updates under MT-TCG */
-> +uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
-> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
-> +    MemTxResult *result)
+> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                           target_ulong opcode, target_ulong *args)
 > +{
-> +    uint8_t *ptr;
-> +    MemoryRegion *mr;
-> +    hwaddr l =3D 8;
-> +    hwaddr addr1;
-> +    MemTxResult r;
-> +    uint8_t dirty_log_mask;
+> +    target_long target =3D args[0];
+> +    CPUState *cs =3D CPU(cpu);
 > +
-> +    /* Must test result */
-> +    assert(result);
-> +
-> +    RCU_READ_LOCK();
-> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-> +    if (l < 8 || !memory_access_is_direct(mr, true)) {
-> +        r =3D MEMTX_ERROR;
-> +    } else {
-> +        uint32_t orig =3D old;
-> +
-> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-> +        old =3D atomic_cmpxchg(ptr, orig, new);
-> +
-> +        if (old =3D=3D orig) {
-> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
-> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
-> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
-dr(mr) +
-> +                                                addr, 8, dirty_log_mask);
-> +        }
-> +        r =3D MEMTX_OK;
+> +    /*
+> +     * This does not do a targeted yield or confer, but check the parame=
+ter
+> +     * anyway. -1 means confer to all/any other CPUs.
+> +     */
+> +    if (target !=3D -1 && !CPU(spapr_find_cpu(target))) {
+> +        return H_PARAMETER;
 > +    }
-> +    *result =3D r;
-> +    RCU_READ_UNLOCK();
 > +
-> +    return old;
+> +    /*
+> +     * H_CONFER with target =3D=3D this is not exactly the same as H_JOIN
+> +     * according to PAPR (e.g., MSR[EE] check and single threaded check
+> +     * is not done in this case), but unlikely to matter.
+> +     */
+> +    if (cpu =3D=3D spapr_find_cpu(target)) {
+> +        return h_join(cpu, spapr, opcode, args);
+> +    }
+> +
+> +    /*
+> +     * This does not implement the dispatch sequence check that PAPR cal=
+ls for,
+> +     * but PAPR also specifies a stronger implementation where the targe=
+t must
+> +     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a=
+ hard
+> +     * scheduling requirement implemented, there is no correctness reaso=
+n to
+> +     * implement the dispatch sequence check.
+> +     */
+> +    cs->exception_index =3D EXCP_YIELD;
+> +    cpu_loop_exit(cs);
+> +
+> +    return H_SUCCESS;
 > +}
-> +#endif /* CONFIG_ATOMIC64 */
 > +
->  /* warning: addr must be aligned */
->  static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
->      hwaddr addr, uint32_t val, MemTxAttrs attrs,
+> +/*
+> + * H_PROD and H_CONFER are specified to only modify GPR r3, which is not
+> + * achievable running under KVM,
+
+Uh.. why not?
+
+> although KVM already implements H_CONFER
+> + * this way.
+
+And this seems to contradict the above.
+
+> + */
+> +static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> +                           target_ulong opcode, target_ulong *args)
+> +{
+> +    target_long target =3D args[0];
+> +    CPUState *cs;
+> +
+> +    /*
+> +     * Should set the prod flag in the VPA.
+
+So.. why doesn't it?
+
+> +     */
+> +
+> +    cs =3D CPU(spapr_find_cpu(target));
+> +    if (!cs) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    cs->halted =3D 0;
+> +    qemu_cpu_kick(cs);
+> +
+> +    return H_SUCCESS;
+> +}
+> +
+>  static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>                             target_ulong opcode, target_ulong *args)
+>  {
+> @@ -1860,6 +1944,10 @@ static void hypercall_register_types(void)
+>      /* hcall-splpar */
+>      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+>      spapr_register_hypercall(H_CEDE, h_cede);
+> +    spapr_register_hypercall(H_CONFER, h_confer);
+> +    spapr_register_hypercall(H_JOIN, h_join);
+
+I don't see any sign that H_JOIN is implemented in KVM, although
+H_CONFER and H_PROD certainly are.
+
+> +    spapr_register_hypercall(H_PROD, h_prod);
+> +
+>      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+> =20
+>      /* processor register resource access h-calls */
+
+Don't we also need to add something to hypertas-calls to advertise the
+availability of these calls to the guest?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -223,25 +230,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---T7mxYSe680VjQnyC
+--CGDBiGfvSTbxKZlW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyz/LwACgkQbDjKyiDZ
-s5ITBA/7B++rfNXGxzMdEhVzEBjQwvOB3B10U55zNF2cbvSZrC68mNpTQCMq2Czj
-RtuXOAnB6PPJER4k+apLfj+jOnsoTEXNWi8uoXgEacO+3uEQygAaClys/aEP9yN0
-ZQwvZwn9Vwwn44SMKj9haxyrP+Sxr0pNxH8IIMlREdWilo1TA+f5AxeHVybgMMcI
-2o452hdpXPGvFrc2zSgfbNErAdJcXp+KtiSQ9UvJwau85/Ep4njPF5fbLAAl0m0l
-NVL12qXhx6hJMTMyh36NNaurIKWvw/b44Ibnr7+gMsygVVm/rZYON4K6rq9Qf70R
-YD54M9UeIzXI709DD7jMlYi43dQ6R0+GIORSDWxX11t4gdPVlhVIERa8MItQfzHJ
-JAtCHcS5JeUH6rd5Xd6EaAwMZHYkKS9tQurP3K38yhJAss93dlzpx2JrmH1R7Paq
-Jb+qCXMSzgBfQupAOK3W6lw9iardk3DesmIS/uSCUeMlkGXXjxWZ0cNuknkMjUUU
-zLSo/lswNLKCQcYhJEZ1HI7DxlcQqA/rLh74nPQywVBBtEQSPKY1YpPUkJ7Ri5QH
-qFpNJDt1cV0L+1U1agMtMCtdJMV8FouBHIs1L2DDfvcFUIt3GJOK3/q++Xt6i/qE
-4x/n1Cz3YYUhvi3Y6T1XIemrXZE13NUq63h+OZyZ/iXzBlkJr2U=
-=PRW1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAly0BQMACgkQbDjKyiDZ
+s5LSYA/6A2RJn+ThokJI4xLTuTWeVay1YdMnw7wru+gCxxLKG/lqgMNv/AJejEn+
+9a1+wE9TWsCCIJFAULO66+YF1nIZMzVDWK2KbnZI+8m2U9a9ug9c829BXlhVZmf7
+kutapUNIZm5pcnffUBfhtSui0hQIa328npM4isqLYPDmUfYz/V2YrXLzOIybeXbT
+mPddod57axJXElt1UJcocPWApKfY0o5w1GmW5R7De93zkEhPwBJ6CyfeaKpZqJiq
+7b3OmwdESdHbztZxefwPszKxC7HejmJ4kUkKHNzprFSn7MzKpwRHgyAnjRxlBX7t
+/BM2C8lWfvz54uZr3jW3BgF2oP/VUKM//86mqwZvFenjoPvhL2WcuH15ZskA5DDT
+HDVosxvgDDec3RVHnWWW5Jgpur3mjzZ8HFwBfOiVy37vEzRFWCCfzadzOhM6e/j9
+ldjpFQpxKcVpjwQ4I299xJ9bjSr2kRJQ3YD3DRpJw0ZQWf4catG5H8oGz7EWxqbl
+AVwveWbbskeH7+BU4607He7f5VsSNQYU9wTyoYtqv7rKmablDeYrj4etTkR5c3j3
+bCRmrKGk5A+p4p6FAPT4Rq62ZK8MKhe3zyXFNPMEH9qR7Uga6hgvTCQYGgdGB92b
+s9AGntg8aPW1UdBJrR/123OOrGKZFDU7UKr+P7B7/TrVJIYRNBk=
+=3W+S
 -----END PGP SIGNATURE-----
 
---T7mxYSe680VjQnyC--
+--CGDBiGfvSTbxKZlW--
 
