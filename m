@@ -2,76 +2,79 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,URI_NOVOWEL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9CCC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 22:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77C2C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 22:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 409FA20854
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 22:21:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B17020818
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 22:28:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnxXoNkw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409FA20854
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vTlMRgpK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B17020818
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56145 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56197 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG9z5-0004Mo-Mx
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 18:21:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43388)
+	id 1hGA5u-0006D5-Du
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 18:28:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hG9yG-0003zO-Rr
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:21:01 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1hGA54-0005rL-LL
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hG9yE-0002fM-Vd
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:21:00 -0400
-Received: from mail-yb1-xb2e.google.com ([2607:f8b0:4864:20::b2e]:41430)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1hGA50-0007ES-Hj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:28:02 -0400
+Received: from mail-yw1-xc33.google.com ([2607:f8b0:4864:20::c33]:41331)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hG9yC-0002dW-Uy
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:20:57 -0400
-Received: by mail-yb1-xb2e.google.com with SMTP id a13so4081255ybl.8
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 15:20:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hGA4z-0007Dr-KD
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 18:27:58 -0400
+Received: by mail-yw1-xc33.google.com with SMTP id l15so6613569ywe.8
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 15:27:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=RH7FA3FDuNnRl3iJFAPnBSCDZNM+FpKQG4gKIc48LHY=;
-	b=hnxXoNkwvakue/XHPfEIHMw5eJQ2zy/UfL8b0+JLVB0H7lg0ZekW2t/ZmWrNh8XvAS
-	mjIxTYn7BcjMeoDvtQYyaTrSW+2bCMlJ/8MXPKZTMOusZ1aBzqTCDVjnEq9BF9JLJny5
-	d3yLJ11asI/TVuAQDA/NtA9fsUhPb+UuRe56fztQOl8G9CkHDnQWqAqI1U+4Z9mowfqP
-	pxUgAgpOhwCJqPczyS5LE7cpixmhha7KTo0HEqWHutiFVjRu3pkrhZeXPWQpstEb8r8W
-	FB6tNz3ClIgiSyb9mf4YlaCgs5aQLVCZiNA/3EGNRo/NuBCfTwHgRNJfIGMe3NWCacJT
-	ZmVg==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to; 
+	bh=CzWwOMKuhwRz73sK8E2y0D1/FjnBhMwqyacO7FgQXyc=;
+	b=vTlMRgpK/6AWJ+LEGIC3gUpjk9rMuLDYaG2YFBmmHZd6Eojqg5RD9vTAfeQ2Uf+J2j
+	ffECmYXokz6uADx3KkOsaY7h2HJyzD2OQzqsOIcWA/O3ga4QKithdN+T0OxE7w80nfnV
+	OGWdkSWOa482M7jFOEvAduOIr/o45RUH17GZ7nIeMtOszj3tlrk+V7BrBYUNDfVFCfUY
+	bBdzASTyscIdo0r1lYcI+F6JpWQhlmluYGWN+5lj5NO76PpB/q1cEpM3dk5voujoLBGV
+	NJW8miRze0jyYUQmQly5gSlQCHRqjKOzGCMeEuP1Y+6seTvU+OWJm2s0/tVRYaWqmdEB
+	hXPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=RH7FA3FDuNnRl3iJFAPnBSCDZNM+FpKQG4gKIc48LHY=;
-	b=rfZXDvfjACRbwBqhq+tYAp0jDMDRhSAN0K5WzqkY3SqmiAyVEQqSLYijAo43sD2SQA
-	Z21Puks1SSKkjl2aDR+pvY018PRcmxHZFm67YUERAq6VQfvHg+YmMJc4EdSiP8UTmjce
-	VMvHkLNLxpux7lTjB5d0YvYsMIkbQdDY/QDqOcIzELIVTT4nUV1sSs6TGXIbd040Nqua
-	Hx1SSD5dKDlUvUXB0j6u6m515nGjMor7Wx7tYT2xOpjatERMmihdUbHek0W1uhIU6yxC
-	LnBmA7LWQsCy3GxOjidzl5BuKAeUlH8yVvCcjGzjz6f3nZCrIXw92lXmN7k/ESHeHfVD
-	vGow==
-X-Gm-Message-State: APjAAAVHALkWF32uTc8cIrppKTNStIEaFtDNKTBm7s8Tefo11pPUKwMt
-	gCSZLalBRAbbFNTS6uYMNNopUL/a+vKjIjNco7MunuT6
-X-Google-Smtp-Source: APXvYqycaFd++Uw7Z0Xo8mmtfK/2EGOsmjikM3LluXVEZVCCpf1+3aux8woFFUwoqR3AU4ViSvB2CDaxiyb5ned8SqY=
-X-Received: by 2002:a25:2417:: with SMTP id k23mr18096824ybk.430.1555366853551;
-	Mon, 15 Apr 2019 15:20:53 -0700 (PDT)
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to;
+	bh=CzWwOMKuhwRz73sK8E2y0D1/FjnBhMwqyacO7FgQXyc=;
+	b=rk3enXFe/3ZdpO+wiz3VsLy9/316B0cd8IS3e/+5PoG409EzAZiDD+w4t/pGOC/Z2P
+	X4+b2mhdRlWc9Et5ZHpGJP81srQELWIraz5We11gX9D8IQeZzoeS8uGkbXII7XXEuXMD
+	3ZNylvogE4CWJnrn+6OEitT1MDvIZPfwpxIxqQ4xrXHtbmb1hhBsa99dZOcCvcTKs1kY
+	zNVKy+T1p/NXRO1J2KL53Pe/ul09kWu1seQVgHxo/jxx9CimUdlNJ4Bl0yCZIkxCSjGA
+	sWEJWP2BBsubB0eeog60MCSdYwlviZfBHemRg8sW1+ULVNVlUK80nd9GqmwBrydkd2mf
+	a5Ww==
+X-Gm-Message-State: APjAAAV88vVdic9CuacScpL3ICfUIBGcZReevPdbYy8FJbb6zIXhJ20b
+	QRhSYk8ZipHSSgHOGbVIyn7/zpif3ndaxhY4wOEGnkE0
+X-Google-Smtp-Source: APXvYqwLBLZhMF7NukjNC2GWOJp2VGjL9URRFUVIH1cMJCiFjjjWksfkvsNZVECfpcC8jvnb1KcAeHp3yIT87Lh3feo=
+X-Received: by 2002:a81:7d07:: with SMTP id y7mr61339212ywc.395.1555367276410; 
+	Mon, 15 Apr 2019 15:27:56 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
+In-Reply-To: <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 15 Apr 2019 15:20:42 -0700
+Date: Mon, 15 Apr 2019 15:27:45 -0700
 Message-ID:
- <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
+ <CAMo8BfKNNpDmRqLOnJ9CGzOXhir+R1vsgoFgtOBiEpHU853rMA@mail.gmail.com>
 To: qemu-devel <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::b2e
-Subject: [Qemu-devel] recent QEMU-w64 does not load multiboot kernels by
+X-Received-From: 2607:f8b0:4864:20::c33
+Subject: Re: [Qemu-devel] recent QEMU-w64 does not load multiboot kernels by
  default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -87,21 +90,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415222042.0ppZzh5ktusMLzxvZUr_7B3OxOUWeNImZ_vStajDOzc@z>
+Message-ID: <20190415222745.pEZVUxvRrKggaMqW9Xu1AuzQy4lt-58L7JpR8tpscV4@z>
 
-Hello,
+On Mon, Apr 15, 2019 at 3:20 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
+> recent qemu-system-i386 for w64 (e.g. one installed from
+> https://qemu.weilnetz.de/w64/qemu-w64-setup-20190218.exe )
+> refuses to load multiboot kernel by default:
+>
+>   "C:\Program Files\qemu\qemu-system-i386.exe" -kernel p:\tmp\kernel
+>   C:\Program Files\qemu\qemu-system-i386.exe: Error loading
+> uncompressed kernel without PVH ELF Note
 
-recent qemu-system-i386 for w64 (e.g. one installed from
-https://qemu.weilnetz.de/w64/qemu-w64-setup-20190218.exe )
-refuses to load multiboot kernel by default:
-
-  "C:\Program Files\qemu\qemu-system-i386.exe" -kernel p:\tmp\kernel
-  C:\Program Files\qemu\qemu-system-i386.exe: Error loading
-uncompressed kernel without PVH ELF Note
-
-Adding -M pc-i440fx-3.1 (as well as most other machines, but not
-pc-i440fx-4.0) fixes that. On linux host the same kernel gets loaded
-either way (with or without -M).
+Example kernel is available here:
+http://jcmvbkbc.spb.ru/~dumb/tmp/201904151526/kernel
 
 -- 
 Thanks.
