@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42593)
+Received: from eggs.gnu.org ([209.51.188.92]:42617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1dm-0004eJ-Pw
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1dp-0004fg-1h
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1dk-00052s-T0
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1dm-00053k-Ti
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:20 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 15 Apr 2019 15:27:18 +0200
-Message-Id: <1555334842-195718-2-git-send-email-imammedo@redhat.com>
+Date: Mon, 15 Apr 2019 15:27:19 +0200
+Message-Id: <1555334842-195718-3-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
 References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 1/5] sparc64: use
- memory_region_allocate_system_memory() only for '-m' specified RAM
+Subject: [Qemu-devel] [PATCH v1 2/5] ppc: rs6000_mc: drop usage of
+ memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Helge Deller <deller@gmx.de>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-memory_region_allocate_system_memory() was designed to be called for
-allocating inital RAM. Using it mutiple times within one board is not
-supported and could fail if -mem-path with non hugepage path is used.
-
-Keep using memory_region_allocate_system_memory() only for initial
-RAM and use memory_region_init_ram() for the rest fixed size regions.
+rs6000mc_realize() violates memory_region_allocate_system_memory() contract
+by calling it multiple times which could break -mem-path. Replace it with
+plain memory_region_init_ram() instead.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/sparc64/niagara.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ hw/ppc/rs6000_mc.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index f8a856f..39a4522 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -37,6 +37,7 @@
- #include "sysemu/block-backend.h"
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
-+#include "qapi/error.h"
+diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
+index 45cb95e..ea174f1 100644
+--- a/hw/ppc/rs6000_mc.c
++++ b/hw/ppc/rs6000_mc.c
+@@ -142,6 +142,7 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
+     RS6000MCState *s = RS6000MC_DEVICE(dev);
+     int socket = 0;
+     unsigned int ram_size = s->ram_size / MiB;
++    Error *local_err = NULL;
  
+     while (socket < 6) {
+         if (ram_size >= 64) {
+@@ -163,19 +164,21 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
+         if (s->simm_size[socket]) {
+             char name[] = "simm.?";
+             name[5] = socket + '0';
+-            memory_region_allocate_system_memory(&s->simm[socket], OBJECT(dev),
+-                                                 name,
+-                                                 s->simm_size[socket] * MiB);
++            memory_region_init_ram(&s->simm[socket], OBJECT(dev), name,
++                                   s->simm_size[socket] * MiB, &local_err);
++            if (local_err) {
++                goto out;
++            }
+             memory_region_add_subregion_overlap(get_system_memory(), 0,
+                                                 &s->simm[socket], socket);
+         }
+     }
+     if (ram_size) {
+         /* unable to push all requested RAM in SIMMs */
+-        error_setg(errp, "RAM size incompatible with this board. "
++        error_setg(&local_err, "RAM size incompatible with this board. "
+                    "Try again with something else, like %" PRId64 " MB",
+                    s->ram_size / MiB - ram_size);
+-        return;
++        goto out;
+     }
  
- typedef struct NiagaraBoardState {
-@@ -108,8 +109,8 @@ static void niagara_init(MachineState *machine)
-     /* init CPUs */
-     sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
-     /* set up devices */
--    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
--                                         NIAGARA_HV_RAM_SIZE);
-+    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
-+                           NIAGARA_HV_RAM_SIZE, &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+     if (s->autoconfigure) {
+@@ -191,6 +194,8 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
  
-     memory_region_allocate_system_memory(&s->partition_ram, NULL,
-@@ -118,17 +119,17 @@ static void niagara_init(MachineState *machine)
-     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
-                                 &s->partition_ram);
+     isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
+                              rs6000mc_port_list, s, "rs6000mc");
++out:
++    error_propagate(errp, local_err);
+ }
  
--    memory_region_allocate_system_memory(&s->nvram, NULL,
--                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
-+    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
-+                           &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
--    memory_region_allocate_system_memory(&s->md_rom, NULL,
--                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
-+    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
-+                           NIAGARA_MD_ROM_SIZE, &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
--    memory_region_allocate_system_memory(&s->hv_rom, NULL,
--                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
-+    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
-+                           NIAGARA_HV_ROM_SIZE, &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
--    memory_region_allocate_system_memory(&s->prom, NULL,
--                                         "sun4v.prom", PROM_SIZE_MAX);
-+    memory_region_init_ram(&s->prom, NULL, "sun4v.prom", PROM_SIZE_MAX,
-+                           &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
- 
-     add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
-@@ -145,8 +146,8 @@ static void niagara_init(MachineState *machine)
-         BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
-         int size = blk_getlength(blk);
-         if (size > 0) {
--            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
--                                                 "sun4v_vdisk.ram", size);
-+            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
-+                                   &error_fatal);
-             memory_region_add_subregion(get_system_memory(),
-                                         NIAGARA_VDISK_BASE, &s->vdisk_ram);
-             dinfo->is_default = 1;
+ static const VMStateDescription vmstate_rs6000mc = {
 -- 
 2.7.4
