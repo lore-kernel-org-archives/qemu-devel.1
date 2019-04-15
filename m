@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58205)
+Received: from eggs.gnu.org ([209.51.188.92]:58246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG0aU-00015k-Po
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:19:51 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hG0aj-0001DO-PU
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hG0aT-0002IE-Qb
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:19:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hG0aT-0002I2-K1
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:19:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hG0aR-0000fp-UT
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 12:19:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E10052E80D3
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 12:19:47 +0000 (UTC)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hG0ai-0002Kt-IT
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:20:05 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:41282)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hG0ah-0002Kk-Tc
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 08:20:04 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190415113045.GI2852@work-vm>
+References: <20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415101101.GF5718@redhat.com>
+	<251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415102520.GG5718@redhat.com>
+	<259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415104725.GI5718@redhat.com> <20190415111511.GG2852@work-vm>
+	<20190415111911.GK5718@redhat.com> <20190415113045.GI2852@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 15 Apr 2019 15:20:01 +0300
+Message-Id: <329231555330796@myt5-68ad52a76c91.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Apr 2019 12:09:47 -0000
-From: Robie Basak <1486278@bugs.launchpad.net>
-Reply-To: Bug 1486278 <1486278@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150818230718.18792.42543.malonedeb@wampee.canonical.com>
-Message-Id: <155533018711.20665.2522013390529921988.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1486278] Re: 'info vnc' monitor command does not
- show websocket information
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +34,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-Thanks! This is presumed fixed in Ubuntu also then, since 18.04 onwards
-shipped a qemu version higher than 2.10.0. If this is wrong, please
-reopen.
+15.04.2019, 14:30, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> =C2=A0On Mon, Apr 15, 2019 at 12:15:12PM +0100, Dr. David Alan Gilbert=
+ wrote:
+>> =C2=A0> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> =C2=A0> > On Mon, Apr 15, 2019 at 01:33:21PM +0300, Yury Kotov wrote:
+>> =C2=A0> > > 15.04.2019, 13:25, "Daniel P. Berrang=C3=A9" <berrange@red=
+hat.com>:
+>> =C2=A0> > > > On Mon, Apr 15, 2019 at 01:17:06PM +0300, Yury Kotov wro=
+te:
+>> =C2=A0> > > >> =C2=A015.04.2019, 13:11, "Daniel P. Berrang=C3=A9" <ber=
+range@redhat.com>:
+>> =C2=A0> > > >> =C2=A0> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury =
+Kotov wrote:
+>> =C2=A0> > > >> =C2=A0>> =C2=A0Hi,
+>> =C2=A0> > > >> =C2=A0>>
+>> =C2=A0> > > >> =C2=A0>> =C2=A0Just to clarify. I see two possible solu=
+tions:
+>> =C2=A0> > > >> =C2=A0>>
+>> =C2=A0> > > >> =C2=A0>> =C2=A01) Since the migration code doesn't rece=
+ive fd, it isn't responsible for
+>> =C2=A0> > > >> =C2=A0>> =C2=A0closing it. So, it may be better to use =
+migrate_fd_param for both
+>> =C2=A0> > > >> =C2=A0>> =C2=A0incoming/outgoing and add dupping for mi=
+grate_fd_param. Thus, clients must
+>> =C2=A0> > > >> =C2=A0>> =C2=A0close the fd themselves. But existing cl=
+ients will have a leak.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> We can't break existing clients in this way as =
+they are correctly
+>> =C2=A0> > > >> =C2=A0> using the monitor with its current semantics.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0>> =C2=A02) If we don't duplicate fd, then at lea=
+st we should remove fd from
+>> =C2=A0> > > >> =C2=A0>> =C2=A0the corresponding list. Therefore, the s=
+olution is to fix qemu_close to find
+>> =C2=A0> > > >> =C2=A0>> =C2=A0the list and remove fd from it. But qemu=
+_close is currently consistent with
+>> =C2=A0> > > >> =C2=A0>> =C2=A0qemu_open (which opens/dups fd), so addi=
+ng additional logic might not be
+>> =C2=A0> > > >> =C2=A0>> =C2=A0a very good idea.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> qemu_close is not appropriate place to deal wit=
+h something speciifc
+>> =C2=A0> > > >> =C2=A0> to the montor.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0>> =C2=A0I don't see any other solution, but I mi=
+ght miss something.
+>> =C2=A0> > > >> =C2=A0>> =C2=A0What do you think?
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> All callers of monitor_get_fd() will close() th=
+e FD they get back.
+>> =C2=A0> > > >> =C2=A0> Thus monitor_get_fd() should remove it from the=
+ list when it returns
+>> =C2=A0> > > >> =C2=A0> it, and we should add API docs to monitor_get_f=
+d() to explain this.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0Ok, it sounds reasonable. But monitor_get_fd is o=
+nly about outgoing migration.
+>> =C2=A0> > > >> =C2=A0But what about the incoming migration? It doesn't=
+ use monitor_get_fd but just
+>> =C2=A0> > > >> =C2=A0converts input string to int and use it as fd.
+>> =C2=A0> > > >
+>> =C2=A0> > > > The incoming migration expects the FD to be passed into =
+QEMU by the mgmt
+>> =C2=A0> > > > app when it is exec'ing the QEMU binary. It doesn't inte=
+ract with the
+>> =C2=A0> > > > monitor at all AFAIR.
+>> =C2=A0> > > >
+>> =C2=A0> > >
+>> =C2=A0> > > Oh, sorry. This use case is not obvious. We used add-fd to=
+ pass fd for
+>> =C2=A0> > > migrate-incoming and such way has described problems.
+>> =C2=A0> >
+>> =C2=A0> > That's a bug in your usage of QEMU IMHO, as the incoming cod=
+e is not
+>> =C2=A0> > designed to use add-fd.
+>> =C2=A0>
+>> =C2=A0> Hmm, that's true - although:
+>> =C2=A0> a) It's very non-obvious
+>> =C2=A0> b) Unfortunate, since it would go well with -incoming defer
+>>
+>> =C2=A0Yeah I think this is a screw up on QMEU's part when introducing =
+'defer'.
+>>
+>> =C2=A0We should have mandated use of 'add-fd' when using 'defer', sinc=
+e FD
+>> =C2=A0inheritance-over-execve() should only be used for command line a=
+rgs,
+>> =C2=A0not monitor commands.
+>>
+>> =C2=A0Not sure how to best fix this is QEMU though without breaking ba=
+ck
+>> =C2=A0compat for apps using 'defer' already.
+>
+> We could add mon-fd: transports that has the same behaviour as now for
+> outgoing, and for incoming uses the add-fd stash.
+>
 
-** Changed in: qemu (Ubuntu)
-       Status: Confirmed =3D> Fix Released
+May be it's better to use monitor_fd_param for both incoming/outgoing?
+So, "migrate" will know fd:<int> semantics and "migrate-incoming" will
+know fd:<fd_name> semantics. And also modify monitor_get_fd to
+remove fd from list before return.
+This is a backwards compatible change.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1486278
-
-Title:
-  'info vnc' monitor command does not show websocket information
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-
-Bug description:
-  Steps to reproduce^
-  1. run
-   qemu-system-x86_64  -vnc  0.0.0.0:1,websocket=3D5701 -nographic -monitor=
- stdio
-
-  2. then type =
-
-   (qemu) info vnc
-  3.  see
-       address: 0.0.0.0:5901
-          auth: none
-  Client: none
-
-  There is no information about websocket parameters, but 'netstat -nltp' s=
-hows me:
-   ...
-  tcp        0      0 0.0.0.0:5701            0.0.0.0:*               LISTE=
-N      27073/qemu-system-x
-  ....
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1486278/+subscriptions
+Regards,
+Yury
