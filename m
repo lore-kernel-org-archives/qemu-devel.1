@@ -2,78 +2,60 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F7AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D12E5C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:28:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFD4F2077C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:28:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1T/y/2q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD4F2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A39602077C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:28:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39602077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50226 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50250 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG1ei-0005Bg-3Y
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 09:28:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45662)
+	id 1hG1fG-0005oT-QR
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 09:28:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hFxJx-0001wd-P1
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:34 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1dm-0004eJ-Pw
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hFxJv-0002yP-VA
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:33 -0400
-Received: from mail-it1-x12f.google.com ([2607:f8b0:4864:20::12f]:37350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fengyd81@gmail.com>) id 1hFxJu-0002uv-Co
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 04:50:30 -0400
-Received: by mail-it1-x12f.google.com with SMTP id u65so25409208itc.2
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 01:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=pwJczkHJf5dylMpf7qQKSRS9xAoxuZvn6hdjNg8s+x8=;
-	b=N1T/y/2qMskO6HpJLazVwg8anm7ahY02zKigANu4Oyf6TXGz/ZQAaJs20GfRX+ed+E
-	STHCQw61yBNVBgXBiTxZZLDfhbiIXwPl4wgnKY4TPXFNSoY5Erlkt7pNwT+nIwIMXA26
-	2bbVzZuKIJzejljm652zDK6UFnBMV4Azc/meaAZ1GnygV0C4R5giUxTXXNmQXlDJLE2m
-	NuonqtwFhBrUY+swinjMngiY9JEZOxL8+Zn21Fk8EySr84XqI6WBvFv4+sAaX53/FyFV
-	evzHCslBsMgA6C9R6fFufO1hXaftXXEu0GjkPd4M0y348LiMVbs2p4O+nfiTmjuy9/9E
-	cQbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=pwJczkHJf5dylMpf7qQKSRS9xAoxuZvn6hdjNg8s+x8=;
-	b=NXb8HhKBgfnLUR1ZswnftF5Xlvf8Yro7ZHMN9n4pu98lhWkRPCtzEkqQCr/OKTr9tJ
-	oQxf0L5hHYtBpSH/Bruv41bKdDlVdbcgriQYj1fvxd3AoytGHA2sFoqr/N/QyvuVJOmw
-	4BarhDI/14ltuNyV8ahS6PCaMiCmKQyAmcgCvuHjq3xr2VxaPL9zbjE1b4JQ7hFOR/gZ
-	NR0Gc+QjP0zcbCGPBcaSoXRj9cGJsvgcsrAJVab6CFnwHpK9iDhOZ4vrCX+Pu5ch9zKe
-	YipvdM9cTQ/noMvp6koMKgX5Zhm7qqkZYRVs3epHCoocl4MKs7RQXVGIYDHVvb1G4w6A
-	E2Bg==
-X-Gm-Message-State: APjAAAXkG16JZvfzB4Sx9rIEXV9b8oyD1oEh6JkT/2mxp7iRyOfghKyu
-	81n3h/GCKk2QJuphSi9HY5l+PqXiUYPPPfrHeT9qk2k5
-X-Google-Smtp-Source: APXvYqx/uctiyLLGhbZzGc9loWa3InRQj6ftEybkPpJi7MAPOtpNzBFL+yJAw2kTpDlfH5T1PcdoCAPBS99fPC8e4og=
-X-Received: by 2002:a02:9f19:: with SMTP id z25mr51119321jal.2.1555318227433; 
-	Mon, 15 Apr 2019 01:50:27 -0700 (PDT)
-MIME-Version: 1.0
-From: fengyd <fengyd81@gmail.com>
-Date: Mon, 15 Apr 2019 16:50:16 +0800
-Message-ID:
- <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1hG1dk-00052s-T0
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
+	id 1hG1dj-00051g-09; Mon, 15 Apr 2019 09:27:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DB7DE3092645;
+	Mon, 15 Apr 2019 13:27:12 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EC53E1001E6D;
+	Mon, 15 Apr 2019 13:27:06 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::12f
-X-Mailman-Approved-At: Mon, 15 Apr 2019 09:23:38 -0400
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] How live migration work for vhost-user
+Date: Mon, 15 Apr 2019 15:27:18 +0200
+Message-Id: <1555334842-195718-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
+References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 15 Apr 2019 13:27:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v1 1/5] sparc64: use
+ memory_region_allocate_system_memory() only for '-m' specified RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,38 +67,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>,
+	Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+	=?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415085016.63UsOUb8RymnQpNwHmYlwiN3vPVtTRSxAlNYa6Xno2w@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190415132718.oE9dYgs9naYV1yp1HAt6bQ9zcx0tcVWh0OPd-svBPeU@z>
 
-Hi,
+memory_region_allocate_system_memory() was designed to be called for
+allocating inital RAM. Using it mutiple times within one board is not
+supported and could fail if -mem-path with non hugepage path is used.
 
-During live migration,  the folloing log can see in nova-compute.log in my
-environment:
- ERROR nova.virt.libvirt.driver [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
-0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e - default
-default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live Migration
-failure: internal error: qemu unexpectedly closed the monitor:
-2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
-size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+Keep using memory_region_allocate_system_memory() only for initial
+RAM and use memory_region_init_ram() for the rest fixed size regions.
 
-It's OK for standard Linux VM, but not OK for our VM where virtio is
-implemented by ourself.
-KVM version as follow:
-qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
-qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
-libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/sparc64/niagara.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-Do you know what's the difference between virtio and vhost-user during
-migration?
-The function virtio_load in Qemu is called for virtio and vhost-user during
-migration.
-For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
-responsible for updating their values accordingly
-For vhost-user, last_avail_idx  and used_idx are stored in vhost-user app,
-eg. DPDK, not in Qemu?
-How does migration work for vhost-user?
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index f8a856f..39a4522 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -37,6 +37,7 @@
+ #include "sysemu/block-backend.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
++#include "qapi/error.h"
+ 
+ 
+ typedef struct NiagaraBoardState {
+@@ -108,8 +109,8 @@ static void niagara_init(MachineState *machine)
+     /* init CPUs */
+     sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
+     /* set up devices */
+-    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+-                                         NIAGARA_HV_RAM_SIZE);
++    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
++                           NIAGARA_HV_RAM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+ 
+     memory_region_allocate_system_memory(&s->partition_ram, NULL,
+@@ -118,17 +119,17 @@ static void niagara_init(MachineState *machine)
+     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
+                                 &s->partition_ram);
+ 
+-    memory_region_allocate_system_memory(&s->nvram, NULL,
+-                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
++    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
+-    memory_region_allocate_system_memory(&s->md_rom, NULL,
+-                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
++    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
++                           NIAGARA_MD_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
+-    memory_region_allocate_system_memory(&s->hv_rom, NULL,
+-                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
++    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
++                           NIAGARA_HV_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
+-    memory_region_allocate_system_memory(&s->prom, NULL,
+-                                         "sun4v.prom", PROM_SIZE_MAX);
++    memory_region_init_ram(&s->prom, NULL, "sun4v.prom", PROM_SIZE_MAX,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
+ 
+     add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
+@@ -145,8 +146,8 @@ static void niagara_init(MachineState *machine)
+         BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+         int size = blk_getlength(blk);
+         if (size > 0) {
+-            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
+-                                                 "sun4v_vdisk.ram", size);
++            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
++                                   &error_fatal);
+             memory_region_add_subregion(get_system_memory(),
+                                         NIAGARA_VDISK_BASE, &s->vdisk_ram);
+             dinfo->is_default = 1;
+-- 
+2.7.4
 
-Thanks in advance
-Yafeng
+
