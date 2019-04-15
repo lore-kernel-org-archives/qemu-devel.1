@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32967)
+Received: from eggs.gnu.org ([209.51.188.92]:33508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG4iQ-0005el-Oy
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:44:19 -0400
+	(envelope-from <bsd@redhat.com>) id 1hG4lJ-0006pi-4l
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hG4iP-0002lG-Kq
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:44:18 -0400
-Date: Mon, 15 Apr 2019 18:43:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190415184359.452613ae.cohuck@redhat.com>
-In-Reply-To: <20190301093902.27799-1-cohuck@redhat.com>
-References: <20190301093902.27799-1-cohuck@redhat.com>
+	(envelope-from <bsd@redhat.com>) id 1hG4lI-0005T3-Am
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:47:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1hG4lI-0005Rw-1B
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:47:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 933B38667D
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 16:47:13 +0000 (UTC)
+Received: from gigantic.usersys.redhat.com (helium.bos.redhat.com
+	[10.18.17.132])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EE1E1001E65
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 16:47:13 +0000 (UTC)
+From: Bandan Das <bsd@redhat.com>
+Date: Mon, 15 Apr 2019 12:47:12 -0400
+Message-ID: <jpgwojv9pwv.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] vfio-ccw: support hsch/csch (kernel
- part)
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] usb-mtp: change default to success for
+ usb_mtp_update_object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri,  1 Mar 2019 10:38:56 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> [This is the Linux kernel part, git tree is available at
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
-> 
-> The companion QEMU patches are available at
-> https://github.com/cohuck/qemu vfio-ccw-caps]
-> 
-> Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
-> device. This tends to work well for the most common 'good path' scenarios;
-> however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
-> clearing pending requests at the device is currently not supported.
-> This may be a problem for e.g. error recovery.
-> 
-> This patch series introduces capabilities (similar to what vfio-pci uses)
-> and exposes a new async region for handling hsch/csch.
-> 
-> Lightly tested (I can interact with a dasd as before, and reserve/release
-> seems to work well.) Not sure if there is a better way to test this, ideas
-> welcome.
-> 
-> Changes v3->v4:
-> - shrunk the capability offset, we don't need to accommodate as much as pci
-> - make checks in patch 1 more consistent and less buggy
-> - rebased on top of my current vfio-ccw branch
-> 
-> Changes v2->v3:
-> - Unb0rked patch 1, improved scope
-> - Split out the new mutex from patch 2 into new patch 3; added missing
->   locking and hopefully improved description
-> - Patch 2 now reworks the state handling by splitting the BUSY state
->   into CP_PROCESSING and CP_PENDING
-> - Patches 3 and 5 adapted on top of the reworked patches; hsch/csch
->   are allowed in CP_PENDING, but not in CP_PROCESSING (did not add
->   any R-b due to that)
-> - Added missing free in patch 5
-> - Probably some small changes I forgot to note down
-> 
-> Changes v1->v2:
-> - New patch 1: make it safe to use the cp accessors at any time; this
->   should avoid problems with unsolicited interrupt handling
-> - New patch 2: handle concurrent accesses to the io region; the idea is
->   to return -EAGAIN to userspace more often (so it can simply retry)
-> - also handle concurrent accesses to the async io region
-> - change VFIO_REGION_TYPE_CCW
-> - merge events for halt and clear to a single async event; this turned out
->   to make the code quite a bit simpler
-> - probably some small changes I forgot to note down
-> 
-> Cornelia Huck (6):
->   vfio-ccw: make it safe to access channel programs
->   vfio-ccw: rework ssch state handling
->   vfio-ccw: protect the I/O region
->   vfio-ccw: add capabilities chain
->   s390/cio: export hsch to modules
->   vfio-ccw: add handling for async channel instructions
-> 
->  drivers/s390/cio/Makefile           |   3 +-
->  drivers/s390/cio/ioasm.c            |   1 +
->  drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++
->  drivers/s390/cio/vfio_ccw_cp.c      |  21 ++-
->  drivers/s390/cio/vfio_ccw_cp.h      |   2 +
->  drivers/s390/cio/vfio_ccw_drv.c     |  57 ++++++--
->  drivers/s390/cio/vfio_ccw_fsm.c     | 143 +++++++++++++++++-
->  drivers/s390/cio/vfio_ccw_ops.c     | 215 +++++++++++++++++++++++-----
->  drivers/s390/cio/vfio_ccw_private.h |  48 ++++++-
->  include/uapi/linux/vfio.h           |   4 +
->  include/uapi/linux/vfio_ccw.h       |  12 ++
->  11 files changed, 537 insertions(+), 57 deletions(-)
->  create mode 100644 drivers/s390/cio/vfio_ccw_async.c
-> 
+Commit c5ead51f90cf (usb-mtp: return incomplete transfer on a lstat
+failure) checks if lstat succeeded when updating attributes of a
+file. However, it also changed behavior to return an error by
+default. This is incorrect because for smaller file sizes, Qemu
+will attempt to write the file in one go and there won't be
+an object for it.
 
-Queued (with the touchups discussed in the thread) to the vfio-ccw
-branch on kernel.org.
+Fixes: c5ead51f90cf
+Signed-off-by: Bandan Das <bsd@redhat.com>
+---
+ hw/usb/dev-mtp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index ebf210fbf8..5de22738ce 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1587,7 +1587,7 @@ done:
+ 
+ static int usb_mtp_update_object(MTPObject *parent, char *name)
+ {
+-    int ret = -1;
++    int ret = 0;
+ 
+     MTPObject *o =
+         usb_mtp_object_lookup_name(parent, name, strlen(name));
+-- 
+2.19.2
