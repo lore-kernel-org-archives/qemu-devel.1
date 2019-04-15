@@ -3,62 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB70C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F011C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EF1320825
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:16:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF1320825
+	by mail.kernel.org (Postfix) with ESMTPS id D7B3020825
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:17:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B3020825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50895 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50897 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG2Pc-0005Np-8k
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 10:16:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51730)
+	id 1hG2QD-0005mB-1a
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 10:17:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG2Ng-0004Aq-4D
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:14:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1hG2Ox-00054w-Dc
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG2Ne-0002ST-Ke
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:14:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42934)
+	(envelope-from <berrange@redhat.com>) id 1hG2Ov-0003DY-SF
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:16:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hG2Na-0002Qv-WE; Mon, 15 Apr 2019 10:14:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hG2Ov-00035c-Hv
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 10:16:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD851C05FBD7;
-	Mon, 15 Apr 2019 14:14:36 +0000 (UTC)
-Received: from Igors-MacBook-Pro.local (ovpn-112-37.ams2.redhat.com
-	[10.36.112.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1896060C43;
-	Mon, 15 Apr 2019 14:14:31 +0000 (UTC)
-Date: Mon, 15 Apr 2019 16:14:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190415161426.668ae6f2@Igors-MacBook-Pro.local>
-In-Reply-To: <20190415070307.13668-5-richardw.yang@linux.intel.com>
-References: <20190415070307.13668-1-richardw.yang@linux.intel.com>
-	<20190415070307.13668-5-richardw.yang@linux.intel.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C7DF307D941;
+	Mon, 15 Apr 2019 14:15:55 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.42.22.189])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E5BD9608C0;
+	Mon, 15 Apr 2019 14:15:49 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 15 Apr 2019 15:15:47 +0100
+Message-Id: <20190415141547.15444-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Mon, 15 Apr 2019 14:14:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 15 Apr 2019 14:15:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/acpi: Extract build_mcfg to pci.c
+Subject: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for all
+ code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,237 +67,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com,
-	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415141426.e-SVgTWTf3OGzjGnlZv7q39U5JhGV9ytJYP2T27NwQY@z>
+Message-ID: <20190415141547.-ZU9E8hTktQU2kdx3OzKjrLkhMD8AAW3WIJ0On2cvNI@z>
 
-On Mon, 15 Apr 2019 15:03:07 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+Localization is not a feature whose impact is limited to the UI
+frontends. Other parts of QEMU rely in localization. In particular the
+USB MTP driver needs to be able to convert filenames from the locale
+specified character set into UTF-16 / UCS-2 encoded wide characters.
+setlocale() is only set from two of the UI frontends though, and worse,
+there is inconsistent behaviour with GTK setting LC_CTYPE to C.UTF-8,
+while ncurses honours whatever is set in the user's environment.
 
-> Now we have two identical build_mcfg function.
-s/function./functions,/
+This causes the USP MTP driver to behave differently depending on which
+UI frontend is activated.
 
-> 
-> Extract them to pci.c.
-s|.*|consolidate them in acpi/pci.c|
+Furthermore, the curses settings are dangerous because LC_CTYPE will affe=
+ct
+the is{upper,lower,alnum} functions which much QEMU code assumes to have
+C locale sorting behaviour. This also breaks QMP if the env requests a
+non-UTF-8 locale, since QMP is defined to use UTF-8 encoding for JSON.
+This problematic curses code was introduced in:
 
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+  commit 2f8b7cd587558944532f587abb5203ce54badba9
+  Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
+  Date:   Mon Mar 11 14:51:27 2019 +0100
 
-with above and Philippe's comment addressed 
+    curses: add option to specify VGA font encoding
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+This patch moves the GTK frontend setlocale() handling into the main()
+method. This ensures QMP and other QEMU code has a predictable C.UTF-8.
 
-> 
-> ---
-> v2:
->   * put it to dedicated file pci.c
-> ---
->  default-configs/arm-softmmu.mak  |  1 +
->  default-configs/i386-softmmu.mak |  1 +
->  hw/acpi/Kconfig                  |  4 +++
->  hw/acpi/Makefile.objs            |  1 +
->  hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c         | 18 +------------
->  hw/i386/acpi-build.c             | 19 ++-----------
->  include/hw/acpi/pci.h            |  5 ++++
->  8 files changed, 61 insertions(+), 34 deletions(-)
->  create mode 100644 hw/acpi/pci.c
->  create mode 100644 include/hw/acpi/pci.h
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 613d19a06d..8f2796e195 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -144,6 +144,7 @@ CONFIG_XIO3130=y
->  CONFIG_IOH3420=y
->  CONFIG_I82801B11=y
->  CONFIG_ACPI=y
-> +CONFIG_ACPI_PCI=y
->  CONFIG_ARM_VIRT=y
->  CONFIG_SMBIOS=y
->  CONFIG_ASPEED_SOC=y
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index ba3fb3ff50..cd5ea391e8 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -25,3 +25,4 @@
->  CONFIG_ISAPC=y
->  CONFIG_I440FX=y
->  CONFIG_Q35=y
-> +CONFIG_ACPI_PCI=y
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index eca3beed75..7265843cc3 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->      bool
->      depends on ACPI
->  
-> +config ACPI_PCI
-> +    bool
-> +    depends on ACPI
-> +
->  config ACPI_VMGENID
->      bool
->      default y
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index ba93c5b64a..9bb2101e3b 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  common-obj-y += acpi_interface.o
->  common-obj-y += bios-linker-loader.o
->  common-obj-y += aml-build.o utils.o
-> +common-obj-$(CONFIG_ACPI_PCI) += pci.o
->  common-obj-$(CONFIG_TPM) += tpm.o
->  
->  common-obj-$(CONFIG_IPMI) += ipmi.o
-> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-> new file mode 100644
-> index 0000000000..fa0fa30bb9
-> --- /dev/null
-> +++ b/hw/acpi/pci.c
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Support for generating PCI related ACPI tables and passing them to Guests
-> + *
-> + * Copyright (C) 2006 Fabrice Bellard
-> + * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-> + * Copyright (C) 2013-2019 Red Hat Inc
-> + * Copyright (C) 2019 Intel Corporation
-> + *
-> + * Author: Wei Yang <richardw.yang@linux.intel.com>
-> + * Author: Michael S. Tsirkin <mst@redhat.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/pci.h"
-> +#include "hw/pci/pcie_host.h"
-> +
-> +void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> +{
-> +    AcpiTableMcfg *mcfg;
-> +    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> +
-> +    mcfg = acpi_data_push(table_data, len);
-> +    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> +
-> +    /* Only a single allocation so no need to play with segments */
-> +    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> +    mcfg->allocation[0].start_bus_number = 0;
-> +    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> +
-> +    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> +}
-> +
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 7350f207b5..e3353de9e4 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -40,6 +40,7 @@
->  #include "hw/hw.h"
->  #include "hw/acpi/aml-build.h"
->  #include "hw/acpi/utils.h"
-> +#include "hw/acpi/pci.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
-> @@ -545,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->                   "SRAT", table_data->len - srat_start, 3, NULL, NULL);
->  }
->  
-> -static void
-> -build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> -{
-> -    AcpiTableMcfg *mcfg;
-> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> -
-> -    mcfg = acpi_data_push(table_data, len);
-> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> -
-> -    /* Only a single allocation so no need to play with segments */
-> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> -    mcfg->allocation[0].start_bus_number = 0;
-> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> -
-> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> -}
-> -
->  /* GTDT */
->  static void
->  build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 7613b245cf..29980bb3f4 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -58,6 +58,7 @@
->  
->  #include "hw/acpi/aml-build.h"
->  #include "hw/acpi/utils.h"
-> +#include "hw/acpi/pci.h"
->  
->  #include "qom/qom-qobject.h"
->  #include "hw/i386/amd_iommu.h"
-> @@ -2392,22 +2393,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->                   table_data->len - srat_start, 1, NULL, NULL);
->  }
->  
-> -static void
-> -build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> -{
-> -    AcpiTableMcfg *mcfg;
-> -    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
-> -
-> -    mcfg = acpi_data_push(table_data, len);
-> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> -    /* Only a single allocation so no need to play with segments */
-> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> -    mcfg->allocation[0].start_bus_number = 0;
-> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> -
-> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> -}
-> -
->  /*
->   * VT-d spec 8.1 DMA Remapping Reporting Structure
->   * (version Oct. 2014 or later)
-> @@ -2677,7 +2662,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->      }
->      if (acpi_get_mcfg(&mcfg)) {
->          acpi_add_table(table_offsets, tables_blob);
-> -        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-> +        build_mcfg(tables_blob, tables->linker, &mcfg);
->      }
->      if (x86_iommu_get_default()) {
->          IommuType IOMMUType = x86_iommu_get_type();
-> diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-> new file mode 100644
-> index 0000000000..6f94ac4926
-> --- /dev/null
-> +++ b/include/hw/acpi/pci.h
-> @@ -0,0 +1,5 @@
-> +#ifndef HW_ACPI_PCI_H
-> +#define HW_ACPI_PCI_H
-> +
-> +void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
-> +#endif
+Eventually QEMU should set LC_ALL, honouring the full user environment,
+but this needs various cleanups in QEMU code first. Hardcoding LC_CTYPE
+to C.UTF-8 is a partial regression vs the above curses commit, since it
+will break the curses wide character handling for non-UTF-8 locales but
+this is unavoidable until QEMU is cleaned up to cope with non-UTF-8
+locales fully.
+
+Setting of LC_MESSAGES is left in the GTK code since only the GTK
+frontend is using translation of strings. This lets us avoid the
+platform portability problem where LC_MESSAGES is not provided by
+locale.h on MinGW. GTK pulls it in indirectly from libintl.h via
+gi18n.h header, but we don't want to pull that into the global
+QEMU namespace.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+
+Changed in v2:
+
+ - Leave LC_MESSAGES setting in gtk code to avoid platform
+   portability problems.
+
+ ui/curses.c |  2 --
+ ui/gtk.c    | 32 +++++++++++---------------------
+ vl.c        | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+), 23 deletions(-)
+
+diff --git a/ui/curses.c b/ui/curses.c
+index cc6d6da684..403cd57913 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -27,7 +27,6 @@
+ #include <sys/ioctl.h>
+ #include <termios.h>
+ #endif
+-#include <locale.h>
+ #include <wchar.h>
+ #include <langinfo.h>
+ #include <iconv.h>
+@@ -716,7 +715,6 @@ static void curses_display_init(DisplayState *ds, Dis=
+playOptions *opts)
+     }
+ #endif
+=20
+-    setlocale(LC_CTYPE, "");
+     if (opts->u.curses.charset) {
+         font_charset =3D opts->u.curses.charset;
+     }
+diff --git a/ui/gtk.c b/ui/gtk.c
+index e96e15435a..e6a41c79ab 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2208,12 +2208,12 @@ static void gtk_display_init(DisplayState *ds, Di=
+splayOptions *opts)
+=20
+     s->free_scale =3D FALSE;
+=20
+-    /* Mostly LC_MESSAGES only. See early_gtk_display_init() for details=
+. For
+-     * LC_CTYPE, we need to make sure that non-ASCII characters are cons=
+idered
+-     * printable, but without changing any of the character classes to m=
+ake
+-     * sure that we don't accidentally break implicit assumptions.  */
++    /*
++     * See comment in main() for why it has only setup LC_CTYPE,
++     * as opposed to LC_ALL. Given that we need to enable
++     * LC_MESSAGES too for menu translations.
++     */
+     setlocale(LC_MESSAGES, "");
+-    setlocale(LC_CTYPE, "C.UTF-8");
+     bindtextdomain("qemu", CONFIG_QEMU_LOCALEDIR);
+     textdomain("qemu");
+=20
+@@ -2262,22 +2262,12 @@ static void gtk_display_init(DisplayState *ds, Di=
+splayOptions *opts)
+=20
+ static void early_gtk_display_init(DisplayOptions *opts)
+ {
+-    /* The QEMU code relies on the assumption that it's always run in
+-     * the C locale. Therefore it is not prepared to deal with
+-     * operations that produce different results depending on the
+-     * locale, such as printf's formatting of decimal numbers, and
+-     * possibly others.
+-     *
+-     * Since GTK+ calls setlocale() by default -importing the locale
+-     * settings from the environment- we must prevent it from doing so
+-     * using gtk_disable_setlocale().
+-     *
+-     * QEMU's GTK+ UI, however, _does_ have translations for some of
+-     * the menu items. As a trade-off between a functionally correct
+-     * QEMU and a fully internationalized UI we support importing
+-     * LC_MESSAGES from the environment (see the setlocale() call
+-     * earlier in this file). This allows us to display translated
+-     * messages leaving everything else untouched.
++    /*
++     * GTK calls setlocale() by default, importing the locale
++     * settings from the environment. QEMU's main() method will
++     * have set LC_MESSAGES and LC_CTYPE to allow GTK to display
++     * translated messages, including use of wide characters. We
++     * must not allow GTK to change other aspects of the locale.
+      */
+     gtk_disable_setlocale();
+     gtkinit =3D gtk_init_check(NULL, NULL);
+diff --git a/vl.c b/vl.c
+index c696ad2a13..87a55cddb3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -49,6 +49,7 @@ int main(int argc, char **argv)
+ #define main qemu_main
+ #endif /* CONFIG_COCOA */
+=20
++#include <locale.h>
+=20
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+@@ -3022,6 +3023,45 @@ int main(int argc, char **argv, char **envp)
+     char *dir, **dirs;
+     BlockdevOptionsQueue bdo_queue =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_que=
+ue);
+=20
++    /*
++     * Ideally we would set LC_ALL, but QEMU currently isn't able to cop=
+e
++     * with arbitrary localization settings. In particular there are two
++     * known problems
++     *
++     *   - The QMP monitor needs to use the C locale rules for numeric
++     *     formatting. This would need a double/int -> string formatter
++     *     that is locale independant.
++     *
++     *   - The QMP monitor needs to encode all data as UTF-8. This needs
++     *     to be updated to use iconv(3) to explicitly convert the curre=
+nt
++     *     locale's charset into utf-8
++     *
++     *   - Lots of codes uses is{upper,lower,alnum,...} functions, expec=
+ting
++     *     C locale sorting behaviour. Most QEMU usage should likely be
++     *     changed to g_ascii_is{upper,lower,alnum...} to match code
++     *     assumptions, without being broken by locale settnigs.
++     *
++     * We do still have two requirements
++     *
++     *   - Ability to correct display translated text according to the
++     *     user's locale
++     *
++     *   - Ability to handle multibyte characters, ideally according to
++     *     user's locale specified character set. This affects ability
++     *     of usb-mtp to correctly convert filenames to UCS16 and curses
++     *     & GTK frontends wide character display.
++     *
++     * The second requirement would need LC_CTYPE to be honoured, but
++     * this conflicts with the 2nd & 3rd problems listed earlier. For
++     * now we make a tradeoff, trying to set an explicit UTF-8 localee
++     *
++     * Note we can't set LC_MESSAGES here, since mingw doesn't define
++     * this constant in locale.h Fortunately we only need it for the
++     * GTK frontend and that uses gi18n.h which pulls in a definition
++     * of LC_MESSAGES.
++     */
++    setlocale(LC_CTYPE, "C.UTF-8");
++
+     module_call_init(MODULE_INIT_TRACE);
+=20
+     qemu_init_cpu_list();
+--=20
+2.20.1
 
 
