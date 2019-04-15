@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39727)
+Received: from eggs.gnu.org ([209.51.188.92]:39849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy6-0001L4-Oj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:07 -0400
+	(envelope-from <philmd@redhat.com>) id 1hFyyg-0001ce-3R
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy5-0005qP-Bj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:06 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hFyy4-0005pn-Rp
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:05 -0400
-Date: Mon, 15 Apr 2019 13:35:47 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190415103546.GA6854@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hFyyf-00064Z-2W
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:42 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hFyye-00064C-Qm
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:41 -0400
+Received: by mail-wm1-f67.google.com with SMTP id n25so19728083wmk.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 03:36:40 -0700 (PDT)
+References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	<1555103178-21894-5-git-send-email-atar4qemu@gmail.com>
+	<29f79530-fd9e-ea60-8cf3-df593b855f10@reactos.org>
+	<CACXAS8De=OS0O4O2=Q721KCUc9RuQryOGNfedejM+yzWcX9aOg@mail.gmail.com>
+	<4eec1d45-01a6-1c96-ee49-6c3131823b83@reactos.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5665d408-512e-2ad4-aa4e-481287fc39e7@redhat.com>
+Date: Mon, 15 Apr 2019 12:36:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190411190215.2163572e.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+In-Reply-To: <4eec1d45-01a6-1c96-ee49-6c3131823b83@reactos.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/isa/i82378.c: use 1900 as a base
+ year
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, linux-rdma@vger.kernel.org, jgg@mellanox.com
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "open list:PReP" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> On Thu, 11 Apr 2019 14:01:54 +0300
-> Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> 
-> > Data center backends use more and more RDMA or RoCE devices and more and
-> > more software runs in virtualized environment.
-> > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > 
-> > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > technology and also because the Virtio specification
-> > allows Hardware Vendors to support Virtio protocol natively in order to
-> > achieve bare metal performance.
-> > 
-> > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > Virtio Specification and a look forward on possible implementation
-> > techniques.
-> > 
-> > Open issues/Todo list:
-> > List is huge, this is only start point of the project.
-> > Anyway, here is one example of item in the list:
-> > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> >   that this is reasonable so one option is to have one for all and
-> >   multiplex the traffic on it. This is not good approach as by design it
-> >   introducing an optional starvation. Another approach would be multi
-> >   queues and round-robin (for example) between them.
-> > 
-> > Expectations from this posting:
-> > In general, any comment is welcome, starting from hey, drop this as it is a
-> > very bad idea, to yeah, go ahead, we really want it.
-> > Idea here is that since it is not a minor effort i first want to know if
-> > there is some sort interest in the community for such device.
-> 
-> My first reaction is: Sounds sensible, but it would be good to have a
-> spec for this :)
-> 
-> You'll need a spec if you want this to go forward anyway, so at least a
-> sketch would be good to answer questions such as how many virtqueues
-> you use for which purpose, what is actually put on the virtqueues,
-> whether there are negotiable features, and what the expectations for
-> the device and the driver are. It also makes it easier to understand
-> how this is supposed to work in practice.
-> 
-> If folks agree that this sounds useful, the next step would be to
-> reserve an id for the device type.
+On 4/14/19 11:24 PM, Hervé Poussineau wrote:
+> Le 14/04/2019 à 20:53, Artyom Tarasenko a écrit :
+>> On Sun, Apr 14, 2019 at 7:01 PM Hervé Poussineau
+>> <hpoussin@reactos.org> wrote:
+>>>
+>>> Le 12/04/2019 à 23:06, Artyom Tarasenko a écrit :
+>>>> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
+>>>>
+>>>> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+>>>> ---
+>>>>    hw/isa/i82378.c | 4 +++-
+>>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+>>>> index a5d67bc..546c928 100644
+>>>> --- a/hw/isa/i82378.c
+>>>> +++ b/hw/isa/i82378.c
+>>>> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error
+>>>> **errp)
+>>>>        isa = isa_create_simple(isabus, "i82374");
+>>>>
+>>>>        /* timer */
+>>>> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
+>>>> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
+>>>> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
+>>>> +    qdev_init_nofail(DEVICE(isa));
+>>>
+>>> I am not sure the base_year should be hardcoded in i82378. I can
+>>> assume other machines with a i82378 can have another base_year.
+>>
+>> I doubt it to be honest. How would it work in the hardware? Is there a
+>> pin which would switch a year?
+>> I do believe the different i823xx may have the different base years
+>> though.
 
-Thanks for the tips, will sure do that, it is that first i wanted to make
-sure there is a use case here.
+There is no RTC on the i82378, this should be moved to the board code
+and set the date there. Do you want me to send this patch?
 
-Waiting for any feedback from the community.
+Regards,
 
-> 
-> > 
-> > The scope of the implementation is limited to probing the device and doing
-> > some basic ibverbs commands. Data-path is not yet implemented. So with this
-> > one can expect only that driver is (partialy) loaded and basic queries and
-> > resource allocation is done.
-> > 
-> > One note regarding the patchset.
-> > I know it is not standard to collaps patches from several repos as i did
-> > here (qemu and linux) but decided to do it anyway so the whole picture can
-> > be seen.
-> > 
-> > patch 1: virtio-net: Move some virtio-net-pci decl to include/hw/virtio
-> > 	This is a prelimenary patch just as a hack so i will not need to
-> > 	impelement new netdev
-> > patch 2: hw/virtio-rdma: VirtIO rdma device
-> > 	The implementation of the device
-> > patch 3: RDMA/virtio-rdma: VirtIO rdma driver
-> > 	The device driver
-> > 
-> 
+Phil.
