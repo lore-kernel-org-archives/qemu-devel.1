@@ -2,63 +2,66 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E1D2C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 18:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F6BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 18:13:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D658218A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 18:09:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D658218A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+	by mail.kernel.org (Postfix) with ESMTPS id 10C5C2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 18:13:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C5C2073F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53965 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54009 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG62g-0001B5-Ce
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 14:09:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49603)
+	id 1hG66W-0002eY-7W
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 14:13:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hG5zu-0007nv-SA
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:06:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hG65Z-00028R-Gt
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hG5zt-0004KR-VC
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:06:26 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:35368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1hG5zt-0004K5-MJ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:06:25 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by hera.aquilenet.fr (Postfix) with ESMTP id BDD78BEEA;
-	Mon, 15 Apr 2019 20:06:24 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
-Received: from hera.aquilenet.fr ([127.0.0.1])
-	by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pbAhRydBs_9k; Mon, 15 Apr 2019 20:06:20 +0200 (CEST)
-Received: from function (105.251.129.77.rev.sfr.net [77.129.251.105])
-	by hera.aquilenet.fr (Postfix) with ESMTPSA id E7728BEE9;
-	Mon, 15 Apr 2019 20:06:19 +0200 (CEST)
-Received: from samy by function with local (Exim 4.92)
-	(envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1hG5zm-0000O9-RV; Mon, 15 Apr 2019 20:06:18 +0200
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Date: Mon, 15 Apr 2019 20:06:18 +0200
-Message-Id: <20190415180618.1450-2-samuel.thibault@ens-lyon.org>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <no-reply@patchew.org>) id 1hG65Y-00008N-AH
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:12:17 -0400
+Resent-Date: Mon, 15 Apr 2019 14:12:17 -0400
+Resent-Message-Id: <E1hG65Y-00008N-AH@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hG65X-00007k-VM
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 14:12:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555351900; cv=none; d=zoho.com; s=zohoarc; 
+	b=kZaoOY0itFyjJ6kKIas0FHvgTG8Yy9Gdg0sFTwkklRg+EYSi020PF2sgr35mBQO+M7Zrfhdfylz1q0xTwUY9L5KFw4S9e9IWeDmwrCgNENx8HioIyoEPOybmVZ56+H6idYXj2hzG7SMIFQ2Jo3fOf1+y731RPzqqTCT+jehTKvo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555351900;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=dx75OnFdkJwLW5dVkUWCngJf+5ySP6zcQvug8QQFJhY=; 
+	b=lP2SvAAEs29u9PiV3oNQxQvKnT9RACl3Gay1RUsNj1jdA/Q1UHLhmEyU68XnrM8VrfYrIHahb0lgUzDZ/gd3MJB6ckSRl0SVsumzxVnV7JQFS5R/LmL98FNWnzWAbsWsfC9j46TwXG9qULnF//+GkfNoKwFHnRiEh53YXKQNp/o=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1555351896467557.352768108662;
+	Mon, 15 Apr 2019 11:11:36 -0700 (PDT)
+Message-ID: <155535189493.14176.10363908934654471797@76452e4e88f2>
 In-Reply-To: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
-References: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: samuel.thibault@ens-lyon.org
+Date: Mon, 15 Apr 2019 11:11:36 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.233.100.1
-Subject: [Qemu-devel] [PULL 1/1] slirp: Gcc 9 -O3 fix
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PULL 0/1] slirp gcc9 build fix
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,59 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jan.kiszka@siemens.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	stefanha@redhat.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, jan.kiszka@siemens.com,
+	qemu-devel@nongnu.org, stefanha@redhat.com, samuel.thibault@ens-lyon.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190415180618.fMW91wvF_y6po-leXPZQ7iYnbb40R9GwvFfE-6l7Taw@z>
+Message-ID: <20190415181136.QWFr0dDlXWW2PnDJNa78RsNqMuzxGxAGawQcwGQXSz0@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-
-Gcc 9 needs some convincing that sopreprbuf really is going to fill
-in iov in the call from soreadbuf, even though the failure case
-shouldn't happen.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190415121740.9881-1-dgilbert@redhat.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- slirp/src/socket.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/slirp/src/socket.c b/slirp/src/socket.c
-index 4a3c935e25..bb752fdcae 100644
---- a/slirp/src/socket.c
-+++ b/slirp/src/socket.c
-@@ -171,6 +171,7 @@ int
- soread(struct socket *so)
- {
- 	int n, nn;
-+	size_t buf_len;
- 	struct sbuf *sb =3D &so->so_snd;
- 	struct iovec iov[2];
-=20
-@@ -181,7 +182,8 @@ soread(struct socket *so)
- 	 * No need to check if there's enough room to read.
- 	 * soread wouldn't have been called if there weren't
- 	 */
--	sopreprbuf(so, iov, &n);
-+	buf_len =3D sopreprbuf(so, iov, &n);
-+	assert(buf_len !=3D 0);
-=20
- 	nn =3D recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
- 	if (nn <=3D 0) {
-@@ -257,6 +259,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
- size)
- 	 * No need to check if there's enough room to read.
- 	 * soread wouldn't have been called if there weren't
- 	 */
-+	assert(size > 0);
- 	if (sopreprbuf(so, iov, &n) < size)
-         goto err;
-=20
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxNTE4MDYxOC4xNDUw
+LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA0MTUxODA2MTguMTQ1MC0xLXNh
+bXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAv
+MV0gc2xpcnAgZ2NjOSBidWlsZCBmaXgKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
+dCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDExMTUyNTIwLjEwMDYxLTEt
+YXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQxMTE1MjUyMC4xMDA2MS0xLWFybWJy
+dUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTUx
+ODA2MTguMTQ1MC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE5
+MDQxNTE4MDYxOC4xNDUwLTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdlNDVmZDBiZjYgc2xpcnA6IEdjYyA5IC1PMyBmaXgKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzI0OiBGSUxFOiBzbGlycC9zcmMvc29ja2V0LmM6MTc0OgorXklzaXplX3QgYnVmX2xlbjsk
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzogRklMRTogc2xp
+cnAvc3JjL3NvY2tldC5jOjE4NToKK15JYnVmX2xlbiA9IHNvcHJlcHJidWYoc28sIGlvdiwgJm4p
+OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM0OiBGSUxFOiBz
+bGlycC9zcmMvc29ja2V0LmM6MTg2OgorXklhc3NlcnQoYnVmX2xlbiAhPSAwKTskCgpFUlJPUjog
+Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MjogRklMRTogc2xpcnAvc3JjL3Nv
+Y2tldC5jOjI2MjoKK15JYXNzZXJ0KHNpemUgPiAwKTskCgp0b3RhbDogNCBlcnJvcnMsIDAgd2Fy
+bmluZ3MsIDIzIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA3ZTQ1ZmQwYmY2OTAgKHNsaXJwOiBHY2Mg
+OSAtTzMgZml4KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQxNTE4MDYxOC4xNDUwLTEtc2Ft
+dWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
+ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
 
 
