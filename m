@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45296)
+Received: from eggs.gnu.org ([209.51.188.92]:46208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hFusP-0008N2-6y
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:13:58 -0400
+	(envelope-from <clg@kaod.org>) id 1hFuvK-0001D4-Gc
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hFusN-0006vC-PU
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:13:57 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:38262)
+	(envelope-from <clg@kaod.org>) id 1hFuvJ-0000iC-Bw
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:16:58 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:55537)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hFusN-0006rI-GZ
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:13:55 -0400
-Received: from player798.ha.ovh.net (unknown [10.109.143.72])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 90A05EF063
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 08:13:46 +0200 (CEST)
-References: <20190328062222.8409-1-joel@jms.id.au>
-	<20190328062222.8409-2-joel@jms.id.au>
-	<CAFEAcA_K1Rv1G-s=ndVYX6i_BvWME6ToShL6ZBpB4gnE3zdZdA@mail.gmail.com>
-	<89438392-9a54-7f43-5dff-6ceeffaf9f3e@kaod.org>
-	<CACPK8Xc_WeP3xuimjTBFRArteecikin9Qj8ZoCW-J2qBY4C=5g@mail.gmail.com>
-	<CAFEAcA9t+GUG8PK623gb4v6ZBEhDX_7coOPcgLHDnUXTsrcrvg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hFuvJ-0000hc-2T
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 02:16:57 -0400
+Received: from player763.ha.ovh.net (unknown [10.108.54.133])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 3E4475C0BC
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 08:16:54 +0200 (CEST)
+References: <20190411080004.8690-1-clg@kaod.org>
+	<20190411080004.8690-6-clg@kaod.org>
+	<20190415033836.GD32705@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c287ed71-59e8-3d7a-f835-1421cba7f6d9@kaod.org>
-Date: Mon, 15 Apr 2019 08:13:40 +0200
+Message-ID: <b5154105-1cd9-bf5f-b4ab-21b4a2b28e35@kaod.org>
+Date: Mon, 15 Apr 2019 08:16:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9t+GUG8PK623gb4v6ZBEhDX_7coOPcgLHDnUXTsrcrvg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190415033836.GD32705@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw: timer: Add ASPEED RTC device
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE
+ updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +33,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 4/12/19 1:55 PM, Peter Maydell wrote:
-> On Fri, 12 Apr 2019 at 04:17, Joel Stanley <joel@jms.id.au> wrote:
->> vmstate and migration is a foreign concept for the small ARM machines.
->> As well as being a developer, I am an end user of Qemu for them (the
->> aspeeds, microbit), and the use case is to boot up a firmware and
->> check that it does correct thing. I've never considered saving the
->> state and resming it, and can't think of a situation where that would
->> be done.
-> 
-> It's a really useful debugging tool:
->  https://translatedcode.wordpress.com/2015/07/06/tricks-for-debugging-qemu-savevm-snapshots/
+On 4/15/19 5:38 AM, David Gibson wrote:
+> On Thu, Apr 11, 2019 at 10:00:03AM +0200, C=E9dric Le Goater wrote:
+>> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>>
+>> On some architectures, PTE updates for dirty and changed bits need
+>> to be performed atomically. This adds a couple of address_space_cmpxch=
+g*
+>> helpers for that purpose.
+>>
+>> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> But I think this needs to go past Paolo for review as memory subsystem =
+maintainer.
 
-yes.  Our Aspeed machines migrate quite well today and, who knows,
-we might want one day to run Aspeed VMs on the "cloud". I doubt it 
-but, anyway, it's really not complex to do either.
+I will resend the last two patches in a new patchset and include a fix=20
+for Intel that Ben provided.
 
 Thanks,
 
-C. 
+C.=20
+
+>=20
+>> ---
+>>  include/exec/memory_ldst.inc.h |  6 +++
+>>  memory_ldst.inc.c              | 80 +++++++++++++++++++++++++++++++++=
++
+>>  2 files changed, 86 insertions(+)
+>>
+>> diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst=
+.inc.h
+>> index 272c20f02eae..f3cfa7e9a622 100644
+>> --- a/include/exec/memory_ldst.inc.h
+>> +++ b/include/exec/memory_ldst.inc.h
+>> @@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq, SUFFIX)(ARG=
+1_DECL,
+>>      hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
+>>  extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+>>      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)=
+;
+>> +extern uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DE=
+CL,
+>> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+>> +    MemTxResult *result);
+>> +extern uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DE=
+CL,
+>> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+>> +    MemTxResult *result);
+>>  extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
+>>      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)=
+;
+>>  extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
+>> diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+>> index acf865b900d7..1d58d2fea67d 100644
+>> --- a/memory_ldst.inc.c
+>> +++ b/memory_ldst.inc.c
+>> @@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG=
+1_DECL,
+>>      RCU_READ_UNLOCK();
+>>  }
+>> =20
+>> +/* This is meant to be used for atomic PTE updates under MT-TCG */
+>> +uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
+>> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+>> +    MemTxResult *result)
+>> +{
+>> +    uint8_t *ptr;
+>> +    MemoryRegion *mr;
+>> +    hwaddr l =3D 4;
+>> +    hwaddr addr1;
+>> +    MemTxResult r;
+>> +    uint8_t dirty_log_mask;
+>> +
+>> +    /* Must test result */
+>> +    assert(result);
+>> +
+>> +    RCU_READ_LOCK();
+>> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+>> +    if (l < 4 || !memory_access_is_direct(mr, true)) {
+>> +        r =3D MEMTX_ERROR;
+>> +    } else {
+>> +        uint32_t orig =3D old;
+>> +
+>> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+>> +        old =3D atomic_cmpxchg(ptr, orig, new);
+>> +
+>> +        if (old =3D=3D orig) {
+>> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+>> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+>> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram=
+_addr(mr) +
+>> +                                                addr, 4, dirty_log_ma=
+sk);
+>> +        }
+>> +        r =3D MEMTX_OK;
+>> +    }
+>> +    *result =3D r;
+>> +    RCU_READ_UNLOCK();
+>> +
+>> +    return old;
+>> +}
+>> +
+>> +#ifdef CONFIG_ATOMIC64
+>> +/* This is meant to be used for atomic PTE updates under MT-TCG */
+>> +uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
+>> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+>> +    MemTxResult *result)
+>> +{
+>> +    uint8_t *ptr;
+>> +    MemoryRegion *mr;
+>> +    hwaddr l =3D 8;
+>> +    hwaddr addr1;
+>> +    MemTxResult r;
+>> +    uint8_t dirty_log_mask;
+>> +
+>> +    /* Must test result */
+>> +    assert(result);
+>> +
+>> +    RCU_READ_LOCK();
+>> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+>> +    if (l < 8 || !memory_access_is_direct(mr, true)) {
+>> +        r =3D MEMTX_ERROR;
+>> +    } else {
+>> +        uint32_t orig =3D old;
+>> +
+>> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+>> +        old =3D atomic_cmpxchg(ptr, orig, new);
+>> +
+>> +        if (old =3D=3D orig) {
+>> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+>> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+>> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram=
+_addr(mr) +
+>> +                                                addr, 8, dirty_log_ma=
+sk);
+>> +        }
+>> +        r =3D MEMTX_OK;
+>> +    }
+>> +    *result =3D r;
+>> +    RCU_READ_UNLOCK();
+>> +
+>> +    return old;
+>> +}
+>> +#endif /* CONFIG_ATOMIC64 */
+>> +
+>>  /* warning: addr must be aligned */
+>>  static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL=
+,
+>>      hwaddr addr, uint32_t val, MemTxAttrs attrs,
+>=20
