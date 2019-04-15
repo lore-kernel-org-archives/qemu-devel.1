@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33622)
+Received: from eggs.gnu.org ([209.51.188.92]:34395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hFtpX-0004Cg-8x
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:06:56 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1hFtvb-0005SW-KO
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hFtpV-0006VD-SV
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:06:55 -0400
-Date: Mon, 15 Apr 2019 15:06:43 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-References: <20190412093603.18232-1-npiggin@gmail.com>
-	<20190415041359.GE32705@umbus.fritz.box>
-In-Reply-To: <20190415041359.GE32705@umbus.fritz.box>
-MIME-Version: 1.0
-Message-Id: <1555302690.7m52mtdllv.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <benh@kernel.crashing.org>) id 1hFtva-0008Ix-C4
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 01:13:11 -0400
+Message-ID: <6b177677d32eff4d3969b6601b13de2c97324812.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Mon, 15 Apr 2019 15:12:48 +1000
+In-Reply-To: <20190415033836.GD32705@umbus.fritz.box>
+References: <20190411080004.8690-1-clg@kaod.org>
+	<20190411080004.8690-6-clg@kaod.org>
+	<20190415033836.GD32705@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] spapr: add splpar hcalls H_JOIN, H_PROD,
- H_CONFER
+Subject: Re: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE
+ updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,182 +25,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
-David Gibson's on April 15, 2019 2:13 pm:
-> On Fri, Apr 12, 2019 at 07:36:03PM +1000, Nicholas Piggin wrote:
->> These implementations have a few deficiencies that are noted, but are
->> good enough for Linux to use.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->>=20
->> Cleaned up checkpatch warnings, sorry I didn't realise that exists.
->>=20
->>  hw/ppc/spapr_hcall.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 88 insertions(+)
->>=20
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index 8a736797b9..e985bb694d 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1065,6 +1065,90 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
->>      return H_SUCCESS;
->>  }
->> =20
->> +static target_ulong h_join(PowerPCCPU *cpu, SpaprMachineState *spapr,
->> +                           target_ulong opcode, target_ulong *args)
->> +{
->> +    CPUPPCState *env =3D &cpu->env;
->> +    CPUState *cs =3D CPU(cpu);
->> +
->> +    if (env->msr & (1ULL << MSR_EE)) {
->> +        return H_BAD_MODE;
->> +    }
->> +
->> +    /*
->> +     * This should check for single-threaded mode. In practice, Linux
->> +     * does not try to H_JOIN all CPUs.
->> +     */
->> +
->> +    cs->halted =3D 1;
->> +    cs->exception_index =3D EXCP_HALTED;
->> +    cs->exit_request =3D 1;
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
->> +                           target_ulong opcode, target_ulong *args)
->> +{
->> +    target_long target =3D args[0];
->> +    CPUState *cs =3D CPU(cpu);
->> +
->> +    /*
->> +     * This does not do a targeted yield or confer, but check the param=
-eter
->> +     * anyway. -1 means confer to all/any other CPUs.
->> +     */
->> +    if (target !=3D -1 && !CPU(spapr_find_cpu(target))) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    /*
->> +     * H_CONFER with target =3D=3D this is not exactly the same as H_JO=
-IN
->> +     * according to PAPR (e.g., MSR[EE] check and single threaded check
->> +     * is not done in this case), but unlikely to matter.
->> +     */
->> +    if (cpu =3D=3D spapr_find_cpu(target)) {
->> +        return h_join(cpu, spapr, opcode, args);
->> +    }
->> +
->> +    /*
->> +     * This does not implement the dispatch sequence check that PAPR ca=
-lls for,
->> +     * but PAPR also specifies a stronger implementation where the targ=
-et must
->> +     * be run (or EE, or H_PROD) before H_CONFER returns. Without such =
-a hard
->> +     * scheduling requirement implemented, there is no correctness reas=
-on to
->> +     * implement the dispatch sequence check.
->> +     */
->> +    cs->exception_index =3D EXCP_YIELD;
->> +    cpu_loop_exit(cs);
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * H_PROD and H_CONFER are specified to only modify GPR r3, which is no=
-t
->> + * achievable running under KVM,
+On Mon, 2019-04-15 at 13:38 +1000, David Gibson wrote:
+> On Thu, Apr 11, 2019 at 10:00:03AM +0200, C=C3=A9dric Le Goater wrote:
+> > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> >=20
+> > On some architectures, PTE updates for dirty and changed bits need
+> > to be performed atomically. This adds a couple of
+> > address_space_cmpxchg*
+> > helpers for that purpose.
+> >=20
+> > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >=20
-> Uh.. why not?
-
-sc 1 handler kills ctr and cr0, but I misread the spec, they are not
-specified to modify _only_ GPR r3, but rather the only GPR modified
-is r3. cr0 and ctr still in the kill set.
-
->> although KVM already implements H_CONFER
->> + * this way.
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 >=20
-> And this seems to contradict the above.
+> But I think this needs to go past Paolo for review as memory
+> subsystem maintainer.
 
-I just meat it already is implemented with those clobbers, but as
-above that's not a problem. I'll take the comment out.
+This needs to go to rth and Peter. They were talking about a change in
+the abstraction to do these more cleanly... that said, it might be
+worthwhile merging the fixes first.
 
->> + */
->> +static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
->> +                           target_ulong opcode, target_ulong *args)
->> +{
->> +    target_long target =3D args[0];
->> +    CPUState *cs;
->> +
->> +    /*
->> +     * Should set the prod flag in the VPA.
->=20
-> So.. why doesn't it?
-
-It needs to be cleared at all vCPU dispatch points to SPEC, not just
-when calling H_CEDE as Ben's patch had. I think complexity would be
-significant for questionable benefit. Like the dispatch sequence, it
-seems like the test is trying to cover some race condition for the
-client but does not really do it well (and for Linux not necessary).
-
-prod bit is cleared after vCPU returns from preemption, so it can=20
-clear at any time and you can't rely on it, unless you look at=20
-dispatch sequence numbers to decipher if it was reset or not.
-
-KVM does implement something like the prodded flag as Ben's patch did
-but that's not to spec AFAIKS.
+Cheers,
+Ben.
 
 >=20
->> +     */
->> +
->> +    cs =3D CPU(spapr_find_cpu(target));
->> +    if (!cs) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    cs->halted =3D 0;
->> +    qemu_cpu_kick(cs);
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->>  static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>                             target_ulong opcode, target_ulong *args)
->>  {
->> @@ -1860,6 +1944,10 @@ static void hypercall_register_types(void)
->>      /* hcall-splpar */
->>      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
->>      spapr_register_hypercall(H_CEDE, h_cede);
->> +    spapr_register_hypercall(H_CONFER, h_confer);
->> +    spapr_register_hypercall(H_JOIN, h_join);
+> > ---
+> >  include/exec/memory_ldst.inc.h |  6 +++
+> >  memory_ldst.inc.c              | 80
+> > ++++++++++++++++++++++++++++++++++
+> >  2 files changed, 86 insertions(+)
+> >=20
+> > diff --git a/include/exec/memory_ldst.inc.h
+> > b/include/exec/memory_ldst.inc.h
+> > index 272c20f02eae..f3cfa7e9a622 100644
+> > --- a/include/exec/memory_ldst.inc.h
+> > +++ b/include/exec/memory_ldst.inc.h
+> > @@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq,
+> > SUFFIX)(ARG1_DECL,
+> >      hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
+> >  extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+> >      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult
+> > *result);
+> > +extern uint32_t glue(address_space_cmpxchgl_notdirty,
+> > SUFFIX)(ARG1_DECL,
+> > +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+> > +    MemTxResult *result);
+> > +extern uint32_t glue(address_space_cmpxchgq_notdirty,
+> > SUFFIX)(ARG1_DECL,
+> > +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+> > +    MemTxResult *result);
+> >  extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
+> >      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult
+> > *result);
+> >  extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
+> > diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+> > index acf865b900d7..1d58d2fea67d 100644
+> > --- a/memory_ldst.inc.c
+> > +++ b/memory_ldst.inc.c
+> > @@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty,
+> > SUFFIX)(ARG1_DECL,
+> >      RCU_READ_UNLOCK();
+> >  }
+> > =20
+> > +/* This is meant to be used for atomic PTE updates under MT-TCG */
+> > +uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
+> > +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+> > +    MemTxResult *result)
+> > +{
+> > +    uint8_t *ptr;
+> > +    MemoryRegion *mr;
+> > +    hwaddr l =3D 4;
+> > +    hwaddr addr1;
+> > +    MemTxResult r;
+> > +    uint8_t dirty_log_mask;
+> > +
+> > +    /* Must test result */
+> > +    assert(result);
+> > +
+> > +    RCU_READ_LOCK();
+> > +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+> > +    if (l < 4 || !memory_access_is_direct(mr, true)) {
+> > +        r =3D MEMTX_ERROR;
+> > +    } else {
+> > +        uint32_t orig =3D old;
+> > +
+> > +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+> > +        old =3D atomic_cmpxchg(ptr, orig, new);
+> > +
+> > +        if (old =3D=3D orig) {
+> > +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+> > +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+> > +            cpu_physical_memory_set_dirty_range(memory_region_get_
+> > ram_addr(mr) +
+> > +                                                addr, 4,
+> > dirty_log_mask);
+> > +        }
+> > +        r =3D MEMTX_OK;
+> > +    }
+> > +    *result =3D r;
+> > +    RCU_READ_UNLOCK();
+> > +
+> > +    return old;
+> > +}
+> > +
+> > +#ifdef CONFIG_ATOMIC64
+> > +/* This is meant to be used for atomic PTE updates under MT-TCG */
+> > +uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
+> > +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+> > +    MemTxResult *result)
+> > +{
+> > +    uint8_t *ptr;
+> > +    MemoryRegion *mr;
+> > +    hwaddr l =3D 8;
+> > +    hwaddr addr1;
+> > +    MemTxResult r;
+> > +    uint8_t dirty_log_mask;
+> > +
+> > +    /* Must test result */
+> > +    assert(result);
+> > +
+> > +    RCU_READ_LOCK();
+> > +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+> > +    if (l < 8 || !memory_access_is_direct(mr, true)) {
+> > +        r =3D MEMTX_ERROR;
+> > +    } else {
+> > +        uint32_t orig =3D old;
+> > +
+> > +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+> > +        old =3D atomic_cmpxchg(ptr, orig, new);
+> > +
+> > +        if (old =3D=3D orig) {
+> > +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+> > +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+> > +            cpu_physical_memory_set_dirty_range(memory_region_get_
+> > ram_addr(mr) +
+> > +                                                addr, 8,
+> > dirty_log_mask);
+> > +        }
+> > +        r =3D MEMTX_OK;
+> > +    }
+> > +    *result =3D r;
+> > +    RCU_READ_UNLOCK();
+> > +
+> > +    return old;
+> > +}
+> > +#endif /* CONFIG_ATOMIC64 */
+> > +
+> >  /* warning: addr must be aligned */
+> >  static inline void glue(address_space_stl_internal,
+> > SUFFIX)(ARG1_DECL,
+> >      hwaddr addr, uint32_t val, MemTxAttrs attrs,
 >=20
-> I don't see any sign that H_JOIN is implemented in KVM, although
-> H_CONFER and H_PROD certainly are.
-
-H_JOIN is not.
-
->> +    spapr_register_hypercall(H_PROD, h_prod);
->> +
->>      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
->> =20
->>      /* processor register resource access h-calls */
 >=20
-> Don't we also need to add something to hypertas-calls to advertise the
-> availability of these calls to the guest?
-
-hcall-splpar is for H_CONFER and H_PROD, H_JOIN also wants
-hcall-join actually, good point. I could split the patch up and add
-H_CONFER and H_PROD first.
-
-Thanks,
-Nick
-
-=
