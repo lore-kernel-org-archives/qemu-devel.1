@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36016)
+Received: from eggs.gnu.org ([209.51.188.92]:36747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hG3D1-0006wO-Ix
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:07:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1hG3GE-0007pm-46
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hG3D0-0007WM-Em
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:07:47 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34949)
+	(envelope-from <bounces@canonical.com>) id 1hG3GD-0000tT-0g
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:11:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38080)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hG3D0-0007W6-71
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:07:46 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w1so22448306wrp.2
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 08:07:46 -0700 (PDT)
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-2-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <efbf9e4e-8be1-04b4-3743-ce384de2b58d@redhat.com>
-Date: Mon, 15 Apr 2019 17:07:42 +0200
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hG3GC-0000rz-Pz
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:11:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hG3GB-0002aU-DE
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 15:11:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A54D2E80CC
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 15:11:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1555334842-195718-2-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/5] sparc64: use
- memory_region_allocate_system_memory() only for '-m' specified RAM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 15 Apr 2019 14:56:22 -0000
+From: =?utf-8?b?6LSe6LS15p2O?= <1788582@bugs.launchpad.net>
+Reply-To: Bug 1788582 <1788582@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153501548405.31458.2315196104370535583.malonedeb@soybean.canonical.com>
+Message-Id: <155534018274.21090.11925098381334643656.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788582] Re: Race condition during shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +36,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>, Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 4/15/19 3:27 PM, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() was designed to be called for
-> allocating inital RAM. Using it mutiple times within one board is not
-> supported and could fail if -mem-path with non hugepage path is used.
-> 
-> Keep using memory_region_allocate_system_memory() only for initial
-> RAM and use memory_region_init_ram() for the rest fixed size regions.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  hw/sparc64/niagara.c | 25 +++++++++++++------------
->  1 file changed, 13 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-> index f8a856f..39a4522 100644
-> --- a/hw/sparc64/niagara.c
-> +++ b/hw/sparc64/niagara.c
-> @@ -37,6 +37,7 @@
->  #include "sysemu/block-backend.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/qtest.h"
-> +#include "qapi/error.h"
->  
->  
->  typedef struct NiagaraBoardState {
-> @@ -108,8 +109,8 @@ static void niagara_init(MachineState *machine)
->      /* init CPUs */
->      sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
->      /* set up devices */
-> -    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
-> -                                         NIAGARA_HV_RAM_SIZE);
-> +    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
-> +                           NIAGARA_HV_RAM_SIZE, &error_fatal);
->      memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
->  
->      memory_region_allocate_system_memory(&s->partition_ram, NULL,
+Do you find the cause of the bug and fix it?
 
-Using the partition RAM as system memory rather than HV one seems the
-correct choice.
+-- =
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788582
 
-> @@ -118,17 +119,17 @@ static void niagara_init(MachineState *machine)
->      memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
->                                  &s->partition_ram);
->  
-> -    memory_region_allocate_system_memory(&s->nvram, NULL,
-> -                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
-> +    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
-> +                           &error_fatal);
->      memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
-> -    memory_region_allocate_system_memory(&s->md_rom, NULL,
-> -                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
-> +    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
-> +                           NIAGARA_MD_ROM_SIZE, &error_fatal);
->      memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
-> -    memory_region_allocate_system_memory(&s->hv_rom, NULL,
-> -                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
-> +    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
-> +                           NIAGARA_HV_ROM_SIZE, &error_fatal);
->      memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
-> -    memory_region_allocate_system_memory(&s->prom, NULL,
-> -                                         "sun4v.prom", PROM_SIZE_MAX);
-> +    memory_region_init_ram(&s->prom, NULL, "sun4v.prom", PROM_SIZE_MAX,
-> +                           &error_fatal);
->      memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
->  
->      add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
-> @@ -145,8 +146,8 @@ static void niagara_init(MachineState *machine)
->          BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
->          int size = blk_getlength(blk);
->          if (size > 0) {
-> -            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
-> -                                                 "sun4v_vdisk.ram", size);
-> +            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
-> +                                   &error_fatal);
->              memory_region_add_subregion(get_system_memory(),
->                                          NIAGARA_VDISK_BASE, &s->vdisk_ram);
->              dinfo->is_default = 1;
-> 
+Title:
+  Race condition during shutdown
+
+Status in QEMU:
+  New
+
+Bug description:
+  I ran into a bug when I started several VMs in parallel using
+  libvirt. The VMs are using only a kernel and a initrd (which includes a
+  minimal OS). The guest OS itself does a 'poweroff -f' as soon as the
+  login prompt shows up. So the expectaction is that the VMs will start,
+  the shutdown will be initiated, and the QEMU processes will then
+  end. But instead some of the QEMU processes get stuck in ppoll().
+
+  A bisect showed that the first bad commit was
+  0f12264e7a41458179ad10276a7c33c72024861a ("block: Allow graph changes in
+  bdrv_drain_all_begin/end sections").
+
+  I've already tried the current master (13b7b188501d419a7d63c016e00065bcc6=
+93b7d4) =
+
+  since the problem might be related
+  to the commit a1405acddeb0af6625dd9c30e8277b08e0885bd3 ("aio: Do
+  aio_notify_accept only during blocking aio_poll"). But the bug is still
+  there. I=E2=80=99ve reproduced the bug on x86_64 and on s390x.
+
+  The backtrace of a hanging QEMU process:
+
+  (gdb) bt
+  #0  0x00007f5d0e251b36 in ppoll () from target:/lib64/libc.so.6
+  #1  0x0000560191052014 in qemu_poll_ns (fds=3D0x560193b23d60, nfds=3D5, t=
+imeout=3D55774838936000) at /home/user/git/qemu/util/qemu-timer.c:334
+  #2  0x00005601910531fa in os_host_main_loop_wait (timeout=3D5577483893600=
+0) at /home/user/git/qemu/util/main-loop.c:233
+  #3  0x0000560191053119 in main_loop_wait (nonblocking=3D0) at /home/user/=
+git/qemu/util/main-loop.c:497
+  #4  0x0000560190baf454 in main_loop () at /home/user/git/qemu/vl.c:1866
+  #5  0x0000560190baa552 in main (argc=3D71, argv=3D0x7ffde10e41c8, envp=3D=
+0x7ffde10e4408) at /home/user/git/qemu/vl.c:4644
+
+  The used domain definition is:
+
+  <domain type=3D'kvm'>
+    <name>test</name>
+    <memory unit=3D'KiB'>716800</memory>
+    <vcpu placement=3D'static'>2</vcpu>
+    <iothreads>8</iothreads>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-3.0'>hvm</type>
+      <kernel>/var/lib/libvirt/images/vmlinuz-4.14.13-200.fc26.x86_64</kern=
+el>
+      <initrd>/var/lib/libvirt/images/test-image-qemux86_64+modules-4.14.13=
+-200.fc26.x86_64.cpio.gz</initrd>
+      <cmdline>console=3Dhvc0 STARTUP=3Dshutdown.sh</cmdline>
+      <boot dev=3D'hd'/>
+    </os>
+    <features>
+      <acpi/>
+    </features>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>preserve</on_crash>
+    <devices>
+      <emulator>/usr/local/qemu/master/bin/qemu-system-x86_64</emulator>
+      <controller type=3D'usb' index=3D'0' model=3D'piix3-uhci'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'virtio-serial' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </controller>
+      <console type=3D'pty'>
+        <target type=3D'virtio' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <memballoon model=3D'none'/>
+    </devices>
+  </domain>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788582/+subscriptions
