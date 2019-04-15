@@ -2,83 +2,89 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A7AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 09:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30068C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 09:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 154D32070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 09:51:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E43252070D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 09:54:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="KpGuapW5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 154D32070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V51EKFrk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E43252070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47456 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47468 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFyGd-00037P-6X
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 05:51:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58870)
+	id 1hFyKG-0003un-66
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 05:54:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFp-0002dh-9R
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:22 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hFyJQ-0003a4-42
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFn-0004Wm-Iz
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:21 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:53474)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyFj-0004VC-VL
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:50:17 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
-	[IPv6:2a02:6b8:0:1402::301])
-	by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id CDF582E124E;
-	Mon, 15 Apr 2019 12:50:10 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	UgIlpAgJxk-o9oa9Bpu; Mon, 15 Apr 2019 12:50:10 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1555321810; bh=fXKK66QPLDrSfz/JgAehCzJxIeqEUXisPKponFeWRIk=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=KpGuapW5yC6SDlWFqHQo3nJtnu+chxJyIxhvSypx16BusROS6Ztje5wbMAFQzhMts
-	32ujFwThvS/qY9kLiN6jHg6wnZZW2OQLrM3QQDCXmYR+8wGgpQIcsg7V0GFckSjYrP
-	tZgvwdOYOHxARlnnf+oHqrYoHXzBh3YiSK/oeBv0=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1o.mail.yandex.net ([::1])
-	by mxbackcorp1o.mail.yandex.net with LMTP id yD56tfcS
-	for <yury-kotov@yandex-team.ru>; Mon, 15 Apr 2019 12:50:04 +0300
-Received: by vla1-1374b6242101.qloud-c.yandex.net with HTTP;
-	Mon, 15 Apr 2019 12:50:03 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
-	Dr. David Alan Gilbert <dgilbert@redhat.com>
-In-Reply-To: <226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
-References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-	<20190411120421.GP3641@redhat.com>
-	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190411123911.GR3641@redhat.com>
-	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	(envelope-from <stefanha@gmail.com>) id 1hFyJP-0005uC-7p
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:54:04 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:33316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hFyJO-0005tj-VG
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 05:54:03 -0400
+Received: by mail-wr1-x436.google.com with SMTP id q1so21106303wrp.0
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 02:54:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=IoDrJ1YNFEzfxURP885irVULx9NqTXOpvdmPDDHT0oI=;
+	b=V51EKFrkQDDZWVdDx5DZb7e0YOubv3TFAXVdHnBM8G+rF3jLzzfpXP+1/qMVG0yLdL
+	Nn8BSjRQasjZVWD7waUPi2K0w6vdo8bYXI/aqEQAe8IKjslzL0dQBTUCkc90DdgopRE2
+	hPGXJBICY7y19rMVljIXvMSczmRvPZkCi+3TS4AiwpT1l1pTBMlHmVsAGxKvbAXxnHN5
+	i4dEs5g5MgKt2oU6gRI4cNkxlx1H58vy/CoLp/I47BsfcLqUdNK80ZbH1TfSPyEEPUIw
+	Fh3z45oKzlICpiWZIpj/5/vWwWfvhVhmKCyCBAbZjH1yUIVVqQz7n2TKZUEljm2eig9T
+	LsVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=IoDrJ1YNFEzfxURP885irVULx9NqTXOpvdmPDDHT0oI=;
+	b=jO/8t2TbaQGAwXnG6pLGnJwAsVLmwlnfqubjGHCpH03ISLxAx9pdNnJNSu6CxFd9kv
+	kNPvU/uUrCn5ui+8tztBsAmyEkCl1X0wKPlTDe+3/Nnd0ol/NhGejVKtEeCoPQHJzbiP
+	6KNp6U/UU5Bubbw64m5HETGMXiIqS+JflRFThpbeI/QpNc8DXwmIuNfy/XfN6j+pWCNu
+	oxsZnzVlEu3HH+QEoLJ8kknmVcHulRn+LSVc84nRx5t5yJnkYJ4IHMMVWagXNms0DOve
+	gkALCObRfurljC2EUj99T/98oVksOZyjLlEGGiImGRQ249yGEvmMBnnBp/cisAR+g3ei
+	v+sw==
+X-Gm-Message-State: APjAAAU8fwF9fb0+YdxTsiYlHahTV75uO7elbiuSe0TxlpCMAlcV70cX
+	BwGdxi8gdPw7oRI5B1WuAkw=
+X-Google-Smtp-Source: APXvYqyQQD9IFqgmNcIYRTWZcOAfRyDDsfZwZBXyUONt5QDbUmCC2VLywnKA1wFSbZomE5JoA9Lvrg==
+X-Received: by 2002:adf:b458:: with SMTP id v24mr46338400wrd.46.1555322041918; 
+	Mon, 15 Apr 2019 02:54:01 -0700 (PDT)
+Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
+	r16sm36778562wrx.37.2019.04.15.02.54.01
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 15 Apr 2019 02:54:01 -0700 (PDT)
+Date: Mon, 15 Apr 2019 10:54:00 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Message-ID: <20190415095400.GD29134@stefanha-x1.localdomain>
+References: <839EC771-5973-4B05-BC76-D6CC5EE63A43@gmail.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 15 Apr 2019 12:50:08 +0300
-Message-Id: <243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cHMo6Wbp1wrKhbfi"
+Content-Disposition: inline
+In-Reply-To: <839EC771-5973-4B05-BC76-D6CC5EE63A43@gmail.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a02:6b8:0:1a2d::193
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+X-Received-From: 2a00:1450:4864:20::436
+Subject: Re: [Qemu-devel] Booting from a Bootcamp partition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,121 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
-	Juan Quintela <quintela@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415095008.K-J9ZRb3xP1a_aIIIjOa7v1floeyvCzJUdnEYGTDAAA@z>
+Message-ID: <20190415095400.FoRoZNACKp_yoWk0RGVuTeJkqAQh9Pj5Y1-iN7sSfmY@z>
+
+
+--cHMo6Wbp1wrKhbfi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Apr 14, 2019 at 07:33:17PM -0400, Programmingkid wrote:
+> Hi I was wondering if anyone has been able to boot from a bootcamp partit=
+ion inside of QEMU. I know this partition can be used in QEMU but my own at=
+tempts at booting Windows 7 on my bootcamp partition did not work. I always=
+ see "A disk read error occurred". Has anyone else been successful at this?=
+=20
 
 Hi,
+It's difficult to help without more information:
+1. What is your QEMU command-line?
+2. What is the partition table on the disk?
 
-Just to clarify. I see two possible solutions:
+General problems with booting Windows are usually caused by a guest
+configuration that doesn't match the hardware configuration that Windows
+was installed under.  Can you check that the AHCI bus address of the
+disk and partition numbering matches what Windows expected?
 
-1) Since the migration code doesn't receive fd, it isn't responsible for
-closing it. So, it may be better to use migrate_fd_param for both
-incoming/outgoing and add dupping for migrate_fd_param. Thus, clients mus=
-t
-close the fd themselves. But existing clients will have a leak.
+It may also be useful to enable tracing (see docs/devel/tracing.txt) to
+see what the ahci_* trace event log says.  I have CCed John Snow, one of
+the few people who can read this log :).
 
-2) If we don't duplicate fd, then at least we should remove fd from
-the corresponding list. Therefore, the solution is to fix qemu_close to f=
-ind
-the list and remove fd from it. But qemu_close is currently consistent wi=
-th
-qemu_open (which opens/dups fd), so adding additional logic might not be
-a very good idea.
+Stefan
 
-I don't see any other solution, but I might miss something.
-What do you think?
+--cHMo6Wbp1wrKhbfi
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Regards,
-Yury
+-----BEGIN PGP SIGNATURE-----
 
-11.04.2019, 15:58, "Yury Kotov" <yury-kotov@yandex-team.ru>:
-> 11.04.2019, 15:39, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
->> =C2=A0On Thu, Apr 11, 2019 at 03:31:43PM +0300, Yury Kotov wrote:
->>> =C2=A0=C2=A011.04.2019, 15:04, "Daniel P. Berrang=C3=A9" <berrange@re=
-dhat.com>:
->>> =C2=A0=C2=A0> On Wed, Apr 10, 2019 at 12:26:52PM +0300, Yury Kotov wr=
-ote:
->>> =C2=A0=C2=A0>> =C2=A0Currently such case is possible for incoming:
->>> =C2=A0=C2=A0>> =C2=A0QMP: add-fd (fdset =3D 0, fd of some file):
->>> =C2=A0=C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0adds fd to fdset 0 and r=
-eturns QEMU's fd (e.g. 33)
->>> =C2=A0=C2=A0>> =C2=A0QMP: migrate-incoming (uri =3D "fd:33"): fd is s=
-tored in QIOChannel *ioc
->>> =C2=A0=C2=A0>> =C2=A0...
->>> =C2=A0=C2=A0>> =C2=A0Incoming migration completes and unrefs ioc -> c=
-lose(33)
->>> =C2=A0=C2=A0>> =C2=A0QMP: remove-fd (fdset =3D 0, fd =3D 33):
->>> =C2=A0=C2=A0>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0removes fd from fdset 0 =
-and qemu_close() -> close(33) =3D> double close
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> IMHO this is user error.
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> You've given the FD to QEMU and told it to use it for m=
-igration.
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> Once you've done that you should not be calling remove-=
-fd.
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> remove-fd should only be used in some error code path. =
-ie if you
->>> =C2=A0=C2=A0> have called add-fd, and then some failure means you've =
-decided you
->>> =C2=A0=C2=A0> can't invoke 'migrate-incoming'. Now you should call "r=
-emove-fd".
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> AFAIK, we have never documented that 'add-fd' must be p=
-aired
->>> =C2=A0=C2=A0> with 'remove-fd'.
->>> =C2=A0=C2=A0>
->>> =C2=A0=C2=A0> IOW, I think this "fix" is in fact not a fix - it is in=
-stead
->>> =C2=A0=C2=A0> changing the semantics of when "remove-fd" should be us=
-ed.
->>> =C2=A0=C2=A0>
->>>
->>> =C2=A0=C2=A0I think it might be user's error but fd is still in cur_m=
-on->fds (in getfd case)
->>> =C2=A0=C2=A0or in mon_fdsets (in add-fd case). So if fd is still exis=
-ts in the lists why
->>> =C2=A0=C2=A0user can't close/remove it?
->>>
->>> =C2=A0=C2=A0So, there are 2 valid options:
->>> =C2=A0=C2=A01) fd is still valid after migration (dup)
->>
->> =C2=A0If we do this then existing mgmt apps using QEMU who don't expec=
-t to need
->> =C2=A0to call remove-fd are going to be leaking FDs forever.
->
-> Ok, so what do you think about modifying qemu_close to remove fd from t=
-hese two
-> lists? Currently it tryes to remove fd only from mon_fdsets->dup_fds.
->
-> Regards,
-> Yury
->
->>> =C2=A0=C2=A02) fd is closed but also removed from the appropriate lis=
-t
->>
->> =C2=A0monitor_get_fd currently leaves the FD on the list.
->>
->> =C2=A0if all current users of that API are closing the FD
->> =C2=A0themselves, then we could change that method to remove
->> =C2=A0it from the list.
->>
->> =C2=A0Either way the requirements in this area are pooly documented
->> =C2=A0both from QEMU's internal POV and from mgmt app public QMP pov.
->>
->> =C2=A0Regards,
->> =C2=A0Daniel
->> =C2=A0--
->> =C2=A0|: https://berrange.com -o- https://www.flickr.com/photos/dberra=
-nge :|
->> =C2=A0|: https://libvirt.org -o- https://fstop138.berrange.com :|
->> =C2=A0|: https://entangle-photo.org -o- https://www.instagram.com/dber=
-range :|
+iQEcBAEBAgAGBQJctFS4AAoJEJykq7OBq3PIukYIAIS4icUascjT/GGtZCcQ1Xtb
+YWpRKWxfq7dDcRIGeRN+kIiBim+BcV36LaEb0QfDg82KzvNI55GFy/PhfZrrf5RA
+7eoIJmwqghGYOWJZaWN3dOQtnKKhy6RDNiLIhwead7Kt10XSHP5vUQm6nFKhiemt
+BYbw93Oe3bLmgBNBEmykgooEr8WZinJ/iL+/lZbjdP86CuvSWEipJjzcBXoghXgR
+5A5IfpYlJplM3kH/KzLGdiicw1oMyqW1Sd4/raigQKIEEPLytHpub/P2HF4ABHH4
+MAb96GaYZsui/bxBF76dgmbdXHHNgwIqimwaNI/lsC6qyty5l1wGWwojh+7PPjc=
+=R1Fm
+-----END PGP SIGNATURE-----
+
+--cHMo6Wbp1wrKhbfi--
 
