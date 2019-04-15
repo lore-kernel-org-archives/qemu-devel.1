@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55260)
+Received: from eggs.gnu.org ([209.51.188.92]:55671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Iy-0004Jw-Uq
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:18:01 -0400
+	(envelope-from <berrange@redhat.com>) id 1hG4KU-0005BM-SI
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Iy-0000jN-2s
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:18:00 -0400
-References: <20190415155452.5115-1-kwolf@redhat.com>
-	<20190415155452.5115-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cd898659-76d9-5041-d560-3dd1c7e03011@redhat.com>
-Date: Mon, 15 Apr 2019 11:17:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1hG4KP-0002mF-Pl
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hG4KJ-0002VE-M2
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:19:27 -0400
+Date: Mon, 15 Apr 2019 17:19:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190415161913.GQ5718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190415160609.24240-1-marcandre.lureau@redhat.com>
+	<20190415160809.GP5718@redhat.com>
+	<CAJ+F1CJwW-20YWbYgcHGhtBDZnHGAHSrj-OHht0hFb5O8ndsFQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190415155452.5115-3-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ouv4dC9zsheUuGwvMZWCh7jCEkxXhRrhY"
-Subject: Re: [Qemu-devel] [PATCH for-4.0? 2/4] qcow2: Fix preallocation
- bdrv_pwrite to wrong file
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJwW-20YWbYgcHGhtBDZnHGAHSrj-OHht0hFb5O8ndsFQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] socket: allow wait=false for client
+ socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ouv4dC9zsheUuGwvMZWCh7jCEkxXhRrhY
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <cd898659-76d9-5041-d560-3dd1c7e03011@redhat.com>
-Subject: Re: [PATCH for-4.0? 2/4] qcow2: Fix preallocation bdrv_pwrite to
- wrong file
-References: <20190415155452.5115-1-kwolf@redhat.com>
- <20190415155452.5115-3-kwolf@redhat.com>
-In-Reply-To: <20190415155452.5115-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/15/19 10:54 AM, Kevin Wolf wrote:
-> With an external data file, preallocate_co() must write the final byte
-> to the external data file, not to the qcow2 image file.
+On Mon, Apr 15, 2019 at 06:16:33PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> On Mon, Apr 15, 2019 at 6:08 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+> >
+> > On Mon, Apr 15, 2019 at 06:06:09PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Commit 767abe7 ("chardev: forbid 'wait' option with client sockets"=
+)
+> > > is a bit too strict. Current libvirt always set wait=3Dfalse, and w=
+ill
+> > > thus fail to add client chardev.
+> > >
+> > > Make the code more permissive, allowing wait=3Dfalse with client so=
+cket
+> > > chardevs.
+> > >
+> > > Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
+> > > Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  chardev/char-socket.c | 10 +++++++---
+> > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > index 3916505d67..ebc1adb83e 100644
+> > > --- a/chardev/char-socket.c
+> > > +++ b/chardev/char-socket.c
+> > > @@ -1263,9 +1263,13 @@ static bool qmp_chardev_validate_socket(Char=
+devSocket *sock,
+> > >              return false;
+> > >          }
+> > >          if (sock->has_wait) {
+> > > -            error_setg(errp, "%s",
+> > > -                       "'wait' option is incompatible with "
+> > > -                       "socket in client connect mode");
+> > > +            warn_report("'wait' option is deprecated with "
+> > > +                        "socket in client connect mode");
+> > > +            if (sock->wait) {
+> > > +                error_setg(errp, "%s",
+> > > +                           "'wait' option is incompatible with "
+> > > +                           "socket in client connect mode");
+> > > +            }
+> > >              return false;
+> > >          }
+> > >      }
+> >
+> > NB, it should also update qemu-deprecated.texi
 >=20
-> This is harmless for preallocation of newly created images (only the
-> qcow2 file size is increased to the virtual disk size while it should b=
-e
-> much smaller), but with preallocated resize, it could in theory cause
-> visible corruption if the metadata of the image is larger than the data=
+> Is that clear enough?
+>=20
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 2219386769..0f53d1c228 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -105,6 +105,12 @@ details.
+>  The ``query-events'' command has been superseded by the more powerful
+>  and accurate ``query-qmp-schema'' command.
+>=20
+> +@subsection chardev client socket with 'wait' option (since 4.0)
+> +
+> +The ``chardev-add'' and ``chardev-change'' should not be used to
+> +create client sockets with a ``wait'' field, which is reserved for
+> +server sockets only.
 
-> (e.g. lots of bitmaps).
+It applies to command line syntax too, so I would just generalize that
+a little to
 
-Can we come up with such an image - maybe one with 512-byte cluster
-sizing and only 1k in guest-visible length?  Since each bitmap is
-cluster-aligned, it seems like you'd only need a couple of bitmaps to
-easily reach that point.
+ "Character devices creating sockets in client mode should not
+  specify the 'wait' field, which is only applicable to sockets
+  in server mode"
 
-We're awfully late for 4.0, but as we already have -rc4 coming due, and
-as this is a data-corruption bug in a new feature, I can buy the
-argument of getting this one into 4.0, particularly if you can design
-the iotest along the lines of my ideas to prove that yes, indeed, we are
-accidentally wiping out qcow2 metadata for visible image corruption.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+Regards,
+Daniel
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---Ouv4dC9zsheUuGwvMZWCh7jCEkxXhRrhY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0rq4ACgkQp6FrSiUn
-Q2qJbAgArd/B95BVkKMtFcqLWmoaNCjxOMugr52M+grS0tpotJ9ctb9Ag3v0cAMu
-GHYqvwM5Z6jpPIKg6fSHBpb/hFB52S27DfosKuivIwGvnP43CiClNnN6XaN5Q86Y
-qkpVrWoUURpjXMxJyuZZ5wVie/YsiCYLwqvpNCPMZ6h+EoMZP7oeCuhMUWV3m/tX
-abjKdzG+5gJUPTxxPtEoIff97d2tZq/GRnBYyPFVWJpxVnQ6UUhk7tFCdMcfff6n
-MT9Q2aKizpMuFd/uD18vb8E9l3EGVnjkttA2NgefVBDPVtDknFUlqIgIA8R9Gs2H
-sDdSKdawQOFj6GTV1JR0uHsWLqLlTQ==
-=PKow
------END PGP SIGNATURE-----
-
---Ouv4dC9zsheUuGwvMZWCh7jCEkxXhRrhY--
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
