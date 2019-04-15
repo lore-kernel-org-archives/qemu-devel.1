@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51468)
+Received: from eggs.gnu.org ([209.51.188.92]:53674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hFsaP-0001UD-P6
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 23:47:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hFsss-000456-TS
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hFsaO-0000mp-OB
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 23:47:13 -0400
-Received: from pv50p00im-ztdg10021801.me.com ([17.58.6.56]:55618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hFsaO-0000ls-BP
-	for qemu-devel@nongnu.org; Sun, 14 Apr 2019 23:47:12 -0400
-From: Chen Zhang <tgfbeta@me.com>
-Message-Id: <3E4F522E-55ED-4DC4-88D5-8F1D68E68A84@me.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Date: Mon, 15 Apr 2019 11:46:36 +0800
-In-Reply-To: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
-References: <B786F00D-5518-405B-B0AC-C5BF2D7283F5@me.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] ui/cocoa: Fix absolute and relative
- input issues on Mojave
+	(envelope-from <dgibson@ozlabs.org>) id 1hFssr-0005T9-G4
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 00:06:18 -0400
+Date: Mon, 15 Apr 2019 13:38:36 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190415033836.GD32705@umbus.fritz.box>
+References: <20190411080004.8690-1-clg@kaod.org>
+	<20190411080004.8690-6-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="T7mxYSe680VjQnyC"
+Content-Disposition: inline
+In-Reply-To: <20190411080004.8690-6-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 5/6] memory_ldst: Add atomic ops for PTE
+ updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +25,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-ping
 
-> On Apr 8, 2019, at 10:04 AM, Chen Zhang <tgfbeta@me.com> wrote:
+--T7mxYSe680VjQnyC
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 11, 2019 at 10:00:03AM +0200, C=E9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> The following patches fixed absolute and relative input device issues =
-on macOS Mojave.
+> On some architectures, PTE updates for dirty and changed bits need
+> to be performed atomically. This adds a couple of address_space_cmpxchg*
+> helpers for that purpose.
 >=20
-> Chen Zhang (2):
->   ui/cocoa: Fix absolute input device grabbing issue on Mojave
->   ui/cocoa: Fix mouse grabbing in fullscreen mode for relative input
->     device
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+But I think this needs to go past Paolo for review as memory subsystem main=
+tainer.
+
+> ---
+>  include/exec/memory_ldst.inc.h |  6 +++
+>  memory_ldst.inc.c              | 80 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 86 insertions(+)
 >=20
->  ui/cocoa.m | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 47 insertions(+), 3 deletions(-)
->=20
-> --=20
-> 2.19.2
->=20
+> diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst.in=
+c.h
+> index 272c20f02eae..f3cfa7e9a622 100644
+> --- a/include/exec/memory_ldst.inc.h
+> +++ b/include/exec/memory_ldst.inc.h
+> @@ -28,6 +28,12 @@ extern uint64_t glue(address_space_ldq, SUFFIX)(ARG1_D=
+ECL,
+>      hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
+>  extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+>      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
+> +extern uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
+> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+> +    MemTxResult *result);
+> +extern uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
+> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+> +    MemTxResult *result);
+>  extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
+>      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
+>  extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
+> diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+> index acf865b900d7..1d58d2fea67d 100644
+> --- a/memory_ldst.inc.c
+> +++ b/memory_ldst.inc.c
+> @@ -320,6 +320,86 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_D=
+ECL,
+>      RCU_READ_UNLOCK();
+>  }
+> =20
+> +/* This is meant to be used for atomic PTE updates under MT-TCG */
+> +uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
+> +    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
+> +    MemTxResult *result)
+> +{
+> +    uint8_t *ptr;
+> +    MemoryRegion *mr;
+> +    hwaddr l =3D 4;
+> +    hwaddr addr1;
+> +    MemTxResult r;
+> +    uint8_t dirty_log_mask;
+> +
+> +    /* Must test result */
+> +    assert(result);
+> +
+> +    RCU_READ_LOCK();
+> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+> +    if (l < 4 || !memory_access_is_direct(mr, true)) {
+> +        r =3D MEMTX_ERROR;
+> +    } else {
+> +        uint32_t orig =3D old;
+> +
+> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+> +        old =3D atomic_cmpxchg(ptr, orig, new);
+> +
+> +        if (old =3D=3D orig) {
+> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
+dr(mr) +
+> +                                                addr, 4, dirty_log_mask);
+> +        }
+> +        r =3D MEMTX_OK;
+> +    }
+> +    *result =3D r;
+> +    RCU_READ_UNLOCK();
+> +
+> +    return old;
+> +}
+> +
+> +#ifdef CONFIG_ATOMIC64
+> +/* This is meant to be used for atomic PTE updates under MT-TCG */
+> +uint32_t glue(address_space_cmpxchgq_notdirty, SUFFIX)(ARG1_DECL,
+> +    hwaddr addr, uint64_t old, uint64_t new, MemTxAttrs attrs,
+> +    MemTxResult *result)
+> +{
+> +    uint8_t *ptr;
+> +    MemoryRegion *mr;
+> +    hwaddr l =3D 8;
+> +    hwaddr addr1;
+> +    MemTxResult r;
+> +    uint8_t dirty_log_mask;
+> +
+> +    /* Must test result */
+> +    assert(result);
+> +
+> +    RCU_READ_LOCK();
+> +    mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
+> +    if (l < 8 || !memory_access_is_direct(mr, true)) {
+> +        r =3D MEMTX_ERROR;
+> +    } else {
+> +        uint32_t orig =3D old;
+> +
+> +        ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+> +        old =3D atomic_cmpxchg(ptr, orig, new);
+> +
+> +        if (old =3D=3D orig) {
+> +            dirty_log_mask =3D memory_region_get_dirty_log_mask(mr);
+> +            dirty_log_mask &=3D ~(1 << DIRTY_MEMORY_CODE);
+> +            cpu_physical_memory_set_dirty_range(memory_region_get_ram_ad=
+dr(mr) +
+> +                                                addr, 8, dirty_log_mask);
+> +        }
+> +        r =3D MEMTX_OK;
+> +    }
+> +    *result =3D r;
+> +    RCU_READ_UNLOCK();
+> +
+> +    return old;
+> +}
+> +#endif /* CONFIG_ATOMIC64 */
+> +
+>  /* warning: addr must be aligned */
+>  static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
+>      hwaddr addr, uint32_t val, MemTxAttrs attrs,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--T7mxYSe680VjQnyC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlyz/LwACgkQbDjKyiDZ
+s5ITBA/7B++rfNXGxzMdEhVzEBjQwvOB3B10U55zNF2cbvSZrC68mNpTQCMq2Czj
+RtuXOAnB6PPJER4k+apLfj+jOnsoTEXNWi8uoXgEacO+3uEQygAaClys/aEP9yN0
+ZQwvZwn9Vwwn44SMKj9haxyrP+Sxr0pNxH8IIMlREdWilo1TA+f5AxeHVybgMMcI
+2o452hdpXPGvFrc2zSgfbNErAdJcXp+KtiSQ9UvJwau85/Ep4njPF5fbLAAl0m0l
+NVL12qXhx6hJMTMyh36NNaurIKWvw/b44Ibnr7+gMsygVVm/rZYON4K6rq9Qf70R
+YD54M9UeIzXI709DD7jMlYi43dQ6R0+GIORSDWxX11t4gdPVlhVIERa8MItQfzHJ
+JAtCHcS5JeUH6rd5Xd6EaAwMZHYkKS9tQurP3K38yhJAss93dlzpx2JrmH1R7Paq
+Jb+qCXMSzgBfQupAOK3W6lw9iardk3DesmIS/uSCUeMlkGXXjxWZ0cNuknkMjUUU
+zLSo/lswNLKCQcYhJEZ1HI7DxlcQqA/rLh74nPQywVBBtEQSPKY1YpPUkJ7Ri5QH
+qFpNJDt1cV0L+1U1agMtMCtdJMV8FouBHIs1L2DDfvcFUIt3GJOK3/q++Xt6i/qE
+4x/n1Cz3YYUhvi3Y6T1XIemrXZE13NUq63h+OZyZ/iXzBlkJr2U=
+=PRW1
+-----END PGP SIGNATURE-----
+
+--T7mxYSe680VjQnyC--
