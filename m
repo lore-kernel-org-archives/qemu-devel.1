@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56056)
+Received: from eggs.gnu.org ([209.51.188.92]:56202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Lv-00068s-2V
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:03 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hG4MW-0006Y7-JC
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hG4Lu-0005CL-1D
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:02 -0400
-References: <20190415155452.5115-1-kwolf@redhat.com>
-	<20190415155452.5115-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <110a72ca-eab8-9879-868d-47416c29a404@redhat.com>
-Date: Mon, 15 Apr 2019 11:20:57 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hG4MV-0006CI-Jj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hG4MT-000675-07
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 12:21:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 451FC309E979
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 16:21:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 15 Apr 2019 18:21:29 +0200
+Message-Id: <20190415162129.30511-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190415155452.5115-4-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL"
-Subject: Re: [Qemu-devel] [PATCH 3/4] qcow2: Add errp to preallocate_co()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] socket: allow wait=false for client socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "reviewer:Incompatible changes" <libvir-list@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <110a72ca-eab8-9879-868d-47416c29a404@redhat.com>
-Subject: Re: [PATCH 3/4] qcow2: Add errp to preallocate_co()
-References: <20190415155452.5115-1-kwolf@redhat.com>
- <20190415155452.5115-4-kwolf@redhat.com>
-In-Reply-To: <20190415155452.5115-4-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
+is a bit too strict. Current libvirt always set wait=3Dfalse, and will
+thus fail to add client chardev.
 
-On 4/15/19 10:54 AM, Kevin Wolf wrote:
-> We'll add a bdrv_co_truncate() call in the next patch which can return
-> an Error that we don't want to discard. So add an errp parameter to
-> preallocate_co().
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qcow2.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->=20
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Make the code more permissive, allowing wait=3Dfalse with client socket
+chardevs. Deprecate usage of 'wait' with client sockets.
 
+Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ chardev/char-socket.c | 10 +++++++---
+ qemu-deprecated.texi  |  5 +++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 3916505d67..ebc1adb83e 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -1263,9 +1263,13 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
+ket *sock,
+             return false;
+         }
+         if (sock->has_wait) {
+-            error_setg(errp, "%s",
+-                       "'wait' option is incompatible with "
+-                       "socket in client connect mode");
++            warn_report("'wait' option is deprecated with "
++                        "socket in client connect mode");
++            if (sock->wait) {
++                error_setg(errp, "%s",
++                           "'wait' option is incompatible with "
++                           "socket in client connect mode");
++            }
+             return false;
+         }
+     }
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 2219386769..842e71b11d 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -105,6 +105,11 @@ details.
+ The ``query-events'' command has been superseded by the more powerful
+ and accurate ``query-qmp-schema'' command.
+=20
++@subsection chardev client socket with 'wait' option (since 4.0)
++
++Character devices creating sockets in client mode should not specify
++the 'wait' field, which is only applicable to sockets in server mode
++
+ @section Human Monitor Protocol (HMP) commands
+=20
+ @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (si=
+nce 3.1)
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly0r2kACgkQp6FrSiUn
-Q2ozeAgAh3biQhs4LnSt79eobttIx/gJf8bRlna/i+uyJr+DTPAr9WEQT+a+EYiF
-CrNXeau3Xc9yNA7MGCHu3rOo5OsVk3FnPTEGUZnUc1SMf6prjrpP6kBhG+rlYWV2
-TPsCvXyHKue6xLZPG107jTuDDWM4lhHF5xxpnSw2yybwZn9AOI01azTIkxMXbR7K
-JwufCzjibPnfzDjr0EjLlBg3JERMIDgWZEWKpNHnboG/qJjIKDt9EuAsyU5huDQj
-4SjNBX0ulqai5zMPJ8lgO0V1zDeDLGe0dfDdgtnaGPRSesZFCaQSn0iqthElMRfO
-UYZr8xCVf0VOV+D3w9Si62AtWjjyoA==
-=VYFn
------END PGP SIGNATURE-----
-
---uPfJV2PYgYYCRkkkYiaTa9npM6dBsc0SL--
+2.21.0.313.ge35b8cb8e2
