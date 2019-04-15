@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44608)
+Received: from eggs.gnu.org ([209.51.188.92]:45717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hG3or-0001pU-5t
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:55 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hG3r7-0003dX-Kn
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hG3oj-00011w-Uj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:48 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:43547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hG3og-0000vZ-1A
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:42 -0400
-Received: by mail-oi1-x231.google.com with SMTP id t81so14178733oig.10
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 08:46:41 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hG3r6-0004KN-QA
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:49:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hG3r6-0004Gk-JF
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:49:12 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5893F307D857
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 15:49:10 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 15 Apr 2019 17:49:06 +0200
+Message-Id: <20190415154906.14621-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190415141547.15444-1-berrange@redhat.com>
-	<CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
-	<0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
-In-Reply-To: <0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Apr 2019 16:46:29 +0100
-Message-ID: <CAFEAcA-ZYZ2M-nLThqc6bP2ZqeoRUEt_-7qA3m=obTyyi=7zow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for
- all code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] socket: allow wait=false for client socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,15 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 15 Apr 2019 at 16:25, Eric Blake <eblake@redhat.com> wrote:
-> "two known problems" but...
->
-> ...three bullet points.
+Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
+is a bit too strict. Current libvirt always set wait=3Dfalse, and will
+thus fail to add client chardev.
 
-Nobody expects the Spanish Inquisition to be code reviewed :-)
+Make the code more permissive, allowing wait=3Dfalse with client socket
+chardevs.
 
-thanks
--- PMM
+Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ chardev/char-socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 3916505d67..2ad9c9eea5 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -1262,7 +1262,7 @@ static bool qmp_chardev_validate_socket(ChardevSock=
+et *sock,
+             error_setg(errp, "%s", "Websocket client is not implemented"=
+);
+             return false;
+         }
+-        if (sock->has_wait) {
++        if (sock->has_wait && sock->wait) {
+             error_setg(errp, "%s",
+                        "'wait' option is incompatible with "
+                        "socket in client connect mode");
+--=20
+2.21.0.313.ge35b8cb8e2
