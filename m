@@ -2,58 +2,56 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8283C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C769DC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9AA92087C
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:00:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9AA92087C
+	by mail.kernel.org (Postfix) with ESMTPS id 972332087C
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 14:01:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972332087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50626 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG29a-0006Z4-0C
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 10:00:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48404)
+	id 1hG2BG-000811-Um
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 10:01:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-00055h-Vd
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:00 -0400
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27U-000562-FG
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-0007xV-38
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:57:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51936)
+	(envelope-from <mlevitsk@redhat.com>) id 1hG27T-0007xv-Jr
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:58:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
-	id 1hG27P-0007tR-9A; Mon, 15 Apr 2019 09:57:55 -0400
+	id 1hG27P-0007sQ-99; Mon, 15 Apr 2019 09:57:55 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C817D3082E1F;
-	Mon, 15 Apr 2019 13:57:52 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2D12A1001DE8;
+	by mx1.redhat.com (Postfix) with ESMTPS id C97213087946;
 	Mon, 15 Apr 2019 13:57:50 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2A2F31001E85;
+	Mon, 15 Apr 2019 13:57:48 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 15 Apr 2019 16:57:42 +0300
-Message-Id: <20190415135746.7571-2-mlevitsk@redhat.com>
-In-Reply-To: <20190415135746.7571-1-mlevitsk@redhat.com>
-References: <20190415135746.7571-1-mlevitsk@redhat.com>
+Date: Mon, 15 Apr 2019 16:57:41 +0300
+Message-Id: <20190415135746.7571-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Mon, 15 Apr 2019 13:57:52 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 15 Apr 2019 13:57:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/5] block/nvme: don't flip CQ phase bits
+Subject: [Qemu-devel] [PATCH 0/5] Few fixes for userspace NVME driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,29 +70,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190415135742.qDLJ0l7ZIx1Q6jktUC5YflA4HCNhJE5Jtdlg3_OA-Xs@z>
+Message-ID: <20190415135741.uNmekKlafC5yJ5jo73Kp_JWHjUu7lWz4YbmFnOzhe7Q@z>
 
-Phase bits are only set by the hardware to indicate new completions
-and not by the device driver.
+CC: Fam Zheng <fam@euphon.net>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: qemu-devel@nongnu.org
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 0684bbd077..2d208000df 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -340,8 +340,6 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
-         qemu_mutex_lock(&q->lock);
-         c->cid = cpu_to_le16(0);
-         q->inflight--;
--        /* Flip Phase Tag bit. */
--        c->status = cpu_to_le16(le16_to_cpu(c->status) ^ 0x1);
-         progress = true;
-     }
-     if (progress) {
+Hi!
+These are few assorted fixes and features for the userspace
+nvme driver.
+
+Tested that on my laptop with my Samsung X5 thunderbolt drive, which
+happens to have 4K sectors, support for discard and write zeros.
+
+Also bunch of fixes sitting in my queue from the period when I developed
+the nvme-mdev driver.
+
+Best regards,
+	Maxim Levitsky
+
+Maxim Levitsky (5):
+  block/nvme: don't flip CQ phase bits
+  block/nvme: fix doorbell stride
+  block/nvme: support larger that 512 bytes sector devices
+  block/nvme: add support for write zeros
+  block/nvme: add support for discard
+
+ block/nvme.c         | 194 +++++++++++++++++++++++++++++++++++++++++--
+ block/trace-events   |   3 +
+ include/block/nvme.h |  17 +++-
+ 3 files changed, 204 insertions(+), 10 deletions(-)
+
 -- 
 2.17.2
 
