@@ -2,85 +2,102 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E53C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81357C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:37:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E5DD2064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 376DC2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:37:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Ecl1gmqB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5DD2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LwPE2go3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376DC2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47977 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFywg-0000nF-08
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:34:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39159)
+	id 1hFyz6-0001hr-DM
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:37:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyvV-0000P1-TE
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:33:29 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy6-0001L4-Oj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyvU-0004v7-V9
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:33:25 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:59258)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hFyvU-0004uQ-8l
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:33:24 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
-	[IPv6:2a02:6b8:0:1402::301])
-	by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 9D6592E0D83;
-	Mon, 15 Apr 2019 13:33:21 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	2UltphWF0r-XLom6S0d; Mon, 15 Apr 2019 13:33:21 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1555324401; bh=PwjqXAViCh19GVlEfEu5gN9Z8TlPt/+5H8N/SoOHmYc=;
-	h=Cc:Subject:Date:References:To:From:Message-Id;
-	b=Ecl1gmqBLrxDEiCfqE6lxR1Xez/JSAzW5aqJlZyfMxwFasjObZcEfdynAPN11SnCY
-	WEuAk97MNhvImtM5IUh06pRGgu8HTnPLQbU08YYsZ4/AzD57wYZtvQRBn1nEiRIc++
-	GrvWEtrI3LTwEONFF/naJ+dDqF+lkKFfndIMDPpU=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp2j.mail.yandex.net ([::1])
-	by mxbackcorp2j.mail.yandex.net with LMTP id mEK7zmO7
-	for <yury-kotov@yandex-team.ru>; Mon, 15 Apr 2019 13:33:16 +0300
-Received: by vla1-1374b6242101.qloud-c.yandex.net with HTTP;
-	Mon, 15 Apr 2019 13:33:16 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-References: <20190410092652.22616-1-yury-kotov@yandex-team.ru>
-	<20190411120421.GP3641@redhat.com>
-	<219131554985898@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190411123911.GR3641@redhat.com>
-	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
-	<20190415101101.GF5718@redhat.com>
-	<251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
-	<20190415102520.GG5718@redhat.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy5-0005qP-Bj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:06 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hFyy4-0005pn-Rp
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:05 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3FATA5k154348; Mon, 15 Apr 2019 10:35:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	in-reply-to; s=corp-2018-07-02;
+	bh=y3V9ndy/Qm5yVBdn+YrDF4jd95IBdj4M6Ir3QrTHJOA=;
+	b=LwPE2go3ika4GfcdL/mqQFwLnSf42Y9Gwoo6Z8+LegQpSIEzagjefWXYueDkMLNj/32G
+	kcnJ8SS6wqIA8zQV91UCmSuqHDviaWX6o4ulU2/z1DFz7JW2eQPB2Ow66VT3Jx53aqjN
+	pQsXZOKz+qRXSY8etzOom+/vrxwVJH7uWkTagfIz/W3JKLPdp/M0hsWzHmjLQqhabOxG
+	myuVBjj+snviCCvg6T/bdA+b3jWKqokIQRuBXj1kwsH5wnNmaaLtkJ1+15juJwlJBn8m
+	BfCGNL+ZxUaVnpK5rdjyffrUyfg1OjQFOlCEP6ZJVUCD/xM9dhM0zAP6zjY2a/jHK9CG
+	NQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+	by userp2120.oracle.com with ESMTP id 2rusnekvb8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2019 10:35:56 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3FAY3tk188212; Mon, 15 Apr 2019 10:35:55 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserp3030.oracle.com with ESMTP id 2ru5ta8vpw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2019 10:35:55 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3FAZs7M000534;
+	Mon, 15 Apr 2019 10:35:54 GMT
+Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Mon, 15 Apr 2019 03:35:54 -0700
+Date: Mon, 15 Apr 2019 13:35:47 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190415103546.GA6854@lap1>
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411190215.2163572e.cohuck@redhat.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 15 Apr 2019 13:33:21 +0300
-Message-Id: <259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a02:6b8:0:1a2d::193
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+Content-Disposition: inline
+In-Reply-To: <20190411190215.2163572e.cohuck@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9227
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904150074
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9227
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904150074
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,77 +106,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org, jgg@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415103321.oZgf6bqWcQawtGww723FvnJkdt4BN_2FDFuExTwgQ_k@z>
+Message-ID: <20190415103547.2GxNeS6WBzZnT-AEhTs3uXgWHQA8csYrX2Nwkqrdy9o@z>
 
-15.04.2019, 13:25, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
-> On Mon, Apr 15, 2019 at 01:17:06PM +0300, Yury Kotov wrote:
->> =C2=A015.04.2019, 13:11, "Daniel P. Berrang=C3=A9" <berrange@redhat.co=
-m>:
->> =C2=A0> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
->> =C2=A0>> =C2=A0Hi,
->> =C2=A0>>
->> =C2=A0>> =C2=A0Just to clarify. I see two possible solutions:
->> =C2=A0>>
->> =C2=A0>> =C2=A01) Since the migration code doesn't receive fd, it isn'=
-t responsible for
->> =C2=A0>> =C2=A0closing it. So, it may be better to use migrate_fd_para=
-m for both
->> =C2=A0>> =C2=A0incoming/outgoing and add dupping for migrate_fd_param.=
- Thus, clients must
->> =C2=A0>> =C2=A0close the fd themselves. But existing clients will have=
- a leak.
->> =C2=A0>
->> =C2=A0> We can't break existing clients in this way as they are correc=
-tly
->> =C2=A0> using the monitor with its current semantics.
->> =C2=A0>
->> =C2=A0>> =C2=A02) If we don't duplicate fd, then at least we should re=
-move fd from
->> =C2=A0>> =C2=A0the corresponding list. Therefore, the solution is to f=
-ix qemu_close to find
->> =C2=A0>> =C2=A0the list and remove fd from it. But qemu_close is curre=
-ntly consistent with
->> =C2=A0>> =C2=A0qemu_open (which opens/dups fd), so adding additional l=
-ogic might not be
->> =C2=A0>> =C2=A0a very good idea.
->> =C2=A0>
->> =C2=A0> qemu_close is not appropriate place to deal with something spe=
-ciifc
->> =C2=A0> to the montor.
->> =C2=A0>
->> =C2=A0>> =C2=A0I don't see any other solution, but I might miss someth=
-ing.
->> =C2=A0>> =C2=A0What do you think?
->> =C2=A0>
->> =C2=A0> All callers of monitor_get_fd() will close() the FD they get b=
-ack.
->> =C2=A0> Thus monitor_get_fd() should remove it from the list when it r=
-eturns
->> =C2=A0> it, and we should add API docs to monitor_get_fd() to explain =
-this.
->> =C2=A0>
->> =C2=A0Ok, it sounds reasonable. But monitor_get_fd is only about outgo=
-ing migration.
->> =C2=A0But what about the incoming migration? It doesn't use monitor_ge=
-t_fd but just
->> =C2=A0converts input string to int and use it as fd.
->
-> The incoming migration expects the FD to be passed into QEMU by the mgm=
-t
-> app when it is exec'ing the QEMU binary. It doesn't interact with the
-> monitor at all AFAIR.
->
+On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
+> On Thu, 11 Apr 2019 14:01:54 +0300
+> Yuval Shaia <yuval.shaia@oracle.com> wrote:
+> 
+> > Data center backends use more and more RDMA or RoCE devices and more and
+> > more software runs in virtualized environment.
+> > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
+> > 
+> > Virtio is the optimal solution since is the de-facto para-virtualizaton
+> > technology and also because the Virtio specification
+> > allows Hardware Vendors to support Virtio protocol natively in order to
+> > achieve bare metal performance.
+> > 
+> > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
+> > Virtio Specification and a look forward on possible implementation
+> > techniques.
+> > 
+> > Open issues/Todo list:
+> > List is huge, this is only start point of the project.
+> > Anyway, here is one example of item in the list:
+> > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+> >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
+> >   that this is reasonable so one option is to have one for all and
+> >   multiplex the traffic on it. This is not good approach as by design it
+> >   introducing an optional starvation. Another approach would be multi
+> >   queues and round-robin (for example) between them.
+> > 
+> > Expectations from this posting:
+> > In general, any comment is welcome, starting from hey, drop this as it is a
+> > very bad idea, to yeah, go ahead, we really want it.
+> > Idea here is that since it is not a minor effort i first want to know if
+> > there is some sort interest in the community for such device.
+> 
+> My first reaction is: Sounds sensible, but it would be good to have a
+> spec for this :)
+> 
+> You'll need a spec if you want this to go forward anyway, so at least a
+> sketch would be good to answer questions such as how many virtqueues
+> you use for which purpose, what is actually put on the virtqueues,
+> whether there are negotiable features, and what the expectations for
+> the device and the driver are. It also makes it easier to understand
+> how this is supposed to work in practice.
+> 
+> If folks agree that this sounds useful, the next step would be to
+> reserve an id for the device type.
 
-Oh, sorry. This use case is not obvious. We used add-fd to pass fd for
-migrate-incoming and such way has described problems.
+Thanks for the tips, will sure do that, it is that first i wanted to make
+sure there is a use case here.
 
-Regards,
-Yury
+Waiting for any feedback from the community.
+
+> 
+> > 
+> > The scope of the implementation is limited to probing the device and doing
+> > some basic ibverbs commands. Data-path is not yet implemented. So with this
+> > one can expect only that driver is (partialy) loaded and basic queries and
+> > resource allocation is done.
+> > 
+> > One note regarding the patchset.
+> > I know it is not standard to collaps patches from several repos as i did
+> > here (qemu and linux) but decided to do it anyway so the whole picture can
+> > be seen.
+> > 
+> > patch 1: virtio-net: Move some virtio-net-pci decl to include/hw/virtio
+> > 	This is a prelimenary patch just as a hack so i will not need to
+> > 	impelement new netdev
+> > patch 2: hw/virtio-rdma: VirtIO rdma device
+> > 	The implementation of the device
+> > patch 3: RDMA/virtio-rdma: VirtIO rdma driver
+> > 	The device driver
+> > 
+> 
 
