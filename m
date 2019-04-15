@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38043)
+Received: from eggs.gnu.org ([209.51.188.92]:38245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyqB-0006RD-Js
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:27:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1hFyr7-0006u6-8v
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyqA-0003HP-Is
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:27:55 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hFyqA-0003Ed-7B
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:27:54 -0400
-Date: Mon, 15 Apr 2019 13:27:39 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190415102738.GB6145@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190411172402.GA14509@mellanox.com> <20190411173419.GB6259@lap1>
-	<20190411174124.GA6428@lap1>
-	<CANjDDBj0rqZEmHzMH+2461_DvjV5K4hT=hJ_usBuucV4Xwh84g@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1hFyr6-0003bg-8u
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:28:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hFyr4-0003ZZ-US
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:28:52 -0400
+Date: Mon, 15 Apr 2019 11:28:38 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190415102838.GH5718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190315032629.21234-1-richard.henderson@linaro.org>
+	<20190315032629.21234-13-richard.henderson@linaro.org>
+	<6ea1d95e-f5c7-7b14-04c7-07699e9d564a@redhat.com>
+	<66f73b23-11cc-b5b3-e4ca-34776a4faf32@linaro.org>
+	<bed878ef-0ce1-1081-a4cb-88b7775d1433@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CANjDDBj0rqZEmHzMH+2461_DvjV5K4hT=hJ_usBuucV4Xwh84g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+In-Reply-To: <bed878ef-0ce1-1081-a4cb-88b7775d1433@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 12/23] linux-user: Call qcrypto_init if
+ not using -seed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Devesh Sharma <devesh.sharma@broadcom.com>
-Cc: Jason Gunthorpe <jgg@mellanox.com>, "mst@redhat.com" <mst@redhat.com>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-On Fri, Apr 12, 2019 at 03:21:56PM +0530, Devesh Sharma wrote:
-> On Thu, Apr 11, 2019 at 11:11 PM Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> >
-> > On Thu, Apr 11, 2019 at 08:34:20PM +0300, Yuval Shaia wrote:
-> > > On Thu, Apr 11, 2019 at 05:24:08PM +0000, Jason Gunthorpe wrote:
-> > > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > > >
-> > > > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > > > more software runs in virtualized environment.
-> > > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > > >
-> > > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > > > technology and also because the Virtio specification
-> > > > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > > > achieve bare metal performance.
-> > > > > >
-> > > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > > > Virtio Specification and a look forward on possible implementation
-> > > > > > techniques.
-> > > > > >
-> > > > > > Open issues/Todo list:
-> > > > > > List is huge, this is only start point of the project.
-> > > > > > Anyway, here is one example of item in the list:
-> > > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > > > >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > > > >   that this is reasonable so one option is to have one for all and
-> > > > > >   multiplex the traffic on it. This is not good approach as by design it
-> > > > > >   introducing an optional starvation. Another approach would be multi
-> > > > > >   queues and round-robin (for example) between them.
-> > > > > >
-> > > > > > Expectations from this posting:
-> > > > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > > > there is some sort interest in the community for such device.
-> > > > >
-> > > > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > > > spec for this :)
-> > > >
-> > > > I'm unclear why you'd want to have a virtio queue for anything other
-> > > > that some kind of command channel.
-> > > >
-> > > > I'm not sure a QP or CQ benefits from this??
-> > >
-> > > Virtqueue is a standard mechanism to pass data from guest to host. By
-> >
-> > And vice versa (CQ?)
-> >
-> > > saying that - it really sounds like QP send and recv rings. So my thought
-> > > is to use a standard way for rings. As i've learned this is how it is used
-> > > by other virtio devices ex virtio-net.
-> > >
-> > > >
-> > > > Jason
-> > >
-> I would like to ask more basic question, how virtio queue will glue
-> with actual h/w qps? I may be to naive though.
+On Mon, Apr 15, 2019 at 12:23:18PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 4/13/19 8:44 AM, Richard Henderson wrote:
+> > On 4/10/19 11:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>> -    if (seed_optarg !=3D NULL) {
+> >>> -        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
+> >>> +    {
+> >> Since 7be41675f7c we use gnu99 C, so this extra block indentation ca=
+n be
+> >> removed.
+> >>
+> >>> +        Error *err =3D NULL;
+> >>> +        if (seed_optarg !=3D NULL) {
+> >>> +            qemu_guest_random_seed_main(seed_optarg, &err);
+> >>> +        } else {
+> >>> +            /* ??? Assumes qcrypto is only used by qemu_guest_getr=
+andom.  */
+> >>> +            qcrypto_init(&err);
+> >>> +        }
+> >>> +        if (err) {
+> >>> +            error_reportf_err(err, "cannot initialize crypto: ");
+> >>> +            exit(1);
+> >>> +        }
+> >>>      }
+> >=20
+> > I could, but it also limits the scope, which is of more importance to=
+ variables
+> > who have their address taken.  It means that their storage could (in =
+theory) be
+> > shared with objects not overlapping in scope.
+>=20
+> Fine then.
+>=20
+> I think your '???' comment is appropriate but I'd rather let Daniel
+> opinate. Except that comment, for the rest:
 
-Have to admit - I have no idea.
-This work is based on emulated device so i'm my case - the emulated device
-is creating the virtqueue. I guess that HW device will create a QP and
-expose a virtqueue interface to it.
-The same driver should serve both the SW and HW devices.
+In linux-user context, afaik, the random APIs are the only stuff that
+will be used, none of the hash or cipher stuff is needed.
 
-One of the objectives of this RFC is to collaborate an effort and
-implementation notes/ideas from HW vendors.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
 
-> 
-> -Regards
-> Devesh
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
