@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF23C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61306C10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5013720825
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:33:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5013720825
+	by mail.kernel.org (Postfix) with ESMTPS id 3237F20833
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 13:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3237F20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50334 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50342 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hG1jU-0000J9-KE
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 09:33:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42668)
+	id 1hG1kg-0000xV-He
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 09:34:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1ds-0004jH-Tx
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hG1e0-0004rt-B8
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1dq-00055L-TY
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57400)
+	(envelope-from <imammedo@redhat.com>) id 1hG1dy-00059s-Ew
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hG1do-00053y-Vm; Mon, 15 Apr 2019 09:27:21 -0400
+	id 1hG1dw-00058E-FX; Mon, 15 Apr 2019 09:27:28 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDF723007C25;
-	Mon, 15 Apr 2019 13:27:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA5BE307EA98;
+	Mon, 15 Apr 2019 13:27:26 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2E5831001E84;
-	Mon, 15 Apr 2019 13:27:16 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E7D0A1001DDD;
+	Mon, 15 Apr 2019 13:27:21 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 15 Apr 2019 15:27:20 +0200
-Message-Id: <1555334842-195718-4-git-send-email-imammedo@redhat.com>
+Date: Mon, 15 Apr 2019 15:27:22 +0200
+Message-Id: <1555334842-195718-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
 References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 15 Apr 2019 13:27:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Mon, 15 Apr 2019 13:27:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 3/5] hppa: drop usage of
- memory_region_allocate_system_memory() for ROM
+Subject: [Qemu-devel] [PATCH v1 5/5] s390: do not call
+ memory_region_allocate_system_memory() multiple times
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,33 +80,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190415132720.0WaHuwobBSkqbdN8tEuiaueXsBvb5aq6K6idbc8QZ3c@z>
+Message-ID: <20190415132722.uA3bHhHsvD3dRhugzZcUZTr6NlkQHIYfaZzOt4DFuoE@z>
 
-machine_hppa_init() violates memory_region_allocate_system_memory() contract
-by calling it multiple times which could break with -mem-path. Replace
-the second usage (for 'rom') with memory_region_init_ram() instead.
+s390 was trying to solve limited memslot size issue by abusing
+memory_region_allocate_system_memory(), which breaks API contract
+where the function might be called only once.
+
+s390 should have used memory aliases to fragment inital memory into
+smaller chunks to satisfy KVM's memslot limitation. But its a bit
+late now, since allocated pieces are transfered in migration stream
+separately, so it's not possible to just replace broken layout with
+correct one. Previous patch made MemoryRegion alases migratable and
+this patch switches to use them to split big initial RAM chunk into
+smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
+for migration.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/hppa/machine.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+A don't have access to a suitable system to test it, so I've simulated
+it with smaller chunks on x84 host. Ping-pong migration between old
+and new QEMU worked fine.  KVM part should be fine as memslots
+using mapped MemoryRegions (in this case it would be aliases) as
+far as I know but is someone could test it on big enough host it
+would be nice.
+---
+ hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index d1b1d3c..b413913 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -158,9 +158,8 @@ static void machine_hppa_init(MachineState *machine)
-     g_free(firmware_filename);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d11069b..12ca3a9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     ram_addr_t chunk, offset = 0;
+     unsigned int number = 0;
+     gchar *name;
  
-     rom_region = g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(rom_region, OBJECT(machine),
--                                         "firmware",
--                                         (FIRMWARE_END - FIRMWARE_START));
-+    memory_region_init_ram(rom_region, NULL, "firmware",
-+                           (FIRMWARE_END - FIRMWARE_START), &error_fatal);
-     memory_region_add_subregion(addr_space, FIRMWARE_START, rom_region);
+     /* allocate RAM for core */
++    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
++    /*
++     * memory_region_allocate_system_memory() registers allocated RAM for
++     * migration, however for compat reasons the RAM should be passed over
++     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
++     * allocated RAM so it won't be migrated directly. Aliases will take
++     * of segmenting RAM into legacy chunks.
++     */
++    vmstate_unregister_ram(ram, NULL);
+     name = g_strdup_printf("s390.ram");
+     while (mem_size) {
+-        MemoryRegion *ram = g_new(MemoryRegion, 1);
+-        uint64_t size = mem_size;
++        MemoryRegion *alias = g_new(MemoryRegion, 1);
  
-     /* Load kernel */
+         /* KVM does not allow memslots >= 8 TB */
+-        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+-        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+-        memory_region_add_subregion(sysmem, offset, ram);
++        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
++        vmstate_register_ram_global(alias);
++        memory_region_add_subregion(sysmem, offset, alias);
+         mem_size -= chunk;
+         offset += chunk;
+         g_free(name);
 -- 
 2.7.4
 
