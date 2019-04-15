@@ -2,99 +2,83 @@ Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81357C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FABC10F0E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:38:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 376DC2064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:37:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LwPE2go3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376DC2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFE4C2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 10:38:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE4C2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48039 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hFyz6-0001hr-DM
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:37:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39727)
+	id 1hFz0i-0002z3-7x
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 06:38:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy6-0001L4-Oj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:07 -0400
+	(envelope-from <philmd@redhat.com>) id 1hFyyg-0001ce-3R
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hFyy5-0005qP-Bj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:06 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hFyy4-0005pn-Rp
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:05 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3FATA5k154348; Mon, 15 Apr 2019 10:35:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=date : from : to : cc
-	: subject : message-id : references : mime-version : content-type :
-	in-reply-to; s=corp-2018-07-02;
-	bh=y3V9ndy/Qm5yVBdn+YrDF4jd95IBdj4M6Ir3QrTHJOA=;
-	b=LwPE2go3ika4GfcdL/mqQFwLnSf42Y9Gwoo6Z8+LegQpSIEzagjefWXYueDkMLNj/32G
-	kcnJ8SS6wqIA8zQV91UCmSuqHDviaWX6o4ulU2/z1DFz7JW2eQPB2Ow66VT3Jx53aqjN
-	pQsXZOKz+qRXSY8etzOom+/vrxwVJH7uWkTagfIz/W3JKLPdp/M0hsWzHmjLQqhabOxG
-	myuVBjj+snviCCvg6T/bdA+b3jWKqokIQRuBXj1kwsH5wnNmaaLtkJ1+15juJwlJBn8m
-	BfCGNL+ZxUaVnpK5rdjyffrUyfg1OjQFOlCEP6ZJVUCD/xM9dhM0zAP6zjY2a/jHK9CG
-	NQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-	by userp2120.oracle.com with ESMTP id 2rusnekvb8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Apr 2019 10:35:56 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3FAY3tk188212; Mon, 15 Apr 2019 10:35:55 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-	by aserp3030.oracle.com with ESMTP id 2ru5ta8vpw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Apr 2019 10:35:55 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3FAZs7M000534;
-	Mon, 15 Apr 2019 10:35:54 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Mon, 15 Apr 2019 03:35:54 -0700
-Date: Mon, 15 Apr 2019 13:35:47 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190415103546.GA6854@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hFyyf-00064Z-2W
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:42 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hFyye-00064C-Qm
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 06:36:41 -0400
+Received: by mail-wm1-f67.google.com with SMTP id n25so19728083wmk.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 03:36:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ifqdwrAThYfGn8IUoYywJOyZXzG7ITczfE0kygCkwTA=;
+	b=Z9ZiklBSsU3PD/DJthzJ0KJFhVac8sFWwnMgfAwcFYFzujKEqkPrI2ULwhUMJ3gGJI
+	dOAcQYrKoyJb0sYRqD6zBERUvGShtPlYBD+azEA72+4APtQTk+oUS+z6/5K9pNVfxvMt
+	H7Tg2sE+go8Vk5eKUoFhwr4Di/s+7QOpu1SXZcAcMXZcUSw58ZnWlVZwQom78XYx37ja
+	haQf64YCOOXvMKmYNEhxDxh0CUplQusjsN/wGNQmmn5WY0bW7t5WhmZTKvzkNbnuKEbi
+	SNKXfMkrDlJIn2Shua0YkwZDXcGnn50WXWQuFDs13FXybJ53F7oVliuM/qLQMRUqO9iy
+	gXkw==
+X-Gm-Message-State: APjAAAW6rnDrIc9iSgYhsv8CkzeqpimsFQGxqggwR9jI7SMCSVkTuKGB
+	hDNOGLxCNZgyCUsa+DqV5IIQlaeuyns=
+X-Google-Smtp-Source: APXvYqwGCAIC5bmCeGpWJMCwcD9wrR7rrdRXDNL2OzOMJ8CrieZm5T/yCnWGUNJwjugNi0s0hF1osQ==
+X-Received: by 2002:a1c:b782:: with SMTP id h124mr21878939wmf.5.1555324599787; 
+	Mon, 15 Apr 2019 03:36:39 -0700 (PDT)
+Received: from [10.115.78.87] ([46.31.59.59]) by smtp.gmail.com with ESMTPSA id
+	h2sm69810287wro.11.2019.04.15.03.36.38
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 15 Apr 2019 03:36:39 -0700 (PDT)
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+	Artyom Tarasenko <atar4qemu@gmail.com>
+References: <1555103178-21894-1-git-send-email-atar4qemu@gmail.com>
+	<1555103178-21894-5-git-send-email-atar4qemu@gmail.com>
+	<29f79530-fd9e-ea60-8cf3-df593b855f10@reactos.org>
+	<CACXAS8De=OS0O4O2=Q721KCUc9RuQryOGNfedejM+yzWcX9aOg@mail.gmail.com>
+	<4eec1d45-01a6-1c96-ee49-6c3131823b83@reactos.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <5665d408-512e-2ad4-aa4e-481287fc39e7@redhat.com>
+Date: Mon, 15 Apr 2019 12:36:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <4eec1d45-01a6-1c96-ee49-6c3131823b83@reactos.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190411190215.2163572e.cohuck@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9227
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904150074
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9227
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1904150074
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/isa/i82378.c: use 1900 as a base
+ year
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,83 +90,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org, jgg@mellanox.com
+Cc: "open list:PReP" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415103547.2GxNeS6WBzZnT-AEhTs3uXgWHQA8csYrX2Nwkqrdy9o@z>
+Message-ID: <20190415103636.MMd5bG-UT33XXe247wgToAGK32pMDc8LwVoMqqaxBm4@z>
 
-On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> On Thu, 11 Apr 2019 14:01:54 +0300
-> Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> 
-> > Data center backends use more and more RDMA or RoCE devices and more and
-> > more software runs in virtualized environment.
-> > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > 
-> > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > technology and also because the Virtio specification
-> > allows Hardware Vendors to support Virtio protocol natively in order to
-> > achieve bare metal performance.
-> > 
-> > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > Virtio Specification and a look forward on possible implementation
-> > techniques.
-> > 
-> > Open issues/Todo list:
-> > List is huge, this is only start point of the project.
-> > Anyway, here is one example of item in the list:
-> > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> >   in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> >   that this is reasonable so one option is to have one for all and
-> >   multiplex the traffic on it. This is not good approach as by design it
-> >   introducing an optional starvation. Another approach would be multi
-> >   queues and round-robin (for example) between them.
-> > 
-> > Expectations from this posting:
-> > In general, any comment is welcome, starting from hey, drop this as it is a
-> > very bad idea, to yeah, go ahead, we really want it.
-> > Idea here is that since it is not a minor effort i first want to know if
-> > there is some sort interest in the community for such device.
-> 
-> My first reaction is: Sounds sensible, but it would be good to have a
-> spec for this :)
-> 
-> You'll need a spec if you want this to go forward anyway, so at least a
-> sketch would be good to answer questions such as how many virtqueues
-> you use for which purpose, what is actually put on the virtqueues,
-> whether there are negotiable features, and what the expectations for
-> the device and the driver are. It also makes it easier to understand
-> how this is supposed to work in practice.
-> 
-> If folks agree that this sounds useful, the next step would be to
-> reserve an id for the device type.
+On 4/14/19 11:24 PM, Hervé Poussineau wrote:
+> Le 14/04/2019 à 20:53, Artyom Tarasenko a écrit :
+>> On Sun, Apr 14, 2019 at 7:01 PM Hervé Poussineau
+>> <hpoussin@reactos.org> wrote:
+>>>
+>>> Le 12/04/2019 à 23:06, Artyom Tarasenko a écrit :
+>>>> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
+>>>>
+>>>> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+>>>> ---
+>>>>    hw/isa/i82378.c | 4 +++-
+>>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+>>>> index a5d67bc..546c928 100644
+>>>> --- a/hw/isa/i82378.c
+>>>> +++ b/hw/isa/i82378.c
+>>>> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error
+>>>> **errp)
+>>>>        isa = isa_create_simple(isabus, "i82374");
+>>>>
+>>>>        /* timer */
+>>>> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
+>>>> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
+>>>> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
+>>>> +    qdev_init_nofail(DEVICE(isa));
+>>>
+>>> I am not sure the base_year should be hardcoded in i82378. I can
+>>> assume other machines with a i82378 can have another base_year.
+>>
+>> I doubt it to be honest. How would it work in the hardware? Is there a
+>> pin which would switch a year?
+>> I do believe the different i823xx may have the different base years
+>> though.
 
-Thanks for the tips, will sure do that, it is that first i wanted to make
-sure there is a use case here.
+There is no RTC on the i82378, this should be moved to the board code
+and set the date there. Do you want me to send this patch?
 
-Waiting for any feedback from the community.
+Regards,
 
-> 
-> > 
-> > The scope of the implementation is limited to probing the device and doing
-> > some basic ibverbs commands. Data-path is not yet implemented. So with this
-> > one can expect only that driver is (partialy) loaded and basic queries and
-> > resource allocation is done.
-> > 
-> > One note regarding the patchset.
-> > I know it is not standard to collaps patches from several repos as i did
-> > here (qemu and linux) but decided to do it anyway so the whole picture can
-> > be seen.
-> > 
-> > patch 1: virtio-net: Move some virtio-net-pci decl to include/hw/virtio
-> > 	This is a prelimenary patch just as a hack so i will not need to
-> > 	impelement new netdev
-> > patch 2: hw/virtio-rdma: VirtIO rdma device
-> > 	The implementation of the device
-> > patch 3: RDMA/virtio-rdma: VirtIO rdma driver
-> > 	The device driver
-> > 
-> 
+Phil.
 
