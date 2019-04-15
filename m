@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42786)
+Received: from eggs.gnu.org ([209.51.188.92]:45089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1e0-0004rt-B8
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hG1mH-0001Zy-Eg
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hG1dy-00059s-Ew
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:27:32 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 15 Apr 2019 15:27:22 +0200
-Message-Id: <1555334842-195718-6-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hG1mG-0002B0-9o
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:36:05 -0400
+Received: from mail-eopbgr80114.outbound.protection.outlook.com
+	([40.107.8.114]:64671
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hG1mF-00029Q-8E
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 09:36:04 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 15 Apr 2019 13:35:59 +0000
+Message-ID: <e432f8cf-4014-8175-4a56-167a14534528@virtuozzo.com>
+References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
+	<87zhorbytu.fsf@dusky.pond.sub.org>
+	<3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
+	<874l6za00z.fsf@dusky.pond.sub.org>
+In-Reply-To: <874l6za00z.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FC52E9E32B794E4CB5993DB6F0EE896A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
+ error_abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Helge Deller <deller@gmx.de>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-s390 was trying to solve limited memslot size issue by abusing
-memory_region_allocate_system_memory(), which breaks API contract
-where the function might be called only once.
-
-s390 should have used memory aliases to fragment inital memory into
-smaller chunks to satisfy KVM's memslot limitation. But its a bit
-late now, since allocated pieces are transfered in migration stream
-separately, so it's not possible to just replace broken layout with
-correct one. Previous patch made MemoryRegion alases migratable and
-this patch switches to use them to split big initial RAM chunk into
-smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
-for migration.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-A don't have access to a suitable system to test it, so I've simulated
-it with smaller chunks on x84 host. Ping-pong migration between old
-and new QEMU worked fine.  KVM part should be fine as memslots
-using mapped MemoryRegions (in this case it would be aliases) as
-far as I know but is someone could test it on big enough host it
-would be nice.
----
- hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index d11069b..12ca3a9 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ram = g_new(MemoryRegion, 1);
-     ram_addr_t chunk, offset = 0;
-     unsigned int number = 0;
-     gchar *name;
- 
-     /* allocate RAM for core */
-+    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
-+    /*
-+     * memory_region_allocate_system_memory() registers allocated RAM for
-+     * migration, however for compat reasons the RAM should be passed over
-+     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
-+     * allocated RAM so it won't be migrated directly. Aliases will take
-+     * of segmenting RAM into legacy chunks.
-+     */
-+    vmstate_unregister_ram(ram, NULL);
-     name = g_strdup_printf("s390.ram");
-     while (mem_size) {
--        MemoryRegion *ram = g_new(MemoryRegion, 1);
--        uint64_t size = mem_size;
-+        MemoryRegion *alias = g_new(MemoryRegion, 1);
- 
-         /* KVM does not allow memslots >= 8 TB */
--        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
--        memory_region_allocate_system_memory(ram, NULL, name, chunk);
--        memory_region_add_subregion(sysmem, offset, ram);
-+        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-+        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
-+        vmstate_register_ram_global(alias);
-+        memory_region_add_subregion(sysmem, offset, alias);
-         mem_size -= chunk;
-         offset += chunk;
-         g_free(name);
--- 
-2.7.4
+MTUuMDQuMjAxOSAxNjowOCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
+Cj4+IDE1LjA0LjIwMTkgODo1MSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+Pj4gVmxhZGlt
+aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3cml0ZXM6
+DQo+Pj4NCj4+Pj4gSXQgd291bGQgYmUgbmljZSB0byBoYXZlIEVycm9yIG9iamVjdCBub3QgZnJl
+ZWQgYXdheSB3aGVuIGRlYnVnZ2luZyBhDQo+Pj4+IGNvcmVkdW1wLg0KPj4+Pg0KPj4+PiBTaWdu
+ZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
+b3p6by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICB1dGlsL2Vycm9yLmMgfCA4ICsrKysrLS0tDQo+
+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+
+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS91dGlsL2Vycm9yLmMgYi91dGlsL2Vycm9yLmMNCj4+Pj4g
+aW5kZXggOTM0YTc4ZTFiMS4uZjkxODBjMGYzMCAxMDA2NDQNCj4+Pj4gLS0tIGEvdXRpbC9lcnJv
+ci5jDQo+Pj4+ICsrKyBiL3V0aWwvZXJyb3IuYw0KPj4+PiBAQCAtMzIsOSArMzIsMTEgQEAgRXJy
+b3IgKmVycm9yX2ZhdGFsOw0KPj4+PiAgICBzdGF0aWMgdm9pZCBlcnJvcl9oYW5kbGVfZmF0YWwo
+RXJyb3IgKiplcnJwLCBFcnJvciAqZXJyKQ0KPj4+PiAgICB7DQo+Pj4+ICAgICAgICBpZiAoZXJy
+cCA9PSAmZXJyb3JfYWJvcnQpIHsNCj4+Pj4gLSAgICAgICAgZnByaW50ZihzdGRlcnIsICJVbmV4
+cGVjdGVkIGVycm9yIGluICVzKCkgYXQgJXM6JWQ6XG4iLA0KPj4+PiAtICAgICAgICAgICAgICAg
+IGVyci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSk7DQo+Pj4+IC0gICAgICAgIGVycm9yX3Jl
+cG9ydF9lcnIoZXJyKTsNCj4+Pj4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJVbmV4cGVjdGVkIGVy
+cm9yIGluICVzKCkgYXQgJXM6JWQ6ICVzIiwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgIGVy
+ci0+ZnVuYywgZXJyLT5zcmMsIGVyci0+bGluZSwgZXJyb3JfZ2V0X3ByZXR0eShlcnIpKTsNCj4+
+Pj4gKyAgICAgICAgaWYgKGVyci0+aGludCkgew0KPj4+PiArICAgICAgICAgICAgZXJyb3JfcHJp
+bnRmX3VubGVzc19xbXAoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPj4+PiArICAgICAgICB9DQo+
+Pj4+ICAgICAgICAgICAgYWJvcnQoKTsNCj4+Pj4gICAgICAgIH0NCj4+Pj4gICAgICAgIGlmIChl
+cnJwID09ICZlcnJvcl9mYXRhbCkgew0KPj4+DQo+Pj4gTm8gb2JqZWN0aW9ucyB0byBub3QgZnJl
+ZWluZyB0aGUgZXJyb3Igb2JqZWN0IG9uIHRoZSBwYXRoIHRvIGFib3J0KCkuDQo+Pj4NCj4+PiBZ
+b3UgYWxzbyBmb3JtYXQgdGhlIGVycm9yIG1lc3NhZ2UgZGlmZmVyZW50bHkuICBDb21taXQgMWU5
+YjY1YmIxYmEncw0KPj4+IGV4YW1wbGUNCj4+Pg0KPj4+ICAgICAgICAgICBVbmV4cGVjdGVkIGVy
+cm9yIGluIHBhcnNlX2Jsb2NrX2Vycm9yX2FjdGlvbigpIGF0IC4uLi9xZW11L2Jsb2NrZGV2LmM6
+MzIyOg0KPj4+ICAgICAgICAgICBxZW11LXN5c3RlbS14ODZfNjQ6IC1kcml2ZSBpZj1ub25lLHdl
+cnJvcj1mb286ICdmb28nIGludmFsaWQgd3JpdGUgZXJyb3IgYWN0aW9uDQo+Pj4gICAgICAgICAg
+IEFib3J0ZWQgKGNvcmUgZHVtcGVkKQ0KPj4+DQo+Pj4gY2hhbmdlcyB0byAoZ3Vlc3N3b3JrLCBu
+b3QgdGVzdGVkKToNCj4+Pg0KPj4+ICAgICAgICAgICBxZW11LXN5c3RlbS14ODZfNjQ6IC1kcml2
+ZSBpZj1ub25lLHdlcnJvcj1mb286IFVuZXhwZWN0ZWQgZXJyb3IgaW4gcGFyc2VfYmxvY2tfZXJy
+b3JfYWN0aW9uKCkgYXQgLi4uL3FlbXUvYmxvY2tkZXYuYzozMjI6ICdmb28nIGludmFsaWQgd3Jp
+dGUgZXJyb3IgYWN0aW9uDQo+Pj4gICAgICAgICAgIEFib3J0ZWQgKGNvcmUgZHVtcGVkKQ0KPj4N
+Cj4+IGhtLiBjaGVja3BhdGNoIGRvbid0IGFsbG93IHRvIHB1dCBcbiBpbnRvIGVycm9yX3JlcG9y
+dC4gU28sIHNob3VsZCBJIGNhbGwgZXJyb3JfcmVwb3J0IHR3aWNlPw0KPj4NCj4+IFRyYW5zaXRp
+b24gZnJvbSBmcHJpbnRmIHRvIGVycm9yX3JlcG9ydCBpcyBPSyBmb3IgeW91Pw0KPiANCj4gTGV0
+J3Mgc2ltcGx5IG5vdCBtZXNzIHdpdGggdGhlIGZvcm1hdHRpbmcgYXQgYWxsLiAgU29tZXRoaW5n
+IGxpa2U6DQo+IA0KPiAoMSkgSW5saW5lIGVycm9yX3JlcG9ydF9lcnIoKSwgZGVsZXRlIHRoZSBl
+cnJvcl9mcmVlKCkNCj4gDQo+ICgyKSBPcHRpb25hbDogcmVwbGFjZSBmcHJpbnRmKCkgYnkgZXJy
+b3JfcHJpbnRmKCkNCj4gDQo+ICgzKSBPcHRpb25hbDogY2xlYW4gdXAgdGhlIGFkZGl0aW9uYWwg
+Y29weSBvZg0KPiANCj4gICAgICAgICAgaWYgKGVyci0+aGludCkgew0KPiAgICAgICAgICAgICAg
+ZXJyb3JfcHJpbnRmX3VubGVzc19xbXAoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPiAgICAgICAg
+ICB9DQo+IA0KPiAoM2EpIEVpdGhlciBjcmVhdGUgYSBoZWxwZXIgZnVuY3Rpb24sIHJlcGxhY2lu
+ZyBhbGwgdGhyZWUgY29waWVzLA0KPiANCj4gKDNiKSBPciBzaW1wbHkgZGVsZXRlIHRoZSBuZXcg
+Y29weSBmcm9tIHRoZSBwYXRoIGxlYWRpbmcgdG8gYWJvcnQoKSwNCj4gICAgICAgc2luY2UgdGhl
+IGhpbnQgaXMgdW5saWtlbHkgdG8gYmUgdXNlZnVsIHRoZXJlLg0KPiANCg0KV2h5IHdlIHByaW50
+IGVycm9yIGFsd2F5cyBidXQgaGludCBvbmx5ICJ1bmxlc3NfcW1wIj8NCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
