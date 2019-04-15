@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44155)
+Received: from eggs.gnu.org ([209.51.188.92]:44608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hG3nb-0000vH-S9
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:45:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hG3or-0001pU-5t
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hG3na-0007yF-DH
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:45:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hG3nZ-0007Zw-T3
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:45:34 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 15 Apr 2019 16:45:01 +0100
-Message-Id: <20190415154503.6758-2-berrange@redhat.com>
-In-Reply-To: <20190415154503.6758-1-berrange@redhat.com>
-References: <20190415154503.6758-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hG3oj-00011w-Uj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:48 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:43547)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hG3og-0000vZ-1A
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 11:46:42 -0400
+Received: by mail-oi1-x231.google.com with SMTP id t81so14178733oig.10
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 08:46:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/3] usb-mtp: fix string length for filename
- when writing metadata
+References: <20190415141547.15444-1-berrange@redhat.com>
+	<CAFEAcA9353Sar3Uny0Qvx0Ex6jP-dzE2w4AjsA4O8gCEF3RdKA@mail.gmail.com>
+	<0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
+In-Reply-To: <0ade556d-bdf1-4440-472a-1e3e6cb7387a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Apr 2019 16:46:29 +0100
+Message-ID: <CAFEAcA-ZYZ2M-nLThqc6bP2ZqeoRUEt_-7qA3m=obTyyi=7zow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for
+ all code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +31,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-The ObjectInfo 'length' field provides the length of the
-wide character string filename. This is then converted to
-a multi-byte character string. This may have a different
-byte count to the wide character string. We should use the
-C string length of the multi-byte string instead.
+On Mon, 15 Apr 2019 at 16:25, Eric Blake <eblake@redhat.com> wrote:
+> "two known problems" but...
+>
+> ...three bullet points.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- hw/usb/dev-mtp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Nobody expects the Spanish Inquisition to be code reviewed :-)
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index ebf210fbf8..838cd74da6 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -1714,7 +1714,7 @@ static void usb_mtp_write_metadata(MTPState *s, uin=
-t64_t dlen)
-         return;
-     }
-=20
--    o =3D usb_mtp_object_lookup_name(p, filename, dataset->length);
-+    o =3D usb_mtp_object_lookup_name(p, filename, -1);
-     if (o !=3D NULL) {
-         next_handle =3D o->handle;
-     }
---=20
-2.20.1
+thanks
+-- PMM
