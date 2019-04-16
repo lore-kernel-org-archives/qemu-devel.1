@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44015)
+Received: from eggs.gnu.org ([209.51.188.92]:44046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4R-0006SC-M3
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:36 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4T-0006U1-3F
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4Q-0007o3-Oy
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:35 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4S-0007p5-4V
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:37 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 15 Apr 2019 18:38:59 -0700
-Message-Id: <20190416013902.4941-3-andrew.smirnov@gmail.com>
+Date: Mon, 15 Apr 2019 18:39:00 -0700
+Message-Id: <20190416013902.4941-4-andrew.smirnov@gmail.com>
 In-Reply-To: <20190416013902.4941-1-andrew.smirnov@gmail.com>
 References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/5] i.mx7d: Add no-op/unimplemented PCIE PHY
- IP block
+Subject: [Qemu-devel] [PATCH 3/5] pci: designware: Update MSI mapping
+ unconditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,8 +25,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-Add no-op/unimplemented PCIE PHY IP block. Needed by new kernels to
-use PCIE.
+Expression to calculate update_msi_mapping in code handling writes to
+DESIGNWARE_PCIE_MSI_INTR0_ENABLE is missing an ! operator and should
+be:
+
+    !!root->msi.intr[0].enable ^ !!val;
+
+so that MSI mapping is updated when enabled transitions from either
+"none" -> "any" or "any" -> "none". Since that register shouldn't be
+written to very often, change the code to update MSI mapping
+unconditionally instead of trying to fix the update_msi_mapping logic.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
@@ -34,39 +42,31 @@ Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 ---
- include/hw/arm/fsl-imx7.h | 3 +++
- hw/arm/fsl-imx7.c         | 5 +++++
- 2 files changed, 8 insertions(+)
+ hw/pci-host/designware.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index aae4f860fc..3efa697adc 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -125,6 +125,9 @@ enum FslIMX7MemoryMap {
-     FSL_IMX7_ADC2_ADDR            = 0x30620000,
-     FSL_IMX7_ADCn_SIZE            = 0x1000,
+diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+index 29ea313798..6affe823c0 100644
+--- a/hw/pci-host/designware.c
++++ b/hw/pci-host/designware.c
+@@ -296,16 +296,10 @@ static void designware_pcie_root_config_write(PCIDevice *d, uint32_t address,
+         root->msi.base |= (uint64_t)val << 32;
+         break;
  
-+    FSL_IMX7_PCIE_PHY_ADDR        = 0x306D0000,
-+    FSL_IMX7_PCIE_PHY_SIZE        = 0x10000,
-+
-     FSL_IMX7_GPC_ADDR             = 0x303A0000,
+-    case DESIGNWARE_PCIE_MSI_INTR0_ENABLE: {
+-        const bool update_msi_mapping = !root->msi.intr[0].enable ^ !!val;
+-
++    case DESIGNWARE_PCIE_MSI_INTR0_ENABLE:
+         root->msi.intr[0].enable = val;
+-
+-        if (update_msi_mapping) {
+-            designware_pcie_root_update_msi_mapping(root);
+-        }
++        designware_pcie_root_update_msi_mapping(root);
+         break;
+-    }
  
-     FSL_IMX7_I2C1_ADDR            = 0x30A20000,
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 1abfa5910c..813fb55ca9 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -532,6 +532,11 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-      */
-     create_unimplemented_device("dma-apbh", FSL_IMX7_DMA_APBH_ADDR,
-                                 FSL_IMX7_DMA_APBH_SIZE);
-+    /*
-+     * PCIe PHY
-+     */
-+    create_unimplemented_device("pcie-phy", FSL_IMX7_PCIE_PHY_ADDR,
-+                                FSL_IMX7_PCIE_PHY_SIZE);
- }
- 
- static void fsl_imx7_class_init(ObjectClass *oc, void *data)
+     case DESIGNWARE_PCIE_MSI_INTR0_MASK:
+         root->msi.intr[0].mask = val;
 -- 
 2.20.1
