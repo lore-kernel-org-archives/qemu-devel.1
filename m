@@ -3,47 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0048C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89746C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:27:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64D9B20868
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:21:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D9B20868
+	by mail.kernel.org (Postfix) with ESMTPS id 606E62075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:27:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 606E62075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40717 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40763 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGSiG-0004ir-H7
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 14:21:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48653)
+	id 1hGSoB-0005yq-NZ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 14:27:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGShL-0004K8-IJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:20:48 -0400
+	(envelope-from <david@redhat.com>) id 1hGSnB-0005SO-0f
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGShK-0003Ec-Et
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:20:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37432)
+	(envelope-from <david@redhat.com>) id 1hGSnA-0001ir-1D
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:26:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGShJ-0003Di-VL; Tue, 16 Apr 2019 14:20:46 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hGSn3-0001S9-F5; Tue, 16 Apr 2019 14:26:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F092F2D805;
-	Tue, 16 Apr 2019 18:20:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62B9B3084031;
+	Tue, 16 Apr 2019 18:26:36 +0000 (UTC)
 Received: from [10.36.116.105] (ovpn-116-105.ams2.redhat.com [10.36.116.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 972A019C71;
-	Tue, 16 Apr 2019 18:20:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F3E7B608C1;
+	Tue, 16 Apr 2019 18:26:34 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-42-david@redhat.com>
-	<0871b6f8-6073-4311-78a5-4772817a009e@linaro.org>
+	<20190411100836.646-38-david@redhat.com>
+	<9ecb39e2-99e3-4d48-2582-8962005ed940@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <5cadf319-7320-85a1-67d4-e03638cc4d63@redhat.com>
-Date: Tue, 16 Apr 2019 20:20:42 +0200
+Message-ID: <37a2054d-bc9b-14ae-25f6-2508b457b5f3@redhat.com>
+Date: Tue, 16 Apr 2019 20:26:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <0871b6f8-6073-4311-78a5-4772817a009e@linaro.org>
+In-Reply-To: <9ecb39e2-99e3-4d48-2582-8962005ed940@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 16 Apr 2019 18:20:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 16 Apr 2019 18:26:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 41/41] s390x/tcg: Implement VECTOR TEST
- UNDER MASK
+Subject: Re: [Qemu-devel] [PATCH v1 37/41] s390x/tcg: Implement VECTOR
+ SUBTRACT WITH BORROW COMPUTE BORROW INDICATION
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -123,58 +124,42 @@ Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416182042.KbwYCubs9ZkUxttVxZo_S0mhpSCfQDuxCaOsKM101kA@z>
+Message-ID: <20190416182634.A0IS4iVIxA-YwaMLr1T8V7iqj9J-9Lxtwds1ErtaWHM@z>
 
-On 13.04.19 08:28, Richard Henderson wrote:
+On 13.04.19 08:11, Richard Henderson wrote:
 > On 4/11/19 12:08 AM, David Hildenbrand wrote:
->> +void HELPER(gvec_vtm)(void *v1, const void *v2, CPUS390XState *env,
->> +                      uint32_t desc)
+>> +static DisasJumpType op_vsbcbi(DisasContext *s, DisasOps *o)
 >> +{
->> +    S390Vector tmp;
->> +
->> +    s390_vec_and(&tmp, v1, v2);
->> +    if (s390_vec_is_zero(&tmp)) {
->> +        /* Selected bits all zeros; or all mask bits zero */
->> +        env->cc_op = 0;
->> +    } else if (s390_vec_equal(&tmp, v2)) {
->> +        /* Selected bits all ones */
->> +        env->cc_op = 3;
->> +    } else {
->> +        /* Selected bits a mix of zeros and ones */
->> +        env->cc_op = 1;
+>> +    if (get_field(s->fields, m5) != ES_128) {
+>> +        gen_program_exception(s, PGM_SPECIFICATION);
+>> +        return DISAS_NORETURN;
 >> +    }
+>> +
+>> +    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
+>> +                   get_field(s->fields, v3), get_field(s->fields, v4), 0,
+>> +                   gen_helper_gvec_vsbcbi128);
+>> +    return DISAS_NEXT;
 >> +}
+> 
 > 
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> However, if you return this value, then you can do
+> I'm sure this can be done similarly to add with carry compute carry, but it's
+> harder to reason with sub2.  Something like
 > 
-> DEF_HELPER_FLAGS_4(gvec_vtm, TCG_CALL_NO_RWG_SE, i32, cptr, cptr)
-> 
-> static DisasJumpType op_vtm(DisasContext *s, DisasOps *o)
-> {
->     TCGv_ptr p1 = tcg_temp_new_ptr();
->     TCGv_ptr p2 = tcg_temp_new_ptr();
-> 
->     tcg_gen_addi_ptr(p1, cpu_env,
->         vec_full_reg_offset(get_field(s->fields, v1)));
->     tcg_gen_addi_ptr(p2, cpu_env,
->         vec_full_reg_offset(get_field(s->fields, v2)));
->     gen_helper_gvec_vtm(cc_op, p1, p2);
->     tcg_temp_free_ptr(p1);
->     tcg_temp_free_ptr(p2);
->     set_cc_static(s);
->     return DISAS_NEXT;
-> }
-> 
-> Perhaps it doesn't matter though, since use of vtm probably implies a jump,
-> which implies end of TB, which means that registers are going to get saved to
-> backing store anyway.
+> 	tcg_gen_andi_i64(tl, cl, 1);
+> 	tcg_gen_sub2_i64(tl, th, al, zero, tl, zero);
+> 	tcg_gen_sub2_i64(tl, th, tl, th, bl, zero);
+> 	tcg_gen_andi_i64(tl, th, 1);
+> 	tcg_gen_sub2_i64(tl, th, ah, zero, tl, zero);
+> 	tcg_gen_sub2_i64(tl, th, tl, th, bh, zero);
+> 	tcg_gen_andi_i64(tl, th, 1);
+> 	/* result in tl */
 
-Had a similar idea, but I guess it doesn't really matter. This way, we
-can at least use standardized gvec ool helpers. Will leave it as is for
-now, thanks!
+Indeed, looks good to me. The only thing to care about is to convert -1
+to 1, so we get a proper borrow.
 
+Thanks!
 
 -- 
 
