@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D95C7C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D03C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A231920674
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:11:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A6842077C
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:14:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HreNCUuv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A231920674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bvBj8Do/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6842077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36528 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36555 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGNsT-0007e1-Rp
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:11:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34668)
+	id 1hGNuc-0000tE-84
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:14:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfJ-0004r8-PB
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfU-00051J-JX
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfI-0001M6-2A
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:21 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:36148)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfS-0001Si-Lh
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:32 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNfH-0001Kz-Oi
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:19 -0400
-Received: by mail-wm1-x335.google.com with SMTP id h18so25327460wml.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:19 -0700 (PDT)
+	id 1hGNfR-0001OB-2u
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:30 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w1so26956454wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=oKhQw5TgUN0CJPeTbE7gAN8kI/N1+VlPzRCCDtvAZtE=;
-	b=HreNCUuvD0e5wQi79dWBWrQu3YZa7sNIr2l3kmLrc2xcNsq2h4683HclK6gO+ngrci
-	JJCuYA9A+T3gDvIW5mvk/0YPo05OjNJPFsN30neivj+YJUQlyAaeqyvJ6x5QHcs/JA+Z
-	mbwKJHL3UQ+lS5P3LS61SMqJtpC6sM3DxeS9KkXybVqskZjkVJ4vxMYljFnzXNS5wfSc
-	e2fHGU4zj346ylL09uE5ZbVKuucmEf4ZIid7mtvQ2NSAi5qo9DHtONczqaqoDE5zLaoI
-	glpWQUuAo2XasdZsXGjn+jq/KXlEbUCzgkNYNgjK415krxxnEYIjEFOJhAQP5hQ12jtE
-	WZqw==
+	bh=Tkj4srWAc4/EjY7BD+Il79S6ivdgS+b3NoUBeFSWH/s=;
+	b=bvBj8Do/aVo7szYKVJdS0iWwv7zlN9y6RwnKkVpG5o0WfZ4oRP+MsZoRQqc/X98we1
+	sk7ahAnpQ1TwVnJOZw67//M3nuozxjATPzw+AIo/g9upZco1MILS4GpJmjyNFaMhQb+V
+	l2CzMb0o3y99sPg82KvA+e0S+kMaW2rV2p8q0pPqWMrhe36FlAgvvi5YLb5y7hVIY8ue
+	4ikKGXxxzahIL/6mRMG3OacmegyZRWbj+Mi9oyY7Y/bBnYiCedIWw/kjcz30R3rj0+6n
+	c72+nv2zF1fPl0g9zaBrVDQfo57Z9tMd80B6Md1R3cnd7zQfMNhregdCgtFsGxBp45oX
+	Cd/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=oKhQw5TgUN0CJPeTbE7gAN8kI/N1+VlPzRCCDtvAZtE=;
-	b=DVjwx+7CrrksnODN3sXmSDI0FgZo1Lvk+0QWqGP02CFBsKE5Wjn0DGcGu817dDfXGF
-	HnyAlUKrIWlYjXaXbZU9H1xSPEksSmhV7MM24jgg/QCDey8Tz8epAQuqazwjvKAki70x
-	ZbyrYrTX1lYSG8yqDf6Conw6qeV8bBSPSGSOoRe0LGtn//oC7baDHNBblq100uw84vxQ
-	WwWRP/MtEa6qw2YriIrderWItWx9NBmbOX9vry9NxDIMhKQ6RHO1Qa8sbjvMWIODQxVX
-	R18Cw/oY5B1PGQCGcZyNILItMLsBjukwmgSbnHHfmuenW7tL263/DZo7mB9s+f1LOtwh
-	AYNA==
-X-Gm-Message-State: APjAAAXkDd22i93gXAjGSZNiNg/VK/HTdk8xywVGAMJE+4mfT6tBt3q3
-	czxvFQZwAAlRjzWu5nBz+JBPYQ==
-X-Google-Smtp-Source: APXvYqwl95al5Y3LOtRhbHMoOQ56YCImnsEa1pPOHGSI6GwjogiYdO5Gdp59W8agAfVht11CsZdYyA==
-X-Received: by 2002:a1c:f204:: with SMTP id s4mr26600232wmc.51.1555419498715; 
-	Tue, 16 Apr 2019 05:58:18 -0700 (PDT)
+	bh=Tkj4srWAc4/EjY7BD+Il79S6ivdgS+b3NoUBeFSWH/s=;
+	b=M+np46GA3Px12MWdO8H/JqbViyFNdq86dbuuabOmOkOg9AOLvG6fPLoVxIeeiKTVOo
+	Uze8pbGkRqIOvgEJZ7Up1Zi+/4sLj2CjoLZpDclqcPg4S419SmMwWK7H+fkz4t66luwl
+	9hE2ttHHlaXEJsPk+DURuw8N5s3J/ooIXB/2zse0tgwpaMzn0r1+csMNprtOeek6kNhe
+	5gSXIhqrwy+rqZIuRzrGDigcw5iIiu77r1Z9BCEAkyetHmCBstRJC5VMZ5mZX9buHM72
+	kRe/DfLUEuMVjoif49tmd0GHEbYJ/IjoV9LhmJBQYUWk2j596ulnxOv1mjXyt/VEWeLb
+	J4Zw==
+X-Gm-Message-State: APjAAAW4wHKKOrQ2tW1LlqEY3XIGliE8Hxjo10a0o+yJV6A1F+mKvCEy
+	9tpNr7yzgXcPmRY29gZitr+PA4/zYL8=
+X-Google-Smtp-Source: APXvYqzCjd3rGLsSL+ff9Gr9dru17N92aFNz4T+84uJH5aaXzc/cKTiiYwtOHu+usWM3agln47JFJg==
+X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr21425562wru.150.1555419503330;
+	Tue, 16 Apr 2019 05:58:23 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	v184sm39476572wma.6.2019.04.16.05.58.16
+	v184sm39476572wma.6.2019.04.16.05.58.22
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 05:58:17 -0700 (PDT)
+	Tue, 16 Apr 2019 05:58:22 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 13:57:32 +0100
-Message-Id: <20190416125744.27770-15-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:35 +0100
+Message-Id: <20190416125744.27770-18-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::335
-Subject: [Qemu-devel] [PATCH 14/26] target/arm: Allow for floating point in
- callee stack integrity check
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH 17/26] target/arm: Overlap VECSTRIDE and
+ XSCALE_CPAR TB flags
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,75 +98,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416125732.Q6ZFCSKLcPMpiTUeABj5AIRWKN_xpprM_B-XSbaEb_k@z>
+Message-ID: <20190416125735.JldwJGFGCpGoALSXFi4Ays9E2_q7nxyYS3pW_VdL2qM@z>
 
-The magic value pushed onto the callee stack as an integrity
-check is different if floating point is present.
+We are close to running out of TB flags for AArch32; we could
+start using the cs_base word, but before we do that we can
+economise on our usage by sharing the same bits for the VFP
+VECSTRIDE field and the XScale XSCALE_CPAR field. This
+works because no XScale CPU ever had VFP.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ target/arm/cpu.h       | 10 ++++++----
+ target/arm/cpu.c       |  7 +++++++
+ target/arm/helper.c    |  6 +++++-
+ target/arm/translate.c |  9 +++++++--
+ 4 files changed, 25 insertions(+), 7 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index c436f628987..a4e4d17e787 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3139,6 +3139,12 @@ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
+ FIELD(TBFLAG_A32, THUMB, 0, 1)
+ FIELD(TBFLAG_A32, VECLEN, 1, 3)
+ FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)
++/*
++ * We store the bottom two bits of the CPAR as TB flags and handle
++ * checks on the other bits at runtime. This shares the same bits as
++ * VECSTRIDE, which is OK as no XScale CPU has VFP.
++ */
++FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
+ /*
+  * Indicates whether cp register reads and writes by guest code should access
+  * the secure or nonsecure bank of banked registers; note that this is not
+@@ -3148,10 +3154,6 @@ FIELD(TBFLAG_A32, NS, 6, 1)
+ FIELD(TBFLAG_A32, VFPEN, 7, 1)
+ FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
+ FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
+-/* We store the bottom two bits of the CPAR as TB flags and handle
+- * checks on the other bits at runtime
+- */
+-FIELD(TBFLAG_A32, XSCALE_CPAR, 17, 2)
+ /* For M profile only, Handler (ie not Thread) mode */
+ FIELD(TBFLAG_A32, HANDLER, 21, 1)
+ /* For M profile only, whether we should generate stack-limit checks */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 3f9c81e7e9e..dd6c4f6da8d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1035,6 +1035,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         set_feature(env, ARM_FEATURE_THUMB_DSP);
+     }
+ 
++    /*
++     * We rely on no XScale CPU having VFP so we can use the same bits in the
++     * TB flags field for VECSTRIDE and XSCALE_CPAR.
++     */
++    assert(!(arm_feature(env, ARM_FEATURE_VFP) &&
++             arm_feature(env, ARM_FEATURE_XSCALE)));
++
+     if (arm_feature(env, ARM_FEATURE_V7) &&
+         !arm_feature(env, ARM_FEATURE_M) &&
+         !arm_feature(env, ARM_FEATURE_PMSA)) {
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index fe8e78fe36d..2f6382a0b24 100644
+index 0c5b0a73e95..d8a9620b870 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7984,6 +7984,21 @@ load_fail:
-     return false;
- }
+@@ -13375,7 +13375,11 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
+             flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+         }
+-        flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
++        /* Note that XSCALE_CPAR shares bits with VECSTRIDE */
++        if (arm_feature(env, ARM_FEATURE_XSCALE)) {
++            flags = FIELD_DP32(flags, TBFLAG_A32,
++                               XSCALE_CPAR, env->cp15.c15_cpar);
++        }
+     }
  
-+static uint32_t v7m_integrity_sig(CPUARMState *env, uint32_t lr)
-+{
-+    /*
-+     * Return the integrity signature value for the callee-saves
-+     * stack frame section. @lr is the exception return payload/LR value
-+     * whose FType bit forms bit 0 of the signature if FP is present.
-+     */
-+    uint32_t sig = 0xfefa125a;
-+
-+    if (!arm_feature(env, ARM_FEATURE_VFP) || (lr & R_V7M_EXCRET_FTYPE_MASK)) {
-+        sig |= 1;
+     flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX, arm_to_core_mmu_idx(mmu_idx));
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d280b3a9a3a..9172a382c4d 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -13329,8 +13329,13 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
+     dc->vfp_enabled = FIELD_EX32(tb_flags, TBFLAG_A32, VFPEN);
+     dc->vec_len = FIELD_EX32(tb_flags, TBFLAG_A32, VECLEN);
+-    dc->vec_stride = FIELD_EX32(tb_flags, TBFLAG_A32, VECSTRIDE);
+-    dc->c15_cpar = FIELD_EX32(tb_flags, TBFLAG_A32, XSCALE_CPAR);
++    if (arm_feature(env, ARM_FEATURE_XSCALE)) {
++        dc->c15_cpar = FIELD_EX32(tb_flags, TBFLAG_A32, XSCALE_CPAR);
++        dc->vec_stride = 0;
++    } else {
++        dc->vec_stride = FIELD_EX32(tb_flags, TBFLAG_A32, VECSTRIDE);
++        dc->c15_cpar = 0;
 +    }
-+    return sig;
-+}
-+
- static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-                                   bool ignore_faults)
- {
-@@ -7998,6 +8013,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-     bool stacked_ok;
-     uint32_t limit;
-     bool want_psp;
-+    uint32_t sig;
- 
-     if (dotailchain) {
-         bool mode = lr & R_V7M_EXCRET_MODE_MASK;
-@@ -8039,8 +8055,9 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-     /* Write as much of the stack frame as we can. A write failure may
-      * cause us to pend a derived exception.
-      */
-+    sig = v7m_integrity_sig(env, lr);
-     stacked_ok =
--        v7m_stack_write(cpu, frameptr, 0xfefa125b, mmu_idx, ignore_faults) &&
-+        v7m_stack_write(cpu, frameptr, sig, mmu_idx, ignore_faults) &&
-         v7m_stack_write(cpu, frameptr + 0x8, env->regs[4], mmu_idx,
-                         ignore_faults) &&
-         v7m_stack_write(cpu, frameptr + 0xc, env->regs[5], mmu_idx,
-@@ -8645,12 +8662,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         if (return_to_secure &&
-             ((excret & R_V7M_EXCRET_ES_MASK) == 0 ||
-              (excret & R_V7M_EXCRET_DCRS_MASK) == 0)) {
--            uint32_t expected_sig = 0xfefa125b;
-             uint32_t actual_sig;
- 
-             pop_ok = v7m_stack_read(cpu, &actual_sig, frameptr, mmu_idx);
- 
--            if (pop_ok && expected_sig != actual_sig) {
-+            if (pop_ok && v7m_integrity_sig(env, excret) != actual_sig) {
-                 /* Take a SecureFault on the current stack */
-                 env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
-                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
+     dc->v7m_handler_mode = FIELD_EX32(tb_flags, TBFLAG_A32, HANDLER);
+     dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
+         regime_is_secure(env, dc->mmu_idx);
 -- 
 2.20.1
 
