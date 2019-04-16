@@ -2,71 +2,93 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEF4C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B67C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:24:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E39D206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:21:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E39D206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFAAA205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:24:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZNMBiH1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFAAA205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39981 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40020 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGRlt-0002eu-Hm
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 13:21:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36163)
+	id 1hGRoX-00040J-NF
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 13:24:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1hGRl7-0002Nm-EB
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:20:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGRnT-0003Qi-Sn
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1hGRl6-00043O-IT
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:20:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1hGRl6-0003mi-Bj
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:20:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CCDF358E33;
-	Tue, 16 Apr 2019 17:20:18 +0000 (UTC)
-Received: from gigantic.usersys.redhat.com (helium.bos.redhat.com
-	[10.18.17.132])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C6EA1001DE0;
-	Tue, 16 Apr 2019 17:20:14 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-References: <20190415154503.6758-1-berrange@redhat.com>
-	<jpgk1fvp5wm.fsf@linux.bootlegged.copy>
-	<20190415165426.GT5718@redhat.com> <20190416084059.GD31311@redhat.com>
-	<jpglg0a3p93.fsf@linux.bootlegged.copy>
-	<20190416161242.GU31311@redhat.com>
-	<jpgwojtoq5r.fsf@linux.bootlegged.copy>
-	<20190416165217.GV31311@redhat.com>
-Date: Tue, 16 Apr 2019 13:20:14 -0400
-In-Reply-To: <20190416165217.GV31311@redhat.com> ("Daniel P.
-	\=\?utf-8\?Q\?Ber\?\= \=\?utf-8\?Q\?rang\=C3\=A9\=22's\?\=
-	message of "Tue, 16 Apr 2019 17:52:17 +0100")
-Message-ID: <jpg1s21dfzl.fsf@linux.bootlegged.copy>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <richard.henderson@linaro.org>) id 1hGRnS-0006RS-Ve
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:23:03 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGRnS-0006Pz-Iz
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:23:02 -0400
+Received: by mail-pf1-x444.google.com with SMTP id z5so10734455pfn.3
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=9ireNXBEenac/bpbP2qhhiCHhvW1o/b4CWXejO6S1ZY=;
+	b=ZNMBiH1pqVRL666B5ZlIeUsk3NQewI/ZuL3sGngtPWU/zRjwYdk+PNhl9/0vFTZfsU
+	xTAHTQViYb2ln7n6I2LDO4j2jii4hpKt49LoJy2GPUr8cCR35NMT05q+B93xFwVR4w/8
+	mS6zmgqcBK1teYr5489NYK/q4754jf14mZWH2Y/Y0w2l2XLK1xDuPantcAsm666ZOpRv
+	Yi6ja3nlDSe6aWAs/I888cKsPUFM6zItkSIAfAselSttqNsouB6OhFMB++jxNYIINjv4
+	UR6cfD2J/jDykEGn2VufTCEGVYCVobI9tyT/yhCo82Rl2J3GWlTAW+RhgvsfMZqdxkQP
+	8Sfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=9ireNXBEenac/bpbP2qhhiCHhvW1o/b4CWXejO6S1ZY=;
+	b=bxF1WvCjWGFMuzEktrQy5OtSz6LqfbgA7mvamxBvN/V2E0tvxYN3cR9b7Kr1AYAAqW
+	iiVe5Dh4QeNwLnEdSonTQg3Q/XxXniRb3fPpfhqymVltAlLATnIO2j+Uc11w8zNBUcTw
+	jkQSr9YIdgPqC9n37qBQaiWVPIsbdPvO048IR1OZ3BzEFN1TkN84KDQl+L2jS4ZdzLVj
+	cR0UVzb3OlB2PVmQgwQvLsI5anO3LXHTGDWzc4J8nVno/qx7UBWjjesRJ0MlRm3MbaRV
+	ubmaoH0csffufWWM0OZlx5Xee/qxM7XtLr5pkjruRs09H5APlddsa7waSLVy7ETeRbc+
+	fJFQ==
+X-Gm-Message-State: APjAAAWYt7WuPGaNwQhKutAbxcwDDWlcAINc58DLhObRZe065B1cdEqG
+	ZP+43nG84v9bqVD16SGFjoJDHQ==
+X-Google-Smtp-Source: APXvYqy8gXc5B34agVJd8MihQzZ560DKc9MAxgRaLT3m/yqdq3lcgFJOCGutCDsGYvDH6lSxVK08Ow==
+X-Received: by 2002:a62:19c3:: with SMTP id 186mr85403794pfz.172.1555435380730;
+	Tue, 16 Apr 2019 10:23:00 -0700 (PDT)
+Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
+	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
+	w10sm53683820pfi.126.2019.04.16.10.22.58
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 10:22:59 -0700 (PDT)
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org
+References: <20190401031155.21293-1-richard.henderson@linaro.org>
+	<20190401031155.21293-4-richard.henderson@linaro.org>
+	<c6b66db9-24d5-b55b-8b45-e73f3d7c3fba@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <50effb1c-3bbe-126b-9bfb-0b65eacc9c36@linaro.org>
+Date: Tue, 16 Apr 2019 07:22:55 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <c6b66db9-24d5-b55b-8b45-e73f3d7c3fba@mail.uni-paderborn.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 16 Apr 2019 17:20:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
- handling
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH for-4.1 3/8] target/riscv: Merge argument
+ sets for insn32 and insn16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,50 +100,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>,
-	qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, palmer@sifive.com, Alistair.Francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416172014.9F7RxPUaH3BYXBNT_9_4Un4f2T8qlvuW2EzQdamxKf4@z>
+Message-ID: <20190416172255.OzdDZa6rXjdG4J1WMi2F46AoP2xy9Ch8v9pqq9m0e5g@z>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On 4/16/19 2:02 AM, Bastian Koppelmann wrote:
+> 
+> On 4/1/19 5:11 AM, Richard Henderson wrote:
+>>     # *** RV64C Standard Extension (Quadrant 0) ***
+>>   c_addi4spn        000    ........ ... 00 @ciw
+>> -c_fld             001  ... ... .. ... 00 @cl_d
+>> -c_lw              010  ... ... .. ... 00 @cl_w
+>> +fld               001  ... ... .. ... 00 @cl_d
+>> +lw                010  ... ... .. ... 00 @cl_w
+> 
+> This leads to a redefinition of arg_lw and arg_fld for which clang emits a
+> warning as found by Peter as he wanted to merge the original pull request for
+> RISC-V-dt. The same goes for all other merged args.
 
->> I can't find usb-mtp sending a "I/O error" on an error condition
->> for the objectinfo phase. It might be libmtp or even the command itself
->> failing for some reason. For incomplete transfer, I just checked, it's
->> spitting out the error message correctly as INCOMPLETE_FILE_TRANSFER.
->>=20
->> With libmtp version 1.13 on a FC24 guest, here's the output:
->>=20
->> $ mtp-sendfile test.txt test.img
->> libmtp version: 1.1.13
->>=20
->> Device 0 (VID=3D46f4 and PID=3D0004) is UNKNOWN in libmtp v1.1.13.
->> Please report this VID/PID and the device model to the libmtp developmen=
-t team
->> ignoring libusb_claim_interface() =3D -6PTP_ERROR_IO: failed to open ses=
-sion, trying again after resetting USB interface
->> LIBMTP libusb: Attempt to reset device
->> Sending test.txt to test.img
->> type: txt, 44
->> Sending file...
->> Progress: 322 of 322 (100%)
->> New file ID: 7
->>=20
->> What guest is this ? I can try to reproduce.
->
-> This was Fedora 26, so technically it is end of life, but then so
-> is your F24 guest :-)
->
-> Should really check with a modern guest like Fedora 29 or rawhide.
->
-I had a F28 guest and here, mtp-sendfile appears to succeed but no file is =
-written
-However, nautilus works fine, it doesn't appear like an issue with libmtp
-or Qemu.
+I thought that would be handled by the #pragma, but it seems
+that we need another one for clang-6.
 
-> Regards,
-> Daniel
+
+r~
+
+
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index fb66e886bf..c96c616539 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -695,6 +695,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+  */
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wredundant-decls"
++#pragma GCC diagnostic ignored "-Wtypedef-redefinition"
+
+ #include "decode_insn16.inc.c"
+
+
 
