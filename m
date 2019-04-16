@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54510)
+Received: from eggs.gnu.org ([209.51.188.92]:56334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGHML-0007mi-0C
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:14:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGHVG-0000rQ-VK
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:23:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGHMJ-0006zy-IK
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:14:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60220)
+	(envelope-from <armbru@redhat.com>) id 1hGHVG-0003Ck-3a
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:23:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGHMI-0006wR-Ls
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:14:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F123C30832E8
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 06:14:13 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGHVF-0003CF-Sl
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:23:34 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20190411152520.10061-1-armbru@redhat.com>
-	<20190411152520.10061-10-armbru@redhat.com>
-	<20190415154342.GM2852@work-vm>
-Date: Tue, 16 Apr 2019 08:14:12 +0200
-In-Reply-To: <20190415154342.GM2852@work-vm> (David Alan Gilbert's message of
-	"Mon, 15 Apr 2019 16:43:44 +0100")
-Message-ID: <871s228ojv.fsf@dusky.pond.sub.org>
+	<20190411152520.10061-11-armbru@redhat.com>
+	<20190415155306.GN2852@work-vm>
+Date: Tue, 16 Apr 2019 08:23:30 +0200
+In-Reply-To: <20190415155306.GN2852@work-vm> (David Alan Gilbert's message of
+	"Mon, 15 Apr 2019 16:53:07 +0100")
+Message-ID: <87tvey79jx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 09/17] target: Simplify how the
- TARGET_cpu_list() print
+Subject: Re: [Qemu-devel] [PATCH 10/17] target: Clean up how the dump_mmu()
+ print
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +30,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
 > * Markus Armbruster (armbru@redhat.com) wrote:
->> The various TARGET_cpu_list() take an fprintf()-like callback and a
->> FILE * to pass to it.  Their callers (vl.c's main() via list_cpus(),
->> bsd-user/main.c's main(), linux-user/main.c's main()) all pass
->> fprintf() and stdout.  Thus, the flexibility provided by the (rather
->> tiresome) indirection isn't actually used.
+>> The various dump_mmu() take an fprintf()-like callback and a FILE * to
+>> pass to it, and so do their helper functions.  Passing around callback
+>> and argument is rather tiresome.
 >> 
->> Drop the callback, and call qemu_fprintf() instead.
+>> Most dump_mmu() are called only by the target's hmp_info_tlb().  These
+>> all pass monitor_printf() cast to fprintf_function and the current
+>> monitor cast to FILE *.
+>> 
+>> SPARC's dump_mmu() gets also called from target/sparc/ldst_helper.c a
+>> few times #ifdef DEBUG_MMU.  These calls pass fprintf() and stdout.
 >
-> Actually calling qemu_printf
+> You might want to fixup the DPRINTF_MMU in ldst_helper.c to also
+> use qemu_printf.
 
-Typo, will fix.  Thanks!
+Hmm.  Makes DPRINTF_MMU() consistent with how dump_mmu() prints, but
+inconsistent with how the other DPRINTF_*() print.  Dunno...
 
->> Calling printf() would also work, but would make the code unsuitable
->> for monitor context without making it simpler.
+All that debug code should really be tracepoints of course.
+
+I'll leave DPRINTF_MMU() alone unless a maintainer (cc'ed) wants me to
+update it.
+
+>> The type-punning is technically undefined behaviour, but works in
+>> practice.  Clean up: drop the callback, and call qemu_printf()
+>> instead.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
-> Gernally OK; but just checking - are there any flag combos that will
-> mean this ends up with the result going down a monitor rather than
-> stdout, and will that upset something like libvirt that might be using
-> this to enumerate a cpu list?
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-No.
-
-qemu_printf() prints to current monitor if we have one, else to stdout.
-Thus, it prints to stdout as long as !cur_mon.
-
-cur_mon is thread-local, and always set like this:
-
-    Monitor *old_mon = cur_mon;
-    cur_mon = ... non-null value ...
-    ... do something ...
-    cur-mon = old_mon;
-
-It's set and restored
-
-* in monitor_qmp_dispatch() around executing a QMP command
-
-* in monitor_read() around handling HMP input (this includes executing
-  a command)
-
-* in qmp_human_monitor_command() around executing the HMP command (this
-  is where monitors become nested)
-
-Therefore, cur_mon is null unless we're executing a QMP command, an HMP
-command, or are processing HMP input.
-
-Clearer now?
+Thanks!
