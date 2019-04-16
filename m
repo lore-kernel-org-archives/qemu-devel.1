@@ -2,61 +2,67 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,TRACKER_ID,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1B7C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E13C282DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:29:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60F10206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:25:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F10206B6
+	by mail.kernel.org (Postfix) with ESMTPS id D9BF620821
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:29:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9BF620821
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41606 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41665 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGTiJ-0006vW-Dt
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 15:25:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55397)
+	id 1hGTls-0001gV-V1
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 15:29:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTE2-0005kg-HG
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:54:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGTkV-0000fZ-JS
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:28:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTE1-0006Ps-Hl
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:54:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35388)
+	(envelope-from <armbru@redhat.com>) id 1hGTkU-0007zh-Lv
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:28:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGTE1-0006P7-9E; Tue, 16 Apr 2019 14:54:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGTkU-0007yo-Dn
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:28:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 860AC3092669;
-	Tue, 16 Apr 2019 18:54:32 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 09F1D5D707;
-	Tue, 16 Apr 2019 18:54:30 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 20:52:59 +0200
-Message-Id: <20190416185301.25344-40-david@redhat.com>
-In-Reply-To: <20190416185301.25344-1-david@redhat.com>
-References: <20190416185301.25344-1-david@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A667A3082133;
+	Tue, 16 Apr 2019 19:28:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6812B1001E8C;
+	Tue, 16 Apr 2019 19:28:02 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id EDA5E1138648; Tue, 16 Apr 2019 21:28:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+References: <20190416153850.5186-1-armbru@redhat.com>
+	<5ee06a0b-90bc-602d-5ee3-3bb3f80f2f6c@redhat.com>
+Date: Tue, 16 Apr 2019 21:28:00 +0200
+In-Reply-To: <5ee06a0b-90bc-602d-5ee3-3bb3f80f2f6c@redhat.com> (Eric Blake's
+	message of "Tue, 16 Apr 2019 10:50:41 -0500")
+Message-ID: <87h8ax3g3j.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 16 Apr 2019 18:54:32 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 16 Apr 2019 19:28:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 39/41] s390x/tcg: Implement VECTOR SUM
- ACROSS QUADWORD
+Subject: Re: [Qemu-devel] [PATCH] error: Fix error_report_err(),
+ warn_report_err() hint printing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,82 +74,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416185259.voWymKOFB_6qskB9J_KktjbMqcxdUFfAueN0EJp8_Bw@z>
+Message-ID: <20190416192800.D_gJThYa8NDljlodoDhnfE_xM2NEUcu6pcQ-jbvi3bE@z>
 
-Similar to VECTOR SUM ACROSS DOUBLEWORD, however without a loop and
-using 128-bit calculations.
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+> On 4/16/19 10:38 AM, Markus Armbruster wrote:
+>> Before the from qerror_report() to error_setg(), hints looked like
+>
+> s/the from/the change from/
+>
+>> this:
+>> 
+>>     qerror_report(QERR_MACRO, ... arguments ...);
+>>     error_printf_unless_qmp(... hint ...);
+>> 
+>> error_printf_unless_qmp() made perfect sense: it printed exactly when
+>> qerror_report() did.
+>> 
+>> After the conversion to error_setg():
+>
+> Commit id?
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index dd37003082..2483ee01d7 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1184,6 +1184,8 @@
-     F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
- /* VECTOR SUM ACROSS DOUBLEWORD */
-     F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
-+/* VECTOR SUM ACROSS QUADWORD */
-+    F(0xe767, VSUMQ,   VRR_c, V,   0, 0, 0, 0, vsumq, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 1c781bcd68..82ab42d2d9 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2334,3 +2334,35 @@ static DisasJumpType op_vsumg(DisasContext *s, Dis=
-asOps *o)
-     tcg_temp_free_i64(tmp);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vsumq(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    const uint8_t max_idx =3D NUM_VEC_ELEMENTS(es) - 1;
-+    TCGv_i64 sumh, suml, zero, tmpl;
-+    uint8_t idx;
-+
-+    if (es < ES_32 || es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    sumh =3D tcg_const_i64(0);
-+    suml =3D tcg_temp_new_i64();
-+    zero =3D tcg_const_i64(0);
-+    tmpl =3D tcg_temp_new_i64();
-+
-+    read_vec_element_i64(suml, get_field(s->fields, v3), max_idx, es);
-+    for (idx =3D 0; idx <=3D max_idx; idx++) {
-+        read_vec_element_i64(tmpl, get_field(s->fields, v2), idx, es);
-+        tcg_gen_add2_i64(suml, sumh, suml, sumh, tmpl, zero);
-+    }
-+    write_vec_element_i64(sumh, get_field(s->fields, v1), 0, ES_64);
-+    write_vec_element_i64(suml, get_field(s->fields, v1), 1, ES_64);
-+
-+    tcg_temp_free_i64(sumh);
-+    tcg_temp_free_i64(suml);
-+    tcg_temp_free_i64(zero);
-+    tcg_temp_free_i64(tmpl);
-+    return DISAS_NEXT;
-+}
---=20
-2.20.1
+Many.  From the cover letter of the series that finally killed
+qerror_report: "After a bit over a year and many patches, QError is
+finally ripe."
 
+Here are two known to have messed up hints (commit 50b7b000c91 says so):
+
+7216ae3d1a11e07192623ad04d450e98bf1f3d10
+d282842999b914c38c8be4659012aa619c22af8b
+
+>> 
+>>     error_setg(errp, QERR_MACRO, ... arguments ...);
+>>     error_printf_unless_qmp(... hint ...);
+>> 
+>> The "unless QMP part" still made some sense; in QMP context, the
+>> caller generally uses the error as QMP response instead of printing
+>> it.
+>> 
+>> However, everything else is wrong.  If the caller handles the error,
+>> the hint gets printed anyway (unless QMP).  If the caller reports the
+>> error, the hint gets printed *before* the report (unless QMP) or not
+>> at all (if QMP).
+>> 
+>> Commit 50b7b000c91 fixed this by making hints a member of Error.  It
+>
+> Belongs to 2.5.0.
+>
+>> kept printing hints with error_printf_unless_qmp():
+>> 
+>>      void error_report_err(Error *err)
+>>      {
+>> 	 error_report("%s", error_get_pretty(err));
+>>     +    if (err->hint) {
+>>     +        error_printf_unless_qmp("%s\n", err->hint->str);
+>>     +    }
+>> 	 error_free(err);
+>>      }
+>> 
+>> This is wrong.  We should (and now can) print the hint exactly when we
+>> print the error.
+>> 
+>> The mistake has since been copied to warn_report_err().
+>
+> Commit id?
+
+e43ead1d0b9c467af4a2af8f5177316a0ccb5602
+
+>> 
+>> Fix both to use error_printf().
+>> 
+>> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  util/error.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> 
+>
+> Probably too late for 4.0-rc4. Then again, it regressed in 2.5, so
+> having yet one more release with the lame output doesn't hurt.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
 
