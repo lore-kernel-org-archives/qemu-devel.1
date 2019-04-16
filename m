@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56513)
+Received: from eggs.gnu.org ([209.51.188.92]:60397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGP70-00021k-Kv
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGPQ0-0006Dw-Ae
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGP6z-0004aL-Kb
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48938)
+	(envelope-from <bounces@canonical.com>) id 1hGPPz-00030o-AR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGP6z-0004ZR-Dg
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:01 -0400
+	id 1hGPPz-0002yM-20
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGP6x-0007Uk-66
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:30:59 +0000
+	id 1hGPPx-0001tR-GY
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:50:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 23CA52E80CB
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:30:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A7B92E80CC
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:50:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 14:17:17 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 14:41:31 -0000
+From: TimeMaster <timemaster@trillinis.com>
 Reply-To: Bug 1824768 <1824768@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155531602468.14046.8896369782282114161.malonedeb@gac.canonical.com>
-Message-Id: <155542423775.21329.1334631485013398012.malone@soybean.canonical.com>
+Message-Id: <155542569115.14094.5882527741991186132.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1824768] Re: Qemu ARMv7 TCG MultiThreading for
  i386 guest doesn't work
@@ -39,16 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implementing a stronger guest memory model than the host has is tricky
--- we would need to emit barrier instructions after each guest load or
-store, which would slow down straight-line execution speed by quite a
-lot, perhaps by so much that it would outweigh the gain from being able
-to run more than one thread at once. (Perhaps some of the armv8 load-
-acquire/store-release insns would help, but they're no good to you on a
-v7 CPU.)
+Yes, I can imagine that.
 
-There aren't many people overall who want to try to run emulation on
-anything other than x86 host.
+Unfortunately, my programming knowledge isn't so strong to help you with
+it. But can help with testing if it is useful.
+
+Alex Benn=C3=A9e pointed me to this patch: =
+
+[RFC,v3,4/5] mttcg: Implement implicit ordering semantics
+
+Which maybe could help. I can try to compile it and do the requested
+tests.
 
 -- =
 
