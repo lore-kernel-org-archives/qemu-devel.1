@@ -2,75 +2,68 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C417C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC90AC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 603CA20870
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:33:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603CA20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D5F220870
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5F220870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37014 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37016 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGOD5-0006tQ-BG
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:33:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43428)
+	id 1hGODO-00078T-MT
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:33:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOAb-0005Wc-Mz
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1hGO4B-0000Dk-O7
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOAa-0001uY-Cx
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGOAa-0001tu-5b
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGOAY-0006Ah-St
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:30:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D640B2E80CD
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:30:38 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1hGO47-0005Ki-GL
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:24:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>)
+	id 1hGO44-0005DC-5m; Tue, 16 Apr 2019 09:23:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7658A307CB3F;
+	Tue, 16 Apr 2019 13:23:44 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D06171001F41;
+	Tue, 16 Apr 2019 13:23:40 +0000 (UTC)
+Date: Tue, 16 Apr 2019 14:23:37 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <20190416132337.GN31311@redhat.com>
+References: <cover.1554937288.git.alistair.francis@wdc.com>
+	<efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 13:20:43 -0000
-From: diddly <dflogeras2@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dflogeras2 liuke schneiderit
-X-Launchpad-Bug-Reporter: Kan Li (liuke)
-X-Launchpad-Bug-Modifier: diddly (dflogeras2)
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155542084365.21129.3132847180218761017.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a62b48de3f27deae077b045d4932588e4ce3edc3
+Content-Disposition: inline
+In-Reply-To: <efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 16 Apr 2019 13:23:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1805913] Re: readdir() returns NULL
- (errno=EOVERFLOW) for 32-bit user-static qemu on 64-bit host
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 2/6] target/riscv: Fall back to
+ generating a RISC-V CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,71 +72,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
+	"palmer@sifive.com" <palmer@sifive.com>,
+	"qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"ijc@hellion.org.uk" <ijc@hellion.org.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416132043.JamNVH_c9CCW4eCS_ypjTuC1bGWekehPEwDVNDxLaSk@z>
+Message-ID: <20190416132337.Lh2RdTJ6xqmh48NVp9VhHmRe9sPBB93lMee9Gr3JlAQ@z>
 
-https://lkml.org/lkml/2018/12/27/155
+On Wed, Apr 10, 2019 at 11:10:25PM +0000, Alistair Francis wrote:
+> If a user specifies a CPU that we don't understand then we want to fall
+> back to a CPU generated from the ISA string.
+> 
+> At the moment the generated CPU is assumed to be a privledge spec
+> version 1.10 CPU with an MMU. This can be changed in the future.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> v3:
+>  - Ensure a minimal length so we don't run off the end of the string.
+>  - Don't parse the rv32/rv64 in the loop
+>  target/riscv/cpu.c | 101 ++++++++++++++++++++++++++++++++++++++++++++-
+>  target/riscv/cpu.h |   2 +
+>  2 files changed, 102 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d61bce6d55..27be9e412a 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -19,6 +19,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/log.h"
+> +#include "qemu/error-report.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "qapi/error.h"
+> @@ -103,6 +104,99 @@ static void set_resetvec(CPURISCVState *env, int resetvec)
+>  #endif
+>  }
+>  
+> +static void riscv_generate_cpu_init(Object *obj)
+> +{
+> +    RISCVCPU *cpu = RISCV_CPU(obj);
+> +    CPURISCVState *env = &cpu->env;
+> +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
+> +    const char *riscv_cpu = mcc->isa_str;
+> +    target_ulong target_misa = 0;
+> +    target_ulong rvxlen = 0;
+> +    int i;
+> +    bool valid = false;
+> +
+> +    /*
+> +     * We need at least 5 charecters for the string to be valid. Check that
+> +     * now so we can be lazier later.
+> +     */
+> +    if (strlen(riscv_cpu) < 5) {
+> +        error_report("'%s' does not appear to be a valid RISC-V ISA string",
+> +                     riscv_cpu);
+> +        exit(1);
+> +    }
+> +
+> +    if (riscv_cpu[0] == 'r' && riscv_cpu[1] == 'v') {
+> +        /* Starts with "rv" */
+> +        if (riscv_cpu[2] == '3' && riscv_cpu[3] == '2') {
+> +            valid = true;
+> +            rvxlen = RV32;
+> +        }
+> +        if (riscv_cpu[2] == '6' && riscv_cpu[3] == '4') {
+> +            valid = true;
+> +            rvxlen = RV64;
+> +        }
+> +    }
+> +
+> +    if (!valid) {
+> +        error_report("'%s' does not appear to be a valid RISC-V CPU",
+> +                     riscv_cpu);
+> +        exit(1);
+> +    }
+> +
+> +    for (i = 4; i < strlen(riscv_cpu); i++) {
+> +        switch (riscv_cpu[i]) {
+> +        case 'i':
+> +            if (target_misa & RVE) {
+> +                error_report("I and E extensions are incompatible");
+> +                exit(1);
+> +            }
+> +            target_misa |= RVI;
+> +            continue;
+> +        case 'e':
+> +            if (target_misa & RVI) {
+> +                error_report("I and E extensions are incompatible");
+> +                exit(1);
+> +            }
+> +            target_misa |= RVE;
+> +            continue;
+> +        case 'g':
+> +            target_misa |= RVI | RVM | RVA | RVF | RVD;
+> +            continue;
+> +        case 'm':
+> +            target_misa |= RVM;
+> +            continue;
+> +        case 'a':
+> +            target_misa |= RVA;
+> +            continue;
+> +        case 'f':
+> +            target_misa |= RVF;
+> +            continue;
+> +        case 'd':
+> +            target_misa |= RVD;
+> +            continue;
+> +        case 'c':
+> +            target_misa |= RVC;
+> +            continue;
+> +        case 's':
+> +            target_misa |= RVS;
+> +            continue;
+> +        case 'u':
+> +            target_misa |= RVU;
+> +            continue;
+> +        default:
+> +            warn_report("QEMU does not support the %c extension",
+> +                        riscv_cpu[i]);
+> +            continue;
+> +        }
+> +    }
+> +
+> +    set_misa(env, rvxlen | target_misa);
+> +    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> +    set_resetvec(env, DEFAULT_RSTVEC);
+> +    set_feature(env, RISCV_FEATURE_MMU);
+> +    set_feature(env, RISCV_FEATURE_PMP);
+> +}
 
--- =
+This whole approach feels undesirable to me, as it is quite different to
+way CPUs are represented in the other architectures in QEMU and as a result
+does not fit in the QAPI commands we've been building in QEMU for dealing
+with CPU model representation. This will make for increased maint burden
+in both QEMU and apps managing QEMU
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
+IIUC, this code is taking an arbitrary CPU model string and looking
+at individual characters in that string & turning on individual features
+according to what characters it sees. There's several problems with this
 
-Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
+ - There's no way to enumerate valid CPU model names
 
-Status in QEMU:
-  New
+ - There can be many different names that all result
+   in the same CPU model. eg "fdcs", "scdf", a"ffddccss"
+   all result in the same features getting enabled
+   by this loop above.
 
-Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
+ - There's no way to check compatibility between CPUs
 
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
+ - There will be no way to version the CPUs if we need
+   to tie them to machine types for back compatibility.
 
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
+If we have a base CPU model, with a bunch of features that can optionally
+be enabled, then IMHO we should represent that the same way was we do
+on x86, whre we have a CPU model name, and then a comma sepaprated list
+of features.
 
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
+If on the other hand we don't want to support the combinatorial matrix
+of all possible feature flags, then we should just list all the expected
+named CPU models that are required explicitly.
 
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
-
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
-
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
