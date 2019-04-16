@@ -2,80 +2,72 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDAAC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1741FC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:40:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36077205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:39:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d87ipYoQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36077205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D88A4205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:40:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88A4205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38615 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38619 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGQBY-0004uq-Ge
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:39:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41791)
+	id 1hGQC4-0005Eb-5r
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:40:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGQAC-0004Cs-Ck
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGQAb-0004SY-BJ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGQAB-0000YJ-C7
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:24 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:43118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGQAA-0000Ur-Rm
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:23 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id t81so17331678oig.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=3dRX2ZVJjnc63D9aV1WFofCsH5TIO9/qmrOMac70/Y0=;
-	b=d87ipYoQxSasiZPS40WsfvGcL1clFpZX6EQ7xr7pAurh1vRcgwLab0FoR/xZbR5oYh
-	YOp/Y7B2yCGq2vbtFTgQA6JKEpUwtQ/SP9HcSQ6MfmX4c2UMS4xwPllLFf6bQHUaBDiA
-	JrMgtLG41XDJJ6lhotw5mFLLZ82driaX66WtjvGBv3hjx8BtNomkK+fbBnKu/u6+nyYL
-	i9iCjQ33CKzcWG883ctcEtM54j+Q7nZvEDEV9crOVC6fNfrGD6//9YX0iSrSfM13jzZa
-	hlcGHdPxEvkJQd26pelKgupNQ+P3kDpcHE1FfnlpuJBBQlIXBwrKQFck2OIq+vmEvdTU
-	cXww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=3dRX2ZVJjnc63D9aV1WFofCsH5TIO9/qmrOMac70/Y0=;
-	b=Ad8uuNGt4bAoqM83YzsjdKsw7XN73Y7+0t4Sxgu9AcW4gLActZE7aoz8O0unaq5Ghe
-	TFOCYkKRBFHJhA9T1IFh3rFnxIQ701ynsJ9QgctcVvNY1sgWZ4soIRHDSrzj0/J4xiIY
-	1x+NW5cWPUB0M1l4rIR4RqCZ/JT8GpJEhWxLOqy//qkjfqOQv8bRxqVA3uizN4SpzV8D
-	+MUNq593Mm6/m1zEoAyRJHnZWFT57j5+25fv+hbxPDizyjevfY5apkXTm+THuoZYxXAw
-	9rZPFE/x3I28UZn6wdY/XWgM8evckA1tlAYqM7XsiJhFxA0iTydaoRhfdtMGIqlPTH/P
-	y6YA==
-X-Gm-Message-State: APjAAAWxBRVHJnF+1HrPaonShyO5a+qp8oJov4IsBjfDuki6Qag1xUt4
-	mtxpnmSIC2g0gCXhKY5+ASlCmeLMe63VZ+CLCqZbVg==
-X-Google-Smtp-Source: APXvYqwJoJJtc0gFMOpn60ytpIkKUVjJqCyJlEcQOOvTuwZoLqBG6rjzaqy8+zBVglrjRMMZ3SfXs28Mgtch/2V7wF8=
-X-Received: by 2002:aca:e054:: with SMTP id x81mr23158378oig.146.1555429098311;
-	Tue, 16 Apr 2019 08:38:18 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hGQAa-0000jv-5T
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGQAZ-0000jd-Re
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 149792D808;
+	Tue, 16 Apr 2019 15:38:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B28275D71A;
+	Tue, 16 Apr 2019 15:38:46 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 463671138648; Tue, 16 Apr 2019 17:38:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
+	<87zhorbytu.fsf@dusky.pond.sub.org>
+	<3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
+	<874l6za00z.fsf@dusky.pond.sub.org>
+	<e432f8cf-4014-8175-4a56-167a14534528@virtuozzo.com>
+	<87k1fu791j.fsf@dusky.pond.sub.org>
+	<da576bee-8ed5-13d9-7f29-74110d6ccb4b@virtuozzo.com>
+Date: Tue, 16 Apr 2019 17:38:45 +0200
+In-Reply-To: <da576bee-8ed5-13d9-7f29-74110d6ccb4b@virtuozzo.com> (Vladimir
+	Sementsov-Ogievskiy's message of "Tue, 16 Apr 2019 06:38:17 +0000")
+Message-ID: <87a7gq55a2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190416142802.11990-1-kwolf@redhat.com>
-In-Reply-To: <20190416142802.11990-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 16:38:07 +0100
-Message-ID:
- <CAFEAcA_=qyZZLj2sVacnCP0pEpkzSVwsA5YKk6VhB+0Z4HvPvg@mail.gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
-Subject: Re: [Qemu-devel] [PULL 0/1] qcow2: Fix potential corruption with
- external data file
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Tue, 16 Apr 2019 15:38:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
+ error_abort
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,40 +79,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416153807._Fe2Z8KGEKbSwEqkuVf4iFwyQZ1mLGgmVGIoDzfGXvs@z>
+Message-ID: <20190416153845.ZfG7iCgokTyrppgmatxAxi3JD7ZBglZ98q1YqsabLWQ@z>
 
-On Tue, 16 Apr 2019 at 15:28, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit a9b305ba291fb74f7ff732b3d7b8f4c812431ddf:
->
->   socket: allow wait=false for client socket (2019-04-16 10:40:43 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 93e32b3e2012a668e4da1c2566d2935c24060435:
->
->   qcow2: Fix preallocation bdrv_pwrite to wrong file (2019-04-16 16:23:24 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qcow2: Fix potential corruption for preallocated resize with external data file
->
-> ----------------------------------------------------------------
-> Kevin Wolf (1):
->       qcow2: Fix preallocation bdrv_pwrite to wrong file
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Applied, thanks.
+> 16.04.2019 9:34, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>> 
+>>> 15.04.2019 16:08, Markus Armbruster wrote:
+>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>
+>>>>> 15.04.2019 8:51, Markus Armbruster wrote:
+>>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>>>
+>>>>>>> It would be nice to have Error object not freed away when debugging a
+>>>>>>> coredump.
+>>>>>>>
+>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>>> ---
+>>>>>>>     util/error.c | 8 +++++---
+>>>>>>>     1 file changed, 5 insertions(+), 3 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/util/error.c b/util/error.c
+>>>>>>> index 934a78e1b1..f9180c0f30 100644
+>>>>>>> --- a/util/error.c
+>>>>>>> +++ b/util/error.c
+>>>>>>> @@ -32,9 +32,11 @@ Error *error_fatal;
+>>>>>>>     static void error_handle_fatal(Error **errp, Error *err)
+>>>>>>>     {
+>>>>>>>         if (errp == &error_abort) {
+>>>>>>> -        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
+>>>>>>> -                err->func, err->src, err->line);
+>>>>>>> -        error_report_err(err);
+>>>>>>> +        error_report("Unexpected error in %s() at %s:%d: %s",
+>>>>>>> +                     err->func, err->src, err->line, error_get_pretty(err));
+>>>>>>> +        if (err->hint) {
+>>>>>>> +            error_printf_unless_qmp("%s", err->hint->str);
+>>>>>>> +        }
+>>>>>>>             abort();
+>>>>>>>         }
+>>>>>>>         if (errp == &error_fatal) {
+>>>>>>
+>>>>>> No objections to not freeing the error object on the path to abort().
+>>>>>>
+>>>>>> You also format the error message differently.  Commit 1e9b65bb1ba's
+>>>>>> example
+>>>>>>
+>>>>>>            Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322:
+>>>>>>            qemu-system-x86_64: -drive if=none,werror=foo: 'foo' invalid write error action
+>>>>>>            Aborted (core dumped)
+>>>>>>
+>>>>>> changes to (guesswork, not tested):
+>>>>>>
+>>>>>>            qemu-system-x86_64: -drive if=none,werror=foo: Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322: 'foo' invalid write error action
+>>>>>>            Aborted (core dumped)
+>>>>>
+>>>>> hm. checkpatch don't allow to put \n into error_report. So, should I call error_report twice?
+>>>>>
+>>>>> Transition from fprintf to error_report is OK for you?
+>>>>
+>>>> Let's simply not mess with the formatting at all.  Something like:
+>>>>
+>>>> (1) Inline error_report_err(), delete the error_free()
+>>>>
+>>>> (2) Optional: replace fprintf() by error_printf()
+>>>>
+>>>> (3) Optional: clean up the additional copy of
+>>>>
+>>>>           if (err->hint) {
+>>>>               error_printf_unless_qmp("%s", err->hint->str);
+>>>>           }
+>>>>
+>>>> (3a) Either create a helper function, replacing all three copies,
+>>>>
+>>>> (3b) Or simply delete the new copy from the path leading to abort(),
+>>>>        since the hint is unlikely to be useful there.
+>>>>
+>>>
+>>> Why we print error always but hint only "unless_qmp"?
+>> 
+>> "Hints" are intended for giving hints to a human user (although they are
+>> misused for other purposes in places):
+>> 
+>> /*
+>>   * Append a printf-style human-readable explanation to an existing error.
+>>   * If the error is later reported to a human user with
+>>   * error_report_err() or warn_report_err(), the hints will be shown,
+>>   * too.  If it's reported via QMP, the hints will be ignored.
+>>   * Intended use is adding helpful hints on the human user interface,
+>>   * e.g. a list of valid values.  It's not for clarifying a confusing
+>>   * error message.
+>>   * @errp may be NULL, but not &error_fatal or &error_abort.
+>>   * Trivially the case if you call it only after error_setg() or
+>>   * error_propagate().
+>>   * May be called multiple times.  The resulting hint should end with a
+>>   * newline.
+>>   */
+>> void error_append_hint(Error **errp, const char *fmt, ...)
+>>      GCC_FMT_ATTR(2, 3);
+>> 
+>
+> Hmm, this means, that in error_report_err checking for qmp monitor is wrong thing,
+> as error_report_err is exactly for human user who will read qemu log and will need
+> maximum information.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+You're right.  I'll post a patch.
 
