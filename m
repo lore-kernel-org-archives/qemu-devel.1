@@ -2,48 +2,49 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FB3C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CA9C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E5020645
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:10:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E5020645
+	by mail.kernel.org (Postfix) with ESMTPS id 77C2320645
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:11:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C2320645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33508 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33523 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGK6u-0002ic-5H
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:10:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42718)
+	id 1hGK86-0003c4-NY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:11:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGK3w-0000tG-CR
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:07:33 -0400
+	(envelope-from <david@redhat.com>) id 1hGK6t-0002y3-Vx
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGK3v-0001eD-IM
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:07:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34318)
+	(envelope-from <david@redhat.com>) id 1hGK6t-0002vp-1E
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:10:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGK3v-0001cy-12; Tue, 16 Apr 2019 05:07:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hGK6s-0002ut-Kn; Tue, 16 Apr 2019 05:10:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45361BCD24;
-	Tue, 16 Apr 2019 09:07:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC0D73086229;
+	Tue, 16 Apr 2019 09:10:33 +0000 (UTC)
 Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CED4A5D9CA;
-	Tue, 16 Apr 2019 09:07:26 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 81F19104C512;
+	Tue, 16 Apr 2019 09:10:31 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-14-david@redhat.com>
-	<fb483994-1809-d628-df9b-983736c66315@linaro.org>
+	<20190411100836.646-16-david@redhat.com>
+	<1365cc84-fdb6-3a36-9b5f-6921f04423e0@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <693811a2-6d4f-b281-c6f4-ff70a7f6cbd1@redhat.com>
-Date: Tue, 16 Apr 2019 11:07:26 +0200
+Message-ID: <190241b2-efbe-c700-32dd-180ac0d25150@redhat.com>
+Date: Tue, 16 Apr 2019 11:10:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <fb483994-1809-d628-df9b-983736c66315@linaro.org>
+In-Reply-To: <1365cc84-fdb6-3a36-9b5f-6921f04423e0@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Tue, 16 Apr 2019 09:07:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 16 Apr 2019 09:10:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 13/41] s390x/tcg: Implement VECTOR COUNT
- TRAILING ZEROS
+Subject: Re: [Qemu-devel] [PATCH v1 15/41] s390x/tcg: Implement VECTOR
+ GALOIS FIELD MULTIPLY SUM (AND ACCUMULATE)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -123,12 +124,46 @@ Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416090726.QyGxYuaq03gy7-H58j1s9fZ0vPZkQaAfQQirVqwZ67M@z>
+Message-ID: <20190416091030.klEGgdQKotaN8qrpPWHViaboFOYFpBf9F_lOQ6OkBVk@z>
 
-On 13.04.19 01:23, Richard Henderson wrote:
-> a ? ctz32(a) : BITS
+On 13.04.19 01:44, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> A galois field multiplication in field 2 is like binary multiplication,
+>> however instead of doing ordinary binary additions, xor's are performed.
+>> So no carries are considered.
+>>
+>> Implement all variants via helpers. s390_vec_sar() and s390_vec_shr()
+>> will be reused later on.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/helper.h           |   8 ++
+>>  target/s390x/insn-data.def      |   4 +
+>>  target/s390x/translate_vx.inc.c |  38 ++++++++
+>>  target/s390x/vec_int_helper.c   | 168 ++++++++++++++++++++++++++++++++
+>>  4 files changed, 218 insertions(+)
+> 
+> FYI, this is now the 4th copy of this operation.
+> 
+>   arm: pmull
+>   x86: pclmulqdq
+>   ppc: vpmsum[bhwd]
+> 
+> We really should promote this to generic.  But that can come later,
 
-Nice catch, thanks!
+huh, I tried my best to search for anything related to galois, but seems
+like only s390x uses that terminology.  :) Well at least I learned how
+it is supposed to be calculated.
+
+Thanks!
+
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+> r~
+> 
+
 
 -- 
 
